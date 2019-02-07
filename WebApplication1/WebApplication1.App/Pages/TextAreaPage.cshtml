@@ -1,0 +1,45 @@
+﻿@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@page "/textarea"
+
+<h1>TextArea</h1>
+
+<p>This page demonstrates <b>TextArea</b> component.</p>
+<RadzenCard Style="height:600px">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>TextArea</h3>
+            <RadzenTextArea Style="margin-bottom: 20px" Change="@(args => Change(args, "TextArea"))" />
+            <br />
+            <h3>TextArea with placeholder</h3>
+            <RadzenTextArea Placeholder="Enter here..." Change="@(args => Change(args, "TextArea with placeholder"))" Style="margin-bottom: 20px" />
+            <br />
+            <h3>TextArea with 5 maximum characters</h3>
+            <RadzenTextArea MaxLength="5" Change="@(args => Change(args, "TextArea with 5 maximum characters"))" Style="margin-bottom: 20px" />
+            <br />
+            <h3>TextArea with 3 rows and 30 columns</h3>
+            <RadzenTextArea Cols="30" Rows="3" Change="@(args => Change(args, "TextArea with 3 rows and 30 columns"))" Style="margin-bottom: 20px" />
+        </div>
+        <div class="col-md-6">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+                @foreach (var e in events.OrderByDescending(i => i.Key))
+                {
+                    @e.Value
+                    <br />
+                }
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenCard>
+
+@functions {
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Change(string value, string name)
+    {
+        events.Add(DateTime.Now, $"{name} value changed to {value}");
+        StateHasChanged();
+    }
+}

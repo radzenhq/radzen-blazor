@@ -1,0 +1,153 @@
+﻿@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@page "/"
+
+@inject NorthwindContext dbContext
+
+<h1>First Look</h1>
+
+<p>This page demonstrates fetching data from the server using <b>IQueryable</b> bound to hierarchical <b>DataGrid</b> with <b>Tabs</b> and <b>DataList</b>.</p>
+
+@if (orders == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <RadzenGrid AllowFiltering="true" AllowPaging="true" PageSize="3"  AllowSorting="true" Data="@orders" TItem="Order">
+        <Template Context="order">
+            <RadzenCard Style="margin-bottom:20px">
+                Company:
+                <b>@order.Customer?.CompanyName</b>
+            </RadzenCard>
+            <RadzenTabs>
+                <Tabs>
+                    <RadzenTabsItem Text="Order Details">
+                        <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@order.OrderDetails" TItem="OrderDetail">
+                            <Columns>
+                                <RadzenGridColumn TItem="OrderDetail" Property="OrderID" SortProperty="Order.CustomerID" FilterProperty="Order.CustomerID" Title="Order" Type="string">
+                                    <Template Context="detail">
+                                        @detail?.Order?.CustomerID
+                                    </Template>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="OrderDetail" Property="ProductID" SortProperty="Product.ProductName" FilterProperty="Product.ProductName" Title="Product" Type="string">
+                                    <Template Context="detail">
+                                        @detail?.Product?.ProductName
+                                    </Template>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="OrderDetail" Format="decimal" Property="UnitPrice" Title="Unit Price" Type="number">
+                                    <Template Context="detail">
+                                        @detail?.UnitPrice
+                                    </Template>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="OrderDetail" Format="int16" Property="Quantity" Title="Quantity" Type="integer">
+                                    <Template Context="detail">
+                                        @detail?.Quantity
+                                    </Template>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="OrderDetail" Format="float" Property="Discount" Title="Discount" Type="number">
+                                    <Template Context="detail">
+                                        @detail?.Discount
+                                    </Template>
+                                </RadzenGridColumn>
+                            </Columns>
+                        </RadzenGrid>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Products">
+                        <RadzenDataList WrapItems="true" AllowPaging="true" Data="@order.OrderDetails" TItem="OrderDetail" PageSize="10">
+                            <Template Context="detail">
+                                <RadzenCard Style="width:100px;height:100px">
+                                    Product:
+                                    <b>@detail?.Product?.ProductName</b>
+                                </RadzenCard>
+                            </Template>
+                        </RadzenDataList>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </Template>
+        <Columns>
+            <RadzenGridColumn TItem="Order" Property="OrderID" Title="Order ID" Type="integer">
+                <Template Context="order">
+                    @order.OrderID
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="CustomerID" SortProperty="Customer.CompanyName" Title="Customer" Type="string">
+                <Template Context="order">
+                    @order.Customer?.CompanyName
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="EmployeeID" SortProperty="Employee.LastName" Title="Employee" Type="string">
+                <Template Context="order">
+                    <div>@order.Employee?.LastName</div>
+                    <RadzenImage Path="@order.Employee?.Photo" />
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Format="date-time" Property="OrderDate" Title="Order Date" Type="string">
+                <Template Context="order">
+                    @String.Format("{0:d}", order.OrderDate)
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Format="date-time" Property="RequiredDate" Title="Required Date" Type="string">
+                <Template Context="order">
+                    @String.Format("{0:d}", order.RequiredDate)
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Format="date-time" Property="ShippedDate" Title="Shipped Date" Type="string">
+                <Template Context="order">
+                    @String.Format("{0:d}", order.ShippedDate)
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Format="decimal" Property="Freight" Title="Freight" Type="number">
+                <Template Context="order">
+                    @order.Freight
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name" Type="string">
+                <Template Context="order">
+                    @order.ShipName
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="ShipAddress" Title="Ship Address" Type="string">
+                <Template Context="order">
+                    @order.ShipAddress
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="ShipCity" Title="Ship City" Type="string">
+                <Template Context="order">
+                    @order.ShipCity
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="ShipRegion" Title="Ship Region" Type="string">
+                <Template Context="order">
+                    @order.ShipRegion
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="ShipPostalCode" Title="Ship Postal Code" Type="string">
+                <Template Context="order">
+                    @order.ShipPostalCode
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="ShipCountry" Title="Ship Country" Type="string">
+                <Template Context="order">
+                    @order.ShipCountry
+                </Template>
+            </RadzenGridColumn>
+        </Columns>
+    </RadzenGrid>
+}
+
+@functions {
+    IEnumerable<Order> orders;
+
+    protected override async Task OnInitAsync()
+    {
+        orders = await Task.FromResult((from order in dbContext.Orders
+                    .Include("Customer")
+                    .Include("Employee")
+                    .Include("OrderDetails")
+                    .Include("OrderDetails.Product")
+                                        select order).ToList());
+    }
+}

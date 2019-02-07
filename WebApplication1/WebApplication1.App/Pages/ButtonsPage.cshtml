@@ -1,0 +1,46 @@
+﻿@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@page "/buttons"
+
+<h1>Buttons</h1>
+
+<p>This page demonstrates <b>Button</b> component.</p>
+<RadzenCard Style="height:600px">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Button with text</h3>
+            <RadzenButton Click="@((args) => Click(args, "Button with text"))" Text="Button" Style="margin-bottom: 20px; width: 150px" />
+            <br />
+            <h3>Button with text and icon</h3>
+            <RadzenButton Click="@((args) => Click(args, "Button with text and icon"))" Text="Button" Icon="account_circle" Style="margin-bottom: 20px; width: 150px" />
+            <br />
+            <h3>Button with icon</h3>
+            <RadzenButton Click="@((args) => Click(args, "Button with icon"))" Icon="account_circle" Style="margin-bottom: 20px; width: 80px" />
+            <br />
+            <h3>Button with secondary style</h3>
+            <RadzenButton Click="@((args) => Click(args, "Secondary button"))" Text="Button" ButtonStyle="secondary" Style="margin-bottom: 20px; width: 150px" />
+            <br />
+        </div>
+        <div class="col-md-6">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+                @foreach (var e in events.OrderByDescending(i => i.Key))
+                {
+                    @e.Value
+                    <br />
+                }
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenCard>
+
+@functions {
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Click(UIMouseEventArgs args, string buttonName)
+    {
+        events.Add(DateTime.Now, $"{buttonName} clicked");
+        StateHasChanged();
+    }
+}

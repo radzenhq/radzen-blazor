@@ -1,0 +1,39 @@
+﻿@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@page "/datepicker"
+
+<h1>DatePicker</h1>
+
+<p>This page demonstrates <b>DatePicker</b> component.</p>
+<RadzenCard Style="height:600px">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>DatePicker</h3>
+            <RadzenDatePicker Style="margin-bottom: 20px" Change="@(args => Change(args, "DatePicker"))" />
+            <br />
+            <h3>DatePicker with time</h3>
+            <RadzenDatePicker ShowTime="true" Change="@(args => Change(args, "DatePicker with time"))" Style="margin-bottom: 20px" />
+        </div>
+        <div class="col-md-6">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+                @foreach (var e in events.OrderByDescending(i => i.Key))
+                {
+                    @e.Value
+                    <br />
+                }
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenCard>
+
+@functions {
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Change(DateTime? value, string name)
+    {
+        events.Add(DateTime.Now, $"{name} value changed to {value}");
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,53 @@
+﻿@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@page "/checkbox"
+
+<h1>CheckBox</h1>
+
+<p>This page demonstrates <b>CheckBox</b> component.</p>
+<RadzenCard Style="height:600px">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>CheckBox</h3>
+            <RadzenCheckBox Name="CheckBox1" TriState="false" Value="@CheckBox1Value" Style="margin-bottom: 20px" Change="@(args => Change(args, "CheckBox1 CheckBox"))" /><RadzenLabel Text="CheckBox1" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 20px" />
+            <br />
+            <RadzenCheckBox Name="CheckBox2" TriState="false" Value="@CheckBox2Value" Style="margin-bottom: 20px" Change="@(args => Change(args, "CheckBox2 CheckBox"))" /><RadzenLabel Text="CheckBox2" Component="CheckBox2" Style="margin-left: 5px;margin-bottom: 20px" />
+            <br />
+            <RadzenCheckBox Name="CheckBox3" TriState="true" Change="@(args => Change(args, "TriState CheckBox"))" /><RadzenLabel Text="TriState" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox3" />
+            <br />
+        </div>
+        <div class="col-md-6">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+                @foreach (var e in events.OrderByDescending(i => i.Key))
+                {
+                    @e.Value
+                    <br />
+                }
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenCard>
+
+@functions {
+    bool CheckBox1Value = true;
+    bool CheckBox2Value = false;
+
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Change(bool? value, string name)
+    {
+        if(name.Contains("CheckBox1"))
+        {
+            CheckBox1Value = value.Value;
+        } 
+        else if(name.Contains("CheckBox2"))
+        {
+            CheckBox2Value = value.Value;
+        }
+
+        events.Add(DateTime.Now, $"{name} value changed to {value}");
+        StateHasChanged();
+    }
+}
