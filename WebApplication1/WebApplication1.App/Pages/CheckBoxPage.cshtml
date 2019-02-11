@@ -3,7 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @page "/checkbox"
 
-<h1>CheckBox</h1>
+<h1 style="display:inline">CheckBox</h1><a style="margin-left: 10px" href="https://github.com/akorchev/razor.radzen.com/blob/master/WebApplication1/WebApplication1.App/Pages/CheckBoxPage.cshtml" target="_blank">[source code]</a>
 
 <p>This page demonstrates <b>CheckBox</b> component.</p>
 <RadzenCard Style="height:600px">
@@ -38,11 +38,11 @@
 
     void Change(bool? value, string name)
     {
-        if(name.Contains("CheckBox1"))
+        if (name.Contains("CheckBox1"))
         {
             CheckBox1Value = value.Value;
-        } 
-        else if(name.Contains("CheckBox2"))
+        }
+        else if (name.Contains("CheckBox2"))
         {
             CheckBox2Value = value.Value;
         }

@@ -3,7 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @page "/numeric"
 
-<h1>Numeric</h1>
+<h1 style="display:inline">Numeric</h1><a style="margin-left: 10px" href="https://github.com/akorchev/razor.radzen.com/blob/master/WebApplication1/WebApplication1.App/Pages/NumericPage.cshtml" target="_blank">[source code]</a>
 
 <p>This page demonstrates <b>Numeric</b> component.</p>
 <RadzenCard Style="height:600px">
@@ -13,7 +13,7 @@
             <RadzenNumeric TItem="int" Style="margin-bottom: 20px" Change="@(args => Change(args, "Numeric"))" />
             <br />
             <h3>Numeric with Min set to 1 and Max set to 10</h3>
-            <RadzenNumeric  Min="1" Max="10" Value="1" TItem="int" Change="@(args => Change(args, "Numeric with Min set to 1 and Max set to 10"))" Style="margin-bottom: 20px" />
+            <RadzenNumeric Min="1" Max="10" Value="1" TItem="int" Change="@(args => Change(args, "Numeric with Min set to 1 and Max set to 10"))" Style="margin-bottom: 20px" />
             <br />
             <h3>Numeric with placeholder and 0.5 step</h3>
             <RadzenNumeric TItem="double" Placeholder="0.0" Step="0.5" Change="@(args => Change(args, "NNumeric with placeholder and 0.5 step"))" Style="margin-bottom: 20px" />
