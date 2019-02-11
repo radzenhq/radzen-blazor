@@ -68,17 +68,17 @@ else
             </RadzenTabs>
         </Template>
         <Columns>
-            <RadzenGridColumn TItem="Order" Property="OrderID" Title="Order ID" Type="integer">
+            <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" Type="integer">
                 <Template Context="order">
                     @order.OrderID
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="CustomerID" SortProperty="Customer.CompanyName" Title="Customer" Type="string">
+            <RadzenGridColumn Width="200px" TItem="Order" Property="CustomerID" SortProperty="Customer.CompanyName" Title="Customer" Type="string">
                 <Template Context="order">
                     @order.Customer?.CompanyName
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="EmployeeID" SortProperty="Employee.LastName" Title="Employee" Type="string">
+            <RadzenGridColumn Width="150px" TItem="Order" Property="EmployeeID" SortProperty="Employee.LastName" Title="Employee" Type="string">
                 <Template Context="order">
                     <div>@order.Employee?.LastName</div>
                     <RadzenImage Path="@order.Employee?.Photo" />
