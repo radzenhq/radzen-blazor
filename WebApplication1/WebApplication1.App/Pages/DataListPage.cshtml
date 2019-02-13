@@ -29,7 +29,7 @@ else
                     </div>
                     <div class="col-md-6">
                         <div>Freight:</div>
-                        <b>@String.Format(System.Globalization.CultureInfo.CurrentCulture, "{0:C}", order.Freight)</b>
+                        <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)</b>
                         <div style="margin-top:20px">Ship country:</div>
                         <b>@(order.ShipCountry)</b>
                         <div style="margin-top:20px">Ship city:</div>
