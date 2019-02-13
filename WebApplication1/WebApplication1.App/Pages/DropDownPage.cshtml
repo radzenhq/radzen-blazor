@@ -31,11 +31,11 @@
 </RadzenCard>
 
 @functions {
-    IEnumerable<dynamic> customers;
+        IEnumerable<dynamic> customers;
 
     protected override async Task OnInitAsync()
     {
-        customers = await Task.FromResult(dbContext.Customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).ToList());
+        customers = await Task.FromResult(dbContext.Customers);
     }
 
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();

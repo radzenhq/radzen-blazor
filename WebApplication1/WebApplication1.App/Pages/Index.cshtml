@@ -26,27 +26,15 @@ else
                     <RadzenTabsItem Text="Order Details">
                         <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@order.OrderDetails" TItem="OrderDetail">
                             <Columns>
-                                <RadzenGridColumn TItem="OrderDetail" Property="OrderID" SortProperty="Order.CustomerID" FilterProperty="Order.CustomerID" Title="Order" Type="string">
-                                    <Template Context="detail">
-                                        @detail?.Order?.CustomerID
-                                    </Template>
-                                </RadzenGridColumn>
-                                <RadzenGridColumn TItem="OrderDetail" Property="ProductID" SortProperty="Product.ProductName" FilterProperty="Product.ProductName" Title="Product" Type="string">
-                                    <Template Context="detail">
-                                        @detail?.Product?.ProductName
-                                    </Template>
-                                </RadzenGridColumn>
-                                <RadzenGridColumn TItem="OrderDetail" Format="decimal" Property="UnitPrice" Title="Unit Price" Type="number">
+                                <RadzenGridColumn TItem="OrderDetail" Property="Order.CustomerID" Title="Order" />
+                                <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+                                <RadzenGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
                                     <Template Context="detail">
                                         @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
                                     </Template>
                                 </RadzenGridColumn>
-                                <RadzenGridColumn TItem="OrderDetail" Format="int16" Property="Quantity" Title="Quantity" Type="integer">
-                                    <Template Context="detail">
-                                        @detail?.Quantity
-                                    </Template>
-                                </RadzenGridColumn>
-                                <RadzenGridColumn TItem="OrderDetail" Format="float" Property="Discount" Title="Discount" Type="number">
+                                <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+                                <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
                                     <Template Context="detail">
                                         @String.Format("{0}%", detail.Discount * 100)
                                     </Template>
@@ -68,72 +56,40 @@ else
             </RadzenTabs>
         </Template>
         <Columns>
-            <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" Type="integer">
-                <Template Context="order">
-                    @order.OrderID
-                </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn Width="200px" TItem="Order" Property="CustomerID" SortProperty="Customer.CompanyName" Title="Customer" Type="string">
-                <Template Context="order">
-                    @order.Customer?.CompanyName
-                </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn Width="150px" TItem="Order" Property="EmployeeID" SortProperty="Employee.LastName" Title="Employee" Type="string">
+            <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
+            <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
+            <RadzenGridColumn Width="150px" TItem="Order" Property="Employee.LastName" Title="Employee">
                 <Template Context="order">
                     <div>@order.Employee?.LastName</div>
                     <RadzenImage Path="@order.Employee?.Photo" />
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Format="date-time" Property="OrderDate" Title="Order Date" Type="string">
+            <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
                 <Template Context="order">
                     @String.Format("{0:d}", order.OrderDate)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Format="date-time" Property="RequiredDate" Title="Required Date" Type="string">
+            <RadzenGridColumn TItem="Order" Property="RequiredDate" Title="Required Date">
                 <Template Context="order">
                     @String.Format("{0:d}", order.RequiredDate)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Format="date-time" Property="ShippedDate" Title="Shipped Date" Type="string">
+            <RadzenGridColumn TItem="Order" Property="ShippedDate" Title="Shipped Date">
                 <Template Context="order">
                     @String.Format("{0:d}", order.ShippedDate)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Format="decimal" Property="Freight" Title="Freight" Type="number">
+            <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight">
                 <Template Context="order">
                     @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name" Type="string">
-                <Template Context="order">
-                    @order.ShipName
-                </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="ShipAddress" Title="Ship Address" Type="string">
-                <Template Context="order">
-                    @order.ShipAddress
-                </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="ShipCity" Title="Ship City" Type="string">
-                <Template Context="order">
-                    @order.ShipCity
-                </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="ShipRegion" Title="Ship Region" Type="string">
-                <Template Context="order">
-                    @order.ShipRegion
-                </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="ShipPostalCode" Title="Ship Postal Code" Type="string">
-                <Template Context="order">
-                    @order.ShipPostalCode
-                </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="ShipCountry" Title="Ship Country" Type="string">
-                <Template Context="order">
-                    @order.ShipCountry
-                </Template>
-            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
+            <RadzenGridColumn TItem="Order" Property="ShipAddress" Title="Ship Address" />
+            <RadzenGridColumn TItem="Order" Property="ShipCity" Title="Ship City" />
+            <RadzenGridColumn TItem="Order" Property="ShipRegion" Title="Ship Region" />
+            <RadzenGridColumn TItem="Order" Property="ShipPostalCode" Title="Ship Postal Code" />
+            <RadzenGridColumn TItem="Order" Property="ShipCountry" Title="Ship Country" Type="string" />
         </Columns>
     </RadzenGrid>
 }
@@ -143,11 +99,11 @@ else
 
     protected override async Task OnInitAsync()
     {
-        orders = await Task.FromResult((from order in dbContext.Orders
+        orders = await Task.FromResult(from order in dbContext.Orders
                     .Include("Customer")
                     .Include("Employee")
                     .Include("OrderDetails")
                     .Include("OrderDetails.Product")
-                                        select order).ToList());
+                                        select order);
     }
 }

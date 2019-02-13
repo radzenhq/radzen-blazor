@@ -43,147 +43,51 @@
         <RadzenTabsItem Text="Employee">
             <RadzenGrid AllowFiltering="true" AllowPaging="true" PageSize="4" AllowSorting="true" Data="@employees" TItem="Employee">
                 <Columns>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="EmployeeID" Title="Employee ID" Type="integer">
-                        <Template Context="data">
-                            @data?.EmployeeID
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Format="binary" Property="Photo" Title="Photo" Type="string" Sortable="false" Filterable="false">
+                    <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
+                    <RadzenGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false">
                         <Template Context="data">
                             <RadzenImage Path="@data?.Photo" />
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="LastName" Title="Last Name" Type="string">
-                        <Template Context="data">
-                            @data?.LastName
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="FirstName" Title="First Name" Type="string">
-                        <Template Context="data">
-                            @data?.FirstName
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="Title" Title="Title" Type="string">
-                        <Template Context="data">
-                            @data?.Title
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="TitleOfCourtesy" Title="Title Of Courtesy" Type="string">
-                        <Template Context="data">
-                            @data?.TitleOfCourtesy
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Format="date-time" Property="BirthDate" Title="Birth Date" Type="string">
+                    <RadzenGridColumn TItem="Employee" Property="LastName" Title="Last Name" />
+                    <RadzenGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
+                    <RadzenGridColumn TItem="Employee" Property="Title" Title="Title" />
+                    <RadzenGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
+                    <RadzenGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date">
                         <Template Context="data">
                             @String.Format("{0:d}", data.BirthDate)
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Format="date-time" Property="HireDate" Title="Hire Date" Type="string">
+                    <RadzenGridColumn TItem="Employee" Property="HireDate" Title="Hire Date">
                         <Template Context="data">
                             @String.Format("{0:d}", data.HireDate)
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="Address" Title="Address" Type="string">
-                        <Template Context="data">
-                            @data?.Address
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="City" Title="City" Type="string">
-                        <Template Context="data">
-                            @data?.City
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="Region" Title="Region" Type="string">
-                        <Template Context="data">
-                            @data?.Region
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="PostalCode" Title="Postal Code" Type="string">
-                        <Template Context="data">
-                            @data?.PostalCode
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="Country" Title="Country" Type="string">
-                        <Template Context="data">
-                            @data?.Country
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="HomePhone" Title="Home Phone" Type="string">
-                        <Template Context="data">
-                            @data?.HomePhone
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="Extension" Title="Extension" Type="string">
-                        <Template Context="data">
-                            @data?.Extension
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Context="data" Property="Notes" Title="Notes" Type="string">
-                        <Template Context="data">
-                            @data?.Notes
-                        </Template>
-                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Employee" Property="Address" Title="Address" />
+                    <RadzenGridColumn TItem="Employee" Property="City" Title="City" />
+                    <RadzenGridColumn TItem="Employee" Property="Region" Title="Region" />
+                    <RadzenGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
+                    <RadzenGridColumn TItem="Employee" Property="Country" Title="Country" />
+                    <RadzenGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
+                    <RadzenGridColumn TItem="Employee" Property="Extension" Title="Extension" />
+                    <RadzenGridColumn TItem="Employee" Property="Notes" Title="Notes" />
                 </Columns>
             </RadzenGrid>
         </RadzenTabsItem>
         <RadzenTabsItem Text="Customers">
             <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@customers" TItem="Customer">
                 <Columns>
-                    <RadzenGridColumn TItem="Customer" Context="data" Property="CustomerID" Title="Customer ID" Type="string">
-                        <Template Context="data">
-                            @data?.CustomerID
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Customer" Context="data" Property="CompanyName" Title="Company Name" Type="string">
-                        <Template Context="data">
-                            @data?.CompanyName
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Customer" Context="data" Property="ContactName" Title="Contact Name" Type="string">
-                        <Template Context="data">
-                            @data?.ContactName
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Customer" Context="data" Property="ContactTitle" Title="Contact Title" Type="string">
-                        <Template Context="data">
-                            @data?.ContactTitle
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Customer" Context="data" Property="Address" Title="Address" Type="string">
-                        <Template Context="data">
-                            @data?.Address
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Customer" Context="data" Property="City" Title="City" Type="string">
-                        <Template Context="data">
-                            @data?.City
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Customer" Context="data" Property="Region" Title="Region" Type="string">
-                        <Template Context="data">
-                            @data?.Region
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Customer" Context="data" Property="PostalCode" Title="Postal Code" Type="string">
-                        <Template Context="data">
-                            @data?.PostalCode
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Customer" Context="data" Property="Country" Title="Country" Type="string">
-                        <Template Context="data">
-                            @data?.Country
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Customer" Context="data" Property="Phone" Title="Phone" Type="string">
-                        <Template Context="data">
-                            @data?.Phone
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Customer" Context="data" Property="Fax" Title="Fax" Type="string">
-                        <Template Context="data">
-                            @data?.Fax
-                        </Template>
-                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Customer" Property="CustomerID" Title="Customer ID"/>
+                    <RadzenGridColumn TItem="Customer" Property="CompanyName" Title="Company Name" />
+                    <RadzenGridColumn TItem="Customer" Property="ContactName" Title="Contact Name" />
+                    <RadzenGridColumn TItem="Customer" Property="ContactTitle" Title="Contact Title" />
+                    <RadzenGridColumn TItem="Customer" Property="Address" Title="Address" />
+                    <RadzenGridColumn TItem="Customer" Property="City" Title="City" />
+                    <RadzenGridColumn TItem="Customer" Property="Region" Title="Region" />
+                    <RadzenGridColumn TItem="Customer" Property="PostalCode" Title="Postal Code" />
+                    <RadzenGridColumn TItem="Customer" Property="Country" Title="Country" />
+                    <RadzenGridColumn TItem="Customer" Property="Phone" Title="Phone" />
+                    <RadzenGridColumn TItem="Customer" Property="Fax" Title="Fax" />
                 </Columns>
             </RadzenGrid>
         </RadzenTabsItem>
@@ -196,15 +100,15 @@
 
     protected override async Task OnInitAsync()
     {
-        employees = await Task.FromResult(dbContext.Employees.ToList());
+        employees = await Task.FromResult(dbContext.Employees);
 
-        customers = await Task.FromResult(dbContext.Customers.ToList());
+        customers = await Task.FromResult(dbContext.Customers);
 
         orders = await Task.FromResult((from order in dbContext.Orders
                     .Include("Customer")
                     .Include("Employee")
                     .Include("OrderDetails")
                     .Include("OrderDetails.Product")
-                                        select order).ToList());
+                                        select order));
     }
 }
