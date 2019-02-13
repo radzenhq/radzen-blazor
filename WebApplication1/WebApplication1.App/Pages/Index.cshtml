@@ -38,7 +38,7 @@ else
                                 </RadzenGridColumn>
                                 <RadzenGridColumn TItem="OrderDetail" Format="decimal" Property="UnitPrice" Title="Unit Price" Type="number">
                                     <Template Context="detail">
-                                        @detail?.UnitPrice
+                                        @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
                                     </Template>
                                 </RadzenGridColumn>
                                 <RadzenGridColumn TItem="OrderDetail" Format="int16" Property="Quantity" Title="Quantity" Type="integer">
@@ -48,7 +48,7 @@ else
                                 </RadzenGridColumn>
                                 <RadzenGridColumn TItem="OrderDetail" Format="float" Property="Discount" Title="Discount" Type="number">
                                     <Template Context="detail">
-                                        @detail?.Discount
+                                        @String.Format("{0}%", detail.Discount * 100)
                                     </Template>
                                 </RadzenGridColumn>
                             </Columns>
@@ -101,7 +101,7 @@ else
             </RadzenGridColumn>
             <RadzenGridColumn TItem="Order" Format="decimal" Property="Freight" Title="Freight" Type="number">
                 <Template Context="order">
-                    @order.Freight
+                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
                 </Template>
             </RadzenGridColumn>
             <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name" Type="string">
