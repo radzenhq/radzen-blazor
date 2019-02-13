@@ -64,17 +64,17 @@ else
                     <RadzenImage Path="@order.Employee?.Photo" />
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
+            <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date" Format="date-time">
                 <Template Context="order">
                     @String.Format("{0:d}", order.OrderDate)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="RequiredDate" Title="Required Date">
+            <RadzenGridColumn TItem="Order" Property="RequiredDate" Title="Required Date" Format="date-time">
                 <Template Context="order">
                     @String.Format("{0:d}", order.RequiredDate)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="ShippedDate" Title="Shipped Date">
+            <RadzenGridColumn TItem="Order" Property="ShippedDate" Title="Shipped Date" Format="date-time">
                 <Template Context="order">
                     @String.Format("{0:d}", order.ShippedDate)
                 </Template>

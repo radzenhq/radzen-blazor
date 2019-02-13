@@ -53,12 +53,12 @@
                     <RadzenGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
                     <RadzenGridColumn TItem="Employee" Property="Title" Title="Title" />
                     <RadzenGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
-                    <RadzenGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date">
+                    <RadzenGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" Format="date-time">
                         <Template Context="data">
                             @String.Format("{0:d}", data.BirthDate)
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Employee" Property="HireDate" Title="Hire Date">
+                    <RadzenGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" Format="date-time">
                         <Template Context="data">
                             @String.Format("{0:d}", data.HireDate)
                         </Template>
