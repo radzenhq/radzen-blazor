@@ -24,7 +24,7 @@
                     </div>
                     <div class="col-md-6">
                         <div>Freight:</div>
-                        <b>@String.Format("{0:C}", lastOrder.Freight)</b>
+                        <b>@String.Format(System.Globalization.CultureInfo.CurrentCulture, "{0:C}", lastOrder.Freight)</b>
                         <div style="margin-top:20px">Ship country:</div>
                         <b>@(lastOrder.ShipCountry)</b>
                         <div style="margin-top:20px">Ship city:</div>

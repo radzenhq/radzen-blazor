@@ -14,7 +14,7 @@
         <RadzenTabsItem Text="Orders">
             <RadzenDataList PageSize="6" WrapItems="true" AllowPaging="true" Data="@orders" TItem="Order">
                 <Template Context="order">
-                    <RadzenCard Style="width:400px;height:280px;">
+                    <RadzenCard Style="width:400px;">
                         <div class="row">
                             <div class="col-md-6">
                                 <div>Company:</div>
@@ -26,7 +26,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div>Freight:</div>
-                                <b>@String.Format("{0:C}", order.Freight)</b>
+                                <b>@String.Format(System.Globalization.CultureInfo.CurrentCulture, "{0:C}", order.Freight)</b>
                                 <div style="margin-top:20px">Ship country:</div>
                                 <b>@(order.ShipCountry)</b>
                                 <div style="margin-top:20px">Ship city:</div>
