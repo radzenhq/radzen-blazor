@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Build" Version="3.0.0-preview-19075-0444" PrivateAssets="all" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0-preview.19074.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0-preview.19074.3" />
-    <PackageReference Include="Radzen.Blazor" Version="0.0.10" />
+    <PackageReference Include="Radzen.Blazor" Version="0.0.12" />
   </ItemGroup>
 
 </Project>

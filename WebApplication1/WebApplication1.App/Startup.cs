@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using NorthwindBlazor.Data;
+using Radzen;
 
 namespace WebApplication1.App
 {
@@ -10,6 +11,8 @@ namespace WebApplication1.App
         {
             // Add NorthwindContext
             services.AddSingleton<NorthwindContext>();
+
+            services.AddSingleton<DialogService>();
         }
 
         public void Configure(IComponentsApplicationBuilder app)
