@@ -46,12 +46,12 @@
     void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
     {
         events.Add(DateTime.Now, "Dialog opened");
-        StateHasChanged();
+        Invoke(() => { StateHasChanged(); });
     }
 
     void Close()
     {
         events.Add(DateTime.Now, "Dialog closed");
-        StateHasChanged();
+        Invoke(() => { StateHasChanged(); });
     }
 }
