@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:3.0-sdk
+FROM dotnet/core:3.0.100-preview3
 COPY . /app
 WORKDIR /app/RazorComponentsApp1
 
