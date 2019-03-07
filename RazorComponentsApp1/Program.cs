@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace WebApplication1.Server
+namespace RazorComponentsApp1
 {
     public class Program
     {
