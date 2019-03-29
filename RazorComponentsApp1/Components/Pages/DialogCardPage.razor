@@ -1,9 +1,12 @@
 ﻿@using NorthwindBlazor.Data
 @using NorthwindBlazor.Models.Northwind
 @using Microsoft.EntityFrameworkCore
+@using Radzen
+
 @page "/dialogcard/{OrderID}"
 
 @inject NorthwindContext dbContext
+@inject DialogService dialogService
 
 <h1 style="display:inline">Dialog with parameters</h1><a style="margin-left: 10px" href="https://github.com/akorchev/razor.radzen.com/blob/master/RazorComponentsApp1/Components/Pages/DialogCardPage.razor" target="_blank">[source code]</a>
 
@@ -31,6 +34,12 @@
         </div>
     </div>
 </RadzenCard>
+<div class="row">
+    <div class="col-md-12">
+        <RadzenButton Click="@((args) => dialogService.Close(true))" Text="OK" Style="margin-bottom: 10px; width: 150px" />
+        <RadzenButton Click="@((args) => dialogService.Close(false))" ButtonStyle="secondary" Text="Cancel" Style="margin-bottom: 10px; width: 150px" />
+    </div>
+</div>
 
 @functions {
     [Parameter] private int OrderID { get; set; }

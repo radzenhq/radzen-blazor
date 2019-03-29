@@ -12,7 +12,7 @@
    
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0-preview3.19153.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0-preview3.19153.1" />
-    <PackageReference Include="Radzen.Blazor" Version="0.0.13" />
+    <PackageReference Include="Radzen.Blazor" Version="0.0.14" />
   </ItemGroup>
 
 </Project>
