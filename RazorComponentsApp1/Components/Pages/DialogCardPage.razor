@@ -48,13 +48,17 @@
 
     protected override async Task OnInitAsync()
     {
-        var query = from order in dbContext.Orders.Where(o => o.OrderID == OrderID)
+        await Invoke(() => {
+             var query = from order in dbContext.Orders.Where(o => o.OrderID == OrderID)
                             .Include("Customer")
                             .Include("Employee")
                             .Include("OrderDetails")
                             .Include("OrderDetails.Product")
                     select order;
 
-        order = query.Last();
+            order = query.Last();
+
+            StateHasChanged();
+        });
     }
 }
