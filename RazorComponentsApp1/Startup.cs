@@ -25,8 +25,8 @@ namespace RazorComponentsApp1
 
             services.AddRazorComponents();
 
-            services.AddSingleton<NorthwindContext>();
-            services.AddSingleton<DialogService>();
+            services.AddScoped<NorthwindContext>();
+            services.AddScoped<DialogService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
