@@ -1,0 +1,63 @@
+﻿@page "/templateform"
+
+@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<h1>TemplateForm</h1>
+
+<p>This page demonstrates TemplateForm features.</p>
+
+@if (order == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-12">
+            <RadzenTemplateForm Data="@order" Visible="@(order != null)" TItem="Order">
+                <ChildContent>
+                    <div style="margin-bottom: 1rem;" class="row">
+                        <div class="col-md-3">
+                            <RadzenLabel Text="User Name" Component="UserName" style="width: 100%;">
+                            </RadzenLabel>
+                        </div>
+                        <div class="col-md-9">
+                            <RadzenTextBox MaxLength="255" style="display: block; width: 100%;" Name="UserName">
+                            </RadzenTextBox>
+                            <RadzenRequiredValidator Component="UserName" Text="UserName is required" style="position: absolute;">
+                            </RadzenRequiredValidator>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 1rem;" class="row">
+                        <div class="col-md-3">
+                            <RadzenLabel Text="Order Date" Component="OrderDate" style="width: 100%;">
+                            </RadzenLabel>
+                        </div>
+                        <div class="col-md-9">
+                            <RadzenDatePicker style="display: block; width: 100%;" Name="OrderDate">
+                            </RadzenDatePicker>
+                            <RadzenRequiredValidator Component="OrderDate" Text="OrderDate is required" style="position: absolute;">
+                            </RadzenRequiredValidator>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col offset-sm-3">
+                            <RadzenButton ButtonType="submit" Icon="save" Text="Save" ButtonStyle="primary">
+                            </RadzenButton>
+                            <RadzenButton ButtonStyle="light" Text="Cancel">
+                            </RadzenButton>
+                        </div>
+                    </div>
+                </ChildContent>
+            </RadzenTemplateForm>
+        </div>
+    </div>
+}
+
+@functions {
+    Order order = new Order();
+}
