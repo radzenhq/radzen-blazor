@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0.100-preview5
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0.100-preview6
 COPY . /app
 WORKDIR /app
 
