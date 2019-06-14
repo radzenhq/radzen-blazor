@@ -5,6 +5,7 @@
 @inject IUriHelper UriHelper
 <link href="css/@(Theme)" rel="stylesheet" />
 <RadzenDialog />
+<<<<<<< HEAD
 <div class="rz-sidebar" style="@width">
     <div class="header fixed ng-trigger ng-trigger-open" style="margin-left: 0px;">
         <div class="row justify-content-start align-items-center">
@@ -15,153 +16,153 @@
                 <label>Radzen Blazor Components</label>
             </div>
             <div class="col-md-6">
-                <RadzenDropDown TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@((v) => ChangeTheme(v))" />
+                <RadzenDropDown TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" />
             </div>
         </div>
     </div>
-    <div class="ng-tns-c2-2 rz-sidebar ng-trigger ng-trigger-open" style="@($"top: 51px; bottom: 57px; {transform}")">
-        <ul class="panel-menu ng-tns-c4-4" style="height: 100%;">
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="/" Match="NavLinkMatch.All">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">home</i>
-                        <span class="navigation-item-text">First Look</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="datagrid">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">grid_on</i>
-                        <span class="navigation-item-text">DataGrid</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="datalist">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">list</i>
-                        <span class="navigation-item-text">DataList</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="tabs">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">tab</i>
-                        <span class="navigation-item-text">Tabs</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="buttons">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">account_circle</i>
-                        <span class="navigation-item-text">Buttons</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="checkbox">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">check_circle</i>
-                        <span class="navigation-item-text">CheckBox</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="textbox">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">input</i>
-                        <span class="navigation-item-text">TextBox</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="textarea">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">description</i>
-                        <span class="navigation-item-text">TextArea</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="password">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">payment</i>
-                        <span class="navigation-item-text">Password</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="numeric">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">aspect_ratio</i>
-                        <span class="navigation-item-text">Numeric</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="datepicker">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">date_range</i>
-                        <span class="navigation-item-text">DatePicker</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="dropdown">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">dns</i>
-                        <span class="navigation-item-text">DropDown</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="listbox">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">view_list</i>
-                        <span class="navigation-item-text">ListBox</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="panel">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">content_paste</i>
-                        <span class="navigation-item-text">Panel</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="fieldset">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">account_balance_wallet</i>
-                        <span class="navigation-item-text">Fieldset</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="card">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">line_style</i>
-                        <span class="navigation-item-text">Card</span>
-                    </NavLink>
-                </div>
-            </li>
-            <li class="navigation-item ng-tns-c4-4 ng-star-inserted">
-                <div class="navigation-item-wrapper">
-                    <NavLink class="navigation-item-link ng-tns-c4-4 ng-star-inserted" href="dialog">
-                        <i class="material-icons navigation-item-icon ng-tns-c4-4 ng-star-inserted">perm_media</i>
-                        <span class="navigation-item-text">Dialog</span>
-                    </NavLink>
-                </div>
-            </li>
-        </ul>
-    </div>
+</div>
+<div class=" rz-sidebar" style="@($"top: 51px; bottom: 57px; {transform}")">
+    <ul class="panel-menu " style="height: 100%;">
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="/" Match="NavLinkMatch.All">
+                    <i class="material-icons navigation-item-icon">home</i>
+                    <span class="navigation-item-text">First Look</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="datagrid">
+                    <i class="material-icons navigation-item-icon">grid_on</i>
+                    <span class="navigation-item-text">DataGrid</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="datalist">
+                    <i class="material-icons navigation-item-icon">list</i>
+                    <span class="navigation-item-text">DataList</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="tabs">
+                    <i class="material-icons navigation-item-icon">tab</i>
+                    <span class="navigation-item-text">Tabs</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="buttons">
+                    <i class="material-icons navigation-item-icon">account_circle</i>
+                    <span class="navigation-item-text">Buttons</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="checkbox">
+                    <i class="material-icons navigation-item-icon">check_circle</i>
+                    <span class="navigation-item-text">CheckBox</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="textbox">
+                    <i class="material-icons navigation-item-icon">input</i>
+                    <span class="navigation-item-text">TextBox</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="textarea">
+                    <i class="material-icons navigation-item-icon">description</i>
+                    <span class="navigation-item-text">TextArea</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="password">
+                    <i class="material-icons navigation-item-icon">payment</i>
+                    <span class="navigation-item-text">Password</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="numeric">
+                    <i class="material-icons navigation-item-icon">aspect_ratio</i>
+                    <span class="navigation-item-text">Numeric</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="datepicker">
+                    <i class="material-icons navigation-item-icon">date_range</i>
+                    <span class="navigation-item-text">DatePicker</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="dropdown">
+                    <i class="material-icons navigation-item-icon">dns</i>
+                    <span class="navigation-item-text">DropDown</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="listbox">
+                    <i class="material-icons navigation-item-icon">view_list</i>
+                    <span class="navigation-item-text">ListBox</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="panel">
+                    <i class="material-icons navigation-item-icon">content_paste</i>
+                    <span class="navigation-item-text">Panel</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="fieldset">
+                    <i class="material-icons navigation-item-icon">account_balance_wallet</i>
+                    <span class="navigation-item-text">Fieldset</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="card">
+                    <i class="material-icons navigation-item-icon">line_style</i>
+                    <span class="navigation-item-text">Card</span>
+                </NavLink>
+            </div>
+        </li>
+        <li class="navigation-item">
+            <div class="navigation-item-wrapper">
+                <NavLink class="navigation-item-link" href="dialog">
+                    <i class="material-icons navigation-item-icon">perm_media</i>
+                    <span class="navigation-item-text">Dialog</span>
+                </NavLink>
+            </div>
+        </li>
+    </ul>
 </div>
 
-<div class="body ng-trigger ng-trigger-open" style="@($"width:100%;margin-top: 51px;margin-bottom: 57px;{margin}")">
+<div class="body" style="@($"width:100%;margin-top: 51px;margin-bottom: 57px;{margin}")">
     <div class="content">
         @Body
     </div>
@@ -180,7 +181,7 @@
         width = width == "width: 0px;" ? "width: 250px;" : "width: 0px;";
     }
 
-    string Theme 
+    string Theme
     {
         get
         {

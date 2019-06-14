@@ -1,0 +1,61 @@
+@page "/get-started"
+
+<RadzenCard>
+  <h1>Get started</h1>
+</RadzenCard>
+<h2 class="my-3">1. Install</h2>
+<RadzenCard>
+<p>
+  Radzen Blazor Components are distributed as the <a href="https://www.nuget.org/packages/Radzen.Blazor/">Radzen.Blazor</a> nuget package.
+</p>
+<p>
+  You can add them to your project in one of the following ways
+</p>
+<ul>
+  <li>Install the package from command line by running <code>dotnet add package Radzen.Blazor</code></li>
+  <li>Add the project from the Visual Nuget Package Manager <img src="images/nuget-explorer.png"></li>
+  <li>Manually edit the .csproj file and add a project reference <code></code></li>
+</ul>
+</RadzenCard>
+<h2 class="my-3">2. Import the namespace</h2>
+<RadzenCard>
+<p>
+  Open the <code>_Imports.razor</code> file of your Blazor application and add this line <code>@@using Radzen.Blazor</code>.
+</p>
+</RadzenCard>
+<h2 class="my-3">3. Include a theme</h2>
+<RadzenCard>
+<ol>
+  <li>Download the <code>css</code> and <code>fonts</code> directories from the <a href="https://github.com/akorchev/razor.radzen.com/tree/master/wwwroot">github repository</a>.</li>
+  <li>Copy both directories to the <code>wwwroot</code> folder of your Blazor application.</li>
+  <li>Open the <code>_Host.cshtml</code> file and include a theme CSS file by adding this snippet <code>&lt;link rel="stylesheet" href="css/default.css" &gt;</code>
+  </li>
+</ol>
+</RadzenCard>
+<h2 class="my-3">4. Use a component</h2>
+<RadzenCard>
+  <p>
+    Use any Radzen Blazor component by typing its tag name in a Blazor page e.g. <code>&lt;RadzenButton Text="Hi"&gt;&lt;/RadzenButton&gt;</code>
+  </p>
+  <h4 class="my-2">Data-binding a property</h4>
+<pre>
+<code>
+&lt;RadzenButton Text="@@text"&gt;&lt;/RadzenButton&gt;
+@@code {
+  string text = "Hi";
+}
+</code>
+</pre>
+  <h4 class="my-2">Handing events</h4>
+<pre>
+<code>
+&lt;RadzenButton Click="@@ButtonClicked" Text="Hi"&gt;&lt;/RadzenButton&gt;
+@@code {
+  void ButtonClicked()
+  {
+
+  }
+}
+</code>
+</pre>
+</RadzenCard>
