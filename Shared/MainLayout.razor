@@ -15,7 +15,7 @@
                 <label>Radzen Blazor Components</label>
             </div>
             <div class="col-md-6">
-                <RadzenDropDown Data="@themes" Value="@ThemeState.CurrentTheme" Change="@((v) => ChangeTheme(v))" TextProperty="Text" ValueProperty="Value" />
+                <RadzenDropDown TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@((v) => ChangeTheme(v))" />
             </div>
         </div>
     </div>

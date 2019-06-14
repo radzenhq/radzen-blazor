@@ -15,7 +15,7 @@ namespace LatestBlazor
 {
   public class ThemeState
   {
-    public string CurrentTheme { get; set; } = "Default";
+    public string CurrentTheme { get; set; } = "default";
   }
   public class Startup
   {
