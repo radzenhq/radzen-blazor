@@ -1,8 +1,7 @@
 ﻿@page "/"
 @namespace LatestBlazor.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@using Radzen
-
+@inject ThemeState ThemeState
 <!DOCTYPE html>
 <html>
 <head>
@@ -22,7 +21,6 @@
               integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" />
     </environment>
     <link href="css/site.css" rel="stylesheet" />
-    <link href="css/styles.css" rel="stylesheet" />
 </head>
 <body>
     <app>@(await Html.RenderComponentAsync<App>())</app>

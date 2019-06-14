@@ -13,47 +13,52 @@ using Radzen;
 
 namespace LatestBlazor
 {
-    public class Startup
+  public class ThemeState
+  {
+    public string CurrentTheme { get; set; } = "default";
+  }
+  public class Startup
+  {
+    // This method gets called by the runtime. Use this method to add services to the container.
+    // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+    public void ConfigureServices(IServiceCollection services)
     {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddRazorPages();
-            services.AddServerSideBlazor();
+      services.AddRazorPages();
+      services.AddServerSideBlazor();
+      services.AddScoped<ThemeState>();
 
-            services.AddScoped<NorthwindContext>();
-            services.AddScoped<DialogService>();
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.Use((ctx, next) =>
-                {
-                    ctx.Request.Scheme = "https";
-                    return next();
-                });
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseStaticFiles();
-
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapBlazorHub();
-                endpoints.MapFallbackToPage("/_Host");
-            });
-        }
+      services.AddScoped<NorthwindContext>();
+      services.AddScoped<DialogService>();
     }
+
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+      if (env.IsDevelopment())
+      {
+        app.UseDeveloperExceptionPage();
+      }
+      else
+      {
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.Use((ctx, next) =>
+        {
+          ctx.Request.Scheme = "https";
+          return next();
+        });
+      }
+
+      app.UseHttpsRedirection();
+
+      app.UseStaticFiles();
+
+      app.UseRouting();
+
+      app.UseEndpoints(endpoints =>
+      {
+        endpoints.MapBlazorHub();
+        endpoints.MapFallbackToPage("/_Host");
+      });
+    }
+  }
 }

@@ -1,7 +1,10 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Http
 @using Radzen.Blazor
+@inject ThemeState ThemeState
+@inject IUriHelper UriHelper
+<link href="css/@(Theme)" rel="stylesheet" />
 <RadzenDialog />
-
 <div class="rz-sidebar" style="@width">
     <div class="header fixed ng-trigger ng-trigger-open" style="margin-left: 0px;">
         <div class="row justify-content-start align-items-center">
@@ -11,7 +14,8 @@
                 </button>
                 <label>Radzen Blazor Components</label>
             </div>
-            <div class="col-md-6 text-lg-right">
+            <div class="col-md-6">
+                <RadzenDropDown Data="@themes" TextProperty="Text" ValueProperty="Value" Change="@ChangeTheme" />
             </div>
         </div>
     </div>
@@ -167,10 +171,26 @@
     string margin = "margin-left: 250px;";
     string width = "width: 250px;";
 
+    dynamic themes = new [] { new {Text = "Default", Value = "default"}, new { Text = "Dark", Value="dark" } };
+
     void ToggleNavMenu()
     {
         transform = transform == "" ? "transform: translateX(-100%);" : "";
         margin = margin == "margin-left: 0px;" ? "margin-left: 250px;" : "margin-left: 0px;";
         width = width == "width: 0px;" ? "width: 250px;" : "width: 0px;";
+    }
+
+    string Theme 
+    {
+        get
+        {
+            return $"{ThemeState.CurrentTheme}.css";
+        }
+    }
+
+    void ChangeTheme(object value)
+    {
+        ThemeState.CurrentTheme = value.ToString();
+        UriHelper.NavigateTo(UriHelper.GetAbsoluteUri());
     }
 }
