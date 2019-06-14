@@ -5,19 +5,17 @@
 @inject IUriHelper UriHelper
 <link href="css/@(Theme)" rel="stylesheet" />
 <RadzenDialog />
-<div class="rz-sidebar" style="@width">
-    <div class="header fixed ng-trigger ng-trigger-open" style="margin-left: 0px;">
-        <div class="row justify-content-start align-items-center">
-            <div class="col-md-6 d-flex align-items-center">
-                <button class="sidebar-toggle" onclick=@ToggleNavMenu>
-                    <i class="material-icons d-flex align-items-center">menu</i>
-                </button>
-                <label>Radzen Blazor Components</label>
-            </div>
-            <div class="col-md-6 d-flex align-items-center justify-content-end">
-                <NavLink class="btn-secondary" style="padding: 0 1rem; margin: 1rem; display: inline-block;" href="/get-started">Get started</NavLink>
-                <div style="margin: 1rem">Theme: <RadzenDropDown TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" /></div>
-            </div>
+<div class="header fixed ng-trigger ng-trigger-open" style="margin-left: 0px;">
+    <div class="row justify-content-start align-items-center">
+        <div class="col-md-6 d-flex align-items-center">
+            <button class="sidebar-toggle" onclick=@ToggleNavMenu>
+                <i class="material-icons d-flex align-items-center">menu</i>
+            </button>
+            <label>Radzen Blazor Components</label>
+        </div>
+        <div class="col-md-6 d-flex align-items-center justify-content-end">
+            <NavLink class="btn-secondary" style="padding: 0 1rem; margin: 1rem; display: inline-block;" href="/get-started">Get started</NavLink>
+            <div style="margin: 1rem">Theme: <RadzenDropDown TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" /></div>
         </div>
     </div>
 </div>
