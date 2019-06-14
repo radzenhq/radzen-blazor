@@ -5,7 +5,6 @@
 @inject IUriHelper UriHelper
 <link href="css/@(Theme)" rel="stylesheet" />
 <RadzenDialog />
-<<<<<<< HEAD
 <div class="rz-sidebar" style="@width">
     <div class="header fixed ng-trigger ng-trigger-open" style="margin-left: 0px;">
         <div class="row justify-content-start align-items-center">
@@ -15,13 +14,14 @@
                 </button>
                 <label>Radzen Blazor Components</label>
             </div>
-            <div class="col-md-6">
-                <RadzenDropDown TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" />
+            <div class="col-md-6 d-flex align-items-center justify-content-end">
+                <NavLink class="btn-secondary" style="padding: 0 1rem; margin: 1rem; display: inline-block;" href="/get-started">Get started</NavLink>
+                <div style="margin: 1rem">Theme: <RadzenDropDown TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" /></div>
             </div>
         </div>
     </div>
 </div>
-<div class=" rz-sidebar" style="@($"top: 51px; bottom: 57px; {transform}")">
+<div class="rz-sidebar" style="@($"top: 68px; bottom: 57px; {transform}")">
     <ul class="panel-menu " style="height: 100%;">
         <li class="navigation-item">
             <div class="navigation-item-wrapper">
@@ -172,7 +172,13 @@
     string margin = "margin-left: 250px;";
     string width = "width: 250px;";
 
-    dynamic themes = new [] { new {Text = "Default", Value = "default"}, new { Text = "Dark", Value="dark" } };
+    dynamic themes = new [] 
+    { 
+        new {Text = "Default", Value = "default"}, 
+        new { Text = "Dark", Value="dark" }, 
+        new { Text = "Software", Value = "software"}, 
+        new { Text = "Humanistic", Value = "Humanistic" } 
+    };
 
     void ToggleNavMenu()
     {
