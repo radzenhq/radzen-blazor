@@ -26,16 +26,22 @@
 <h2 class="my-3">3. Include a theme</h2>
 <RadzenCard>
 <ol>
-  <li>Download the <code>css</code> and <code>fonts</code> directories from the <a href="https://github.com/akorchev/razor.radzen.com/tree/master/wwwroot">github repository</a>.</li>
-  <li>Copy both directories to the <code>wwwroot</code> folder of your Blazor application.</li>
-  <li>Open the <code>_Host.cshtml</code> file and include a theme CSS file by adding this snippet <code>&lt;link rel="stylesheet" href="css/default.css" &gt;</code>
-  </li>
+  <li>Download the <a href="https://github.com/akorchev/razor.radzen.com/raw/master/Radzen.Blazor.Themes.zip">Radzen.Blazor.Themes.zip</a> and unzip it somewhere. It contains two directorires: <code>fonts</code> and <code>css</code>.</li>
+  <li>Copy those two directories to the <code>wwwroot</code> folder of your Blazor application.</li>
+  <li>Open the <code>_Host.cshtml</code> file and include a theme CSS file by adding this snippet <code>&lt;link rel="stylesheet" href="css/default.css" &gt;</code></li>
 </ol>
 </RadzenCard>
 <h2 class="my-3">4. Use a component</h2>
 <RadzenCard>
   <p>
     Use any Radzen Blazor component by typing its tag name in a Blazor page e.g. <code>&lt;RadzenButton Text="Hi"&gt;&lt;/RadzenButton&gt;</code>
+  </p>
+  <p>
+    If you are using client-side Blazor also add the following code to your <code>.csproj</code> file (after the closing <code>RazorLangVersion</code> element):
+<pre>
+<code><BlazorLinkOnBuild>false</BlazorLinkOnBuild></code>
+</pre>
+  It is a workaround for [this](https://github.com/mono/mono/issues/12917) issue.
   </p>
   <h4 class="my-2">Data-binding a property</h4>
 <pre>
