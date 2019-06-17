@@ -1,4 +1,4 @@
-# Sample application showcasing the Radzen Blazor Components
+# Radzen Blazor Components examples
 
 This is the source code of of the application behind [blazor.radzen.com](https://blazor.radzen.com)
 
