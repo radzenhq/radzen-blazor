@@ -38,9 +38,11 @@
   </p>
   <p>
     If you are using client-side Blazor also add the following code to your <code>.csproj</code> file (after the closing <code>RazorLangVersion</code> element):
+  </p>
 <pre>
 <code>&lt;BlazorLinkOnBuild&gt;false&lt;/BlazorLinkOnBuild&gt;</code>
 </pre>
+  <p>
   It is a workaround for a <a href="https://github.com/mono/mono/issues/12917">known issue</a> when using IQueryable.
   </p>
   <h4 class="my-2">Data-binding a property</h4>
