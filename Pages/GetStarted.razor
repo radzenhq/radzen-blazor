@@ -28,7 +28,7 @@
 <ol>
   <li>Download the <a href="https://github.com/akorchev/blazor.radzen.com/raw/master/Radzen.Blazor.Themes.zip">Radzen.Blazor.Themes.zip</a> and unzip it somewhere. It contains two directorires: <code>fonts</code> and <code>css</code>.</li>
   <li>Copy those two directories to the <code>wwwroot</code> folder of your Blazor application.</li>
-  <li>Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side Blazor) and include a theme CSS file by adding this snippet <code>&lt;link rel="stylesheet" href="css/default.css" &gt;</code></li>
+  <li>Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side Blazor) and include a theme CSS file by adding this snippet <code>&lt;link rel="stylesheet" href="css/default.css"&gt;</code></li>
 </ol>
 </RadzenCard>
 <h2 class="my-3">4. Use a component</h2>
@@ -59,9 +59,10 @@
 <code>
 &lt;RadzenButton Click="@@ButtonClicked" Text="Hi"&gt;&lt;/RadzenButton&gt;
 @@code {
-  void ButtonClicked()
+  void ButtonClicked(UIMouseEventArgs args)
   {
 
+    StateHasChanged();
   }
 }
 </code>
