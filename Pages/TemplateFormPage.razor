@@ -6,7 +6,7 @@
 
 @inject NorthwindContext dbContext
 
-<h1>TemplateForm</h1>
+    <h1 style="display:inline">TemplateForm</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/TemplateFormPage.razor" target="_blank">[source code]</a>
 
 <p>This page demonstrates TemplateForm features.</p>
 
@@ -18,7 +18,7 @@ else
 {
     <div class="row">
         <div class="col-md-12">
-            <RadzenTemplateForm TItem="dynamic" Data="@order" Submit="@((dynamic args) => { Submit(args); })">
+            <RadzenTemplateForm Data="@order" Submit="@((Order args) => { Submit(args); })">
                 <ChildContent>
                     <RadzenCard>
                         <ChildContent>
@@ -333,15 +333,15 @@ else
     };
 
     List<CreditCard> cards = new List<CreditCard>()
-    {
+{
         new CreditCard() { CardId = 1, CardNr = "5555555555554444" },
-        new CreditCard() { CardId = 2, CardNr = "4012888888881881" } 
+        new CreditCard() { CardId = 2, CardNr = "4012888888881881" }
     };
 
     List<Country> countries = new List<Country>()
-    {
+{
         new Country() { Id = 1, Name = "USA" },
-        new Country() { Id = 2, Name = "Germany" } 
+        new Country() { Id = 2, Name = "Germany" }
     };
 
     void Submit(Order arg)
