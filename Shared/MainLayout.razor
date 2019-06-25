@@ -5,193 +5,81 @@
 @inject IUriHelper UriHelper
 <link href="css/@(Theme)" rel="stylesheet" />
 <RadzenDialog />
-<div class="header fixed ng-trigger ng-trigger-open" style="margin-left: 0px;">
-    <div class="row justify-content-start align-items-center">
-        <div class="col-md-6 d-flex align-items-center">
-            <button class="sidebar-toggle" onclick=@ToggleNavMenu>
-                <i class="material-icons d-flex align-items-center">menu</i>
-            </button>
-            <label>Radzen Blazor Components</label>
-        </div>
-        <div class="col-md-6 d-flex align-items-center justify-content-end">
-            <NavLink class="btn-secondary" style="padding: 0 1rem; margin: 1rem; display: inline-block;" href="/get-started">Get started</NavLink>
-            <div style="margin: 1rem">Theme: <RadzenDropDown TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" /></div>
-        </div>
-    </div>
-</div>
-<div class="rz-sidebar" style="@($"top: 68px; bottom: 57px; {transform}")">
-    <ul class="panel-menu " style="height: 100%;">
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="/" Match="NavLinkMatch.All">
-                    <i class="material-icons navigation-item-icon">home</i>
-                    <span class="navigation-item-text">First Look</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="datagrid">
-                    <i class="material-icons navigation-item-icon">grid_on</i>
-                    <span class="navigation-item-text">DataGrid</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="datalist">
-                    <i class="material-icons navigation-item-icon">list</i>
-                    <span class="navigation-item-text">DataList</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="tabs">
-                    <i class="material-icons navigation-item-icon">tab</i>
-                    <span class="navigation-item-text">Tabs</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="buttons">
-                    <i class="material-icons navigation-item-icon">account_circle</i>
-                    <span class="navigation-item-text">Buttons</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="checkbox">
-                    <i class="material-icons navigation-item-icon">check_circle</i>
-                    <span class="navigation-item-text">CheckBox</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="textbox">
-                    <i class="material-icons navigation-item-icon">input</i>
-                    <span class="navigation-item-text">TextBox</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="textarea">
-                    <i class="material-icons navigation-item-icon">description</i>
-                    <span class="navigation-item-text">TextArea</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="password">
-                    <i class="material-icons navigation-item-icon">payment</i>
-                    <span class="navigation-item-text">Password</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="numeric">
-                    <i class="material-icons navigation-item-icon">aspect_ratio</i>
-                    <span class="navigation-item-text">Numeric</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="datepicker">
-                    <i class="material-icons navigation-item-icon">date_range</i>
-                    <span class="navigation-item-text">DatePicker</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="dropdown">
-                    <i class="material-icons navigation-item-icon">dns</i>
-                    <span class="navigation-item-text">DropDown</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="listbox">
-                    <i class="material-icons navigation-item-icon">view_list</i>
-                    <span class="navigation-item-text">ListBox</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="panel">
-                    <i class="material-icons navigation-item-icon">content_paste</i>
-                    <span class="navigation-item-text">Panel</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="fieldset">
-                    <i class="material-icons navigation-item-icon">account_balance_wallet</i>
-                    <span class="navigation-item-text">Fieldset</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="card">
-                    <i class="material-icons navigation-item-icon">line_style</i>
-                    <span class="navigation-item-text">Card</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="dialog">
-                    <i class="material-icons navigation-item-icon">perm_media</i>
-                    <span class="navigation-item-text">Dialog</span>
-                </NavLink>
-            </div>
-        </li>
-        <li class="navigation-item">
-            <div class="navigation-item-wrapper">
-                <NavLink class="navigation-item-link" href="templateform">
-                    <i class="material-icons navigation-item-icon">save</i>
-                    <span class="navigation-item-text">TemplateForm</span>
-                </NavLink>
-            </div>
-        </li>
-    </ul>
-</div>
 
-<div class="body" style="@($"width:100%;margin-top: 51px;margin-bottom: 57px;{margin}")">
-    <div class="content">
-        @Body
-    </div>
+<RadzenHeader>
+    <ChildContent>
+        <div class="row justify-content-start align-items-center">
+            <div class="col-md-6 d-flex align-items-center">
+                <RadzenSidebarToggle Click="@SidebarToggle0Click">
+                </RadzenSidebarToggle>
+                <RadzenLabel Text="Radzen Blazor Components">
+                </RadzenLabel>
+            </div>
+            <div class="col-md-6 d-flex align-items-center justify-content-end">
+                <NavLink class="btn-secondary" style="padding: 0 1rem; margin: 1rem; display: inline-block;" href="/get-started">Get started</NavLink>
+                <div style="margin: 1rem">Theme: <RadzenDropDown TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" /></div>
+            </div>
+        </div>
+    </ChildContent>
+</RadzenHeader>
+<div style="width:100%">
+    <RadzenBody @ref="body0">
+        <ChildContent>
+            <RadzenContentContainer Name="main">
+                @Body
+            </RadzenContentContainer>
+        </ChildContent>
+    </RadzenBody>
 </div>
+<RadzenSidebar @ref="sidebar0">
+    <ChildContent>
+        <RadzenPanelMenu style="height: 100%;padding-top:20px">
+            <ChildContent>
+                <RadzenPanelmenuItem Text="First Look" Path="/" Icon="home"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="DataGrid" Path="datagrid" Icon="grid_on"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="DataList" Path="datalist" Icon="list"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="Tabs" Path="tabs" Icon="tab"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="CheckBox" Path="checkbox" Icon="check_circle"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="TextBox" Path="textbox" Icon="input"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="TextArea" Path="textarea" Icon="description"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="Password" Path="password" Icon="payment"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="Numeric" Path="numeric" Icon="aspect_ratio"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="DatePicker" Path="datepicker" Icon="date_range"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="DropDown" Path="dropdown" Icon="dns"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="ListBox" Path="listbox" Icon="view_list"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="Panel" Path="panel" Icon="content_paste"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="Fieldset" Path="fieldset" Icon="account_balance_wallet"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="Card" Path="card" Icon="line_style"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="Dialog" Path="dialog" Icon="perm_media"></RadzenPanelmenuItem>
+                <RadzenPanelmenuItem Text="TemplateForm" Path="templateform" Icon="line_style"></RadzenPanelmenuItem>
+            </ChildContent>
+        </RadzenPanelMenu>
+    </ChildContent>
+</RadzenSidebar>
+<RadzenFooter>
+    <ChildContent>
+        <RadzenLabel Text="Radzen Blazor Components, Copyright &copy; 2019">
+        </RadzenLabel>
+    </ChildContent>
+</RadzenFooter>
 @code {
-    string transform = "";
-    string margin = "margin-left: 250px;";
-    string width = "width: 250px;";
+    RadzenSidebar sidebar0;
+    RadzenBody body0;
 
-    dynamic themes = new [] 
-    { 
-        new {Text = "Default", Value = "default"}, 
-        new { Text = "Dark", Value="dark" }, 
-        new { Text = "Software", Value = "software"}, 
-        new { Text = "Humanistic", Value = "humanistic" } 
+    dynamic themes = new[]
+    {
+        new {Text = "Default", Value = "default"},
+        new { Text = "Dark", Value="dark" },
+        new { Text = "Software", Value = "software"},
+        new { Text = "Humanistic", Value = "humanistic" }
     };
 
-    void ToggleNavMenu()
-    {
-        transform = transform == "" ? "transform: translateX(-100%);" : "";
-        margin = margin == "margin-left: 0px;" ? "margin-left: 250px;" : "margin-left: 0px;";
-        width = width == "width: 0px;" ? "width: 250px;" : "width: 0px;";
-    }
+        void SidebarToggle0Click(dynamic args)
+        {
+            sidebar0.Toggle();
+            body0.Toggle();
+        }
 
     string Theme
     {
