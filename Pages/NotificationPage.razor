@@ -1,0 +1,55 @@
+﻿@page "/notification"
+
+@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NotificationService notificationService
+
+<h1 style="display:inline">Notification</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/NotificationPage.razor" target="_blank">[source code]</a>
+
+<p>This page demonstrates <b>NotificationService</b>.</p>
+
+<RadzenCard>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Info</h3>
+            <RadzenButton Text=@($"Show info notification") Style="margin-bottom: 20px; width: 200px"
+                Click="@(args => ShowNotification(new NotificationMessage() { Severity = "info", Summary = "Info Summary", Detail = "Info Detail", Duration = 4000 }))" />
+            <br />
+            <h3>Warning</h3>
+            <RadzenButton Text=@($"Show warning notification") Style="margin-bottom: 20px; width: 200px"
+                Click="@(args => ShowNotification(new NotificationMessage() { Severity = "warn", Summary = "Warning Summary", Detail = "Warning Detail", Duration = 4000 }))" />
+            <br />
+            <h3>Error</h3>
+            <RadzenButton Text=@($"Show error notification") Style="margin-bottom: 20px; width: 200px"
+                Click="@(args => ShowNotification(new NotificationMessage() { Severity = "error", Summary = "Error Summary", Detail = "Error Detail", Duration = 4000 }))" />
+            <br />
+            <h3>Success</h3>
+            <RadzenButton Text=@($"Show success notification") Style="margin-bottom: 20px; width: 200px"
+                Click="@(args => ShowNotification(new NotificationMessage() { Severity = "success", Summary = "Success Summary", Detail = "Success Detail", Duration = 4000 }))" />
+        </div>
+        <div class="col-md-6">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+                @foreach (var e in events.OrderByDescending(i => i.Key))
+                {
+                    @e.Value
+                    <br />
+                }
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenCard>
+
+@code {
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+
+        events.Add(DateTime.Now, $"{message.Severity} notification");
+        Invoke(() => { StateHasChanged(); });
+    }
+}
