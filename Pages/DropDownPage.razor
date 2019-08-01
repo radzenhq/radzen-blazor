@@ -18,8 +18,17 @@
             <h3>DropDown with placeholder</h3>
             <RadzenDropDown Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px" />
             <br />
+            <h3>DropDown with template</h3>
+            <RadzenDropDown Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+                            Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px; width:400px;">
+                <Template>
+                    Company: @((context as Customer).CompanyName)
+                </Template>
+            </RadzenDropDown>
+            <br />
             <h3>DropDown with multiple selection</h3>
-            <RadzenDropDown Multiple="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDown with multiple selection"))" Style="margin-bottom: 20px" />
+            <RadzenDropDown Multiple="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" 
+                            Change="@(args => Change(args, "DropDown with multiple selection"))" Style="margin-bottom: 20px; width:400px;" />
         </div>
         <div class="col-md-6">
             <h3>Events</h3>
