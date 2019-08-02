@@ -1,0 +1,58 @@
+﻿@page "/fileinput"
+
+@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+    <h1 style="display:inline">FileInput</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/FileInput.razor" target="_blank">[source code]</a>
+
+<p>This page demonstrates <b>FileInput</b> component.</p>
+<RadzenCard>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>FileInput</h3>
+            <RadzenCard Style="width:600px;margin-bottom: 20px; height:500px;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div style="margin-top:20px">Employee:</div>
+                        <b>@(firstEmployee.FirstName + " " + firstEmployee.LastName)</b>
+                        <br />
+                        <RadzenFileInput Value="@firstEmployee.Photo" Style="width:400px;" Change="@(args => Change(args, "FileInput"))" />
+                    </div>
+                </div>
+            </RadzenCard>
+        </div>
+        <div class="col-md-6">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+                @foreach (var e in events.OrderByDescending(i => i.Key))
+                {
+                    @e.Value
+                    <br />
+                }
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenCard>
+
+@code {
+    Employee firstEmployee;
+
+    protected override async Task OnInitAsync()
+    {
+        firstEmployee = dbContext.Employees.FirstOrDefault();
+    }
+
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Change(object value, string name)
+    {
+        firstEmployee.Photo = $"{value}";
+        var str = new string($"{value}".Take(100).ToArray());
+
+        events.Add(DateTime.Now, $"{name} value changed to {str}...");
+        StateHasChanged();
+    }
+}

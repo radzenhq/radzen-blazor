@@ -24,7 +24,10 @@ namespace LatestBlazor
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddRazorPages();
-      services.AddServerSideBlazor();
+      services.AddServerSideBlazor().AddHubOptions(o =>
+      {
+          o.MaximumReceiveMessageSize = 10 * 1024 * 1024;
+      });
       services.AddScoped<ThemeState>();
 
       services.AddScoped<NorthwindContext>();

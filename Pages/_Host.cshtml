@@ -24,7 +24,25 @@
 </head>
 <body>
     <app>@(await Html.RenderComponentAsync<App>())</app>
+    <script>
+        window.readFileAsBase64 = (fileInput) => {
+            const readAsDataURL = (fileInput) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onerror = () => {
+                        reader.abort();
+                        reject(new Error("Error reading file."));
+                    };
+                    reader.addEventListener("load", () => {
+                        resolve(reader.result);
+                    }, false);
+                    reader.readAsDataURL(fileInput.files[0]);
+                });
+            };
 
+            return readAsDataURL(fileInput);
+        };
+    </script>
     <script src="_framework/blazor.server.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-73079289-4"></script>
