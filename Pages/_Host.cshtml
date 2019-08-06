@@ -42,6 +42,16 @@
 
             return readAsDataURL(fileInput);
         };
+
+        window.getPopupWidthAndTop = (popup) => {
+            var rect = popup.parentNode.getBoundingClientRect();
+            return `width:calc(${rect.width + 'px'} - 1.425rem); top:${rect.top + rect.height - 3 + 'px'}`;
+        };
+
+        window.getInputValue = (id) => {
+            var input = document.getElementById(id);
+            return input ? input.value : '';
+        };
     </script>
     <script src="_framework/blazor.server.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->

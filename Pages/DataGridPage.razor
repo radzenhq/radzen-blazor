@@ -16,36 +16,36 @@
 }
 else
 {
-    <RadzenGrid AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" Data="@employees" TItem="Employee">
+    <RadzenGrid AllowFiltering="true" AllowPaging="true" PageSize="4" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px">
         <Columns>
-            <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" Width="200px" />
-            <RadzenGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false" Width="200px">
+            <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
+            <RadzenGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false">
                 <Template Context="data">
                     <RadzenImage Path="@data?.Photo" />
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="200px"/>
-            <RadzenGridColumn TItem="Employee" Property="FirstName" Title="First Name" Width="200px"/>
-            <RadzenGridColumn TItem="Employee" Property="Title" Title="Title" Width="200px"/>
-            <RadzenGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" Width="200px"/>
-            <RadzenGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" Format="date-time" Width="200px">
+            <RadzenGridColumn TItem="Employee" Property="LastName" Title="Last Name"/>
+            <RadzenGridColumn TItem="Employee" Property="FirstName" Title="First Name"/>
+            <RadzenGridColumn TItem="Employee" Property="Title" Title="Title"/>
+            <RadzenGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy"/>
+            <RadzenGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" Format="date-time">
                 <Template Context="data">
                     @String.Format("{0:d}", data.BirthDate)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" Format="date-time" Width="200px">
+            <RadzenGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" Format="date-time">
                 <Template Context="data">
                     @String.Format("{0:d}", data.HireDate)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Employee" Property="Address" Title="Address" Width="200px"/>
-            <RadzenGridColumn TItem="Employee" Property="City" Title="City" Width="200px"/>
-            <RadzenGridColumn TItem="Employee" Property="Region" Title="Region" Width="200px"/>
-            <RadzenGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" Width="200px"/>
-            <RadzenGridColumn TItem="Employee" Property="Country" Title="Country" Width="200px" />
-            <RadzenGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" Width="200px"/>
-            <RadzenGridColumn TItem="Employee" Property="Extension" Title="Extension" Width="200px"/>
-            <RadzenGridColumn TItem="Employee" Property="Notes" Title="Notes" Width="200px"/>
+            <RadzenGridColumn TItem="Employee" Property="Address" Title="Address"/>
+            <RadzenGridColumn TItem="Employee" Property="City" Title="City"/>
+            <RadzenGridColumn TItem="Employee" Property="Region" Title="Region"/>
+            <RadzenGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code"/>
+            <RadzenGridColumn TItem="Employee" Property="Country" Title="Country" />
+            <RadzenGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone"/>
+            <RadzenGridColumn TItem="Employee" Property="Extension" Title="Extension"/>
+            <RadzenGridColumn TItem="Employee" Property="Notes" Title="Notes"/>
         </Columns>
     </RadzenGrid>
 }
