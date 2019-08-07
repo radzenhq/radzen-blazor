@@ -11,14 +11,19 @@
     <div class="row">
         <div class="col-md-6">
             <h3>DatePicker</h3>
-            <RadzenDatePicker Style="margin-bottom: 20px" Change="@(args => Change(args, "DatePicker"))" />
-            <br />
-            <h3>DatePicker with time</h3>
-            <RadzenDatePicker ShowTime="true" Change="@(args => Change(args, "DatePicker with time"))" Style="margin-bottom: 20px" />
+            <RadzenDatePicker Change="@(args => Change(args, "DatePicker"))" />
+            <h3 style="margin-top: 40px">DatePicker with time</h3>
+            <RadzenDatePicker ShowTime="true" Change="@(args => Change(args, "DatePicker with time"))" />
+            <h3 style="margin-top: 40px">DatePicker with 12 hour time format</h3>
+            <RadzenDatePicker ShowTime="true" Change="@(args => Change(args, "DatePicker with 12 hour time format"))" HourFormat="12" />
+            <h3 style="margin-top: 40px">Time-only DatePicker</h3>
+            <RadzenDatePicker ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Change="@(args => Change(args, "Time-only DatePicker"))" />
+            <h3 style="margin-top: 40px">Calendar</h3>
+            <RadzenDatePicker Inline="true" Change="@(args => Change(args, "Calendar"))" />
         </div>
         <div class="col-md-6">
             <h3>Events</h3>
-            <RadzenCard style="overflow: auto;height:500px;">
+            <RadzenCard style="overflow: auto;height:750px;">
                 @foreach (var e in events.OrderByDescending(i => i.Key))
                 {
                     @e.Value

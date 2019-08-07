@@ -43,13 +43,15 @@
             return readAsDataURL(fileInput);
         };
 
-        window.getPopupWidthAndTop = (popup) => {
-            var rect = popup.parentNode.getBoundingClientRect();
-            return `width:calc(${rect.width + 'px'} - 1.425rem); top:${rect.top + rect.height - 3 + 'px'}`;
+        window.getPopupWidthAndTop = (popup, sibling) => {
+            var el = sibling ? popup.previousElementSibling : popup.parentNode;
+            var elHeight = sibling ? popup.getBoundingClientRect().height : 0;
+            var rect = el.getBoundingClientRect();
+            return `width:calc(${rect.width + 'px'} - 1.425rem); top:${rect.top + rect.height + elHeight - 3 + 'px'}`;
         };
 
-        window.getInputValue = (id) => {
-            var input = document.getElementById(id);
+        window.getInputValue = (arg) => {
+            var input = (arg instanceof Element || arg instanceof HTMLDocument) ? arg : document.getElementById(id);
             return input ? input.value : '';
         };
     </script>
