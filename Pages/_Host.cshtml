@@ -47,12 +47,33 @@
             var el = sibling ? popup.previousElementSibling : popup.parentNode;
             var elHeight = sibling ? popup.getBoundingClientRect().height : 0;
             var rect = el.getBoundingClientRect();
-            return `width:calc(${rect.width + 'px'} - 1.425rem); top:${rect.top + rect.height + elHeight - 3 + 'px'}`;
+            var display = popup.style.display == 'none' ? 'display:none;' : '';
+            popup.style.display = 'inline-block';
+            return `width:calc(${rect.width + 'px'} - 1.425rem); top:${rect.top + rect.height + elHeight - 3 + 'px'}; ${display}`;
         };
 
         window.getInputValue = (arg) => {
             var input = (arg instanceof Element || arg instanceof HTMLDocument) ? arg : document.getElementById(id);
             return input ? input.value : '';
+        };
+
+        window.closePopup = (e, el) => {
+            if (!el.contains(e.relatedTarget) && el.children[1]) {
+                el.children[1].style.display = 'none';
+            }
+        };
+
+        window.openPopup = (e, el) => {
+            const handler = () => {
+                popup.style.display = 'none';
+                window.removeEventListener('wheel', handler);
+            };
+            window.addEventListener('wheel', handler);
+
+            var popup = el.parentNode.parentNode.children[1];
+            popup.style.cssText = popup.style.display == 'none' ?
+                `margin-left: 0px; z-index: 1002; transform: translateY(0px); opacity: 1; position: fixed; ${getPopupWidthAndTop(popup).replace('display:none;' ,'')};width:320px;`
+                : 'display:none;';
         };
     </script>
     <script src="_framework/blazor.server.js"></script>
