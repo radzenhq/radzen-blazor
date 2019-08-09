@@ -21,7 +21,6 @@ window.getPopupWidthAndTop = (popup, sibling) => {
     var elHeight = sibling ? popup.getBoundingClientRect().height : 0;
     var rect = el.getBoundingClientRect();
     var display = popup.style.display == 'none' ? 'display:none;' : '';
-    popup.style.display = 'inline-block';
     return `width:calc(${rect.width + 'px'} - 1.425rem); top:${rect.top + rect.height + elHeight - 3 + 'px'}; ${display}`;
 };
 
