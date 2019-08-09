@@ -53,7 +53,7 @@
         };
 
         window.getInputValue = (arg) => {
-            var input = (arg instanceof Element || arg instanceof HTMLDocument) ? arg : document.getElementById(id);
+            var input = (arg instanceof Element || arg instanceof HTMLDocument) ? arg : document.getElementById(arg);
             return input ? input.value : '';
         };
 
