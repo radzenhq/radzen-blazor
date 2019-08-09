@@ -1,51 +1,59 @@
 @page "/get-started"
 
 <RadzenCard>
-  <h1>Get started</h1>
+    <h1>Get started</h1>
 </RadzenCard>
 <h2 class="my-3">1. Install</h2>
 <RadzenCard>
-<p>
-  Radzen Blazor Components are distributed as the <a href="https://www.nuget.org/packages/Radzen.Blazor/">Radzen.Blazor</a> nuget package.
-</p>
-<p>
-  You can add them to your project in one of the following ways
-</p>
-<ul>
-  <li>Install the package from command line by running <code>dotnet add package Radzen.Blazor</code></li>
-  <li>Add the project from the Visual Nuget Package Manager <img style="display: block" src="images/nuget-explorer.png"></li>
-  <li>Manually edit the .csproj file and add a project reference <code></code></li>
-</ul>
+    <p>
+        Radzen Blazor Components are distributed as the <a href="https://www.nuget.org/packages/Radzen.Blazor/">Radzen.Blazor</a> nuget package.
+    </p>
+    <p>
+        You can add them to your project in one of the following ways
+    </p>
+    <ul>
+        <li>Install the package from command line by running <code>dotnet add package Radzen.Blazor</code></li>
+        <li>Add the project from the Visual Nuget Package Manager <img style="display: block" src="images/nuget-explorer.png"></li>
+        <li>Manually edit the .csproj file and add a project reference <code></code></li>
+    </ul>
 </RadzenCard>
 <h2 class="my-3">2. Import the namespace</h2>
 <RadzenCard>
-<p>
-  Open the <code>_Imports.razor</code> file of your Blazor application and add this line <code>@@using Radzen.Blazor</code>.
-</p>
+    <p>
+        Open the <code>_Imports.razor</code> file of your Blazor application and add this line <code>@@using Radzen.Blazor</code>.
+    </p>
 </RadzenCard>
 <h2 class="my-3">3. Include a theme</h2>
 <RadzenCard>
-<ol>
-  <li>Download the <a href="https://github.com/akorchev/blazor.radzen.com/raw/master/Radzen.Blazor.Themes.zip">Radzen.Blazor.Themes.zip</a> and unzip it somewhere. It contains two directorires: <code>fonts</code> and <code>css</code>.</li>
-  <li>Copy those two directories to the <code>wwwroot</code> folder of your Blazor application.</li>
-  <li>Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side Blazor) and include a theme CSS file by adding this snippet <code>&lt;link rel="stylesheet" href="css/default.css"&gt;</code></li>
-</ol>
+    <ol>
+        <li>Download the <a href="https://github.com/akorchev/blazor.radzen.com/raw/master/Radzen.Blazor.Themes.zip">Radzen.Blazor.Themes.zip</a> and unzip it somewhere. It contains two directorires: <code>fonts</code> and <code>css</code>.</li>
+        <li>Copy those two directories to the <code>wwwroot</code> folder of your Blazor application.</li>
+        <li>Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side Blazor) and include a theme CSS file by adding this snippet <code>&lt;link rel="stylesheet" href="css/default.css"&gt;</code></li>
+    </ol>
 </RadzenCard>
-<h2 class="my-3">4. Use a component</h2>
+<h2 class="my-3">4. Include Radzen.Blazor.js</h2>
 <RadzenCard>
-  <p>
-    Use any Radzen Blazor component by typing its tag name in a Blazor page e.g. <code>&lt;RadzenButton Text="Hi"&gt;&lt;/RadzenButton&gt;</code>
-  </p>
-  <p>
-    If you are using client-side Blazor also add the following code to your <code>.csproj</code> file (after the closing <code>RazorLangVersion</code> element):
-  </p>
+    <ol>
+        <li>Get the <a href="https://github.com/akorchev/blazor.radzen.com/blob/master/wwwroot/Radzen.Blazor.js">Radzen.Blazor.js</a>.</li>
+        <li>Copy the file <code>wwwroot</code> folder of your Blazor application.</li>
+        <li>Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side Blazor) and include it <code>&lt;script src="Radzen.Blazor.js"&gt;&lt;/script&gt;</code></li>
+    </ol>
+</RadzenCard>
+<h2 class="my-3">5. Use a component</h2>
+<RadzenCard>
+    <p>
+        Use any Radzen Blazor component by typing its tag name in a Blazor page e.g. <code>&lt;RadzenButton Text="Hi"&gt;&lt;/RadzenButton&gt;</code>
+    </p>
+    <p>
+        If you are using client-side Blazor also add the following code to your <code>.csproj</code> file (after the closing <code>RazorLangVersion</code> element):
+    </p>
 <pre>
 <code>&lt;BlazorLinkOnBuild&gt;false&lt;/BlazorLinkOnBuild&gt;</code>
 </pre>
-  <p>
-  It is a workaround for a <a href="https://github.com/mono/mono/issues/12917">known issue</a> when using IQueryable.
-  </p>
-  <h4 class="my-2">Data-binding a property</h4>
+    <p>
+        It is a workaround for a <a href="https://github.com/mono/mono/issues/12917">known issue</a> when using IQueryable.
+    </p>
+    <h4 class="my-2">Data-binding a property</h4>
 <pre>
 <code>
 &lt;RadzenButton Text="@@text"&gt;&lt;/RadzenButton&gt;
@@ -54,7 +62,7 @@
 }
 </code>
 </pre>
-  <h4 class="my-2">Handing events</h4>
+    <h4 class="my-2">Handing events</h4>
 <pre>
 <code>
 &lt;RadzenButton Click="@@ButtonClicked" Text="Hi"&gt;&lt;/RadzenButton&gt;
