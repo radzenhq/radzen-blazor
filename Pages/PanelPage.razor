@@ -67,7 +67,7 @@
 @code {
     IEnumerable<Order> orders;
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
         var query = from order in dbContext.Orders
                             .Include("Customer")

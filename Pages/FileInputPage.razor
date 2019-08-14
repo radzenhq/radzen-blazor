@@ -6,7 +6,7 @@
 
 @inject NorthwindContext dbContext
 
-    <h1 style="display:inline">FileInput</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/FileInputPage.razor" target="_blank">[source code]</a>
+<h1 style="display:inline">FileInput</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/FileInputPage.razor" target="_blank">[source code]</a>
 
 <p>This page demonstrates <b>FileInput</b> component.</p>
 <RadzenCard>
@@ -40,19 +40,21 @@
 @code {
     Employee firstEmployee;
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
-        firstEmployee = dbContext.Employees.FirstOrDefault();
+        firstEmployee = await Task.FromResult(dbContext.Employees.FirstOrDefault());
     }
 
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    Dictionary<DateTime, string>
+    events = new Dictionary<DateTime, string>
+        ();
 
-    void Change(object value, string name)
-    {
+        void Change(object value, string name)
+        {
         firstEmployee.Photo = $"{value}";
         var str = new string($"{value}".Take(100).ToArray());
 
         events.Add(DateTime.Now, $"{name} value changed to {str}...");
         StateHasChanged();
-    }
-}
+        }
+        }

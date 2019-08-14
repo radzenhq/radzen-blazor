@@ -53,7 +53,7 @@ else
 @code {
     IEnumerable<Employee> employees;
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
         employees = await Task.FromResult(dbContext.Employees);
     }

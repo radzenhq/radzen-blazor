@@ -48,7 +48,7 @@ else
 @code {
     IEnumerable<Order> orders;
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
         orders = await Task.FromResult((from order in dbContext.Orders
                     .Include("Customer")

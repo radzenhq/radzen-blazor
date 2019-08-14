@@ -36,21 +36,21 @@
 
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
-    protected override void OnInit()
+    protected override void OnInitialized()
     {
         dialogService.OnOpen += Open;
         dialogService.OnClose += Close;
     }
 
-    void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+    async void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
     {
         events.Add(DateTime.Now, "Dialog opened");
-        Invoke(() => { StateHasChanged(); });
+        await InvokeAsync(() => { StateHasChanged(); });
     }
 
-    void Close(dynamic result)
+    async void Close(dynamic result)
     {
         events.Add(DateTime.Now, "Dialog closed. Result: " + result);
-        Invoke(() => { StateHasChanged(); });
+        await InvokeAsync(() => { StateHasChanged(); });
     }
 }

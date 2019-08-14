@@ -99,7 +99,7 @@
     IEnumerable<Employee> employees;
     IEnumerable<Customer> customers;
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
         employees = await Task.FromResult(dbContext.Employees);
 

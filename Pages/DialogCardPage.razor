@@ -5,7 +5,7 @@
 @using Microsoft.EntityFrameworkCore
 
 @inject NorthwindContext dbContext
-@inject DialogService dialogService
+@inject Radzen.DialogService dialogService
 
 <h1 style="display:inline">Dialog with parameters</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/DialogCardPage.razor" target="_blank">[source code]</a>
 
@@ -45,9 +45,9 @@
 
     Order order;
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
-        await Invoke(() =>
+        await InvokeAsync(() =>
         {
             var query = from order in dbContext.Orders.Where(o => o.OrderID == OrderID)
                            .Include("Customer")

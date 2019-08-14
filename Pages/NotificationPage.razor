@@ -45,11 +45,11 @@
 @code {
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
-    void ShowNotification(NotificationMessage message)
+    async void ShowNotification(NotificationMessage message)
     {
         notificationService.Notify(message);
 
         events.Add(DateTime.Now, $"{message.Severity} notification");
-        Invoke(() => { StateHasChanged(); });
+        await InvokeAsync(() => { StateHasChanged(); });
     }
 }

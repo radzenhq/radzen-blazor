@@ -47,7 +47,7 @@
     IEnumerable<Order> orders;
     Order lastOrder;
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
         var query = from order in dbContext.Orders
                             .Include("Customer")
