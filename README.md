@@ -30,9 +30,11 @@ Open the `_Imports.razor` file of your Blazor application and add this line `@us
 
 ### Include a theme
 
-Download the [Radzen.Blazor.Themes.zip](https://github.com/akorchev/blazor.radzen.com/raw/master/Radzen.Blazor.Themes.zip) and unzip it somewhere. It contains two directorires: `fonts` and `css`.
-Copy those two directories to the `wwwroot` folder of your Blazor application.
-Open the `_Host.cshtml` file (server-side Blazor) or `wwwroot/index.html` (client-side Blazor) and include a theme CSS file by adding this snippet `<link rel="stylesheet" href="css/default.css">`
+Open the `_Host.cshtml` file (server-side Blazor) or `wwwroot/index.html` (client-side Blazor) and include a theme CSS file by adding this snippet `<link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css">`
+
+### Include Radzen.Blazor.js
+
+Open the `_Host.cshtml` file (server-side Blazor) or `wwwroot/index.html` (client-side Blazor) and include this snippet `<script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>`
 
 ### Use a component
 Use any Radzen Blazor component by typing its tag name in a Blazor page e.g. 
