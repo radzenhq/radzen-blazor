@@ -52,7 +52,9 @@ namespace LatestBlazor
         });
       }
 
+      /*
       app.UseHttpsRedirection();
+      */
 
       app.UseStaticFiles();
 
