@@ -15,7 +15,7 @@
             <br />
             <RadzenCheckBox Name="CheckBox2" TriState="false" Value="@CheckBox2Value" Style="margin-bottom: 20px" Change="@(args => Change(args, "CheckBox2 CheckBox"))" /><RadzenLabel Text="CheckBox2" Component="CheckBox2" Style="margin-left: 5px;margin-bottom: 20px" />
             <br />
-            <RadzenCheckBox Name="CheckBox3" TriState="true" Change="@(args => Change(args, "TriState CheckBox"))" /><RadzenLabel Text="TriState" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox3" />
+            <RadzenCheckBox @bind-Value="value" Name="CheckBox3" TriState="true" Change="@(args => Change(args, "TriState CheckBox"))" /><RadzenLabel Text="TriState" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox3" />
             <br />
             <RadzenCheckBox Name="CheckBox4" Disabled="true" TriState="true" Change="@(args => Change(args, "Disabled CheckBox"))" /><RadzenLabel Text="Disabled" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox4" />
             <br />
@@ -34,6 +34,8 @@
 </RadzenCard>
 
 @code {
+    bool? value;
+
     bool CheckBox1Value = true;
     bool CheckBox2Value = false;
 

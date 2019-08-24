@@ -13,7 +13,7 @@
     <div class="row">
         <div class="col-md-6">
             <h3>ListBox</h3>
-            <RadzenListBox Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px; height:500px;" Change="@(args => Change(args, "ListBox"))" />
+            <RadzenListBox @bind-Value="@value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px; height:500px;" Change="@(args => Change(args, "ListBox"))" />
         </div>
         <div class="col-md-6">
             <h3>Events</h3>
@@ -29,6 +29,8 @@
 </RadzenCard>
 
 @code {
+    string value;
+
     IEnumerable<dynamic> customers;
 
     protected override async Task OnInitializedAsync()

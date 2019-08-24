@@ -19,7 +19,7 @@
             <RadzenDropDown Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px" />
             <br />
             <h3>DropDown with template</h3>
-            <RadzenDropDown Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+            <RadzenDropDown @bind-Value="value" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
                             Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px; width:400px;">
                 <Template>
                     Company: @((context as Customer).CompanyName)
@@ -27,7 +27,7 @@
             </RadzenDropDown>
             <br />
             <h3>DropDown with multiple selection</h3>
-            <RadzenDropDown Multiple="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" 
+            <RadzenDropDown @bind-Value="multipleValues" Multiple="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" 
                             Change="@(args => Change(args, "DropDown with multiple selection"))" Style="margin-bottom: 20px; width:400px;" />
         </div>
         <div class="col-md-6">
@@ -45,6 +45,9 @@
 
 @code {
 IEnumerable<dynamic> customers;
+
+IEnumerable<string> multipleValues;
+string value;
 
 protected override async Task OnInitializedAsync()
 {
