@@ -39,7 +39,7 @@
 @code {
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
-    void Click(UIMouseEventArgs args, string buttonName)
+    void Click(MouseEventArgs args, string buttonName)
     {
         events.Add(DateTime.Now, $"{buttonName} clicked");
         StateHasChanged();

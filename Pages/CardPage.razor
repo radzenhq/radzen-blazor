@@ -49,15 +49,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var query = from order in dbContext.Orders
+        var query = (from order in dbContext.Orders
                             .Include("Customer")
                             .Include("Employee")
                             .Include("OrderDetails")
                             .Include("OrderDetails.Product")
-                    select order;
+                    select order).ToList();
 
         lastOrder = query.Last();
 
-        orders = await Task.FromResult(query.ToList());
+        orders = await Task.FromResult(query);
     }
 }

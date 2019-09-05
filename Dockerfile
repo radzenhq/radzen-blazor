@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0.100-preview8
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0.100-preview9
 COPY . /app
 WORKDIR /app
 RUN dotnet publish -c Release -o out

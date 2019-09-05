@@ -3,7 +3,7 @@
 @using Radzen.Blazor
 @inherits LayoutComponentBase
 @inject ThemeState ThemeState
-@inject IUriHelper UriHelper
+@inject NavigationManager UriHelper
 
 <link href="_content/Radzen.Blazor/css/@(Theme)" rel="stylesheet" />
 <RadzenDialog />
@@ -71,6 +71,9 @@
     </ChildContent>
 </RadzenFooter>
 @code {
+    RadzenSidebar sidebar0;
+    RadzenBody body0;
+
     dynamic themes = new[]
     {
         new {Text = "Default", Value = "default"},
@@ -90,6 +93,6 @@
     void ChangeTheme(object value)
     {
         ThemeState.CurrentTheme = value.ToString();
-        UriHelper.NavigateTo(UriHelper.GetAbsoluteUri());
+        UriHelper.NavigateTo(UriHelper.ToAbsoluteUri(UriHelper.Uri).ToString());
     }
 }
