@@ -15,19 +15,19 @@
         <div class="col-md-6">
             <h3>Info</h3>
             <RadzenButton Text=@($"Show info notification") Style="margin-bottom: 20px; width: 200px"
-                Click="@(args => ShowNotification(new NotificationMessage() { Severity = "info", Summary = "Info Summary", Detail = "Info Detail", Duration = 4000 }))" />
+                Click="@(args => ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Info, Summary = "Info Summary", Detail = "Info Detail", Duration = 4000 }))" />
             <br />
             <h3>Warning</h3>
             <RadzenButton Text=@($"Show warning notification") Style="margin-bottom: 20px; width: 200px"
-                Click="@(args => ShowNotification(new NotificationMessage() { Severity = "warn", Summary = "Warning Summary", Detail = "Warning Detail", Duration = 4000 }))" />
+                Click="@(args => ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Warning, Summary = "Warning Summary", Detail = "Warning Detail", Duration = 4000 }))" />
             <br />
             <h3>Error</h3>
             <RadzenButton Text=@($"Show error notification") Style="margin-bottom: 20px; width: 200px"
-                Click="@(args => ShowNotification(new NotificationMessage() { Severity = "error", Summary = "Error Summary", Detail = "Error Detail", Duration = 4000 }))" />
+                Click="@(args => ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Error Summary", Detail = "Error Detail", Duration = 4000 }))" />
             <br />
             <h3>Success</h3>
             <RadzenButton Text=@($"Show success notification") Style="margin-bottom: 20px; width: 200px"
-                Click="@(args => ShowNotification(new NotificationMessage() { Severity = "success", Summary = "Success Summary", Detail = "Success Detail", Duration = 4000 }))" />
+                Click="@(args => ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = "Success Summary", Detail = "Success Detail", Duration = 4000 }))" />
         </div>
         <div class="col-md-6">
             <h3>Events</h3>
