@@ -11,11 +11,28 @@
 <p>This page demonstrates <b>ListBox</b> component.</p>
 <RadzenCard>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <h3>ListBox</h3>
-            <RadzenListBox @bind-Value="@value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px; height:500px;" Change="@(args => Change(args, "ListBox"))" />
+            <RadzenListBox @bind-Value="@value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px;height:200px;" Change="@(args => Change(args, "ListBox"))" />
+            <br />
+            <h3>ListBox with template</h3>
+            <RadzenListBox @bind-Value="value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+                           Change="@(args => Change(args, "ListBox with template"))" Style="margin-bottom: 20px; height:200px;">
+                <Template>
+                    Company: @((context as Customer).CompanyName)
+                </Template>
+            </RadzenListBox>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
+            <h3>ListBox with filtering</h3>
+            <RadzenListBox AllowFiltering="true" @bind-Value="value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+                           Change="@(args => Change(args, "ListBox with filtering"))" Style="margin-bottom: 20px; height:200px;" />
+            <br />
+            <h3>ListBox with multiple selection</h3>
+            <RadzenListBox AllowFiltering="true" @bind-Value="multipleValues" Multiple="true" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+                           Change="@(args => Change(args, "ListBox with multiple selection"))" Style="margin-bottom: 20px; height:200px;" />
+        </div>
+        <div class="col-md-4">
             <h3>Events</h3>
             <RadzenCard style="overflow: auto;height:500px;">
                 @foreach (var e in events.OrderByDescending(i => i.Key))
@@ -29,6 +46,7 @@
 </RadzenCard>
 
 @code {
+    IEnumerable<string> multipleValues;
     string value;
 
     IEnumerable<dynamic> customers;
@@ -42,7 +60,9 @@
 
     void Change(object value, string name)
     {
-        events.Add(DateTime.Now, $"{name} value changed to {value}");
+        var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
+
+        events.Add(DateTime.Now, $"{name} value changed to {str}");
         StateHasChanged();
     }
 }
