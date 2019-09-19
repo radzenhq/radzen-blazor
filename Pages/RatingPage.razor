@@ -11,20 +11,29 @@
     <div class="row">
         <div class="col-md-6">
             <h3>Rating with 5 stars</h3>
-            <RadzenRating @bind-Value="@value" Style="margin-bottom: 20px"  />
+            <RadzenRating Style="margin-bottom: 20px" Change="@((args) => Change(args, "Rating with 5 stars"))"  />
             <br />
             <h3>Rating with 10 stars</h3>
-            <RadzenRating Value="3" Stars="10" Style="margin-bottom: 20px" />
+            <RadzenRating Stars="10" Style="margin-bottom: 20px" Change="@((args) => Change(args, "Rating with 10 stars"))"/>
         </div>
         <div class="col-md-6">
             <h3>Events</h3>
             <RadzenCard style="overflow: auto;height:500px;">
-               N/A
+                @foreach (var e in events.OrderByDescending(i => i.Key))
+                {
+                    @e.Value
+                    <br />
+                }
             </RadzenCard>
         </div>
     </div>
 </RadzenCard>
 
 @code {
-    int value = 2;
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Change(int value, string name)
+    {
+        events.Add(DateTime.Now, $"{name} value changed to {value}");
+    }
 }
