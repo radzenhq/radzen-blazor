@@ -1,0 +1,30 @@
+﻿@page "/rating"
+@using Radzen
+@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+<h1 style="display:inline">Rating</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/RatingPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/rating/" target="_blank">[documentation]</a>
+
+<p>This page demonstrates <b>Rating</b> component.</p>
+<RadzenCard>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Rating with 5 stars</h3>
+            <RadzenRating @bind-Value="@value" Style="margin-bottom: 20px"  />
+            <br />
+            <h3>Rating with 10 stars</h3>
+            <RadzenRating Value="3" Stars="10" Style="margin-bottom: 20px" />
+        </div>
+        <div class="col-md-6">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+               N/A
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenCard>
+
+@code {
+    int value = 2;
+}
