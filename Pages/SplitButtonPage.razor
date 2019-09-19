@@ -10,19 +10,27 @@
 <RadzenCard>
     <div class="row">
         <div class="col-md-6">
-            <h3>Button with text</h3>
-            <RadzenSplitButton Click="@((args) => Click(args, "SplitButton with text"))" Text="Button" Style="margin-bottom: 20px; width: 150px">
+            <h3>SplitButton with text</h3>
+            <RadzenSplitButton Click="@((args) => Click(args, "SplitButton with text"))" Text="SplitButton" Style="margin-bottom: 20px;">
                 <ChildContent>
                     <RadzenSplitButtonItem Text="Item1" Value="1" />
                     <RadzenSplitButtonItem Text="Item2" Value="2" />
                 </ChildContent>
             </RadzenSplitButton>
             <br />
-            <h3>Button with text and icon</h3>
-            <RadzenSplitButton Click="@((args) => Click(args, "SplitButton with text and icon"))" Text="Button" Icon="account_circle" Style="margin-bottom: 20px; width: 150px">
+            <h3>SplitButton with text and icon</h3>
+            <RadzenSplitButton Click="@((args) => Click(args, "SplitButton with text and icon"))" Text="SplitButton" Icon="account_circle" Style="margin-bottom: 20px;">
                 <ChildContent>
-                    <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box"  />
-                    <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet"  />
+                    <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
+                    <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
+                </ChildContent>
+            </RadzenSplitButton>
+            <br />
+            <h3>SplitButton with icon</h3>
+            <RadzenSplitButton Click="@((args) => Click(args, "SplitButton with icon"))" Icon="account_circle" Style="margin-bottom: 20px;">
+                <ChildContent>
+                    <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
+                    <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
                 </ChildContent>
             </RadzenSplitButton>
             <br />
