@@ -1,0 +1,56 @@
+﻿@page "/checkboxlist"
+@using Radzen
+@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<h1 style="display:inline">CheckBoxList</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/CheckBoxListPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/checkboxlist/" target="_blank">[documentation]</a>
+
+<p>This page demonstrates <b>CheckBoxList</b> component.</p>
+<RadzenCard>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>CheckBoxList with horizontal orientation</h3>
+            <RadzenCheckBoxList Change="@((args) => Change(args, "CheckBoxList with horizontal orientation"))">
+                <Items>
+                    <RadzenCheckBoxListItem Text="Orders" Value="1" />
+                    <RadzenCheckBoxListItem Text="Employees" Value="2" />
+                    <RadzenCheckBoxListItem Text="Customers" Value="3" />
+                </Items>
+            </RadzenCheckBoxList>
+            <br />
+            <h3>CheckBoxList with vertical orientation</h3>
+            <RadzenCheckBoxList Orientation="Orientation.Vertical" Change="@((args) => Change(args, "CheckBoxList with vertical orientation"))">
+                <Items>
+                    <RadzenCheckBoxListItem Text="Orders" Value="1" />
+                    <RadzenCheckBoxListItem Text="Employees" Value="2" />
+                    <RadzenCheckBoxListItem Text="Customers" Value="3" />
+                </Items>
+            </RadzenCheckBoxList>
+            <br />
+        </div>
+        <div class="col-md-6">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+                @foreach (var e in events.OrderByDescending(i => i.Key))
+                {
+                    @e.Value
+                    <br />
+                }
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenCard>
+
+@code {
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Change(object value, string name)
+    {
+        var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
+        events.Add(DateTime.Now, $"{name} value changed to {str}");
+        StateHasChanged();
+    }
+}
