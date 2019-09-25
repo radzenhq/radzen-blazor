@@ -1,0 +1,117 @@
+﻿@page "/master-detail"
+
+@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<h1 style="display:inline">Master/Detail</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/MasterDetailPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/datagrid/" target="_blank">[documentation]</a>
+
+<p>This page demonstrates fetching data from the server using <b>IQueryable</b> bound to a master <b>DataGrid</b>. The detail data are presented with <b>DataGrid</b>, <b>Tabs</b> and <b>DataList</b> updated on master <b>DataGrid</b> row select.</p>
+
+@if (orders == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <RadzenGrid ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" Data="@orders" TItem="Order" Value="@order" RowSelect="@(args => order = args)">
+                <Columns>
+                    <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
+                    <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
+                    <RadzenGridColumn Width="150px" TItem="Order" Property="Employee.LastName" Title="Employee">
+                        <Template Context="order">
+                            <div>@order.Employee?.LastName</div>
+                            <RadzenImage Path="@order.Employee?.Photo" />
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date" Format="date-time">
+                        <Template Context="order">
+                            @String.Format("{0:d}", order.OrderDate)
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Order" Property="RequiredDate" Title="Required Date" Format="date-time">
+                        <Template Context="order">
+                            @String.Format("{0:d}", order.RequiredDate)
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Order" Property="ShippedDate" Title="Shipped Date" Format="date-time">
+                        <Template Context="order">
+                            @String.Format("{0:d}", order.ShippedDate)
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight">
+                        <Template Context="order">
+                            @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
+                    <RadzenGridColumn TItem="Order" Property="ShipAddress" Title="Ship Address" />
+                    <RadzenGridColumn TItem="Order" Property="ShipCity" Title="Ship City" />
+                    <RadzenGridColumn TItem="Order" Property="ShipRegion" Title="Ship Region" />
+                    <RadzenGridColumn TItem="Order" Property="ShipPostalCode" Title="Ship Postal Code" />
+                    <RadzenGridColumn TItem="Order" Property="ShipCountry" Title="Ship Country" Type="string" />
+                </Columns>
+            </RadzenGrid>
+        </div>
+        <div class="col-md-6">
+            <RadzenCard Style="margin-bottom:20px">
+                Company:
+                <b>@order.Customer?.CompanyName</b>
+            </RadzenCard>
+            <RadzenTabs>
+                <Tabs>
+                    <RadzenTabsItem Text="Order Details">
+                        <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@order.OrderDetails" TItem="OrderDetail">
+                            <Columns>
+                                <RadzenGridColumn TItem="OrderDetail" Property="Order.CustomerID" Title="Order" />
+                                <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+                                <RadzenGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
+                                    <Template Context="detail">
+                                        @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
+                                    </Template>
+                                </RadzenGridColumn>
+                                <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+                                <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
+                                    <Template Context="detail">
+                                        @String.Format("{0}%", detail.Discount * 100)
+                                    </Template>
+                                </RadzenGridColumn>
+                            </Columns>
+                        </RadzenGrid>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Products">
+                        <RadzenDataList WrapItems="true" AllowPaging="true" Data="@order.OrderDetails" TItem="OrderDetail" PageSize="10">
+                            <Template Context="detail">
+                                <RadzenCard Style="width:100px;height:100px">
+                                    Product:
+                                    <b>@detail?.Product?.ProductName</b>
+                                </RadzenCard>
+                            </Template>
+                        </RadzenDataList>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </div>
+    </div>
+}
+
+@code {
+    Order order;
+    IEnumerable<Order> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        orders = await Task.FromResult(from order in dbContext.Orders
+        .Include("Customer")
+        .Include("Employee")
+        .Include("OrderDetails")
+        .Include("OrderDetails.Product")
+                                       select order);
+        order = orders.FirstOrDefault();
+
+    }
+}
