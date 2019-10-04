@@ -123,8 +123,9 @@ else
     {
         ordersGrid.CancelEditRow(order);
 
-        dbContext.Entry(order).CurrentValues.SetValues(dbContext.Entry(order).OriginalValues);
-        dbContext.Entry(order).State = EntityState.Unchanged;
+        var orderEntry = dbContext.Entry(order);
+        orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
+        orderEntry.State = EntityState.Unchanged;
     }
 
     void DeleteRow(Order order)
