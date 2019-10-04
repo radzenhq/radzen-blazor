@@ -1,0 +1,120 @@
+﻿@page "/datagrid-inline-edit"
+
+@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<h1 style="display:inline">DataGrid InLine Editing</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/DataGridInLineEdit.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/datagrid/" target="_blank">[documentation]</a>
+
+<p>This page demonstrates fetching data from the server using <b>IQueryable</b> bound to a <b>DataGrid</b> with InLine edit.></p>
+
+@if (orders == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-12">
+            <RadzenGrid @ref="ordersGrid" ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
+                        Data="@orders" TItem="Order" Value="@order" RowUpdate="ordersGridRowUpdate">
+                <Columns>
+                    <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
+                    <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer">
+                        <EditTemplate Context="order">
+                            <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%" />
+                        </EditTemplate>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn Width="150px" TItem="Order" Property="Employee.LastName" Title="Employee">
+                        <Template Context="order">
+                            <div>@order.Employee?.LastName</div>
+                            <RadzenImage Path="@order.Employee?.Photo" Style="width:100%" />
+                        </Template>
+                        <EditTemplate Context="order">
+                            <RadzenFileInput @bind-Value="order.Employee.Photo" Style="width:100%" />
+                        </EditTemplate>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date" Format="date-time">
+                        <Template Context="order">
+                            @String.Format("{0:d}", order.OrderDate)
+                        </Template>
+                        <EditTemplate Context="order">
+                            <RadzenDatePicker @bind-Value="order.OrderDate" Style="width:100%"/>
+                        </EditTemplate>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight">
+                        <Template Context="order">
+                            @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+                        </Template>
+                        <EditTemplate Context="order">
+                            <RadzenNumeric @bind-Value="order.Freight" Style="width:100%" />
+                        </EditTemplate>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name">
+                        <EditTemplate Context="order">
+                            <RadzenTextBox @bind-Value="order.ShipName" Style="width:100%" />
+                        </EditTemplate>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Order" Context="sampleBlazorModelsSampleOrder" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+                        <Template Context="order">
+                            <RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@((args) => ordersGrid.EditRow(order))">
+                            </RadzenButton>
+                        </Template>
+                        <EditTemplate Context="order">
+                            <RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => ordersGrid.UpdateRow(order))">
+                            </RadzenButton>
+                            <RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => ordersGrid.CancelEditRow(order))">
+                            </RadzenButton>
+                        </EditTemplate>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Order" Context="order" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+                        <Template Context="order">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@((args) =>ordersGridDelete(args, order))">
+                            </RadzenButton>
+                        </Template>
+                        <EditTemplate Context="order">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@((args) =>ordersGridDelete(args, order))">
+                            </RadzenButton>
+                        </EditTemplate>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </div>
+    </div>
+}
+
+@code {
+    RadzenGrid<Order> ordersGrid;
+
+    Order order;
+    IEnumerable<Order> orders;
+    IEnumerable<Customer> customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        customers = await Task.FromResult(dbContext.Customers);
+
+        orders = await Task.FromResult(from order in dbContext.Orders
+        .Include("Customer")
+        .Include("Employee")
+        .Include("OrderDetails")
+        .Include("OrderDetails.Product")
+                                       select order);
+        order = orders.FirstOrDefault();
+
+    }
+
+    void ordersGridRowUpdate(Order args)
+    {
+        dbContext.Update<Order>(args);
+        dbContext.SaveChanges();
+    }
+
+    void ordersGridDelete(MouseEventArgs args, Order data)
+    {
+        dbContext.Remove<Order>(data);
+        dbContext.SaveChanges();
+    }
+}
