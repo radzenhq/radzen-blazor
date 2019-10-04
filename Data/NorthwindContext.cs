@@ -1,5 +1,9 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.IO;
+using System.Threading;
 
 namespace NorthwindBlazor.Data
 {
@@ -13,13 +17,53 @@ namespace NorthwindBlazor.Data
         {
         }
 
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public NorthwindContext(DbContextOptions<NorthwindContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
+        {
+            _httpContextAccessor = httpContextAccessor;
+            Ensure();
+        }
+
+        public NorthwindContext(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+            Ensure();
+        }
+
+        public void Ensure()
+        {
+            var sessionId = string.Format("northwind-{0}", _httpContextAccessor.HttpContext.Session.Id);
+
+            if (_httpContextAccessor.HttpContext.Session.GetString(sessionId) == null)
+            {
+                _httpContextAccessor.HttpContext.Session.SetString(sessionId, sessionId);
+
+                this.Database.OpenConnection();
+                this.Database.EnsureCreated();
+
+                this.Database.ExecuteSqlCommand(System.IO.File.ReadAllText("northwind.sql"));
+
+                System.Threading.Tasks.Task.Factory.StartNew(() =>
+                {
+                    Thread.Sleep(TimeSpan.FromHours(1));
+                    var dbFile = string.Format("{0}.db", sessionId);
+
+                    if (File.Exists(dbFile))
+                    {
+                        File.Delete(dbFile);
+                    }
+                });
+            }
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
                 var builder = new SqliteConnectionStringBuilder()
                 {
-                    DataSource = "northwind.db",
+                    DataSource = string.Format("northwind-{0}.db", _httpContextAccessor.HttpContext.Session.Id),
                     Cache = SqliteCacheMode.Private
                 };
 

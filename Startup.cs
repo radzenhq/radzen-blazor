@@ -23,6 +23,14 @@ namespace LatestBlazor
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services)
     {
+      services.AddSession(options =>
+      {
+            options.IdleTimeout = TimeSpan.FromHours(1);
+            options.Cookie.HttpOnly = true;
+      });
+
+      services.AddHttpContextAccessor();
+
       services.AddRazorPages();
       services.AddServerSideBlazor().AddHubOptions(o =>
       {
@@ -38,6 +46,8 @@ namespace LatestBlazor
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+       app.UseSession();
+
       if (env.IsDevelopment())
       {
         app.UseDeveloperExceptionPage();

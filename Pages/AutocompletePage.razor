@@ -35,9 +35,6 @@
 @code {
 IEnumerable<dynamic> customers;
 
-IEnumerable<string> multipleValues;
-string value;
-
 protected override async Task OnInitializedAsync()
 {
     customers = await Task.FromResult(dbContext.Customers);
