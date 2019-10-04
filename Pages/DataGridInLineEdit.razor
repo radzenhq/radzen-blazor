@@ -19,7 +19,7 @@ else
     <div class="row">
         <div class="col-md-12">
             <RadzenGrid @ref="ordersGrid" ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
-                        Data="@orders" TItem="Order" Value="@order" RowUpdate="ordersGridRowUpdate">
+                        Data="@orders" TItem="Order" Value="@order">
                 <Columns>
                     <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
                     <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer">
@@ -59,23 +59,23 @@ else
                     </RadzenGridColumn>
                     <RadzenGridColumn TItem="Order" Context="sampleBlazorModelsSampleOrder" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
                         <Template Context="order">
-                            <RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@((args) => ordersGrid.EditRow(order))">
+                            <RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditRow(order))">
                             </RadzenButton>
                         </Template>
                         <EditTemplate Context="order">
-                            <RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => ordersGrid.UpdateRow(order))">
+                            <RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => UpdateRow(order))">
                             </RadzenButton>
-                            <RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => ordersGrid.CancelEditRow(order))">
+                            <RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => CancelEdit(order))">
                             </RadzenButton>
                         </EditTemplate>
                     </RadzenGridColumn>
                     <RadzenGridColumn TItem="Order" Context="order" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
                         <Template Context="order">
-                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@((args) =>ordersGridDelete(args, order))">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@(args => DeleteRow(order))">
                             </RadzenButton>
                         </Template>
                         <EditTemplate Context="order">
-                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@((args) =>ordersGridDelete(args, order))">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@(args => DeleteRow(order))">
                             </RadzenButton>
                         </EditTemplate>
                     </RadzenGridColumn>
@@ -106,15 +106,30 @@ else
 
     }
 
-    void ordersGridRowUpdate(Order args)
+    void EditRow(Order order)
     {
-        dbContext.Update<Order>(args);
+        ordersGrid.EditRow(order);
+    }
+
+    void UpdateRow(Order order)
+    {
+        ordersGrid.UpdateRow(order);
+
+        dbContext.Update<Order>(order);
         dbContext.SaveChanges();
     }
 
-    void ordersGridDelete(MouseEventArgs args, Order data)
+    void CancelEdit(Order order)
     {
-        dbContext.Remove<Order>(data);
+        ordersGrid.CancelEditRow(order);
+
+        dbContext.Entry(order).CurrentValues.SetValues(dbContext.Entry(order).OriginalValues);
+        dbContext.Entry(order).State = EntityState.Unchanged;
+    }
+
+    void DeleteRow(Order order)
+    {
+        dbContext.Remove<Order>(order);
         dbContext.SaveChanges();
     }
 }
