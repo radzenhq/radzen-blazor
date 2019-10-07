@@ -18,7 +18,7 @@ else
 {
     <div class="row">
         <div class="col-md-12">
-            <RadzenGrid @ref="ordersGrid" ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
+            <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
                         Data="@orders" TItem="Order" Value="@order">
                 <Columns>
                     <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
@@ -27,10 +27,10 @@ else
                             <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%" />
                         </EditTemplate>
                     </RadzenGridColumn>
-                    <RadzenGridColumn Width="150px" TItem="Order" Property="Employee.LastName" Title="Employee">
+                    <RadzenGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
                         <Template Context="order">
                             <div>@order.Employee?.LastName</div>
-                            <RadzenImage Path="@order.Employee?.Photo" Style="width:100%" />
+                            <RadzenImage Path="@order.Employee?.Photo" Style="width:150px" />
                         </Template>
                         <EditTemplate Context="order">
                             <RadzenFileInput @bind-Value="order.Employee.Photo" Style="width:100%" />
