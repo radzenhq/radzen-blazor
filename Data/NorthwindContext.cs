@@ -42,7 +42,7 @@ namespace NorthwindBlazor.Data
                 this.Database.OpenConnection();
                 this.Database.EnsureCreated();
 
-                this.Database.ExecuteSqlCommand(System.IO.File.ReadAllText("northwind.sql"));
+                this.Database.ExecuteSqlRaw(System.IO.File.ReadAllText("northwind.sql"));
 
                 System.Threading.Tasks.Task.Factory.StartNew(() =>
                 {

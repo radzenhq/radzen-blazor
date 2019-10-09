@@ -53,8 +53,8 @@
 
     MyObject myModel = new MyObject();
 
-    IEnumerable<object> multipleValues;
-    string value;
+    IEnumerable<string> multipleValues = new string[] { "ALFKI", "ANATR" };
+    string value = "ALFKI";
 
     protected override async Task OnInitializedAsync()
     {
