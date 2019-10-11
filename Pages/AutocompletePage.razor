@@ -13,10 +13,10 @@
     <div class="row">
         <div class="col-md-6">
             <h3>AutoComplete</h3>
-            <RadzenAutoComplete TValue="string" Data="@customers" TextProperty="CompanyName" Style="margin-bottom: 20px" Change="@(args => Change(args, "AutoComplete"))" />
+            <RadzenAutoComplete Data="@customers" TextProperty="CompanyName" Style="margin-bottom: 20px" Change="@(args => Change(args, "AutoComplete"))" />
             <br />
             <h3>AutoComplete with placeholder</h3>
-            <RadzenAutoComplete TValue="string" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" Change="@(args => Change(args, "AutoComplete with placeholder"))" Style="margin-bottom: 20px" />
+            <RadzenAutoComplete Placeholder="Select..." Data="@customers" TextProperty="CompanyName" Change="@(args => Change(args, "AutoComplete with placeholder"))" Style="margin-bottom: 20px" />
             <br />
         </div>
         <div class="col-md-6">
