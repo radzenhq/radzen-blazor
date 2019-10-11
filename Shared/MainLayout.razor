@@ -20,7 +20,7 @@
             </div>
             <div class="col-md-6 d-flex align-items-center justify-content-end">
                 <NavLink class="btn-secondary" style="padding: 0 1rem; margin: 1rem; display: inline-block;" href="/get-started">Get started</NavLink>
-                <div style="margin: 1rem">Theme: <RadzenDropDown TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" /></div>
+                <div style="margin: 1rem">Theme: <RadzenDropDown TValue="string" TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" /></div>
             </div>
         </div>
     </ChildContent>

@@ -11,16 +11,16 @@
     <div class="row">
         <div class="col-md-6">
             <h3>Numeric</h3>
-            <RadzenNumeric TItem="int" Style="margin-bottom: 20px" Change="@(args => Change(args, "Numeric"))" />
+            <RadzenNumeric TValue="int" Style="margin-bottom: 20px" Change="@(args => Change(args, "Numeric"))" />
             <br />
             <h3>Numeric with Min set to 1 and Max set to 10</h3>
-            <RadzenNumeric TItem="int" Min="1" Max="10" Change="@(args => Change(args, "Numeric with Min set to 1 and Max set to 10"))" Style="margin-bottom: 20px" />
+            <RadzenNumeric TValue="int" Min="1" Max="10" Change="@(args => Change(args, "Numeric with Min set to 1 and Max set to 10"))" Style="margin-bottom: 20px" />
             <br />
             <h3>Numeric with placeholder and 0.5 step</h3>
-            <RadzenNumeric TItem="double" Placeholder="0.0" Step="0.5" Change="@(args => Change(args, "Numeric with placeholder and 0.5 step"))" Style="margin-bottom: 20px" />
+            <RadzenNumeric TValue="double" Placeholder="0.0" Step="0.5" Change="@(args => Change(args, "Numeric with placeholder and 0.5 step"))" Style="margin-bottom: 20px" />
             <br />
             <h3>Nullable numeric</h3>
-            <RadzenNumeric TItem="int?" @bind-Value="@value" Placeholder="Enter or clear value" Change="@(args => Change(args, "Nullable numeric"))" Style="margin-bottom: 20px" />
+            <RadzenNumeric TValue="int?" @bind-Value="@value" Placeholder="Enter or clear value" Change="@(args => Change(args, "Nullable numeric"))" Style="margin-bottom: 20px" />
         </div>
         <div class="col-md-6">
             <h3>Events</h3>
