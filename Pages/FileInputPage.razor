@@ -19,7 +19,7 @@
                         <div style="margin-top:20px">Employee:</div>
                         <b>@(firstEmployee.FirstName + " " + firstEmployee.LastName)</b>
                         <br />
-                        <RadzenFileInput Value="@firstEmployee.Photo" Style="width:400px;" Change="@(args => Change(args, "FileInput"))" />
+                        <RadzenFileInput @bind-Value="@firstEmployee.Photo" Style="width:400px;" TValue="string" Change="@(args => Change(args, "FileInput"))" />
                     </div>
                 </div>
             </RadzenCard>
@@ -45,16 +45,14 @@
         firstEmployee = await Task.FromResult(dbContext.Employees.FirstOrDefault());
     }
 
-    Dictionary<DateTime, string>
-    events = new Dictionary<DateTime, string>
-        ();
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
-        void Change(object value, string name)
-        {
-        firstEmployee.Photo = $"{value}";
+    void Change(string value, string name)
+    {
+        firstEmployee.Photo = value;
         var str = new string($"{value}".Take(100).ToArray());
 
         events.Add(DateTime.Now, $"{name} value changed to {str}...");
         StateHasChanged();
-        }
-        }
+    }
+}

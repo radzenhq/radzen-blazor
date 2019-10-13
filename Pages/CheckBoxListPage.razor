@@ -13,20 +13,20 @@
     <div class="row">
         <div class="col-md-6">
             <h3>CheckBoxList with horizontal orientation</h3>
-            <RadzenCheckBoxList Change="@((args) => Change(args, "CheckBoxList with horizontal orientation"))">
+            <RadzenCheckBoxList @bind-Value="values" TValue="int" Change="@((args) => Change(args, "CheckBoxList with horizontal orientation"))">
                 <Items>
                     <RadzenCheckBoxListItem Text="Orders" Value="1" />
-                    <RadzenCheckBoxListItem Text="Employees" Value="2" />
-                    <RadzenCheckBoxListItem Text="Customers" Value="3" />
+                    <RadzenCheckBoxListItem Text="Employees" Value="2"  />
+                    <RadzenCheckBoxListItem Text="Customers" Value="3"  />
                 </Items>
             </RadzenCheckBoxList>
             <br />
             <h3>CheckBoxList with vertical orientation</h3>
-            <RadzenCheckBoxList Orientation="Orientation.Vertical" Change="@((args) => Change(args, "CheckBoxList with vertical orientation"))">
+            <RadzenCheckBoxList @bind-Value="values" TValue="int" Orientation="Orientation.Vertical" Change="@((args) => Change(args, "CheckBoxList with vertical orientation"))">
                 <Items>
                     <RadzenCheckBoxListItem Text="Orders" Value="1" />
-                    <RadzenCheckBoxListItem Text="Employees" Value="2" />
-                    <RadzenCheckBoxListItem Text="Customers" Value="3" />
+                    <RadzenCheckBoxListItem Text="Employees" Value="2"  />
+                    <RadzenCheckBoxListItem Text="Customers" Value="3"  />
                 </Items>
             </RadzenCheckBoxList>
             <br />
@@ -45,11 +45,13 @@
 </RadzenCard>
 
 @code {
+    IEnumerable<int> values = new int[] { 1 };
+
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
-    void Change(object value, string name)
+    void Change(IEnumerable<int> value, string name)
     {
-        var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
+        var str = string.Join(", ", value);
         events.Add(DateTime.Now, $"{name} value changed to {str}");
         StateHasChanged();
     }
