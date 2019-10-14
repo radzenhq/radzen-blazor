@@ -16,7 +16,7 @@
             <RadzenDropDown TValue="string" @bind-Value="CustomerID" Placeholder="Select customer" AllowFiltering="true" Data="@(customers)" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" />
             <br />
             <h3>Orders</h3>
-            <RadzenDropDown TValue="int" @bind-Value="OrderID" Placeholder="Select order" AllowFiltering="true" Data="@(orders.Where(o => o.CustomerID == CustomerID))" ValueProperty="OrderID" Style="margin-bottom: 20px">
+            <RadzenDropDown TValue="int" @bind-Value="OrderID" Placeholder="Select order" Data="@(orders.Where(o => o.CustomerID == CustomerID))" ValueProperty="OrderID" Style="margin-bottom: 20px">
                 <Template>
                     Order Date: @String.Format("{0:d}", ((Order)context).OrderDate)
                 </Template>
