@@ -1,0 +1,53 @@
+﻿@page "/cascading-dropdowns"
+
+@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<h1 style="display:inline">Cascading DropDowns</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/CascadingDropDownsPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/dropdown/" target="_blank">[documentation]</a>
+
+<p>This page demonstrates cascading <b>DropDown</b> component.</p>
+<RadzenCard>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Customers</h3>
+            <RadzenDropDown TValue="string" @bind-Value="CustomerID" Placeholder="Select customer" AllowFiltering="true" Data="@(customers)" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" />
+            <br />
+            <h3>Orders</h3>
+            <RadzenDropDown TValue="int" @bind-Value="OrderID" Placeholder="Select order" AllowFiltering="true" Data="@(orders.Where(o => o.CustomerID == CustomerID))" ValueProperty="OrderID" Style="margin-bottom: 20px">
+                <Template>
+                    Order Date: @String.Format("{0:d}", ((Order)context).OrderDate)
+                </Template>
+            </RadzenDropDown>
+            <br />
+            <h3>Order Details</h3>
+            <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                        Data="@(orderDetails.Where(o => o.OrderID == OrderID))" TItem="OrderDetail" ColumnWidth="200px">
+                <Columns>
+                    <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+                    <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+                    <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount"  FormatString="{0:P}" />
+                </Columns>
+            </RadzenGrid>
+            <br />
+        </div>
+    </div>
+</RadzenCard>
+
+@code {
+    IEnumerable<Customer> customers;
+    IEnumerable<Order> orders;
+    IEnumerable<OrderDetail> orderDetails;
+
+    string CustomerID;
+    int OrderID;
+
+    protected override async Task OnInitializedAsync()
+    {
+        customers = await Task.FromResult(dbContext.Customers);
+        orders = await Task.FromResult(dbContext.Orders);
+        orderDetails = await Task.FromResult(dbContext.OrderDetails.Include("Product"));
+    }
+}
