@@ -27,8 +27,6 @@ namespace LatestBlazor
       {
             options.IdleTimeout = TimeSpan.FromHours(1);
             options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-            options.Cookie.IsEssential = true;
       });
 
       services.AddHttpContextAccessor();
