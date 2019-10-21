@@ -12,15 +12,16 @@
 <RadzenHeader>
     <ChildContent>
         <div class="row justify-content-start align-items-center">
-            <div class="col-md-6 d-flex align-items-center">
+            <div class="col-6 d-flex align-items-center">
                 <RadzenSidebarToggle Click="@(args => { sidebar0.Toggle(); body0.Toggle(); })">
                 </RadzenSidebarToggle>
                 <RadzenLabel Text="Radzen Blazor Components">
                 </RadzenLabel>
             </div>
-            <div class="col-md-6 d-flex align-items-center justify-content-end">
-                <NavLink class="btn-secondary" style="padding: 0 1rem; margin: 1rem; display: inline-block;" href="/get-started">Get started</NavLink>
-                <div style="margin: 1rem">Theme: <RadzenDropDown TValue="string" TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" /></div>
+            <div class="col-6 d-flex align-items-center justify-content-end">
+                <NavLink class="btn-secondary d-none d-md-inline-block" style="padding: 0 1rem; margin: 1rem" href="/get-started">Get started</NavLink>
+                <label class="d-none d-sm-inline-block">Theme:</label>
+                <RadzenDropDown style="margin:0 1rem" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" />
             </div>
         </div>
     </ChildContent>

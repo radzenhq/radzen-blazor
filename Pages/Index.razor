@@ -1,64 +1,79 @@
 ﻿@page "/"
 
-<RadzenCard>
-    <h1 class="my-4">The first component suite for Blazor</h1>
+<div class="p-lg-5">
+<div class="row my-3">
+  <div class="col-xl-4 text-xl-left text-center">
+    <h1 class="my-4">The Blazor Component Library</h1>
+    <h2>
+      Radzen Blazor Components is a <strong>free</strong> set of 30+ native Blazor UI controls.
+    </h2>
     <p>
-        Radzen Blazor Components is a free component suite developed by <a href="https://www.radzen.com">Radzen Ltd.</a> for <a href="https://docs.microsoft.com/en-us/aspnet/core/blazor/">ASP.NET Core Blazor</a>
+      <NavLink class="btn-primary" style="padding: .5rem 1rem; margin: 1rem 0; display: inline-block;" href="/get-started">Get started</NavLink>
     </p>
-    <p>
-        <NavLink class="btn-primary" style="padding: .5rem 1rem; margin: 1rem 0; display: inline-block;" href="/get-started">Get started</NavLink>
-    </p>
-</RadzenCard>
-<h2 class="text-center my-4">Why choose Radzen Blazor Components?</h2>
-<div class="row">
-    <div class="col-md-4">
-        <RadzenCard style="height: 100%">
-            <h3>Free</h3>
-            <p>
-                Radzen components for Blazor are free for commercial use. You can get them from nuget.org right now!
-            </p>
-            <p>
-                Paid support is available as part of the <a href="https://www.radzen.com/pricing/">Radzen Professional subscription</a>.
-            </p>
-        </RadzenCard>
-    </div>
-    <div class="col-md-4">
-        <RadzenCard style="height: 100%">
-        <h3>Native</h3>
-        <p>
-            The components are implemented in C# and leverage the Blazor framework. They do not depent on or wrap existing JavaScript frameworks or suites.
-            Both server-side and client-side (WASM) Blazor are supported.
-        </p>
-        </RadzenCard>
-    </div>
-    <div class="col-md-4">
-        <RadzenCard style="height: 100%">
-        <h3>Evolving</h3>
-        <p>
-            Radzen Blazor Components are updated on a regular basis. We release updates often.
-        </p>
-        </RadzenCard>
-    </div>
+  </div>
+  <div class="col">
+    <img src="images/hero.png" style="width:100%">
+  </div>
 </div>
-<h2 class="text-center my-5">Do you want to boost your Blazor development productivity even more?</h2>
+<h3 class="text-center my-5">Why choose Radzen Blazor Components?</h3>
+<div class="row">
+  <div class="col-lg-4 mb-4">
+    <RadzenCard style="height: 100%;margin-bottom:1rem">
+      <h4>Free</h4>
+      <p>
+        Radzen Blazor Components are free for commercial use. You can install them from nuget without registration.
+      </p>
+      <p class="my-4">
+        Paid support is also available as part of the <a href="https://www.radzen.com/pricing/">Radzen Professional subscription</a>.
+      </p>
+    </RadzenCard>
+  </div>
+  <div class="col-lg-4 mb-4">
+    <RadzenCard style="height: 100%">
+      <h4>Native</h4>
+      <ul style="padding:1rem">
+        <li>The components are implemented in C# and take full advantage of the Blazor framework.</li>
+        <li>They do not depent on or wrap existing JavaScript frameworks or libraries.</li>
+        <li>Both server-side and client-side (WASM) Blazor are supported.</li>
+      </ul>
+    </RadzenCard>
+  </div>
+  <div class="col-lg-4 mb-4">
+    <RadzenCard style="height: 100%">
+      <h4>Growing</h4>
+      <p>
+        We add new components and features on a regular basis.
+      </p>
+      <p class="my-4">
+        Short development cycle. We release as soon as new stuff is available. No more quarterly releases.
+      </p>
+    </RadzenCard>
+  </div>
+</div>
+<h3 class="text-center my-5">Do you want to boost your Blazor development even more?</h3>
 <RadzenCard>
 <div class="row">
-    <div class="col-md-6">
-        <p>
-            Our flagship product Radzen provides tons of productivity features for Blazor developers:
-        </p>
-        <ul>
-            <li>The first in the industry WYSIWYG Blazor design time canvas</li>
-            <li>Scaffolding a complete CRUD applications from a database</li>
-            <li>Built-in security - authentication and authorization</li>
-            <li>Visual Studio Code and Professional support</li>
-            <li>Deployment to IIS and Azure</li>
-            <li>Dedicated support with 24 hour guaranteed response time</li>
-            <li>Active community forum</li>
-        </ul>
-    </div>
-    <div class="col-md-6">
-        <img style="width: 100%" src="https://www.radzen.com/assets/blazor-designer-expressions-a3849277d32e32ea4156feccf5fc3173273694f8909e9afef6d71e65d40caba2.gif">
-    </div>
+  <div class="col-md-6">
+    <h4>
+      Then check Radzen. It provides tons of productivity improvements for Blazor developers:
+    </h4>
+    <ul style="padding:1rem">
+      <li>The first WYSIWYG design time experience for Blazor in the industry.</li>
+      <li>Scaffolding a complete CRUD application from a database.</li>
+      <li>Built-in security - authentication and authorization, user and role management.</li>
+      <li>Full Visual Studio support. Run your Radzen Blazor application directly from Visual Studio Code or Visual Studio Professional.</li>
+      <li>One-click deployment to IIS and Azure.</li>
+      <li>Developer seat license.</li>
+      <li>Dedicated support with 24 hour response time (or even less).</li>
+      <li>Active community forum.</li>
+    </ul>
+    <p>
+      <NavLink class="btn-primary" style="padding: .5rem 1rem; margin: 1rem 0; display: inline-block;" href="https://www.radzen.com/download/">DOWNLOAD NOW</NavLink>
+    </p>
+  </div>
+  <div class="col-md-6">
+    <img style="width: 100%" src="https://www.radzen.com/assets/blazor-designer-expressions-a3849277d32e32ea4156feccf5fc3173273694f8909e9afef6d71e65d40caba2.gif">
+  </div>
 </div>
 </RadzenCard>
+</div>
