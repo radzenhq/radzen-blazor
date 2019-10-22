@@ -45,7 +45,7 @@
         <RadzenPanelMenu>
         @foreach (var category in examples)
         {
-            <RadzenPanelMenuItem Expanded="@category.Expanded" Text="@category.Name" Path="@category.Path" Icon="@category.Icon">
+            <RadzenPanelMenuItem @bind-Expanded="@category.Expanded" Text="@category.Name" Path="@category.Path" Icon="@category.Icon">
             @if (category.Children != null)
             {
                 @foreach(var example in category.Children)
@@ -392,7 +392,7 @@
                                   Name = category.Name,
                                   Expanded = true,
                                   Children = category.Children.Where(filter).ToArray()
-                              });
+                              }).ToList();
     }
 
     void ChangeTheme(object value)
