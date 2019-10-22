@@ -37,54 +37,24 @@
 </div>
 <RadzenSidebar @ref="@sidebar0">
     <ChildContent>
-        <RadzenPanelMenu style="height: 100%;">
-            <ChildContent>
-                <RadzenPanelMenuItem Text="First Look" Path="/" Icon="home"></RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="General" Expanded="true">
-                    <RadzenPanelMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="SplitButton" Path="splitbutton" Icon="playlist_play"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="ProgressBar" Path="progressbar" Icon="label_outline"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Dialog" Path="dialog" Icon="perm_media"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Notification" Path="notification" Icon="announcement"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Menu" Path="menu" Icon="line_weight"></RadzenPanelMenuItem>
-                </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Containers">
-                    <RadzenPanelMenuItem Text="Accordion" Path="accordion" Icon="view_headline"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Card" Path="card" Icon="line_style"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Fieldset" Path="fieldset" Icon="account_balance_wallet"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Panel" Path="panel" Icon="content_paste"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Tabs" Path="tabs" Icon="tab"></RadzenPanelMenuItem>
-                </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Forms">
-                    <RadzenPanelMenuItem Text="AutoComplete" Path="autocomplete" Icon="playlist_add"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="CheckBox" Path="checkbox" Icon="check_circle"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="CheckBoxList" Path="checkboxlist" Icon="playlist_add_check"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="DatePicker" Path="datepicker" Icon="date_range"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="DropDown" Path="dropdown" Icon="dns"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="DropDownDataGrid" Path="dropdown-datagrid" Icon="receipt"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="FileInput" Path="fileinput" Icon="attach_file"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="ListBox" Path="listbox" Icon="view_list"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Numeric" Path="numeric" Icon="aspect_ratio"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Password" Path="password" Icon="payment"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="RadioButtonList" Path="radiobuttonlist" Icon="radio_button_checked"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Rating" Path="rating" Icon="star_rate"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="SelectBar" Path="selectbar" Icon="chrome_reader_mode"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="TemplateForm" Path="templateform" Icon="featured_play_list"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="TextBox" Path="textbox" Icon="input"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="TextArea" Path="textarea" Icon="description"></RadzenPanelMenuItem>
-                </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Data">
-                    <RadzenPanelMenuItem Text="DataGrid" Path="datagrid" Icon="grid_on"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="DataList" Path="datalist" Icon="list"></RadzenPanelMenuItem>
-                </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Application Scenarios">
-                    <RadzenPanelMenuItem Text="Hierarchy" Path="master-detail-hierarchy" Icon="format_indent_increase"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Master/Detail" Path="master-detail" Icon="dvr"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="DataGrid InLine Editing" Path="datagrid-inline-edit" Icon="border_color"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="DataGrid Footer Totals" Path="datagrid-footer-totals" Icon="power_input"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Cascading DropDowns" Path="cascading-dropdowns" Icon="compare_arrows"></RadzenPanelMenuItem>
-                </RadzenPanelMenuItem>
-            </ChildContent>
+        <div style="padding: 1rem">
+            <span style="width: 100%" class="ui-autocomplete ui-widget">
+                <input placeholder="Find component ..." class="ui-inputtext ui-widget ui-state-default ui-corner-all ui-autocomplete-input" type="search" @oninput="@FilterPanelMenu" />
+            </span>
+        </div>
+        <RadzenPanelMenu>
+        @foreach (var category in examples)
+        {
+            <RadzenPanelMenuItem Expanded="@category.Expanded" Text="@category.Name" Path="@category.Path" Icon="@category.Icon">
+            @if (category.Children != null)
+            {
+                @foreach(var example in category.Children)
+                {
+                    <RadzenPanelMenuItem Text="@example.Name" Path="@example.Path" Icon="@example.Icon" />
+                }
+            }
+            </RadzenPanelMenuItem>
+        }
         </RadzenPanelMenu>
     </ChildContent>
 </RadzenSidebar>
@@ -106,12 +76,286 @@
         new { Text = "Humanistic", Value = "humanistic" }
     };
 
+    class Example
+    {
+        public string Name { get; set; }
+        public string Icon { get; set; }
+        public string Path { get; set; }
+        public bool Expanded { get; set; }
+        public IEnumerable<Example> Children { get; set; }
+    }
+
+
+    Example[] allExamples = new [] {
+        new Example()
+        {
+            Name = "First Look",
+            Path = "/",
+            Icon = "home"
+        },
+        new Example()
+        {
+            Name = "General",
+            Expanded = true,
+            Children = new [] {
+                new Example()
+                {
+                    Name = "Buttons",
+                    Path = "buttons",
+                    Icon = "account_circle"
+                },
+                new Example()
+                {
+                    Name = "SplitButton",
+                    Path = "splitbutton",
+                    Icon = "playlist_play"
+                },
+                new Example()
+                {
+                    Name = "ProgressBar",
+                    Path = "progressbar",
+                    Icon = "label_outline"
+                },
+                new Example()
+                {
+                    Name = "Dialog",
+                    Path = "dialog",
+                    Icon = "perm_media"
+                },
+                new Example()
+                {
+                    Name = "Notification",
+                    Path = "notification",
+                    Icon = "announcement"
+                },
+                new Example()
+                {
+                    Name = "Menu",
+                    Path = "menu",
+                    Icon = "line_weight"
+                }
+            }
+        },
+        new Example()
+        {
+            Name="Containers",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "Accordion",
+                    Path = "accordion",
+                    Icon = "view_headline"
+                },
+                new Example()
+                {
+                    Name = "Card",
+                    Path = "card",
+                    Icon = "line_style"
+                },
+                new Example()
+                {
+                    Name = "Fieldset",
+                    Path = "fieldset",
+                    Icon = "account_balance_wallet"
+                },
+                new Example()
+                {
+                    Name = "Panel",
+                    Path = "panel",
+                    Icon = "content_paste"
+                },
+                new Example()
+                {
+                    Name = "Tabs",
+                    Path = "tabs",
+                    Icon = "tab"
+                },
+            }
+        },
+        new Example()
+        {
+            Name="Forms",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "AutoComplete",
+                    Path = "autocomplete",
+                    Icon = "playlist_add"
+                },
+                new Example()
+                {
+                    Name = "CheckBox",
+                    Path = "checkbox",
+                    Icon = "check_circle"
+                },
+                new Example()
+                {
+                    Name = "CheckBoxList",
+                    Path = "checkboxlist",
+                    Icon = "playlist_add_check"
+                },
+                new Example()
+                {
+                    Name = "DatePicker",
+                    Path = "datepicker",
+                    Icon = "date_range"
+                },
+                new Example()
+                {
+                    Name = "DropDown",
+                    Path = "dropdown",
+                    Icon = "dns"
+                },
+                new Example()
+                {
+                    Name = "DropDownDataGrid",
+                    Path = "dropdown-datagrid",
+                    Icon = "receipt"
+                },
+                new Example()
+                {
+                    Name = "FileInput",
+                    Path = "fileinput",
+                    Icon = "attach_file"
+                },
+                new Example()
+                {
+                    Name = "ListBox",
+                    Path = "listbox",
+                    Icon = "view_list"
+                },
+                new Example()
+                {
+                    Name = "Numeric",
+                    Path = "numeric",
+                    Icon = "aspect_ratio"
+                },
+                new Example()
+                {
+                    Name = "Password",
+                    Path = "password",
+                    Icon = "payment"
+                },
+                new Example()
+                {
+                    Name = "RadioButtonList",
+                    Path = "radiobuttonlist",
+                    Icon = "radio_button_checked"
+                },
+                new Example()
+                {
+                    Name = "Rating",
+                    Path = "rating",
+                    Icon = "star_rate"
+                },
+                new Example()
+                {
+                    Name = "SelectBar",
+                    Path = "selectbar",
+                    Icon = "chrome_reader_mode"
+                },
+                new Example()
+                {
+                    Name = "TemplateForm",
+                    Path = "templateform",
+                    Icon = "featured_play_list"
+                },
+                new Example()
+                {
+                    Name = "TextBox",
+                    Path = "textbox",
+                    Icon = "input"
+                },
+                new Example()
+                {
+                    Name = "TextArea",
+                    Path = "textarea",
+                    Icon = "description"
+                },
+            },
+        },
+        new Example()
+        {
+            Name="Data",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "DataGrid",
+                    Path = "datagrid",
+                    Icon = "grid_on"
+                },
+                new Example()
+                {
+                    Name = "DataList",
+                    Path = "datalist",
+                    Icon = "list"
+                },
+            }
+        },
+        new Example()
+        {
+            Name="Application Scenarios",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "Hierarchy",
+                    Path = "master-detail-hierarchy",
+                    Icon = "format_indent_increase"
+                },
+                new Example()
+                {
+                    Name = "Master/Detail",
+                    Path = "master-detail",
+                    Icon = "dvr"
+                },
+                new Example()
+                {
+                    Name = "DataGrid InLine Editing",
+                    Path = "datagrid-inline-edit",
+                    Icon = "border_color"
+                },
+                new Example()
+                {
+                    Name = "DataGrid Footer Totals",
+                    Path = "datagrid-footer-totals",
+                    Icon = "power_input"
+                },
+                new Example()
+                {
+                    Name = "Cascading DropDowns",
+                    Path = "cascading-dropdowns",
+                    Icon = "compare_arrows"
+                },
+            }
+        }, 
+    };
+
+    IEnumerable<Example> examples;
+
     string Theme
     {
         get
         {
             return $"{ThemeState.CurrentTheme}.css";
         }
+    }
+
+    protected override void OnInitialized()
+    {
+        examples = allExamples;
+    }
+
+    void FilterPanelMenu(ChangeEventArgs args)
+    {
+        Func<Example, bool> filter = (Example example) => example.Name.Contains(args.Value.ToString(), StringComparison.OrdinalIgnoreCase);
+
+        examples = allExamples.Where(category => category.Children != null && category.Children.Any(filter))
+                              .Select(category => new Example()
+                              {
+                                  Name = category.Name,
+                                  Expanded = true,
+                                  Children = category.Children.Where(filter).ToArray()
+                              });
     }
 
     void ChangeTheme(object value)
