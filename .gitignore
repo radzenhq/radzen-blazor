@@ -331,3 +331,4 @@ ASALocalRun/
 .mfractor/
 .DS_Store
 .vscode
+northwind*.db
