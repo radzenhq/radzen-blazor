@@ -83,6 +83,7 @@
         public string Path { get; set; }
         public bool Expanded { get; set; }
         public IEnumerable<Example> Children { get; set; }
+        public IEnumerable<string> Tags { get; set; }
     }
 
 
@@ -114,25 +115,29 @@
                 {
                     Name = "ProgressBar",
                     Path = "progressbar",
-                    Icon = "label_outline"
+                    Icon = "label_outline",
+                    Tags = new [] { "progress", "spinner" }
                 },
                 new Example()
                 {
                     Name = "Dialog",
                     Path = "dialog",
-                    Icon = "perm_media"
+                    Icon = "perm_media",
+                    Tags = new [] { "popup", "window" }
                 },
                 new Example()
                 {
                     Name = "Notification",
                     Path = "notification",
-                    Icon = "announcement"
+                    Icon = "announcement",
+                    Tags = new [] { "message", "alert" }
                 },
                 new Example()
                 {
                     Name = "Menu",
                     Path = "menu",
-                    Icon = "line_weight"
+                    Icon = "line_weight",
+                    Tags = new [] { "navigation", "dropdown" }
                 }
             }
         },
@@ -144,31 +149,36 @@
                 {
                     Name = "Accordion",
                     Path = "accordion",
-                    Icon = "view_headline"
+                    Icon = "view_headline",
+                    Tags = new [] { "panel", "container" }
                 },
                 new Example()
                 {
                     Name = "Card",
                     Path = "card",
-                    Icon = "line_style"
+                    Icon = "line_style",
+                    Tags = new [] { "container" }
                 },
                 new Example()
                 {
                     Name = "Fieldset",
                     Path = "fieldset",
-                    Icon = "account_balance_wallet"
+                    Icon = "account_balance_wallet",
+                    Tags = new [] { "form", "container" }
                 },
                 new Example()
                 {
                     Name = "Panel",
                     Path = "panel",
-                    Icon = "content_paste"
+                    Icon = "content_paste",
+                    Tags = new [] { "container" }
                 },
                 new Example()
                 {
                     Name = "Tabs",
                     Path = "tabs",
-                    Icon = "tab"
+                    Icon = "tab",
+                    Tags = new [] { "tabstrip", "tabview", "container" }
                 },
             }
         },
@@ -180,97 +190,113 @@
                 {
                     Name = "AutoComplete",
                     Path = "autocomplete",
-                    Icon = "playlist_add"
+                    Icon = "playlist_add",
+                    Tags = new [] { "form", "complete", "suggest", "edit" }
                 },
                 new Example()
                 {
                     Name = "CheckBox",
                     Path = "checkbox",
-                    Icon = "check_circle"
+                    Icon = "check_circle",
+                    Tags = new [] { "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "CheckBoxList",
                     Path = "checkboxlist",
-                    Icon = "playlist_add_check"
+                    Icon = "playlist_add_check",
+                    Tags = new [] { "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "DatePicker",
                     Path = "datepicker",
-                    Icon = "date_range"
+                    Icon = "date_range",
+                    Tags = new [] { "calendar", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "DropDown",
                     Path = "dropdown",
-                    Icon = "dns"
+                    Icon = "dns",
+                    Tags = new [] { "select", "picker", "form" , "edit" }
                 },
                 new Example()
                 {
                     Name = "DropDownDataGrid",
                     Path = "dropdown-datagrid",
-                    Icon = "receipt"
+                    Icon = "receipt",
+                    Tags = new [] { "select", "picker", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "FileInput",
                     Path = "fileinput",
-                    Icon = "attach_file"
+                    Icon = "attach_file",
+                    Tags = new [] { "upload", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "ListBox",
                     Path = "listbox",
-                    Icon = "view_list"
+                    Icon = "view_list",
+                    Tags = new [] { "select", "picker", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "Numeric",
                     Path = "numeric",
-                    Icon = "aspect_ratio"
+                    Icon = "aspect_ratio",
+                    Tags = new [] { "input", "number", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "Password",
                     Path = "password",
-                    Icon = "payment"
+                    Icon = "payment",
+                    Tags = new [] { "input", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "RadioButtonList",
                     Path = "radiobuttonlist",
-                    Icon = "radio_button_checked"
+                    Icon = "radio_button_checked",
+                    Tags = new [] { "toggle", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "Rating",
                     Path = "rating",
-                    Icon = "star_rate"
+                    Icon = "star_rate",
+                    Tags = new [] { "star", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "SelectBar",
                     Path = "selectbar",
-                    Icon = "chrome_reader_mode"
+                    Icon = "chrome_reader_mode",
+                    Tags = new [] { "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "TemplateForm",
                     Path = "templateform",
-                    Icon = "featured_play_list"
+                    Icon = "featured_play_list",
+                    Tags = new [] { "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "TextBox",
                     Path = "textbox",
-                    Icon = "input"
+                    Icon = "input",
+                    Tags = new [] { "input", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "TextArea",
                     Path = "textarea",
-                    Icon = "description"
+                    Icon = "description",
+                    Tags = new [] { "input", "form", "edit" }
                 },
             },
         },
@@ -282,13 +308,15 @@
                 {
                     Name = "DataGrid",
                     Path = "datagrid",
-                    Icon = "grid_on"
+                    Icon = "grid_on",
+                    Tags = new [] { "datatable", "datagridview", "dataview", "grid", "table" }
                 },
                 new Example()
                 {
                     Name = "DataList",
                     Path = "datalist",
-                    Icon = "list"
+                    Icon = "list",
+                    Tags = new [] { "dataview", "grid", "table" }
                 },
             }
         },
@@ -300,31 +328,36 @@
                 {
                     Name = "Hierarchy",
                     Path = "master-detail-hierarchy",
-                    Icon = "format_indent_increase"
+                    Icon = "format_indent_increase",
+                    Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
                 },
                 new Example()
                 {
                     Name = "Master/Detail",
                     Path = "master-detail",
-                    Icon = "dvr"
+                    Icon = "dvr",
+                    Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
                 },
                 new Example()
                 {
                     Name = "DataGrid InLine Editing",
                     Path = "datagrid-inline-edit",
-                    Icon = "border_color"
+                    Icon = "border_color",
+                    Tags = new [] { "inline", "editor", "datagrid", "table", "dataview" }
                 },
                 new Example()
                 {
                     Name = "DataGrid Footer Totals",
                     Path = "datagrid-footer-totals",
-                    Icon = "power_input"
+                    Icon = "power_input",
+                    Tags = new [] { "summary", "total", "aggregate", "datagrid", "table", "dataview" }
                 },
                 new Example()
                 {
                     Name = "Cascading DropDowns",
                     Path = "cascading-dropdowns",
-                    Icon = "compare_arrows"
+                    Icon = "compare_arrows",
+                    Tags = new [] { "related", "parent", "child" }
                 },
             }
         }, 
@@ -347,7 +380,11 @@
 
     void FilterPanelMenu(ChangeEventArgs args)
     {
-        Func<Example, bool> filter = (Example example) => example.Name.Contains(args.Value.ToString(), StringComparison.OrdinalIgnoreCase);
+        var term = args.Value.ToString();
+
+        Func<string, bool> contains = value => value.Contains(term, StringComparison.OrdinalIgnoreCase);
+
+        Func<Example, bool> filter = (example) => contains(example.Name) || (example.Tags != null && example.Tags.Any(contains));
 
         examples = allExamples.Where(category => category.Children != null && category.Children.Any(filter))
                               .Select(category => new Example()
