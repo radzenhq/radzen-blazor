@@ -29,13 +29,13 @@ else
                             <Columns>
                                 <RadzenGridColumn TItem="OrderDetail" Property="Order.CustomerID" Title="Order" />
                                 <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
-                                <RadzenGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price" >
+                                <RadzenGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price" Type="number" >
                                     <Template Context="detail">
                                         @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
                                     </Template>
                                 </RadzenGridColumn>
-                                <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-                                <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
+                                <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" Type="number" />
+                                <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" Type="number">
                                     <Template Context="detail">
                                         @String.Format("{0}%", detail.Discount * 100)
                                     </Template>
@@ -57,7 +57,7 @@ else
             </RadzenTabs>
         </Template>
         <Columns>
-            <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
+            <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" Type="integer" />
             <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
             <RadzenGridColumn Width="150px" TItem="Order" Property="Employee.LastName" Title="Employee">
                 <Template Context="order">
@@ -80,7 +80,7 @@ else
                     @String.Format("{0:d}", order.ShippedDate)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight">
+            <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight" Type="number">
                 <Template Context="order">
                     @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
                 </Template>
