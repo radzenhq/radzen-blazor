@@ -5,7 +5,10 @@
 @inject ThemeState ThemeState
 @inject NavigationManager UriHelper
 
-<link href="_content/Radzen.Blazor/css/@(Theme)" rel="stylesheet" />
+@if (Theme != "default.css")
+{
+    <link href="_content/Radzen.Blazor/css/@(Theme)" rel="stylesheet" />
+}
 <RadzenDialog />
 <RadzenNotification />
 
