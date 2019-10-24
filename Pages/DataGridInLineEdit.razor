@@ -21,7 +21,7 @@ else
             <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
                         Data="@orders" TItem="Order" Value="@order">
                 <Columns>
-                    <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" Type="integer"/>
+                    <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID"/>
                     <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer">
                         <EditTemplate Context="order">
                             <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%" />
@@ -44,7 +44,7 @@ else
                             <RadzenDatePicker @bind-Value="order.OrderDate" Style="width:100%"/>
                         </EditTemplate>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight" Type="number">
+                    <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight">
                         <Template Context="order">
                             @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
                         </Template>

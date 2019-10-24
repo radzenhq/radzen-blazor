@@ -21,7 +21,7 @@ else
             <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
                         Data="@orders" TItem="Order" Value="@order">
                 <Columns>
-                    <RadzenGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID" Type="integer">
+                    <RadzenGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID">
                         <FooterTemplate>
                             Total orders: <b>@orders.Count()</b>
                         </FooterTemplate>
@@ -41,7 +41,7 @@ else
                             Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).Last().OrderDate)</b>
                         </FooterTemplate>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight" Type="number">
+                    <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight">
                         <Template Context="order">
                             @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
                         </Template>

@@ -18,7 +18,7 @@ else
 {
     <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px">
         <Columns>
-            <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" Type="integer"/>
+            <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID"/>
             <RadzenGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false">
                 <Template Context="data">
                     <RadzenImage Path="@data?.Photo" />
