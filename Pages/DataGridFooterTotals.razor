@@ -33,7 +33,7 @@ else
                             <RadzenImage Path="@order.Employee?.Photo" Style="width:150px" />
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date" Format="date-time">
+                    <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
                         <Template Context="order">
                             @String.Format("{0:d}", order.OrderDate)
                         </Template>

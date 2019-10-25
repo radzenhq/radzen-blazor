@@ -36,7 +36,7 @@ else
                             <RadzenFileInput @bind-Value="order.Employee.Photo" Style="width:100%" />
                         </EditTemplate>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date" Format="date-time">
+                    <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
                         <Template Context="order">
                             @String.Format("{0:d}", order.OrderDate)
                         </Template>
