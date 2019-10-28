@@ -17,7 +17,7 @@
                 <Items>
                     <RadzenRadioButtonListItem Text="Orders" Value="1" />
                     <RadzenRadioButtonListItem Text="Employees" Value="2" />
-                    <RadzenRadioButtonListItem Text="Customers" Value="3" />
+                    <RadzenRadioButtonListItem Text="Customers" Value="3"  />
                 </Items>
             </RadzenRadioButtonList>
             <br />
@@ -27,6 +27,15 @@
                     <RadzenRadioButtonListItem Text="Orders" Value="1" />
                     <RadzenRadioButtonListItem Text="Employees" Value="2" />
                     <RadzenRadioButtonListItem Text="Customers" Value="3" />
+                </Items>
+            </RadzenRadioButtonList>
+            <br />
+            <h3>RadioButtonList with null as initial value</h3>
+            <RadzenRadioButtonList @bind-Value="nullableValue" TValue="int?" Change="@((args) => Change(args, "RadioButtonList with horizontal orientation"))">
+                <Items>
+                    <RadzenRadioButtonListItem Text="Orders" Value="1" TValue="int?" />
+                    <RadzenRadioButtonListItem Text="Employees" Value="2" TValue="int?" />
+                    <RadzenRadioButtonListItem Text="Customers" Value="3" TValue="int?" />
                 </Items>
             </RadzenRadioButtonList>
             <br />
@@ -46,10 +55,11 @@
 
 @code {
     int value = 1;
+    int? nullableValue = null;
 
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
-    void Change(int value, string name)
+    void Change(int? value, string name)
     {
         events.Add(DateTime.Now, $"{name} value changed to {value}");
         StateHasChanged();
