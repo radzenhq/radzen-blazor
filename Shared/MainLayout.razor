@@ -386,6 +386,8 @@
     protected override void OnInitialized()
     {
         examples = allExamples;
+
+        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
     }
 
     void FilterPanelMenu(ChangeEventArgs args)
