@@ -1,0 +1,45 @@
+﻿@page "/export-excel-csv"
+
+@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+@inject NorthwindService service
+
+<h1 style="display:inline">DataGrid</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/ExportToExcelCsvPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/event-handling/#export" target="_blank">[documentation]</a>
+
+<p>This page demonstrates <b>DataGrid</b> component export to Excel and CSV. Exported data will be sorted and filtered according to the DataGrid sort and filter.</p>
+
+@if (data == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <RadzenButton Text="Excel" Icon="grid_on" Click="@(args => Export("excel"))" Style="margin-bottom:20px" /><RadzenButton Text="CSV" Icon="wrap_text" Click="@(args => Export("csv"))" Style="margin-left:20px;margin-bottom:20px;" />
+    <RadzenGrid @ref="grid" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@data" TItem="OrderDetail">
+        <Columns>
+            <RadzenGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
+            <RadzenGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
+            <RadzenGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price" FormatString="{0:C}" />
+            <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+            <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
+        </Columns>
+    </RadzenGrid>
+}
+
+@code {
+    RadzenGrid<OrderDetail> grid;
+    IEnumerable<OrderDetail> data;
+
+    protected override async Task OnInitializedAsync()
+    {
+        data = await Task.FromResult(dbContext.OrderDetails);
+    }
+
+    public void Export(string type)
+    {
+        service.Export("OrderDetails", type, new Query() { OrderBy = grid.Query.OrderBy, Filter = grid.Query.Filter });
+    }
+}

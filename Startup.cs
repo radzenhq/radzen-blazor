@@ -41,6 +41,7 @@ namespace LatestBlazor
       services.AddScoped<NorthwindContext>();
       services.AddScoped<DialogService>();
       services.AddScoped<NotificationService>();
+      services.AddScoped<NorthwindService>();
 
       services.AddDistributedMemoryCache();
     }
@@ -74,6 +75,7 @@ namespace LatestBlazor
 
       app.UseEndpoints(endpoints =>
       {
+        endpoints.MapControllers();
         endpoints.MapBlazorHub();
         endpoints.MapFallbackToPage("/_Host");
       });

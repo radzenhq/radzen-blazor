@@ -24,7 +24,7 @@ namespace NorthwindBlazor.Models.Northwind
 
     [ForeignKey("ProductID")]
     public Product Product { get; set; }
-    public decimal? UnitPrice
+    public double? UnitPrice
     {
       get;
       set;
