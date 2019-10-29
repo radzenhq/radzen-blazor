@@ -22,7 +22,11 @@ else
         <Columns>
             <RadzenGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
             <RadzenGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
-            <RadzenGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price" FormatString="{0:C}" />
+            <RadzenGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
+                <Template Context="detail">
+                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
+                </Template>
+            </RadzenGridColumn>
             <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
             <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
         </Columns>
