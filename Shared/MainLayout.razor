@@ -68,29 +68,29 @@
     </ChildContent>
 </RadzenFooter>
 @code {
-    RadzenSidebar sidebar0;
-    RadzenBody body0;
+            RadzenSidebar sidebar0;
+            RadzenBody body0;
 
-    dynamic themes = new[]
-    {
+            dynamic themes = new[]
+            {
         new {Text = "Default", Value = "default"},
         new { Text = "Dark", Value="dark" },
         new { Text = "Software", Value = "software"},
         new { Text = "Humanistic", Value = "humanistic" }
     };
 
-    class Example
-    {
-        public string Name { get; set; }
-        public string Icon { get; set; }
-        public string Path { get; set; }
-        public bool Expanded { get; set; }
-        public IEnumerable<Example> Children { get; set; }
-        public IEnumerable<string> Tags { get; set; }
-    }
+            class Example
+            {
+                public string Name { get; set; }
+                public string Icon { get; set; }
+                public string Path { get; set; }
+                public bool Expanded { get; set; }
+                public IEnumerable<Example> Children { get; set; }
+                public IEnumerable<string> Tags { get; set; }
+            }
 
 
-    Example[] allExamples = new [] {
+            Example[] allExamples = new[] {
         new Example()
         {
             Name = "First Look",
@@ -369,6 +369,13 @@
                     Icon = "import_export",
                     Tags = new [] { "export", "excel", "csv" }
                 },
+                new Example()
+                {
+                    Name = "DataGrid with LoadData",
+                    Path = "datagrid-loaddata",
+                    Icon = "dashboard",
+                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata" }
+    },
             }
         }, 
     };

@@ -25,11 +25,11 @@
         </div>
         <div class="col-md-4">
             <h3>ListBox with filtering</h3>
-            <RadzenListBox AllowFiltering="true" @bind-Value="value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+            <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
                            Change="@(args => Change(args, "ListBox with filtering"))" Style="margin-bottom: 20px; height:200px;" />
             <br />
             <h3>ListBox with multiple selection</h3>
-            <RadzenListBox AllowFiltering="true" @bind-Value="multipleValues" Multiple="true" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+            <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="multipleValues" Multiple="true" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
                            Change="@(args => Change(args, "ListBox with multiple selection"))" Style="margin-bottom: 20px; height:200px;" />
         </div>
         <div class="col-md-4">
