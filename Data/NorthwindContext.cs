@@ -35,9 +35,9 @@ namespace NorthwindBlazor.Data
         {
             var sessionId = string.Format("northwind-{0}", _httpContextAccessor.HttpContext.Session.Id);
 
-            if (_httpContextAccessor.HttpContext.Session.GetString(sessionId) == null)
+            if (!_httpContextAccessor.HttpContext.Items.ContainsKey(sessionId))
             {
-                _httpContextAccessor.HttpContext.Session.SetString(sessionId, sessionId);
+                _httpContextAccessor.HttpContext.Items[sessionId] = sessionId;
 
                 this.Database.OpenConnection();
                 this.Database.EnsureCreated();
@@ -52,6 +52,11 @@ namespace NorthwindBlazor.Data
                     if (File.Exists(dbFile))
                     {
                         File.Delete(dbFile);
+                    }
+
+                    if (_httpContextAccessor.HttpContext.Items.ContainsKey(sessionId))
+                    {
+                        _httpContextAccessor.HttpContext.Items.Remove(sessionId);
                     }
                 });
             }
