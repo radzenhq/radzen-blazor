@@ -4,6 +4,7 @@ using System;
 
 namespace LatestBlazor
 {
+    [DisableRequestSizeLimit]
     public partial class UploadController : Controller
     {
         [HttpPost("upload/single")]

@@ -19,72 +19,71 @@ namespace LatestBlazor
   }
   public class Startup
   {
-    // This method gets called by the runtime. Use this method to add services to the container.
-    // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-    public void ConfigureServices(IServiceCollection services)
-    {
-      services.AddSession(options =>
-      {
-            options.IdleTimeout = TimeSpan.FromHours(1);
-            options.Cookie.HttpOnly = true;
-      });
-
-      services.AddHttpContextAccessor();
-
-      services.AddRazorPages();
-      services.AddServerSideBlazor().AddHubOptions(o =>
-      {
-          o.MaximumReceiveMessageSize = 10 * 1024 * 1024;
-      });
-      services.AddScoped<ThemeState>();
-
-      services.AddScoped<NorthwindContext>();
-      services.AddScoped<DialogService>();
-      services.AddScoped<NotificationService>();
-      services.AddScoped<NorthwindService>();
-
-      services.AddDistributedMemoryCache();
-
-      services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(x =>
-      {
-            x.ValueLengthLimit = int.MaxValue;
-            x.MultipartBodyLengthLimit = int.MaxValue;
-      });
-    }
-
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-    {
-       app.UseSession();
-
-      if (env.IsDevelopment())
-      {
-        app.UseDeveloperExceptionPage();
-      }
-      else
-      {
-        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-        app.Use((ctx, next) =>
+        // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        public void ConfigureServices(IServiceCollection services)
         {
-          ctx.Request.Scheme = "https";
-          return next();
-        });
-      }
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(1);
+                options.Cookie.HttpOnly = true;
+            });
 
-      /*
-      app.UseHttpsRedirection();
-      */
+            services.AddHttpContextAccessor();
 
-      app.UseStaticFiles();
+            services.AddRazorPages();
+            services.AddServerSideBlazor().AddHubOptions(o =>
+            {
+                o.MaximumReceiveMessageSize = 10 * 1024 * 1024;
+            });
+            services.AddScoped<ThemeState>();
 
-      app.UseRouting();
+            services.AddScoped<NorthwindContext>();
+            services.AddScoped<DialogService>();
+            services.AddScoped<NotificationService>();
+            services.AddScoped<NorthwindService>();
 
-      app.UseEndpoints(endpoints =>
-      {
-        endpoints.MapControllers();
-        endpoints.MapBlazorHub();
-        endpoints.MapFallbackToPage("/_Host");
-      });
-    }
+            services.AddDistributedMemoryCache();
+
+            services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = long.MaxValue;
+            });
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            app.UseSession();
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.Use((ctx, next) =>
+                {
+                    ctx.Request.Scheme = "https";
+                    return next();
+                });
+            }
+
+            /*
+            app.UseHttpsRedirection();
+            */
+
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage("/_Host");
+            });
+        }
   }
 }
