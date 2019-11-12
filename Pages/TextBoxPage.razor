@@ -18,6 +18,9 @@
             <br />
             <h3>TextBox with 5 maximum characters</h3>
             <RadzenTextBox @bind-Value="@value" MaxLength="5" Change="@(args => Change(args, "TextBox with 5 maximum characters"))" Style="margin-bottom: 20px" />
+            <h3>TextBox with change on every input</h3>
+            <RadzenTextBox Style="margin-bottom: 20px"  @oninput="@(args => Change(args.Value.ToString(), "TextBox with change on every input"))" />
+            <br />
         </div>
         <div class="col-md-6">
             <h3>Events</h3>
