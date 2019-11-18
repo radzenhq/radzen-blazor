@@ -1,0 +1,132 @@
+@page "/tree"
+@using Microsoft.EntityFrameworkCore
+@using System.IO
+@using NorthwindBlazor.Models.Northwind
+@inject NorthwindBlazor.Data.NorthwindContext Northwind
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
+
+<h1 style="display:inline">Tree</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/TreePage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/tree/" target="_blank">[documentation]</a>
+<p>This page demonstrates the <strong>Tree</strong> component.</p>
+
+<RadzenCard>
+    <div class="row">
+        <div class="col-md-6" style="margin-bottom: 16px">
+            <div class="row">
+                <div class="col-md-6" style="margin-bottom: 16px">
+                    <h3>Inline definition</h3>
+                    <RadzenTree Expand="@LogExpand" Change="@LogChange" Style="width: 100%; height: 300px">
+                        <RadzenTreeItem Text="BMW">
+                            <RadzenTreeItem Text="M3" />
+                            <RadzenTreeItem Text="M5" />
+                        </RadzenTreeItem>
+                        <RadzenTreeItem Text="Audi">
+                            <RadzenTreeItem Text="RS4" />
+                            <RadzenTreeItem Text="RS6" />
+                        </RadzenTreeItem>
+                        <RadzenTreeItem Text="Mercedes">
+                            <RadzenTreeItem Text="C63 AMG" />
+                            <RadzenTreeItem Text="S63 AMG" />
+                        </RadzenTreeItem>
+                    </RadzenTree>
+                </div>
+                <div class="col-md-6" style="margin-bottom: 16px">
+                    <h3>Data-bound to Entity Framework</h3>
+                    <RadzenTree Expand="@LogExpand" Change="@LogChange" Data="@Northwind.Categories.Include(c => c.Products)" Style="width: 100%; height: 300px">
+                        <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
+                        <RadzenTreeLevel TextProperty="ProductName" HasChildren="@((product) => false)" />
+                    </RadzenTree>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6" style="margin-bottom: 16px">
+                    <h3>Load nodes on demand</h3>
+                    <RadzenTree Change="@LogChange" Data="@Northwind.Categories" Expand="@OnExpand" Style="width: 100%; height: 300px">
+                        <RadzenTreeLevel TextProperty="CategoryName"/>
+                    </RadzenTree>
+                </div>
+                <div class="col-md-6" style="margin-bottom: 16px">
+                    <h3>Files and directories</h3>
+                    <RadzenTree Change="@LogChange" Data="@entries" Expand="@LoadFiles" Style="width: 100%; height: 300px">
+                        <RadzenTreeLevel Text="@GetTextForNode" />
+                    </RadzenTree>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6" style="margin-bottom: 16px">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+                @foreach (var e in events.OrderByDescending(i => i.Key))
+                {
+                    @e.Value
+                    <br />
+                }
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenCard>
+
+@code {
+    IEnumerable<string>entries = null;
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Log(string eventName, string value)
+    {
+        events.Add(DateTime.Now, $"{eventName}: {value}");
+    }
+
+    void LogChange(TreeEventArgs args)
+    {
+        Log("Change", $"Item Text: {args.Text}");
+    }
+
+    void LogExpand(TreeExpandEventArgs args)
+    {
+        if (args.Value is Category category)
+        {
+            Log("Expand", $"Text: {category.CategoryName}");
+        }
+
+        if (args.Value is string text)
+        {
+            Log("Expand", $"Text: {text}");
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        entries = Directory.GetDirectories(HostEnvironment.ContentRootPath)
+                           .Where(entry => 
+                           {
+                               var name = Path.GetFileName(entry);
+
+                               return !name.StartsWith(".") && name != "bin" && name != "obj";
+                           });
+    }
+
+    string GetTextForNode(object data)
+    {
+        return Path.GetFileName((string)data);        
+    }
+
+    void OnExpand(TreeExpandEventArgs args)
+    {
+        var category = args.Value as Category;
+
+        args.Children.Data = category.Products;
+        args.Children.TextProperty = "ProductName";
+        args.Children.HasChildren = (product) => false;
+
+        LogExpand(args);
+    }
+
+    void LoadFiles(TreeExpandEventArgs args)
+    {
+        var directory = args.Value as string;
+
+        args.Children.Data = Directory.EnumerateFileSystemEntries(directory);
+        args.Children.Text = GetTextForNode;
+        args.Children.HasChildren = (path) => Directory.Exists((string)path);
+
+        Log("Expand", $"Text: {args.Text}");
+    }
+}
