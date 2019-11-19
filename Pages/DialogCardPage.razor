@@ -32,6 +32,20 @@
             <b>@(order.ShipName)</b>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Order Details</h3>
+            <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        Data="@(orderDetails.Where(o => o.OrderID == OrderID))" TItem="OrderDetail" ColumnWidth="200px">
+                <Columns>
+                    <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+                    <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+                    <RadzenGridColumn TItem="OrderDetail" Property="Order.OrderDate" Title="OrderDate" />
+                    <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
+                </Columns>
+            </RadzenGrid>
+        </div>
+    </div>
 </RadzenCard>
 <div class="row">
     <div class="col-md-12">
@@ -41,13 +55,15 @@
 </div>
 
 @code {
+    IEnumerable<OrderDetail> orderDetails;
+
     [Parameter] public int OrderID { get; set; }
 
     Order order;
 
     protected override async Task OnInitializedAsync()
     {
-        await InvokeAsync(() =>
+        await InvokeAsync(async () =>
         {
             var query = (from order in dbContext.Orders.Where(o => o.OrderID == OrderID)
                            .Include("Customer")
@@ -57,6 +73,8 @@
                         select order).ToList();
 
             order = query.Last();
+
+            orderDetails = await Task.FromResult(dbContext.OrderDetails.Include("Order"));
 
             StateHasChanged();
         });

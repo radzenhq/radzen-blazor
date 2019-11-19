@@ -45,13 +45,9 @@
     int count;
     IEnumerable<Employee> employees;
 
-    protected override async Task OnInitializedAsync()
-    {
-        count = await Task.FromResult(dbContext.Employees.Count());
-    }
-
     private async void LoadData(LoadDataArgs args)
     {
+        count = await Task.FromResult(dbContext.Employees.Count());
         employees = await Task.FromResult(dbContext.Employees.Skip(args.Skip.Value).Take(args.Top.Value));
     }
 }
