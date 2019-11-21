@@ -55,6 +55,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        employees = await Task.FromResult(dbContext.Employees);
+        employees = await Task.FromResult(dbContext.Employees.ToList());
     }
 }
