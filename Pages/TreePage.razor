@@ -32,7 +32,11 @@
                 <div class="col-md-6" style="margin-bottom: 16px">
                     <h3>Data-bound to Entity Framework</h3>
                     <RadzenTree Expand="@LogExpand" Change="@LogChange" Data="@Northwind.Categories.Include(c => c.Products)" Style="width: 100%; height: 300px">
-                        <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
+                        <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products">
+                            <Template>
+                                <strong>@((context.Value as Category).CategoryName)</strong>
+                            </Template>
+                        </RadzenTreeLevel>
                         <RadzenTreeLevel TextProperty="ProductName" HasChildren="@((product) => false)" />
                     </RadzenTree>
                 </div>
@@ -47,7 +51,7 @@
                 <div class="col-md-6" style="margin-bottom: 16px">
                     <h3>Files and directories</h3>
                     <RadzenTree Change="@LogChange" Data="@entries" Expand="@LoadFiles" Style="width: 100%; height: 300px">
-                        <RadzenTreeLevel Text="@GetTextForNode" />
+                        <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
                     </RadzenTree>
                 </div>
             </div>
@@ -108,6 +112,21 @@
         return Path.GetFileName((string)data);        
     }
 
+    RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder => 
+    {
+        string path = context.Value as string;
+        bool isDirectory = Directory.Exists(path);
+
+        builder.OpenComponent<RadzenIcon>(0);
+        builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
+        if (!isDirectory)
+        {
+            builder.AddAttribute(2, "Style", "margin-left: 24px");
+        }
+        builder.CloseComponent();
+        builder.AddContent(3, context.Text);
+    };
+
     void OnExpand(TreeExpandEventArgs args)
     {
         var category = args.Value as Category;
@@ -115,6 +134,14 @@
         args.Children.Data = category.Products;
         args.Children.TextProperty = "ProductName";
         args.Children.HasChildren = (product) => false;
+
+        /* Optional template
+        args.Children.Template = context => builder => {
+            builder.OpenElement(1, "strong");
+            builder.AddContent(2, (context.Value as Product).ProductName);
+            builder.CloseElement();
+        };
+        */
 
         LogExpand(args);
     }
@@ -126,6 +153,7 @@
         args.Children.Data = Directory.EnumerateFileSystemEntries(directory);
         args.Children.Text = GetTextForNode;
         args.Children.HasChildren = (path) => Directory.Exists((string)path);
+        args.Children.Template = FileOrFolderTemplate;
 
         Log("Expand", $"Text: {args.Text}");
     }
