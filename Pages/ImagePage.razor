@@ -1,0 +1,34 @@
+﻿@page "/image"
+
+@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<h1 style="display:inline">Image</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/ImagePage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/image/" target="_blank">[documentation]</a>
+
+<p>This page demonstrates <b>Image</b> component.</p>
+<RadzenCard>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Image from application assets</h3>
+            <RadzenCard>
+                <RadzenImage Path="images/hero.png" Style="width:600px">
+                </RadzenImage>
+            </RadzenCard>
+            <br>
+            <h3>Image from url</h3>
+            <RadzenCard>
+                <RadzenImage Path="https://www.radzen.com/assets/hero-40b90af93c7bda2d44608c74e2b8eeb6785e273e02340ec44583d097b5dfb896.png" Style="width:600px">
+                </RadzenImage>
+            </RadzenCard>
+        </div>
+        <div class="col-md-6">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+               N/A
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenCard>
