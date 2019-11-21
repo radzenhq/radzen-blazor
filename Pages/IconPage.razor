@@ -1,0 +1,249 @@
+﻿@page "/icon"
+
+@using NorthwindBlazor.Data
+@using NorthwindBlazor.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<h1 style="display:inline">Icon</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/IconPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/icon/" target="_blank">[documentation]</a>
+
+<p>This page demonstrates <b>Icon</b> component.</p>
+<RadzenCard>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Material Icons</h3>
+            <RadzenIcon Icon="accessibility">
+            </RadzenIcon>
+            <RadzenIcon Icon="3d_rotation">
+            </RadzenIcon>
+            <RadzenIcon Icon="accessible">
+            </RadzenIcon>
+            <RadzenIcon Icon="account_balance">
+            </RadzenIcon>
+            <RadzenIcon Icon="account_balance_wallet">
+            </RadzenIcon>
+            <RadzenIcon Icon="account_box">
+            </RadzenIcon>
+            <RadzenIcon Icon="account_circle">
+            </RadzenIcon>
+            <RadzenIcon Icon="add_shopping_cart">
+            </RadzenIcon>
+            <RadzenIcon Icon="alarm">
+            </RadzenIcon>
+            <RadzenIcon Icon="alarm_add">
+            </RadzenIcon>
+            <RadzenIcon Icon="alarm_off">
+            </RadzenIcon>
+            <RadzenIcon Icon="alarm_on">
+            </RadzenIcon>
+            <RadzenIcon Icon="all_out">
+            </RadzenIcon>
+            <RadzenIcon Icon="android">
+            </RadzenIcon>
+            <RadzenIcon Icon="announcement">
+            </RadzenIcon>
+            <RadzenIcon Icon="aspect_ratio">
+            </RadzenIcon>
+            <RadzenIcon Icon="assessment">
+            </RadzenIcon>
+            <RadzenIcon Icon="assignment">
+            </RadzenIcon>
+            <RadzenIcon Icon="assignment_ind">
+            </RadzenIcon>
+            <RadzenIcon Icon="assignment_late">
+            </RadzenIcon>
+            <RadzenIcon Icon="assignment_return">
+            </RadzenIcon>
+            <RadzenIcon Icon="assignment_returned">
+            </RadzenIcon>
+            <RadzenIcon Icon="assignment_turned_in">
+            </RadzenIcon>
+            <RadzenIcon Icon="autorenew">
+            </RadzenIcon>
+            <RadzenIcon Icon="backup">
+            </RadzenIcon>
+            <RadzenIcon Icon="book">
+            </RadzenIcon>
+            <RadzenIcon Icon="bookmark">
+            </RadzenIcon>
+            <RadzenIcon Icon="bookmark_border">
+            </RadzenIcon>
+            <RadzenIcon Icon="bug_report">
+            </RadzenIcon>
+            <RadzenIcon Icon="build">
+            </RadzenIcon>
+            <RadzenIcon Icon="cached">
+            </RadzenIcon>
+            <RadzenIcon Icon="camera_enhance">
+            </RadzenIcon>
+            <RadzenIcon Icon="card_giftcard">
+            </RadzenIcon>
+            <RadzenIcon Icon="card_membership">
+            </RadzenIcon>
+            <RadzenIcon Icon="card_travel">
+            </RadzenIcon>
+            <RadzenIcon Icon="change_history">
+            </RadzenIcon>
+            <RadzenIcon Icon="check_circle">
+            </RadzenIcon>
+            <RadzenIcon Icon="chrome_reader_mode">
+            </RadzenIcon>
+            <RadzenIcon Icon="class">
+            </RadzenIcon>
+            <RadzenIcon Icon="code">
+            </RadzenIcon>
+            <RadzenIcon Icon="compare_arrows">
+            </RadzenIcon>
+            <RadzenIcon Icon="copyright">
+            </RadzenIcon>
+            <RadzenIcon Icon="credit_card">
+            </RadzenIcon>
+            <RadzenIcon Icon="dashboard">
+            </RadzenIcon>
+            <RadzenIcon Icon="date_range">
+            </RadzenIcon>
+            <RadzenIcon Icon="delete">
+            </RadzenIcon>
+            <RadzenIcon Icon="delete_forever">
+            </RadzenIcon>
+            <RadzenIcon Icon="description">
+            </RadzenIcon>
+            <RadzenIcon Icon="dns">
+            </RadzenIcon>
+            <RadzenIcon Icon="done">
+            </RadzenIcon>
+            <RadzenIcon Icon="done_all">
+            </RadzenIcon>
+            <RadzenIcon Icon="donut_large">
+            </RadzenIcon>
+            <RadzenIcon Icon="donut_small">
+            </RadzenIcon>
+            <RadzenIcon Icon="eject">
+            </RadzenIcon>
+            <RadzenIcon Icon="euro_symbol">
+            </RadzenIcon>
+            <RadzenIcon Icon="event">
+            </RadzenIcon>
+            <RadzenIcon Icon="event_seat">
+            </RadzenIcon>
+            <RadzenIcon Icon="exit_to_app">
+            </RadzenIcon>
+            <RadzenIcon Icon="explore">
+            </RadzenIcon>
+            <RadzenIcon Icon="extension">
+            </RadzenIcon>
+            <RadzenIcon Icon="face">
+            </RadzenIcon>
+            <RadzenIcon Icon="favorite">
+            </RadzenIcon>
+            <RadzenIcon Icon="favorite_border">
+            </RadzenIcon>
+            <RadzenIcon Icon="feedback">
+            </RadzenIcon>
+            <RadzenIcon Icon="find_in_page">
+            </RadzenIcon>
+            <RadzenIcon Icon="find_replace">
+            </RadzenIcon>
+            <RadzenIcon Icon="fingerprint">
+            </RadzenIcon>
+            <RadzenIcon Icon="flight_land">
+            </RadzenIcon>
+            <RadzenIcon Icon="flight_takeoff">
+            </RadzenIcon>
+            <RadzenIcon Icon="flip_to_back">
+            </RadzenIcon>
+            <RadzenIcon Icon="flip_to_front">
+            </RadzenIcon>
+            <RadzenIcon Icon="g_translate">
+            </RadzenIcon>
+            <RadzenIcon Icon="gavel">
+            </RadzenIcon>
+            <RadzenIcon Icon="get_app">
+            </RadzenIcon>
+            <RadzenIcon Icon="gif">
+            </RadzenIcon>
+            <RadzenIcon Icon="grade">
+            </RadzenIcon>
+            <RadzenIcon Icon="group_work">
+            </RadzenIcon>
+            <RadzenIcon Icon="help">
+            </RadzenIcon>
+            <RadzenIcon Icon="help_outline">
+            </RadzenIcon>
+            <RadzenIcon Icon="highlight_off">
+            </RadzenIcon>
+            <RadzenIcon Icon="history">
+            </RadzenIcon>
+            <RadzenIcon Icon="home">
+            </RadzenIcon>
+            <RadzenIcon Icon="hourglass_empty">
+            </RadzenIcon>
+            <RadzenIcon Icon="hourglass_full">
+            </RadzenIcon>
+            <RadzenIcon Icon="http">
+            </RadzenIcon>
+            <RadzenIcon Icon="https">
+            </RadzenIcon>
+            <RadzenIcon Icon="important_devices">
+            </RadzenIcon>
+            <RadzenIcon Icon="info">
+            </RadzenIcon>
+            <RadzenIcon Icon="info_outline">
+            </RadzenIcon>
+            <RadzenIcon Icon="input">
+            </RadzenIcon>
+            <RadzenIcon Icon="invert_colors">
+            </RadzenIcon>
+            <RadzenIcon Icon="label">
+            </RadzenIcon>
+            <RadzenIcon Icon="label_outline">
+            </RadzenIcon>
+            <RadzenIcon Icon="language">
+            </RadzenIcon>
+            <RadzenIcon Icon="launch">
+            </RadzenIcon>
+            <RadzenIcon Icon="lightbulb_outline">
+            </RadzenIcon>
+            <RadzenIcon Icon="line_style">
+            </RadzenIcon>
+            <RadzenIcon Icon="line_weight">
+            </RadzenIcon>
+            <RadzenIcon Icon="list">
+            </RadzenIcon>
+            <RadzenIcon Icon="lock">
+            </RadzenIcon>
+            <RadzenIcon Icon="lock_open">
+            </RadzenIcon>
+            <RadzenIcon Icon="lock_outline">
+            </RadzenIcon>
+            <RadzenIcon Icon="loyalty">
+            </RadzenIcon>
+            <RadzenIcon Icon="markunread_mailbox">
+            </RadzenIcon>
+            <RadzenIcon Icon="motorcycle">
+            </RadzenIcon>
+            <RadzenIcon Icon="note_add">
+            </RadzenIcon>
+            <RadzenIcon Icon="offline_pin">
+            </RadzenIcon>
+            <RadzenIcon Icon="opacity">
+            </RadzenIcon>
+            <RadzenIcon Icon="open_in_browser">
+            </RadzenIcon>
+            <RadzenIcon Icon="open_in_new">
+            </RadzenIcon>
+            <RadzenIcon Icon="open_with">
+            </RadzenIcon>
+            <RadzenIcon Icon="pageview">
+            </RadzenIcon>
+            <RadzenLink Path="https://material.io/tools/icons/" Text="More icons..." target="_blank" />
+        </div>
+        <div class="col-md-6">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+               N/A
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenCard>
