@@ -132,5 +132,7 @@ else
     {
         dbContext.Remove<Order>(order);
         dbContext.SaveChanges();
+
+        ordersGrid.Reload();
     }
 }
