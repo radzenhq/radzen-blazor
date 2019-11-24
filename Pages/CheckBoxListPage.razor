@@ -16,8 +16,8 @@
             <RadzenCheckBoxList @bind-Value="values" TValue="int" Change="@((args) => Change(args, "CheckBoxList with horizontal orientation"))">
                 <Items>
                     <RadzenCheckBoxListItem Text="Orders" Value="1" />
-                    <RadzenCheckBoxListItem Text="Employees" Value="2"  />
-                    <RadzenCheckBoxListItem Text="Customers" Value="3"  />
+                    <RadzenCheckBoxListItem Text="Employees" Value="2" />
+                    <RadzenCheckBoxListItem Text="Customers" Value="3" />
                 </Items>
             </RadzenCheckBoxList>
             <br />
@@ -25,8 +25,17 @@
             <RadzenCheckBoxList @bind-Value="values" TValue="int" Orientation="Orientation.Vertical" Change="@((args) => Change(args, "CheckBoxList with vertical orientation"))">
                 <Items>
                     <RadzenCheckBoxListItem Text="Orders" Value="1" />
-                    <RadzenCheckBoxListItem Text="Employees" Value="2"  />
-                    <RadzenCheckBoxListItem Text="Customers" Value="3"  />
+                    <RadzenCheckBoxListItem Text="Employees" Value="2" />
+                    <RadzenCheckBoxListItem Text="Customers" Value="3" />
+                </Items>
+            </RadzenCheckBoxList>
+            <br />
+            <h3>Disabled CheckBoxList with vertical orientation</h3>
+            <RadzenCheckBoxList @bind-Value="values" Disabled="true" TValue="int" Orientation="Orientation.Vertical" Change="@((args) => Change(args, "CheckBoxList with vertical orientation"))">
+                <Items>
+                    <RadzenCheckBoxListItem Text="Orders" Value="1" />
+                    <RadzenCheckBoxListItem Text="Employees" Value="2" />
+                    <RadzenCheckBoxListItem Text="Customers" Value="3" />
                 </Items>
             </RadzenCheckBoxList>
             <br />

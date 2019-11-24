@@ -11,11 +11,11 @@
     <div class="row">
         <div class="col-md-6">
             <h3>CheckBox</h3>
-            <RadzenCheckBox Name="CheckBox1" @bind-Value="@CheckBox1Value" Style="margin-bottom: 20px" TValue="bool" Change="@(args => Change(args, "CheckBox1 CheckBox"))" /><RadzenLabel Text="CheckBox1" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 20px" />
+            <RadzenCheckBox @bind-Value="@CheckBox1Value" Style="margin-bottom: 20px" TValue="bool" Change="@(args => Change(args, "CheckBox1 CheckBox"))" /><RadzenLabel Text="CheckBox1" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 20px" />
             <br />
-            <RadzenCheckBox @bind-Value="CheckBox2Value" Name="CheckBox2" TriState="true" TValue="bool?" Change="@(args => Change(args, "TriState CheckBox"))" /><RadzenLabel Text="TriState" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox2" />
+            <RadzenCheckBox @bind-Value="CheckBox2Value" TriState="true" TValue="bool?" Change="@(args => Change(args, "TriState CheckBox"))" /><RadzenLabel Text="TriState" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox2" />
             <br />
-            <RadzenCheckBox Name="CheckBox3" Disabled="true" TriState="true" TValue="bool?" Change="@(args => Change(args, "Disabled CheckBox"))" /><RadzenLabel Text="Disabled" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox3" />
+            <RadzenCheckBox @bind-Value="CheckBox3Value" Disabled="true" TriState="true" TValue="bool?" Change="@(args => Change(args, "Disabled CheckBox"))" /><RadzenLabel Text="Disabled" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox3" />
             <br />
         </div>
         <div class="col-md-6">
@@ -34,6 +34,7 @@
 @code {
     bool CheckBox1Value;
     bool? CheckBox2Value;
+    bool? CheckBox3Value = true;
 
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
