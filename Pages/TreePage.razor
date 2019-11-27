@@ -5,69 +5,70 @@
 @inject NorthwindBlazor.Data.NorthwindContext Northwind
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
 
-<h1 style="display:inline">Tree</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/TreePage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/tree/" target="_blank">[documentation]</a>
-<p>This page demonstrates the <strong>Tree</strong> component.</p>
+<h1>Tree</h1>
 
-<RadzenCard>
-    <div class="row">
-        <div class="col-md-6" style="margin-bottom: 16px">
-            <div class="row">
-                <div class="col-md-6" style="margin-bottom: 16px">
-                    <h3>Inline definition</h3>
-                    <RadzenTree Expand="@LogExpand" Change="@LogChange" Style="width: 100%; height: 300px">
-                        <RadzenTreeItem Text="BMW">
-                            <RadzenTreeItem Text="M3" />
-                            <RadzenTreeItem Text="M5" />
-                        </RadzenTreeItem>
-                        <RadzenTreeItem Text="Audi">
-                            <RadzenTreeItem Text="RS4" />
-                            <RadzenTreeItem Text="RS6" />
-                        </RadzenTreeItem>
-                        <RadzenTreeItem Text="Mercedes">
-                            <RadzenTreeItem Text="C63 AMG" />
-                            <RadzenTreeItem Text="S63 AMG" />
-                        </RadzenTreeItem>
-                    </RadzenTree>
-                </div>
-                <div class="col-md-6" style="margin-bottom: 16px">
-                    <h3>Data-bound to Entity Framework</h3>
-                    <RadzenTree Expand="@LogExpand" Change="@LogChange" Data="@Northwind.Categories.Include(c => c.Products)" Style="width: 100%; height: 300px">
-                        <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products">
-                            <Template>
-                                <strong>@((context.Value as Category).CategoryName)</strong>
-                            </Template>
-                        </RadzenTreeLevel>
-                        <RadzenTreeLevel TextProperty="ProductName" HasChildren="@((product) => false)" />
-                    </RadzenTree>
-                </div>
+<p>This page demonstrates how to use and configure the Radzen Blazor <strong>Tree</strong> component.</p>
+
+<RadzenExample Name="Tree" DocumentationUrl="https://www.radzen.com/documentation/blazor/tree/">
+<div class="row">
+    <div class="col-md-6" style="margin-bottom: 16px">
+        <div class="row">
+            <div class="col-md-6" style="margin-bottom: 16px">
+                <h3>Inline definition</h3>
+                <RadzenTree Expand="@LogExpand" Change="@LogChange" Style="width: 100%; height: 300px">
+                    <RadzenTreeItem Text="BMW">
+                        <RadzenTreeItem Text="M3" />
+                        <RadzenTreeItem Text="M5" />
+                    </RadzenTreeItem>
+                    <RadzenTreeItem Text="Audi">
+                        <RadzenTreeItem Text="RS4" />
+                        <RadzenTreeItem Text="RS6" />
+                    </RadzenTreeItem>
+                    <RadzenTreeItem Text="Mercedes">
+                        <RadzenTreeItem Text="C63 AMG" />
+                        <RadzenTreeItem Text="S63 AMG" />
+                    </RadzenTreeItem>
+                </RadzenTree>
             </div>
-            <div class="row">
-                <div class="col-md-6" style="margin-bottom: 16px">
-                    <h3>Load nodes on demand</h3>
-                    <RadzenTree Change="@LogChange" Data="@Northwind.Categories" Expand="@OnExpand" Style="width: 100%; height: 300px">
-                        <RadzenTreeLevel TextProperty="CategoryName"/>
-                    </RadzenTree>
-                </div>
-                <div class="col-md-6" style="margin-bottom: 16px">
-                    <h3>Files and directories</h3>
-                    <RadzenTree Change="@LogChange" Data="@entries" Expand="@LoadFiles" Style="width: 100%; height: 300px">
-                        <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
-                    </RadzenTree>
-                </div>
+            <div class="col-md-6" style="margin-bottom: 16px">
+                <h3>Data-bound to Entity Framework</h3>
+                <RadzenTree Expand="@LogExpand" Change="@LogChange" Data="@Northwind.Categories.Include(c => c.Products)" Style="width: 100%; height: 300px">
+                    <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products">
+                        <Template>
+                            <strong>@((context.Value as Category).CategoryName)</strong>
+                        </Template>
+                    </RadzenTreeLevel>
+                    <RadzenTreeLevel TextProperty="ProductName" HasChildren="@((product) => false)" />
+                </RadzenTree>
             </div>
         </div>
-        <div class="col-md-6" style="margin-bottom: 16px">
-            <h3>Events</h3>
-            <RadzenCard style="overflow: auto;height:500px;">
-                @foreach (var e in events.OrderByDescending(i => i.Key))
-                {
-                    @e.Value
-                    <br />
-                }
-            </RadzenCard>
+        <div class="row">
+            <div class="col-md-6" style="margin-bottom: 16px">
+                <h3>Load nodes on demand</h3>
+                <RadzenTree Change="@LogChange" Data="@Northwind.Categories" Expand="@OnExpand" Style="width: 100%; height: 300px">
+                    <RadzenTreeLevel TextProperty="CategoryName"/>
+                </RadzenTree>
+            </div>
+            <div class="col-md-6" style="margin-bottom: 16px">
+                <h3>Files and directories</h3>
+                <RadzenTree Change="@LogChange" Data="@entries" Expand="@LoadFiles" Style="width: 100%; height: 300px">
+                    <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
+                </RadzenTree>
+            </div>
         </div>
     </div>
-</RadzenCard>
+    <div class="col-md-6" style="margin-bottom: 16px">
+        <h3>Events</h3>
+        <RadzenCard style="overflow: auto;height:500px;">
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
+        </RadzenCard>
+    </div>
+</div>
+</RadzenExample>
 
 @code {
     IEnumerable<string>entries = null;

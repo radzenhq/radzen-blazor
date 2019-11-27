@@ -1,0 +1,25 @@
+@using Radzen.Blazor
+
+<a class="documentation-link" target="blank" href="@DocumentationUrl"><RadzenIcon Icon="help" /> Documentation </a>
+
+<RadzenTabs>
+    <Tabs>
+        <RadzenTabsItem Text="Example" Icon="apps">
+            @ChildContent
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Source" Icon="code">
+            <CodeViewer PageName="@($"{Name}Page.razor")" />
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public string DocumentationUrl { get; set; }
+}
