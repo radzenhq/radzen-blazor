@@ -1,10 +1,17 @@
 @using Radzen.Blazor
 
-<h1>@Name</h1>
+@if (Heading)
+{
+    <h1>@Name</h1>
 
-<p>Demonstration and configuration of the Radzen Blazor <strong>@Name</strong> component.</p
+    <p>Demonstration and configuration of the Radzen Blazor <strong>@Name</strong> component.</p>
+}
 
-<a class="documentation-link" target="blank" href="@DocumentationUrl"><RadzenIcon Icon="help" /> Documentation </a>
+@if (Documentation)
+{
+    <a class="documentation-link" target="blank" href="@DocumentationUrl"><RadzenIcon Icon="help" /> Documentation </a>
+}
+
 <RadzenTabs>
     <Tabs>
         <RadzenTabsItem Text="Example" Icon="apps">
@@ -22,6 +29,12 @@
 
     [Parameter]
     public string Name { get; set; }
+
+    [Parameter]
+    public bool Heading { get; set; } = true;
+
+    [Parameter]
+    public bool Documentation { get; set; } = true;
 
     public string DocumentationUrl 
     { 

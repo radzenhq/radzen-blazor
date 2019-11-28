@@ -6,42 +6,30 @@
 
 @inject NorthwindContext dbContext
 
-<h1 style="display:inline">Card</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/CardPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/card/" target="_blank">[documentation]</a>
-
-<p>This page demonstrates <b>Card</b> component.</p>
-<RadzenCard>
+<RadzenExample Name="Card">
+<RadzenCard Style="width:600px; margin-bottom: 20px; height:500px;">
     <div class="row">
         <div class="col-md-6">
-            <h3>Card</h3>
-            <RadzenCard Style="width:600px;margin-bottom: 20px; height:500px;">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div>Company:</div>
-                        <b>@lastOrder.Customer?.CompanyName</b>
-                        <div style="margin-top:20px">Employee:</div>
-                        <b>@(lastOrder.Employee?.FirstName + " " + lastOrder.Employee?.LastName)</b>
-                        <br />
-                        <RadzenImage Path="@lastOrder.Employee?.Photo" Style="width:100px;" />
-                    </div>
-                    <div class="col-md-6">
-                        <div>Freight:</div>
-                        <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", lastOrder.Freight)</b>
-                        <div style="margin-top:20px">Ship country:</div>
-                        <b>@(lastOrder.ShipCountry)</b>
-                        <div style="margin-top:20px">Ship city:</div>
-                        <b>@(lastOrder.ShipCity)</b>
-                        <div style="margin-top:20px">Ship name:</div>
-                        <b>@(lastOrder.ShipName)</b>
-                    </div>
-                </div>
-            </RadzenCard>
+            <div>Company:</div>
+            <b>@lastOrder.Customer?.CompanyName</b>
+            <div style="margin-top:20px">Employee:</div>
+            <b>@(lastOrder.Employee?.FirstName + " " + lastOrder.Employee?.LastName)</b>
+            <br />
+            <RadzenImage Path="@lastOrder.Employee?.Photo" Style="width:100px;" />
         </div>
         <div class="col-md-6">
-            <h3>Events</h3>
-            N/A
+            <div>Freight:</div>
+            <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", lastOrder.Freight)</b>
+            <div style="margin-top:20px">Ship country:</div>
+            <b>@(lastOrder.ShipCountry)</b>
+            <div style="margin-top:20px">Ship city:</div>
+            <b>@(lastOrder.ShipCity)</b>
+            <div style="margin-top:20px">Ship name:</div>
+            <b>@(lastOrder.ShipName)</b>
         </div>
     </div>
 </RadzenCard>
+</RadzenExample>
 
 @code {
     IEnumerable<Order> orders;

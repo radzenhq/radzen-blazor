@@ -6,10 +6,11 @@
 
 @inject NorthwindContext dbContext
 
-<h1 style="display:inline">Master/Detail</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/MasterDetailPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/datagrid/" target="_blank">[documentation]</a>
+<h1>Master/Detail</h1>
 
-<p>This page demonstrates fetching data from the server using <b>IQueryable</b> bound to a master <b>DataGrid</b>. The detail data are presented with <b>DataGrid</b>, <b>Tabs</b> and <b>DataList</b> updated on master <b>DataGrid</b> row select.</p>
+<p>This page demonstrates how to create a master/detail relationship between two Radzen Blazor DataGrid components.</p>
 
+<RadzenExample Name="MasterDetail" Heading="false" Documentation="false">
 @if (orders == null)
 {
     <p><em>Loading...</em></p>
@@ -98,6 +99,7 @@ else
         </div>
     </div>
 }
+</RadzenExample>
 
 @code {
     Order order;

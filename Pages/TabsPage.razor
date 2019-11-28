@@ -6,10 +6,7 @@
 
 @inject NorthwindContext dbContext
 
-<h1 style="display:inline">Tabs</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/TabsPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/tabs/" target="_blank">[documentation]</a>
-
-<p>This page demonstrates <b>Tabs</b> component.</p>
-
+<RadzenExample Name="Tabs">
 <RadzenTabs>
     <Tabs>
         <RadzenTabsItem Text="Orders">
@@ -94,6 +91,8 @@
         </RadzenTabsItem>
     </Tabs>
 </RadzenTabs>
+</RadzenExample>
+
 @code {
     IEnumerable<Order> orders;
     IEnumerable<Employee> employees;

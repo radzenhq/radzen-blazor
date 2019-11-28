@@ -6,44 +6,41 @@
 
 @inject NorthwindContext dbContext
 
-<h1 style="display:inline">ListBox</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/ListBoxPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/listbox/" target="_blank">[documentation]</a>
-
-<p>This page demonstrates <b>ListBox</b> component.</p>
-<RadzenCard>
-    <div class="row">
-        <div class="col-md-4">
-            <h3>ListBox</h3>
-            <RadzenListBox @bind-Value="@value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px;height:200px;" Change="@(args => Change(args, "ListBox"))" />
-            <br />
-            <h3>ListBox with template</h3>
-            <RadzenListBox @bind-Value="value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
-                           Change="@(args => Change(args, "ListBox with template"))" Style="margin-bottom: 20px; height:200px;">
-                <Template>
-                    Company: @((context as Customer).CompanyName)
-                </Template>
-            </RadzenListBox>
-        </div>
-        <div class="col-md-4">
-            <h3>ListBox with filtering</h3>
-            <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
-                           Change="@(args => Change(args, "ListBox with filtering"))" Style="margin-bottom: 20px; height:200px;" />
-            <br />
-            <h3>ListBox with multiple selection</h3>
-            <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="multipleValues" Multiple="true" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
-                           Change="@(args => Change(args, "ListBox with multiple selection"))" Style="margin-bottom: 20px; height:200px;" />
-        </div>
-        <div class="col-md-4">
-            <h3>Events</h3>
-            <RadzenCard style="overflow: auto;height:500px;">
-                @foreach (var e in events.OrderByDescending(i => i.Key))
-                {
-                    @e.Value
-                    <br />
-                }
-            </RadzenCard>
-        </div>
+<RadzenExample Name="ListBox">
+<div class="row">
+    <div class="col-md-4">
+        <h3>ListBox</h3>
+        <RadzenListBox @bind-Value="@value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px;height:200px;" Change="@(args => Change(args, "ListBox"))" />
+        <br />
+        <h3>ListBox with template</h3>
+        <RadzenListBox @bind-Value="value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+                        Change="@(args => Change(args, "ListBox with template"))" Style="margin-bottom: 20px; height:200px;">
+            <Template>
+                Company: @((context as Customer).CompanyName)
+            </Template>
+        </RadzenListBox>
     </div>
-</RadzenCard>
+    <div class="col-md-4">
+        <h3>ListBox with filtering</h3>
+        <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+                        Change="@(args => Change(args, "ListBox with filtering"))" Style="margin-bottom: 20px; height:200px;" />
+        <br />
+        <h3>ListBox with multiple selection</h3>
+        <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="multipleValues" Multiple="true" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+                        Change="@(args => Change(args, "ListBox with multiple selection"))" Style="margin-bottom: 20px; height:200px;" />
+    </div>
+    <div class="col-md-4">
+        <h3>Events</h3>
+        <RadzenCard style="overflow: auto;height:500px;">
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
+        </RadzenCard>
+    </div>
+</div>
+</RadzenExample>
 
 @code {
     IEnumerable<string> multipleValues = new string[] { "ALFKI", "ANATR" };

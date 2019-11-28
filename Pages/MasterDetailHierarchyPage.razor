@@ -6,10 +6,11 @@
 
 @inject NorthwindContext dbContext
 
-<h1 style="display:inline">Hierarchy</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/MasterDetailHierarchyPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/datagrid/" target="_blank">[documentation]</a>
+<h1>DataGrid Master Detail Hierarchy</h1>
 
-<p>This page demonstrates fetching data from the server using <b>IQueryable</b> bound to hierarchical <b>DataGrid</b> with <b>Tabs</b> and <b>DataList</b>.</p>
+<p>This page demonstrates how to use templates to create a Radzen Blazor DataGrid hierarchy.</p>
 
+<RadzenExample Name="MasterDetailHierarchy" Heading="false" Documentation="false">
 @if (orders == null)
 {
     <p><em>Loading...</em></p>
@@ -94,6 +95,7 @@ else
         </Columns>
     </RadzenGrid>
 }
+</RadzenExample>
 
 @code {
     IEnumerable<Order> orders;

@@ -1,35 +1,29 @@
 ﻿@page "/checkbox"
 
-@using NorthwindBlazor.Data
-@using NorthwindBlazor.Models.Northwind
-@using Microsoft.EntityFrameworkCore
-
-<h1 style="display:inline">CheckBox</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/CheckBoxPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/checkbox/" target="_blank">[documentation]</a>
-
-<p>This page demonstrates <b>CheckBox</b> component.</p>
-<RadzenCard>
-    <div class="row">
-        <div class="col-md-6">
-            <h3>CheckBox</h3>
-            <RadzenCheckBox @bind-Value="@CheckBox1Value" Style="margin-bottom: 20px" TValue="bool" Change="@(args => Change(args, "CheckBox1 CheckBox"))" /><RadzenLabel Text="CheckBox1" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 20px" />
-            <br />
-            <RadzenCheckBox @bind-Value="CheckBox2Value" TriState="true" TValue="bool?" Change="@(args => Change(args, "TriState CheckBox"))" /><RadzenLabel Text="TriState" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox2" />
-            <br />
-            <RadzenCheckBox @bind-Value="CheckBox3Value" Disabled="true" TriState="true" TValue="bool?" Change="@(args => Change(args, "Disabled CheckBox"))" /><RadzenLabel Text="Disabled" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox3" />
-            <br />
-        </div>
-        <div class="col-md-6">
-            <h3>Events</h3>
-            <RadzenCard style="overflow: auto;height:500px;">
-                @foreach (var e in events.OrderByDescending(i => i.Key))
-                {
-                    @e.Value
-                    <br />
-                }
-            </RadzenCard>
-        </div>
+<RadzenExample Name="CheckBox">
+<div class="row">
+    <div class="col-md-6">
+        <h3>CheckBox</h3>
+        <RadzenCheckBox @bind-Value="@CheckBox1Value" Style="margin-bottom: 20px" TValue="bool" Change="@(args => Change(args, "CheckBox1 CheckBox"))" />
+        <RadzenLabel Text="CheckBox1" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 20px" />
+        <br />
+        <RadzenCheckBox @bind-Value="CheckBox2Value" TriState="true" TValue="bool?" Change="@(args => Change(args, "TriState CheckBox"))" /><RadzenLabel Text="TriState" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox2" />
+        <br />
+        <RadzenCheckBox @bind-Value="CheckBox3Value" Disabled="true" TriState="true" TValue="bool?" Change="@(args => Change(args, "Disabled CheckBox"))" /><RadzenLabel Text="Disabled" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox3" />
+        <br />
     </div>
-</RadzenCard>
+    <div class="col-md-6">
+        <h3>Events</h3>
+        <RadzenCard style="overflow: auto;height:500px;">
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
+        </RadzenCard>
+    </div>
+</div>
+</RadzenExample>
 
 @code {
     bool CheckBox1Value;

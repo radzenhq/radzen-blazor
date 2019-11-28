@@ -1,3 +1,4 @@
+@using System.Text.RegularExpressions;
 @inject IJSRuntime JSRuntime
 
 <pre style="max-height: 500px; overflow: auto; font-size: 12px" @ref="pre">@source</pre>
@@ -14,6 +15,7 @@
         var http = new HttpClient();
 
         source = await http.GetStringAsync($"https://raw.githubusercontent.com/akorchev/blazor.radzen.com/code-viewer/Pages/{PageName}");
+        source = Regex.Replace(source, "</?RadzenExample[^>]*>\n", "");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
