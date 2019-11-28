@@ -1,4 +1,4 @@
-@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+@import url('fa.css');
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -212,4 +212,9 @@ Visual Studio-like style based on original C# coloring by Jason Diamond <jason@d
     position: relative; 
     float: right; 
     margin-left: -100%;
+ }
+
+ .social-link {
+    margin-right: 8px;
+    text-decoration: none;
  }
