@@ -2,50 +2,46 @@
 
 @using NorthwindBlazor.Data
 @using NorthwindBlazor.Models.Northwind
-@using Microsoft.EntityFrameworkCore
 
 @inject NorthwindContext dbContext
 
-<h1 style="display:inline">DropDown</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/DropDownPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/dropdown/" target="_blank">[documentation]</a>
-
-<p>This page demonstrates <b>DropDown</b> component.</p>
-<RadzenCard>
-    <div class="row">
-        <div class="col-md-6">
-            <h3>DropDown</h3>
-            <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Data="@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" Change="@(args => Change(args, "DropDown"))" />
-            <br />
-            <h3>DropDown with placeholder</h3>
-            <RadzenDropDown AllowClear="true"  TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px" />
-            <br />
-            <h3>DropDown with template</h3>
-            <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="value" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
-                            Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px; width:400px;">
-                <Template>
-                    Company: @((context as Customer).CompanyName)
-                </Template>
-            </RadzenDropDown>
-            <br />
-            <h3>DropDown with multiple selection</h3>
-            <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="multipleValues" Multiple="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
-                            Change="@(args => Change(args, "DropDown with multiple selection"))" Style="margin-bottom: 20px; width:400px;" />
-            <br />
-            <h3>Bind DropDown Value to model property</h3>
-            <RadzenDropDown AllowClear="true"  AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@products" @bind-Value="myModel.MyValue"
-                            TextProperty="ProductName" ValueProperty="ProductID" Style="margin-bottom: 20px; width:400px;" Change="@(args => ChangeBound(args, "DropDown with bound Value"))" />
-        </div>
-        <div class="col-md-6">
-            <h3>Events</h3>
-            <RadzenCard style="overflow: auto;height:500px;">
-                @foreach (var e in events.OrderByDescending(i => i.Key))
-                {
-                    @e.Value
-                    <br />
-                }
-            </RadzenCard>
-        </div>
+<RadzenExample Name="DropDown">
+<div class="row">
+    <div class="col-md-6">
+        <h3>DropDown</h3>
+        <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Data="@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" Change="@(args => Change(args, "DropDown"))" />
+        <br />
+        <h3>DropDown with placeholder</h3>
+        <RadzenDropDown AllowClear="true"  TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px" />
+        <br />
+        <h3>DropDown with template</h3>
+        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="value" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+                        Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px; width:400px;">
+            <Template>
+                Company: @((context as Customer).CompanyName)
+            </Template>
+        </RadzenDropDown>
+        <br />
+        <h3>DropDown with multiple selection</h3>
+        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="multipleValues" Multiple="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+                        Change="@(args => Change(args, "DropDown with multiple selection"))" Style="margin-bottom: 20px; width:400px;" />
+        <br />
+        <h3>Bind DropDown Value to model property</h3>
+        <RadzenDropDown AllowClear="true"  AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@products" @bind-Value="myModel.MyValue"
+                        TextProperty="ProductName" ValueProperty="ProductID" Style="margin-bottom: 20px; width:400px;" Change="@(args => ChangeBound(args, "DropDown with bound Value"))" />
     </div>
-</RadzenCard>
+    <div class="col-md-6">
+        <h3>Events</h3>
+        <RadzenCard style="overflow: auto;height:500px;">
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
+        </RadzenCard>
+    </div>
+</div>
+</RadzenExample>
 
 @code {
     IEnumerable<Customer> customers;

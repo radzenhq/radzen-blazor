@@ -1,290 +1,225 @@
 ﻿@page "/templateform"
 
-@using NorthwindBlazor.Data
-@using NorthwindBlazor.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<style>
+    .row {
+        margin-bottom: 16px;
+    }
+</style>
 
-@inject NorthwindContext dbContext
-
-    <h1 style="display:inline">TemplateForm</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/TemplateFormPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/template-form/" target="_blank">[documentation]</a>
-
-<p>This page demonstrates TemplateForm features.</p>
-
+<RadzenExample Name="TemplateForm" Documentation="false">
 @if (order == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <div class="row">
-        <div class="col-md-12">
-            <RadzenTemplateForm Data="@order" Submit="@((Order args) => { Submit(args); })">
-                <ChildContent>
-                    <RadzenCard>
-                        <ChildContent>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <RadzenFieldset Text="Purchase Info">
-                                        <ChildContent>
-                                            <div class="row">
-                                                <div class="col-md-4 align-items-center d-flex">
-                                                    <RadzenLabel Text="Credit Card">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <RadzenDropDown @bind-Value="order.CardId" AllowClear="true" Placeholder="Select something" Data="@cards" style="width: 100%;" TextProperty="CardNr" ValueProperty="CardId" Name="CardId">
-                                                    </RadzenDropDown>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-4 align-items-center d-flex">
-                                                    <RadzenLabel Text="Card #">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <RadzenTextBox style="width: 100%;" Name="CardNr">
-                                                    </RadzenTextBox>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-4 align-items-center d-flex">
-                                                    <RadzenLabel Text="Expiry Date">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <RadzenDatePicker style="width: 100%;" Name="ExpiryDate" @bind-Value="order.ExpiryDate" >
-                                                    </RadzenDatePicker>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-4 align-items-center d-flex">
-                                                    <RadzenLabel Text="Cardholder">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <RadzenTextBox style="width: 100%;" Name="CardHolder">
-                                                    </RadzenTextBox>
-                                                </div>
-                                            </div>
-                                        </ChildContent>
-                                    </RadzenFieldset>
-                                    <RadzenFieldset Text="Contact Info">
-                                        <ChildContent>
-                                            <div class="row">
-                                                <div class="col-md-4 align-items-center d-flex">
-                                                    <RadzenLabel Text="Name">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <RadzenTextBox style="width: 100%;" Name="Name">
-                                                    </RadzenTextBox>
-                                                </div>
-                                            </div>
-                                            <RadzenTabs SelectedIndex="0">
-                                                <Tabs>
-                                                    <RadzenTabsItem Text="Billing Address">
-                                                        <ChildContent>
-                                                            <div class="row">
-                                                                <div class="col-md-4 align-items-center d-flex">
-                                                                    <RadzenLabel Text="Country">
-                                                                    </RadzenLabel>
-                                                                </div>
-                                                                <div class="col-md-8">
-                                                                    <RadzenDropDown @bind-Value="order.Country" Placeholder="USA" Data="@countries" style="width: 100%;" TextProperty="Name" ValueProperty="Id" Name="Country">
-                                                                    </RadzenDropDown>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-md-4 align-items-center d-flex">
-                                                                    <RadzenLabel Text="City">
-                                                                    </RadzenLabel>
-                                                                </div>
-                                                                <div class="col-md-8">
-                                                                    <RadzenTextBox style="width: 100%;" Name="City">
-                                                                    </RadzenTextBox>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-md-4 align-items-center d-flex">
-                                                                    <RadzenLabel Text="Address Line 1">
-                                                                    </RadzenLabel>
-                                                                </div>
-                                                                <div class="col-md-8">
-                                                                    <RadzenTextBox style="width: 100%;" Name="Address1">
-                                                                    </RadzenTextBox>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-md-4 align-items-center d-flex">
-                                                                    <RadzenLabel Text="Address Line 2">
-                                                                    </RadzenLabel>
-                                                                </div>
-                                                                <div class="col-md-8">
-                                                                    <RadzenTextBox style="width: 100%;" Name="Address2">
-                                                                    </RadzenTextBox>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-md-4 align-items-center d-flex">
-                                                                    <RadzenLabel Text="State/Province/Region">
-                                                                    </RadzenLabel>
-                                                                </div>
-                                                                <div class="col-md-8">
-                                                                    <RadzenTextBox style="width: 100%;" Name="State">
-                                                                    </RadzenTextBox>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-md-4 align-items-center d-flex">
-                                                                    <RadzenLabel Text="Zip/Postal Code">
-                                                                    </RadzenLabel>
-                                                                </div>
-                                                                <div class="col-md-8">
-                                                                    <RadzenTextBox style="width: 100%;" Name="Zip">
-                                                                    </RadzenTextBox>
-                                                                </div>
-                                                            </div>
-                                                        </ChildContent>
-                                                    </RadzenTabsItem>
-                                                    <RadzenTabsItem Selected="false" Text="Shipping Address">
-                                                    </RadzenTabsItem>
-                                                </Tabs>
-                                            </RadzenTabs>
-                                        </ChildContent>
-                                    </RadzenFieldset>
+    <RadzenTemplateForm Data="@order" Submit="@((Order args) => { Submit(args); })">
+        <div class="row">
+            <div class="col-md-6">
+                <RadzenFieldset Text="Purchase Info">
+                    <div class="row">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <RadzenLabel Text="Credit Card" />
+                        </div>
+                        <div class="col-md-8">
+                            <RadzenDropDown @bind-Value="order.CardId" AllowClear="true" Placeholder="Select something" Data="@cards" style="width: 100%;" TextProperty="CardNr" ValueProperty="CardId" Name="CardId">
+                            </RadzenDropDown>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <RadzenLabel Text="Card #" />
+                        </div>
+                        <div class="col-md-8">
+                            <RadzenTextBox style="width: 100%;" Name="CardNr" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <RadzenLabel Text="Expiry Date" />
+                        </div>
+                        <div class="col-md-8">
+                            <RadzenDatePicker style="width: 100%;" Name="ExpiryDate" @bind-Value="order.ExpiryDate" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <RadzenLabel Text="Cardholder" />
+                        </div>
+                        <div class="col-md-8">
+                            <RadzenTextBox style="width: 100%;" Name="CardHolder" />
+                        </div>
+                    </div>
+                </RadzenFieldset>
+                <RadzenFieldset Text="Contact Info">
+                    <div class="row">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <RadzenLabel Text="Name" />
+                        </div>
+                        <div class="col-md-8">
+                            <RadzenTextBox style="width: 100%;" Name="Name" />
+                        </div>
+                    </div>
+                    <RadzenTabs SelectedIndex="0">
+                        <Tabs>
+                            <RadzenTabsItem Text="Billing Address">
+                                <div class="row">
+                                    <div class="col-md-4 align-items-center d-flex">
+                                        <RadzenLabel Text="Country" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <RadzenDropDown @bind-Value="order.Country" Placeholder="USA" Data="@countries" style="width: 100%;" TextProperty="Name" ValueProperty="Id" Name="Country">
+                                        </RadzenDropDown>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <RadzenFieldset Text="Store Info">
-                                        <ChildContent>
-                                            <div class="row">
-                                                <div class="align-items-center d-flex col-md-2">
-                                                    <RadzenLabel Text="Store #">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <RadzenTextBox Placeholder="123" style="width: 45.3125px;" Name="StoreId">
-                                                    </RadzenTextBox>
-                                                    <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="add_location" style="margin-left: 11px; width: 166.046875px;" Text="Locate store">
-                                                    </RadzenButton>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="align-items-center d-flex col-md-2">
-                                                    <RadzenLabel Text="Name">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <RadzenTextBox Disabled="true" Placeholder="The warehouse" style="width: 100%;" Name="Warehouse">
-                                                    </RadzenTextBox>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="align-items-center d-flex col-md-2">
-                                                    <RadzenLabel Text="Region">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <RadzenTextBox Disabled="true" Placeholder="West" style="width: 100%;" Name="Region">
-                                                    </RadzenTextBox>
-                                                </div>
-                                                <div class="align-items-center d-flex col-md-2">
-                                                    <RadzenLabel Text="System">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <RadzenTextBox Disabled="true" Placeholder="US" style="width: 100%;" Name="System">
-                                                    </RadzenTextBox>
-                                                </div>
-                                            </div>
-                                        </ChildContent>
-                                    </RadzenFieldset>
-                                    <RadzenFieldset Text="POS Info">
-                                        <ChildContent>
-                                            <div class="row">
-                                                <div class="align-items-center d-flex col-md-3">
-                                                    <RadzenLabel Text="Trans #">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-9">
-                                                    <RadzenTextBox Disabled="true" Placeholder="S4485" style="width: 100%;" Name="TransId">
-                                                    </RadzenTextBox>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="align-items-center d-flex col-md-3">
-                                                    <RadzenLabel Text="Register">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-9">
-                                                    <RadzenTextBox Disabled="true" Placeholder="Register #4" style="width: 100%;" Name="Register">
-                                                    </RadzenTextBox>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="align-items-center d-flex col-md-3">
-                                                    <RadzenLabel Text="Clerk">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-9">
-                                                    <RadzenTextBox Disabled="true" Placeholder="Jane Doe" style="width: 100%;" Name="Clerk">
-                                                    </RadzenTextBox>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="align-items-center d-flex col-md-3">
-                                                    <RadzenLabel Text="Amount">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <RadzenNumeric Placeholder="300" style="width: 100%;" Name="Amount" @bind-Value="order.Amount">
-                                                    </RadzenNumeric>
-                                                </div>
-                                                <div class="align-items-center d-flex col-md-2">
-                                                    <RadzenLabel Text="Tax">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <RadzenNumeric Placeholder="123" style="width: 100%;" Name="Tax" @bind-Value="order.Tax">
-                                                    </RadzenNumeric>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="align-items-center d-flex col-md-3">
-                                                    <RadzenLabel Text="Order Date">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <RadzenDatePicker style="width: 100%;" Name="OrderDate" @bind-Value="order.OrderDate">
-                                                    </RadzenDatePicker>
-                                                </div>
-                                                <div class="align-items-center d-flex col-md-2">
-                                                    <RadzenLabel Text="Ship Date">
-                                                    </RadzenLabel>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <RadzenDatePicker style="width: 100%;" Name="ShipDate" @bind-Value="order.ShipDate">
-                                                    </RadzenDatePicker>
-                                                </div>
-                                            </div>
-                                        </ChildContent>
-                                    </RadzenFieldset>
+                                <div class="row">
+                                    <div class="col-md-4 align-items-center d-flex">
+                                        <RadzenLabel Text="City" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <RadzenTextBox style="width: 100%;" Name="City" />
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row justify-content-center">
-                                <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
-                                    <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save">
-                                    </RadzenButton>
-                                    <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="display: inline-block; margin-left: 10px;" Text="Cancel" Click="@Cancel">
-                                    </RadzenButton>
+                                <div class="row">
+                                    <div class="col-md-4 align-items-center d-flex">
+                                        <RadzenLabel Text="Address Line 1">
+                                        </RadzenLabel>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <RadzenTextBox style="width: 100%;" Name="Address1" />
+                                    </div>
                                 </div>
-                            </div>
-                        </ChildContent>
-                    </RadzenCard>
-                </ChildContent>
-            </RadzenTemplateForm>
+                                <div class="row">
+                                    <div class="col-md-4 align-items-center d-flex">
+                                        <RadzenLabel Text="Address Line 2" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <RadzenTextBox style="width: 100%;" Name="Address2" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 align-items-center d-flex">
+                                        <RadzenLabel Text="State/Province/Region" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <RadzenTextBox style="width: 100%;" Name="State" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 align-items-center d-flex">
+                                        <RadzenLabel Text="Zip/Postal Code" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <RadzenTextBox style="width: 100%;" Name="Zip" />
+                                    </div>
+                                </div>
+                            </RadzenTabsItem>
+                            <RadzenTabsItem Text="Shipping Address">
+                            </RadzenTabsItem>
+                        </Tabs>
+                    </RadzenTabs>
+                </RadzenFieldset>
+            </div>
+            <div class="col-md-6">
+                <RadzenFieldset Text="Store Info">
+                    <div class="row">
+                        <div class="align-items-center d-flex col-md-2">
+                            <RadzenLabel Text="Store #" />
+                        </div>
+                        <div class="col-md-10">
+                            <RadzenTextBox Placeholder="123" style="width: 45.3125px;" Name="StoreId" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="add_location" style="margin-left: 11px; width: 166.046875px;" Text="Locate store">
+                            </RadzenButton>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="align-items-center d-flex col-md-2">
+                            <RadzenLabel Text="Name" />
+                        </div>
+                        <div class="col-md-10">
+                            <RadzenTextBox Disabled="true" Placeholder="The warehouse" style="width: 100%;" Name="Warehouse" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="align-items-center d-flex col-md-2">
+                            <RadzenLabel Text="Region" />
+                        </div>
+                        <div class="col-md-3">
+                            <RadzenTextBox Disabled="true" Placeholder="West" style="width: 100%;" Name="Region" />
+                        </div>
+                        <div class="align-items-center d-flex col-md-2">
+                            <RadzenLabel Text="System" />
+                        </div>
+                        <div class="col-md-5">
+                            <RadzenTextBox Disabled="true" Placeholder="US" style="width: 100%;" Name="System" />
+                        </div>
+                    </div>
+                </RadzenFieldset>
+                <RadzenFieldset Text="POS Info">
+                    <div class="row">
+                        <div class="align-items-center d-flex col-md-3">
+                            <RadzenLabel Text="Trans #" />
+                        </div>
+                        <div class="col-md-9">
+                            <RadzenTextBox Disabled="true" Placeholder="S4485" style="width: 100%;" Name="TransId" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="align-items-center d-flex col-md-3">
+                            <RadzenLabel Text="Register" />
+                        </div>
+                        <div class="col-md-9">
+                            <RadzenTextBox Disabled="true" Placeholder="Register #4" style="width: 100%;" Name="Register" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="align-items-center d-flex col-md-3">
+                            <RadzenLabel Text="Clerk" />
+                        </div>
+                        <div class="col-md-9">
+                            <RadzenTextBox Disabled="true" Placeholder="Jane Doe" style="width: 100%;" Name="Clerk" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="align-items-center d-flex col-md-3">
+                            <RadzenLabel Text="Amount" />
+                        </div>
+                        <div class="col-md-3">
+                            <RadzenNumeric Placeholder="300" style="width: 100%;" Name="Amount" @bind-Value="order.Amount" />
+                        </div>
+                        <div class="align-items-center d-flex col-md-2">
+                            <RadzenLabel Text="Tax" />
+                        </div>
+                        <div class="col-md-4">
+                            <RadzenNumeric Placeholder="123" style="width: 100%;" Name="Tax" @bind-Value="order.Tax" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="align-items-center d-flex col-md-3">
+                            <RadzenLabel Text="Order Date" />
+                        </div>
+                        <div class="col-md-3">
+                            <RadzenDatePicker style="width: 100%;" Name="OrderDate" @bind-Value="order.OrderDate" />
+                        </div>
+                        <div class="align-items-center d-flex col-md-2">
+                            <RadzenLabel Text="Ship Date" />
+                        </div>
+                        <div class="col-md-4">
+                            <RadzenDatePicker style="width: 100%;" Name="ShipDate" @bind-Value="order.ShipDate" />
+                        </div>
+                    </div>
+                </RadzenFieldset>
+            </div>
         </div>
-    </div>
+        <div class="row justify-content-center">
+            <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+                <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save" />
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="display: inline-block; margin-left: 10px;" Text="Cancel" Click="@Cancel" />
+            </div>
+        </div>
+    </RadzenTemplateForm>
 }
+</RadzenExample>
 
 @code {
     public class Order

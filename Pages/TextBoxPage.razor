@@ -1,39 +1,32 @@
 ﻿@page "/textbox"
 
-@using NorthwindBlazor.Data
-@using NorthwindBlazor.Models.Northwind
-@using Microsoft.EntityFrameworkCore
-
-<h1 style="display:inline">TextBox</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/TextBoxPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/textbox/" target="_blank">[documentation]</a>
-
-<p>This page demonstrates <b>TextBox</b> component.</p>
-<RadzenCard>
-    <div class="row">
-        <div class="col-md-6">
-            <h3>TextBox</h3>
-            <RadzenTextBox Style="margin-bottom: 20px" Change="@(args => Change(args, "TextBox"))" />
-            <br />
-            <h3>TextBox with placeholder</h3>
-            <RadzenTextBox Placeholder="Search..." Change="@(args => Change(args, "TextBox with placeholder"))" Style="margin-bottom: 20px" />
-            <br />
-            <h3>TextBox with 5 maximum characters</h3>
-            <RadzenTextBox @bind-Value="@value" MaxLength="5" Change="@(args => Change(args, "TextBox with 5 maximum characters"))" Style="margin-bottom: 20px" />
-            <h3>TextBox with change on every input</h3>
-            <RadzenTextBox Style="margin-bottom: 20px"  @oninput="@(args => Change(args.Value.ToString(), "TextBox with change on every input"))" />
-            <br />
-        </div>
-        <div class="col-md-6">
-            <h3>Events</h3>
-            <RadzenCard style="overflow: auto;height:500px;">
-                @foreach (var e in events.OrderByDescending(i => i.Key))
-                {
-                    @e.Value
-                    <br />
-                }
-            </RadzenCard>
-        </div>
+<RadzenExample Name="TextBox">
+<div class="row">
+    <div class="col-md-6">
+        <h3>TextBox</h3>
+        <RadzenTextBox Style="margin-bottom: 20px" Change="@(args => Change(args, "TextBox"))" />
+        <br />
+        <h3>TextBox with placeholder</h3>
+        <RadzenTextBox Placeholder="Search..." Change="@(args => Change(args, "TextBox with placeholder"))" Style="margin-bottom: 20px" />
+        <br />
+        <h3>TextBox with 5 maximum characters</h3>
+        <RadzenTextBox @bind-Value="@value" MaxLength="5" Change="@(args => Change(args, "TextBox with 5 maximum characters"))" Style="margin-bottom: 20px" />
+        <h3>TextBox with change on every input</h3>
+        <RadzenTextBox Style="margin-bottom: 20px"  @oninput="@(args => Change(args.Value.ToString(), "TextBox with change on every input"))" />
+        <br />
     </div>
-</RadzenCard>
+    <div class="col-md-6">
+        <h3>Events</h3>
+        <RadzenCard style="overflow: auto;height:500px;">
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
+        </RadzenCard>
+    </div>
+</div>
+</RadzenExample>
 
 @code {
     string value;

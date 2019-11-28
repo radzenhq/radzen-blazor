@@ -1,35 +1,27 @@
 ﻿@page "/dialog"
 
-@using NorthwindBlazor.Data
-@using NorthwindBlazor.Models.Northwind
-@using Microsoft.EntityFrameworkCore
-
 @inject DialogService dialogService
 
-<h1 style="display:inline">Dialog</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/DialogPage.razor" target="_blank">[source code]</a>
-
-<p>This page demonstrates <b>Dialog</b> component.</p>
-
-<RadzenCard>
-    <div class="row">
-        <div class="col-md-6">
-            <h3>Dialog</h3>
-            <RadzenButton Text=@($"Show OrderID: {orderID} details") Click="@(args => dialogService.Open<DialogCardPage>($"Order {orderID}",
-                          new Dictionary<string, object>() { { "OrderID", orderID } },
-                          new DialogOptions(){ Width = "700px", Height = "530px", Left = "calc(50% - 350px)", Top = "calc(50% - 265px)" }))" />
-        </div>
-        <div class="col-md-6">
-            <h3>Events</h3>
-            <RadzenCard style="overflow: auto;height:500px;">
-                @foreach (var e in events.OrderByDescending(i => i.Key))
-                {
-                    @e.Value
-                    <br />
-                }
-            </RadzenCard>
-        </div>
+<RadzenExample Name="Dialog" Documentation="false">
+<div class="row">
+    <div class="col-md-6">
+        <h3>Dialog</h3>
+        <RadzenButton Text=@($"Show OrderID: {orderID} details") Click="@(args => dialogService.Open<DialogCardPage>($"Order {orderID}",
+                        new Dictionary<string, object>() { { "OrderID", orderID } },
+                        new DialogOptions(){ Width = "700px", Height = "530px", Left = "calc(50% - 350px)", Top = "calc(50% - 265px)" }))" />
     </div>
-</RadzenCard>
+    <div class="col-md-6">
+        <h3>Events</h3>
+        <RadzenCard style="overflow: auto;height:500px;">
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
+        </RadzenCard>
+    </div>
+</div>
+</RadzenExample>
 
 @code {
     int orderID = 10248;

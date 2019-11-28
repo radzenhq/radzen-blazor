@@ -4,10 +4,11 @@
 
 @inject NorthwindContext dbContext
 
-<h1 style="display:inline">DataGrid</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/DataGridLoadDataPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/datagrid/" target="_blank">[documentation]</a>
+<h1>DataGrid</h1>
 
-<p>This page demonstrates <b>DataGrid</b> component bound using LoadData event. This technique can be used to populate data from external source like service.</p>
+<p>This page demonstrates how to data-bind the Radzen Blazor DataGrid to custom collection via the LoadData event.</p>
 
+<RadzenExample Name="DataGridLoadData" Heading="false" Documentation="false">
 <RadzenGrid Count="@count" Data="@employees" LoadData="@LoadData" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
     <Columns>
         <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
@@ -40,6 +41,7 @@
         <RadzenGridColumn TItem="Employee" Property="Notes" Title="Notes" />
     </Columns>
 </RadzenGrid>
+</RadzenExample>
 
 @code {
     int count;

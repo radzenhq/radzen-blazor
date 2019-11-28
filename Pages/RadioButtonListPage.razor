@@ -1,66 +1,59 @@
 ﻿@page "/radiobuttonlist"
+
 @using Radzen
-@using NorthwindBlazor.Data
-@using NorthwindBlazor.Models.Northwind
-@using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
-
-<h1 style="display:inline">RadioButtonList</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/RadioButtonListPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/radiobuttonlist/" target="_blank">[documentation]</a>
-
-<p>This page demonstrates <b>RadioButtonList</b> component.</p>
-<RadzenCard>
-    <div class="row">
-        <div class="col-md-6">
-            <h3>RadioButtonList with horizontal orientation</h3>
-            <RadzenRadioButtonList @bind-Value="value" TValue="int" Change="@((args) => Change(args, "RadioButtonList with horizontal orientation"))">
-                <Items>
-                    <RadzenRadioButtonListItem Text="Orders" Value="1" />
-                    <RadzenRadioButtonListItem Text="Employees" Value="2" />
-                    <RadzenRadioButtonListItem Text="Customers" Value="3" />
-                </Items>
-            </RadzenRadioButtonList>
-            <br />
-            <h3>RadioButtonList with vertical orientation</h3>
-            <RadzenRadioButtonList @bind-Value="value" TValue="int" Orientation="Orientation.Vertical" Change="@((args) => Change(args, "RadioButtonList with vertical orientation"))">
-                <Items>
-                    <RadzenRadioButtonListItem Text="Orders" Value="1" />
-                    <RadzenRadioButtonListItem Text="Employees" Value="2" />
-                    <RadzenRadioButtonListItem Text="Customers" Value="3" />
-                </Items>
-            </RadzenRadioButtonList>
-            <br />
-            <h3>RadioButtonList with null as initial value</h3>
-            <RadzenRadioButtonList @bind-Value="nullableValue" TValue="int?" Change="@((args) => Change(args, "RadioButtonList with horizontal orientation"))">
-                <Items>
-                    <RadzenRadioButtonListItem Text="Orders" Value="1" TValue="int?" />
-                    <RadzenRadioButtonListItem Text="Employees" Value="2" TValue="int?" />
-                    <RadzenRadioButtonListItem Text="Customers" Value="3" TValue="int?" />
-                </Items>
-            </RadzenRadioButtonList>
-            <br />
-            <h3>Disabled RadioButtonList with initial value</h3>
-            <RadzenRadioButtonList @bind-Value="value" Disabled="true" TValue="int" Change="@((args) => Change(args, "Disabled RadioButtonList with initial value"))">
-                <Items>
-                    <RadzenRadioButtonListItem Text="Orders" Value="1" TValue="int" />
-                    <RadzenRadioButtonListItem Text="Employees" Value="2" TValue="int" />
-                    <RadzenRadioButtonListItem Text="Customers" Value="3" TValue="int" />
-                </Items>
-            </RadzenRadioButtonList>
-            <br />
-        </div>
-        <div class="col-md-6">
-            <h3>Events</h3>
-            <RadzenCard style="overflow: auto;height:500px;">
-                @foreach (var e in events.OrderByDescending(i => i.Key))
-                {
-                    @e.Value
-                    <br />
-                }
-            </RadzenCard>
-        </div>
+<RadzenExample Name="RadioButtonList">
+<div class="row">
+    <div class="col-md-6">
+        <h3>RadioButtonList with horizontal orientation</h3>
+        <RadzenRadioButtonList @bind-Value="value" TValue="int" Change="@((args) => Change(args, "RadioButtonList with horizontal orientation"))">
+            <Items>
+                <RadzenRadioButtonListItem Text="Orders" Value="1" />
+                <RadzenRadioButtonListItem Text="Employees" Value="2" />
+                <RadzenRadioButtonListItem Text="Customers" Value="3" />
+            </Items>
+        </RadzenRadioButtonList>
+        <br />
+        <h3>RadioButtonList with vertical orientation</h3>
+        <RadzenRadioButtonList @bind-Value="value" TValue="int" Orientation="Orientation.Vertical" Change="@((args) => Change(args, "RadioButtonList with vertical orientation"))">
+            <Items>
+                <RadzenRadioButtonListItem Text="Orders" Value="1" />
+                <RadzenRadioButtonListItem Text="Employees" Value="2" />
+                <RadzenRadioButtonListItem Text="Customers" Value="3" />
+            </Items>
+        </RadzenRadioButtonList>
+        <br />
+        <h3>RadioButtonList with null as initial value</h3>
+        <RadzenRadioButtonList @bind-Value="nullableValue" TValue="int?" Change="@((args) => Change(args, "RadioButtonList with horizontal orientation"))">
+            <Items>
+                <RadzenRadioButtonListItem Text="Orders" Value="1" TValue="int?" />
+                <RadzenRadioButtonListItem Text="Employees" Value="2" TValue="int?" />
+                <RadzenRadioButtonListItem Text="Customers" Value="3" TValue="int?" />
+            </Items>
+        </RadzenRadioButtonList>
+        <br />
+        <h3>Disabled RadioButtonList with initial value</h3>
+        <RadzenRadioButtonList @bind-Value="value" Disabled="true" TValue="int" Change="@((args) => Change(args, "Disabled RadioButtonList with initial value"))">
+            <Items>
+                <RadzenRadioButtonListItem Text="Orders" Value="1" TValue="int" />
+                <RadzenRadioButtonListItem Text="Employees" Value="2" TValue="int" />
+                <RadzenRadioButtonListItem Text="Customers" Value="3" TValue="int" />
+            </Items>
+        </RadzenRadioButtonList>
+        <br />
     </div>
-</RadzenCard>
+    <div class="col-md-6">
+        <h3>Events</h3>
+        <RadzenCard style="overflow: auto;height:500px;">
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
+        </RadzenCard>
+    </div>
+</div>
+</RadzenExample>
 
 @code {
     int value = 1;
@@ -71,6 +64,5 @@
     void Change(int? value, string name)
     {
         events.Add(DateTime.Now, $"{name} value changed to {value}");
-        StateHasChanged();
     }
 }

@@ -4,68 +4,65 @@
 @using NorthwindBlazor.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-<h1 style="display:inline">Login</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/LoginPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/login/" target="_blank">[documentation]</a>
-
-<p>This page demonstrates <b>Login</b> component.</p>
-<RadzenCard>
-    <div class="row">
-        <div class="col-md-6">
-            <h3>Simple login</h3>
-            <RadzenCard>
-                <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login="@((args) => Login(args, "Simple login"))" Style="margin-bottom: 20px;" />
-            </RadzenCard>
-            <br />
-            <h3>Login with register</h3>
-            <RadzenCard>
-                <RadzenLogin AllowResetPassword="false" 
-                             Login="@((args) => Login(args, "Login with register"))" 
-                             Register="@((args) => Register("Login with register"))" Style="margin-bottom: 20px;" />
-            </RadzenCard>
-            <br />
-            <h3>Login with register and password reset</h3>
-            <RadzenCard>
-                <RadzenLogin Login="@((args) => Login(args, "Login with register and password reset"))" 
-                             ResetPassword="@((args) => ResetPassword(args, "Login with register and password reset"))"
-                             Register="@((args) => Register("Login with register and password reset"))" Style="margin-bottom: 20px;" />
-            </RadzenCard>
-            <br />
-            <h3>Login with default values</h3>
-            <RadzenCard>
-                <RadzenLogin AllowRegister="true" AllowResetPassword="true" Username="@userName" Password="@password"
-                             Login="@((args) => Login(args, "Login with default values"))"
-                             ResetPassword="@((args) => ResetPassword(args, "Login with default values"))"
-                             Register="@((args) => Register("Login with default values"))"
-                             Style="margin-bottom: 20px;" />
-            </RadzenCard>
-            <br />
-            <h3>Localization</h3>
-            <RadzenCard>
-                <RadzenLogin AllowRegister="true" AllowResetPassword="true"
-                             LoginText="Einloggen" UserText="Benutzername" PasswordText="Passwort"
-                             UserRequired="Benutzername erforderlich"
-                             PasswordRequired="Passwort erforderlich"
-                             RegisterText="Registrieren"
-                             RegisterMessageText="Sie haben noch keinen Account?"
-                             ResetPasswordText="Passwort zurücksetzen"
-                             Login="@((args) => Login(args, "Localized login"))"
-                             ResetPassword="@((args) => ResetPassword(args, "Localized login"))"
-                             Register="@((args) => Register("Localized login"))"
-                             Style="margin-bottom: 20px;" />
-            </RadzenCard>
-            <br />
-        </div>
-        <div class="col-md-6">
-            <h3>Events</h3>
-            <RadzenCard style="overflow: auto;height:500px;">
-                @foreach (var e in events.OrderByDescending(i => i.Key))
-                {
-                    @e.Value
-                    <br />
-                }
-            </RadzenCard>
-        </div>
+<RadzenExample Name="Login">
+<div class="row">
+    <div class="col-md-6">
+        <h3>Simple login</h3>
+        <RadzenCard>
+            <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login="@((args) => Login(args, "Simple login"))" Style="margin-bottom: 20px;" />
+        </RadzenCard>
+        <br />
+        <h3>Login with register</h3>
+        <RadzenCard>
+            <RadzenLogin AllowResetPassword="false" 
+                            Login="@((args) => Login(args, "Login with register"))" 
+                            Register="@((args) => Register("Login with register"))" Style="margin-bottom: 20px;" />
+        </RadzenCard>
+        <br />
+        <h3>Login with register and password reset</h3>
+        <RadzenCard>
+            <RadzenLogin Login="@((args) => Login(args, "Login with register and password reset"))" 
+                            ResetPassword="@((args) => ResetPassword(args, "Login with register and password reset"))"
+                            Register="@((args) => Register("Login with register and password reset"))" Style="margin-bottom: 20px;" />
+        </RadzenCard>
+        <br />
+        <h3>Login with default values</h3>
+        <RadzenCard>
+            <RadzenLogin AllowRegister="true" AllowResetPassword="true" Username="@userName" Password="@password"
+                            Login="@((args) => Login(args, "Login with default values"))"
+                            ResetPassword="@((args) => ResetPassword(args, "Login with default values"))"
+                            Register="@((args) => Register("Login with default values"))"
+                            Style="margin-bottom: 20px;" />
+        </RadzenCard>
+        <br />
+        <h3>Localization</h3>
+        <RadzenCard>
+            <RadzenLogin AllowRegister="true" AllowResetPassword="true"
+                            LoginText="Einloggen" UserText="Benutzername" PasswordText="Passwort"
+                            UserRequired="Benutzername erforderlich"
+                            PasswordRequired="Passwort erforderlich"
+                            RegisterText="Registrieren"
+                            RegisterMessageText="Sie haben noch keinen Account?"
+                            ResetPasswordText="Passwort zurücksetzen"
+                            Login="@((args) => Login(args, "Localized login"))"
+                            ResetPassword="@((args) => ResetPassword(args, "Localized login"))"
+                            Register="@((args) => Register("Localized login"))"
+                            Style="margin-bottom: 20px;" />
+        </RadzenCard>
+        <br />
     </div>
-</RadzenCard>
+    <div class="col-md-6">
+        <h3>Events</h3>
+        <RadzenCard style="overflow: auto;height:500px;">
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
+        </RadzenCard>
+    </div>
+</div>
+</RadzenExample>
 
 @code {
     string userName = "admin";

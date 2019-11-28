@@ -1,13 +1,6 @@
 ﻿@page "/numeric"
 
-@using NorthwindBlazor.Data
-@using NorthwindBlazor.Models.Northwind
-@using Microsoft.EntityFrameworkCore
-
-<h1 style="display:inline">Numeric</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/NumericPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/numeric/" target="_blank">[documentation]</a>
-
-<p>This page demonstrates <b>Numeric</b> component.</p>
-<RadzenCard>
+<RadzenExample Name="Numeric">
     <div class="row">
         <div class="col-md-6">
             <h3>Numeric</h3>
@@ -33,7 +26,7 @@
             </RadzenCard>
         </div>
     </div>
-</RadzenCard>
+</RadzenExample>
 
 @code {
     int? value;
@@ -43,6 +36,5 @@
     void Change(dynamic value, string name)
     {
         events.Add(DateTime.Now, $"{name} value changed to {value}");
-        StateHasChanged();
     }
 }

@@ -1,61 +1,52 @@
 ﻿@page "/accordion"
 
-@using NorthwindBlazor.Data
-@using NorthwindBlazor.Models.Northwind
-@using Microsoft.EntityFrameworkCore
-
-@inject NorthwindContext dbContext
-
-<h1 style="display:inline">Accordion</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/AccordionPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/blazor/accordion/" target="_blank">[documentation]</a>
-
-<p>This page demonstrates <b>Accordion</b> component.</p>
-<RadzenCard>
-    <div class="row">
-        <div class="col-md-6">
-            <h3>Accordion with single expand</h3>
-            <RadzenAccordion Expand="@((args) => Change(args, "Accordion with single expand", "expanded"))">
-                <Items>
-                    <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
-                        Details for Orders
-                    </RadzenAccordionItem>
-                    <RadzenAccordionItem Text="Employees" Icon="account_box">
-                        Details for Employees
-                    </RadzenAccordionItem>
-                    <RadzenAccordionItem Text="Customers" Icon="accessibility">
-                        Details for Customers
-                    </RadzenAccordionItem>
-                </Items>
-            </RadzenAccordion>
-            <br />
-            <h3>Accordion with multiple expand</h3>
-            <RadzenAccordion Multiple="true" Collapse="@((args) => Change(args, "Accordion with multiple expand", "collapsed"))"
-                             Expand="@((args) => Change(args, "Accordion with multiple expand", "expanded"))">
-                <Items>
-                    <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
-                        Details for Orders
-                    </RadzenAccordionItem>
-                    <RadzenAccordionItem Text="Employees" Icon="account_box">
-                        Details for Employees
-                    </RadzenAccordionItem>
-                    <RadzenAccordionItem Text="Customers" Icon="accessibility">
-                        Details for Customers
-                    </RadzenAccordionItem>
-                </Items>
-            </RadzenAccordion>
-            <br />
-        </div>
-        <div class="col-md-6">
-            <h3>Events</h3>
-            <RadzenCard style="overflow: auto;height:500px;">
-                @foreach (var e in events.OrderByDescending(i => i.Key))
-                {
-                    @e.Value
-                    <br />
-                }
-            </RadzenCard>
-        </div>
+<RadzenExample Name="Accordion">
+<div class="row">
+    <div class="col-md-6">
+        <h3>Accordion with single expand</h3>
+        <RadzenAccordion Expand="@((args) => Change(args, "Accordion with single expand", "expanded"))">
+            <Items>
+                <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
+                    Details for Orders
+                </RadzenAccordionItem>
+                <RadzenAccordionItem Text="Employees" Icon="account_box">
+                    Details for Employees
+                </RadzenAccordionItem>
+                <RadzenAccordionItem Text="Customers" Icon="accessibility">
+                    Details for Customers
+                </RadzenAccordionItem>
+            </Items>
+        </RadzenAccordion>
+        <br />
+        <h3>Accordion with multiple expand</h3>
+        <RadzenAccordion Multiple="true" Collapse="@((args) => Change(args, "Accordion with multiple expand", "collapsed"))"
+                            Expand="@((args) => Change(args, "Accordion with multiple expand", "expanded"))">
+            <Items>
+                <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
+                    Details for Orders
+                </RadzenAccordionItem>
+                <RadzenAccordionItem Text="Employees" Icon="account_box">
+                    Details for Employees
+                </RadzenAccordionItem>
+                <RadzenAccordionItem Text="Customers" Icon="accessibility">
+                    Details for Customers
+                </RadzenAccordionItem>
+            </Items>
+        </RadzenAccordion>
+        <br />
     </div>
-</RadzenCard>
+    <div class="col-md-6">
+        <h3>Events</h3>
+        <RadzenCard style="overflow: auto;height:500px;">
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
+        </RadzenCard>
+    </div>
+</div>
+</RadzenExample>
 
 @code {
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();

@@ -7,10 +7,11 @@
 @inject NorthwindContext dbContext
 @inject NorthwindService service
 
-<h1 style="display:inline">DataGrid</h1><a style="margin-left: 10px" href="https://github.com/akorchev/blazor.radzen.com/blob/master/Pages/ExportToExcelCsvPage.razor" target="_blank">[source code]</a><a style="margin-left: 10px" href="https://www.radzen.com/documentation/event-handling/#export" target="_blank">[documentation]</a>
+<h1>Export to Excel and CSV</h1>
 
-<p>This page demonstrates <b>DataGrid</b> component export to Excel and CSV. Exported data will be sorted and filtered according to the DataGrid sort and filter.</p>
+<p>This page demonstrates how to export a Radzen Blazor DataGrid to Excel and CSV.</p>
 
+<RadzenExample Name="ExportToExcelCsv" Heading="false" Documentation="false">
 @if (data == null)
 {
     <p><em>Loading...</em></p>
@@ -32,6 +33,7 @@ else
         </Columns>
     </RadzenGrid>
 }
+</RadzenExample>
 
 @code {
     RadzenGrid<OrderDetail> grid;
