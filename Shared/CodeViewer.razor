@@ -13,7 +13,7 @@
     {
         var http = new HttpClient();
 
-        source = await http.GetStringAsync($"https://raw.githubusercontent.com/akorchev/blazor.radzen.com/master/Pages/{PageName}");
+        source = await http.GetStringAsync($"https://raw.githubusercontent.com/akorchev/blazor.radzen.com/code-viewer/Pages/{PageName}");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

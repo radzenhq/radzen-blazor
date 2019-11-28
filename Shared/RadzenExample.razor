@@ -1,7 +1,10 @@
 @using Radzen.Blazor
 
-<a class="documentation-link" target="blank" href="@DocumentationUrl"><RadzenIcon Icon="help" /> Documentation </a>
+<h1>@Name</h1>
 
+<p>Demonstration and configuration of the Radzen Blazor <strong>@Name</strong> component.</p
+
+<a class="documentation-link" target="blank" href="@DocumentationUrl"><RadzenIcon Icon="help" /> Documentation </a>
 <RadzenTabs>
     <Tabs>
         <RadzenTabsItem Text="Example" Icon="apps">
@@ -20,6 +23,11 @@
     [Parameter]
     public string Name { get; set; }
 
-    [Parameter]
-    public string DocumentationUrl { get; set; }
+    public string DocumentationUrl 
+    { 
+        get
+        {
+            return $"https://www.radzen.com/documentation/blazor/{Name.ToLower()}/";
+        }
+    }
 }
