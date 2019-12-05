@@ -12,6 +12,9 @@
         <h3>AutoComplete with placeholder</h3>
         <RadzenAutoComplete Placeholder="Select..." Data="@customers" TextProperty="CompanyName" Change="@(args => Change(args, "AutoComplete with placeholder"))" Style="margin-bottom: 20px" />
         <br />
+        <h3>Disabled AutoComplete</h3>
+        <RadzenAutoComplete Disabled="true" Data="@customers" TextProperty="CompanyName" Change="@(args => Change(args, "AutoComplete with placeholder"))" Style="margin-bottom: 20px" />
+        <br />
     </div>
     <div class="col-md-6">
         <h3>Events</h3>

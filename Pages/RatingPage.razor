@@ -4,10 +4,13 @@
 <div class="row">
     <div class="col-md-6">
         <h3>Rating with 5 stars</h3>
-        <RadzenRating Style="margin-bottom: 20px" Change="@((args) => Change(args, "Rating with 5 stars"))"  />
+        <RadzenRating Style="margin-bottom: 20px" Change="@((args) => Change(args, "Rating with 5 stars"))" />
         <br />
         <h3>Rating with 10 stars</h3>
-        <RadzenRating Stars="10" Style="margin-bottom: 20px" Change="@((args) => Change(args, "Rating with 10 stars"))"/>
+        <RadzenRating Stars="10" Style="margin-bottom: 20px" Change="@((args) => Change(args, "Rating with 10 stars"))" />
+        <br />
+        <h3>Disabled Rating with 10 stars</h3>
+        <RadzenRating Disabled="true" Stars="10" Style="margin-bottom: 20px" Change="@((args) => Change(args, "Disabled Rating with 10 stars"))" />
     </div>
     <div class="col-md-6">
         <h3>Events</h3>
