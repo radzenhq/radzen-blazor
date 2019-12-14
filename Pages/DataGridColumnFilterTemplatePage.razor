@@ -1,0 +1,55 @@
+﻿@page "/datagrid-filter-template"
+
+<RadzenExample Name="DataGridColumnFilterTemplate">
+@if (employees == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <RadzenGrid Data="@(employees.Where(e => e.TitleOfCourtesy == currentTOC))" 
+                AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
+        <Columns>
+            <RadzenGridColumn TItem="Employee" Property="ID" Title="ID" />
+            <RadzenGridColumn TItem="Employee" Property="Name" Title="Name"/>
+            <RadzenGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy">
+                <FilterTemplate>
+                    <RadzenDropDown @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%"
+                                    Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy>().Select(t => new { Text = $"{t}", Value = t }))" />
+
+                </FilterTemplate>
+            </RadzenGridColumn>
+        </Columns>
+    </RadzenGrid>
+}
+</RadzenExample>
+
+@code {
+    public enum TitleOfCourtesy
+    {
+        Ms,
+        Mr,
+    }
+
+    public class Employee
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public TitleOfCourtesy TitleOfCourtesy { get; set; }
+
+    }
+
+    IEnumerable<Employee> employees;
+    TitleOfCourtesy currentTOC;
+
+    protected override async Task OnInitializedAsync()
+    {
+        employees = await Task.FromResult(Enumerable.Range(0, 10).Select(i =>
+            new Employee
+            {
+                ID = i,
+                Name = $"Name{i}",
+                TitleOfCourtesy = i < 5 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms
+            }));
+    }
+}
