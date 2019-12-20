@@ -1,0 +1,110 @@
+@page "/validation"
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using System.ComponentModel.DataAnnotations
+
+<RadzenExample Name="Validator" Documentation="false">
+    <div class="row">
+        <div class="col-md-6" style="margin-bottom: 16px">
+            <RadzenFieldset Text="EditForm and ValidationMessage">
+                <EditForm Model="@exampleModel">
+                    <DataAnnotationsValidator />
+                    <p>
+                        <RadzenTextBox @bind-Value="exampleModel.Name" />
+                        <ValidationMessage For="() => exampleModel.Name" />
+                    </p>
+                    <button type="submit">Submit</button>
+                </EditForm>
+            </RadzenFieldset>
+            <RadzenFieldset Text="RadzenTemplateForm and RadzenRequiredValidator">
+                <RadzenTemplateForm TItem="ExampleModel2" Data="@exampleModel2" @ref="templateForm" InvalidSubmit="@OnInvalidSubmit" Submit="@(args => OnSubmit(args))">
+                    <p>
+                        <RadzenSelectBar Name="Name" @bind-Value="exampleModel2.Items">
+                            <Items>
+                                <RadzenSelectBarItem Text="One" Value="1" />
+                                <RadzenSelectBarItem Text="Two" Value="2" />
+                            </Items>
+
+                        </RadzenSelectBar>
+                        <RadzenRequiredValidator Component="Name" Text="Name is required" />
+                    </p>
+                    
+                    <p>
+                        <RadzenNumeric Name="Quantity" @bind-Value="exampleModel2.Quantity" />
+                        <RadzenRequiredValidator Component="Quantity" Text="Quantity is required" />
+                        <RadzenNumericRangeValidator Component="Quantity" Min="1" Max="10" Text="Quantity should be between 1 and 10" />
+                    </p>
+                    <p>
+                        <RadzenPassword Name="Password" @bind-Value="exampleModel2.Password" />
+                        <RadzenRequiredValidator Component="Password" Text="Password is required" />
+                    </p>
+                    <p>
+                        <RadzenPassword Name="ConfirmPassword" @bind-Value="exampleModel2.ConfirmPassword" />
+                        <RadzenRequiredValidator Component="ConfirmPassword" Text="Confirm your password" />
+                        <RadzenCompareValidator Component="ConfirmPassword" Value="@exampleModel2.Password" Text="Passwords don't match" />
+                    </p>
+                    <p>
+                        Valid: @templateForm.IsValid
+                    </p>
+                    <button type="submit">Submit</button>
+                </RadzenTemplateForm>
+            </RadzenFieldset>
+        </div>
+        <div class="col-md-6" style="margin-bottom: 16px">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto; height: 500px;">
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenExample>
+
+@code {
+    public class ExampleModel
+    {
+        [Required]
+        public string Name { get; set; }
+    }
+
+    ExampleModel exampleModel = new ExampleModel();
+
+    public class ExampleModel2
+    {
+        public string Name { get; set; }
+        public int? Quantity { get; set; }
+        public int Rating { get; set; }
+        public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+        public bool Checked { get; set; }
+        public IEnumerable<int> Items { get; set; }
+    }
+
+    ExampleModel2 exampleModel2 = new ExampleModel2();
+    RadzenTemplateForm<ExampleModel2> templateForm;
+
+    ExampleModel2[] models = new [] {
+        new ExampleModel2 { Name = "One" },
+        new ExampleModel2 { Name = "Two" },
+    };
+
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Log(string eventName, string value)
+    {
+        events.Add(DateTime.Now, $"{eventName}: {value}");
+    }
+
+    void OnSubmit(ExampleModel2 model)
+    {
+        Log("Submit", JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true }));
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        Log("InvalidSubmit", JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true }));
+    }
+}
