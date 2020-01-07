@@ -18,7 +18,7 @@
 else
 {
     <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
-                Data="@orders" TItem="Order" Value="@order">
+                Data="@orders" TItem="Order" Value="@order" RowUpdate="@OnUpdateRow">
         <Columns>
             <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID"/>
             <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer">
@@ -53,7 +53,8 @@ else
             </RadzenGridColumn>
             <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name">
                 <EditTemplate Context="order">
-                    <RadzenTextBox @bind-Value="order.ShipName" Style="width:100%" />
+                    <RadzenTextBox @bind-Value="order.ShipName" Style="width:100%; display: block" Name="ShipName" />
+                    <RadzenRequiredValidator Text="ShipName is required" Component="ShipName" Popup="true" />
                 </EditTemplate>
             </RadzenGridColumn>
             <RadzenGridColumn TItem="Order" Context="sampleBlazorModelsSampleOrder" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
@@ -62,7 +63,7 @@ else
                     </RadzenButton>
                 </Template>
                 <EditTemplate Context="order">
-                    <RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => UpdateRow(order))">
+                    <RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => SaveRow(order))">
                     </RadzenButton>
                     <RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => CancelEdit(order))">
                     </RadzenButton>
@@ -109,12 +110,15 @@ else
         ordersGrid.EditRow(order);
     }
 
-    void UpdateRow(Order order)
+    void OnUpdateRow(Order order)
     {
-        ordersGrid.UpdateRow(order);
-
         dbContext.Update<Order>(order);
         dbContext.SaveChanges();
+    }
+
+    void SaveRow(Order order)
+    {
+        ordersGrid.UpdateRow(order);
     }
 
     void CancelEdit(Order order)

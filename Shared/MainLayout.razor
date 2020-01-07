@@ -346,6 +346,47 @@
         },
         new Example()
         {
+            Name = "Validators",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "RequiredValidator",
+                    Path = "requiredvalidator",
+                    Icon = "check",
+                    Tags = new [] { "validator", "validation", "required"}
+                },
+                new Example()
+                {
+                    Name = "LengthValidator",
+                    Path = "lengthvalidator",
+                    Icon = "compare_arrows",
+                    Tags = new [] { "validator", "validation", "required", "length"}
+                } ,
+                new Example()
+                {
+                    Name = "NumericRangeValidator",
+                    Path = "numericrangevalidator",
+                    Icon = "filter_1",
+                    Tags = new [] { "validator", "validation", "required", "range"}
+                },
+                new Example()
+                {
+                    Name = "CompareValidator",
+                    Path = "comparevalidator",
+                    Icon = "done_all",
+                    Tags = new [] { "validator", "validation", "required", "compare"}
+                },
+                new Example()
+                {
+                    Name = "EmailValidator",
+                    Path = "emailvalidator",
+                    Icon = "email",
+                    Tags = new [] { "validator", "validation", "required", "email"}
+                }
+            }
+        },
+        new Example()
+        {
             Name="Data",
             Children = new [] {
                 new Example()
