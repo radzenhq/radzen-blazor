@@ -6,10 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        Free Blazor Components | 40+ controls by Radzen
-    </title>
-    <meta name="description" content="The Radzen Blazor component library provides more than 30 UI controls for building rich ASP.NET Core web applications.">
+    @(await Html.RenderComponentAsync<Metadata>(RenderMode.ServerPrerendered))
     <environment include="Development">
         <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     </environment>
@@ -37,6 +34,10 @@
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'UA-73079289-4');
+
+        function setTitle(title) {
+            document.title = title;
+        }
     </script>
 </body>
 </html>

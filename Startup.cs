@@ -37,6 +37,7 @@ namespace LatestBlazor
                 o.MaximumReceiveMessageSize = 10 * 1024 * 1024;
             });
             services.AddScoped<ThemeState>();
+            services.AddScoped<ExampleService>();
 
             services.AddScoped<NorthwindContext>();
             services.AddScoped<DialogService>();

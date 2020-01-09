@@ -1,0 +1,12 @@
+@inject ExampleService ExampleService
+@inject NavigationManager NavigationManager
+<title>@ExampleService.TitleFor(example)</title>
+<meta name="description" content="@ExampleService.DescriptionFor(example)">
+@code {
+    Example example;
+
+    protected override void OnInitialized()
+    {
+        example = ExampleService.FindCurrent(NavigationManager.ToAbsoluteUri(NavigationManager.Uri));
+    }
+}
