@@ -6,9 +6,9 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid conditional template</h1>
+<h1>DataGrid conditional styles and templates</h1>
 
-<p>This page demonstrates <b>DataGrid</b> with conditional cell template/style for Quantity column.</p>
+<p>This page demonstrates <b>DataGrid</b> with conditional rows and cells template/styles.</p>
 
 <RadzenExample Name="DataGridConditionalTemplate" Heading="false" Documentation="false">
     @if (orderDetails == null)
@@ -19,18 +19,18 @@
     {
         <h3>Order Details</h3>
         <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                    Data="@orderDetails" TItem="OrderDetail" ColumnWidth="200px">
+                    Data="@orderDetails" TItem="OrderDetail" ColumnWidth="200px" RowRender="@RowRender" CellRender="@CellRender">
             <Columns>
                 <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
                 <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity">
                     <Template Context="data">
                         @if (data.Quantity > 20)
                         {
-                            <span style='color:red'>@data.Quantity</span>
+                            <span style='color:white'>@data.Quantity</span>
                         }
                         else
                         {
-                            <span style='color:blue'>@data.Quantity</span>
+                            <span style='color:black'>@data.Quantity</span>
                         }
                     </Template>
                 </RadzenGridColumn>
@@ -46,5 +46,18 @@
     protected override async Task OnInitializedAsync()
     {
         orderDetails = await Task.FromResult(dbContext.OrderDetails.Include("Product"));
+    }
+
+    void RowRender(RowRenderEventArgs<OrderDetail> args)
+    {
+        args.Attributes.Add("style", $"font-weight: {(args.Data.Quantity > 20 ? "bold" : "normal")};");
+    }
+
+    void CellRender(CellRenderEventArgs<OrderDetail> args)
+    {
+        if (args.Column.Property == "Quantity")
+        {
+            args.Attributes.Add("style", $"background-color: {(args.Data.Quantity > 20 ? "#ff6d41" : "white")};");
+        }
     }
 }
