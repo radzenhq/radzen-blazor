@@ -364,6 +364,14 @@ namespace LatestBlazor
                 },
                 new Example()
                 {
+                    Name = "DataGrid conditional template",
+                    Path = "datagrid-conditional-template",
+                    Title = "DataGrid conditional template",
+                    Icon = "style",
+                    Tags = new [] { "conditional", "template", "style", "datagrid", "table", "dataview" }
+                },
+                new Example()
+                {
                     Name = "Cascading DropDowns",
                     Path = "cascading-dropdowns",
                     Title = "Blazor Cascading DropDowns",
