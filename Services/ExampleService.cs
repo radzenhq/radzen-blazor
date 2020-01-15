@@ -137,6 +137,13 @@ namespace LatestBlazor
                     Icon = "tab",
                     Tags = new [] { "tabstrip", "tabview", "container" }
                 },
+                new Example()
+                {
+                    Name = "Steps",
+                    Path = "steps",
+                    Icon = "skip_next",
+                    Tags = new [] { "step", "steps", "wizard" }
+                },
             }
         },
         new Example()
