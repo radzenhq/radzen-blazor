@@ -43,6 +43,7 @@ namespace LatestBlazor
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
             services.AddScoped<NorthwindService>();
+            services.AddScoped<NorthwindODataService>();
 
             services.AddDistributedMemoryCache();
 

@@ -2,14 +2,14 @@
 @using NorthwindBlazor.Data
 @using NorthwindBlazor.Models.Northwind
 
-@inject NorthwindContext dbContext
+@inject NorthwindODataService service
 
 <h1>DataGrid</h1>
 
 <p>This page demonstrates how to data-bind the Radzen Blazor DataGrid to custom collection via the LoadData event.</p>
 
 <RadzenExample Name="DataGridLoadData" Heading="false" Documentation="false">
-<RadzenGrid Count="@count" Data="@employees" LoadData="@LoadData" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
+<RadzenGrid Count="@count" Data="@employees" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
     <Columns>
         <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
         <RadzenGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false">
@@ -47,9 +47,12 @@
     int count;
     IEnumerable<Employee> employees;
 
-    private async void LoadData(LoadDataArgs args)
+    async void LoadData(LoadDataArgs args)
     {
-        count = await Task.FromResult(dbContext.Employees.Count());
-        employees = await Task.FromResult(dbContext.Employees.Skip(args.Skip.Value).Take(args.Top.Value));
+        var result = await service.GetEmployees(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+        employees = result.Value.AsODataEnumerable();
+        count = result.Count;
+
+        StateHasChanged();
     }
 }
