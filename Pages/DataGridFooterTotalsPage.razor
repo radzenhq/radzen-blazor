@@ -22,7 +22,7 @@ else
         <Columns>
             <RadzenGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID">
                 <FooterTemplate>
-                    Total orders: <b>@orders.Count()</b>
+                    Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
                 </FooterTemplate>
             </RadzenGridColumn>
             <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
