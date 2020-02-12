@@ -3,24 +3,27 @@
 @inject DialogService dialogService
 
 <RadzenExample Name="Dialog" Documentation="true">
-<div class="row">
-    <div class="col-md-6">
-        <h3>Dialog</h3>
-        <RadzenButton Text=@($"Show OrderID: {orderID} details") Click="@(args => dialogService.Open<DialogCardPage>($"Order {orderID}",
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Dialog</h3>
+            <RadzenButton Text=@($"Show OrderID: {orderID} details") Click="@(args => dialogService.Open<DialogCardPage>($"Order {orderID}",
                         new Dictionary<string, object>() { { "OrderID", orderID } },
                         new DialogOptions(){ Width = "700px", Height = "530px", Left = "calc(50% - 350px)", Top = "calc(50% - 265px)" }))" />
+
+            <h3 style="margin-top: 20px;">Simple Dialog</h3>
+            <RadzenButton Text=@($"Show simple dialog") Click="@ShowSimpleDialog" />
+        </div>
+        <div class="col-md-6">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+                @foreach (var e in events.OrderByDescending(i => i.Key))
+                {
+                    @e.Value
+                    <br />
+                }
+            </RadzenCard>
+        </div>
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
-    </div>
-</div>
 </RadzenExample>
 
 @code {
@@ -45,4 +48,15 @@
         events.Add(DateTime.Now, "Dialog closed. Result: " + result);
         await InvokeAsync(() => { StateHasChanged(); });
     }
+
+    async Task ShowSimpleDialog() => await dialogService.OpenAsync("Simple Dialog", ds =>
+        @<RadzenCard Style="padding: 20px;">
+        <p Style="margin-bottom: 10px;">Confirm?</p>
+        <div class="row">
+            <div class="col-md-12">
+                <RadzenButton Text="Ok" Click="()=> ds.Close(true)" Style="margin-bottom: 10px; width: 150px" />
+                <RadzenButton Text="Cancel" Click="()=> ds.Close(false)" ButtonStyle="ButtonStyle.Secondary"  Style="margin-bottom: 10px; width: 150px"/>
+            </div>
+        </div>
+    </RadzenCard>);
 }
