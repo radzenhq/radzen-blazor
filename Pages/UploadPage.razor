@@ -24,6 +24,11 @@
         <h3>Events</h3>
         <RadzenCard style="overflow: auto;height:500px;">
             <RadzenProgressBar Value="@progress" Unit="@info" Visible="@(progress > 0)" Style="margin-bottom: 20px" />
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
         </RadzenCard>
     </div>
 </div>
@@ -32,10 +37,20 @@
 @code {
     int progress;
     string info;
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
     void OnProgress(UploadProgressArgs args, string name)
     {
         this.info = $"% '{name}' / {args.Loaded} of {args.Total} bytes.";
         this.progress = args.Progress;
+
+        if (args.Progress == 100)
+        {
+            events.Clear();
+            foreach (var file in args.Files)
+            {
+                events.Add(DateTime.Now, $"Uploaded: {file.Name} / {file.Size} bytes");
+            }
+        }
     }
 }
