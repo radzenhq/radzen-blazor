@@ -10,7 +10,7 @@
 <RadzenTabs>
     <Tabs>
         <RadzenTabsItem Text="Orders">
-            <RadzenDataList PageSize="6" WrapItems="true" AllowPaging="true" Data="@orders" TItem="Order">
+            <RadzenDataList PageSize="6" WrapItems="true" AllowPaging="true" Data="@dbContext.Orders.Include("Customer").Include("Employee")" TItem="Order">
                 <Template Context="order">
                     <RadzenCard Style="width:400px;">
                         <div class="row">
@@ -39,7 +39,7 @@
             </RadzenDataList>
         </RadzenTabsItem>
         <RadzenTabsItem Text="Employee">
-            <RadzenGrid AllowFiltering="true" AllowPaging="true" PageSize="4" AllowSorting="true" Data="@employees" TItem="Employee">
+            <RadzenGrid AllowFiltering="true" AllowPaging="true" PageSize="4" AllowSorting="true" Data="@dbContext.Employees" TItem="Employee">
                 <Columns>
                     <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
                     <RadzenGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false">
@@ -73,7 +73,7 @@
             </RadzenGrid>
         </RadzenTabsItem>
         <RadzenTabsItem Text="Customers">
-            <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@customers" TItem="Customer">
+            <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@dbContext.Customers" TItem="Customer">
                 <Columns>
                     <RadzenGridColumn TItem="Customer" Property="CustomerID" Title="Customer ID" />
                     <RadzenGridColumn TItem="Customer" Property="CompanyName" Title="Company Name" />
@@ -92,23 +92,3 @@
     </Tabs>
 </RadzenTabs>
 </RadzenExample>
-
-@code {
-    IEnumerable<Order> orders;
-    IEnumerable<Employee> employees;
-    IEnumerable<Customer> customers;
-
-    protected override async Task OnInitializedAsync()
-    {
-        employees = await Task.FromResult(dbContext.Employees);
-
-        customers = await Task.FromResult(dbContext.Customers);
-
-        orders = await Task.FromResult((from order in dbContext.Orders
-                    .Include("Customer")
-                    .Include("Employee")
-                    .Include("OrderDetails")
-                    .Include("OrderDetails.Product")
-                                        select order));
-    }
-}

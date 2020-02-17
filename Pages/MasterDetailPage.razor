@@ -103,17 +103,16 @@ else
 
 @code {
     Order order;
-    IEnumerable<Order> orders;
+    IQueryable<Order> orders;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        orders = await Task.FromResult(from order in dbContext.Orders
-        .Include("Customer")
-        .Include("Employee")
-        .Include("OrderDetails")
-        .Include("OrderDetails.Product")
-                                       select order);
-        order = orders.FirstOrDefault();
+        orders = dbContext.Orders
+            .Include("Customer")
+            .Include("Employee")
+            .Include("OrderDetails")
+            .Include("OrderDetails.Product");
 
+        order = orders.FirstOrDefault();
     }
 }

@@ -12,14 +12,8 @@
 <p>This page demonstrates how to export a Radzen Blazor DataGrid to Excel and CSV.</p>
 
 <RadzenExample Name="ExportToExcelCsv" Heading="false" Documentation="false">
-@if (data == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
     <RadzenButton Text="Excel" Icon="grid_on" Click="@(args => Export("excel"))" Style="margin-bottom:20px" /><RadzenButton Text="CSV" Icon="wrap_text" Click="@(args => Export("csv"))" Style="margin-left:20px;margin-bottom:20px;" />
-    <RadzenGrid @ref="grid" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@data" TItem="OrderDetail">
+    <RadzenGrid @ref="grid" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@dbContext.OrderDetails" TItem="OrderDetail">
         <Columns>
             <RadzenGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
             <RadzenGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
@@ -32,17 +26,10 @@ else
             <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
         </Columns>
     </RadzenGrid>
-}
 </RadzenExample>
 
 @code {
     RadzenGrid<OrderDetail> grid;
-    IEnumerable<OrderDetail> data;
-
-    protected override async Task OnInitializedAsync()
-    {
-        data = await Task.FromResult(dbContext.OrderDetails);
-    }
 
     public void Export(string type)
     {

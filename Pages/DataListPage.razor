@@ -7,13 +7,7 @@
 @inject NorthwindContext dbContext
 
 <RadzenExample Name="DataList">
-@if (orders == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <RadzenDataList WrapItems="true" AllowPaging="true" Data="@orders" TItem="Order">
+    <RadzenDataList WrapItems="true" AllowPaging="true" Data="@dbContext.Orders.Include("Customer").Include("Employee")" TItem="Order">
         <Template Context="order">
             <RadzenCard Style="width:300px;">
                 <div class="row">
@@ -40,19 +34,4 @@ else
             </RadzenCard>
         </Template>
     </RadzenDataList>
-}
 </RadzenExample>
-
-@code {
-    IEnumerable<Order> orders;
-
-    protected override async Task OnInitializedAsync()
-    {
-        orders = await Task.FromResult((from order in dbContext.Orders
-                    .Include("Customer")
-                    .Include("Employee")
-                    .Include("OrderDetails")
-                    .Include("OrderDetails.Product")
-                                        select order));
-    }
-}

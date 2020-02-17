@@ -18,7 +18,8 @@
                 </span>
             </HeaderTemplate>
             <ChildContent>
-                <RadzenDataList PageSize="1" WrapItems="true" AllowPaging="true" Data="@orders" TItem="Order">
+                <RadzenDataList PageSize="1" WrapItems="true" AllowPaging="true" 
+                                Data="@(dbContext.Orders.Include("Customer").Include("Employee"))" TItem="Order">
                     <Template Context="order">
                         <RadzenCard Style="width:300px;height:300px">
                             <div class="row">
@@ -62,20 +63,6 @@
 </RadzenExample>
 
 @code {
-    IEnumerable<Order> orders;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var query = from order in dbContext.Orders
-                            .Include("Customer")
-                            .Include("Employee")
-                            .Include("OrderDetails")
-                            .Include("OrderDetails.Product")
-                    select order;
-
-        orders = await Task.FromResult(query.ToList());
-    }
-
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
     void Change(string text)

@@ -11,43 +11,29 @@
 <p>This page demonstrates <b>DataGrid</b> with conditional rows and cells template/styles.</p>
 
 <RadzenExample Name="DataGridConditionalTemplate" Heading="false" Documentation="false">
-    @if (orderDetails == null)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else
-    {
-        <h3>Order Details</h3>
-        <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                    Data="@orderDetails" TItem="OrderDetail" ColumnWidth="200px" RowRender="@RowRender" CellRender="@CellRender">
-            <Columns>
-                <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
-                <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity">
-                    <Template Context="data">
-                        @if (data.Quantity > 20)
-                        {
-                            <span style='color:white'>@data.Quantity</span>
-                        }
-                        else
-                        {
-                            <span style='color:black'>@data.Quantity</span>
-                        }
-                    </Template>
-                </RadzenGridColumn>
-                <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
-            </Columns>
-        </RadzenGrid>
-    }
+    <h3>Order Details</h3>
+    <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                Data="@dbContext.OrderDetails.Include("Product")" TItem="OrderDetail" ColumnWidth="200px" RowRender="@RowRender" CellRender="@CellRender">
+        <Columns>
+            <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+            <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity">
+                <Template Context="data">
+                    @if (data.Quantity > 20)
+                    {
+                        <span style='color:white'>@data.Quantity</span>
+                    }
+                    else
+                    {
+                        <span style='color:black'>@data.Quantity</span>
+                    }
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
+        </Columns>
+    </RadzenGrid>
 </RadzenExample>
 
 @code {
-    IEnumerable<OrderDetail> orderDetails;
-
-    protected override async Task OnInitializedAsync()
-    {
-        orderDetails = await Task.FromResult(dbContext.OrderDetails.Include("Product"));
-    }
-
     void RowRender(RowRenderEventArgs<OrderDetail> args)
     {
         args.Attributes.Add("style", $"font-weight: {(args.Data.Quantity > 20 ? "bold" : "normal")};");

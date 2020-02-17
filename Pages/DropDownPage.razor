@@ -9,13 +9,13 @@
 <div class="row">
     <div class="col-md-6">
         <h3>DropDown</h3>
-        <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Data="@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" Change="@(args => Change(args, "DropDown"))" />
+        <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Data="@(dbContext.Customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" Change="@(args => Change(args, "DropDown"))" />
         <br />
         <h3>DropDown with placeholder</h3>
-        <RadzenDropDown AllowClear="true"  TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px" />
+        <RadzenDropDown AllowClear="true"  TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Placeholder="Select..." Data="@dbContext.Customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px" />
         <br />
         <h3>DropDown with template</h3>
-        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="value" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="value" Placeholder="Select..." Data="@dbContext.Customers" TextProperty="CompanyName" ValueProperty="CustomerID"
                         Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px; width:400px;">
             <Template>
                 Company: @((context as Customer).CompanyName)
@@ -23,11 +23,11 @@
         </RadzenDropDown>
         <br />
         <h3>DropDown with multiple selection</h3>
-        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="multipleValues" Multiple="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="multipleValues" Multiple="true" Placeholder="Select..." Data="@dbContext.Customers" TextProperty="CompanyName" ValueProperty="CustomerID"
                         Change="@(args => Change(args, "DropDown with multiple selection"))" Style="margin-bottom: 20px; width:400px;" />
         <br />
         <h3>Bind DropDown Value to model property</h3>
-        <RadzenDropDown AllowClear="true"  AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@products" @bind-Value="myModel.MyValue"
+        <RadzenDropDown AllowClear="true"  AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@dbContext.Products" @bind-Value="myModel.MyValue"
                         TextProperty="ProductName" ValueProperty="ProductID" Style="margin-bottom: 20px; width:400px;" Change="@(args => ChangeBound(args, "DropDown with bound Value"))" />
     </div>
     <div class="col-md-6">
@@ -44,19 +44,10 @@
 </RadzenExample>
 
 @code {
-    IEnumerable<Customer> customers;
-    IEnumerable<Product> products;
-
     MyObject myModel = new MyObject();
 
     IEnumerable<string> multipleValues = new string[] { "ALFKI", "ANATR" };
     string value = "ALFKI";
-
-    protected override async Task OnInitializedAsync()
-    {
-        customers = await Task.FromResult(dbContext.Customers);
-        products = await Task.FromResult(dbContext.Products);
-    }
 
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 

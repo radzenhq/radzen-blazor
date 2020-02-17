@@ -18,7 +18,7 @@
 else
 {
     <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
-                Data="@orders" TItem="Order" Value="@order">
+                Data="@dbContext.Orders.Include("Customer").Include("Employee")" TItem="Order">
         <Columns>
             <RadzenGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID">
                 <FooterTemplate>
@@ -56,50 +56,10 @@ else
 
 @code {
     RadzenGrid<Order> ordersGrid;
-
-    Order order;
     IEnumerable<Order> orders;
-    IEnumerable<Customer> customers;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        customers = await Task.FromResult(dbContext.Customers);
-
-        orders = await Task.FromResult(from order in dbContext.Orders
-        .Include("Customer")
-        .Include("Employee")
-        .Include("OrderDetails")
-        .Include("OrderDetails.Product")
-                                       select order);
-        order = orders.FirstOrDefault();
-
-    }
-
-    void EditRow(Order order)
-    {
-        ordersGrid.EditRow(order);
-    }
-
-    void UpdateRow(Order order)
-    {
-        ordersGrid.UpdateRow(order);
-
-        dbContext.Update<Order>(order);
-        dbContext.SaveChanges();
-    }
-
-    void CancelEdit(Order order)
-    {
-        ordersGrid.CancelEditRow(order);
-
-        var orderEntry = dbContext.Entry(order);
-        orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
-        orderEntry.State = EntityState.Unchanged;
-    }
-
-    void DeleteRow(Order order)
-    {
-        dbContext.Remove<Order>(order);
-        dbContext.SaveChanges();
+        orders = dbContext.Orders.Include("Customer").Include("Employee");
     }
 }

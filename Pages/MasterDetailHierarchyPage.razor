@@ -11,13 +11,8 @@
 <p>This page demonstrates how to use templates to create a Radzen Blazor DataGrid hierarchy.</p>
 
 <RadzenExample Name="MasterDetailHierarchy" Heading="false" Documentation="false">
-@if (orders == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <RadzenGrid AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" Data="@orders" TItem="Order">
+    <RadzenGrid AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true"
+                Data="@dbContext.Orders.Include("Customer").Include("Employee").Include("OrderDetails").Include("OrderDetails.Product")" TItem="Order">
         <Template Context="order">
             <RadzenCard Style="margin-bottom:20px">
                 Company:
@@ -30,7 +25,7 @@ else
                             <Columns>
                                 <RadzenGridColumn TItem="OrderDetail" Property="Order.CustomerID" Title="Order" />
                                 <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
-                                <RadzenGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price" >
+                                <RadzenGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
                                     <Template Context="detail">
                                         @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
                                     </Template>
@@ -94,19 +89,4 @@ else
             <RadzenGridColumn TItem="Order" Property="ShipCountry" Title="Ship Country" />
         </Columns>
     </RadzenGrid>
-}
 </RadzenExample>
-
-@code {
-    IEnumerable<Order> orders;
-
-    protected override async Task OnInitializedAsync()
-    {
-        orders = await Task.FromResult(from order in dbContext.Orders
-        .Include("Customer")
-        .Include("Employee")
-        .Include("OrderDetails")
-        .Include("OrderDetails.Product")
-        select order);
-    }
-}

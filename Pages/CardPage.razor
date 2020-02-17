@@ -11,41 +11,36 @@
     <div class="row">
         <div class="col-md-6">
             <div>Company:</div>
-            <b>@lastOrder.Customer?.CompanyName</b>
+            <b>@order.Customer?.CompanyName</b>
             <div style="margin-top:20px">Employee:</div>
-            <b>@(lastOrder.Employee?.FirstName + " " + lastOrder.Employee?.LastName)</b>
+            <b>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</b>
             <br />
-            <RadzenImage Path="@lastOrder.Employee?.Photo" Style="width:100px;" />
+            <RadzenImage Path="@order.Employee?.Photo" Style="width:100px;" />
         </div>
         <div class="col-md-6">
             <div>Freight:</div>
-            <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", lastOrder.Freight)</b>
+            <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)</b>
             <div style="margin-top:20px">Ship country:</div>
-            <b>@(lastOrder.ShipCountry)</b>
+            <b>@(order.ShipCountry)</b>
             <div style="margin-top:20px">Ship city:</div>
-            <b>@(lastOrder.ShipCity)</b>
+            <b>@(order.ShipCity)</b>
             <div style="margin-top:20px">Ship name:</div>
-            <b>@(lastOrder.ShipName)</b>
+            <b>@(order.ShipName)</b>
         </div>
     </div>
 </RadzenCard>
 </RadzenExample>
 
 @code {
-    IEnumerable<Order> orders;
-    Order lastOrder;
+    Order order;
 
     protected override async Task OnInitializedAsync()
     {
-        var query = (from order in dbContext.Orders
+        var query = await (from order in dbContext.Orders
                             .Include("Customer")
                             .Include("Employee")
-                            .Include("OrderDetails")
-                            .Include("OrderDetails.Product")
-                    select order).ToList();
+                    select order).Take(1).ToListAsync();
 
-        lastOrder = query.Last();
-
-        orders = await Task.FromResult(query);
+        order = query.FirstOrDefault();
     }
 }
