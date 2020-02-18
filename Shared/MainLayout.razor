@@ -101,13 +101,17 @@
 
     protected override void OnInitialized()
     {
-        var userAgent = httpContextAccessor.HttpContext.Request.Headers["User-Agent"].FirstOrDefault();
-        if (!string.IsNullOrEmpty(userAgent))
+        if (httpContextAccessor != null && httpContextAccessor.HttpContext != null &&
+             httpContextAccessor.HttpContext.Request != null && httpContextAccessor.HttpContext.Request.Headers.ContainsKey("User-Agent"))
         {
-            if (userAgent.Contains("iPhone") || userAgent.Contains("Android") || userAgent.Contains("Googlebot"))
+            var userAgent = httpContextAccessor.HttpContext.Request.Headers["User-Agent"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(userAgent))
             {
-                sidebarExpanded = false;
-                bodyExpanded = true;
+                if (userAgent.Contains("iPhone") || userAgent.Contains("Android") || userAgent.Contains("Googlebot"))
+                {
+                    sidebarExpanded = false;
+                    bodyExpanded = true;
+                }
             }
         }
 
