@@ -7,16 +7,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @(await Html.RenderComponentAsync<Metadata>(RenderMode.ServerPrerendered))
-    <environment include="Development">
-        <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
-    </environment>
-    <environment exclude="Development">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-              asp-fallback-href="css/bootstrap/bootstrap.min.css"
-              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
-              crossorigin="anonymous"
-              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" />
-    </environment>
     <link rel="icon" href="favicon.ico">
     <link href="css/site.css" rel="stylesheet">
     <link href="_content/Radzen.Blazor/css/default.css" rel="stylesheet">
@@ -25,10 +15,10 @@
     <app>
         @(await Html.RenderComponentAsync<App>(RenderMode.ServerPrerendered))
     </app>
-    <script type="text/javascript" src="js/highlight.pack.js"></script>
-    <script type="text/javascript" src="blazor.polyfill.min.js"></script>
-    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
-    <script src="_framework/blazor.server.js"></script>
+    <script async src="js/highlight.pack.js"></script>
+    <script async src="blazor.polyfill.min.js"></script>
+    <script async src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    <script async src="_framework/blazor.server.js"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-73079289-4"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
