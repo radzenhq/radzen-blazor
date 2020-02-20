@@ -12,7 +12,7 @@
 
 <RadzenExample Name="DataGridInLineEdit" Heading="false" Documentation="false">
     <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true"
-                Data="@dbContext.Orders.Include("Customer").Include("Employee")" TItem="Order" RowUpdate="@OnUpdateRow">
+                Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow">
         <Columns>
             <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
             <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer">
@@ -80,6 +80,19 @@
 @code {
     RadzenGrid<Order> ordersGrid;
 
+    IList<Order> orders;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        // For demo purposes only
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+
+        // For production
+        //orders = dbContext.Orders.Include("Customer").Include("Employee");
+    }
+
     void EditRow(Order order)
     {
         ordersGrid.EditRow(order);
@@ -88,7 +101,12 @@
     void OnUpdateRow(Order order)
     {
         dbContext.Update<Order>(order);
-        dbContext.SaveChanges();
+
+        // For demo purposes only
+        order.Customer = dbContext.Customers.Where(c => c.CustomerID == order.CustomerID).FirstOrDefault();
+
+        // For production
+        //dbContext.SaveChanges();
     }
 
     void SaveRow(Order order)
@@ -100,6 +118,7 @@
     {
         ordersGrid.CancelEditRow(order);
 
+        // For production
         var orderEntry = dbContext.Entry(order);
         orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
         orderEntry.State = EntityState.Unchanged;
@@ -108,7 +127,12 @@
     void DeleteRow(Order order)
     {
         dbContext.Remove<Order>(order);
-        dbContext.SaveChanges();
+
+        // For demo purposes only
+        orders.Remove(order);
+
+        // For production
+        //dbContext.SaveChanges();
 
         ordersGrid.Reload();
     }
