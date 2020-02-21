@@ -12,7 +12,7 @@ namespace LatestBlazor
         {
             Name = "First Look",
             Path = "/",
-            Icon = "home"
+            Icon = "&#xe88a"
         },
         new Example()
         {
@@ -23,77 +23,77 @@ namespace LatestBlazor
                 {
                     Name = "Button",
                     Path = "button",
-                    Icon = "account_circle"
+                    Icon = "&#x853"
                 },
                 new Example()
                 {
                     Name = "Gravatar",
                     Path = "gravatar",
-                    Icon = "accessibility"
+                    Icon = "&#xe84e"
                 },
                 new Example()
                 {
                     Name = "SplitButton",
                     Path = "splitbutton",
-                    Icon = "playlist_play"
+                    Icon = "&#xe05f"
                 },
                 new Example()
                 {
                     Name = "Icon",
                     Path = "icon",
-                    Icon = "account_balance"
+                    Icon = "&#xe84f"
                 },
                 new Example()
                 {
                     Name = "Image",
                     Path = "image",
-                    Icon = "picture_in_picture"
+                    Icon = "&#xe8aa"
                 },
                 new Example()
                 {
                     Name = "Link",
                     Path = "link",
-                    Icon = "link"
+                    Icon = "&#xe157"
                 },
                 new Example()
                 {
                     Name = "Login",
                     Path = "login",
-                    Icon = "verified_user"
+                    Icon = "&#xe8e8"
                 },
                 new Example()
                 {
                     Name = "ProgressBar",
                     Path = "progressbar",
-                    Icon = "label_outline",
+                    Icon = "&#xe893",
                     Tags = new [] { "progress", "spinner" }
                 },
                 new Example()
                 {
                     Name = "Dialog",
                     Path = "dialog",
-                    Icon = "perm_media",
+                    Icon = "&#xe8a7",
                     Tags = new [] { "popup", "window" }
                 },
                 new Example()
                 {
                     Name = "Notification",
                     Path = "notification",
-                    Icon = "announcement",
+                    Icon = "&#xe85a",
                     Tags = new [] { "message", "alert" }
                 },
                 new Example()
                 {
                     Name = "Menu",
                     Path = "menu",
-                    Icon = "line_weight",
+                    Icon = "&#xe91a",
                     Tags = new [] { "navigation", "dropdown" }
                 },
                 new Example()
                 {
                     Name = "Upload",
                     Path = "example-upload",
-                    Icon = "file_upload",
+                    Icon = "&#xe2c6",
                     Tags = new [] { "upload", "file"}
                 }
             }
@@ -106,42 +106,42 @@ namespace LatestBlazor
                 {
                     Name = "Accordion",
                     Path = "accordion",
-                    Icon = "view_headline",
+                    Icon = "&#xe8ee",
                     Tags = new [] { "panel", "container" }
                 },
                 new Example()
                 {
                     Name = "Card",
                     Path = "card",
-                    Icon = "line_style",
+                    Icon = "&#xe919",
                     Tags = new [] { "container" }
                 },
                 new Example()
                 {
                     Name = "Fieldset",
                     Path = "fieldset",
-                    Icon = "account_balance_wallet",
+                    Icon = "&#xe850",
                     Tags = new [] { "form", "container" }
                 },
                 new Example()
                 {
                     Name = "Panel",
                     Path = "panel",
-                    Icon = "content_paste",
+                    Icon = "&#xe14f",
                     Tags = new [] { "container" }
                 },
                 new Example()
                 {
                     Name = "Tabs",
                     Path = "tabs",
-                    Icon = "tab",
+                    Icon = "&#xe8d8",
                     Tags = new [] { "tabstrip", "tabview", "container" }
                 },
                 new Example()
                 {
                     Name = "Steps",
                     Path = "steps",
-                    Icon = "skip_next",
+                    Icon = "&#xe044",
                     Tags = new [] { "step", "steps", "wizard" }
                 },
             }
@@ -154,112 +154,112 @@ namespace LatestBlazor
                 {
                     Name = "AutoComplete",
                     Path = "autocomplete",
-                    Icon = "playlist_add",
+                    Icon = "&#xe03b",
                     Tags = new [] { "form", "complete", "suggest", "edit" }
                 },
                 new Example()
                 {
                     Name = "CheckBox",
                     Path = "checkbox",
-                    Icon = "check_circle",
+                    Icon = "&#xe86c",
                     Tags = new [] { "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "CheckBoxList",
                     Path = "checkboxlist",
-                    Icon = "playlist_add_check",
+                    Icon = "&#xe065",
                     Tags = new [] { "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "DatePicker",
                     Path = "datepicker",
-                    Icon = "date_range",
+                    Icon = "&#xe916",
                     Tags = new [] { "calendar", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "DropDown",
                     Path = "dropdown",
-                    Icon = "dns",
+                    Icon = "&#xe875",
                     Tags = new [] { "select", "picker", "form" , "edit" }
                 },
                 new Example()
                 {
                     Name = "DropDownDataGrid",
                     Path = "dropdown-datagrid",
-                    Icon = "receipt",
+                    Icon = "&#xe8b0",
                     Tags = new [] { "select", "picker", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "FileInput",
                     Path = "fileinput",
-                    Icon = "attach_file",
+                    Icon = "&#xe226",
                     Tags = new [] { "upload", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "ListBox",
                     Path = "listbox",
-                    Icon = "view_list",
+                    Icon = "&#xe8ef",
                     Tags = new [] { "select", "picker", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "Numeric",
                     Path = "numeric",
-                    Icon = "aspect_ratio",
+                    Icon = "&#xe85b",
                     Tags = new [] { "input", "number", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "Password",
                     Path = "password",
-                    Icon = "payment",
+                    Icon = "&#xe8a1",
                     Tags = new [] { "input", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "RadioButtonList",
                     Path = "radiobuttonlist",
-                    Icon = "radio_button_checked",
+                    Icon = "&#xe837",
                     Tags = new [] { "toggle", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "Rating",
                     Path = "rating",
-                    Icon = "star_rate",
+                    Icon = "&#xe839",
                     Tags = new [] { "star", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "SelectBar",
                     Path = "selectbar",
-                    Icon = "chrome_reader_mode",
+                    Icon = "&#xe86d",
                     Tags = new [] { "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "TemplateForm",
                     Path = "templateform",
-                    Icon = "featured_play_list",
+                    Icon = "&#xe06d",
                     Tags = new [] { "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "TextBox",
                     Path = "textbox",
-                    Icon = "input",
+                    Icon = "&#xe890",
                     Tags = new [] { "input", "form", "edit" }
                 },
                 new Example()
                 {
                     Name = "TextArea",
                     Path = "textarea",
-                    Icon = "description",
+                    Icon = "&#xe873",
                     Tags = new [] { "input", "form", "edit" }
                 },
             },
@@ -272,35 +272,35 @@ namespace LatestBlazor
                 {
                     Name = "RequiredValidator",
                     Path = "requiredvalidator",
-                    Icon = "check",
+                    Icon = "&#xe5ca",
                     Tags = new [] { "validator", "validation", "required"}
                 },
                 new Example()
                 {
                     Name = "LengthValidator",
                     Path = "lengthvalidator",
-                    Icon = "compare_arrows",
+                    Icon = "&#xe915",
                     Tags = new [] { "validator", "validation", "required", "length"}
                 } ,
                 new Example()
                 {
                     Name = "NumericRangeValidator",
                     Path = "numericrangevalidator",
-                    Icon = "filter_1",
+                    Icon = "&#xe3d0",
                     Tags = new [] { "validator", "validation", "required", "range"}
                 },
                 new Example()
                 {
                     Name = "CompareValidator",
                     Path = "comparevalidator",
-                    Icon = "done_all",
+                    Icon = "&#xe877",
                     Tags = new [] { "validator", "validation", "required", "compare"}
                 },
                 new Example()
                 {
                     Name = "EmailValidator",
                     Path = "emailvalidator",
-                    Icon = "email",
+                    Icon = "&#xe0be",
                     Tags = new [] { "validator", "validation", "required", "email"}
                 }
             }
@@ -313,14 +313,14 @@ namespace LatestBlazor
                 {
                     Name = "DataGrid",
                     Path = "datagrid",
-                    Icon = "grid_on",
+                    Icon = "&#xe3ec",
                     Tags = new [] { "datatable", "datagridview", "dataview", "grid", "table" }
                 },
                 new Example()
                 {
                     Name = "DataList",
                     Path = "datalist",
-                    Icon = "list",
+                    Icon = "&#xe896",
                     Tags = new [] { "dataview", "grid", "table" }
                 },
 
@@ -328,7 +328,7 @@ namespace LatestBlazor
                 {
                     Name = "Tree",
                     Path = "tree",
-                    Icon = "view_list",
+                    Icon = "&#xe8ef",
                     Tags = new [] { "tree", "treeview", "nodes", "hierarchy" }
                 },
             }
@@ -341,7 +341,7 @@ namespace LatestBlazor
                 {
                     Name = "Hierarchy",
                     Path = "master-detail-hierarchy",
-                    Icon = "format_indent_increase",
+                    Icon = "&#xe23e",
                     Title = "Blazor DataGrid Hierarchy",
                     Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
                 },
@@ -349,7 +349,7 @@ namespace LatestBlazor
                 {
                     Name = "Master/Detail",
                     Path = "master-detail",
-                    Icon = "dvr",
+                    Icon = "&#xe1b2",
                     Title = "Master and detail Blazor DataGrid",
                     Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
                 },
@@ -358,7 +358,7 @@ namespace LatestBlazor
                     Name = "DataGrid InLine Editing",
                     Path = "datagrid-inline-edit",
                     Title = "Blazor DataGrid InLine Editing",
-                    Icon = "border_color",
+                    Icon = "&#xe22b",
                     Tags = new [] { "inline", "editor", "datagrid", "table", "dataview" }
                 },
                 new Example()
@@ -366,7 +366,7 @@ namespace LatestBlazor
                     Name = "DataGrid Footer Totals",
                     Path = "datagrid-footer-totals",
                     Title = "Blazor DataGrid footer totals",
-                    Icon = "power_input",
+                    Icon = "&#xe336",
                     Tags = new [] { "summary", "total", "aggregate", "datagrid", "table", "dataview" }
                 },
                 new Example()
@@ -374,7 +374,7 @@ namespace LatestBlazor
                     Name = "DataGrid conditional template",
                     Path = "datagrid-conditional-template",
                     Title = "DataGrid conditional template",
-                    Icon = "style",
+                    Icon = "&#xe41d",
                     Tags = new [] { "conditional", "template", "style", "datagrid", "table", "dataview" }
                 },
                 new Example()
@@ -382,7 +382,7 @@ namespace LatestBlazor
                     Name = "Cascading DropDowns",
                     Path = "cascading-dropdowns",
                     Title = "Blazor Cascading DropDowns",
-                    Icon = "compare_arrows",
+                    Icon = "&#xe915",
                     Tags = new [] { "related", "parent", "child" }
                 },
                 new Example()
@@ -390,7 +390,7 @@ namespace LatestBlazor
                     Name = "Export to Excel and CSV",
                     Path = "export-excel-csv",
                     Title = "Blazor DataGrid export to Excel and CSV",
-                    Icon = "import_export",
+                    Icon = "&#xe0c3",
                     Tags = new [] { "export", "excel", "csv" }
                 },
                 new Example()
@@ -398,7 +398,7 @@ namespace LatestBlazor
                     Name = "DataGrid with LoadData",
                     Path = "datagrid-loaddata",
                     Title = "Blazor DataGrid custom data-binding",
-                    Icon = "dashboard",
+                    Icon = "&#xe871",
                     Tags = new [] { "datagrid", "bind", "load", "data", "loaddata" }
                 },
                 new Example()
@@ -406,7 +406,7 @@ namespace LatestBlazor
                     Name = "DataGrid Column FilterTemplate",
                     Path = "datagrid-filter-template",
                     Title = "Blazor DataGrid custom filtering",
-                    Icon = "filter_list",
+                    Icon = "&#xe152",
                     Tags = new [] { "datagrid", "column", "filter", "template" }
                 },
             }
