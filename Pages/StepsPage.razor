@@ -11,7 +11,7 @@
         <Steps>
             <RadzenStepsItem Text="Customers">
                 <h3>Select Customer</h3>
-                <RadzenGrid ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@dbContext.Customers" TItem="Customer" Value="@customer" RowSelect="@(args => customer = args)">
+                <RadzenGrid ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@customers" TItem="Customer" Value="@customer" RowSelect="@(args => customer = args)">
                     <Columns>
                         <RadzenGridColumn TItem="Customer" Property="CustomerID" Title="Customer ID" />
                         <RadzenGridColumn TItem="Customer" Property="CompanyName" Title="Company Name" />
@@ -30,7 +30,7 @@
             <RadzenStepsItem Text="Orders" Disabled="@(customer == null)">
                 <h3>Select Order</h3>
                 <RadzenGrid ColumnWidth="200px" PageSize="2" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
-                            Data="@dbContext.Orders.Include("Customer").Include("Employee")" TItem="Order" Value="@order" RowSelect="@(args => order = args)">
+                            Data="@orders" TItem="Order" Value="@order" RowSelect="@(args => order = args)">
                     <Columns>
                         <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
                         <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
@@ -71,7 +71,7 @@
             </RadzenStepsItem>
             <RadzenStepsItem Text="Order Details" Disabled="@(order == null)">
                 <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true"
-                            Data="@(dbContext.OrderDetails.Include("Product").Where(o => o.OrderID == order.OrderID))" TItem="OrderDetail" ColumnWidth="200px">
+                            Data="@(orderDetails.Where(o => o.OrderID == order.OrderID))" TItem="OrderDetail" ColumnWidth="200px">
                     <Columns>
                         <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
                         <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
@@ -84,6 +84,17 @@
 </RadzenExample>
 
 @code {
+    IEnumerable<Customer> customers;
+    IEnumerable<Order> orders;
+    IEnumerable<OrderDetail> orderDetails;
+
     Customer customer;
     Order order;
+
+    protected override void OnInitialized()
+    {
+        customers = dbContext.Customers.ToList();
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+        orderDetails = dbContext.OrderDetails.Include("Product").ToList();
+    }
 }

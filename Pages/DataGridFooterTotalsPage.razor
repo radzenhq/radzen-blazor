@@ -60,6 +60,6 @@ else
 
     protected override void OnInitialized()
     {
-        orders = dbContext.Orders.Include("Customer").Include("Employee");
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
     }
 }

@@ -9,13 +9,13 @@
 <div class="row">
     <div class="col-md-6">
         <h3>DropDownDataGrid</h3>
-        <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true" Data="@(dbContext.Customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct().AsQueryable())" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" Change="@(args => Change(args, "DropDown"))" />
+        <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true" Data="@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct().AsQueryable())" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" Change="@(args => Change(args, "DropDown"))" />
         <br />
         <h3>DropDownDataGrid with placeholder</h3>
-        <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true" Placeholder="Select..." Data="@dbContext.Customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px" />
+        <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px" />
         <br />
         <h3>DropDownDataGrid with template</h3>
-        <RadzenDropDownDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value="value" Placeholder="Select..." Data="@dbContext.Customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+        <RadzenDropDownDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value="value" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
                         Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px; width:400px;">
             <Template>
                 Company: @((context as Customer).CompanyName)
@@ -23,7 +23,7 @@
         </RadzenDropDownDataGrid>
         <br />
         <h3>DropDownDataGrid with multiple selection</h3>
-        <RadzenDropDownDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value="multipleValues" Multiple="true" Placeholder="Select..." Data="@dbContext.Customers" TextProperty="CompanyName" ValueProperty="CustomerID" 
+        <RadzenDropDownDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value="multipleValues" Multiple="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" 
                         Change="@(args => Change(args, "DropDown with multiple selection"))" Style="margin-bottom: 20px; width:400px;" />
     </div>
     <div class="col-md-6">
@@ -40,16 +40,22 @@
 </RadzenExample>
 
 @code {
-IEnumerable<string> multipleValues;
-string value;
+    IEnumerable<Customer> customers;
+    IEnumerable<string> multipleValues;
+    string value;
 
-Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    protected override void OnInitialized()
+    {
+        customers = dbContext.Customers.ToList();
+    }
 
-void Change(object value, string name)
-{
-    var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
-    events.Add(DateTime.Now, $"{name} value changed to {str}");
-    StateHasChanged();
-}
+    void Change(object value, string name)
+    {
+        var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
+
+        events.Add(DateTime.Now, $"{name} value changed to {str}");
+        StateHasChanged();
+    }
 }

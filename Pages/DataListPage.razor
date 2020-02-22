@@ -7,7 +7,7 @@
 @inject NorthwindContext dbContext
 
 <RadzenExample Name="DataList">
-    <RadzenDataList WrapItems="true" AllowPaging="true" Data="@dbContext.Orders.Include("Customer").Include("Employee")" TItem="Order">
+    <RadzenDataList WrapItems="true" AllowPaging="true" Data="@orders" TItem="Order">
         <Template Context="order">
             <RadzenCard Style="width:300px;">
                 <div class="row">
@@ -35,3 +35,11 @@
         </Template>
     </RadzenDataList>
 </RadzenExample>
+@code {
+    IEnumerable<Order> orders;
+
+    protected override void OnInitialized()
+    {
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+}

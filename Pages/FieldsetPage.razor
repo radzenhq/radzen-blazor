@@ -19,7 +19,7 @@
             </HeaderTemplate>
             <ChildContent>
                 <RadzenDataList PageSize="1" WrapItems="true" AllowPaging="true" 
-                                Data="@(dbContext.Orders.Include("Customer").Include("Employee"))" TItem="Order">
+                                Data="@orders" TItem="Order">
                     <Template Context="order">
                         <RadzenCard Style="width:300px;height:300px">
                             <div class="row">
@@ -64,6 +64,13 @@
 
 @code {
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    IEnumerable<Order> orders;
+
+    protected override void OnInitialized()
+    {
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
 
     void Change(string text)
     {

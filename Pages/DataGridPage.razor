@@ -7,8 +7,8 @@
 @inject NorthwindContext dbContext
 
 <RadzenExample Name="DataGrid">
-    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4" 
-                AllowSorting="true" Data="@dbContext.Employees" TItem="Employee" ColumnWidth="200px">
+    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px">
         <Columns>
             <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
             <RadzenGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false">
@@ -41,3 +41,11 @@
         </Columns>
     </RadzenGrid>
 </RadzenExample>
+@code {
+    IEnumerable<Employee> employees;
+
+    protected override void OnInitialized()
+    {
+        employees = dbContext.Employees.ToList();
+    }
+}

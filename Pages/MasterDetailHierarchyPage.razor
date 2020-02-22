@@ -12,7 +12,7 @@
 
 <RadzenExample Name="MasterDetailHierarchy" Heading="false" Documentation="false">
     <RadzenGrid AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true"
-                Data="@dbContext.Orders.Include("Customer").Include("Employee").Include("OrderDetails").Include("OrderDetails.Product")" TItem="Order">
+                Data="@orders" TItem="Order">
         <Template Context="order">
             <RadzenCard Style="margin-bottom:20px">
                 Company:
@@ -90,3 +90,11 @@
         </Columns>
     </RadzenGrid>
 </RadzenExample>
+@code {
+    IEnumerable<Order> orders;
+
+    protected override void OnInitialized()
+    {
+        orders = dbContext.Orders.Include("Customer").Include("Employee").Include("OrderDetails").Include("OrderDetails.Product").ToList();
+    }
+}

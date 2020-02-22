@@ -12,10 +12,10 @@
 
 <RadzenExample Name="CascadingDropDowns" Heading="false" Documentation="false">
 <h3>Customers</h3>
-<RadzenDropDown TValue="string" @bind-Value="CustomerID" Placeholder="Select customer" AllowFiltering="true" Data="@(dbContext.Customers)" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" />
+<RadzenDropDown TValue="string" @bind-Value="CustomerID" Placeholder="Select customer" AllowFiltering="true" Data="@(customers)" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" />
 <br />
 <h3>Orders</h3>
-<RadzenDropDown TValue="int" @bind-Value="OrderID" Placeholder="Select order" Data="@(dbContext.Orders.Where(o => o.CustomerID == CustomerID))" ValueProperty="OrderID" Style="margin-bottom: 20px">
+<RadzenDropDown TValue="int" @bind-Value="OrderID" Placeholder="Select order" Data="@(orders.Where(o => o.CustomerID == CustomerID))" ValueProperty="OrderID" Style="margin-bottom: 20px">
     <Template>
         Order Date: @String.Format("{0:d}", ((Order)context).OrderDate)
     </Template>
@@ -23,7 +23,7 @@
 <br />
 <h3>Order Details</h3>
 <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-            Data="@(dbContext.OrderDetails.Include("Product").Where(o => o.OrderID == OrderID))" TItem="OrderDetail" ColumnWidth="200px">
+            Data="@(orderDetails.Where(o => o.OrderID == OrderID))" TItem="OrderDetail" ColumnWidth="200px">
     <Columns>
         <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
         <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
@@ -33,6 +33,17 @@
 <br />
 </RadzenExample>
 @code {
+    IEnumerable<Customer> customers;
+    IEnumerable<Order> orders;
+    IEnumerable<OrderDetail> orderDetails;
+
     string CustomerID;
     int OrderID;
+
+    protected override void OnInitialized()
+    {
+        customers = dbContext.Customers.ToList();
+        orders = dbContext.Orders.ToList();
+        orderDetails = dbContext.OrderDetails.Include("Product").ToList();
+    }
 }

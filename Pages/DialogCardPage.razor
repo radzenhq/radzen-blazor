@@ -36,7 +36,7 @@
         <div class="col-md-12">
             <h3>Order Details</h3>
             <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                        Data="@(dbContext.OrderDetails.Include("Order").Where(o => o.OrderID == OrderID))" TItem="OrderDetail" ColumnWidth="200px">
+                        Data="@(orderDetails.Where(o => o.OrderID == OrderID))" TItem="OrderDetail" ColumnWidth="200px">
                 <Columns>
                     <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
                     <RadzenGridColumn TItem="OrderDetail" Property="Order.OrderDate" Title="OrderDate" />
@@ -57,19 +57,14 @@
     [Parameter] public int OrderID { get; set; }
 
     Order order;
+    IEnumerable<OrderDetail> orderDetails;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await InvokeAsync(async () =>
-        {
-            var query = await (from order in dbContext.Orders.Where(o => o.OrderID == OrderID)
-                           .Include("Customer")
-                           .Include("Employee")
-                        select order).ToListAsync();
+        order = dbContext.Orders.Where(o => o.OrderID == OrderID)
+                          .Include("Customer")
+                          .Include("Employee").FirstOrDefault();
 
-            order = query.FirstOrDefault();
-
-            StateHasChanged();
-        });
+        orderDetails = dbContext.OrderDetails.Include("Order").ToList();
     }
 }
