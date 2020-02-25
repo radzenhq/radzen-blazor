@@ -37,16 +37,16 @@
         dialogService.OnClose += Close;
     }
 
-    async void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+    void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
     {
         events.Add(DateTime.Now, "Dialog opened");
-        await InvokeAsync(() => { StateHasChanged(); });
+        StateHasChanged();
     }
 
-    async void Close(dynamic result)
+    void Close(dynamic result)
     {
         events.Add(DateTime.Now, "Dialog closed. Result: " + result);
-        await InvokeAsync(() => { StateHasChanged(); });
+        StateHasChanged();
     }
 
     async Task ShowSimpleDialog() => await dialogService.OpenAsync("Simple Dialog", ds =>

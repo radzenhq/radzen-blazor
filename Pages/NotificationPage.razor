@@ -37,7 +37,7 @@
 @code {
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
-    async void ShowNotification(NotificationMessage message)
+    async Task ShowNotification(NotificationMessage message)
     {
         notificationService.Notify(message);
 

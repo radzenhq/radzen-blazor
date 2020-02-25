@@ -47,7 +47,7 @@
     int count;
     IEnumerable<Employee> employees;
 
-    async void LoadData(LoadDataArgs args)
+    async Task LoadData(LoadDataArgs args)
     {
         var result = await service.GetEmployees(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
         employees = result.Value.AsODataEnumerable();

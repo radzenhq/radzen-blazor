@@ -15,7 +15,8 @@
                     <div style="margin-top:20px">Employee:</div>
                     <b>@(firstEmployee.FirstName + " " + firstEmployee.LastName)</b>
                     <br />
-                    <RadzenFileInput @bind-Value="@firstEmployee.Photo" Style="width:400px;" TValue="string" Change="@(args => Change(args, "FileInput"))" />
+                    <RadzenFileInput @bind-Value="@firstEmployee.Photo" Style="width:400px;" TValue="string" 
+                                     Change="@(args => Change(args, "FileInput"))" Error="@(args => Error(args, "FileInput"))" />
                 </div>
             </div>
         </RadzenCard>
@@ -45,9 +46,11 @@
 
     void Change(string value, string name)
     {
-        var str = new string($"{value}".Take(100).ToArray());
+        events.Add(DateTime.Now, $"{name} value changed");
+    }
 
-        events.Add(DateTime.Now, $"{name} value changed to {str}...");
-        StateHasChanged();
+    void Error(UploadErrorEventArgs args, string name)
+    {
+        events.Add(DateTime.Now, $"{args.Message}");
     }
 }
