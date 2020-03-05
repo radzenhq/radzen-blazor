@@ -333,6 +333,19 @@ namespace LatestBlazor
                 },
             }
         },
+        new Example
+        {
+            Name="Charts",
+            Children= new [] {
+                new Example
+                {
+                    Name = "Line Chart",
+                    Path = "line-chart",
+                    Icon = "&#xe922",
+                    Tags = new [] { "chart", "graph", "line" }
+                }
+            }
+        },
         new Example()
         {
             Name="Application Scenarios",

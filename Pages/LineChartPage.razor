@@ -1,0 +1,93 @@
+@page "/line-chart"
+@using System.Globalization
+
+<RadzenExample Name="LineChart">
+    <div class="col-md-6 col-sm-12">
+        <label>Smooth <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox></label>
+        <RadzenChart Style="min-width: 400px; height: 400px">
+            <RadzenLineSeries Smooth="@smooth" Data="@revenue" CategoryProperty="Date" ValueProperty="Revenue" Name="Revenue for 2019">
+                <RadzenMarkers Type="MarkerType.Circle" />
+            </RadzenLineSeries>
+            <RadzenCategoryAxis Padding="20" FormatString="{0:MMM yyy}" />
+            <RadzenValueAxis Formatter="@FormatAsUSD">
+                <RadzenGridLines Visible="true" />
+            </RadzenValueAxis>
+        </RadzenChart>
+    </div>
+</RadzenExample>
+@code {
+    bool smooth = false;
+    class DataItem
+    {
+        public DateTime Date { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    DataItem[] revenue = new DataItem[] {
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-01"),
+            Revenue = 234000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-02-01"),
+            Revenue = 269000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-03-01"),
+            Revenue = 233000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-04-01"),
+            Revenue = 244000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-05-01"),
+            Revenue = 214000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-06-01"),
+            Revenue = 253000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-07-01"),
+            Revenue = 274000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-08-01"),
+            Revenue = 284000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-09-01"),
+            Revenue = 273000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-10-01"),
+            Revenue = 282000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-11-01"),
+            Revenue = 289000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-12-01"),
+            Revenue = 294000
+        }
+    };
+}
