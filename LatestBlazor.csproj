@@ -10,5 +10,10 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.0" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.9.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="*.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 </Project>
