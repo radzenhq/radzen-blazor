@@ -1,18 +1,16 @@
-@page "/line-chart"
+@page "/area-chart"
 @using System.Globalization
 
-<h1>Radzen Blazor Chart with line series</h1>
-<RadzenExample Name="LineChart" DocumentationUrl="https://www.radzen.com/documentation/blazor/chart/" Heading="false">
+<h1>Radzen Blazor Chart area series</h1>
+<RadzenExample Name="AreaChart" DocumentationUrl="https://www.radzen.com/documentation/blazor/chart/" Heading="false">
     <div class="row">
         <div class="col-md-6 col-sm-12 p-4">
             <label>Smooth <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox></label>
             <RadzenChart>
-                <RadzenLineSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Name="2019" LineType="LineType.Dashed" ValueProperty="Revenue">
-                    <RadzenMarkers MarkerType="MarkerType.Square" />
-                </RadzenLineSeries>
-                <RadzenLineSeries Smooth="@smooth" Data="@revenue2020" CategoryProperty="Date" Name="2020" ValueProperty="Revenue">
-                    <RadzenMarkers MarkerType="MarkerType.Circle" />
-                </RadzenLineSeries>
+                <RadzenAreaSeries Smooth="@smooth" Data="@revenue2020" CategoryProperty="Date" Name="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                </RadzenAreaSeries>
+                <RadzenAreaSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Name="2019" ValueProperty="Revenue">
+                </RadzenAreaSeries>
                 <RadzenCategoryAxis Padding="20" FormatString="{0:MMM}" />
                 <RadzenValueAxis Formatter="@FormatAsUSD">
                     <RadzenGridLines Visible="true" />
@@ -23,7 +21,7 @@
     </div>
 </RadzenExample>
 @code {
-    bool smooth = false;
+    bool smooth = true;
     class DataItem
     {
         public DateTime Date { get; set; }

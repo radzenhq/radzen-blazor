@@ -343,6 +343,20 @@ namespace LatestBlazor
                     Path = "line-chart",
                     Icon = "&#xe922",
                     Tags = new [] { "chart", "graph", "line" }
+                },
+                new Example
+                {
+                    Name = "Area Chart",
+                    Path = "area-chart",
+                    Icon = "&#xe251",
+                    Tags = new [] { "chart", "graph", "area" }
+                },
+                new Example
+                {
+                    Name = "Column Chart",
+                    Path = "column-chart",
+                    Icon = "&#xe24b",
+                    Tags = new [] { "chart", "graph", "column", "bar" }
                 }
             }
         },

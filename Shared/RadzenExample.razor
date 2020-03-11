@@ -7,9 +7,13 @@
     <p>Demonstration and configuration of the Radzen Blazor <strong>@Name</strong> component.</p>
 }
 
-@if (Documentation)
+@if (!String.IsNullOrEmpty(DocumentationUrl))
 {
     <a class="documentation-link" target="blank" href="@DocumentationUrl"><RadzenIcon Icon="help" /> Documentation </a>
+}
+else if (Documentation)
+{
+    <a class="documentation-link" target="blank" href="https://www.radzen.com/documentation/blazor/@Name.ToLower()/"><RadzenIcon Icon="help" /> Documentation </a>
 }
 
 <RadzenTabs>
@@ -36,11 +40,6 @@
     [Parameter]
     public bool Documentation { get; set; } = true;
 
-    public string DocumentationUrl 
-    { 
-        get
-        {
-            return $"https://www.radzen.com/documentation/blazor/{Name.ToLower()}/";
-        }
-    }
+    [Parameter]
+    public string DocumentationUrl  { get; set; }
 }
