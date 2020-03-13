@@ -357,7 +357,14 @@ namespace LatestBlazor
                     Path = "column-chart",
                     Icon = "&#xe24b",
                     Tags = new [] { "chart", "graph", "column", "bar" }
-                }
+                },
+                new Example
+                {
+                    Name = "Styling",
+                    Path = "styling-chart",
+                    Icon = "&#xe41d",
+                    Tags = new [] { "chart", "graph", "styling" }
+                },
             }
         },
         new Example()
