@@ -9,7 +9,8 @@
             <RadzenChart ColorScheme="@colorScheme">
                 @for (var year = 2013; year <= 2020; year++)
                 {
-                    <RadzenColumnSeries Data="@(revenue.Where(r => r.Year == year).ToList())" CategoryProperty="Quarter" Name="@year.ToString()" ValueProperty="Revenue" />
+                    var currentYearRevenue = revenue.Where(r => r.Year == year).ToList();
+                    <RadzenColumnSeries Data="@currentYearRevenue" CategoryProperty="Quarter" Name="@year.ToString()" ValueProperty="Revenue" />
                 }
                 <RadzenColumnOptions Margin="0" />
                 <RadzenValueAxis Formatter="@FormatAsUSD" />
@@ -22,7 +23,7 @@
     <h3>Custom colors and styling</h3>
     <div class="col-md-6 col-sm-12 p-4">
         <RadzenChart style="">
-            <RadzenAreaSeries Stroke="rgb(236,72,127)" StrokeWidth="2" Fill="rgba(236,72,127,.5)" Data="@(revenue.Where(r => r.Year == 2020).ToList())" CategoryProperty="Quarter" ValueProperty="Revenue">
+            <RadzenAreaSeries Stroke="rgb(236,72,127)" StrokeWidth="2" Fill="rgba(236,72,127,.5)" Data="@revenue.Where(r => r.Year == 2020)" CategoryProperty="Quarter" ValueProperty="Revenue">
                 <ChildContent>
                     <RadzenMarkers MarkerType="MarkerType.Circle" Fill="#fff" Stroke="rgba(236,72,127)" StrokeWidth="2" Size="8" />
                 </ChildContent>
