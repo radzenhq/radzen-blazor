@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-md-6">
         <h3>DatePicker</h3>
-        <RadzenDatePicker @bind-Value="value" DateFormat="MM/dd/yyyy" Change="@(args => Change(args, "DatePicker", "MM/dd/yyyy"))" />
+        <RadzenDatePicker @bind-Value="value" DateFormat="d" Change="@(args => Change(args, "DatePicker", "MM/dd/yyyy"))" />
         <h3 style="margin-top: 40px">DatePicker with time</h3>
         <RadzenDatePicker TValue="DateTime?" ShowTime="true" Change="@(args => Change(args, "DatePicker with time", "MM/dd/yyyy HH:mm"))" DateFormat="MM/dd/yyyy HH:mm" />
         <h3 style="margin-top: 40px">DatePicker with 12 hour time format</h3>
