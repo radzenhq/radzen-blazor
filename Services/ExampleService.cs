@@ -333,6 +333,40 @@ namespace LatestBlazor
                 },
             }
         },
+        new Example
+        {
+            Name="Charts",
+            Children= new [] {
+                new Example
+                {
+                    Name = "Line Chart",
+                    Path = "line-chart",
+                    Icon = "&#xe922",
+                    Tags = new [] { "chart", "graph", "line" }
+                },
+                new Example
+                {
+                    Name = "Area Chart",
+                    Path = "area-chart",
+                    Icon = "&#xe251",
+                    Tags = new [] { "chart", "graph", "area" }
+                },
+                new Example
+                {
+                    Name = "Column Chart",
+                    Path = "column-chart",
+                    Icon = "&#xe24b",
+                    Tags = new [] { "chart", "graph", "column", "bar" }
+                },
+                new Example
+                {
+                    Name = "Styling",
+                    Path = "styling-chart",
+                    Icon = "&#xe41d",
+                    Tags = new [] { "chart", "graph", "styling" }
+                },
+            }
+        },
         new Example()
         {
             Name="Application Scenarios",

@@ -1,0 +1,46 @@
+@page "/line-chart"
+@using Radzen.Blazor
+    @using Microsoft.JSInterop
+    @inject IJSRuntime JSRuntime
+
+    <RadzenChart style="height: ; width: 773.296875px">
+  <ChildContent>
+    <RadzenLegend Visible="false">
+    </RadzenLegend>
+    <RadzenColumnSeries CategoryProperty="CategoryName" Data="@(getCategorySalesFor1997sResult.Take(4))" Title="Categories" ValueProperty="CategorySales">
+    </RadzenColumnSeries>
+  </ChildContent>
+</RadzenChart>
+
+    @code {
+      
+  partial class CategorySalesFor1997
+  {
+    public string CategoryName { get; set; }  = "CategoryName";
+public decimal? CategorySales { get; set; }  = __Next<decimal?>();
+  }
+  
+
+      CategorySalesFor1997[] getCategorySalesFor1997sResult = new [] { new CategorySalesFor1997(),new CategorySalesFor1997(),new CategorySalesFor1997(),new CategorySalesFor1997(),new CategorySalesFor1997(),new CategorySalesFor1997(),new CategorySalesFor1997(),new CategorySalesFor1997(),new CategorySalesFor1997(),new CategorySalesFor1997() };
+      
+
+      protected override void OnInitialized()
+      {
+        StateHasChanged();
+        
+      }
+
+      static int [] __numbers = new int[] { 0, 500, 1500, 1000 };
+      static int __index;
+
+
+      static T __Next<T>()
+      {
+        return (T)Convert.ChangeType(__numbers[__index++ % __numbers.Length], typeof(T));
+      }
+
+      protected string Culture { get; set; }
+
+      [Parameter(CaptureUnmatchedValues = true)]
+      public IReadOnlyDictionary<string, dynamic> Attributes { get; set; } = new Dictionary<string, object>();
+    }
