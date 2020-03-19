@@ -10,7 +10,7 @@
                 @for (var year = 2013; year <= 2020; year++)
                 {
                     var currentYearRevenue = revenue.Where(r => r.Year == year).ToList();
-                    <RadzenColumnSeries Data="@currentYearRevenue" CategoryProperty="Quarter" Name="@year.ToString()" ValueProperty="Revenue" />
+                    <RadzenColumnSeries Data="@currentYearRevenue" CategoryProperty="Quarter" Title="@year.ToString()" ValueProperty="Revenue" />
                 }
                 <RadzenColumnOptions Margin="0" />
                 <RadzenValueAxis Formatter="@FormatAsUSD" />

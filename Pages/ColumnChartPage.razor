@@ -6,8 +6,8 @@
     <div class="row">
         <div class="col-md-6 col-sm-12 p-4">
             <RadzenChart>
-                <RadzenColumnSeries Data="@revenue2020" CategoryProperty="Quarter" Name="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
-                <RadzenColumnSeries Data="@revenue2019" CategoryProperty="Quarter" Name="2019" ValueProperty="Revenue" />
+                <RadzenColumnSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
+                <RadzenColumnSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
                 <RadzenColumnOptions Radius="5" />
                 <RadzenValueAxis Formatter="@FormatAsUSD">
                     <RadzenGridLines Visible="true" />
