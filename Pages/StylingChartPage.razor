@@ -3,7 +3,12 @@
 
 <h1>Radzen Blazor Chart Styling</h1>
 <RadzenExample Name="LineChart" DocumentationUrl="https://www.radzen.com/documentation/blazor/chart/" Heading="false">
-    <h3>Color schemes</h3>
+    <h3>
+        <label style="display: flex; align-items: center">
+            <span style="margin-right: 32px">Color scheme:</span>
+            <RadzenDropDown Data="@colorSchemes" @bind-Value="@colorScheme" />
+        </label>
+    </h3>
     <div class="row">
         <div class="col-md-6 col-sm-12 p-4">
             <RadzenChart ColorScheme="@colorScheme">
@@ -17,12 +22,14 @@
             </RadzenChart>
         </div>
         <div class="col">
-            <label>Color scheme: <RadzenDropDown Data="@colorSchemes" @bind-Value="@colorScheme"></RadzenDropDown></label>
+            <RadzenChart ColorScheme="@colorScheme">
+                <RadzenPieSeries Data="@revenue.Where(r => r.Year == 2020)" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
+            </RadzenChart>
         </div>
     </div>
     <h3>Custom colors and styling</h3>
     <div class="col-md-6 col-sm-12 p-4">
-        <RadzenChart style="">
+        <RadzenChart>
             <RadzenAreaSeries Stroke="rgb(236,72,127)" StrokeWidth="2" Fill="rgba(236,72,127,.5)" Data="@revenue.Where(r => r.Year == 2020)" CategoryProperty="Quarter" ValueProperty="Revenue">
                 <ChildContent>
                     <RadzenMarkers MarkerType="MarkerType.Circle" Fill="#fff" Stroke="rgba(236,72,127)" StrokeWidth="2" Size="8" />

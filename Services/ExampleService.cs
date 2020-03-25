@@ -360,6 +360,13 @@ namespace LatestBlazor
                 },
                 new Example
                 {
+                    Name = "Pie Chart",
+                    Path = "pie-chart",
+                    Icon = "&#xe6c4",
+                    Tags = new [] { "chart", "graph", "pie" }
+                },
+                new Example
+                {
                     Name = "Styling",
                     Path = "styling-chart",
                     Icon = "&#xe41d",
