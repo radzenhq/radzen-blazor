@@ -26,7 +26,11 @@
 <h2 class="my-3">3. Include a theme</h2>
 <RadzenCard>
     <p>
-        Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side Blazor) and include a theme CSS file by adding this snippet <code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css"&gt;</code>
+        Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side Blazor) and include a theme CSS file by adding this snippet <code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css"&gt;</code>
+        This version requires only the Radzen Blazor CSS. Optionally you can include Bootstrap. 
+    </p>
+    <p>
+        Alternatively you can include <code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css"&gt;</code> which embeds Bootstrap.
     </p>
 </RadzenCard>
 <h2 class="my-3">4. Include Radzen.Blazor.js</h2>
