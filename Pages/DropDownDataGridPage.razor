@@ -1,5 +1,5 @@
 ﻿@page "/dropdown-datagrid"
-
+@using System.Linq.Dynamic.Core
 @using NorthwindBlazor.Data
 @using NorthwindBlazor.Models.Northwind
 
@@ -9,7 +9,20 @@
 <div class="row">
     <div class="col-md-6">
         <h3>DropDownDataGrid</h3>
-        <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true" Data="@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct().AsQueryable())" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" Change="@(args => Change(args, "DropDownDataGrid"))" />
+        <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true" 
+                                Data="@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct().AsQueryable())" 
+                                TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" 
+                                Change="@(args => Change(args, "DropDownDataGrid"))" />
+        <br />
+        <h3>DropDownDataGrid with custom filter operator</h3>
+        <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" 
+                                AllowFiltering="true" AllowClear="true" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" 
+                                Change="@(args => Change(args, "DropDownDataGrid with custom filter operator"))" />
+        <br />
+        <h3>DropDownDataGrid with custom filtering</h3>
+        <RadzenDropDownDataGrid TValue="string" LoadData="@LoadData" AllowFiltering="true" AllowClear="true" 
+                                Data="@customCustomersData" Count="@count" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" 
+                                Change="@(args => Change(args, "DropDownDataGrid with custom filtering"))" />
         <br />
         <h3>DropDownDataGrid with placeholder</h3>
         <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDownDataGrid with placeholder"))" Style="margin-bottom: 20px" />
@@ -55,8 +68,12 @@
 
 @code {
     IEnumerable<Customer> customers;
+
     IEnumerable<string> multipleValues;
     string value;
+
+    int count;
+    IEnumerable<Customer> customCustomersData;
 
     protected override void OnInitialized()
     {
@@ -71,5 +88,34 @@
 
         events.Add(DateTime.Now, $"{name} value changed to {str}");
         StateHasChanged();
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var query = dbContext.Customers.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(c => c.CustomerID.Contains(args.Filter) || c.ContactName.Contains(args.Filter));
+        }
+
+        count = query.Count();
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        if (args.Skip != null)
+        {
+            query = query.Skip(args.Skip.Value);
+        }
+
+        if (args.Top != null)
+        {
+            query = query.Take(args.Top.Value);
+        }
+
+        customCustomersData = query;
     }
 }

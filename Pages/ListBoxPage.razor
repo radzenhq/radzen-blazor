@@ -14,20 +14,29 @@
         <br />
         <h3>ListBox with template</h3>
         <RadzenListBox @bind-Value="value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
-                        Change="@(args => Change(args, "ListBox with template"))" Style="margin-bottom: 20px; height:200px;">
+                       Change="@(args => Change(args, "ListBox with template"))" Style="margin-bottom: 20px; height:200px;">
             <Template>
                 Company: @((context as Customer).CompanyName)
             </Template>
         </RadzenListBox>
+        <br />
+        <h3>ListBox with multiple selection</h3>
+        <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="multipleValues" Multiple="true" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+                       Change="@(args => Change(args, "ListBox with multiple selection"))" Style="margin-bottom: 20px; height:200px;" />
     </div>
     <div class="col-md-4">
         <h3>ListBox with filtering</h3>
         <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
-                        Change="@(args => Change(args, "ListBox with filtering"))" Style="margin-bottom: 20px; height:200px;" />
+                       Change="@(args => Change(args, "ListBox with filtering"))" Style="margin-bottom: 20px; height:200px;" />
         <br />
-        <h3>ListBox with multiple selection</h3>
-        <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="multipleValues" Multiple="true" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
-                        Change="@(args => Change(args, "ListBox with multiple selection"))" Style="margin-bottom: 20px; height:200px;" />
+        <h3>ListBox with custom filter operator</h3>
+        <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" @bind-Value="value" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
+                       Change="@(args => Change(args, "ListBox with custom filter operator"))" Style="margin-bottom: 20px; height:200px;" />
+        <br />
+        <h3>ListBox with custom filtering</h3>
+        <RadzenListBox AllowFiltering="true" LoadData="@LoadData"  @bind-Value="value" Data="@customCustomersData" TextProperty="CompanyName" ValueProperty="CustomerID"
+                       Change="@(args => Change(args, "ListBox with custom filtering"))" Style="margin-bottom: 20px; height:200px;" />
+
     </div>
     <div class="col-md-4">
         <h3>Events</h3>
@@ -44,6 +53,7 @@
 
 @code {
     IEnumerable<Customer> customers;
+    IEnumerable<Customer> customCustomersData;
 
     protected override void OnInitialized()
     {
@@ -61,5 +71,10 @@
 
         events.Add(DateTime.Now, $"{name} value changed to {str}");
         StateHasChanged();
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        customCustomersData = dbContext.Customers.Where(c => c.CustomerID.Contains(args.Filter) || c.ContactName.Contains(args.Filter)).ToList();
     }
 }

@@ -9,10 +9,24 @@
 <div class="row">
     <div class="col-md-6">
         <h3>DropDown</h3>
-        <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Data="@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" Change="@(args => Change(args, "DropDown"))" />
+        <RadzenDropDown AllowClear="true" TValue="string"
+                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true"
+                        Data="@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())"
+                        TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" Change="@(args => Change(args, "DropDown"))" />
+        <br />
+        <h3>DropDown with custom filter operator</h3>
+        <RadzenDropDown AllowClear="true" TValue="string"
+                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                        Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" Change="@(args => Change(args, "DropDown with custom filter operator"))" />
+        <br />
+        <h3>DropDown with custom filtering</h3>
+        <RadzenDropDown AllowClear="true" TValue="string"
+                        LoadData="@LoadData" AllowFiltering="true"
+                        Data="@customCustomersData" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px"
+                        Change="@(args => Change(args, "DropDown with custom filtering"))" />
         <br />
         <h3>DropDown with placeholder</h3>
-        <RadzenDropDown AllowClear="true"  TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px" />
+        <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px" />
         <br />
         <h3>DropDown with template</h3>
         <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="value" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
@@ -27,8 +41,9 @@
                         Change="@(args => Change(args, "DropDown with multiple selection"))" Style="margin-bottom: 20px; width:400px;" />
         <br />
         <h3>Bind DropDown Value to model property</h3>
-        <RadzenDropDown AllowClear="true"  AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@products" @bind-Value="myModel.MyValue"
+        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@products" @bind-Value="myModel.MyValue"
                         TextProperty="ProductName" ValueProperty="ProductID" Style="margin-bottom: 20px; width:400px;" Change="@(args => ChangeBound(args, "DropDown with bound Value"))" />
+        <br />
     </div>
     <div class="col-md-6">
         <h3>Events</h3>
@@ -45,6 +60,7 @@
 
 @code {
     IEnumerable<Customer> customers;
+    IEnumerable<Customer> customCustomersData;
     IEnumerable<Product> products;
     MyObject myModel = new MyObject();
 
@@ -76,5 +92,10 @@
     class MyObject
     {
         public int? MyValue { get; set; } = 3;
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        customCustomersData = dbContext.Customers.Where(c => c.CustomerID.Contains(args.Filter) || c.ContactName.Contains(args.Filter)).ToList();
     }
 }
