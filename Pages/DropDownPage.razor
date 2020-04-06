@@ -96,6 +96,13 @@
 
     void LoadData(LoadDataArgs args)
     {
-        customCustomersData = dbContext.Customers.Where(c => c.CustomerID.Contains(args.Filter) || c.ContactName.Contains(args.Filter)).ToList();
+        var query = dbContext.Customers.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(c => c.CustomerID.Contains(args.Filter) || c.ContactName.Contains(args.Filter));
+        }
+
+        customCustomersData = query.ToList();
     }
 }
