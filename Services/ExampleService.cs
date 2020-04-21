@@ -302,6 +302,13 @@ namespace LatestBlazor
                     Path = "emailvalidator",
                     Icon = "&#xe0be",
                     Tags = new [] { "validator", "validation", "required", "email"}
+                },
+                new Example()
+                {
+                    Name = "RegexValidator",
+                    Path = "regexvalidator",
+                    Icon = "&#xe53f",
+                    Tags = new [] { "validator", "validation", "pattern", "regex", "regular", "expression"}
                 }
             }
         },
