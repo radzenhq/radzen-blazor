@@ -26,7 +26,7 @@
         <br />
         <h3>Upload completed</h3>
         <RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
-                      Complete="@Copmleted" />
+                      Complete="@Completed" />
         <br />
     </div>
     <div class="col-md-6">
@@ -65,7 +65,7 @@
         }
     }
 
-    void Copmleted(UploadCompleteEventArgs args)
+    void Completed(UploadCompleteEventArgs args)
     {
         events.Add(DateTime.Now, $"Server response: {args.RawResponse}");
     }
