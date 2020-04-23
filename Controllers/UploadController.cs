@@ -13,7 +13,7 @@ namespace LatestBlazor
             try
             {
                 // Put your code here
-                return StatusCode(200);
+                return Ok(new { Completed = true });
             }
             catch (Exception ex)
             {
