@@ -8,7 +8,7 @@
             <h3>Dialog</h3>
             <RadzenButton Text=@($"Show OrderID: {orderID} details") Click="@(args => dialogService.Open<DialogCardPage>($"Order {orderID}",
                         new Dictionary<string, object>() { { "OrderID", orderID } },
-                        new DialogOptions(){ Width = "700px", Height = "530px", Left = "calc(50% - 350px)", Top = "calc(50% - 265px)" }))" />
+                        new DialogOptions(){ Width = "700px", Height = "530px" }))" />
 
             <h3 style="margin-top: 20px;">Simple Dialog</h3>
             <RadzenButton Text=@($"Show simple dialog") Click="@ShowSimpleDialog" />
