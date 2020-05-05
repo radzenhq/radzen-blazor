@@ -91,6 +91,13 @@ namespace LatestBlazor
                 },
                 new Example()
                 {
+                    Name = "ProfileMenu",
+                    Path = "profile-menu",
+                    Icon = "&#xe851",
+                    Tags = new [] { "navigation", "dropdown", "menu" }
+                },
+                new Example()
+                {
                     Name = "Upload",
                     Path = "example-upload",
                     Icon = "&#xe2c6",
