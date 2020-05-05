@@ -511,12 +511,12 @@ namespace LatestBlazor
                 return example.Title ?? $"Blazor {example.Name} | a free UI component by Radzen";
             }
 
-            return "Free Blazor Components | 40+ controls by Radzen";
+            return "Free Blazor Components | 50+ controls by Radzen";
         }
 
         public string DescriptionFor(Example example)
         {
-            return example?.Description ?? "The Radzen Blazor component library provides more than 30 UI controls for building rich ASP.NET Core web applications.";
+            return example?.Description ?? "The Radzen Blazor component library provides more than 50 UI controls for building rich ASP.NET Core web applications.";
         }
     }
 }
