@@ -374,6 +374,13 @@ namespace LatestBlazor
                 },
                 new Example
                 {
+                    Name = "Donut Chart",
+                    Path = "donut-chart",
+                    Icon = "&#xe917",
+                    Tags = new [] { "chart", "graph", "donut" }
+                },
+                new Example
+                {
                     Name = "Styling",
                     Path = "styling-chart",
                     Icon = "&#xe41d",
@@ -478,16 +485,16 @@ namespace LatestBlazor
             return Examples.Where(category => category.Children != null && category.Children.Any(filter))
                            .Select(category => new Example()
                            {
-                                Name = category.Name,
-                                Expanded = true,
-                                Children = category.Children.Where(filter).ToArray()
+                               Name = category.Name,
+                               Expanded = true,
+                               Children = category.Children.Where(filter).ToArray()
                            }).ToList();
         }
 
         public Example FindCurrent(Uri uri)
         {
-           return Examples.SelectMany(example => example.Children ?? new [] {example})
-                          .FirstOrDefault(example => example.Path == uri.AbsolutePath || $"/{example.Path}" == uri.AbsolutePath); 
+            return Examples.SelectMany(example => example.Children ?? new[] { example })
+                           .FirstOrDefault(example => example.Path == uri.AbsolutePath || $"/{example.Path}" == uri.AbsolutePath);
         }
 
         public string TitleFor(Example example)
