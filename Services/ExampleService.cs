@@ -250,6 +250,13 @@ namespace LatestBlazor
                 },
                 new Example()
                 {
+                    Name = "Slider",
+                    Path = "slider",
+                    Icon = "&#xe260",
+                    Tags = new [] { "form", "slider" }
+                },
+                new Example()
+                {
                     Name = "TemplateForm",
                     Path = "templateform",
                     Icon = "&#xe06d",

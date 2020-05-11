@@ -13,6 +13,11 @@
         <h3>Button with icon</h3>
         <RadzenButton Click="@((args) => Click(args, "Button with icon"))" Icon="account_circle" Style="margin-bottom: 20px; width: 80px" />
         <br />
+        <h3>Button with image</h3>
+        <RadzenButton Click="@((args) => Click(args, "Button with image"))" ButtonStyle="ButtonStyle.Light" Style="margin-bottom: 20px; width: 80px">
+            <RadzenImage Path="images/radzen-nuget.png" Style="width:100%" />
+        </RadzenButton>
+        <br />
         <h3>Button with secondary style</h3>
         <RadzenButton Click="@((args) => Click(args, "Secondary button"))" Text="Button" ButtonStyle="ButtonStyle.Secondary" Style="margin-bottom: 20px; width: 150px" />
         <br />
