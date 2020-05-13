@@ -6,11 +6,15 @@
         <h3>DatePicker</h3>
         <RadzenDatePicker @bind-Value="value" DateFormat="d" Change="@(args => Change(args, "DatePicker", "MM/dd/yyyy"))" />
         <h3 style="margin-top: 40px">DatePicker with time</h3>
-        <RadzenDatePicker TValue="DateTime?" ShowTime="true" Change="@(args => Change(args, "DatePicker with time", "MM/dd/yyyy HH:mm"))" DateFormat="MM/dd/yyyy HH:mm" />
+        <RadzenDatePicker TValue="DateTime?" ShowTime="true" ShowSeconds="true" HoursStep="1.5" MinutesStep="5" SecondsStep="10" Change="@(args => Change(args, "DatePicker with time", "MM/dd/yyyy HH:mm"))" DateFormat="MM/dd/yyyy HH:mm" />
         <h3 style="margin-top: 40px">DatePicker with 12 hour time format</h3>
         <RadzenDatePicker TValue="DateTime?" ShowTime="true" Change="@(args => Change(args, "DatePicker with 12 hour time format", "MM/dd/yyyy h:mm tt"))" HourFormat="12" DateFormat="MM/dd/yyyy h:mm tt" />
         <h3 style="margin-top: 40px">Time-only DatePicker</h3>
         <RadzenDatePicker TValue="DateTime?" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Change="@(args => Change(args, "Time-only DatePicker", "HH:mm"))" />
+        <h3 style="margin-top: 40px">DatePicker with steps for time</h3>
+        <RadzenDatePicker TValue="DateTime?" ShowTime="true" TimeOnly="true" 
+                          ShowSeconds="true" HoursStep="1.5" MinutesStep="5"  DateFormat="HH:mm:ss"
+                          SecondsStep="10" Change="@(args => Change(args, "DatePicker with steps for time", "HH:mm:ss"))" />
         <h3 style="margin-top: 40px">Calendar</h3>
         <RadzenDatePicker TValue="DateTime?" Inline="true" Change="@(args => Change(args, "Calendar", "MM/dd/yyyy"))" />
         <h3 style="margin-top: 40px">Disabled DatePicker</h3>
