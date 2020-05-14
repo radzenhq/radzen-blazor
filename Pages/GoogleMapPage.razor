@@ -1,0 +1,54 @@
+﻿@page "/googlemap"
+
+<RadzenExample Name="GoogleMap">
+<div class="row">
+    <div class="col-md-6">
+        <h3>Map 
+            <RadzenButton Text="Add/Remove marker for Madrid" Click="@(()=> { showMadridMarker = !showMadridMarker;})" Style="float: right; margin-left: 20px;" />
+        </h3> 
+        <br />
+        <RadzenGoogleMap Zoom="@zoom" 
+                         Center="@(new GoogleMapPosition() { Lat = 42.6977, Lng = 23.3219 })"
+                         MapClick="@MapClick" MarkerClick="@MarkerClick">
+            <Markers>
+                <RadzenGoogleMapMarker Title="London" Label="London" Position="@(new GoogleMapPosition() { Lat = 51.5074, Lng = 0.1278 })" />
+                <RadzenGoogleMapMarker Title="Paris " Label="Paris" Position="@(new GoogleMapPosition() { Lat = 48.8566, Lng = 2.3522 })" />
+                @if (showMadridMarker)
+                { 
+                    <RadzenGoogleMapMarker Title="Madrid " Label="Madrid" Position="@(new GoogleMapPosition() { Lat = 40.4168, Lng = 3.7038 })" />
+                }
+            </Markers>
+        </RadzenGoogleMap>
+    </div>
+    <div class="col-md-6">
+        <h3>Events</h3>
+        <RadzenCard style="overflow: auto;height:500px;">
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
+        </RadzenCard>
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    int zoom = 3;
+
+    bool showMadridMarker;
+
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void MapClick(GoogleMapClickEventArgs args)
+    {
+        events.Add(DateTime.Now, $"Map clicked at Lat: {args.Position.Lat}, Lng: {args.Position.Lng}");
+        StateHasChanged();
+    }
+
+    void MarkerClick(RadzenGoogleMapMarker marker)
+    {
+        events.Add(DateTime.Now, $"Map {marker.Title} marker clicked. Marker position -> Lat: {marker.Position.Lat}, Lng: {marker.Position.Lng}");
+        StateHasChanged();
+    }
+}

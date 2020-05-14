@@ -27,6 +27,12 @@ namespace LatestBlazor
                 },
                 new Example()
                 {
+                    Name = "GoogleMap",
+                    Path = "googlemap",
+                    Icon = "&#xe55b"
+                },
+                new Example()
+                {
                     Name = "Gravatar",
                     Path = "gravatar",
                     Icon = "&#xe84e"
