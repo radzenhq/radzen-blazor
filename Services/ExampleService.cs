@@ -387,6 +387,13 @@ namespace LatestBlazor
                 },
                 new Example
                 {
+                    Name = "Bar Chart",
+                    Path = "bar-chart",
+                    Icon = "&#xe164",
+                    Tags = new [] { "chart", "graph", "column", "bar" }
+                },
+                new Example
+                {
                     Name = "Pie Chart",
                     Path = "pie-chart",
                     Icon = "&#xe6c4",
