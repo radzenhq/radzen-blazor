@@ -13,7 +13,7 @@
         </RadzenSelectBar>
         <br />
         <h3>SelectBar with multiple selection</h3>
-        <RadzenSelectBar @bind-Value="values" TValue="int" Multiple="true" Change="@((args) => Change(args, "SelectBar with multiple selection"))" Style="margin-bottom: 20px;">
+        <RadzenSelectBar @bind-Value="values" TValue="IEnumerable<int>" Multiple="true" Change="@((args) => Change(args, "SelectBar with multiple selection"))" Style="margin-bottom: 20px;">
             <Items>
                 <RadzenSelectBarItem Text="Orders" Value="1" />
                 <RadzenSelectBarItem Text="Employees" Value="2" />
@@ -22,7 +22,7 @@
         </RadzenSelectBar>
         <br />
         <h3>Disabled SelectBar with multiple selection</h3>
-        <RadzenSelectBar Disabled="true" @bind-Value="values" TValue="int" Multiple="true" Change="@((args) => Change(args, "Disabled SelectBar with multiple selection"))">
+        <RadzenSelectBar Disabled="true" @bind-Value="values" TValue="IEnumerable<int>" Multiple="true" Change="@((args) => Change(args, "Disabled SelectBar with multiple selection"))">
             <Items>
                 <RadzenSelectBarItem Text="Orders" Value="1" />
                 <RadzenSelectBarItem Text="Employees" Value="2" />
@@ -45,14 +45,14 @@
 </RadzenExample>
 
 @code {
-    IEnumerable<int> value = new int[] { 1 };
+    int value = 2;
     IEnumerable<int> values = new int[] { 1, 2 };
 
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
-    void Change(IEnumerable<int> value, string name)
+    void Change(object value, string name)
     {
-        var str = string.Join(", ", value);
+        var str = value is IEnumerable<int> ? string.Join(", ", (IEnumerable<int>)value) : value;
         events.Add(DateTime.Now, $"{name} value changed to {str}");
         StateHasChanged();
     }
