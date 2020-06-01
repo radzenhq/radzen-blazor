@@ -83,5 +83,7 @@
         }
 
         customCustomersData = query.ToList();
+
+        InvokeAsync(StateHasChanged);
     }
 }

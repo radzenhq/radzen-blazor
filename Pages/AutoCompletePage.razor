@@ -59,5 +59,7 @@
     void LoadData(LoadDataArgs args)
     {
         customCustomersData = dbContext.Customers.Where(c=> c.CustomerID.Contains(args.Filter) || c.ContactName.Contains(args.Filter)).ToList();
+
+        InvokeAsync(StateHasChanged);
     }
 }

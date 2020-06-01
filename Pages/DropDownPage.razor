@@ -99,9 +99,11 @@
 
         if (!string.IsNullOrEmpty(args.Filter))
         {
-            query = query.Where(c => c.CustomerID.Contains(args.Filter) || c.ContactName.Contains(args.Filter));
+            query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()));
         }
 
         customCustomersData = query.ToList();
+
+        InvokeAsync(StateHasChanged);
     }
 }
