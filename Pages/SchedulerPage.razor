@@ -4,7 +4,8 @@
 <RadzenExample Name="Scheduler">
 <div class="row">
     <div class="col-md-6">
-    <RadzenScheduler style="height: 768px;" TItem="Appointment" Data="@appointments" StartProperty="Start" EndProperty="End" TextProperty="Text" SelectedIndex="2" EventAdd="@OnEventAdd" EventEdit="@OnEventEdit">
+    <RadzenScheduler style="height: 768px;" TItem="Appointment" Data="@appointments" StartProperty="Start" EndProperty="End" TextProperty="Text" 
+        SelectedIndex="2" SlotSelect="@OnSlotSelect" AppointmentSelect="@OnAppointmentSelect">
         <RadzenDayView />
         <RadzenWeekView />
         <RadzenMonthView />
@@ -37,7 +38,7 @@
     new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
     };
 
-    async Task OnEventAdd(SchedulerAddEventArgs args)
+    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
         Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
             new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
@@ -48,7 +49,7 @@
         }
     }
 
-    async Task OnEventEdit(SchedulerEditEventArgs<Appointment> args)
+    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
     {
         await DialogService.OpenAsync<EditAppointmentPage>("Edit Appointment", new Dictionary<string, object> { { "Appointment", args.Data } });
     }
