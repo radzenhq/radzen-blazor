@@ -358,6 +358,14 @@ namespace LatestBlazor
                     Icon = "&#xe8ef",
                     Tags = new [] { "tree", "treeview", "nodes", "hierarchy" }
                 },
+
+                new Example()
+                {
+                    Name = "Scheduler",
+                    Path = "scheduler",
+                    Icon = "&#xe616",
+                    Tags = new [] { "scheduler", "calendar", "event", "appointment"}
+                },
             }
         },
         new Example
