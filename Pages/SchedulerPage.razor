@@ -4,8 +4,10 @@
 <RadzenExample Name="Scheduler">
 <div class="row">
     <div class="col-md-6">
-    <RadzenScheduler style="height: 768px;" TItem="Appointment" Data="@appointments" StartProperty="Start" EndProperty="End" TextProperty="Text" 
-        SelectedIndex="2" SlotSelect="@OnSlotSelect" AppointmentSelect="@OnAppointmentSelect">
+    <RadzenScheduler style="height: 768px;" TItem="Appointment" Data="@appointments" StartProperty="Start" EndProperty="End" 
+        TextProperty="Text" SelectedIndex="2" 
+        LoadData="@OnLoadData"
+        SlotSelect="@OnSlotSelect" AppointmentSelect="@OnAppointmentSelect" AppointmentRender="@OnAppointmentRender">
         <RadzenDayView />
         <RadzenWeekView />
         <RadzenMonthView />
@@ -40,6 +42,8 @@
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
+        Log($"SlotSelect: Start={args.Start} End={args.End}");
+
         Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
             new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
 
@@ -51,6 +55,28 @@
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
     {
+        Log($"AppointmentSelect: Appointment={args.Data.Text}");
+
         await DialogService.OpenAsync<EditAppointmentPage>("Edit Appointment", new Dictionary<string, object> { { "Appointment", args.Data } });
+    }
+
+    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
+    {
+        // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
+
+        if (args.Data.Text == "Birthday")
+        {
+            args.Attributes["style"] = "background: red";
+        }
+    }
+
+    void OnLoadData(SchedulerLoadDataEventArgs args)
+    {
+        Log($"LoadData: Start={args.Start} End={args.End}");
+    }
+
+    void Log(string text)
+    {
+        events.Add(DateTime.Now, text);
     }
 }
