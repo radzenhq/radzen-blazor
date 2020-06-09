@@ -4,9 +4,8 @@
 <RadzenExample Name="Scheduler">
 <div class="row">
     <div class="col-md-6">
-    <RadzenScheduler style="height: 768px;" TItem="Appointment" Data="@appointments" StartProperty="Start" EndProperty="End" 
+    <RadzenScheduler @ref="scheduler" style="height: 768px;" TItem="Appointment" Data="@appointments" StartProperty="Start" EndProperty="End" 
         TextProperty="Text" SelectedIndex="2" 
-        LoadData="@OnLoadData"
         SlotSelect="@OnSlotSelect" AppointmentSelect="@OnAppointmentSelect" AppointmentRender="@OnAppointmentRender">
         <RadzenDayView />
         <RadzenWeekView />
@@ -27,6 +26,7 @@
 </RadzenExample>
 
 @code {
+    RadzenScheduler<Appointment> scheduler;
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
     IList<Appointment> appointments = new List<Appointment>
@@ -50,6 +50,8 @@
         if (data != null)
         {
             appointments.Add(data);
+            // Either call the Reload method or reassign the Data property of the Scheduler
+            scheduler.Reload();
         }
     }
 
@@ -58,6 +60,8 @@
         Log($"AppointmentSelect: Appointment={args.Data.Text}");
 
         await DialogService.OpenAsync<EditAppointmentPage>("Edit Appointment", new Dictionary<string, object> { { "Appointment", args.Data } });
+
+        scheduler.Reload();
     }
 
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
@@ -68,11 +72,6 @@
         {
             args.Attributes["style"] = "background: red";
         }
-    }
-
-    void OnLoadData(SchedulerLoadDataEventArgs args)
-    {
-        Log($"LoadData: Start={args.Start} End={args.End}");
     }
 
     void Log(string text)
