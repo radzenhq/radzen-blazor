@@ -24,6 +24,12 @@ else if (Documentation)
         <RadzenTabsItem Text="Source" Icon="code">
             <CodeViewer PageName="@($"{Name}Page.razor")" />
         </RadzenTabsItem>
+        @foreach (var p in AdditionalSourceCodePages)
+        {
+        <RadzenTabsItem Text="@p" Icon="code">
+            <CodeViewer PageName="@p" />
+        </RadzenTabsItem>
+        }
     </Tabs>
 </RadzenTabs>
 
@@ -42,4 +48,7 @@ else if (Documentation)
 
     [Parameter]
     public string DocumentationUrl  { get; set; }
+
+    [Parameter]
+    public IEnumerable<string> AdditionalSourceCodePages { get; set; } = Enumerable.Empty<string>();
 }

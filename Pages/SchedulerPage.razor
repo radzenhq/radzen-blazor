@@ -1,7 +1,7 @@
 @page "/scheduler"
 @inject DialogService DialogService
 
-<RadzenExample Name="Scheduler">
+<RadzenExample Name="Scheduler" AdditionalSourceCodePages="@(new List<string>() { "AddAppointmentPage.razor", "EditAppointmentPage.razor" })">
 <div class="row">
     <div class="col-md-6">
     <RadzenScheduler @ref="scheduler" style="height: 768px;" TItem="Appointment" Data="@appointments" StartProperty="Start" EndProperty="End" 
