@@ -11,7 +11,7 @@
 <p>This page demonstrates how to configure the Razden Blazor DataGrid for inline editing</p>
 
 <RadzenExample Name="DataGridInLineEdit" Heading="false" Documentation="false">
-    <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true"
+    <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" EditMode="DataGridEditMode.Single"
                 Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow">
         <Columns>
             <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
