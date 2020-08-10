@@ -11,7 +11,7 @@
 <p>This page demonstrates how to use templates to create a Radzen Blazor DataGrid hierarchy.</p>
 
 <RadzenExample Name="MasterDetailHierarchy" Heading="false" Documentation="false">
-    <RadzenGrid AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" RowRender="@RowRender" ExpandMode="DataGridExpandMode.Single"
+    <RadzenGrid @ref="grid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" RowRender="@RowRender" ExpandMode="DataGridExpandMode.Single"
                 Data="@orders" TItem="Order">
         <Template Context="order">
             <RadzenCard Style="margin-bottom:20px">
@@ -92,6 +92,7 @@
 </RadzenExample>
 @code {
     IEnumerable<Order> orders;
+    RadzenGrid<Order> grid;
 
     protected override void OnInitialized()
     {
@@ -101,5 +102,16 @@
     void RowRender(RowRenderEventArgs<Order> args)
     {
         args.Expandable = args.Data.ShipCountry == "France" || args.Data.ShipCountry == "Brazil";
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            grid.ExpandRow(orders.FirstOrDefault());
+            StateHasChanged();
+        }
+
+        base.OnAfterRender(firstRender);
     }
 }
