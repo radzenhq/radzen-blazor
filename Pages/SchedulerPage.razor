@@ -51,7 +51,7 @@
         {
             appointments.Add(data);
             // Either call the Reload method or reassign the Data property of the Scheduler
-            scheduler.Reload();
+            await scheduler.Reload();
         }
     }
 
@@ -61,7 +61,7 @@
 
         await DialogService.OpenAsync<EditAppointmentPage>("Edit Appointment", new Dictionary<string, object> { { "Appointment", args.Data } });
 
-        scheduler.Reload();
+        await scheduler.Reload();
     }
 
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
