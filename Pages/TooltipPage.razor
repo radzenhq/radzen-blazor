@@ -2,15 +2,14 @@
 
 @inject TooltipService tooltipService
 
-<RadzenExample Name="Tooltip" Documentation="true">
+<RadzenExample Name="Tooltip" Documentation="true" AdditionalSourceCodePages="@(new List<string>() { "TooltipCardPage.razor" })">
     <div class="row">
         <div class="col-md-6">
             <h3>Page as tooltip</h3>
-            <button @ref="showOrderButton" @onmouseover="@(args => tooltipService.Open<DialogCardPage>(
+            <button @ref="showOrderButton" @onmouseover="@(args => tooltipService.Open<TooltipCardPage>(
                         showOrderButton,
                         new Dictionary<string, object>() { { "OrderID", orderID } },
-                        new TooltipOptions(){ Style = $"width: 600px; height: 300px" }))"
-                    @onmouseout="@(args => tooltipService.Close())">
+                        new TooltipOptions(){ Style = $"width: 600px; height: 300px" }))">
                 @($"Show OrderID: {orderID} details")
             </button>
 
@@ -25,12 +24,12 @@
             </RadzenButton>
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on click</h3>
-            <RadzenButton @ref="radzenButton2" Click="@(args => ShowTooltip(radzenButton2.Element))">
+            <RadzenButton @ref="radzenButton3" Click="@(args => ShowTooltip(radzenButton3.Element))">
                 @($"Show tooltip")
             </RadzenButton>
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on click with style</h3>
-            <RadzenButton @ref="radzenButton2" Click="@(args => ShowTooltip(radzenButton2.Element, "background-color: red;"))">
+            <RadzenButton @ref="radzenButton4" Click="@(args => ShowTooltip(radzenButton4.Element, "background-color: red;"))">
                 @($"Show tooltip")
             </RadzenButton>
             <br />
@@ -57,6 +56,8 @@
     ElementReference htmlButton;
     RadzenButton radzenButton1;
     RadzenButton radzenButton2;
+    RadzenButton radzenButton3;
+    RadzenButton radzenButton4;
 
     int orderID = 10248;
 
