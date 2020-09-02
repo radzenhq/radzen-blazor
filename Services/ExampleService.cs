@@ -90,6 +90,13 @@ namespace LatestBlazor
                 },
                 new Example()
                 {
+                    Name = "Tooltip",
+                    Path = "tooltip",
+                    Icon = "&#xe8cd",
+                    Tags = new [] { "popup", "tooltip" }
+                },
+                new Example()
+                {
                     Name = "Menu",
                     Path = "menu",
                     Icon = "&#xe91a",
