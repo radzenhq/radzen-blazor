@@ -488,8 +488,16 @@ namespace LatestBlazor
                     Name = "DataGrid with LoadData",
                     Path = "datagrid-loaddata",
                     Title = "Blazor DataGrid custom data-binding",
-                    Icon = "&#xe871",
+                    Icon = "&#xe265",
                     Tags = new [] { "datagrid", "bind", "load", "data", "loaddata" }
+                },
+                new Example()
+                {
+                    Name = "DataGrid with OData",
+                    Path = "datagrid-odata",
+                    Title = "Blazor DataGrid OData data-binding",
+                    Icon = "&#xe871",
+                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "odata" }
                 },
                 new Example()
                 {
