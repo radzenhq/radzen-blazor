@@ -9,7 +9,7 @@
             <RadzenButton @ref="showOrderButton" Text="@($"Show OrderID: {orderID} details")" @onmouseover="@(args => tooltipService.Open<TooltipCardPage>(
                         showOrderButton.Element,
                         new Dictionary<string, object>() { { "OrderID", orderID } },
-                        new TooltipOptions(){ Style = $"width: 600px;", Duration = null }))" />
+                        new TooltipOptions(){ Style = $"width: 600px;background-color: #fff; color:#000;", Duration = null }))" />
             <h3 style="margin-top: 20px;">Show tooltip on mouse over Radzen component</h3>
             <RadzenButton @ref="radzenButton1" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton1.Element) )" />
             <br />
@@ -20,7 +20,7 @@
             <RadzenButton @ref="radzenButton3" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton3.Element, new TooltipOptions(){ OpenDelay = 2000 }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on click with style and close it only when click outside</h3>
-            <RadzenButton @ref="radzenButton4" Text="Show tooltip" Click="@(args => ShowTooltip(radzenButton4.Element, new TooltipOptions(){ Style = "background-color: #ffffca;", Duration = null, Position = TooltipPosition.Right }))" />
+            <RadzenButton @ref="radzenButton4" Text="Show tooltip" Click="@(args => ShowTooltip(radzenButton4.Element, new TooltipOptions(){ Style = "background-color: #ffffca; color:#000", Duration = null, Position = TooltipPosition.Right }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on mouse over HTML elment</h3>
             <button @ref="htmlButton" @onmouseover="@(args => ShowTooltip(htmlButton))">
@@ -48,7 +48,7 @@
 
 
     void ShowTooltip(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, ds =>
-        @<div style="@($"padding: 20px; {options?.Style}")">
+        @<div style="@options?.Style">
             <div class="row">
                 <div class="col-md-12">
                     Some content
