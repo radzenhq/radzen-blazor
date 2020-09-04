@@ -6,24 +6,21 @@
     <div class="row">
         <div class="col-md-6">
             <h3>Page as tooltip</h3>
-            <button @ref="showOrderButton" @onmouseover="@(args => tooltipService.Open<TooltipCardPage>(
-                        showOrderButton,
+            <RadzenButton @ref="showOrderButton" Text="@($"Show OrderID: {orderID} details")" @onmouseover="@(args => tooltipService.Open<TooltipCardPage>(
+                        showOrderButton.Element,
                         new Dictionary<string, object>() { { "OrderID", orderID } },
-                        new TooltipOptions(){ Style = $"width: 600px; height: 300px", Duration = null }))">
-                Show OrderID: @orderID details
-            </button>
-
+                        new TooltipOptions(){ Style = $"width: 600px;", Duration = null }))" />
             <h3 style="margin-top: 20px;">Show tooltip on mouse over Radzen component</h3>
             <RadzenButton @ref="radzenButton1" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton1.Element) )" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on mouse over Radzen component and close it after 10 sec</h3>
-            <RadzenButton @ref="radzenButton2" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton2.Element, new TooltipOptions(){ Duration = 10000 }))" />
+            <RadzenButton @ref="radzenButton2" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton2.Element, new TooltipOptions(){ Duration = 10000, Position = TooltipPosition.Top }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on on mouse over with after 2 sec</h3>
             <RadzenButton @ref="radzenButton3" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton3.Element, new TooltipOptions(){ OpenDelay = 2000 }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on click with style and close it only when click outside</h3>
-            <RadzenButton @ref="radzenButton4" Text="Show tooltip" Click="@(args => ShowTooltip(radzenButton4.Element, new TooltipOptions(){ Style = "background-color: red;", Duration = null }))" />
+            <RadzenButton @ref="radzenButton4" Text="Show tooltip" Click="@(args => ShowTooltip(radzenButton4.Element, new TooltipOptions(){ Style = "background-color: #ffffca;", Duration = null, Position = TooltipPosition.Right }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on mouse over HTML elment</h3>
             <button @ref="htmlButton" @onmouseover="@(args => ShowTooltip(htmlButton))">
@@ -40,7 +37,7 @@
 </RadzenExample>
 
 @code {
-    ElementReference showOrderButton;
+    RadzenButton showOrderButton;
     ElementReference htmlButton;
     RadzenButton radzenButton1;
     RadzenButton radzenButton2;
@@ -51,11 +48,11 @@
 
 
     void ShowTooltip(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, ds =>
-        @<RadzenCard Style="@($"padding: 20px;{options?.Style}")">
-        <div class="row">
-            <div class="col-md-12">
-                Some content
+        @<div style="@($"padding: 20px; {options?.Style}")">
+            <div class="row">
+                <div class="col-md-12">
+                    Some content
+                </div>
             </div>
-        </div>
-    </RadzenCard>, options);
+        </div>, options);
 }
