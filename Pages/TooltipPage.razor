@@ -14,13 +14,13 @@
             <RadzenButton @ref="radzenButton1" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton1.Element) )" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on mouse over Radzen component and close it after 10 sec</h3>
-            <RadzenButton @ref="radzenButton2" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton2.Element, new TooltipOptions(){ Duration = 10000, Position = TooltipPosition.Top }))" />
+            <RadzenButton @ref="radzenButton2" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton2.Element, new TooltipOptions(){ Duration = 10000 }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on on mouse over with after 2 sec</h3>
             <RadzenButton @ref="radzenButton3" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton3.Element, new TooltipOptions(){ OpenDelay = 2000 }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on click with style and close it only when click outside</h3>
-            <RadzenButton @ref="radzenButton4" Text="Show tooltip" Click="@(args => ShowTooltip(radzenButton4.Element, new TooltipOptions(){ Style = "background-color: #ffffca; color:#000", Duration = null, Position = TooltipPosition.Right }))" />
+            <RadzenButton @ref="radzenButton4" Text="Show tooltip" Click="@(args => ShowTooltip(radzenButton4.Element, new TooltipOptions(){ Style = "background-color: #ffffca; color:#000", Duration = null }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on mouse over HTML elment</h3>
             <button @ref="htmlButton" @onmouseover="@(args => ShowTooltip(htmlButton))">
@@ -28,10 +28,23 @@
             </button>
         </div>
         <div class="col-md-6">
-            <h3>Events</h3>
-            <RadzenCard style="overflow: auto;height:500px;">
-                N/A
-            </RadzenCard>
+            <h3>Show tooltip with right position</h3>
+            <RadzenButton @ref="radzenButton5" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton5.Element,
+                                                                            new TooltipOptions(){ Position = TooltipPosition.Right, Duration = null }))" />
+            <br />
+            <h3 style="margin-top: 20px;">Show tooltip with left position</h3>
+            <RadzenButton @ref="radzenButton6" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton6.Element,
+                                                                            new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null }))" />
+            <br />
+            <h3 style="margin-top: 20px;">Show tooltip with top position</h3>
+            <RadzenButton @ref="radzenButton7" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton7.Element,
+                                                                            new TooltipOptions(){ Position = TooltipPosition.Top, Duration = null }))" />
+            <br />
+            <h3 style="margin-top: 20px;">Show tooltip with bottom position</h3>
+            <RadzenButton @ref="radzenButton8" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton8.Element,
+                                                                            new TooltipOptions(){ Position = TooltipPosition.Bottom, Duration = null }))" />
+            <br />
+
         </div>
     </div>
 </RadzenExample>
@@ -43,6 +56,10 @@
     RadzenButton radzenButton2;
     RadzenButton radzenButton3;
     RadzenButton radzenButton4;
+    RadzenButton radzenButton5;
+    RadzenButton radzenButton6;
+    RadzenButton radzenButton7;
+    RadzenButton radzenButton8;
 
     int orderID = 10248;
 
