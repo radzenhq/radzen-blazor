@@ -6,18 +6,18 @@
     <div class="row">
         <div class="col-md-6">
             <h3>Page as tooltip</h3>
-            <RadzenButton @ref="showOrderButton" Text="@($"Show OrderID: {orderID} details")" @onmouseover="@(args => tooltipService.Open<TooltipCardPage>(
+            <RadzenButton @ref="showOrderButton" Text="@($"Show OrderID: {orderID} details")" @onmouseenter="@(args => tooltipService.Open<TooltipCardPage>(
                         showOrderButton.Element,
                         new Dictionary<string, object>() { { "OrderID", orderID } },
                         new TooltipOptions(){ Style = $"width: 600px;background-color: #fff; color:#000;", Duration = null }))" />
             <h3 style="margin-top: 20px;">Show tooltip on mouse over Radzen component</h3>
-            <RadzenButton @ref="radzenButton1" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton1.Element) )" />
+            <RadzenButton @ref="radzenButton1" Text="Show tooltip" @onmouseenter="@(args => ShowTooltip(radzenButton1.Element) )" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on mouse over Radzen component and close it after 10 sec</h3>
-            <RadzenButton @ref="radzenButton2" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton2.Element, new TooltipOptions(){ Duration = 10000 }))" />
+            <RadzenButton @ref="radzenButton2" Text="Show tooltip" @onmouseenter="@(args => ShowTooltip(radzenButton2.Element, new TooltipOptions(){ Duration = 10000 }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on on mouse over with after 2 sec</h3>
-            <RadzenButton @ref="radzenButton3" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton3.Element, new TooltipOptions(){ OpenDelay = 2000 }))" />
+            <RadzenButton @ref="radzenButton3" Text="Show tooltip" @onmouseenter="@(args => ShowTooltip(radzenButton3.Element, new TooltipOptions(){ OpenDelay = 2000 }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip on click with style and close it only when click outside</h3>
             <RadzenButton @ref="radzenButton4" Text="Show tooltip" Click="@(args => ShowTooltip(radzenButton4.Element, new TooltipOptions(){ Style = "background-color: #ffffca; color:#000", Duration = null }))" />
@@ -29,19 +29,19 @@
         </div>
         <div class="col-md-6">
             <h3>Show tooltip with right position</h3>
-            <RadzenButton @ref="radzenButton5" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton5.Element,
+            <RadzenButton @ref="radzenButton5" Text="Show tooltip" @onmouseenter="@(args => ShowTooltip(radzenButton5.Element,
                                                                             new TooltipOptions(){ Position = TooltipPosition.Right }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip with left position</h3>
-            <RadzenButton @ref="radzenButton6" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton6.Element,
+            <RadzenButton @ref="radzenButton6" Text="Show tooltip" @onmouseenter="@(args => ShowTooltip(radzenButton6.Element,
                                                                             new TooltipOptions(){ Position = TooltipPosition.Left }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip with top position</h3>
-            <RadzenButton @ref="radzenButton7" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton7.Element,
+            <RadzenButton @ref="radzenButton7" Text="Show tooltip" @onmouseenter="@(args => ShowTooltip(radzenButton7.Element,
                                                                             new TooltipOptions(){ Position = TooltipPosition.Top }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip with bottom position</h3>
-            <RadzenButton @ref="radzenButton8" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton8.Element,
+            <RadzenButton @ref="radzenButton8" Text="Show tooltip" @onmouseenter="@(args => ShowTooltip(radzenButton8.Element,
                                                                             new TooltipOptions(){ Position = TooltipPosition.Bottom }))" />
             <br />
 
