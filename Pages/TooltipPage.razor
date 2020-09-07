@@ -30,19 +30,19 @@
         <div class="col-md-6">
             <h3>Show tooltip with right position</h3>
             <RadzenButton @ref="radzenButton5" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton5.Element,
-                                                                            new TooltipOptions(){ Position = TooltipPosition.Right, Duration = null }))" />
+                                                                            new TooltipOptions(){ Position = TooltipPosition.Right }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip with left position</h3>
             <RadzenButton @ref="radzenButton6" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton6.Element,
-                                                                            new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null }))" />
+                                                                            new TooltipOptions(){ Position = TooltipPosition.Left }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip with top position</h3>
             <RadzenButton @ref="radzenButton7" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton7.Element,
-                                                                            new TooltipOptions(){ Position = TooltipPosition.Top, Duration = null }))" />
+                                                                            new TooltipOptions(){ Position = TooltipPosition.Top }))" />
             <br />
             <h3 style="margin-top: 20px;">Show tooltip with bottom position</h3>
             <RadzenButton @ref="radzenButton8" Text="Show tooltip" @onmouseover="@(args => ShowTooltip(radzenButton8.Element,
-                                                                            new TooltipOptions(){ Position = TooltipPosition.Bottom, Duration = null }))" />
+                                                                            new TooltipOptions(){ Position = TooltipPosition.Bottom }))" />
             <br />
 
         </div>
@@ -66,10 +66,6 @@
 
     void ShowTooltip(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, ds =>
         @<div style="@options?.Style">
-            <div class="row">
-                <div class="col-md-12">
-                    Some content
-                </div>
-            </div>
+            Some content
         </div>, options);
 }
