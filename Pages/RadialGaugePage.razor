@@ -1,13 +1,59 @@
 @page "/radial-gauge"
 @using Radzen
+@using System.Threading;
+@implements IDisposable
 
 <RadzenExample Name="RadialGauge">
 <div class="row">
-    <div class="col-md-12">
-        <RadzenRadialGauge Style="width: 500px; height: 500px" />
+    <div class="col-md-6">
+        <RadzenRadialGauge Style="width: 100%; height: 500px;">
+            <RadzenGaugeScale Step="1" Min="0" Max="12" StartAngle="0" EndAngle="360" ShowFirstTick="false" 
+                TickLength="20"
+                TickLabelOffset="40"
+                TickPosition="GaugeTickPosition.Inside">
+                <RadzenGaugePointer Value=@hours Length="0.6" ShowValue="false" />
+            </RadzenGaugeScale>
+            <RadzenGaugeScale Step="1" Min="0" Max="60" StartAngle="0" EndAngle="360" ShowTickLabels="false" 
+                TickPosition="GaugeTickPosition.Inside">
+                <RadzenGaugePointer Value=@seconds Length="0.9" Fill="red" Width="2" ShowValue="false" />
+                <RadzenGaugePointer Value=@minutes Length="0.8" ShowValue="false" />
+            </RadzenGaugeScale>
+        </RadzenRadialGauge>
     </div>
 </div>
+    <RadzenTextBox @bind-Value=@value Change=@OnChange />
 </RadzenExample>
 
 @code {
+    string value;
+
+    void OnChange(string value)
+    {
+        this.value = value.ToUpper();
+    }
+
+    Timer timer;
+    double hours;
+    double minutes;
+    double seconds;
+
+    protected override void OnInitialized()
+    {
+        timer = new Timer(state =>
+        {
+            var now = DateTime.Now;
+
+            hours = now.Hour + now.Minute / 60.0;
+
+            minutes = now.Minute + now.Second / 60.0;
+            seconds = now.Second;
+
+            InvokeAsync(StateHasChanged);
+        }, null, 0, 1000);
+    }
+
+    public void Dispose()
+    {
+        timer.Dispose();
+    }
 }
