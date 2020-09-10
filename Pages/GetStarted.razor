@@ -93,6 +93,7 @@
         ...
         services.AddScoped&lt;DialogService&gt;();
         services.AddScoped&lt;NotificationService&gt;();
+        services.AddScoped&lt;TooltipService&gt;();
         ...
     }
     </code>
@@ -113,6 +114,7 @@
 
         builder.Services.AddScoped&lt;DialogService&gt;();
         builder.Services.AddScoped&lt;NotificationService&gt;();
+        builder.Services.AddScoped&lt;TooltipService&gt;();
         ...
 
         await builder.Build().RunAsync();
