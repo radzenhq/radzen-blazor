@@ -1,59 +1,37 @@
 @page "/radial-gauge"
-@using Radzen
-@using System.Threading;
-@implements IDisposable
 
 <RadzenExample Name="RadialGauge">
 <div class="row">
-    <div class="col-md-6">
-        <RadzenRadialGauge Style="width: 100%; height: 500px;">
-            <RadzenRadialGaugeScale Step="1" Min="0" Max="12" StartAngle="0" EndAngle="360" ShowFirstTick="false"
-                MinorStep=@minorStep
-                TickLength="20"
-                MinorTickLength="10"
-                TickLabelOffset="40"
-                TickPosition="GaugeTickPosition.Inside">
-                <RadzenRadialGaugePointer Value=@hours Length="0.6" ShowValue="false" />
-                <RadzenRadialGaugePointer Value=@seconds Length="0.9" Fill="red" Width="2" ShowValue="false" />
-                <RadzenRadialGaugePointer Value=@minutes Length="0.8" ShowValue="false" />
+    <div class="col-md-6 col-sm-12 p-4">
+        <RadzenRadialGauge Style="width: 100%; height: 250px;">
+            <RadzenRadialGaugeScale Step="20" Min="0" Max="260" MinorStep="2" Radius="1.5" TickPosition=@tickPosition Y="0.9" Padding="0">
+                <RadzenRadialGaugePointer Value=@value Length="0.6" ShowValue=@showValue>
+                    <Template Context="pointer">
+                        <h4>
+                            @pointer.Value <sup>km/h</sup>
+                        </h4>
+                    </Template>
+                </RadzenRadialGaugePointer>
             </RadzenRadialGaugeScale>
         </RadzenRadialGauge>
     </div>
-    <div class="col-md-6">
-        <RadzenRadialGauge Style="width: 100%; height: 250px;border: 1px solid red;">
-            <RadzenRadialGaugeScale Step="20" Min="0" Max="260" MinorStep="2" TickPosition="GaugeTickPosition.Inside" Y="1" Padding="0">
-                <RadzenRadialGaugePointer Value="100" Length="0.6" />
-            </RadzenRadialGaugeScale>
-        </RadzenRadialGauge>
+    <div class="col-md-6 col-sm-12 p-4">
+        <p>
+            <label>Value <RadzenSlider Min="0" Max="260" @bind-Value=@value /></label>
+        </p>
+        <p>
+            <label>Show the pointer value <RadzenCheckBox @bind-Value=@showValue /></label>
+        </p>
+        <p>
+            <label>Tick position <RadzenDropDown @bind-Value=@tickPosition Data=@tickPositions /> </label>
+        </p>
     </div>
 </div>
 </RadzenExample>
 
 @code {
-    Timer timer;
-    double hours;
-    double minutes;
-    double seconds;
-
-    double minorStep = 12 / 60.0;
-
-    protected override void OnInitialized()
-    {
-        timer = new Timer(state =>
-        {
-            var now = DateTime.Now;
-
-            hours = now.Hour + now.Minute / 60.0;
-
-            minutes = now.Minute * minorStep + now.Second * 12 / 3600.0;
-            seconds = now.Second * minorStep;
-
-            InvokeAsync(StateHasChanged);
-        }, null, 0, 1000);
-    }
-
-    public void Dispose()
-    {
-        timer.Dispose();
-    }
+    bool showValue = true;
+    double value = 100;
+    IEnumerable<GaugeTickPosition> tickPositions = Enum.GetValues(typeof(GaugeTickPosition)).Cast<GaugeTickPosition>();
+    GaugeTickPosition tickPosition = GaugeTickPosition.Inside;
 }
