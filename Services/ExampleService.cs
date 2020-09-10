@@ -441,6 +441,13 @@ namespace LatestBlazor
                     Icon = "&#xe01b",
                     Tags = new [] { "gauge", "graph", "radial", "circle" }
                 },
+                new Example
+                {
+                    Name = "Arc Gauge",
+                    Path = "arc-gauge",
+                    Icon = "&#xe3fc",
+                    Tags = new [] { "gauge", "graph", "arc", "progress" }
+                },
             }
         },
         new Example()
