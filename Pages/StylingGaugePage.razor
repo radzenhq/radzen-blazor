@@ -16,9 +16,9 @@
                     MinorTickLength="10"
                     TickLabelOffset="40"
                     TickPosition="GaugeTickPosition.Inside">
-                    <RadzenRadialGaugePointer Value=@hours Length="0.6" ShowValue="false" />
-                    <RadzenRadialGaugePointer Value=@seconds Length="0.9" Fill="red" Width="2" ShowValue="false" />
-                    <RadzenRadialGaugePointer Value=@minutes Length="0.8" ShowValue="false" />
+                    <RadzenRadialGaugeScalePointer Value=@hours Length="0.6" ShowValue="false" />
+                    <RadzenRadialGaugeScalePointer Value=@seconds Length="0.9" Fill="red" Width="2" ShowValue="false" />
+                    <RadzenRadialGaugeScalePointer Value=@minutes Length="0.8" ShowValue="false" />
                 </RadzenRadialGaugeScale>
             </RadzenRadialGauge>
         </div>
@@ -29,7 +29,7 @@
             </p>
             <RadzenArcGauge Style="width: 100%; height: 500px; background: #000">
                 <RadzenArcGaugeScale Min="0" Max="520" StartAngle="0" EndAngle="360" Fill="rgba(249, 32, 99, 0.5)">
-                    <RadzenArcGaugeValue Value=@move Fill="rgb(249, 32, 99)">
+                    <RadzenArcGaugeScaleValue Value=@move Fill="rgb(249, 32, 99)">
                         <Template>
                             <svg width="100%" viewBox="0 0 240 120" >
                                 <text x="90" y="10" fill="#fff">
@@ -52,13 +52,13 @@
                                 </text>
                             </svg>
                         </Template>
-                    </RadzenArcGaugeValue>
+                    </RadzenArcGaugeScaleValue>
                 </RadzenArcGaugeScale>
                 <RadzenArcGaugeScale Min="0" Max="30" StartAngle="0" EndAngle="360" Radius="0.8" Fill="rgba(203, 255, 0, 0.5)">
-                    <RadzenArcGaugeValue Value=@exercise Fill="rgb(203, 255, 0)" ShowValue="false" />
+                    <RadzenArcGaugeScaleValue Value=@exercise Fill="rgb(203, 255, 0)" ShowValue="false" />
                 </RadzenArcGaugeScale>
                 <RadzenArcGaugeScale Min="0" Max="12" StartAngle="0" EndAngle="360" Radius="0.6" Fill="rgb(0, 253, 234, 0.5)">
-                    <RadzenArcGaugeValue Value=@stand Fill="rgb(0, 253, 234)" ShowValue="false" />
+                    <RadzenArcGaugeScaleValue Value=@stand Fill="rgb(0, 253, 234)" ShowValue="false" />
                 </RadzenArcGaugeScale>
             </RadzenArcGauge>
         </div>

@@ -3,18 +3,18 @@
 <RadzenExample Name="RadialGauge">
 <div class="row">
     <div class="col-md-6 col-sm-12 p-4">
-        <RadzenRadialGauge Style="width: 100%; height: 250px;">
-            <RadzenRadialGaugeScale StartAngle="-150" EndAngle="150" Step="20" Min="0" Max="260" TickPosition=@tickPosition Padding="0">
-                <RadzenRadialGaugePointer Value=@value Length="0.6" ShowValue=@showValue>
+        <RadzenRadialGauge Style="width: 100%; height: 300px;">
+            <RadzenRadialGaugeScale StartAngle="-150" EndAngle="150" Step="20" Min="0" Max="260" TickPosition=@tickPosition>
+                <RadzenRadialGaugeScalePointer Value=@value Length="0.6" ShowValue=@showValue>
                     <Template Context="pointer">
                         <h4>
                             @pointer.Value <sup>km/h</sup>
                         </h4>
                     </Template>
-                </RadzenRadialGaugePointer>
-                <RadzenRadialGaugeRange From="0" To="90" Fill="green" />
-                <RadzenRadialGaugeRange From="90" To="140" Fill="orange" />
-                <RadzenRadialGaugeRange From="140" To="260" Fill="red" />
+                </RadzenRadialGaugeScalePointer>
+                <RadzenRadialGaugeScaleRange From="0" To="90" Fill="green" />
+                <RadzenRadialGaugeScaleRange From="90" To="140" Fill="orange" />
+                <RadzenRadialGaugeScaleRange From="140" To="260" Fill="red" />
             </RadzenRadialGaugeScale>
         </RadzenRadialGauge>
     </div>

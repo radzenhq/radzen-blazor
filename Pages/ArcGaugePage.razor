@@ -6,13 +6,13 @@
     <div class="col-md-6 col-sm-12 p-4">
         <RadzenArcGauge Style="width: 100%; height: 250px;">
             <RadzenArcGaugeScale Step="20" Min="0" Max="260" MinorStep="2" Radius="1.5" TickPosition=@tickPosition Y="0.9" Padding="0">
-                <RadzenArcGaugeValue Value=@value ShowValue=@showValue>
+                <RadzenArcGaugeScaleValue Value=@value ShowValue=@showValue>
                     <Template Context="pointer">
                         <h4>
                             @pointer.Value <sup>km/h</sup>
                         </h4>
                     </Template>
-                </RadzenArcGaugeValue>
+                </RadzenArcGaugeScaleValue>
             </RadzenArcGaugeScale>
         </RadzenArcGauge>
     </div>
