@@ -20,9 +20,10 @@
                       Progress="@((args) => OnProgress(args, "Upload with additional parameter"))" />
         <br />
         <h3>Manual Upload</h3>
-        <RadzenUpload @ref="upload" Auto="false" Url="upload/single" Style="margin-bottom: 20px;"
+        <RadzenUpload @ref="upload" Auto="false" Multiple="true" Url="upload/multiple" Style="margin-bottom: 20px;" Change="@((args) => OnChange(args, "Manual Upload"))"
                       Progress="@((args) => OnProgress(args, "Manual Upload"))" />
-        <RadzenButton Text="Upload" Click="@(args => upload.Upload())" />
+        <br />
+        <RadzenButton Text="Upload" Click="@(args => upload.Upload())" Style="margin-bottom: 20px;" />
         <br />
         <h3>Upload completed</h3>
         <RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
@@ -49,6 +50,15 @@
     int progress;
     string info;
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void OnChange(UploadChangeEventArgs args, string name)
+    {
+        foreach (var file in args.Files)
+        {
+            events.Add(DateTime.Now, $"File: {file.Name} / {file.Size} bytes");
+        }
+        events.Add(DateTime.Now, $"{name} changed");
+    }
 
     void OnProgress(UploadProgressArgs args, string name)
     {
