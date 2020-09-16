@@ -7,9 +7,9 @@
 
 <RadzenExample Name="Tree">
 <div class="row">
-    <div class="col-md-6" style="margin-bottom: 16px">
+    <div class="col-xl-6" style="margin-bottom: 16px">
         <div class="row">
-            <div class="col-md-6" style="margin-bottom: 16px">
+            <div class="col-md-4" style="margin-bottom: 16px">
                 <h3>Inline definition</h3>
                 <RadzenTree Expand="@LogExpand" Change="@LogChange" Style="width: 100%; height: 300px">
                     <RadzenTreeItem Text="BMW">
@@ -26,9 +26,9 @@
                     </RadzenTreeItem>
                 </RadzenTree>
             </div>
-            <div class="col-md-6" style="margin-bottom: 16px">
+            <div class="col-md-4" style="margin-bottom: 16px">
                 <h3>Data-bound to Entity Framework</h3>
-                <RadzenTree Expand="@LogExpand" Change="@LogChange" Data="@Northwind.Categories.Include(c => c.Products)" Style="width: 100%; height: 300px">
+                <RadzenTree Expand="@LogExpand" Change="@LogChange" Data="@categories" Style="width: 100%; height: 300px">
                     <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products">
                         <Template>
                             <strong>@((context.Value as Category).CategoryName)</strong>
@@ -37,11 +37,17 @@
                     <RadzenTreeLevel TextProperty="ProductName" HasChildren="@((product) => false)" />
                 </RadzenTree>
             </div>
+            <div class="col-md-4" style="margin-bottom: 16px">
+                <h3>Data-bound to self-referencing data</h3>
+                <RadzenTree Expand="@LogExpand" Change="@LogChange" Data="@rootEmployees" Style="width: 100%; height: 300px">
+                    <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1"  HasChildren="@(e => (e as Employee).Employees1.Any())" />
+                </RadzenTree>
+            </div>
         </div>
         <div class="row">
             <div class="col-md-6" style="margin-bottom: 16px">
                 <h3>Load nodes on demand</h3>
-                <RadzenTree Change="@LogChange" Data="@Northwind.Categories" Expand="@OnExpand" Style="width: 100%; height: 300px">
+                <RadzenTree Change="@LogChange" Data="@categories" Expand="@OnExpand" Style="width: 100%; height: 300px">
                     <RadzenTreeLevel TextProperty="CategoryName"/>
                 </RadzenTree>
             </div>
@@ -53,7 +59,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6" style="margin-bottom: 16px">
+    <div class="col-xl-6" style="margin-bottom: 16px">
         <h3>Events</h3>
         <RadzenCard style="overflow: auto;height:500px;">
             @foreach (var e in events.OrderByDescending(i => i.Key))
@@ -67,14 +73,13 @@
 </RadzenExample>
 
 @code {
-    IEnumerable<string>entries = null;
+    IEnumerable<string> entries = null;
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
     void Log(string eventName, string value)
     {
         events.Add(DateTime.Now, $"{eventName}: {value}");
     }
-
     void LogChange(TreeEventArgs args)
     {
         Log("Change", $"Item Text: {args.Text}");
@@ -93,23 +98,29 @@
         }
     }
 
+    IEnumerable<Employee> employees;
+    IEnumerable<Employee> rootEmployees;
+    IEnumerable<Category> categories;
     protected override void OnInitialized()
     {
         entries = Directory.GetDirectories(HostEnvironment.ContentRootPath)
-                           .Where(entry => 
+                           .Where(entry =>
                            {
                                var name = Path.GetFileName(entry);
 
                                return !name.StartsWith(".") && name != "bin" && name != "obj";
                            });
+        employees = Northwind.Employees.Include(e => e.Employees1).ToList();
+        rootEmployees = employees.Where(e => e.ReportsTo == null);
+        categories = Northwind.Categories.Include(c => c.Products);
     }
 
     string GetTextForNode(object data)
     {
-        return Path.GetFileName((string)data);        
+        return Path.GetFileName((string)data);
     }
 
-    RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder => 
+    RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder =>
     {
         string path = context.Value as string;
         bool isDirectory = Directory.Exists(path);
