@@ -43,6 +43,12 @@ namespace NorthwindBlazor.Data
                 table.ProductID
             });
 
+            builder.Entity<NorthwindBlazor.Models.Northwind.Employee>()
+                   .HasOne(i => i.Employee1)
+                   .WithMany(i => i.Employees1)
+                   .HasForeignKey(i => i.ReportsTo)
+                   .HasPrincipalKey(i => i.EmployeeID);
+
             builder.Entity<NorthwindBlazor.Models.Northwind.CustomerCustomerDemo>()
                   .HasOne(i => i.Customer)
                   .WithMany(i => i.CustomerCustomerDemos)

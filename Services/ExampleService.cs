@@ -430,6 +430,33 @@ namespace LatestBlazor
                 },
             }
         },
+        new Example
+        {
+            Name="Gauges",
+            Children= new [] {
+                new Example
+                {
+                    Name = "Radial Gauge",
+                    Path = "radial-gauge",
+                    Icon = "&#xe01b",
+                    Tags = new [] { "gauge", "graph", "radial", "circle" }
+                },
+                new Example
+                {
+                    Name = "Arc Gauge",
+                    Path = "arc-gauge",
+                    Icon = "&#xe3fc",
+                    Tags = new [] { "gauge", "graph", "arc", "progress" }
+                },
+                new Example
+                {
+                    Name = "Styling Gauge",
+                    Path = "styling-gauge",
+                    Icon = "&#xe41d",
+                    Tags = new [] { "gauge", "graph", "styling" }
+                },
+            }
+        },
         new Example()
         {
             Name="Application Scenarios",
