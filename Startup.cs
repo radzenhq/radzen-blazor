@@ -38,6 +38,7 @@ namespace LatestBlazor
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
             services.AddScoped<TooltipService>();
+            services.AddScoped<ContextMenuService>();
             services.AddScoped<NorthwindService>();
             services.AddScoped<NorthwindODataService>();
             services.AddScoped<GitHubService>();

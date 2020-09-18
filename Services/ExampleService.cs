@@ -109,6 +109,13 @@ namespace LatestBlazor
                 },
                 new Example()
                 {
+                    Name = "ContextMenu",
+                    Path = "contextmenu",
+                    Icon = "&#xe8de",
+                    Tags = new [] { "popup", "dropdown", "menu" }
+                },
+                new Example()
+                {
                     Name = "ProfileMenu",
                     Path = "profile-menu",
                     Icon = "&#xe851",
