@@ -1,0 +1,129 @@
+@page "/dashboard"
+@using System.Net.Http
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using System.Text.RegularExpressions
+
+<RadzenGrid Data=@issues Style="height: 500px">
+    <Columns>
+        <RadzenGridColumn TItem="GithubIssue" Title="User">
+            <Template Context="issue">
+                <img style="width: 40px; height: 40px; border-radius: 50%;" src=@issue.User.AvatarUrl />
+            </Template>
+        </RadzenGridColumn>
+        <RadzenGridColumn TItem="GithubIssue" Property="Title" Title="Title" />
+        <RadzenGridColumn TItem="GithubIssue" Title="Labels">
+            <Template Context="issue">
+                @foreach(var label in issue.Labels)
+                {
+                    <span style="display: inline-block; color: #fff; margin: 0 4px; padding: 0 4px; border-radius: 4px; background-color: #@label.Color">@label.Name</span>
+                }
+            </Template>
+        </RadzenGridColumn>
+    </Columns>
+</RadzenGrid>
+
+@code {
+    class GithubIssue
+    {
+        [JsonPropertyName("title")]
+        public string Title { get; set; }
+        [JsonPropertyName("labels")]
+        public IEnumerable<Label> Labels { get; set; }
+
+        [JsonPropertyName("user")]
+        public User User { get; set; }
+    }
+
+    class User
+    {
+        [JsonPropertyName("avatar_url")]
+        public string AvatarUrl { get; set; }
+
+        [JsonPropertyName("login")]
+        public string Login { get; set; }
+    }
+
+    class Label
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [JsonPropertyName("color")]
+        public string Color { get; set; }
+    }
+
+    public class Link
+    {
+        public string Next { get; set; }
+
+        public static Link FromHeader(IEnumerable<string> header)
+        {
+            var result = new Link();
+
+            var links = String.Join("", header).Split(',');
+
+            foreach (var link in links)
+            {
+                var rel = Regex.Match(link, "(?<=rel=\").+?(?=\")", RegexOptions.IgnoreCase);
+                var value = Regex.Match(link, "(?<=<).+?(?=>)", RegexOptions.IgnoreCase);
+
+                if (rel.Success && value.Success)
+                {
+                    if (rel.Value == "next")
+                    {
+                        result.Next = value.Value;
+                    }
+                }
+            }
+
+            return result;
+        }
+    }
+
+    List<GithubIssue> issues;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var today = DateTime.Today;
+        var lastMonth = new DateTime(today.Year, today.Month - 1, 1);
+
+        using (var http = new HttpClient())
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repos/dotnet/aspnetcore/issues?state=all&labels=area-blazor&since={lastMonth.ToString("yyyy-MM-ddThh:mm:ssZ")}");
+            request.Headers.Add("User-Agent", "Radzen");
+
+            var response = await http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                using var responseStream = await response.Content.ReadAsStreamAsync();
+                issues = await JsonSerializer.DeserializeAsync<List<GithubIssue>>(responseStream);
+                Link link = Link.FromHeader(response.Headers.GetValues("Link"));
+
+                while (link.Next != null)
+                {
+                    request = new HttpRequestMessage(HttpMethod.Get, link.Next);
+                    request.Headers.Add("User-Agent", "Radzen");
+
+                    response = await http.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        using (var stream = await response.Content.ReadAsStreamAsync())
+                        {
+                            var page = await JsonSerializer.DeserializeAsync<IList<GithubIssue>>(stream);
+                            issues.AddRange(page);
+                        }
+
+                        link = Link.FromHeader(response.Headers.GetValues("Link"));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
