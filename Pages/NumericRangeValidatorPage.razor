@@ -16,7 +16,7 @@
                                 <small style="display: block">(1-10 items)</small>
                             </div>
                             <div class="col">
-                                <RadzenNumeric style="display: block" Name="Quantity" @bind-Value="model.Quantity" />
+                                <RadzenNumeric style="display: block" Name="Quantity" @bind-Value="model.Quantity" @oninput=@OnInput />
                                 <RadzenNumericRangeValidator Component="Quantity" Min="1" Max="10" Text="Quantity should be between 1 and 10" Popup="@popup" Style="position: absolute" />
                             </div>
                         </div>
@@ -56,6 +56,11 @@
     Model model = new Model();
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
+    void OnInput(ChangeEventArgs args)
+    {
+        Log("oninput", args.Value.ToString());
+    }
+
     void Log(string eventName, string value)
     {
         events.Add(DateTime.Now, $"{eventName}: {value}");
@@ -63,11 +68,11 @@
 
     void OnSubmit(Model model)
     {
-        Log("Submit", JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true }));
+        Log("Submit", JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true }));
     }
 
     void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
     {
-        Log("InvalidSubmit", JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true }));
+        Log("InvalidSubmit", JsonSerializer.Serialize(args, new JsonSerializerOptions() { WriteIndented = true }));
     }
 }

@@ -1,129 +1,226 @@
 @page "/dashboard"
-@using System.Net.Http
-@using System.Text.Json
-@using System.Text.Json.Serialization
 @using System.Text.RegularExpressions
+@using Radzen.Blazor.Rendering
+@using RadzenBlazorDemos.Models.GitHub
+@inject RadzenBlazorDemos.Services.GitHubService GitHub
 
-<RadzenGrid Data=@issues Style="height: 500px">
-    <Columns>
-        <RadzenGridColumn TItem="GithubIssue" Title="User">
-            <Template Context="issue">
-                <img style="width: 40px; height: 40px; border-radius: 50%;" src=@issue.User.AvatarUrl />
-            </Template>
-        </RadzenGridColumn>
-        <RadzenGridColumn TItem="GithubIssue" Property="Title" Title="Title" />
-        <RadzenGridColumn TItem="GithubIssue" Title="Labels">
-            <Template Context="issue">
-                @foreach(var label in issue.Labels)
-                {
-                    <span style="display: inline-block; color: #fff; margin: 0 4px; padding: 0 4px; border-radius: 4px; background-color: #@label.Color">@label.Name</span>
-                }
-            </Template>
-        </RadzenGridColumn>
-    </Columns>
-</RadzenGrid>
+<h1>Blazor GitHub Issue Dashboard</h1>
+<div class="row">
+    <div class="col-xl-3 col-lg-6 py-2">
+        <RadzenCard>
+            <h2>Open Issues <label style="position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@openIssues?.Count()</label></h2>
+            <RadzenChart style="width: 100%; height: 300px">
+                <RadzenColumnSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" />
+                <RadzenCategoryAxis FormatString="{0:dd MMM}" Padding="50" />
+                <RadzenColumnOptions Margin="10" />
+                <RadzenLegend Visible="false" />
+            </RadzenChart>
+        </RadzenCard>
+    </div>
+    <div class="col-xl-3 col-lg-6 py-2">
+        <RadzenCard>
+            <h2>Closed Issues <label style="position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@closedIssues?.Count()</label></h2>
+            <RadzenChart style="width: 100%; height: 300px">
+                <RadzenColumnSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" />
+                <RadzenCategoryAxis FormatString="{0:dd MMM}" Padding="50" />
+                <RadzenColumnOptions Margin="10" />
+                <RadzenLegend Visible="false" />
+            </RadzenChart>
+        </RadzenCard>
+    </div>
+    <div class="col-xl-3 col-lg-6 py-2">
+        <RadzenCard>
+            <h2>All Issues <label style="position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@issues?.Count()</label></h2>
+            <RadzenChart style="width: 100%; height: 300px">
+                <RadzenLineSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" />
+                <RadzenLineSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" />
+                <RadzenCategoryAxis FormatString="{0:dd MMM}" />
+            </RadzenChart>
+        </RadzenCard>
+    </div>
+    <div class="col-xl-3 col-lg-6 py-2">
+        <RadzenCard>
+            <h2>Progress</h2>
+            <RadzenArcGauge style="width: 100%; height: 300px">
+                <RadzenArcGaugeScale Max="1">
+                    <RadzenArcGaugeScaleValue Value=@closeRatio FormatString="{0:P0}" />
+                </RadzenArcGaugeScale>
+            </RadzenArcGauge>
+        </RadzenCard>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-6 col-lg-12 py-2">
+        <RadzenCard>
+            <h2>Issue List</h2>
+            <RadzenGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true">
+                <Columns>
+                    <RadzenGridColumn TItem="Issue" Title="User" Width="200px">
+                        <FilterTemplate>
+                            <RadzenDropDown AllowClear="true" AllowFiltering="true" Data=@users TextProperty="Login" @bind-Value="selectedUser" Change=@FilterIssues>
+                                <Template Context="user">
+                                    <div style="white-space: nowrap">
+                                        <img style="width: 30px; height: 30px; border-radius: 50%;" src=@user.AvatarUrl /> @user.Login
+                                    </div>
+                                </Template>
+                            </RadzenDropDown>
+                        </FilterTemplate>
+                        <Template Context="issue">
+                            <img style="width: 40px; height: 40px; border-radius: 50%;" src=@issue.User.AvatarUrl />@issue.User.Login
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Issue" Property="Title" Title="Title" />
+                    <RadzenGridColumn TItem="Issue" Title="Labels">
+                        <FilterTemplate>
+                            <RadzenDropDown Style="width: 100%" AllowClear="true" AllowFiltering="true" Multiple="true" Data=@labels @bind-Value="selectedLabels" Change=@FilterIssues>
+                                <Template Context="label">
+                                    @Regex.Replace(label, ":\\w+:", "")
+                                </Template>
+                            </RadzenDropDown>
+                        </FilterTemplate>
+
+                        <Template Context="issue">
+                            @foreach(var label in issue.Labels)
+                            {
+                                <span style="display: inline-block; color: #fff; margin: 0 4px; padding: 0 4px; border-radius: 4px; background-color: #@label.Color">@Regex.Replace(label.Name, ":\\w+:", "")</span>
+                            }
+                        </Template>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </RadzenCard>
+    </div>
+    <div class="col-xl-3 col-lg-6 py-2">
+        <RadzenCard>
+            <h2>Top Contributors</h2>
+            <RadzenChart style="width: 100%; height: 300px">
+                <RadzenPieSeries Data=@openByGroups CategoryProperty="Name" ValueProperty="Count" Title="Issues" Radius="50" />
+            </RadzenChart>
+        </RadzenCard>
+    </div>
+    <div class="col-xl-3 col-lg-6 py-2">
+        <RadzenCard>
+            <h2>Most Active Member</h2>
+            <h4>
+                <img style="width: 25%; border-radius: 50%;" src=@mostActiveMember?.AvatarUrl />
+                @mostActiveMember?.Login
+            </h4>
+        </RadzenCard>
+    </div>
+</div>
 
 @code {
-    class GithubIssue
-    {
-        [JsonPropertyName("title")]
-        public string Title { get; set; }
-        [JsonPropertyName("labels")]
-        public IEnumerable<Label> Labels { get; set; }
+    IEnumerable<Issue> issues;
+    IEnumerable<Issue> openIssues;
+    IEnumerable<Issue> closedIssues;
 
-        [JsonPropertyName("user")]
-        public User User { get; set; }
+    class IssueGroup
+    {
+        public int Count { get; set; }
+        public DateTime Week { get; set; }
     }
 
-    class User
+    class LabelGroup
     {
-        [JsonPropertyName("avatar_url")]
-        public string AvatarUrl { get; set; }
-
-        [JsonPropertyName("login")]
-        public string Login { get; set; }
+        public int Count { get; set; }
+        public string Label { get; set; }
     }
 
-    class Label
+    class UserGroup
     {
-        [JsonPropertyName("name")]
+        public int Count { get; set; }
         public string Name { get; set; }
-
-        [JsonPropertyName("color")]
-        public string Color { get; set; }
     }
 
-    public class Link
+    IEnumerable<IssueGroup> openIssuesByDate;
+    IEnumerable<IssueGroup> closedIssuesByDate;
+    IEnumerable<LabelGroup> labelGroups;
+    IEnumerable<UserGroup> openByGroups;
+    IEnumerable<User> users;
+    IEnumerable<Issue> filteredIssues;
+    IEnumerable<string> labels;
+    IEnumerable<string> selectedLabels = new List<string>();
+    User mostActiveMember;
+    User selectedUser;
+    double closeRatio = 0;
+
+    class UserComparer : IEqualityComparer<User>
     {
-        public string Next { get; set; }
-
-        public static Link FromHeader(IEnumerable<string> header)
+        public bool Equals(User x, User y)
         {
-            var result = new Link();
+            return x.Login.Equals(y.Login);
+        }
 
-            var links = String.Join("", header).Split(',');
-
-            foreach (var link in links)
-            {
-                var rel = Regex.Match(link, "(?<=rel=\").+?(?=\")", RegexOptions.IgnoreCase);
-                var value = Regex.Match(link, "(?<=<).+?(?=>)", RegexOptions.IgnoreCase);
-
-                if (rel.Success && value.Success)
-                {
-                    if (rel.Value == "next")
-                    {
-                        result.Next = value.Value;
-                    }
-                }
-            }
-
-            return result;
+        public int GetHashCode(User user)
+        {
+            return user.Login.GetHashCode();
         }
     }
 
-    List<GithubIssue> issues;
-
-    protected override async Task OnInitializedAsync()
+    void FilterIssues()
     {
-        var today = DateTime.Today;
-        var lastMonth = new DateTime(today.Year, today.Month - 1, 1);
+        filteredIssues = issues;
 
-        using (var http = new HttpClient())
+        if (selectedUser != null)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repos/dotnet/aspnetcore/issues?state=all&labels=area-blazor&since={lastMonth.ToString("yyyy-MM-ddThh:mm:ssZ")}");
-            request.Headers.Add("User-Agent", "Radzen");
+            filteredIssues = issues.Where(issue => issue.User.Login == selectedUser.Login);
+        }
 
-            var response = await http.SendAsync(request);
+        foreach (var selectedLabel in selectedLabels)
+        {
+            filteredIssues = filteredIssues.Where(issue => issue.Labels.Any(label => label.Name == selectedLabel));
+        }
+    }
 
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                issues = await JsonSerializer.DeserializeAsync<List<GithubIssue>>(responseStream);
-                Link link = Link.FromHeader(response.Headers.GetValues("Link"));
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            issues = await GitHub.GetIssues(DateTime.Now);
+            filteredIssues = issues;
+            openIssues = issues.Where(issue => issue.State == IssueState.Open);
+            closedIssues = issues.Where(issue => issue.State == IssueState.Closed);
 
-                while (link.Next != null)
-                {
-                    request = new HttpRequestMessage(HttpMethod.Get, link.Next);
-                    request.Headers.Add("User-Agent", "Radzen");
+            closeRatio = closedIssues.Count() / (double)issues.Count();
 
-                    response = await http.SendAsync(request);
-
-                    if (response.IsSuccessStatusCode)
+            openIssuesByDate = openIssues.GroupBy(issue => issue.CreatedAt.EndOfWeek())
+                    .Select(group => new IssueGroup
                     {
-                        using (var stream = await response.Content.ReadAsStreamAsync())
-                        {
-                            var page = await JsonSerializer.DeserializeAsync<IList<GithubIssue>>(stream);
-                            issues.AddRange(page);
-                        }
+                        Week = group.Key,
+                        Count = group.Count()
+                    });
 
-                        link = Link.FromHeader(response.Headers.GetValues("Link"));
-                    }
-                    else
+            closedIssuesByDate = closedIssues.GroupBy(issue => issue.ClosedAt.Value.EndOfWeek())
+                    .Select(group => new IssueGroup
                     {
-                        break;
-                    }
-                }
-            }
+                        Week = group.Key,
+                        Count = group.Count()
+                    });
+
+            labels = issues.SelectMany(issue => issue.Labels).Select(label => label.Name).Distinct();
+
+            labelGroups = issues.SelectMany(issue => issue.Labels)
+                                .GroupBy(label => label.Name)
+                                .Select(group => new LabelGroup { Label = Regex.Replace(group.Key, ":\\w+:", ""), Count = group.Count() })
+                                .Where(group => group.Label != "area-blazor")
+                                .Take(5);
+
+            openByGroups = issues.GroupBy(issue => issue.User.Login)
+                                .Select(group => new UserGroup { Name = group.Key, Count = group.Count() })
+                                .OrderByDescending(group => group.Count)
+                                .Take(5);
+
+            mostActiveMember = issues.SelectMany(issue => issue.Assignees)
+                                .GroupBy(assignee => assignee, new UserComparer())
+                                .Select(group => new { User = group.Key, Count = group.Count() })
+                                .OrderByDescending(group => group.Count)
+                                .Select(group => group.User)
+                                .First();
+
+            users = issues.Select(issue => issue.User)
+                           .Distinct(new UserComparer());
+
+            StateHasChanged();
         }
     }
 }
