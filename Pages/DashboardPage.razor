@@ -5,6 +5,9 @@
 @inject RadzenBlazorDemos.Services.GitHubService GitHub
 
 <h1>Blazor GitHub Issue Dashboard</h1>
+<p>
+    Sample dashboard that uses real data from the <a href="https://github.com/dotnet/aspnetcore/issues" target="_blank">Microsoft ASP.NET GitHub repository</a>.
+</p>
 <div class="row">
     <div class="col-xl-3 col-lg-6 py-2">
         <RadzenCard>
@@ -70,6 +73,27 @@
                         </Template>
                     </RadzenGridColumn>
                     <RadzenGridColumn TItem="Issue" Property="Title" Title="Title" />
+                    <RadzenGridColumn TItem="Issue" Property="Title" Title="Status" Width="100px">
+                        <FilterTemplate>
+                            <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues />
+                        </FilterTemplate>
+                        <Template Context="issue">
+                            @if (issue.State == IssueState.Open)
+                            {
+                                <div style="display: flex; align-items: center; color: #28a745">
+                                    <svg viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm9 3a1 1 0 11-2 0 1 1 0 012 0zm-.25-6.25a.75.75 0 00-1.5 0v3.5a.75.75 0 001.5 0v-3.5z"></path></svg>
+                                    <span style="margin-left: 4px">open</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div style="display: flex; align-items: center; color: #cb2431">
+                                    <svg viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" fill-rule="evenodd" d="M1.5 8a6.5 6.5 0 0110.65-5.003.75.75 0 00.959-1.153 8 8 0 102.592 8.33.75.75 0 10-1.444-.407A6.5 6.5 0 011.5 8zM8 12a1 1 0 100-2 1 1 0 000 2zm0-8a.75.75 0 01.75.75v3.5a.75.75 0 11-1.5 0v-3.5A.75.75 0 018 4zm4.78 4.28l3-3a.75.75 0 00-1.06-1.06l-2.47 2.47-.97-.97a.749.749 0 10-1.06 1.06l1.5 1.5a.75.75 0 001.06 0z"></path></svg>
+                                    <span style="margin-left: 4px">closed</span>
+                                </div>
+                            }
+                        </Template>
+                    </RadzenGridColumn>
                     <RadzenGridColumn TItem="Issue" Title="Labels">
                         <FilterTemplate>
                             <RadzenDropDown Style="width: 100%" AllowClear="true" AllowFiltering="true" Multiple="true" Data=@labels @bind-Value="selectedLabels" Change=@FilterIssues>
@@ -140,6 +164,9 @@
     IEnumerable<Issue> filteredIssues;
     IEnumerable<string> labels;
     IEnumerable<string> selectedLabels;
+    IEnumerable<IssueState> issueStates = Enum.GetValues(typeof(IssueState)).Cast<IssueState>();
+    IssueState selectedState = IssueState.All;
+
     User mostActiveMember;
     User selectedUser;
     double closeRatio = 0;
@@ -172,6 +199,11 @@
             {
                 filteredIssues = filteredIssues.Where(issue => issue.Labels.Any(label => label.Name == selectedLabel));
             }
+        }
+
+        if (selectedState != IssueState.All)
+        {
+            filteredIssues = filteredIssues.Where(issue => issue.State == selectedState);
         }
     }
 
