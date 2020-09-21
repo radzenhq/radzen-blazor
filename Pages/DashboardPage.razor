@@ -139,7 +139,7 @@
     IEnumerable<User> users;
     IEnumerable<Issue> filteredIssues;
     IEnumerable<string> labels;
-    IEnumerable<string> selectedLabels = new List<string>();
+    IEnumerable<string> selectedLabels;
     User mostActiveMember;
     User selectedUser;
     double closeRatio = 0;
@@ -166,9 +166,12 @@
             filteredIssues = issues.Where(issue => issue.User.Login == selectedUser.Login);
         }
 
-        foreach (var selectedLabel in selectedLabels)
+        if (selectedLabels != null)
         {
-            filteredIssues = filteredIssues.Where(issue => issue.Labels.Any(label => label.Name == selectedLabel));
+            foreach (var selectedLabel in selectedLabels)
+            {
+                filteredIssues = filteredIssues.Where(issue => issue.Labels.Any(label => label.Name == selectedLabel));
+            }
         }
     }
 
