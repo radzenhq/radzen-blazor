@@ -23,7 +23,6 @@ namespace LatestBlazor
         new Example()
         {
             Name = "General",
-            Expanded = true,
             Children = new [] {
                 new Example()
                 {

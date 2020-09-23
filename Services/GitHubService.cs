@@ -18,6 +18,21 @@ namespace RadzenBlazorDemos.Services
         public string Next { get; set; }
         public string Last { get; set; }
 
+        public int NextPage { get; set; }
+        public int LastPage { get; set; }
+
+        private static int ExtractPage(string value)
+        {
+            var match = Regex.Match(value, "page=(?<page>\\d+)");
+
+            if (match != null)
+            {
+                return Convert.ToInt32(match.Groups["page"].Value);
+            }
+
+            return 0;
+        }
+
         public static Link FromHeader(IEnumerable<string> header)
         {
             var result = new Link();
@@ -34,10 +49,12 @@ namespace RadzenBlazorDemos.Services
                     if (rel.Value == "next")
                     {
                         result.Next = value.Value;
+                        result.NextPage = ExtractPage(result.Next);
                     }
                     if (rel.Value == "last")
                     {
                         result.Last = value.Value;
+                        result.LastPage = ExtractPage(result.Last);
                     }
                 }
             }
@@ -55,11 +72,19 @@ namespace RadzenBlazorDemos.Services
         public IEnumerable<Issue> Issues { get; set; }
     }
 
+    public class FetchProgressEventArgs
+    {
+        public int Total { get; set; }
+        public int Current { get; set; }
+    }
+
     public class GitHubService
     {
         private readonly IWebHostEnvironment hostEnvironment;
 
         private readonly JsonSerializerOptions options;
+
+        public Action<FetchProgressEventArgs> OnProgress;
 
         public GitHubService(IWebHostEnvironment hostEnvironment)
         {
@@ -72,6 +97,7 @@ namespace RadzenBlazorDemos.Services
         {
             var cacheFile = Path.Combine(hostEnvironment.WebRootPath, "issues.json");
             var lastMonth = new DateTime(date.Year, date.Month - 1, 1);
+
             IEnumerable<Issue> issues = null;
 
             if (File.Exists(cacheFile))
@@ -79,7 +105,7 @@ namespace RadzenBlazorDemos.Services
                 var json = await File.ReadAllTextAsync(cacheFile);
                 var cache = JsonSerializer.Deserialize<IssueCache>(json, options);
 
-                if (date.Subtract(cache.Date).TotalHours < 4)
+                if (date.Subtract(cache.Date).TotalHours < 24)
                 {
                     issues = cache.Issues;
                 }
@@ -108,14 +134,15 @@ namespace RadzenBlazorDemos.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-
                     using var responseStream = await response.Content.ReadAsStreamAsync();
                     var page = await JsonSerializer.DeserializeAsync<IEnumerable<Issue>>(responseStream, options);
                     issues.AddRange(page);
                     var link = Link.FromHeader(response.Headers.GetValues("Link"));
+                    OnProgress?.Invoke(new FetchProgressEventArgs { Current = 1, Total = link.LastPage });
 
                     while (link.Next != null)
                     {
+                        OnProgress?.Invoke(new FetchProgressEventArgs { Current = link.NextPage, Total = link.LastPage });
                         request = new HttpRequestMessage(HttpMethod.Get, link.Next);
                         request.Headers.Add("User-Agent", "Radzen");
 
@@ -136,6 +163,10 @@ namespace RadzenBlazorDemos.Services
                             break;
                         }
                     }
+                }
+                else
+                {
+                    throw new ApplicationException(response.ReasonPhrase);
                 }
             }
 

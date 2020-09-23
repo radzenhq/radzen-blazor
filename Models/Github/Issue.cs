@@ -6,6 +6,9 @@ namespace RadzenBlazorDemos.Models.GitHub
 {
     public class Issue
     {
+        [JsonPropertyName("html_url")]
+        public string Url { get; set; }
+
         [JsonPropertyName("created_at")]
         public DateTime CreatedAt { get; set; }
 

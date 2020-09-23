@@ -2,18 +2,29 @@
 @using System.Text.RegularExpressions
 @using Radzen.Blazor.Rendering
 @using RadzenBlazorDemos.Models.GitHub
-@inject RadzenBlazorDemos.Services.GitHubService GitHub
+@using RadzenBlazorDemos.Services
+@inject GitHubService GitHub
 
-<h1>Blazor GitHub Issue Dashboard</h1>
+<h1>Blazor GitHub Issues</h1>
 <p>
-    Sample dashboard that uses real data from the <a href="https://github.com/dotnet/aspnetcore/issues" target="_blank">Microsoft ASP.NET GitHub repository</a>.
+    Sample dashboard that uses data from the <a href="https://github.com/dotnet/aspnetcore/issues" target="_blank">ASP.NET GitHub repository</a>. Data is updated 24 hours.
 </p>
+<div class="container-fluid" style="position: relative">
+    <RadzenCard Visible=@fetchingData style="z-index: 1; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, .5)">
+        <RadzenCard Visible=@(error == null) style="margin: 32px auto; width: 80%">
+            <h3 style="margin: 32px 0">Fetching data from GitHub: page @currentPage of @totalPages.</h3>
+            <RadzenProgressBar Value=@currentPage Max=@totalPages ShowValue="false" Style="display: inline-block; width: 180px; height: 8px; margin-top: 16px" />
+        </RadzenCard>
+        <RadzenCard Visible=@(error != null) style="margin: 32px auto; width: 80%">
+            <h3 style="margin: 32px 0">An error has occurred: @error. Try reloading your browser.</h3>
+        </RadzenCard>
+    </RadzenCard>
 <div class="row">
     <div class="col-xl-3 col-lg-6 py-2">
         <RadzenCard>
-            <h2>Open Issues <label style="position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@openIssues?.Count()</label></h2>
-            <RadzenChart style="width: 100%; height: 300px">
-                <RadzenColumnSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" />
+            <h2>Open Issues <label style="color: #28a745; position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@openIssues?.Count()</label></h2>
+            <RadzenChart style="width: 100%; height: 200px">
+                <RadzenColumnSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="#28a745" />
                 <RadzenCategoryAxis FormatString="{0:dd MMM}" Padding="50" />
                 <RadzenColumnOptions Margin="10" />
                 <RadzenLegend Visible="false" />
@@ -22,9 +33,9 @@
     </div>
     <div class="col-xl-3 col-lg-6 py-2">
         <RadzenCard>
-            <h2>Closed Issues <label style="position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@closedIssues?.Count()</label></h2>
-            <RadzenChart style="width: 100%; height: 300px">
-                <RadzenColumnSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" />
+            <h2>Closed Issues <label style="color: #cb2431; position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@closedIssues?.Count()</label></h2>
+            <RadzenChart style="width: 100%; height: 200px">
+                <RadzenColumnSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="#cb2431" />
                 <RadzenCategoryAxis FormatString="{0:dd MMM}" Padding="50" />
                 <RadzenColumnOptions Margin="10" />
                 <RadzenLegend Visible="false" />
@@ -34,9 +45,9 @@
     <div class="col-xl-3 col-lg-6 py-2">
         <RadzenCard>
             <h2>All Issues <label style="position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@issues?.Count()</label></h2>
-            <RadzenChart style="width: 100%; height: 300px">
-                <RadzenLineSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" />
-                <RadzenLineSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" />
+            <RadzenChart style="width: 100%; height: 200px">
+                <RadzenLineSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" Stroke="#28a745" />
+                <RadzenLineSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" Stroke="#cb2431" />
                 <RadzenCategoryAxis FormatString="{0:dd MMM}" />
             </RadzenChart>
         </RadzenCard>
@@ -44,8 +55,8 @@
     <div class="col-xl-3 col-lg-6 py-2">
         <RadzenCard>
             <h2>Progress</h2>
-            <RadzenArcGauge style="width: 100%; height: 300px">
-                <RadzenArcGaugeScale Max="1">
+            <RadzenArcGauge style="width: 100%; height: 200px">
+                <RadzenArcGaugeScale Max="1" Y="0.8" Radius="2">
                     <RadzenArcGaugeScaleValue Value=@closeRatio FormatString="{0:P0}" />
                 </RadzenArcGaugeScale>
             </RadzenArcGauge>
@@ -56,9 +67,9 @@
     <div class="col-xl-6 col-lg-12 py-2">
         <RadzenCard>
             <h2>Issue List</h2>
-            <RadzenGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true">
+            <RadzenGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true" AllowSorting="true">
                 <Columns>
-                    <RadzenGridColumn TItem="Issue" Title="User" Width="200px">
+                    <RadzenGridColumn TItem="Issue" Title="User" Width="200px" Property="User.Login">
                         <FilterTemplate>
                             <RadzenDropDown AllowClear="true" AllowFiltering="true" Data=@users TextProperty="Login" @bind-Value="selectedUser" Change=@FilterIssues>
                                 <Template Context="user">
@@ -72,8 +83,12 @@
                             <img style="width: 40px; height: 40px; border-radius: 50%;" src=@issue.User.AvatarUrl />@issue.User.Login
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Issue" Property="Title" Title="Title" />
-                    <RadzenGridColumn TItem="Issue" Property="Title" Title="Status" Width="100px">
+                    <RadzenGridColumn TItem="Issue" Property="Title" Title="Title" Width="200px">
+                        <Template Context="issue">
+                            <RadzenLink Path=@issue.Url Text=@issue.Title Target="_blank" />
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Issue" Property="State" Title="State" Width="100px">
                         <FilterTemplate>
                             <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues />
                         </FilterTemplate>
@@ -94,7 +109,7 @@
                             }
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Issue" Title="Labels">
+                    <RadzenGridColumn TItem="Issue" Title="Labels" Sortable="false" Width="250px">
                         <FilterTemplate>
                             <RadzenDropDown Style="width: 100%" AllowClear="true" AllowFiltering="true" Multiple="true" Data=@labels @bind-Value="selectedLabels" Change=@FilterIssues>
                                 <Template Context="label">
@@ -104,10 +119,11 @@
                         </FilterTemplate>
 
                         <Template Context="issue">
+                            <div style="white-space: normal">
                             @foreach(var label in issue.Labels)
                             {
-                                <span style="display: inline-block; color: #fff; margin: 0 4px; padding: 0 4px; border-radius: 4px; background-color: #@label.Color">@Regex.Replace(label.Name, ":\\w+:", "")</span>
-                            }
+                                <span style="display: inline-block; color: #fff; margin: 4px; padding: 0 4px; border-radius: 4px; background-color: #@label.Color">@Regex.Replace(label.Name, ":\\w+:", "")</span>
+                            }</div>
                         </Template>
                     </RadzenGridColumn>
                 </Columns>
@@ -117,22 +133,34 @@
     <div class="col-xl-3 col-lg-6 py-2">
         <RadzenCard>
             <h2>Top Contributors</h2>
-            <RadzenChart style="width: 100%; height: 300px">
-                <RadzenPieSeries Data=@openByGroups CategoryProperty="Name" ValueProperty="Count" Title="Issues" Radius="50" />
+            <RadzenChart style="width: 100%; height: 500px">
+                <RadzenPieSeries Data=@openByGroups CategoryProperty="Name" ValueProperty="Count" Title="Issues" />
             </RadzenChart>
         </RadzenCard>
     </div>
-    <div class="col-xl-3 col-lg-6 py-2">
-        <RadzenCard>
-            <h2>Most Active Member</h2>
-            <h4>
-                <img style="width: 25%; border-radius: 50%;" src=@mostActiveMember?.AvatarUrl />
-                @mostActiveMember?.Login
-            </h4>
-        </RadzenCard>
+    <div class="col-xl-3 col-lg-6">
+        <div class="row">
+            <div class="col-xl-12 py-2">
+                <RadzenCard style="height: 200px">
+                    <h2>Most Active Member</h2>
+                    <h4>
+                        <img style="width: 25%; border-radius: 50%;" src=@mostActiveMember?.AvatarUrl />
+                        @mostActiveMember?.Login
+                    </h4>
+                </RadzenCard>
+            </div>
+            <div class="col-xl-12 py-2">
+                <RadzenCard>
+                    <h2>Top Issue Labels</h2>
+                    <RadzenChart style="width: 100%; height: 284px">
+                        <RadzenDonutSeries Data=@labelGroups CategoryProperty="Label" ValueProperty="Count" Title="Issues" Fills=@labelColors />
+                    </RadzenChart>
+                </RadzenCard>
+            </div>
+        </div>
     </div>
 </div>
-
+</div>
 @code {
     IEnumerable<Issue> issues;
     IEnumerable<Issue> openIssues;
@@ -148,6 +176,7 @@
     {
         public int Count { get; set; }
         public string Label { get; set; }
+        public string Color { get; set; }
     }
 
     class UserGroup
@@ -165,11 +194,15 @@
     IEnumerable<string> labels;
     IEnumerable<string> selectedLabels;
     IEnumerable<IssueState> issueStates = Enum.GetValues(typeof(IssueState)).Cast<IssueState>();
+    IEnumerable<string> labelColors;
     IssueState selectedState = IssueState.All;
-
     User mostActiveMember;
     User selectedUser;
     double closeRatio = 0;
+    int currentPage = 0;
+    int totalPages = 0;
+    bool fetchingData = false;
+    string error = null;
 
     class UserComparer : IEqualityComparer<User>
     {
@@ -184,9 +217,22 @@
         }
     }
 
+    class LabelComparer : IEqualityComparer<Label>
+    {
+        public bool Equals(Label x, Label y)
+        {
+            return x.Name.Equals(y.Name);
+        }
+
+        public int GetHashCode(Label user)
+        {
+            return user.Name.GetHashCode();
+        }
+    }
+
     void FilterIssues()
     {
-        filteredIssues = issues;
+        filteredIssues = issues.OrderByDescending(issue => issue.CreatedAt);
 
         if (selectedUser != null)
         {
@@ -207,53 +253,76 @@
         }
     }
 
+    void OnProgress(FetchProgressEventArgs args)
+    {
+        currentPage = args.Current;
+        totalPages = args.Total;
+        
+        StateHasChanged();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            issues = await GitHub.GetIssues(DateTime.Now);
-            filteredIssues = issues;
-            openIssues = issues.Where(issue => issue.State == IssueState.Open);
-            closedIssues = issues.Where(issue => issue.State == IssueState.Closed);
+            GitHub.OnProgress += OnProgress;
+            fetchingData = true;
+            try 
+            {
+                issues = await GitHub.GetIssues(DateTime.Now);
+                filteredIssues = issues.OrderByDescending(issue => issue.CreatedAt);
+                openIssues = issues.Where(issue => issue.State == IssueState.Open);
+                closedIssues = issues.Where(issue => issue.State == IssueState.Closed);
 
-            closeRatio = closedIssues.Count() / (double)issues.Count();
+                closeRatio = closedIssues.Count() / (double)issues.Count();
 
-            openIssuesByDate = openIssues.GroupBy(issue => issue.CreatedAt.EndOfWeek())
-                    .Select(group => new IssueGroup
-                    {
-                        Week = group.Key,
-                        Count = group.Count()
-                    });
+                openIssuesByDate = openIssues.GroupBy(issue => issue.CreatedAt.EndOfWeek())
+                        .Select(group => new IssueGroup
+                        {
+                            Week = group.Key,
+                            Count = group.Count()
+                        });
 
-            closedIssuesByDate = closedIssues.GroupBy(issue => issue.ClosedAt.Value.EndOfWeek())
-                    .Select(group => new IssueGroup
-                    {
-                        Week = group.Key,
-                        Count = group.Count()
-                    });
+                closedIssuesByDate = closedIssues.GroupBy(issue => issue.ClosedAt.Value.EndOfWeek())
+                        .Select(group => new IssueGroup
+                        {
+                            Week = group.Key,
+                            Count = group.Count()
+                        });
 
-            labels = issues.SelectMany(issue => issue.Labels).Select(label => label.Name).Distinct();
+                labels = issues.SelectMany(issue => issue.Labels).Select(label => label.Name).Distinct();
 
-            labelGroups = issues.SelectMany(issue => issue.Labels)
-                                .GroupBy(label => label.Name)
-                                .Select(group => new LabelGroup { Label = Regex.Replace(group.Key, ":\\w+:", ""), Count = group.Count() })
-                                .Where(group => group.Label != "area-blazor")
-                                .Take(5);
+                labelGroups = issues.SelectMany(issue => issue.Labels)
+                                    .GroupBy(label => label, new LabelComparer())
+                                    .Select(group => new LabelGroup { Label = Regex.Replace(group.Key.Name, ":\\w+:", ""), Color = $"#{group.Key.Color}", Count = group.Count() })
+                                    .Where(group => group.Label != "area-blazor")
+                                    .OrderByDescending(group => group.Count)
+                                    .Take(5);
 
-            openByGroups = issues.GroupBy(issue => issue.User.Login)
-                                .Select(group => new UserGroup { Name = group.Key, Count = group.Count() })
-                                .OrderByDescending(group => group.Count)
-                                .Take(5);
+                labelColors = labelGroups.Select(label => label.Color);
 
-            mostActiveMember = issues.SelectMany(issue => issue.Assignees)
-                                .GroupBy(assignee => assignee, new UserComparer())
-                                .Select(group => new { User = group.Key, Count = group.Count() })
-                                .OrderByDescending(group => group.Count)
-                                .Select(group => group.User)
-                                .First();
+                openByGroups = issues.GroupBy(issue => issue.User.Login)
+                                    .Select(group => new UserGroup { Name = group.Key, Count = group.Count() })
+                                    .OrderByDescending(group => group.Count)
+                                    .Take(7);
 
-            users = issues.Select(issue => issue.User)
-                           .Distinct(new UserComparer());
+                mostActiveMember = issues.SelectMany(issue => issue.Assignees)
+                                    .GroupBy(assignee => assignee, new UserComparer())
+                                    .Select(group => new { User = group.Key, Count = group.Count() })
+                                    .OrderByDescending(group => group.Count)
+                                    .Select(group => group.User)
+                                    .First();
+
+                users = issues.Select(issue => issue.User)
+                            .Distinct(new UserComparer());
+
+                error = null;
+                fetchingData = false;
+            } 
+            catch (Exception ex)
+            {
+                error = ex.Message;
+            }
 
             StateHasChanged();
         }
