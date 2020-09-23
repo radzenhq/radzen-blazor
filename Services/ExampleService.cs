@@ -16,8 +16,13 @@ namespace LatestBlazor
         },
         new Example()
         {
+            Name = "Dashboard",
+            Path = "/dashboard",
+            Icon = "&#xe871"
+        },
+        new Example()
+        {
             Name = "General",
-            Expanded = true,
             Children = new [] {
                 new Example()
                 {

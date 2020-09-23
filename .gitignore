@@ -332,3 +332,4 @@ ASALocalRun/
 .DS_Store
 .vscode
 northwind*.db
+issues.json

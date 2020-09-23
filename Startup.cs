@@ -10,15 +10,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NorthwindBlazor.Data;
 using Radzen;
+using RadzenBlazorDemos.Services;
 
 namespace LatestBlazor
 {
-  public class ThemeState
-  {
-    public string CurrentTheme { get; set; } = "default";
-  }
-  public class Startup
-  {
+    public class ThemeState
+    {
+        public string CurrentTheme { get; set; } = "default";
+    }
+    public class Startup
+    {
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -39,6 +40,7 @@ namespace LatestBlazor
             services.AddScoped<TooltipService>();
             services.AddScoped<NorthwindService>();
             services.AddScoped<NorthwindODataService>();
+            services.AddScoped<GitHubService>();
 
             services.AddDistributedMemoryCache();
 
@@ -80,5 +82,5 @@ namespace LatestBlazor
                 endpoints.MapFallbackToPage("/_Host");
             });
         }
-  }
+    }
 }
