@@ -75,13 +75,13 @@
 </code>
 </pre>
 </RadzenCard>
-<h2 class="my-3">6. Use Dialog, Notification and Tooltip components</h2>
+<h2 class="my-3">6. Use Dialog, Notification, ContextMenu and Tooltip components</h2>
 <RadzenCard>
     <p>
-        Open the <code>Shared/MainLayout.razor</code> file and include <code>&lt;RadzenDialog/&gt;</code>, <code>&lt;RadzenNotification/&gt;</code> and  <code>&lt;RadzenTooltip/&gt;</code>
+        Open the <code>Shared/MainLayout.razor</code> file and include <code>&lt;RadzenDialog/&gt;</code>, <code>&lt;RadzenNotification/&gt;</code>, <code>&lt;RadzenContextMenu/&gt;</code> and  <code>&lt;RadzenTooltip/&gt;</code>
     </p>
     <p>
-        Open the <code>Startup.cs</code> file (server-side Blazor) or <code>Program.cs</code> (client-side WebAssembly Blazor) and add DialogService, NotificationService and TooltipService.
+        Open the <code>Startup.cs</code> file (server-side Blazor) or <code>Program.cs</code> (client-side WebAssembly Blazor) and add DialogService, NotificationService, ContextMenuService and TooltipService.
     </p>
     <h4 class="my-2">Startup.cs (server-side Blazor)</h4>
 <pre>
@@ -94,17 +94,18 @@
         services.AddScoped&lt;DialogService&gt;();
         services.AddScoped&lt;NotificationService&gt;();
         services.AddScoped&lt;TooltipService&gt;();
+        services.AddScoped&lt;ContextMenuService&gt;();
         ...
     }
     </code>
 </pre>
 <h4 class="my-2">Program.cs (client-side WebAssembly Blazor)</h4>
 <pre>
-<code>
-    using Radzen;
-    ...
-    public static async Task Main(string[] args)
-    {
+    <code>
+        using Radzen;
+        ...
+        public static async Task Main(string[] args)
+        {
         var builder = WebAssemblyHostBuilder.CreateDefault(args);
         builder.RootComponents.Add&lt;App&gt;("app");
 
@@ -115,11 +116,12 @@
         builder.Services.AddScoped&lt;DialogService&gt;();
         builder.Services.AddScoped&lt;NotificationService&gt;();
         builder.Services.AddScoped&lt;TooltipService&gt;();
+        builder.Services.AddScoped&lt;ContextMenuService&gt;();
         ...
 
         await builder.Build().RunAsync();
-    }
-</code>
+        }
+    </code>
 </pre>
 </RadzenCard>
 
