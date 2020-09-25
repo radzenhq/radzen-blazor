@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace LatestBlazor
+namespace RadzenBlazorDemos
 {
     public class Example
     {

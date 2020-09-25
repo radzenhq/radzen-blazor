@@ -9,9 +9,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Radzen;
-using NorthwindBlazor.Models.Northwind;
+using RadzenBlazorDemos.Models.Northwind;
 
-namespace LatestBlazor
+namespace RadzenBlazorDemos
 {
     public partial class NorthwindODataService
     {

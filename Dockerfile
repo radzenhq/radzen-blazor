@@ -8,4 +8,4 @@ COPY ./northwind.sql /app/out
 ENV ASPNETCORE_URLS http://*:5000
 WORKDIR /app/out
 
-ENTRYPOINT ["dotnet", "LatestBlazor.dll"]
+ENTRYPOINT ["dotnet", "RadzenBlazorDemos.dll"]

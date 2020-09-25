@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace LatestBlazor
+namespace RadzenBlazorDemos
 {
     public class Program
     {

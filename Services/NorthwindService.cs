@@ -1,7 +1,7 @@
 using Radzen;
 using Microsoft.AspNetCore.Components;
 
-namespace LatestBlazor
+namespace RadzenBlazorDemos
 {
     public partial class NorthwindService
     {

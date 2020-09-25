@@ -13,7 +13,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
 
-namespace LatestBlazor
+namespace RadzenBlazorDemos
 {
     public partial class ExportController : Controller
     {

@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NorthwindBlazor.Models.Northwind
+namespace RadzenBlazorDemos.Models.Northwind
 {
   [Table("OrderDetails")]
   public partial class OrderDetail

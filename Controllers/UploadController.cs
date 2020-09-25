@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 
-namespace LatestBlazor
+namespace RadzenBlazorDemos
 {
     [DisableRequestSizeLimit]
     public partial class UploadController : Controller

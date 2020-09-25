@@ -1,6 +1,6 @@
 using System;
 
-namespace LatestBlazor
+namespace RadzenBlazorDemos
 {
     public class Appointment
     {

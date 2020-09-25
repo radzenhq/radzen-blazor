@@ -8,11 +8,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NorthwindBlazor.Data;
+using RadzenBlazorDemos.Data;
 using Radzen;
 using RadzenBlazorDemos.Services;
 
-namespace LatestBlazor
+namespace RadzenBlazorDemos
 {
     public class ThemeState
     {

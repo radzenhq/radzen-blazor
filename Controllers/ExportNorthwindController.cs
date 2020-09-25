@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NorthwindBlazor.Data;
+using RadzenBlazorDemos.Data;
 
-namespace LatestBlazor
+namespace RadzenBlazorDemos
 {
     public partial class ExportNorthwindController : ExportController
     {
