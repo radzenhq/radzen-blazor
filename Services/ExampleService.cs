@@ -28,7 +28,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Button",
                     Path = "button",
-                    Icon = "&#x853"
+                    Icon = "&#xe86d"
                 },
                 new Example()
                 {
