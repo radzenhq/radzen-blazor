@@ -357,13 +357,6 @@ namespace RadzenBlazorDemos
             Children = new [] {
                 new Example()
                 {
-                    Name = "DataGrid",
-                    Path = "datagrid",
-                    Icon = "&#xe3ec",
-                    Tags = new [] { "datatable", "datagridview", "dataview", "grid", "table" }
-                },
-                new Example()
-                {
                     Name = "DataList",
                     Path = "datalist",
                     Icon = "&#xe896",
@@ -384,6 +377,99 @@ namespace RadzenBlazorDemos
                     Path = "scheduler",
                     Icon = "&#xe616",
                     Tags = new [] { "scheduler", "calendar", "event", "appointment"}
+                },
+            }
+        },
+        new Example()
+        {
+            Name="DataGrid",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "Binding to IQueryable",
+                    Path = "datagrid",
+                    Icon = "&#xe3ec",
+                    Tags = new [] { "datatable", "datagridview", "dataview", "grid", "table" }
+                },
+                new Example()
+                {
+                    Name = "Binding with LoadData event",
+                    Path = "datagrid-loaddata",
+                    Title = "Blazor DataGrid custom data-binding",
+                    Icon = "&#xe265",
+                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata" }
+                },
+                new Example()
+                {
+                    Name = "Binding to OData service",
+                    Path = "datagrid-odata",
+                    Title = "Blazor DataGrid OData data-binding",
+                    Icon = "&#xe871",
+                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "odata" }
+                },
+                new Example()
+                {
+                    Name = "Footer Totals",
+                    Path = "datagrid-footer-totals",
+                    Title = "Blazor DataGrid footer totals",
+                    Icon = "&#xe336",
+                    Tags = new [] { "summary", "total", "aggregate", "datagrid", "table", "dataview" }
+                },
+                new Example()
+                {
+                    Name = "Custom Column FilterTemplate",
+                    Path = "datagrid-filter-template",
+                    Title = "Blazor DataGrid custom filtering",
+                    Icon = "&#xe152",
+                    Tags = new [] { "datagrid", "column", "filter", "template" }
+                },
+                new Example()
+                {
+                    Name = "Hierarchy",
+                    Path = "master-detail-hierarchy",
+                    Icon = "&#xe23e",
+                    Title = "Blazor DataGrid Hierarchy",
+                    Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
+                },
+                new Example()
+                {
+                    Name = "Master/Detail",
+                    Path = "master-detail",
+                    Icon = "&#xe1b2",
+                    Title = "Master and detail Blazor DataGrid",
+                    Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
+                },
+                new Example()
+                {
+                    Name = "InLine Editing",
+                    Path = "datagrid-inline-edit",
+                    Title = "Blazor DataGrid InLine Editing",
+                    Icon = "&#xe22b",
+                    Tags = new [] { "inline", "editor", "datagrid", "table", "dataview" }
+                },
+                new Example()
+                {
+                    Name = "Conditional styles and templates",
+                    Path = "datagrid-conditional-template",
+                    Title = "DataGrid conditional template",
+                    Icon = "&#xe41d",
+                    Tags = new [] { "conditional", "template", "style", "datagrid", "table", "dataview" }
+                },
+                new Example()
+                {
+                    Name = "Export to Excel and CSV",
+                    Path = "export-excel-csv",
+                    Title = "Blazor DataGrid export to Excel and CSV",
+                    Icon = "&#xe0c3",
+                    Tags = new [] { "export", "excel", "csv" }
+                },
+                new Example()
+                {
+                    Name = "Cascading DropDowns",
+                    Path = "cascading-dropdowns",
+                    Title = "Blazor Cascading DropDowns",
+                    Icon = "&#xe915",
+                    Tags = new [] { "related", "parent", "child" }
                 },
             }
         },
@@ -466,92 +552,6 @@ namespace RadzenBlazorDemos
                     Path = "styling-gauge",
                     Icon = "&#xe41d",
                     Tags = new [] { "gauge", "graph", "styling" }
-                },
-            }
-        },
-        new Example()
-        {
-            Name="Application Scenarios",
-            Children = new [] {
-                new Example()
-                {
-                    Name = "Hierarchy",
-                    Path = "master-detail-hierarchy",
-                    Icon = "&#xe23e",
-                    Title = "Blazor DataGrid Hierarchy",
-                    Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
-                },
-                new Example()
-                {
-                    Name = "Master/Detail",
-                    Path = "master-detail",
-                    Icon = "&#xe1b2",
-                    Title = "Master and detail Blazor DataGrid",
-                    Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
-                },
-                new Example()
-                {
-                    Name = "DataGrid InLine Editing",
-                    Path = "datagrid-inline-edit",
-                    Title = "Blazor DataGrid InLine Editing",
-                    Icon = "&#xe22b",
-                    Tags = new [] { "inline", "editor", "datagrid", "table", "dataview" }
-                },
-                new Example()
-                {
-                    Name = "DataGrid Footer Totals",
-                    Path = "datagrid-footer-totals",
-                    Title = "Blazor DataGrid footer totals",
-                    Icon = "&#xe336",
-                    Tags = new [] { "summary", "total", "aggregate", "datagrid", "table", "dataview" }
-                },
-                new Example()
-                {
-                    Name = "DataGrid conditional template",
-                    Path = "datagrid-conditional-template",
-                    Title = "DataGrid conditional template",
-                    Icon = "&#xe41d",
-                    Tags = new [] { "conditional", "template", "style", "datagrid", "table", "dataview" }
-                },
-                new Example()
-                {
-                    Name = "Cascading DropDowns",
-                    Path = "cascading-dropdowns",
-                    Title = "Blazor Cascading DropDowns",
-                    Icon = "&#xe915",
-                    Tags = new [] { "related", "parent", "child" }
-                },
-                new Example()
-                {
-                    Name = "Export to Excel and CSV",
-                    Path = "export-excel-csv",
-                    Title = "Blazor DataGrid export to Excel and CSV",
-                    Icon = "&#xe0c3",
-                    Tags = new [] { "export", "excel", "csv" }
-                },
-                new Example()
-                {
-                    Name = "DataGrid with LoadData",
-                    Path = "datagrid-loaddata",
-                    Title = "Blazor DataGrid custom data-binding",
-                    Icon = "&#xe265",
-                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata" }
-                },
-                new Example()
-                {
-                    Name = "DataGrid with OData",
-                    Path = "datagrid-odata",
-                    Title = "Blazor DataGrid OData data-binding",
-                    Icon = "&#xe871",
-                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "odata" }
-                },
-                new Example()
-                {
-                    Name = "DataGrid Column FilterTemplate",
-                    Path = "datagrid-filter-template",
-                    Title = "Blazor DataGrid custom filtering",
-                    Icon = "&#xe152",
-                    Tags = new [] { "datagrid", "column", "filter", "template" }
                 },
             }
         },
