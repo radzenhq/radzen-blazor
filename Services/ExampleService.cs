@@ -109,6 +109,13 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "PanelMenu",
+                    Path = "panelmenu",
+                    Icon = "&#xe8d2",
+                    Tags = new [] { "navigation", "menu" }
+                },
+                new Example()
+                {
                     Name = "ContextMenu",
                     Path = "contextmenu",
                     Icon = "&#xe8de",
