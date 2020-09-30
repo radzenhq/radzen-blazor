@@ -7,7 +7,7 @@
 @inject NorthwindContext dbContext
 
 <RadzenExample Name="DataGrid">
-    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowPaging="true" PageSize="4"
                 AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px">
         <Columns>
             <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
