@@ -14,7 +14,4 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\radzen-blazor\Radzen.Blazor\Radzen.Blazor.csproj" />
-  </ItemGroup>
 </Project>
