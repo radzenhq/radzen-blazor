@@ -4,13 +4,13 @@
         <div class="col-md-6">
             <RadzenTemplateForm Data="@obj" Submit="@((MyObject args) => { Submit(args); })">
                 <h3>Telephone</h3>
-                <RadzenMask Format="(***) ***-****" Mask="(###) ###-####" Name="Phone" @bind-Value="obj.Phone" Style="margin-bottom: 20px" Change="@(args => Change(args, "Telephone"))" />
+                <RadzenMask Mask="(***) ***-****" Placeholder="(###) ###-####" Name="Phone" @bind-Value="obj.Phone" Style="margin-bottom: 20px" Change="@(args => Change(args, "Telephone"))" />
                 <br />
                 <h3>Date</h3>
-                <RadzenMask Format="**-**-****" Mask="MM-DD-YYYY" Name="Date" @bind-Value="obj.Date" Style="margin-bottom: 20px" Change="@(args => Change(args, "Date"))" />
+                <RadzenMask Mask="**-**-****" Placeholder="MM-DD-YYYY" Name="Date" @bind-Value="obj.Date" Style="margin-bottom: 20px" Change="@(args => Change(args, "Date"))" />
                 <br />
                 <h3>SSN</h3>
-                <RadzenMask Format="***-**-****" Mask="###-##-####" Name="SSN" @bind-Value="obj.SSN" Style="margin-bottom: 20px" Change="@(args => Change(args, "SSN"))" />
+                <RadzenMask Mask="***-**-****" Placeholder="###-##-####" Name="SSN" @bind-Value="obj.SSN" Style="margin-bottom: 20px" Change="@(args => Change(args, "SSN"))" />
                 <br />
                 <div class="row justify-content-center">
                     <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
