@@ -1,13 +1,12 @@
 ﻿@page "/mask"
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
 <RadzenExample Name="Mask">
     <div class="row">
         <div class="col-md-6">
             <RadzenTemplateForm Data="@obj" Submit="@((MyObject args) => { Submit(args); })">
                 <h3>Telephone</h3>
                 <RadzenMask Mask="(***) ***-****" Placeholder="(###) ###-####" Name="Phone" @bind-Value="obj.Phone" Style="margin-bottom: 20px" Change="@(args => Change(args, "Telephone"))" />
-                <br />
-                <h3>Date</h3>
-                <RadzenMask Mask="**-**-****" Placeholder="MM-DD-YYYY" Name="Date" @bind-Value="obj.Date" Style="margin-bottom: 20px" Change="@(args => Change(args, "Date"))" />
                 <br />
                 <h3>SSN</h3>
                 <RadzenMask Mask="***-**-****" Placeholder="###-##-####" Name="SSN" @bind-Value="obj.SSN" Style="margin-bottom: 20px" Change="@(args => Change(args, "SSN"))" />
@@ -38,7 +37,6 @@
     {
         public string Phone { get; set; }
         public string SSN { get; set; }
-        public string Date { get; set; }
     }
 
     MyObject obj = new MyObject();
@@ -53,6 +51,7 @@
 
     void Submit(MyObject arg)
     {
-        //
-    } 
+        events.Add(DateTime.Now, $"Form submitted with values {JsonSerializer.Serialize(arg)}");
+        StateHasChanged();
+    }
 }
