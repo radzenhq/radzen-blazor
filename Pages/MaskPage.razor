@@ -1,0 +1,61 @@
+﻿@page "/mask"
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+<RadzenExample Name="Mask">
+    <div class="row">
+        <div class="col-md-6">
+            <RadzenTemplateForm Data="@obj" Submit="@((MyObject args) => { Submit(args); })">
+                <h3>Telephone</h3>
+                <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" Name="Phone" @bind-Value="obj.Phone" Style="margin-bottom: 20px" Change="@(args => Change(args, "Telephone"))" />
+                <br />
+                <h3>Credit Card</h3>
+                <RadzenMask Mask="**** **** **** ****" Pattern="[^0-9]" Placeholder="0000 0000 0000 0000" Name="CardNr" @bind-Value="obj.CardNr" Style="margin-bottom: 20px" Change="@(args => Change(args, "Telephone"))" />
+                <br />
+                <h3>SSN</h3>
+                <RadzenMask Mask="***-**-****" Pattern="[^0-9]" Placeholder="000-00-0000" Name="SSN" @bind-Value="obj.SSN" Style="margin-bottom: 20px" Change="@(args => Change(args, "SSN"))" />
+                <br />
+                <div class="row justify-content-center">
+                    <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+                        <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save" />
+                        <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="display: inline-block; margin-left: 10px;" Text="Cancel" />
+                    </div>
+                </div>
+            </RadzenTemplateForm>
+        </div>
+        <div class="col-md-6">
+            <h3>Events</h3>
+            <RadzenCard style="overflow: auto;height:500px;">
+                @foreach (var e in events.OrderByDescending(i => i.Key))
+                {
+                    @e.Value
+                    <br />
+                }
+            </RadzenCard>
+        </div>
+    </div>
+</RadzenExample>
+
+@code { 
+    public class MyObject
+    {
+        public string Phone { get; set; }
+        public string CardNr { get; set; }
+        public string SSN { get; set; }
+    }
+
+    MyObject obj = new MyObject();
+
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Change(string value, string name)
+    {
+        events.Add(DateTime.Now, $"{name} value changed to {value}");
+        StateHasChanged();
+    }
+
+    void Submit(MyObject arg)
+    {
+        events.Add(DateTime.Now, $"Form submitted with values {JsonSerializer.Serialize(arg)}");
+        StateHasChanged();
+    }
+}

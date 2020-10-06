@@ -303,6 +303,13 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "Mask",
+                    Path = "mask",
+                    Icon = "&#xe262",
+                    Tags = new [] { "input", "form", "edit", "mask" }
+                },
+                new Example()
+                {
                     Name = "TextArea",
                     Path = "textarea",
                     Icon = "&#xe873",
