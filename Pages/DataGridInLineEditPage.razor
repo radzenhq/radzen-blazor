@@ -11,8 +11,9 @@
 <p>This page demonstrates how to configure the Razden Blazor DataGrid for inline editing</p>
 
 <RadzenExample Name="DataGridInLineEdit" Heading="false" Documentation="false">
+    <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Text="Add" Click="@InsertRow" />
     <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" EditMode="DataGridEditMode.Single"
-                Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow">
+                Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow">
         <Columns>
             <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
             <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer">
@@ -26,7 +27,11 @@
                     <RadzenImage Path="@order.Employee?.Photo" Style="width:150px" />
                 </Template>
                 <EditTemplate Context="order">
-                    <RadzenFileInput @bind-Value="order.Employee.Photo" Style="width:100%" />
+                    <RadzenDropDown @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%">
+                        <Template>
+                            @context.FirstName @context.LastName
+                        </Template>
+                    </RadzenDropDown>
                 </EditTemplate>
             </RadzenGridColumn>
             <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
@@ -81,12 +86,14 @@
     RadzenGrid<Order> ordersGrid;
     IList<Order> orders;
     IEnumerable<Customer> customers;
+    IEnumerable<Employee> employees;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
         customers = dbContext.Customers.ToList();
+        employees = dbContext.Employees.ToList();
 
         // For demo purposes only
         orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
@@ -102,10 +109,11 @@
 
     void OnUpdateRow(Order order)
     {
-        dbContext.Update<Order>(order);
+        dbContext.Update(order);
 
         // For demo purposes only
-        order.Customer = dbContext.Customers.Where(c => c.CustomerID == order.CustomerID).FirstOrDefault();
+        order.Customer = dbContext.Customers.Find(order.CustomerID);
+        order.Employee = dbContext.Employees.Find(order.EmployeeID);
 
         // For production
         //dbContext.SaveChanges();
@@ -122,20 +130,47 @@
 
         // For production
         var orderEntry = dbContext.Entry(order);
-        orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
-        orderEntry.State = EntityState.Unchanged;
+        if (orderEntry.State == EntityState.Modified)
+        {
+            orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
+            orderEntry.State = EntityState.Unchanged;
+        }
     }
 
     void DeleteRow(Order order)
     {
-        dbContext.Remove<Order>(order);
+        if (orders.Contains(order))
+        {
+            dbContext.Remove<Order>(order);
+
+            // For demo purposes only
+            orders.Remove(order);
+
+            // For production
+            //dbContext.SaveChanges();
+
+            ordersGrid.Reload();
+        }
+        else
+        {
+            ordersGrid.CancelEditRow(order);
+        }
+    }
+
+    void InsertRow()
+    {
+        ordersGrid.InsertRow(new Order());
+    }
+
+    void OnCreateRow(Order order)
+    {
+        dbContext.Add(order);
 
         // For demo purposes only
-        orders.Remove(order);
+        order.Customer = dbContext.Customers.Find(order.CustomerID);
+        order.Employee = dbContext.Employees.Find(order.EmployeeID);
 
         // For production
         //dbContext.SaveChanges();
-
-        ordersGrid.Reload();
     }
 }
