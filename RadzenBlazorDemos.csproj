@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Radzen.Blazor" Version="2.15.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0-rc.1.20451.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.0-rc.1.20451.13" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.11.3" />
@@ -13,8 +14,5 @@
     <Content Include="*.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\radzen-blazor\Radzen.Blazor\Radzen.Blazor.csproj" />
   </ItemGroup>
 </Project>
