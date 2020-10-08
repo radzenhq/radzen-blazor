@@ -13,7 +13,7 @@
 <RadzenExample Name="DataGridInLineEdit" Heading="false" Documentation="false">
     <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Text="Add" Click="@InsertRow" />
     <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" EditMode="DataGridEditMode.Single"
-                Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowInsert="@OnInsertRow">
+                Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow">
         <Columns>
             <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
             <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer">
@@ -162,7 +162,7 @@
         ordersGrid.InsertRow(new Order());
     }
 
-    void OnInsertRow(Order order)
+    void OnCreateRow(Order order)
     {
         dbContext.Add(order);
 
