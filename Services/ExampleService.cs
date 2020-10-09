@@ -607,7 +607,7 @@ namespace RadzenBlazorDemos
                 return example.Title ?? $"Blazor {example.Name} | a free UI component by Radzen";
             }
 
-            return "Free Blazor Components | 50+ controls by Radzen";
+            return "Free Blazor Components | 60+ controls by Radzen";
         }
 
         public string DescriptionFor(Example example)
