@@ -109,7 +109,7 @@
                             }
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Issue" Title="Labels" Sortable="false" Width="250px">
+                    <RadzenGridColumn TItem="Issue" Title="Labels" Sortable="false">
                         <FilterTemplate>
                             <RadzenDropDown Style="width: 100%" AllowClear="true" AllowFiltering="true" Multiple="true" Data=@labels @bind-Value="selectedLabels" Change=@FilterIssues>
                                 <Template Context="label">
