@@ -30,7 +30,7 @@ namespace RadzenBlazorDemos
         new Example
         {
             Name = "Support",
-            Title = "How to get support for Radzen Blazor components",
+            Title = "How to get support for the Radzen Blazor components",
             Path = "/support",
             Icon = "&#xe94c"
         },
