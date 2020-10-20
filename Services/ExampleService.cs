@@ -20,6 +20,20 @@ namespace RadzenBlazorDemos
             Path = "/dashboard",
             Icon = "&#xe871"
         },
+        new Example
+        {
+            Name = "Get Started",
+            Title = "How to get started with the Radzen Blazor components",
+            Path = "/get-started",
+            Icon = "&#xe037"
+        },
+        new Example
+        {
+            Name = "Support",
+            Title = "How to get support for Radzen Blazor components",
+            Path = "/support",
+            Icon = "&#xe94c"
+        },
         new Example()
         {
             Name = "General",

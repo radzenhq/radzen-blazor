@@ -30,9 +30,8 @@
                 <div class="d-none d-md-inline-flex align-items-center">
                   <Social /> 
                 </div>
-                <NavLink class="ui-button btn-secondary d-none d-md-inline-block" style="padding: 0 1rem; margin: 1rem" href="/get-started">Get started</NavLink>
-                <label class="d-none d-sm-inline-block">Theme:</label>
-                <RadzenDropDown style="margin:0 1rem" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" />
+                <label class="d-none d-sm-inline-block" style="margin-left: 1rem">Theme:</label>
+                <RadzenDropDown style="margin:0 .5rem" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" />
             </div>
         </div>
     </ChildContent>
