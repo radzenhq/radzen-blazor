@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Radzen.Blazor" Version="2.15.19" />
+    <PackageReference Include="Radzen.Blazor" Version="2.15.21" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0-rc.2.20475.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.0-rc.2.20475.6" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.11.3" />
