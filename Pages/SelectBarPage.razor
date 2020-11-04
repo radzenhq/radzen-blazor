@@ -4,11 +4,10 @@
 <div class="row">
     <div class="col-md-6">
         <h3>SelectBar with single selection</h3>
-        <RadzenSelectBar @bind-Value="value" TValue="int" Change="@((args) => Change(args, "SelectBar with single selection"))" Style="margin-bottom: 20px;">
+        <RadzenSelectBar @bind-Value="singleValue" TValue="bool" Change="@((args) => Change(args, "SelectBar with single selection"))" Style="margin-bottom: 20px;">
             <Items>
-                <RadzenSelectBarItem Text="Orders" Value="1" />
-                <RadzenSelectBarItem Text="Employees" Value="2" />
-                <RadzenSelectBarItem Text="Customers" Value="3" />
+                <RadzenSelectBarItem Text="On" Value="true" />
+                <RadzenSelectBarItem Text="Off" Value="false" />
             </Items>
         </RadzenSelectBar>
         <br />
@@ -45,6 +44,7 @@
 </RadzenExample>
 
 @code {
+    bool singleValue = false;
     int value = 2;
     IEnumerable<int> values = new int[] { 1, 2 };
 
