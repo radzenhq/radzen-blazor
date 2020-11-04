@@ -212,6 +212,13 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "Switch",
+                    Path = "switch",
+                    Icon = "&#xe8e0",
+                    Tags = new [] { "form", "edit", "switch" }
+                },
+                new Example()
+                {
                     Name = "CheckBox",
                     Path = "checkbox",
                     Icon = "&#xe86c",
