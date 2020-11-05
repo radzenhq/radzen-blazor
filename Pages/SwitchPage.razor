@@ -1,0 +1,37 @@
+﻿@page "/switch"
+
+<RadzenExample Name="Switch">
+<div class="row">
+    <div class="col-md-6">
+        <h3>Switch</h3>
+        <RadzenSwitch @bind-Value="@value" Style="margin-bottom: 20px" Change="@(args => Change(args, "Switch"))" />
+        <br />
+        <h3>Disabled Switch</h3>
+        <RadzenSwitch @bind-Value="@disabledValue" Disabled="true" Style="margin-bottom: 20px" Change="@(args => Change(args, "Switch"))" />
+        <br />
+    </div>
+    <div class="col-md-6">
+        <h3>Events</h3>
+        <RadzenCard style="overflow: auto;height:500px;">
+            @foreach (var e in events.OrderByDescending(i => i.Key))
+            {
+                @e.Value
+                <br />
+            }
+        </RadzenCard>
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    bool value;
+    bool disabledValue = true;
+
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Change(bool? value, string name)
+    {
+        events.Add(DateTime.Now, $"{name} value changed to {value}");
+        StateHasChanged();
+    }
+}
