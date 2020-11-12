@@ -233,6 +233,13 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "ColorPicker",
+                    Path = "colorpicker",
+                    Icon = "&#xe40a",
+                    Tags = new [] { "form", "edit" }
+                },
+                new Example()
+                {
                     Name = "DatePicker",
                     Path = "datepicker",
                     Icon = "&#xe916",

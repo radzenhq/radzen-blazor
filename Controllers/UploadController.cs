@@ -21,6 +21,20 @@ namespace RadzenBlazorDemos
             }
         }
 
+        [HttpPost("upload/image")]
+        public IActionResult Image(IFormFile file)
+        {
+            try
+            {
+                // Put your code here
+                return Ok(new { Url = file.FileName });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         [HttpPost("upload/multiple")]
         public IActionResult Multiple(IFormFile[] files)
         {

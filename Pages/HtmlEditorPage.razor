@@ -1,0 +1,59 @@
+﻿@page "/html-editor"
+
+<RadzenExample Name="Html Editor">
+    <RadzenCheckBox @bind-Value=@disabled />
+
+    <RadzenHtmlEditor @ref=editor Disabled=@disabled @bind-Value=@html style="height: 500px; margin-bottom: 1rem;" UploadUrl="upload/image" Paste=@OnPaste Execute=@OnExecute>
+    </RadzenHtmlEditor>
+
+    <pre style="height: 500px; overflow: auto; white-space: pre-wrap">
+        @html
+    </pre>
+</RadzenExample>
+
+@code {
+    string html = null;
+    bool disabled = false;
+    RadzenHtmlEditor editor;
+    string value = null;
+
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Change(object value, string name, string action)
+    {
+        events.Add(DateTime.Now, $"{name} item with index {value} {action}");
+        StateHasChanged();
+    }
+
+    void OnPaste(HtmlEditorPasteEventArgs args)
+    {
+        args.Html = "<strong>Test</test>";
+    }
+
+    async Task OnChange(object text)
+    {
+        await editor.RestoreSelectionAsync();
+        await editor.ExecuteCommandAsync("insertHTML", (string)text);
+        value = null;
+    }
+
+    async Task OnClick()
+    {
+        await editor.ExecuteCommandAsync("bold", "<strong>Foo</strong>");
+    }
+
+    async Task OnExecute(HtmlEditorExecuteEventArgs args)
+    {
+        if (args.CommandName == "InsertSignature")
+        {
+            await editor.ExecuteCommandAsync("insertHTML", "<strong>Foo</strong>");
+            //   await args.Editor.ExecuteCommandAsync("bold");
+        }
+    }
+
+    async Task OnMouseDown()
+    {
+        Console.WriteLine("ONMousedown");
+        await editor.SaveSelectionAsync();
+    }
+}
