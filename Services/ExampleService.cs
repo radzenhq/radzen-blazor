@@ -515,6 +515,19 @@ namespace RadzenBlazorDemos
                 },
             }
         },
+        new Example()
+        {
+            Name="HtmlEditor",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "Tools",
+                    Path = "html-editor",
+                    Icon = "&#xe3c9",
+                    Tags = new [] { "html", "editor", "rich", "text" }
+                },
+            }
+        },
         new Example
         {
             Name="Charts",
