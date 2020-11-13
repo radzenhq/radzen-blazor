@@ -20,6 +20,10 @@
         <h3>Success</h3>
         <RadzenButton Text=@($"Show success notification") Style="margin-bottom: 20px; width: 200px"
             Click="@(args => ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = "Success Summary", Detail = "Success Detail", Duration = 4000 }))" />
+        <br />
+        <h3>Message with custom position</h3>
+        <RadzenButton Text=@($"Show success notification with custom position") Style="margin-bottom: 20px; width: 200px"
+            Click="@(args => ShowNotification(new NotificationMessage() { Style = "position:absolute;left:-1000px;", Severity = NotificationSeverity.Success, Summary = "Success Summary", Detail = "Success Detail", Duration = 40000 }))" />
     </div>
     <div class="col-md-6">
         <h3>Events</h3>
