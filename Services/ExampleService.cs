@@ -233,6 +233,13 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "ColorPicker",
+                    Path = "colorpicker",
+                    Icon = "&#xe40a",
+                    Tags = new [] { "form", "edit" }
+                },
+                new Example()
+                {
                     Name = "DatePicker",
                     Path = "datepicker",
                     Icon = "&#xe916",
@@ -505,6 +512,26 @@ namespace RadzenBlazorDemos
                     Title = "Blazor Cascading DropDowns",
                     Icon = "&#xe915",
                     Tags = new [] { "related", "parent", "child" }
+                },
+            }
+        },
+        new Example()
+        {
+            Name="HtmlEditor",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "Default Tools",
+                    Path = "html-editor",
+                    Icon = "&#xe3c9",
+                    Tags = new [] { "html", "editor", "rich", "text" }
+                },
+                new Example()
+                {
+                    Name = "Custom Tools",
+                    Path = "html-editor-custom-tools",
+                    Icon = "&#xe8b8",
+                    Tags = new [] { "html", "editor", "rich", "text", "tool", "custom" }
                 },
             }
         },

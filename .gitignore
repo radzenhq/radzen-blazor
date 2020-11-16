@@ -333,3 +333,4 @@ ASALocalRun/
 .vscode
 northwind*.db
 issues.json
+project.csproj

@@ -1,0 +1,71 @@
+﻿@page "/html-editor-custom-tools"
+@inject DialogService DialogService
+
+<h1>Radzen Blazor HtmlEditor custom tools</h1>
+<RadzenExample Name="HtmlEditorCustomTools" DocumentationUrl="https://www.radzen.com/documentation/blazor/htmleditor/" Heading="false">
+    <div class="row">
+        <div class="col-md-4">
+            <h3>Custom button</h3>
+            <RadzenHtmlEditor style="height: 500px; margin-bottom: 1rem;" Execute=@OnExecute>
+                <RadzenHtmlEditorCustomTool CommandName="InsertToday" Icon="today" Title="Insert today" />
+            </RadzenHtmlEditor>
+        </div>
+        <div class="col-md-4">
+            <h3>Custom tool with template</h3>
+            <RadzenHtmlEditor style="height: 500px; margin-bottom: 1rem;">
+                <RadzenHtmlEditorCustomTool>
+                    <Template Context="editor">
+                        <RadzenDatePicker Change=@(args => OnDateChange(args, editor)) TValue="DateTime" />
+                    </Template>
+                </RadzenHtmlEditorCustomTool>
+            </RadzenHtmlEditor>
+        </div>
+        <div class="col-md-4">
+            <h3>Custom dialog</h3>
+            <RadzenHtmlEditor style="height: 500px; margin-bottom: 1rem;" Execute=@OnExecute>
+                <RadzenHtmlEditorCustomTool CommandName="InsertImageFromList" Icon="attach_file" />
+            </RadzenHtmlEditor>
+        </div>
+    </div>
+</RadzenExample>
+@code {
+    async Task OnExecute(HtmlEditorExecuteEventArgs args)
+    {
+        if (args.CommandName == "InsertToday")
+        {
+            await InsertDate(args.Editor, DateTime.Now);
+        }
+
+        if (args.CommandName == "InsertImageFromList")
+        {
+            await InsertImageFromList(args.Editor);
+        }
+    }
+
+    async Task InsertImageFromList(RadzenHtmlEditor editor)
+    {
+        await editor.SaveSelectionAsync();
+
+        var result = await DialogService.OpenAsync<HtmlEditorCustomDialog>("Select image file"); 
+
+        await editor.RestoreSelectionAsync();
+
+        if (result != null)
+        {
+            await editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, $"<img style=\"max-width: 100%\" src=\"{result}\">");
+        }
+    }
+
+    async Task OnDateChange(DateTime? date, RadzenHtmlEditor editor)
+    {
+        if (date != null)
+        {
+            await InsertDate(editor, date.Value);
+        }
+    }
+
+    async Task InsertDate(RadzenHtmlEditor editor, DateTime date)
+    {
+        await editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, $"<strong>{date.ToLongDateString()}</strong>");
+    }
+}
