@@ -2,7 +2,7 @@
 @inject DialogService DialogService
 
 <h1>Radzen Blazor HtmlEditor custom tools</h1>
-<RadzenExample Name="HtmlEditorCustomTools" DocumentationUrl="https://www.radzen.com/documentation/blazor/html-editor/" Heading="false">
+<RadzenExample Name="HtmlEditorCustomTools" DocumentationUrl="https://www.radzen.com/documentation/blazor/htmleditor/" Heading="false">
     <div class="row">
         <div class="col-md-4">
             <h3>Custom button</h3>
@@ -52,7 +52,7 @@
 
         if (result != null)
         {
-            await editor.ExecuteCommandAsync("insertHTML", $"<img style=\"max-width: 100%\" src=\"{result}\">");
+            await editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, $"<img style=\"max-width: 100%\" src=\"{result}\">");
         }
     }
 
@@ -66,6 +66,6 @@
 
     async Task InsertDate(RadzenHtmlEditor editor, DateTime date)
     {
-        await editor.ExecuteCommandAsync("insertHTML", $"<strong>{date.ToLongDateString()}</strong>");
+        await editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, $"<strong>{date.ToLongDateString()}</strong>");
     }
 }
