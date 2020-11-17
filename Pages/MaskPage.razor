@@ -1,38 +1,29 @@
 ﻿@page "/mask"
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
+
 <RadzenExample Name="Mask">
-    <div class="row">
-        <div class="col-md-6">
-            <RadzenTemplateForm Data="@obj" Submit="@((MyObject args) => { Submit(args); })">
-                <h3>Telephone</h3>
-                <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" Name="Phone" @bind-Value="obj.Phone" Style="margin-bottom: 20px" Change="@(args => Change(args, "Telephone"))" />
-                <br />
-                <h3>Credit Card</h3>
-                <RadzenMask Mask="**** **** **** ****" Pattern="[^0-9]" Placeholder="0000 0000 0000 0000" Name="CardNr" @bind-Value="obj.CardNr" Style="margin-bottom: 20px" Change="@(args => Change(args, "Telephone"))" />
-                <br />
-                <h3>SSN</h3>
-                <RadzenMask Mask="***-**-****" Pattern="[^0-9]" Placeholder="000-00-0000" Name="SSN" @bind-Value="obj.SSN" Style="margin-bottom: 20px" Change="@(args => Change(args, "SSN"))" />
-                <br />
-                <div class="row justify-content-center">
-                    <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
-                        <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save" />
-                        <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="display: inline-block; margin-left: 10px;" Text="Cancel" />
-                    </div>
+<div class="row">
+    <div class="col-xl-6">
+        <RadzenTemplateForm TItem="MyObject" Data=@obj Submit=@OnSubmit>
+            <h3>Telephone</h3>
+            <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" Name="Phone" @bind-Value=@obj.Phone Change=@(args => OnChange(args, "Telephone")) />
+            <h3 style="margin-top: 2rem">Credit Card</h3>
+            <RadzenMask Mask="**** **** **** ****" Pattern="[^0-9]" Placeholder="0000 0000 0000 0000" Name="CardNr" @bind-Value=@obj.CardNr Change=@(args => OnChange(args, "Telephone")) />
+            <h3 style="margin-top: 2rem">SSN</h3>
+            <RadzenMask Mask="***-**-****" Pattern="[^0-9]" Placeholder="000-00-0000" Name="SSN" @bind-Value=@obj.SSN Change=@(args => OnChange(args, "SSN")) />
+            <div class="row justify-content-center">
+                <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 2rem">
+                    <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="margin-left: 10px;" Text="Cancel" />
                 </div>
-            </RadzenTemplateForm>
-        </div>
-        <div class="col-md-6">
-            <h3>Events</h3>
-            <RadzenCard style="overflow: auto;height:500px;">
-                @foreach (var e in events.OrderByDescending(i => i.Key))
-                {
-                    @e.Value
-                    <br />
-                }
-            </RadzenCard>
-        </div>
+            </div>
+        </RadzenTemplateForm>
     </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
 </RadzenExample>
 
 @code { 
@@ -45,17 +36,15 @@
 
     MyObject obj = new MyObject();
 
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    EventConsole console;
 
-    void Change(string value, string name)
+    void OnChange(string value, string name)
     {
-        events.Add(DateTime.Now, $"{name} value changed to {value}");
-        StateHasChanged();
+        console.Log($"{name} value changed to {value}");
     }
 
-    void Submit(MyObject arg)
+    void OnSubmit(MyObject arg)
     {
-        events.Add(DateTime.Now, $"Form submitted with values {JsonSerializer.Serialize(arg)}");
-        StateHasChanged();
+        console.Log($"Form submitted with values {JsonSerializer.Serialize(arg)}");
     }
 }

@@ -2,34 +2,25 @@
 
 <RadzenExample Name="Rating">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <h3>Rating with 5 stars</h3>
-        <RadzenRating Style="margin-bottom: 20px" Change="@((args) => Change(args, "Rating with 5 stars"))" />
-        <br />
-        <h3>Rating with 10 stars</h3>
-        <RadzenRating Stars="10" Style="margin-bottom: 20px" Change="@((args) => Change(args, "Rating with 10 stars"))" />
-        <br />
-        <h3>Disabled Rating with 10 stars</h3>
-        <RadzenRating Disabled="true" Stars="10" Style="margin-bottom: 20px" Change="@((args) => Change(args, "Disabled Rating with 10 stars"))" />
+        <RadzenRating Change=@(args => OnChange(args, "Rating with 5 stars")) />
+        <h3 style="margin-top: 2rem">Rating with 10 stars</h3>
+        <RadzenRating Stars="10" Change=@(args => OnChange(args, "Rating with 10 stars")) />
+        <h3 style="margin-top: 2rem">Disabled Rating with 10 stars</h3>
+        <RadzenRating Disabled="true" Stars="10" />
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
 
 @code {
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    EventConsole console;
 
-    void Change(int value, string name)
+    void OnChange(int value, string name)
     {
-        events.Add(DateTime.Now, $"{name} value changed to {value}");
+        console.Log($"{name} value changed to {value}");
     }
 }

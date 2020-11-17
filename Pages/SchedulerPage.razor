@@ -1,32 +1,26 @@
 @page "/scheduler"
 @inject DialogService DialogService
 
-<RadzenExample Name="Scheduler" AdditionalSourceCodePages="@(new List<string>() { "AddAppointmentPage.razor", "EditAppointmentPage.razor" })">
+<RadzenExample Name="Scheduler" AdditionalSourceCodePages=@(new List<string>() { "AddAppointmentPage.razor", "EditAppointmentPage.razor" })>
 <div class="row">
     <div class="col-xl-6">
-    <RadzenScheduler @ref="scheduler" style="height: 768px;" TItem="Appointment" Data="@appointments" StartProperty="Start" EndProperty="End"
+    <RadzenScheduler @ref=@scheduler style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
         TextProperty="Text" SelectedIndex="2"
-        SlotSelect="@OnSlotSelect" AppointmentSelect="@OnAppointmentSelect" AppointmentRender="@OnAppointmentRender">
+        SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender>
         <RadzenDayView />
         <RadzenWeekView />
         <RadzenMonthView />
     </RadzenScheduler>
     </div>
     <div class="col-xl-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
 
 @code {
     RadzenScheduler<Appointment> scheduler;
+    EventConsole console;
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
     IList<Appointment> appointments = new List<Appointment>
@@ -42,7 +36,7 @@
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        Log($"SlotSelect: Start={args.Start} End={args.End}");
+        console.Log($"SlotSelect: Start={args.Start} End={args.End}");
 
         Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
             new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
@@ -57,7 +51,7 @@
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
     {
-        Log($"AppointmentSelect: Appointment={args.Data.Text}");
+        console.Log($"AppointmentSelect: Appointment={args.Data.Text}");
 
         await DialogService.OpenAsync<EditAppointmentPage>("Edit Appointment", new Dictionary<string, object> { { "Appointment", args.Data } });
 
@@ -72,10 +66,5 @@
         {
             args.Attributes["style"] = "background: red";
         }
-    }
-
-    void Log(string text)
-    {
-        events.Add(DateTime.Now, text);
     }
 }

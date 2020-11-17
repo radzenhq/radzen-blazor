@@ -2,58 +2,45 @@
 
 <RadzenExample Name="SelectBar">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <h3>SelectBar with single selection</h3>
-        <RadzenSelectBar @bind-Value="singleValue" TValue="bool" Change="@((args) => Change(args, "SelectBar with single selection"))" Style="margin-bottom: 20px;">
+        <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
             <Items>
                 <RadzenSelectBarItem Text="On" Value="true" />
                 <RadzenSelectBarItem Text="Off" Value="false" />
             </Items>
         </RadzenSelectBar>
-        <br />
-        <h3>SelectBar with multiple selection</h3>
-        <RadzenSelectBar @bind-Value="values" TValue="IEnumerable<int>" Multiple="true" Change="@((args) => Change(args, "SelectBar with multiple selection"))" Style="margin-bottom: 20px;">
+        <h3 style="margin-top: 2rem">SelectBar with multiple selection</h3>
+        <RadzenSelectBar @bind-Value=@values TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with multiple selection"))>
             <Items>
                 <RadzenSelectBarItem Text="Orders" Value="1" />
                 <RadzenSelectBarItem Text="Employees" Value="2" />
                 <RadzenSelectBarItem Text="Customers" Value="3" />
             </Items>
         </RadzenSelectBar>
-        <br />
-        <h3>Disabled SelectBar with multiple selection</h3>
-        <RadzenSelectBar Disabled="true" @bind-Value="values" TValue="IEnumerable<int>" Multiple="true" Change="@((args) => Change(args, "Disabled SelectBar with multiple selection"))">
+        <h3 style="margin-top: 2rem">Disabled SelectBar with multiple selection</h3>
+        <RadzenSelectBar Disabled="true" @bind-Value=@values TValue="IEnumerable<int>" Multiple="true">
             <Items>
                 <RadzenSelectBarItem Text="Orders" Value="1" />
                 <RadzenSelectBarItem Text="Employees" Value="2" />
                 <RadzenSelectBarItem Text="Customers" Value="3" />
             </Items>
         </RadzenSelectBar>
-        <br Style="margin-bottom: 20px;" />
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
 
 @code {
     bool singleValue = false;
-    int value = 2;
     IEnumerable<int> values = new int[] { 1, 2 };
+    EventConsole console;
 
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
-
-    void Change(object value, string name)
+    void OnChange(object value, string name)
     {
         var str = value is IEnumerable<int> ? string.Join(", ", (IEnumerable<int>)value) : value;
-        events.Add(DateTime.Now, $"{name} value changed to {str}");
-        StateHasChanged();
+        console.Log($"{name} value changed to {str}");
     }
 }

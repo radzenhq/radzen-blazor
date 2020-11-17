@@ -2,39 +2,30 @@
 
 <RadzenExample Name="CheckBox">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <h3>CheckBox</h3>
-        <RadzenCheckBox @bind-Value="@CheckBox1Value" Style="margin-bottom: 20px" TValue="bool" Change="@(args => Change(args, "CheckBox1 CheckBox"))" />
-        <RadzenLabel Text="CheckBox1" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 20px" />
-        <br />
-        <RadzenCheckBox @bind-Value="CheckBox2Value" TriState="true" TValue="bool?" Change="@(args => Change(args, "TriState CheckBox"))" /><RadzenLabel Text="TriState" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox2" />
-        <br />
-        <RadzenCheckBox @bind-Value="CheckBox3Value" Disabled="true" TriState="true" TValue="bool?" Change="@(args => Change(args, "Disabled CheckBox"))" /><RadzenLabel Text="Disabled" Style="margin-left: 5px;margin-bottom: 20px" Component="CheckBox3" />
-        <br />
+        <RadzenCheckBox @bind-Value=@checkBox1Value  TValue="bool" Change=@(args => OnChange(args, "CheckBox1 CheckBox")) />
+        <RadzenLabel Text="CheckBox1" Component="CheckBox1" Style="margin-left: 5px;" />
+        <h3 style="margin-top: 2rem">Tri State</h3>
+        <RadzenCheckBox @bind-Value=@checkBox2Value TriState="true" TValue="bool?" Change=@(args => OnChange(args, "TriState CheckBox")) /><RadzenLabel Text="TriState" Style="margin-left: 5px" Component="CheckBox2" />
+        <h3 style="margin-top: 2rem">Disabled</h3>
+        <RadzenCheckBox @bind-Value=@checkBox3Value Disabled="true" TriState="true" TValue="bool?" /><RadzenLabel Text="Disabled" Style="margin-left: 5px" Component="CheckBox3" />
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
 
 @code {
-    bool CheckBox1Value;
-    bool? CheckBox2Value;
-    bool? CheckBox3Value = true;
+    bool checkBox1Value;
+    bool? checkBox2Value;
+    bool? checkBox3Value = true;
 
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    EventConsole console;
 
-    void Change(bool? value, string name)
+    void OnChange(bool? value, string name)
     {
-        events.Add(DateTime.Now, $"{name} value changed to {value}");
-        StateHasChanged();
+        console.Log($"{name} value changed to {value}");
     }
 }

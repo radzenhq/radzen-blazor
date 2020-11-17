@@ -9,52 +9,40 @@
 
 <RadzenExample Name="DropDown">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <h3>DropDown</h3>
         <RadzenDropDown AllowClear="true" TValue="string"
-                        Data="@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())"
-                        TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" Change="@(args => Change(args, "DropDown"))" />
-        <br />
-        <h3>DropDown with custom filter operator</h3>
+                        Data=@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())
+                        TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown")) />
+        <h3 style="margin-top: 2rem">DropDown with custom filter operator</h3>
         <RadzenDropDown AllowClear="true" TValue="string"
                         FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
-                        Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px" Change="@(args => Change(args, "DropDown with custom filter operator"))" />
-        <br />
-        <h3>DropDown with custom filtering</h3>
+                        Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown with custom filter operator")) />
+        <h3 style="margin-top: 2rem">DropDown with custom filtering</h3>
         <RadzenDropDown AllowClear="true" TValue="string"
-                        LoadData="@LoadData" AllowFiltering="true"
-                        Data="@customCustomersData" TextProperty="CompanyName" ValueProperty="CustomerID" Style="margin-bottom: 20px"
-                        Change="@(args => Change(args, "DropDown with custom filtering"))" />
-        <br />
-        <h3>DropDown with placeholder</h3>
-        <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px" />
-        <br />
-        <h3>DropDown with template</h3>
-        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="value" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
-                        Change="@(args => Change(args, "DropDown with placeholder"))" Style="margin-bottom: 20px; width:400px;">
+                        LoadData=@LoadData AllowFiltering="true"
+                        Data=@customCustomersData TextProperty="CompanyName" ValueProperty="CustomerID"
+                        Change=@(args => OnChange(args, "DropDown with custom filtering")) />
+        <h3 style="margin-top: 2rem">DropDown with placeholder</h3>
+        <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" 
+            Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown with placeholder")) />
+        <h3 style="margin-top: 2rem">DropDown with template</h3>
+        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value=@value Placeholder="Select..."
+            Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown with placeholder")) Style="width:400px">
             <Template>
                 Company: @((context as Customer).CompanyName)
             </Template>
         </RadzenDropDown>
-        <br />
-        <h3>DropDown with multiple selection</h3>
-        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="multipleValues" Multiple="true" Placeholder="Select..." Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID"
-                        Change="@(args => Change(args, "DropDown with multiple selection"))" Style="margin-bottom: 20px; width:400px;" />
-        <br />
-        <h3>Bind DropDown Value to model property</h3>
-        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@products" @bind-Value="myModel.MyValue"
-                        TextProperty="ProductName" ValueProperty="ProductID" Style="margin-bottom: 20px; width:400px;" Change="@(args => ChangeBound(args, "DropDown with bound Value"))" />
-        <br />
+        <h3 style="margin-top: 2rem">DropDown with multiple selection</h3>
+        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+            @bind-Value=@multipleValues Multiple="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
+                Change=@(args => OnChange(args, "DropDown with multiple selection")) Style="width:400px" />
+        <h3 style="margin-top: 2rem">Bind DropDown Value to model property</h3>
+        <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@myModel.MyValue
+                        TextProperty="ProductName" ValueProperty="ProductID" Style="width:400px" Change=@(args => ChangeBound(args, "DropDown with bound Value")) />
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
@@ -74,20 +62,18 @@
     IEnumerable<string> multipleValues = new string[] { "ALFKI", "ANATR" };
     string value = "ALFKI";
 
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    EventConsole console;
 
-    void Change(object value, string name)
+    void OnChange(object value, string name)
     {
         var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
 
-        events.Add(DateTime.Now, $"{name} value changed to {str}");
-        StateHasChanged();
+        console.Log($"{name} value changed to {str}");
     }
 
     void ChangeBound(object value, string name)
     {
-        events.Add(DateTime.Now, $"{name} value changed to {myModel.MyValue}");
-        StateHasChanged();
+        console.Log($"{name} value changed to {myModel.MyValue}");
     }
 
     class MyObject
@@ -103,6 +89,8 @@
         {
             query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()));
         }
+
+        console.Log($"LoadData with filter: {args.Filter}");
 
         customCustomersData = query.ToList();
 

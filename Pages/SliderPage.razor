@@ -2,26 +2,16 @@
 @using System.Collections
 <RadzenExample Name="Slider">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <h3>Slider from 0 to 100</h3>
-        <RadzenSlider @bind-Value="value" TValue="int" Min="0" Max="100" Change="@((args) => Change(args, "Slider from 0 to 100"))" Style="margin-bottom: 20px;" />
-        <br />
-        <h3>Slider with Step 10</h3>
-        <RadzenSlider @bind-Value="valueWithStep" TValue="int" Step="10" Change="@((args) => Change(args, "Slider with Step 10"))" Style="margin-bottom: 20px;" />
-        <br />
-        <h3>Range Slider</h3>
-        <RadzenSlider Range="true" @bind-Value="values" TValue="IEnumerable<int>" Change="@((args) => Change(args, "Range Slider"))" Style="margin-bottom: 20px;" />
-        <br Style="margin-bottom: 20px;" />
+        <RadzenSlider @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => OnChange(args, "Slider from 0 to 100")) />
+        <h3 style="margin-top: 2rem">Slider with Step 10</h3>
+        <RadzenSlider @bind-Value=@valueWithStep TValue="int" Step="10" Change=@(args => OnChange(args, "Slider with Step 10")) />
+        <h3 style="margin-top: 2rem">Range Slider</h3>
+        <RadzenSlider Range="true" @bind-Value=@values TValue="IEnumerable<int>" Change=@(args => OnChange(args, "Range Slider")) />
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
@@ -31,13 +21,11 @@
     int value = 67;
     int valueWithStep = 30;
 
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    EventConsole console;
 
-    void Change(dynamic value, string name)
+    void OnChange(dynamic value, string name)
     {
         var str = value is IEnumerable ? string.Join(", ", value) : value;
-        events.Add(DateTime.Now, $"{name} value changed to {str}");
-        StateHasChanged();
+        console.Log($"{name} value changed to {str}");
     }
-
 }

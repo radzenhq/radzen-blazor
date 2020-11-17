@@ -5,10 +5,10 @@
 
 <RadzenExample Name="NumericRangeValidator" Documentation="false">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <div class="row">
             <div class="col">
-                <RadzenTemplateForm TItem="Model" Data="@model" Submit="@OnSubmit" InvalidSubmit="@OnInvalidSubmit">
+                <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
                     <RadzenFieldset Text="Bid info">
                         <div class="row" style="margin-bottom: 48px">
                             <div class="col-md-4 align-right">
@@ -16,8 +16,8 @@
                                 <small style="display: block">(1-10 items)</small>
                             </div>
                             <div class="col">
-                                <RadzenNumeric style="display: block" Name="Quantity" @bind-Value="model.Quantity" @oninput=@OnInput />
-                                <RadzenNumericRangeValidator Component="Quantity" Min="1" Max="10" Text="Quantity should be between 1 and 10" Popup="@popup" Style="position: absolute" />
+                                <RadzenNumeric style="display: block" Name="Quantity" @bind-Value=@model.Quantity @oninput=@OnInput />
+                                <RadzenNumericRangeValidator Component="Quantity" Min="1" Max="10" Text="Quantity should be between 1 and 10" Popup=@popup Style="position: absolute" />
                             </div>
                         </div>
                         <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
@@ -27,20 +27,13 @@
             <div class="col">
                 <label>
                     Display validators as popup
-                    <RadzenCheckBox @bind-Value="@popup"></RadzenCheckBox>
+                    <RadzenCheckBox @bind-Value=@popup></RadzenCheckBox>
                 </label>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
@@ -54,7 +47,7 @@
     bool popup;
 
     Model model = new Model();
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    EventConsole console;
 
     void OnInput(ChangeEventArgs args)
     {
@@ -63,7 +56,7 @@
 
     void Log(string eventName, string value)
     {
-        events.Add(DateTime.Now, $"{eventName}: {value}");
+        console.Log($"{eventName}: {value}");
     }
 
     void OnSubmit(Model model)

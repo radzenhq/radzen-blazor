@@ -6,36 +6,32 @@
 
 <RadzenExample Name="Login">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <h3>Simple login</h3>
         <RadzenCard>
-            <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login="@((args) => Login(args, "Simple login"))" Style="margin-bottom: 20px;" />
+            <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login=@(args => OnLogin(args, "Simple login")) Style="margin-bottom: 20px;" />
         </RadzenCard>
-        <br />
-        <h3>Login with register</h3>
+        <h3 style="margin-top: 1rem">Login with register</h3>
         <RadzenCard>
             <RadzenLogin AllowResetPassword="false" 
-                            Login="@((args) => Login(args, "Login with register"))" 
-                            Register="@((args) => Register("Login with register"))" Style="margin-bottom: 20px;" />
+                            Login=@(args => OnLogin(args, "Login with register")) 
+                            Register=@(args => OnRegister("Login with register")) Style="margin-bottom: 20px;" />
         </RadzenCard>
-        <br />
-        <h3>Login with register and password reset</h3>
+        <h3 style="margin-top: 1rem">Login with register and password reset</h3>
         <RadzenCard>
-            <RadzenLogin Login="@((args) => Login(args, "Login with register and password reset"))" 
-                            ResetPassword="@((args) => ResetPassword(args, "Login with register and password reset"))"
-                            Register="@((args) => Register("Login with register and password reset"))" Style="margin-bottom: 20px;" />
+            <RadzenLogin Login=@(args => OnLogin(args, "Login with register and password reset")) 
+                            ResetPassword=@(args => OnResetPassword(args, "Login with register and password reset"))
+                            Register=@(args => OnRegister("Login with register and password reset")) Style="margin-bottom: 20px;" />
         </RadzenCard>
-        <br />
-        <h3>Login with default values</h3>
+        <h3 style="margin-top: 1rem">Login with default values</h3>
         <RadzenCard>
-            <RadzenLogin AllowRegister="true" AllowResetPassword="true" Username="@userName" Password="@password"
-                            Login="@((args) => Login(args, "Login with default values"))"
-                            ResetPassword="@((args) => ResetPassword(args, "Login with default values"))"
-                            Register="@((args) => Register("Login with default values"))"
+            <RadzenLogin AllowRegister="true" AllowResetPassword="true" Username=@userName Password=@password
+                            Login=@(args => OnLogin(args, "Login with default values"))
+                            ResetPassword=@(args => OnResetPassword(args, "Login with default values"))
+                            Register=@(args => OnRegister("Login with default values"))
                             Style="margin-bottom: 20px;" />
         </RadzenCard>
-        <br />
-        <h3>Localization</h3>
+        <h3 style="margin-top: 1rem">Localization</h3>
         <RadzenCard>
             <RadzenLogin AllowRegister="true" AllowResetPassword="true"
                             LoginText="Einloggen" UserText="Benutzername" PasswordText="Passwort"
@@ -44,22 +40,14 @@
                             RegisterText="Registrieren"
                             RegisterMessageText="Sie haben noch keinen Account?"
                             ResetPasswordText="Passwort zurücksetzen"
-                            Login="@((args) => Login(args, "Localized login"))"
-                            ResetPassword="@((args) => ResetPassword(args, "Localized login"))"
-                            Register="@((args) => Register("Localized login"))"
+                            Login=@(args => OnLogin(args, "Localized login"))
+                            ResetPassword=@(args => OnResetPassword(args, "Localized login"))
+                            Register=@(args => OnRegister("Localized login"))
                             Style="margin-bottom: 20px;" />
         </RadzenCard>
-        <br />
     </div>
     <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
@@ -67,24 +55,20 @@
 @code {
     string userName = "admin";
     string password = "admin";
+    EventConsole console;
 
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
-
-    void Login(LoginArgs args, string name)
+    void OnLogin(LoginArgs args, string name)
     {
-        events.Add(DateTime.Now, $"{name} -> Username: {args.Username} and password: {args.Password}");
-        StateHasChanged();
+        console.Log($"{name} -> Username: {args.Username} and password: {args.Password}");
     }
 
-    void Register(string name)
+    void OnRegister(string name)
     {
-        events.Add(DateTime.Now, $"{name} -> Register");
-        StateHasChanged();
+        console.Log($"{name} -> Register");
     }
 
-    void ResetPassword(string value, string name)
+    void OnResetPassword(string value, string name)
     {
-        events.Add(DateTime.Now, $"{name} -> ResetPassword for user: {value}");
-        StateHasChanged();
+        console.Log($"{name} -> ResetPassword for user: {value}");
     }
 }

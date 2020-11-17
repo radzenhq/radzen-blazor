@@ -8,10 +8,10 @@
 
 <RadzenExample Name="Fieldset">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <h3>Fieldset</h3>
         <RadzenFieldset AllowCollapse="true" Style="width:600px;margin-bottom: 20px; height:500px;"
-                        Expand="@(() => Change("Fieldset expanded"))" Collapse="@(() => Change("Fieldset collapsed"))">
+                        Expand=@(() => Change("Fieldset expanded")) Collapse=@(() => Change("Fieldset collapsed"))>
             <HeaderTemplate>
                 <span>
                     <RadzenIcon Icon="account_box" /><b style="font-size:30px">ORDER</b>
@@ -49,22 +49,14 @@
             </ChildContent>
         </RadzenFieldset>
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
 
 @code {
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
-
+    EventConsole console;
     IEnumerable<Order> orders;
 
     protected override void OnInitialized()
@@ -74,7 +66,6 @@
 
     void Change(string text)
     {
-        events.Add(DateTime.Now, $"{text}");
-        StateHasChanged();
+        console.Log($"{text}");
     }
 }

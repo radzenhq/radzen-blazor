@@ -2,64 +2,66 @@
 
 <RadzenExample Name="SplitButton">
 <div class="row">
-    <div class="col-md-6">
-        <h3>SplitButton with text</h3>
-        <RadzenSplitButton Click="@((args) => Click(args, "SplitButton with text"))" Text="SplitButton" Style="margin-bottom: 20px;">
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" />
-            </ChildContent>
-        </RadzenSplitButton>
-        <br />
-        <h3>SplitButton with text and icon</h3>
-        <RadzenSplitButton Click="@((args) => Click(args, "SplitButton with text and icon"))" Text="SplitButton" Icon="account_circle" Style="margin-bottom: 20px;">
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
-            </ChildContent>
-        </RadzenSplitButton>
-        <br />
-        <h3>SplitButton with icon</h3>
-        <RadzenSplitButton Click="@((args) => Click(args, "SplitButton with icon"))" Icon="account_circle" Style="margin-bottom: 20px;">
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
-            </ChildContent>
-        </RadzenSplitButton>
-        <br />
-        <h3>Disabled SplitButton</h3>
-        <RadzenSplitButton Disabled="true" Click="@((args) => Click(args, "Disabled SplitButton"))" Text="SplitButton" Style="margin-bottom: 20px;">
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" />
-            </ChildContent>
-        </RadzenSplitButton>
+    <div class="col-xl-6">
+        <div class="row">
+            <div class="col-xl-6">
+                <h4>SplitButton with text</h4>
+                <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" Style="margin-bottom: 20px;">
+                    <ChildContent>
+                        <RadzenSplitButtonItem Text="Item1" Value="1" />
+                        <RadzenSplitButtonItem Text="Item2" Value="2" />
+                    </ChildContent>
+                </RadzenSplitButton>
+            </div>
+            <div class="col-xl-6">
+                <h4>SplitButton with text and icon</h4>
+                <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text and icon")) Text="SplitButton" Icon="account_circle" Style="margin-bottom: 20px;">
+                    <ChildContent>
+                        <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
+                        <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
+                    </ChildContent>
+                </RadzenSplitButton>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-6">
+                <h4>SplitButton with icon</h4>
+                <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with icon")) Icon="account_circle" Style="margin-bottom: 20px;">
+                    <ChildContent>
+                        <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
+                        <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
+                    </ChildContent>
+                </RadzenSplitButton>
+            </div>
+            <div class="col-xl-6">
+                <h4>Disabled SplitButton</h4>
+                <RadzenSplitButton Disabled="true" Click=@(args => OnClick(args, "Disabled SplitButton")) Text="SplitButton" Style="margin-bottom: 20px;">
+                    <ChildContent>
+                        <RadzenSplitButtonItem Text="Item1" Value="1" />
+                        <RadzenSplitButtonItem Text="Item2" Value="2" />
+                    </ChildContent>
+                </RadzenSplitButton>
+            </div>
+        </div>
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
 
 @code {
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    EventConsole console;
 
-    void Click(RadzenSplitButtonItem item, string buttonName)
+    void OnClick(RadzenSplitButtonItem item, string buttonName)
     {
         if(item != null)
         {
-            events.Add(DateTime.Now, $"{buttonName}, item with value {item.Value} clicked");
+            console.Log($"{buttonName}, item with value {item.Value} clicked");
         }
         else
         {
-            events.Add(DateTime.Now, $"{buttonName} clicked");
+            console.Log($"{buttonName} clicked");
         }
     }
 }

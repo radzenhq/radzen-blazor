@@ -5,18 +5,18 @@
 
 <RadzenExample Name="RequiredValidator" Documentation="false">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <div class="row">
             <div class="col">
-                <RadzenTemplateForm TItem="Model" Data="@model" Submit="@OnSubmit" InvalidSubmit="@OnInvalidSubmit">
+                <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
                     <RadzenFieldset Text="Personal information">
                         <div class="row" style="margin-bottom: 48px">
                             <div class="col-md-4 align-right">
                                 <RadzenLabel Text="First Name" />
                             </div>
                             <div class="col">
-                                <RadzenTextBox style="display: block" Name="FirstName" @bind-Value="model.FirstName" />
-                                <RadzenRequiredValidator Component="FirstName" Text="First name is required" Popup="@popup" Style="position: absolute"/>
+                                <RadzenTextBox style="display: block" Name="FirstName" @bind-Value=@model.FirstName />
+                                <RadzenRequiredValidator Component="FirstName" Text="First name is required" Popup=@popup Style="position: absolute"/>
                             </div>
                         </div>
                         <div class="row" style="margin-bottom: 48px">
@@ -24,8 +24,8 @@
                                 <RadzenLabel Text="Last Name" />
                             </div>
                             <div class="col">
-                                <RadzenTextBox style="display: block" Name="LastName" @bind-Value="model.LastName" />
-                                <RadzenRequiredValidator Component="LastName" Text="Last name is required" Popup="@popup" Style="position: absolute"/>
+                                <RadzenTextBox style="display: block" Name="LastName" @bind-Value=@model.LastName />
+                                <RadzenRequiredValidator Component="LastName" Text="Last name is required" Popup=@popup Style="position: absolute"/>
                             </div>
                         </div>
                         <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
@@ -35,20 +35,13 @@
             <div class="col">
                 <label>
                     Display validators as popup
-                    <RadzenCheckBox @bind-Value="@popup"></RadzenCheckBox>
+                    <RadzenCheckBox @bind-Value=@popup></RadzenCheckBox>
                 </label>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
@@ -63,20 +56,15 @@
     bool popup;
 
     Model model = new Model();
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
-
-    void Log(string eventName, string value)
-    {
-        events.Add(DateTime.Now, $"{eventName}: {value}");
-    }
+    EventConsole console;
 
     void OnSubmit(Model model)
     {
-        Log("Submit", JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true }));
+        console.Log($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true })}");
     }
 
     void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
     {
-        Log("InvalidSubmit", JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true }));
+        console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true })}");
     }
 }

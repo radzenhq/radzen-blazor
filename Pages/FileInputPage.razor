@@ -7,50 +7,34 @@
 
 <RadzenExample Name="FileInput">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <h3>FileInput</h3>
-        <RadzenCard Style="width:600px;margin-bottom: 20px; height:500px;">
-            <div class="row">
-                <div class="col-md-12">
-                    <div style="margin-top:20px">Employee:</div>
-                    <b>@(firstEmployee.FirstName + " " + firstEmployee.LastName)</b>
-                    <br />
-                    <RadzenFileInput @bind-Value="@firstEmployee.Photo" Style="width:400px;" TValue="string" 
-                                     Change="@(args => Change(args, "FileInput"))" Error="@(args => Error(args, "FileInput"))" />
-                </div>
-            </div>
-        </RadzenCard>
+        <div style="margin: 2rem 0">Employee: <b>@(firstEmployee.FirstName + " " + firstEmployee.LastName)</b></div>
+        <RadzenFileInput @bind-Value=@firstEmployee.Photo Style="width:400px" TValue="string" 
+            Change=@(args => OnChange(args, "FileInput")) Error=@(args => OnError(args, "FileInput")) />
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
 
 @code {
     Employee firstEmployee;
+    EventConsole console;
 
     protected override async Task OnInitializedAsync()
     {
         firstEmployee = await Task.FromResult(dbContext.Employees.FirstOrDefault());
     }
 
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
-
-    void Change(string value, string name)
+    void OnChange(string value, string name)
     {
-        events.Add(DateTime.Now, $"{name} value changed");
+        console.Log($"{name} value changed");
     }
 
-    void Error(UploadErrorEventArgs args, string name)
+    void OnError(UploadErrorEventArgs args, string name)
     {
-        events.Add(DateTime.Now, $"{args.Message}");
+        console.Log($"{args.Message}");
     }
 }

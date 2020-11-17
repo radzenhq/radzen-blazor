@@ -2,31 +2,20 @@
 
 <RadzenExample Name="TextArea">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <h3>TextArea</h3>
-        <RadzenTextArea Style="margin-bottom: 20px" Change="@(args => Change(args, "TextArea"))" />
-        <br />
-        <h3>TextArea with placeholder</h3>
-        <RadzenTextArea Placeholder="Enter here..." Change="@(args => Change(args, "TextArea with placeholder"))" Style="margin-bottom: 20px" />
-        <br />
-        <h3>TextArea with 5 maximum characters</h3>
-        <RadzenTextArea MaxLength="5" Change="@(args => Change(args, "TextArea with 5 maximum characters"))" Style="margin-bottom: 20px" />
-        <br />
-        <h3>TextArea with 3 rows and 30 columns</h3>
-        <RadzenTextArea @bind-Value="@value" Cols="30" Rows="3" Change="@(args => Change(args, "TextArea with 3 rows and 30 columns"))" Style="margin-bottom: 20px" />
-        <br />
-        <h3>Disabled TextArea with 3 rows and 30 columns</h3>
-        <RadzenTextArea Disabled="true" @bind-Value="@value" Cols="30" Rows="3" Change="@(args => Change(args, "Disabled TextArea with 3 rows and 30 columns"))" Style="margin-bottom: 20px" />
+        <RadzenTextArea Change=@(args => OnChange(args, "TextArea")) />
+        <h3 style="margin-top: 2rem">TextArea with placeholder</h3>
+        <RadzenTextArea Placeholder="Enter here..." Change=@(args => OnChange(args, "TextArea with placeholder")) />
+        <h3 style="margin-top: 2rem">TextArea with 5 maximum characters</h3>
+        <RadzenTextArea MaxLength="5" Change=@(args => OnChange(args, "TextArea with 5 maximum characters")) />
+        <h3 style="margin-top: 2rem">TextArea with 3 rows and 30 columns</h3>
+        <RadzenTextArea @bind-Value=@value Cols="30" Rows="3" Change=@(args => OnChange(args, "TextArea with 3 rows and 30 columns")) />
+        <h3 style="margin-top: 2rem">Disabled TextArea with 3 rows and 30 columns</h3>
+        <RadzenTextArea Disabled="true" @bind-Value=@value Cols="30" Rows="3" />
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
@@ -34,11 +23,10 @@
 @code {
     string value;
 
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    EventConsole console;
 
-    void Change(string value, string name)
+    void OnChange(string value, string name)
     {
-        events.Add(DateTime.Now, $"{name} value changed to {value}");
-        StateHasChanged();
+        console.Log($"{name} value changed to {value}");
     }
 }

@@ -2,9 +2,9 @@
 
 <RadzenExample Name="Accordion">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <h3>Accordion with single expand</h3>
-        <RadzenAccordion Expand="@((args) => Change(args, "Accordion with single expand", "expanded"))">
+        <RadzenAccordion Expand=@(args => Change(args, "Accordion with single expand", "expanded"))>
             <Items>
                 <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
                     Details for Orders
@@ -19,8 +19,8 @@
         </RadzenAccordion>
         <br />
         <h3>Accordion with multiple expand</h3>
-        <RadzenAccordion Multiple="true" Collapse="@((args) => Change(args, "Accordion with multiple expand", "collapsed"))"
-                            Expand="@((args) => Change(args, "Accordion with multiple expand", "expanded"))">
+        <RadzenAccordion Multiple="true" Collapse=@(args => Change(args, "Accordion with multiple expand", "collapsed"))
+                            Expand=@(args => Change(args, "Accordion with multiple expand", "expanded"))>
             <Items>
                 <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
                     Details for Orders
@@ -35,25 +35,16 @@
         </RadzenAccordion>
         <br />
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
 
 @code {
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
-
+    EventConsole console;
     void Change(object value, string name, string action)
     {
-        events.Add(DateTime.Now, $"{name} item with index {value} {action}");
-        StateHasChanged();
+        console.Log($"{name} item with index {value} {action}");
     }
 }

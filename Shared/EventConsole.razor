@@ -38,7 +38,14 @@
 
     void OnClearClick()
     {
+        Clear();
+    }
+
+    public void Clear()
+    {
         messages.Clear();
+
+        StateHasChanged();
     }
 
     public void Log(string message)

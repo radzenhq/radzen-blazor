@@ -1,56 +1,43 @@
 ﻿@page "/radiobuttonlist"
 
-@using Radzen
-
 <RadzenExample Name="RadioButtonList">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6">
         <h3>RadioButtonList with horizontal orientation</h3>
-        <RadzenRadioButtonList @bind-Value="value" TValue="int" Change="@((args) => Change(args, "RadioButtonList with horizontal orientation"))">
+        <RadzenRadioButtonList @bind-Value=@value TValue="int" Change=@((args) => OnChange(args, "RadioButtonList with horizontal orientation"))>
             <Items>
                 <RadzenRadioButtonListItem Text="Orders" Value="1" />
                 <RadzenRadioButtonListItem Text="Employees" Value="2" />
                 <RadzenRadioButtonListItem Text="Customers" Value="3" />
             </Items>
         </RadzenRadioButtonList>
-        <br />
-        <h3>RadioButtonList with vertical orientation</h3>
-        <RadzenRadioButtonList @bind-Value="value" TValue="int" Orientation="Orientation.Vertical" Change="@((args) => Change(args, "RadioButtonList with vertical orientation"))">
+        <h3 style="margin-top: 2rem">RadioButtonList with vertical orientation</h3>
+        <RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" Change=@((args) => OnChange(args, "RadioButtonList with vertical orientation"))>
             <Items>
                 <RadzenRadioButtonListItem Text="Orders" Value="1" />
                 <RadzenRadioButtonListItem Text="Employees" Value="2" />
                 <RadzenRadioButtonListItem Text="Customers" Value="3" />
             </Items>
         </RadzenRadioButtonList>
-        <br />
-        <h3>RadioButtonList with null as initial value</h3>
-        <RadzenRadioButtonList @bind-Value="nullableValue" TValue="int?" Change="@((args) => Change(args, "RadioButtonList with horizontal orientation"))">
+        <h3 style="margin-top: 2rem">RadioButtonList with null as initial value</h3>
+        <RadzenRadioButtonList @bind-Value=@nullableValue TValue="int?" Change=@((args) => OnChange(args, "RadioButtonList with horizontal orientation"))>
             <Items>
                 <RadzenRadioButtonListItem Text="Orders" Value="1" TValue="int?" />
                 <RadzenRadioButtonListItem Text="Employees" Value="2" TValue="int?" />
                 <RadzenRadioButtonListItem Text="Customers" Value="3" TValue="int?" />
             </Items>
         </RadzenRadioButtonList>
-        <br />
-        <h3>Disabled RadioButtonList with initial value</h3>
-        <RadzenRadioButtonList @bind-Value="value" Disabled="true" TValue="int" Change="@((args) => Change(args, "Disabled RadioButtonList with initial value"))">
+        <h3 style="margin-top: 2rem">Disabled RadioButtonList with initial value</h3>
+        <RadzenRadioButtonList @bind-Value=@value Disabled="true" TValue="int">
             <Items>
                 <RadzenRadioButtonListItem Text="Orders" Value="1" TValue="int" />
                 <RadzenRadioButtonListItem Text="Employees" Value="2" TValue="int" />
                 <RadzenRadioButtonListItem Text="Customers" Value="3" TValue="int" />
             </Items>
         </RadzenRadioButtonList>
-        <br />
     </div>
-    <div class="col-md-6">
-        <h3>Events</h3>
-        <RadzenCard style="overflow: auto;height:500px;">
-            @foreach (var e in events.OrderByDescending(i => i.Key))
-            {
-                @e.Value
-                <br />
-            }
-        </RadzenCard>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
     </div>
 </div>
 </RadzenExample>
@@ -59,10 +46,10 @@
     int value = 1;
     int? nullableValue = null;
 
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    EventConsole console;
 
-    void Change(int? value, string name)
+    void OnChange(int? value, string name)
     {
-        events.Add(DateTime.Now, $"{name} value changed to {value}");
+        console.Log($"{name} value changed to {value}");
     }
 }
