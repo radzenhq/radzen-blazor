@@ -5,7 +5,14 @@
     <div class="col-xl-6">
         <h3>Single file upload</h3>
         <RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
-                      Progress=@(args => OnProgress(args, "Single file upload")) />
+                      Progress=@(args => OnProgress(args, "Single file upload"))>
+        </RadzenUpload>
+        <h3 style="margin-top: 1rem">Custom HTTP headers</h3>
+        <RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
+                      Progress=@(args => OnProgress(args, "Single file upload"))>
+            <RadzenUploadHeader Name="Authorization" Value="Bearer <token>" />
+            <RadzenUploadHeader Name="X-Uploaded-By" Value="Radzen" />
+        </RadzenUpload>
         <h3 style="margin-top: 1rem">Multiple files upload</h3>
         <RadzenUpload Multiple="true" Url="upload/multiple" Style="margin-bottom: 20px;"
                       Progress=@(args => OnProgress(args, "Multiple files upload")) />
