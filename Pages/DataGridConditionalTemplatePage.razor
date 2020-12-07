@@ -15,6 +15,8 @@
     <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 Data="@orderDetails" TItem="OrderDetail" ColumnWidth="200px" RowRender="@RowRender" CellRender="@CellRender">
         <Columns>
+            <RadzenGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
+            <RadzenGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
             <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
             <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity">
                 <Template Context="data">
@@ -51,6 +53,24 @@
         if (args.Column.Property == "Quantity")
         {
             args.Attributes.Add("style", $"background-color: {(args.Data.Quantity > 20 ? "#ff6d41" : "white")};");
+
+            if (args.Data.Discount == 0)
+            {
+                args.Attributes.Add("colspan", 2);
+            }
+        }
+
+        if (args.Column.Property == "OrderID")
+        {
+            if (args.Data.OrderID == 10248 && args.Data.ProductID == 11 || args.Data.OrderID == 10250 && args.Data.ProductID == 41)
+            {
+                args.Attributes.Add("rowspan", 3);
+            }
+
+            if (args.Data.OrderID == 10249 && args.Data.ProductID == 14 || args.Data.OrderID == 10251 && args.Data.ProductID == 22)
+            {
+                args.Attributes.Add("rowspan", 2);
+            }
         }
     }
 }
