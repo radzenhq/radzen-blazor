@@ -96,7 +96,7 @@ namespace RadzenBlazorDemos.Services
         public async Task<IEnumerable<Issue>> GetIssues(DateTime date)
         {
             var cacheFile = Path.Combine(hostEnvironment.WebRootPath, "issues.json");
-            var lastMonth = new DateTime(date.Month > 1 ? date.Year : date.Year - 1, date.Month > 1 ? date.Month - 1 : 1, 1);
+            var lastMonth = new DateTime(date.Month > 1 ? date.Year : date.Year - 1, date.Month > 1 ? date.Month - 1 : 12, 1);
 
             IEnumerable<Issue> issues = null;
 
