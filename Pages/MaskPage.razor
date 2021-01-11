@@ -9,7 +9,7 @@
             <h3>Telephone</h3>
             <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" Name="Phone" @bind-Value=@obj.Phone Change=@(args => OnChange(args, "Telephone")) />
             <h3 style="margin-top: 2rem">Credit Card</h3>
-            <RadzenMask Mask="**** **** **** ****" Pattern="[^0-9]" Placeholder="0000 0000 0000 0000" Name="CardNr" @bind-Value=@obj.CardNr Change=@(args => OnChange(args, "Telephone")) />
+            <RadzenMask Mask="**** **** **** ****" Pattern="[^0-9]" Placeholder="0000 0000 0000 0000" Name="CardNr" @bind-Value=@obj.CardNr Change=@(args => OnChange(args, "Credit Card")) />
             <h3 style="margin-top: 2rem">SSN</h3>
             <RadzenMask Mask="***-**-****" Pattern="[^0-9]" Placeholder="000-00-0000" Name="SSN" @bind-Value=@obj.SSN Change=@(args => OnChange(args, "SSN")) />
             <div class="row justify-content-center">
