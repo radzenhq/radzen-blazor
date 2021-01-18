@@ -76,7 +76,7 @@
 
     protected override void OnInitialized()
     {
-        orders = dbContext.Orders.ToList();
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
     }
 
     void RowRender(RowRenderEventArgs<Order> args)
