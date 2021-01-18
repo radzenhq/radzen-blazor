@@ -475,6 +475,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "Hierarchy on demand",
+                    Path = "master-detail-hierarchy-demand",
+                    Icon = "&#xe23e",
+                    Title = "Blazor DataGrid Hierarchy on demand",
+                    Tags = new [] { "master", "detail", "datagrid", "table", "dataview", "on-demand" }
+                },
+                new Example()
+                {
                     Name = "Master/Detail",
                     Path = "master-detail",
                     Icon = "&#xe1b2",
