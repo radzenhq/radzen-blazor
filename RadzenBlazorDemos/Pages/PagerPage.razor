@@ -1,0 +1,59 @@
+﻿@page "/pager"
+
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<RadzenExample Name="Pager">
+    <RadzenDataList WrapItems="true" AllowPaging="false" Data="@orders" TItem="Order">
+        <Template Context="order">
+            <RadzenCard Style="width:300px;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div>Company:</div>
+                        <b>@order.Customer?.CompanyName</b>
+                        <div style="margin-top:20px">Employee:</div>
+                        <b>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</b>
+                        <br />
+                        <RadzenImage Path="@order.Employee?.Photo" Style="width:100px;" />
+                    </div>
+                    <div class="col-md-6">
+                        <div>Freight:</div>
+                        <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)</b>
+                        <div style="margin-top:20px">Ship country:</div>
+                        <b>@(order.ShipCountry)</b>
+                        <div style="margin-top:20px">Ship city:</div>
+                        <b>@(order.ShipCity)</b>
+                        <div style="margin-top:20px">Ship name:</div>
+                        <b>@(order.ShipName)</b>
+                    </div>
+                </div>
+
+            </RadzenCard>
+        </Template>
+    </RadzenDataList>
+    <RadzenPager Count="count" PageSize="@pageSize" PageNumbersCount="10" PageChanged="@PageChanged" />
+</RadzenExample>
+@code {
+    int pageSize = 6;
+    int count;
+    IEnumerable<Order> orders;
+
+    protected override void OnInitialized()
+    {
+        count = dbContext.Orders.Count();
+        orders = GetOrders(0, pageSize);
+    }
+
+    void PageChanged(PagerEventArgs args)
+    {
+        orders = GetOrders(args.Skip, args.Top);
+    }
+
+    IEnumerable<Order> GetOrders(int skip, int take)
+    {
+        return dbContext.Orders.Include("Customer").Include("Employee").Skip(skip).Take(take).ToList();
+    }
+}

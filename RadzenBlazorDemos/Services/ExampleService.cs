@@ -407,6 +407,14 @@ namespace RadzenBlazorDemos
 
                 new Example()
                 {
+                    Name = "Pager",
+                    Path = "pager",
+                    Icon = "&#xe8be",
+                    Tags = new [] { "pager", "paging" }
+                },
+
+                new Example()
+                {
                     Name = "Tree",
                     Path = "tree",
                     Icon = "&#xe8ef",
