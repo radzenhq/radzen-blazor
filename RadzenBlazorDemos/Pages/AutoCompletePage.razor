@@ -1,0 +1,54 @@
+﻿@page "/autocomplete"
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@inject NorthwindContext dbContext
+
+<RadzenExample Name="AutoComplete">
+<div class="row">
+    <div class="col-xl-6">
+        <h3>AutoComplete</h3>
+        <RadzenAutoComplete Data=@customers TextProperty="CompanyName"
+                            Style="margin-bottom: 20px" Change=@(args => OnChange(args, "AutoComplete")) />
+        <h3 style="margin-top: 1rem">AutoComplete with placeholder</h3>
+        <RadzenAutoComplete Placeholder="Select..." Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "AutoComplete with placeholder")) Style="margin-bottom: 20px" />
+        <h3 style="margin-top: 1rem">AutoComplete with custom filter operator</h3>
+        <RadzenAutoComplete Data=@customers TextProperty="CompanyName" FilterOperator="StringFilterOperator.StartsWith"
+                            Style="margin-bottom: 20px" Change=@(args => OnChange(args, "AutoComplete with custom filter operator")) />
+        <h3 style="margin-top: 1rem">AutoComplete with custom filtering</h3>
+        <RadzenAutoComplete Data=@customCustomersData TextProperty="CompanyName"
+                            LoadData=@OnLoadData
+                            Style="margin-bottom: 20px" Change=@(args => OnChange(args, "AutoComplete with custom filtering")) />
+        <h3 style="margin-top: 1rem">Disabled AutoComplete</h3>
+        <RadzenAutoComplete Disabled="true" Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "AutoComplete with placeholder")) Style="margin-bottom: 20px" />
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    EventConsole console;
+
+    IEnumerable<Customer> customers;
+    IEnumerable<Customer> customCustomersData;
+
+    protected override void OnInitialized()
+    {
+        customers = dbContext.Customers.ToList();
+    }
+
+    void OnChange(object value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+
+    void OnLoadData(LoadDataArgs args)
+    {
+        console.Log($"LoadData with filter: {args.Filter}");
+
+        customCustomersData = dbContext.Customers.Where(c => c.CustomerID.Contains(args.Filter) || c.ContactName.Contains(args.Filter)).ToList();
+
+        InvokeAsync(StateHasChanged);
+    }
+}

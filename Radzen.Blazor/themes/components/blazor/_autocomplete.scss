@@ -1,0 +1,44 @@
+.rz-autocomplete {
+  display: inline-block;
+  border: $input-border;
+  border-radius: $input-border-radius;
+  overflow: hidden;
+
+  &:hover {
+    @extend %input-hover;
+  }
+}
+
+.rz-autocomplete-input {
+  padding: $input-padding;
+  background-color: $input-background-color;
+  box-shadow: $input-shadow;
+  border: none;
+  height: $input-height;
+  line-height: $input-line-height;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled {
+    @extend %input-disabled;
+    border: none;
+  }
+}
+
+.rz-autocomplete-panel {
+  @extend %dropdown-panel;
+  overflow: auto;
+  box-sizing: content-box;
+  transform: translate(-1px, -$input-border-radius);
+}
+
+.rz-autocomplete-items {
+  @extend .rz-dropdown-items;
+}
+
+.rz-autocomplete-list-item {
+  @extend .rz-dropdown-item;
+}

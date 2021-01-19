@@ -1,0 +1,64 @@
+﻿@using System.Timers
+
+@if (Visible)
+{
+    var classes = GetMessageCssClasses();
+
+    <div class="rz-notification-message rz-growl " style="width: 250px;z-index: 1002;position:static;@Style">
+        <div aria-live="polite" class="rz-growl-item-container rz-state-highlight   @classes.Item1">
+            <div class="rz-growl-item">
+                <div class="rz-growl-icon-close rzi rzi-times" @onclick="@Close" style="cursor:pointer"></div>
+                <span class="rz-growl-image rzi @classes.Item2"></span>
+                <div class="rz-growl-message">
+                    <span class="rz-growl-title">@Message.Summary</span>
+                    <p>@Message.Detail</p>
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+        </div>
+    </div>
+}
+@code {
+    Tuple<string, string> GetMessageCssClasses()
+    {
+        if (Message.Severity == NotificationSeverity.Error)
+        {
+            return new Tuple<string, string>("rz-growl-message-error", "rzi-times");
+        }
+        else if (Message.Severity == NotificationSeverity.Info)
+        {
+            return new Tuple<string, string>("rz-growl-message-info", "rzi-info-circle");
+        }
+        else if (Message.Severity == NotificationSeverity.Success)
+        {
+            return new Tuple<string, string>("rz-growl-message-success", "rzi-check");
+        }
+        else if (Message.Severity == NotificationSeverity.Warning)
+        {
+            return new Tuple<string, string>("rz-growl-message-warn", "rzi-exclamation-triangle");
+        }
+
+        return new Tuple<string, string>("", "");
+    }
+
+    [Inject] private NotificationService Service { get; set; }
+
+    public bool Visible { get; set; } = true;
+
+    [Parameter]
+    public NotificationMessage Message { get; set; }
+
+    [Parameter]
+    public string Style { get; set; }
+
+    public void Close()
+    {
+        Service.Messages.Remove(Message);
+        System.Threading.Tasks.Task.Delay(0).ContinueWith(r => { Visible = false; });
+    }
+
+    protected override void OnInitialized()
+    {
+        System.Threading.Tasks.Task.Delay(Convert.ToInt32(Message.Duration ?? 3000)).ContinueWith(r => InvokeAsync(Close));
+    }
+}

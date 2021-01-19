@@ -1,0 +1,57 @@
+﻿@page "/tooltip"
+
+@inject TooltipService tooltipService
+
+<RadzenExample Name="Tooltip" Documentation="true">
+    <div class="row">
+        <div class="col-md-6">
+            <h3 style="margin-top: 20px;">Show tooltip on mouse over Radzen component</h3>
+            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args) )" />
+            <br />
+            <h3 style="margin-top: 20px;">Show tooltip on mouse over Radzen component and close it after 10 sec</h3>
+            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args, new TooltipOptions(){ Duration = 10000 }))" />
+            <br />
+            <h3 style="margin-top: 20px;">Show tooltip with style on button click and close it on page click</h3>
+            <RadzenButton @ref="radzenButton" Text="Show tooltip" Click="@(args => ShowTooltip(radzenButton.Element, new TooltipOptions(){ Style = "background-color: #ffffca; color:#000", Duration = null }))" />
+            <br />
+            <h3 style="margin-top: 20px;">Show tooltip with HTML content</h3>
+            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltipWithHtml(args, new TooltipOptions(){ Style = "color:#000", Duration = null }))" />
+            <br />
+            <h3 style="margin-top: 20px;">Show tooltip on mouse over HTML elment</h3>
+            <button @ref="htmlButton" @onmouseover="@(args => ShowTooltip(htmlButton))">
+                Show tooltip
+            </button>
+        </div>
+        <div class="col-md-6">
+            <h3>Show tooltip with right position</h3>
+            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args,
+                                                                            new TooltipOptions(){ Position = TooltipPosition.Right }))" />
+            <br />
+            <h3 style="margin-top: 20px;">Show tooltip with left position</h3>
+            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args,
+                                                                            new TooltipOptions(){ Position = TooltipPosition.Left }))" />
+            <br />
+            <h3 style="margin-top: 20px;">Show tooltip with top position</h3>
+            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args,
+                                                                            new TooltipOptions(){ Position = TooltipPosition.Top }))" />
+            <br />
+            <h3 style="margin-top: 20px;">Show tooltip with bottom position</h3>
+            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args,
+                                                                            new TooltipOptions(){ Position = TooltipPosition.Bottom }))" />
+            <br />
+
+        </div>
+    </div>
+</RadzenExample>
+
+@code {
+    ElementReference htmlButton;
+    RadzenButton radzenButton;
+
+    void ShowTooltip(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, "Some content", options);
+
+    void ShowTooltipWithHtml(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, ds =>
+@<div>
+    Some <b>HTML</b> content
+</div>, options);
+}

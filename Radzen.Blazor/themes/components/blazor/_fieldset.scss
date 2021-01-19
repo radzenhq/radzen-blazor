@@ -1,0 +1,71 @@
+$fieldset-border: 1px solid #dadfe2 !default;
+$fieldset-padding: 1.25rem !default;
+$fieldset-legend-color: $cool-grey !default;
+$fieldset-legend-font-size: 0.875rem !default;
+$fieldset-legend-padding: 0 1rem !default;
+
+$fieldset-toggle-width: 1.125rem !default;
+$fieldset-toggle-margin: 0 0.5rem 0 0 !default;
+$fieldset-toggle-height: $fieldset-toggle-width !default;
+$fieldset-toggle-background-color: #e6ecef !default;
+$fieldset-toggle-color: $cool-grey !default;
+$fieldset-toggle-font-size: 1rem !default;
+$fieldset-toggle-border: none !default;
+
+.rz-fieldset {
+  border: $fieldset-border;
+}
+
+.rz-fieldset-content {
+  padding: $fieldset-padding;
+}
+
+.rz-fieldset-content-wrapper {
+  overflow: hidden;
+}
+
+.rz-fieldset-legend-text {
+  vertical-align: middle;
+}
+
+.rz-fieldset-toggler {
+  vertical-align: middle;
+  width: $fieldset-toggle-width;
+  height: $fieldset-toggle-height;
+  background-color: $fieldset-toggle-background-color;
+  color: $fieldset-toggle-color;
+  border: $fieldset-toggle-border;
+
+  &.rzi {
+    text-align: center;
+    font-size: $fieldset-toggle-font-size;
+    line-height: $fieldset-toggle-height;
+    margin: $fieldset-toggle-margin;
+  }
+
+  &.rzi-minus {
+    &:before {
+      content: 'remove';
+    }
+  }
+
+  &.rzi-plus {
+    &:before {
+      content: 'add';
+    }
+  }
+}
+
+.rz-fieldset-legend {
+  margin: 0 0 0 1rem;
+  width: auto;
+
+  color: $fieldset-legend-color;
+  font-size: $fieldset-legend-font-size;
+  padding: $fieldset-legend-padding;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}

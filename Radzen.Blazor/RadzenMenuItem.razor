@@ -1,0 +1,89 @@
+@using Microsoft.AspNetCore.Components.Routing
+@inherits RadzenComponent
+@if (Visible)
+{
+    <li @attributes="Attributes" class="@GetCssClass()" style="@Style" @onclick="@OnClick" @onclick:stopPropagation>
+        <div class="rz-navigation-item-wrapper" onclick="Radzen.toggleMenuItem(this)">
+            @if (!string.IsNullOrEmpty(Path))
+            {
+                <NavLink target="@Target" class="rz-navigation-item-link" href="@Path">
+                    @if (!string.IsNullOrEmpty(Icon))
+                    {
+                        <i class="rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>
+                    }
+                    @if (!string.IsNullOrEmpty(Image))
+                    {
+                        <img class="rz-navigation-item-icon" src="@Image" />
+                    }
+                    <span class="rz-navigation-item-text">@Text</span>
+                    @if (ChildContent != null)
+                    {
+                        <i class="rzi rz-navigation-item-icon-children">keyboard_arrow_down</i>
+                    }
+                </NavLink>
+            }
+            else
+            {
+                <div class="rz-navigation-item-link">
+                    @if (!string.IsNullOrEmpty(Icon))
+                    {
+                        <i class="rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>
+                    }
+                    @if (!string.IsNullOrEmpty(Image))
+                    {
+                        <img class="rz-navigation-item-icon" src="@Image" />
+                    }
+                    <span class="rz-navigation-item-text">@Text</span>
+                    @if (ChildContent != null)
+                    {
+                        <i class="rzi rz-navigation-item-icon-children">keyboard_arrow_down</i>
+                    }
+                </div>
+            }
+        </div>
+        @if (ChildContent != null)
+        {
+            <ul class="rz-navigation-menu" style="display: none">
+                @ChildContent
+            </ul>
+        }
+    </li>
+}
+@code {
+    protected override string GetComponentCssClass()
+    {
+        return "rz-navigation-item";
+    }
+
+    [Parameter]
+    public string Target { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public object Value { get; set; }
+
+    [Parameter]
+    public string Path { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Image { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter]
+    public RadzenMenu Parent { get; set; }
+
+    public async System.Threading.Tasks.Task OnClick(MouseEventArgs args)
+    {
+        if (Parent != null)
+        {
+            await Parent.Click.InvokeAsync(new MenuItemEventArgs() { Text = this.Text, Path = this.Path, Value = this.Value });
+        }
+    }
+}

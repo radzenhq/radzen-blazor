@@ -1,0 +1,23 @@
+@inherits RadzenChartComponentBase
+<defs>
+    <clipPath id="@Chart.ClipPath">
+        <path d="@Path"></path>
+    </clipPath>
+</defs>
+@code {
+    string Path { get; set; }
+
+    protected override void Initialize()
+    {
+        var categoryTicks = Chart.CategoryScale.Ticks(Chart.CategoryAxis.TickDistance);
+        var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+
+        var x1 = Chart.CategoryScale.Scale(categoryTicks.Start).ToInvariantString();
+        var x2 = Chart.CategoryScale.Scale(categoryTicks.End).ToInvariantString();
+
+        var y1 = Chart.ValueScale.Scale(valueTicks.Start).ToInvariantString();
+        var y2 = Chart.ValueScale.Scale(valueTicks.End).ToInvariantString();
+
+        Path = $"M {x1} {y1} L {x2} {y1} L {x2} {y2} L {x1} {y2}";
+    }
+}

@@ -1,0 +1,37 @@
+﻿@inherits RadzenComponent
+@typeparam TValue
+@code {
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public TValue Value { get; set; }
+
+    [Parameter]
+    public virtual bool Disabled { get; set; }
+
+    RadzenRadioButtonList<TValue> _list;
+
+    [CascadingParameter]
+    public RadzenRadioButtonList<TValue> List
+    {
+        get
+        {
+            return _list;
+        }
+        set
+        {
+            if (_list != value)
+            {
+                _list = value;
+                _list.AddItem(this);
+            }
+        }
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        List?.RemoveItem(this);
+    }
+}

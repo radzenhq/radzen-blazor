@@ -1,0 +1,69 @@
+$panel-background-color: $default-background-color !default;
+$panel-padding: 0.625rem 1.25rem !default;
+$panel-title-line-height: 1.5rem !default;
+$panel-title-font-weight: 600 !default;
+$panel-content-margin: 1.4375rem 0 0 0 !default;
+$panel-toggle-icon-width: 1.625rem !default;
+$panel-toggle-icon-height: $panel-toggle-icon-width !default;
+$panel-toggle-icon-border-radius: 2px !default;
+$panel-toggle-icon-background-color: #e6ecef !default;
+$panel-hover-color: $default-link !default;
+$panel-border-radius: $border-radius !default;
+$panel-shadow: none !default;
+
+.rz-panel {
+  background: $panel-background-color;
+  border-radius: $panel-border-radius;
+  padding: $panel-padding;
+  box-shadow: $panel-shadow;
+  display: flex;
+  flex-direction: column;
+}
+
+.rz-panel-titlebar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.rz-panel-content {
+  margin: $panel-content-margin;
+}
+
+.rz-panel-content-wrapper {
+  &[aria-hidden='true'] {
+    display: none;
+  }
+}
+
+.rz-panel-title {
+  line-height: $panel-title-line-height;
+  font-weight: $panel-title-font-weight;
+}
+
+.rz-panel-titlebar-toggler {
+  width: $panel-toggle-icon-width;
+  height: $panel-toggle-icon-height;
+  border-radius: $panel-toggle-icon-border-radius;
+  background-color: $panel-toggle-icon-background-color;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    text-decoration: none;
+    color: $panel-hover-color;
+  }
+
+  .rzi-minus {
+    &:before {
+      content: 'remove';
+    }
+  }
+
+  .rzi-plus {
+    &:before {
+      content: 'add';
+    }
+  }
+}

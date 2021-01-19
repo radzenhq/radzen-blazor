@@ -1,0 +1,70 @@
+@page "/requiredvalidator"
+@using Radzen
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
+<RadzenExample Name="RequiredValidator" Documentation="false">
+<div class="row">
+    <div class="col-xl-6">
+        <div class="row">
+            <div class="col">
+                <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+                    <RadzenFieldset Text="Personal information">
+                        <div class="row" style="margin-bottom: 48px">
+                            <div class="col-md-4 align-right">
+                                <RadzenLabel Text="First Name" />
+                            </div>
+                            <div class="col">
+                                <RadzenTextBox style="display: block" Name="FirstName" @bind-Value=@model.FirstName />
+                                <RadzenRequiredValidator Component="FirstName" Text="First name is required" Popup=@popup Style="position: absolute"/>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-bottom: 48px">
+                            <div class="col-md-4">
+                                <RadzenLabel Text="Last Name" />
+                            </div>
+                            <div class="col">
+                                <RadzenTextBox style="display: block" Name="LastName" @bind-Value=@model.LastName />
+                                <RadzenRequiredValidator Component="LastName" Text="Last name is required" Popup=@popup Style="position: absolute"/>
+                            </div>
+                        </div>
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
+                    </RadzenFieldset>
+                </RadzenTemplateForm>
+            </div>
+            <div class="col">
+                <label>
+                    Display validators as popup
+                    <RadzenCheckBox @bind-Value=@popup></RadzenCheckBox>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    class Model
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
+    bool popup;
+
+    Model model = new Model();
+    EventConsole console;
+
+    void OnSubmit(Model model)
+    {
+        console.Log($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true })}");
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true })}");
+    }
+}

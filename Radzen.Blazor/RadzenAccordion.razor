@@ -1,0 +1,160 @@
+﻿@using System.Linq
+
+@inherits RadzenComponent
+
+@if (Items != null)
+{
+    <CascadingValue Value=this>
+        @Items
+    </CascadingValue>
+}
+@if (Visible)
+{
+<div @ref="@Element" role="tablist" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+    @for (var i = 0; i < items.Count; i++)
+    {
+        var item = items[i];
+        if (!item.Visible)
+            continue;
+
+        <div class="rz-accordion-header rz-state-active" @attributes="item.Attributes" style="@item.Style">
+            <a @onclick="@((args) => SelectItem(item))" href="javascript:void(0)" role="tab" tabindex="0"
+               id="@($"rz-accordiontab-{items.IndexOf(item)}")" aria-controls="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-expanded="true">
+                @if (IsSelected(i, item))
+                {
+                    <span class="rz-accordion-toggle-icon rzi rzi-chevron-down"></span>
+                }
+                else
+                {
+                    <span class="rz-accordion-toggle-icon rzi rzi-chevron-right"></span>
+                }
+                @if (!string.IsNullOrEmpty(item.Icon))
+                {
+            <i class="rzi">@((MarkupString)item.Icon)</i>
+                }
+                @if (!string.IsNullOrEmpty(item.Text))
+                {
+                    <span>@item.Text</span>
+                }
+            </a>
+        </div>
+        @if (IsSelected(i, item))
+        {
+            <div class="rz-accordion-content-wrapper" role="tabpanel"
+                 id="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-hidden="false" aria-labelledby="@($"rz-accordiontab-{items.IndexOf(item)}")">
+                <div class="rz-accordion-content ">
+                    @item.ChildContent
+                </div>
+            </div>
+        }
+    }
+</div>
+}
+
+@code {
+    protected override string GetComponentCssClass()
+    {
+        return "rz-accordion";
+    }
+
+    [Parameter]
+    public bool Multiple { get; set; }
+
+    [Parameter]
+    public int SelectedIndex { get; set; } = 0;
+
+    [Parameter]
+    public EventCallback<int> Expand { get; set; }
+
+    [Parameter]
+    public EventCallback<int> Collapse { get; set; }
+
+    [Parameter]
+    public RenderFragment Items { get; set; }
+
+    List<RadzenAccordionItem> items = new List<RadzenAccordionItem>();
+
+    public void AddItem(RadzenAccordionItem item)
+    {
+        if (items.IndexOf(item) == -1)
+        {
+            if (item.Selected)
+            {
+                SelectedIndex = items.Count;
+                if (!Multiple)
+                {
+                    expandedIdexes.Clear();
+                }
+
+                if (!expandedIdexes.Contains(SelectedIndex))
+                {
+                    expandedIdexes.Add(SelectedIndex);
+                }
+            }
+
+            items.Add(item);
+            StateHasChanged();
+        }
+    }
+
+    public void RemoveItem(RadzenAccordionItem item)
+    {
+        if (items.Contains(item))
+        {
+            items.Remove(item);
+            try { InvokeAsync(StateHasChanged); } catch { }
+        }
+    }
+
+    internal void Refresh()
+    {
+        StateHasChanged();
+    }
+
+    protected bool IsSelected(int index, RadzenAccordionItem item)
+    {
+        return expandedIdexes.Contains(index);
+    }
+
+    List<int> expandedIdexes = new List<int>();
+
+    internal async System.Threading.Tasks.Task SelectItem(RadzenAccordionItem item)
+    {
+        await CollapseAll(item);
+
+        var itemIndex = items.IndexOf(item);
+        if (!expandedIdexes.Contains(itemIndex))
+        {
+            expandedIdexes.Add(itemIndex);
+            await Expand.InvokeAsync(itemIndex);
+        }
+        else
+        {
+            expandedIdexes.Remove(itemIndex);
+            await Collapse.InvokeAsync(itemIndex);
+        }
+
+        if (!Multiple)
+        {
+            SelectedIndex = itemIndex;
+        }
+
+        StateHasChanged();
+    }
+
+    async System.Threading.Tasks.Task CollapseAll(RadzenAccordionItem item)
+    {
+        if (!Multiple && items.Count > 1)
+        {
+            foreach (var i in items.Where(i => i != item))
+            {
+                var itemIndex = items.IndexOf(i);
+                if (expandedIdexes.Contains(itemIndex))
+                {
+                    expandedIdexes.Remove(itemIndex);
+                    await Collapse.InvokeAsync(items.IndexOf(i));
+                }
+            }
+        }
+    }
+}

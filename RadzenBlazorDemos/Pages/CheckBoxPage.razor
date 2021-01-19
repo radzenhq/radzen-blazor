@@ -1,0 +1,31 @@
+﻿@page "/checkbox"
+
+<RadzenExample Name="CheckBox">
+<div class="row">
+    <div class="col-xl-6">
+        <h3>CheckBox</h3>
+        <RadzenCheckBox @bind-Value=@checkBox1Value  TValue="bool" Change=@(args => OnChange(args, "CheckBox1 CheckBox")) />
+        <RadzenLabel Text="CheckBox1" Component="CheckBox1" Style="margin-left: 5px;" />
+        <h3 style="margin-top: 2rem">Tri State</h3>
+        <RadzenCheckBox @bind-Value=@checkBox2Value TriState="true" TValue="bool?" Change=@(args => OnChange(args, "TriState CheckBox")) /><RadzenLabel Text="TriState" Style="margin-left: 5px" Component="CheckBox2" />
+        <h3 style="margin-top: 2rem">Disabled</h3>
+        <RadzenCheckBox @bind-Value=@checkBox3Value Disabled="true" TriState="true" TValue="bool?" /><RadzenLabel Text="Disabled" Style="margin-left: 5px" Component="CheckBox3" />
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    bool checkBox1Value;
+    bool? checkBox2Value;
+    bool? checkBox3Value = true;
+
+    EventConsole console;
+
+    void OnChange(bool? value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+}

@@ -1,0 +1,59 @@
+@using Radzen.Blazor.Rendering
+<g class="rz-gauge-pointer">
+    <Path Fill=@Fill D=@Path Stroke=@Stroke StrokeWidth=@StrokeWidth />
+    <circle fill=@Fill cx=@Center.X.ToInvariantString() stroke=@Stroke stroke-width=@StrokeWidth.ToInvariantString() cy=@Center.Y.ToInvariantString() r=@Radius.ToInvariantString() />
+</g>
+@code {
+    [Parameter]
+    public string Stroke { get; set; }
+
+    [Parameter]
+    public string Fill { get; set; }
+
+    [Parameter]
+    public double Radius { get; set; }
+
+    [Parameter]
+    public double StrokeWidth { get; set; }
+
+    [Parameter]
+    public double StartAngle { get; set; }
+
+    [Parameter]
+    public double EndAngle { get; set; }
+
+    [Parameter]
+    public double Min { get; set; }
+
+    [Parameter]
+    public double Max { get; set; }
+
+    [Parameter]
+    public double Width { get; set; }
+
+    [Parameter]
+    public double Length { get; set; }
+
+    [Parameter]
+    public Point Center { get; set; }
+
+    [Parameter]
+
+    public double Value { get; set; }
+
+    private string Path { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        var ratio = (Value - Min) / (Max - Min);
+        var angle = StartAngle + ratio * (EndAngle - StartAngle);
+
+        angle = Polar.ToRadian(angle - 90);
+
+        var value = Center.ToCartesian(Length, angle);
+        var alpha = Center.ToCartesian(Width, angle - Math.PI / 2);
+        var beta = Center.ToCartesian(Width, angle + Math.PI / 2);
+
+        Path = $"M {value.Render()} L {alpha.Render()} L {beta.Render()} Z";
+    }
+}

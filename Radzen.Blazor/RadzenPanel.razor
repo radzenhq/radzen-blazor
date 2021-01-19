@@ -1,0 +1,115 @@
+﻿@inherits RadzenComponentWithChildren
+@if (Visible)
+{
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        <div class="rz-panel-titlebar">
+            <div>
+                @if (!string.IsNullOrEmpty(Icon))
+                {
+                    <i class="rzi">@((MarkupString)Icon)</i>
+                }
+                <span>@Text</span>
+            </div>
+            @HeaderTemplate
+            @if (AllowCollapse)
+            {
+                @if (collapsed)
+                {
+                    <a @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler" href="javascript:void(0)" role="tab" id="rz-panel-0-label" aria-controls="rz-panel-0-content" aria-expanded="false">
+                        <span class="rzi  rzi-plus"></span>
+                    </a>
+                }
+                else
+                {
+                    <a @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler" href="javascript:void(0)" role="tab" id="rz-panel-0-label" aria-controls="rz-panel-0-content" aria-expanded="true">
+                        <span class="rzi  rzi-minus"></span>
+                    </a>
+                }
+            }
+        </div>
+        <div class="rz-panel-content-wrapper" role="region" aria-hidden="false" style="@contentStyle">
+            <div class="rz-panel-content">
+                @ChildContent
+            </div>
+            @if (FooterTemplate != null)
+            {
+                <div class="rz-panel-footer ">
+                    @FooterTemplate
+                </div>
+            }
+        </div>
+    </div>
+}
+@code {
+    protected override string GetComponentCssClass()
+    {
+        return "rz-panel   ";
+    }
+
+    [Parameter]
+    public bool AllowCollapse { get; set; }
+
+    private bool collapsed;
+
+    [Parameter]
+    public bool Collapsed { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = "";
+
+    [Parameter]
+    public RenderFragment HeaderTemplate { get; set; }
+
+    [Parameter]
+    public RenderFragment FooterTemplate { get; set; }
+
+    [Parameter]
+    public EventCallback Expand { get; set; }
+
+    [Parameter]
+    public EventCallback Collapse { get; set; }
+
+    string contentStyle = "display: block;";
+
+    async System.Threading.Tasks.Task Toggle(MouseEventArgs args)
+    {
+        collapsed = !collapsed;
+        contentStyle = collapsed ? "display: none;" : "display: block;";
+
+        if (collapsed)
+        {
+            await Collapse.InvokeAsync(args);
+        }
+        else
+        {
+            await Expand.InvokeAsync(args);
+        }
+
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        collapsed = Collapsed;
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.DidParameterChange(nameof(Collapsed), Collapsed))
+        {
+            collapsed = parameters.GetValueOrDefault<bool>(nameof(Collapsed));
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        contentStyle = collapsed ? "display: none;" : "display: block;";
+
+        return base.OnParametersSetAsync();
+    }
+}

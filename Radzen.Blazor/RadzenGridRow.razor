@@ -1,0 +1,52 @@
+@implements IRadzenForm
+
+<tr class="@CssClass" @attributes="@Attributes">
+<CascadingValue Value=this>
+    @ChildContent
+</CascadingValue>
+</tr>
+@code {
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object> Attributes { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
+
+    [Parameter]
+    public bool InEditMode { get; set; }
+
+    List<IRadzenFormComponent> components;
+
+    public void AddComponent(IRadzenFormComponent component)
+    {
+        if (components != null)
+        {
+            if (components.IndexOf(component) == -1)
+            {
+                components.Add(component);
+            }
+        }
+    }
+    public void RemoveComponent(IRadzenFormComponent component)
+    {
+        components?.Remove(component);
+    }
+
+    public override Task SetParametersAsync(ParameterView parameters)
+    {
+        if (InEditMode != parameters.GetValueOrDefault<bool>("InEditMode"))
+        {
+            components = new List<IRadzenFormComponent>();
+        }
+
+        return base.SetParametersAsync(parameters);
+    }
+
+    public IRadzenFormComponent FindComponent(string name)
+    {
+        return components.Where(component => component.Name == name).FirstOrDefault();
+    }
+}

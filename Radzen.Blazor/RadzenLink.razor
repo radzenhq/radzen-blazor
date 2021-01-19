@@ -1,0 +1,29 @@
+﻿@inherits RadzenComponent
+@if (Visible)
+{
+    <Microsoft.AspNetCore.Components.Routing.NavLink style="@Style" href="@Path" @attributes="Attributes" class="@GetCssClass()" target="@Target" id="@GetId()">
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+            <i class="rzi">@((MarkupString)Icon)</i>
+        }
+        <span @ref="@Element" class="rz-link-text">@Text</span>
+    </Microsoft.AspNetCore.Components.Routing.NavLink>
+}
+@code {
+    protected override string GetComponentCssClass()
+    {
+        return "rz-link";
+    }
+
+    [Parameter]
+    public string Target { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = "";
+
+    [Parameter]
+    public string Path { get; set; } = "";
+}

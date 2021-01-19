@@ -1,0 +1,15 @@
+@inherits Tick
+
+<g class="rz-tick">
+<Line class="rz-tick-line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" X1="@X" Y1="@Y" X2="@X" Y2="@(Y+6)" />
+@if (ChildContent == null)
+{
+  <g>
+    <text class="rz-tick-text" x="@X.ToInvariantString()" dy="1em" y="@((Y + 6).ToInvariantString())">@Text</text>
+  </g>
+}
+else
+{
+  @ChildContent
+}
+</g>

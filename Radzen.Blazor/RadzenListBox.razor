@@ -1,0 +1,150 @@
+﻿@using Radzen
+@using System.Linq.Dynamic.Core
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
+@typeparam TValue
+@inherits DropDownBase<TValue>
+@if (Visible)
+{
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@TabIndex" @onkeydown="@OnKeyDown" id="@GetId()">
+        <div class="rz-helper-hidden-accessible">
+            <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" />
+        </div>
+        @if (AllowFiltering || Multiple)
+        {
+            <div class=" rz-listbox-header rz-helper-clearfix rz-listbox-header-w-checkbox">
+                @if (Multiple)
+                {
+                    <div class="rz-chkbox " @onclick="@SelectAll">
+                        <div class="rz-helper-hidden-accessible">
+                            <input id="@($"{UniqueID}sa")" readonly="readonly" type="checkbox">
+                        </div>
+                        <div class="@(View != null && selectedItems.Count == View.Cast<object>().Count() ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
+                            <span class="@(View != null && selectedItems.Count == View.Cast<object>().Count() ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
+                        </div>
+                    </div>
+                    @if (!AllowFiltering && !string.IsNullOrEmpty(Placeholder))
+                    { 
+                        <label for="@($"{UniqueID}sa")" class="rz-dropdown-label rz-inputtext " style="width:100%;">@Placeholder</label>
+                    }
+                }
+                @if (AllowFiltering)
+                {
+                    <div class="rz-listbox-filter-container">
+                        <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext   " role="textbox" type="text" placeholder="@Placeholder"
+                               @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" @onkeydown:stopPropagation="true" />
+                        <span class="rz-listbox-filter-icon rzi rzi-search"></span>
+                    </div>
+                }
+            </div>
+        }
+        @if (View != null)
+        {
+            <div class="rz-listbox-list-wrapper">
+                <ul @ref="list" class="rz-listbox-list">
+                    @foreach (var item in View)
+                    {
+                        <li class="@(isSelected(item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")" aria-label="@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)" style="display: block;" @onclick="@(async () => { if (!Disabled) { await SelectItem(item); } })">
+                            @if (Multiple)
+                            {
+                                <div class="rz-chkbox ">
+                                    <div class="@(isSelected(item) ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
+                                        <span class="@(isSelected(item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
+                                    </div>
+                                </div>
+                            }
+                            <span>
+                                @if (Template != null)
+                                {
+                                    @Template(item)
+                                }
+                                else
+                                {
+                                    @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
+                                }
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+}
+@code {
+    protected async System.Threading.Tasks.Task OnKeyDown(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
+    {
+        if (Disabled)
+            return;
+
+        var key = $"{args.Key}".Trim();
+
+        if (AllowFiltering && key.Length == 1)
+        {
+            await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, key);
+            await JSRuntime.InvokeVoidAsync("Radzen.focusElement", SearchID);
+        }
+
+        await OnKeyPress(args);
+    }
+
+    private bool visibleChanged = false;
+    private bool firstRender = true;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+
+        await base.SetParametersAsync(parameters);
+
+        if (visibleChanged && !firstRender)
+        {
+            if (Visible == false)
+            {
+                Dispose();
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        this.firstRender = firstRender;
+
+        if (firstRender || visibleChanged)
+        {
+            visibleChanged = false;
+
+            if (Visible)
+            {
+                bool reload = false;
+                if (LoadData.HasDelegate && Data == null)
+                {
+                    await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { });
+                    reload = true;
+                }
+
+                if (!Disabled)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.preventArrows", Element);
+                    reload = true;
+                }
+
+                if (reload)
+                {
+                    StateHasChanged();
+                }
+            }
+        }
+    }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    protected override string GetComponentCssClass()
+    {
+        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
+
+        return $"rz-listbox rz-inputtext  {(Disabled ? " rz-state-disabled" : "")} {fieldCssClass}";
+    }
+}

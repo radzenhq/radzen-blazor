@@ -1,0 +1,99 @@
+﻿@implements IDisposable
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+@foreach (var menu in menus)
+{
+    <div id="@UniqueID" class="rz-tooltip" style="display: none; top: 0px; left: 0px; z-index: 1001; position: absolute;">
+        @if (menu.Options.ChildContent != null)
+        {
+            <div class="rz-context-menu">
+                @menu.Options.ChildContent(Service)
+            </div>
+        }
+        else if (menu.Options.Items != null && menu.Options.Items.Any())
+        {
+            <div class="rz-context-menu">
+                <RadzenMenu Click="@(args => { if (menu.Options.Click != null) { menu.Options.Click(args); } })">
+                    @foreach (var item in menu.Options.Items)
+                    {
+                        <RadzenMenuItem Text="@item.Text" Value="@item.Value"></RadzenMenuItem>
+                    }
+                </RadzenMenu>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    public string UniqueID { get; set; }
+
+    [Inject] private ContextMenuService Service { get; set; }
+
+    List<ContextMenu> menus = new List<ContextMenu>();
+
+    public async Task Open(MouseEventArgs args, ContextMenuOptions options)
+    {
+        menus.Clear();
+        menus.Add(new ContextMenu() { Options = options, MouseEventArgs = args });
+
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var menu = menus.LastOrDefault();
+        if (menu != null)
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.openContextMenu",
+                menu.MouseEventArgs.ClientX,
+                menu.MouseEventArgs.ClientY,
+                UniqueID);
+        }
+    }
+
+    public async Task Close()
+    {
+        var lastTooltip = menus.LastOrDefault();
+        if (lastTooltip != null)
+        {
+            menus.Remove(lastTooltip);
+            await JSRuntime.InvokeVoidAsync("Radzen.closePopup", UniqueID);
+        }
+
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    public void Dispose()
+    {
+        JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+
+        Service.OnOpen -= OnOpen;
+        Service.OnClose -= OnClose;
+        Service.OnNavigate -= OnNavigate;
+    }
+
+    protected override void OnInitialized()
+    {
+        UniqueID = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("/", "-").Replace("+", "-").Substring(0, 10);
+
+        Service.OnOpen += OnOpen;
+        Service.OnClose += OnClose;
+        Service.OnNavigate += OnNavigate;
+    }
+
+    void OnOpen(MouseEventArgs args, ContextMenuOptions options)
+    {
+        Open(args, options).ConfigureAwait(false);
+    }
+
+    void OnClose()
+    {
+        Close().ConfigureAwait(false);
+    }
+
+    void OnNavigate()
+    {
+        JSRuntime.InvokeVoidAsync("Radzen.closePopup", UniqueID);
+    }
+}

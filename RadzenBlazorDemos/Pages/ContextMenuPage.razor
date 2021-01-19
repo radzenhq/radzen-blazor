@@ -1,0 +1,52 @@
+﻿@page "/contextmenu"
+
+@inject ContextMenuService ContextMenuService
+
+<RadzenExample Name="ContextMenu" Documentation="true">
+    <div class="row">
+        <div class="col-xl-6">
+            <h3 style="margin-top: 20px;">Show context menu for Radzen component</h3>
+            <RadzenButton Text="Show context menu" ContextMenu=@(args => ShowContextMenuWithItems(args)) />
+            <h3 style="margin-top: 20px;">Show context menu with custom content</h3>
+            <RadzenButton Text="Show context menu" ContextMenu=@(args => ShowContextMenuWithContent(args)) />
+            <h3 style="margin-top: 20px;">Show context menu with custom content for HTML elment</h3>
+            <button @oncontextmenu=@(args => ShowContextMenuWithContent(args)) @oncontextmenu:preventDefault="true">
+                Show context menu
+            </button>
+        </div>
+        <div class="col-xl-6">
+            <EventConsole @ref=@console />
+        </div>
+    </div>
+</RadzenExample>
+
+@code {
+    EventConsole console;
+
+    void ShowContextMenuWithItems(MouseEventArgs args)
+    {
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Context menu item 1", Value = 1 },
+                new ContextMenuItem(){ Text = "Context menu item 2", Value = 2 },
+                new ContextMenuItem(){ Text = "Context menu item 3", Value = 3 },
+         }, OnMenuItemClick);
+    }
+
+    void ShowContextMenuWithContent(MouseEventArgs args) => ContextMenuService.Open(args, ds =>
+        @<RadzenMenu Click="OnMenuItemClick">
+            <RadzenMenuItem Text="Item1" Value="1"></RadzenMenuItem>
+            <RadzenMenuItem Text="Item2" Value="2"></RadzenMenuItem>
+            <RadzenMenuItem Text="More items" Value="3">
+                <RadzenMenuItem Text="More sub items" Value="4">
+                    <RadzenMenuItem Text="Item1" Value="5"></RadzenMenuItem>
+                    <RadzenMenuItem Text="Item2" Value="6"></RadzenMenuItem>
+                </RadzenMenuItem>
+            </RadzenMenuItem>
+        </RadzenMenu>);
+
+    void OnMenuItemClick(MenuItemEventArgs args)
+    {
+        console.Log($"Menu item with Value={args.Value} clicked");
+    }
+}

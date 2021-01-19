@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Radzen Community Support
+    url: https://forum.radzen.com/
+    about: Please ask and answer questions here.
+  - name: Radzen Commercial Support 
+    url: info@radzen.com
+    about: Radzen Professional or Enterprise subscribers can get dedicated support over email.

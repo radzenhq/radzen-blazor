@@ -1,0 +1,74 @@
+﻿@page "/login"
+
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+<RadzenExample Name="Login">
+<div class="row">
+    <div class="col-xl-6">
+        <h3>Simple login</h3>
+        <RadzenCard>
+            <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login=@(args => OnLogin(args, "Simple login")) Style="margin-bottom: 20px;" />
+        </RadzenCard>
+        <h3 style="margin-top: 1rem">Login with register</h3>
+        <RadzenCard>
+            <RadzenLogin AllowResetPassword="false" 
+                            Login=@(args => OnLogin(args, "Login with register")) 
+                            Register=@(args => OnRegister("Login with register")) Style="margin-bottom: 20px;" />
+        </RadzenCard>
+        <h3 style="margin-top: 1rem">Login with register and password reset</h3>
+        <RadzenCard>
+            <RadzenLogin Login=@(args => OnLogin(args, "Login with register and password reset")) 
+                            ResetPassword=@(args => OnResetPassword(args, "Login with register and password reset"))
+                            Register=@(args => OnRegister("Login with register and password reset")) Style="margin-bottom: 20px;" />
+        </RadzenCard>
+        <h3 style="margin-top: 1rem">Login with default values</h3>
+        <RadzenCard>
+            <RadzenLogin AllowRegister="true" AllowResetPassword="true" Username=@userName Password=@password
+                            Login=@(args => OnLogin(args, "Login with default values"))
+                            ResetPassword=@(args => OnResetPassword(args, "Login with default values"))
+                            Register=@(args => OnRegister("Login with default values"))
+                            Style="margin-bottom: 20px;" />
+        </RadzenCard>
+        <h3 style="margin-top: 1rem">Localization</h3>
+        <RadzenCard>
+            <RadzenLogin AllowRegister="true" AllowResetPassword="true"
+                            LoginText="Einloggen" UserText="Benutzername" PasswordText="Passwort"
+                            UserRequired="Benutzername erforderlich"
+                            PasswordRequired="Passwort erforderlich"
+                            RegisterText="Registrieren"
+                            RegisterMessageText="Sie haben noch keinen Account?"
+                            ResetPasswordText="Passwort zurücksetzen"
+                            Login=@(args => OnLogin(args, "Localized login"))
+                            ResetPassword=@(args => OnResetPassword(args, "Localized login"))
+                            Register=@(args => OnRegister("Localized login"))
+                            Style="margin-bottom: 20px;" />
+        </RadzenCard>
+    </div>
+    <div class="col-md-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    string userName = "admin";
+    string password = "admin";
+    EventConsole console;
+
+    void OnLogin(LoginArgs args, string name)
+    {
+        console.Log($"{name} -> Username: {args.Username} and password: {args.Password}");
+    }
+
+    void OnRegister(string name)
+    {
+        console.Log($"{name} -> Register");
+    }
+
+    void OnResetPassword(string value, string name)
+    {
+        console.Log($"{name} -> ResetPassword for user: {value}");
+    }
+}

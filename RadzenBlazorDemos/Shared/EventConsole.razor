@@ -1,0 +1,57 @@
+@inject IJSRuntime JSRuntime
+<div class="console" @attributes=@Attributes>
+    <div class="console-header">
+        <div class="console-title">Console Log</div>
+        <button class="console-clear" @onclick=@OnClearClick>Clear</button>
+    </div>
+    <div class="console-content" @ref=@console>
+    @foreach(var message in messages)
+    {
+        <div class="console-message">
+            <span class="console-message-time">@message.Date.ToString("HH:mm:ss.ff")</span>
+            <span class="console-message-text">@message.Text</span>
+        </div>
+    }
+    </div>
+</div>
+
+@code {
+    class Message
+    {
+        public DateTime Date { get; set; }
+        public string Text { get; set; }
+    }
+
+    ElementReference console;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> Attributes { get; set; }
+    IList<Message> messages = new List<Message>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) 
+    {
+        if (!firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("scrollToBottom", console);
+        }
+    }
+
+    void OnClearClick()
+    {
+        Clear();
+    }
+
+    public void Clear()
+    {
+        messages.Clear();
+
+        StateHasChanged();
+    }
+
+    public void Log(string message)
+    {
+        messages.Add(new Message { Date = DateTime.Now, Text = message });
+
+        StateHasChanged();
+    }
+}

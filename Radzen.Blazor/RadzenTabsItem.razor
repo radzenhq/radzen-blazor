@@ -1,0 +1,126 @@
+﻿@if (Visible)
+{
+ <li role="presentation" class=@Class @attributes=@Attributes style=@Style>
+    <a @onclick=@OnClick role="tab" href="javascript: void(0)" id="@($"{Tabs.Id}-tabpanel-{Index}-label")" aria-selected=@(IsSelected? "true" : "false")  aria-controls="@($"{Tabs.Id}-tabpanel-{Index}")">
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+            <span class="rz-tabview-left-icon rzi">@((MarkupString)Icon)</span>
+        }
+        @if (Template != null)
+        {
+            @Template(this)
+        }
+        else
+        {
+        <span class="rz-tabview-title">@Text</span>
+        }
+    </a>
+</li>
+}
+@implements IDisposable
+@code {
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> Attributes { get; set; }
+
+    [Parameter]
+    public string Style { get; set; }
+
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public RenderFragment<RadzenTabsItem> Template { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public bool Selected { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    string Class
+    {
+        get
+        {
+            var classList = new List<string> { "", "rz-state-active" };
+
+            if (IsSelected)
+            {
+                classList.Add("rz-tabview-selected");
+            }
+
+            if (Disabled)
+            {
+                classList.Add("rz-state-disabled");
+            }
+
+            return string.Join(" ", classList);
+        }
+    }
+
+    public int Index
+    {
+        get
+        {
+            return Tabs.IndexOf(this);
+        }
+    }
+
+    public bool IsSelected
+    {
+        get
+        {
+            return Tabs.IsSelected(this);
+        }
+    }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter]
+    public RadzenTabs Tabs { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Tabs.AddTab(this);
+    }
+
+    async Task OnClick()
+    {
+        if (!Disabled)
+        {
+            await Tabs.SelectTab(this, true);
+        }
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var selectedChanged = parameters.DidParameterChange(nameof(Selected), Selected);
+        var visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+
+        await base.SetParametersAsync(parameters);
+
+        if (selectedChanged)
+        {
+            if (Selected)
+            {
+                Tabs?.SelectTab(this);
+            }
+        }
+
+        if (visibleChanged && IsSelected)
+        {
+            Tabs?.SelectTab(this);
+        }
+    }
+
+    public void Dispose()
+    {
+        Tabs?.RemoveItem(this);
+    }
+}

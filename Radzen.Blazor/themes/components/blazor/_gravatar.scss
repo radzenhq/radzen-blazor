@@ -1,0 +1,10 @@
+$gravatar-width: 2rem !default;
+$gravatar-height: $gravatar-width !default;
+$gravatar-border-radius: 50%;
+
+.rz-gravatar {
+  width: $gravatar-width;
+  height: $gravatar-height;
+  display: inline-block;
+  border-radius: $gravatar-border-radius;
+}

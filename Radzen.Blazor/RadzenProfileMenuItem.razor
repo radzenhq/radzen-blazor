@@ -1,0 +1,60 @@
+﻿@inherits RadzenComponent
+@if (Visible)
+{
+    <li @attributes="Attributes" class="@GetCssClass()" style="@Style" @onclick="@OnClick">
+        <div class="rz-navigation-item-wrapper">
+            @if (!string.IsNullOrEmpty(Path))
+            {
+                <Microsoft.AspNetCore.Components.Routing.NavLink target="@Target" class="rz-navigation-item-link" href="@Path" @onclick="@OnClick">
+                    @if (!string.IsNullOrEmpty(Icon))
+                    {
+                        <i class="rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>
+                    }
+                    <span class="rz-navigation-item-text">@Text</span>
+                </Microsoft.AspNetCore.Components.Routing.NavLink>
+            }
+            else
+            {
+                @if (!string.IsNullOrEmpty(Icon))
+                {
+                    <i class="rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>
+                }
+                <span class="rz-navigation-item-text">@Text</span>
+            }
+        </div>
+    </li>
+}
+@code {
+    protected override string GetComponentCssClass()
+    {
+        return "rz-navigation-item";
+    }
+
+    [Parameter]
+    public string Target { get; set; }
+
+    [Parameter]
+    public string Path { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    [CascadingParameter]
+    public RadzenProfileMenu Menu { get; set; }
+
+
+    public async System.Threading.Tasks.Task OnClick(MouseEventArgs args)
+    {
+        if (Menu != null)
+        {
+            Menu.Close();
+            await Menu.Click.InvokeAsync(this);
+        }
+    }
+}

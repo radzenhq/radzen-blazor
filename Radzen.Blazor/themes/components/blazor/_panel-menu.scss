@@ -1,0 +1,155 @@
+$panel-menu-color: $white !default;
+$panel-menu-background-color: $sidebar-background-color !default;
+$panel-menu-hover-background-color: #28363c !default;
+$panel-menu-hover-color: $panel-menu-color !default;
+
+$panel-menu-item-line-height: 1.575 !default;
+$panel-menu-item-margin: 0 1.25rem 0 1.25rem !default;
+$panel-menu-item-padding: 0.625rem 0 !default;
+$panel-menu-item-border: solid 1px #363d40 !default;
+$panel-menu-item-active-background-color: #28363c !default;
+$panel-menu-item-offset: 0.75rem !default;
+
+$panel-menu-item-2nd-level-padding: 0.25rem 0 !default;
+$panel-menu-item-2nd-level-offset: 3.625rem !default;
+$panel-menu-item-2nd-level-font-size: 0.875rem !default;
+$panel-menu-item-2nd-level-hover-background-color: #1f2b31 !default;
+$panel-menu-item-2nd-level-hover-color: inherit !default;
+$panel-menu-item-2nd-level-color: inherit !default;
+$panel-menu-item-3rd-level-hover-background-color: #172024 !default;
+$panel-menu-item-3rd-level-hover-color: inherit !default;
+
+$panel-menu-icon-width: 1.5rem !default;
+$panel-menu-icon-font-size: 1.125rem !default;
+$panel-menu-icon-color: $cool-grey !default;
+$panel-menu-icon-height: $panel-menu-icon-width !default;
+$panel-menu-icon-margin: 0 0.9375rem 0 0 !default;
+$panel-menu-icon-2nd-level-margin: 0 0.75rem 0 -2.25rem !default;
+
+$panel-menu-toggle-icon-font-size: 1.5rem !default;
+
+.rz-panel-menu {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+  overflow: auto;
+
+  color: $panel-menu-color;
+  background-color: $panel-menu-background-color;
+
+  .rz-navigation-item {
+    border-bottom: $panel-menu-item-border;
+  }
+
+  .rz-navigation-item-active {
+    background-color: $panel-menu-item-active-background-color;
+  }
+
+  .rz-navigation-item-wrapper {
+    position: relative;
+    line-height: $panel-menu-item-line-height;
+    padding: $panel-menu-item-padding;
+
+    &:hover {
+      background-color: $panel-menu-hover-background-color;
+      color: $panel-menu-hover-color;
+    }
+  }
+
+  .rz-navigation-item-wrapper-active {
+    background-color: $panel-menu-item-active-background-color;
+
+    &:before {
+      position: absolute;
+      content: '';
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background-color: $default-link;
+    }
+  }
+
+  .rz-navigation-item-link {
+    padding: $panel-menu-item-margin;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  a.rz-navigation-item-link {
+    cursor: pointer;
+  }
+
+  .rz-navigation-item-text {
+    flex: auto;
+  }
+
+  .rz-navigation-item-icon-children {
+    font-size: $panel-menu-toggle-icon-font-size;
+  }
+
+  .rz-navigation-item-icon {
+    height: $panel-menu-item-line-height;
+    width: $panel-menu-icon-width;
+    color: $panel-menu-icon-color;
+    margin: $panel-menu-icon-margin;
+  }
+
+  .rz-navigation-menu {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 0;
+    overflow: hidden;
+
+    .rz-navigation-item-active {
+      background-color: $panel-menu-item-2nd-level-hover-background-color;
+      color: $panel-menu-item-2nd-level-hover-color;
+    }
+
+    .rz-navigation-item-wrapper {
+      padding: $panel-menu-item-2nd-level-padding;
+
+      background-color: $panel-menu-item-active-background-color;
+
+      &:hover {
+        background-color: $panel-menu-item-2nd-level-hover-background-color;
+        color: $panel-menu-item-2nd-level-hover-color;
+      }
+    }
+
+    .rz-navigation-item-icon {
+      margin: $panel-menu-icon-2nd-level-margin;
+    }
+
+    .rz-navigation-menu {
+      .rz-navigation-item-link {
+        padding-left: $panel-menu-item-offset;
+      }
+
+      .rz-navigation-item-active,
+      .rz-navigation-item-wrapper-active {
+        background-color: $panel-menu-item-3rd-level-hover-background-color;
+        color: $panel-menu-item-3rd-level-hover-color;
+      }
+
+      .rz-navigation-item-wrapper {
+        background-color: $panel-menu-item-2nd-level-hover-background-color;
+        color: $panel-menu-item-2nd-level-color;
+
+        &:hover {
+          background-color: $panel-menu-item-3rd-level-hover-background-color;
+          color: $panel-menu-item-3rd-level-hover-color;
+        }
+      }
+    }
+
+    .rz-navigation-item {
+      border-bottom: none;
+
+      font-size: $panel-menu-item-2nd-level-font-size;
+
+      .rz-navigation-item-link {
+        padding-left: $panel-menu-item-2nd-level-offset;
+      }
+    }
+  }
+}

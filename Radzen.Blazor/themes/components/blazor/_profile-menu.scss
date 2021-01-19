@@ -1,0 +1,71 @@
+$profile-menu-background-color: $white !default;
+$profile-menu-top-item-background-color: $profile-menu-background-color !default;
+$profile-menu-border: 1px solid #eaeef0 !default;
+$profile-menu-padding: 0.5625rem 1.25rem !default;
+$profile-menu-border-radius: 2px !default;
+$profile-menu-toggle-button-color: $default-link !default;
+
+$profile-menu-item-hover-background-color: $default-link !default;
+$profile-menu-item-icon-width: 1.125rem !default;
+$profile-menu-item-icon-height: $profile-menu-item-icon-width !default;
+$profile-menu-item-icon-font-size: $profile-menu-item-icon-height !default;
+$profile-menu-item-icon-margin: 0 0.625rem 0 0 !default;
+
+ul.rz-profile-menu {
+  list-style: none;
+  margin-bottom: 0;
+  padding: $profile-menu-padding;
+  display: inline-block;
+  background-color: $profile-menu-top-item-background-color;
+  border-left: $profile-menu-border;
+  position: relative;
+  z-index: 1;
+
+  .rz-navigation-item-icon-children {
+    color: $profile-menu-toggle-button-color;
+  }
+
+  .rz-navigation-menu {
+    border-radius: $profile-menu-border-radius;
+    background-color: $profile-menu-background-color;
+    box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06);
+    overflow: hidden;
+    margin-bottom: 0;
+    padding: 0;
+    position: absolute;
+    text-align: left;
+    top: calc(100% - 2px);
+    min-width: 100%;
+    right: 0;
+    white-space: nowrap;
+
+    .rz-navigation-item-wrapper {
+      padding: $menu-item-padding;
+
+      &:hover {
+        background-color: $profile-menu-item-hover-background-color;
+        color: $menu-item-hover-color;
+
+        .rz-navigation-item-link {
+          color: $menu-item-hover-color;
+        }
+
+        .rz-navigation-item-text {
+          color: $menu-item-hover-color;
+        }
+      }
+    }
+
+    .rz-navigation-item-link,
+    .rz-navigation-item-text {
+      color: $menu-item-color;
+    }
+
+    .rzi {
+      width: $profile-menu-item-icon-width;
+      height: $profile-menu-item-icon-height;
+      font-size: $profile-menu-item-icon-font-size;
+      margin: $profile-menu-item-icon-margin;
+    }
+  }
+}

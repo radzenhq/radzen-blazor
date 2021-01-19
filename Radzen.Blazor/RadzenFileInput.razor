@@ -1,0 +1,155 @@
+﻿@using Radzen
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Forms
+@typeparam TValue
+@inherits FormComponent<TValue>
+
+@if (Visible)
+{
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        <div class="rz-fileupload-buttonbar ">
+            <span class="@getChooseCss()" icon="rzi-upload" label="Choose"  tabindex="@TabIndex">
+                <input disabled="@Disabled" @ref="@fileUpload" name="@Name" type="file" accept="@Accept" @onchange="@OnChange" />
+                <span class="rz-button-icon-left  rzi  rzi-upload"></span><span class="rz-button-text ">@ChooseText</span>
+            </span>
+        </div>
+        <div class="rz-fileupload-content  rz-corner-bottom">
+            @if (!object.Equals(Value, default(TValue)))
+            {
+                <div class="rz-fileupload-files" style="">
+                    <div class="rz-fileupload-row">
+                        <div>
+                            @if (IsImage)
+                            {
+                                <img style="width:100px;" src="@Value">
+                            }
+                        </div>
+                        <div>
+                            @if (!string.IsNullOrEmpty(Title))
+                            {
+                            <span>@Title</span>
+                            } 
+                            else if (!string.IsNullOrEmpty(name))
+                            {
+                            <span>@name</span>
+                            }
+                        </div>
+                        <div>
+                            @if (size != null)
+                            {
+                                <span>@size</span>
+                            }
+                        </div>
+                        <div  tabindex="@TabIndex">
+                            <button disabled="@Disabled" icon="rz-icon-trash" type="button" class="@getButtonCss()">
+                                <span class="rz-button-icon-left rz-icon-trash" style="display:block" @onclick="@Remove"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+@code {
+
+    [Parameter]
+    public string ChooseText { get; set; } = "Choose";
+
+    [Parameter]
+    public string Title { get; set; }
+
+    string getChooseCss()
+    {
+        return $"rz-fileupload-choose rz-button    rz-button-text-icon-left{(Disabled ? " rz-state-disabled" : "")}";
+    }
+    string getButtonCss()
+    {
+        return $"rz-button    rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}";
+    }
+
+    protected override string GetComponentCssClass()
+    {
+        var disabledCss = Disabled ? "rz-state-disabled" : "";
+
+        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
+
+        return $"rz-fileupload  {disabledCss} {fieldCssClass}";
+    }
+
+    string name = "";
+    string size = "";
+
+    protected ElementReference fileUpload;
+
+    private bool IsImage
+    {
+        get
+        {
+            if (Value == null)
+            {
+                return false;
+            }
+            else if (Value is string)
+            {
+                return $"{Value}".StartsWith("data:image");
+            }
+            else if (Value is byte[])
+            {
+                return  $"{System.Text.Encoding.Default.GetString((byte[])(object)Value)}".StartsWith("data:image");
+            }
+
+            return false;
+        }
+    }
+
+    async Task OnChange()
+    {
+        string uploadValue;
+
+        try
+        {
+            uploadValue = await JSRuntime.InvokeAsync<string>("Radzen.readFileAsBase64", fileUpload, MaxFileSize);
+
+            if (typeof(TValue) == typeof(byte[]))
+            {
+                Value = (TValue)(object)System.Text.Encoding.Default.GetBytes($"{uploadValue}");
+            }
+            else if (typeof(TValue) == typeof(string))
+            {
+                Value = (TValue)(object)uploadValue;
+            }
+
+            await ValueChanged.InvokeAsync(Value);
+            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            await Change.InvokeAsync(Value);
+
+            StateHasChanged();
+        }
+        catch(Exception ex)
+        {
+            await Error.InvokeAsync(new UploadErrorEventArgs() { Message = $"Unable to read file as base64 string. {ex.Message}" });
+        }
+    }
+
+    [Parameter]
+    public EventCallback<UploadErrorEventArgs> Error { get; set; }
+
+
+    async System.Threading.Tasks.Task Remove(EventArgs args)
+    {
+        Value = default(TValue);
+
+        await ValueChanged.InvokeAsync(Value);
+        if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+        await Change.InvokeAsync(Value);
+
+        StateHasChanged();
+    }
+
+    [Parameter]
+    public string Accept { get; set; } = "image/*";
+
+    [Parameter]
+    public int MaxFileSize { get; set; } = 5 * 1024 * 1024;
+}

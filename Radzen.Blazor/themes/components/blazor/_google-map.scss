@@ -1,0 +1,16 @@
+$map-height: 10rem !default;
+$map-padding: 1.25rem !default;
+$map-background-color: $white !default;
+$map-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
+
+.rz-map {
+  height: $map-height;
+  padding: $map-padding;
+  background-color: $map-background-color;
+  box-shadow: $map-shadow;
+  border-radius: $border-radius;
+}
+
+.rz-map-container {
+  height: 100%;
+}

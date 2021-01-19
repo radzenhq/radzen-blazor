@@ -1,0 +1,70 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+
+<g class="rz-arc-gauge-scale-value">
+    <GaugeBand 
+        From=@Scale.Min
+        To=@Value
+        Fill=@Fill
+        Stroke=@Stroke
+        StrokeWidth=@StrokeWidth
+        Radius=@Scale.CurrentRadius
+        Center=@Scale.CurrentCenter
+        StartAngle=@Scale.StartAngle
+        EndAngle=@Scale.EndAngle
+        Min=@Scale.Min
+        Max=@Scale.Max
+        Size=@Scale.CurrentSize
+    />
+</g>
+@code {
+    [Parameter]
+    public double Value { get; set; }
+
+    [CascadingParameter]
+    public RadzenArcGaugeScale Scale { get; set; }
+
+    [Parameter]
+    public string Stroke { get; set; }
+
+    [Parameter]
+    public double StrokeWidth { get; set; }
+
+    [Parameter]
+    public string Fill { get; set; }
+
+    [Parameter]
+    public bool ShowValue { get; set; } = true;
+
+    [Parameter]
+    public string FormatString { get; set; }
+
+    [Parameter]
+    public RenderFragment<RadzenArcGaugeScaleValue> Template { get; set; }
+
+    [CascadingParameter]
+    public RadzenArcGauge Gauge { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Gauge.AddValue(this);
+    }
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var shouldRefresh = false;
+
+        if (parameters.DidParameterChange(nameof(Value), Value) || parameters.DidParameterChange(nameof(ShowValue), ShowValue))
+        {
+            shouldRefresh = true;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (shouldRefresh)
+        {
+            Gauge.Reload();
+        }
+    }
+}

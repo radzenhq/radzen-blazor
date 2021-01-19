@@ -1,0 +1,43 @@
+﻿@using Radzen
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
+@using System.Linq.Dynamic.Core;
+@inherits FormComponent<string>
+@if (Visible)
+{
+    <input @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@TabIndex"
+           placeholder="@Placeholder" maxlength="@MaxLength" autocomplete="@(AutoComplete ? "on" : "off")" value="@Value" @onchange="@OnChange" id="@GetId()"
+           onkeyup="Radzen.mask('@GetId()', '@Mask', '@Pattern')"/>
+}
+@code {
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public bool AutoComplete { get; set; } = true;
+
+    [Parameter]
+    public long? MaxLength { get; set; }
+
+    [Parameter]
+    public string Mask { get; set; }
+
+    [Parameter]
+    public string Pattern { get; set; }
+
+    protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
+    {
+        Value = $"{args.Value}";
+
+        await ValueChanged.InvokeAsync(Value);
+        if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+        await Change.InvokeAsync(Value);
+    }
+
+    protected override string GetComponentCssClass()
+    {
+        var disabledCss = Disabled ? " rz-state-disabled" : "";
+        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
+        return $"rz-textbox{disabledCss} {fieldCssClass}";
+    }
+}

@@ -1,0 +1,145 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Http
+@using Radzen.Blazor
+@inherits LayoutComponentBase
+@inject ThemeState ThemeState
+@inject ExampleService ExampleService
+@inject NavigationManager UriHelper
+@inject IJSRuntime JSRuntime
+@inject IHttpContextAccessor httpContextAccessor
+
+@if (Theme != "default.css")
+{
+    <link href="_content/Radzen.Blazor/css/@(Theme)" rel="stylesheet" />
+}
+<RadzenDialog />
+<RadzenNotification />
+<RadzenTooltip />
+<RadzenContextMenu />
+
+<RadzenHeader>
+    <ChildContent>
+        <div class="row justify-content-start align-items-center">
+            <div class="col-6 d-flex align-items-center">
+                <RadzenSidebarToggle Click="@(args => { sidebarExpanded = !sidebarExpanded; bodyExpanded = !bodyExpanded; })">
+                </RadzenSidebarToggle>
+                <RadzenLabel Text="Radzen Blazor Components">
+                </RadzenLabel>
+            </div>
+            <div class="col-6 d-flex align-items-center justify-content-end">
+                <div class="d-none d-md-inline-flex align-items-center">
+                  <Social /> 
+                </div>
+                <label class="d-none d-sm-inline-block" style="margin-left: 1rem">Theme:</label>
+                <RadzenDropDown style="margin:0 .5rem" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" />
+            </div>
+        </div>
+    </ChildContent>
+</RadzenHeader>
+<div style="width:100%">
+    <RadzenBody @ref="@body0" @bind-Expanded="@bodyExpanded">
+        <ChildContent>
+            <RadzenContentContainer Name="main">
+                @Body
+            </RadzenContentContainer>
+        </ChildContent>
+    </RadzenBody>
+</div>
+<RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded">
+    <ChildContent>
+        <div style="padding: 1rem">
+            <span style="width: 100%" class="ui-autocomplete ui-widget">
+                <input placeholder="Find component ..." class="ui-inputtext ui-widget ui-state-default ui-corner-all ui-autocomplete-input" type="search" @oninput="@FilterPanelMenu" />
+            </span>
+        </div>
+        <RadzenPanelMenu>
+            @foreach (var category in examples)
+            {
+                <RadzenPanelMenuItem @bind-Expanded="@category.Expanded" Text="@category.Name" Path="@category.Path" Icon="@category.Icon">
+                    @if (category.Children != null)
+                    {
+                        @foreach (var example in category.Children)
+                        {
+                            <RadzenPanelMenuItem Text="@example.Name" Path="@example.Path" Icon="@example.Icon" />
+                        }
+                    }
+                </RadzenPanelMenuItem>
+            }
+        </RadzenPanelMenu>
+    </ChildContent>
+</RadzenSidebar>
+<RadzenFooter>
+    <ChildContent>
+        <RadzenLabel Text="Radzen Blazor Components, Copyright &copy; 2020">
+        </RadzenLabel>
+        <RadzenLink Text="[source]" Path="https://github.com/radzenhq/radzen-blazor" Target="_blank" Style="margin-left:5px;vertical-align:bottom;" />
+    </ChildContent>
+</RadzenFooter>
+@code {
+    RadzenSidebar sidebar0;
+    RadzenBody body0;
+    bool sidebarExpanded = true;
+    bool bodyExpanded = false;
+
+    dynamic themes = new[]
+    {
+        new { Text = "Default", Value = "default"},
+        new { Text = "Dark", Value="dark" },
+        new { Text = "Software", Value = "software"},
+        new { Text = "Humanistic", Value = "humanistic" }
+    };
+
+    IEnumerable<Example> examples;
+
+    string Theme
+    {
+        get
+        {
+            return $"{ThemeState.CurrentTheme}.css";
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        if (httpContextAccessor != null && httpContextAccessor.HttpContext != null &&
+             httpContextAccessor.HttpContext.Request != null && httpContextAccessor.HttpContext.Request.Headers.ContainsKey("User-Agent"))
+        {
+            var userAgent = httpContextAccessor.HttpContext.Request.Headers["User-Agent"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(userAgent))
+            {
+                if (userAgent.Contains("iPhone") || userAgent.Contains("Android") || userAgent.Contains("Googlebot"))
+                {
+                    sidebarExpanded = false;
+                    bodyExpanded = true;
+                }
+            }
+        }
+
+        examples = ExampleService.Examples;
+
+        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            var example = ExampleService.FindCurrent(UriHelper.ToAbsoluteUri(UriHelper.Uri));
+
+            await JSRuntime.InvokeVoidAsync("setTitle", ExampleService.TitleFor(example));
+        }
+    }
+
+    void FilterPanelMenu(ChangeEventArgs args)
+    {
+        var term = args.Value.ToString();
+
+        examples = ExampleService.Filter(term);
+    }
+
+    void ChangeTheme(object value)
+    {
+        ThemeState.CurrentTheme = value.ToString();
+        UriHelper.NavigateTo(UriHelper.ToAbsoluteUri(UriHelper.Uri).ToString());
+    }
+}

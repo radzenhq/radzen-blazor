@@ -1,0 +1,47 @@
+<button @onclick=@OnClick class=@Class disabled=@(Editor.Disabled || Disabled) @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@Title>
+    <i class="rzi">@Icon</i>
+</button>
+@code {
+    [CascadingParameter]
+    public RadzenHtmlEditor Editor { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool Selected { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public EventCallback Click { get; set; }
+
+    async Task OnClick()
+    {
+        await Click.InvokeAsync(null);
+    }
+
+    string Class
+    {
+        get
+        {
+            var classList = new List<string>() { "rz-html-editor-button" };
+
+            if (Selected && !Editor.Disabled)
+            {
+                classList.Add("rz-selected");
+            }
+
+            return string.Join(" ", classList);
+        }
+    }
+
+    void Empty()
+    {
+
+    }
+}

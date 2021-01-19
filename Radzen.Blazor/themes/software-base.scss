@@ -1,0 +1,64 @@
+@import 'colors';
+@import 'variables';
+// Theme colors
+$primary-color: #598087 !default;
+$secondary: #80a4ab !default;
+$tertiary: $cool-grey !default;
+$additional-1: $soft-green !default;
+$additional-2: $tip !default;
+$additional-3: $dev !default;
+$contrast: $charcoal-grey !default;
+
+$default-background-color: $white !default;
+$button-hover-background-color: #ff7b54 !default;
+$button-active-background-color: #e5613a !default;
+$sidebar-background-color: $charcoal-grey !default;
+
+// Bootstrap overrides
+$primary: $primary-color !default;
+$danger: #f9777f !default;
+$info: $tip !default;
+$success: $additional-1 !default;
+$warning: $dull-yellow !default;
+$light: #e6ecef !default;
+$default-link: $primary;
+$link-color: $default-link;
+$link-hover-color: $default-link;
+$state-success-bg: $success;
+$state-warning-bg: $warning;
+$state-danger-bg: $danger;
+$state-info-bg: $info;
+$body-color: #212529 !default;
+
+$dropdown-item-hover-background-color: $secondary;
+
+$checkbox-checked-background-color: $secondary;
+$checkbox-checked-hover-background-color: $secondary;
+
+$switch-checked-background-color: $secondary;
+
+$radio-checked-background-color: $secondary;
+
+$body-bg: #f3f5f7;
+$font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
+  'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
+  'Segoe UI Emoji', 'Segoe UI Symbol';
+
+$secondary-hover: $secondary;
+
+// Tree
+$tree-node-hover-background-color: $secondary-hover;
+// Slider
+$slider-handle-hover-background-color: $secondary-hover;
+$slider-range-background-color: $secondary-hover;
+$slider-range-border: 1px solid #598087;
+// DropDown
+$dropdown-item-hover-background-color: $secondary-hover;
+// Radio
+$radio-checked-hover-background-color: $secondary-hover;
+// SplitButton
+$splitbutton-menu-button-border: 1px solid #475359;
+
+@import 'fonts';
+@import 'typography';
+@import 'components';

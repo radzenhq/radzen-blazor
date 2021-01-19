@@ -1,0 +1,78 @@
+﻿@page "/example-upload"
+
+<RadzenExample Name="Upload">
+<div class="row">
+    <div class="col-xl-6">
+        <h3>Single file upload</h3>
+        <RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
+                      Progress=@(args => OnProgress(args, "Single file upload"))>
+        </RadzenUpload>
+        <h3 style="margin-top: 1rem">Custom HTTP headers</h3>
+        <RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
+                      Progress=@(args => OnProgress(args, "Single file upload"))>
+            <RadzenUploadHeader Name="Authorization" Value="Bearer <token>" />
+            <RadzenUploadHeader Name="X-Uploaded-By" Value="Radzen" />
+        </RadzenUpload>
+        <h3 style="margin-top: 1rem">Multiple files upload</h3>
+        <RadzenUpload Multiple="true" Url="upload/multiple" Style="margin-bottom: 20px;"
+                      Progress=@(args => OnProgress(args, "Multiple files upload")) />
+        <h3 style="margin-top: 1rem">Upload images only</h3>
+        <RadzenUpload Multiple="true" Accept="image/*" Url="upload/multiple" Style="margin-bottom: 20px;"
+                      Progress=@(args => OnProgress(args, "Images only upload")) />
+        <h3 style="margin-top: 1rem">Upload with additional parameter</h3>
+        <RadzenUpload Multiple="true" Accept="image/*" Url=@($"upload/{1}") Style="margin-bottom: 20px;"
+                      Progress=@(args => OnProgress(args, "Upload with additional parameter")) />
+        <h3 style="margin-top: 1rem">Manual Upload</h3>
+        <RadzenUpload @ref="upload" Auto="false" Multiple="true" Url="upload/multiple" Style="margin-bottom: 20px;" Change=@(args => OnChange(args, "Manual Upload"))
+                      Progress=@(args => OnProgress(args, "Manual Upload")) />
+        <RadzenButton Text="Upload" Click=@(args => upload.Upload()) Style="margin-bottom: 20px;" />
+        <h3 style="margin-top: 1rem">Upload completed</h3>
+        <RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
+                      Complete=@OnComplete />
+        <br />
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    EventConsole console;
+
+    RadzenUpload upload;
+
+    int progress;
+    string info;
+
+    void OnChange(UploadChangeEventArgs args, string name)
+    {
+        foreach (var file in args.Files)
+        {
+            console.Log($"File: {file.Name} / {file.Size} bytes");
+        }
+
+        console.Log($"{name} changed");
+    }
+
+    void OnProgress(UploadProgressArgs args, string name)
+    {
+        this.info = $"% '{name}' / {args.Loaded} of {args.Total} bytes.";
+        this.progress = args.Progress;
+
+        if (args.Progress == 100)
+        {
+            console.Clear();
+
+            foreach (var file in args.Files)
+            {
+                console.Log($"Uploaded: {file.Name} / {file.Size} bytes");
+            }
+        }
+    }
+
+    void OnComplete(UploadCompleteEventArgs args)
+    {
+        console.Log($"Server response: {args.RawResponse}");
+    }
+}

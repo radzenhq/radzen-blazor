@@ -1,0 +1,85 @@
+$input-border: 1px solid #dadfe2 !default;
+$input-line-height: 1.75rem !default;
+$input-padding: 0.1875rem 0.625rem !default;
+$input-font-size: 0.875rem !default;
+$input-shadow: inset 0 4px 3px 0 rgba(0, 0, 0, 0.03) !default;
+$input-placeholder-color: #3a3a3a !default;
+$input-background-color: $white !default;
+$input-border-radius: $border-radius !default;
+$input-value-color: $body-color !default;
+
+$input-hover-shadow: inset 0 4px 7px 0 rgba(0, 0, 0, 0.03) !default;
+$input-hover-border: 1px solid #cecece !default;
+
+$input-disabled-shadow: inset 0 4px 7px 0 rgba(0, 0, 0, 0.03) !default;
+$input-disabled-background-color: rgba(#fff, 0.7) !default;
+$input-disabled-border: solid 1px #eaeaea !default;
+$input-disabled-color: rgba(#3a3a3a, 0.4) !default;
+
+%input-hover {
+  box-shadow: $input-hover-shadow;
+  border: $input-hover-border;
+}
+
+%input-disabled {
+  color: $input-disabled-color;
+  box-shadow: $input-disabled-shadow;
+  background-color: $input-disabled-background-color;
+  border: $input-disabled-border;
+
+  &::placeholder {
+    color: $input-disabled-color;
+  }
+
+  .rz-inputtext {
+    background-color: transparent;
+    color: inherit;
+  }
+}
+
+input {
+  color: $input-value-color;
+  font-size: $input-font-size;
+
+  &::placeholder {
+    color: $input-placeholder-color;
+  }
+}
+
+%input-base {
+  @extend %input-no-padding;
+  padding: $input-padding;
+}
+
+%input-no-padding {
+  border: $input-border;
+  border-radius: $input-border-radius;
+  box-shadow: $input-shadow;
+  background-color: $input-background-color;
+}
+
+%input {
+  height: $input-height;
+  line-height: $input-line-height;
+  color: $input-value-color;
+  font-size: $input-font-size;
+
+  @extend %input-base;
+
+  &:hover {
+    &:not(:focus) {
+      @extend %input-hover;
+    }
+  }
+
+  &:disabled {
+    @extend %input-disabled;
+  }
+}
+
+@media (max-width: 768px) {
+  %input,
+  input {
+    font-size: 1rem;
+  }
+}

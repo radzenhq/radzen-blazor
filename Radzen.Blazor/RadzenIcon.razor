@@ -1,0 +1,15 @@
+﻿@inherits RadzenComponent
+
+@if (Visible)
+{
+    <i @ref="@Element" style="@Style" class="@GetCssClass()" @attributes="Attributes" id="@GetId()">@((MarkupString)Icon)</i>
+}
+@code {
+    [Parameter]
+    public string Icon { get; set; }
+
+    protected override string GetComponentCssClass()
+    {
+        return "rzi d-inline-flex justify-content-center align-items-center";
+    }
+}

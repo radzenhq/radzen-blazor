@@ -1,0 +1,118 @@
+$radio-width: 1.25rem !default;
+$radio-height: $radio-width !default;
+$radio-border-radius: 50%;
+$radio-label-margin: 0 1rem 0 0.5rem;
+$radio-margin: 1rem 0;
+
+$radio-active-background-color: #3f8cb3 !default;
+$radio-active-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.1) !default;
+
+$radio-checked-background-color: #3f8cb3 !default;
+$radio-checked-hover-background-color: #59a6cd !default;
+$radio-checked-hover-shadow: inset 0 -3px 0 0 rgba(#fff, 0.2) !default;
+
+$radio-checked-color: $white !default;
+
+$radio-circle-background-color: $white !default;
+$radio-circle-shadow: inset 0 4px 7px 0 rgba(0, 0, 0, 0.03);
+$radio-circle-hover-background-color: #fafafa !default;
+
+$radio-icon-width: 0.5rem !default;
+$radio-icon-height: $radio-icon-width !default;
+$radio-checked-border: $input-border !default;
+
+.rz-radio-button-list-vertical {
+  .rz-radio-btn {
+    display: flex;
+    margin: $radio-margin;
+  }
+}
+
+.rz-radio-button-list-horizontal {
+  .rz-radio-btn {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+.rz-radiobutton {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.rz-radiobutton-label {
+  margin: $radio-label-margin;
+}
+
+.rz-radiobutton {
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+
+  width: $radio-width;
+  height: $radio-height;
+
+  .rz-helper-hidden-accessible {
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+  }
+}
+
+.rz-radiobutton-box {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: inherit;
+
+  border: $input-border;
+  border-radius: $radio-border-radius;
+  box-shadow: $input-shadow;
+  background-color: $input-background-color;
+
+  &:hover:not(.rz-state-disabled) {
+    @extend %input-hover;
+  }
+
+  &:active {
+    background-color: $radio-active-background-color;
+    box-shadow: $radio-active-shadow;
+  }
+
+  &.rz-state-disabled {
+    @extend %input-disabled;
+  }
+
+  .rzi {
+    width: $radio-icon-width;
+    height: $radio-icon-height;
+    color: $radio-checked-color;
+  }
+
+  .rzi-circle-on {
+    border-radius: $radio-border-radius;
+    vertical-align: middle;
+    background-color: $radio-circle-background-color;
+    box-shadow: $radio-circle-shadow;
+
+    &:hover {
+      background-color: $radio-circle-hover-background-color;
+    }
+  }
+
+  &.rz-state-active {
+    background-color: $radio-checked-background-color;
+    border: $radio-checked-border;
+
+    &:hover {
+      background-color: $radio-checked-hover-background-color;
+      box-shadow: $radio-checked-hover-shadow;
+    }
+  }
+}

@@ -1,0 +1,63 @@
+$gauge-scale-color: #808080 !default;
+$gauge-scale-label-color: #808080 !default;
+$gauge-scale-font-size: 0.875rem !default;
+$gauge-pointer-color: $greyish-brown !default;
+$gauge-arc-scale-color: #e6ecef !default;
+$gauge-arc-scale-label-color: #808080 !default;
+$gauge-arc-value-color: $default-link !default;
+
+.rz-gauge,
+.rz-arc-gauge {
+  position: relative;
+  display: inline-block;
+  width: 300px;
+  height: 300px;
+}
+
+.rz-gauge {
+  .rz-line,
+  .rz-tick {
+    stroke: $gauge-scale-color;
+  }
+
+  .rz-tick-text {
+    font-size: $gauge-scale-font-size;
+    fill: $gauge-scale-label-color;
+  }
+}
+
+.rz-arc-gauge {
+  .rz-line,
+  .rz-tick {
+    stroke: $gauge-arc-scale-color;
+  }
+
+  .rz-tick-text {
+    font-size: $gauge-scale-font-size;
+    fill: $gauge-arc-scale-label-color;
+  }
+}
+
+.rz-gauge-value {
+  position: absolute;
+  transform: translateX(-50%);
+  padding: 0.5rem;
+}
+
+.rz-arc-gauge-value {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 0.5rem;
+}
+
+.rz-gauge-pointer {
+  fill: $gauge-pointer-color;
+}
+
+.rz-arc-gauge-scale-value {
+  fill: $gauge-arc-value-color;
+}
+
+.rz-arc-gauge-scale {
+  fill: $gauge-arc-scale-color;
+}

@@ -1,0 +1,133 @@
+@using Radzen
+
+<li class="rz-treenode">
+    <div class="@($"rz-treenode-content {(selected ? "rz-treenode-content-selected" : "")}")" @onclick="@Select">
+        @if (ChildContent != null || HasChildren)
+        {
+            <span class="@($"rz-tree-toggler rzi {(expanded ? "rzi-caret-down" : "rzi-caret-right")}")" @onclick="@Toggle" @onclick:stopPropagation></span>
+        }
+        @if (Template != null)
+        {
+            @Template(this)
+        } else
+        {
+            <span class="rz-treenode-label">@Text</span>
+        }
+    </div>
+    @if (ChildContent != null && expanded)
+    {
+    <ul class="rz-treenode-children">
+        @ChildContent
+    </ul>
+    }
+</li>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<RadzenTreeItem> Template { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    private bool expanded;
+
+    [Parameter]
+    public bool Expanded { get; set; }
+
+    [Parameter]
+    public object Value { get; set; }
+
+    [Parameter]
+    public bool HasChildren { get; set; }
+
+    private bool selected;
+
+    [Parameter]
+    public bool Selected { get; set; }
+
+    [CascadingParameter]
+    public RadzenTree Tree { get; set; }
+
+    async Task Toggle()
+    {
+        expanded = !expanded;
+
+        if (expanded)
+        {
+            await Tree?.ExpandItem(this);
+        }
+    }
+
+    void Select()
+    {
+        selected = true;
+        Tree?.SelectItem(this);
+    }
+
+    internal void Unselect()
+    {
+        selected = false;
+        StateHasChanged();
+    }
+
+    internal void RenderChildContent(RenderFragment content)
+    {
+        ChildContent = content;
+    }
+
+    override protected void OnInitialized()
+    {
+        expanded = Expanded;
+
+        if (expanded)
+        {
+            Tree?.ExpandItem(this);
+        }
+
+        selected = Selected;
+
+        if (selected)
+        {
+            Tree?.SelectItem(this);
+        }
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var shouldExpand = false;
+
+        if (parameters.DidParameterChange(nameof(Expanded), Expanded))
+        {
+            // The Expanded property has changed - update the expanded state
+            expanded = parameters.GetValueOrDefault<bool>(nameof(Expanded));
+            shouldExpand = true;
+        }
+
+        if (parameters.DidParameterChange(nameof(Value), Value))
+        {
+            // The Value property has changed - the children may have also changed
+            shouldExpand = expanded;
+        }
+
+        if (shouldExpand)
+        {
+            // Either the expanded state or Value changed - expand the node to render its children
+            Tree?.ExpandItem(this);
+        }
+
+        if (parameters.DidParameterChange(nameof(Selected), Selected))
+        {
+            selected = parameters.GetValueOrDefault<bool>(nameof(Selected));
+
+            if (selected)
+            {
+                Tree?.SelectItem(this);
+            }
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
+}

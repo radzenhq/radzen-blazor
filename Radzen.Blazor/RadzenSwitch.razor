@@ -1,0 +1,39 @@
+﻿@using Radzen
+@using Microsoft.AspNetCore.Components.Forms
+@inherits FormComponent<bool>
+@if (Visible)
+{
+<div @ref="@Element" @attributes="Attributes" class="@GetCssClass()"
+     @onmouseup="@OnMouseUp" @onkeypress="@(async (args) => { if (args.Code == "Space") { await Toggle(); } })" style="outline: 0 none;@Style" tabindex="@TabIndex">
+    <div class="rz-helper-hidden-accessible">
+        <input type="checkbox" name="@Name" value="@Value" tabindex="-1">
+    </div>
+    <span class="rz-switch-circle@(Disabled ? " rz-disabled" : "")"></span>
+</div>
+}
+@code {
+    protected override string GetComponentCssClass()
+    {
+        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
+        return $"rz-switch {(Value ? " rz-switch-checked " : "")} {fieldCssClass}";
+    }
+
+    public async Task OnMouseUp(MouseEventArgs args)
+    {
+        await Toggle();
+    }
+
+    async System.Threading.Tasks.Task Toggle()
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        Value = !Value;
+
+        await ValueChanged.InvokeAsync(Value);
+        if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+        await Change.InvokeAsync(Value);
+    }
+}

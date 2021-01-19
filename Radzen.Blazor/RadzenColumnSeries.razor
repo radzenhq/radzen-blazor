@@ -1,0 +1,167 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+@implements IChartColumnSeries
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+
+@code {
+   [Parameter]
+   public string Fill { get; set; }
+
+   [Parameter]
+   public string Stroke { get; set; }
+
+   [Parameter]
+   public double StrokeWidth { get; set; }
+
+   [Parameter]
+   public LineType LineType { get; set; }
+
+   public override string Color
+   {
+       get
+       {
+           return Fill;
+       }
+   }
+
+   int IChartColumnSeries.Count 
+   {
+       get
+       {
+           if (Items == null)
+           {
+               return 0;
+           }
+
+           return Items.Count();
+       }
+   }
+
+   private IList<IChartSeries> ColumnSeries
+   {
+        get
+        {
+            return Chart.Series.Where(series => series is IChartColumnSeries).Cast<IChartSeries>().ToList();
+        }
+   }
+
+   private IList<IChartSeries> VisibleColumnSeries
+   {
+       get
+       {
+           return ColumnSeries.Where(series => series.Visible).ToList();
+       }
+   }
+
+   private double BandWidth
+   {
+       get
+       {
+            var availableWidth = Chart.CategoryScale.OutputSize - (Chart.CategoryAxis.Padding * 2);
+            var bands = VisibleColumnSeries.Cast<IChartColumnSeries>().Max(series => series.Count) + 2;
+            return availableWidth / bands;
+       }
+   }
+
+   public override bool Contains(double x, double y)
+   {
+       return DataAt(x, y) != null;
+   }
+
+   protected override double TooltipX(TItem item)
+   {
+       var columnSeries = VisibleColumnSeries;
+       var index = columnSeries.IndexOf(this);
+       var padding = Chart.ColumnOptions.Margin;
+       var bandWidth = BandWidth;
+       var width = bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();
+       var category = ComposeCategory(Chart.CategoryScale);
+       var x = category(item) - bandWidth / 2 + index * width + index * padding;
+
+       return x + width / 2;
+   }
+
+    protected override double TooltipY(TItem item)
+    {
+        var y = base.TooltipY(item);
+        var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+        var y0 = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
+
+        return Math.Min(y, y0);
+    }
+   public override object DataAt(double x, double y)
+   {
+        var category = ComposeCategory(Chart.CategoryScale);
+        var value = ComposeValue(Chart.ValueScale);
+        var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+        var y0 = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
+
+        var columnSeries = VisibleColumnSeries;
+        var index = columnSeries.IndexOf(this);
+        var padding = Chart.ColumnOptions.Margin;
+        var bandWidth = BandWidth;
+        var width = bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();
+
+        foreach(var data in Items)
+        {
+            var startX = category(data) - bandWidth / 2 + index * width + index * padding;
+            var endX = startX + width;
+            var dataY = value(data);
+            var startY = Math.Min(dataY, y0);
+            var endY = Math.Max(dataY, y0);
+
+            if (startX <= x && x <= endX && startY <= y && y <= endY)
+            {
+                return data;
+            }
+        }
+
+        return null;
+    }
+
+   public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+   {
+        var category = ComposeCategory(categoryScale);
+        var value = ComposeValue(valueScale);
+        var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+        var y0 = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
+        var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
+
+        var columnSeries = VisibleColumnSeries;
+        var index = columnSeries.IndexOf(this);
+        var padding = Chart.ColumnOptions.Margin;
+
+        var bandWidth = BandWidth;
+        var width = bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();;
+        var className = $"rz-column-series rz-series-{Chart.Series.IndexOf(this)}";
+
+        return 
+        @<g class="@className">
+            @foreach(var data in Items)
+            {
+                var x = category(data) - bandWidth / 2 + index * width + index * padding;
+                var y = value(data);
+                var radius = Chart.ColumnOptions.Radius;
+
+                if (radius > width / 2)
+                {
+                    radius = 0;
+                }
+
+                var path = $"M {x.ToInvariantString()} {(y+radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + radius).ToInvariantString()} {y.ToInvariantString()} L {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(y+radius).ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
+
+                if (y > y0)
+                {
+                    path = $"M {x.ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {(y-radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} L {(x + radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {x.ToInvariantString()} {(y-radius).ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
+                }
+
+                <Path @key="@path" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Fill="@Fill" LineType="@LineType" Style="@style" />
+            }
+        </g>;
+    }
+}

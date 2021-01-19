@@ -1,0 +1,85 @@
+<div title=@Title class="rz-html-editor-colorpicker" @onmousedown:preventDefault>
+    <button class="rz-html-editor-color" @onclick=@OnClick disabled=@Editor.Disabled @onclick:preventDefault>
+        <i class="rzi">@Icon</i>
+        <div class="rz-html-editor-color-value" style="background-color:@Value"></div>
+    </button>
+    <RadzenColorPicker 
+        @bind-Value=@Value Change=@OnChange @onclick:stopPropagation 
+        Open=@OnOpen Disabled=@Editor.Disabled ShowHSV=@ShowHSV
+        ShowRGBA=@ShowRGBA ShowColors=@ShowColors ShowButton=@ShowButton
+        HexText=@HexText RedText=@RedText GreenText=@GreenText BlueText=@BlueText AlphaText=@AlphaText
+        ButtonText=@ButtonText
+        >
+    @ChildContent
+    </RadzenColorPicker>
+</div>
+
+@code {
+    [CascadingParameter]
+    public RadzenHtmlEditor Editor { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public bool ShowHSV { get; set; } = true;
+
+    [Parameter]
+    public bool ShowRGBA { get; set; } = true;
+
+    [Parameter]
+    public bool ShowColors { get; set; } = true;
+
+    [Parameter]
+    public bool ShowButton { get; set; } = true;
+
+    [Parameter]
+    public string HexText { get; set; } = "Hex";
+
+    [Parameter]
+    public string RedText { get; set; } = "R";
+
+    [Parameter]
+    public string GreenText { get; set; } = "G";
+
+    [Parameter]
+    public string BlueText { get; set; } = "B";
+
+    [Parameter]
+    public string AlphaText { get; set; } = "A";
+
+    [Parameter]
+    public string ButtonText { get; set; } = "OK";
+
+    [Parameter]
+    public EventCallback<string> Change { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    async Task OnChange(string value)
+    {
+        await Editor.RestoreSelectionAsync();
+        await ValueChanged.InvokeAsync(value);
+        await Change.InvokeAsync(value);
+    }
+
+    async Task OnOpen()
+    {
+        await Editor.SaveSelectionAsync();
+    }
+
+    async Task OnClick()
+    {
+        await Change.InvokeAsync(Value);
+    }
+}

@@ -1,0 +1,65 @@
+@typeparam TItem
+
+@foreach(var data in Data)
+{
+    var x = Category(data);
+    var y = Value(data);
+
+    @if (InPlotArea(x, y))
+    {
+        <Marker X="@x" Y="@y" Type="@MarkerType" Fill="@Fill" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Size="@Size" />
+    }
+}
+
+@code {
+    [CascadingParameter]
+    public RadzenChart Chart { get; set;}
+
+    [Parameter]
+    public IEnumerable<TItem> Data { get; set; }
+
+    [Parameter]
+    public Func<TItem, double> Category { get; set; }
+    
+    [Parameter]
+    public Func<TItem, double> Value { get; set; }
+
+    [Parameter]
+    public MarkerType MarkerType { get; set; }
+
+    [Parameter]
+    public string Stroke { get; set; }
+
+    [Parameter]
+    public string Fill { get; set; }
+
+    [Parameter]
+    public double StrokeWidth { get; set; }
+
+    [Parameter]
+    public double Size { get; set; }
+
+    private double x1;
+    private double x2;
+
+    private double y1;
+    private double y2;
+
+    private bool InPlotArea(double x, double y)
+    {
+        return x >= x1 && x <= x2 && y >= y1 && y <= y2;
+    }
+
+    protected override void OnParametersSet()
+    {
+        var categoryTicks = Chart.CategoryScale.Ticks(Chart.CategoryAxis.TickDistance);
+
+        x1 = Chart.CategoryScale.Scale(categoryTicks.Start);
+        x2 = Chart.CategoryScale.Scale(categoryTicks.End);
+
+        var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+
+        y1 = Chart.ValueScale.Scale(valueTicks.End);
+        y2 = Chart.ValueScale.Scale(valueTicks.Start);
+    }
+}

@@ -1,0 +1,43 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenChartComponentBase
+
+@code {
+    [Parameter]
+    public LegendPosition Position { get; set; }
+
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
+    internal double Measure(RadzenChart chart)
+    {
+        if (!Visible)
+        {
+            return 0;
+        }
+
+        double length = 0;
+
+        var size = 16 * 0.875;
+
+        if (Position == LegendPosition.Right || Position == LegendPosition.Left)
+        {
+            if (chart.Series.Any())
+            {
+                length = chart.Series.Select(series => series.MeasureLegend()).Max();
+                size = length + 8 + 2 * chart.Series.Select(series => series.MarkerSize).Max();
+            }
+        }
+
+        return size;
+    }
+
+    protected override void Initialize()
+    {
+        Chart.Legend = this;
+    }
+
+    protected override bool ShouldRefreshChart(ParameterView parameters)
+    {
+        return DidParameterChange(parameters, nameof(Position), Position) || DidParameterChange(parameters, nameof(Visible), Visible);
+    }
+}

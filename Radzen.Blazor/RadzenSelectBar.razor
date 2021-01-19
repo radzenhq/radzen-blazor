@@ -1,0 +1,124 @@
+﻿@using System.Linq
+@using System.Collections
+@using System.Linq.Dynamic.Core
+@typeparam TValue
+@using Microsoft.AspNetCore.Components.Forms
+@inherits FormComponent<TValue>
+@implements IRadzenSelectBar
+@if (Items != null)
+{
+    <CascadingValue Value=this>
+        @Items
+    </CascadingValue>
+}
+@if (Visible)
+{
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        @foreach (var item in items.Where(i => i.Visible))
+        {<div @onclick="@(args => SelectItem(item))" @onkeypress="@(async args => { if (args.Code == "Space") { await SelectItem(item); } })" @attributes="item.Attributes" style="@item.Style"
+              class="@($"rz-button   rz-button-text-only{getActiveState(item)}{getDisabledState()}")" aria-label="@item.Text" tabindex="@TabIndex"><span class="rz-button-text ">@item.Text</span></div>}
+    </div>
+}
+
+@code {
+    protected override string GetComponentCssClass()
+    {
+        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
+        return $"rz-selectbutton rz-buttonset   rz-buttonset-{items.Count} {fieldCssClass}";
+    }
+
+    [Parameter]
+    public bool Multiple { get; set; }
+
+    [Parameter]
+    public RenderFragment Items { get; set; }
+
+    List<RadzenSelectBarItem> items = new List<RadzenSelectBarItem>();
+
+    public void AddItem(RadzenSelectBarItem item)
+    {
+        if (items.IndexOf(item) == -1)
+        {
+            items.Add(item);
+            StateHasChanged();
+        }
+    }
+
+    public void RemoveItem(RadzenSelectBarItem item)
+    {
+        if (items.Contains(item))
+        {
+            items.Remove(item);
+            try { InvokeAsync(StateHasChanged); } catch { }
+        }
+    }
+
+    protected bool IsSelected(RadzenSelectBarItem item)
+    {
+        if (Value != null)
+        {
+            if (Multiple)
+            {
+                return ((IEnumerable)Value).Cast<object>().Contains(item.Value);
+            }
+            else
+            {
+                return object.Equals(Value, item.Value);
+            }
+        }
+
+        return false;
+    }
+
+    public override bool HasValue
+    {
+        get
+        {
+            return Multiple ? Value != null && ((IEnumerable)Value).Cast<object>().Any() : Value != null;
+        }
+    }
+
+    protected async System.Threading.Tasks.Task SelectItem(RadzenSelectBarItem item)
+    {
+        if (Disabled)
+            return;
+
+        if (Multiple)
+        {
+            var type = typeof(TValue).IsGenericType ? typeof(TValue).GetGenericArguments()[0] : typeof(TValue);
+
+            var selectedValues = Value != null ? ((IEnumerable)Value).AsQueryable().Cast(type).AsEnumerable().ToList() : new List<dynamic>();
+
+            if (!selectedValues.Contains(item.Value))
+            {
+                selectedValues.Add(item.Value);
+            }
+            else
+            {
+                selectedValues.Remove(item.Value);
+            }
+
+            Value = (TValue)selectedValues.AsQueryable().Cast(type);
+        }
+        else
+        {
+            Value = (TValue)item.Value;
+        }
+
+        await ValueChanged.InvokeAsync(Value);
+        if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+        await Change.InvokeAsync(Value);
+
+        StateHasChanged();
+    }
+
+    private string getDisabledState()
+    {
+        return Disabled ? " rz-state-disabled" : "";
+    }
+
+    private string getActiveState(RadzenSelectBarItem item)
+    {
+        return IsSelected(item) ? " rz-state-active" : "";
+    }
+}

@@ -1,0 +1,266 @@
+﻿@using Radzen.Blazor
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+
+@inherits RadzenComponent
+
+@using System.Linq
+
+@if (Steps != null)
+{
+    <CascadingValue Value=this>
+        @Steps
+    </CascadingValue>
+}
+@if (Visible)
+{
+<div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+    <ul role="tablist">
+        @for (var i = 0; i < steps.Count; i++)
+        {
+            var step = steps[i];
+            @if (step.Visible)
+            {
+                <li class='@($"rz-steps-item {(IsSelected(i, step) ? "rz-state-highlight rz-steps-current" : step.Disabled ? "rz-state-disabled" : "")}")' @attributes="step.Attributes" style="@step.Style">
+                    <a @onclick="@(async (args) => { if (!step.Disabled) { await SelectStep(step, true); } })" href="javascript:void(0)" class="rz-menuitem-link">
+                        <span class="rz-steps-number">@(steps.Where(s => s.Visible).ToList().IndexOf(step) + 1)</span>
+                        <span class="rz-steps-title">@step.Text</span>
+                    </a>
+                </li>
+            }
+        }
+    </ul>
+
+    @for (var i = 0; i < steps.Count; i++)
+    {
+        var step = steps[i];
+        @if (step.Visible)
+        {
+            @if (IsSelected(i, step))
+            {
+                <div class="">
+                    @if (step.ChildContent != null)
+                    {
+                        @step.ChildContent
+                    }
+                </div>
+            }
+        }
+    }
+    <div class="rz-steps-buttons">
+        <a class='@($"rz-steps-prev {(IsFirstVisibleStep() ?  "rz-state-disabled" : "")}")' @onclick="@PrevStep" href="javascript:void(0)"><i class="rzi">navigate_before</i>@PreviousText</a>
+        <a class='@($"rz-steps-next {(IsLastVisibleStep() ?  "rz-state-disabled" : "")}")' @onclick="@NextStep" href="javascript:void(0)">@NextText<i class="rzi">navigate_next</i></a>
+    </div>
+</div>
+}
+
+@code {
+    [CascadingParameter]
+    public EditContext EditContext { get; set; }
+
+    bool IsFirstVisibleStep()
+    {
+        var firstVisibleStep = steps.Where(s => s.Visible).FirstOrDefault();
+        if (firstVisibleStep != null)
+        {
+            return steps.IndexOf(firstVisibleStep) == SelectedIndex;
+        }
+
+        return false;
+    }
+
+    bool IsLastVisibleStep()
+    {
+        var lastVisibleStep = steps.Where(s => s.Visible).LastOrDefault();
+        if (lastVisibleStep != null)
+        {
+            return steps.IndexOf(lastVisibleStep) == SelectedIndex;
+        }
+
+        return false;
+    }
+
+    async System.Threading.Tasks.Task NextStep()
+    {
+        if(!IsLastVisibleStep())
+        {
+            var nextIndex = SelectedIndex + 1;
+            while (nextIndex < steps.Count)
+            {
+                if(!steps[nextIndex].Visible)
+                {
+                    nextIndex++;
+                    continue;
+                }
+
+                break;
+            }
+
+            await SelectStepFromIndex(nextIndex);
+        }
+    }
+
+    async System.Threading.Tasks.Task PrevStep()
+    {
+        if(!IsFirstVisibleStep())
+        {
+            var prevIndex = SelectedIndex - 1;
+            while (prevIndex >= 0)
+            {
+                if (!steps[prevIndex].Visible)
+                {
+                    prevIndex--;
+                    continue;
+                }
+
+                break;
+            }
+
+            await SelectStepFromIndex(prevIndex);
+        }
+    }
+
+    async System.Threading.Tasks.Task SelectStepFromIndex(int index)
+    {
+        if (index >= 0 && index < steps.Count)
+        {
+            var stepToSelect = steps[index];
+
+            if (stepToSelect != null && !stepToSelect.Disabled)
+            {
+                await SelectStep(stepToSelect, true);
+            }
+        }
+    }
+
+    int _selectedIndex = 0;
+    [Parameter]
+    public int SelectedIndex
+    {
+        get
+        {
+            return _selectedIndex;
+        }
+        set
+        {
+            if (_selectedIndex != value)
+            {
+                _selectedIndex = value;
+
+                if (value >= 0 && value < steps.Count)
+                {
+                    var stepToSelect = steps[_selectedIndex];
+
+                    if (stepToSelect != null)
+                    {
+                        SelectStep(stepToSelect).Wait();
+                    }
+                }
+            }
+        }
+    }
+
+    [Parameter]
+    public EventCallback<int> SelectedIndexChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<int> Change { get; set; }
+
+    [Parameter]
+    public string NextText { get; set; } = "Next";
+
+    [Parameter]
+    public string PreviousText { get; set; } = "Previous";
+
+    [Parameter]
+    public RenderFragment Steps { get; set; }
+
+    List<RadzenStepsItem> steps = new List<RadzenStepsItem>();
+
+    public void AddStep(RadzenStepsItem step)
+    {
+        if (steps.IndexOf(step) == -1)
+        {
+            if (step.Selected)
+            {
+                SelectedIndex = steps.Count;
+            }
+
+            steps.Add(step);
+            StateHasChanged();
+        }
+    }
+
+    public void RemoveStep(RadzenStepsItem item)
+    {
+        if (steps.Contains(item))
+        {
+            steps.Remove(item);
+
+            StateHasChanged();
+        }
+    }
+
+    internal void Refresh()
+    {
+        StateHasChanged();
+    }
+
+    protected bool IsSelected(int index, RadzenStepsItem step)
+    {
+        return SelectedIndex == index;
+    }
+
+    internal async System.Threading.Tasks.Task SelectStep(RadzenStepsItem step, bool raiseChange = false)
+    {
+        var valid = true;
+
+        if (EditContext != null)
+        {
+            valid = EditContext.Validate();
+        }
+
+        var newIndex = steps.IndexOf(step);
+
+        if (valid || newIndex < SelectedIndex)
+        {
+            SelectedIndex = newIndex;
+
+            if (raiseChange)
+            {
+                await Change.InvokeAsync(SelectedIndex);
+                await SelectedIndexChanged.InvokeAsync(SelectedIndex);
+                StateHasChanged();
+            }
+        }
+    }
+
+    internal void SelectFirst()
+    {
+        SelectedIndex = 0;
+    }
+
+    protected override string GetComponentCssClass()
+    {
+        return "rz-steps";
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        var selectedStep = steps.Where(t => t.Selected).FirstOrDefault();
+        var selectedItemIndex = selectedStep != null ? steps.IndexOf(selectedStep) : 0;
+
+        if (selectedItemIndex != SelectedIndex && SelectedIndex >= 0 && SelectedIndex < steps.Count)
+        {
+            SelectStep(steps[SelectedIndex]).Wait();
+        }
+
+        return base.OnParametersSetAsync();
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        steps.Clear();
+    }
+}

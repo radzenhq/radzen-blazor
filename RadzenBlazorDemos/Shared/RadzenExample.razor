@@ -1,0 +1,54 @@
+@using Radzen.Blazor
+
+@if (Heading)
+{
+    <h1>@Name</h1>
+
+    <p>Demonstration and configuration of the Radzen Blazor <strong>@Name</strong> component.</p>
+}
+
+@if (!String.IsNullOrEmpty(DocumentationUrl))
+{
+    <a class="documentation-link" target="blank" href="@DocumentationUrl"><RadzenIcon Icon="help" /> Documentation </a>
+}
+else if (Documentation)
+{
+    <a class="documentation-link" target="blank" href="https://www.radzen.com/documentation/blazor/@Name.ToLower()/"><RadzenIcon Icon="help" /> Documentation </a>
+}
+
+<RadzenTabs>
+    <Tabs>
+        <RadzenTabsItem Text="Example" Icon="apps">
+            @ChildContent
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Source" Icon="code">
+            <CodeViewer PageName="@($"{Name}Page.razor")" />
+        </RadzenTabsItem>
+        @foreach (var p in AdditionalSourceCodePages)
+        {
+        <RadzenTabsItem Text="@p" Icon="code">
+            <CodeViewer PageName="@p" />
+        </RadzenTabsItem>
+        }
+    </Tabs>
+</RadzenTabs>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public bool Heading { get; set; } = true;
+
+    [Parameter]
+    public bool Documentation { get; set; } = true;
+
+    [Parameter]
+    public string DocumentationUrl  { get; set; }
+
+    [Parameter]
+    public IEnumerable<string> AdditionalSourceCodePages { get; set; } = Enumerable.Empty<string>();
+}

@@ -1,0 +1,92 @@
+$numeric-line-height: 1.5rem !default;
+$numeric-input-padding: 1px 12px 1px 1px;
+$numeric-button-width: 0.875rem !default;
+$numeric-button-height: $numeric-button-width !default;
+$numeric-button-border-radius: 2px !default;
+$numeric-button-background-color: $default-link !default;
+$numeric-button-disabled-background-color: #dadfe2 !default;
+$numeric-button-disabled-color: $cool-grey !default;
+$numeric-button-color: $white !default;
+
+.rz-spinner {
+  display: inline-block;
+  position: relative;
+
+  @extend %input;
+
+  input[type='number'],
+  input[type='text'] {
+    -moz-appearance: textfield;
+    width: 100%;
+    border: none;
+    background-color: transparent;
+    line-height: $numeric-line-height;
+    text-align: inherit;
+    padding: $numeric-input-padding;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  &.rz-state-disabled {
+    @extend %input-disabled;
+
+    .rz-spinner-button {
+      background-color: $numeric-button-disabled-background-color;
+      color: $numeric-button-disabled-color;
+
+      &:active,
+      &:hover {
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+.rz-spinner-button {
+  position: absolute;
+  right: 3px;
+  padding: 0;
+
+  width: $numeric-button-width;
+  height: $numeric-button-height;
+  border-radius: $numeric-button-border-radius;
+  background-color: $numeric-button-background-color;
+  color: $numeric-button-color;
+
+  &:hover {
+    background-color: $numeric-button-background-color;
+  }
+
+  .rzi {
+    font-size: $numeric-button-height;
+    vertical-align: top;
+  }
+
+  .rzi-caret-up {
+    &:before {
+      content: 'expand_less';
+    }
+  }
+
+  .rzi-caret-down {
+    &:before {
+      content: 'expand_more';
+    }
+  }
+}
+
+.rz-spinner-up {
+  top: 2px;
+}
+
+.rz-spinner-down {
+  bottom: 2px;
+}

@@ -1,0 +1,24 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+
+<EditorDropDown Title=@Title Value=@Editor.State.FontSize Change=@OnChange Placeholder="Font size">
+    <EditorDropDownItem Text="10px" Value="1" style="font-size: x-small" />
+    <EditorDropDownItem Text="13px" Value="2" style="font-size: small" />
+    <EditorDropDownItem Text="16px" Value="3" style="font-size: medium" />
+    <EditorDropDownItem Text="18px" Value="4" style="font-size: large" />
+    <EditorDropDownItem Text="24px" Value="5" style="font-size: x-large" />
+    <EditorDropDownItem Text="32px" Value="6" style="font-size: xx-large" />
+    <EditorDropDownItem Text="48px" Value="7" style="font-size: -webkit-xxx-large; font-size: xxx-large" />
+</EditorDropDown>
+@code {
+    [CascadingParameter]
+    public RadzenHtmlEditor Editor { get; set; }
+
+    [Parameter]
+    public string Title { get; set; } = "Font size";
+    
+    async Task OnChange(string value)
+    {
+        await Editor.ExecuteCommandAsync("fontSize", value);
+    }
+}

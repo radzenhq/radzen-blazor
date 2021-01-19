@@ -1,0 +1,60 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+
+@inherits SchedulerViewBase
+    
+@code {
+    [Parameter]
+    public override string Text { get; set; } = "Day";
+
+    [Parameter]
+    public TimeSpan StartTime { get; set; } = TimeSpan.FromHours(8);
+
+    [Parameter]
+    public TimeSpan EndTime { get; set; } = TimeSpan.FromHours(24);
+
+    public override string Title
+    {
+        get
+        {
+            return Scheduler.CurrentDate.ToShortDateString();
+        }
+    }
+
+    public override DateTime StartDate
+    {
+        get
+        {
+            return Scheduler.CurrentDate.Date.Add(StartTime);
+        }
+    }
+
+    public override DateTime EndDate
+    {
+        get
+        {
+            return Scheduler.CurrentDate.Date.Add(EndTime);
+        }
+    }
+
+    public override RenderFragment Render()
+    {
+        var date = Scheduler.CurrentDate.Date;
+
+        var appointments = Scheduler.GetAppointmentsInRange(date, date.AddDays(1)).ToList();
+
+        return @<CascadingValue Value=@Scheduler>
+                    <DayView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments />
+                </CascadingValue>;
+    }
+
+    public override DateTime Next()
+    {
+        return Scheduler.CurrentDate.Date.AddDays(1);
+    }
+
+    public override DateTime Prev()
+    {
+        return Scheduler.CurrentDate.Date.AddDays(-1);
+    }
+}

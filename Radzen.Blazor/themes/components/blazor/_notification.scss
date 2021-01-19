@@ -1,0 +1,95 @@
+$notification-padding: 1rem 1.25rem !default;
+$notification-icon-margin: 0 0.625rem 0 0 !default;
+
+.rz-growl {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  min-width: 20rem;
+}
+
+.rz-growl-item {
+  border-radius: $border-radius;
+  padding: $notification-padding;
+}
+
+.rz-growl-message-success {
+  .rz-growl-item {
+    background-color: $success;
+  }
+}
+
+.rz-growl-message-warn {
+  .rz-growl-item {
+    background-color: $warning;
+  }
+}
+
+.rz-growl-message-error {
+  .rz-growl-item {
+    background-color: $danger;
+  }
+}
+
+.rz-growl-message-info {
+  .rz-growl-item {
+    background-color: $info;
+  }
+}
+
+.rz-growl-item {
+  margin: 1rem 0;
+  color: $white;
+
+  p {
+    color: inherit;
+  }
+}
+
+.rz-growl-icon-close {
+  float: right;
+
+  &:before {
+    content: "close";
+  }
+}
+
+.rz-growl-image {
+  float: left;
+  margin: $notification-icon-margin;
+
+  &.rzi-check {
+    &:before {
+      content: "check";
+    }
+  }
+
+  &.rzi-exclamation-triangle {
+    &:before {
+      content: "warning";
+    }
+  }
+
+  &.rzi-info-circle {
+    &:before {
+      content: "info";
+    }
+  }
+
+  &.rzi-times {
+    &:before {
+      content: "error";
+    }
+  }
+}
+
+.rz-growl-title {
+  font-weight: bold;
+}
+
+.rz-growl-message {
+  p {
+    display: inline-block;
+    margin-bottom: 0;
+  }
+}

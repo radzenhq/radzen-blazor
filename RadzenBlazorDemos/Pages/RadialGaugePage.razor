@@ -1,0 +1,41 @@
+@page "/radial-gauge"
+
+<h1>Radzen Blazor Radial Gauge</h1
+<RadzenExample Name="RadialGauge" DocumentationUrl="https://www.radzen.com/documentation/blazor/gauge/" Heading="false">
+<div class="row">
+    <div class="col-md-6 col-sm-12 p-4">
+        <RadzenRadialGauge Style="width: 100%; height: 300px;">
+            <RadzenRadialGaugeScale StartAngle="-150" EndAngle="150" Step="20" Min="0" Max="260" TickPosition=@tickPosition>
+                <RadzenRadialGaugeScalePointer Value=@value Length="0.6" ShowValue=@showValue>
+                    <Template Context="pointer">
+                        <h4>
+                            @pointer.Value <sup>km/h</sup>
+                        </h4>
+                    </Template>
+                </RadzenRadialGaugeScalePointer>
+                <RadzenRadialGaugeScaleRange From="0" To="90" Fill="green" />
+                <RadzenRadialGaugeScaleRange From="90" To="140" Fill="orange" />
+                <RadzenRadialGaugeScaleRange From="140" To="260" Fill="red" />
+            </RadzenRadialGaugeScale>
+        </RadzenRadialGauge>
+    </div>
+    <div class="col-md-6 col-sm-12 p-4">
+        <p>
+            <label>Value <RadzenSlider Min="0" Max="260" @bind-Value=@value /></label>
+        </p>
+        <p>
+            <label>Show the pointer value <RadzenCheckBox @bind-Value=@showValue /></label>
+        </p>
+        <p>
+            <label>Tick position <RadzenDropDown @bind-Value=@tickPosition Data=@tickPositions /> </label>
+        </p>
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    bool showValue = true;
+    double value = 100;
+    IEnumerable<GaugeTickPosition> tickPositions = Enum.GetValues(typeof(GaugeTickPosition)).Cast<GaugeTickPosition>();
+    GaugeTickPosition tickPosition = GaugeTickPosition.Inside;
+}

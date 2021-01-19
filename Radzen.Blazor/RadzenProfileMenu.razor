@@ -1,0 +1,56 @@
+﻿@inherits RadzenComponentWithChildren
+
+@if (Visible)
+{
+
+    <ul @ref="@Element" style="@Style" @onfocusout="@Close" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        <li class="rz-navigation-item">
+            <div class="rz-navigation-item-wrapper" onclick="Radzen.toggleMenuItem(this)">
+                <div class="rz-navigation-item-link">
+                    <div class="item-text">
+                        @if (Template != null)
+                        {
+                            @Template
+                        }
+                    </div>
+                    <i class="rzi rz-navigation-item-icon-children" style="@iconStyle">keyboard_arrow_down</i>
+                </div>
+            </div>
+            <ul class="rz-navigation-menu" style="@contentStyle">
+                <CascadingValue Value=this>
+                    @ChildContent
+                </CascadingValue>
+            </ul>
+        </li>
+    </ul>
+
+}
+@code {
+    protected override string GetComponentCssClass()
+    {
+        return "rz-menu rz-profile-menu";
+    }
+
+    [Parameter]
+    public RenderFragment Template { get; set; }
+
+    [Parameter]
+    public EventCallback<RadzenProfileMenuItem> Click { get; set; }
+
+    string contentStyle = "display:none;position:absolute;z-index:1;";
+    string iconStyle = "transform: rotate(0deg);";
+
+    public void Toggle(MouseEventArgs args)
+    {
+        contentStyle = contentStyle.IndexOf("display:none;") != -1 ? "display:block;" : "display:none;position:absolute;z-index:1;";
+        iconStyle = iconStyle.IndexOf("rotate(0deg)") != -1 ? "transform: rotate(-180deg);" : "transform: rotate(0deg);";
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        contentStyle = "display:none;";
+        iconStyle = "transform: rotate(0deg);";
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,285 @@
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter]
+    public double? X { get; set; }
+
+    [Parameter]
+    public double? Y { get; set; }
+
+    [Parameter]
+    public double? Radius { get; set; }
+
+    [Parameter]
+    public IEnumerable<string> Fills { get; set; }
+
+    [Parameter]
+    public IEnumerable<string> Strokes { get; set; }
+
+    [Parameter]
+    public double StrokeWidth { get; set; }
+
+    protected double CurrentRadius
+    {
+        get
+        {
+            return Radius ?? Math.Min(Chart.CategoryScale.Output.Mid, Chart.ValueScale.Output.Mid);
+        }
+    }
+
+    protected double CenterX
+    {
+        get
+        {
+            return X ?? Chart.CategoryScale.Output.Mid + 8;
+        }
+    }
+
+    protected double CenterY
+    {
+        get
+        {
+            return Y ?? Chart.ValueScale.Output.Mid;
+        }
+    }
+   public override string Color
+   {
+       get
+       {
+           return "#000";
+       }
+   }
+
+    public override double MeasureLegend()
+    {
+        if (Items.Any())
+        {
+            return Items.Select(item => TextMeasurer.TextWidth(TooltipTitle(item))).Max() + MarkerSize;
+        }
+
+        return 0;
+    }
+     
+   public override RenderFragment RenderLegendItem()
+   {
+       return builder =>
+       {
+            foreach (var data in Items)
+            {
+                builder.OpenComponent<LegendItem>(0);
+                builder.AddAttribute(1, nameof(LegendItem.Text), TooltipTitle(data));
+                builder.AddAttribute(2, nameof(LegendItem.Class), $"rz-series-item-{Items.IndexOf(data)}");
+                builder.AddAttribute(3, nameof(LegendItem.MarkerSize), MarkerSize);
+                builder.AddAttribute(4, nameof(LegendItem.MarkerType), MarkerType);
+                builder.AddAttribute(5, nameof(LegendItem.Color), PickColor(Items.IndexOf(data), Fills));
+                builder.CloseComponent();
+            };
+       };
+   }
+
+   public override bool Contains(double x, double y)
+   {
+       if (Items.Any())
+       {
+           var distance = Math.Sqrt(Math.Pow(CenterX - x, 2) + Math.Pow(CenterY - y, 2));
+
+           return distance <= CurrentRadius;
+       }
+
+       return false;
+   }
+
+   public override object DataAt(double x, double y)
+   {
+        var angle = 90 - Math.Atan((CenterY - y) / (x - CenterX)) * 180 / Math.PI;
+
+        if (x < CenterX)
+        {
+            angle += 180;
+        }
+
+        var sum = Items.Sum(Value);
+        double startAngle = 0;
+  
+        foreach(var data in Items)
+        {
+            var value = Value(data);
+            var endAngle = startAngle + (value / sum) * 360;
+
+            if (startAngle <= angle && angle <= endAngle)
+            {
+                return data;
+            }
+
+            startAngle = endAngle;
+        }
+
+        return null;
+   }
+    protected override string TooltipClass(TItem item)
+    {
+        return $"{base.TooltipClass(item)} rz-pie-tooltip rz-series-item-{Items.IndexOf(item)}";
+    }
+    protected override string TooltipStyle(TItem item)
+    {
+        var style = base.TooltipStyle(item);
+
+        var color = PickColor(Items.IndexOf(item), Fills);
+
+        if (color != null)
+        {
+            style = $"{style}; border-color: {color};";
+        }
+
+        return style;
+    }
+
+   protected override double TooltipX(TItem item)
+   {
+        var sum = Items.Sum(Value);
+        double startAngle = 0;
+        double endAngle = 0;
+  
+        foreach(var data in Items)
+        {
+            var value = Value(data);
+            endAngle = startAngle + (value / sum) * 360;
+
+            if (EqualityComparer<TItem>.Default.Equals(data, item))
+            {
+                break;
+            }
+
+            startAngle = endAngle;
+        }
+
+        var angle = startAngle + (endAngle - startAngle) / 2;
+
+        return CenterX + CurrentRadius * Math.Cos(DegToRad(90 - angle));
+   }
+
+   protected override double TooltipY(TItem item)
+   { 
+        var sum = Items.Sum(Value);
+        double startAngle = 0;
+        double endAngle = 0;
+  
+        foreach(var data in Items)
+        {
+            var value = Value(data);
+            endAngle = startAngle + (value / sum) * 360;
+
+            if (EqualityComparer<TItem>.Default.Equals(data, item))
+            {
+                break;
+            }
+
+            startAngle = endAngle;
+        }
+
+        var angle = startAngle + (endAngle - startAngle) / 2;
+
+        return CenterY - CurrentRadius * Math.Sin(DegToRad(90 - angle));
+   }
+
+   protected double DegToRad(double degrees)
+   {
+        var radians = (degrees) * Math.PI / 180;
+
+        return radians;
+   }
+
+   protected (double X, double Y) ToCartesian(double x, double y, double radius, double degrees) 
+   {
+        var radians = (degrees) * Math.PI / 180;
+
+        return (x + radius * Math.Cos(radians), y + radius * Math.Sin(radians));
+   }
+
+   protected string Segment(double x, double y, double radius, double innerRadius, double startAngle, double endAngle)
+   {
+        var start = ToCartesian(x, y, radius, startAngle);
+        var end = ToCartesian(x, y, radius, endAngle);
+
+        var innerStart = ToCartesian(x, y, innerRadius, startAngle);
+        var innerEnd = ToCartesian(x, y, innerRadius, endAngle);
+
+        var largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
+        var startX = start.X.ToInvariantString();
+        var startY = start.Y.ToInvariantString();
+        var endX = end.X.ToInvariantString();
+        var endY = end.Y.ToInvariantString();
+        var r = radius.ToInvariantString();
+        var innerStartX = innerStart.X.ToInvariantString();
+        var innerStartY = innerStart.Y.ToInvariantString();
+        var innerEndX = innerEnd.X.ToInvariantString();
+        var innerEndY = innerEnd.Y.ToInvariantString();
+
+        if (Math.Abs(end.X - start.X) < 0.01 && Math.Abs(end.Y - start.Y) < 0.01)
+        {
+            // Full circle - SVG can't render a full circle arc 
+            endX  = (end.X - 0.01).ToInvariantString();
+
+            innerEndX = (innerEnd.X - 0.01).ToInvariantString();
+        }
+
+        return $"M {startX} {startY} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {innerEndX} {innerEndY} A {innerRadius} {innerRadius} 0 {largeArcFlag} 0 {innerStartX} {innerStartY}";
+   }
+
+   protected string PickColor(int index, IEnumerable<string> colors)
+   {
+       if (colors == null || !colors.Any())
+       {
+           return null;
+       }
+
+       return colors.ElementAt(index % colors.Count());
+   }
+
+   public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+   {
+        var className = $"rz-pie-series rz-series-{Chart.Series.IndexOf(this)}";
+        var x = CenterX;
+        var y = CenterY;
+        var radius = CurrentRadius;
+
+        return 
+        @<g class="@className">
+            @if (Items.Any())
+            {
+                var sum = Items.Sum(Value);
+
+                double startAngle = -90;
+
+                @foreach(var data in Items)
+                {
+                    var value = Value(data);
+                    var angle = sum == 0 ? 0 : (value / sum) * 360;
+                    var endAngle = startAngle + angle;
+
+                    var d = Segment(x, y, radius, 0, startAngle, endAngle);
+
+                    startAngle = endAngle;
+                    
+                    var index = Items.IndexOf(data);
+                    var arcClassName = $"rz-series-item-{index}";
+                    var fill = PickColor(index, Fills);
+                    var stroke = PickColor(index, Strokes);
+
+                    <g class="@arcClassName">
+                        @if (angle > 0)
+                        {
+                            <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
+                        }
+                    </g>
+                }
+            }
+        </g>;
+    }
+}

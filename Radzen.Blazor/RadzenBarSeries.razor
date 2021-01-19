@@ -1,0 +1,185 @@
+@using Radzen
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+@implements IChartBarSeries
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+
+@code {
+   [Parameter]
+   public string Fill { get; set; }
+
+   [Parameter]
+   public string Stroke { get; set; }
+
+   [Parameter]
+   public double StrokeWidth { get; set; }
+
+   [Parameter]
+   public LineType LineType { get; set; }
+
+   public override string Color
+   {
+       get
+       {
+           return Fill;
+       }
+   }
+
+    public override ScaleBase TransformCategoryScale(ScaleBase scale)
+    {
+        return base.TransformValueScale(scale);
+    }
+
+    public override ScaleBase TransformValueScale(ScaleBase scale)
+    {
+        return base.TransformCategoryScale(scale);
+    }
+
+   private IList<IChartSeries> BarSeries
+   {
+        get
+        {
+            return Chart.Series.Where(series => series is IChartBarSeries).Cast<IChartSeries>().ToList();
+        }
+   }
+
+   private IList<IChartSeries> VisibleBarSeries
+   {
+       get
+       {
+           return BarSeries.Where(series => series.Visible).ToList();
+       }
+   }
+
+   private double BandHeight
+   {
+       get
+       {
+            var availableHeight = Chart.ValueScale.OutputSize; // - (Chart.ValueAxis.Padding * 2);
+            var bands = VisibleBarSeries.Cast<IChartBarSeries>().Max(series => series.Count) + 2;
+            return availableHeight / bands;
+       }
+   }
+
+   int IChartBarSeries.Count
+   {
+       get
+       {
+           return Items.Count;
+       }
+   }
+
+   public override bool Contains(double x, double y)
+   {
+       return DataAt(x, y) != null;
+   }
+
+   protected override double TooltipX(TItem item)
+   {
+        var value = Chart.CategoryScale.Compose(Value);
+        var x = value(item);
+
+        return x;
+   }        
+
+   protected override string TooltipValue(TItem item)
+   {
+       return Chart.ValueAxis.Format(Chart.CategoryScale, Chart.CategoryScale.Value(Value(item)));
+   }
+    protected override string TooltipTitle(TItem item)
+    {
+        var category = Category(Chart.ValueScale);
+        return Chart.CategoryAxis.Format(Chart.ValueScale, Chart.ValueScale.Value(category(item)));
+    }
+
+   public override object DataAt(double x, double y)
+   {
+        var value = ComposeValue(Chart.CategoryScale);
+        var category = ComposeCategory(Chart.ValueScale);
+        var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
+        var x0 = Chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
+
+        var barSeries = VisibleBarSeries;
+        var index = barSeries.IndexOf(this);
+        var padding = Chart.BarOptions.Margin;
+        var bandHeight = BandHeight;
+        var height = bandHeight / barSeries.Count() - padding + padding / barSeries.Count();
+
+        foreach(var data in Items)
+        {
+            var startY = category(data) - bandHeight / 2 + index * height + index * padding;
+            var endY = startY + height;
+            var dataX = value(data);
+            var startX = Math.Min(dataX, x0);
+            var endX = Math.Max(dataX, x0);
+
+            if (startX <= x && x <= endX && startY <= y && y <= endY)
+            {
+                return data;
+            }
+        }
+
+        return null;
+    }
+
+    protected override double TooltipY(TItem item)
+    {
+       var category = ComposeCategory(Chart.ValueScale);
+       var barSeries = VisibleBarSeries;
+       var index = barSeries.IndexOf(this);
+       var padding = Chart.BarOptions.Margin;
+       var bandHeight = BandHeight;
+       var height = bandHeight / barSeries.Count() - padding + padding / barSeries.Count();
+       var y = category(item) - bandHeight / 2 + index * height + index * padding;
+
+       return y + height / 2;
+    }
+
+   public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+   {
+        var value = ComposeValue(categoryScale);
+        var category = ComposeCategory(valueScale);
+        var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
+        var x0 = Chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
+        var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
+
+        var barSeries = VisibleBarSeries;
+        var index = barSeries.IndexOf(this);
+        var padding = Chart.BarOptions.Margin;
+
+        var barHeight = BandHeight;
+        var height = barHeight / barSeries.Count() - padding + padding / barSeries.Count();;
+        var className = $"rz-bar-series rz-series-{Chart.Series.IndexOf(this)}";
+
+        return 
+        @<g class="@className">
+            @foreach(var data in Items)
+            {
+                var y = category(data) - barHeight / 2 + index * height + index * padding;
+                var x = value(data);
+                var radius = Chart.BarOptions.Radius;
+
+                if (radius > height / 2)
+                {
+                    radius = 0;
+                }
+
+                var r = radius.ToInvariantString();
+
+                var path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x-radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 1 {x.ToInvariantString()} {(y+radius).ToInvariantString()} L {x.ToInvariantString()} {(y+height-radius).ToInvariantString()} A {r} {r} 0 0 1 {(x-radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y+height).ToInvariantString()} Z";
+
+                if (x < x0)
+                {
+                    path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x+radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 0 {x.ToInvariantString()} {(y+radius).ToInvariantString()} L {x.ToInvariantString()} {(y+height-radius).ToInvariantString()} A {r} {r} 0 0 0 {(x+radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y+height).ToInvariantString()} Z";
+                }
+
+                <Path @key="@path" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Fill="@Fill" LineType="@LineType" Style="@style" />
+            }
+        </g>;
+    }
+}

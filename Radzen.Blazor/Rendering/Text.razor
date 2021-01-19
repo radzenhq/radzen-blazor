@@ -1,0 +1,11 @@
+<text class=@Class alignment-baseline="middle" text-anchor="middle" x=@Position.X.ToInvariantString() y=@Position.Y.ToInvariantString()>@Value</text>
+@code {
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public Point Position { get; set; }
+}

@@ -1,0 +1,32 @@
+﻿@page "/textbox"
+
+<RadzenExample Name="TextBox">
+<div class="row">
+    <div class="col-xl-6">
+        <h3>TextBox</h3>
+        <RadzenTextBox Change=@(args => OnChange(args, "TextBox")) />
+        <h3 style="margin-top: 2rem">TextBox with placeholder</h3>
+        <RadzenTextBox Placeholder="Search..." Change=@(args => OnChange(args, "TextBox with placeholder")) />
+        <h3 style="margin-top: 2rem">TextBox with 5 maximum characters</h3>
+        <RadzenTextBox @bind-Value=@value MaxLength="5" Change=@(args => OnChange(args, "TextBox with 5 maximum characters")) />
+        <h3 style="margin-top: 2rem">TextBox with change on every input</h3>
+        <RadzenTextBox @oninput=@(args => OnChange(args.Value.ToString(), "TextBox with change on every input")) />
+        <h3 style="margin-top: 2rem">Disabled TextBox</h3>
+        <RadzenTextBox Disabled="true" />
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    string value;
+
+    EventConsole console;
+
+    void OnChange(string value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+}

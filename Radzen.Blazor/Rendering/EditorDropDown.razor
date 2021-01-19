@@ -1,0 +1,89 @@
+@inherits RadzenComponent
+@using Microsoft.JSInterop
+<div title=@Title @ref=@Element class=@Class @onclick=@Toggle @onmousedown:preventDefault @attributes=@Attributes>
+    <div class="rz-html-editor-dropdown-value">
+        @if (SelectedItem != null)
+        {
+            @SelectedItem.Text
+        }
+        else
+        {
+            @Placeholder
+        }
+    </div>
+    <button @onclick:preventDefault class="rz-html-editor-dropdown-trigger" disabled=@Editor.Disabled><i class="rzi" /></button>
+    <Popup @ref=Popup class="rz-html-editor-dropdown-items" Style=@PopupStyle>
+        <CascadingValue Value=@this>
+            @ChildContent
+        </CascadingValue>
+    </Popup>
+</div>
+@code {
+    [CascadingParameter]
+    public RadzenHtmlEditor Editor { get; set; }
+
+    Popup Popup { get; set; } 
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string PopupStyle { get; set; }
+
+    [Parameter]
+    public string Placeholder { get; set; }
+
+    async Task Toggle()
+    {
+        if (!Editor.Disabled)
+        {
+            await Popup.ToggleAsync(Element);
+        }
+    }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    internal EditorDropDownItem SelectedItem { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<string> Change { get; set; }
+
+    internal async Task Select(EditorDropDownItem item, bool change)
+    {
+        if (SelectedItem != item && !Editor.Disabled)
+        {
+            SelectedItem = item;
+
+            if (change)
+            {
+                await Popup.CloseAsync();
+                await ValueChanged.InvokeAsync(item?.Value);
+                await Change.InvokeAsync(item?.Value);
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    string Class
+    {
+        get
+        {
+            var classList = new List<string>() { "rz-html-editor-dropdown" };
+
+            if (Editor.Disabled)
+            {
+                classList.Add("rz-disabled");
+            }
+
+            return string.Join(" ", classList);
+        }
+    }
+}

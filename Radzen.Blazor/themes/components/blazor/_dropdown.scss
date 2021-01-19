@@ -1,0 +1,246 @@
+$dropdown-trigger-icon-width: 1.1875rem !default;
+$dropdown-trigger-icon-height: $dropdown-trigger-icon-width !default;
+$dropdown-trigger-icon-margin: 0 0.5rem 0 0 !default;
+
+$dropdown-horizontal-padding: 0.625rem !default;
+$dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
+$dropdown-items-margin: 0 (-$dropdown-horizontal-padding) !default;
+
+$dropdown-item-padding: 0.25rem $dropdown-horizontal-padding !default;
+$dropdown-item-font-size: $input-font-size !default;
+$dropdown-item-hover-background-color: #59a6cd !default;
+$dropdown-item-selected-background-color: $default-link !default;
+$dropdown-item-selected-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
+$dropdown-item-hover-color: $white !default;
+$dropdown-item-selected-color: $dropdown-item-hover-color !default;
+
+$multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
+$dropdown-label-padding: 0 $dropdown-trigger-icon-width 0 0 !default;
+$dropdown-filter-border: 1px solid rgba(#979797, 0.1) !default;
+$dropdown-filter-padding: 0.5rem 0 !default;
+
+$dropdown-open-background-color: $input-background-color !default;
+$dropdown-open-border: $input-border !default;
+$dropdown-panel-border: $dropdown-open-border !default;
+
+%dropdown {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+
+  @extend %input;
+
+  .rz-helper-hidden-accessible {
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  &.rz-state-disabled {
+    @extend %input-disabled;
+  }
+
+  .rz-placeholder {
+    color: $input-placeholder-color;
+  }
+}
+
+.rz-dropdown {
+  @extend %dropdown;
+
+  &.rz-dropdown-open {
+    background-color: $dropdown-open-background-color;
+    border: $dropdown-open-border;
+  }
+}
+
+.rz-multiselect {
+  @extend %dropdown;
+
+  &.rz-state-focus {
+    background-color: $dropdown-open-background-color;
+    border: $dropdown-open-border;
+  }
+}
+
+%dropdown-trigger {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  right: 0;
+  top: 0;
+  bottom: 0;
+
+  .rzi {
+    width: $dropdown-trigger-icon-width;
+    height: $dropdown-trigger-icon-height;
+    font-size: $dropdown-trigger-icon-height;
+    margin: $dropdown-trigger-icon-margin;
+  }
+
+  .rzi-chevron-down {
+    &:before {
+      content: 'arrow_drop_down';
+    }
+  }
+}
+
+.rz-dropdown-trigger {
+  @extend %dropdown-trigger;
+}
+
+.rz-dropdown-clear-icon {
+  position: absolute;
+  right: $dropdown-trigger-icon-width + 0.5rem;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  font-size: $dropdown-trigger-icon-height;
+
+  &:before {
+    content: 'close';
+  }
+}
+
+.rz-multiselect-trigger {
+  @extend %dropdown-trigger;
+}
+
+%dropdown-panel {
+  position: absolute;
+  transform: translateY(-$input-border-radius);
+  background-color: $dropdown-open-background-color;
+  border-radius: $input-border-radius;
+  border: $dropdown-panel-border;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+}
+
+.rz-dropdown-panel {
+  @extend %dropdown-panel;
+  box-sizing: content-box;
+  padding: $dropdown-panel-padding;
+}
+
+.rz-multiselect-panel {
+  @extend %dropdown-panel;
+  box-sizing: content-box;
+  padding: $dropdown-panel-padding;
+
+  .rz-chkbox {
+    margin: $multiselect-checkbox-margin;
+  }
+}
+
+.rz-dropdown-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    /* The 'No results found' item has no CSS class */
+    @extend .rz-dropdown-item;
+  }
+}
+
+.rz-multiselect-items {
+  @extend .rz-dropdown-items;
+}
+
+.rz-dropdown-items-wrapper,
+.rz-multiselect-items-wrapper {
+  overflow: auto;
+  margin: $dropdown-items-margin;
+}
+
+.rz-multiselect-items-wrapper {
+  overflow: auto;
+}
+
+.rz-dropdown-filter-container {
+  padding: $dropdown-filter-padding;
+  @extend %filter-container;
+  border-bottom: $dropdown-filter-border;
+}
+
+.rz-dropdown-filter {
+  background-color: transparent;
+  color: $body-color;
+}
+
+.rz-multiselect-header {
+  display: flex;
+  align-items: center;
+  padding: $dropdown-item-padding;
+  margin: $dropdown-items-margin;
+}
+
+@mixin dropdown-item($radius: $border-radius) {
+  cursor: default;
+  font-size: $dropdown-item-font-size;
+
+  &.rz-state-highlight {
+    background-color: $dropdown-item-selected-background-color;
+    color: $dropdown-item-selected-color;
+    box-shadow: $dropdown-item-selected-shadow;
+
+    @if $radius {
+      border-radius: $radius;
+    }
+  }
+}
+
+@mixin dropdown-item-hover($radius: $border-radius) {
+  &:hover {
+    background-color: $dropdown-item-hover-background-color;
+    color: $dropdown-item-hover-color;
+    @if $radius {
+      border-radius: $radius;
+    }
+  }
+}
+
+.rz-dropdown-item {
+  padding: $dropdown-item-padding;
+
+  @include dropdown-item(0);
+  @include dropdown-item-hover(0);
+}
+
+.rz-multiselect-close {
+  display: none;
+}
+
+.rz-multiselect-filter-container {
+  @extend %filter-container;
+  flex: auto;
+  border-bottom: $dropdown-filter-border;
+
+  .rz-inputtext {
+    @extend .rz-dropdown-filter;
+  }
+}
+
+.rz-multiselect-item {
+  @extend .rz-dropdown-item;
+
+  display: flex;
+  align-items: center;
+}
+
+.rz-multiselect-label-container,
+.rz-dropdown-label {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-right: $dropdown-trigger-icon-width;
+}
+
+.rz-clear {
+  .rz-multiselect-label-container,
+  .rz-dropdown-label {
+    margin-right: 2 * $dropdown-trigger-icon-width;
+  }
+}

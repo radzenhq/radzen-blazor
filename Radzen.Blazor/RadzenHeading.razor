@@ -1,0 +1,41 @@
+﻿@inherits RadzenComponent
+
+@if (Visible)
+{
+    @if (Size == "H1")
+    {
+        <h1 @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">@Text</h1>
+    }
+    else if (Size == "H2")
+    {
+        <h2 @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">@Text</h2>
+    }
+    else if (Size == "H3")
+    {
+        <h3 @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">@Text</h3>
+    }
+    else if (Size == "H4")
+    {
+        <h4 @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">@Text</h4>
+    }
+    else if (Size == "H5")
+    {
+        <h5 @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">@Text</h5>
+    }
+    else if (Size == "H6")
+    {
+        <h6 @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">@Text</h6>
+    }
+}
+@code {
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public string Size { get; set; } = "H1";
+
+    protected override string GetComponentCssClass()
+    {
+        return "rz-heading";
+    }
+}

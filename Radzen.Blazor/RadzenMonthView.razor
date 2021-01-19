@@ -1,0 +1,70 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+
+@inherits SchedulerViewBase
+
+@code {    
+    public override string Title
+    {
+        get
+        {
+            return Scheduler.CurrentDate.ToString("MMMM yyyy");
+        }
+    }
+
+    [Parameter]
+    public override string Text { get; set; } = "Month";
+
+    [Parameter]
+    public int? MaxAppointmentsInSlot { get; set; }
+
+    [Parameter]
+    public string MoreText { get; set; } = "+ {0} more";
+
+    public override DateTime StartDate
+    {
+        get
+        {
+            return Scheduler.CurrentDate.Date.StartOfMonth().StartOfWeek();
+        }
+    }
+
+    public override DateTime EndDate
+    {
+        get
+        {
+            return Scheduler.CurrentDate.Date.EndOfMonth().EndOfWeek().AddDays(1);
+        }
+    }
+
+    public override RenderFragment Render()
+    {
+        var appointments = Scheduler.GetAppointmentsInRange(StartDate, EndDate);
+
+        var maxAppointmentsInSlot = 0;
+
+        if (MaxAppointmentsInSlot != null)
+        {
+          maxAppointmentsInSlot = MaxAppointmentsInSlot.Value;
+        }
+        else
+        {
+          var slotHeight = (Scheduler.Height - 60) / 6;
+          maxAppointmentsInSlot = Convert.ToInt32(Math.Floor(slotHeight / 24)) - 1;
+        }
+
+        return @<CascadingValue Value=@Scheduler>
+            <MonthView StartDate=@StartDate EndDate=@EndDate MaxAppointmentsInSlot=@maxAppointmentsInSlot MoreText=@MoreText Appointments=@appointments />
+        </CascadingValue>;
+    }
+
+    public override DateTime Next()
+    {
+        return Scheduler.CurrentDate.Date.StartOfMonth().AddMonths(1);
+    }
+
+    public override DateTime Prev()
+    {
+        return Scheduler.CurrentDate.Date.StartOfMonth().AddMonths(-1);
+    }
+}

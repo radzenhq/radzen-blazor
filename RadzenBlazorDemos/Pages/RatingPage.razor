@@ -1,0 +1,26 @@
+﻿@page "/rating"
+
+<RadzenExample Name="Rating">
+<div class="row">
+    <div class="col-xl-6">
+        <h3>Rating with 5 stars</h3>
+        <RadzenRating Change=@(args => OnChange(args, "Rating with 5 stars")) />
+        <h3 style="margin-top: 2rem">Rating with 10 stars</h3>
+        <RadzenRating Stars="10" Change=@(args => OnChange(args, "Rating with 10 stars")) />
+        <h3 style="margin-top: 2rem">Disabled Rating with 10 stars</h3>
+        <RadzenRating Disabled="true" Stars="10" />
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    EventConsole console;
+
+    void OnChange(int value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+}

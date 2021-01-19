@@ -1,0 +1,102 @@
+$listbox-background-color: $input-background-color !default;
+$listbox-border-radius: $input-border-radius !default;
+$listbox-border: $input-border !default;
+$listbox-filter-border: $input-border !default;
+$listbox-padding: 0.5rem !default;
+
+$listbox-item-padding: $dropdown-item-padding !default;
+$listbox-item-margin: 1px 0 !default;
+
+$listbox-checkbox-margin: 0 0.5rem 0 0 !default;
+
+$listbox-header-padding: 0.5625rem 1.25rem 0.625rem 1.125rem !default;
+$listbox-header-icon-width: 1.25rem !default;
+$listbox-header-icon-height: $listbox-header-icon-width !default;
+$listbox-header-icon-margin: 0 !default;
+
+.rz-listbox {
+  display: inline-flex;
+  flex-direction: column;
+
+  background-color: $listbox-background-color;
+  border: $listbox-border;
+  border-radius: $listbox-border-radius;
+
+  .rz-chkbox {
+    margin: $listbox-checkbox-margin;
+  }
+
+  &.rz-state-disabled {
+    @extend %input-disabled;
+  }
+
+  &:not(.rz-state-disabled) {
+    .rz-listbox-item {
+      &:hover {
+        @include dropdown-item-hover();
+      }
+    }
+  }
+}
+
+.rz-listbox-list {
+  margin: 0;
+  padding: 0;
+}
+
+.rz-listbox-item {
+  cursor: default;
+  padding: $listbox-item-padding;
+  margin: $listbox-item-margin;
+
+  @include dropdown-item();
+}
+
+.rz-listbox-header {
+  display: flex;
+  align-items: center;
+  padding: $listbox-header-padding;
+  border-bottom: $listbox-filter-border;
+}
+
+.rz-listbox-list-wrapper {
+  flex: auto;
+  overflow: auto;
+  padding: $listbox-padding;
+}
+
+%filter-container {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+
+  .rz-inputtext {
+    flex: auto;
+    width: 0;
+    border: none;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .rzi-search {
+    width: $listbox-header-icon-width;
+    height: $listbox-header-icon-height;
+    line-height: $listbox-header-icon-height;
+    font-size: $listbox-header-icon-height;
+
+    &:before {
+      content: 'search';
+    }
+  }
+}
+
+.rz-listbox-filter-container {
+  @extend %filter-container;
+  flex: auto;
+
+  .rz-inputtext {
+    background-color: transparent;
+  }
+}

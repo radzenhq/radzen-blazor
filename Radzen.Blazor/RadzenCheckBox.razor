@@ -1,0 +1,88 @@
+﻿@using Radzen
+@using Microsoft.AspNetCore.Components.Forms
+@typeparam TValue
+@inherits FormComponent<TValue>
+@if (Visible)
+{
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" 
+         @onmouseup="@OnMouseUp" @onkeypress="@(async (args) => { if (args.Code == "Space") { await Toggle(); } })" style="@Style" tabindex="@TabIndex" id="@GetId()">
+        <div class="rz-helper-hidden-accessible">
+            <input type="text" name="@Name" value="@Value" tabindex="-1">
+        </div>
+        <div class="@getInnerCssClass()">
+            <span class="@getCheckBoxCssClass()"></span>
+        </div>
+    </div>
+}
+@code {
+    [Parameter]
+    public bool TriState { get; set; } = false;
+
+    string getInnerCssClass()
+    {
+        string activeState = !object.Equals(Value, false) ? " rz-state-active" : "";
+        string disabledState = Disabled ? " rz-state-disabled" : "";
+        return $"rz-chkbox-box {activeState}{disabledState}";
+    }
+
+    string getCheckBoxCssClass()
+    {
+        if (object.Equals(Value, true))
+        {
+            return "rz-chkbox-icon rzi rzi-check";
+        }
+        else if (object.Equals(Value, false))
+        {
+            return "rz-chkbox-icon";
+        }
+        else if (object.Equals(Value, null))
+        {
+            return "rz-chkbox-icon rzi rzi-times";
+        }
+
+        return "";
+    }
+
+    protected override string GetComponentCssClass()
+    {
+        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
+        return $"rz-chkbox {(Disabled ? " rz-state-disabled" : "")} {fieldCssClass}";
+    }
+
+    public async Task OnMouseUp(MouseEventArgs args)
+    {
+        await Toggle();
+    }
+
+    async System.Threading.Tasks.Task Toggle()
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        if (object.Equals(Value, false))
+        {
+            if (TriState)
+            {
+                Value = default(TValue);
+            }
+            else
+            {
+                Value = (TValue)(object)true;
+            }
+        }
+        else if (Value == null)
+        {
+            Value = (TValue)(object)true;
+        }
+        else if (object.Equals(Value, true))
+        {
+            Value = (TValue)(object)false;
+        }
+
+        await ValueChanged.InvokeAsync(Value);
+        if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+        await Change.InvokeAsync(Value);
+    }
+}

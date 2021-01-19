@@ -1,0 +1,85 @@
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.RadzenPieSeries<TItem>
+@implements Radzen.Blazor.IChartDonutSeries
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter]
+    public double? InnerRadius { get; set; }
+
+    [Parameter]
+    public RenderFragment TitleTemplate { get; set; }
+
+    public RenderFragment RenderTitle(double x, double y)
+    {
+      if (TitleTemplate == null)
+      {
+        return null;
+      }
+
+        var radius = CurrentRadius;
+        var innerRadius = InnerRadius ?? radius / 2;
+
+        var left = (x + CenterX - innerRadius).ToInvariantString();
+        var top = (y + CenterY - innerRadius).ToInvariantString();
+        var width = innerRadius * 2;
+        var height = innerRadius * 2;
+
+      return @<div style="position: absolute;left: @(left)px;top: @(top)px;width: @(width)px; height: @(height)px;">
+                @TitleTemplate
+            </div>;
+      }
+
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+   {
+        var className = $"rz-donut-series rz-series-{Chart.Series.IndexOf(this)}";
+        var x = CenterX;
+        var y = CenterY;
+        var radius = CurrentRadius;
+        var innerRadius = InnerRadius ?? radius / 2;
+
+        return 
+        @<g>
+            <g class="@className">
+                @if (Items.Any())
+                {
+                    var sum = Items.Sum(Value);
+                    double startAngle = -90;
+
+                    @foreach(var data in Items)
+                    {
+                        var value = Value(data);
+                        var angle = (value / sum) * 360;
+                        var endAngle = startAngle + angle;
+
+                        var d = Segment(x, y, radius, innerRadius, startAngle, endAngle);
+
+                        startAngle = endAngle;
+                        
+                        var index = Items.IndexOf(data);
+                        var arcClassName = $"rz-series-item-{index}";
+                        var fill = PickColor(index, Fills);
+                        var stroke = PickColor(index, Strokes);
+
+                        <g class="@arcClassName">
+                            <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
+                        </g>
+                    }
+                }
+            </g>
+       
+        @if (!string.IsNullOrEmpty(Title) && TitleTemplate == null)
+        {
+            <g class="rz-donut-title">
+                <text class="rz-donut-title" x="@CenterX.ToInvariantString()" y="@CenterY.ToInvariantString()">
+                    @Title
+                </text>
+            </g>
+        }
+        </g>;
+    }
+}

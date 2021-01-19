@@ -1,0 +1,21 @@
+﻿@page "/progressbar"
+@using Radzen
+
+<RadzenExample Name="ProgressBar">
+<div class="row">
+    <div class="col-xl-6">
+        <h3>ProgressBar in determinate mode</h3>
+        <RadzenProgressBar @bind-Value="@value" Style="margin-bottom: 20px" />
+        <br />
+        <h3>ProgressBar in indeterminate mode</h3>
+        <RadzenProgressBar Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" Style="margin-bottom: 20px" />
+        <br />
+        <h3>ProgressBar in max value > 100</h3>
+        <RadzenProgressBar Value="156" Max="200" Style="margin-bottom: 20px" />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    double value = 55;
+}

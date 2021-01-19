@@ -1,0 +1,87 @@
+@using Radzen.Blazor
+@using System.Text
+@using Radzen.Blazor.Rendering
+@using Microsoft.JSInterop
+@inherits RadzenHtmlEditorButtonBase
+@inject DialogService DialogService
+@inject IJSRuntime JSRuntime
+
+<EditorButton Title=@Title Click=@OnClick Icon="insert_link" />
+
+@code {
+    class LinkAttributes
+    {
+        public string InnerText { get; set; }
+        public string Href { get; set; }
+        public string Target { get; set; }
+    }
+
+    [Parameter]
+    public string Title { get; set; } = "Insert link";
+
+    [Parameter]
+    public string UrlText { get; set; } = "Web address";
+
+    [Parameter]
+    public string OpenInNewWindowText { get; set; } = "Open in new window";
+
+    [Parameter]
+    public string LinkText { get; set; } = "Text";
+
+    [Parameter]
+    public string OkText { get; set; } = "OK";
+
+    [Parameter]
+    public string CancelText { get; set; } = "Cancel";
+
+    protected override async Task OnClick()
+    {
+        await Editor.SaveSelectionAsync();
+
+        bool blank = false;
+
+        var attributes = await JSRuntime.InvokeAsync<LinkAttributes>("Radzen.selectionAttributes", "a", new [] {"innerText", "href", "target" });
+
+        if (attributes.Target == "_blank")
+        {
+            blank = true;
+        }
+
+        var result = await DialogService.OpenAsync(Title, ds =>
+        @<div class="rz-html-editor-dialog">
+            <div class="rz-html-editor-dialog-item">
+                <label>@UrlText</label>
+                <RadzenTextBox @bind-Value=@attributes.Href style="width: 100%" />
+            </div>
+            <div class="rz-html-editor-dialog-item">
+                <label>@LinkText</label>
+                <RadzenTextBox @bind-Value=@attributes.InnerText style="width: 100%" />
+            </div>
+            <div class="rz-html-editor-dialog-item">
+                <RadzenCheckBox @bind-Value=@blank />
+                <label>@OpenInNewWindowText</label>
+            </div>
+            <div class="rz-html-editor-dialog-buttons">
+                <RadzenButton Text=@OkText Click="()=> ds.Close(true)" />
+                <RadzenButton Text=@CancelText Click="()=> ds.Close(false)" ButtonStyle="ButtonStyle.Secondary"  />
+            </div>
+        </div>
+        );
+
+        await Editor.RestoreSelectionAsync();
+
+        if (result == true && !String.IsNullOrEmpty(attributes.Href))
+        {
+            var html = new StringBuilder();
+            html.AppendFormat("<a href=\"{0}\"", attributes.Href);
+            if (blank)
+            {
+                html.Append(" target=\"_blank\"");
+            }
+            html.AppendFormat(">{0}</a>", attributes.InnerText);
+
+            await Editor.ExecuteCommandAsync("insertHTML", html.ToString());
+        }
+
+    }
+}

@@ -1,0 +1,75 @@
+﻿@using System.Linq
+@using Microsoft.AspNetCore.Components.Forms
+@inherits FormComponent<int>
+@if (Visible)
+{
+    @if (Disabled)
+    {
+        <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+            <a href="javascript:void(0)" class="rz-rating-cancel">
+                <span class="rz-rating-icon rzi rzi-ban"></span>
+            </a>
+            @foreach (var index in Enumerable.Range(1, Stars))
+            {
+                @if (index <= Value)
+                {
+                    <a href="javascript:void(0)">
+                        <span class="rz-rating-icon rzi rzi-star"></span>
+                    </a>
+                }
+                else
+                {
+                    <a href="javascript:void(0)">
+                        <span class="rz-rating-icon rzi rzi-star-o"></span>
+                    </a>
+                }
+
+            }
+        </div>
+    }
+    else
+    {
+        <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+            <a href="javascript:void(0)" class="rz-rating-cancel" tabindex="@TabIndex" @onclick="@(args => SetValue(0))" @onkeypress="@(async args => { if (args.Code == "Space") { await SetValue(0); } })">
+                <span class="rz-rating-icon rzi rzi-ban"></span>
+            </a>
+            @foreach (var index in Enumerable.Range(1, Stars))
+            {
+
+                @if (index <= Value)
+                {
+                    <a href="javascript:void(0)" tabindex="@TabIndex" @onclick="@(args => SetValue(index))" @onkeypress="@(async args => { if (args.Code == "Space") { await SetValue(index); } })">
+                        <span class="rz-rating-icon rzi rzi-star"></span>
+                    </a>
+                }
+                else
+                {
+                    <a href="javascript:void(0)" tabindex="@TabIndex" @onclick="@(args => SetValue(index))" @onkeypress="@(async args => { if (args.Code == "Space") { await SetValue(index); } })">
+                        <span class="rz-rating-icon rzi rzi-star-o"></span>
+                    </a>
+                }
+
+            }
+        </div>
+    }
+}
+@code {
+    protected override string GetComponentCssClass()
+    {
+        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
+
+        return $"rz-rating {(Disabled ? "rz-state-disabled" : "")} {fieldCssClass}";
+    }
+
+    [Parameter]
+    public int Stars { get; set; } = 5;
+
+    private async System.Threading.Tasks.Task SetValue(int value)
+    {
+        Value = value;
+
+        await ValueChanged.InvokeAsync(value);
+       if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+        await Change.InvokeAsync(value);
+    }
+}

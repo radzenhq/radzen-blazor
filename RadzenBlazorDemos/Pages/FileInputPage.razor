@@ -1,0 +1,40 @@
+﻿@page "/fileinput"
+
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inject NorthwindContext dbContext
+
+<RadzenExample Name="FileInput">
+<div class="row">
+    <div class="col-xl-6">
+        <h3>FileInput</h3>
+        <div style="margin: 2rem 0">Employee: <b>@(firstEmployee.FirstName + " " + firstEmployee.LastName)</b></div>
+        <RadzenFileInput @bind-Value=@firstEmployee.Photo Style="width:400px" TValue="string" 
+            Change=@(args => OnChange(args, "FileInput")) Error=@(args => OnError(args, "FileInput")) />
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    Employee firstEmployee;
+    EventConsole console;
+
+    protected override async Task OnInitializedAsync()
+    {
+        firstEmployee = await Task.FromResult(dbContext.Employees.FirstOrDefault());
+    }
+
+    void OnChange(string value, string name)
+    {
+        console.Log($"{name} value changed");
+    }
+
+    void OnError(UploadErrorEventArgs args, string name)
+    {
+        console.Log($"{args.Message}");
+    }
+}

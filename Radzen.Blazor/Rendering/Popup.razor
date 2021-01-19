@@ -1,0 +1,49 @@
+@inherits RadzenComponent
+@using Microsoft.JSInterop
+<div @ref=@Element @onmousedown:preventDefault @attributes=@Attributes style=@Style id=@GetId()>
+    @ChildContent
+</div>
+@code {
+    bool open;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback Open { get; set; }
+
+    [Parameter]
+    public EventCallback Close { get; set; }
+
+    public async Task ToggleAsync(ElementReference target)
+    {
+        open = !open;
+
+        if (open)
+        {
+            await Open.InvokeAsync(null);
+        }
+
+        await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", target, GetId(), false, DotNetObjectReference.Create(this), nameof(OnClose));
+    }
+
+    [JSInvokable]
+    public async Task OnClose()
+    {
+        open = false;
+
+        await Close.InvokeAsync(null);
+    }
+
+    public async Task CloseAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", GetId(), DotNetObjectReference.Create(this), nameof(OnClose));
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+
+        JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", GetId());
+    }
+}

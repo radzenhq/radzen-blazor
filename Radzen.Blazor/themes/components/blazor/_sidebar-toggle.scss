@@ -1,0 +1,35 @@
+$sidebar-toggle-icon-width: 1.5rem !default;
+$sidebar-toggle-icon-height: 1.5rem !default;
+$sidebar-toggle-padding: 0.8125rem !default;
+$sidebar-toggle-border: 1px solid #eaeef0 !default;
+$sidebar-toggle-hover-color: $default-link !default;
+$sidebar-toggle-hover-background-color: $header-background-color !default;
+$sidebar-toggle-hover-border-radius: 0 !default;
+$sidebar-toggle-background-color: $header-background-color !default;
+$sidebar-toggle-color: #000 !default;
+$sidebar-toggle-margin: 0 1rem 0 0 !default;
+
+.sidebar-toggle {
+  -webkit-appearance: none;
+  border: none;
+  padding: $sidebar-toggle-padding;
+  margin: $sidebar-toggle-margin;
+  border-right: $sidebar-toggle-border;
+  background-color: $sidebar-toggle-background-color;
+  color: $sidebar-toggle-color;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover {
+    color: $sidebar-toggle-hover-color;
+    background: $sidebar-toggle-hover-background-color;
+    border-radius: $sidebar-toggle-hover-border-radius;
+  }
+
+  .rzi {
+    width: $sidebar-toggle-icon-width;
+    height: $sidebar-toggle-icon-height;
+  }
+}

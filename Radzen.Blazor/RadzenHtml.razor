@@ -1,0 +1,12 @@
+﻿@if (Visible)
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

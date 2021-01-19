@@ -1,0 +1,18 @@
+@inherits RadzenChartComponentBase
+@code {
+    [Parameter]
+    public double Radius { get; set; }
+
+    [Parameter]
+    public double Margin { get; set; } = 10;
+
+    protected override void Initialize()
+    {
+        Chart.BarOptions = this;
+    }
+
+    protected override bool ShouldRefreshChart(ParameterView parameters)
+    {
+        return DidParameterChange(parameters, nameof(Radius), Radius) || DidParameterChange(parameters, nameof(Margin), Margin);
+    }
+}

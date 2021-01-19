@@ -1,0 +1,135 @@
+a.ui-button:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+/*
+Visual Studio-like style based on original C# coloring by Jason Diamond <jason@diamond.name>
+*/
+.hljs {
+display: block;
+overflow-x: auto;
+background: white;
+color: black;
+}
+
+.hljs-comment,
+.hljs-quote,
+.hljs-variable {
+color: #008000;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name,
+.hljs-tag {
+color: #00f;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section,
+.hljs-attribute,
+.hljs-literal,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-addition {
+color: #a31515;
+}
+
+.hljs-deletion,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-meta {
+color: #2b91af;
+}
+
+.hljs-doctag {
+color: #808080;
+}
+
+.hljs-attr {
+color: #f00;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link {
+color: #00b0e8;
+}
+
+
+.hljs-emphasis {
+font-style: italic;
+}
+
+.hljs-strong {
+font-weight: bold;
+}
+
+.documentation-link {
+text-decoration: none !important; 
+padding: 6px 0; 
+display: flex; 
+align-items: center; 
+position: relative; 
+float: right; 
+margin-left: -100%;
+}
+
+.social-link {
+margin-right: 8px;
+text-decoration: none;
+}
+
+.console {
+    height: 400px;
+    background: #fff;
+    margin: 16px 0;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 16px 0;
+    color: #000;
+}
+
+.console-content {
+    flex: 1;
+    overflow: auto;
+    background-color: #ccc;
+}
+
+.console-header {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    padding: 8px 0;
+}
+.console-title {
+    flex: 1;
+    text-align: center;
+    font-size: 24px;
+}
+
+.console-clear {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: #000;
+    padding: 0 16px 0 0;
+}
+
+.console-message {
+    margin: 8px;
+    padding: 4px 0;
+    display: flex;
+    align-items: baseline;
+    background: #fff;
+    border-radius: 4px;
+}
+
+.console-message-time {
+    font-size: 12px;
+    padding: 2px 4px;
+}

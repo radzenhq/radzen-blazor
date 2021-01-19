@@ -1,0 +1,18 @@
+﻿@inherits RadzenComponentWithChildren
+
+@if (Visible)
+{
+    <img @ref="@Element" src="@Path" style="@Style" @onclick="@((args) => OnClick(args))" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"/>
+}
+@code {
+    [Parameter]
+    public string Path { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> Click { get; set; }
+
+    protected async System.Threading.Tasks.Task OnClick(MouseEventArgs args)
+    {
+        await Click.InvokeAsync(args);
+    }
+}

@@ -1,0 +1,55 @@
+﻿@page "/radiobuttonlist"
+
+<RadzenExample Name="RadioButtonList">
+<div class="row">
+    <div class="col-xl-6">
+        <h3>RadioButtonList with horizontal orientation</h3>
+        <RadzenRadioButtonList @bind-Value=@value TValue="int" Change=@((args) => OnChange(args, "RadioButtonList with horizontal orientation"))>
+            <Items>
+                <RadzenRadioButtonListItem Text="Orders" Value="1" />
+                <RadzenRadioButtonListItem Text="Employees" Value="2" />
+                <RadzenRadioButtonListItem Text="Customers" Value="3" />
+            </Items>
+        </RadzenRadioButtonList>
+        <h3 style="margin-top: 2rem">RadioButtonList with vertical orientation</h3>
+        <RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" Change=@((args) => OnChange(args, "RadioButtonList with vertical orientation"))>
+            <Items>
+                <RadzenRadioButtonListItem Text="Orders" Value="1" />
+                <RadzenRadioButtonListItem Text="Employees" Value="2" />
+                <RadzenRadioButtonListItem Text="Customers" Value="3" />
+            </Items>
+        </RadzenRadioButtonList>
+        <h3 style="margin-top: 2rem">RadioButtonList with null as initial value</h3>
+        <RadzenRadioButtonList @bind-Value=@nullableValue TValue="int?" Change=@((args) => OnChange(args, "RadioButtonList with horizontal orientation"))>
+            <Items>
+                <RadzenRadioButtonListItem Text="Orders" Value="1" TValue="int?" />
+                <RadzenRadioButtonListItem Text="Employees" Value="2" TValue="int?" />
+                <RadzenRadioButtonListItem Text="Customers" Value="3" TValue="int?" />
+            </Items>
+        </RadzenRadioButtonList>
+        <h3 style="margin-top: 2rem">Disabled RadioButtonList with initial value</h3>
+        <RadzenRadioButtonList @bind-Value=@value Disabled="true" TValue="int">
+            <Items>
+                <RadzenRadioButtonListItem Text="Orders" Value="1" TValue="int" />
+                <RadzenRadioButtonListItem Text="Employees" Value="2" TValue="int" />
+                <RadzenRadioButtonListItem Text="Customers" Value="3" TValue="int" />
+            </Items>
+        </RadzenRadioButtonList>
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    int value = 1;
+    int? nullableValue = null;
+
+    EventConsole console;
+
+    void OnChange(int? value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+}

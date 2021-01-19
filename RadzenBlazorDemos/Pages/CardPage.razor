@@ -1,0 +1,46 @@
+﻿@page "/card"
+
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<RadzenExample Name="Card">
+<RadzenCard Style="width:600px; margin-bottom: 20px; height:500px;">
+    <div class="row">
+        <div class="col-md-6">
+            <div>Company:</div>
+            <b>@order.Customer?.CompanyName</b>
+            <div style="margin-top:20px">Employee:</div>
+            <b>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</b>
+            <br />
+            <RadzenImage Path="@order.Employee?.Photo" Style="width:100px;" />
+        </div>
+        <div class="col-md-6">
+            <div>Freight:</div>
+            <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)</b>
+            <div style="margin-top:20px">Ship country:</div>
+            <b>@(order.ShipCountry)</b>
+            <div style="margin-top:20px">Ship city:</div>
+            <b>@(order.ShipCity)</b>
+            <div style="margin-top:20px">Ship name:</div>
+            <b>@(order.ShipName)</b>
+        </div>
+    </div>
+</RadzenCard>
+</RadzenExample>
+
+@code {
+    Order order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var query = await (from order in dbContext.Orders
+                            .Include("Customer")
+                            .Include("Employee")
+                    select order).Take(1).ToListAsync();
+
+        order = query.FirstOrDefault();
+    }
+}

@@ -1,0 +1,176 @@
+﻿@page "/datagrid-inline-edit"
+
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<h1>DataGrid InLine Editing</h1>
+
+<p>This page demonstrates how to configure the Razden Blazor DataGrid for inline editing</p>
+
+<RadzenExample Name="DataGridInLineEdit" Heading="false" Documentation="false">
+    <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Text="Add" Click="@InsertRow" />
+    <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" EditMode="DataGridEditMode.Single"
+                Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow">
+        <Columns>
+            <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
+            <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer">
+                <EditTemplate Context="order">
+                    <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%" />
+                </EditTemplate>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
+                <Template Context="order">
+                    <div>@order.Employee?.LastName</div>
+                    <RadzenImage Path="@order.Employee?.Photo" Style="width:150px" />
+                </Template>
+                <EditTemplate Context="order">
+                    <RadzenDropDown @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%">
+                        <Template>
+                            @context.FirstName @context.LastName
+                        </Template>
+                    </RadzenDropDown>
+                </EditTemplate>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
+                <Template Context="order">
+                    @String.Format("{0:d}", order.OrderDate)
+                </Template>
+                <EditTemplate Context="order">
+                    <RadzenDatePicker @bind-Value="order.OrderDate" Style="width:100%" />
+                </EditTemplate>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight">
+                <Template Context="order">
+                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+                </Template>
+                <EditTemplate Context="order">
+                    <RadzenNumeric @bind-Value="order.Freight" Style="width:100%" />
+                </EditTemplate>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name">
+                <EditTemplate Context="order">
+                    <RadzenTextBox @bind-Value="order.ShipName" Style="width:100%; display: block" Name="ShipName" />
+                    <RadzenRequiredValidator Text="ShipName is required" Component="ShipName" Popup="true" />
+                </EditTemplate>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Context="sampleBlazorModelsSampleOrder" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+                <Template Context="order">
+                    <RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditRow(order))">
+                    </RadzenButton>
+                </Template>
+                <EditTemplate Context="order">
+                    <RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => SaveRow(order))">
+                    </RadzenButton>
+                    <RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => CancelEdit(order))">
+                    </RadzenButton>
+                </EditTemplate>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Context="order" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+                <Template Context="order">
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@(args => DeleteRow(order))">
+                    </RadzenButton>
+                </Template>
+                <EditTemplate Context="order">
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@(args => DeleteRow(order))">
+                    </RadzenButton>
+                </EditTemplate>
+            </RadzenGridColumn>
+        </Columns>
+    </RadzenGrid>
+</RadzenExample>
+
+@code {
+    RadzenGrid<Order> ordersGrid;
+    IList<Order> orders;
+    IEnumerable<Customer> customers;
+    IEnumerable<Employee> employees;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        customers = dbContext.Customers.ToList();
+        employees = dbContext.Employees.ToList();
+
+        // For demo purposes only
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+
+        // For production
+        //orders = dbContext.Orders.Include("Customer").Include("Employee");
+    }
+
+    void EditRow(Order order)
+    {
+        ordersGrid.EditRow(order);
+    }
+
+    void OnUpdateRow(Order order)
+    {
+        dbContext.Update(order);
+
+        // For demo purposes only
+        order.Customer = dbContext.Customers.Find(order.CustomerID);
+        order.Employee = dbContext.Employees.Find(order.EmployeeID);
+
+        // For production
+        //dbContext.SaveChanges();
+    }
+
+    void SaveRow(Order order)
+    {
+        ordersGrid.UpdateRow(order);
+    }
+
+    void CancelEdit(Order order)
+    {
+        ordersGrid.CancelEditRow(order);
+
+        // For production
+        var orderEntry = dbContext.Entry(order);
+        if (orderEntry.State == EntityState.Modified)
+        {
+            orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
+            orderEntry.State = EntityState.Unchanged;
+        }
+    }
+
+    void DeleteRow(Order order)
+    {
+        if (orders.Contains(order))
+        {
+            dbContext.Remove<Order>(order);
+
+            // For demo purposes only
+            orders.Remove(order);
+
+            // For production
+            //dbContext.SaveChanges();
+
+            ordersGrid.Reload();
+        }
+        else
+        {
+            ordersGrid.CancelEditRow(order);
+        }
+    }
+
+    void InsertRow()
+    {
+        ordersGrid.InsertRow(new Order());
+    }
+
+    void OnCreateRow(Order order)
+    {
+        dbContext.Add(order);
+
+        // For demo purposes only
+        order.Customer = dbContext.Customers.Find(order.CustomerID);
+        order.Employee = dbContext.Employees.Find(order.EmployeeID);
+
+        // For production
+        //dbContext.SaveChanges();
+    }
+}

@@ -1,0 +1,13 @@
+$overlay-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06) !default;
+$overlay-border: solid 1px #cecece !default;
+$overlay-background-color: $body-bg !default;
+
+.rz-overlaypanel {
+  position: absolute;
+  overflow: hidden;
+
+  box-shadow: $overlay-shadow;
+  border: $overlay-border;
+  border-radius: $border-radius;
+  background-color: $overlay-background-color;
+}

@@ -1,0 +1,116 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+  [Parameter]
+  public string Stroke { get; set; }
+
+  [Parameter]
+  public string Fill { get; set; }
+
+  [Parameter]
+  public double StrokeWidth { get; set; } = 2;
+
+  [Parameter]
+  public LineType LineType { get; set; }
+
+  [Parameter]
+  public bool Smooth { get; set; }
+
+  public override string Color
+  {
+    get
+    {
+      return Stroke;
+    }
+  }
+
+  public override bool Contains(double x, double y)
+  {
+      var tolerance = 25;
+      var category = ComposeCategory(Chart.CategoryScale);
+      var value = ComposeValue(Chart.ValueScale);
+
+      var points =  Items.Select(item => new Point { X = category(item), Y = value(item) }).ToArray();
+
+      var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+      var axisY = Chart.ValueScale.Scale(Math.Max(0, valueTicks.Start));
+
+      if (points.Any())
+      {
+        for (var i = 0; i < points.Length - 1; i++)
+        {
+            var start = points[i];
+            var end = points[i + 1];
+
+            var polygon = new[] {
+                new Point { X = start.X, Y = start.Y - tolerance },
+                new Point { X = end.X, Y = end.Y - tolerance },
+                new Point { X = end.X, Y = axisY },
+                new Point { X = start.X, Y = axisY },
+            };
+
+            if (InsidePolygon(new Point { X = x, Y = y }, polygon))
+            {
+              return true;
+            }
+        }
+      }
+
+      return false;
+  }
+
+  public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+  {
+    var category = ComposeCategory(categoryScale);
+
+    var value = ComposeValue(valueScale);
+
+    IPathGenerator pathGenerator;
+      
+    if (Smooth)
+    {
+      pathGenerator = new SplineGenerator();
+    }
+    else
+    {
+      pathGenerator = new LineGenerator();
+    }
+
+    var data = Items.Select(item => 
+    {
+      var x = category(item);
+      var y = value(item);
+
+      return new Point { X = x, Y = y };
+    });
+
+    var ticks = Chart.CategoryScale.Ticks(Chart.CategoryAxis.TickDistance);
+    var index = Chart.Series.IndexOf(this);
+    var className = $"rz-area-series rz-series-{index}";
+
+    return 
+    @<g class="@className">
+      @if (Items.Any())
+      {
+        var x1 = category(Items.First()).ToInvariantString();
+        var x2 = category(Items.Last()).ToInvariantString();
+        var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+        var start = Math.Max(0, valueTicks.Start);
+        var y = Chart.ValueScale.Scale(start).ToInvariantString();
+        var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
+        var path = pathGenerator.Path(data);
+        var area = $"M {x1} {y} {path} L {x2} {y}";
+        var line = $"M {path}";
+
+        <path @key="@area" style="@style" d="@area" fill="@Fill" stroke="none"></path>
+        <Path @key="@line" D="@line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
+      }
+      <Markers Data="@Items" Category="@category" Value="@value" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
+    </g>;
+  }
+}

@@ -1,0 +1,25 @@
+﻿@using Radzen.Blazor.Rendering
+
+<div class="rz-colorpicker-item" style="background-color: @Background" @onmousedown:preventDefault @onclick=@OnClick></div>
+@code {
+    [Parameter]
+    public string Value { get; set; }
+
+    string Background
+    {
+        get
+        {
+            RGB rgb = RGB.Parse(Value);
+
+            return rgb?.ToCSS();
+        }
+    }
+
+    [CascadingParameter]
+    public RadzenColorPicker ColorPicker { get; set; }
+
+    async Task OnClick()
+    {
+        await ColorPicker.SelectColor(Value);
+    }
+}

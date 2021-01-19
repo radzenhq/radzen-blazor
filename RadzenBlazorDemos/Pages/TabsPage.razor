@@ -1,0 +1,122 @@
+﻿@page "/tabs"
+
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<RadzenExample Name="Tabs">
+    <div class="row">
+        <div class="col-xl-6">
+        <RadzenTabs Change=@OnChange style="height: 880px">
+            <Tabs>
+                <RadzenTabsItem Text="Orders">
+                    <RadzenDataList PageSize="2" WrapItems="true" AllowPaging="true" Data="@orders" TItem="Order">
+                        <Template Context="order">
+                            <RadzenCard Style="width:400px;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div>Company:</div>
+                                        <b>@order.Customer?.CompanyName</b>
+                                        <div style="margin-top:20px">Employee:</div>
+                                        <b>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</b>
+                                        <br />
+                                        <RadzenImage Path="@order.Employee?.Photo" Style="width:100px;" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div>Freight:</div>
+                                        <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)</b>
+                                        <div style="margin-top:20px">Ship country:</div>
+                                        <b>@(order.ShipCountry)</b>
+                                        <div style="margin-top:20px">Ship city:</div>
+                                        <b>@(order.ShipCity)</b>
+                                        <div style="margin-top:20px">Ship name:</div>
+                                        <b>@(order.ShipName)</b>
+                                    </div>
+                                </div>
+
+                            </RadzenCard>
+                        </Template>
+                    </RadzenDataList>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Employee">
+                    <RadzenGrid ColumnWidth="150px" AllowFiltering="true" AllowPaging="true" PageSize="4" AllowSorting="true" Data="@employees" TItem="Employee">
+                        <Columns>
+                            <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
+                            <RadzenGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false">
+                                <Template Context="data">
+                                    <RadzenImage Path="@data?.Photo" />
+                                </Template>
+                            </RadzenGridColumn>
+                            <RadzenGridColumn TItem="Employee" Property="LastName" Title="Last Name" />
+                            <RadzenGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
+                            <RadzenGridColumn TItem="Employee" Property="Title" Title="Title" />
+                            <RadzenGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
+                            <RadzenGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date">
+                                <Template Context="data">
+                                    @String.Format("{0:d}", data.BirthDate)
+                                </Template>
+                            </RadzenGridColumn>
+                            <RadzenGridColumn TItem="Employee" Property="HireDate" Title="Hire Date">
+                                <Template Context="data">
+                                    @String.Format("{0:d}", data.HireDate)
+                                </Template>
+                            </RadzenGridColumn>
+                            <RadzenGridColumn TItem="Employee" Property="Address" Title="Address" />
+                            <RadzenGridColumn TItem="Employee" Property="City" Title="City" />
+                            <RadzenGridColumn TItem="Employee" Property="Region" Title="Region" />
+                            <RadzenGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
+                            <RadzenGridColumn TItem="Employee" Property="Country" Title="Country" />
+                            <RadzenGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
+                            <RadzenGridColumn TItem="Employee" Property="Extension" Title="Extension" />
+                            <RadzenGridColumn TItem="Employee" Property="Notes" Title="Notes" />
+                        </Columns>
+                    </RadzenGrid>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Customers">
+                    <RadzenGrid ColumnWidth="150px" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@customers" TItem="Customer">
+                        <Columns>
+                            <RadzenGridColumn TItem="Customer" Property="CustomerID" Title="Customer ID" />
+                            <RadzenGridColumn TItem="Customer" Property="CompanyName" Title="Company Name" />
+                            <RadzenGridColumn TItem="Customer" Property="ContactName" Title="Contact Name" />
+                            <RadzenGridColumn TItem="Customer" Property="ContactTitle" Title="Contact Title" />
+                            <RadzenGridColumn TItem="Customer" Property="Address" Title="Address" />
+                            <RadzenGridColumn TItem="Customer" Property="City" Title="City" />
+                            <RadzenGridColumn TItem="Customer" Property="Region" Title="Region" />
+                            <RadzenGridColumn TItem="Customer" Property="PostalCode" Title="Postal Code" />
+                            <RadzenGridColumn TItem="Customer" Property="Country" Title="Country" />
+                            <RadzenGridColumn TItem="Customer" Property="Phone" Title="Phone" />
+                            <RadzenGridColumn TItem="Customer" Property="Fax" Title="Fax" />
+                        </Columns>
+                    </RadzenGrid>
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
+        </div>
+        <div class="col-xl-6">
+            <EventConsole @ref=@console />
+        </div>
+    </div>
+    
+</RadzenExample>
+@code {
+    EventConsole console;
+    IEnumerable<Order> orders;
+    IEnumerable<Employee> employees;
+    IEnumerable<Customer> customers;
+
+    protected override void OnInitialized()
+    {
+        employees = dbContext.Employees.ToList();
+
+        customers = dbContext.Customers.ToList();
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+
+    void OnChange(int index)
+    {
+        console.Log($"Tab with index {index} was selected.");
+    }
+}

@@ -1,0 +1,46 @@
+﻿@page "/checkboxlist"
+
+<RadzenExample Name="CheckBoxList">
+<div class="row">
+    <div class="col-xl-6">
+        <h3>CheckBoxList with horizontal orientation</h3>
+        <RadzenCheckBoxList @bind-Value=@values TValue="int" Change=@(args => OnChange(args, "CheckBoxList with horizontal orientation"))>
+            <Items>
+                <RadzenCheckBoxListItem Text="Orders" Value="1" />
+                <RadzenCheckBoxListItem Text="Employees" Value="2" />
+                <RadzenCheckBoxListItem Text="Customers" Value="3" />
+            </Items>
+        </RadzenCheckBoxList>
+        <h3 style="margin-top: 2rem">CheckBoxList with vertical orientation</h3>
+        <RadzenCheckBoxList @bind-Value=@values TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "CheckBoxList with vertical orientation"))>
+            <Items>
+                <RadzenCheckBoxListItem Text="Orders" Value="1" />
+                <RadzenCheckBoxListItem Text="Employees" Value="2" />
+                <RadzenCheckBoxListItem Text="Customers" Value="3" />
+            </Items>
+        </RadzenCheckBoxList>
+        <h3 style="margin-top: 2rem">Disabled CheckBoxList with vertical orientation</h3>
+        <RadzenCheckBoxList @bind-Value=@values Disabled="true" TValue="int" Orientation="Orientation.Vertical">
+            <Items>
+                <RadzenCheckBoxListItem Text="Orders" Value="1" />
+                <RadzenCheckBoxListItem Text="Employees" Value="2" />
+                <RadzenCheckBoxListItem Text="Customers" Value="3" />
+            </Items>
+        </RadzenCheckBoxList>
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    IEnumerable<int> values = new int[] { 1 };
+
+    EventConsole console;
+
+    void OnChange(IEnumerable<int> value, string name)
+    {
+        console.Log($"{name} value changed to {string.Join(", ", value)}");
+    }
+}

@@ -1,0 +1,708 @@
+$grid-cell-border: solid 1px #dfe7eb !default;
+$grid-cell-padding: 0.5rem 0.625rem 0.5rem 0.625rem !default;
+$grid-cell-color: #48606c !default;
+$grid-cell-font-size: 0.875rem !default;
+
+$grid-hover-background-color: rgba(#d4ecf8, 0.5) !default;
+$grid-hover-color: $default-link !default;
+
+$grid-selected-background-color: $default-link !default;
+$grid-selected-color: $white !default;
+
+$grid-stripe-background-color: #f7f9fa !default;
+
+$grid-toolbar-background-color: $white !default;
+$grid-header-background-color: #e6ecef !default;
+$grid-header-font-size: 0.75rem !default;
+$grid-header-text-transform: uppercase !default;
+$grid-header-color: $charcoal-grey !default;
+$grid-header-cell-padding: 0.5rem 0 0 0 !default;
+$grid-header-title-padding: 0 0 0.625rem 0.625rem !default;
+$grid-header-sorted-background-color: #e2e9ee !default;
+
+$grid-header-padding: 0.625rem !default;
+
+$grid-filter-background-color: #f6f8f9 !default;
+$grid-filter-padding: 0.25rem 0.625rem !default;
+$grid-filter-border: $grid-cell-border !default;
+$grid-filter-icon-width: 0.875rem !default;
+$grid-filter-icon-height: 0.875rem !default;
+$grid-filter-icon-margin: 0 0.3125rem 0 0 !default;
+$grid-filter-color: $cool-grey !default;
+$grid-filter-focus-color: $default-link !default;
+$grid-filter-font-size: 0.8125rem !default;
+$grid-filter-operator-margin: 1.25rem !default;
+$grid-filter-buttons-padding: 0.325rem 1.25rem !default;
+$grid-filter-buttons-border: 1px solid rgba(#979797, 0.2) !default;
+$grid-filter-buttons-background-color: $white !default;
+
+$grid-clear-filter-button-background-color: #e6ecef !default;
+$grid-clear-filter-button-color: $cool-grey !default;
+$grid-apply-filter-button-background-color: $default-link !default;
+
+$grid-border: 1px solid #e6ecef !default;
+
+$grid-sort-icon-width: 1rem !default;
+$grid-sort-icon-height: $grid-sort-icon-width !default;
+
+$grid-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
+$grid-background-color: $white !default;
+
+$grid-column-resizer-width: 0.5rem !default;
+$grid-column-resizer-helper-width: 0.25rem !default;
+$grid-column-resizer-helper-background-color: $default-link !default;
+
+$grid-column-icon-width: 2rem !default;
+$grid-column-icon-padding: 0 !default;
+
+$grid-detail-template-border: solid 1px rgba(71, 156, 200, 0.2) !default;
+$grid-detail-template-border-radius: 2px !default;
+$grid-detail-template-padding: 0.625rem !default;
+$grid-detail-template-background-color: $white !default;
+
+$grid-loading-indicator-background-color: rgba($cool-grey, 0.5) !default;
+$grid-button-icon-only-padding: 0 0.25rem !default;
+$grid-button-text-padding: 0 0.6875rem !default;
+$grid-button-font-size: 0.75rem !default;
+$grid-button-icon-width: 0.75rem !default;
+$grid-button-icon-height: $grid-button-icon-width !default;
+$grid-button-height: 1.25rem !default;
+$grid-button-line-height: $grid-button-height !default;
+
+.rz-datatable {
+  position: relative;
+  box-shadow: $grid-shadow;
+  border: $grid-cell-border;
+  background-color: $grid-background-color;
+
+  border-bottom-right-radius: $border-radius;
+  border-bottom-left-radius: $border-radius;
+
+  .rz-col-icon {
+    text-align: center;
+    vertical-align: middle;
+    width: $grid-column-icon-width;
+    padding: $grid-column-icon-padding;
+  }
+
+  .rzi-chevron-circle-right {
+    @extend .rzi;
+
+    vertical-align: top;
+    &:before {
+      content: 'arrow_right';
+    }
+  }
+
+  .rzi-chevron-circle-down {
+    @extend .rzi;
+    vertical-align: top;
+    &:before {
+      content: 'arrow_drop_down';
+    }
+  }
+
+  &.rz-has-template {
+    > .rz-datatable-scrollable-wrapper {
+      > .rz-datatable-scrollable-view {
+        > .rz-datatable-scrollable-body {
+          > .rz-datatable-scrollable-table-wrapper {
+            > table {
+              > .rz-datatable-scrollable-colgroup col {
+                &:first-child {
+                  width: $grid-column-icon-width;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.rz-unselectable-text {
+  user-select: none;
+}
+
+.rz-datatable-tablewrapper,
+.rz-datatable-scrollable-header-box,
+.rz-datatable-scrollable-table-wrapper,
+.rz-datatable-scrollable-footer-box {
+  > table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+  }
+}
+
+.rz-resizable-column {
+  position: relative;
+}
+
+.rz-column-resizer-helper {
+  position: absolute;
+  display: none;
+  width: $grid-column-resizer-helper-width;
+  background-color: $grid-column-resizer-helper-background-color;
+}
+
+.rz-datatable-reorder-indicator-up {
+  position: absolute;
+  &:before {
+    content: 'arrow_drop_down';
+  }
+}
+
+.rz-datatable-reorder-indicator-down {
+  position: absolute;
+
+  &:before {
+    content: 'arrow_drop_up';
+  }
+}
+
+.rz-column-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  cursor: col-resize;
+  width: $grid-column-resizer-width;
+}
+
+.rz-rowgroup-header .fa,
+.rz-row-toggler {
+  color: $grid-cell-color;
+}
+
+.rz-datatable-scrollable-footer {
+  background-color: $grid-header-background-color;
+  border-top: $grid-cell-border;
+}
+
+.rz-datatable-thead {
+  .rzi {
+    color: $grid-cell-color;
+  }
+
+  th {
+    background-color: $grid-header-background-color;
+    padding: $grid-header-cell-padding;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @if $material == false and $fluent == false {
+      &:not(:last-child) {
+        border-right: $grid-cell-border;
+      }
+    }
+
+    .rz-column-title {
+      display: inline-block;
+      font-size: $grid-header-font-size;
+      text-transform: $grid-header-text-transform;
+      color: $grid-header-color;
+      padding: $grid-header-title-padding;
+      font-weight: normal;
+    }
+  }
+}
+
+.rz-datatable-tfoot {
+  td {
+    background-color: $grid-header-background-color;
+    font-size: $grid-cell-font-size;
+    color: $grid-cell-color;
+    padding: $grid-cell-padding;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @if $material == false and $fluent == false {
+      &:not(:last-child) {
+        border-right: $grid-cell-border;
+      }
+    }
+  }
+}
+
+.rz-datatable-scrollable-header {
+  background-color: $grid-header-background-color;
+  border-bottom: $grid-cell-border;
+}
+
+.rz-datatable-scrollable-body {
+  overflow: auto;
+  border-top: none;
+  flex: auto;
+  border-bottom-right-radius: $border-radius;
+  border-bottom-left-radius: $border-radius;
+}
+
+.rz-has-paginator {
+  .rz-datatable-scrollable-body {
+    border-radius: 0;
+  }
+}
+.rz-sortable-column {
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+
+  &.rz-state-active {
+    background-color: $grid-header-sorted-background-color;
+  }
+
+  .rzi-grid-sort {
+    @extend .rzi;
+    width: $grid-sort-icon-width;
+    height: $grid-sort-icon-height;
+    font-size: $grid-sort-icon-height;
+    vertical-align: middle;
+  }
+
+  .rzi-sort {
+    color: $grid-header-color;
+    &:before {
+      content: 'sort';
+    }
+  }
+
+  .rzi-sort-asc {
+    color: $grid-header-color;
+    &:before {
+      content: 'arrow_drop_up';
+    }
+  }
+
+  .rzi-sort-desc {
+    color: $grid-header-color;
+    &:before {
+      content: 'arrow_drop_down';
+    }
+  }
+}
+
+.rz-datatable-odd {
+  > td {
+    background-color: $grid-stripe-background-color;
+  }
+}
+
+.rz-datatable-even {
+  > td {
+    background-color: $grid-background-color;
+  }
+}
+
+.rz-datatable-data .rz-cell-data {
+  .rz-button-sm {
+    line-height: $grid-button-line-height;
+    padding: $grid-button-text-padding;
+    height: $grid-button-line-height;
+    font-size: $grid-button-font-size;
+
+    .rz-button-icon-left {
+      font-size: $grid-button-font-size;
+      line-height: $grid-button-line-height;
+      width: $grid-button-icon-width;
+    }
+
+    .rz-button-text {
+      line-height: $grid-button-line-height;
+    }
+    &.rz-button-icon-only {
+      padding: $grid-button-icon-only-padding;
+    }
+  }
+}
+
+.rz-datatable-data {
+  td {
+    padding: $grid-cell-padding;
+    border-bottom: $grid-cell-border;
+
+    @if $material == false and $fluent == false {
+      &:not(:last-child) {
+        border-right: $grid-cell-border;
+      }
+    }
+    .rz-cell-data {
+      color: $grid-cell-color;
+      font-size: $grid-cell-font-size;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  tr {
+    td {
+      &:first-child {
+        border-left: none;
+      }
+      &:last-child {
+        border-right: none;
+      }
+    }
+
+    &:first-child {
+      td {
+        border-top: none;
+      }
+    }
+
+    &:last-child {
+      td {
+        border-bottom: none;
+      }
+    }
+  }
+}
+
+.rz-datatable-reflow {
+  .rz-datatable-data {
+    td {
+      > .rz-column-title {
+        display: none;
+      }
+    }
+  }
+}
+
+.rz-datatable-scrollable {
+  display: flex;
+  flex-direction: column;
+
+  &.rz-has-height {
+    // IE 11 can't size without that
+    > .rz-datatable-scrollable-wrapper {
+      height: 0;
+
+      > .rz-datatable-scrollable-view {
+        height: 0;
+      }
+    }
+  }
+}
+
+.rz-datatable-scrollable-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+}
+
+.rz-datatable-scrollable-view {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rz-datatable-header {
+  background-color: $grid-toolbar-background-color;
+  padding: $grid-header-padding;
+  border-bottom: $grid-cell-border;
+
+  .rzi-plus {
+    @extend .rzi;
+
+    font-size: $grid-cell-font-size;
+    &:before {
+      content: 'add';
+    }
+  }
+}
+
+.rz-cell-filter {
+  padding: $grid-filter-padding;
+  background-color: $grid-filter-background-color;
+  border-top: $grid-filter-border;
+  font-size: $grid-filter-font-size;
+  font-weight: normal;
+
+  label {
+    display: flex;
+    flex: auto;
+    align-items: center;
+  }
+
+  .rzi {
+    width: $grid-filter-icon-width;
+    height: $grid-filter-icon-height;
+    font-size: $grid-filter-font-size;
+    margin: $grid-filter-icon-margin;
+    color: $grid-filter-color;
+
+    &.rz-cell-filter-clear {
+      margin-left: auto;
+    }
+  }
+
+  .rz-spinner {
+    border: none;
+    padding: 0;
+    height: auto;
+    background-color: transparent;
+    box-shadow: none;
+    line-height: 1;
+    flex: auto;
+
+    input {
+      line-height: 1;
+    }
+
+    button {
+      display: none;
+    }
+  }
+
+  .rz-chkbox-box {
+    &.rz-state-active {
+      background-color: $input-background-color;
+    }
+  }
+
+  input {
+    width: 0;
+    flex: auto;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    background-color: transparent;
+    color: $grid-filter-color;
+    line-height: 1;
+
+    &:focus {
+      outline: none;
+      color: $grid-filter-focus-color;
+    }
+  }
+}
+
+.rz-selectable {
+  .rz-datatable-even,
+  .rz-datatable-odd {
+    &.rz-state-highlight {
+      > td {
+        background-color: $grid-selected-background-color;
+      }
+
+      .rz-cell-data {
+        color: $grid-selected-color;
+      }
+
+      > .rzi {
+        color: $grid-selected-color;
+      }
+    }
+
+    &:hover {
+      &:not(.rz-state-highlight) {
+        > td {
+          background-color: $grid-hover-background-color;
+        }
+
+        .rz-cell-data {
+          color: $grid-hover-color;
+        }
+      }
+    }
+  }
+}
+
+.rz-cell-filter-content {
+  display: flex;
+  flex: auto;
+  align-items: center;
+}
+
+.rz-cell-filter-content {
+  color: $grid-filter-color;
+  min-height: 1.375rem;
+}
+
+.rz-date-filter {
+  display: flex;
+  align-items: center;
+  background-color: $grid-filter-background-color;
+
+  .rz-listbox {
+    margin: $grid-filter-operator-margin;
+  }
+
+  .rz-datepicker {
+    border-left: $grid-border;
+  }
+}
+
+.rz-expanded-row {
+  > td {
+    border-bottom: none;
+
+    .rz-cell-data,
+    .rz-row-toggler {
+      color: $grid-hover-color;
+    }
+
+    background-color: $grid-hover-background-color;
+  }
+}
+
+.rz-expanded-row-template {
+  background-color: $grid-detail-template-background-color;
+  padding: $grid-detail-template-padding;
+  border: $grid-detail-template-border;
+  border-radius: $grid-detail-template-border-radius;
+}
+
+.rz-expanded-row-content {
+  > td {
+    padding-top: 0;
+    background-color: $grid-detail-template-background-color;
+  }
+}
+
+.rz-rowgroup-header {
+  a {
+    &:hover {
+      text-decoration: none;
+    }
+  }
+  td {
+    border-top: $grid-border;
+    border-bottom: $grid-border;
+  }
+}
+
+.rz-date-filter-buttons {
+  display: flex;
+  justify-content: space-between;
+  padding: $grid-filter-buttons-padding;
+  background-color: $grid-filter-buttons-background-color;
+  border-top: $grid-filter-buttons-border;
+
+  .rz-button {
+    @extend .rz-button-md;
+  }
+}
+
+.rz-clear-filter {
+  background-color: $grid-clear-filter-button-background-color;
+  color: $grid-clear-filter-button-color;
+}
+
+.rz-apply-filter {
+  background-color: $grid-apply-filter-button-background-color;
+}
+
+.rz-datatable-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $grid-loading-indicator-background-color;
+  z-index: 1;
+}
+
+.rz-datatable-loading-content {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+
+  .rzi-circle-o-notch {
+    @extend .rzi;
+
+    animation: rotation 1s linear infinite;
+
+    &:before {
+      content: 'refresh';
+    }
+  }
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .rz-datatable-reflow {
+    .rz-datatable-tablewrapper,
+    .rz-datatable-scrollable-header-box,
+    .rz-datatable-scrollable-table-wrapper {
+      > table {
+        table-layout: auto;
+      }
+    }
+
+    .rz-datatable-thead {
+      th {
+        display: none;
+      }
+    }
+
+    .rz-datatable-odd,
+    .rz-datatable-even {
+      > td {
+        display: block;
+        width: 100% !important;
+        text-align: left !important;
+        border: none;
+
+        .rz-column-title {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+.rz-grid-filter {
+  padding: 0 1rem;
+
+  .rz-dropdown,
+  .rz-spinner,
+  .rz-textbox,
+  .rz-grid-filter-label {
+    display: block;
+    margin: 1rem 0;
+  }
+}
+
+.rz-grid-filter-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem;
+}
+
+.rz-grid-filter-icon {
+  color: $grid-header-color;
+  margin: 5px 5px 0 0;
+  float: right;
+  font-size: 1rem;
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:after {
+    content: 'filter_alt';
+  }
+}
+
+.rz-grid-filter-active {
+  color: $default-link;
+}

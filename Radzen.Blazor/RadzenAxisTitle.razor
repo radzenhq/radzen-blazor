@@ -1,0 +1,28 @@
+@inherits RadzenChartComponentBase
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+
+    [CascadingParameter]
+    public AxisBase Axis
+    {
+        set
+        {
+            value.Title = this;
+        }
+    }
+
+    internal double Size
+    {
+        get
+        {
+            return 16 * 0.875;
+        }
+    }
+
+    protected override bool ShouldRefreshChart(ParameterView parameters)
+    {
+        return DidParameterChange(parameters, nameof(Text), Text);
+    }
+}

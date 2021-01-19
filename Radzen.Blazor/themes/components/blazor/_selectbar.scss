@@ -1,0 +1,39 @@
+$selectbar-background-color: $white !default;
+$selectbar-color: #3a3a3a !default;
+$selectbar-border: solid 1px #dadfe2 !default;
+
+$selectbar-selected-background-color: $default-link !default;
+$selectbar-selected-color: $white !default;
+$selectbar-selected-border: solid 1px #459cca !default;
+$selectbar-border-radius: $border-radius !default;
+
+.rz-selectbutton {
+  display: inline-block;
+
+  .rz-button {
+    @extend .rz-button-md;
+
+    margin-left: -1px;
+    display: inline-block;
+    border-radius: 0;
+    background-color: $selectbar-background-color;
+    color: $selectbar-color;
+    border: $selectbar-border;
+
+    &:first-child {
+      border-top-left-radius: $border-radius;
+      border-bottom-left-radius: $selectbar-border-radius;
+    }
+
+    &:last-child {
+      border-top-right-radius: $selectbar-border-radius;
+      border-bottom-right-radius: $selectbar-border-radius;
+    }
+
+    &.rz-state-active {
+      background-color: $selectbar-selected-background-color;
+      color: $selectbar-selected-color;
+      border: $selectbar-selected-border;
+    }
+  }
+}

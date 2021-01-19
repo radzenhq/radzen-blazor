@@ -1,0 +1,22 @@
+$header-background-color: $default-background-color !default;
+$header-min-height: 3.125rem !default;
+$header-z: 2 !default;
+$header-border: 1px solid #eaeef0 !default;
+$header-color: $body-color !default;
+$header-shadow: none !default;
+
+.header {
+  background-color: $header-background-color;
+  min-height: $header-min-height;
+  border-bottom: $header-border;
+  color: $header-color;
+  box-shadow: $header-shadow;
+
+  &.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: $header-z;
+  }
+}

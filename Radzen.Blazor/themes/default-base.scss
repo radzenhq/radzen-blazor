@@ -1,0 +1,39 @@
+@import 'colors';
+@import 'variables';
+// Theme colors
+$primary-color: $pinkish-orange !default;
+$secondary: $default-link !default;
+$tertiary: $cool-grey !default;
+$additional-1: $soft-green !default;
+$additional-2: $tip !default;
+$additional-3: $dev !default;
+$contrast: $charcoal-grey !default;
+
+$default-background-color: $white !default;
+$button-hover-background-color: #ff7b54 !default;
+$button-active-background-color: #e5613a !default;
+$sidebar-background-color: $charcoal-grey !default;
+
+// Bootstrap overrides
+$primary: $primary-color !default;
+$danger: #f9777f !default;
+$info: $tip !default;
+$success: $additional-1 !default;
+$warning: $dull-yellow !default;
+$light: #e6ecef !default;
+$body-color: #212529 !default;
+$link-color: $default-link;
+$link-hover-color: $default-link;
+$state-success-bg: $success;
+$state-warning-bg: $warning;
+$state-danger-bg: $danger;
+$state-info-bg: $info;
+
+$body-bg: #f3f5f7 !default;
+$font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
+  'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
+  'Segoe UI Emoji', 'Segoe UI Symbol' !default;
+
+@import 'fonts';
+@import 'typography';
+@import 'components';

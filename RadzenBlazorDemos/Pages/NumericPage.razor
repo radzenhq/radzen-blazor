@@ -1,0 +1,32 @@
+﻿@page "/numeric"
+
+<RadzenExample Name="Numeric">
+    <div class="row">
+        <div class="col-xl-6">
+            <h3>Numeric</h3>
+            <RadzenNumeric TValue="int" Change=@(args => OnChange(args, "Numeric")) />
+            <h3 style="margin-top: 2rem">Numeric with Min set to 1 and Max set to 10</h3>
+            <RadzenNumeric TValue="int" Min="1" Max="10" Change=@(args => OnChange(args, "Numeric with Min set to 1 and Max set to 10")) />
+            <h3 style="margin-top: 2rem">Numeric with placeholder and 0.5 step</h3>
+            <RadzenNumeric TValue="double" Placeholder="0.0" Step="0.5" Change=@(args => OnChange(args, "Numeric with placeholder and 0.5 step")) />
+            <h3 style="margin-top: 2rem">Nullable numeric</h3>
+            <RadzenNumeric TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" Change=@(args => OnChange(args, "Nullable numeric")) />
+            <h3 style="margin-top: 2rem">Disabled numeric</h3>
+            <RadzenNumeric Disabled="true" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" />
+        </div>
+        <div class="col-xl-6">
+            <EventConsole @ref=@console />
+        </div>
+    </div>
+</RadzenExample>
+
+@code {
+    int? value;
+
+    EventConsole console;
+
+    void OnChange(dynamic value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+}

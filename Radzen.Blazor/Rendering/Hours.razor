@@ -1,0 +1,23 @@
+<div class="rz-slot-hours">
+@{var minor = false; }
+@for (var date = DateTime.Today.Add(Start); date < DateTime.Today.Add(End); date = date.AddMinutes(30))
+{
+    @if (minor)
+    {
+        <div class="rz-slot-header"></div>
+    }
+    else
+    {
+        <div class="rz-slot-header">@date.ToString("h tt")</div>
+    }
+
+    minor = !minor;
+}
+</div>
+@code {
+    [Parameter]
+    public TimeSpan Start { get; set; }
+
+    [Parameter]
+    public TimeSpan End { get; set; }
+}

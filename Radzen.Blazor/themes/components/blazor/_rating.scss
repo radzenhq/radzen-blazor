@@ -1,0 +1,57 @@
+$rating-color: $default-link !default;
+$rating-selected-color: $pinkish-orange !default;
+$rating-disabled-color: $cool-grey !default;
+
+.rz-rating {
+  display: inline-block;
+
+  &.rz-state-disabled {
+    .rzi {
+      opacity: 0.3;
+      color: $rating-disabled-color;
+    }
+  }
+
+  a {
+    text-decoration: none;
+    outline: none;
+  }
+
+  .rzi {
+    color: $rating-color;
+  }
+
+  .rzi-ban {
+    &:before {
+      content: "not_interested";
+    }
+  }
+
+  .rzi-star-o {
+    opacity: 0.2;
+
+    &:before {
+      content: "star_border";
+    }
+  }
+
+  .rzi-star {
+    color: $rating-selected-color;
+
+    &:before {
+      content: "star";
+    }
+  }
+}
+
+.rz-rating:not(.rz-state-disabled) {
+  .rzi-star-o {
+    &:hover {
+      color: $rating-selected-color;
+
+      &:before {
+        content: "star";
+      }
+    }
+  }
+}

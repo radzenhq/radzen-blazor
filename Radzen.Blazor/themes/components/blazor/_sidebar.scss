@@ -1,0 +1,16 @@
+$sidebar-z: 1 !default;
+$sidebar-width: 250px !default;
+$sidebar-border-right: 1px solid #eaeef0 !default;
+$sidebar-background-color: $charcoal-grey !default;
+
+.rz-sidebar {
+  background-color: $sidebar-background-color;
+  border-right: $sidebar-border-right;
+  position: fixed;
+  overflow: auto;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: $sidebar-z;
+  width: $sidebar-width;
+}

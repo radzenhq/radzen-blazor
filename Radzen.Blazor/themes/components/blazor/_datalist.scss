@@ -1,0 +1,60 @@
+$datalist-background-color: $white !default;
+$datalist-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
+$datalist-padding: 0.6875rem !default;
+$datalist-border: 1px solid #e6ecef !default;
+
+$datalist-item-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
+$datalist-item-border: solid 1px #e6ecef !default;
+$datalist-item-vertical-margin: 0.6875rem 0 !default;
+$datalist-item-horizontal-margin: 0.6875rem !default;
+$datalist-item-padding: 1rem !default;
+$datalist-item-background-color: $white !default;
+$datalist-border-radius: $border-radius !default;
+
+.rz-datalist,
+.rz-datagrid {
+  background-color: $datalist-background-color;
+  border-bottom-right-radius: $datalist-border-radius;
+  border-bottom-left-radius: $datalist-border-radius;
+  box-shadow: $datalist-shadow;
+  border: $datalist-border;
+}
+
+%datalist-item {
+  border-radius: $border-radius;
+  border: $datalist-item-border;
+  box-shadow: $datalist-item-shadow;
+  padding: $datalist-item-padding;
+  background-color: $datalist-item-background-color;
+}
+
+.rz-datalist-data {
+  list-style: none;
+  padding: $datalist-padding;
+  margin: 0;
+
+  > li {
+    @extend %datalist-item;
+
+    margin: $datalist-item-vertical-margin;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.rz-g {
+  display: flex;
+  flex-wrap: wrap;
+
+  > div {
+    @extend %datalist-item;
+    flex: auto;
+    margin: $datalist-item-horizontal-margin;
+  }
+}

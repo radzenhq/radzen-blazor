@@ -1,0 +1,20 @@
+$footer-padding: 1rem !default;
+$footer-background-color: $default-background-color !default;
+$footer-border: 1px solid #eaeef0 !default;
+$footer-color: $body-color !default;
+$footer-z: 2 !default;
+
+.footer {
+  padding: $footer-padding;
+  border-top: $footer-border;
+  background-color: $footer-background-color;
+  color: $footer-color;
+
+  &.fixed {
+    position: fixed;
+    z-index: $footer-z;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}

@@ -1,0 +1,122 @@
+﻿@inherits RadzenComponent
+
+@if (Visible)
+{
+    <fieldset @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+        <legend class="rz-fieldset-legend" style="white-space:nowrap">
+
+            @if (AllowCollapse)
+            {
+                <a href="javascript:void(0)" aria-controls="rz-fieldset-0-content" aria-expanded="false" @onclick=@Toggle>
+                @if (collapsed)
+                {
+                    <span class="rz-fieldset-toggler rzi rzi-w rzi-plus"></span>
+                }
+                else
+                {
+                    <span class="rz-fieldset-toggler rzi rzi-w rzi-minus"></span>
+                }
+
+                @if (!string.IsNullOrEmpty(Icon))
+                {
+                    <i class="rzi">@((MarkupString)Icon)</i><span>@Text</span>
+                }
+                else
+                {
+                    <span class="rz-fieldset-legend-text">@Text</span>
+                }
+                @HeaderTemplate
+                </a>
+            } 
+            else
+            {
+                @if (!string.IsNullOrEmpty(Icon))
+                {
+                    <i class="rzi">@((MarkupString)Icon)</i><span>@Text</span>
+                }
+                else
+                {
+                    <span class="rz-fieldset-legend-text">@Text</span>
+                }
+                @HeaderTemplate
+            }
+        </legend>
+        <div class="rz-fieldset-content-wrapper" role="region" id="rz-fieldset-0-content" aria-hidden="false" style="@contentStyle">
+            <div class="rz-fieldset-content">
+                @ChildContent
+            </div>
+        </div>
+    </fieldset>
+}
+@code {
+    protected override string GetComponentCssClass()
+    {
+        return AllowCollapse ? "rz-fieldset rz-fieldset-toggleable" : "rz-fieldset";
+    }
+
+    [Parameter]
+    public bool AllowCollapse { get; set; }
+
+    private bool collapsed;
+    [Parameter]
+    public bool Collapsed { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = "";
+
+    [Parameter]
+    public RenderFragment HeaderTemplate { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback Expand { get; set; }
+
+    [Parameter]
+    public EventCallback Collapse { get; set; }
+
+    string contentStyle = "display: block;";
+
+    async System.Threading.Tasks.Task Toggle(EventArgs args)
+    {
+        collapsed = !collapsed;
+        contentStyle = collapsed ? "display: none;" : "display: block;";
+
+        if (collapsed)
+        {
+            await Collapse.InvokeAsync(args);
+        }
+        else
+        {
+            await Expand.InvokeAsync(args);
+        }
+
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        collapsed = Collapsed;
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.DidParameterChange(nameof(Collapsed), Collapsed))
+        {
+            collapsed = parameters.GetValueOrDefault<bool>(nameof(Collapsed));
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        contentStyle = collapsed ? "display: none;" : "display: block;";
+
+        return base.OnParametersSetAsync();
+    }
+}

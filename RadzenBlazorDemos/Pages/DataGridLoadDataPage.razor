@@ -1,0 +1,71 @@
+﻿@page "/datagrid-loaddata"
+@using System.Linq.Dynamic.Core
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inject NorthwindContext dbContext
+
+<h1>DataGrid</h1>
+
+<p>This page demonstrates how to data-bind the Radzen Blazor DataGrid to custom collection via the LoadData event.</p>
+
+<RadzenExample Name="DataGridLoadData" Heading="false" Documentation="false">
+    <RadzenGrid Count="@count" Data="@employees" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
+        <Columns>
+            <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
+            <RadzenGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false">
+                <Template Context="data">
+                    <RadzenImage Path="@data?.Photo" />
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Employee" Property="LastName" Title="Last Name" />
+            <RadzenGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
+            <RadzenGridColumn TItem="Employee" Property="Title" Title="Title" />
+            <RadzenGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
+            <RadzenGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date">
+                <Template Context="data">
+                    @String.Format("{0:d}", data.BirthDate)
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Employee" Property="HireDate" Title="Hire Date">
+                <Template Context="data">
+                    @String.Format("{0:d}", data.HireDate)
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Employee" Property="Address" Title="Address" />
+            <RadzenGridColumn TItem="Employee" Property="City" Title="City" />
+            <RadzenGridColumn TItem="Employee" Property="Region" Title="Region" />
+            <RadzenGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
+            <RadzenGridColumn TItem="Employee" Property="Country" Title="Country" />
+            <RadzenGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
+            <RadzenGridColumn TItem="Employee" Property="Extension" Title="Extension" />
+            <RadzenGridColumn TItem="Employee" Property="Notes" Title="Notes" />
+        </Columns>
+    </RadzenGrid>
+</RadzenExample>
+
+@code {
+    int count;
+    IEnumerable<Employee> employees;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        var query = dbContext.Employees.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        employees = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+        count = dbContext.Employees.Count();
+
+        await InvokeAsync(StateHasChanged);
+    }
+}

@@ -1,0 +1,7 @@
+$text-area-padding: $input-padding !default;
+
+.rz-textarea {
+  @extend %input;
+  padding: $text-area-padding;
+  height: auto;
+}

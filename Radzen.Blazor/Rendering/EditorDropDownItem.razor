@@ -1,0 +1,52 @@
+<div class=@Class @onclick=@Select @attributes=@Attributes>
+    @if (ChildContent != null)
+    {
+        @ChildContent(this)
+    }
+    else
+    {
+        @Text
+    }
+</div>
+@code {
+    [Parameter]
+    public RenderFragment<EditorDropDownItem> ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> Attributes { get; set; }
+
+    [CascadingParameter]
+    public EditorDropDown DropDown { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    async Task Select()
+    {
+        await DropDown.Select(this, true);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (DropDown.Value == Value)
+        {
+            await DropDown.Select(this, false);
+        }
+    }
+
+    string Class
+    {
+        get
+        {
+            var classList = new List<string>() { "rz-html-editor-dropdown-item" };
+            if (DropDown.Value == Value)
+            {
+                classList.Add("rz-selected");
+            }
+            return string.Join(" ", classList);
+        }
+    }
+}

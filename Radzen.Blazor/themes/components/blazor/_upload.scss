@@ -1,0 +1,110 @@
+$upload-button-bar-background-color: rgba(#e6ecef, 0.5) !default;
+$upload-button-bar-padding: 0.75rem !default;
+
+$upload-files-background-color: $white !default;
+$upload-files-padding: 1rem 0 !default;
+$upload-files-remove-background-color: #dadfe2 !default;
+$upload-files-remove-color: $white !default;
+
+$upload-files-margin: 0 0.75rem !default;
+
+$upload-choose-background-color: $default-link !default;
+$upload-cancel-background-color: #dadfe2 !default;
+$upload-cancel-color: $charcoal-grey !default;
+$upload-button-background-color: $primary !default;
+
+.rz-fileupload {
+  display: inline-block;
+
+  .rz-button {
+    @extend .rz-button-sm;
+    vertical-align: middle;
+
+    -webkit-appearance: none !important;
+
+    &:not(.rz-fileupload-choose) {
+      background-color: $upload-button-background-color;
+    }
+
+    &[disabled] {
+      opacity: 0.5;
+    }
+
+    .rzi {
+      display: none;
+    }
+  }
+}
+
+.rz-fileupload-choose {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: middle;
+  background-color: $upload-choose-background-color;
+  @extend .rz-button-md;
+
+  .rzi {
+    display: none;
+  }
+
+  input[type='file'] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    opacity: 0;
+    min-height: 100%;
+  }
+}
+
+.rz-fileupload-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  > div {
+    margin: $upload-files-margin;
+  }
+
+  .rz-button-text {
+    display: none;
+  }
+
+  .rz-button {
+    background-color: $upload-files-remove-background-color;
+    color: $upload-files-remove-color;
+
+    .rzi-close,
+    .rzi-times,
+    .rz-icon-trash {
+      @extend .rzi;
+      display: block;
+
+      &:before {
+        content: 'close';
+      }
+    }
+  }
+}
+
+.rz-fileupload-buttonbar {
+  position: relative;
+
+  background-color: $upload-button-bar-background-color;
+  padding: $upload-button-bar-padding;
+
+  .rz-button {
+    &:nth-child(3) {
+      float: right;
+
+      background-color: $upload-cancel-background-color;
+      color: $upload-cancel-color;
+    }
+  }
+}
+
+.rz-fileupload-files {
+  background-color: $upload-files-background-color;
+  padding: $upload-files-padding;
+}

@@ -1,0 +1,15 @@
+﻿@inherits RadzenComponentWithChildren
+
+@if (Visible)
+{
+    <div @ref="@Element" style="@Style" Container="@Container" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">@ChildContent</div>
+}
+@code {
+    [Parameter]
+    public string Container { get; set; }
+
+    protected override string GetComponentCssClass()
+    {
+        return "content";
+    }
+}

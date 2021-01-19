@@ -1,0 +1,15 @@
+@code {
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    [CascadingParameter]
+    public RadzenUpload Upload { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Upload?.AddHeader(Name, Value);
+    }
+}

@@ -1,0 +1,63 @@
+﻿@page "/datepicker"
+
+<RadzenExample Name="DatePicker">
+<div class="row">
+    <div class="col-xl-6">
+        <div class="row">
+            <div class="col-xl-6">
+                <h4>DatePicker</h4>
+                <RadzenDatePicker @bind-Value=@value DateFormat="d" Change=@(args => OnChange(args, "DatePicker", "MM/dd/yyyy")) />
+                <h4 style="margin-top: 40px">DatePicker with time</h4>
+                <RadzenDatePicker TValue="DateTime?" ShowTime="true" ShowSeconds="true" HoursStep="1.5" MinutesStep="5" SecondsStep="10" Change=@(args => OnChange(args, "DatePicker with time", "MM/dd/yyyy HH:mm")) DateFormat="MM/dd/yyyy HH:mm" />
+                <h4 style="margin-top: 40px">DatePicker with 12 hour time format</h4>
+                <RadzenDatePicker TValue="DateTime?" ShowTime="true" Change=@(args => OnChange(args, "DatePicker with 12 hour time format", "MM/dd/yyyy h:mm tt")) HourFormat="12" DateFormat="MM/dd/yyyy h:mm tt" />
+                <h4 style="margin-top: 40px">Time-only DatePicker</h4>
+                <RadzenDatePicker TValue="DateTime?" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Change=@(args => OnChange(args, "Time-only DatePicker", "HH:mm")) />
+                <h4 style="margin-top: 40px">Calendar</h4>
+                <RadzenDatePicker TValue="DateTime?" Inline="true" Change="@(args => OnChange(args, "Calendar", "MM/dd/yyyy"))" />
+            </div>
+            <div class="col-xl-6">
+                <h4>DatePicker with steps for time</h4>
+                <RadzenDatePicker TValue="DateTime?" ShowTime="true" TimeOnly="true"
+                                ShowSeconds="true" HoursStep="1.5" MinutesStep="5" DateFormat="HH:mm:ss"
+                                SecondsStep="10" Change=@(args => OnChange(args, "DatePicker with steps for time", "HH:mm:ss")) />
+                <h4 style="margin-top: 40px">DatePicker with special dates</h4>
+                <RadzenDatePicker TValue="DateTime?" DateRender=@DateRenderSpecial Change=@(args => OnChange(args, "DatePicker with special dates", "MM/dd/yyyy")) />
+                <h4 style="margin-top: 40px">DatePicker with disabled dates</h4>
+                <RadzenDatePicker TValue="DateTime?" DateRender=@DateRender Change=@(args => OnChange(args, "DatePicker with disabled dates", "MM/dd/yyyy")) />
+                <h4 style="margin-top: 40px">Disabled DatePicker</h4>
+                <RadzenDatePicker Disabled="true" @bind-Value=@value />
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    DateTime? value = DateTime.Now;
+
+    IEnumerable<DateTime> dates = new DateTime[] { DateTime.Today.AddDays(-1), DateTime.Today.AddDays(1) };
+
+    EventConsole console;
+
+    void OnChange(DateTime? value, string name, string format)
+    {
+        console.Log($"{name} value changed to {value?.ToString(format)}");
+    }
+
+    void DateRenderSpecial(DateRenderEventArgs args)
+    {
+        if (dates.Contains(args.Date))
+        {
+            args.Attributes.Add("style", "background-color: #ff6d41; border-color: white;");
+        }
+    }
+
+    void DateRender(DateRenderEventArgs args)
+    {
+        args.Disabled = dates.Contains(args.Date);
+    }
+}

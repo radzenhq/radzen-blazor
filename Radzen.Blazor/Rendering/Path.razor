@@ -1,0 +1,53 @@
+<path class="@Class" d="@D" stroke-linecap="@StrokeLineCap" fill="@Fill" stroke="@Stroke" stroke-width="@StrokeWidth.ToInvariantString()" stroke-dasharray="@StrokeDashArray" style="@Style"></path>
+@code {
+    [Parameter]
+    public string Style { get; set; }
+
+    [Parameter]
+    public string D { get; set; }
+
+    [Parameter]
+    public string Stroke { get; set; }
+
+    [Parameter]
+    public string Fill { get; set; }
+
+    [Parameter]
+    public double StrokeWidth { get; set; }
+
+    [Parameter]
+    public LineType LineType { get; set; }
+
+    [Parameter]
+    public string Class { get; set;}
+
+    private string StrokeLineCap
+    {
+        get
+        {
+            switch (LineType)
+            {
+                case LineType.Dotted:
+                return "round";
+                default:
+                return null;
+            }
+        }
+    }
+
+    private string StrokeDashArray
+    {
+        get
+        {
+            switch (LineType)
+            {
+                case LineType.Dotted:
+                return $"0 {StrokeWidth * 2}";
+                case LineType.Dashed:
+                return $"{StrokeWidth * 3} {StrokeWidth * 3}";
+                default:
+                return null;
+            }
+        }
+    }
+}

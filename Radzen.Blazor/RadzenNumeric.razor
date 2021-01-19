@@ -1,0 +1,153 @@
+﻿@using Radzen
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Forms
+@typeparam TValue
+@inherits FormComponent<TValue>
+
+@if (Visible)
+{
+    <span @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        <input @ref="@input" type="text" inputmode="decimal" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
+               class="rz-spinner-input rz-inputtext " tabindex="@TabIndex"
+               placeholder="@Placeholder" autocomplete="@(AutoComplete ? "on" : "off")" value="@Value" @onchange="@OnChange"
+               onkeypress="Radzen.numericKeyPress(event)" onpaste="Radzen.numericOnPaste(event)" />
+
+        <button type="button" class="rz-spinner-button rz-spinner-up rz-corner-tr rz-button  " tabindex="-1"
+                @onclick="@((args) => UpdateValueWithStep(true))">
+            <span class="rz-spinner-button-icon rzi rzi-caret-up "></span>
+        </button>
+        <button type="button" class="rz-spinner-button rz-spinner-down rz-corner-br rz-button  " tabindex="-1"
+                @onclick="@((args) => UpdateValueWithStep(false))">
+            <span class="rz-spinner-button-icon rzi rzi-caret-down "></span>
+        </button>
+    </span>
+}
+@code {
+    protected ElementReference input;
+
+    protected override string GetComponentCssClass()
+    {
+        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
+
+        return $"rz-spinner {(Disabled ? " rz-state-disabled" : "")} {fieldCssClass}";
+    }
+
+    async System.Threading.Tasks.Task UpdateValueWithStep(bool stepUp)
+    {
+        if (Disabled || ReadOnly)
+        {
+            return;
+        }
+
+        var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : double.Parse(Step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+
+        var valueToUpdate = Value != null ? Convert.ChangeType(Value, typeof(decimal)) : (decimal)Convert.ChangeType(default(decimal), typeof(decimal));
+
+        var newValue = ((decimal)Convert.ChangeType(valueToUpdate, typeof(decimal))) + (decimal)Convert.ChangeType(stepUp ? step : -step, typeof(decimal));
+
+        if (Max.HasValue && newValue > Max.Value || Min.HasValue && newValue < Min.Value || object.Equals(Value, newValue))
+        {
+            return;
+        }
+
+        Value = (TValue)ConvertType.ChangeType(newValue, typeof(TValue));
+
+        await ValueChanged.InvokeAsync(Value);
+        if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+        await Change.InvokeAsync(Value);
+
+        StateHasChanged();
+    }
+
+    [Parameter]
+    public override TValue Value
+    {
+        get
+        {
+            return _value;
+        }
+        set
+        {
+            if (!EqualityComparer<TValue>.Default.Equals(value, _value))
+            {
+                _value = value;
+            }
+        }
+    }
+
+    public override bool HasValue
+    {
+        get
+        {
+            return Value != null;
+        }
+    }
+
+    [Parameter]
+    public string Step { get; set; }
+
+    private bool IsTypeSupported()
+    {
+        var type = typeof(TValue).IsGenericType ? typeof(TValue).GetGenericArguments()[0] : typeof(TValue);
+
+        switch (Type.GetTypeCode(type))
+        {
+            //case TypeCode.Byte:
+            //case TypeCode.SByte:
+            //case TypeCode.UInt16:
+            case TypeCode.UInt32:
+            //case TypeCode.UInt64:
+            //case TypeCode.Int16:
+            case TypeCode.Int32:
+            //case TypeCode.Int64:
+            case TypeCode.Decimal:
+            case TypeCode.Double:
+            case TypeCode.Single:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public bool AutoComplete { get; set; } = true;
+
+    protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
+    {
+        TValue newValue;
+        BindConverter.TryConvertTo<TValue>($"{args.Value}", System.Globalization.CultureInfo.CurrentCulture, out newValue);
+
+        decimal? newValueAsDecimal = newValue == null ? default(decimal?) : (decimal)ConvertType.ChangeType(newValue, typeof(decimal));
+
+        if (object.Equals(Value, newValue))
+        {
+            return;
+        }
+
+        if (Max.HasValue && newValueAsDecimal > Max.Value)
+        {
+            newValueAsDecimal = Max.Value;
+        }
+
+        if (Min.HasValue && newValueAsDecimal < Min.Value)
+        {
+            newValueAsDecimal = Min.Value;
+        }
+
+        Value = (TValue)ConvertType.ChangeType(newValueAsDecimal, typeof(TValue));
+        await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, Value);
+
+        await ValueChanged.InvokeAsync(Value);
+        if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+        await Change.InvokeAsync(Value);
+    }
+
+    [Parameter]
+    public decimal? Min { get; set; }
+
+    [Parameter]
+    public decimal? Max { get; set; }
+}

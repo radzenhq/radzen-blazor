@@ -1,0 +1,72 @@
+﻿@inherits RadzenComponent
+
+@if (Visible)
+{
+    <button @ref="@Element" style="@Style" disabled="@Disabled"
+            type="@Enum.GetName(typeof(ButtonType), ButtonType).ToLower()"
+            @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
+            @onclick="@((args) => OnClick(args))">
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            @if (!string.IsNullOrEmpty(@Icon))
+            {
+                <i class="rz-button-icon-left rzi">@((MarkupString)Icon)</i>
+            }
+            @if (!string.IsNullOrEmpty(Image))
+            {
+                <img class="rz-button-icon-left rzi" src="@Image" />
+            }
+            @if (!string.IsNullOrEmpty(Text))
+            {
+                <span class="rz-button-text">@Text</span>
+            }
+        }
+    </button>
+}
+@code {
+    private string getButtonSize()
+    {
+        return Size == ButtonSize.Medium ? "md" : "sm";
+    }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = "";
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Image { get; set; }
+
+    [Parameter]
+    public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Primary;
+
+    [Parameter]
+    public ButtonType ButtonType { get; set; } = ButtonType.Button;
+
+    [Parameter]
+    public ButtonSize Size { get; set; } = ButtonSize.Medium;
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> Click { get; set; }
+
+    public async System.Threading.Tasks.Task OnClick(MouseEventArgs args)
+    {
+        await Click.InvokeAsync(args);
+    }
+
+    protected override string GetComponentCssClass()
+    {
+        return $"rz-button rz-button-{getButtonSize()} btn-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLower()}{(Disabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}";
+    }
+}

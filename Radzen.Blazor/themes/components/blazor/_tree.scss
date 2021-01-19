@@ -1,0 +1,74 @@
+$tree-background-color: $white !default;
+$tree-border: 1px solid #cecece !default;
+$tree-padding: 0.6875rem !default;
+
+$tree-node-padding: 0.375rem 0.25rem !default;
+$tree-node-selected-background-color: $default-link !default;
+$tree-node-selected-color: $white !default;
+$tree-node-selected-border-radius: 2px !default;
+$tree-node-children-padding: 0 0 0 1rem !default;
+$tree-node-margin: 1px 0 !default;
+$tree-node-hover-background-color: #59a6cd !default;
+$tree-node-hover-color: $white !default;
+$tree-border-radius: $border-radius !default;
+$tree-icon-right: 'arrow_right' !default;
+$tree-icon-down: 'arrow_drop_down' !default;
+
+.rz-tree {
+  display: inline-block;
+  overflow: auto;
+}
+
+.rz-tree .rz-treenode.rz-treenode-leaf>.rz-treenode-content>.rz-tree-toggler {
+  visibility: hidden;
+ }
+
+.rz-tree-toggler {
+  cursor: pointer;
+
+  &.rzi-caret-right {
+    &:before {
+      content: $tree-icon-right;
+    }
+  }
+
+  &.rzi-caret-down {
+    &:before {
+      content: $tree-icon-down;
+    }
+  }
+}
+
+.rz-treenode-content {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  padding: $tree-node-padding;
+  margin: $tree-node-margin;
+
+  &:not(.rz-treenode-content-selected) {
+    &:hover {
+      background-color: $tree-node-hover-background-color;
+      color: $tree-node-hover-color;
+      border-radius: $tree-node-selected-border-radius;
+    }
+  }
+}
+
+.rz-tree-container,
+.rz-treenode-children {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rz-treenode-children {
+  padding: $tree-node-children-padding;
+}
+
+.rz-treenode-content-selected {
+  border-radius: $tree-node-selected-border-radius;
+  color: $tree-node-selected-color;
+  background-color: $tree-node-selected-background-color;
+}

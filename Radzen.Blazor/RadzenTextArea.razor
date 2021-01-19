@@ -1,0 +1,39 @@
+﻿@using Radzen
+@using Microsoft.AspNetCore.Components.Forms
+@inherits FormComponent<string>
+@if (Visible)
+{
+    <textarea @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
+        placeholder="@Placeholder" maxlength="@MaxLength" value="@Value" @onchange="@OnChange" tabindex="@TabIndex" id="@GetId()"></textarea>
+}
+@code {
+    [Parameter]
+    public long? MaxLength { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public int Rows { get; set; } = 2;
+
+    [Parameter]
+    public int Cols { get; set; } = 20;
+
+    protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
+    {
+        Value = $"{args.Value}";
+
+        await ValueChanged.InvokeAsync(Value);
+        if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+        await Change.InvokeAsync(Value);
+    }
+
+    protected override string GetComponentCssClass()
+    {
+        var disabledCss = Disabled ? "rz-state-disabled" : "";
+
+        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
+
+        return $"rz-textarea {disabledCss} {fieldCssClass}";
+    }
+}

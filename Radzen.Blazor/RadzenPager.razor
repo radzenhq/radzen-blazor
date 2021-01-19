@@ -1,0 +1,184 @@
+﻿@inherits RadzenComponent
+@if (Visible && Count > PageSize)
+{
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+        @if (skip > 0)
+        {
+            <a class="rz-paginator-first rz-paginator-element" href="javascript:void(0)" tabindex="-1" @onclick="@(() => FirstPage())">
+                <span class="rz-paginator-icon rzi rzi-step-backward"></span>
+            </a>
+            <a class="rz-paginator-prev rz-paginator-element" href="javascript:void(0)" tabindex="-1" @onclick="@(() => PrevPage())">
+                <span class="rz-paginator-icon rzi rzi-caret-left"></span>
+            </a>
+        }
+        else
+        {
+            <a class="rz-paginator-first rz-paginator-element rz-state-disabled" href="javascript:void(0)" tabindex="-1" @onclick="@(() => FirstPage())">
+                <span class="rz-paginator-icon rzi rzi-step-backward"></span>
+            </a>
+            <a class="rz-paginator-prev rz-paginator-element   rz-state-disabled" href="javascript:void(0)" tabindex="-1" @onclick="@(() => PrevPage())">
+                <span class="rz-paginator-icon rzi rzi-caret-left"></span>
+            </a>
+        }
+        <span class="rz-paginator-pages">
+            @foreach (var i in Enumerable.Range(startPage, Math.Min(endPage + 1, PageNumbersCount)))
+            {
+                @if (i == CurrentPage)
+                {
+                    <a class="rz-paginator-page rz-paginator-element rz-state-active" href="javascript:void(0)" @onclick="@(() => GoToPage(i))">@(i + 1)</a>
+                }
+                else
+                {
+                    <a class="rz-paginator-page rz-paginator-element" href="javascript:void(0)" @onclick="@(() => GoToPage(i))">@(i + 1)</a>
+                }
+            }
+        </span>
+        @if (CurrentPage != numberOfPages - 1)
+        {
+            <a class="rz-paginator-next rz-paginator-element" href="javascript:void(0)" tabindex="0" @onclick="@(() => NextPage())">
+                <span class="rz-paginator-icon rzi rzi-caret-right"></span>
+            </a>
+            <a class="rz-paginator-last rz-paginator-element" href="javascript:void(0)" tabindex="0" @onclick="@(() => LastPage())">
+                <span class="rz-paginator-icon rzi rzi-step-forward"></span>
+            </a>
+        }
+        else
+        {
+            <a class="rz-paginator-next rz-paginator-element rz-state-disabled" href="javascript:void(0)" tabindex="0" @onclick="@(() => NextPage())">
+                <span class="rz-paginator-icon rzi rzi-caret-right"></span>
+            </a>
+            <a class="rz-paginator-last rz-paginator-element rz-state-disabled" href="javascript:void(0)" tabindex="0" @onclick="@(() => LastPage())">
+                <span class="rz-paginator-icon rzi rzi-step-forward"></span>
+            </a>
+        }
+    </div>
+}
+@code {
+    protected override string GetComponentCssClass()
+    {
+        return "rz-paginator rz-unselectable-text rz-helper-clearfix";
+    }
+
+    [Parameter]
+    public int PageSize { get; set; } = 10;
+
+    [Parameter]
+    public int PageNumbersCount { get; set; } = 5;
+
+    [Parameter]
+    public int Count { get; set; }
+
+    public int CurrentPage
+    {
+        get
+        {
+            return GetPage();
+        }
+    }
+
+    [Parameter]
+    public EventCallback<PagerEventArgs> PageChanged { get; set; }
+
+    public async virtual Task Reload()
+    {
+        await InvokeAsync(CalculatePager);
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (Visible)
+        {
+            InvokeAsync(Reload);
+        }
+
+        return base.OnParametersSetAsync();
+    }
+
+    protected int skip;
+    protected int numberOfPageLinks = 5;
+    protected int startPage;
+    protected int endPage;
+    protected int numberOfPages;
+
+    protected void CalculatePager()
+    {
+        var pageSize = PageSize > 0 ? PageSize : 10;
+        numberOfPages = (int)Math.Ceiling((decimal)Count / pageSize);
+
+        if (numberOfPages < 1)
+        {
+            numberOfPages = 1;
+        }
+
+        int visiblePages = Math.Min(PageNumbersCount, numberOfPages);
+
+        startPage = (int)Math.Max(0, Math.Ceiling((decimal)(CurrentPage - (visiblePages / 2))));
+        endPage = Math.Min(numberOfPages - 1, startPage + visiblePages - 1);
+
+        var delta = PageNumbersCount - (endPage - startPage + 1);
+        startPage = Math.Max(0, startPage - delta);
+
+        if (skip == Count)
+        {
+            skip = pageSize * (numberOfPages - 1);
+        }
+    }
+
+    protected int GetPage()
+    {
+        return (int)Math.Floor((decimal)(skip / (PageSize > 0 ? PageSize : 10)));
+    }
+
+    public async Task GoToPage(int page)
+    {
+        if (CurrentPage != page)
+        {
+            skip = page * PageSize;
+            await InvokeAsync(Reload);
+            await PageChanged.InvokeAsync(new PagerEventArgs() { Skip = skip, Top = PageSize, PageIndex = CurrentPage });
+        }
+    }
+
+    public async Task FirstPage(bool forceReload = false)
+    {
+        if (CurrentPage != 0 || forceReload)
+        {
+            skip = 0;
+            await InvokeAsync(Reload);
+            await PageChanged.InvokeAsync(new PagerEventArgs() { Skip = skip, Top = PageSize, PageIndex = CurrentPage });
+        }
+    }
+
+    public async Task PrevPage()
+    {
+        var newskip = skip - PageSize < 0 ? 0 : skip - PageSize;
+        if (newskip != skip)
+        {
+            skip = newskip;
+            await InvokeAsync(Reload);
+            await PageChanged.InvokeAsync(new PagerEventArgs() { Skip = skip, Top = PageSize, PageIndex = CurrentPage });
+        }
+    }
+
+    public async Task NextPage()
+    {
+        var newskip = PageSize * (CurrentPage < (numberOfPages - 1) ? CurrentPage + 1 : numberOfPages - 1);
+        if (newskip != skip)
+        {
+            skip = newskip;
+            await InvokeAsync(Reload);
+            await PageChanged.InvokeAsync(new PagerEventArgs() { Skip = skip, Top = PageSize, PageIndex = CurrentPage });
+        }
+    }
+
+    public async Task LastPage()
+    {
+        var newskip = PageSize * (numberOfPages - 1);
+        if (newskip != skip)
+        {
+            skip = newskip;
+            await InvokeAsync(Reload);
+            await PageChanged.InvokeAsync(new PagerEventArgs() { Skip = skip, Top = PageSize, PageIndex = CurrentPage });
+        }
+    }
+}

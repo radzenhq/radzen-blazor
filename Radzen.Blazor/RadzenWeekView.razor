@@ -1,0 +1,58 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+
+@inherits SchedulerViewBase
+
+@code {
+    [Parameter]
+    public override string Text { get; set; } = "Week";
+
+    [Parameter]
+    public TimeSpan StartTime { get; set; } = TimeSpan.FromHours(8);
+
+    [Parameter]
+    public TimeSpan EndTime { get; set; } = TimeSpan.FromHours(24);
+
+    public override DateTime StartDate
+    { 
+        get
+        {
+            return Scheduler.CurrentDate.Date.StartOfWeek();
+        }
+    }
+
+    public override DateTime EndDate 
+    { 
+        get
+        {
+            return StartDate.EndOfWeek().AddDays(1);
+        }
+    }
+
+    public override string Title
+    {
+        get
+        {
+            return $"{StartDate.ToShortDateString()} - {StartDate.EndOfWeek().ToShortDateString()}";
+        }
+    }
+
+    public override RenderFragment Render()
+    {
+        var appointments = Scheduler.GetAppointmentsInRange(StartDate, EndDate).ToList();
+
+        return @<CascadingValue Value=@Scheduler>
+                <WeekView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments />
+            </CascadingValue>;
+    }
+
+    public override DateTime Next()
+    {
+        return Scheduler.CurrentDate.Date.AddDays(7);
+    }
+
+    public override DateTime Prev()
+    {
+        return Scheduler.CurrentDate.Date.AddDays(-7);
+    }
+}

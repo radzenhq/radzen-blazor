@@ -1,0 +1,35 @@
+$login-register-background-color: $white !default;
+$login-register-padding: 1rem !default;
+$login-register-button-margin: 0 1rem !default;
+
+.login {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .register {
+    text-align: center;
+    background-color: $login-register-background-color;
+    padding: $login-register-padding;
+
+    .rz-button {
+      margin: $login-register-button-margin;
+    }
+  }
+
+  .login-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    a {
+      color: $link-color;
+      cursor: pointer;
+
+      &:hover {
+        color: $link-hover-color;
+        text-decoration: $link-hover-decoration;
+      }
+    }
+  }
+}

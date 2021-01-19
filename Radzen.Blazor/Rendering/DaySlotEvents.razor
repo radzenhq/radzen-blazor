@@ -1,0 +1,94 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+
+<div class="rz-events">
+@{
+    var eventGroups = AppointmentGroups(); 
+}
+@for (var date = StartDate; date < EndDate; date = date.AddMinutes(30))
+{
+    var start = date;
+    var end = start.AddMinutes(30);
+
+    var appointments = AppointmentsInSlot(start, end);
+
+    @foreach (var item in appointments)
+    {
+        var width = 90.0 / appointments.Max(data => eventGroups[Appointments.IndexOf(data)]);
+        var left = Array.IndexOf(appointments, item) * width;
+        var eventStart = item.Start < StartDate ? StartDate : item.Start;
+        var eventEnd = item.End > EndDate ? EndDate : item.End;
+        var length = eventStart.Subtract(StartDate).TotalMinutes / 30;
+        var top = 1.5 * length;
+        var height = Math.Max(1.5, 1.5 * eventEnd.Subtract(eventStart).TotalHours * 2);
+
+        @if (item.Start >= start && item.Start <= end)
+        {
+            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect />
+        } 
+        else if (date == StartDate)
+        {
+            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect />
+        }
+    }
+}
+</div>
+
+@code {
+    [CascadingParameter]
+    public IScheduler Scheduler { get; set; }
+
+    [Parameter]
+    public DateTime StartDate { get; set; }
+
+    [Parameter]
+    public DateTime EndDate { get; set; }
+
+    [Parameter]
+    public IList<AppointmentData> Appointments { get; set; }
+
+    async Task OnAppointmentSelect(AppointmentData data)
+    {
+        await Scheduler.SelectAppointment(data);
+    }
+
+    private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
+    {
+        if (Appointments == null)
+        {
+            return Array.Empty<AppointmentData>();
+        }
+
+        return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
+    }
+
+    private IDictionary<int, int> AppointmentGroups()
+    {
+        var groups = new Dictionary<int, int>();
+
+        for (var index = 0; index < Appointments.Count(); index++)
+        {
+            groups[index] = 0;
+        }
+
+        for (var date = StartDate; date < EndDate; date = date.AddMinutes(30))
+        {
+            var start = date;
+            var end = start.AddMinutes(30);
+
+            var appointments = AppointmentsInSlot(start, end);
+
+            foreach (var item in appointments)
+            {
+                var index = Appointments.IndexOf(item);
+
+                var count = groups[index];
+
+                groups[index] = Math.Max(appointments.Length, count);
+            }
+        }
+
+        return groups;
+    }
+
+}

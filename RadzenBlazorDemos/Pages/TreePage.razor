@@ -1,0 +1,162 @@
+@page "/tree"
+@using System.IO
+@using Microsoft.EntityFrameworkCore
+@using RadzenBlazorDemos.Models.Northwind
+@inject RadzenBlazorDemos.Data.NorthwindContext Northwind
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
+
+<RadzenExample Name="Tree">
+<div class="row">
+    <div class="col-xl-6" style="margin-bottom: 16px">
+        <div class="row">
+            <div class="col-md-4" style="margin-bottom: 16px">
+                <h3>Inline definition</h3>
+                <RadzenTree Expand=@OnExpand Change=@OnChange Style="width: 100%; height: 300px">
+                    <RadzenTreeItem Text="BMW">
+                        <RadzenTreeItem Text="M3" />
+                        <RadzenTreeItem Text="M5" />
+                    </RadzenTreeItem>
+                    <RadzenTreeItem Text="Audi">
+                        <RadzenTreeItem Text="RS4" />
+                        <RadzenTreeItem Text="RS6" />
+                    </RadzenTreeItem>
+                    <RadzenTreeItem Text="Mercedes">
+                        <RadzenTreeItem Text="C63 AMG" />
+                        <RadzenTreeItem Text="S63 AMG" />
+                    </RadzenTreeItem>
+                </RadzenTree>
+            </div>
+            <div class="col-md-4" style="margin-bottom: 16px">
+                <h3>Data-bound to Entity Framework</h3>
+                <RadzenTree Expand=@OnExpand Change=@OnChange Data=@categories Style="width: 100%; height: 300px">
+                    <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products">
+                        <Template>
+                            <strong>@((context.Value as Category).CategoryName)</strong>
+                        </Template>
+                    </RadzenTreeLevel>
+                    <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
+                </RadzenTree>
+            </div>
+            <div class="col-md-4" style="margin-bottom: 16px">
+                <h3>Data-bound to self-referencing data</h3>
+                <RadzenTree Expand=@OnExpand Change=@OnChange Data=@rootEmployees Style="width: 100%; height: 300px">
+                    <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1"  HasChildren=@(e => (e as Employee).Employees1.Any()) />
+                </RadzenTree>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6" style="margin-bottom: 16px">
+                <h3>Load nodes on demand</h3>
+                <RadzenTree Change=@OnChange Data=@categories Expand=@OnLoad Style="width: 100%; height: 300px">
+                    <RadzenTreeLevel TextProperty="CategoryName"/>
+                </RadzenTree>
+            </div>
+            <div class="col-md-6" style="margin-bottom: 16px">
+                <h3>Files and directories</h3>
+                <RadzenTree Change=@OnChange Data=@entries Expand=@LoadFiles Style="width: 100%; height: 300px">
+                    <RadzenTreeLevel Text=@GetTextForNode Template=@FileOrFolderTemplate />
+                </RadzenTree>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6" style="margin-bottom: 16px">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    IEnumerable<string> entries = null;
+    EventConsole console;
+
+    void Log(string eventName, string value)
+    {
+        console.Log($"{eventName}: {value}");
+    }
+
+    void OnChange(TreeEventArgs args)
+    {
+        Log("Change", $"Item Text: {args.Text}");
+    }
+
+    void OnExpand(TreeExpandEventArgs args)
+    {
+        if (args.Value is Category category)
+        {
+            Log("Expand", $"Text: {category.CategoryName}");
+        }
+
+        if (args.Value is string text)
+        {
+            Log("Expand", $"Text: {text}");
+        }
+    }
+
+    IEnumerable<Employee> employees;
+    IEnumerable<Employee> rootEmployees;
+    IEnumerable<Category> categories;
+    protected override void OnInitialized()
+    {
+        entries = Directory.GetDirectories(HostEnvironment.ContentRootPath)
+                           .Where(entry =>
+                           {
+                               var name = Path.GetFileName(entry);
+
+                               return !name.StartsWith(".") && name != "bin" && name != "obj";
+                           });
+        employees = Northwind.Employees.Include(e => e.Employees1).ToList();
+        rootEmployees = employees.Where(e => e.ReportsTo == null);
+        categories = Northwind.Categories.Include(c => c.Products);
+    }
+
+    string GetTextForNode(object data)
+    {
+        return Path.GetFileName((string)data);
+    }
+
+    RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder =>
+    {
+        string path = context.Value as string;
+        bool isDirectory = Directory.Exists(path);
+
+        builder.OpenComponent<RadzenIcon>(0);
+        builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
+        if (!isDirectory)
+        {
+            builder.AddAttribute(2, "Style", "margin-left: 24px");
+        }
+        builder.CloseComponent();
+        builder.AddContent(3, context.Text);
+    };
+
+    void OnLoad(TreeExpandEventArgs args)
+    {
+        var category = args.Value as Category;
+
+        args.Children.Data = category.Products;
+        args.Children.TextProperty = "ProductName";
+        args.Children.HasChildren = (product) => false;
+
+        /* Optional template
+        args.Children.Template = context => builder => {
+            builder.OpenElement(1, "strong");
+            builder.AddContent(2, (context.Value as Product).ProductName);
+            builder.CloseElement();
+        };
+        */
+
+        OnExpand(args);
+    }
+
+    void LoadFiles(TreeExpandEventArgs args)
+    {
+        var directory = args.Value as string;
+
+        args.Children.Data = Directory.EnumerateFileSystemEntries(directory);
+        args.Children.Text = GetTextForNode;
+        args.Children.HasChildren = (path) => Directory.Exists((string)path);
+        args.Children.Template = FileOrFolderTemplate;
+
+        Log("Expand", $"Text: {args.Text}");
+    }
+}

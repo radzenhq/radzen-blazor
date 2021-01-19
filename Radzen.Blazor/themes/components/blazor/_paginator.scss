@@ -1,0 +1,147 @@
+$paginator-background-color: $white !default;
+$paginator-padding: 0.625rem !default;
+
+$paginator-numeric-button-background-color: #e6ecef !default;
+$paginator-numeric-button-color: $battleship-grey !default;
+$paginator-numeric-button-margin: 0 0.3125rem !default;
+$paginator-numeric-button-padding: 0.3125rem 0.6875rem !default;
+$paginator-numeric-button-selected-background-color: $white !default;
+$paginator-numeric-button-selected-color: $primary-color !default;
+$paginator-numeric-button-selected-border: 1px solid #e6ecef !default;
+$paginator-numeric-button-selected-padding: 0.25rem 0.625rem !default;
+
+$paginator-back-button-background-color: #e6ecef !default;
+$paginator-back-button-color: $battleship-grey !default;
+
+$paginator-first-button-margin: 0 0.625rem 0 0 !default;
+$paginator-last-button-margin: 0 0 0 0.625rem !default;
+
+$paginator-next-button-background-color: $default-link !default;
+$paginator-next-button-color: $white !default;
+
+$paginator-dropdown-width: 80px !default;
+$paginator-dropdown-margin: $paginator-last-button-margin !default;
+
+.rz-paginator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background-color: $paginator-background-color;
+  padding: $paginator-padding;
+
+  .rzi-step-backward {
+    &:before {
+      content: 'first_page';
+    }
+  }
+
+  .rzi-caret-left {
+    &:before {
+      content: 'navigate_before';
+    }
+  }
+
+  .rzi-caret-right {
+    &:before {
+      content: 'navigate_next';
+    }
+  }
+
+  .rzi-step-forward {
+    &:before {
+      content: 'last_page';
+    }
+  }
+
+  .rz-dropdown {
+    width: $paginator-dropdown-width;
+    margin: $paginator-last-button-margin;
+    overflow: visible;
+  }
+
+  .rz-dropdown-items-wrapper {
+    width: $paginator-dropdown-width - 4px;
+  }
+}
+
+.rz-paginator-element,
+.rz-paginator-page {
+  &:hover {
+    color: inherit;
+  }
+}
+
+.rz-paginator-bottom {
+  border-top: $grid-border;
+
+  border-bottom-right-radius: $border-radius;
+  border-bottom-left-radius: $border-radius;
+}
+
+.rz-paginator-element {
+  @extend .rz-button, .rz-button-sm, .rz-button-icon-only;
+}
+
+.rz-paginator-first {
+  margin: $paginator-first-button-margin;
+}
+
+.rz-paginator-prev {
+  margin-right: auto;
+}
+
+.rz-paginator-next {
+  margin-left: auto;
+}
+
+.rz-paginator-last {
+  margin: $paginator-last-button-margin;
+}
+
+.rz-paginator-first,
+.rz-paginator-prev {
+  background-color: $paginator-back-button-background-color;
+  color: $paginator-back-button-color;
+}
+
+.rz-paginator-element {
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.rz-paginator-last,
+.rz-paginator-next {
+  background-color: $paginator-next-button-background-color;
+  color: $paginator-next-button-color;
+
+  &:hover {
+    color: $paginator-next-button-color;
+  }
+}
+
+.rz-paginator-page {
+  display: inline-block;
+
+  margin: $paginator-numeric-button-margin;
+  background-color: $paginator-numeric-button-background-color;
+  border-radius: $border-radius;
+  padding: $paginator-numeric-button-padding;
+  color: $paginator-numeric-button-color;
+
+  &.rz-state-active {
+    background-color: $paginator-numeric-button-selected-background-color;
+    color: $paginator-numeric-button-selected-color;
+    border: $paginator-numeric-button-selected-border;
+    padding: $paginator-numeric-button-selected-padding;
+  }
+}
+
+@media (max-width: 768px) {
+  .rz-paginator-page {
+    &:not(.rz-state-active) {
+      display: none;
+    }
+  }
+}

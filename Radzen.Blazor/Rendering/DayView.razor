@@ -1,0 +1,55 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+
+<div class="rz-view rz-day-view">
+    <div class="rz-view-header">
+        <div class="rz-slot-hour-header"></div>
+        <div class="rz-slot-header">
+            @StartDate.ToString("ddd")
+        </div>
+    </div>
+    <div class="rz-view-content">
+        <Hours Start=@StartTime End=@EndTime />
+        <div class="rz-slots">
+            <DaySlotEvents StartDate=@StartDate EndDate=@EndDate Appointments=@Appointments />
+            @for (var date = StartDate; date < EndDate; date = date.AddMinutes(30))
+            {
+                var slotDate = date;
+
+                @if (date.Minute == 30)
+                {
+                    <div class="rz-slot rz-slot-minor" @onclick=@(args => OnSlotClick(slotDate))></div>
+                }
+                else
+                {
+                    <div class="rz-slot" @onclick=@(args => OnSlotClick(slotDate))></div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public DateTime StartDate { get; set; }
+
+    [Parameter]
+    public TimeSpan StartTime { get; set; }
+
+    [Parameter]
+    public DateTime EndDate { get; set; }
+
+    [Parameter]
+    public TimeSpan EndTime { get; set; }
+
+    [Parameter]
+    public IList<AppointmentData> Appointments { get; set; }
+
+    [CascadingParameter]
+    public IScheduler Scheduler { get; set; }
+
+    async Task OnSlotClick(DateTime date)
+    {
+        await Scheduler.SelectSlot(date, date.AddMinutes(30));
+    }
+} 

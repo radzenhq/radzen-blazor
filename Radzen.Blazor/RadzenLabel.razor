@@ -1,0 +1,13 @@
+﻿@inherits RadzenComponent
+
+@if (Visible)
+{
+    <label @ref="@Element" for="@Component" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">@Text</label>
+}
+@code {
+    [Parameter]
+    public string Component { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = "";
+}

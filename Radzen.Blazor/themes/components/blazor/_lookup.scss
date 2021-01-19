@@ -1,0 +1,34 @@
+$lookup-panel-background-color: $white !default;
+$lookup-panel-padding: 1rem !default;
+
+.rz-lookup-panel {
+  background-color: $lookup-panel-background-color;
+  padding: $lookup-panel-padding;
+}
+
+.rz-lookup-search {
+  display: flex;
+  margin-bottom: 1rem;
+
+  input {
+    flex: auto;
+    margin-right: 1rem;
+
+    @extend %input;
+  }
+}
+
+.rz-lookup-select {
+  margin-top: 1rem;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+.rz-lookup {
+  display: inline-block;
+
+  .rz-dropdown {
+    width: 100%;
+  }
+}

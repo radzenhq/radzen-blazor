@@ -1,0 +1,182 @@
+$editor-border: $input-border !default;
+$editor-border-radius: $border-radius !default;
+$editor-toolbar-background-color: $white !default;
+$editor-button-background-color: $white !default;
+$editor-button-color: $body-color !default;
+$editor-button-disabled-color: $input-disabled-color !default;
+$editor-button-selected-background-color: $default-link !default;
+$editor-button-selected-color: $white !default;
+$editor-separator-background-color: #dadfe2 !default;
+$editor-content-background-color: $input-background-color !default;
+
+.rz-html-editor {
+  display: flex;
+  flex-direction: column;
+  border-radius: $border-radius;
+  border: $editor-border;
+}
+
+.rz-html-editor-content {
+  flex: 1;
+  overflow: auto;
+  padding: 0.5rem;
+  outline: none;
+  background-color: $editor-content-background-color;
+}
+
+.rz-html-editor-toolbar {
+  border-bottom: $editor-border;
+  display: flex;
+  line-height: 1rem;
+  flex-wrap: wrap;
+  background-color: $editor-toolbar-background-color;
+
+  .rzi {
+    font-size: 1rem;
+  }
+
+  > * {
+    margin: 0.5rem;
+  }
+}
+
+.rz-html-editor-colorpicker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: $editor-button-background-color;
+  padding: 0.625rem;
+
+  .rz-colorpicker-trigger {
+    color: inherit;
+    background-color: $editor-button-background-color;
+  }
+
+  .rz-colorpicker-value {
+    display: none;
+  }
+
+  .rz-colorpicker {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    height: auto;
+
+    &:hover {
+      border: none;
+      box-shadow: none;
+    }
+  }
+}
+
+.rz-html-editor-color {
+  border: none;
+  display: flex;
+  flex-direction: column;
+  background: inherit;
+  color: inherit;
+  appearance: none;
+  padding: 0;
+  position: relative;
+
+  &:disabled {
+    color: $input-disabled-color;
+  }
+}
+
+.rz-html-editor-color-value {
+  position: absolute;
+  bottom: -4px;
+  height: 4px;
+  width: 100%;
+}
+
+.rz-html-editor-button {
+  color: $editor-button-color;
+  appearance: none;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: $editor-button-background-color;
+  padding: 0.625rem;
+
+  &.rz-selected {
+    background-color: $editor-button-selected-background-color;
+    color: $editor-button-selected-color;
+    border-radius: $editor-border-radius;
+  }
+
+  &:disabled {
+    color: $editor-button-disabled-color;
+  }
+}
+
+.rz-html-editor-dropdown {
+  display: inline-flex;
+  padding: 0.625rem;
+  align-items: center;
+  cursor: pointer;
+
+  &.rz-disabled {
+    color: $input-disabled-color;
+    cursor: default;
+  }
+}
+
+.rz-html-editor-dropdown-items {
+  @extend %dropdown-panel;
+}
+
+.rz-html-editor-dropdown-item {
+  cursor: default;
+  font-size: $dropdown-item-font-size;
+  padding: $dropdown-item-padding;
+  white-space: nowrap;
+
+  @include dropdown-item-hover(0);
+
+  &.rz-selected {
+    background-color: $dropdown-item-selected-background-color;
+    color: $dropdown-item-selected-color;
+  }
+}
+
+.rz-html-editor-dropdown-trigger {
+  border: none;
+  appearance: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+  background-color: inherit;
+
+  .rzi {
+    &:before {
+      content: 'arrow_drop_down';
+    }
+  }
+}
+
+.rz-html-editor-dropdown-items {
+  display: none;
+}
+
+.rz-html-editor-dialog-item {
+  margin-bottom: 1rem;
+
+  label {
+    &:first-child {
+      display: block;
+    }
+  }
+}
+
+.rz-html-editor-dialog-buttons {
+  text-align: right;
+}
+
+.rz-html-editor-separator {
+  width: 1px;
+  background-color: $editor-separator-background-color;
+}

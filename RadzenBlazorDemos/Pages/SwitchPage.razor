@@ -1,0 +1,28 @@
+﻿@page "/switch"
+
+<RadzenExample Name="Switch">
+<div class="row">
+    <div class="col-xl-6">
+        <h3>Switch</h3>
+        <RadzenSwitch @bind-Value=@value Style="margin-bottom: 20px" Change=@(args => OnChange(args, "Switch")) />
+        <h3 style="margin-top: 1rem">Disabled Switch</h3>
+        <RadzenSwitch @bind-Value=@disabledValue Disabled="true" Style="margin-bottom: 20px" />
+        <br />
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    bool value;
+    bool disabledValue = true;
+
+    EventConsole console;
+
+    void OnChange(bool? value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+}

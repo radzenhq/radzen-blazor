@@ -1,0 +1,65 @@
+﻿@page "/datagrid-footer-totals"
+
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<h1>DataGrid Footer Totals</h1>
+
+<p>This page demonstrates fetching data from the server using <b>IQueryable</b> bound to a <b>DataGrid</b> with totals in column footers.</p>
+
+<RadzenExample Name="DataGridFooterTotals" Heading="false" Documentation="false">
+@if (orders == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
+                Data="@dbContext.Orders.Include("Customer").Include("Employee")" TItem="Order">
+        <Columns>
+            <RadzenGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID">
+                <FooterTemplate>
+                    Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
+                </FooterTemplate>
+            </RadzenGridColumn>
+            <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
+            <RadzenGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
+                <Template Context="order">
+                    <div>@order.Employee?.LastName</div>
+                    <RadzenImage Path="@order.Employee?.Photo" Style="width:150px" />
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
+                <Template Context="order">
+                    @String.Format("{0:d}", order.OrderDate)
+                </Template>
+                <FooterTemplate>
+                    Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).Last().OrderDate)</b>
+                </FooterTemplate>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight">
+                <Template Context="order">
+                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+                </Template>
+                <FooterTemplate>
+                    Total amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orders.Sum(o => o.Freight))</b>
+                </FooterTemplate>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
+        </Columns>
+    </RadzenGrid>
+}
+</RadzenExample>
+
+@code {
+    RadzenGrid<Order> ordersGrid;
+    IEnumerable<Order> orders;
+
+    protected override void OnInitialized()
+    {
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+}

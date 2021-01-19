@@ -1,0 +1,118 @@
+@page "/get-started"
+
+<RadzenCard>
+    <h1>Get started</h1>
+</RadzenCard>
+<h2 class="my-3">1. Install</h2>
+<RadzenCard>
+    <p>
+        Radzen Blazor Components are distributed as the <a href="https://www.nuget.org/packages/Radzen.Blazor/">Radzen.Blazor</a> nuget package.
+    </p>
+    <p>
+        You can add them to your project in one of the following ways
+    </p>
+    <ul>
+        <li>Install the package from command line by running <code>dotnet add package Radzen.Blazor</code></li>
+        <li>Add the project from the Visual Nuget Package Manager <img style="display: block; max-width: 100%" src="images/nuget-explorer.png"></li>
+        <li>Manually edit the .csproj file and add a project reference <code></code></li>
+    </ul>
+</RadzenCard>
+<h2 class="my-3">2. Import the namespace</h2>
+<RadzenCard>
+    <p>
+        Open the <code>_Imports.razor</code> file of your Blazor application and add these two lines <code>@@using Radzen</code> and <code>@@using Radzen.Blazor</code>.
+    </p>
+</RadzenCard>
+<h2 class="my-3">3. Include a theme</h2>
+<RadzenCard>
+    <p>
+        Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side WebAssembly Blazor) and include a theme CSS file by adding this snippet <code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css"&gt;</code>
+        This version requires only the Radzen Blazor CSS. Optionally you can include Bootstrap.
+    </p>
+    <p>
+        Alternatively you can include <code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css"&gt;</code> which embeds Bootstrap.
+    </p>
+</RadzenCard>
+<h2 class="my-3">4. Include Radzen.Blazor.js</h2>
+<RadzenCard>
+    <p>
+        Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side WebAssembly Blazor) and include this snippet <code>&lt;script src="_content/Radzen.Blazor/Radzen.Blazor.js"&gt;&lt;/script&gt;</code>
+    </p>
+</RadzenCard>
+<h2 class="my-3">5. Use a component</h2>
+<RadzenCard>
+    <p>
+        Use any Radzen Blazor component by typing its tag name in a Blazor page e.g. <code>&lt;RadzenButton Text="Hi"&gt;&lt;/RadzenButton&gt;</code>
+    </p>
+    <h4 class="my-2">Setting a property</h4>
+<pre>
+<code>
+&lt;RadzenButton Text="@@text"&gt;&lt;/RadzenButton&gt;
+@@code {
+  string text = "Hi";
+}
+</code>
+</pre>
+    <h4 class="my-2">Handing events</h4>
+<pre>
+<code>
+&lt;RadzenButton Click="@@ButtonClicked" Text="Hi"&gt;&lt;/RadzenButton&gt;
+@@code {
+  void ButtonClicked()
+  {
+    //
+  }
+}
+</code>
+</pre>
+</RadzenCard>
+<h2 class="my-3">6. Use Dialog, Notification, ContextMenu and Tooltip components</h2>
+<RadzenCard>
+    <p>
+        Open the <code>Shared/MainLayout.razor</code> file and include <code>&lt;RadzenDialog/&gt;</code>, <code>&lt;RadzenNotification/&gt;</code>, <code>&lt;RadzenContextMenu/&gt;</code> and  <code>&lt;RadzenTooltip/&gt;</code>
+    </p>
+    <p>
+        Open the <code>Startup.cs</code> file (server-side Blazor) or <code>Program.cs</code> (client-side WebAssembly Blazor) and add DialogService, NotificationService, ContextMenuService and TooltipService.
+    </p>
+    <h4 class="my-2">Startup.cs (server-side Blazor)</h4>
+<pre>
+    <code>
+    using Radzen;
+    ...
+    public void ConfigureServices(IServiceCollection services)
+    {
+        ...
+        services.AddScoped&lt;DialogService&gt;();
+        services.AddScoped&lt;NotificationService&gt;();
+        services.AddScoped&lt;TooltipService&gt;();
+        services.AddScoped&lt;ContextMenuService&gt;();
+        ...
+    }
+    </code>
+</pre>
+<h4 class="my-2">Program.cs (client-side WebAssembly Blazor)</h4>
+<pre>
+    <code>
+    using Radzen;
+    ...
+    public static async Task Main(string[] args)
+    {
+        var builder = WebAssemblyHostBuilder.CreateDefault(args);
+        builder.RootComponents.Add&lt;App&gt;("app");
+
+        builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+        ...
+
+        builder.Services.AddScoped&lt;DialogService&gt;();
+        builder.Services.AddScoped&lt;NotificationService&gt;();
+        builder.Services.AddScoped&lt;TooltipService&gt;();
+        builder.Services.AddScoped&lt;ContextMenuService&gt;();
+        ...
+
+        await builder.Build().RunAsync();
+    }
+    </code>
+</pre>
+</RadzenCard>
+

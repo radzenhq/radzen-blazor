@@ -1,0 +1,212 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+
+<g class="rz-line">
+    <Path D=@Path Stroke=@Stroke StrokeWidth=@StrokeWidth Fill="none" Class="rz-scale-line" />
+</g>
+@foreach (var tick in Ticks)
+{
+    <g class="rz-tick">
+        <Path Class="rz-tick-line" D=@tick.Path Stroke=@Stroke StrokeWidth=@StrokeWidth Fill="none" />
+        if (!string.IsNullOrEmpty(tick.Value))
+        {
+            <Text Value=@tick.Value Class="rz-tick-text" Position=@tick.Text />
+        }
+    </g>
+}
+@foreach (var tick in MinorTicks)
+{
+    <g class="rz-tick rz-minor-tick">
+        <Path Class="rz-tick-line" D=@tick.Path Stroke=@Stroke StrokeWidth=@StrokeWidth Fill="none" />
+    </g>
+}
+
+@code {
+    [Parameter]
+    public double StartAngle { get; set; }
+
+    [Parameter]
+    public string Stroke { get; set; }
+
+    [Parameter]
+    public double StrokeWidth { get; set; }
+
+    [Parameter]
+    public double TickLength { get; set; }
+
+    [Parameter]
+    public double MinorTickLength { get; set; }
+
+    [Parameter]
+    public double TickLabelOffset { get; set; }
+
+    [Parameter]
+    public double EndAngle { get; set; }
+
+    [Parameter]
+    public double Radius { get; set; }
+
+    [Parameter]
+    public Point Center { get; set; }
+
+    [Parameter]
+    public double Min { get; set; }
+
+    [Parameter]
+    public double Max { get; set; }
+
+    [Parameter]
+    public bool ShowFirstTick { get; set; }
+
+    [Parameter]
+    public bool ShowLastTick { get; set; }
+
+    [Parameter]
+    public bool ShowTickLabels { get; set; }
+
+    [Parameter]
+    public GaugeTickPosition TickPosition { get; set; }
+
+    [Parameter]
+    public string FormatString { get; set; }
+
+    [Parameter]
+    public Func<double, string> Formatter { get; set; }
+
+    [Parameter]
+    public double Step { get; set; }
+
+    [Parameter]
+    public double MinorStep { get; set; }
+
+    private string Path { get; set; }
+
+    class Tick
+    {
+        public Point Start { get; set; }
+        public Point End { get; set; }
+        public Point Text { get; set; }
+
+        public string Value { get; set; }
+        public string Path
+        {
+            get
+            {
+                return $"M {Start.Render()} L {End.Render()}";
+            }
+        }
+    }
+
+    private IList<Tick> Ticks { get; set; }
+    private IList<Tick> MinorTicks { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        var startAngle = Polar.ToRadian(StartAngle - 90);
+        var start = Center.ToCartesian(Radius, startAngle);
+
+        var endAngle = Polar.ToRadian(EndAngle - 90);
+
+        var end = Center.ToCartesian(Radius, endAngle);
+
+        var sweep = EndAngle - StartAngle <= 180 ? 0 : 1;
+
+        if (Math.Abs(end.X - start.X) < 0.01 && Math.Abs(end.Y - start.Y) < 0.01)
+        {
+            // Full circle - SVG can't render a full circle arc 
+            end.X = end.X - 0.01;
+        }
+
+        Path = $"M {start.Render()} A {Radius.ToInvariantString()} {Radius.ToInvariantString()} 0 {sweep} 1 {end.Render()}";
+
+        Ticks = new List<Tick>();
+        MinorTicks = new List<Tick>();
+
+        if (TickPosition != GaugeTickPosition.None)
+        {
+            var count = Math.Floor((Max - Min) / Step);
+            var step = Polar.ToRadian(EndAngle - StartAngle) / count;
+            var angle = startAngle;
+            var value = Min;
+
+            for (var idx = 0; idx <= count; idx++)
+            {
+                var tick = new Tick();
+
+                if (ShowTickLabels)
+                {
+                    if (!string.IsNullOrEmpty(FormatString))
+                    {
+                        tick.Value = string.Format(FormatString, value);
+                    }
+                    else
+                    {
+                        tick.Value = Formatter(value);
+                    }
+                }
+
+                if (TickPosition == GaugeTickPosition.Outside)
+                {
+                    tick.Start = Center.ToCartesian(Radius, angle);
+                    tick.End = Center.ToCartesian(Radius + TickLength, angle);
+                    tick.Text = Center.ToCartesian(Radius + TickLabelOffset, angle);
+                }
+
+                if (TickPosition == GaugeTickPosition.Inside)
+                {
+                    tick.Start = Center.ToCartesian(Radius - TickLength, angle);
+                    tick.End = Center.ToCartesian(Radius, angle);
+                    tick.Text = Center.ToCartesian(Radius - TickLabelOffset, angle);
+                }
+
+                angle += step;
+                value += Step;
+
+                if (idx == 0 && ShowFirstTick == false)
+                {
+                    continue;
+                }
+
+                if (idx == count && ShowLastTick == false)
+                {
+                    continue;
+                }
+
+                Ticks.Add(tick);
+            }
+
+            if (MinorStep > 0)
+            {
+                var minorCount = Math.Floor((Max - Min) / MinorStep);
+                var minorStep = Polar.ToRadian(EndAngle - StartAngle) / minorCount;
+                var minorAngle = startAngle;
+
+                for (var idx = 0; idx <= minorCount; idx++)
+                {
+                    var tick = new Tick();
+
+                    if (TickPosition == GaugeTickPosition.Outside)
+                    {
+                        tick.Start = Center.ToCartesian(Radius, minorAngle);
+                        tick.End = Center.ToCartesian(Radius + MinorTickLength, minorAngle);
+                    }
+
+                    if (TickPosition == GaugeTickPosition.Inside)
+                    {
+                        tick.Start = Center.ToCartesian(Radius - MinorTickLength, minorAngle);
+                        tick.End = Center.ToCartesian(Radius, minorAngle);
+                    }
+
+                    minorAngle += minorStep;
+
+                    if (idx % (Step / MinorStep) == 0)
+                    {
+                        continue;
+                    }
+
+                    MinorTicks.Add(tick);
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,10 @@
+﻿@inherits RadzenComponentWithChildren
+
+@if (Visible)
+{
+    @ChildContent
+}
+@code {
+    [Parameter]
+    public string Name { get; set; }
+}

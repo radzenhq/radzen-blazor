@@ -1,0 +1,255 @@
+$chart-axis-color: rgba($greyish-brown, 0.2) !default;
+$chart-axis-label-color: rgba($greyish-brown, 0.5) !default;
+$chart-axis-font-size: 0.875rem !default;
+$chart-tooltip-background: rgba(#fff, 0.95) !default;
+$chart-tooltip-color: $body-color !default;
+
+$color-schemes: (
+  palette: (
+    #003f5c,
+    #2f4b7c,
+    #665191,
+    #a05195,
+    #d45087,
+    #f95d6a,
+    #ff7c43,
+    #ffa600
+  ),
+  pastel: (
+    #0479cc,
+    #68d5c8,
+    #ff6d41,
+    #cb6992,
+    #e6c54f,
+    #f9777f,
+    #5dbf74,
+    #4db9f2
+  ),
+  monochrome: (
+    #004c6d,
+    #296080,
+    #437594,
+    #5d8ba9,
+    #75a1be,
+    #8eb8d3,
+    #a7cfe9,
+    #c1e7ff
+  ),
+  divergent: (
+    #00876c,
+    #57a18b,
+    #8cbcac,
+    #bed6ce,
+    #f1f1f1,
+    #f1c6c6,
+    #ec9c9d,
+    #e27076,
+    #d43d51
+  )
+);
+
+.chart,
+.pie {
+  height: 200px;
+
+  .ngx-charts {
+    overflow: visible !important;
+
+    .gridline-path {
+      stroke: $chart-axis-color;
+    }
+  }
+
+  .chart-legend {
+    .legend-labels {
+      background-color: transparent;
+    }
+  }
+
+  .legend-title {
+    display: none;
+  }
+
+  .tick {
+    text {
+      fill: $chart-axis-label-color;
+      font-size: $chart-axis-font-size !important;
+    }
+  }
+}
+
+.rz-chart {
+  position: relative;
+  height: 300px;
+}
+
+.rz-area-series {
+  fill-opacity: 0.8;
+}
+
+@each $scheme, $colors in $color-schemes {
+  @each $color in $colors {
+    $index: index($colors, $color);
+    .rz-scheme-#{$scheme} {
+      .rz-series-#{$index - 1} {
+        fill: $color;
+        stroke: $color;
+      }
+
+      .rz-series-#{$index - 1}-tooltip {
+        .rz-chart-tooltip-content {
+          border: 1px solid $color;
+        }
+      }
+
+      .rz-series-item-#{$index - 1} {
+        fill: $color;
+        stroke: $color;
+
+        .rz-chart-tooltip-content {
+          border: 1px solid $color;
+        }
+      }
+    }
+  }
+}
+
+.rz-marker {
+  stroke: #fff;
+}
+
+.rz-area-series .rz-marker {
+  fill-opacity: 1;
+}
+
+.rz-axis {
+  stroke: #a0a0a0;
+  font-size: 0.875em;
+}
+
+.rz-axis .rz-grid-line {
+  stroke: $chart-axis-color;
+}
+
+.rz-tick-text {
+  stroke: none;
+  fill: $chart-axis-label-color;
+}
+
+.rz-value-axis .rz-tick-text {
+  text-anchor: end;
+}
+
+.rz-category-axis .rz-tick-text {
+  text-anchor: middle;
+}
+
+.rz-axis .rz-axis-title {
+  stroke: none;
+  text-anchor: middle;
+}
+
+.rz-donut-title {
+  text-anchor: middle;
+}
+
+.rz-donut-content {
+  height: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.rz-legend {
+  position: absolute;
+  display: flex;
+}
+
+.rz-legend-right {
+  right: 0;
+  top: 0;
+  bottom: 0;
+  align-items: center;
+}
+
+.rz-legend-left {
+  left: 0;
+  top: 0;
+  bottom: 0;
+  align-items: center;
+}
+
+.rz-legend-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  justify-content: center;
+}
+
+.rz-legend-bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  justify-content: center;
+}
+
+.rz-legend-items {
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 100%;
+}
+
+.rz-legend-item {
+  align-items: center;
+  display: flex;
+}
+
+.rz-legend-top .rz-legend-item,
+.rz-legend-bottom .rz-legend-item {
+  display: inline-flex;
+}
+
+.rz-legend-item-text {
+  padding: 4px;
+}
+
+.rz-chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  transition: top 0.2s, left 0.2s;
+  top: 0;
+  left: 0;
+}
+
+.rz-chart-tooltip-content {
+  background: $chart-tooltip-background;
+  color: $chart-tooltip-color;
+  box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15);
+  padding: 0.25rem 1rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.rz-chart-tooltip {
+  &:not(.rz-pie-tooltip) {
+    .rz-chart-tooltip-content {
+      margin-bottom: 15px;
+      &:after {
+        content: ' ';
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        left: 50%;
+        bottom: 0;
+        background-color: inherit;
+        transform-origin: center;
+        transform: translate(-50%, -11px) rotate(45deg);
+        border-bottom: inherit;
+        border-right: inherit;
+      }
+    }
+  }
+}

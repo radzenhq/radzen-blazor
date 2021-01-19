@@ -1,0 +1,110 @@
+﻿@page "/dropdown-datagrid"
+@using System.Linq.Dynamic.Core
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inject NorthwindContext dbContext
+
+<RadzenExample Name="DropDownDataGrid" DocumentationUrl="https://www.radzen.com/documentation/blazor/dropdown-datagrid/">
+<div class="row">
+    <div class="col-xl-6">
+        <h3>DropDownDataGrid</h3>
+        <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true" 
+                                Data=@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct().AsQueryable()) 
+                                TextProperty="CompanyName" ValueProperty="CustomerID" 
+                                Change=@(args => OnChange(args, "DropDownDataGrid")) />
+        <h3 style="margin-top: 2rem">DropDownDataGrid with custom filter operator</h3>
+        <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" 
+                                AllowFiltering="true" AllowClear="true" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
+                                Change=@(args => OnChange(args, "DropDownDataGrid with custom filter operator")) />
+        <h3 style="margin-top: 2rem">DropDownDataGrid with custom filtering</h3>
+        <RadzenDropDownDataGrid TValue="string" LoadData="@LoadData" AllowFiltering="true" AllowClear="true" 
+                                Data=@customCustomersData Count="@count" TextProperty="CompanyName" ValueProperty="CustomerID"
+                                Change=@(args => OnChange(args, "DropDownDataGrid with custom filtering")) />
+        <h3 style="margin-top: 2rem">DropDownDataGrid with placeholder</h3>
+        <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" 
+            ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDownDataGrid with placeholder")) />
+        <h3 style="margin-top: 2rem">DropDownDataGrid with template</h3>
+        <RadzenDropDownDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" 
+            @bind-Value="value" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
+            Change=@(args => OnChange(args, "DropDownDataGrid with placeholder")) Style="width:400px">
+            <Template>
+                Company: @((context as Customer).CompanyName)
+            </Template>
+        </RadzenDropDownDataGrid>
+        <h3 style="margin-top: 2rem">DropDownDataGrid with multiple selection</h3>
+        <RadzenDropDownDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value=@multipleValues
+            Multiple="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
+            Change=@(args => OnChange(args, "DropDownDataGrid with multiple selection")) Style="width:400px" />
+        <h3 style="margin-top: 2rem">DropDownDataGrid with multiple columns</h3>
+        <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                AllowFiltering="true" AllowClear="true" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
+                                Style="width:400px" Change=@(args => OnChange(args, "DropDownDataGrid with multiple columns"))>
+            <Columns>
+                <RadzenDropDownDataGridColumn Property="CustomerID" Title="CustomerID" Width="100px" />
+                <RadzenDropDownDataGridColumn Property="CompanyName" Title="CompanyName" Width="200px" />
+                <RadzenDropDownDataGridColumn Property="City" Title="City" Width="100px" />
+                <RadzenDropDownDataGridColumn Property="Country" Title="Country" Width="100px" />
+            </Columns>
+        </RadzenDropDownDataGrid>
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    IEnumerable<Customer> customers;
+
+    IEnumerable<string> multipleValues;
+    string value;
+
+    int count;
+    IEnumerable<Customer> customCustomersData;
+
+    protected override void OnInitialized()
+    {
+        customers = dbContext.Customers.ToList();
+    }
+
+    EventConsole console;
+
+    void OnChange(object value, string name)
+    {
+        var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
+
+        console.Log($"{name} value changed to {str}");
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var query = dbContext.Customers.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(c => c.CustomerID.Contains(args.Filter) || c.ContactName.Contains(args.Filter));
+        }
+
+        count = query.Count();
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        if (args.Skip != null)
+        {
+            query = query.Skip(args.Skip.Value);
+        }
+
+        if (args.Top != null)
+        {
+            query = query.Take(args.Top.Value);
+        }
+
+        customCustomersData = query;
+
+        InvokeAsync(StateHasChanged);
+    }
+}

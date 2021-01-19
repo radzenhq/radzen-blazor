@@ -1,0 +1,111 @@
+@page "/comparevalidator"
+@using Radzen
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
+<RadzenExample Name="CompareValidator" Documentation="false">
+<div class="row">
+    <div class="col-xl-6">
+        <div class="row">
+            <div class="col">
+                <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+                    <RadzenFieldset Text="Password">
+                        <div class="row" style="margin-bottom: 48px">
+                            <div class="col-md-4 align-right">
+                                <RadzenLabel Text="Password" />
+                            </div>
+                            <div class="col">
+                                <RadzenPassword style="display: block" Name="Password" @bind-Value=@model.Password />
+                                <RadzenRequiredValidator Component="Password" Text="Enter password" Popup="@popup" Style="position: absolute" />
+                            </div>
+                        </div>
+                        <div class="row" style="margin-bottom: 48px">
+                            <div class="col-md-4">
+                                <RadzenLabel Text="Repeat Password" />
+                            </div>
+                            <div class="col">
+                                <RadzenPassword style="display: block" Name="RepeatPassword" @bind-Value=@model.RepeatPassword />
+                                <RadzenRequiredValidator Component="RepeatPassword" Text="Repeat your password" Popup=@popup Style="position: absolute" />
+                                <RadzenCompareValidator Visible=@(!string.IsNullOrEmpty(model.RepeatPassword)) Value=@model.Password Component="RepeatPassword" Text="Passwords should be the same" Popup=@popup Style="position: absolute" />
+                            </div>
+                        </div>
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
+                    </RadzenFieldset>
+                </RadzenTemplateForm>
+                <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+                    <RadzenFieldset Text="Comparison operator">
+                        <div class="row" style="margin-bottom: 48px">
+                            <div class="col-md-4 align-right">
+                                <RadzenLabel Text="Operator" />
+                            </div>
+                            <div class="col">
+                                <RadzenDropDown @bind-Value=@compareOperator Data=@Enum.GetValues(typeof(CompareOperator)) />
+                            </div>
+                        </div>
+                        <div class="row" style="margin-bottom: 48px">
+                            <div class="col-md-4 align-right">
+                                <RadzenLabel Text="Value to compare with" />
+                            </div>
+                            <div class="col">
+                                <RadzenNumeric @bind-Value=@targetValue />
+                            </div>
+                        </div>
+                        <div class="row" style="margin-bottom: 48px">
+                            <div class="col-md-4">
+                                <RadzenLabel Text="Value" />
+                            </div>
+                            <div class="col">
+                                <RadzenNumeric @bind-Value=@model.Value Name="Value" style="display: block" />
+                                <RadzenCompareValidator Value=@targetValue Component="Value" Popup=@popup Style="position: absolute" Operator=@compareOperator />
+                            </div>
+                        </div>
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Validate"></RadzenButton>
+                    </RadzenFieldset>
+
+                </RadzenTemplateForm>
+            </div>
+            <div class="col">
+                <label>
+                    Display validators as popup
+                    <RadzenCheckBox @bind-Value=@popup></RadzenCheckBox>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    class Model
+    {
+        public string Password { get; set; }
+        public double Value { get; set; }
+        public string RepeatPassword { get; set; }
+    }
+
+    bool popup;
+    double targetValue = 1;
+
+    CompareOperator compareOperator = CompareOperator.Equal;
+
+    Model model = new Model();
+    EventConsole console;
+
+    void Log(string eventName, string value)
+    {
+        console.Log($"{eventName}: {value}");
+    }
+
+    void OnSubmit(Model model)
+    {
+        Log("Submit", JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true }));
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        Log("InvalidSubmit", JsonSerializer.Serialize(args, new JsonSerializerOptions() { WriteIndented = true }));
+    }
+}

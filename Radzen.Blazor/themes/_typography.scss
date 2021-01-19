@@ -1,0 +1,31 @@
+// Headings
+
+$headings: (
+  h1: (font-size: 2.25rem, font-weight: bold),
+  h2: (font-size: 1.5rem, font-weight: 600),
+  h3: (font-size: 1.25rem, font-weight: normal),
+  h4: (font-size: 1.125rem, font-weight: 600),
+  h5: (font-size: 1rem, font-weight: 600),
+  h6: (font-size: 0.875rem, font-weight: 600)
+);
+
+@each $name, $heading in $headings {
+  #{$name} {
+    @each $name, $value in $heading {
+      #{$name}: #{$value};
+    }
+  }
+}
+
+// Paragraph
+$paragraph-line-height: 1.38 !default;
+
+p {
+  line-height: 1.38;
+}
+
+$link-color: $default-link !default;
+
+label {
+  margin-bottom: 0;
+}

@@ -1,0 +1,65 @@
+﻿@using System.Linq.Expressions
+@typeparam TItem
+@inherits PagedDataBoundComponent<TItem>
+@if (Visible)
+{
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+        @if (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom)
+        {
+       <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" />
+        }
+        @if (Data != null)
+        {
+            @if (!WrapItems)
+            {
+                @foreach (var item in LoadData.HasDelegate ? Data : PagedView)
+                {
+                    <ul class="rz-datalist-data">
+                        <li>
+                            @if (Template != null)
+                            {
+                                @Template(item)
+                            }
+                            else
+                            {
+                                <span>Template</span>
+                            }
+                        </li>
+                    </ul>
+                }
+            }
+            else
+            {
+                <div class="rz-g">
+                    @foreach (var item in LoadData.HasDelegate ? Data : PagedView)
+                    {
+                        @if (Template != null)
+                        {
+                            @Template(item)
+                        }
+                        else
+                        {
+                            <span>Template</span>
+                        }
+                    }
+                </div>
+            }
+        }
+        @if (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom)
+        {
+       <RadzenPager @ref="bottomPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" class="rz-paginator-bottom" />
+        }
+    </div>
+}
+@code {
+    protected override string GetComponentCssClass()
+    {
+        return "rz-datalist-content ";
+    }
+
+    [Parameter]
+    public bool WrapItems { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> RowSelect { get; set; }
+}

@@ -1,0 +1,39 @@
+﻿@inherits RadzenComponent
+@if (Visible)
+{
+<li class="rz-menuitem" role="menuitem" @onclick="@OnClick" @attributes="Attributes" style="@Style">
+    <a class="rz-menuitem-link">
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+        <span class="rz-menuitem-icon">@((MarkupString)Icon)</span>
+        }
+        @if (!string.IsNullOrEmpty(Text))
+        {
+            <span class="rz-menuitem-text">@Text</span>
+        }
+    </a>
+</li>
+}
+@code {
+    [Parameter]
+    public string Text { get; set; } = "";
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    [CascadingParameter]
+    public RadzenSplitButton SplitButton { get; set; }
+
+
+    public async System.Threading.Tasks.Task OnClick(MouseEventArgs args)
+    {
+        if (SplitButton != null)
+        {
+            SplitButton.Close();
+            await SplitButton.Click.InvokeAsync(this);
+        }
+    }
+}

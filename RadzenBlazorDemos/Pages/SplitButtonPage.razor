@@ -1,0 +1,67 @@
+﻿@page "/splitbutton"
+
+<RadzenExample Name="SplitButton">
+<div class="row">
+    <div class="col-xl-6">
+        <div class="row">
+            <div class="col-xl-6">
+                <h4>SplitButton with text</h4>
+                <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" Style="margin-bottom: 20px;">
+                    <ChildContent>
+                        <RadzenSplitButtonItem Text="Item1" Value="1" />
+                        <RadzenSplitButtonItem Text="Item2" Value="2" />
+                    </ChildContent>
+                </RadzenSplitButton>
+            </div>
+            <div class="col-xl-6">
+                <h4>SplitButton with text and icon</h4>
+                <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text and icon")) Text="SplitButton" Icon="account_circle" Style="margin-bottom: 20px;">
+                    <ChildContent>
+                        <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
+                        <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
+                    </ChildContent>
+                </RadzenSplitButton>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-6">
+                <h4>SplitButton with icon</h4>
+                <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with icon")) Icon="account_circle" Style="margin-bottom: 20px;">
+                    <ChildContent>
+                        <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
+                        <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
+                    </ChildContent>
+                </RadzenSplitButton>
+            </div>
+            <div class="col-xl-6">
+                <h4>Disabled SplitButton</h4>
+                <RadzenSplitButton Disabled="true" Click=@(args => OnClick(args, "Disabled SplitButton")) Text="SplitButton" Style="margin-bottom: 20px;">
+                    <ChildContent>
+                        <RadzenSplitButtonItem Text="Item1" Value="1" />
+                        <RadzenSplitButtonItem Text="Item2" Value="2" />
+                    </ChildContent>
+                </RadzenSplitButton>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <EventConsole @ref=@console />
+    </div>
+</div>
+</RadzenExample>
+
+@code {
+    EventConsole console;
+
+    void OnClick(RadzenSplitButtonItem item, string buttonName)
+    {
+        if(item != null)
+        {
+            console.Log($"{buttonName}, item with value {item.Value} clicked");
+        }
+        else
+        {
+            console.Log($"{buttonName} clicked");
+        }
+    }
+}

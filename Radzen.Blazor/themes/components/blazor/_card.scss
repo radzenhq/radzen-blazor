@@ -1,0 +1,24 @@
+$card-padding: 1.25rem 1.5625rem !default;
+$card-background-color: $default-background-color !default;
+$card-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06) !default;
+$card-border-radius: $border-radius !default;
+
+.rz-card {
+  padding: $card-padding;
+  border-radius: $card-border-radius;
+  box-shadow: $card-shadow;
+  background-color: $card-background-color;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-bottom: 0.8125rem;
+  }
+
+  p {
+    margin-bottom: 0;
+  }
+}

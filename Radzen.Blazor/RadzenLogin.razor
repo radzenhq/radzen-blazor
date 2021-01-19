@@ -1,0 +1,161 @@
+﻿@inherits RadzenComponent
+
+@if (Visible)
+{
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+        <div class="rz-form" novalidate="">
+            <div class="row form-group">
+                <label class="col-sm-3 col-form-label" for="username">@UserText</label>
+                <div class="col">
+                    <input name="userName" class="rz-textbox" @bind="@Username" />
+                    @if ((loginClicked || resetClicked) && string.IsNullOrEmpty(Username))
+                    {
+                        <div class="md-inputfield">
+                            <div class="rz-message rz-messages-error ">
+                                @UserRequired
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="row form-group">
+                <label class="col-sm-3 col-form-label" for="password">@PasswordText</label>
+                <div class="col">
+                    <input name="password" class="rz-textbox" type="password" @bind="@Password" @oninput="@(args => Password = $"{args.Value}")" />
+                    @if (loginClicked && string.IsNullOrEmpty(Password))
+                    {
+                        <div class="md-inputfield">
+                            <div class="rz-message rz-messages-error ">
+                                @PasswordRequired
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="offset-sm-3 col login-buttons">
+                    <button class="rz-button rz-button-md    btn-primary" type="@(!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password) ? "submit" : "button")" @onclick="@OnLogin">
+                        <span class="rz-button-text" style="">@LoginText</span>
+                    </button>
+                    @if (AllowResetPassword)
+                    {
+                        <a @onclick="@OnReset">@ResetPasswordText</a>
+                    }
+                </div>
+            </div>
+        </div>
+        @if (AllowRegister)
+        {
+            <div class="register" style="">
+                @RegisterMessageText
+                <button class="rz-button rz-button-md    btn-secondary" type="button" @onclick="@OnRegister">
+                    <span class="rz-button-text">@RegisterText</span>
+                </button>
+            </div>
+        }
+    </div>
+}
+@code {
+    protected override string GetComponentCssClass()
+    {
+        return "login";
+    }
+
+    string _username;
+    [Parameter]
+    public string Username
+    {
+        get
+        {
+            return _username;
+        }
+        set
+        {
+            if (_username != value)
+            {
+                _username = value;
+            }
+        }
+    }
+
+    string _password;
+    [Parameter]
+    public string Password
+    {
+        get
+        {
+            return _password;
+        }
+        set
+        {
+            if (_password != value)
+            {
+                _password = value;
+            }
+        }
+    }
+
+    [Parameter]
+    public EventCallback<Radzen.LoginArgs> Login { get; set; }
+
+    [Parameter]
+    public EventCallback Register { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ResetPassword { get; set; }
+
+    [Parameter]
+    public bool AllowRegister { get; set; } = true;
+
+    [Parameter]
+    public bool AllowResetPassword { get; set; } = true;
+
+    [Parameter]
+    public string LoginText { get; set; } = "Login";
+
+    [Parameter]
+    public string RegisterText { get; set; } = "Sign up";
+
+    [Parameter]
+    public string RegisterMessageText { get; set; } = "Don't have an account yet?";
+
+    [Parameter]
+    public string ResetPasswordText { get; set; } = "Forgot password";
+
+    [Parameter]
+    public string UserText { get; set; } = "Username";
+
+    [Parameter]
+    public string UserRequired { get; set; } = "Username is required";
+
+    [Parameter]
+    public string PasswordText { get; set; } = "Password";
+
+    [Parameter]
+    public string PasswordRequired { get; set; } = "Password is required";
+
+    bool loginClicked = false;
+    protected async System.Threading.Tasks.Task OnLogin(EventArgs args)
+    {
+        loginClicked = true;
+        if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+        {
+            await Login.InvokeAsync(new Radzen.LoginArgs() { Username = Username, Password = Password });
+        }
+    }
+
+    bool resetClicked = false;
+    protected async System.Threading.Tasks.Task OnReset(EventArgs args)
+    {
+        resetClicked = true;
+        if (!string.IsNullOrEmpty(Username))
+        {
+            await ResetPassword.InvokeAsync(Username);
+        }
+    }
+
+    protected async System.Threading.Tasks.Task OnRegister(EventArgs args)
+    {
+        await Register.InvokeAsync(args);
+    }
+}

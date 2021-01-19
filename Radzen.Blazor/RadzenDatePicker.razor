@@ -1,0 +1,642 @@
+﻿@using Radzen
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
+@using System.Globalization
+@using Microsoft.JSInterop
+
+@typeparam TValue
+@inherits RadzenComponent
+@implements IRadzenFormComponent
+@if (Visible)
+{
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@getStyle()" id="@GetId()">
+        @if (!Inline)
+        {
+            <span class="@($"rz-calendar rz-calendar-w-btn{(Disabled ? " rz-state-disabled" : "")}")" style="width:100%">
+                <input @ref="@input" disabled="@Disabled" readonly="@ReadOnly" value="@FormattedValue" tabindex="@TabIndex"
+                       @onchange="@ParseDate" autocomplete="off" type="text" 
+                       class="rz-inputtext" id="@Name" placeholder="@Placeholder" />
+                <button onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
+                    <span aria-hidden="true" class="rz-button-icon-left  rzi rzi-calendar"></span><span class="rz-button-text"></span>
+                </button>
+            </span>
+        }
+        <div id="@PopupID" style="@(Inline ? "" : contentStyle);width: 320px;box-sizing: border-box; margin: 0;" class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")">
+            <div class="rz-datepicker-group">
+                @if (!TimeOnly)
+                {
+                    <div class="rz-datepicker-header">
+                        <a href="javascript:void(0)" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { Value = CurrentDate.AddMonths(-1); await OnChange(); } })">
+                            <span class="rz-datepicker-prev-icon rzi rzi-chevron-left"></span>
+                        </a>
+                        <a href="javascript:void(0)" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { Value = CurrentDate.AddMonths(1); await OnChange(); } })">
+                            <span class="rz-datepicker-next-icon rzi rzi-chevron-right"></span>
+                        </a>
+                        <div class="rz-datepicker-title" style="height:40px;">
+                            <RadzenDropDown Style="height:auto;width:120px;margin-top:5px;text-align:left;" TabIndex="-1"
+                                            TValue="int" Value="@CurrentDate.Month" Disabled="@Disabled" Data="@months" TextProperty="Name" ValueProperty="Value"
+                                            Change="@(async (args) => { await SetMonth(int.Parse(args.ToString())); })" />
+                            <RadzenDropDown Style="height:auto;width:80px;margin-top:5px;text-align:left;" TabIndex="-1"
+                                            TValue="int" Value="@CurrentDate.Year" Disabled="@Disabled" Data="@years" TextProperty="Name" ValueProperty="Value"
+                                            Change="@(async (args) => { await SetYear(int.Parse(args.ToString())); })" />
+                        </div>
+                    </div>
+                    <div class="rz-datepicker-calendar-container">
+                        <table class="rz-datepicker-calendar" style="@(Inline ? "" : "width:100%")">
+                            <thead>
+                                <tr>
+                                    @foreach (var day in AbbreviatedDayNames)
+                                    {
+                                        <th scope="col">
+                                            <span>@day</span>
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{int dayNumber = 0;}
+                                @for (int i = 0; i < 6; i++)
+                                {
+                                    <tr>
+                                        @for (int j = 0; j < 7; j++)
+                                        {
+                                            DateTime date = StartDate.AddDays(dayNumber++);
+                                            var dateArgs = DateAttributes(date);
+
+                                            @if (CurrentDate.Month == date.Month)
+                                            {
+                                                <td @attributes="@(dateArgs.Attributes)" onmouseup=@(Inline || ShowTime ? "" : $"Radzen.closePopup('{PopupID}')")
+                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
+                                                    <span class=@($"rz-state-default{(CurrentDate.Year == date.Year && CurrentDate.Day == date.Day ? " rz-state-active" : "")}{(!dateArgs.Disabled ? "" : " rz-state-disabled")}")>@date.Day</span>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td @attributes="@(dateArgs.Attributes)" class="rz-datepicker-other-month" onmouseup=@(Inline || ShowTime ? "" : $"Radzen.closePopup('{PopupID}')")
+                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
+                                                    <span class="rz-state-default rz-state-disabled">@date.Day</span>
+                                                </td>
+                                            }
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+            @if (ShowTime)
+            {
+        <div class="rz-timepicker">
+            <RadzenNumeric Disabled="@Disabled" Value="CurrentDate.Hour" TValue="double" Step="@HoursStep"
+                           Change="@(async v => {
+                                         var step = getStep(StepType.Hours);
+                                         if (v == CurrentDate.Hour - step || v == CurrentDate.Hour + step)
+                                         {
+                                             if (v > CurrentDate.Hour)
+                                             {
+                                                 Value = CurrentDate.AddHours(step);
+                                             }
+                                             else
+                                             {
+                                                 Value = CurrentDate.AddHours(-step);
+                                             }
+                                         }
+                                         else 
+                                         { 
+                                            Value = CurrentDate.AddHours(v - CurrentDate.Hour);
+                                         }
+
+                                         await OnChange();
+                                     } )" class="rz-hour-picker" />
+            <div class="rz-separator">
+                <span>:</span>
+            </div>
+            <RadzenNumeric Disabled="@Disabled" Value="CurrentDate.Minute" TValue="double" Step="@MinutesStep"
+                           Change="@(async v => {
+                                                 var step = getStep(StepType.Minutes);
+                                                 if (v == CurrentDate.Minute - step || v == CurrentDate.Minute + step)
+                                                 {
+                                                     if (v > CurrentDate.Minute)
+                                                     {
+                                                         Value = CurrentDate.AddMinutes(step);
+                                                     }
+                                                     else
+                                                     {
+                                                         Value = CurrentDate.AddMinutes(-step);
+                                                     }
+                                                 }
+                                                 else 
+                                                 { 
+                                                    Value = CurrentDate.AddMinutes(v - CurrentDate.Minute);
+                                                 }
+
+                                                 await OnChange();
+                                             } )" class="rz-minute-picker" />
+            @if (ShowSeconds)
+            {
+                <div class="rz-separator">
+                    <span>:</span>
+                </div>
+                <RadzenNumeric Disabled="@Disabled" Value="CurrentDate.Second" TValue="double" Step="@SecondsStep"
+                               Change="@(async v => {
+                                                 var step = getStep(StepType.Seconds);
+                                                 if (v == CurrentDate.Second - step || v == CurrentDate.Second + step)
+                                                 {
+                                                     if (v > CurrentDate.Second)
+                                                     {
+                                                         Value = CurrentDate.AddSeconds(step);
+                                                     }
+                                                     else
+                                                     {
+                                                         Value = CurrentDate.AddSeconds(-step);
+                                                     }
+                                                 }
+                                                 else 
+                                                 { 
+                                                    Value = CurrentDate.AddSeconds(v - CurrentDate.Second);
+                                                 }
+
+                                                 await OnChange();
+                                             } )" class="rz-second-picker" />
+            }
+            @if (HourFormat == "12")
+            {
+                <div class="rz-ampm-picker">
+                    <a href="javascript:void(0)" @onclick="@(async() => { if (amPm == "am" && !Disabled) { Value = CurrentDate.AddDays(1).AddHours(-12); amPm = "pm"; await OnChange(); } })">
+                        <span class="rzi rzi-chevron-up"></span>
+                    </a>
+                    <span>@CurrentDate.ToString("tt")</span>
+                    <a href="javascript:void(0)" @onclick="@(async() => { if (amPm == "pm" && !Disabled) { Value = CurrentDate.AddDays(-1).AddHours(12); amPm = "am"; await OnChange(); } })">
+                        <span class="rzi rzi-chevron-down"></span>
+                    </a>
+                </div>
+            }
+            @if (ShowTimeOkButton)
+            {
+                <button type="button" class="rz-button rz-button-md btn-secondary" style="width:60px;padding:0px;margin-left:10px;"
+                        @onclick="@(async() => { if (!Disabled) { Value = CurrentDate; await OnChange(); } })"
+                        onmouseup="@($"Radzen.closePopup('{PopupID}')")">
+                    <span class="rz-button-text">Ok</span>
+                </button>
+            }
+        </div>
+            }
+        </div>
+    </div>
+}
+@code {
+    class NameValue
+    {
+        public string Name { get; set; }
+        public int Value { get; set; }
+    }
+
+    IList<NameValue> months;
+    IList<NameValue> years;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        months = Enumerable.Range(1, 12).Select(i => new NameValue() { Name = DateTimeFormatInfo.CurrentInfo.GetMonthName(i), Value = i }).ToList();
+        years = Enumerable.Range(int.Parse(YearRange.Split(':').First()), int.Parse(YearRange.Split(':').Last()) - int.Parse(YearRange.Split(':').First()) + 1)
+            .Select(i => new NameValue() { Name = $"{i}", Value = i }).ToList();
+    }
+
+    [Parameter]
+    public int TabIndex { get; set; } = 0;
+
+    string amPm = "am";
+
+    [Parameter]
+    public string Name { get; set; }
+
+    DateTime? _dateTimeValue;
+
+    DateTime? DateTimeValue
+    {
+        get
+        {
+            return _dateTimeValue;
+        }
+        set
+        {
+            if (_dateTimeValue != value)
+            {
+                _dateTimeValue = value;
+                Value = value;
+            }
+        }
+    }
+
+    [Parameter]
+    public Action<DateRenderEventArgs> DateRender { get; set; }
+
+    DateRenderEventArgs DateAttributes(DateTime value)
+    {
+        var args = new Radzen.DateRenderEventArgs() { Date = value, Disabled = false };
+
+        if (DateRender != null)
+        {
+            DateRender(args);
+        }
+
+        return args;
+    }
+
+    object _value;
+
+    [Parameter]
+    public object Value
+    {
+        get
+        {
+            return _value;
+        }
+        set
+        {
+            if (_value != value)
+            {
+                _value = value;
+                DateTimeValue = value as DateTime?;
+
+                if (DateTimeValue.HasValue && DateTimeValue.Value == default(DateTime))
+                {
+                    _value = null;
+                    _dateTimeValue = null;
+                }
+            }
+        }
+    }
+
+    private DateTime CurrentDate
+    {
+        get
+        {
+            return HasValue && DateTimeValue.Value != default(DateTime) ? DateTimeValue.Value : DateTime.Today;
+        }
+    }
+
+    private DateTime StartDate
+    {
+        get
+        {
+            var firstDayOfTheMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
+
+            int diff = (7 + (firstDayOfTheMonth.DayOfWeek - DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek)) % 7;
+            return firstDayOfTheMonth.AddDays(-1 * diff).Date;
+        }
+    }
+
+    IList<string> _abbreviatedDayNames;
+    IList<string> AbbreviatedDayNames
+    {
+        get
+        {
+            if (_abbreviatedDayNames == null)
+            {
+                _abbreviatedDayNames = new List<string>();
+
+                for (int i = (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek; i < 7; i++)
+                {
+                    _abbreviatedDayNames.Add(CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedDayNames[i]);
+                }
+
+                for (int i = 0; i < (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek; i++)
+                {
+                    _abbreviatedDayNames.Add(CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedDayNames[i]);
+                }
+            }
+            return _abbreviatedDayNames;
+        }
+    }
+
+    public bool IsBound
+    {
+        get
+        {
+            return ValueChanged.HasDelegate;
+        }
+    }
+
+    public bool HasValue
+    {
+        get
+        {
+            return DateTimeValue.HasValue;
+        }
+    }
+
+    public string FormattedValue
+    {
+        get
+        {
+            return string.Format("{0:" + DateFormat + "}", Value);
+        }
+    }
+
+    IRadzenForm _form;
+
+    [CascadingParameter]
+    public IRadzenForm Form
+    {
+        get
+        {
+            return _form;
+        }
+        set
+        {
+            if (_form != value && value != null)
+            {
+                _form = value;
+                _form.AddComponent(this);
+            }
+        }
+    }
+
+    protected ElementReference input;
+
+    protected async Task ParseDate()
+    {
+        DateTime? newValue;
+        DateTime value;
+        var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
+
+        var valid = DateTime.TryParseExact(inputValue, DateFormat, null, DateTimeStyles.None, out value);
+        var nullable = Nullable.GetUnderlyingType(typeof(TValue)) != null;
+
+        if (!valid)
+        {
+            valid = DateTime.TryParse(inputValue, out value);
+        }
+
+        if (valid)
+        {
+            newValue = value;
+        }
+        else
+        {
+            newValue = null;
+
+            if (nullable)
+            {
+                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, "");
+            }
+            else
+            {
+                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
+            }
+
+        }
+
+        if (DateTimeValue != newValue && (newValue != null || nullable))
+        {
+            DateTimeValue = newValue;
+            await ValueChanged.InvokeAsync((TValue)Value);
+
+            if (FieldIdentifier.FieldName != null)
+            {
+                EditContext?.NotifyFieldChanged(FieldIdentifier);
+            }
+
+            await Change.InvokeAsync(DateTimeValue);
+            StateHasChanged();
+        }
+    }
+
+    [Parameter]
+    public bool Inline { get; set; }
+
+    [Parameter]
+    public bool TimeOnly { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool ShowTime { get; set; }
+
+    [Parameter]
+    public bool ShowSeconds { get; set; }
+
+    [Parameter]
+    public string HoursStep { get; set; }
+
+    [Parameter]
+    public string MinutesStep { get; set; }
+
+    [Parameter]
+    public string SecondsStep { get; set; }
+
+    enum StepType
+    {
+        Hours,
+        Minutes,
+        Seconds
+    }
+
+    double getStep(StepType type)
+    {
+        double step = 1;
+
+        if (type == StepType.Hours)
+        {
+            step = parseStep(HoursStep);
+        }
+        else if (type == StepType.Minutes)
+        {
+            step = parseStep(MinutesStep);
+        }
+        else if (type == StepType.Seconds)
+        {
+            step = parseStep(SecondsStep);
+        }
+
+        return step;
+    }
+
+
+    double parseStep(string step)
+    {
+        return string.IsNullOrEmpty(step) || step == "any" ? 1 : double.Parse(step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    [Parameter]
+    public bool ShowTimeOkButton { get; set; } = true;
+
+    [Parameter]
+    public string DateFormat { get; set; }
+
+    [Parameter]
+    public string YearRange { get; set; } = "1950:2050";
+    /*
+    [Parameter]
+    public string SelectionMode { get; set; } = "single";
+    */
+    [Parameter]
+    public string HourFormat { get; set; } = "24";
+
+    /*
+    [Parameter]
+    public bool Utc { get; set; } = true;
+    */
+
+    [Parameter]
+    public string Placeholder { get; set; }
+
+    [Parameter]
+    public EventCallback<DateTime?> Change { get; set; }
+
+    [Parameter]
+    public EventCallback<TValue> ValueChanged { get; set; }
+
+    string contentStyle = "display:none;";
+
+    private string getStyle()
+    {
+        return $"display: inline-block;{(Style != null ? Style : "")}";
+    }
+
+    public void Close()
+    {
+        if (!Disabled)
+        {
+            contentStyle = "display:none;";
+            StateHasChanged();
+        }
+    }
+
+    async System.Threading.Tasks.Task OnChange()
+    {
+        await ValueChanged.InvokeAsync((TValue)Value);
+        if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+        await Change.InvokeAsync(DateTimeValue);
+    }
+
+    protected override string GetComponentCssClass()
+    {
+        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
+
+        return $"{base.GetComponentCssClass()} {fieldCssClass}";
+    }
+
+    private async System.Threading.Tasks.Task SetDay(DateTime newValue)
+    {
+        var currentValue = HasValue ? DateTimeValue.Value : CurrentDate;
+
+        if (newValue != DateTimeValue)
+        {
+            DateTimeValue = newValue;
+            await OnChange();
+            Close();
+        }
+    }
+
+    private async System.Threading.Tasks.Task SetMonth(int month)
+    {
+        var currentValue = HasValue ? DateTimeValue.Value : CurrentDate;
+        var newValue = new DateTime(currentValue.Year, month, Math.Min(currentValue.Day, DateTime.DaysInMonth(currentValue.Year, month)), currentValue.Hour, currentValue.Minute, currentValue.Second);
+
+        if (newValue != DateTimeValue)
+        {
+            DateTimeValue = newValue;
+            await OnChange();
+            Close();
+        }
+    }
+
+    private async System.Threading.Tasks.Task SetYear(int year)
+    {
+        var currentValue = HasValue ? DateTimeValue.Value : CurrentDate;
+        var newValue = new DateTime(year, currentValue.Month, Math.Min(currentValue.Day, DateTime.DaysInMonth(year, currentValue.Month)), currentValue.Hour, currentValue.Minute, currentValue.Second);
+
+        if (newValue != DateTimeValue)
+        {
+            DateTimeValue = newValue;
+            await OnChange();
+            Close();
+        }
+    }
+
+    private string getOpenPopup()
+    {
+        return !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
+    }
+
+    [CascadingParameter]
+    public EditContext EditContext { get; set; }
+
+    public FieldIdentifier FieldIdentifier { get; private set; }
+
+    [Parameter]
+    public Expression<Func<TValue>> ValueExpression { get; set; }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var shouldClose = false;
+
+        if (parameters.DidParameterChange(nameof(Visible), Visible))
+        {
+            var visible = parameters.GetValueOrDefault<bool>(nameof(Visible));
+            shouldClose = !visible;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (shouldClose && !firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+        }
+
+        if (EditContext != null && ValueExpression != null && FieldIdentifier.Model != EditContext.Model)
+        {
+            FieldIdentifier = FieldIdentifier.Create(ValueExpression);
+            EditContext.OnValidationStateChanged += ValidationStateChanged;
+        }
+    }
+
+    private void ValidationStateChanged(object sender, ValidationStateChangedEventArgs e)
+    {
+        StateHasChanged();
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+
+        if (EditContext != null)
+        {
+            EditContext.OnValidationStateChanged -= ValidationStateChanged;
+        }
+
+        Form?.RemoveComponent(this);
+
+        JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+    }
+
+    public object GetValue()
+    {
+        return Value;
+    }
+
+    private string PopupID
+    {
+        get
+        {
+            return $"popup{UniqueID}";
+        }
+    }
+
+    private bool firstRender = true;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        this.firstRender = firstRender;
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+}

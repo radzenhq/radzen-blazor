@@ -1,0 +1,68 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+
+<div class="rz-event" style=@Style @onclick=@OnClick>
+    <div class="rz-event-content" title=@Data?.Text @attributes=@Attributes>
+        @Scheduler.RenderAppointment(Data)
+    </div>
+</div>
+@code {
+    [Parameter]
+    public double? Top { get; set; }
+
+    [Parameter]
+    public double? Left { get; set; }
+
+    [Parameter]
+    public double? Width { get; set; }
+
+    [Parameter]
+    public double? Height { get; set; }
+
+    [Parameter]
+    public EventCallback<AppointmentData> Click { get; set; }
+
+    IDictionary<string, object> Attributes { get; set; }
+
+    [Parameter]
+    public AppointmentData Data { get; set; }
+
+    [CascadingParameter]
+    public IScheduler Scheduler { get; set; }
+
+    string Style { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        Attributes = Scheduler.GetAppointmentAttributes(Data);
+
+        var style = new List<string>();
+
+        if (Top.HasValue)
+        {
+            style.Add($"top: {Top.ToInvariantString()}em");
+        }
+
+        if (Left.HasValue)
+        {
+            style.Add($"left: {Left.ToInvariantString()}%");
+        }
+
+        if (Width.HasValue)
+        {
+            style.Add($"width: {Width.ToInvariantString()}%");
+        }
+
+        if (Height.HasValue)
+        {
+            style.Add($"height: {Height.ToInvariantString()}em");
+        }
+
+        Style = String.Join(";", style);
+    }
+
+    async Task OnClick()
+    {
+        await Click.InvokeAsync(Data);
+    }
+}

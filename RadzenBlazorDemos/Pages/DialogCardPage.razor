@@ -1,0 +1,70 @@
+﻿@page "/dialogcard/{OrderID}"
+
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+@inject Radzen.DialogService dialogService
+
+<h1>Dialog with parameters</h1>
+
+<p>This page demonstrates <b>Dialog</b> component with parameters.</p>
+<h3>OrderID: @OrderID</h3>
+<RadzenCard Style="margin-bottom: 20px;">
+    <div class="row">
+        <div class="col-md-6">
+            <div>Company:</div>
+            <b>@order.Customer?.CompanyName</b>
+            <div style="margin-top:20px">Employee:</div>
+            <b>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</b>
+            <br />
+            <RadzenImage Path="@order.Employee?.Photo" Style="width:100px;" />
+        </div>
+        <div class="col-md-6">
+            <div>Freight:</div>
+            <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)</b>
+            <div style="margin-top:20px">Ship country:</div>
+            <b>@(order.ShipCountry)</b>
+            <div style="margin-top:20px">Ship city:</div>
+            <b>@(order.ShipCity)</b>
+            <div style="margin-top:20px">Ship name:</div>
+            <b>@(order.ShipName)</b>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Order Details</h3>
+            <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        Data="@(orderDetails.Where(o => o.OrderID == OrderID))" TItem="OrderDetail" ColumnWidth="200px">
+                <Columns>
+                    <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+                    <RadzenGridColumn TItem="OrderDetail" Property="Order.OrderDate" Title="OrderDate" />
+                    <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
+                </Columns>
+            </RadzenGrid>
+        </div>
+    </div>
+</RadzenCard>
+<div class="row">
+    <div class="col-md-12">
+        <RadzenButton Click="@((args) => dialogService.Close(true))" Text="OK" Style="margin-bottom: 10px; width: 150px" />
+        <RadzenButton Click="@((args) => dialogService.Close(false))" ButtonStyle="ButtonStyle.Secondary" Text="Cancel" Style="margin-bottom: 10px; width: 150px" />
+    </div>
+</div>
+
+@code {
+    [Parameter] public int OrderID { get; set; }
+
+    Order order;
+    IEnumerable<OrderDetail> orderDetails;
+
+    protected override void OnInitialized()
+    {
+        order = dbContext.Orders.Where(o => o.OrderID == OrderID)
+                          .Include("Customer")
+                          .Include("Employee").FirstOrDefault();
+
+        orderDetails = dbContext.OrderDetails.Include("Order").ToList();
+    }
+}

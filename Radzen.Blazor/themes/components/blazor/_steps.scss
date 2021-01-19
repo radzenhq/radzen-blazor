@@ -1,0 +1,106 @@
+$steps-color: $body-color !default;
+
+$steps-number-width: 2rem !default;
+$steps-number-height: $steps-number-width !default;
+$steps-number-background-color: #e6ecef !default;
+$steps-number-border-radius: 50% !default;
+$steps-number-color: $body-color !default;
+$steps-number-padding: 0.4375rem 0 !default;
+$steps-number-selected-background: $default-link !default;
+$steps-number-selected-color: $white !default;
+
+$steps-title-selected-color: $default-link !default;
+$steps-title-margin: 0 0.8125rem !default;
+$steps-button-color: $battleship-grey !default;
+
+.rz-steps {
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .rz-menuitem-link {
+    display: inline-flex;
+    align-items: center;
+    color: $steps-color;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: none;
+      color: $steps-title-selected-color !important;
+    }
+  }
+
+  .rz-state-disabled {
+    .rz-menuitem-link {
+      color: rgba($steps-color, 0.5);
+      cursor: default;
+
+      &:hover {
+        color: rgba($steps-color, 0.5) !important;
+      }
+    }
+  }
+
+  .rz-state-highlight {
+    .rz-steps-title {
+      color: $steps-title-selected-color;
+    }
+
+    .rz-steps-number {
+      background: $steps-number-selected-background;
+      color: $steps-number-selected-color;
+    }
+  }
+}
+
+.rz-steps-item {
+  display: inline-block;
+}
+
+.rz-steps-title {
+  margin: $steps-title-margin;
+}
+
+.rz-steps-number {
+  text-align: center;
+  line-height: 1;
+
+  color: $steps-number-color;
+  padding: $steps-number-padding;
+  width: $steps-number-width;
+  height: $steps-number-height;
+  background-color: $steps-number-background-color;
+  border-radius: $steps-number-border-radius;
+}
+
+.rz-steps-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.rz-steps-next,
+.rz-steps-prev {
+  display: inline-flex;
+  align-items: center;
+  color: $steps-button-color !important;
+
+  &:not(.rz-state-disabled) {
+    &:hover {
+      cursor: pointer;
+      color: $steps-title-selected-color !important;
+    }
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &.rz-state-disabled {
+    color: rgba($steps-button-color, 0.5) !important;
+  }
+
+  .rzi {
+    font-size: 1.25rem;
+  }
+}
