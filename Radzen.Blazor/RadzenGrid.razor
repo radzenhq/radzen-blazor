@@ -15,7 +15,7 @@
 @if (Visible)
 {
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-    @if (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom)
+    @if (AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
     {
         <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" />
     }
@@ -466,7 +466,7 @@
             </div>
         </div>
 
-        @if (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom)
+        @if (AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
         {
             <RadzenPager @ref="bottomPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" class="rz-paginator-bottom" />
         }
