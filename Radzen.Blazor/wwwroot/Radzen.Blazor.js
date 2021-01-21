@@ -653,14 +653,16 @@ window.Radzen = {
     }
 
     Radzen[id] = function (e) {
-        if (parent) {
-            if (!parent.contains(e.target) && !popup.contains(e.target) && !Radzen.containsTarget(e.target)) {
-                Radzen.closePopup(id, instance, callback);
+        if (!e.defaultPrevented) {
+          if (parent) {
+            if (!parent.contains(e.target) && !popup.contains(e.target)) {
+              Radzen.closePopup(id, instance, callback);
             }
-        } else {
+          } else {
             if (!popup.contains(e.target)) {
-                Radzen.closePopup(id, instance, callback);
+              Radzen.closePopup(id, instance, callback);
             }
+          }
         }
     };
 
@@ -672,14 +674,6 @@ window.Radzen = {
         document.removeEventListener('contextmenu', Radzen[id]);
         document.addEventListener('contextmenu', Radzen[id]);
     }
-  },
-  containsTarget: function (target) {
-    for (var i = 0; i < document.body.children.length; i++) {
-      if (document.body.children[i].classList.contains('rz-popup') && document.body.children[i].contains(target)) {
-          return true;
-      }
-    }
-    return false;
   },
   closePopup: function (id, instance, callback) {
     var popup = document.getElementById(id);
