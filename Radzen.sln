@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Radzen.Blazor", "Radzen.Bla
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadzenBlazorDemos", "RadzenBlazorDemos\RadzenBlazorDemos.csproj", "{DF9EC444-791A-415A-A3EB-C4B008E5FCB5}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Radzen.Blazor.Tests", "Radzen.Blazor.Tests\Radzen.Blazor.Tests.csproj", "{BC20637F-A979-425A-9C3F-D72633FE555C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{DF9EC444-791A-415A-A3EB-C4B008E5FCB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF9EC444-791A-415A-A3EB-C4B008E5FCB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF9EC444-791A-415A-A3EB-C4B008E5FCB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC20637F-A979-425A-9C3F-D72633FE555C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC20637F-A979-425A-9C3F-D72633FE555C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC20637F-A979-425A-9C3F-D72633FE555C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC20637F-A979-425A-9C3F-D72633FE555C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
