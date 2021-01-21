@@ -112,7 +112,7 @@
                             @if (Multiple)
                             {
                                 <li class="@(isSelected(item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")" 
-                                    aria-label="@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)" style="display: block;white-space: nowrap;" @onclick="@(() => OnSelectItem(item))">
+                                    aria-label="@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)" style="display: block;white-space: nowrap;" @onclick:preventDefault @onclick="@(() => OnSelectItem(item))">
                                     <div class="rz-chkbox ">
                                         <div class="@(isSelected(item) ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
                                             <span class="@(isSelected(item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
@@ -132,7 +132,7 @@
                             }
                             else
                             {
-                                <li role="option" class="@(isSelected(item) ? "rz-dropdown-item  rz-state-highlight" : "rz-dropdown-item ")" aria-label=">@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)" @onclick="@(() => OnSelectItem(item))">
+                                <li role="option" class="@(isSelected(item) ? "rz-dropdown-item  rz-state-highlight" : "rz-dropdown-item ")" aria-label=">@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)" @onclick:preventDefault @onclick="@(() => OnSelectItem(item))">
                                     <span>
                                         @if (Template != null)
                                         {
