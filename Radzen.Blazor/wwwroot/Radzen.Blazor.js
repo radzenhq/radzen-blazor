@@ -49,7 +49,8 @@ window.Radzen = {
      var el = document.getElementById(id);
      if (el) {
         var handler = function (e) {
-            e.preventDefault(); e.pa
+            e.stopPropagation();
+            e.preventDefault(); 
             ref.invokeMethodAsync('RadzenComponent.RaiseContextMenu',
                 {
                     ClientX: e.clientX,
