@@ -39,6 +39,26 @@
         <LogicalName>$(MSBuildProjectName).xml</LogicalName>
       </EmbeddedResource>
   </ItemGroup>
+  
+  <UsingTask
+  TaskName="RemoveSourceMap"
+  TaskFactory="CodeTaskFactory"
+  AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+    <Task>
+      <Using Namespace="System"/>
+      <Using Namespace="System.IO"/>
+      <Using Namespace="System.Text"/>
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+          foreach (var file in Directory.EnumerateFiles("./wwwroot/css", "*.css"))
+          {
+              File.WriteAllText(file, File.ReadAllText(file).Replace("/*# sourceMappingURL=themes" + Path.DirectorySeparatorChar + Path.GetFileName(file) + ".map */", ""), Encoding.UTF8);
+          }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+  
   <Target Name="ToolRestore" BeforeTargets="PreBuildEvent">
     <Exec Command="dotnet tool restore" StandardOutputImportance="high" />
   </Target>
@@ -53,5 +73,6 @@
     <Delete Files="@(CssFiles)" />
     <Delete Files="@(BootstrapFiles)" />
     <RemoveDir Directories="$(MSBuildProjectDirectory)\wwwroot\css\bootstrap" />
+    <RemoveSourceMap />
   </Target>
 </Project>
