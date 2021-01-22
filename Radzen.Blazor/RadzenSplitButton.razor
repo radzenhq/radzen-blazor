@@ -5,20 +5,24 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         <button disabled="@Disabled" class="@getButtonCss()" type="button" @onclick="@OnClick">
-            @if (!string.IsNullOrEmpty(Icon))
+            @if (!string.IsNullOrEmpty(@Icon))
             {
-                <span aria-hidden="true" class="rz-button-icon-left  rzi">@((MarkupString)Icon)</span>
+                <i class="rz-button-icon-left rzi">@((MarkupString)Icon)</i>
+            }
+            @if (!string.IsNullOrEmpty(Image))
+            {
+                <img class="rz-button-icon-left rzi" src="@Image" />
             }
             @if (!string.IsNullOrEmpty(Text))
             {
-                <span class="rz-button-text ">@Text</span>
+                <span class="rz-button-text">@Text</span>
             }
             else
             {
-                <span class="rz-button-text ">&nbsp;</span>
+                <span class="rz-button-text">&nbsp;</span>
             }
         </button><button onclick="@OpenPopupScript()" class="@getPopupButtonCss()" icon="rzi rzi-chevron-down" type="button">
-            <span aria-hidden="true" class="rz-button-icon-left  rzi rzi-chevron-down"></span><span class="rz-button-text ">rz-btn</span>
+            <span aria-hidden="true" class="rz-button-icon-left rzi rzi-chevron-down"></span><span class="rz-button-text ">rz-btn</span>
         </button>
         <div id="@PopupID" style="display:none;" class="rz-menu">
             <ul class="rz-menu-list">
@@ -35,6 +39,9 @@
 
     [Parameter]
     public string Icon { get; set; }
+
+    [Parameter]
+    public string Image { get; set; }
 
     [Parameter]
     public bool Disabled { get; set; }
@@ -70,7 +77,7 @@
 
     private string getPopupButtonCss()
     {
-        return $"rz-splitbutton-menubutton rz-button  rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}";
+        return $"rz-splitbutton-menubutton rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}";
     }
 
     private string OpenPopupScript()
