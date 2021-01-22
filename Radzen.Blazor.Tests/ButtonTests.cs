@@ -6,7 +6,7 @@ namespace Radzen.Blazor.Tests
     public class ButtonTests
     {
         [Fact]
-        public void ButtonTextTest()
+        public void Button_Renders_TextParameter()
         {
             using var ctx = new TestContext();
 
@@ -20,7 +20,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ButtonIconTest()
+        public void Button_Renders_IconParameter()
         {
             using var ctx = new TestContext();
 
@@ -34,7 +34,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ButtonTextAndIconTest()
+        public void Button_Renders_IconAndTextParameters()
         {
             using var ctx = new TestContext();
 
@@ -53,7 +53,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ButtonImageTest()
+        public void Button_Renders_ImageParameter()
         {
             using var ctx = new TestContext();
 
@@ -67,7 +67,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ButtonTextAndImageTest()
+        public void Button_Renders_ImageAndTextParameters()
         {
             using var ctx = new TestContext();
 
@@ -86,7 +86,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ButtonSizeTest()
+        public void Button_Renders_SizeParameter()
         {
             using var ctx = new TestContext();
 
@@ -102,7 +102,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ButtonStyleTest()
+        public void Button_Renders_StyleParameter()
         {
             using var ctx = new TestContext();
 
@@ -118,7 +118,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ButtonTypeTest()
+        public void Button_Renders_TypeParameter()
         {
             using var ctx = new TestContext();
 
@@ -138,7 +138,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ButtonDisabledTest()
+        public void Button_Renders_DisabledParameter()
         {
             using var ctx = new TestContext();
 
@@ -150,7 +150,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ButtonChildContentTest()
+        public void Button_Renders_ChildContent()
         {
             using var ctx = new TestContext();
 
@@ -162,7 +162,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ButtonUnmatchedTest()
+        public void Button_Renders_UnmatchedParameter()
         {
             using var ctx = new TestContext();
 
@@ -174,7 +174,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ButtonClickTest()
+        public void Button_Raises_ClickEvent()
         {
             using var ctx = new TestContext();
 
