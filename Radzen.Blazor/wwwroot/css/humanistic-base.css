@@ -1295,7 +1295,7 @@ ul.rz-profile-menu {
   .rz-dropdown-clear-icon:before {
     content: 'close'; }
 
-.rz-html-editor-dropdown-items, .rz-menu, .rz-autocomplete-panel, .rz-multiselect-panel, .rz-dropdown-panel {
+.rz-html-editor-dropdown-items, .rz-splitbutton-menu, .rz-autocomplete-panel, .rz-multiselect-panel, .rz-dropdown-panel {
   position: absolute;
   -webkit-transform: translateY(0);
       -ms-transform: translateY(0);
@@ -1522,7 +1522,8 @@ ul.rz-profile-menu {
   .rz-splitbutton .rz-button, .rz-splitbutton .rz-paginator-element {
     background-color: #d64d42; }
 
-.rz-menu {
+.rz-splitbutton-menu {
+  display: none;
   position: absolute;
   min-width: 10rem;
   border-top-right-radius: 0;
