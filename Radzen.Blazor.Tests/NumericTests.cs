@@ -36,6 +36,51 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Numeric_Respect_MinParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenNumeric<double>>();
+
+            var minValue = 2;
+            var raised = false;
+
+            component.SetParametersAndRender(parameters => {
+                component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; }));
+                parameters.Add<decimal?>(p => p.Min, minValue);
+            });
+
+            component.Find(".rz-spinner-down").Click();
+
+            Assert.False(raised, $"Numeric value should Change event if value is less than min value.");
+        }
+
+        [Fact]
+        public void Numeric_Respect_MaxParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenNumeric<double>>();
+
+            var maxValue = 10;
+            var raised = false;
+
+            component.SetParametersAndRender(parameters => {
+                component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; }));
+                parameters.Add<double>(p => p.Value, maxValue);
+                parameters.Add<decimal?>(p => p.Max, maxValue);
+            });
+
+            component.Find(".rz-spinner-up").Click();
+
+            Assert.False(raised, $"Numeric value should Change event if value is less than min value.");
+        }
+
+        [Fact]
         public void Numeric_Renders_StyleParameter()
         {
             using var ctx = new TestContext();
