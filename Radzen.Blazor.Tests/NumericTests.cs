@@ -200,11 +200,12 @@ namespace Radzen.Blazor.Tests
 
             var raised = false;
             var value = 3.5;
-            var expectedValue = 4.5;
+            var expectedValue = 5.5;
             object newValue = null;
 
             component.SetParametersAndRender(parameters => {
                 parameters.Add<double>(p => p.Value, value);
+                parameters.Add(p => p.Step, "2");
                 parameters.Add(p => p.Change, args => { raised = true; newValue = args; }); 
             });
 
@@ -233,11 +234,12 @@ namespace Radzen.Blazor.Tests
 
             var raised = false;
             var value = 3.5;
-            var expectedValue = 2.5;
+            var expectedValue = 1.5;
             object newValue = null;
 
             component.SetParametersAndRender(parameters => {
                 parameters.Add<double>(p => p.Value, value);
+                parameters.Add(p => p.Step, "2");
                 parameters.Add(p => p.Change, args => { raised = true; newValue = args; });
             });
 
