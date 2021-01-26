@@ -74,6 +74,22 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void ProgressBar_Renders_ModeParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenProgressBar>();
+
+            component.Render();
+
+            Assert.Contains(@$"rz-progressbar-determinate", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<ProgressBarMode>(p => p.Mode, ProgressBarMode.Indeterminate));
+
+            Assert.Contains(@$"rz-progressbar-indeterminate", component.Markup);
+        }
+
+        [Fact]
         public void ProgressBar_Renders_UnmatchedParameter()
         {
             using var ctx = new TestContext();
