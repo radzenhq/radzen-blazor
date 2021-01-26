@@ -158,5 +158,24 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.True(object.Equals(value, newValue));
         }
+
+        [Fact]
+        public void Password_Raises_ValueChangedEvent()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenPassword>();
+
+            var raised = false;
+            var value = "Test";
+            object newValue = null;
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; }));
+
+            component.Find("input").Change(value);
+
+            Assert.True(raised);
+            Assert.True(object.Equals(value, newValue));
+        }
     }
 }

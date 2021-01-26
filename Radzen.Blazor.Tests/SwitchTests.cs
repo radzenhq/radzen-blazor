@@ -115,5 +115,24 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.True(object.Equals(value, !(bool)newValue));
         }
+
+        [Fact]
+        public void Switch_Raises_ValueChangedEvent()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenSwitch>();
+
+            var raised = false;
+            var value = false;
+            object newValue = null;
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; }));
+
+            component.Find("div").MouseUp();
+
+            Assert.True(raised);
+            Assert.True(object.Equals(value, !(bool)newValue));
+        }
     }
 }

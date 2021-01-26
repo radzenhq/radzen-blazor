@@ -184,5 +184,24 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.True(object.Equals(value, newValue));
         }
+
+        [Fact]
+        public void TextArea_Raises_ValueChangedEvent()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextArea>();
+
+            var raised = false;
+            var value = "Test";
+            object newValue = null;
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; }));
+
+            component.Find("textarea").Change(value);
+
+            Assert.True(raised);
+            Assert.True(object.Equals(value, newValue));
+        }
     }
 }
