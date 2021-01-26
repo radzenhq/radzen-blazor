@@ -6,6 +6,20 @@ namespace Radzen.Blazor.Tests
     public class SplitButtonTests
     {
         [Fact]
+        public void SplitButton_Renders_StyleParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenSplitButton>();
+
+            var value = "width:20px";
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+
+            Assert.Contains(@$"style=""{value}""", component.Markup);
+        }
+
+        [Fact]
         public void SplitButton_Renders_TextParameter()
         {
             using var ctx = new TestContext();

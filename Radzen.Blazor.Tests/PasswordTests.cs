@@ -30,6 +30,20 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Password_Renders_StyleParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenPassword>();
+
+            var value = "width:20px";
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+
+            Assert.Contains(@$"style=""{value}""", component.Markup);
+        }
+
+        [Fact]
         public void Password_Renders_NameParameter()
         {
             using var ctx = new TestContext();

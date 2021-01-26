@@ -6,6 +6,20 @@ namespace Radzen.Blazor.Tests
     public class LoginTests
     {
         [Fact]
+        public void Login_Renders_StyleParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenLogin>();
+
+            var value = "width:20px";
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+
+            Assert.Contains(@$"style=""{value}""", component.Markup);
+        }
+
+        [Fact]
         public void Login_Renders_UsernameLabel()
         {
             using var ctx = new TestContext();

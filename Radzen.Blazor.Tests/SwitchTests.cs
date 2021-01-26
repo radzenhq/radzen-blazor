@@ -29,6 +29,21 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(@$"rz-switch-checked", component.Markup);
         }
 
+
+        [Fact]
+        public void Switch_Renders_StyleParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenSwitch>();
+
+            var value = "width:20px";
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+
+            Assert.Contains(@$"style=""outline: 0 none;{value}""", component.Markup);
+        }
+
         [Fact]
         public void Switch_Renders_NameParameter()
         {

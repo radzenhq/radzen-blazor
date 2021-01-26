@@ -6,6 +6,20 @@ namespace Radzen.Blazor.Tests
     public class LinkTests
     {
         [Fact]
+        public void Link_Renders_StyleParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenLink>();
+
+            var value = "width:20px";
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+
+            Assert.Contains(@$"style=""{value}""", component.Markup);
+        }
+
+        [Fact]
         public void Link_Renders_TextParameter()
         {
             using var ctx = new TestContext();

@@ -30,6 +30,20 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void TextArea_Renders_StyleParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextArea>();
+
+            var value = "width:20px";
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
+
+            Assert.Contains(@$"style=""{value}""", component.Markup);
+        }
+
+        [Fact]
         public void TextArea_Renders_NameParameter()
         {
             using var ctx = new TestContext();

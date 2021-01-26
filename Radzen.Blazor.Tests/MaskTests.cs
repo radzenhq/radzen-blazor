@@ -3,24 +3,24 @@ using Xunit;
 
 namespace Radzen.Blazor.Tests
 {
-    public class TextBoxTests
+    public class MaskTests
     {
         [Fact]
-        public void TextBox_Renders_CssClass()
+        public void Mask_Renders_CssClass()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.RenderComponent<RadzenMask>();
 
             Assert.Contains(@$"rz-textbox", component.Markup);
         }
 
         [Fact]
-        public void TextBox_Renders_ValueParameter()
+        public void Mask_Renders_ValueParameter()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.RenderComponent<RadzenMask>();
 
             var value = "Test";
 
@@ -30,11 +30,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void TextBox_Renders_StyleParameter()
+        public void Mask_Renders_StyleParameter()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.RenderComponent<RadzenMask>();
 
             var value = "width:20px";
 
@@ -44,11 +44,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void TextBox_Renders_NameParameter()
+        public void Mask_Renders_NameParameter()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.RenderComponent<RadzenMask>();
 
             var value = "Test";
 
@@ -58,11 +58,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void TextBox_Renders_TabIndexParameter()
+        public void Mask_Renders_TabIndexParameter()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.RenderComponent<RadzenMask>();
 
             var value = 1;
 
@@ -72,11 +72,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void TextBox_Renders_PlaceholderParameter()
+        public void Mask_Renders_PlaceholderParameter()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.RenderComponent<RadzenMask>();
 
             var value = "Test";
 
@@ -86,11 +86,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void TextBox_Renders_DisabledParameter()
+        public void Mask_Renders_DisabledParameter()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.RenderComponent<RadzenMask>();
 
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.Disabled, true));
 
@@ -99,11 +99,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void TextBox_Renders_ReadOnlyParameter()
+        public void Mask_Renders_ReadOnlyParameter()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.RenderComponent<RadzenMask>();
 
             var value = true;
 
@@ -113,11 +113,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void TextBox_Renders_AutoCompleteParameter()
+        public void Mask_Renders_AutoCompleteParameter()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.RenderComponent<RadzenMask>();
 
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
 
@@ -129,11 +129,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void TextBox_Renders_MaxLengthParameter()
+        public void Mask_Renders_MaxLengthParameter()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.RenderComponent<RadzenMask>();
 
             var value = 10;
 
@@ -143,11 +143,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void TextBox_Renders_UnmatchedParameter()
+        public void Mask_Renders_UnmatchedParameter()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.RenderComponent<RadzenMask>();
 
             component.SetParametersAndRender(parameters => parameters.AddUnmatched("autofocus", ""));
 
@@ -155,11 +155,11 @@ namespace Radzen.Blazor.Tests
         }
         
         [Fact]
-        public void TextBox_Raises_ChangedEvent()
+        public void Mask_Raises_ChangedEvent()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>();
+            var component = ctx.RenderComponent<RadzenMask>();
 
             var raised = false;
             var value = "Test";
