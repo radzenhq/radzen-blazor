@@ -19,6 +19,10 @@
                 <button onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
                     <span aria-hidden="true" class="rz-button-icon-left  rzi rzi-calendar"></span><span class="rz-button-text"></span>
                 </button>
+                @if (AllowClear && HasValue)
+                {
+                    <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@(args => Value = null)" @onclick:stopPropagation="true"></i>
+                }
             </span>
         }
         <div id="@PopupID" style="@(Inline ? "" : contentStyle);width: 320px;box-sizing: border-box; margin: 0;" class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")">
@@ -203,6 +207,9 @@
         years = Enumerable.Range(int.Parse(YearRange.Split(':').First()), int.Parse(YearRange.Split(':').Last()) - int.Parse(YearRange.Split(':').First()) + 1)
             .Select(i => new NameValue() { Name = $"{i}", Value = i }).ToList();
     }
+
+    [Parameter]
+    public bool AllowClear { get; set; }
 
     [Parameter]
     public int TabIndex { get; set; } = 0;
