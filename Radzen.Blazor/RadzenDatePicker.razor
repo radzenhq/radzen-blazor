@@ -92,7 +92,7 @@
             @if (ShowTime)
             {
         <div class="rz-timepicker">
-            <RadzenNumeric Disabled="@Disabled" Value="CurrentDate.Hour" TValue="double" Step="@HoursStep"
+            <RadzenNumeric Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)" TValue="double" Step="@HoursStep"
                            Change="@(async v => {
                                          var step = getStep(StepType.Hours);
                                          if (v == CurrentDate.Hour - step || v == CurrentDate.Hour + step)
