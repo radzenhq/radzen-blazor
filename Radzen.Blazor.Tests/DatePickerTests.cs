@@ -228,5 +228,93 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
+
+        [Fact]
+        public void DatePicker_Raises_ChangeEventOnNextMonth()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>();
+
+            var raised = false;
+            object newValue = null;
+
+            component.SetParametersAndRender(parameters => {
+                parameters.Add(p => p.Change, args => { raised = true; newValue = args; });
+            });
+
+            component.Find(".rz-datepicker-next-icon").Click();
+
+            Assert.True(raised);
+            Assert.True(((DateTime)newValue) > DateTime.Now);
+        }
+
+        [Fact]
+        public void DatePicker_Raises_ValueChangedEventOnNextMonth()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>();
+
+            var raised = false;
+            object newValue = null;
+
+            component.SetParametersAndRender(parameters => {
+                parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; });
+            });
+
+            component.Find(".rz-datepicker-next-icon").Click();
+
+            Assert.True(raised);
+            Assert.True(((DateTime)newValue) > DateTime.Now);
+        }
+
+        [Fact]
+        public void DatePicker_Raises_ChangeEventOnPrevMonth()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>();
+
+            var raised = false;
+            object newValue = null;
+
+            component.SetParametersAndRender(parameters => {
+                parameters.Add(p => p.Change, args => { raised = true; newValue = args; });
+            });
+
+            component.Find(".rz-datepicker-prev-icon").Click();
+
+            Assert.True(raised);
+            Assert.True(((DateTime)newValue) < DateTime.Now);
+        }
+
+        [Fact]
+        public void DatePicker_Raises_ValueChangedEventOnPrevMonth()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>();
+
+            var raised = false;
+            object newValue = null;
+
+            component.SetParametersAndRender(parameters => {
+                parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; });
+            });
+
+            component.Find(".rz-datepicker-prev-icon").Click();
+
+            Assert.True(raised);
+            Assert.True(((DateTime)newValue) < DateTime.Now);
+        }
     }
 }
