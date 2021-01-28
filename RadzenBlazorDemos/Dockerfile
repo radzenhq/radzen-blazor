@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:5.0
+FROM mcr.microsoft.com/dotnet/sdk:5.0-focal
 COPY . /app
 WORKDIR /app
 RUN dotnet publish -c Release -o out
