@@ -997,6 +997,7 @@
                 if (object.Equals(itemToInsert, item))
                 {
                     await RowCreate.InvokeAsync(item);
+                    itemToInsert = default(TItem);
                 }
                 else
                 {
