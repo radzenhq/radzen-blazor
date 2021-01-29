@@ -32,6 +32,9 @@
 }
 @code {
     [Parameter]
+    public int MinLength { get; set; } = 1;
+
+    [Parameter]
     public int FilterDelay { get; set; } = 500;
 
     protected ElementReference search;
@@ -79,14 +82,19 @@
 
     async Task DebounceFilter()
     {
+        var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
+
+        if (value.Length < MinLength)
+            return;
+
         if (!LoadData.HasDelegate)
         {
-            searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
+            searchText = value;
             await InvokeAsync(() => { StateHasChanged(); });
         }
         else
         {
-            customSearchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
+            customSearchText = value;
             await InvokeAsync(() => { LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Filter = customSearchText }); });
         }
     }
