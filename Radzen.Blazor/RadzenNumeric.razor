@@ -124,6 +124,7 @@
 
         if (object.Equals(Value, newValue))
         {
+            await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, Value);
             return;
         }
 
