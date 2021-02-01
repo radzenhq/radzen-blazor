@@ -90,7 +90,7 @@
                 }
                 @if (Template != null)
                 {
-                    <RadzenGrid Responsive="@Responsive" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData" 
+                    <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData" 
                                 TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
                         <Columns>
                             <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="string">
@@ -103,7 +103,7 @@
                 }
                 else
                 {
-                    <RadzenGrid Responsive="@Responsive" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData" 
+                    <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData" 
                                 TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
                         <Columns>
                             @if (Columns != null)
@@ -127,6 +127,9 @@
     </div>
 }
 @code {
+    [Parameter]
+    public string ColumnWidth { get; set; }
+
     [Parameter]
     public bool Responsive { get; set; } = true;
 
@@ -213,7 +216,7 @@
                 if (AllowFilteringByAllStringColumns)
                 {
                     query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => c.Type == "string" && string.IsNullOrEmpty(c.Format))
-                        .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))), 
+                        .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
                             FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
                 }
                 else
