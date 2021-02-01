@@ -130,17 +130,17 @@ $menu-top-item-color: $menu-item-color !default;
 
 .rz-menu-toggle-item {
     display: none;
-    position: absolute;
-    right: 0;
-    top: 0;
     padding: $menu-top-item-padding;
+    text-align: right;
+    width: 100%;
+    height: 100%;
 }
 
 .rz-menu-toggle {
     appearance: none;
     background-color: transparent;
     border: none;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0;
@@ -154,20 +154,21 @@ $menu-top-item-color: $menu-item-color !default;
 @media (max-width: 768px) {
   .rz-menu:not(.rz-profile-menu) {
     &.rz-menu-closed {
-      position: relative;
       .rz-navigation-item {
         display: none;
       }
     }
 
     .rz-menu-toggle .rzi {
-        margin: 0;
+      margin: 0;
     }
 
     &.rz-menu-open {
-      position: relative;
       display: block;
-      padding-top: 32px;
+
+      .rz-navigation-item {
+        background-color: inherit;
+      }
 
       .rz-navigation-menu {
         position: static;
@@ -176,7 +177,7 @@ $menu-top-item-color: $menu-item-color !default;
     }
 
     .rz-menu-toggle-item {
-      display: inline-block;
+      display: block;
     }
 
     .rz-navigation-item-wrapper-active:before {
