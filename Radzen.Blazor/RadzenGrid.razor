@@ -644,9 +644,15 @@
     }
 
     [JSInvokable("RadzenGrid.OnColumnResized")]
-    public void OnColumnResized(int columnIndex, decimal value)
+    public async Task OnColumnResized(int columnIndex, double value)
     {
-        this.ColumnsCollection.Where(c => c.Visible).ToList()[columnIndex].SetWidth($"{value}px");
+        var column = this.ColumnsCollection.Where(c => c.Visible).ToList()[columnIndex];
+        column.SetWidth($"{value}px");
+        await ColumnResized.InvokeAsync(new ColumnResizedEventArgs<TItem>
+        {
+            Column = column,
+            Width = value,
+        });
     }
 
     [Parameter]
