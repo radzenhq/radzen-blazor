@@ -636,27 +636,20 @@
     }
 
     DraggableEventArgs resizingColumn = null;
-    void OnColumnResizeStart(DraggableEventArgs args, RadzenGridColumn<TItem> column)
+    Rect resizingColumnRect = null;
+
+    async Task OnColumnResizeStart(DraggableEventArgs args, RadzenGridColumn<TItem> column)
     {
         resizingColumn = args;
+        resizingColumnRect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", getColumnId(column));
     }
 
-    async Task OnColumnResize(DraggableEventArgs args, RadzenGridColumn<TItem> column)
+    void OnColumnResize(DraggableEventArgs args, RadzenGridColumn<TItem> column)
     {
-        if (resizingColumn != null)
+        if (resizingColumn != null && resizingColumnRect != null)
         {
-            var percent = 1 - ((resizingColumn.ClientX - args.ClientX) / resizingColumn.ClientX);
-            if (percent != 1)
-            {
-                var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", getColumnId(column));
-                Debounce(() => SetColumnWidth(column, $"{rect.Width * percent}px"), 10);
-            }
+            column.SetWidth($"{resizingColumnRect.Width - (resizingColumn.ClientX - args.ClientX)}px");
         }
-    }
-
-    async Task SetColumnWidth(RadzenGridColumn<TItem> column, string width)
-    {
-        await InvokeAsync(() => { column.SetWidth(width); });
     }
 
     public override IQueryable<TItem> View
