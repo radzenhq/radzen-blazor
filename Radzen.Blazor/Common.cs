@@ -252,6 +252,12 @@ namespace Radzen
         Center
     }
 
+    public class ColumnResizedEventArgs<T>
+    { 
+        public RadzenGridColumn<T> Column { get; internal set; }
+        public double Width { get; internal set; }
+    }
+
     public class LoadDataArgs
     {
         public int? Skip { get; set; }

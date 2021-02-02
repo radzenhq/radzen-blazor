@@ -76,7 +76,8 @@
                                             }
                                             @if (AllowColumnResize)
                                             {
-                                                <Draggable DragStart=@(args => OnColumnResizeStart(args, column)) Drag=@(args => OnColumnResize(args, column)) 
+                                                <Draggable DragStart=@(args => OnColumnResizeStart(args, column)) DragEnd=@(args => OnColumnResizeEnd(args, column)) 
+                                                           Drag=@(args => OnColumnResize(args, column)) 
                                                            Style="cursor:col-resize;float:right;"
                                                            @onclick:stopPropagation="true" @onmousedown:stopPropagation="true" @onmouseup:stopPropagation="true">&nbsp;</Draggable>
                                             }
@@ -644,6 +645,16 @@
         resizingColumnRect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", getColumnId(column));
     }
 
+    async Task OnColumnResizeEnd(DraggableEventArgs args, RadzenGridColumn<TItem> column)
+    {
+        resizingColumn = null;
+        resizingColumnRect = null;
+
+        var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", getColumnId(column));
+
+        await ColumnResized.InvokeAsync(new ColumnResizedEventArgs<TItem>() { Column = column, Width = rect.Width });
+    }
+
     void OnColumnResize(DraggableEventArgs args, RadzenGridColumn<TItem> column)
     {
         if (resizingColumn != null && resizingColumnRect != null)
@@ -651,6 +662,9 @@
             column.SetWidth($"{resizingColumnRect.Width - (resizingColumn.ClientX - args.ClientX)}px");
         }
     }
+
+    [Parameter]
+    public EventCallback<ColumnResizedEventArgs<TItem>> ColumnResized { get; set; }
 
     public override IQueryable<TItem> View
     {
