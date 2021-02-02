@@ -3,6 +3,7 @@
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components.Forms
 @using Radzen;
+@using Radzen.Blazor.Rendering
 @inherits PagedDataBoundComponent<TItem>
 
 @typeparam TItem
@@ -46,7 +47,7 @@
                                 @foreach (var column in columns.Where(c => c.Visible))
                                 {
                                     var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
-                                    <th class="@($" rz-unselectable-text {sortableClass} {column.HeaderCssClass}")" scope="col" style="@column.GetStyle(true)">
+                                    <th id="@getColumnId(column)" class="@($" rz-unselectable-text {sortableClass} {column.HeaderCssClass}")" scope="col" style="@column.GetStyle(true)">
                                         <div @onclick='@((args) => OnSort(args, column))' style="width:100%">
                                             <span class="rz-column-title">
                                                 @if (column.HeaderTemplate != null)
@@ -72,6 +73,12 @@
                                                 {
                                                     <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
                                                 }
+                                            }
+                                            @if (AllowColumnResize)
+                                            {
+                                                <Draggable DragStart=@(args => OnColumnResizeStart(args, column)) Drag=@(args => OnColumnResize(args, column)) 
+                                                           Style="cursor:col-resize;float:right;"
+                                                           @onclick:stopPropagation="true" @onmousedown:stopPropagation="true" @onmouseup:stopPropagation="true">&nbsp;</Draggable>
                                             }
                                             @if (AllowFiltering && column.Filterable && FilterMode == FilterMode.Advanced)
                                             {
@@ -619,6 +626,38 @@
 
     [Parameter]
     public bool AllowFiltering { get; set; }
+
+    [Parameter]
+    public bool AllowColumnResize { get; set; }
+
+    string getColumnId(RadzenGridColumn<TItem> column)
+    {
+        return string.Join("", $"{UniqueID}".Split('.')) + column.Property;
+    }
+
+    DraggableEventArgs resizingColumn = null;
+    void OnColumnResizeStart(DraggableEventArgs args, RadzenGridColumn<TItem> column)
+    {
+        resizingColumn = args;
+    }
+
+    async Task OnColumnResize(DraggableEventArgs args, RadzenGridColumn<TItem> column)
+    {
+        if (resizingColumn != null)
+        {
+            var percent = 1 - ((resizingColumn.ClientX - args.ClientX) / resizingColumn.ClientX);
+            if (percent != 1)
+            {
+                var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", getColumnId(column));
+                Debounce(() => SetColumnWidth(column, $"{rect.Width * percent}px"), 10);
+            }
+        }
+    }
+
+    async Task SetColumnWidth(RadzenGridColumn<TItem> column, string width)
+    {
+        await InvokeAsync(() => { column.SetWidth(width); });
+    }
 
     public override IQueryable<TItem> View
     {

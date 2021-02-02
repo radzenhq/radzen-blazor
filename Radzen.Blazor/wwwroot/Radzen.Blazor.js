@@ -1054,8 +1054,11 @@ window.Radzen = {
     document.addEventListener('touchend', ref.mouseUpHandler, { passive: true });
     return Radzen.clientRect(ref);
   },
-  clientRect: function (ref) {
-    var rect = ref.getBoundingClientRect();
+  clientRect: function (arg) {
+    var el = arg instanceof Element || arg instanceof HTMLDocument
+        ? arg
+        : document.getElementById(arg);
+    var rect = el.getBoundingClientRect();
     return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
   },
   endDrag: function (ref) {
