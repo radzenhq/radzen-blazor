@@ -15,6 +15,8 @@
 }
 @if (Visible)
 {
+    var grid = DotNetObjectReference.Create(this);
+    var visibleColumns = columns.Where(c => c.Visible).ToList();
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     @if (AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
     {
@@ -31,9 +33,9 @@
                             {
                                 <col>
                             }
-                            @foreach (var column in columns.Where(c => c.Visible))
+                            @foreach (var column in visibleColumns)
                             {
-                                <col style="@column.GetStyle()">
+                                <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-col") style="@column.GetStyle()">
                             }
                         </colgroup>
                         <thead class="rz-datatable-thead">
@@ -44,10 +46,11 @@
                                         <span class="rz-column-title"></span>
                                     </th>
                                 }
-                                @foreach (var column in columns.Where(c => c.Visible))
+                                
+                                @foreach (var column in visibleColumns)
                                 {
                                     var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
-                                    <th id="@getColumnId(column)" class="@($" rz-unselectable-text {sortableClass} {column.HeaderCssClass}")" scope="col" style="@column.GetStyle(true)">
+                                    <th class="@($" rz-unselectable-text {sortableClass} {column.HeaderCssClass}")" scope="col" style="@column.GetStyle(true)">
                                         <div @onclick='@((args) => OnSort(args, column))' style="width:100%">
                                             <span class="rz-column-title">
                                                 @if (column.HeaderTemplate != null)
@@ -76,10 +79,10 @@
                                             }
                                             @if (AllowColumnResize)
                                             {
-                                                <Draggable DragStart=@(args => OnColumnResizeStart(args, column)) DragEnd=@(args => OnColumnResizeEnd(args, column)) 
-                                                           Drag=@(args => OnColumnResize(args, column)) 
-                                                           Style="cursor:col-resize;float:right;"
-                                                           @onclick:stopPropagation="true" @onmousedown:stopPropagation="true" @onmouseup:stopPropagation="true">&nbsp;</Draggable>
+                                                var columnIndex = visibleColumns.IndexOf(column);
+                                                <div id="@getColumnResizerId(columnIndex)" style="cursor:col-resize;float:right;"
+                                                     @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                                     @onmousedown=@(args => StartColumnResize(args, columnIndex))>&nbsp;</div>
                                             }
                                             @if (AllowFiltering && column.Filterable && FilterMode == FilterMode.Advanced)
                                             {
@@ -163,7 +166,7 @@
                                             <span class="rz-column-title"></span>
                                         </th>
                                     }
-                                    @foreach (var column in columns.Where(c => c.Visible))
+                                    @foreach (var column in visibleColumns)
                                     {
                                         <th class="@($" rz-unselectable-text")" tabindex="1" scope="col" style="@column.GetStyle(true)">
                                             @if (AllowFiltering && column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
@@ -270,9 +273,9 @@
                             {
                                 <col>
                             }
-                            @foreach (var column in columns.Where(c => c.Visible))
+                            @foreach (var column in visibleColumns)
                             {
-                                <col style="@column.GetStyle()">
+                                <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-data-col") style="@column.GetStyle()">
                             }
                         </colgroup>
                         <tbody class="rz-datatable-data  rz-datatable-hoverable-rows">
@@ -284,7 +287,6 @@
                                     @foreach (var item in LoadData.HasDelegate ? Data : PagedView)
                                     {
                                         var rowArgs = RowAttributes(item, i);
-                                        var visibleColumns = columns.Where(c => c.Visible).ToList();
 
                                         <RadzenGridRow CssClass="@(RowStyle(item, i))" Attributes="@(rowArgs.Item2)" InEditMode="@IsRowInEditMode(item)">
                                             @if (Template != null)
@@ -408,7 +410,7 @@
                                             @if (Template != null && expandedItems.Keys.Contains(item.GetHashCode()))
                                             {
                                                 <tr class="rz-expanded-row-content">
-                                                    <td colspan="@(columns.Where(c => c.Visible).Count() + 1)">
+                                                    <td colspan="@(visibleColumns.Count + 1)">
                                                         <div class="rz-expanded-row-template">
                                                             @Template(item)
                                                         </div>
@@ -421,7 +423,7 @@
                                 else
                                 {
                                     <tr class=" rz-datatable-emptymessage-row">
-                                        <td class="rz-datatable-emptymessage" colspan="@columns.Where(c => c.Visible).Count()">
+                                        <td class="rz-datatable-emptymessage" colspan="@visibleColumns.Count">
                                             <span>@EmptyText</span>
                                         </td>
                                     </tr>
@@ -441,9 +443,9 @@
                                     {
                                         <col>
                                     }
-                                    @foreach (var column in columns.Where(c => c.Visible))
+                                    @foreach (var column in visibleColumns)
                                     {
-                                        <col style="@column.GetStyle()">
+                                        <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-footer-col") style="@column.GetStyle()">
                                     }
                                 </colgroup>
                                 <tfoot class="rz-datatable-tfoot">
@@ -454,7 +456,7 @@
                                                 <span class="rz-column-title"></span>
                                             </td>
                                         }
-                                        @foreach (var column in columns.Where(c => c.Visible))
+                                        @foreach (var column in visibleColumns)
                                         {
                                             <td class="@($" {column.FooterCssClass}")" style="@column.GetStyle(true)">
                                                 <span class="rz-column-footer">
@@ -631,36 +633,20 @@
     [Parameter]
     public bool AllowColumnResize { get; set; }
 
-    string getColumnId(RadzenGridColumn<TItem> column)
+    string getColumnResizerId(int columnIndex)
     {
-        return string.Join("", $"{UniqueID}".Split('.')) + column.Property;
+        return string.Join("", $"{UniqueID}".Split('.')) + columnIndex;
     }
 
-    DraggableEventArgs resizingColumn = null;
-    Rect resizingColumnRect = null;
-
-    async Task OnColumnResizeStart(DraggableEventArgs args, RadzenGridColumn<TItem> column)
+    async Task StartColumnResize(MouseEventArgs args, int columnIndex)
     {
-        resizingColumn = args;
-        resizingColumnRect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", getColumnId(column));
+        await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnResizerId(columnIndex), DotNetObjectReference.Create(this), columnIndex, args.ClientX);
     }
 
-    async Task OnColumnResizeEnd(DraggableEventArgs args, RadzenGridColumn<TItem> column)
+    [JSInvokable("RadzenGrid.OnColumnResized")]
+    public void OnColumnResized(int columnIndex, decimal value)
     {
-        resizingColumn = null;
-        resizingColumnRect = null;
-
-        var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", getColumnId(column));
-
-        await ColumnResized.InvokeAsync(new ColumnResizedEventArgs<TItem>() { Column = column, Width = rect.Width });
-    }
-
-    void OnColumnResize(DraggableEventArgs args, RadzenGridColumn<TItem> column)
-    {
-        if (resizingColumn != null && resizingColumnRect != null)
-        {
-            column.SetWidth($"{resizingColumnRect.Width - (resizingColumn.ClientX - args.ClientX)}px");
-        }
+        this.ColumnsCollection.Where(c => c.Visible).ToList()[columnIndex].SetWidth($"{value}px");
     }
 
     [Parameter]

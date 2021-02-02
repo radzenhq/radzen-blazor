@@ -1067,4 +1067,55 @@ window.Radzen = {
     document.removeEventListener('touchmove', ref.touchMoveHandler)
     document.removeEventListener('touchend', ref.mouseUpHandler);
   },
+  startColumnResize: function(id, grid, columnIndex, clientX) {
+      var el = document.getElementById(id);
+      var cell = el.parentNode.parentNode;
+      var col = document.getElementById(id + '-col');
+      var dataCol = document.getElementById(id + '-data-col');
+      var footerCol = document.getElementById(id + '-footer-col');
+      Radzen[el] = {
+          clientX: clientX,
+          width: cell.getBoundingClientRect().width,
+          mouseUpHandler: function (e) {
+              if (Radzen[el]) {
+                  grid.invokeMethodAsync(
+                      'RadzenGrid.OnColumnResized',
+                      columnIndex,
+                      cell.getBoundingClientRect().width
+                  );
+                  document.removeEventListener('mousemove', Radzen[el].mouseMoveHandler);
+                  document.removeEventListener('mouseup', Radzen[el].mouseUpHandler);
+                  document.removeEventListener('touchmove', Radzen[el].touchMoveHandler)
+                  document.removeEventListener('touchend', Radzen[el].mouseUpHandler);
+                  Radzen[el] = null;
+              }
+          },
+          mouseMoveHandler: function (e) {
+              if (Radzen[el]) {
+                  var width = (Radzen[el].width - (Radzen[el].clientX - e.clientX)) + 'px';
+                  if (cell) {
+                      cell.style.width = width;
+                  }
+                  if (col) {
+                      col.style.width = width;
+                  }
+                  if (dataCol) {
+                      dataCol.style.width = width;
+                  }
+                  if (footerCol) {
+                      footerCol.style.width = width;
+                  }
+              }
+          },
+          touchMoveHandler: function (e) {
+              if (e.targetTouches[0]) {
+                  Radzen[el].mouseMoveHandler(e.targetTouches[0]);
+              }
+          }
+      };
+      document.addEventListener('mousemove', Radzen[el].mouseMoveHandler);
+      document.addEventListener('mouseup', Radzen[el].mouseUpHandler);
+      document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: true })
+      document.addEventListener('touchend', Radzen[el].mouseUpHandler, { passive: true });
+  }
 };
