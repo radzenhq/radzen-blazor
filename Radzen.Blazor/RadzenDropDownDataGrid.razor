@@ -318,6 +318,9 @@
         await ValueChanged.InvokeAsync((TValue)Value);
         if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
         await Change.InvokeAsync(Value);
+
+        await grid.Reload();
+
         StateHasChanged();
     }
 
