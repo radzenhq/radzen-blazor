@@ -25,7 +25,7 @@
                 }
             </span>
         }
-        <div id="@PopupID" style="@(Inline ? "" : contentStyle);width: 320px;box-sizing: border-box; margin: 0;" class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")">
+        <div id="@PopupID" style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")">
             <div class="rz-datepicker-group">
                 @if (!TimeOnly)
                 {
@@ -505,7 +505,7 @@
 
     private string getStyle()
     {
-        return $"display: inline-block;{(Style != null ? Style : "")}";
+        return $"display: inline-block;{(Inline ? "overflow:auto;": "")}{(Style != null ? Style : "")}";
     }
 
     public void Close()
@@ -514,6 +514,21 @@
         {
             contentStyle = "display:none;";
             StateHasChanged();
+        }
+    }
+
+    private string PopupStyle
+    {
+        get
+        {
+            if (Inline)
+            {
+                return "white-space: nowrap";
+            }
+            else
+            {
+                return $"width: 320px; {contentStyle}";
+            }
         }
     }
 
@@ -528,7 +543,21 @@
     {
         var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
 
-        return $"{base.GetComponentCssClass()} {fieldCssClass}";
+        var classNames = new List<string>();
+
+        classNames.Add(base.GetComponentCssClass());
+
+        if (Inline)
+        {
+            classNames.Add("rz-calendar-inline");
+        }
+
+        if (!string.IsNullOrEmpty(fieldCssClass))
+        {
+            classNames.Add(fieldCssClass);
+        }
+
+        return string.Join(" ", classNames);
     }
 
     private async System.Threading.Tasks.Task SetDay(DateTime newValue)

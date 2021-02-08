@@ -61,6 +61,10 @@ $timepicker-border: none !default;
   }
 }
 
+.rz-calendar-inline {
+  border: $input-border;
+}
+
 .rz-datepicker-trigger {
   box-shadow: none;
   position: absolute;
@@ -122,6 +126,10 @@ $timepicker-border: none !default;
 
 .rz-datepicker-inline {
   position: static;
+
+  .rz-datepicker-group {
+    display: inline-block;
+  }
 }
 
 .rz-datepicker-header {
