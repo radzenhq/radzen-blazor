@@ -386,6 +386,14 @@ window.Radzen = {
 
     return ul.nextSelectedIndex;
   },
+  uploadInputChange: function (e, url, auto, multiple) {
+      if (auto) {
+          Radzen.upload(e.target, url, multiple, true);
+          e.target.value = '';
+      } else {
+          Radzen.uploadChange(e.target);
+      }
+  },
   uploads: function (uploadComponent, id) {
     if (!Radzen.uploadComponents) {
       Radzen.uploadComponents = {};

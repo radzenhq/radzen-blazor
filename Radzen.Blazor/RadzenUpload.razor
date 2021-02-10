@@ -8,17 +8,9 @@
 {
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     <div class="rz-fileupload-buttonbar">
-        <span class="rz-fileupload-choose rz-button  rz-button-text-icon-left">
-            @if (Multiple)
-            {
-                <input id="@Id" @ref="@fileUpload" type="file" multiple accept="@Accept"
-                       onchange="(function (e) { if (@Auto.ToString().ToLower()) { Radzen.upload(e.target, '@Url', @Multiple.ToString().ToLower(), true); e.target.value = ''; } else { Radzen.uploadChange(e.target) } })(event)" />
-            }
-            else
-            {
-                <input id="@Id" @ref="@fileUpload" type="file" accept="@Accept"
-                       onchange="(function (e) { if (@Auto.ToString().ToLower()) { Radzen.upload(e.target, '@Url', @Multiple.ToString().ToLower(), true); e.target.value = ''; } else { Radzen.uploadChange(e.target) } })(event)" />
-            }
+        <span class="rz-fileupload-choose rz-button rz-button-text-icon-left">
+            <input id="@Id" @ref="@fileUpload" type="file" multiple="@Multiple" accept="@Accept"
+                   onchange="Radzen.uploadInputChange(event, '@Url', @Auto.ToString().ToLower(), @Multiple.ToString().ToLower(), true)" />
             <span aria-hidden="true" class="rz-button-icon-left rzi rzi-plus"></span><span class="rz-button-text ">@ChooseText</span>
         </span>
     </div>
