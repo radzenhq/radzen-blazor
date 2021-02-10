@@ -69,7 +69,7 @@ namespace RadzenBlazorDemos
                     {
                         System.IO.File.Delete(file);
                     } 
-                    catch (Exception ex)
+                    catch
                     {
 
                     }

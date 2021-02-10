@@ -24,7 +24,7 @@ namespace Radzen
                     }) : default(T);
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 var responseAsString = await response.Content.ReadAsStringAsync();
                 if (!string.IsNullOrEmpty(responseAsString))
@@ -78,7 +78,7 @@ namespace Radzen
                         }
                     }
                 }
-                throw ex;
+                throw;
             }
         }
     }

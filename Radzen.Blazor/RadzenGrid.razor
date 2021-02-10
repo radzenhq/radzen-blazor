@@ -99,7 +99,7 @@
                                                         else
                                                         {
                                                             <RadzenLabel Text="@FilterText" class="rz-grid-filter-label" />
-                                                            <RadzenDropDown @onclick:preventDefault="true" Data="@(column.FilterOperators)" TextProperty="Value" ValueProperty="Key" @bind-Value="@column.FilterOperator" />
+                                                            <RadzenDropDown @onclick:preventDefault="true" Data="@(column.FilterOperators)" TextProperty="Value" ValueProperty="Key" TValue="string" Value="@column.FilterOperator" Change="@(args => column.SetFilterOperator($"{args}"))" />
                                                             @if (column.Type == "number")
                                                             {
                                                                 @(DrawNumericFilter(column, false))
@@ -120,9 +120,9 @@
                                                             }
 
                                                             <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 80px"
-                                                                            Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" @bind-Value="@column.LogicalFilterOperator" />
+                                                                            Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator" Value="@column.LogicalFilterOperator" Change="@(args => column.SetLogicalFilterOperator((LogicalFilterOperator)args))" />
 
-                                                            <RadzenDropDown @onclick:preventDefault="true" Data="@(column.FilterOperators)" TextProperty="Value" ValueProperty="Key" @bind-Value="@column.SecondFilterOperator" />
+                                                            <RadzenDropDown @onclick:preventDefault="true" Data="@(column.FilterOperators)" TextProperty="Value" ValueProperty="Key" TValue="string" Value="@column.SecondFilterOperator" Change="@(args => column.SetSecondFilterOperator($"{args}"))" />
                                                             @if (column.Type == "number")
                                                             {
                                                                 @(DrawNumericFilter(column, false, false))
@@ -699,7 +699,7 @@
             if (!object.Equals(_value, value))
             {
                 _value = value;
-                OnRowSelect(_value);
+                OnRowSelect(_value).Wait();
                 ValueChanged?.Invoke(_value);
             }
         }

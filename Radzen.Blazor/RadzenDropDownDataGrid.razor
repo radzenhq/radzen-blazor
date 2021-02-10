@@ -348,7 +348,7 @@
 
                 if (item != null && (!Multiple ? selectedItem != item : true))
                 {
-                    grid.OnRowSelect(item, false);
+                    await grid.OnRowSelect(item, false);
                 }
             }
             catch (Exception)
@@ -386,7 +386,7 @@
             await InvokeAsync(() =>
             {
                 StateHasChanged();
-                grid.FirstPage(true);
+                grid.FirstPage(true).Wait();
             });
         }
     }
@@ -399,7 +399,7 @@
             previousSearch = searchText;
             _view = null;
             StateHasChanged();
-            grid.FirstPage(true);
+            await grid.FirstPage(true);
         }
     }
 
