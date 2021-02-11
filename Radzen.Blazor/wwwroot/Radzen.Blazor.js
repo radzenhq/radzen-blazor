@@ -118,6 +118,10 @@ window.Radzen = {
           : 'margin-left:0px;';
     }
   },
+  preventDefaultAndStopPropagation: function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  },
   preventArrows: function (el) {
     var preventDefault = function (e) {
       if (e.keyCode === 38 || e.keyCode === 40) {
