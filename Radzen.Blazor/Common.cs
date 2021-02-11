@@ -220,12 +220,6 @@ namespace Radzen
         Info
     }
 
-    public enum DisplayStyle
-    {
-        Block,
-        Contents
-    }
-
     public enum FilterMode
     {
         Simple,

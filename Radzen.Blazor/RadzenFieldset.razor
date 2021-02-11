@@ -79,15 +79,12 @@
     [Parameter]
     public EventCallback Collapse { get; set; }
 
-    [Parameter]
-    public DisplayStyle DisplayStyle { get; set; } = DisplayStyle.Block;
-
-    string contentStyle = "display: block;";
+    string contentStyle = "";
 
     async System.Threading.Tasks.Task Toggle(EventArgs args)
     {
         collapsed = !collapsed;
-        contentStyle = collapsed ? "display: none;" : $"display: {DisplayStyle.ToString().ToLower()};";
+        contentStyle = collapsed ? "display: none;" : "";
 
         if (collapsed)
         {
@@ -118,7 +115,7 @@
 
     protected override Task OnParametersSetAsync()
     {
-        contentStyle = collapsed ? "display: none;" : $"display: {DisplayStyle.ToString().ToLower()};";
+        contentStyle = collapsed ? "display: none;" : "";
 
         return base.OnParametersSetAsync();
     }
