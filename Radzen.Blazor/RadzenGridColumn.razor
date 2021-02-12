@@ -3,6 +3,19 @@
 @implements IDisposable
 @typeparam TItem
 @code {
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.DidParameterChange(nameof(Visible), Visible))
+        {
+            if (Grid != null)
+            {
+                await Grid.Reload();
+            }
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
+
     [Parameter]
     public string Title { get; set; }
 
