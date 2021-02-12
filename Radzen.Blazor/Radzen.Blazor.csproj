@@ -59,7 +59,7 @@
     </Task>
   </UsingTask>
   
-  <Target Name="ToolRestore" BeforeTargets="PreBuildEvent">
+  <Target Name="ToolRestore" BeforeTargets="AfterBuildEvent">
     <Exec Command="dotnet tool restore" StandardOutputImportance="high" />
   </Target>
   <Target Name="PreBuild" AfterTargets="ToolRestore">
