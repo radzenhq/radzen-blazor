@@ -5,7 +5,7 @@ RUN dotnet publish -c Release -o out
 COPY ./northwind.db /app/out
 COPY ./northwind.sql /app/out
 
-ENV ASPNETCORE_URLS http://*:5000;https://*:5001
+ENV ASPNETCORE_URLS http://*:5000
 WORKDIR /app/out
 
 ENTRYPOINT ["dotnet", "RadzenBlazorDemos.dll"]

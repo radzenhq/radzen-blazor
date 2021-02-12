@@ -49,12 +49,6 @@ namespace RadzenBlazorDemos
             {
                 options.MultipartBodyLengthLimit = long.MaxValue;
             });
-
-            services.AddHttpsRedirection(options =>
-            {
-                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                options.HttpsPort = 5001;
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,8 +67,6 @@ namespace RadzenBlazorDemos
                     return next();
                 });
             }
-
-            app.UseHttpsRedirection();
 
             app.UseStaticFiles();
 
