@@ -794,6 +794,11 @@
         }
     }
 
+    internal async Task ChangeState()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
     protected override Task OnParametersSetAsync()
     {
         if (Visible && !LoadData.HasDelegate && _view == null)
