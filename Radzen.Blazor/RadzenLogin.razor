@@ -21,7 +21,7 @@
             <div class="row form-group">
                 <label class="col-sm-3 col-form-label" for="password">@PasswordText</label>
                 <div class="col">
-                    <input name="password" class="rz-textbox" type="password" @bind="@Password" @oninput="@(args => Password = $"{args.Value}")" />
+                    <input name="password" class="rz-textbox" type="password" @bind="@Password" @oninput="@(args => Password = $"{args.Value}")" @onkeypress="@OnPwdKeyPress" />
                     @if (loginClicked && string.IsNullOrEmpty(Password))
                     {
                         <div class="md-inputfield">
@@ -34,7 +34,7 @@
             </div>
             <div class="row form-group">
                 <div class="offset-sm-3 col login-buttons">
-                    <button class="rz-button rz-button-md    btn-primary" type="@(!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password) ? "submit" : "button")" @onclick="@OnLogin">
+                    <button class="rz-button rz-button-md btn-primary" type="@(!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password) ? "submit" : "button")" @onclick="@OnLogin">
                         <span class="rz-button-text" style="">@LoginText</span>
                     </button>
                     @if (AllowResetPassword)
@@ -141,6 +141,15 @@
         if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
         {
             await Login.InvokeAsync(new Radzen.LoginArgs() { Username = Username, Password = Password });
+        }
+    }
+
+    async Task OnPwdKeyPress(KeyboardEventArgs args)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+        if (key == "Enter") 
+        { 
+            await OnLogin(args); 
         }
     }
 
