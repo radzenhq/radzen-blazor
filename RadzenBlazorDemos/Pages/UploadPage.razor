@@ -20,7 +20,7 @@
         <RadzenUpload Multiple="true" Accept="image/*" Url="upload/multiple" Style="margin-bottom: 20px;"
                       Progress=@(args => OnProgress(args, "Images only upload")) />
         <h3 style="margin-top: 1rem">Upload with additional parameter</h3>
-        <RadzenUpload Multiple="true" Accept="image/*" Url=@($"upload/{1}") Style="margin-bottom: 20px;"
+        <RadzenUpload Multiple="true" Accept="image/*" Url=@($"upload/{customParameter}") Style="margin-bottom: 20px;"
                       Progress=@(args => OnProgress(args, "Upload with additional parameter")) />
         <h3 style="margin-top: 1rem">Manual Upload</h3>
         <RadzenUpload @ref="upload" Auto="false" Multiple="true" Url="upload/multiple" Style="margin-bottom: 20px;" Change=@(args => OnChange(args, "Manual Upload"))
@@ -44,6 +44,8 @@
 
     int progress;
     string info;
+
+    int customParameter = 1;
 
     void OnChange(UploadChangeEventArgs args, string name)
     {
