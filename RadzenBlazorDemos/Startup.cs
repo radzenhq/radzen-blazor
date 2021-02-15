@@ -49,6 +49,22 @@ namespace RadzenBlazorDemos
             {
                 options.MultipartBodyLengthLimit = long.MaxValue;
             });
+
+            services.AddLocalization();
+
+            /* --> Uncomment to enable localization
+            var supportedCultures = new[]
+            {
+                new System.Globalization.CultureInfo("de-DE"),
+            };
+
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("de-DE");
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+            });
+            */
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,6 +83,20 @@ namespace RadzenBlazorDemos
                     return next();
                 });
             }
+
+            /* --> Uncomment to enable localization
+            var supportedCultures = new[]
+            {
+                new System.Globalization.CultureInfo("de-DE"),
+            };
+
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("de-DE"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            });
+            */
 
             app.UseStaticFiles();
 
