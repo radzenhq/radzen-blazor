@@ -30,4 +30,14 @@
         base.Dispose();
         SelectBar?.RemoveItem(this);
     }
+
+    internal void SetText(string value)
+    {
+        Text = value;
+    }
+
+    internal void SetValue(object value)
+    {
+        Value = value;
+    }
 }
