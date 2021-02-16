@@ -34,4 +34,14 @@
         base.Dispose();
         CheckBoxList?.RemoveItem(this);
     }
+
+    internal void SetText(string value)
+    {
+        Text = value;
+    }
+
+    internal void SetValue(TValue value)
+    {
+        Value = value;
+    }
 }
