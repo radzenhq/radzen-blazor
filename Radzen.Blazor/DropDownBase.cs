@@ -379,6 +379,22 @@ namespace Radzen
             }
         }
 
+        void SetSelectedIndexFromSelectedItem()
+        {
+            if (selectedItem != null)
+            {
+                var result = Items.Select((x, i) => new { Item = x, Index = i }).FirstOrDefault(itemWithIndex => object.Equals(itemWithIndex.Item, selectedItem));
+                if (result != null)
+                {
+                    selectedIndex = result.Index;
+                }
+            }
+            else
+            {
+                selectedIndex = -1;
+            }
+        }
+
         protected async System.Threading.Tasks.Task SelectItem(object item, bool raiseChange = true)
         {
             if (!Multiple)
@@ -395,20 +411,10 @@ namespace Radzen
                 {
                     Value = item;
                 }
-                SelectedItemChanged?.Invoke(selectedItem);
 
-                if (selectedItem != null)
-                {
-                    var result = Items.Select((x, i) => new { Item = x, Index = i }).FirstOrDefault(itemWithIndex => object.Equals(itemWithIndex.Item, selectedItem));
-                    if (result != null)
-                    {
-                        selectedIndex = result.Index;
-                    }
-                }
-                else
-                {
-                    selectedIndex = -1;
-                }
+                SetSelectedIndexFromSelectedItem();
+
+                SelectedItemChanged?.Invoke(selectedItem);
             }
             else
             {
@@ -470,6 +476,9 @@ namespace Radzen
                     {
                         selectedItem = Value;
                     }
+
+                    SetSelectedIndexFromSelectedItem();
+
                     SelectedItemChanged?.Invoke(selectedItem);
                 }
                 else
