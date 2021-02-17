@@ -30,11 +30,18 @@ namespace Radzen
 
         public event Action<dynamic> OnClose;
 
+        public event Action OnRefresh;
+
         public event Action<string, Type, Dictionary<string, object>, DialogOptions> OnOpen;
 
         public void Open<T>(string title, Dictionary<string, object> parameters = null, DialogOptions options = null) where T : ComponentBase
         {
             OpenDialog<T>(title, parameters, options);
+        }
+
+        public void Refresh()
+        {
+            OnRefresh?.Invoke();
         }
 
         protected List<TaskCompletionSource<dynamic>> tasks = new List<TaskCompletionSource<dynamic>>();
