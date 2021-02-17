@@ -176,6 +176,12 @@ namespace Radzen
         Multiple
     }
 
+    public enum DataGridSelectionMode
+    {
+        Single,
+        Multiple
+    }
+
     public enum NotificationSeverity
     {
         Error,

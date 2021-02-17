@@ -685,10 +685,10 @@
     }
 
 
-    TItem _value;
+    object _value;
 
     [Parameter]
-    public TItem Value
+    public object Value
     {
         get
         {
@@ -699,17 +699,35 @@
             if (!object.Equals(_value, value))
             {
                 _value = value;
-                OnRowSelect(_value).Wait();
+
+                selectedItems.Clear();
+
+                if (_value != null)
+                {
+                    var values = _value as IEnumerable<TItem>;
+                    if (values != null && SelectionMode == DataGridSelectionMode.Multiple)
+                    {
+                        values.Select(i => i.GetHashCode()).ToList().ForEach(hash => selectedItems.Add(hash, true));
+                    }
+                    else
+                    {
+                        selectedItems.Add(_value.GetHashCode(), true);
+                    }
+                }
+
                 ValueChanged?.Invoke(_value);
             }
         }
     }
 
     [Parameter]
-    public Action<TItem> ValueChanged { get; set; }
+    public Action<object> ValueChanged { get; set; }
 
     [Parameter]
     public EventCallback<TItem> RowSelect { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> RowDeselect { get; set; }
 
     [Parameter]
     public EventCallback<TItem> RowDoubleClick { get; set; }
@@ -824,7 +842,7 @@
     {
         var evenOrOdd = index % 2 == 0 ? "rz-datatable-even" : "rz-datatable-odd";
 
-        return RowSelect.HasDelegate && selectedItems.Keys.Contains(item.GetHashCode()) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
+        return (RowSelect.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item.GetHashCode()) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
     }
 
     protected Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item, int index)
@@ -959,20 +977,53 @@
         column.SetFilterOperator(filterOperator);
     }
 
-    internal async System.Threading.Tasks.Task OnRowSelect(TItem item, bool raiseChange = true)
+    [Parameter]
+    public DataGridSelectionMode SelectionMode { get; set; } = DataGridSelectionMode.Single;
+
+    internal async System.Threading.Tasks.Task OnRowSelect(object item, bool raiseChange = true)
     {
-        selectedItems.Clear();
+        if (SelectionMode == DataGridSelectionMode.Single && item != null && selectedItems.Keys.Contains(item.GetHashCode()))
+            return;
+
+        if (SelectionMode == DataGridSelectionMode.Single && selectedItems.Keys.Any())
+        {
+            var itemToDeselect = PagedView.Where(i => !object.Equals(i, item) && selectedItems.Keys.Contains(i.GetHashCode())).FirstOrDefault();
+            if (itemToDeselect != null)
+            {
+                selectedItems.Remove(itemToDeselect.GetHashCode());
+                await RowDeselect.InvokeAsync(itemToDeselect);
+            }
+        }
 
         if (item != null)
         {
-            selectedItems.Add(item.GetHashCode(), true);
+            int hash = item.GetHashCode();
+            if (!selectedItems.Keys.Contains(hash))
+            {
+                selectedItems.Add(hash, true);
+                if (raiseChange)
+                {
+                    await RowSelect.InvokeAsync((TItem)item);
+                }
+            }
+            else
+            {
+                selectedItems.Remove(hash);
+                await RowDeselect.InvokeAsync((TItem)item);
+            }
+        }
+        else
+        {
+            if (raiseChange)
+            {
+                await RowSelect.InvokeAsync((TItem)item);
+            }
         }
 
-        if (raiseChange)
-        {
-            StateHasChanged();
-            await RowSelect.InvokeAsync(item);
-        }
+        var value = PagedView.Where(i => selectedItems.Keys.Contains(i.GetHashCode()));
+
+        _value = SelectionMode == DataGridSelectionMode.Multiple ? (object)value : value.FirstOrDefault();
+        ValueChanged?.Invoke(_value);
     }
 
     public async System.Threading.Tasks.Task SelectRow(TItem item)
@@ -1187,7 +1238,7 @@
             additionalClasses.Add("rz-has-height");
         }
 
-        if (RowSelect.HasDelegate)
+        if (RowSelect.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple)
         {
             additionalClasses.Add("rz-selectable");
         }
