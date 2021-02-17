@@ -27,6 +27,15 @@
                 <RadzenRadioButtonListItem Text="Customers" Value="3" TValue="int?" />
             </Items>
         </RadzenRadioButtonList>
+        <h3 style="margin-top: 2rem">RadioButtonList with items from data</h3>
+        <RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "RadioButtonList with items from data"))
+                            Data="@data" TextProperty="Name" ValueProperty="Id" />
+        <h3 style="margin-top: 2rem">RadioButtonList with declared items and items from data</h3>
+        <RadzenRadioButtonList @bind-Value=@value Data="@data" TextProperty="Name" ValueProperty="Id" TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "RadioButtonList with declared items and items from data"))>
+            <Items>
+                <RadzenRadioButtonListItem Text="Static item" Value="0" />
+            </Items>
+        </RadzenRadioButtonList>
         <h3 style="margin-top: 2rem">Disabled RadioButtonList with initial value</h3>
         <RadzenRadioButtonList @bind-Value=@value Disabled="true" TValue="int">
             <Items>
@@ -43,6 +52,15 @@
 </RadzenExample>
 
 @code {
+    public class MyObject
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    IEnumerable<MyObject> data = new MyObject[] {
+        new MyObject(){ Id = 1 , Name = "Orders"}, new MyObject() { Id = 2 , Name = "Employees"}, new MyObject() { Id = 3 , Name = "Customers" } };
+
     int value = 1;
     int? nullableValue = null;
 

@@ -507,6 +507,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "Multiple selection",
+                    Path = "datagrid-multiple-selection",
+                    Title = "Blazor DataGrid Multiple selection",
+                    Icon = "&#xf0c5",
+                    Tags = new [] { "multiple", "selection", "datagrid", "table", "dataview" }
+                },
+                new Example()
+                {
                     Name = "Conditional styles and templates",
                     Path = "datagrid-conditional-template",
                     Title = "DataGrid conditional template",

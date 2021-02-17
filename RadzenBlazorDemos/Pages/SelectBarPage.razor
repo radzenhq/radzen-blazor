@@ -18,6 +18,15 @@
                 <RadzenSelectBarItem Text="Customers" Value="3" />
             </Items>
         </RadzenSelectBar>
+        <h3 style="margin-top: 2rem">SelectBar with items from data</h3>
+        <RadzenSelectBar @bind-Value=@values TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with items from data"))
+                            Data="@data" TextProperty="Name" ValueProperty="Id" />
+        <h3 style="margin-top: 2rem">SelectBar with declared items and items from data</h3>
+        <RadzenSelectBar @bind-Value=@values Data="@data" TextProperty="Name" ValueProperty="Id" TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with declared items and items from data"))>
+            <Items>
+                <RadzenSelectBarItem Text="Static item" Value="0" />
+            </Items>
+        </RadzenSelectBar>
         <h3 style="margin-top: 2rem">Disabled SelectBar with multiple selection</h3>
         <RadzenSelectBar Disabled="true" @bind-Value=@values TValue="IEnumerable<int>" Multiple="true">
             <Items>
@@ -34,6 +43,15 @@
 </RadzenExample>
 
 @code {
+    public class MyObject
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    IEnumerable<MyObject> data = new MyObject[] {
+        new MyObject(){ Id = 1 , Name = "Orders"}, new MyObject() { Id = 2 , Name = "Employees"}, new MyObject() { Id = 3 , Name = "Customers" } };
+
     bool singleValue = false;
     IEnumerable<int> values = new int[] { 1, 2 };
     EventConsole console;
