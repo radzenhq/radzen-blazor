@@ -48,6 +48,8 @@
                 <div class="col-md-12">
                     <RadzenButton Text="Ok" Click="() => ds.Close(true)" Style="margin-bottom: 10px; width: 150px" />
                     <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary"  Style="margin-bottom: 10px; width: 150px"/>
+                    <RadzenButton Text="Refresh" Click="(() => { orderID = 10249; ds.Refresh(); })" ButtonStyle="ButtonStyle.Info"  Style="margin-bottom: 10px; width: 150px"/>
+                    Order ID: @orderID
                 </div>
             </div>
     </div>);
