@@ -35,7 +35,7 @@
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
-        disabledChanged = parameters.DidParameterChange(nameof(Disabled), Visible);
+        disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
 
         await base.SetParametersAsync(parameters);
 

@@ -88,17 +88,19 @@
     }
 
     private bool visibleChanged = false;
+    private bool disabledChanged = false;
     private bool firstRender = true;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+        disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
 
         await base.SetParametersAsync(parameters);
 
-        if (visibleChanged && !firstRender)
+        if ((visibleChanged || disabledChanged) && !firstRender)
         {
-            if (Visible == false)
+            if (Visible == false || Disabled == true)
             {
                 Dispose();
             }
@@ -111,9 +113,10 @@
 
         this.firstRender = firstRender;
 
-        if (firstRender || visibleChanged)
+        if (firstRender || visibleChanged || disabledChanged)
         {
             visibleChanged = false;
+            disabledChanged = false;
 
             if (Visible)
             {
