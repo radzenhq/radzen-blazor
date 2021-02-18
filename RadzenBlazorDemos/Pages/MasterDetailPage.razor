@@ -19,7 +19,7 @@ else
 {
     <div class="row">
         <div class="col-md-6">
-            <RadzenGrid ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" Data="@orders" TItem="Order" Value="@order" RowSelect="@(args => order = args)">
+            <RadzenGrid ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" Data="@orders" TItem="Order" @bind-Value="@order">
                 <Columns>
                     <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
                     <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
@@ -102,7 +102,23 @@ else
 </RadzenExample>
 
 @code {
-    Order order;
+    dynamic _order;
+    dynamic order
+    {
+        get
+        {
+            return _order;
+        }
+        set
+        {
+            if (_order != value)
+            {
+                _order = value;
+                StateHasChanged();
+            }
+        }
+    }
+
     IQueryable<Order> orders;
 
     protected override void OnInitialized()
