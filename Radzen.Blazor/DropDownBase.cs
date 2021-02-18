@@ -181,7 +181,7 @@ namespace Radzen
             await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, true);
             await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
 
-            if (selectedIndex > 0)
+            if (selectedIndex >= 0)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.focusListItem", search, list, key == "ArrowDown", selectedIndex + (isFromClick ? -1 : 1));
             }
