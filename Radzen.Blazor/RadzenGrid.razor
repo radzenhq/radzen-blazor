@@ -842,7 +842,7 @@
     {
         var evenOrOdd = index % 2 == 0 ? "rz-datatable-even" : "rz-datatable-odd";
 
-        return (RowSelect.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item.GetHashCode()) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
+        return (RowSelect.HasDelegate || ValueChanged != null || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item.GetHashCode()) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
     }
 
     protected Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item, int index)
@@ -1238,7 +1238,7 @@
             additionalClasses.Add("rz-has-height");
         }
 
-        if (RowSelect.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple)
+        if (RowSelect.HasDelegate || ValueChanged != null || SelectionMode == DataGridSelectionMode.Multiple)
         {
             additionalClasses.Add("rz-selectable");
         }
