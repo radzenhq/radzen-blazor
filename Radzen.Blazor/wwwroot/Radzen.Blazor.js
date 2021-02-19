@@ -67,7 +67,7 @@ window.Radzen = {
             return false;
         };
         Radzen[id + 'contextmenu'] = handler;
-        el.addEventListener('contextmenu', handler, true);
+        el.addEventListener('contextmenu', handler, false);
      }
   },
   addMouseEnter: function (id, ref) {
