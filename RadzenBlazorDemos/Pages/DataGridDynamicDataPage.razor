@@ -4,7 +4,7 @@
     <h3>Binding to IEnumerable of IDictionary</h3>
     <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced"
                 AllowPaging="true" PageSize="5" AllowSorting="true" Data="@data" TItem="IDictionary<string, dynamic>"
-                Count="@count" LoadData="@LoadEnumerableOfDictionaryCount">
+                Count="@count" LoadData="@LoadData">
         <Columns>
             <RadzenGridColumn TItem="IDictionary<string, dynamic>" Property="EmployeeID" Title="EmployeeID" Type="integer">
                 <Template>
@@ -28,7 +28,7 @@
     IEnumerable<IDictionary<string, dynamic>> data;
     int count;
 
-    async Task LoadEnumerableOfDictionaryCount(LoadDataArgs args)
+    async Task LoadData(LoadDataArgs args)
     {
         var uri = new Uri("https://services.radzen.com/odata/Northwind/Employees")
             .GetODataUri(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
