@@ -459,6 +459,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "Binding to dynamic data",
+                    Path = "datagrid-dynamic",
+                    Title = "Blazor DataGrid binding dynamic data",
+                    Icon = "&#xe871",
+                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "dynamic" }
+                },
+                new Example()
+                {
                     Name = "Footer Totals",
                     Path = "datagrid-footer-totals",
                     Title = "Blazor DataGrid footer totals",
