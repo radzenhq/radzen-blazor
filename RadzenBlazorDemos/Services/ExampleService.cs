@@ -459,6 +459,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "Binding to dynamic data",
+                    Path = "datagrid-dynamic",
+                    Title = "Blazor DataGrid binding dynamic data",
+                    Icon = "&#xe871",
+                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "dynamic" }
+                },
+                new Example()
+                {
                     Name = "Footer Totals",
                     Path = "datagrid-footer-totals",
                     Title = "Blazor DataGrid footer totals",
@@ -504,6 +512,14 @@ namespace RadzenBlazorDemos
                     Title = "Blazor DataGrid InLine Editing",
                     Icon = "&#xe22b",
                     Tags = new [] { "inline", "editor", "datagrid", "table", "dataview" }
+                },
+                new Example()
+                {
+                    Name = "Multiple selection",
+                    Path = "datagrid-multiple-selection",
+                    Title = "Blazor DataGrid Multiple selection",
+                    Icon = "&#xf0c5",
+                    Tags = new [] { "multiple", "selection", "datagrid", "table", "dataview" }
                 },
                 new Example()
                 {

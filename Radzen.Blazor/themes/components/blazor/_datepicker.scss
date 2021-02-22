@@ -61,6 +61,10 @@ $timepicker-border: none !default;
   }
 }
 
+.rz-calendar-inline {
+  border: $input-border;
+}
+
 .rz-datepicker-trigger {
   box-shadow: none;
   position: absolute;
@@ -122,6 +126,10 @@ $timepicker-border: none !default;
 
 .rz-datepicker-inline {
   position: static;
+
+  .rz-datepicker-group {
+    display: inline-block;
+  }
 }
 
 .rz-datepicker-header {
@@ -242,39 +250,4 @@ $timepicker-border: none !default;
 .rz-second-picker {
   background-color: $timepicker-background-color;
   width: 4rem;
-}
-
-.rz-hour-picker,
-.rz-minute-picker,
-.rz-second-picker {
-  position: relative;
-  background-color: $timepicker-background-color;
-  border-radius: $border-radius;
-  padding: $timepicker-hour-padding;
-  width: 4rem;
-  border: $timepicker-border;
-
-  a {
-    position: absolute;
-    background-color: $timepicker-button-background-color;
-    color: $timepicker-button-color;
-    width: $timepicker-button-width;
-    height: $timepicker-button-height;
-    border-radius: $timepicker-button-border-radius;
-
-    .rzi {
-      font-size: $timepicker-button-height;
-      vertical-align: top;
-    }
-
-    &:first-child {
-      top: 0.25rem;
-      right: 0.3125rem;
-    }
-
-    &:last-child {
-      right: 0.3125rem;
-      bottom: 0.25rem;
-    }
-  }
 }

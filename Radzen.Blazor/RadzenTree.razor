@@ -76,6 +76,7 @@
                         builder.AddAttribute(7, "ChildContent", RenderChildren(grandChildren, depth + 1));
                     }
                 }
+                builder.SetKey(data);
 
                 builder.CloseComponent();
             }
@@ -131,6 +132,7 @@
                     builder.AddAttribute(4, nameof(RadzenTreeItem.Template), args.Children.Template);
                     builder.AddAttribute(5, nameof(RadzenTreeItem.Expanded), args.Children.Expanded(data));
                     builder.AddAttribute(6, nameof(RadzenTreeItem.Selected), args.Children.Selected(data));
+                    builder.SetKey(data);
                     builder.CloseComponent();
                 }
             });

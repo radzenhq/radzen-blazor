@@ -3,6 +3,7 @@
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components.Forms
 @using Radzen;
+@using Radzen.Blazor.Rendering
 @inherits PagedDataBoundComponent<TItem>
 
 @typeparam TItem
@@ -14,8 +15,10 @@
 }
 @if (Visible)
 {
+    var grid = DotNetObjectReference.Create(this);
+    var visibleColumns = columns.Where(c => c.Visible).ToList();
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-    @if (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom)
+    @if (AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
     {
         <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" />
     }
@@ -30,9 +33,9 @@
                             {
                                 <col>
                             }
-                            @foreach (var column in columns.Where(c => c.Visible))
+                            @foreach (var column in visibleColumns)
                             {
-                                <col style="@column.GetStyle()">
+                                <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-col") style="@column.GetStyle()">
                             }
                         </colgroup>
                         <thead class="rz-datatable-thead">
@@ -43,7 +46,8 @@
                                         <span class="rz-column-title"></span>
                                     </th>
                                 }
-                                @foreach (var column in columns.Where(c => c.Visible))
+                                
+                                @foreach (var column in visibleColumns)
                                 {
                                     var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
                                     <th class="@($" rz-unselectable-text {sortableClass} {column.HeaderCssClass}")" scope="col" style="@column.GetStyle(true)">
@@ -73,6 +77,13 @@
                                                     <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
                                                 }
                                             }
+                                            @if (AllowColumnResize)
+                                            {
+                                                var columnIndex = visibleColumns.IndexOf(column);
+                                                <div id="@getColumnResizerId(columnIndex)" style="cursor:col-resize;float:right;"
+                                                     @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                                     @onmousedown=@(args => StartColumnResize(args, columnIndex))>&nbsp;</div>
+                                            }
                                             @if (AllowFiltering && column.Filterable && FilterMode == FilterMode.Advanced)
                                             {
                                                 <i @onclick:stopPropagation="true" onclick="@($"Radzen.togglePopup(this, '{PopupID}{column.GetFilterProperty()}')")"
@@ -88,7 +99,7 @@
                                                         else
                                                         {
                                                             <RadzenLabel Text="@FilterText" class="rz-grid-filter-label" />
-                                                            <RadzenDropDown @onclick:preventDefault="true" Data="@(column.FilterOperators)" TextProperty="Value" ValueProperty="Key" @bind-Value="@column.FilterOperator" />
+                                                            <RadzenDropDown @onclick:preventDefault="true" Data="@(column.FilterOperators)" TextProperty="Value" ValueProperty="Key" TValue="string" Value="@column.FilterOperator" Change="@(args => column.SetFilterOperator($"{args}"))" />
                                                             @if (column.Type == "number")
                                                             {
                                                                 @(DrawNumericFilter(column, false))
@@ -109,9 +120,9 @@
                                                             }
 
                                                             <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 80px"
-                                                                            Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" @bind-Value="@column.LogicalFilterOperator" />
+                                                                            Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator" Value="@column.LogicalFilterOperator" Change="@(args => column.SetLogicalFilterOperator((LogicalFilterOperator)args))" />
 
-                                                            <RadzenDropDown @onclick:preventDefault="true" Data="@(column.FilterOperators)" TextProperty="Value" ValueProperty="Key" @bind-Value="@column.SecondFilterOperator" />
+                                                            <RadzenDropDown @onclick:preventDefault="true" Data="@(column.FilterOperators)" TextProperty="Value" ValueProperty="Key" TValue="string" Value="@column.SecondFilterOperator" Change="@(args => column.SetSecondFilterOperator($"{args}"))" />
                                                             @if (column.Type == "number")
                                                             {
                                                                 @(DrawNumericFilter(column, false, false))
@@ -155,7 +166,7 @@
                                             <span class="rz-column-title"></span>
                                         </th>
                                     }
-                                    @foreach (var column in columns.Where(c => c.Visible))
+                                    @foreach (var column in visibleColumns)
                                     {
                                         <th class="@($" rz-unselectable-text")" tabindex="1" scope="col" style="@column.GetStyle(true)">
                                             @if (AllowFiltering && column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
@@ -262,9 +273,9 @@
                             {
                                 <col>
                             }
-                            @foreach (var column in columns.Where(c => c.Visible))
+                            @foreach (var column in visibleColumns)
                             {
-                                <col style="@column.GetStyle()">
+                                <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-data-col") style="@column.GetStyle()">
                             }
                         </colgroup>
                         <tbody class="rz-datatable-data  rz-datatable-hoverable-rows">
@@ -276,7 +287,6 @@
                                     @foreach (var item in LoadData.HasDelegate ? Data : PagedView)
                                     {
                                         var rowArgs = RowAttributes(item, i);
-                                        var visibleColumns = columns.Where(c => c.Visible).ToList();
 
                                         <RadzenGridRow CssClass="@(RowStyle(item, i))" Attributes="@(rowArgs.Item2)" InEditMode="@IsRowInEditMode(item)">
                                             @if (Template != null)
@@ -400,7 +410,7 @@
                                             @if (Template != null && expandedItems.Keys.Contains(item.GetHashCode()))
                                             {
                                                 <tr class="rz-expanded-row-content">
-                                                    <td colspan="@(columns.Where(c => c.Visible).Count() + 1)">
+                                                    <td colspan="@(visibleColumns.Count + 1)">
                                                         <div class="rz-expanded-row-template">
                                                             @Template(item)
                                                         </div>
@@ -413,7 +423,7 @@
                                 else
                                 {
                                     <tr class=" rz-datatable-emptymessage-row">
-                                        <td class="rz-datatable-emptymessage" colspan="@columns.Where(c => c.Visible).Count()">
+                                        <td class="rz-datatable-emptymessage" colspan="@visibleColumns.Count">
                                             <span>@EmptyText</span>
                                         </td>
                                     </tr>
@@ -433,9 +443,9 @@
                                     {
                                         <col>
                                     }
-                                    @foreach (var column in columns.Where(c => c.Visible))
+                                    @foreach (var column in visibleColumns)
                                     {
-                                        <col style="@column.GetStyle()">
+                                        <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-footer-col") style="@column.GetStyle()">
                                     }
                                 </colgroup>
                                 <tfoot class="rz-datatable-tfoot">
@@ -446,7 +456,7 @@
                                                 <span class="rz-column-title"></span>
                                             </td>
                                         }
-                                        @foreach (var column in columns.Where(c => c.Visible))
+                                        @foreach (var column in visibleColumns)
                                         {
                                             <td class="@($" {column.FooterCssClass}")" style="@column.GetStyle(true)">
                                                 <span class="rz-column-footer">
@@ -466,7 +476,7 @@
             </div>
         </div>
 
-        @if (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom)
+        @if (AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
         {
             <RadzenPager @ref="bottomPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" class="rz-paginator-bottom" />
         }
@@ -620,6 +630,34 @@
     [Parameter]
     public bool AllowFiltering { get; set; }
 
+    [Parameter]
+    public bool AllowColumnResize { get; set; }
+
+    string getColumnResizerId(int columnIndex)
+    {
+        return string.Join("", $"{UniqueID}".Split('.')) + columnIndex;
+    }
+
+    async Task StartColumnResize(MouseEventArgs args, int columnIndex)
+    {
+        await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnResizerId(columnIndex), DotNetObjectReference.Create(this), columnIndex, args.ClientX);
+    }
+
+    [JSInvokable("RadzenGrid.OnColumnResized")]
+    public async Task OnColumnResized(int columnIndex, double value)
+    {
+        var column = this.ColumnsCollection.Where(c => c.Visible).ToList()[columnIndex];
+        column.SetWidth($"{value}px");
+        await ColumnResized.InvokeAsync(new ColumnResizedEventArgs<TItem>
+        {
+            Column = column,
+            Width = value,
+        });
+    }
+
+    [Parameter]
+    public EventCallback<ColumnResizedEventArgs<TItem>> ColumnResized { get; set; }
+
     public override IQueryable<TItem> View
     {
         get
@@ -647,10 +685,10 @@
     }
 
 
-    TItem _value;
+    object _value;
 
     [Parameter]
-    public TItem Value
+    public object Value
     {
         get
         {
@@ -661,17 +699,35 @@
             if (!object.Equals(_value, value))
             {
                 _value = value;
-                OnRowSelect(_value);
+
+                selectedItems.Clear();
+
+                if (_value != null)
+                {
+                    var values = _value as IEnumerable<TItem>;
+                    if (values != null && SelectionMode == DataGridSelectionMode.Multiple)
+                    {
+                        values.Select(i => i.GetHashCode()).ToList().ForEach(hash => selectedItems.Add(hash, true));
+                    }
+                    else
+                    {
+                        selectedItems.Add(_value.GetHashCode(), true);
+                    }
+                }
+
                 ValueChanged?.Invoke(_value);
             }
         }
     }
 
     [Parameter]
-    public Action<TItem> ValueChanged { get; set; }
+    public Action<object> ValueChanged { get; set; }
 
     [Parameter]
     public EventCallback<TItem> RowSelect { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> RowDeselect { get; set; }
 
     [Parameter]
     public EventCallback<TItem> RowDoubleClick { get; set; }
@@ -723,7 +779,7 @@
 
         if (resetColumnFilters)
         {
-            columns.ForEach(c => c.SetFilterValue(null));
+            columns.ForEach(c => { c.SetFilterValue(null); c.SetSecondFilterOperator(null); });
         }
     }
 
@@ -756,6 +812,11 @@
         }
     }
 
+    internal async Task ChangeState()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
     protected override Task OnParametersSetAsync()
     {
         if (Visible && !LoadData.HasDelegate && _view == null)
@@ -781,7 +842,7 @@
     {
         var evenOrOdd = index % 2 == 0 ? "rz-datatable-even" : "rz-datatable-odd";
 
-        return RowSelect.HasDelegate && selectedItems.Keys.Contains(item.GetHashCode()) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
+        return (RowSelect.HasDelegate || ValueChanged != null || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item.GetHashCode()) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
     }
 
     protected Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item, int index)
@@ -916,20 +977,53 @@
         column.SetFilterOperator(filterOperator);
     }
 
-    internal async System.Threading.Tasks.Task OnRowSelect(TItem item, bool raiseChange = true)
+    [Parameter]
+    public DataGridSelectionMode SelectionMode { get; set; } = DataGridSelectionMode.Single;
+
+    internal async System.Threading.Tasks.Task OnRowSelect(object item, bool raiseChange = true)
     {
-        selectedItems.Clear();
+        if (SelectionMode == DataGridSelectionMode.Single && item != null && selectedItems.Keys.Contains(item.GetHashCode()))
+            return;
+
+        if (SelectionMode == DataGridSelectionMode.Single && selectedItems.Keys.Any())
+        {
+            var itemToDeselect = PagedView.Where(i => !object.Equals(i, item) && selectedItems.Keys.Contains(i.GetHashCode())).FirstOrDefault();
+            if (itemToDeselect != null)
+            {
+                selectedItems.Remove(itemToDeselect.GetHashCode());
+                await RowDeselect.InvokeAsync(itemToDeselect);
+            }
+        }
 
         if (item != null)
         {
-            selectedItems.Add(item.GetHashCode(), true);
+            int hash = item.GetHashCode();
+            if (!selectedItems.Keys.Contains(hash))
+            {
+                selectedItems.Add(hash, true);
+                if (raiseChange)
+                {
+                    await RowSelect.InvokeAsync((TItem)item);
+                }
+            }
+            else
+            {
+                selectedItems.Remove(hash);
+                await RowDeselect.InvokeAsync((TItem)item);
+            }
+        }
+        else
+        {
+            if (raiseChange)
+            {
+                await RowSelect.InvokeAsync((TItem)item);
+            }
         }
 
-        if (raiseChange)
-        {
-            StateHasChanged();
-            await RowSelect.InvokeAsync(item);
-        }
+        var value = PagedView.Where(i => selectedItems.Keys.Contains(i.GetHashCode()));
+
+        _value = SelectionMode == DataGridSelectionMode.Multiple ? (object)value : value.FirstOrDefault();
+        ValueChanged?.Invoke(_value);
     }
 
     public async System.Threading.Tasks.Task SelectRow(TItem item)
@@ -997,6 +1091,7 @@
                 if (object.Equals(itemToInsert, item))
                 {
                     await RowCreate.InvokeAsync(item);
+                    itemToInsert = default(TItem);
                 }
                 else
                 {
@@ -1143,7 +1238,7 @@
             additionalClasses.Add("rz-has-height");
         }
 
-        if (RowSelect.HasDelegate)
+        if (RowSelect.HasDelegate || ValueChanged != null || SelectionMode == DataGridSelectionMode.Multiple)
         {
             additionalClasses.Add("rz-selectable");
         }

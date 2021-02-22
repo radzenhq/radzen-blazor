@@ -26,8 +26,9 @@ $splitbutton-border-radius: $input-border-radius !default;
   }
 }
 
-.rz-menu {
+.rz-splitbutton-menu {
   @extend %dropdown-panel;
+  display: none;
   position: absolute;
   min-width: $splitbutton-menu-min-width;
 

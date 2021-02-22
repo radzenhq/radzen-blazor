@@ -4,7 +4,7 @@
 @if (Visible)
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
-        @if (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom)
+        @if (AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
         {
        <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" />
         }
@@ -45,7 +45,7 @@
                 </div>
             }
         }
-        @if (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom)
+        @if (AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
         {
        <RadzenPager @ref="bottomPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" class="rz-paginator-bottom" />
         }
@@ -54,7 +54,7 @@
 @code {
     protected override string GetComponentCssClass()
     {
-        return "rz-datalist-content ";
+        return "rz-datalist-content";
     }
 
     [Parameter]

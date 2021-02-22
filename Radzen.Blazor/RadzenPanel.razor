@@ -16,13 +16,13 @@
                 @if (collapsed)
                 {
                     <a @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler" href="javascript:void(0)" role="tab" id="rz-panel-0-label" aria-controls="rz-panel-0-content" aria-expanded="false">
-                        <span class="rzi  rzi-plus"></span>
+                        <span class="rzi rzi-plus"></span>
                     </a>
                 }
                 else
                 {
                     <a @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler" href="javascript:void(0)" role="tab" id="rz-panel-0-label" aria-controls="rz-panel-0-content" aria-expanded="true">
-                        <span class="rzi  rzi-minus"></span>
+                        <span class="rzi rzi-minus"></span>
                     </a>
                 }
             }
@@ -33,7 +33,7 @@
             </div>
             @if (FooterTemplate != null)
             {
-                <div class="rz-panel-footer ">
+                <div class="rz-panel-footer">
                     @FooterTemplate
                 </div>
             }
@@ -43,7 +43,7 @@
 @code {
     protected override string GetComponentCssClass()
     {
-        return "rz-panel   ";
+        return "rz-panel";
     }
 
     [Parameter]

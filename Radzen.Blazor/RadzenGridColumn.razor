@@ -3,6 +3,19 @@
 @implements IDisposable
 @typeparam TItem
 @code {
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.DidParameterChange(nameof(Visible), Visible))
+        {
+            if (Grid != null)
+            {
+                await Grid.ChangeState();
+            }
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
+
     [Parameter]
     public string Title { get; set; }
 
@@ -274,6 +287,16 @@
     internal void SetSecondFilterOperator(string value)
     {
         SecondFilterOperator = value;
+    }
+
+    internal void SetLogicalFilterOperator(LogicalFilterOperator value)
+    {
+        LogicalFilterOperator = value;
+    }
+
+    internal void SetWidth(string value)
+    {
+        Width = value;
     }
 
     public void Dispose()

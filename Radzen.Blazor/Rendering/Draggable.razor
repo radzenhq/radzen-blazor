@@ -12,15 +12,25 @@
     public EventCallback<DraggableEventArgs> DragStart { get; set; }
 
     [Parameter]
+    public EventCallback<DraggableEventArgs> DragEnd { get; set; }
+
+    [Parameter]
     public EventCallback<DraggableEventArgs> Drag { get; set; }
 
     Rect Rect { get; set; }
 
     bool Touch { get; set; }
 
-    async Task OnMouseUp()
+    async Task OnMouseUp(MouseEventArgs args)
     {
         await JSRuntime.InvokeVoidAsync("Radzen.endDrag", Element);
+
+        await DragEnd.InvokeAsync(new DraggableEventArgs
+        {
+            ClientX = args.ClientX,
+            ClientY = args.ClientY,
+            Rect = Rect
+        });
     }
 
     async Task OnMouseDown(MouseEventArgs args)

@@ -1,4 +1,5 @@
 ﻿@using System.Linq
+@using System.Collections
 @using Radzen
 @using Microsoft.AspNetCore.Components.Forms
 @typeparam TValue
@@ -13,7 +14,7 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-        @foreach (var item in items.Where(i => i.Visible))
+        @foreach (var item in allItems.Where(i => i.Visible))
         {
             <div class="rz-checkbox" @onclick="@(args => SelectItem(item))" @attributes="item.Attributes" style="@item.Style">
                 <div class="rz-chkbox " @onkeypress="@(async args => { if (args.Code == "Space") { await SelectItem(item); } })"  tabindex="@TabIndex">
@@ -41,6 +42,44 @@
 }
 
 @code {
+    [Parameter]
+    public string ValueProperty { get; set; }
+
+    [Parameter]
+    public string TextProperty { get; set; }
+
+    IEnumerable<RadzenCheckBoxListItem<TValue>> allItems
+    {
+        get
+        {
+            return items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
+            {
+                var item = new RadzenCheckBoxListItem<TValue>();
+                item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
+                item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
+                return item;
+            }));
+        }
+    }
+
+    IEnumerable _data = null;
+    [Parameter]
+    public virtual IEnumerable Data
+    {
+        get
+        {
+            return _data;
+        }
+        set
+        {
+            if (_data != value)
+            {
+                _data = value;
+                StateHasChanged();
+            }
+        }
+    }
+
     protected override string GetComponentCssClass()
     {
         var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";

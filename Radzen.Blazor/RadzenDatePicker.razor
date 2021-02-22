@@ -19,9 +19,13 @@
                 <button onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
                     <span aria-hidden="true" class="rz-button-icon-left  rzi rzi-calendar"></span><span class="rz-button-text"></span>
                 </button>
+                @if (AllowClear && HasValue)
+                {
+                    <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@(args => Value = null)" @onclick:stopPropagation="true"></i>
+                }
             </span>
         }
-        <div id="@PopupID" style="@(Inline ? "" : contentStyle);width: 320px;box-sizing: border-box; margin: 0;" class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")">
+        <div id="@PopupID" style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")">
             <div class="rz-datepicker-group">
                 @if (!TimeOnly)
                 {
@@ -88,7 +92,7 @@
             @if (ShowTime)
             {
         <div class="rz-timepicker">
-            <RadzenNumeric Disabled="@Disabled" Value="CurrentDate.Hour" TValue="double" Step="@HoursStep"
+            <RadzenNumeric Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)" TValue="double" Step="@HoursStep"
                            Change="@(async v => {
                                          var step = getStep(StepType.Hours);
                                          if (v == CurrentDate.Hour - step || v == CurrentDate.Hour + step)
@@ -203,6 +207,9 @@
         years = Enumerable.Range(int.Parse(YearRange.Split(':').First()), int.Parse(YearRange.Split(':').Last()) - int.Parse(YearRange.Split(':').First()) + 1)
             .Select(i => new NameValue() { Name = $"{i}", Value = i }).ToList();
     }
+
+    [Parameter]
+    public bool AllowClear { get; set; }
 
     [Parameter]
     public int TabIndex { get; set; } = 0;
@@ -498,7 +505,7 @@
 
     private string getStyle()
     {
-        return $"display: inline-block;{(Style != null ? Style : "")}";
+        return $"display: inline-block;{(Inline ? "overflow:auto;": "")}{(Style != null ? Style : "")}";
     }
 
     public void Close()
@@ -507,6 +514,21 @@
         {
             contentStyle = "display:none;";
             StateHasChanged();
+        }
+    }
+
+    private string PopupStyle
+    {
+        get
+        {
+            if (Inline)
+            {
+                return "white-space: nowrap";
+            }
+            else
+            {
+                return $"width: 320px; {contentStyle}";
+            }
         }
     }
 
@@ -521,7 +543,21 @@
     {
         var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
 
-        return $"{base.GetComponentCssClass()} {fieldCssClass}";
+        var classNames = new List<string>();
+
+        classNames.Add(base.GetComponentCssClass());
+
+        if (Inline)
+        {
+            classNames.Add("rz-calendar-inline");
+        }
+
+        if (!string.IsNullOrEmpty(fieldCssClass))
+        {
+            classNames.Add(fieldCssClass);
+        }
+
+        return string.Join(" ", classNames);
     }
 
     private async System.Threading.Tasks.Task SetDay(DateTime newValue)

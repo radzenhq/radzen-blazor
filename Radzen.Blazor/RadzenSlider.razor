@@ -12,14 +12,14 @@
     <div @ref="Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         @if (Range)
         {
-            <span class="rz-slider-range " style="left: @((MinValue() / Max * 100).ToInvariantString())%; width: @(((MaxValue() / Max * 100) - (MinValue() / Max * 100)).ToInvariantString())%;"></span>
-            <span @ref="minHandle" class="rz-slider-handle   " style="left: @((MinValue() / Max * 100).ToInvariantString())%; bottom: auto;"></span>
-            <span @ref="maxHandle"class="rz-slider-handle    rz-slider-handle-active" style="left: @((MaxValue() / Max * 100).ToInvariantString())%; bottom: auto;"></span>
+            <span class="rz-slider-range" style="left: @((MinValue() / Max * 100).ToInvariantString())%; width: @(((MaxValue() / Max * 100) - (MinValue() / Max * 100)).ToInvariantString())%;"></span>
+            <span @ref="minHandle" class="rz-slider-handle" style="left: @((MinValue() / Max * 100).ToInvariantString())%; bottom: auto;"></span>
+            <span @ref="maxHandle"class="rz-slider-handle rz-slider-handle-active" style="left: @((MaxValue() / Max * 100).ToInvariantString())%; bottom: auto;"></span>
         }
         else
         {
-            <span class="rz-slider-range rz-slider-range-min " style="width: @((MinValue() / Max * 100).ToInvariantString())%;"></span>
-            <span @ref="handle" class="rz-slider-handle   " style="left: @((MinValue() / Max * 100).ToInvariantString())%;"></span>
+            <span class="rz-slider-range rz-slider-range-min" style="width: @((MinValue() / Max * 100).ToInvariantString())%;"></span>
+            <span @ref="handle" class="rz-slider-handle" style="left: @((MinValue() / Max * 100).ToInvariantString())%;"></span>
         }
     </div>
 }
@@ -29,17 +29,19 @@
     ElementReference maxHandle;
 
     private bool visibleChanged = false;
+    private bool disabledChanged = false;
     private bool firstRender = true;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+        disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
 
         await base.SetParametersAsync(parameters);
 
-        if (visibleChanged && !firstRender)
+        if ((visibleChanged || disabledChanged) && !firstRender)
         {
-            if (Visible == false)
+            if (Visible == false || Disabled == true)
             {
                 Dispose();
             }
@@ -52,9 +54,10 @@
 
         this.firstRender = firstRender;
 
-        if (firstRender || visibleChanged)
+        if (firstRender || visibleChanged || disabledChanged)
         {
             visibleChanged = false;
+            disabledChanged = false;
 
             if (Visible && !Disabled)
             {
@@ -149,7 +152,7 @@
 
     protected override string GetComponentCssClass()
     {
-        return $"rz-slider    {(Disabled ? "rz-state-disabled " : "")}rz-slider-horizontal";
+        return $"rz-slider {(Disabled ? "rz-state-disabled " : "")}rz-slider-horizontal";
     }
 
     [Parameter]

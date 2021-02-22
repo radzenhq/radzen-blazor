@@ -176,6 +176,12 @@ namespace Radzen
         Multiple
     }
 
+    public enum DataGridSelectionMode
+    {
+        Single,
+        Multiple
+    }
+
     public enum NotificationSeverity
     {
         Error,
@@ -250,6 +256,12 @@ namespace Radzen
         Left,
         Right,
         Center
+    }
+
+    public class ColumnResizedEventArgs<T>
+    { 
+        public RadzenGridColumn<T> Column { get; internal set; }
+        public double Width { get; internal set; }
     }
 
     public class LoadDataArgs

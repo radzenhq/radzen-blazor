@@ -330,4 +330,6 @@ ASALocalRun/
 .DS_Store
 .vscode
 issues.json
+
+Radzen.Blazor/wwwroot/css/
 project.csproj

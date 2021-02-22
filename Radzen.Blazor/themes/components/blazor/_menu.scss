@@ -127,3 +127,61 @@ $menu-top-item-color: $menu-item-color !default;
     margin: $menu-item-icon-margin;
   }
 }
+
+.rz-menu-toggle-item {
+    display: none;
+    padding: $menu-top-item-padding;
+    text-align: right;
+    width: 100%;
+    height: 100%;
+}
+
+.rz-menu-toggle {
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+
+    &:active {
+      background-color: transparent;
+      color: inherit;
+    }
+}
+
+@media (max-width: 768px) {
+  .rz-menu:not(.rz-profile-menu) {
+    &.rz-menu-closed {
+      .rz-navigation-item {
+        display: none;
+      }
+    }
+
+    .rz-menu-toggle .rzi {
+      margin: 0;
+    }
+
+    &.rz-menu-open {
+      display: block;
+
+      .rz-navigation-item {
+        background-color: inherit;
+      }
+
+      .rz-navigation-menu {
+        position: static;
+        box-shadow: none;
+      }
+    }
+
+    .rz-menu-toggle-item {
+      display: block;
+    }
+
+    .rz-navigation-item-wrapper-active:before {
+      display: none !important;
+    }
+  }
+}

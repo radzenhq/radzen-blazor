@@ -7,7 +7,7 @@
 
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onclick="@(args => OpenPopup("ArrowDown", false, true))" style="@Style" tabindex="@TabIndex" 
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onmousedown="@(args => OpenPopup("ArrowDown", false, true))" style="@Style" tabindex="@TabIndex" 
         @onkeydown="@((args) => OnKeyPress(args))" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" style="width:100%" aria-haspopup="listbox" readonly="" type="text" tabindex="-1"
@@ -91,8 +91,8 @@
                     @if (AllowFiltering)
                     {
                         <div class="rz-multiselect-filter-container">
-                            <input id="@SearchID" tabindex="@TabIndex" class="rz-inputtext   " role="textbox" type="text"
-                                   onclick="(function (e) { e.preventDefault(); e.stopPropagation(); })(event)"
+                            <input id="@SearchID" tabindex="@TabIndex" class="rz-inputtext" role="textbox" type="text"
+                                   onclick="Radzen.preventDefaultAndStopPropagation(event)"
                                    @ref="@search"
                                    @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" />
                             <span class="rz-multiselect-filter-icon rzi rzi-search"></span>
@@ -112,7 +112,7 @@
                             @if (Multiple)
                             {
                                 <li class="@(isSelected(item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")" 
-                                    aria-label="@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)" style="display: block;white-space: nowrap;" @onclick="@(() => OnSelectItem(item))">
+                                    aria-label="@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)" style="display: block;white-space: nowrap;" @onclick:preventDefault @onclick="@(() => OnSelectItem(item))">
                                     <div class="rz-chkbox ">
                                         <div class="@(isSelected(item) ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
                                             <span class="@(isSelected(item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
@@ -132,7 +132,7 @@
                             }
                             else
                             {
-                                <li role="option" class="@(isSelected(item) ? "rz-dropdown-item  rz-state-highlight" : "rz-dropdown-item ")" aria-label=">@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)" @onclick="@(() => OnSelectItem(item))">
+                                <li role="option" class="@(isSelected(item) ? "rz-dropdown-item  rz-state-highlight" : "rz-dropdown-item ")" aria-label=">@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)" @onclick:preventDefault @onclick="@(() => OnSelectItem(item))">
                                     <span>
                                         @if (Template != null)
                                         {
@@ -164,17 +164,19 @@
     public string SelectedItemsText { get; set; } = "items selected";
 
     private bool visibleChanged = false;
+    private bool disabledChanged = false;
     private bool firstRender = true;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+        disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
 
         await base.SetParametersAsync(parameters);
 
-        if (visibleChanged && !firstRender)
+        if ((visibleChanged || disabledChanged) && !firstRender)
         {
-            if (Visible == false)
+            if (Visible == false || Disabled == true)
             {
                 Dispose();
             }
@@ -187,9 +189,10 @@
 
         this.firstRender = firstRender;
 
-        if (firstRender || visibleChanged)
+        if (firstRender || visibleChanged || disabledChanged)
         {
             visibleChanged = false;
+            disabledChanged = false;
 
             if (Visible)
             {

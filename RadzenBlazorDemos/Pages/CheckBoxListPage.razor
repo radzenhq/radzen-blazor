@@ -19,6 +19,15 @@
                 <RadzenCheckBoxListItem Text="Customers" Value="3" />
             </Items>
         </RadzenCheckBoxList>
+        <h3 style="margin-top: 2rem">CheckBoxList with items from data</h3>
+        <RadzenCheckBoxList @bind-Value=@values TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "CheckBoxList with items from data"))
+                            Data="@data" TextProperty="Name" ValueProperty="Id" />
+        <h3 style="margin-top: 2rem">CheckBoxList with declared items and items from data</h3>
+        <RadzenCheckBoxList @bind-Value=@values Data="@data" TextProperty="Name" ValueProperty="Id" TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "CheckBoxList with declared items and items from data"))>
+            <Items>
+                <RadzenCheckBoxListItem Text="Static item" Value="0" />
+            </Items>
+        </RadzenCheckBoxList>
         <h3 style="margin-top: 2rem">Disabled CheckBoxList with vertical orientation</h3>
         <RadzenCheckBoxList @bind-Value=@values Disabled="true" TValue="int" Orientation="Orientation.Vertical">
             <Items>
@@ -35,6 +44,15 @@
 </RadzenExample>
 
 @code {
+    public class MyObject
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    IEnumerable<MyObject> data = new MyObject[] {
+        new MyObject(){ Id = 1 , Name = "Orders"}, new MyObject() { Id = 2 , Name = "Employees"}, new MyObject() { Id = 3 , Name = "Customers" } };
+
     IEnumerable<int> values = new int[] { 1 };
 
     EventConsole console;

@@ -90,7 +90,7 @@
                 }
                 @if (Template != null)
                 {
-                    <RadzenGrid Responsive="@Responsive" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData" 
+                    <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData" 
                                 TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
                         <Columns>
                             <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="string">
@@ -103,7 +103,7 @@
                 }
                 else
                 {
-                    <RadzenGrid Responsive="@Responsive" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData" 
+                    <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData" 
                                 TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
                         <Columns>
                             @if (Columns != null)
@@ -127,6 +127,9 @@
     </div>
 }
 @code {
+    [Parameter]
+    public string ColumnWidth { get; set; }
+
     [Parameter]
     public bool Responsive { get; set; } = true;
 
@@ -192,6 +195,20 @@
         OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize }).Wait();
     }
 
+    private string GetPropertyFilterExpression(string property, string filterCaseSensitivityOperator)
+    {
+        return $"{property}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)";
+    }
+
+    private bool IsColumnFilterPropertyTypeString(RadzenGridColumn<object> column)
+    {
+        var property = column.GetFilterProperty();
+        var itemType = Data != null ? Data.AsQueryable().ElementType : typeof(object);
+        var type = PropertyAccess.GetPropertyType(itemType, property);
+
+        return type == typeof(string);
+    }
+
     async Task OnLoadData(LoadDataArgs args)
     {
         if (!LoadData.HasDelegate)
@@ -205,8 +222,17 @@
             {
                 string filterCaseSensitivityOperator = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
 
-                query = query.Where($"{TextProperty}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)",
-                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                if (AllowFilteringByAllStringColumns)
+                {
+                    query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => IsColumnFilterPropertyTypeString(c))
+                        .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
+                            FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                }
+                else
+                {
+                    query = query.Where($"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
+                        FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                }
             }
 
             if (!string.IsNullOrEmpty(args.OrderBy))
@@ -292,6 +318,9 @@
         await ValueChanged.InvokeAsync((TValue)Value);
         if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
         await Change.InvokeAsync(Value);
+
+        await grid.Reload();
+
         StateHasChanged();
     }
 
@@ -319,7 +348,7 @@
 
                 if (item != null && (!Multiple ? selectedItem != item : true))
                 {
-                    grid.OnRowSelect(item, false);
+                    await grid.OnRowSelect(item, false);
                 }
             }
             catch (Exception)
@@ -357,7 +386,7 @@
             await InvokeAsync(() =>
             {
                 StateHasChanged();
-                grid.FirstPage(true);
+                grid.FirstPage(true).Wait();
             });
         }
     }
@@ -370,7 +399,7 @@
             previousSearch = searchText;
             _view = null;
             StateHasChanged();
-            grid.FirstPage(true);
+            await grid.FirstPage(true);
         }
     }
 
@@ -379,6 +408,9 @@
 
     [Parameter]
     public override bool AllowFiltering { get; set; } = true;
+
+    [Parameter]
+    public bool AllowFilteringByAllStringColumns { get; set; }
 
     [Parameter]
     public int PageSize { get; set; } = 5;

@@ -49,7 +49,8 @@ window.Radzen = {
      var el = document.getElementById(id);
      if (el) {
         var handler = function (e) {
-            e.preventDefault(); e.pa
+            e.stopPropagation();
+            e.preventDefault(); 
             ref.invokeMethodAsync('RadzenComponent.RaiseContextMenu',
                 {
                     ClientX: e.clientX,
@@ -66,7 +67,7 @@ window.Radzen = {
             return false;
         };
         Radzen[id + 'contextmenu'] = handler;
-        el.addEventListener('contextmenu', handler, true);
+        el.addEventListener('contextmenu', handler, false);
      }
   },
   addMouseEnter: function (id, ref) {
@@ -116,6 +117,10 @@ window.Radzen = {
             'px'
           : 'margin-left:0px;';
     }
+  },
+  preventDefaultAndStopPropagation: function (e) {
+    e.preventDefault();
+    e.stopPropagation();
   },
   preventArrows: function (el) {
     var preventDefault = function (e) {
@@ -338,6 +343,33 @@ window.Radzen = {
       el.focus();
     }
   },
+  selectListItem: function (input, ul, index) {
+    if (!input || !ul) return;
+
+    var childNodes = ul.getElementsByTagName('LI');
+
+    var highlighted = ul.querySelectorAll('.rz-state-highlight');
+    if (highlighted.length) {
+      for (var i = 0; i < highlighted.length; i++) {
+        highlighted[i].classList.remove('rz-state-highlight');
+      }
+    }
+
+    ul.nextSelectedIndex = index;
+
+    if (
+      ul.nextSelectedIndex >= 0 &&
+      ul.nextSelectedIndex <= childNodes.length - 1
+    ) {
+      childNodes[ul.nextSelectedIndex].classList.add('rz-state-highlight');
+      if (ul.parentNode.classList.contains('rz-autocomplete-panel')) {
+        ul.parentNode.scrollTop = childNodes[ul.nextSelectedIndex].offsetTop;
+      } else {
+        ul.parentNode.scrollTop =
+          childNodes[ul.nextSelectedIndex].offsetTop - ul.parentNode.offsetTop;
+      }
+    }
+  },
   focusListItem: function (input, ul, isDown, startIndex) {
     if (!input || !ul) return;
 
@@ -350,8 +382,6 @@ window.Radzen = {
     }
 
     ul.nextSelectedIndex = startIndex;
-
-    ul.prevSelectedIndex = ul.nextSelectedIndex;
 
     if (isDown) {
       if (ul.nextSelectedIndex < childNodes.length - 1) {
@@ -384,6 +414,14 @@ window.Radzen = {
     }
 
     return ul.nextSelectedIndex;
+  },
+  uploadInputChange: function (e, url, auto, multiple) {
+      if (auto) {
+          Radzen.upload(e.target, url, multiple, true);
+          e.target.value = '';
+      } else {
+          Radzen.uploadChange(e.target);
+      }
   },
   uploads: function (uploadComponent, id) {
     if (!Radzen.uploadComponents) {
@@ -653,14 +691,16 @@ window.Radzen = {
     }
 
     Radzen[id] = function (e) {
-        if (parent) {
-            if (!parent.contains(e.target) && !popup.contains(e.target) && !Radzen.containsTarget(e.target)) {
-                Radzen.closePopup(id, instance, callback);
+        if (!e.defaultPrevented) {
+          if (parent) {
+            if (!parent.contains(e.target) && !popup.contains(e.target)) {
+              Radzen.closePopup(id, instance, callback);
             }
-        } else {
+          } else {
             if (!popup.contains(e.target)) {
-                Radzen.closePopup(id, instance, callback);
+              Radzen.closePopup(id, instance, callback);
             }
+          }
         }
     };
 
@@ -672,14 +712,6 @@ window.Radzen = {
         document.removeEventListener('contextmenu', Radzen[id]);
         document.addEventListener('contextmenu', Radzen[id]);
     }
-  },
-  containsTarget: function (target) {
-    for (var i = 0; i < document.body.children.length; i++) {
-      if (document.body.children[i].classList.contains('rz-popup') && document.body.children[i].contains(target)) {
-          return true;
-      }
-    }
-    return false;
   },
   closePopup: function (id, instance, callback) {
     var popup = document.getElementById(id);
@@ -1059,8 +1091,11 @@ window.Radzen = {
     document.addEventListener('touchend', ref.mouseUpHandler, { passive: true });
     return Radzen.clientRect(ref);
   },
-  clientRect: function (ref) {
-    var rect = ref.getBoundingClientRect();
+  clientRect: function (arg) {
+    var el = arg instanceof Element || arg instanceof HTMLDocument
+        ? arg
+        : document.getElementById(arg);
+    var rect = el.getBoundingClientRect();
     return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
   },
   endDrag: function (ref) {
@@ -1069,4 +1104,55 @@ window.Radzen = {
     document.removeEventListener('touchmove', ref.touchMoveHandler)
     document.removeEventListener('touchend', ref.mouseUpHandler);
   },
+  startColumnResize: function(id, grid, columnIndex, clientX) {
+      var el = document.getElementById(id);
+      var cell = el.parentNode.parentNode;
+      var col = document.getElementById(id + '-col');
+      var dataCol = document.getElementById(id + '-data-col');
+      var footerCol = document.getElementById(id + '-footer-col');
+      Radzen[el] = {
+          clientX: clientX,
+          width: cell.getBoundingClientRect().width,
+          mouseUpHandler: function (e) {
+              if (Radzen[el]) {
+                  grid.invokeMethodAsync(
+                      'RadzenGrid.OnColumnResized',
+                      columnIndex,
+                      cell.getBoundingClientRect().width
+                  );
+                  document.removeEventListener('mousemove', Radzen[el].mouseMoveHandler);
+                  document.removeEventListener('mouseup', Radzen[el].mouseUpHandler);
+                  document.removeEventListener('touchmove', Radzen[el].touchMoveHandler)
+                  document.removeEventListener('touchend', Radzen[el].mouseUpHandler);
+                  Radzen[el] = null;
+              }
+          },
+          mouseMoveHandler: function (e) {
+              if (Radzen[el]) {
+                  var width = (Radzen[el].width - (Radzen[el].clientX - e.clientX)) + 'px';
+                  if (cell) {
+                      cell.style.width = width;
+                  }
+                  if (col) {
+                      col.style.width = width;
+                  }
+                  if (dataCol) {
+                      dataCol.style.width = width;
+                  }
+                  if (footerCol) {
+                      footerCol.style.width = width;
+                  }
+              }
+          },
+          touchMoveHandler: function (e) {
+              if (e.targetTouches[0]) {
+                  Radzen[el].mouseMoveHandler(e.targetTouches[0]);
+              }
+          }
+      };
+      document.addEventListener('mousemove', Radzen[el].mouseMoveHandler);
+      document.addEventListener('mouseup', Radzen[el].mouseUpHandler);
+      document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: true })
+      document.addEventListener('touchend', Radzen[el].mouseUpHandler, { passive: true });
+  }
 };
