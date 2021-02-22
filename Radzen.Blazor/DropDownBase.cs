@@ -181,10 +181,7 @@ namespace Radzen
             await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, true);
             await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
 
-            if (selectedIndex >= 0)
-            {
-                await JSRuntime.InvokeVoidAsync("Radzen.focusListItem", search, list, key == "ArrowDown", selectedIndex + (isFromClick ? -1 : 1));
-            }
+            await JSRuntime.InvokeVoidAsync("Radzen.selectListItem", search, list, selectedIndex);
         }
 
         private async System.Threading.Tasks.Task HandleKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args, bool isFilter = false)

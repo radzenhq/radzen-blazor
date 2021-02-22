@@ -343,6 +343,33 @@ window.Radzen = {
       el.focus();
     }
   },
+  selectListItem: function (input, ul, index) {
+    if (!input || !ul) return;
+
+    var childNodes = ul.getElementsByTagName('LI');
+
+    var highlighted = ul.querySelectorAll('.rz-state-highlight');
+    if (highlighted.length) {
+      for (var i = 0; i < highlighted.length; i++) {
+        highlighted[i].classList.remove('rz-state-highlight');
+      }
+    }
+
+    ul.nextSelectedIndex = index;
+
+    if (
+      ul.nextSelectedIndex >= 0 &&
+      ul.nextSelectedIndex <= childNodes.length - 1
+    ) {
+      childNodes[ul.nextSelectedIndex].classList.add('rz-state-highlight');
+      if (ul.parentNode.classList.contains('rz-autocomplete-panel')) {
+        ul.parentNode.scrollTop = childNodes[ul.nextSelectedIndex].offsetTop;
+      } else {
+        ul.parentNode.scrollTop =
+          childNodes[ul.nextSelectedIndex].offsetTop - ul.parentNode.offsetTop;
+      }
+    }
+  },
   focusListItem: function (input, ul, isDown, startIndex) {
     if (!input || !ul) return;
 
@@ -355,8 +382,6 @@ window.Radzen = {
     }
 
     ul.nextSelectedIndex = startIndex;
-
-    ul.prevSelectedIndex = ul.nextSelectedIndex;
 
     if (isDown) {
       if (ul.nextSelectedIndex < childNodes.length - 1) {
