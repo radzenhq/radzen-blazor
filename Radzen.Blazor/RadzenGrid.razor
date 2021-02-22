@@ -779,7 +779,7 @@
 
         if (resetColumnFilters)
         {
-            columns.ForEach(c => c.SetFilterValue(null));
+            columns.ForEach(c => { c.SetFilterValue(null); c.SetSecondFilterOperator(null); });
         }
     }
 
