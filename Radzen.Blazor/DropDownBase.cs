@@ -445,7 +445,7 @@ namespace Radzen
             }
             if (raiseChange)
             {
-                await ValueChanged.InvokeAsync((T)Value);
+                await ValueChanged.InvokeAsync(object.Equals(Value, null) ? default(T) : (T)Value);
                 if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
                 await Change.InvokeAsync(Value);
             }
