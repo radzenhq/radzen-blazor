@@ -21,7 +21,7 @@
                 </button>
                 @if (AllowClear && HasValue)
                 {
-                    <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@(args => Value = null)" @onclick:stopPropagation="true"></i>
+                    <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
                 }
             </span>
         }
@@ -410,6 +410,21 @@
             await Change.InvokeAsync(DateTimeValue);
             StateHasChanged();
         }
+    }
+
+    async Task Clear()
+    {
+        Value = null;
+
+        await ValueChanged.InvokeAsync(default(TValue));
+
+        if (FieldIdentifier.FieldName != null)
+        {
+            EditContext?.NotifyFieldChanged(FieldIdentifier);
+        }
+
+        await Change.InvokeAsync(DateTimeValue);
+        StateHasChanged();
     }
 
     [Parameter]
