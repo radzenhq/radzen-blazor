@@ -367,7 +367,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <td @onclick="@(() => OnRowSelect(item))"
+                                                    <td @onclick="@(() => OnRowClick(item))"
                                                         @ondblclick="@(() => OnRowDblClick(item))"
                                                         style="@column.GetStyle(true)" class="@column.CssClass" @attributes="@(cellAttr)">
                                                         @if (Responsive)
@@ -730,6 +730,9 @@
     public EventCallback<TItem> RowDeselect { get; set; }
 
     [Parameter]
+    public EventCallback<TItem> RowClick { get; set; }
+
+    [Parameter]
     public EventCallback<TItem> RowDoubleClick { get; set; }
 
     [Parameter]
@@ -979,6 +982,12 @@
 
     [Parameter]
     public DataGridSelectionMode SelectionMode { get; set; } = DataGridSelectionMode.Single;
+
+    async Task OnRowClick(object item)
+    {
+        await RowClick.InvokeAsync((TItem)item);
+        await OnRowSelect(item);
+    }
 
     internal async System.Threading.Tasks.Task OnRowSelect(object item, bool raiseChange = true)
     {
