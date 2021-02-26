@@ -430,17 +430,17 @@ $grid-button-line-height: $grid-button-height !default;
     display: flex;
     flex: auto;
     align-items: center;
-  }
 
-  .rzi {
-    width: $grid-filter-icon-width;
-    height: $grid-filter-icon-height;
-    font-size: $grid-filter-font-size;
-    margin: $grid-filter-icon-margin;
-    color: $grid-filter-color;
+    > .rzi {
+      width: $grid-filter-icon-width;
+      height: $grid-filter-icon-height;
+      font-size: $grid-filter-font-size;
+      margin: $grid-filter-icon-margin;
+      color: $grid-filter-color;
 
-    &.rz-cell-filter-clear {
-      margin-left: auto;
+      &.rz-cell-filter-clear {
+        margin-left: auto;
+      }
     }
   }
 
