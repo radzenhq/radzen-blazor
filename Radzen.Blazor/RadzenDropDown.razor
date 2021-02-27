@@ -80,7 +80,7 @@
             @if (Multiple)
             {
                 <div class=" rz-multiselect-header rz-helper-clearfix" @onclick="@SelectAll">
-                    <div class="rz-chkbox ">
+                    <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)">
                         <div class="rz-helper-hidden-accessible">
                             <input readonly="readonly" type="checkbox">
                         </div>
@@ -88,6 +88,10 @@
                             <span class="@(View != null && selectedItems.Count == View.Cast<object>().Count() ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
                         </div>
                     </div>
+                    @if (!AllowFiltering && !string.IsNullOrEmpty(SelectAllText))
+                    { 
+                        @SelectAllText
+                    }
                     @if (AllowFiltering)
                     {
                         <div class="rz-multiselect-filter-container">
@@ -162,6 +166,9 @@
 
     [Parameter]
     public string SelectedItemsText { get; set; } = "items selected";
+
+    [Parameter]
+    public string SelectAllText { get; set; }
 
     private bool visibleChanged = false;
     private bool disabledChanged = false;
