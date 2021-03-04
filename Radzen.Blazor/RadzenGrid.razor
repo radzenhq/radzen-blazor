@@ -89,7 +89,7 @@
                                                 <i @onclick:stopPropagation="true" onclick="@($"Radzen.togglePopup(this, '{PopupID}{column.GetFilterProperty()}')")"
                                                    class="@getFilterIconCss(column)" />
 
-                                                <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel    "
+                                                <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel"
                                                      style="display:none;min-width:250px;" tabindex="0">
                                                     <div class="rz-grid-filter rz-overlaypanel-content">
                                                         @if (column.FilterTemplate != null)

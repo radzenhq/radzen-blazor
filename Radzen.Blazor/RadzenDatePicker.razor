@@ -25,7 +25,7 @@
                 }
             </span>
         }
-        <div id="@PopupID" style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")">
+        <div id="@PopupID" style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")" @onclick:preventDefault="true">
             <div class="rz-datepicker-group">
                 @if (!TimeOnly)
                 {

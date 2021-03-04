@@ -274,7 +274,7 @@
 
     internal void SetFilterValue(object value, bool isFirst = true)
     {
-        if (Format == "date-time-offset" && value != null)
+        if (Format == "date-time-offset" && value != null && value is DateTime?)
         {
             DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)value, DateTimeKind.Utc);
             value = offset;
