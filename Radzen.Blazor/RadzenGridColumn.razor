@@ -201,6 +201,11 @@
                             Type = "string";
                             Format = "date-time";
                         }
+                        else if (_filterPropertyType == typeof(DateTimeOffset) || _filterPropertyType == typeof(DateTimeOffset?))
+                        {
+                            Type = "string";
+                            Format = "date-time-offset";
+                        }
                         else if (_filterPropertyType == typeof(Guid) || _filterPropertyType == typeof(Guid?))
                         {
                             Type = "string";
@@ -269,6 +274,12 @@
 
     internal void SetFilterValue(object value, bool isFirst = true)
     {
+        if (Format == "date-time-offset" && value != null)
+        {
+            DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)value, DateTimeKind.Utc);
+            value = offset;
+        }
+
         if (isFirst)
         {
             FilterValue = value;

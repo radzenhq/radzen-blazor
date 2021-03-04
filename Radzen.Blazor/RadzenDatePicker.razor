@@ -266,12 +266,22 @@
             if (_value != value)
             {
                 _value = value;
-                DateTimeValue = value as DateTime?;
 
-                if (DateTimeValue.HasValue && DateTimeValue.Value == default(DateTime))
+                DateTimeOffset? offset = value as DateTimeOffset?;
+                if (offset != null && offset.HasValue)
                 {
-                    _value = null;
-                    _dateTimeValue = null;
+                    _dateTimeValue = offset.Value.DateTime;
+                    _value = _dateTimeValue;
+                }
+                else
+                {
+                    DateTimeValue = value as DateTime?;
+
+                    if (DateTimeValue.HasValue && DateTimeValue.Value == default(DateTime))
+                    {
+                        _value = null;
+                        _dateTimeValue = null;
+                    }
                 }
             }
         }
@@ -549,9 +559,19 @@
 
     async System.Threading.Tasks.Task OnChange()
     {
-        await ValueChanged.InvokeAsync((TValue)Value);
+        if ((typeof(TValue) == typeof(DateTimeOffset) || typeof(TValue) == typeof(DateTimeOffset?)) && Value != null)
+        {
+            DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)Value, DateTimeKind.Utc);
+            await ValueChanged.InvokeAsync((TValue)(object)offset);
+        }
+        else
+        {
+            await ValueChanged.InvokeAsync((TValue)Value);
+        }
+
         if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
         await Change.InvokeAsync(DateTimeValue);
+
     }
 
     protected override string GetComponentCssClass()

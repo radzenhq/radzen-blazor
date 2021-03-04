@@ -104,7 +104,7 @@
                                                             {
                                                                 @(DrawNumericFilter(column, false))
                                                             }
-                                                            else if (column.Type == "string" && column.Format == "date-time")
+                                                            else if (column.Type == "string" && (column.Format == "date-time" || column.Format == "date-time-offset"))
                                                             {
                                                                 <RadzenDatePicker TValue="@object" ShowTime="true" ShowTimeOkButton="true" DateFormat="@getFilterDateFormat(column)"
                                                                                   Value="@column.FilterValue" Change="@(args => column.SetFilterValue(args.Value))" />
@@ -127,7 +127,7 @@
                                                             {
                                                                 @(DrawNumericFilter(column, false, false))
                                                             }
-                                                            else if (column.Type == "string" && column.Format == "date-time")
+                                                            else if (column.Type == "string" && (column.Format == "date-time" || column.Format == "date-time-offset"))
                                                             {
                                                                 <RadzenDatePicker TValue="@object"
                                                                                   ShowTime="true" ShowTimeOkButton="true" DateFormat="@getFilterDateFormat(column)"
@@ -992,7 +992,14 @@
     internal async System.Threading.Tasks.Task OnRowSelect(object item, bool raiseChange = true)
     {
         if (SelectionMode == DataGridSelectionMode.Single && item != null && selectedItems.Keys.Contains(item.GetHashCode()))
+        {
+            // Legacy RowSelect raise
+            if (raiseChange)
+            {
+                await RowSelect.InvokeAsync((TItem)item);
+            }
             return;
+        }
 
         if (SelectionMode == DataGridSelectionMode.Single && selectedItems.Keys.Any())
         {
