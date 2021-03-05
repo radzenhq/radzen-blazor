@@ -14,6 +14,13 @@
         <RadzenDropDown AllowClear="true" TValue="string"
                         Data=@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())
                         TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown")) />
+        <h3 style="margin-top: 2rem">Disabled DropDown</h3>
+        <div style="display: flex; align-items: center">
+            <RadzenDropDown Disabled=@disabled AllowClear="true" TValue="string"
+                            Data=@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())
+                            TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown")) />
+            <RadzenSwitch style="margin-left: 1rem" @bind-Value=@disabled />
+        </div>
         <h3 style="margin-top: 2rem">DropDown with custom filter operator</h3>
         <RadzenDropDown AllowClear="true" TValue="string"
                         FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
@@ -48,6 +55,7 @@
 </RadzenExample>
 
 @code {
+    bool disabled = true;
     IEnumerable<Customer> customers;
     IEnumerable<Customer> customCustomersData;
     IEnumerable<Product> products;

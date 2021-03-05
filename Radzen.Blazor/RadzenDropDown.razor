@@ -181,9 +181,9 @@
 
         await base.SetParametersAsync(parameters);
 
-        if ((visibleChanged || disabledChanged) && !firstRender)
+        if (visibleChanged && !firstRender)
         {
-            if (Visible == false || Disabled == true)
+            if (Visible == false)
             {
                 Dispose();
             }
