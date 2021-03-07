@@ -113,7 +113,7 @@
 
             if (Visible)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.uploads", DotNetObjectReference.Create(this), Id);
+                await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Id);
             }
         }
     }

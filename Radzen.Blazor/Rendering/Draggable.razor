@@ -37,7 +37,7 @@
     {
         if (!Touch)
         {
-            Rect = await JSRuntime.InvokeAsync<Rect>("Radzen.startDrag", Element, DotNetObjectReference.Create(this), nameof(OnMove));
+            Rect = await JSRuntime.InvokeAsync<Rect>("Radzen.startDrag", Element, Reference, nameof(OnMove));
 
             await DragStart.InvokeAsync(new DraggableEventArgs 
             {

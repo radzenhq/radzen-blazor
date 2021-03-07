@@ -309,7 +309,7 @@
     {
         if (firstRender)
         {
-            var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createScheduler", Element, DotNetObjectReference.Create(this));
+            var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createScheduler", Element, Reference);
 
             if (!heightIsSet)
             {

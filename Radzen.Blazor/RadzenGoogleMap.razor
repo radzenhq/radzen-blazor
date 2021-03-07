@@ -79,7 +79,7 @@
 
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, DotNetObjectReference.Create(this), UniqueID, ApiKey, Zoom, Center,
+            await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center,
                  data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }));
         }
         else
