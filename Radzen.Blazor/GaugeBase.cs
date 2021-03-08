@@ -31,7 +31,7 @@ namespace Radzen.Blazor
 
                 if (Visible)
                 {
-                    var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createGauge", Element, DotNetObjectReference.Create(this));
+                    var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createGauge", Element, Reference);
 
                     if (!widthAndHeightAreSet)
                     {

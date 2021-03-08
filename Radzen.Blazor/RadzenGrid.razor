@@ -15,7 +15,7 @@
 }
 @if (Visible)
 {
-    var grid = DotNetObjectReference.Create(this);
+    var grid = Reference;
     var visibleColumns = columns.Where(c => c.Visible).ToList();
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     @if (AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
@@ -640,7 +640,7 @@
 
     async Task StartColumnResize(MouseEventArgs args, int columnIndex)
     {
-        await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnResizerId(columnIndex), DotNetObjectReference.Create(this), columnIndex, args.ClientX);
+        await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnResizerId(columnIndex), Reference, columnIndex, args.ClientX);
     }
 
     [JSInvokable("RadzenGrid.OnColumnResized")]

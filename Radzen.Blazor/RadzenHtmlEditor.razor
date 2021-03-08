@@ -146,7 +146,7 @@
 
             if (Visible)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.createEditor", ContentEditable, UploadUrl, Paste.HasDelegate, DotNetObjectReference.Create(this));
+                await JSRuntime.InvokeVoidAsync("Radzen.createEditor", ContentEditable, UploadUrl, Paste.HasDelegate, Reference);
             }
         }
 

@@ -309,7 +309,7 @@
 
             if (Visible)
             {
-                var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createChart", Element, DotNetObjectReference.Create(this));
+                var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createChart", Element, Reference);
 
                 if (!widthAndHeightAreSet)
                 {

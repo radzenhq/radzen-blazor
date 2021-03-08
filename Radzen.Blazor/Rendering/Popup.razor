@@ -24,7 +24,7 @@
             await Open.InvokeAsync(null);
         }
 
-        await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", target, GetId(), false, DotNetObjectReference.Create(this), nameof(OnClose));
+        await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", target, GetId(), false, Reference, nameof(OnClose));
     }
 
     [JSInvokable]
@@ -37,7 +37,7 @@
 
     public async Task CloseAsync()
     {
-        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", GetId(), DotNetObjectReference.Create(this), nameof(OnClose));
+        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", GetId(), Reference, nameof(OnClose));
     }
 
     public override void Dispose()

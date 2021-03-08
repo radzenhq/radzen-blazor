@@ -61,7 +61,7 @@
 
             if (Visible && !Disabled)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.createSlider", UniqueID, DotNetObjectReference.Create(this), Element, Range, Range ? minHandle : handle, maxHandle, Min, Max, Value, Step);
+                await JSRuntime.InvokeVoidAsync("Radzen.createSlider", UniqueID, Reference, Element, Range, Range ? minHandle : handle, maxHandle, Min, Max, Value, Step);
 
                 StateHasChanged();
             }
