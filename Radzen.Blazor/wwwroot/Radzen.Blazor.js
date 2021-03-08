@@ -746,11 +746,11 @@ window.Radzen = {
       (e.target.scrollLeft ? '-' + e.target.scrollLeft : 0) + 'px';
 
       e.target.previousElementSibling.style.marginLeft = scrollLeft;
-      e.target.previousElementSibling.style.marginRight =
+      e.target.previousElementSibling.style.paddingRight =
           e.target.clientHeight < e.target.scrollHeight ? (e.target.offsetWidth - e.target.clientWidth) + 'px' : '0px';
 
     if (e.target.nextElementSibling) {
-      e.target.nextElementSibling.style.marginLeft = scrollLeft;
+      e.target.nextElementSibling.style.paddingRight = scrollLeft;
     }
 
     for (var i = 0; i < document.body.children.length; i++) {
