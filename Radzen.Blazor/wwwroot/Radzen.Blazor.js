@@ -745,7 +745,9 @@ window.Radzen = {
     var scrollLeft =
       (e.target.scrollLeft ? '-' + e.target.scrollLeft : 0) + 'px';
 
-    e.target.previousElementSibling.style.marginLeft = scrollLeft;
+      e.target.previousElementSibling.style.marginLeft = scrollLeft;
+      e.target.previousElementSibling.style.marginRight =
+          e.target.clientHeight < e.target.scrollHeight ? (e.target.offsetWidth - e.target.clientWidth) + 'px' : '0px';
 
     if (e.target.nextElementSibling) {
       e.target.nextElementSibling.style.marginLeft = scrollLeft;
