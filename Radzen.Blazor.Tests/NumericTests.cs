@@ -1,6 +1,4 @@
 using Bunit;
-using Bunit.JSInterop;
-using System;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -47,7 +45,8 @@ namespace Radzen.Blazor.Tests
             var minValue = 2;
             var raised = false;
 
-            component.SetParametersAndRender(parameters => {
+            component.SetParametersAndRender(parameters =>
+            {
                 component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; }));
                 parameters.Add<decimal?>(p => p.Min, minValue);
             });
@@ -69,7 +68,8 @@ namespace Radzen.Blazor.Tests
             var maxValue = 10;
             var raised = false;
 
-            component.SetParametersAndRender(parameters => {
+            component.SetParametersAndRender(parameters =>
+            {
                 component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; }));
                 parameters.Add<double>(p => p.Value, maxValue);
                 parameters.Add<decimal?>(p => p.Max, maxValue);
@@ -248,17 +248,18 @@ namespace Radzen.Blazor.Tests
             var expectedValue = 5.5;
             object newValue = null;
 
-            component.SetParametersAndRender(parameters => {
+            component.SetParametersAndRender(parameters =>
+            {
                 parameters.Add<double>(p => p.Value, value);
                 parameters.Add(p => p.Step, "2");
-                parameters.Add(p => p.Change, args => { raised = true; newValue = args; }); 
+                parameters.Add(p => p.Change, args => { raised = true; newValue = args; });
             });
 
             component.Find(".rz-spinner-up").Click();
 
             Assert.True(raised, "Numeric Change should be raised on step up");
             Assert.True(object.Equals(expectedValue, newValue), $"Numeric value should be incremented on step up. Expected value: {expectedValue}, value: {newValue}");
-            
+
             raised = false;
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.ValueChanged, args => { raised = true; }));
@@ -282,7 +283,8 @@ namespace Radzen.Blazor.Tests
             var expectedValue = 1.5;
             object newValue = null;
 
-            component.SetParametersAndRender(parameters => {
+            component.SetParametersAndRender(parameters =>
+            {
                 parameters.Add<double>(p => p.Value, value);
                 parameters.Add(p => p.Step, "2");
                 parameters.Add(p => p.Change, args => { raised = true; newValue = args; });
@@ -300,6 +302,34 @@ namespace Radzen.Blazor.Tests
             component.Find(".rz-spinner-down").Click();
 
             Assert.True(raised, "Numeric ValueChanged should be raised on step up");
+        }
+
+        [Fact]
+        public void Numeric_UpDown_Rendered()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenNumeric<double>>();
+
+            component.Render();
+
+            Assert.Contains(@$"rz-spinner-button-icon", component.Markup);
+            Assert.Contains(@$"rz-spinner-up", component.Markup);
+            Assert.Contains(@$"rz-spinner-down", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_UpDown_NotRenderedIfHidden()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenNumeric<double>>(ComponentParameter.CreateParameter(nameof(RadzenNumeric<double>.ShowUpDown), false));
+
+            component.Render();
+
+            Assert.DoesNotContain(@$"rz-spinner-button-icon", component.Markup);
+            Assert.DoesNotContain(@$"rz-spinner-up", component.Markup);
+            Assert.DoesNotContain(@$"rz-spinner-down", component.Markup);
         }
     }
 }

@@ -11,7 +11,8 @@
                class="rz-spinner-input rz-inputtext" tabindex="@TabIndex"
                placeholder="@Placeholder" autocomplete="@(AutoComplete ? "on" : "off")" value="@Value" @onchange="@OnChange"
                onkeypress="Radzen.numericKeyPress(event)" onpaste="Radzen.numericOnPaste(event)" />
-
+        @if (ShowUpDown)
+        {
         <button type="button" class="rz-spinner-button rz-spinner-up rz-corner-tr rz-button" tabindex="-1"
                 @onclick="@((args) => UpdateValueWithStep(true))">
             <span class="rz-spinner-button-icon rzi rzi-caret-up"></span>
@@ -20,6 +21,7 @@
                 @onclick="@((args) => UpdateValueWithStep(false))">
             <span class="rz-spinner-button-icon rzi rzi-caret-down"></span>
         </button>
+        }
     </span>
 }
 @code {
@@ -114,6 +116,9 @@
 
     [Parameter]
     public bool AutoComplete { get; set; } = true;
+
+    [Parameter]
+    public bool ShowUpDown { get; set; } = true;
 
     protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
     {

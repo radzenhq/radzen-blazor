@@ -13,6 +13,8 @@
             <RadzenNumeric TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" Change=@(args => OnChange(args, "Nullable numeric")) />
             <h3 style="margin-top: 2rem">Disabled numeric</h3>
             <RadzenNumeric Disabled="true" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" />
+            <h3 style="margin-top: 2rem">Without Up/Down</h3>
+            <RadzenNumeric ShowUpDown="false" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" />
         </div>
         <div class="col-xl-6">
             <EventConsole @ref=@console />
