@@ -127,7 +127,7 @@
 
         decimal? newValueAsDecimal = newValue == null ? default(decimal?) : (decimal)ConvertType.ChangeType(newValue, typeof(decimal));
 
-        if (object.Equals(Value, newValue))
+        if (object.Equals(Value, newValue) && !ValueChanged.HasDelegate)
         {
             await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, Value);
             return;
@@ -144,7 +144,10 @@
         }
 
         Value = (TValue)ConvertType.ChangeType(newValueAsDecimal, typeof(TValue));
-        await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, Value);
+        if (!ValueChanged.HasDelegate)
+        {
+            await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, Value);
+        }
 
         await ValueChanged.InvokeAsync(Value);
         if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
