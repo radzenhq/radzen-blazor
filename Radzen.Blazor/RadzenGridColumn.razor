@@ -231,9 +231,11 @@
     {
         var style = new List<string>();
 
-        if (Width != null)
+        var width = GetWidth();
+
+        if (width != null)
         {
-            style.Add($"width:{Width}");
+            style.Add($"width:{width}");
         }
         else if (Grid != null && Grid.ColumnWidth != null)
         {
@@ -305,9 +307,15 @@
         LogicalFilterOperator = value;
     }
 
+    string runtimeWidth;
     internal void SetWidth(string value)
     {
-        Width = value;
+        runtimeWidth = value;
+    }
+
+    internal string GetWidth()
+    {
+        return !string.IsNullOrEmpty(runtimeWidth) ? runtimeWidth : Width;
     }
 
     public void Dispose()
