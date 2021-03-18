@@ -1,12 +1,29 @@
 ﻿@inherits RadzenComponent
 
 @code {
+    private string _text;
     [Parameter]
-    public string Text { get; set; }
+    public string Text
+    {
+        get
+        {
+            return _text;
+        }
+        set
+        {
+            if (_text != value)
+            {
+                _text = value;
+                if (Steps != null)
+                {
+                    Steps.Refresh();
+                }
+            }
+        }
+    }
 
     [Parameter]
     public bool Selected { get; set; }
-
 
     bool _visible = true;
     [Parameter]
