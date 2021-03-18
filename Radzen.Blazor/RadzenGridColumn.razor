@@ -16,8 +16,25 @@
         await base.SetParametersAsync(parameters);
     }
 
+    string _title;
     [Parameter]
-    public string Title { get; set; }
+    public string Title
+    {
+        get
+        {
+            return _title;
+        }
+        set
+        {
+            if (_title != value)
+            {
+                _title = value;
+
+                if (Grid != null)
+                    Grid.ChangeState();
+            }
+        }
+    }
 
     [Parameter]
     public string Property { get; set; }
