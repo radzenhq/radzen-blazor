@@ -30,12 +30,20 @@
 
     private bool visibleChanged = false;
     private bool disabledChanged = false;
+    private bool maxChanged = false;
+    private bool minChanged = false;
+    private bool rangeChanged = false;
+    private bool stepChanged = false;
     private bool firstRender = true;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
         disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
+        maxChanged = parameters.DidParameterChange(nameof(Max), Max);
+        minChanged = parameters.DidParameterChange(nameof(Min), Min);
+        rangeChanged = parameters.DidParameterChange(nameof(Range), Range);
+        stepChanged = parameters.DidParameterChange(nameof(Step), Step);
 
         await base.SetParametersAsync(parameters);
 
@@ -54,10 +62,30 @@
 
         this.firstRender = firstRender;
 
-        if (firstRender || visibleChanged || disabledChanged)
+        if (firstRender || visibleChanged || disabledChanged || maxChanged || minChanged || rangeChanged || stepChanged)
         {
             visibleChanged = false;
             disabledChanged = false;
+
+            if (maxChanged)
+            {
+                maxChanged = false;
+            }
+
+            if (minChanged)
+            {
+                minChanged = false;
+            }
+
+            if (rangeChanged)
+            {
+                rangeChanged = false;
+            }
+
+            if (stepChanged)
+            {
+                stepChanged = false;
+            }
 
             if (Visible && !Disabled)
             {
