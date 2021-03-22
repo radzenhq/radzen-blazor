@@ -3,9 +3,8 @@
 <RadzenExample Name="Slider">
 <div class="row">
     <div class="col-xl-6">
-        <RadzenCheckBox @bind-Value="disabled" />
         <h3>Slider from 0 to 100</h3>
-        <RadzenSlider @bind-Value=@value Disabled="@disabled" TValue="int" Min="0" Max="100" Change=@(args => OnChange(args, "Slider from 0 to 100")) />
+        <RadzenSlider @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => OnChange(args, "Slider from 0 to 100")) />
         <h3 style="margin-top: 2rem">Slider with Step 10</h3>
         <RadzenSlider @bind-Value=@valueWithStep TValue="int" Step="10" Change=@(args => OnChange(args, "Slider with Step 10")) />
         <h3 style="margin-top: 2rem">Range Slider</h3>
