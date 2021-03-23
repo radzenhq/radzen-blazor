@@ -1,8 +1,25 @@
 ﻿@inherits RadzenComponent
 @typeparam TValue
 @code {
+    private string _text;
     [Parameter]
-    public string Text { get; set; }
+    public string Text
+    {
+        get
+        {
+            return _text;
+        }
+        set
+        {
+            if (value != _text)
+            {
+                _text = value;
+
+                if (List != null)
+                    List.Refresh();
+            }
+        }
+    }
 
     [Parameter]
     public TValue Value { get; set; }
