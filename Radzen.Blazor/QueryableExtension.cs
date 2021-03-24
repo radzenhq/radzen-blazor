@@ -36,6 +36,9 @@ namespace Radzen
 
             if (columns.Where(canFilter).Any())
             {
+                var gridLogicalFilterOperator = columns.FirstOrDefault()?.Grid?.LogicalFilterOperator;
+                var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
+
                 var whereList = new List<string>();
                 foreach (var column in columns.Where(canFilter))
                 {
@@ -66,7 +69,7 @@ namespace Radzen
                     }
                 }
 
-                return string.Join(" and ", whereList.Where(i => !string.IsNullOrEmpty(i)));
+                return string.Join($" {gridBooleanOperator} ", whereList.Where(i => !string.IsNullOrEmpty(i)));
             }
 
             return "";
@@ -222,6 +225,9 @@ namespace Radzen
 
             if (columns.Where(canFilter).Any())
             {
+                var gridLogicalFilterOperator = columns.FirstOrDefault()?.Grid?.LogicalFilterOperator;
+                var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
+
                 var whereList = new List<string>();
                 foreach (var column in columns.Where(canFilter))
                 {
@@ -254,7 +260,7 @@ namespace Radzen
                     }
                 }
 
-                return string.Join(" and ", whereList.Where(i => !string.IsNullOrEmpty(i)));
+                return string.Join($" {gridBooleanOperator} ", whereList.Where(i => !string.IsNullOrEmpty(i)));
             }
 
             return "";
@@ -267,6 +273,9 @@ namespace Radzen
 
             if (columns.Where(canFilter).Any())
             {
+                var gridLogicalFilterOperator = columns.FirstOrDefault()?.Grid?.LogicalFilterOperator;
+                var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
+
                 var index = 0;
                 var whereList = new Dictionary<string, IEnumerable<object>>();
                 foreach (var column in columns.Where(canFilter))
@@ -320,7 +329,7 @@ namespace Radzen
                     }
                 }
 
-                return source.Where(string.Join(" and ", whereList.Keys), whereList.Values.SelectMany(i => i.ToArray()).ToArray());
+                return source.Where(string.Join($" {gridBooleanOperator} ", whereList.Keys), whereList.Values.SelectMany(i => i.ToArray()).ToArray());
             }
 
             return source;

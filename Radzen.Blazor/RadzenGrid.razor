@@ -507,6 +507,9 @@
     }
 
     [Parameter]
+    public LogicalFilterOperator LogicalFilterOperator { get; set; } = LogicalFilterOperator.And;
+
+    [Parameter]
     public FilterMode FilterMode { get; set; } = FilterMode.Simple;
 
     [Parameter]
