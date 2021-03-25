@@ -109,7 +109,9 @@
         if (items.Contains(item))
         {
             items.Remove(item);
-            try { InvokeAsync(StateHasChanged); } catch { }
+            try
+            { InvokeAsync(StateHasChanged); }
+            catch { }
         }
     }
 
@@ -126,7 +128,8 @@
         Value = item.Value;
 
         await ValueChanged.InvokeAsync(Value);
-        if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+        if (FieldIdentifier.FieldName != null)
+        { EditContext?.NotifyFieldChanged(FieldIdentifier); }
         await Change.InvokeAsync(Value);
 
         StateHasChanged();
@@ -135,5 +138,10 @@
     private string getDisabledState(RadzenRadioButtonListItem<TValue> item)
     {
         return Disabled || item.Disabled ? " rz-state-disabled" : "";
+    }
+
+    public void Refresh()
+    {
+        StateHasChanged();
     }
 }
