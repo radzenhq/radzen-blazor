@@ -1129,7 +1129,7 @@
             var list = this.PagedView.ToList();
             list.Remove(item);
             this._view = list.AsQueryable();
-            this.Count = this._view.Count();
+            this.Count = this.View.Count();
             itemToInsert = default(TItem);
             StateHasChanged();
         }
