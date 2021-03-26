@@ -1,0 +1,41 @@
+@typeparam TItem
+<td style="@Style" class="@CssClass" @attributes="@Attributes" @onclick="@OnClick" @ondblclick="@OnDblClick" >
+    <CascadingValue Value=this>
+        @ChildContent
+    </CascadingValue>
+</td>
+@code {
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object> Attributes { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
+
+    [Parameter]
+    public string Style { get; set; }
+
+    [Parameter]
+    public TItem Item { get; set; }
+
+    [Parameter]
+    public RadzenGrid<TItem> Grid { get; set; }
+
+    async Task OnClick()
+    {
+        if (Grid != null)
+        {
+            await Grid.OnRowClick(Item);
+        }
+    }
+
+    async Task OnDblClick()
+    {
+        if (Grid != null)
+        {
+            await Grid.OnRowDblClick(Item);
+        }
+    }
+}

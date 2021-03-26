@@ -367,9 +367,8 @@
                                                 }
                                                 else
                                                 {
-                                                    <td @onclick="@(() => OnRowClick(item))"
-                                                        @ondblclick="@(() => OnRowDblClick(item))"
-                                                        style="@column.GetStyle(true)" class="@column.CssClass" @attributes="@(cellAttr)">
+                                                    <RadzenGridCell Grid="@this" Item="@item"
+                                                        Style="@column.GetStyle(true)" CssClass="@column.CssClass" Attributes="@(cellAttr)">
                                                         @if (Responsive)
                                                         {
                                                             <span class="rz-column-title">
@@ -403,7 +402,7 @@
                                                                 }
                                                             }
                                                         </span>
-                                                    </td>
+                                                    </RadzenGridCell>
                                                 }
                                             }
                                             </RadzenGridRow>
@@ -986,7 +985,7 @@
     [Parameter]
     public DataGridSelectionMode SelectionMode { get; set; } = DataGridSelectionMode.Single;
 
-    async Task OnRowClick(object item)
+    internal async Task OnRowClick(object item)
     {
         await RowClick.InvokeAsync((TItem)item);
         await OnRowSelect(item);
@@ -1050,7 +1049,7 @@
         await OnRowSelect(item, true);
     }
 
-    protected async System.Threading.Tasks.Task OnRowDblClick(TItem item)
+    internal async System.Threading.Tasks.Task OnRowDblClick(TItem item)
     {
         await RowDoubleClick.InvokeAsync(item);
     }
