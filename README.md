@@ -19,8 +19,8 @@ Our flagship product Radzen provides tons of productivity features for Blazor de
 
 ### Install
 
-Radzen Blazor Components are distributed as the Radzen.Blazor nuget package. You can add them to your project in one of the following ways
-- Install the package from command line by running dotnet add package Radzen.Blazor
+Radzen Blazor Components are distributed as the `Radzen.Blazor` nuget package. You can add them to your project in one of the following ways
+- Install the package from command line by running `dotnet add package Radzen.Blazor`
 - Add the project from the Visual Nuget Package Manager 
 - Manually edit the .csproj file and add a project reference
 
