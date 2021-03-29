@@ -15,6 +15,8 @@
             <RadzenNumeric Disabled="true" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" />
             <h3 style="margin-top: 2rem">Without Up/Down</h3>
             <RadzenNumeric ShowUpDown="false" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" />
+            <h3 style="margin-top: 2rem">Formatted Value</h3>
+            <RadzenNumeric TValue="double" Format="0.0000" @bind-Value=@dblValue Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Formatted numeric"))" />
         </div>
         <div class="col-xl-6">
             <EventConsole @ref=@console />
@@ -24,6 +26,8 @@
 
 @code {
     int? value;
+
+    double dblValue = 0.0;
 
     EventConsole console;
 
