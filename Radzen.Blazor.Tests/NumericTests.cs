@@ -331,5 +331,23 @@ namespace Radzen.Blazor.Tests
             Assert.DoesNotContain(@$"rz-spinner-up", component.Markup);
             Assert.DoesNotContain(@$"rz-spinner-down", component.Markup);
         }
+
+        [Fact]
+        public void Numeric_Formatted()
+        {
+            using var ctx = new TestContext();
+
+            double valueToTest = 100.234;
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<double>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<double>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<double>.Value), valueToTest)
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest.ToString(format)}\"", component.Markup);
+        }
     }
 }
