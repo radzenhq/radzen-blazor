@@ -112,7 +112,7 @@ window.Radzen = {
     if (scrollableHeader && scrollableBody) {
       scrollableHeader.style.cssText =
         scrollableBody.clientHeight < scrollableBody.scrollHeight
-          ? 'margin-left:0px;margin-right: ' +
+          ? 'margin-left:0px;padding-right: ' +
             (scrollableBody.offsetWidth - scrollableBody.clientWidth) +
             'px'
           : 'margin-left:0px;';
@@ -746,7 +746,7 @@ window.Radzen = {
       (e.target.scrollLeft ? '-' + e.target.scrollLeft : 0) + 'px';
 
       e.target.previousElementSibling.style.marginLeft = scrollLeft;
-      e.target.previousElementSibling.style.paddingRight =
+      e.target.previousElementSibling.firstElementChild.style.paddingRight =
           e.target.clientHeight < e.target.scrollHeight ? (e.target.offsetWidth - e.target.clientWidth) + 'px' : '0px';
 
     if (e.target.nextElementSibling) {
