@@ -339,7 +339,7 @@
 
                                                 if (IsRowInEditMode(item))
                                                 {
-                                                    <CascadingValue Value=editContexts[item.GetHashCode()]>
+                                                    <CascadingValue Value=editContexts[item]>
                                                         <td style="@column.GetStyle(true)" @attributes="@(cellAttr)">
                                                             <span class="rz-cell-data">
                                                                 @if (column.EditTemplate != null)
@@ -406,7 +406,7 @@
                                                 }
                                             }
                                             </RadzenGridRow>
-                                            @if (Template != null && expandedItems.Keys.Contains(item.GetHashCode()))
+                                            @if (Template != null && expandedItems.Keys.Contains(item))
                                             {
                                                 <tr class="rz-expanded-row-content">
                                                     <td colspan="@(visibleColumns.Count + 1)">
@@ -709,11 +709,11 @@
                     var values = _value as IEnumerable<TItem>;
                     if (values != null && SelectionMode == DataGridSelectionMode.Multiple)
                     {
-                        values.Select(i => i.GetHashCode()).ToList().ForEach(hash => selectedItems.Add(hash, true));
+                        values.ToList().ForEach(i => selectedItems.Add(i, true));
                     }
                     else
                     {
-                        selectedItems.Add(_value.GetHashCode(), true);
+                        selectedItems.Add((TItem)_value, true);
                     }
                 }
 
@@ -836,18 +836,18 @@
         return Task.CompletedTask;
     }
 
-    Dictionary<int, bool> expandedItems = new Dictionary<int, bool>();
+    Dictionary<TItem, bool> expandedItems = new Dictionary<TItem, bool>();
     protected string ExpandedItemStyle(TItem item)
     {
-        return expandedItems.Keys.Contains(item.GetHashCode()) ? "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-down" : "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-right";
+        return expandedItems.Keys.Contains(item) ? "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-down" : "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-right";
     }
 
-    Dictionary<int, bool> selectedItems = new Dictionary<int, bool>();
+    Dictionary<TItem, bool> selectedItems = new Dictionary<TItem, bool>();
     protected string RowStyle(TItem item, int index)
     {
         var evenOrOdd = index % 2 == 0 ? "rz-datatable-even" : "rz-datatable-odd";
 
-        return (RowSelect.HasDelegate || ValueChanged != null || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item.GetHashCode()) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
+        return (RowSelect.HasDelegate || ValueChanged != null || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
     }
 
     protected Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item, int index)
@@ -928,23 +928,22 @@
     {
         if (ExpandMode == DataGridExpandMode.Single && expandedItems.Keys.Any())
         {
-            var itemToCollapse = PagedView.Where(i => !object.Equals(i, item) && expandedItems.Keys.Contains(i.GetHashCode())).FirstOrDefault();
+            var itemToCollapse = expandedItems.Keys.FirstOrDefault();
             if (itemToCollapse != null)
             {
-                expandedItems.Remove(itemToCollapse.GetHashCode());
+                expandedItems.Remove(itemToCollapse);
                 await RowCollapse.InvokeAsync(itemToCollapse);
             }
         }
 
-        int hash = item.GetHashCode();
-        if (!expandedItems.Keys.Contains(hash))
+        if (!expandedItems.Keys.Contains(item))
         {
-            expandedItems.Add(hash, true);
+            expandedItems.Add(item, true);
             await RowExpand.InvokeAsync(item);
         }
         else
         {
-            expandedItems.Remove(hash);
+            expandedItems.Remove(item);
             await RowCollapse.InvokeAsync(item);
         }
     }
@@ -993,7 +992,7 @@
 
     internal async System.Threading.Tasks.Task OnRowSelect(object item, bool raiseChange = true)
     {
-        if (SelectionMode == DataGridSelectionMode.Single && item != null && selectedItems.Keys.Contains(item.GetHashCode()))
+        if (SelectionMode == DataGridSelectionMode.Single && item != null && selectedItems.Keys.Contains((TItem)item))
         {
             // Legacy RowSelect raise
             if (raiseChange)
@@ -1005,20 +1004,19 @@
 
         if (SelectionMode == DataGridSelectionMode.Single && selectedItems.Keys.Any())
         {
-            var itemToDeselect = PagedView.Where(i => !object.Equals(i, item) && selectedItems.Keys.Contains(i.GetHashCode())).FirstOrDefault();
+            var itemToDeselect = selectedItems.Keys.FirstOrDefault();
             if (itemToDeselect != null)
             {
-                selectedItems.Remove(itemToDeselect.GetHashCode());
+                selectedItems.Remove(itemToDeselect);
                 await RowDeselect.InvokeAsync(itemToDeselect);
             }
         }
 
         if (item != null)
         {
-            int hash = item.GetHashCode();
-            if (!selectedItems.Keys.Contains(hash))
+            if (!selectedItems.Keys.Contains((TItem)item))
             {
-                selectedItems.Add(hash, true);
+                selectedItems.Add((TItem)item, true);
                 if (raiseChange)
                 {
                     await RowSelect.InvokeAsync((TItem)item);
@@ -1026,7 +1024,7 @@
             }
             else
             {
-                selectedItems.Remove(hash);
+                selectedItems.Remove((TItem)item);
                 await RowDeselect.InvokeAsync((TItem)item);
             }
         }
@@ -1038,7 +1036,7 @@
             }
         }
 
-        var value = PagedView.Where(i => selectedItems.Keys.Contains(i.GetHashCode()));
+        var value = selectedItems.Keys;
 
         _value = SelectionMode == DataGridSelectionMode.Multiple ? (object)value : value.FirstOrDefault();
         ValueChanged?.Invoke(_value);
@@ -1063,29 +1061,27 @@
     [Parameter]
     public EventCallback<TItem> RowCreate { get; set; }
 
-    Dictionary<int, bool> editedItems = new Dictionary<int, bool>();
-    Dictionary<int, EditContext> editContexts = new Dictionary<int, EditContext>();
+    Dictionary<TItem, bool> editedItems = new Dictionary<TItem, bool>();
+    Dictionary<TItem, EditContext> editContexts = new Dictionary<TItem, EditContext>();
 
     public async System.Threading.Tasks.Task EditRow(TItem item)
     {
         if (EditMode == DataGridEditMode.Single && editedItems.Keys.Any())
         {
-            var itemToCancel = PagedView.Where(i => editedItems.Keys.Contains(i.GetHashCode())).FirstOrDefault();
+            var itemToCancel = editedItems.Keys.FirstOrDefault();
             if (itemToCancel != null)
             {
-                editedItems.Remove(itemToCancel.GetHashCode());
-                editContexts.Remove(itemToCancel.GetHashCode());
+                editedItems.Remove(itemToCancel);
+                editContexts.Remove(itemToCancel);
             }
         }
 
-        int hash = item.GetHashCode();
-
-        if (!editedItems.Keys.Contains(hash))
+        if (!editedItems.Keys.Contains(item))
         {
-            editedItems.Add(hash, true);
+            editedItems.Add(item, true);
 
             var editContext = new EditContext(item);
-            editContexts.Add(hash, editContext);
+            editContexts.Add(item, editContext);
 
             await RowEdit.InvokeAsync(item);
 
@@ -1095,16 +1091,14 @@
 
     public async System.Threading.Tasks.Task UpdateRow(TItem item)
     {
-        int hash = item.GetHashCode();
-
-        if (editedItems.Keys.Contains(hash))
+        if (editedItems.Keys.Contains(item))
         {
-            var editContext = editContexts[hash];
+            var editContext = editContexts[item];
 
             if (editContext.Validate())
             {
-                editedItems.Remove(hash);
-                editContexts.Remove(hash);
+                editedItems.Remove(item);
+                editContexts.Remove(item);
 
                 if (object.Equals(itemToInsert, item))
                 {
@@ -1136,10 +1130,10 @@
         {
             int hash = item.GetHashCode();
 
-            if (editedItems.Keys.Contains(hash))
+            if (editedItems.Keys.Contains(item))
             {
-                editedItems.Remove(hash);
-                editContexts.Remove(hash);
+                editedItems.Remove(item);
+                editContexts.Remove(item);
 
                 StateHasChanged();
             }
@@ -1148,9 +1142,7 @@
 
     public bool IsRowInEditMode(TItem item)
     {
-        int hash = item.GetHashCode();
-
-        return editedItems.Keys.Contains(hash);
+        return editedItems.Keys.Contains(item);
     }
 
     TItem itemToInsert;
