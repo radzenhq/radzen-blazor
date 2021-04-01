@@ -623,8 +623,21 @@
     [Parameter]
     public string ColumnWidth { get; set; }
 
+    private string _emptyText = "No records to display.";
     [Parameter]
-    public string EmptyText { get; set; } = "No records to display.";
+    public string EmptyText
+    {
+        get { return _emptyText; }
+        set
+        {
+            if (value != _emptyText)
+            {
+                _emptyText = value;
+
+                ChangeState();
+            }
+        }
+    }
 
     [Parameter]
     public bool AllowSorting { get; set; }
