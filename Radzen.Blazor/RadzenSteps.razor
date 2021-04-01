@@ -166,11 +166,37 @@
     [Parameter]
     public EventCallback<int> Change { get; set; }
 
+    private string _nextStep = "Next";
     [Parameter]
-    public string NextText { get; set; } = "Next";
+    public string NextText
+    {
+        get { return _nextStep; }
+        set
+        {
+            if (value != _nextStep)
+            {
+                _nextStep = value;
 
+                Refresh();
+            }
+        }
+    }
+
+    private string _previousText = "Previous";
     [Parameter]
-    public string PreviousText { get; set; } = "Previous";
+    public string PreviousText
+    {
+        get { return _previousText; }
+        set
+        {
+            if (value != _previousText)
+            {
+                _previousText = value;
+
+                Refresh();
+            }
+        }
+    }
 
     [Parameter]
     public RenderFragment Steps { get; set; }
