@@ -1,5 +1,5 @@
 ﻿@page "/dialog"
-
+@using System.Timers
 @inject DialogService DialogService
 
 <RadzenExample Name="Dialog" Documentation="true" AdditionalSourceCodePages=@(new List<string>() { "DialogCardPage.razor" })>
@@ -12,6 +12,8 @@
 
             <h3 style="margin-top: 20px;">Simple Dialog</h3>
             <RadzenButton Text="Show dialog with inline Blazor content" Click=@ShowInlineDialog />
+            <h3 style="margin-top: 20px;">Busy Dialog</h3>
+            <RadzenButton Text="Show busy dialog" Click=@ShowBusyDialog />
             <h3 style="margin-top: 20px;">Confirm Dialog</h3>
             <RadzenButton Text="Show confirm dialog" Click=@(args => DialogService.Confirm("Are you sure?", "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })) />
         </div>
@@ -53,4 +55,26 @@
                 </div>
             </div>
     </div>);
+
+    async Task ShowBusyDialog()
+    {
+        var timer = new Timer(20000);
+        timer.Elapsed += (sender, e) => 
+        { 
+            DialogService.Close(); 
+            timer.Stop(); 
+        };
+        timer.Start();
+
+        await BusyDialog();
+    }
+
+    async Task BusyDialog() => await DialogService.OpenAsync("", ds =>
+        @<div>
+            <div class="row">
+                <div class="col-md-12">
+                    Loading...
+                </div>
+            </div>
+    </div>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });
 }
