@@ -58,7 +58,7 @@
 
     async Task ShowBusyDialog()
     {
-        var timer = new Timer(20000);
+        var timer = new Timer(2000);
         timer.Elapsed += (sender, e) => 
         { 
             DialogService.Close(); 
