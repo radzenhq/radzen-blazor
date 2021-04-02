@@ -44,7 +44,7 @@
         var topStyle = string.IsNullOrEmpty(dialog.Options.Top) ? "" : $"top: {dialog.Options.Top};";
         var leftStyle = string.IsNullOrEmpty(dialog.Options.Left) ? "" : $"left: {dialog.Options.Left};";
 
-        return $"{baseStyle}{widthStyle}{heightStyle}{topStyle}{leftStyle}";
+        return $"{baseStyle}{widthStyle}{heightStyle}{topStyle}{leftStyle}{dialog.Options.Style}";
     }
 
     [Inject] private DialogService Service { get; set; }

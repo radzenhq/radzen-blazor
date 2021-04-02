@@ -90,7 +90,8 @@ namespace Radzen
                 Height = options != null && !string.IsNullOrEmpty(options.Height) ? options.Height : "",
                 ShowTitle = options != null ? options.ShowTitle : true,
                 ShowClose = options != null ? options.ShowClose : true,
-                ChildContent = options?.ChildContent
+                ChildContent = options?.ChildContent,
+                Style = options != null ? options.Style : "",
             });
         }
 
@@ -159,7 +160,8 @@ namespace Radzen
             Bottom = options != null ? options.Bottom : null,
             ChildContent = options != null ? options.ChildContent : null,
             ShowTitle = options != null ? options.ShowTitle : true,
-            ShowClose = options != null ? options.ShowClose : true
+            ShowClose = options != null ? options.ShowClose : true,
+            Style = options != null ? options.Style : "",
         });
     }
 
@@ -172,6 +174,7 @@ namespace Radzen
         public string Bottom { get; set; }
         public string Width { get; set; }
         public string Height { get; set; }
+        public string Style { get; set; }
         public RenderFragment<DialogService> ChildContent { get; set; }
     }
 
