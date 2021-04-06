@@ -162,6 +162,14 @@
         return PropertyAccess.Getter<T>(data, property);
     }
 
+    protected override void OnParametersSet()
+    {
+        if (Value == null)
+        {
+            SelectedItem = null;
+        }
+    }
+
     internal void AddLevel(RadzenTreeLevel level)
     {
         if (!Levels.Contains(level))
