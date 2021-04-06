@@ -1053,6 +1053,7 @@
 
         _value = SelectionMode == DataGridSelectionMode.Multiple ? (object)value : value.FirstOrDefault();
         ValueChanged?.Invoke(_value);
+        StateHasChanged();
     }
 
     public async System.Threading.Tasks.Task SelectRow(TItem item)
