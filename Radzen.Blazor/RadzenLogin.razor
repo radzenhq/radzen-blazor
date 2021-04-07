@@ -21,7 +21,7 @@
             <div class="row form-group">
                 <label class="col-sm-3 col-form-label" for="password">@PasswordText</label>
                 <div class="col">
-                    <input name="password" class="rz-textbox" type="password" @bind="@Password" @oninput="@(args => Password = $"{args.Value}")" @onkeypress="@OnPwdKeyPress" />
+                    <input name="password" class="rz-textbox" type="password" @bind="@Password" @onkeypress="@OnPwdKeyPress" />
                     @if (loginClicked && string.IsNullOrEmpty(Password))
                     {
                         <div class="md-inputfield">
