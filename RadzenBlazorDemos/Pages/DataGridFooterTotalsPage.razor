@@ -3,7 +3,7 @@
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
-
+@using System.Linq 
 @inject NorthwindContext dbContext
 
 <h1>DataGrid Footer Totals</h1>
@@ -18,8 +18,13 @@
 else
 {
     <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
-                Data="@dbContext.Orders.Include("Customer").Include("Employee")" TItem="Order">
+                Data="@orders" TItem="Order">
         <Columns>
+            <RadzenGridColumn Width="50px" TItem="Order" Title="Nr." Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                <Template>
+                    @(orders.IndexOf(context) + 1)
+                </Template>
+            </RadzenGridColumn>
             <RadzenGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID">
                 <FooterTemplate>
                     Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
@@ -56,7 +61,7 @@ else
 
 @code {
     RadzenGrid<Order> ordersGrid;
-    IEnumerable<Order> orders;
+    IList<Order> orders;
 
     protected override void OnInitialized()
     {
