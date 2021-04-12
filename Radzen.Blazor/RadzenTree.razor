@@ -6,16 +6,16 @@
 @if (Visible)
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
-        <ul class="rz-tree-container">
+    <ul class="rz-tree-container">
         <CascadingValue Value=this>
             @ChildContent
         </CascadingValue>
         @if (Data != null && Levels.Any())
-        {
-            <CascadingValue Value=this>
-                @RenderChildren(Data, 0)
-            </CascadingValue>
-        }
+            {
+                <CascadingValue Value=this>
+                    @RenderChildren(Data, 0)
+                </CascadingValue>
+            }
         </ul>
     </div>
 }
@@ -43,13 +43,14 @@
     public IEnumerable Data { get; set; }
 
     [Parameter]
-    public object Value { get; set;}
+    public object Value { get; set; }
 
     [Parameter]
     public EventCallback<object> ValueChanged { get; set; }
 
-    void RenderTreeItem(RenderTreeBuilder builder, object data, RenderFragment<RadzenTreeItem> template, Func<object, string> text, 
-        Func<object, bool> hasChildren, Func<object, bool> expanded, Func<object, bool> selected)
+    void RenderTreeItem(RenderTreeBuilder builder, object data, RenderFragment<RadzenTreeItem> template, Func<object,
+    string> text,
+    Func<object, bool> hasChildren, Func<object, bool> expanded, Func<object, bool> selected)
     {
         builder.OpenComponent<RadzenTreeItem>(0);
         builder.AddAttribute(1, nameof(RadzenTreeItem.Text), text(data));
@@ -162,12 +163,19 @@
         return PropertyAccess.Getter<T>(data, property);
     }
 
-    protected override void OnParametersSet()
+    public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Value == null)
+        if (parameters.DidParameterChange(nameof(Value), Value))
         {
-            SelectedItem = null;
+            var value = parameters.GetValueOrDefault<object>(nameof(Value));
+            
+            if (value == null)
+            {
+                SelectedItem = null;
+            }
         }
+
+        await base.SetParametersAsync(parameters);
     }
 
     internal void AddLevel(RadzenTreeLevel level)
