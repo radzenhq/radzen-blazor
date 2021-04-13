@@ -197,7 +197,8 @@
 
     private string GetPropertyFilterExpression(string property, string filterCaseSensitivityOperator)
     {
-        return $"{property}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)";
+        var p = $@"({property} == null ? """" : {property})";
+        return $"{p}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)";
     }
 
     private bool IsColumnFilterPropertyTypeString(RadzenGridColumn<object> column)
