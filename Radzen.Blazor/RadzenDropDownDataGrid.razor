@@ -21,12 +21,6 @@
                 @Template(selectedItem)
             </label>
         }
-        else if (SelectedValue != null)
-        {
-            <label class="rz-dropdown-label rz-inputtext rz-corner-all" onclick="@OpenPopupScript()" style="width:100%;">
-                @PropertyAccess.GetItemOrValueFromProperty(SelectedValue, TextProperty)
-            </label>
-        }
         else if (selectedItem != null)
         {
             <label class="rz-dropdown-label rz-inputtext " onclick="@OpenPopupScript()" style="width:100%;">
@@ -54,6 +48,12 @@
                 {
                     @($"{selectedItems.Count} {SelectedItemsText}")
                 }
+            </label>
+        }
+        else if (SelectedValue != null)
+        {
+            <label class="rz-dropdown-label rz-inputtext rz-corner-all" onclick="@OpenPopupScript()" style="width:100%;">
+                @PropertyAccess.GetItemOrValueFromProperty(SelectedValue, TextProperty)
             </label>
         }
         else if (!string.IsNullOrEmpty(Placeholder))
