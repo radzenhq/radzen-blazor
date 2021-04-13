@@ -977,6 +977,7 @@
         column.SetFilterValue(null);
         column.SetFilterValue(null, false);
         skip = 0;
+        CurrentPage = 0;
         await InvokeAsync(Reload);
     }
 
@@ -1202,6 +1203,7 @@
             {
                 column.SetFilterValue(args.Value, isFirst);
                 skip = 0;
+                CurrentPage = 0;
                 InvokeAsync(Reload);
             }
         }
@@ -1241,6 +1243,7 @@
     {
         var p = IsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
         skip = 0;
+        CurrentPage = 0;
         orderBy = orderBy == $"{p} desc" || orderBy == null || orderBy.IndexOf(p) == -1 ? $"{p} asc" : $"{p} desc";
         InvokeAsync(Reload);
     }
@@ -1249,6 +1252,7 @@
     {
         var p = IsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
         skip = 0;
+        CurrentPage = 0;
         orderBy = $"{p} desc";
         InvokeAsync(Reload);
     }
