@@ -225,7 +225,7 @@
 
                 if (AllowFilteringByAllStringColumns)
                 {
-                    query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => IsColumnFilterPropertyTypeString(c))
+                    query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
                         .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
                             FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
                 }
