@@ -1,5 +1,5 @@
 $numeric-line-height: 1.5rem !default;
-$numeric-input-padding: 1px 12px 1px 1px;
+$numeric-input-padding: 1px 12px 1px 0.5rem;
 $numeric-button-width: 0.875rem !default;
 $numeric-button-height: $numeric-button-width !default;
 $numeric-button-border-radius: 2px !default;
@@ -14,19 +14,18 @@ $numeric-button-color: $white !default;
 
   @extend %input;
 
+  padding: 0px;
+
   input[type='number'],
   input[type='text'] {
     -moz-appearance: textfield;
     width: 100%;
+    height: 100%;
     border: none;
     background-color: transparent;
     line-height: $numeric-line-height;
     text-align: inherit;
     padding: $numeric-input-padding;
-
-    &:focus {
-      outline: none;
-    }
 
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
