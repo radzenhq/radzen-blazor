@@ -9,7 +9,7 @@
     <div class="col-xl-6">
         <h3>Simple login</h3>
         <RadzenCard>
-            <RadzenTemplateForm Data=@("SimpleLogin")>
+            <RadzenTemplateForm Data=@("SimpleLogin") Action="http://www.google.com">
                 <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login=@(args => OnLogin(args, "Simple login")) Style="margin-bottom: 20px;" />
             </RadzenTemplateForm>
         </RadzenCard>
