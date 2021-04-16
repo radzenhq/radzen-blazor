@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Forms;
 using Radzen;
+using Microsoft.JSInterop;
 
 namespace Radzen.Blazor
 {
@@ -81,6 +82,11 @@ namespace Radzen.Blazor
                 if (valid)
                 {
                     await Submit.InvokeAsync(Data);
+
+                    if (Action != null)
+                    {
+                        await JSRuntime.InvokeVoidAsync($"Radzen.submit", Element);
+                    }
                 }
                 else
                 {
@@ -137,18 +143,16 @@ namespace Radzen.Blazor
                     builder.AddAttribute(2, "method", Method);
                     builder.AddAttribute(3, "action", Action);
                 }
-                else
-                {
-                    builder.AddAttribute(4, "onsubmit", handleSubmitDelegate);
-                }
 
+                builder.AddAttribute(4, "onsubmit", handleSubmitDelegate);
                 builder.AddMultipleAttributes(5, Attributes);
                 builder.AddAttribute(6, "class", GetCssClass());
+                builder.AddElementReferenceCapture(7, form => Element = form);
 
-                builder.OpenComponent<CascadingValue<IRadzenForm>>(7);
-                builder.AddAttribute(8, "IsFixed", true);
-                builder.AddAttribute(9, "Value", this);
-                builder.AddAttribute(10, "ChildContent", new RenderFragment(contentBuilder =>
+                builder.OpenComponent<CascadingValue<IRadzenForm>>(8);
+                builder.AddAttribute(9, "IsFixed", true);
+                builder.AddAttribute(10, "Value", this);
+                builder.AddAttribute(11, "ChildContent", new RenderFragment(contentBuilder =>
                 {
                     contentBuilder.OpenComponent<CascadingValue<EditContext>>(0);
                     contentBuilder.AddAttribute(1, "IsFixed", true);
@@ -158,6 +162,7 @@ namespace Radzen.Blazor
                 }));
 
                 builder.CloseComponent(); // CascadingValue<IRadzenForm>
+
 
                 builder.CloseElement(); // form
 
