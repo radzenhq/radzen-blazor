@@ -138,14 +138,12 @@ namespace Radzen
         {
             if (topPager != null)
             {
-                topPager.GoToPage(CurrentPage).Wait();
-                InvokeAsync(topPager.Reload);
+                topPager.SetCurrentPage(CurrentPage);
             }
 
             if (bottomPager != null)
             {
-                bottomPager.GoToPage(CurrentPage).Wait();
-                InvokeAsync(bottomPager.Reload);
+                bottomPager.SetCurrentPage(CurrentPage);
             }
         }
 

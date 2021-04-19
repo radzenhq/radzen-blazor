@@ -1242,8 +1242,6 @@
     public void OrderBy(string property)
     {
         var p = IsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
-        skip = 0;
-        CurrentPage = 0;
         orderBy = orderBy == $"{p} desc" || orderBy == null || orderBy.IndexOf(p) == -1 ? $"{p} asc" : $"{p} desc";
         InvokeAsync(Reload);
     }
@@ -1251,8 +1249,6 @@
     public void OrderByDescending(string property)
     {
         var p = IsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
-        skip = 0;
-        CurrentPage = 0;
         orderBy = $"{p} desc";
         InvokeAsync(Reload);
     }

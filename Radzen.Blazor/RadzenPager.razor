@@ -139,6 +139,14 @@
         }
     }
 
+    internal async void SetCurrentPage(int page)
+    {
+        if (CurrentPage != page)
+        {
+            skip = page * PageSize;
+        }
+    }
+
     public async Task FirstPage(bool forceReload = false)
     {
         if (CurrentPage != 0 || forceReload)
