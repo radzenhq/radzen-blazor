@@ -3,54 +3,36 @@
 @if (Visible)
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
-        <div class="rz-form" novalidate="">
+        <div class="rz-form">
             <div class="row form-group">
                 <label class="col-sm-3 col-form-label" for="username">@UserText</label>
                 <div class="col">
-                    <input name="userName" class="rz-textbox" @bind="@Username" />
-                    @if ((loginClicked || resetClicked) && string.IsNullOrEmpty(Username))
-                    {
-                        <div class="md-inputfield">
-                            <div class="rz-message rz-messages-error ">
-                                @UserRequired
-                            </div>
-                        </div>
-                    }
+                    <RadzenTextBox style="display: block" Name="Username" @bind-Value=@Username />
+                    <RadzenRequiredValidator Component="Username" Text=@UserRequired style="position: absolute" />
                 </div>
             </div>
             <div class="row form-group">
                 <label class="col-sm-3 col-form-label" for="password">@PasswordText</label>
                 <div class="col">
-                    <input name="password" class="rz-textbox" type="password" @bind="@Password" @oninput="@(args => Password = $"{args.Value}")" @onkeypress="@OnPwdKeyPress" />
-                    @if (loginClicked && string.IsNullOrEmpty(Password))
-                    {
-                        <div class="md-inputfield">
-                            <div class="rz-message rz-messages-error ">
-                                @PasswordRequired
-                            </div>
-                        </div>
-                    }
+                    <RadzenPassword style="display: block" Name="Password" @bind-Value=@Password />
+                    <RadzenRequiredValidator Component="Password" Text=@PasswordRequired style="position: absolute" />
                 </div>
             </div>
             <div class="row form-group">
                 <div class="offset-sm-3 col login-buttons">
-                    <button class="rz-button rz-button-md btn-primary" type="@(!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password) ? "submit" : "button")" @onclick="@OnLogin">
-                        <span class="rz-button-text" style="">@LoginText</span>
-                    </button>
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text=@LoginText Click=@OnLogin />
                     @if (AllowResetPassword)
                     {
-                        <a @onclick="@OnReset">@ResetPasswordText</a>
+                        <a @onclick=@OnReset>@ResetPasswordText</a>
                     }
                 </div>
             </div>
         </div>
         @if (AllowRegister)
         {
-            <div class="register" style="">
+            <div class="register">
                 @RegisterMessageText
-                <button class="rz-button rz-button-md    btn-secondary" type="button" @onclick="@OnRegister">
-                    <span class="rz-button-text">@RegisterText</span>
-                </button>
+                <RadzenButton ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text=@RegisterText Click=@OnRegister />
             </div>
         }
     </div>
@@ -134,37 +116,24 @@
     [Parameter]
     public string PasswordRequired { get; set; } = "Password is required";
 
-    bool loginClicked = false;
-    protected async System.Threading.Tasks.Task OnLogin(EventArgs args)
+    protected async Task OnLogin()
     {
-        loginClicked = true;
         if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
         {
-            await Login.InvokeAsync(new Radzen.LoginArgs() { Username = Username, Password = Password });
+            await Login.InvokeAsync(new Radzen.LoginArgs { Username = Username, Password = Password });
         }
     }
 
-    async Task OnPwdKeyPress(KeyboardEventArgs args)
+    protected async Task OnReset(EventArgs args)
     {
-        var key = args.Code != null ? args.Code : args.Key;
-        if (key == "Enter") 
-        { 
-            await OnLogin(args); 
-        }
-    }
-
-    bool resetClicked = false;
-    protected async System.Threading.Tasks.Task OnReset(EventArgs args)
-    {
-        resetClicked = true;
         if (!string.IsNullOrEmpty(Username))
         {
             await ResetPassword.InvokeAsync(Username);
         }
     }
 
-    protected async System.Threading.Tasks.Task OnRegister(EventArgs args)
+    protected async Task OnRegister()
     {
-        await Register.InvokeAsync(args);
+        await Register.InvokeAsync(EventArgs.Empty);
     }
 }

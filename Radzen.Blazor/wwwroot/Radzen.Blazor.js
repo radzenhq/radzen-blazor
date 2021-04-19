@@ -1093,6 +1093,9 @@ window.Radzen = {
     document.addEventListener('touchend', ref.mouseUpHandler, { passive: true });
     return Radzen.clientRect(ref);
   },
+  submit: function (form) {
+    form.submit();
+  },
   clientRect: function (arg) {
     var el = arg instanceof Element || arg instanceof HTMLDocument
         ? arg
