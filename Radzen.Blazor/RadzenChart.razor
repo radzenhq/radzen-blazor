@@ -8,7 +8,7 @@
 <CascadingValue Value="@this">
 @ChildContent
 </CascadingValue>
-<div @ref="Element" class="@GetCssClass()" @attributes="@Attributes" style="@Style" id="@GetId()">
+<div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
 @if (Width.HasValue && Height.HasValue)
 {
     <CascadingValue Value="@this">

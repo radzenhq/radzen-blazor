@@ -2,7 +2,7 @@
 
 @if (Visible)
 {
-    <i @ref="@Element" style="@Style" class="@GetCssClass()" @attributes="Attributes" id="@GetId()">@((MarkupString)Icon)</i>
+    <i @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">@((MarkupString)Icon)</i>
 }
 @code {
     [Parameter]

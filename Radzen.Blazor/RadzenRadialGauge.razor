@@ -3,7 +3,7 @@
 @inherits GaugeBase
 @if (Visible)
 {
-    <div @ref="Element" class=@GetCssClass() @attributes=@Attributes style=@Style id="@GetId()">
+    <div @ref="Element" style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()>
     @if (Width.HasValue && Height.HasValue)
     {
         <svg style="width: 100%; height: 100%">

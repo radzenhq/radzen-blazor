@@ -5,7 +5,7 @@
 
 @if (Visible)
 {
-    <div class=@GetCssClass() @ref=@Element @onclick=@Toggle @attributes=@Attributes style=@Style id=@GetId()>
+    <div @ref=@Element style=@Style @onclick=@Toggle @attributes=@Attributes class=@GetCssClass() id=@GetId()>
         @if(Icon != null)
         {
             <i class="rzi">@Icon</i>

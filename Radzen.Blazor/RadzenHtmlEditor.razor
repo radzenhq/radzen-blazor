@@ -6,7 +6,7 @@
 
 @if(Visible)
 {
-    <div @ref=Element class=@GetCssClass() @attributes=@Attributes style=@Style id=@GetId()>
+    <div @ref=Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()>
         <div class="rz-html-editor-toolbar">
             <CascadingValue Value=@this>
             @if (ChildContent != null)
