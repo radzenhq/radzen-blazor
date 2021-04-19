@@ -14,6 +14,7 @@
         </div>
     @{ 
         var days = 0;
+        var points = new Dictionary<AppointmentData, double>();
     }
     <div class="rz-view-content">
     @for (var date = StartDate; date < EndDate; date = date.AddDays(7))
@@ -23,9 +24,9 @@
                 @for (var start = date; start < date.AddDays(7); start = start.AddDays(1))
                 {
                     var end = start.AddDays(1);
-
                     var appointments = AppointmentsInSlot(start, end);
                     var excessCount = appointments.Count() - MaxAppointmentsInSlot;
+                    var existingTops = ExistingTops(points, appointments.Take(MaxAppointmentsInSlot));
 
                     @foreach(var item in appointments.Take(MaxAppointmentsInSlot))
                     {
@@ -34,7 +35,12 @@
                         var left = slotIndex * slotWidth;
                         var length = Math.Max(1, Math.Ceiling(item.End.Subtract(date).TotalDays) - slotIndex);
                         var width = item.End <= date.AddDays(7) ? (length) * slotWidth : (7 - slotIndex) * slotWidth;
-                        var top = 1.5 + 1.5 * Array.IndexOf(appointments, item);
+                        if (!points.TryGetValue(item, out var top))
+                        {
+                            top = DetermineTop(existingTops);
+                            points.Add(item, top);
+                            existingTops.Add(top);
+                        }
                         var height = 1.5;
                         var data = item;
 
@@ -101,6 +107,33 @@
     async Task OnSlotClick(DateTime date)
     {
         await Scheduler.SelectSlot(date, date.AddDays(1));
+    }
+
+    double DetermineTop(HashSet<double> existingTops)
+    {
+        var top = 1.5;
+
+        while (existingTops.Contains(top))
+        {
+            top += 1.5;
+        }
+
+        return top;
+    }
+
+    HashSet<double> ExistingTops(IDictionary<AppointmentData, double> tops, IEnumerable<AppointmentData> appointments)
+    {
+        var existingTops = new HashSet<double>();
+
+        foreach (var appointment in appointments)
+        {
+            if (tops.TryGetValue(appointment, out var existingTop))
+            {
+                existingTops.Add(existingTop);
+            }
+        }
+
+        return existingTops;
     }
 
     async Task OnAppointmentClick(AppointmentData data)
