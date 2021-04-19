@@ -92,7 +92,13 @@ namespace Radzen.Blazor
                 {
                     await InvalidSubmit.InvokeAsync(new FormInvalidSubmitEventArgs() { Errors = EditContext.GetValidationMessages() });
                 }
-
+            }
+            else
+            {
+                if (Action != null)
+                {
+                    await JSRuntime.InvokeVoidAsync($"Radzen.submit", Element);
+                }
             }
         }
 
