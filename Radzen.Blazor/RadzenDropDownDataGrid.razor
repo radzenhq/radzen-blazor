@@ -1,4 +1,6 @@
 ﻿@using Radzen
+@using System.Collections
+@using System.Collections.Generic
 @using System.Linq.Dynamic.Core
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
@@ -39,7 +41,7 @@
                     else
                     {
                         foreach (var item in selectedItems)
-                        { 
+                        {
                             @Template(item)@(",")
                         }
                     }
@@ -78,19 +80,19 @@
                 @if (AllowFiltering)
                 {
                     <div class="rz-lookup-search">
-                        <input id="@SearchID" @ref="@search" tabindex="-1" placeholder="@SearchText"  
+                        <input id="@SearchID" @ref="@search" tabindex="-1" placeholder="@SearchText"
                                @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" style="@(ShowSearch ? "" : "margin-right:0px;")" />
                         @if (ShowSearch)
                         {
-                        <button class="rz-button rz-button-md    btn-primary rz-button-icon-only" type="button" title="">
-                            <i class="rz-button-icon-left rzi">search</i>
-                        </button>
+                            <button class="rz-button rz-button-md    btn-primary rz-button-icon-only" type="button" title="">
+                                <i class="rz-button-icon-left rzi">search</i>
+                            </button>
                         }
                     </div>
                 }
                 @if (Template != null)
                 {
-                    <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData" 
+                    <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
                                 TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
                         <Columns>
                             <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="string">
@@ -103,7 +105,7 @@
                 }
                 else
                 {
-                    <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData" 
+                    <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
                                 TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
                         <Columns>
                             @if (Columns != null)
@@ -112,8 +114,8 @@
                             }
                             else
                             {
-                            <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="string">
-                            </RadzenGridColumn>
+                                <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="string">
+                                </RadzenGridColumn>
                             }
                         </Columns>
                     </RadzenGrid>
@@ -241,6 +243,8 @@
                 query = query.OrderBy(args.OrderBy);
             }
 
+            _internalView = query;
+
             count = query.Count();
 
             pagedData = QueryableExtension.ToList(query.Skip(args.Skip.HasValue ? args.Skip.Value : 0).Take(PageSize)).Cast<object>();
@@ -248,6 +252,15 @@
         else
         {
             await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = args.Skip, Top = args.Top, OrderBy = args.OrderBy, Filter = searchText });
+        }
+    }
+
+    IEnumerable _internalView = Enumerable.Empty<object>();
+    public new IEnumerable View
+    {
+        get
+        {
+            return _internalView;
         }
     }
 
@@ -336,7 +349,8 @@
         {
             try
             {
-                if (key == "ArrowDown" && selectedIndex < items.Count - 1) {
+                if (key == "ArrowDown" && selectedIndex < items.Count - 1)
+                {
                     selectedIndex++;
                 }
 
