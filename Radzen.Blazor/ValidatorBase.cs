@@ -86,16 +86,19 @@ namespace Radzen.Blazor
                 throw new InvalidOperationException($"Cannot find component with Name {Component}");
             }
 
-            IsValid = Validate(component);
-
-            messages.Clear(component.FieldIdentifier);
-
-            if (!IsValid)
+            if (component.FieldIdentifier.FieldName != null)
             {
-                messages.Add(component.FieldIdentifier, Text);
-            }
+                IsValid = Validate(component);
 
-            EditContext?.NotifyValidationStateChanged();
+                messages.Clear(component.FieldIdentifier);
+
+                if (!IsValid)
+                {
+                    messages.Add(component.FieldIdentifier, Text);
+                }
+
+                EditContext?.NotifyValidationStateChanged();
+            }
 
             FieldIdentifier = component.FieldIdentifier;
         }
