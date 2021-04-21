@@ -68,16 +68,7 @@ namespace Radzen.Blazor
         {
             if (EditContext != null)
             {
-                bool valid = false;
-
-                try
-                {
-                    valid = EditContext.Validate();
-                }
-                catch
-                {
-
-                }
+                bool valid = EditContext.Validate();
 
                 if (valid)
                 {
