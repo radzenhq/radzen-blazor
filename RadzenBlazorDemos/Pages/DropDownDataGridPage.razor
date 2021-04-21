@@ -45,14 +45,14 @@
             </Template>
         </RadzenDropDownDataGrid>
         <h3 style="margin-top: 2rem">DropDownDataGrid with multiple selection and multiple columns</h3>
-        <RadzenDropDownDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value=@multipleValues
+        <RadzenDropDownDataGrid @ref="grid" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value=@multipleValues
                                 Multiple="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
                                 Change=@(args => OnChange(args, "DropDownDataGrid with multiple selection")) Style="width:400px">
             <Columns>
                 <RadzenDropDownDataGridColumn Width="40px" Sortable="false">
                     <HeaderTemplate>
                         <RadzenCheckBox TriState="false" TValue="bool" Value="@(customers.Any(c => multipleValues != null && multipleValues.Contains(c.CustomerID)))"
-                                        Change="@(args => multipleValues = args ? customers.Select(c => c.CustomerID) : multipleValues = Enumerable.Empty<string>())" />
+                                        Change="@(args => multipleValues = args ? grid.View.Cast<Customer>().Select(c => c.CustomerID) : multipleValues = Enumerable.Empty<string>())" />
                     </HeaderTemplate>
                     <Template Context="data">
                         <RadzenCheckBox TriState="false" Value="@(multipleValues != null && multipleValues.Contains(((Customer)data).CustomerID))" />
@@ -72,6 +72,7 @@
 </RadzenExample>
 
 @code {
+    RadzenDropDownDataGrid<IEnumerable<string>> grid;
     IEnumerable<Customer> customers;
 
     IEnumerable<string> multipleValues;
