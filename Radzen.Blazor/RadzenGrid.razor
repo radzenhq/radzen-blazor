@@ -946,6 +946,12 @@
             {
                 expandedItems.Remove(itemToCollapse);
                 await RowCollapse.InvokeAsync(itemToCollapse);
+
+                if(object.Equals(item,itemToCollapse))
+                {
+                    return;
+                }
+
             }
         }
 
