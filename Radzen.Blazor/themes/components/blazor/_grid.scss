@@ -426,61 +426,65 @@ $grid-button-line-height: $grid-button-height !default;
   font-size: $grid-filter-font-size;
   font-weight: normal;
 
-  label {
-    display: flex;
-    flex: auto;
-    align-items: center;
+  .rz-cell-filter-label {
+      display: flex;
+      flex: auto;
+      align-items: center;
 
-    > .rzi {
-      width: $grid-filter-icon-width;
-      height: $grid-filter-icon-height;
-      font-size: $grid-filter-font-size;
-      margin: $grid-filter-icon-margin;
-      color: $grid-filter-color;
+      > .rzi {
+        width: $grid-filter-icon-width;
+        height: $grid-filter-icon-height;
+        font-size: $grid-filter-font-size;
+        margin: $grid-filter-icon-margin;
+        color: $grid-filter-color;
 
-      &.rz-cell-filter-clear {
-        margin-left: auto;
+        &.rz-cell-filter-clear {
+          margin-left: auto;
+        }
+      }
+
+    .rz-spinner {
+      border: none;
+      padding: 0;
+      height: auto;
+      background-color: transparent;
+      box-shadow: none;
+      line-height: 1;
+      flex: auto;
+
+      input {
+        line-height: 1;
+        &:focus {
+          outline: none;
+          color: $grid-filter-focus-color;
+        }
+      }
+
+      button {
+        display: none;
       }
     }
-  }
+    .rz-chkbox-box {
 
-  .rz-spinner {
-    border: none;
-    padding: 0;
-    height: auto;
-    background-color: transparent;
-    box-shadow: none;
-    line-height: 1;
-    flex: auto;
+      &.rz-state-active {
+        background-color: $input-background-color;
+      }
+    }
 
-    input {
+    > input {
+      width: 0;
+      flex: auto;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+      background-color: transparent;
+      color: $grid-filter-color;
       line-height: 1;
-    }
 
-    button {
-      display: none;
-    }
-  }
-
-  .rz-chkbox-box {
-    &.rz-state-active {
-      background-color: $input-background-color;
-    }
-  }
-
-  input {
-    width: 0;
-    flex: auto;
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    background-color: transparent;
-    color: $grid-filter-color;
-    line-height: 1;
-
-    &:focus {
-      outline: none;
-      color: $grid-filter-focus-color;
+      &:focus {
+        outline: none;
+        color: $grid-filter-focus-color;
+      }
     }
   }
 }
