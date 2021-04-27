@@ -66,9 +66,10 @@
         };
         timer.Start();
 
-        await BusyDialog();
+        await BusyDialog("Busy...");
     }
 
+    // Busy dialog from markup
     async Task BusyDialog() => await DialogService.OpenAsync("", ds =>
         @<div>
             <div class="row">
@@ -77,4 +78,25 @@
                 </div>
             </div>
     </div>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });
+
+    // Busy dialog from string
+    async Task BusyDialog(string message) => await DialogService.OpenAsync("", ds =>
+    {
+        RenderFragment content = b =>
+        {
+            var i = 0;
+
+            b.OpenElement(i++, "div");
+            b.AddAttribute(i++, "class", "row");
+
+            b.OpenElement(i++, "div");
+            b.AddAttribute(i++, "class", "col-md-12");
+
+            b.AddContent(i++, message);
+
+            b.CloseElement();
+            b.CloseElement();
+        };
+        return content;
+    }, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });
 }
