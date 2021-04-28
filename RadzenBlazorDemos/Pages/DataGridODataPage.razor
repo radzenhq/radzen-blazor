@@ -9,38 +9,38 @@
 <p>This page demonstrates how to data-bind the Radzen Blazor DataGrid to OData service via the LoadData event.</p>
 
 <RadzenExample Name="DataGridOData" Heading="false" Documentation="false">
-<RadzenGrid Count="@count" style="height:400px" Data="@employees" LoadData="@LoadData" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
+<RadzenDataGrid Count="@count" style="height:400px" Data="@employees" LoadData="@LoadData" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
     <Columns>
-        <RadzenGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
-        <RadzenGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false">
+        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
+        <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false">
             <Template Context="data">
                 <RadzenImage Path="@data?.Photo" />
             </Template>
-        </RadzenGridColumn>
-        <RadzenGridColumn TItem="Employee" Property="LastName" Title="Last Name" />
-        <RadzenGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
-        <RadzenGridColumn TItem="Employee" Property="Title" Title="Title" />
-        <RadzenGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
-        <RadzenGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date">
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" />
+        <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
+        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date">
             <Template Context="data">
                 @String.Format("{0:d}", data.BirthDate)
             </Template>
-        </RadzenGridColumn>
-        <RadzenGridColumn TItem="Employee" Property="HireDate" Title="Hire Date">
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date">
             <Template Context="data">
                 @String.Format("{0:d}", data.HireDate)
             </Template>
-        </RadzenGridColumn>
-        <RadzenGridColumn TItem="Employee" Property="Address" Title="Address" />
-        <RadzenGridColumn TItem="Employee" Property="City" Title="City" />
-        <RadzenGridColumn TItem="Employee" Property="Region" Title="Region" />
-        <RadzenGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
-        <RadzenGridColumn TItem="Employee" Property="Country" Title="Country" />
-        <RadzenGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
-        <RadzenGridColumn TItem="Employee" Property="Extension" Title="Extension" />
-        <RadzenGridColumn TItem="Employee" Property="Notes" Title="Notes" />
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
+        <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
+        <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" />
+        <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
+        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
+        <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
+        <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" />
+        <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
     </Columns>
-</RadzenGrid>
+</RadzenDataGrid>
 </RadzenExample>
 
 @code {

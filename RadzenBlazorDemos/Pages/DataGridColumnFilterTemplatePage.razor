@@ -11,20 +11,20 @@
     }
     else
     {
-        <RadzenGrid Data=@filteredEmployees AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
+        <RadzenDataGrid Data=@filteredEmployees AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
             <Columns>
-                <RadzenGridColumn TItem="Employee" Property="ID" Title="ID" />
-                <RadzenGridColumn TItem="Employee" Property="Name" Title="Name" />
-                <RadzenGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy">
+                <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />
+                <RadzenDataGridColumn TItem="Employee" Property="Name" Title="Name" />
+                <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy">
                     <FilterTemplate>
                         <RadzenDropDown @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%"
                                         Change=@OnChange
                                         Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy>().Select(t => new { Text = $"{t}", Value = t }))" />
 
                     </FilterTemplate>
-                </RadzenGridColumn>
+                </RadzenDataGridColumn>
             </Columns>
-        </RadzenGrid>
+        </RadzenDataGrid>
     }
 </RadzenExample>
 

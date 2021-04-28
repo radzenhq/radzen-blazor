@@ -12,13 +12,13 @@
 
 <RadzenExample Name="DataGridConditionalTemplate" Heading="false" Documentation="false">
     <h3>Order Details</h3>
-    <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+    <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 Data="@orderDetails" TItem="OrderDetail" ColumnWidth="200px" RowRender="@RowRender" CellRender="@CellRender">
         <Columns>
-            <RadzenGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
-            <RadzenGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
-            <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
-            <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity">
+            <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
+            <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
+            <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+            <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity">
                 <Template Context="data">
                     @if (data.Quantity > 20)
                     {
@@ -29,10 +29,10 @@
                         <span style='color:black'>@data.Quantity</span>
                     }
                 </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
         </Columns>
-    </RadzenGrid>
+    </RadzenDataGrid>
 </RadzenExample>
 
 @code {
@@ -48,7 +48,7 @@
         args.Attributes.Add("style", $"font-weight: {(args.Data.Quantity > 20 ? "bold" : "normal")};");
     }
 
-    void CellRender(CellRenderEventArgs<OrderDetail> args)
+    void CellRender(DataGridCellRenderEventArgs<OrderDetail> args)
     {
         if (args.Column.Property == "Quantity")
         {

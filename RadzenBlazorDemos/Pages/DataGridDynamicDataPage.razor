@@ -2,27 +2,27 @@
 
 <RadzenExample Name="DataGridDynamicData">
     <h3>Binding to IEnumerable of IDictionary</h3>
-    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced"
+    <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced"
                 AllowPaging="true" PageSize="5" AllowSorting="true" Data="@data" TItem="IDictionary<string, dynamic>"
                 Count="@count" LoadData="@LoadData">
         <Columns>
-            <RadzenGridColumn TItem="IDictionary<string, dynamic>" Property="EmployeeID" Title="EmployeeID" Type="integer">
+            <RadzenDataGridColumn TItem="IDictionary<string, dynamic>" Property="EmployeeID" Title="EmployeeID" Type="integer">
                 <Template>
                     @context["EmployeeID"]
                 </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="IDictionary<string, dynamic>" Property="FirstName" Title="FirstName" Type="string">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="IDictionary<string, dynamic>" Property="FirstName" Title="FirstName" Type="string">
                 <Template>
                     @context["FirstName"]
                 </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="IDictionary<string, dynamic>" Property="LastName" Title="LastName" Type="string">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="IDictionary<string, dynamic>" Property="LastName" Title="LastName" Type="string">
                 <Template>
                     @context["LastName"]
                 </Template>
-            </RadzenGridColumn>
+            </RadzenDataGridColumn>
         </Columns>
-    </RadzenGrid>
+    </RadzenDataGrid>
 </RadzenExample>
 @code {
     IEnumerable<IDictionary<string, dynamic>> data;

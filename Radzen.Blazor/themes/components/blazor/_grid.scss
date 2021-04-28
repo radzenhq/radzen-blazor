@@ -181,7 +181,7 @@ $grid-button-line-height: $grid-button-height !default;
   border-top: $grid-cell-border;
 }
 
-.rz-datatable-thead {
+.rz-datatable-thead, .rz-grid-table thead {
   .rzi {
     color: $grid-cell-color;
   }
@@ -210,7 +210,7 @@ $grid-button-line-height: $grid-button-height !default;
   }
 }
 
-.rz-datatable-tfoot {
+.rz-datatable-tfoot, .rz-grid-table tfoot {
   td {
     background-color: $grid-header-background-color;
     font-size: $grid-cell-font-size;
@@ -299,7 +299,7 @@ $grid-button-line-height: $grid-button-height !default;
   }
 }
 
-.rz-datatable-data .rz-cell-data {
+.rz-datatable-data .rz-cell-data, .rz-grid-table .rz-cell-data {
   .rz-button-sm {
     line-height: $grid-button-line-height;
     padding: $grid-button-text-padding;
@@ -321,7 +321,7 @@ $grid-button-line-height: $grid-button-height !default;
   }
 }
 
-.rz-datatable-data {
+.rz-datatable-data, .rz-grid-table {
   td {
     padding: $grid-cell-padding;
     border-bottom: $grid-cell-border;
@@ -709,4 +709,67 @@ $grid-button-line-height: $grid-button-height !default;
 
 .rz-grid-filter-active {
   color: $default-link !important;
+}
+
+.rz-data-grid {
+    border: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+}
+
+.rz-data-grid-data {
+    overflow: auto;
+    flex: 1;
+}
+
+td, th {
+    padding: .5rem;
+}
+
+thead {
+
+    th {
+        position: sticky;
+        top: 0;
+    }
+
+    tr:nth-of-type(2) {
+        th {
+            top: 35px; // height of the first header row
+        }
+    }
+}
+
+.rz-grid-table-fixed {
+    table-layout: fixed;
+
+    .rz-frozen-cell {
+        position: -webkit-sticky;
+        position: sticky;
+        background: $grid-header-background-color;
+        z-index: 1;
+    }
+}
+
+tfoot, tfoot td {
+    position: sticky;
+    bottom: 0;
+}
+
+.rz-grid-table {
+    overflow: auto;
+    width: 100%;
+    position: relative;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    th {
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+    }
 }

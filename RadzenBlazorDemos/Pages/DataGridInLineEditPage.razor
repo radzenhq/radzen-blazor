@@ -12,16 +12,16 @@
 
 <RadzenExample Name="DataGridInLineEdit" Heading="false" Documentation="false">
     <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Text="Add" Click="@InsertRow" />
-    <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" EditMode="DataGridEditMode.Single"
+    <RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" EditMode="DataGridEditMode.Single"
                 Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow">
         <Columns>
-            <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
-            <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer">
+            <RadzenDataGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
+            <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer">
                 <EditTemplate Context="order">
                     <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%" />
                 </EditTemplate>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
                 <Template Context="order">
                     <div>@order.Employee?.LastName</div>
                     <RadzenImage Path="@order.Employee?.Photo" Style="width:150px" />
@@ -33,32 +33,32 @@
                         </Template>
                     </RadzenDropDown>
                 </EditTemplate>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
                 <Template Context="order">
                     @String.Format("{0:d}", order.OrderDate)
                 </Template>
                 <EditTemplate Context="order">
                     <RadzenDatePicker @bind-Value="order.OrderDate" Style="width:100%" />
                 </EditTemplate>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
                 <Template Context="order">
                     @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
                 </Template>
                 <EditTemplate Context="order">
                     <RadzenNumeric @bind-Value="order.Freight" Style="width:100%" />
                 </EditTemplate>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name">
                 <EditTemplate Context="order">
                     <RadzenTextBox @bind-Value="order.ShipName" Style="width:100%; display: block" Name="ShipName" />
                     <RadzenRequiredValidator Text="ShipName is required" Component="ShipName" Popup="true" />
                 </EditTemplate>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Context="sampleBlazorModelsSampleOrder" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Context="sampleBlazorModelsSampleOrder" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
                 <Template Context="order">
-                    <RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditRow(order))">
+                    <RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditRow(order))" @onclick:stopPropagation="true">
                     </RadzenButton>
                 </Template>
                 <EditTemplate Context="order">
@@ -67,23 +67,23 @@
                     <RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => CancelEdit(order))">
                     </RadzenButton>
                 </EditTemplate>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Context="order" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Context="order" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
                 <Template Context="order">
-                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@(args => DeleteRow(order))">
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@(args => DeleteRow(order))"  @onclick:stopPropagation="true">
                     </RadzenButton>
                 </Template>
                 <EditTemplate Context="order">
                     <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@(args => DeleteRow(order))">
                     </RadzenButton>
                 </EditTemplate>
-            </RadzenGridColumn>
+            </RadzenDataGridColumn>
         </Columns>
-    </RadzenGrid>
+    </RadzenDataGrid>
 </RadzenExample>
 
 @code {
-    RadzenGrid<Order> ordersGrid;
+    RadzenDataGrid<Order> ordersGrid;
     IList<Order> orders;
     IEnumerable<Customer> customers;
     IEnumerable<Employee> employees;

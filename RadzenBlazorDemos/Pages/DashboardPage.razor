@@ -67,9 +67,9 @@
     <div class="col-xl-6 col-lg-12 py-2">
         <RadzenCard>
             <h2>Issue List</h2>
-            <RadzenGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true" AllowSorting="true">
+            <RadzenDataGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true" AllowSorting="true">
                 <Columns>
-                    <RadzenGridColumn TItem="Issue" Title="User" Width="200px" Property="User.Login">
+                    <RadzenDataGridColumn TItem="Issue" Title="User" Width="200px" Property="User.Login">
                         <FilterTemplate>
                             <RadzenDropDown AllowClear="true" AllowFiltering="true" Data=@users TextProperty="Login" @bind-Value="selectedUser" Change=@FilterIssues>
                                 <Template Context="user">
@@ -82,13 +82,13 @@
                         <Template Context="issue">
                             <img style="width: 40px; height: 40px; border-radius: 50%;" src=@issue.User.AvatarUrl />@issue.User.Login
                         </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Issue" Property="Title" Title="Title" Width="200px">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Issue" Property="Title" Title="Title" Width="200px">
                         <Template Context="issue">
                             <RadzenLink Path=@issue.Url Text=@issue.Title Target="_blank" />
                         </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Issue" Property="State" Title="State" Width="100px">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Issue" Property="State" Title="State" Width="100px">
                         <FilterTemplate>
                             <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues />
                         </FilterTemplate>
@@ -108,8 +108,8 @@
                                 </div>
                             }
                         </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Issue" Title="Labels" Sortable="false">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Issue" Title="Labels" Sortable="false">
                         <FilterTemplate>
                             <RadzenDropDown Style="width: 100%" AllowClear="true" AllowFiltering="true" Multiple="true" Data=@labels @bind-Value="selectedLabels" Change=@FilterIssues>
                                 <Template Context="label">
@@ -125,9 +125,9 @@
                                 <span style="display: inline-block; color: #fff; margin: 4px; padding: 0 4px; border-radius: 4px; background-color: #@label.Color">@Regex.Replace(label.Name, ":\\w+:", "")</span>
                             }</div>
                         </Template>
-                    </RadzenGridColumn>
+                    </RadzenDataGridColumn>
                 </Columns>
-            </RadzenGrid>
+            </RadzenDataGrid>
         </RadzenCard>
     </div>
     <div class="col-xl-3 col-lg-6 py-2">

@@ -17,50 +17,50 @@
 }
 else
 {
-    <RadzenGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
+    <RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
                 Data="@orders" TItem="Order">
         <Columns>
-            <RadzenGridColumn Width="50px" TItem="Order" Title="Nr." Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+            <RadzenDataGridColumn Width="50px" TItem="Order" Title="Nr." Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
                 <Template>
                     @(orders.IndexOf(context) + 1)
                 </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID">
                 <FooterTemplate>
                     Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
                 </FooterTemplate>
-            </RadzenGridColumn>
-            <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
-            <RadzenGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
+            <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
                 <Template Context="order">
                     <div>@order.Employee?.LastName</div>
                     <RadzenImage Path="@order.Employee?.Photo" Style="width:150px" />
                 </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
                 <Template Context="order">
                     @String.Format("{0:d}", order.OrderDate)
                 </Template>
                 <FooterTemplate>
                     Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).Last().OrderDate)</b>
                 </FooterTemplate>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
                 <Template Context="order">
                     @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
                 </Template>
                 <FooterTemplate>
                     Total amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orders.Sum(o => o.Freight))</b>
                 </FooterTemplate>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
         </Columns>
-    </RadzenGrid>
+    </RadzenDataGrid>
 }
 </RadzenExample>
 
 @code {
-    RadzenGrid<Order> ordersGrid;
+    RadzenDataGrid<Order> ordersGrid;
     IList<Order> orders;
 
     protected override void OnInitialized()
