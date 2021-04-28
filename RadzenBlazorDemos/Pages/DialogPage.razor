@@ -69,16 +69,6 @@
         await BusyDialog("Busy...");
     }
 
-    // Busy dialog from markup
-    async Task BusyDialog() => await DialogService.OpenAsync("", ds =>
-        @<div>
-            <div class="row">
-                <div class="col-md-12">
-                    Loading...
-                </div>
-            </div>
-    </div>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });
-
     // Busy dialog from string
     async Task BusyDialog(string message) => await DialogService.OpenAsync("", ds =>
     {
