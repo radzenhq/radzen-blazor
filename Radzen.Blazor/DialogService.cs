@@ -163,6 +163,25 @@ namespace Radzen
             ShowClose = options != null ? options.ShowClose : true,
             Style = options != null ? options.Style : "",
         });
+
+        public async Task Busy(string message) => await OpenAsync("", ds => {
+            RenderFragment content = b =>
+            {
+                var i = 0;
+
+                b.OpenElement(i++, "div");
+                b.AddAttribute(i++, "class", "row");
+
+                b.OpenElement(i++, "div");
+                b.AddAttribute(i++, "class", "col-md-12");
+
+                b.AddContent(i++, message);
+
+                b.CloseElement();
+                b.CloseElement();
+            };
+            return content;
+        }, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });    
     }
 
     public class DialogOptions
