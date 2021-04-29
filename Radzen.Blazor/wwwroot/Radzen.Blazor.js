@@ -750,7 +750,9 @@ window.Radzen = {
           e.target.clientHeight < e.target.scrollHeight ? (e.target.offsetWidth - e.target.clientWidth) + 'px' : '0px';
 
     if (e.target.nextElementSibling) {
-      e.target.nextElementSibling.style.paddingRight = scrollLeft;
+        e.target.nextElementSibling.style.marginLeft = scrollLeft;
+        e.target.nextElementSibling.firstElementChild.style.paddingRight =
+            e.target.clientHeight < e.target.scrollHeight ? (e.target.offsetWidth - e.target.clientWidth) + 'px' : '0px';
     }
 
     for (var i = 0; i < document.body.children.length; i++) {
