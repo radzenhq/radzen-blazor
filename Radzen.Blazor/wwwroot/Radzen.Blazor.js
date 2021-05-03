@@ -1053,11 +1053,15 @@ window.Radzen = {
   selectionAttributes: function (selector, attributes) {
     var selection = getSelection();
     var target = selection.focusNode;
+    var innerHTML;
     if (target) {
       if (target.nodeType == 3) {
         target = target.parentElement;
       } else {
         target = target.childNodes[selection.focusOffset];
+        if (target) {
+          innerHTML = target.outerHTML;
+        }
       }
       if (target && !target.matches(selector)) {
         target = target.closest(selector);
@@ -1068,7 +1072,7 @@ window.Radzen = {
         result[name] = target[name];
       }
       return result;
-    }, { innerText: selection.toString() });
+    }, { innerText: selection.toString(), innerHTML: innerHTML });
   },
   destroyEditor: function (ref) {
     if (ref) {

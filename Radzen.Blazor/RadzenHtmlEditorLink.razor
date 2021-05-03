@@ -12,6 +12,7 @@
     class LinkAttributes
     {
         public string InnerText { get; set; }
+        public string InnerHtml { get; set; }
         public string Href { get; set; }
         public string Target { get; set; }
     }
@@ -53,10 +54,13 @@
                 <label>@UrlText</label>
                 <RadzenTextBox @bind-Value=@attributes.Href style="width: 100%" />
             </div>
+            @if (string.IsNullOrEmpty(attributes.InnerHtml))
+            {
             <div class="rz-html-editor-dialog-item">
                 <label>@LinkText</label>
                 <RadzenTextBox @bind-Value=@attributes.InnerText style="width: 100%" />
             </div>
+            }
             <div class="rz-html-editor-dialog-item">
                 <RadzenCheckBox @bind-Value=@blank />
                 <label>@OpenInNewWindowText</label>
@@ -78,7 +82,8 @@
             {
                 html.Append(" target=\"_blank\"");
             }
-            html.AppendFormat(">{0}</a>", attributes.InnerText);
+
+            html.AppendFormat(">{0}</a>", string.IsNullOrEmpty(attributes.InnerText) ? attributes.InnerHtml : attributes.InnerText);
 
             await Editor.ExecuteCommandAsync("insertHTML", html.ToString());
         }
