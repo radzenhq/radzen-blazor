@@ -41,15 +41,17 @@
     [Parameter]
     public double Size { get; set; }
 
+    double Clip(double v) => Math.Max(Min, Math.Min(v, Max));
+
     protected override void OnParametersSet()
     {
-        var startRatio = (From - Min) / (Max - Min);
+        var startRatio = (Clip(From) - Min) / (Max - Min);
         var startAngle = StartAngle + startRatio * (EndAngle - StartAngle);
 
         var outerStart = Center.ToCartesian(Radius, Polar.ToRadian(startAngle - 90));
         var innerStart = Center.ToCartesian(Radius - Size, Polar.ToRadian(startAngle - 90));
 
-        var endRatio = (To - Min) / (Max - Min);
+        var endRatio = (Clip(To) - Min) / (Max - Min);
         var endAngle = StartAngle + endRatio * (EndAngle - StartAngle);
 
         var outerEnd = Center.ToCartesian(Radius, Polar.ToRadian(endAngle - 90));
