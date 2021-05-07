@@ -235,6 +235,11 @@
         }
     }
 
+    object filterValue;
+    FilterOperator? filterOperator;
+    object secondFilterValue;
+    FilterOperator? secondFilterOperator;
+
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         if (parameters.DidParameterChange(nameof(Visible), Visible) ||
@@ -246,7 +251,47 @@
             }
         }
 
+        if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))
+        {
+            filterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
+        }
+
+        if (parameters.DidParameterChange(nameof(FilterOperator), FilterOperator))
+        {
+            filterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(FilterOperator));
+        }
+
+        if (parameters.DidParameterChange(nameof(SecondFilterValue), SecondFilterValue))
+        {
+            secondFilterValue = parameters.GetValueOrDefault<object>(nameof(SecondFilterValue));
+        }
+
+        if (parameters.DidParameterChange(nameof(SecondFilterOperator), SecondFilterOperator))
+        {
+            secondFilterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(SecondFilterOperator));
+        }
+
         await base.SetParametersAsync(parameters);
+    }
+
+    internal object GetFilterValue()
+    {
+        return filterValue ?? FilterValue;
+    }
+
+    internal FilterOperator GetFilterOperator()
+    {
+        return filterOperator ?? FilterOperator;
+    }
+
+    internal object GetSecondFilterValue()
+    {
+        return secondFilterValue ?? SecondFilterValue;
+    }
+
+    internal FilterOperator GetSecondFilterOperator()
+    {
+        return secondFilterOperator ?? SecondFilterOperator;
     }
 
     internal void SetFilterValue(object value, bool isFirst = true)
@@ -259,11 +304,11 @@
 
         if (isFirst)
         {
-            FilterValue = value;
+            filterValue = value;
         }
         else
         {
-            SecondFilterValue = value;
+            secondFilterValue = value;
         }
     }
 
@@ -273,14 +318,14 @@
     [Parameter]
     public FilterOperator SecondFilterOperator { get; set; }
 
-    internal void SetFilterOperator(FilterOperator value)
+    internal void SetFilterOperator(FilterOperator? value)
     {
-        FilterOperator = value;
+        filterOperator = value;
     }
 
-    internal void SetSecondFilterOperator(FilterOperator value)
+    internal void SetSecondFilterOperator(FilterOperator? value)
     {
-        SecondFilterOperator = value;
+        secondFilterOperator = value;
     }
 
     internal void SetLogicalFilterOperator(LogicalFilterOperator value)

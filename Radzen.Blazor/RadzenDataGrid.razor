@@ -94,7 +94,7 @@
                                                 else
                                                 {
                                                     <RadzenLabel Text="@FilterText" class="rz-grid-filter-label" />
-                                                    <RadzenDropDown @onclick:preventDefault="true" Data="@(column.GetFilterOperators().Select(t => new { Value = $"{t}", Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@column.FilterOperator" Change="@(args => column.SetFilterOperator((FilterOperator)args))" />
+                                                    <RadzenDropDown @onclick:preventDefault="true" Data="@(column.GetFilterOperators().Select(t => new { Value = $"{t}", Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@column.GetFilterOperator()" Change="@(args => column.SetFilterOperator((FilterOperator)args))" />
                                                     @if (PropertyAccess.IsNumeric(column.FilterPropertyType))
                                                     {
                                                         @(DrawNumericFilter(column, false))
@@ -103,22 +103,22 @@
                                                         column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
                                                     {
                                                         <RadzenDatePicker TValue="@object" ShowTime="true" ShowTimeOkButton="true" DateFormat="@getFilterDateFormat(column)"
-                                                                          Value="@column.FilterValue" Change="@(args => column.SetFilterValue(args.Value))" />
+                                                                          Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args.Value))" />
 
                                                     }
                                                     else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
                                                     {
-                                                        <RadzenCheckBox TriState="true" TValue="@object" Value="@column.FilterValue" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
+                                                        <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
                                                     }
                                                     else
                                                     {
-                                                        <RadzenTextBox Value="@($"{column.FilterValue}")" Change="@(args => column.SetFilterValue(args))" />
+                                                        <RadzenTextBox Value="@($"{column.GetFilterValue()}")" Change="@(args => column.SetFilterValue(args))" />
                                                     }
 
                                                     <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 80px"
                                                                     Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator" Value="@column.LogicalFilterOperator" Change="@(args => column.SetLogicalFilterOperator((LogicalFilterOperator)args))" />
 
-                                                    <RadzenDropDown @onclick:preventDefault="true" Data="@(column.GetFilterOperators().Select(t => new { Value = $"{t}", Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@column.SecondFilterOperator" Change="@(args => column.SetSecondFilterOperator((FilterOperator)args))" />
+                                                    <RadzenDropDown @onclick:preventDefault="true" Data="@(column.GetFilterOperators().Select(t => new { Value = $"{t}", Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@column.GetSecondFilterOperator()" Change="@(args => column.SetSecondFilterOperator((FilterOperator)args))" />
                                                     @if (PropertyAccess.IsNumeric(column.FilterPropertyType))
                                                     {
                                                         @(DrawNumericFilter(column, false, false))
@@ -128,16 +128,16 @@
                                                     {
                                                         <RadzenDatePicker TValue="@object"
                                                                           ShowTime="true" ShowTimeOkButton="true" DateFormat="@getFilterDateFormat(column)"
-                                                                          Value="@column.SecondFilterValue" Change="@(args => column.SetFilterValue(args.Value, false))" />
+                                                                          Value="@column.GetSecondFilterValue()" Change="@(args => column.SetFilterValue(args.Value, false))" />
 
                                                     }
                                                     else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
                                                     {
-                                                        <RadzenCheckBox TriState="true" TValue="@object" Value="@column.SecondFilterValue" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column, false))" />
+                                                        <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetSecondFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column, false))" />
                                                     }
                                                     else
                                                     {
-                                                        <RadzenTextBox Value="@($"{column.SecondFilterValue}")" Change="@(args => column.SetFilterValue(args, false))" />
+                                                        <RadzenTextBox Value="@($"{column.GetSecondFilterValue()}")" Change="@(args => column.SetFilterValue(args, false))" />
                                                     }
                                                 }
                                             </div>
@@ -181,9 +181,9 @@
                                                         {
                                                             <i onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")"
                                                                class="rzi">date_range</i>
-                                                            @if (column.FilterValue != null)
+                                                            @if (column.GetFilterValue() != null)
                                                             {
-                                                                <span class="rz-current-filter">@column.FilterValue</span>
+                                                                <span class="rz-current-filter">@column.GetFilterValue()</span>
                                                                 <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear">close</i>
                                                             }
                                                             <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel"
@@ -219,7 +219,7 @@
 
                                                                         <RadzenDatePicker TValue="@object"
                                                                                           ShowTime="true" ShowTimeOkButton="false" Inline="true" DateFormat="@getFilterDateFormat(column)"
-                                                                                          Value="@column.FilterValue" Change="@(args => column.SetFilterValue(args.Value))" />
+                                                                                          Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args.Value))" />
 
                                                                     </div>
                                                                     <div class="rz-date-filter-buttons">
@@ -241,12 +241,12 @@
                                                         }
                                                         else if (column.Type == "boolean")
                                                         {
-                                                            <RadzenCheckBox TriState="true" TValue="@object" Value="@column.FilterValue" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
+                                                            <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
                                                         }
                                                         else
                                                         {
                                                             <i class="rzi">search</i>
-                                                            <input id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.FilterValue" type="text" />
+                                                            <input id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" />
                                                         }
                                                     </label>
                                                 }
@@ -437,7 +437,7 @@
 
     protected string DateFilterOperatorStyle(RadzenDataGridColumn<TItem> column, FilterOperator value)
     {
-        return column.FilterOperator == value ?
+        return column.GetFilterOperator() == value ?
             "rz-listbox-item  rz-state-highlight" :
             "rz-listbox-item ";
     }
@@ -450,7 +450,7 @@
     async Task DebounceFilter(RadzenDataGridColumn<TItem> column)
     {
         var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", getFilterInputId(column));
-        if (!object.Equals(column.FilterValue, inputValue))
+        if (!object.Equals(column.GetFilterValue(), inputValue))
         {
             await InvokeAsync(() => { OnFilter(new ChangeEventArgs() { Value = inputValue }, column); });
         }
@@ -521,7 +521,7 @@
 
             builder.OpenComponent(0, numericType);
 
-            builder.AddAttribute(1, "Value", isFirst ? column.FilterValue : column.SecondFilterValue);
+            builder.AddAttribute(1, "Value", isFirst ? column.GetFilterValue() : column.GetSecondFilterValue());
             builder.AddAttribute(2, "Style", "width:100%");
 
             Action<object> action;
@@ -549,7 +549,7 @@
         string property = column.GetFilterProperty();
         if (AllowFiltering && column.Filterable && !string.IsNullOrEmpty(property))
         {
-            if (!object.Equals(isFirst ? column.FilterValue : column.SecondFilterValue, args.Value) || force)
+            if (!object.Equals(isFirst ? column.GetFilterValue() : column.GetSecondFilterValue(), args.Value) || force)
             {
                 column.SetFilterValue(args.Value, isFirst);
                 skip = 0;
@@ -570,7 +570,7 @@
 
     private string getFilterIconCss(RadzenDataGridColumn<TItem> column)
     {
-        var additionalStyle = column.FilterValue != null || column.SecondFilterValue != null ? "rz-grid-filter-active" : "";
+        var additionalStyle = column.GetFilterValue() != null || column.GetSecondFilterValue() != null ? "rz-grid-filter-active" : "";
         return $"rzi rz-grid-filter-icon {additionalStyle}";
     }
 
@@ -591,6 +591,9 @@
         }
         column.SetFilterValue(null);
         column.SetFilterValue(null, false);
+        column.SetFilterOperator(null);
+        column.SetSecondFilterOperator(null);
+
         skip = 0;
         CurrentPage = 0;
         await InvokeAsync(Reload);
@@ -602,7 +605,7 @@
         {
             await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
         }
-        OnFilter(new ChangeEventArgs() { Value = column.FilterValue }, column, true);
+        OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
     }
 
     protected IReadOnlyDictionary<string, object> CellAttributes(TItem item, RadzenDataGridColumn<TItem> column)
