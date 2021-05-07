@@ -47,6 +47,11 @@
                 {
                     propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
                 }
+
+                if (_filterPropertyType == typeof(string))
+                {
+                    FilterOperator = FilterOperator.Contains;
+                }
             }
         }
     }
@@ -292,6 +297,14 @@
     internal string GetWidth()
     {
         return !string.IsNullOrEmpty(runtimeWidth) ? runtimeWidth : Width;
+    }
+
+    internal IEnumerable<FilterOperator> GetFilterOperators()
+    {
+        return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
+            var isStringOperator = o == FilterOperator.Contains || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
+            return FilterPropertyType == typeof(string) ? isStringOperator || o == FilterOperator.Equals || o == FilterOperator.NotEquals : !isStringOperator;
+        });
     }
 
     public void Dispose()
