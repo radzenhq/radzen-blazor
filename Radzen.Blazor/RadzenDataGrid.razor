@@ -776,6 +776,16 @@
                 }
             }
 
+            if(!LoadData.HasDelegate)
+            {
+                var count = view.Count();
+                if (count != Count)
+                {
+                    Count = count;
+                    StateHasChanged();
+                }
+            }
+
             return view;
         }
     }
@@ -866,7 +876,7 @@
 
         if (Data != null && !LoadData.HasDelegate)
         {
-            Count = View.Count();
+            Count = 1;
         }
 
         var orderBy = GetOrderBy();
