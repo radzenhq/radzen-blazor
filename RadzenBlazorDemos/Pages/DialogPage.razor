@@ -6,14 +6,13 @@
     <div class="row">
         <div class="col-xl-6">
             <h3>Dialog</h3>
-            <RadzenButton Text=@($"Show OrderID: {orderID} details") Click=@(args => DialogService.Open<DialogCardPage>($"Order {orderID}",
-                        new Dictionary<string, object>() { { "OrderID", orderID } },
-                        new DialogOptions(){ Width = "700px", Height = "530px" })) />
-
+            <RadzenButton Disabled="@orderOpened" Text=@($"Show OrderID: {orderID} details") Click=@OpenOrder />
             <h3 style="margin-top: 20px;">Simple Dialog</h3>
             <RadzenButton Text="Show dialog with inline Blazor content" Click=@ShowInlineDialog />
-            <h3 style="margin-top: 20px;">Busy Dialog</h3>
-            <RadzenButton Text="Show busy dialog" Click=@ShowBusyDialog />
+            <h3 style="margin-top: 20px;">Busy Dialog with string message</h3>
+            <RadzenButton Text="Show busy dialog" Click=@(args => ShowBusyDialog(true)) />
+            <h3 style="margin-top: 20px;">Busy Dialog with markup</h3>
+            <RadzenButton Text="Show busy dialog" Click=@(args => ShowBusyDialog(false)) />
             <h3 style="margin-top: 20px;">Confirm Dialog</h3>
             <RadzenButton Text="Show confirm dialog" Click=@(args => DialogService.Confirm("Are you sure?", "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })) />
         </div>
@@ -26,6 +25,7 @@
 @code {
     EventConsole console;
     int orderID = 10248;
+    bool orderOpened;
 
     protected override void OnInitialized()
     {
@@ -43,6 +43,17 @@
         console.Log($"Dialog closed with result: {result}");
     }
 
+    public async Task OpenOrder()
+    {
+        orderOpened = true;
+
+        await DialogService.OpenAsync<DialogCardPage>($"Order {orderID}",
+               new Dictionary<string, object>() { { "OrderID", orderID } },
+               new DialogOptions() { Width = "700px", Height = "530px" });
+
+        orderOpened = false;
+    }
+
     async Task ShowInlineDialog() => await DialogService.OpenAsync("Simple Dialog", ds =>
         @<div>
             <p Style="margin-bottom: 1rem">Confirm?</p>
@@ -56,17 +67,24 @@
             </div>
     </div>);
 
-    async Task ShowBusyDialog()
+    async Task ShowBusyDialog(bool withMessageAsString)
     {
         var timer = new Timer(2000);
-        timer.Elapsed += (sender, e) => 
-        { 
-            DialogService.Close(); 
-            timer.Stop(); 
+        timer.Elapsed += (sender, e) =>
+        {
+            timer.Stop();
+            DialogService.Close();
         };
         timer.Start();
 
-        await BusyDialog("Busy...");
+        if (withMessageAsString)
+        {
+            await BusyDialog("Busy...");
+        }
+        else
+        {
+            await BusyDialog();
+        }
     }
 
     // Busy dialog from markup
