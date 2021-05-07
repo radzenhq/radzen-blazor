@@ -43,9 +43,11 @@
 
     private string Path { get; set; }
 
+    double Clip(double v) => Math.Max(Min, Math.Min(v, Max));
+
     protected override void OnParametersSet()
     {
-        var ratio = (Value - Min) / (Max - Min);
+        var ratio = (Clip(Value) - Min) / (Max - Min);
         var angle = StartAngle + ratio * (EndAngle - StartAngle);
 
         angle = Polar.ToRadian(angle - 90);
