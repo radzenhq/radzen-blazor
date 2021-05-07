@@ -8,8 +8,12 @@
     [CascadingParameter]
     public RadzenUpload Upload { get; set; }
 
-    protected override void OnInitialized()
+    public override async Task SetParametersAsync(ParameterView parameters)
     {
+        Upload?.RemoveHeader(Name);
+
+        await base.SetParametersAsync(parameters);
+
         Upload?.AddHeader(Name, Value);
     }
 }

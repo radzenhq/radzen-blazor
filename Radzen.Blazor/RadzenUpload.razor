@@ -83,6 +83,10 @@
         headers.Add(name, value);
     }
 
+    internal void RemoveHeader(string name)
+    {
+        headers.Remove(name);
+    }
     private bool visibleChanged = false;
     private bool firstRender = true;
 
