@@ -6,8 +6,8 @@
     <Line Class="rz-line" X1="@x1" Y1="@y1" X2="@x2" Y2="@y1" Stroke="@XAxis.Stroke" StrokeWidth="@XAxis.StrokeWidth" LineType="@XAxis.LineType" />
     @for (var idx = start; idx <= end; idx += step)
     {
-        var value = Chart.CategoryScale.Value(idx);
-        var x = Chart.CategoryScale.Scale(idx, true);
+        var value = Chart.CategoryScale.Value((double)idx);
+        var x = Chart.CategoryScale.Scale((double)idx, true);
 
         var text = XAxis.Format(Chart.CategoryScale, value);
 
@@ -36,9 +36,9 @@
     </g>
 }
 @code {
-    double start;
-    double end;
-    double step;
+    decimal start;
+    decimal end;
+    decimal step;
     double x1;
     double x2;
     double y1;
@@ -59,12 +59,12 @@
         }
 
         var ticks = Chart.CategoryScale.Ticks(XAxis.TickDistance);
-        start = ticks.Start;
-        end = ticks.End;
-        step = ticks.Step;
+        start = (decimal)ticks.Start;
+        end = (decimal)ticks.End;
+        step = (decimal)ticks.Step;
 
-        x1 = Chart.CategoryScale.Scale(start);
-        x2 = Chart.CategoryScale.Scale(end);
+        x1 = Chart.CategoryScale.Scale(ticks.Start);
+        x2 = Chart.CategoryScale.Scale(ticks.End);
 
         var valueTicks = Chart.ValueScale.Ticks(YAxis.TickDistance);
         y1 = Chart.ValueScale.Scale(valueTicks.Start);
