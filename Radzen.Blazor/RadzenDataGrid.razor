@@ -1,7 +1,7 @@
 ﻿@using System.Linq.Dynamic.Core
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components.Forms
-@using Radzen;
+@using Radzen
 @typeparam TItem
 @inherits PagedDataBoundComponent<TItem>
 
@@ -261,130 +261,7 @@
                 <tbody>
                     @if (Data != null && Count > 0 && columns.Count > 0)
                     {
-                        int i = 0;
-                        @foreach (var item in LoadData.HasDelegate ? Data : PagedView)
-                        {
-                            var rowArgs = RowAttributes(item, i);
-
-                            <RadzenGridRow CssClass="@(RowStyle(item, i))" Attributes="@(rowArgs.Item2)" InEditMode="@IsRowInEditMode(item)">
-
-                                @if (Template != null)
-                                {
-                                    <td class="rz-col-icon">
-                                        <span class="rz-column-title"></span>
-                                        @if (rowArgs.Item1.Expandable)
-                                        {
-                                            <a href="javascript:void(0)" @onclick="@(_ => ExpandItem(item))">
-                                                <span class="@(ExpandedItemStyle(item))"></span>
-                                            </a>
-                                        }
-                                    </td>
-                                }
-
-                                @for (var j = 0; j < visibleColumns.Count; j++)
-                                {
-                                    if (rowSpans.ContainsKey(j))
-                                    {
-                                        rowSpans[j] = rowSpans[j] - 1;
-
-                                        if (rowSpans[j] <= 0)
-                                        {
-                                            rowSpans.Remove(j);
-                                        }
-                                        else
-                                        {
-                                            continue;
-                                        }
-                                    }
-
-                                    var column = visibleColumns[j];
-                                    var cellAttr = CellAttributes(item, column);
-
-                                    object colspan;
-                                    cellAttr.TryGetValue("colspan", out colspan);
-
-                                    if (colspan != null)
-                                    {
-                                        j = j + (int)Convert.ChangeType(colspan, TypeCode.Int32) - 1;
-                                    }
-
-                                    object rowspan;
-                                    cellAttr.TryGetValue("rowspan", out rowspan);
-
-                                    if (rowspan != null)
-                                    {
-                                        rowSpans.Add(j, (int)Convert.ChangeType(rowspan, TypeCode.Int32));
-                                    }
-
-                                    if (IsRowInEditMode(item))
-                                    {
-                                        <CascadingValue Value=editContexts[item]>
-                                            <td style="@column.GetStyle(true)" @attributes="@(cellAttr)" class="@getFrozenColumnClass(column, visibleColumns)">
-                                                <span class="rz-cell-data">
-                                                    @if (column.EditTemplate != null)
-                                                    {
-                                                        @column.EditTemplate(item)
-                                                    }
-                                                    else if (column.Template != null)
-                                                    {
-                                                        @column.Template(item)
-                                                    }
-                                                    else if (!string.IsNullOrEmpty(column.Property))
-                                                    {
-                                                        @if (!string.IsNullOrEmpty(column.FormatString))
-                                                        {
-                                                            @(String.Format(column.FormatString, PropertyAccess.GetValue(item, column.Property)));
-                                                        }
-                                                        else if (!string.IsNullOrEmpty(column.Property))
-                                                        {
-                                                            @(PropertyAccess.GetValue(item, column.Property));
-                                                        }
-                                                    }
-                                                </span>
-                                            </td>
-                                        </CascadingValue>
-                                    }
-                                    else
-                                    {
-                                        <RadzenDataGridCell Grid="@this" Item="@item"
-                                                            Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + getFrozenColumnClass(column, visibleColumns))" Attributes="@(cellAttr)">
-                                            <span class="rz-cell-data">
-                                                @if (item != null)
-                                                {
-                                                    @if (column.Template != null)
-                                                    {
-                                                        @column.Template(item)
-                                                    }
-                                                    else if (!string.IsNullOrEmpty(column.Property))
-                                                    {
-                                                        @if (!string.IsNullOrEmpty(column.FormatString))
-                                                        {
-                                                            @(String.Format(column.FormatString, PropertyAccess.GetValue(item, column.Property)));
-                                                        }
-                                                        else if (!string.IsNullOrEmpty(column.Property))
-                                                        {
-                                                            @(PropertyAccess.GetValue(item, column.Property));
-                                                        }
-                                                    }
-                                                }
-                                            </span>
-                                        </RadzenDataGridCell>
-                                    }
-                                }
-
-                            </RadzenGridRow>
-                            @if (Template != null && expandedItems.Keys.Contains(item))
-                            {
-                                <tr class="rz-expanded-row-content">
-                                    <td colspan="@(visibleColumns.Count + 1)">
-                                        <div class="rz-expanded-row-template">
-                                            @Template(item)
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                            i++;
-                        }
+                        @DrawRows(visibleColumns)
                     }
                     else
                     {
@@ -397,29 +274,29 @@
                 </tbody>
                 @if (visibleColumns.Where(c => c.FooterTemplate != null).Any())
                 {
-                <tfoot class="rz-datatable-tfoot">
-                    <tr class="">
-                        @if (Template != null)
-                        {
-                            <td class="rz-col-icon rz-unselectable-text" scope="col">
-                                <span class="rz-column-title"></span>
-                            </td>
-                        }
-                        @foreach (var column in visibleColumns)
-                        {
-                            <td class="@($" {column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)}")" style="@column.GetStyle(true)">
-                                <span class="rz-column-footer">
-                                    @if (column.FooterTemplate != null)
-                                    {
-                                        @column.FooterTemplate
-                                    }
-                                </span>
-                            </td>
-                        }
-                    </tr>
-                </tfoot>
+                    <tfoot class="rz-datatable-tfoot">
+                        <tr class="">
+                            @if (Template != null)
+                            {
+                                <td class="rz-col-icon rz-unselectable-text" scope="col">
+                                    <span class="rz-column-title"></span>
+                                </td>
+                            }
+                            @foreach (var column in visibleColumns)
+                            {
+                                <td class="@($" {column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)}")" style="@column.GetStyle(true)">
+                                    <span class="rz-column-footer">
+                                        @if (column.FooterTemplate != null)
+                                        {
+                                            @column.FooterTemplate
+                                        }
+                                    </span>
+                                </td>
+                            }
+                        </tr>
+                    </tfoot>
                 }
-             </table>
+            </table>
         </div>
 
         @if (AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
@@ -430,7 +307,97 @@
 }
 
 @code {
-    string getFrozenColumnClass(RadzenDataGridColumn<TItem> column, IList<RadzenDataGridColumn<TItem>> visibleColumns)
+#if NET5
+    Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> virtualize;
+
+    private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
+    {
+        var view = AllowPaging ? PagedView : View;
+        var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
+        var start = request.StartIndex;
+        var top = Math.Min(request.Count, totalItemsCount - request.StartIndex);
+
+        if (LoadData.HasDelegate)
+        {
+            var orderBy = GetOrderBy();
+
+            Query.Skip = start;
+            Query.Top = top;
+            Query.OrderBy = orderBy;
+
+            var filterString = columns.ToFilterString<TItem>();
+            Query.Filter = filterString;
+
+            await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = start, Top = top, OrderBy = orderBy, Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString });
+
+            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(Data, top);
+        }
+        else
+        {
+            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(view.Skip(request.StartIndex).Take(top), totalItemsCount);
+        }
+    }
+#endif
+    RenderFragment DrawRows(IList<RadzenDataGridColumn<TItem>> visibleColumns)
+    {
+        return new RenderFragment(builder =>
+        {
+#if NET5
+            if (AllowVirtualization)
+            {
+                builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>));
+                builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<TItem>(LoadItems));
+                builder.AddAttribute(2, "ChildContent", (RenderFragment<TItem>)((context) =>
+                {
+                    return (RenderFragment)((b) =>
+                    {
+                        b.OpenComponent<RadzenDataGridRow<TItem>>(3);
+                        b.AddAttribute(3, "Columns", visibleColumns);
+                        //b.AddAttribute(4, "Index", list.IndexOf(context));
+                        b.AddAttribute(5, "Grid", this);
+                        b.AddAttribute(6, "TItem", typeof(TItem));
+                        b.AddAttribute(7, "Item", context);
+                        b.CloseComponent();
+                    });
+                }));
+
+                builder.AddComponentReferenceCapture(8, c => { virtualize = (Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>)c; });
+
+                builder.CloseComponent();
+            }
+            else
+            {
+                int i = 0;
+                foreach (var item in LoadData.HasDelegate ? Data : PagedView)
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
+                    builder.AddAttribute(1, "Columns", visibleColumns);
+                    builder.AddAttribute(2, "Index", i);
+                    builder.AddAttribute(3, "Grid", this);
+                    builder.AddAttribute(4, "TItem", typeof(TItem));
+                    builder.AddAttribute(5, "Item", item);
+                    builder.CloseComponent();
+                    i++;
+                }
+            }
+#else
+        int i = 0;
+        foreach (var item in LoadData.HasDelegate ? Data : PagedView)
+        {
+            builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
+            builder.AddAttribute(1, "Columns", visibleColumns);
+            builder.AddAttribute(2, "Index", i);
+            builder.AddAttribute(3, "Grid", this);
+            builder.AddAttribute(4, "TItem", typeof(TItem));
+            builder.AddAttribute(5, "Item", item);
+            builder.CloseComponent();
+            i++;
+        }
+#endif
+        });
+    }
+
+    internal string getFrozenColumnClass(RadzenDataGridColumn<TItem> column, IList<RadzenDataGridColumn<TItem>> visibleColumns)
     {
         return column.Frozen ? "rz-frozen-cell" : "";
     }
@@ -608,7 +575,7 @@
         OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
     }
 
-    protected IReadOnlyDictionary<string, object> CellAttributes(TItem item, RadzenDataGridColumn<TItem> column)
+    internal IReadOnlyDictionary<string, object> CellAttributes(TItem item, RadzenDataGridColumn<TItem> column)
     {
         var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { Data = item, Column = column };
 
@@ -718,6 +685,9 @@
     }
 
     [Parameter]
+    public bool AllowVirtualization { get; set; }
+
+    [Parameter]
     public bool AllowSorting { get; set; }
 
     [Parameter]
@@ -779,7 +749,7 @@
                 }
             }
 
-            if(!LoadData.HasDelegate)
+            if (!LoadData.HasDelegate && (!AllowVirtualization || AllowPaging))
             {
                 var count = view.Count();
                 if (count != Count)
@@ -882,6 +852,11 @@
             Count = 1;
         }
 
+        if (AllowVirtualization && virtualize != null)
+        {
+            await virtualize.RefreshDataAsync();
+        }
+
         var orderBy = GetOrderBy();
 
         Query.Skip = skip;
@@ -891,7 +866,7 @@
         var filterString = columns.ToFilterString<TItem>();
         Query.Filter = filterString;
 
-        if (LoadData.HasDelegate)
+        if (LoadData.HasDelegate && !AllowVirtualization)
         {
             await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = skip, Top = PageSize, OrderBy = orderBy, Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString });
         }
@@ -924,20 +899,20 @@
     }
 
     internal Dictionary<TItem, bool> expandedItems = new Dictionary<TItem, bool>();
-    protected string ExpandedItemStyle(TItem item)
+    internal string ExpandedItemStyle(TItem item)
     {
         return expandedItems.Keys.Contains(item) ? "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-down" : "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-right";
     }
 
     internal Dictionary<TItem, bool> selectedItems = new Dictionary<TItem, bool>();
-    protected string RowStyle(TItem item, int index)
+    internal string RowStyle(TItem item, int index)
     {
         var evenOrOdd = index % 2 == 0 ? "rz-datatable-even" : "rz-datatable-odd";
 
         return (RowSelect.HasDelegate || ValueChanged != null || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
     }
 
-    protected Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item, int index)
+    internal Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item)
     {
         var args = new Radzen.RowRenderEventArgs<TItem>() { Data = item, Expandable = Template != null };
 
@@ -1002,7 +977,7 @@
         await ExpandItem(item);
     }
 
-    protected async System.Threading.Tasks.Task ExpandItem(TItem item)
+    internal async System.Threading.Tasks.Task ExpandItem(TItem item)
     {
         if (ExpandMode == DataGridExpandMode.Single && expandedItems.Keys.Any())
         {

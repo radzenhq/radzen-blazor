@@ -1,0 +1,184 @@
+@typeparam TItem
+@implements IRadzenForm
+
+<tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
+
+    @if (Grid.Template != null)
+    {
+        <td class="rz-col-icon">
+            <span class="rz-column-title"></span>
+            @if (rowArgs.Item1.Expandable)
+            {
+                <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandItem(Item))">
+                    <span class="@(Grid.ExpandedItemStyle(Item))"></span>
+                </a>
+            }
+        </td>
+    }
+    <CascadingValue Value=this>
+        @for (var j = 0; j < Columns.Count; j++)
+        {
+            if (Grid.rowSpans.ContainsKey(j))
+            {
+                Grid.rowSpans[j] = Grid.rowSpans[j] - 1;
+
+                if (Grid.rowSpans[j] <= 0)
+                {
+                    Grid.rowSpans.Remove(j);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            var column = Columns[j];
+            var cellAttr = Grid.CellAttributes(Item, column);
+
+            object colspan;
+            cellAttr.TryGetValue("colspan", out colspan);
+
+            if (colspan != null)
+            {
+                j = j + (int)Convert.ChangeType(colspan, TypeCode.Int32) - 1;
+            }
+
+            object rowspan;
+            cellAttr.TryGetValue("rowspan", out rowspan);
+
+            if (rowspan != null)
+            {
+                Grid.rowSpans.Add(j, (int)Convert.ChangeType(rowspan, TypeCode.Int32));
+            }
+
+            if (Grid.IsRowInEditMode(Item))
+            {
+                <CascadingValue Value=Grid.editContexts[Item]>
+                    <td style="@column.GetStyle(true)" @attributes="@(cellAttr)" class="@Grid.getFrozenColumnClass(column, Columns)">
+                        <span class="rz-cell-data">
+                            @if (column.EditTemplate != null)
+                            {
+                                @column.EditTemplate(Item)
+                            }
+                            else if (column.Template != null)
+                            {
+                                @column.Template(Item)
+                            }
+                            else if (!string.IsNullOrEmpty(column.Property))
+                            {
+                                @if (!string.IsNullOrEmpty(column.FormatString))
+                                {
+                                    @(String.Format(column.FormatString, PropertyAccess.GetValue(Item, column.Property)));
+                                }
+                                else if (!string.IsNullOrEmpty(column.Property))
+                                {
+                                    @(PropertyAccess.GetValue(Item, column.Property));
+                                }
+                            }
+                        </span>
+                    </td>
+                </CascadingValue>
+            }
+            else
+            {
+                <RadzenDataGridCell Grid="@this.Grid" Item="@Item"
+                                    Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + Grid.getFrozenColumnClass(column, Columns))" Attributes="@(cellAttr)">
+                    <span class="rz-cell-data">
+                        @if (Item != null)
+                        {
+                            @if (column.Template != null)
+                            {
+                                @column.Template(Item)
+                            }
+                            else if (!string.IsNullOrEmpty(column.Property))
+                            {
+                                @if (!string.IsNullOrEmpty(column.FormatString))
+                                {
+                                    @(String.Format(column.FormatString, PropertyAccess.GetValue(Item, column.Property)));
+                                }
+                                else if (!string.IsNullOrEmpty(column.Property))
+                                {
+                                    @(PropertyAccess.GetValue(Item, column.Property));
+                                }
+                            }
+                        }
+                    </span>
+                </RadzenDataGridCell>
+            }
+        }
+    </CascadingValue>
+</tr>
+@if (Grid.Template != null && Grid.expandedItems.Keys.Contains(Item))
+{
+    <tr class="rz-expanded-row-content">
+        <td colspan="@(Columns.Count + 1)">
+            <div class="rz-expanded-row-template">
+                @Grid.Template(Item)
+            </div>
+        </td>
+    </tr>
+}
+@code {
+    [Parameter]
+    public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
+
+    [Parameter]
+    public TItem Item { get; set; }
+
+    [Parameter]
+    public int Index { get; set; }
+
+    [Parameter]
+    public RadzenDataGrid<TItem> Grid { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object> Attributes { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
+
+    [Parameter]
+    public bool InEditMode { get; set; }
+
+    List<IRadzenFormComponent> components;
+
+    public void AddComponent(IRadzenFormComponent component)
+    {
+        if (components != null)
+        {
+            if (components.IndexOf(component) == -1)
+            {
+                components.Add(component);
+            }
+        }
+    }
+    public void RemoveComponent(IRadzenFormComponent component)
+    {
+        components?.Remove(component);
+    }
+
+    public override Task SetParametersAsync(ParameterView parameters)
+    {
+        if (InEditMode != parameters.GetValueOrDefault<bool>("InEditMode"))
+        {
+            components = new List<IRadzenFormComponent>();
+        }
+
+        return base.SetParametersAsync(parameters);
+    }
+
+    public IRadzenFormComponent FindComponent(string name)
+    {
+        return components.Where(component => component.Name == name).FirstOrDefault();
+    }
+
+    Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> rowArgs;
+    protected override void OnInitialized()
+    {
+        rowArgs = Grid.RowAttributes(Item);
+        InEditMode = Grid.IsRowInEditMode(Item);
+    }
+}
