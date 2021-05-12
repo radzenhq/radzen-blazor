@@ -731,6 +731,7 @@ thead {
     th {
         position: sticky;
         top: 0;
+        z-index: 1;
     }
 
     tr:nth-of-type(2) {
@@ -754,6 +755,7 @@ thead {
 tfoot, tfoot td {
     position: sticky;
     bottom: 0;
+    z-index: 1;
 }
 
 .rz-grid-table {
@@ -772,4 +774,8 @@ tfoot, tfoot td {
         white-space: nowrap;
         overflow: hidden;
     }
+}
+
+tbody > ::deep div {
+    display: table-row;
 }
