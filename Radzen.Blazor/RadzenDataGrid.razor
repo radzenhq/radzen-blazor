@@ -691,6 +691,9 @@
     public bool AllowSorting { get; set; }
 
     [Parameter]
+    public bool AllowMultiColumnSorting { get; set; }
+
+    [Parameter]
     public bool AllowFiltering { get; set; }
 
     [Parameter]
@@ -1195,6 +1198,14 @@
         var column = columns.Where(c => c.GetSortProperty() == property).FirstOrDefault();
         if (column != null)
         {
+            if (!AllowMultiColumnSorting)
+            {
+                foreach (var c in columns.Where(c => c != column))
+                {
+                    c.SetSortOrder(null);
+                }
+            }
+
             if (column.SortOrder == null)
             {
                 column.SetSortOrder(SortOrder.Ascending);
