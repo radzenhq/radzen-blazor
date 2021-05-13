@@ -259,7 +259,7 @@
                     }
                 </thead>
                 <tbody>
-                    @if (Data != null && Count > 0 && columns.Count > 0)
+                    @if (Data != null && Count > 0 && columns.Count > 0 || LoadData.HasDelegate && AllowVirtualization)
                     {
                         @DrawRows(visibleColumns)
                     }
@@ -330,7 +330,7 @@
 
             await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = start, Top = top, OrderBy = orderBy, Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString });
 
-            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(Data, top);
+            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(Data, Math.Min(request.Count, Count - request.StartIndex));
         }
         else
         {

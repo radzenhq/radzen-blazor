@@ -1,0 +1,54 @@
+﻿@page "/datagrid-virtualization-loaddata"
+@using System.Linq.Dynamic.Core
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<RadzenExample Name="DataGridVirtualizationLoadData">
+    <RadzenDataGrid Data="@orderDetails" Count="@count" LoadData="@LoadData" TItem="OrderDetail" AllowVirtualization="true" Style="height:400px"
+                    AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" LogicalFilterOperator="LogicalFilterOperator.Or"
+                    AllowSorting="true">
+        <Columns>
+            <RadzenDataGridColumn TItem="OrderDetail" Property="Order.CustomerID" Title="Order" />
+            <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+            <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
+                <Template Context="detail">
+                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+            <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
+                <Template Context="detail">
+                    @String.Format("{0}%", detail.Discount * 100)
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenExample>
+@code {
+    int count;
+    IEnumerable<OrderDetail> orderDetails;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        var query = dbContext.OrderDetails.Include("Order").Include("Product").AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        orderDetails = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+        count = dbContext.OrderDetails.Count();
+
+        await InvokeAsync(StateHasChanged);
+    }
+}
