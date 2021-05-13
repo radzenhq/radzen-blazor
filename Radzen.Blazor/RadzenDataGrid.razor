@@ -59,11 +59,11 @@
                                     </span>
                                     @if (AllowSorting && column.Sortable)
                                     {
-                                        @if (column.SortOrder == SortOrder.Ascending)
+                                        @if (column.GetSortOrder() == SortOrder.Ascending)
                                         {
                                             <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
                                         }
-                                        else if (column.SortOrder == SortOrder.Descending)
+                                        else if (column.GetSortOrder() == SortOrder.Descending)
                                         {
                                             <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
                                         }
@@ -723,7 +723,7 @@
 
     internal string GetOrderBy()
     {
-        return string.Join(",", columns.Where(c => c.SortOrder != null).Select(c => c.GetSortOrderAsString(IsOData())));
+        return string.Join(",", columns.Where(c => c.GetSortOrder() != null).Select(c => c.GetSortOrderAsString(IsOData())));
     }
 
     [Parameter]
@@ -1206,15 +1206,15 @@
                 }
             }
 
-            if (column.SortOrder == null)
+            if (column.GetSortOrder() == null)
             {
                 column.SetSortOrder(SortOrder.Ascending);
             }
-            else if (column.SortOrder == SortOrder.Ascending)
+            else if (column.GetSortOrder() == SortOrder.Ascending)
             {
                 column.SetSortOrder(SortOrder.Descending);
             }
-            else if (column.SortOrder == SortOrder.Descending)
+            else if (column.GetSortOrder() == SortOrder.Descending)
             {
                 column.SetSortOrder(null);
             }
