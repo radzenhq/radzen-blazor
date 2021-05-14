@@ -65,7 +65,5 @@
         employees = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
 
         count = dbContext.Employees.Count();
-
-        await InvokeAsync(StateHasChanged);
     }
 }

@@ -31,7 +31,7 @@
     int count;
     IEnumerable<OrderDetail> orderDetails;
 
-    async Task LoadData(LoadDataArgs args)
+    void LoadData(LoadDataArgs args)
     {
         var query = dbContext.OrderDetails.Include("Order").Include("Product").AsQueryable();
 
@@ -48,7 +48,5 @@
         orderDetails = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
 
         count = dbContext.OrderDetails.Count();
-
-        await InvokeAsync(StateHasChanged);
     }
 }

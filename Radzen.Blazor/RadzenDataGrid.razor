@@ -314,28 +314,23 @@
     {
         var view = AllowPaging ? PagedView : View;
         var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
-        var start = request.StartIndex;
         var top = Math.Min(request.Count, totalItemsCount - request.StartIndex);
 
         if (LoadData.HasDelegate)
         {
             var orderBy = GetOrderBy();
 
-            Query.Skip = start;
+            Query.Skip = request.StartIndex;
             Query.Top = top;
             Query.OrderBy = orderBy;
 
             var filterString = columns.ToFilterString<TItem>();
             Query.Filter = filterString;
 
-            await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = start, Top = top, OrderBy = orderBy, Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString });
+            await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = top, OrderBy = orderBy, Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString });
+        }
 
-            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(Data, Math.Min(request.Count, Count - request.StartIndex));
-        }
-        else
-        {
-            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(view.Skip(request.StartIndex).Take(top), totalItemsCount);
-        }
+        return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(LoadData.HasDelegate ? Data : view.Skip(request.StartIndex).Take(top), totalItemsCount);
     }
 #endif
     RenderFragment DrawRows(IList<RadzenDataGridColumn<TItem>> visibleColumns)
