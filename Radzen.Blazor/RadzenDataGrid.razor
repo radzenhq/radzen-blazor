@@ -352,7 +352,6 @@
                         b.AddAttribute(6, "TItem", typeof(TItem));
                         b.AddAttribute(7, "Item", context);
                         b.SetKey(context);
-                        //b.AddAttribute(8, "Index", _view.IndexOf(context));
                         b.CloseComponent();
                     });
                 }));
@@ -446,6 +445,26 @@
             {
                 try { InvokeAsync(StateHasChanged); } catch { }
             }
+        }
+    }
+
+    readonly List<TItem> items = new List<TItem>();
+
+    internal int GetItemIndex(TItem item)
+    {
+        if (!items.Contains(item))
+        {
+            items.Add(item);
+        }
+
+        return items.IndexOf(item);
+    }
+
+    internal void RemoveItem(TItem item)
+    {
+        if (items.Contains(item))
+        {
+            items.Remove(item);
         }
     }
 
