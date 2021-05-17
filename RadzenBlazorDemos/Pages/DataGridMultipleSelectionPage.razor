@@ -7,7 +7,7 @@
 @inject NorthwindContext dbContext
 
 <RadzenExample Name="DataGridMultipleSelection">
-    <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowPaging="true" PageSize="4"
+    <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                 AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
                 SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedEmployees>
         <Columns>

@@ -9,7 +9,7 @@
 <p>This page demonstrates how to data-bind the Radzen Blazor DataGrid to OData service via the LoadData event.</p>
 
 <RadzenExample Name="DataGridOData" Heading="false" Documentation="false">
-<RadzenDataGrid IsLoading="@isLoading" Count="@count" style="height:400px" Data="@employees" LoadData="@LoadData" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
+<RadzenDataGrid IsLoading="@isLoading" Count="@count" style="height:400px" Data="@employees" LoadData="@LoadData" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
         <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false">
