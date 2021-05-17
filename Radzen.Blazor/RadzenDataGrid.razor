@@ -881,12 +881,12 @@
         {
             Count = 1;
         }
-
+#if NET5
         if (AllowVirtualization && virtualize != null && !LoadData.HasDelegate)
         {
             await virtualize.RefreshDataAsync();
         }
-
+#endif
         var orderBy = GetOrderBy();
 
         Query.Skip = skip;
