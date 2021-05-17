@@ -13,73 +13,73 @@
             <Steps>
                 <RadzenStepsItem Text="Customers">
                     <h3>Select Customer</h3>
-                    <RadzenGrid ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@customers" TItem="Customer" Value="@customer" RowSelect="@(args => customer = args)">
+                    <RadzenDataGrid ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@customers" TItem="Customer" @bind-Value="@selectedCustomers">
                         <Columns>
-                            <RadzenGridColumn TItem="Customer" Property="CustomerID" Title="Customer ID" />
-                            <RadzenGridColumn TItem="Customer" Property="CompanyName" Title="Company Name" />
-                            <RadzenGridColumn TItem="Customer" Property="ContactName" Title="Contact Name" />
-                            <RadzenGridColumn TItem="Customer" Property="ContactTitle" Title="Contact Title" />
-                            <RadzenGridColumn TItem="Customer" Property="Address" Title="Address" />
-                            <RadzenGridColumn TItem="Customer" Property="City" Title="City" />
-                            <RadzenGridColumn TItem="Customer" Property="Region" Title="Region" />
-                            <RadzenGridColumn TItem="Customer" Property="PostalCode" Title="Postal Code" />
-                            <RadzenGridColumn TItem="Customer" Property="Country" Title="Country" />
-                            <RadzenGridColumn TItem="Customer" Property="Phone" Title="Phone" />
-                            <RadzenGridColumn TItem="Customer" Property="Fax" Title="Fax" />
+                            <RadzenDataGridColumn TItem="Customer" Property="CustomerID" Title="Customer ID" />
+                            <RadzenDataGridColumn TItem="Customer" Property="CompanyName" Title="Company Name" />
+                            <RadzenDataGridColumn TItem="Customer" Property="ContactName" Title="Contact Name" />
+                            <RadzenDataGridColumn TItem="Customer" Property="ContactTitle" Title="Contact Title" />
+                            <RadzenDataGridColumn TItem="Customer" Property="Address" Title="Address" />
+                            <RadzenDataGridColumn TItem="Customer" Property="City" Title="City" />
+                            <RadzenDataGridColumn TItem="Customer" Property="Region" Title="Region" />
+                            <RadzenDataGridColumn TItem="Customer" Property="PostalCode" Title="Postal Code" />
+                            <RadzenDataGridColumn TItem="Customer" Property="Country" Title="Country" />
+                            <RadzenDataGridColumn TItem="Customer" Property="Phone" Title="Phone" />
+                            <RadzenDataGridColumn TItem="Customer" Property="Fax" Title="Fax" />
                         </Columns>
-                    </RadzenGrid>
+                    </RadzenDataGrid>
                 </RadzenStepsItem>
-                <RadzenStepsItem Text="Orders" Disabled="@(customer == null)">
+                <RadzenStepsItem Text="Orders" Disabled="@(selectedCustomers == null || selectedCustomers != null && !selectedCustomers.Any())">
                     <h3>Select Order</h3>
-                    <RadzenGrid ColumnWidth="200px" PageSize="2" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
-                                Data="@orders" TItem="Order" Value="@order" RowSelect="@(args => order = args)">
+                    <RadzenDataGrid ColumnWidth="200px" PageSize="2" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
+                                Data="@(selectedCustomers != null && selectedCustomers.Any() ? orders.Where(o => o.CustomerID == selectedCustomers[0].CustomerID) : Enumerable.Empty<Order>())" TItem="Order" @bind-Value="@selectedOrders">
                         <Columns>
-                            <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
-                            <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
-                            <RadzenGridColumn Width="150px" TItem="Order" Property="Employee.LastName" Title="Employee">
+                            <RadzenDataGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
+                            <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
+                            <RadzenDataGridColumn Width="150px" TItem="Order" Property="Employee.LastName" Title="Employee">
                                 <Template Context="order">
                                     <div>@order.Employee?.LastName</div>
                                     <RadzenImage Path="@order.Employee?.Photo" />
                                 </Template>
-                            </RadzenGridColumn>
-                            <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
                                 <Template Context="order">
                                     @String.Format("{0:d}", order.OrderDate)
                                 </Template>
-                            </RadzenGridColumn>
-                            <RadzenGridColumn TItem="Order" Property="RequiredDate" Title="Required Date">
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="Order" Property="RequiredDate" Title="Required Date">
                                 <Template Context="order">
                                     @String.Format("{0:d}", order.RequiredDate)
                                 </Template>
-                            </RadzenGridColumn>
-                            <RadzenGridColumn TItem="Order" Property="ShippedDate" Title="Shipped Date">
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="Order" Property="ShippedDate" Title="Shipped Date">
                                 <Template Context="order">
                                     @String.Format("{0:d}", order.ShippedDate)
                                 </Template>
-                            </RadzenGridColumn>
-                            <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight">
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
                                 <Template Context="order">
                                     @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
                                 </Template>
-                            </RadzenGridColumn>
-                            <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
-                            <RadzenGridColumn TItem="Order" Property="ShipAddress" Title="Ship Address" />
-                            <RadzenGridColumn TItem="Order" Property="ShipCity" Title="Ship City" />
-                            <RadzenGridColumn TItem="Order" Property="ShipRegion" Title="Ship Region" />
-                            <RadzenGridColumn TItem="Order" Property="ShipPostalCode" Title="Ship Postal Code" />
-                            <RadzenGridColumn TItem="Order" Property="ShipCountry" Title="Ship Country" />
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
+                            <RadzenDataGridColumn TItem="Order" Property="ShipAddress" Title="Ship Address" />
+                            <RadzenDataGridColumn TItem="Order" Property="ShipCity" Title="Ship City" />
+                            <RadzenDataGridColumn TItem="Order" Property="ShipRegion" Title="Ship Region" />
+                            <RadzenDataGridColumn TItem="Order" Property="ShipPostalCode" Title="Ship Postal Code" />
+                            <RadzenDataGridColumn TItem="Order" Property="ShipCountry" Title="Ship Country" />
                         </Columns>
-                    </RadzenGrid>
+                    </RadzenDataGrid>
                 </RadzenStepsItem>
-                <RadzenStepsItem Text="Order Details" Disabled="@(order == null)">
-                    <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true"
-                                Data="@(orderDetails.Where(o => o.OrderID == order.OrderID))" TItem="OrderDetail" ColumnWidth="200px">
+                <RadzenStepsItem Text="Order Details" Disabled="@(selectedOrders == null || selectedOrders != null && !selectedOrders.Any())">
+                    <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true"
+                                Data="@(selectedOrders != null && selectedOrders.Any() ? orderDetails.Where(o => o.OrderID == selectedOrders[0].OrderID) : Enumerable.Empty<OrderDetail>())" TItem="OrderDetail" ColumnWidth="200px">
                         <Columns>
-                            <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
-                            <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-                            <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
+                            <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+                            <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+                            <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
                         </Columns>
-                    </RadzenGrid>
+                    </RadzenDataGrid>
                 </RadzenStepsItem>
             </Steps>
         </RadzenSteps>
@@ -96,8 +96,8 @@
     IEnumerable<Order> orders;
     IEnumerable<OrderDetail> orderDetails;
 
-    Customer customer;
-    Order order;
+    IList<Customer> selectedCustomers;
+    IList<Order> selectedOrders;
 
     protected override void OnInitialized()
     {

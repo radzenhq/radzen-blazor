@@ -35,14 +35,14 @@
     <div class="row">
         <div class="col-md-12">
             <h3>Order Details</h3>
-            <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                         Data="@(orderDetails.Where(o => o.OrderID == OrderID))" TItem="OrderDetail" ColumnWidth="200px">
                 <Columns>
-                    <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-                    <RadzenGridColumn TItem="OrderDetail" Property="Order.OrderDate" Title="OrderDate" />
-                    <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
+                    <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+                    <RadzenDataGridColumn TItem="OrderDetail" Property="Order.OrderDate" Title="OrderDate" />
+                    <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
                 </Columns>
-            </RadzenGrid>
+            </RadzenDataGrid>
         </div>
     </div>
 </RadzenCard>

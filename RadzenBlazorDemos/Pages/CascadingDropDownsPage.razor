@@ -22,14 +22,14 @@
 </RadzenDropDown>
 <br />
 <h3>Order Details</h3>
-<RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+<RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
             Data="@(orderDetails.Where(o => o.OrderID == OrderID))" TItem="OrderDetail" ColumnWidth="200px">
     <Columns>
-        <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
-        <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-        <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
+        <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+        <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+        <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
     </Columns>
-</RadzenGrid>
+</RadzenDataGrid>
 <br />
 </RadzenExample>
 @code {

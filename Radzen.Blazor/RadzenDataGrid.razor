@@ -1,0 +1,1314 @@
+﻿@using System.Linq.Dynamic.Core
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Forms
+@using Radzen
+@typeparam TItem
+@inherits PagedDataBoundComponent<TItem>
+
+@if (Columns != null)
+{
+    <CascadingValue Value=this>
+        @Columns
+    </CascadingValue>
+}
+
+@if (Visible)
+{
+    var visibleColumns = columns.Where(c => c.Visible).ToList();
+
+    <div style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()">
+        @if (AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
+        {
+            <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" />
+        }
+
+        <div class="rz-data-grid-data">
+            <table class="rz-grid-table rz-grid-table-fixed">
+                <colgroup>
+                    @if (Template != null)
+                    {
+                        <col>
+                    }
+                    @foreach (var column in visibleColumns)
+                    {
+                        <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-col") style="@column.GetStyle()">
+                    }
+                </colgroup>
+                <thead>
+                    <tr>
+                        @if (Template != null)
+                        {
+                            <th class="rz-col-icon rz-unselectable-text" scope="col">
+                                <span class="rz-column-title"></span>
+                            </th>
+                        }
+                        @foreach (var column in visibleColumns)
+                        {
+                            var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
+                            <th class="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}")" scope="col" style="@column.GetStyle(true, true)">
+                                <div @onclick='@((args) => OnSort(args, column))' style="width:100%">
+                                    <span class="rz-column-title">
+                                        @if (column.HeaderTemplate != null)
+                                        {
+                                            @column.HeaderTemplate
+                                        }
+                                        else
+                                        {
+                                            @column.Title
+                                        }
+                                    </span>
+                                    @if (AllowSorting && column.Sortable)
+                                    {
+                                        @if (column.GetSortOrder() == SortOrder.Ascending)
+                                        {
+                                            <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
+                                        }
+                                        else if (column.GetSortOrder() == SortOrder.Descending)
+                                        {
+                                            <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
+                                        }
+                                        else
+                                        {
+                                            <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
+                                        }
+                                    }
+                                    @if (AllowColumnResize)
+                                    {
+                                        var columnIndex = visibleColumns.IndexOf(column);
+                                        <div id="@getColumnResizerId(columnIndex)" style="cursor:col-resize;float:right;"
+                                             @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                             @onmousedown=@(args => StartColumnResize(args, columnIndex))>&nbsp;</div>
+                                    }
+                                    @if (AllowFiltering && column.Filterable && FilterMode == FilterMode.Advanced)
+                                    {
+                                        <i @onclick:stopPropagation="true" onclick="@($"Radzen.togglePopup(this, '{PopupID}{column.GetFilterProperty()}')")"
+                                           class="@getFilterIconCss(column)" />
+
+                                        <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel"
+                                             style="display:none;min-width:250px;" tabindex="0">
+                                            <div class="rz-grid-filter rz-overlaypanel-content">
+                                                @if (column.FilterTemplate != null)
+                                                {
+                                                    @column.FilterTemplate(column)
+                                                }
+                                                else
+                                                {
+                                                    <RadzenLabel Text="@FilterText" class="rz-grid-filter-label" />
+                                                    <RadzenDropDown @onclick:preventDefault="true" Data="@(column.GetFilterOperators().Select(t => new { Value = $"{t}", Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@column.GetFilterOperator()" Change="@(args => column.SetFilterOperator((FilterOperator)args))" />
+                                                    @if (PropertyAccess.IsNumeric(column.FilterPropertyType))
+                                                    {
+                                                        @(DrawNumericFilter(column, false))
+                                                    }
+                                                    else if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?) ||
+                                                        column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
+                                                    {
+                                                        <RadzenDatePicker TValue="@object" ShowTime="true" ShowTimeOkButton="true" DateFormat="@getFilterDateFormat(column)"
+                                                                          Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args.Value))" />
+
+                                                    }
+                                                    else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
+                                                    {
+                                                        <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <RadzenTextBox Value="@($"{column.GetFilterValue()}")" Change="@(args => column.SetFilterValue(args))" />
+                                                    }
+
+                                                    <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 80px"
+                                                                    Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator" Value="@column.LogicalFilterOperator" Change="@(args => column.SetLogicalFilterOperator((LogicalFilterOperator)args))" />
+
+                                                    <RadzenDropDown @onclick:preventDefault="true" Data="@(column.GetFilterOperators().Select(t => new { Value = $"{t}", Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@column.GetSecondFilterOperator()" Change="@(args => column.SetSecondFilterOperator((FilterOperator)args))" />
+                                                    @if (PropertyAccess.IsNumeric(column.FilterPropertyType))
+                                                    {
+                                                        @(DrawNumericFilter(column, false, false))
+                                                    }
+                                                    else if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?) ||
+                                                        column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
+                                                    {
+                                                        <RadzenDatePicker TValue="@object"
+                                                                          ShowTime="true" ShowTimeOkButton="true" DateFormat="@getFilterDateFormat(column)"
+                                                                          Value="@column.GetSecondFilterValue()" Change="@(args => column.SetFilterValue(args.Value, false))" />
+
+                                                    }
+                                                    else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
+                                                    {
+                                                        <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetSecondFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column, false))" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <RadzenTextBox Value="@($"{column.GetSecondFilterValue()}")" Change="@(args => column.SetFilterValue(args, false))" />
+                                                    }
+                                                }
+                                            </div>
+                                            @if (column.FilterTemplate == null)
+                                            {
+                                                <div class="rz-grid-filter-buttons">
+                                                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text=@ClearFilterText Click="@((args) => ClearFilter(column, true))" />
+                                                    <RadzenButton ButtonStyle="ButtonStyle.Primary" Text=@ApplyFilterText Click="@((args) => ApplyFilter(column, true))" />
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </th>
+                        }
+                    </tr>
+                    @if (AllowFiltering && FilterMode == FilterMode.Simple && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())
+                    {
+                        <tr>
+                            @if (Template != null)
+                            {
+                                <th class="rz-col-icon  rz-unselectable-text" scope="col">
+                                    <span class="rz-column-title"></span>
+                                </th>
+                            }
+                            @foreach (var column in visibleColumns)
+                            {
+                                <th class="@($" rz-unselectable-text")" tabindex="1" scope="col" style="@column.GetStyle(true)">
+                                    @if (AllowFiltering && column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
+                                    {
+                                        <div class="rz-cell-filter">
+                                            <div class="rz-cell-filter-content">
+                                                @if (column.FilterTemplate != null)
+                                                {
+                                                    @column.FilterTemplate(column)
+                                                }
+                                                else
+                                                {
+                                                    <label class="rz-cell-filter-label" style="height:35px">
+                                                        @if (column.Type == "string" && column.Format == "date-time")
+                                                        {
+                                                            <i onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")"
+                                                               class="rzi">date_range</i>
+                                                            @if (column.GetFilterValue() != null)
+                                                            {
+                                                                <span class="rz-current-filter">@column.GetFilterValue()</span>
+                                                                <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear">close</i>
+                                                            }
+                                                            <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel"
+                                                                 style="display:none;width:550px;" tabindex="0">
+                                                                <div class="rz-overlaypanel-content">
+
+                                                                    <div class="rz-date-filter">
+
+                                                                        <div class="rz-listbox rz-inputtext   ">
+                                                                            <div class="rz-listbox-list-wrapper">
+                                                                                <ul class="rz-listbox-list">
+                                                                                    <li class="@(DateFilterOperatorStyle(column, FilterOperator.Equals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.Equals))" style="display: block;">
+                                                                                        <span>@EqualsText</span>
+                                                                                    </li>
+                                                                                    <li class="@(DateFilterOperatorStyle(column, FilterOperator.NotEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.NotEquals))" style="display: block;">
+                                                                                        <span>@NotEqualsText</span>
+                                                                                    </li>
+                                                                                    <li class="@(DateFilterOperatorStyle(column, FilterOperator.LessThan))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThan))" style="display: block;">
+                                                                                        <span>@LessThanText</span>
+                                                                                    </li>
+                                                                                    <li class="@(DateFilterOperatorStyle(column, FilterOperator.LessThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThanOrEquals))" style="display: block;">
+                                                                                        <span>@LessThanOrEqualsText</span>
+                                                                                    </li>
+                                                                                    <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThan))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThan))" style="display: block;">
+                                                                                        <span>@GreaterThanText</span>
+                                                                                    </li>
+                                                                                    <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThanOrEquals))" style="display: block;">
+                                                                                        <span>@GreaterThanOrEqualsText</span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <RadzenDatePicker TValue="@object"
+                                                                                          ShowTime="true" ShowTimeOkButton="false" Inline="true" DateFormat="@getFilterDateFormat(column)"
+                                                                                          Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args.Value))" />
+
+                                                                    </div>
+                                                                    <div class="rz-date-filter-buttons">
+                                                                        <button class="rz-button rz-clear-filter" @onclick="@((args) => ClearFilter(column, true))">
+                                                                            @ClearFilterText
+                                                                        </button>
+                                                                        <button class="rz-button rz-apply-filter" @onclick="@((args) => ApplyFilter(column, true))">
+                                                                            @ApplyFilterText
+                                                                        </button>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        else if (column.Type == "number")
+                                                        {
+                                                            <i class="rzi">search</i>
+                                                            @(DrawNumericFilter(column))
+                                                        }
+                                                        else if (column.Type == "boolean")
+                                                        {
+                                                            <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="rzi">search</i>
+                                                            <input id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" />
+                                                        }
+                                                    </label>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </th>
+                            }
+                        </tr>
+                    }
+                </thead>
+                <tbody>
+                    @if (Data != null && Count > 0 && columns.Count > 0)
+                    {
+                        @DrawRows(visibleColumns)
+                    }
+                    else
+                    {
+                        <tr class=" rz-datatable-emptymessage-row">
+                            <td class="rz-datatable-emptymessage" colspan="@visibleColumns.Count">
+                                <span>@EmptyText</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                @if (visibleColumns.Where(c => c.FooterTemplate != null).Any())
+                {
+                    <tfoot class="rz-datatable-tfoot">
+                        <tr class="">
+                            @if (Template != null)
+                            {
+                                <td class="rz-col-icon rz-unselectable-text" scope="col">
+                                    <span class="rz-column-title"></span>
+                                </td>
+                            }
+                            @foreach (var column in visibleColumns)
+                            {
+                                <td class="@($" {column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)}")" style="@column.GetStyle(true, true)">
+                                    <span class="rz-column-footer">
+                                        @if (column.FooterTemplate != null)
+                                        {
+                                            @column.FooterTemplate
+                                        }
+                                    </span>
+                                </td>
+                            }
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+        </div>
+
+        @if (AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
+        {
+            <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" />
+        }
+    </div>
+}
+
+@code {
+#if NET5
+    Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> virtualize;
+
+    private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
+    {
+        var view = AllowPaging ? PagedView : View;
+        var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
+        var top = Math.Min(request.Count, totalItemsCount - request.StartIndex);
+
+        if (LoadData.HasDelegate)
+        {
+            var orderBy = GetOrderBy();
+
+            Query.Skip = request.StartIndex;
+            Query.Top = top;
+            Query.OrderBy = orderBy;
+
+            var filterString = columns.ToFilterString<TItem>();
+            Query.Filter = filterString;
+
+            await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = top, OrderBy = orderBy, Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString });
+        }
+
+        return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(LoadData.HasDelegate ? Data : view.Skip(request.StartIndex).Take(top), totalItemsCount);
+    }
+#endif
+    RenderFragment DrawRows(IList<RadzenDataGridColumn<TItem>> visibleColumns)
+    {
+        return new RenderFragment(builder =>
+        {
+#if NET5
+            if (AllowVirtualization)
+            {
+                builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>));
+                builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<TItem>(LoadItems));
+                builder.AddAttribute(2, "ChildContent", (RenderFragment<TItem>)((context) =>
+                {
+                    return (RenderFragment)((b) =>
+                    {
+                        b.OpenComponent<RadzenDataGridRow<TItem>>(3);
+                        b.AddAttribute(4, "Columns", visibleColumns);
+                        b.AddAttribute(5, "Grid", this);
+                        b.AddAttribute(6, "TItem", typeof(TItem));
+                        b.AddAttribute(7, "Item", context);
+                        b.SetKey(context);
+                        b.CloseComponent();
+                    });
+                }));
+
+                builder.AddComponentReferenceCapture(8, c => { virtualize = (Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>)c; });
+
+                builder.CloseComponent();
+            }
+            else
+            {
+                int i = 0;
+                foreach (var item in LoadData.HasDelegate ? Data : PagedView)
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
+                    builder.AddAttribute(1, "Columns", visibleColumns);
+                    builder.AddAttribute(2, "Index", i);
+                    builder.AddAttribute(3, "Grid", this);
+                    builder.AddAttribute(4, "TItem", typeof(TItem));
+                    builder.AddAttribute(5, "Item", item);
+                    builder.CloseComponent();
+                    i++;
+                }
+            }
+#else
+        int i = 0;
+        foreach (var item in LoadData.HasDelegate ? Data : PagedView)
+        {
+            builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
+            builder.AddAttribute(1, "Columns", visibleColumns);
+            builder.AddAttribute(2, "Index", i);
+            builder.AddAttribute(3, "Grid", this);
+            builder.AddAttribute(4, "TItem", typeof(TItem));
+            builder.AddAttribute(5, "Item", item);
+            builder.CloseComponent();
+            i++;
+        }
+#endif
+        });
+    }
+
+    internal string getFrozenColumnClass(RadzenDataGridColumn<TItem> column, IList<RadzenDataGridColumn<TItem>> visibleColumns)
+    {
+        return column.Frozen ? "rz-frozen-cell" : "";
+    }
+
+    protected string DateFilterOperatorStyle(RadzenDataGridColumn<TItem> column, FilterOperator value)
+    {
+        return column.GetFilterOperator() == value ?
+            "rz-listbox-item  rz-state-highlight" :
+            "rz-listbox-item ";
+    }
+
+    protected void OnFilterKeyPress(EventArgs args, RadzenDataGridColumn<TItem> column)
+    {
+        Debounce(() => DebounceFilter(column), FilterDelay);
+    }
+
+    async Task DebounceFilter(RadzenDataGridColumn<TItem> column)
+    {
+        var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", getFilterInputId(column));
+        if (!object.Equals(column.GetFilterValue(), inputValue))
+        {
+            await InvokeAsync(() => { OnFilter(new ChangeEventArgs() { Value = inputValue }, column); });
+        }
+    }
+
+    protected void ApplyDateFilterByFilterOperator(RadzenDataGridColumn<TItem> column, FilterOperator filterOperator)
+    {
+        column.SetFilterOperator(filterOperator);
+    }
+
+    private readonly List<RadzenDataGridColumn<TItem>> columns = new List<RadzenDataGridColumn<TItem>>();
+
+    [Parameter]
+    public RenderFragment Columns { get; set; }
+
+    internal void AddColumn(RadzenDataGridColumn<TItem> column)
+    {
+        if (!columns.Contains(column))
+        {
+            columns.Add(column);
+        }
+    }
+
+    internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
+    {
+        if (columns.Contains(column))
+        {
+            columns.Remove(column);
+            if (!disposed)
+            {
+                try { InvokeAsync(StateHasChanged); } catch { }
+            }
+        }
+    }
+
+    readonly List<TItem> items = new List<TItem>();
+
+    internal int GetItemIndex(TItem item)
+    {
+        if (!items.Contains(item))
+        {
+            items.Add(item);
+        }
+
+        return items.IndexOf(item);
+    }
+
+    internal void RemoveItem(TItem item)
+    {
+        if (items.Contains(item))
+        {
+            items.Remove(item);
+        }
+    }
+
+    string getFilterInputId(RadzenDataGridColumn<TItem> column)
+    {
+        return string.Join("", $"{UniqueID}".Split('.')) + column.GetFilterProperty();
+    }
+
+
+    string getFilterDateFormat(RadzenDataGridColumn<TItem> column)
+    {
+        if (column != null && !string.IsNullOrEmpty(column.FormatString))
+        {
+            var formats = column.FormatString.Split(new char[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
+            if (formats.Length > 0)
+            {
+                var format = formats[0].Trim().Split(':');
+                if (format.Length > 1)
+                {
+                    return format[1].Trim();
+                }
+            }
+        }
+
+        return FilterDateFormat;
+    }
+
+    RenderFragment DrawNumericFilter(RadzenDataGridColumn<TItem> column, bool force = true, bool isFirst = true)
+    {
+        return new RenderFragment(builder =>
+        {
+            var type = Nullable.GetUnderlyingType(column.FilterPropertyType) != null ?
+                column.FilterPropertyType : typeof(Nullable<>).MakeGenericType(column.FilterPropertyType);
+
+            var numericType = typeof(RadzenNumeric<>).MakeGenericType(type);
+
+            builder.OpenComponent(0, numericType);
+
+            builder.AddAttribute(1, "Value", isFirst ? column.GetFilterValue() : column.GetSecondFilterValue());
+            builder.AddAttribute(2, "Style", "width:100%");
+
+            Action<object> action;
+            if (force)
+            {
+                action = args => OnFilter(new ChangeEventArgs() { Value = args }, column, isFirst);
+            }
+            else
+            {
+                action = args => column.SetFilterValue(args, isFirst);
+            }
+
+            var eventCallbackGenericCreate = typeof(NumericFilterEventCallback).GetMethod("Create").MakeGenericMethod(type);
+            var eventCallbackGenericAction = typeof(NumericFilterEventCallback).GetMethod("Action").MakeGenericMethod(type);
+
+            builder.AddAttribute(3, "Change", eventCallbackGenericCreate.Invoke(this,
+                new object[] { this, eventCallbackGenericAction.Invoke(this, new object[] { action }) }));
+
+            builder.CloseComponent();
+        });
+    }
+
+    protected void OnFilter(ChangeEventArgs args, RadzenDataGridColumn<TItem> column, bool force = false, bool isFirst = true)
+    {
+        string property = column.GetFilterProperty();
+        if (AllowFiltering && column.Filterable && !string.IsNullOrEmpty(property))
+        {
+            if (!object.Equals(isFirst ? column.GetFilterValue() : column.GetSecondFilterValue(), args.Value) || force)
+            {
+                column.SetFilterValue(args.Value, isFirst);
+                skip = 0;
+                CurrentPage = 0;
+
+                if (LoadData.HasDelegate && AllowVirtualization)
+                {
+                    Data = null;
+                }
+
+                InvokeAsync(Reload);
+            }
+        }
+    }
+
+
+    public IList<RadzenDataGridColumn<TItem>> ColumnsCollection
+    {
+        get
+        {
+            return columns;
+        }
+    }
+
+    private string getFilterIconCss(RadzenDataGridColumn<TItem> column)
+    {
+        var additionalStyle = column.GetFilterValue() != null || column.GetSecondFilterValue() != null ? "rz-grid-filter-active" : "";
+        return $"rzi rz-grid-filter-icon {additionalStyle}";
+    }
+
+    protected void OnSort(EventArgs args, RadzenDataGridColumn<TItem> column)
+    {
+        string property = column.GetSortProperty();
+        if (AllowSorting && column.Sortable && !string.IsNullOrEmpty(property))
+        {
+            OrderBy(property);
+        }
+    }
+
+    protected async Task ClearFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
+    {
+        if (closePopup)
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
+        }
+        column.SetFilterValue(null);
+        column.SetFilterValue(null, false);
+        column.SetFilterOperator(null);
+        column.SetSecondFilterOperator(null);
+
+        skip = 0;
+        CurrentPage = 0;
+
+        if (LoadData.HasDelegate && AllowVirtualization)
+        {
+            Data = null;
+        }
+
+        await InvokeAsync(Reload);
+    }
+
+    protected async Task ApplyFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
+    {
+        if (closePopup)
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
+        }
+        OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
+    }
+
+    internal IReadOnlyDictionary<string, object> CellAttributes(TItem item, RadzenDataGridColumn<TItem> column)
+    {
+        var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { Data = item, Column = column };
+
+        if (CellRender != null)
+        {
+            CellRender(args);
+        }
+
+        return new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes);
+    }
+
+    internal Dictionary<int, int> rowSpans = new Dictionary<int, int>();
+
+    [Parameter]
+    public LogicalFilterOperator LogicalFilterOperator { get; set; } = LogicalFilterOperator.And;
+
+    [Parameter]
+    public FilterMode FilterMode { get; set; } = FilterMode.Simple;
+
+    [Parameter]
+    public DataGridExpandMode ExpandMode { get; set; } = DataGridExpandMode.Multiple;
+
+    [Parameter]
+    public DataGridEditMode EditMode { get; set; } = DataGridEditMode.Multiple;
+
+    [Parameter]
+    public string FilterText { get; set; } = "Filter";
+
+    [Parameter]
+    public string AndOperatorText { get; set; } = "And";
+
+    [Parameter]
+    public string OrOperatorText { get; set; } = "Or";
+
+    [Parameter]
+    public string ApplyFilterText { get; set; } = "Apply";
+
+    [Parameter]
+    public string ClearFilterText { get; set; } = "Clear";
+
+    [Parameter]
+    public string EqualsText { get; set; } = "Equals";
+
+    [Parameter]
+    public string NotEqualsText { get; set; } = "Not equals";
+
+    [Parameter]
+    public string LessThanText { get; set; } = "Less than";
+
+    [Parameter]
+    public string LessThanOrEqualsText { get; set; } = "Less than or equals";
+
+    [Parameter]
+    public string GreaterThanText { get; set; } = "Greater than";
+
+    [Parameter]
+    public string GreaterThanOrEqualsText { get; set; } = "Greater than or equals";
+
+    [Parameter]
+    public string EndsWithText { get; set; } = "Ends with";
+
+    [Parameter]
+    public string ContainsText { get; set; } = "Contains";
+
+    [Parameter]
+    public string StartsWithText { get; set; } = "Starts with";
+
+    internal class NumericFilterEventCallback
+    {
+        public static EventCallback<T> Create<T>(object receiver, Action<T> action)
+        {
+            return EventCallback.Factory.Create<T>(receiver, action);
+        }
+
+        public static Action<T> Action<T>(Action<object> action)
+        {
+            return args => action(args);
+        }
+    }
+
+    [Parameter]
+    public FilterCaseSensitivity FilterCaseSensitivity { get; set; } = FilterCaseSensitivity.Default;
+
+    [Parameter]
+    public int FilterDelay { get; set; } = 500;
+
+    [Parameter]
+    public string FilterDateFormat { get; set; }
+
+    [Parameter]
+    public string ColumnWidth { get; set; }
+
+    private string _emptyText = "No records to display.";
+    [Parameter]
+    public string EmptyText
+    {
+        get { return _emptyText; }
+        set
+        {
+            if (value != _emptyText)
+            {
+                _emptyText = value;
+
+                ChangeState();
+            }
+        }
+    }
+
+    [Parameter]
+    public bool AllowVirtualization { get; set; }
+
+    [Parameter]
+    public bool AllowSorting { get; set; }
+
+    [Parameter]
+    public bool AllowMultiColumnSorting { get; set; }
+
+    [Parameter]
+    public bool AllowFiltering { get; set; }
+
+    [Parameter]
+    public bool AllowColumnResize { get; set; }
+
+    internal string getColumnResizerId(int columnIndex)
+    {
+        return string.Join("", $"{UniqueID}".Split('.')) + columnIndex;
+    }
+
+    internal async Task StartColumnResize(MouseEventArgs args, int columnIndex)
+    {
+        await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnResizerId(columnIndex), Reference, columnIndex, args.ClientX);
+    }
+
+    [JSInvokable("RadzenGrid.OnColumnResized")]
+    public async Task OnColumnResized(int columnIndex, double value)
+    {
+        var column = columns.Where(c => c.Visible).ToList()[columnIndex];
+        column.SetWidth($"{value}px");
+        await ColumnResized.InvokeAsync(new DataGridColumnResizedEventArgs<TItem>
+        {
+            Column = column,
+            Width = value,
+        });
+    }
+
+    internal string GetOrderBy()
+    {
+        return string.Join(",", columns.Where(c => c.GetSortOrder() != null).Select(c => c.GetSortOrderAsString(IsOData())));
+    }
+
+    [Parameter]
+    public EventCallback<DataGridColumnResizedEventArgs<TItem>> ColumnResized { get; set; }
+
+    public override IQueryable<TItem> View
+    {
+        get
+        {
+            var view = base.View.Where<TItem>(columns);
+            var orderBy = GetOrderBy();
+
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                if (typeof(TItem) == typeof(object))
+                {
+                    var firstItem = view.FirstOrDefault();
+                    if (firstItem != null)
+                    {
+                        view = view.Cast(firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
+                    }
+                }
+                else
+                {
+                    view = view.OrderBy(orderBy);
+                }
+            }
+
+            if (!LoadData.HasDelegate && (!AllowVirtualization || AllowPaging))
+            {
+                var count = view.Count();
+                if (count != Count)
+                {
+                    Count = count;
+                    StateHasChanged();
+                }
+            }
+
+            return view;
+        }
+    }
+
+
+    IList<TItem> _value;
+
+    [Parameter]
+    public IList<TItem> Value
+    {
+        get
+        {
+            return _value;
+        }
+        set
+        {
+            if (!object.Equals(_value, value))
+            {
+                _value = value;
+
+                selectedItems.Clear();
+
+                if (_value != null)
+                {
+                    _value.Where(v => v != null).ToList().ForEach(v => selectedItems.Add(v, true));
+                }
+
+                ValueChanged?.Invoke(_value);
+            }
+        }
+    }
+
+    [Parameter]
+    public Action<IList<TItem>> ValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> RowSelect { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> RowDeselect { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> RowClick { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> RowDoubleClick { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> RowExpand { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> RowCollapse { get; set; }
+
+    [Parameter]
+    public Action<RowRenderEventArgs<TItem>> RowRender { get; set; }
+
+    [Parameter]
+    public Action<DataGridCellRenderEventArgs<TItem>> CellRender { get; set; }
+
+    [Parameter]
+    public Action<DataGridRenderEventArgs<TItem>> Render { get; set; }
+
+    protected override void OnDataChanged()
+    {
+        Reset(!IsOData() && !LoadData.HasDelegate);
+    }
+
+    public void Reset(bool resetColumnFilters = true, bool resetRowState = false)
+    {
+        _view = null;
+        _value = new List<TItem>();
+
+        if (resetRowState)
+        {
+            selectedItems.Clear();
+            expandedItems.Clear();
+        }
+
+        if (resetColumnFilters)
+        {
+            columns.ForEach(c => { c.SetFilterValue(null); c.SetSecondFilterOperator(FilterOperator.Equals); });
+        }
+    }
+
+    public async override Task Reload()
+    {
+        _view = null;
+
+        if (Data != null && !LoadData.HasDelegate)
+        {
+            Count = 1;
+        }
+
+        if (AllowVirtualization && virtualize != null && !LoadData.HasDelegate)
+        {
+            await virtualize.RefreshDataAsync();
+        }
+
+        var orderBy = GetOrderBy();
+
+        Query.Skip = skip;
+        Query.Top = PageSize;
+        Query.OrderBy = orderBy;
+
+        var filterString = columns.ToFilterString<TItem>();
+        Query.Filter = filterString;
+
+        if (LoadData.HasDelegate)
+        {
+            await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = skip, Top = PageSize, OrderBy = orderBy, Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString });
+        }
+
+        CalculatePager();
+
+        if (!LoadData.HasDelegate)
+        {
+            StateHasChanged();
+        }
+    }
+
+    internal async Task ChangeState()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (Visible && !LoadData.HasDelegate && _view == null)
+        {
+            InvokeAsync(Reload);
+        }
+        else
+        {
+            CalculatePager();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    internal Dictionary<TItem, bool> expandedItems = new Dictionary<TItem, bool>();
+    internal string ExpandedItemStyle(TItem item)
+    {
+        return expandedItems.Keys.Contains(item) ? "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-down" : "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-right";
+    }
+
+    internal Dictionary<TItem, bool> selectedItems = new Dictionary<TItem, bool>();
+    internal string RowStyle(TItem item, int index)
+    {
+        var evenOrOdd = index % 2 == 0 ? "rz-datatable-even" : "rz-datatable-odd";
+
+        return (RowSelect.HasDelegate || ValueChanged != null || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
+    }
+
+    internal Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item)
+    {
+        var args = new Radzen.RowRenderEventArgs<TItem>() { Data = item, Expandable = Template != null };
+
+        if (RowRender != null)
+        {
+            RowRender(args);
+        }
+
+        return new Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>>(args, new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes));
+    }
+
+    private bool visibleChanged = false;
+    private bool firstRender = true;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+
+        await base.SetParametersAsync(parameters);
+
+        if (visibleChanged && !firstRender)
+        {
+            if (Visible == false)
+            {
+                Dispose();
+            }
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (Visible)
+        {
+            var args = new Radzen.DataGridRenderEventArgs<TItem>() { Grid = this, FirstRender = firstRender };
+
+            if (Render != null)
+            {
+                Render(args);
+            }
+        }
+
+        this.firstRender = firstRender;
+
+        if (firstRender || visibleChanged)
+        {
+            visibleChanged = false;
+        }
+    }
+
+    public async System.Threading.Tasks.Task ExpandRow(TItem item)
+    {
+        await ExpandItem(item);
+    }
+
+    internal async System.Threading.Tasks.Task ExpandItem(TItem item)
+    {
+        if (ExpandMode == DataGridExpandMode.Single && expandedItems.Keys.Any())
+        {
+            var itemToCollapse = expandedItems.Keys.FirstOrDefault();
+            if (itemToCollapse != null)
+            {
+                expandedItems.Remove(itemToCollapse);
+                await RowCollapse.InvokeAsync(itemToCollapse);
+
+                if (object.Equals(item, itemToCollapse))
+                {
+                    return;
+                }
+
+            }
+        }
+
+        if (!expandedItems.Keys.Contains(item))
+        {
+            expandedItems.Add(item, true);
+            await RowExpand.InvokeAsync(item);
+        }
+        else
+        {
+            expandedItems.Remove(item);
+            await RowCollapse.InvokeAsync(item);
+        }
+    }
+
+    [Parameter]
+    public DataGridSelectionMode SelectionMode { get; set; } = DataGridSelectionMode.Single;
+
+    internal async Task OnRowClick(object item)
+    {
+        await RowClick.InvokeAsync((TItem)item);
+        await OnRowSelect(item);
+    }
+
+    internal async System.Threading.Tasks.Task OnRowSelect(object item, bool raiseChange = true)
+    {
+        if (SelectionMode == DataGridSelectionMode.Single && item != null && selectedItems.Keys.Contains((TItem)item))
+        {
+            // Legacy RowSelect raise
+            if (raiseChange)
+            {
+                await RowSelect.InvokeAsync((TItem)item);
+            }
+            return;
+        }
+
+        if (SelectionMode == DataGridSelectionMode.Single && selectedItems.Keys.Any())
+        {
+            var itemToDeselect = selectedItems.Keys.FirstOrDefault();
+            if (itemToDeselect != null)
+            {
+                selectedItems.Remove(itemToDeselect);
+                await RowDeselect.InvokeAsync(itemToDeselect);
+            }
+        }
+
+        if (item != null)
+        {
+            if (!selectedItems.Keys.Contains((TItem)item))
+            {
+                selectedItems.Add((TItem)item, true);
+                if (raiseChange)
+                {
+                    await RowSelect.InvokeAsync((TItem)item);
+                }
+            }
+            else
+            {
+                selectedItems.Remove((TItem)item);
+                await RowDeselect.InvokeAsync((TItem)item);
+            }
+        }
+        else
+        {
+            if (raiseChange)
+            {
+                await RowSelect.InvokeAsync((TItem)item);
+            }
+        }
+
+        var value = selectedItems.Keys;
+
+        _value = SelectionMode == DataGridSelectionMode.Multiple ? new List<TItem>(value) : new List<TItem>() { value.FirstOrDefault() };
+        ValueChanged?.Invoke(_value);
+        StateHasChanged();
+    }
+
+    public async System.Threading.Tasks.Task SelectRow(TItem item)
+    {
+        await OnRowSelect(item, true);
+    }
+
+    internal async System.Threading.Tasks.Task OnRowDblClick(TItem item)
+    {
+        await RowDoubleClick.InvokeAsync(item);
+    }
+
+    [Parameter]
+    public EventCallback<TItem> RowEdit { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> RowUpdate { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> RowCreate { get; set; }
+
+    internal Dictionary<TItem, bool> editedItems = new Dictionary<TItem, bool>();
+    internal Dictionary<TItem, EditContext> editContexts = new Dictionary<TItem, EditContext>();
+
+    public async System.Threading.Tasks.Task EditRow(TItem item)
+    {
+        if (EditMode == DataGridEditMode.Single && editedItems.Keys.Any())
+        {
+            var itemToCancel = editedItems.Keys.FirstOrDefault();
+            if (itemToCancel != null)
+            {
+                editedItems.Remove(itemToCancel);
+                editContexts.Remove(itemToCancel);
+            }
+        }
+
+        if (!editedItems.Keys.Contains(item))
+        {
+            editedItems.Add(item, true);
+
+            var editContext = new EditContext(item);
+            editContexts.Add(item, editContext);
+
+            await RowEdit.InvokeAsync(item);
+
+            StateHasChanged();
+        }
+    }
+
+    public async System.Threading.Tasks.Task UpdateRow(TItem item)
+    {
+        if (editedItems.Keys.Contains(item))
+        {
+            var editContext = editContexts[item];
+
+            if (editContext.Validate())
+            {
+                editedItems.Remove(item);
+                editContexts.Remove(item);
+
+                if (object.Equals(itemToInsert, item))
+                {
+                    await RowCreate.InvokeAsync(item);
+                    itemToInsert = default(TItem);
+                }
+                else
+                {
+                    await RowUpdate.InvokeAsync(item);
+                }
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    public void CancelEditRow(TItem item)
+    {
+        if (object.Equals(itemToInsert, item))
+        {
+            var list = this.PagedView.ToList();
+            list.Remove(item);
+            this._view = list.AsQueryable();
+            this.Count = this.View.Count();
+            itemToInsert = default(TItem);
+            StateHasChanged();
+        }
+        else
+        {
+            int hash = item.GetHashCode();
+
+            if (editedItems.Keys.Contains(item))
+            {
+                editedItems.Remove(item);
+                editContexts.Remove(item);
+
+                StateHasChanged();
+            }
+        }
+    }
+
+    public bool IsRowInEditMode(TItem item)
+    {
+        return editedItems.Keys.Contains(item);
+    }
+
+    TItem itemToInsert;
+    public async System.Threading.Tasks.Task InsertRow(TItem item)
+    {
+        itemToInsert = item;
+        var list = this.PagedView.ToList();
+        list.Insert(0, item);
+        this._view = list.AsQueryable();
+        this.Count = this._view.Count();
+        await EditRow(item);
+    }
+
+    internal bool IsOData()
+    {
+        return Data != null && typeof(ODataEnumerable<TItem>).IsAssignableFrom(Data.GetType());
+    }
+
+    public void OrderBy(string property)
+    {
+        var p = IsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
+
+        var column = columns.Where(c => c.GetSortProperty() == property).FirstOrDefault();
+        if (column != null)
+        {
+            if (!AllowMultiColumnSorting)
+            {
+                foreach (var c in columns.Where(c => c != column))
+                {
+                    c.SetSortOrder(null);
+                }
+            }
+
+            if (column.GetSortOrder() == null)
+            {
+                column.SetSortOrder(SortOrder.Ascending);
+            }
+            else if (column.GetSortOrder() == SortOrder.Ascending)
+            {
+                column.SetSortOrder(SortOrder.Descending);
+            }
+            else if (column.GetSortOrder() == SortOrder.Descending)
+            {
+                column.SetSortOrder(null);
+            }
+        }
+
+        if (LoadData.HasDelegate && AllowVirtualization)
+        {
+            Data = null;
+        }
+
+        InvokeAsync(Reload);
+    }
+
+    public void OrderByDescending(string property)
+    {
+        var column = columns.Where(c => c.GetSortProperty() == property).FirstOrDefault();
+        if (column != null)
+        {
+            column.SetSortOrder(SortOrder.Descending);
+        }
+        InvokeAsync(Reload);
+    }
+
+    protected override string GetComponentCssClass()
+    {
+        var additionalClasses = new List<string>();
+
+        if (CurrentStyle.ContainsKey("height"))
+        {
+            additionalClasses.Add("rz-has-height");
+        }
+
+        if (RowSelect.HasDelegate || ValueChanged != null || SelectionMode == DataGridSelectionMode.Multiple)
+        {
+            additionalClasses.Add("rz-selectable");
+        }
+
+        return $"rz-has-paginator rz-datatable  rz-datatable-scrollable {String.Join(" ", additionalClasses)}";
+    }
+
+    internal string getHeaderStyle()
+    {
+        var additionalStyle = Style != null && Style.IndexOf("height:") != -1 ? "padding-right: 17px;" : "";
+        return $"margin-left:0px;{additionalStyle}";
+    }
+
+    public Query Query { get; private set; } = new Query();
+
+    internal string PopupID
+    {
+        get
+        {
+            return $"popup{UniqueID}";
+        }
+    }
+
+    internal bool disposed = false;
+
+    public override void Dispose()
+    {
+        base.Dispose();
+
+        disposed = true;
+
+        foreach (var column in columns.Where(c => c.Visible))
+        {
+            JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", $"{PopupID}{column.GetFilterProperty()}");
+        }
+    }
+}

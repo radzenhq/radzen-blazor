@@ -13,23 +13,23 @@
 
 <RadzenExample Name="ExportToExcelCsv" Heading="false" Documentation="false">
     <RadzenButton Text="Excel" Icon="grid_on" Click="@(args => Export("excel"))" Style="margin-bottom:20px" /><RadzenButton Text="CSV" Icon="wrap_text" Click="@(args => Export("csv"))" Style="margin-left:20px;margin-bottom:20px;" />
-    <RadzenGrid @ref="grid" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@orderDetails" TItem="OrderDetail">
+    <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@orderDetails" TItem="OrderDetail">
         <Columns>
-            <RadzenGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
-            <RadzenGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
-            <RadzenGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
+            <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
+            <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
+            <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
                 <Template Context="detail">
                     @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
                 </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-            <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+            <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
         </Columns>
-    </RadzenGrid>
+    </RadzenDataGrid>
 </RadzenExample>
 
 @code {
-    RadzenGrid<OrderDetail> grid;
+    RadzenDataGrid<OrderDetail> grid;
 
     IEnumerable<OrderDetail> orderDetails;
 

@@ -11,7 +11,7 @@
 <p>This page demonstrates how to use templates to create a Radzen Blazor DataGrid hierarchy.</p>
 
 <RadzenExample Name="MasterDetailHierarchy" Heading="false" Documentation="false">
-    <RadzenGrid @ref="grid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" RowRender="@RowRender" ExpandMode="DataGridExpandMode.Single"
+    <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" RowRender="@RowRender" ExpandMode="DataGridExpandMode.Single"
                 Data="@orders" TItem="Order">
         <Template Context="order">
             <RadzenCard Style="margin-bottom:20px">
@@ -21,23 +21,23 @@
             <RadzenTabs>
                 <Tabs>
                     <RadzenTabsItem Text="Order Details">
-                        <RadzenGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@order.OrderDetails" TItem="OrderDetail">
+                        <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@order.OrderDetails" TItem="OrderDetail">
                             <Columns>
-                                <RadzenGridColumn TItem="OrderDetail" Property="Order.CustomerID" Title="Order" />
-                                <RadzenGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
-                                <RadzenGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
+                                <RadzenDataGridColumn TItem="OrderDetail" Property="Order.CustomerID" Title="Order" />
+                                <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+                                <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
                                     <Template Context="detail">
                                         @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
                                     </Template>
-                                </RadzenGridColumn>
-                                <RadzenGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-                                <RadzenGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+                                <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
                                     <Template Context="detail">
                                         @String.Format("{0}%", detail.Discount * 100)
                                     </Template>
-                                </RadzenGridColumn>
+                                </RadzenDataGridColumn>
                             </Columns>
-                        </RadzenGrid>
+                        </RadzenDataGrid>
                     </RadzenTabsItem>
                     <RadzenTabsItem Text="Products">
                         <RadzenDataList WrapItems="true" AllowPaging="true" Data="@order.OrderDetails" TItem="OrderDetail" PageSize="10">
@@ -53,46 +53,46 @@
             </RadzenTabs>
         </Template>
         <Columns>
-            <RadzenGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
-            <RadzenGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
-            <RadzenGridColumn Width="150px" TItem="Order" Property="Employee.LastName" Title="Employee">
+            <RadzenDataGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
+            <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
+            <RadzenDataGridColumn Width="150px" TItem="Order" Property="Employee.LastName" Title="Employee">
                 <Template Context="order">
                     <div>@order.Employee?.LastName</div>
                     <RadzenImage Path="@order.Employee?.Photo" />
                 </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
                 <Template Context="order">
                     @String.Format("{0:d}", order.OrderDate)
                 </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="RequiredDate" Title="Required Date">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="RequiredDate" Title="Required Date">
                 <Template Context="order">
                     @String.Format("{0:d}", order.RequiredDate)
                 </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="ShippedDate" Title="Shipped Date">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="ShippedDate" Title="Shipped Date">
                 <Template Context="order">
                     @String.Format("{0:d}", order.ShippedDate)
                 </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="Freight" Title="Freight">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
                 <Template Context="order">
                     @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
                 </Template>
-            </RadzenGridColumn>
-            <RadzenGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
-            <RadzenGridColumn TItem="Order" Property="ShipAddress" Title="Ship Address" />
-            <RadzenGridColumn TItem="Order" Property="ShipCity" Title="Ship City" />
-            <RadzenGridColumn TItem="Order" Property="ShipRegion" Title="Ship Region" />
-            <RadzenGridColumn TItem="Order" Property="ShipPostalCode" Title="Ship Postal Code" />
-            <RadzenGridColumn TItem="Order" Property="ShipCountry" Title="Ship Country" />
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
+            <RadzenDataGridColumn TItem="Order" Property="ShipAddress" Title="Ship Address" />
+            <RadzenDataGridColumn TItem="Order" Property="ShipCity" Title="Ship City" />
+            <RadzenDataGridColumn TItem="Order" Property="ShipRegion" Title="Ship Region" />
+            <RadzenDataGridColumn TItem="Order" Property="ShipPostalCode" Title="Ship Postal Code" />
+            <RadzenDataGridColumn TItem="Order" Property="ShipCountry" Title="Ship Country" />
         </Columns>
-    </RadzenGrid>
+    </RadzenDataGrid>
 </RadzenExample>
 @code {
     IEnumerable<Order> orders;
-    RadzenGrid<Order> grid;
+    RadzenDataGrid<Order> grid;
 
     protected override void OnInitialized()
     {

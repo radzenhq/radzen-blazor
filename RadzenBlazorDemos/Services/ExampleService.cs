@@ -467,6 +467,22 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "Virtualization with IQueryable",
+                    Path = "datagrid-virtualization",
+                    Title = "Blazor DataGrid IQueryable virtualization",
+                    Icon = "&#xe871",
+                    Tags = new [] { "datagrid", "bind", "load", "data", "virtualization", "ondemand" }
+                },
+                new Example()
+                {
+                    Name = "Virtualization with LoadData event",
+                    Path = "datagrid-virtualization-loaddata",
+                    Title = "Blazor DataGrid custom virtualization",
+                    Icon = "&#xe871",
+                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "virtualization", "ondemand" }
+                },
+                new Example()
+                {
                     Name = "Footer Totals",
                     Path = "datagrid-footer-totals",
                     Title = "Blazor DataGrid footer totals",

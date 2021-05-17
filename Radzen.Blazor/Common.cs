@@ -71,9 +71,20 @@ namespace Radzen
         public bool FirstRender { get; internal set; }
     }
 
+    public class DataGridRenderEventArgs<T>
+    {
+        public RadzenDataGrid<T> Grid { get; internal set; }
+        public bool FirstRender { get; internal set; }
+    }
+
     public class CellRenderEventArgs<T> : RowRenderEventArgs<T>
     {
         public Blazor.RadzenGridColumn<T> Column { get; internal set; }
+    }
+
+    public class DataGridCellRenderEventArgs<T> : RowRenderEventArgs<T>
+    {
+        public Blazor.RadzenDataGridColumn<T> Column { get; internal set; }
     }
 
     public class UploadChangeEventArgs
@@ -201,6 +212,12 @@ namespace Radzen
         Vertical
     }
 
+    public enum SortOrder
+    {
+        Ascending,
+        Descending
+    }
+
     public enum ButtonType
     {
         Button,
@@ -250,11 +267,30 @@ namespace Radzen
         EndsWith
     }
 
+    public enum FilterOperator
+    {
+        Equals,
+        NotEquals,
+        LessThan,
+        LessThanOrEquals,
+        GreaterThan,
+        GreaterThanOrEquals,
+        Contains,
+        StartsWith,
+        EndsWith
+    }
+
     public enum TextAlign
     {
         Left,
         Right,
         Center
+    }
+
+    public class DataGridColumnResizedEventArgs<T>
+    {
+        public RadzenDataGridColumn<T> Column { get; internal set; }
+        public double Width { get; internal set; }
     }
 
     public class ColumnResizedEventArgs<T>
@@ -388,7 +424,15 @@ namespace Radzen
         public static Func<TItem, TValue> Getter<TItem, TValue>(string propertyName)
         {
             var arg = Expression.Parameter(typeof(TItem));
-            var body = Expression.Convert(Expression.Property(arg, propertyName), typeof(TValue));
+
+            Expression body = arg;
+
+            foreach (var member in propertyName.Split("."))
+            {
+                body = Expression.PropertyOrField(body, member);
+            }
+
+            body = Expression.Convert(body, typeof(TValue));
 
             return Expression.Lambda<Func<TItem, TValue>>(body, arg).Compile();
         }
