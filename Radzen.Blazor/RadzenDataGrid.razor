@@ -259,7 +259,7 @@
                     }
                 </thead>
                 <tbody>
-                    @if (Data != null && Count > 0 && columns.Count > 0 || LoadData.HasDelegate && AllowVirtualization)
+                    @if (Data != null && Count > 0 && columns.Count > 0)
                     {
                         @DrawRows(visibleColumns)
                     }
@@ -347,11 +347,12 @@
                     return (RenderFragment)((b) =>
                     {
                         b.OpenComponent<RadzenDataGridRow<TItem>>(3);
-                        b.AddAttribute(3, "Columns", visibleColumns);
-                        //b.AddAttribute(4, "Index", list.IndexOf(context));
+                        b.AddAttribute(4, "Columns", visibleColumns);
                         b.AddAttribute(5, "Grid", this);
                         b.AddAttribute(6, "TItem", typeof(TItem));
                         b.AddAttribute(7, "Item", context);
+                        b.SetKey(context);
+                        //b.AddAttribute(8, "Index", _view.IndexOf(context));
                         b.CloseComponent();
                     });
                 }));
@@ -516,6 +517,12 @@
                 column.SetFilterValue(args.Value, isFirst);
                 skip = 0;
                 CurrentPage = 0;
+
+                if (LoadData.HasDelegate && AllowVirtualization)
+                {
+                    Data = null;
+                }
+
                 InvokeAsync(Reload);
             }
         }
@@ -558,6 +565,12 @@
 
         skip = 0;
         CurrentPage = 0;
+
+        if (LoadData.HasDelegate && AllowVirtualization)
+        {
+            Data = null;
+        }
+
         await InvokeAsync(Reload);
     }
 
@@ -850,7 +863,7 @@
             Count = 1;
         }
 
-        if (AllowVirtualization && virtualize != null)
+        if (AllowVirtualization && virtualize != null && !LoadData.HasDelegate)
         {
             await virtualize.RefreshDataAsync();
         }
@@ -864,7 +877,7 @@
         var filterString = columns.ToFilterString<TItem>();
         Query.Filter = filterString;
 
-        if (LoadData.HasDelegate && !AllowVirtualization)
+        if (LoadData.HasDelegate)
         {
             await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = skip, Top = PageSize, OrderBy = orderBy, Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString });
         }
@@ -1213,6 +1226,11 @@
             {
                 column.SetSortOrder(null);
             }
+        }
+
+        if (LoadData.HasDelegate && AllowVirtualization)
+        {
+            Data = null;
         }
 
         InvokeAsync(Reload);

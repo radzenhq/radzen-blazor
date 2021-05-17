@@ -11,8 +11,8 @@
                     AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" LogicalFilterOperator="LogicalFilterOperator.Or"
                     AllowSorting="true">
         <Columns>
-            <RadzenDataGridColumn TItem="OrderDetail" Property="Order.CustomerID" Title="Order" />
-            <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+            <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
+            <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
             <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
                 <Template Context="detail">
                     @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
@@ -32,6 +32,6 @@
 
     protected override void OnInitialized()
     {
-        orderDetails = dbContext.OrderDetails.Include("Order").Include("Product");
+        orderDetails = dbContext.OrderDetails;
     }
 }
