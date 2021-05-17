@@ -22,244 +22,246 @@
             <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" />
         }
 
-        <div class="rz-data-grid-data">
-            <table class="rz-grid-table rz-grid-table-fixed">
-                <colgroup>
+    <div class="rz-data-grid-data">
+        <table class="rz-grid-table rz-grid-table-fixed">
+            <colgroup>
+                @if (Template != null)
+                {
+                    <col>
+                }
+                @foreach (var column in visibleColumns)
+                {
+                    <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-col") style="@column.GetStyle()">
+                }
+            </colgroup>
+            <thead>
+                <tr>
                     @if (Template != null)
                     {
-                        <col>
+                        <th class="rz-col-icon rz-unselectable-text" scope="col">
+                            <span class="rz-column-title"></span>
+                        </th>
                     }
                     @foreach (var column in visibleColumns)
                     {
-                        <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-col") style="@column.GetStyle()">
+                        var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
+                        <th class="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}")" scope="col" style="@column.GetStyle(true, true)">
+                            <div @onclick='@((args) => OnSort(args, column))' style="width:100%">
+                                <span class="rz-column-title">
+                                    @if (column.HeaderTemplate != null)
+                                    {
+                                        @column.HeaderTemplate
+                                    }
+                                    else
+                                    {
+                                        @column.Title
+                                    }
+                                </span>
+                                @if (AllowSorting && column.Sortable)
+                                {
+                                    @if (column.GetSortOrder() == SortOrder.Ascending)
+                                    {
+                                        <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
+                                    }
+                                    else if (column.GetSortOrder() == SortOrder.Descending)
+                                    {
+                                        <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
+                                    }
+                                }
+                                @if (AllowColumnResize)
+                                {
+                                    var columnIndex = visibleColumns.IndexOf(column);
+                                    <div id="@getColumnResizerId(columnIndex)" style="cursor:col-resize;float:right;"
+                                         @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                         @onmousedown=@(args => StartColumnResize(args, columnIndex))>&nbsp;</div>
+                                }
+                                @if (AllowFiltering && column.Filterable && FilterMode == FilterMode.Advanced)
+                                {
+                                    <i @onclick:stopPropagation="true" onclick="@($"Radzen.togglePopup(this, '{PopupID}{column.GetFilterProperty()}')")"
+                                       class="@getFilterIconCss(column)" />
+
+                                    <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel"
+                                         style="display:none;min-width:250px;" tabindex="0">
+                                        <div class="rz-grid-filter rz-overlaypanel-content">
+                                            @if (column.FilterTemplate != null)
+                                            {
+                                                @column.FilterTemplate(column)
+                                            }
+                                            else
+                                            {
+                                                <RadzenLabel Text="@FilterText" class="rz-grid-filter-label" />
+                                                <RadzenDropDown @onclick:preventDefault="true" Data="@(column.GetFilterOperators().Select(t => new { Value = $"{t}", Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@column.GetFilterOperator()" Change="@(args => column.SetFilterOperator((FilterOperator)args))" />
+                                                @if (PropertyAccess.IsNumeric(column.FilterPropertyType))
+                                                {
+                                                    @(DrawNumericFilter(column, false))
+                                                }
+                                                else if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?) ||
+                                                    column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
+                                                {
+                                                    <RadzenDatePicker TValue="@object" ShowTime="true" ShowTimeOkButton="true" DateFormat="@getFilterDateFormat(column)"
+                                                                      Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args.Value))" />
+
+                                                }
+                                                else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
+                                                {
+                                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
+                                                }
+                                                else
+                                                {
+                                                    <RadzenTextBox Value="@($"{column.GetFilterValue()}")" Change="@(args => column.SetFilterValue(args))" />
+                                                }
+
+                                                <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 80px"
+                                                                Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator" Value="@column.LogicalFilterOperator" Change="@(args => column.SetLogicalFilterOperator((LogicalFilterOperator)args))" />
+
+                                                <RadzenDropDown @onclick:preventDefault="true" Data="@(column.GetFilterOperators().Select(t => new { Value = $"{t}", Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@column.GetSecondFilterOperator()" Change="@(args => column.SetSecondFilterOperator((FilterOperator)args))" />
+                                                @if (PropertyAccess.IsNumeric(column.FilterPropertyType))
+                                                {
+                                                    @(DrawNumericFilter(column, false, false))
+                                                }
+                                                else if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?) ||
+                                                    column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
+                                                {
+                                                    <RadzenDatePicker TValue="@object"
+                                                                      ShowTime="true" ShowTimeOkButton="true" DateFormat="@getFilterDateFormat(column)"
+                                                                      Value="@column.GetSecondFilterValue()" Change="@(args => column.SetFilterValue(args.Value, false))" />
+
+                                                }
+                                                else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
+                                                {
+                                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetSecondFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column, false))" />
+                                                }
+                                                else
+                                                {
+                                                    <RadzenTextBox Value="@($"{column.GetSecondFilterValue()}")" Change="@(args => column.SetFilterValue(args, false))" />
+                                                }
+                                            }
+                                        </div>
+                                        @if (column.FilterTemplate == null)
+                                        {
+                                            <div class="rz-grid-filter-buttons">
+                                                <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text=@ClearFilterText Click="@((args) => ClearFilter(column, true))" />
+                                                <RadzenButton ButtonStyle="ButtonStyle.Primary" Text=@ApplyFilterText Click="@((args) => ApplyFilter(column, true))" />
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </th>
                     }
-                </colgroup>
-                <thead>
+                </tr>
+                @if (AllowFiltering && FilterMode == FilterMode.Simple && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())
+                {
                     <tr>
                         @if (Template != null)
                         {
-                            <th class="rz-col-icon rz-unselectable-text" scope="col">
+                            <th class="rz-col-icon  rz-unselectable-text" scope="col">
                                 <span class="rz-column-title"></span>
                             </th>
                         }
                         @foreach (var column in visibleColumns)
                         {
-                            var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
-                            <th class="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}")" scope="col" style="@column.GetStyle(true, true)">
-                                <div @onclick='@((args) => OnSort(args, column))' style="width:100%">
-                                    <span class="rz-column-title">
-                                        @if (column.HeaderTemplate != null)
-                                        {
-                                            @column.HeaderTemplate
-                                        }
-                                        else
-                                        {
-                                            @column.Title
-                                        }
-                                    </span>
-                                    @if (AllowSorting && column.Sortable)
-                                    {
-                                        @if (column.GetSortOrder() == SortOrder.Ascending)
-                                        {
-                                            <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
-                                        }
-                                        else if (column.GetSortOrder() == SortOrder.Descending)
-                                        {
-                                            <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
-                                        }
-                                        else
-                                        {
-                                            <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
-                                        }
-                                    }
-                                    @if (AllowColumnResize)
-                                    {
-                                        var columnIndex = visibleColumns.IndexOf(column);
-                                        <div id="@getColumnResizerId(columnIndex)" style="cursor:col-resize;float:right;"
-                                             @onclick:preventDefault="true" @onclick:stopPropagation="true"
-                                             @onmousedown=@(args => StartColumnResize(args, columnIndex))>&nbsp;</div>
-                                    }
-                                    @if (AllowFiltering && column.Filterable && FilterMode == FilterMode.Advanced)
-                                    {
-                                        <i @onclick:stopPropagation="true" onclick="@($"Radzen.togglePopup(this, '{PopupID}{column.GetFilterProperty()}')")"
-                                           class="@getFilterIconCss(column)" />
-
-                                        <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel"
-                                             style="display:none;min-width:250px;" tabindex="0">
-                                            <div class="rz-grid-filter rz-overlaypanel-content">
-                                                @if (column.FilterTemplate != null)
-                                                {
-                                                    @column.FilterTemplate(column)
-                                                }
-                                                else
-                                                {
-                                                    <RadzenLabel Text="@FilterText" class="rz-grid-filter-label" />
-                                                    <RadzenDropDown @onclick:preventDefault="true" Data="@(column.GetFilterOperators().Select(t => new { Value = $"{t}", Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@column.GetFilterOperator()" Change="@(args => column.SetFilterOperator((FilterOperator)args))" />
-                                                    @if (PropertyAccess.IsNumeric(column.FilterPropertyType))
+                            <th class="@($" rz-unselectable-text")" tabindex="1" scope="col" style="@column.GetStyle(true)">
+                                @if (AllowFiltering && column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
+                                {
+                                    <div class="rz-cell-filter">
+                                        <div class="rz-cell-filter-content">
+                                            @if (column.FilterTemplate != null)
+                                            {
+                                                @column.FilterTemplate(column)
+                                            }
+                                            else
+                                            {
+                                                <label class="rz-cell-filter-label" style="height:35px">
+                                                    @if (column.Type == "string" && column.Format == "date-time")
                                                     {
-                                                        @(DrawNumericFilter(column, false))
-                                                    }
-                                                    else if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?) ||
-                                                        column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
-                                                    {
-                                                        <RadzenDatePicker TValue="@object" ShowTime="true" ShowTimeOkButton="true" DateFormat="@getFilterDateFormat(column)"
-                                                                          Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args.Value))" />
+                                                        <i onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")"
+                                                           class="rzi">date_range</i>
+                                                        @if (column.GetFilterValue() != null)
+                                                        {
+                                                            <span class="rz-current-filter">@column.GetFilterValue()</span>
+                                                            <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear">close</i>
+                                                        }
+                                                        <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel"
+                                                             style="display:none;width:550px;" tabindex="0">
+                                                            <div class="rz-overlaypanel-content">
 
+                                                                <div class="rz-date-filter">
+
+                                                                    <div class="rz-listbox rz-inputtext   ">
+                                                                        <div class="rz-listbox-list-wrapper">
+                                                                            <ul class="rz-listbox-list">
+                                                                                <li class="@(DateFilterOperatorStyle(column, FilterOperator.Equals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.Equals))" style="display: block;">
+                                                                                    <span>@EqualsText</span>
+                                                                                </li>
+                                                                                <li class="@(DateFilterOperatorStyle(column, FilterOperator.NotEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.NotEquals))" style="display: block;">
+                                                                                    <span>@NotEqualsText</span>
+                                                                                </li>
+                                                                                <li class="@(DateFilterOperatorStyle(column, FilterOperator.LessThan))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThan))" style="display: block;">
+                                                                                    <span>@LessThanText</span>
+                                                                                </li>
+                                                                                <li class="@(DateFilterOperatorStyle(column, FilterOperator.LessThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThanOrEquals))" style="display: block;">
+                                                                                    <span>@LessThanOrEqualsText</span>
+                                                                                </li>
+                                                                                <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThan))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThan))" style="display: block;">
+                                                                                    <span>@GreaterThanText</span>
+                                                                                </li>
+                                                                                <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThanOrEquals))" style="display: block;">
+                                                                                    <span>@GreaterThanOrEqualsText</span>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <RadzenDatePicker TValue="@object"
+                                                                                      ShowTime="true" ShowTimeOkButton="false" Inline="true" DateFormat="@getFilterDateFormat(column)"
+                                                                                      Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args.Value))" />
+
+                                                                </div>
+                                                                <div class="rz-date-filter-buttons">
+                                                                    <button class="rz-button rz-clear-filter" @onclick="@((args) => ClearFilter(column, true))">
+                                                                        @ClearFilterText
+                                                                    </button>
+                                                                    <button class="rz-button rz-apply-filter" @onclick="@((args) => ApplyFilter(column, true))">
+                                                                        @ApplyFilterText
+                                                                    </button>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
                                                     }
-                                                    else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
+                                                    else if (column.Type == "number")
+                                                    {
+                                                        <i class="rzi">search</i>
+                                                        @(DrawNumericFilter(column))
+                                                    }
+                                                    else if (column.Type == "boolean")
                                                     {
                                                         <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
                                                     }
                                                     else
                                                     {
-                                                        <RadzenTextBox Value="@($"{column.GetFilterValue()}")" Change="@(args => column.SetFilterValue(args))" />
+                                                        <i class="rzi">search</i>
+                                                        <input id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" />
                                                     }
-
-                                                    <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 80px"
-                                                                    Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator" Value="@column.LogicalFilterOperator" Change="@(args => column.SetLogicalFilterOperator((LogicalFilterOperator)args))" />
-
-                                                    <RadzenDropDown @onclick:preventDefault="true" Data="@(column.GetFilterOperators().Select(t => new { Value = $"{t}", Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@column.GetSecondFilterOperator()" Change="@(args => column.SetSecondFilterOperator((FilterOperator)args))" />
-                                                    @if (PropertyAccess.IsNumeric(column.FilterPropertyType))
-                                                    {
-                                                        @(DrawNumericFilter(column, false, false))
-                                                    }
-                                                    else if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?) ||
-                                                        column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
-                                                    {
-                                                        <RadzenDatePicker TValue="@object"
-                                                                          ShowTime="true" ShowTimeOkButton="true" DateFormat="@getFilterDateFormat(column)"
-                                                                          Value="@column.GetSecondFilterValue()" Change="@(args => column.SetFilterValue(args.Value, false))" />
-
-                                                    }
-                                                    else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
-                                                    {
-                                                        <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetSecondFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column, false))" />
-                                                    }
-                                                    else
-                                                    {
-                                                        <RadzenTextBox Value="@($"{column.GetSecondFilterValue()}")" Change="@(args => column.SetFilterValue(args, false))" />
-                                                    }
-                                                }
-                                            </div>
-                                            @if (column.FilterTemplate == null)
-                                            {
-                                                <div class="rz-grid-filter-buttons">
-                                                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text=@ClearFilterText Click="@((args) => ClearFilter(column, true))" />
-                                                    <RadzenButton ButtonStyle="ButtonStyle.Primary" Text=@ApplyFilterText Click="@((args) => ApplyFilter(column, true))" />
-                                                </div>
+                                                </label>
                                             }
                                         </div>
-                                    }
-                                </div>
+                                    </div>
+                                }
                             </th>
                         }
                     </tr>
-                    @if (AllowFiltering && FilterMode == FilterMode.Simple && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())
-                    {
-                        <tr>
-                            @if (Template != null)
-                            {
-                                <th class="rz-col-icon  rz-unselectable-text" scope="col">
-                                    <span class="rz-column-title"></span>
-                                </th>
-                            }
-                            @foreach (var column in visibleColumns)
-                            {
-                                <th class="@($" rz-unselectable-text")" tabindex="1" scope="col" style="@column.GetStyle(true)">
-                                    @if (AllowFiltering && column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
-                                    {
-                                        <div class="rz-cell-filter">
-                                            <div class="rz-cell-filter-content">
-                                                @if (column.FilterTemplate != null)
-                                                {
-                                                    @column.FilterTemplate(column)
-                                                }
-                                                else
-                                                {
-                                                    <label class="rz-cell-filter-label" style="height:35px">
-                                                        @if (column.Type == "string" && column.Format == "date-time")
-                                                        {
-                                                            <i onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")"
-                                                               class="rzi">date_range</i>
-                                                            @if (column.GetFilterValue() != null)
-                                                            {
-                                                                <span class="rz-current-filter">@column.GetFilterValue()</span>
-                                                                <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear">close</i>
-                                                            }
-                                                            <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel"
-                                                                 style="display:none;width:550px;" tabindex="0">
-                                                                <div class="rz-overlaypanel-content">
-
-                                                                    <div class="rz-date-filter">
-
-                                                                        <div class="rz-listbox rz-inputtext   ">
-                                                                            <div class="rz-listbox-list-wrapper">
-                                                                                <ul class="rz-listbox-list">
-                                                                                    <li class="@(DateFilterOperatorStyle(column, FilterOperator.Equals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.Equals))" style="display: block;">
-                                                                                        <span>@EqualsText</span>
-                                                                                    </li>
-                                                                                    <li class="@(DateFilterOperatorStyle(column, FilterOperator.NotEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.NotEquals))" style="display: block;">
-                                                                                        <span>@NotEqualsText</span>
-                                                                                    </li>
-                                                                                    <li class="@(DateFilterOperatorStyle(column, FilterOperator.LessThan))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThan))" style="display: block;">
-                                                                                        <span>@LessThanText</span>
-                                                                                    </li>
-                                                                                    <li class="@(DateFilterOperatorStyle(column, FilterOperator.LessThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThanOrEquals))" style="display: block;">
-                                                                                        <span>@LessThanOrEqualsText</span>
-                                                                                    </li>
-                                                                                    <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThan))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThan))" style="display: block;">
-                                                                                        <span>@GreaterThanText</span>
-                                                                                    </li>
-                                                                                    <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThanOrEquals))" style="display: block;">
-                                                                                        <span>@GreaterThanOrEqualsText</span>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <RadzenDatePicker TValue="@object"
-                                                                                          ShowTime="true" ShowTimeOkButton="false" Inline="true" DateFormat="@getFilterDateFormat(column)"
-                                                                                          Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args.Value))" />
-
-                                                                    </div>
-                                                                    <div class="rz-date-filter-buttons">
-                                                                        <button class="rz-button rz-clear-filter" @onclick="@((args) => ClearFilter(column, true))">
-                                                                            @ClearFilterText
-                                                                        </button>
-                                                                        <button class="rz-button rz-apply-filter" @onclick="@((args) => ApplyFilter(column, true))">
-                                                                            @ApplyFilterText
-                                                                        </button>
-                                                                    </div>
-
-                                                                </div>
-                                                            </div>
-                                                        }
-                                                        else if (column.Type == "number")
-                                                        {
-                                                            <i class="rzi">search</i>
-                                                            @(DrawNumericFilter(column))
-                                                        }
-                                                        else if (column.Type == "boolean")
-                                                        {
-                                                            <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
-                                                        }
-                                                        else
-                                                        {
-                                                            <i class="rzi">search</i>
-                                                            <input id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" />
-                                                        }
-                                                    </label>
-                                                }
-                                            </div>
-                                        </div>
-                                    }
-                                </th>
-                            }
-                        </tr>
-                    }
-                </thead>
-                <tbody>
-                    @if (Data != null && Count > 0 && columns.Count > 0)
+                }
+            </thead>
+            <tbody>
+                @if (Data != null)
+                {
+                    @if (Count > 0 && columns.Count > 0)
                     {
                         @DrawRows(visibleColumns)
                     }
@@ -271,33 +273,42 @@
                             </td>
                         </tr>
                     }
-                </tbody>
-                @if (visibleColumns.Where(c => c.FooterTemplate != null).Any())
-                {
-                    <tfoot class="rz-datatable-tfoot">
-                        <tr class="">
-                            @if (Template != null)
-                            {
-                                <td class="rz-col-icon rz-unselectable-text" scope="col">
-                                    <span class="rz-column-title"></span>
-                                </td>
-                            }
-                            @foreach (var column in visibleColumns)
-                            {
-                                <td class="@($" {column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)}")" style="@column.GetStyle(true, true)">
-                                    <span class="rz-column-footer">
-                                        @if (column.FooterTemplate != null)
-                                        {
-                                            @column.FooterTemplate
-                                        }
-                                    </span>
-                                </td>
-                            }
-                        </tr>
-                    </tfoot>
                 }
-            </table>
-        </div>
+            </tbody>
+            @if (visibleColumns.Where(c => c.FooterTemplate != null).Any())
+            {
+                <tfoot class="rz-datatable-tfoot">
+                    <tr class="">
+                        @if (Template != null)
+                        {
+                            <td class="rz-col-icon rz-unselectable-text" scope="col">
+                                <span class="rz-column-title"></span>
+                            </td>
+                        }
+                        @foreach (var column in visibleColumns)
+                        {
+                            <td class="@($" {column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)}")" style="@column.GetStyle(true, true)">
+                                <span class="rz-column-footer">
+                                    @if (column.FooterTemplate != null)
+                                    {
+                                        @column.FooterTemplate
+                                    }
+                                </span>
+                            </td>
+                        }
+                    </tr>
+                </tfoot>
+            }
+        </table>
+
+        @if (IsLoading)
+        {
+            <div class="rz-datatable-loading"></div>
+            <div class="rz-datatable-loading-content">
+                <i class="rzi-circle-o-notch"></i>
+            </div>
+        }
+    </div>
 
         @if (AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
         {
@@ -713,6 +724,9 @@
 
     [Parameter]
     public bool AllowVirtualization { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; }
 
     [Parameter]
     public bool AllowSorting { get; set; }
