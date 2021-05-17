@@ -154,7 +154,7 @@
         }
     }
 
-    public string GetStyle(bool forCell = false)
+    public string GetStyle(bool forCell = false, bool isHeaderOrFooterCell = false)
     {
         var style = new List<string>();
 
@@ -184,6 +184,11 @@
                 });
 
             style.Add($"left:{left}px");
+        }
+
+        if (isHeaderOrFooterCell && !Frozen && Grid.ColumnsCollection.Where(c => c.Visible && c.Frozen).Any())
+        {
+            style.Add("z-index:0");
         }
 
         return string.Join(";", style);

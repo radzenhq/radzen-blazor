@@ -45,7 +45,7 @@
                         @foreach (var column in visibleColumns)
                         {
                             var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
-                            <th class="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}")" scope="col" style="@column.GetStyle(true)">
+                            <th class="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}")" scope="col" style="@column.GetStyle(true, true)">
                                 <div @onclick='@((args) => OnSort(args, column))' style="width:100%">
                                     <span class="rz-column-title">
                                         @if (column.HeaderTemplate != null)
@@ -284,7 +284,7 @@
                             }
                             @foreach (var column in visibleColumns)
                             {
-                                <td class="@($" {column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)}")" style="@column.GetStyle(true)">
+                                <td class="@($" {column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)}")" style="@column.GetStyle(true, true)">
                                     <span class="rz-column-footer">
                                         @if (column.FooterTemplate != null)
                                         {

@@ -722,11 +722,11 @@ $grid-button-line-height: $grid-button-height !default;
     flex: 1;
 }
 
-td, th {
+.rz-grid-table td, .rz-grid-table th {
     padding: .5rem;
 }
 
-thead {
+.rz-grid-table thead {
 
     th {
         position: sticky;
@@ -752,7 +752,7 @@ thead {
     }
 }
 
-tfoot, tfoot td {
+.rz-grid-table tfoot, .rz-grid-table tfoot td {
     position: sticky;
     bottom: 0;
     z-index: 1;
@@ -776,6 +776,6 @@ tfoot, tfoot td {
     }
 }
 
-tbody > ::deep div {
+.rz-grid-table tbody > ::deep div {
     display: table-row;
 }
