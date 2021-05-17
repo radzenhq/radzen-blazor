@@ -1,26 +1,27 @@
-﻿@page "/datagrid-multiple-selection"
+﻿@page "/datagrid-single-selection"
 @using Radzen
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
 @inject NorthwindContext dbContext
-<h1>DataGrid <strong>Multiple Selection</strong></h1>
+<h1>DataGrid <strong>Single Selection</strong></h1>
 
 <RadzenExample Name="DataGridMultipleSelection" Documentation="false" Heading="false">
+    <div style="display: flex; align-items: center; margin-bottom: 16px">
+    <RadzenButton Click="@ClearSelection" Text="Clear Selection" />
+    @if (selectedEmployees?.Any() == true)
+    {
+    <div style="margin-left: 16px">
+        Selected Employee: @selectedEmployees[0].FirstName @selectedEmployees[0].LastName
+    </div>
+    }
+    </div>
+
     <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                 AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
-                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedEmployees>
+                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees>
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Width="40px" Sortable="false" Filterable="false">
-                <HeaderTemplate>
-                    <RadzenCheckBox TriState="false" TValue="bool" Value="@(employees.Any(i => selectedEmployees != null && selectedEmployees.Contains(i)))"
-                                    Change="@(args => selectedEmployees = args ? employees.ToList() : null)" />
-                </HeaderTemplate>
-                <Template Context="data">
-                    <RadzenCheckBox TriState="false" Value="@(selectedEmployees != null && selectedEmployees.Contains(data))" />
-                </Template>
-            </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
             <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
                 <Template Context="data">
@@ -39,8 +40,14 @@
     IEnumerable<Employee> employees;
     IList<Employee> selectedEmployees;
 
+    void ClearSelection()
+    {
+        selectedEmployees = null;
+    }
+
     protected override void OnInitialized()
     {
         employees = dbContext.Employees;
+        selectedEmployees = employees.Take(1).ToList();
     }
 }

@@ -434,92 +434,186 @@ namespace RadzenBlazorDemos
         {
             Name="DataGrid",
             Children = new [] {
-                new Example()
+                new Example
                 {
-                    Name = "Binding to IQueryable",
-                    Path = "datagrid",
+                    Name = "Data-binding",
                     Icon = "&#xe3ec",
-                    Tags = new [] { "datatable", "datagridview", "dataview", "grid", "table" }
+                    Children = new [] {
+                        new Example
+                        {
+                            Name = "IQueryable",
+                            Path = "datagrid",
+                            Tags = new [] { "datatable", "datagridview", "dataview", "grid", "table" }
+                        },
+                        new Example
+                        {
+                            Name = "LoadData event",
+                            Path = "datagrid-loaddata",
+                            Title = "Blazor DataGrid custom data-binding",
+                            Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "custom" }
+                        },
+                        new Example
+                        {
+                            Name = "OData service",
+                            Path = "datagrid-odata",
+                            Title = "Blazor DataGrid OData data-binding",
+                            Icon = "&#xe871",
+                            Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "odata", "service", "rest" }
+                        },
+                        new Example
+                        {
+                            Name = "Dynamic data",
+                            Path = "datagrid-dynamic",
+                            Title = "Blazor DataGrid binding dynamic data",
+                            Icon = "&#xe871",
+                            Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "dynamic" }
+                        },
+                    }
                 },
-                new Example()
+                new Example
                 {
-                    Name = "Binding with LoadData event",
-                    Path = "datagrid-loaddata",
-                    Title = "Blazor DataGrid custom data-binding",
-                    Icon = "&#xe265",
-                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata" }
-                },
-                new Example()
-                {
-                    Name = "Binding to OData service",
-                    Path = "datagrid-odata",
-                    Title = "Blazor DataGrid OData data-binding",
+                    Name = "Virtualization",
                     Icon = "&#xe871",
-                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "odata" }
+                    Children = new []
+                    {
+                        new Example
+                        {
+                            Name = "IQueryable support",
+                            Path = "datagrid-virtualization",
+                            Title = "Blazor DataGrid IQueryable virtualization",
+                            Tags = new [] { "datagrid", "bind", "load", "data", "virtualization", "ondemand" }
+                        },
+                        new Example
+                        {
+                            Name = "LoadData support",
+                            Path = "datagrid-virtualization-loaddata",
+                            Title = "Blazor DataGrid custom virtualization",
+                            Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "virtualization", "ondemand" }
+                        },
+                    }
                 },
-                new Example()
+                new Example
                 {
-                    Name = "Binding to dynamic data",
-                    Path = "datagrid-dynamic",
-                    Title = "Blazor DataGrid binding dynamic data",
-                    Icon = "&#xe871",
-                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "dynamic" }
-                },
-                new Example()
-                {
-                    Name = "Virtualization with IQueryable",
-                    Path = "datagrid-virtualization",
-                    Title = "Blazor DataGrid IQueryable virtualization",
-                    Icon = "&#xe871",
-                    Tags = new [] { "datagrid", "bind", "load", "data", "virtualization", "ondemand" }
-                },
-                new Example()
-                {
-                    Name = "Virtualization with LoadData event",
-                    Path = "datagrid-virtualization-loaddata",
-                    Title = "Blazor DataGrid custom virtualization",
-                    Icon = "&#xe871",
-                    Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "virtualization", "ondemand" }
-                },
-                new Example()
-                {
-                    Name = "Footer Totals",
-                    Path = "datagrid-footer-totals",
-                    Title = "Blazor DataGrid footer totals",
+                    Name = "Columns",
                     Icon = "&#xe336",
-                    Tags = new [] { "summary", "total", "aggregate", "datagrid", "table", "dataview" }
+                    Children = new []
+                    {
+                        new Example
+                        {
+                            Name = "Template",
+                            Path = "datagrid-column-template",
+                            Title = "Blazor DataGrid column template",
+                            Tags = new [] { "column", "template", "grid", "datagrid", "table"}
+                        },
+                        new Example
+                        {
+                            Name = "Resizing",
+                            Path = "datagrid-column-resizing",
+                            Title = "Blazor DataGrid column resizing",
+                            Tags = new [] { "column", "resizing", "grid", "datagrid", "table"}
+                        },
+                        new Example
+                        {
+                            Name = "Footer Totals",
+                            Path = "datagrid-footer-totals",
+                            Title = "Blazor DataGrid footer totals",
+                            Tags = new [] { "summary", "total", "aggregate", "datagrid", "table", "dataview" }
+                        },
+                        new Example
+                        {
+                            Name = "Filter Template",
+                            Path = "datagrid-filter-template",
+                            Title = "Blazor DataGrid custom filtering",
+                            Tags = new [] { "datagrid", "column", "filter", "template" }
+                        },
+                        new Example
+                        {
+                            Name = "Frozen Columns",
+                            Path = "datagrid-frozen-columns",
+                            Title = "Blazor DataGrid frozen columns",
+                            Tags = new [] { "datagrid", "column", "frozen", "locked" }
+                        }
+                    }
                 },
-                new Example()
+                new Example
                 {
-                    Name = "Custom Column FilterTemplate",
-                    Path = "datagrid-filter-template",
-                    Title = "Blazor DataGrid custom filtering",
-                    Icon = "&#xe152",
-                    Tags = new [] { "datagrid", "column", "filter", "template" }
+                    Name = "Filtering",
+                    Icon = "&#xef4f",
+                    Children = new []
+                    {
+                        new Example
+                        {
+                            Name = "Simple Mode",
+                            Path = "datagrid-simple-filter",
+                            Title = "Blazor DataGrid Simple filter mode",
+                            Tags = new [] { "filter", "simple", "grid", "datagrid", "table"}
+                        },
+                        new Example
+                        {
+                            Name = "Advanced Mode",
+                            Path = "datagrid-advanced-filter",
+                            Title = "Blazor DataGrid Simple filter mode",
+                            Tags = new [] { "filter", "advanced", "grid", "datagrid", "table"}
+                        },
+                        new Example
+                        {
+                            Name = "Filter API",
+                            Path = "datagrid-filter-api",
+                            Title = "Blazor DataGrid Filter API",
+                            Tags = new [] { "filter", "api", "grid", "datagrid", "table"}
+                        },
+                    }
                 },
-                new Example()
+                new Example
                 {
                     Name = "Hierarchy",
-                    Path = "master-detail-hierarchy",
                     Icon = "&#xe23e",
-                    Title = "Blazor DataGrid Hierarchy",
-                    Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
+                    Children  = new []
+                    {
+                        new Example
+                        {
+                            Name = "Hierarchy",
+                            Path = "master-detail-hierarchy",
+                            Title = "Blazor DataGrid Hierarchy",
+                            Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
+                        },
+                        new Example
+                        {
+                            Name = "Hierarchy on demand",
+                            Path = "master-detail-hierarchy-demand",
+                            Title = "Blazor DataGrid Hierarchy on demand",
+                            Tags = new [] { "master", "detail", "datagrid", "table", "dataview", "on-demand" }
+                        },
+                        new Example
+                        {
+                            Name = "Master/Detail",
+                            Path = "master-detail",
+                            Title = "Master and detail Blazor DataGrid",
+                            Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
+                        },
+                    }
                 },
-                new Example()
+                new Example
                 {
-                    Name = "Hierarchy on demand",
-                    Path = "master-detail-hierarchy-demand",
-                    Icon = "&#xe23e",
-                    Title = "Blazor DataGrid Hierarchy on demand",
-                    Tags = new [] { "master", "detail", "datagrid", "table", "dataview", "on-demand" }
-                },
-                new Example()
-                {
-                    Name = "Master/Detail",
-                    Path = "master-detail",
-                    Icon = "&#xe1b2",
-                    Title = "Master and detail Blazor DataGrid",
-                    Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
+                    Name = "Selection",
+                    Icon = "&#xf0c5",
+                    Children = new []
+                    {
+                        new Example()
+                        {
+                            Name = "Single selection",
+                            Path = "datagrid-single-selection",
+                            Title = "Blazor DataGrid single selection",
+                            Tags = new [] { "single", "selection", "datagrid", "table", "dataview" }
+                        },
+                        new Example()
+                        {
+                            Name = "Multiple selection",
+                            Path = "datagrid-multiple-selection",
+                            Title = "Blazor DataGrid Multiple selection",
+                            Tags = new [] { "multiple", "selection", "datagrid", "table", "dataview" }
+                        },
+                    }
                 },
                 new Example()
                 {
@@ -529,17 +623,10 @@ namespace RadzenBlazorDemos
                     Icon = "&#xe22b",
                     Tags = new [] { "inline", "editor", "datagrid", "table", "dataview" }
                 },
+
                 new Example()
                 {
-                    Name = "Multiple selection",
-                    Path = "datagrid-multiple-selection",
-                    Title = "Blazor DataGrid Multiple selection",
-                    Icon = "&#xf0c5",
-                    Tags = new [] { "multiple", "selection", "datagrid", "table", "dataview" }
-                },
-                new Example()
-                {
-                    Name = "Conditional styles and templates",
+                    Name = "Conditional formatting",
                     Path = "datagrid-conditional-template",
                     Title = "DataGrid conditional template",
                     Icon = "&#xe41d",
@@ -677,16 +764,26 @@ namespace RadzenBlazorDemos
 
         public IEnumerable<Example> Filter(string term)
         {
-            Func<string, bool> contains = value => value.Contains(term, StringComparison.OrdinalIgnoreCase);
+            bool contains(string value) => value.Contains(term, StringComparison.OrdinalIgnoreCase);
 
-            Func<Example, bool> filter = (example) => contains(example.Name) || (example.Tags != null && example.Tags.Any(contains));
+            bool filter(Example example) => contains(example.Name) || (example.Tags != null && example.Tags.Any(contains));
 
-            return Examples.Where(category => category.Children != null && category.Children.Any(filter))
-                           .Select(category => new Example()
+            bool deepFilter(Example example) => filter(example) || example.Children?.Any(filter) == true;
+
+            return Examples.Where(category => category.Children?.Any(deepFilter) == true)
+                           .Select(category => new Example
                            {
                                Name = category.Name,
                                Expanded = true,
-                               Children = category.Children.Where(filter).ToArray()
+                               Children = category.Children.Where(deepFilter).Select(example => new Example
+                               {
+                                   Name = example.Name,
+                                   Path = example.Path,
+                                   Icon = example.Icon,
+                                   Expanded = true,
+                                   Children = example.Children
+                               }
+                               ).ToArray()
                            }).ToList();
         }
 

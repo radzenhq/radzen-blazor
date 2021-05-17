@@ -1,4 +1,4 @@
-﻿@page "/datagrid"
+﻿@page "/datagrid-frozen-columns"
 
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
@@ -6,9 +6,9 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid</h1>
+<h1>DataGrid <strong>Frozen Columns</strong></h1>
 
-<p>Display tabular data with ease. Perform paging, sorting and filtering through Entity Framework without extra code.</p>
+<p>Lock columns to prevent them from scrolling out of view via the <code>Frozen</code> property.</p>
 
 <RadzenExample Name="DataGrid" Heading="false">
     <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
@@ -19,7 +19,7 @@
                     <RadzenImage Path="@data.Photo" style="width: 32px; height: 32px; border-radius: 50%;" />
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
+            <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" Frozen="true" />
             <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
             <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
             <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />

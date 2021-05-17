@@ -1,22 +1,27 @@
 ﻿@page "/datagrid-dynamic"
+<h1>DataGrid <strong>dynamic</strong> data support</h1>
 
-<RadzenExample Name="DataGridDynamicData">
-    <h3>Binding to IEnumerable of IDictionary</h3>
-    <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-                AllowPaging="true" PageSize="5" AllowSorting="true" Data="@data" TItem="IDictionary<string, dynamic>"
-                Count="@count" LoadData="@LoadData">
+<p>
+    Sometimes your data comes from external API and you don't have a C# model for it. This demo shows how to implement such a scenario.
+</p>
+
+<RadzenExample Name="DataGridDynamicData" Documentation="false" Heading="false">
+    <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced"
+            AllowPaging="true" PageSize="5" AllowSorting="true" Data="@data" TItem="IDictionary<string, object>"
+            IsLoading="@isLoading"
+            Count="@count" LoadData="@LoadData">
         <Columns>
-            <RadzenDataGridColumn TItem="IDictionary<string, dynamic>" Property="EmployeeID" Title="EmployeeID" Type="integer">
+            <RadzenDataGridColumn TItem="IDictionary<string, object>" Property="EmployeeID" Title="EmployeeID" Type="integer">
                 <Template>
                     @context["EmployeeID"]
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="IDictionary<string, dynamic>" Property="FirstName" Title="FirstName" Type="string">
+            <RadzenDataGridColumn TItem="IDictionary<string, object>" Property="FirstName" Title="FirstName" Type="string">
                 <Template>
                     @context["FirstName"]
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="IDictionary<string, dynamic>" Property="LastName" Title="LastName" Type="string">
+            <RadzenDataGridColumn TItem="IDictionary<string, object>" Property="LastName" Title="LastName" Type="string">
                 <Template>
                     @context["LastName"]
                 </Template>
@@ -25,19 +30,22 @@
     </RadzenDataGrid>
 </RadzenExample>
 @code {
-    IEnumerable<IDictionary<string, dynamic>> data;
+    IEnumerable<IDictionary<string, object>> data;
     int count;
+    bool isLoading;
 
     async Task LoadData(LoadDataArgs args)
     {
+        isLoading = true;
         var uri = new Uri("https://services.radzen.com/odata/Northwind/Employees")
             .GetODataUri(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
 
         var response = await new HttpClient().SendAsync(new HttpRequestMessage(HttpMethod.Get, uri));
 
-        var result = await response.ReadAsync<ODataServiceResult<IDictionary<string, dynamic>>>();
+        var result = await response.ReadAsync<ODataServiceResult<IDictionary<string, object>>>();
 
         data = result.Value.AsODataEnumerable();
         count = result.Count;
+        isLoading = false;
     }
 }

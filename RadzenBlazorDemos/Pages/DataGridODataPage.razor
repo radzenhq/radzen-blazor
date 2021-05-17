@@ -4,33 +4,25 @@
 
 @inject NorthwindODataService service
 
-<h1>DataGrid</h1>
+<h1>DataGrid <strong>OData</strong></h1>
 
-<p>This page demonstrates how to data-bind the Radzen Blazor DataGrid to OData service via the LoadData event.</p>
+<p>Use the <code>LoadData</code> event to get data from a REST service.</p>
 
-<RadzenExample Name="DataGridOData" Heading="false" Documentation="false">
-<RadzenDataGrid IsLoading="@isLoading" Count="@count" style="height:400px" Data="@employees" LoadData="@LoadData" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
+<RadzenExample Name="DataGridOData" Heading="false" Documentation="false" AdditionalSourceCodePages="@(new [] {"../Services/NorthwindODataService.cs"})">
+<RadzenDataGrid IsLoading="@isLoading" Count="@count" Data="@employees" LoadData="@LoadData" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
-        <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false">
+        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
             <Template Context="data">
-                <RadzenImage Path="@data?.Photo" />
+                <RadzenImage Path="@data.Photo" style="width: 32px; height: 32px; border-radius: 50%;" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" />
         <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
+        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
         <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
         <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
-        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date">
-            <Template Context="data">
-                @String.Format("{0:d}", data.BirthDate)
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date">
-            <Template Context="data">
-                @String.Format("{0:d}", data.HireDate)
-            </Template>
-        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
         <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
         <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
         <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" />
@@ -42,7 +34,27 @@
     </Columns>
 </RadzenDataGrid>
 </RadzenExample>
-
+<h3 style="margin-top: 32px">To data-bind to a service:</h3>
+<ol>
+    <li>Set the Data and Count properties.
+    <pre>
+        <code>&lt;RadzenDataGrid Count="@@count" Data="@@employees"</code>
+    </pre>
+    </li>
+    <li>
+        Handle the LoadData event and update the Data and Count backing fields (<code>employees</code> and <code>count</code> in this case).
+    <pre>
+        <code>
+async Task LoadData(LoadDataArgs args)
+{
+    var result = await service.GetEmployees(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+    employees = result.Value.AsODataEnumerable();
+    count = result.Count;
+}
+        </code>
+    </pre>
+    </li>
+</ol>
 @code {
     bool isLoading;
     int count;
@@ -53,7 +65,9 @@
         isLoading = true;
 
         var result = await service.GetEmployees(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+        // Update the Data property
         employees = result.Value.AsODataEnumerable();
+        // Update the count
         count = result.Count;
 
         isLoading = false;

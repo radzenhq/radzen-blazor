@@ -1,3 +1,4 @@
+@using System.IO
 @using Radzen.Blazor
 
 @if (Heading)
@@ -26,7 +27,7 @@ else if (Documentation)
         </RadzenTabsItem>
         @foreach (var p in AdditionalSourceCodePages)
         {
-        <RadzenTabsItem Text="@p" Icon="code">
+        <RadzenTabsItem Text="@Path.GetFileName(p)" Icon="code">
             <CodeViewer PageName="@p" />
         </RadzenTabsItem>
         }

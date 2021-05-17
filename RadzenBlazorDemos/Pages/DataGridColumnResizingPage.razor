@@ -1,4 +1,4 @@
-﻿@page "/datagrid"
+﻿@page "/datagrid-column-resizing"
 
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
@@ -6,15 +6,15 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid</h1>
+<h1>DataGrid <strong>Column Resizing</strong></h1>
 
-<p>Display tabular data with ease. Perform paging, sorting and filtering through Entity Framework without extra code.</p>
+<p>Enable column resizing by setting the AllowColumnResizing property to true.</p
 
 <RadzenExample Name="DataGrid" Heading="false">
-    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+    <RadzenDataGrid Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnResize="true" ColumnResized=@OnColumnResized>
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
+            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Width="200px" >
                 <Template Context="data">
                     <RadzenImage Path="@data.Photo" style="width: 32px; height: 32px; border-radius: 50%;" />
                 </Template>
@@ -36,8 +36,17 @@
         </Columns>
     </RadzenDataGrid>
 </RadzenExample>
+
+<EventConsole @ref=@console />
+
 @code {
     IEnumerable<Employee> employees;
+    EventConsole console;
+
+    void OnColumnResized(DataGridColumnResizedEventArgs<Employee> args)
+    {
+        console.Log($"Resized {args.Column.Title} to {args.Width} pixels");
+    }
 
     protected override void OnInitialized()
     {
