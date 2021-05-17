@@ -232,15 +232,6 @@
         return $"M {startX} {startY} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {innerEndX} {innerEndY} A {innerRadius} {innerRadius} 0 {largeArcFlag} 0 {innerStartX} {innerStartY}";
    }
 
-   protected string PickColor(int index, IEnumerable<string> colors)
-   {
-       if (colors == null || !colors.Any())
-       {
-           return null;
-       }
-
-       return colors.ElementAt(index % colors.Count());
-   }
 
    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
    {

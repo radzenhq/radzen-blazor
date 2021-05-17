@@ -14,7 +14,13 @@
    public string Fill { get; set; }
 
    [Parameter]
+   public IEnumerable<string> Fills { get; set; }
+
+   [Parameter]
    public string Stroke { get; set; }
+
+   [Parameter]
+   public IEnumerable<string> Strokes { get; set; }
 
    [Parameter]
    public double StrokeWidth { get; set; }
@@ -177,8 +183,10 @@
                 {
                     path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x+radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 0 {x.ToInvariantString()} {(y+radius).ToInvariantString()} L {x.ToInvariantString()} {(y+height-radius).ToInvariantString()} A {r} {r} 0 0 0 {(x+radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y+height).ToInvariantString()} Z";
                 }
+                var fill = PickColor(Items.IndexOf(data), Fills, Fill);
+                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
 
-                <Path @key="@path" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Fill="@Fill" LineType="@LineType" Style="@style" />
+                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
             }
         </g>;
     }

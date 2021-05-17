@@ -431,6 +431,16 @@ namespace Radzen.Blazor
             return Items.ElementAtOrDefault(index);
         }
 
+        protected string PickColor(int index, IEnumerable<string> colors, string defaultValue = null)
+        {
+            if (colors == null || !colors.Any())
+            {
+                return defaultValue;
+            }
+
+            return colors.ElementAt(index % colors.Count());
+        }
+
         public void Dispose()
         {
             Chart?.RemoveSeries(this);
