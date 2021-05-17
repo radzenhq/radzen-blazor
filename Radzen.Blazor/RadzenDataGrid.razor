@@ -819,24 +819,12 @@
         }
         set
         {
-            if (!object.Equals(_value, value))
-            {
-                _value = value;
-
-                selectedItems.Clear();
-
-                if (_value != null)
-                {
-                    _value.Where(v => v != null).ToList().ForEach(v => selectedItems.Add(v, true));
-                }
-
-                ValueChanged?.Invoke(_value);
-            }
+            _value = value;
         }
     }
 
     [Parameter]
-    public Action<IList<TItem>> ValueChanged { get; set; }
+    public EventCallback<IList<TItem>> ValueChanged { get; set; }
 
     [Parameter]
     public EventCallback<TItem> RowSelect { get; set; }
@@ -942,6 +930,7 @@
         return Task.CompletedTask;
     }
 
+
     internal Dictionary<TItem, bool> expandedItems = new Dictionary<TItem, bool>();
     internal string ExpandedItemStyle(TItem item)
     {
@@ -953,7 +942,7 @@
     {
         var evenOrOdd = index % 2 == 0 ? "rz-datatable-even" : "rz-datatable-odd";
 
-        return (RowSelect.HasDelegate || ValueChanged != null || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
+        return (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
     }
 
     internal Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item)
@@ -970,12 +959,23 @@
 
     private bool visibleChanged = false;
     private bool firstRender = true;
-
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
+        bool valueChanged = parameters.DidParameterChange(nameof(Value), Value);
+
         await base.SetParametersAsync(parameters);
+
+        if (valueChanged)
+        {
+            selectedItems.Clear();
+
+            if (Value != null)
+            {
+                Value.Where(v => v != null).ToList().ForEach(v => selectedItems.Add(v, true));
+            }
+        }
 
         if (visibleChanged && !firstRender)
         {
@@ -1109,7 +1109,9 @@
         var value = selectedItems.Keys;
 
         _value = SelectionMode == DataGridSelectionMode.Multiple ? new List<TItem>(value) : new List<TItem>() { value.FirstOrDefault() };
-        ValueChanged?.Invoke(_value);
+
+        await ValueChanged.InvokeAsync(_value);
+
         StateHasChanged();
     }
 
@@ -1288,7 +1290,7 @@
             additionalClasses.Add("rz-has-height");
         }
 
-        if (RowSelect.HasDelegate || ValueChanged != null || SelectionMode == DataGridSelectionMode.Multiple)
+        if (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple)
         {
             additionalClasses.Add("rz-selectable");
         }
