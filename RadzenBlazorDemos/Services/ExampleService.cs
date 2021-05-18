@@ -644,6 +644,28 @@ namespace RadzenBlazorDemos
                         }
                     }
                 },
+                new Example
+                {
+                    Name = "Paging",
+                    Icon = "&#xe5dd",
+                    Children = new []
+                    {
+                        new Example
+                        {
+                            Name = "Pager Position",
+                            Path = "datagrid-pager-position",
+                            Title = "Blazor DataGrid pager position",
+                            Tags = new [] { "pager", "paging", "datagrid", "table", "dataview" }
+                        },
+                        new Example
+                        {
+                            Name = "Pager API",
+                            Path = "datagrid-pager-api",
+                            Title = "Blazor DataGrid pager API",
+                            Tags = new [] { "pager", "paging", "api", "datagrid", "table", "dataview" }
+                        }
+                    }
+                },
                 new Example()
                 {
                     Name = "InLine Editing",
