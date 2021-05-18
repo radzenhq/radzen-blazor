@@ -833,10 +833,10 @@
     public EventCallback<TItem> RowDeselect { get; set; }
 
     [Parameter]
-    public EventCallback<TItem> RowClick { get; set; }
+    public EventCallback<DataGridRowMouseEventArgs<TItem>> RowClick { get; set; }
 
     [Parameter]
-    public EventCallback<TItem> RowDoubleClick { get; set; }
+    public EventCallback<DataGridRowMouseEventArgs<TItem>> RowDoubleClick { get; set; }
 
     [Parameter]
     public EventCallback<TItem> RowExpand { get; set; }
@@ -1054,10 +1054,10 @@
     [Parameter]
     public DataGridSelectionMode SelectionMode { get; set; } = DataGridSelectionMode.Single;
 
-    internal async Task OnRowClick(object item)
+    internal async Task OnRowClick(DataGridRowMouseEventArgs<TItem> args)
     {
-        await RowClick.InvokeAsync((TItem)item);
-        await OnRowSelect(item);
+        await RowClick.InvokeAsync(args);
+        await OnRowSelect(args.Data);
     }
 
     internal async System.Threading.Tasks.Task OnRowSelect(object item, bool raiseChange = true)
@@ -1120,9 +1120,9 @@
         await OnRowSelect(item, true);
     }
 
-    internal async System.Threading.Tasks.Task OnRowDblClick(TItem item)
+    internal async System.Threading.Tasks.Task OnRowDblClick(DataGridRowMouseEventArgs<TItem> args)
     {
-        await RowDoubleClick.InvokeAsync(item);
+        await RowDoubleClick.InvokeAsync(args);
     }
 
     [Parameter]

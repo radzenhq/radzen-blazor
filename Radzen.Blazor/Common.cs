@@ -87,6 +87,12 @@ namespace Radzen
         public Blazor.RadzenDataGridColumn<T> Column { get; internal set; }
     }
 
+
+    public class DataGridRowMouseEventArgs<T> : Microsoft.AspNetCore.Components.Web.MouseEventArgs
+    {
+        public T Data { get; internal set; }
+    }
+
     public class UploadChangeEventArgs
     {
         public IEnumerable<FileInfo> Files { get; set; }
