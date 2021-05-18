@@ -21,14 +21,15 @@
                     <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%" />
                 </EditTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
+            <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee" Width="300px">
                 <Template Context="order">
-                    <div>@order.Employee?.LastName</div>
-                    <RadzenImage Path="@order.Employee?.Photo" Style="width:150px" />
+                    <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 50%;" />
+                    @order.Employee?.FirstName @order.Employee?.LastName
                 </Template>
                 <EditTemplate Context="order">
                     <RadzenDropDown @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%">
                         <Template>
+                            <RadzenImage Path="@context.Photo" style="width: 32px; height: 32px; border-radius: 50%;" />
                             @context.FirstName @context.LastName
                         </Template>
                     </RadzenDropDown>

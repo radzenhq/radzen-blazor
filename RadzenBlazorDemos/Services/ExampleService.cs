@@ -599,20 +599,49 @@ namespace RadzenBlazorDemos
                     Icon = "&#xf0c5",
                     Children = new []
                     {
-                        new Example()
+                        new Example
                         {
                             Name = "Single selection",
                             Path = "datagrid-single-selection",
                             Title = "Blazor DataGrid single selection",
                             Tags = new [] { "single", "selection", "datagrid", "table", "dataview" }
                         },
-                        new Example()
+                        new Example
                         {
                             Name = "Multiple selection",
                             Path = "datagrid-multiple-selection",
                             Title = "Blazor DataGrid Multiple selection",
                             Tags = new [] { "multiple", "selection", "datagrid", "table", "dataview" }
                         },
+                    }
+                },
+                new Example
+                {
+                    Name = "Sorting",
+                    Icon = "&#xe164",
+                    Children = new []
+                    {
+                        new Example
+                        {
+                            Name = "Single Column Sorting",
+                            Path = "datagrid-sort",
+                            Title = "Blazor DataGrid sorting",
+                            Tags = new [] { "single", "sort", "datagrid", "table", "dataview" }
+                        },
+                        new Example
+                        {
+                            Name = "Multiple Column Sorting",
+                            Path = "datagrid-multi-sort",
+                            Title = "Blazor DataGrid multiple column sorting",
+                            Tags = new [] { "multi", "sort", "datagrid", "table", "dataview" }
+                        },
+                        new Example
+                        {
+                            Name = "Sort API",
+                            Path = "datagrid-sort-api",
+                            Title = "Blazor DataGrid Sort API",
+                            Tags = new [] { "api", "sort", "datagrid", "table", "dataview" }
+                        }
                     }
                 },
                 new Example()
