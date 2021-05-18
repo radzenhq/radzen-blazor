@@ -177,7 +177,7 @@
                                             else
                                             {
                                                 <label class="rz-cell-filter-label" style="height:35px">
-                                                    @if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?))
+                                                    @if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?) || column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
                                                     {
                                                         <i onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")"
                                                            class="rzi">date_range</i>
