@@ -177,7 +177,7 @@
                                             else
                                             {
                                                 <label class="rz-cell-filter-label" style="height:35px">
-                                                    @if (column.Type == "string" && column.Format == "date-time")
+                                                    @if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?))
                                                     {
                                                         <i onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")"
                                                            class="rzi">date_range</i>
@@ -234,12 +234,12 @@
                                                             </div>
                                                         </div>
                                                     }
-                                                    else if (column.Type == "number")
+                                                    else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
                                                     {
                                                         <i class="rzi">search</i>
                                                         @(DrawNumericFilter(column))
                                                     }
-                                                    else if (column.Type == "boolean")
+                                                    else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
                                                     {
                                                         <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
                                                     }

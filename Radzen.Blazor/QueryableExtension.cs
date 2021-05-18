@@ -104,8 +104,6 @@ namespace Radzen
                     var value = (string)Convert.ChangeType(column.GetFilterValue(), typeof(string));
                     var secondValue = (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
 
-                    var columnFormat = column.Format;
-
                     if (!string.IsNullOrEmpty(value))
                     {
                         var linqOperator = LinqFilterOperators[column.GetFilterOperator()];
@@ -219,7 +217,7 @@ namespace Radzen
                 property = $"({property})";
             }
 
-            if (column.FilterPropertyType == typeof(string) && string.IsNullOrEmpty(column.Format))
+            if (column.FilterPropertyType == typeof(string))
             {
                 property = $@"({property} == null ? """" : {property})";
             }
@@ -235,17 +233,11 @@ namespace Radzen
             var value = !second ? (string)Convert.ChangeType(column.GetFilterValue(), typeof(string)) :
                 (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
 
-            var columnFormat = column.Format;
-
             if (column.FilterPropertyType == typeof(string))
             {
                 string filterCaseSensitivityOperator = column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
 
-                if (columnFormat == "time")
-                {
-                    return $"{property} {linqOperator} duration'{value}'";
-                }
-                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.Contains)
+                if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.Contains)
                 {
                     return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator}.Contains(""{value}""{filterCaseSensitivityOperator})";
                 }
@@ -357,8 +349,6 @@ namespace Radzen
 
         private static string GetColumnODataFilter<T>(RadzenDataGridColumn<T> column, bool second = false)
         {
-            var columnFormat = column.Format;
-
             var property = column.GetFilterProperty().Replace('.', '/');
 
             var columnFilterOperator = !second ? column.GetFilterOperator() : column.GetSecondFilterOperator();
@@ -366,18 +356,14 @@ namespace Radzen
             var value = !second ? (string)Convert.ChangeType(column.GetFilterValue(), typeof(string)) :
                 (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
 
-            if (column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive && column.FilterPropertyType == typeof(string) && string.IsNullOrEmpty(columnFormat))
+            if (column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive && column.FilterPropertyType == typeof(string))
             {
                 property = $"tolower({property})";
             }
 
             if (column.FilterPropertyType == typeof(string))
             {
-                if (columnFormat == "time")
-                {
-                    return $"{property} {columnFilterOperator} duration'{value}'";
-                }
-                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.Contains)
+                if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.Contains)
                 {
                     return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
                         $"contains({property}, tolower('{value}'))" :
@@ -488,8 +474,6 @@ namespace Radzen
 
                     var value = (string)Convert.ChangeType(column.GetFilterValue(), typeof(string));
                     var secondValue = (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
-
-                    var columnFormat = column.Format;
 
                     if (!string.IsNullOrEmpty(value))
                     {
@@ -608,12 +592,12 @@ namespace Radzen
                         property = $"({property})";
                     }
 
-                    if (column.FilterPropertyType == typeof(string) && string.IsNullOrEmpty(column.Format))
+                    if (column.FilterPropertyType == typeof(string))
                     {
                         property = $@"({property} == null ? """" : {property})";
                     }
 
-                    string filterCaseSensitivityOperator = column.FilterPropertyType == typeof(string) && string.IsNullOrEmpty(column.Format) &&
+                    string filterCaseSensitivityOperator = column.FilterPropertyType == typeof(string) &&
                         column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
 
                     var comparison = LinqFilterOperators[column.GetFilterOperator()];

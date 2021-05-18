@@ -11,17 +11,17 @@
             IsLoading="@isLoading"
             Count="@count" LoadData="@LoadData">
         <Columns>
-            <RadzenDataGridColumn TItem="IDictionary<string, object>" Property="EmployeeID" Title="EmployeeID" Type="integer">
+            <RadzenDataGridColumn TItem="IDictionary<string, object>" Property="EmployeeID" Title="EmployeeID" Type="typeof(int)">
                 <Template>
                     @context["EmployeeID"]
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="IDictionary<string, object>" Property="FirstName" Title="FirstName" Type="string">
+            <RadzenDataGridColumn TItem="IDictionary<string, object>" Property="FirstName" Title="FirstName" Type="typeof(string)">
                 <Template>
                     @context["FirstName"]
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="IDictionary<string, object>" Property="LastName" Title="LastName" Type="string">
+            <RadzenDataGridColumn TItem="IDictionary<string, object>" Property="LastName" Title="LastName" Type="typeof(string)">
                 <Template>
                     @context["LastName"]
                 </Template>
