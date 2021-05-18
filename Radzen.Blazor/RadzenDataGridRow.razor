@@ -179,7 +179,6 @@
     protected override void OnInitialized()
     {
         rowArgs = Grid.RowAttributes(Item);
-        InEditMode = Grid.IsRowInEditMode(Item);
 
         if (Grid.AllowVirtualization && Item != null)
         {

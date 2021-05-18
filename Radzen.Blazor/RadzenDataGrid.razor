@@ -362,6 +362,7 @@
                         b.AddAttribute(5, "Grid", this);
                         b.AddAttribute(6, "TItem", typeof(TItem));
                         b.AddAttribute(7, "Item", context);
+                        b.AddAttribute(8, "InEditMode", IsRowInEditMode(context));
                         b.SetKey(context);
                         b.CloseComponent();
                     });
@@ -382,6 +383,7 @@
                     builder.AddAttribute(3, "Grid", this);
                     builder.AddAttribute(4, "TItem", typeof(TItem));
                     builder.AddAttribute(5, "Item", item);
+                    builder.AddAttribute(6, "InEditMode", IsRowInEditMode(item));
                     builder.CloseComponent();
                     i++;
                 }
