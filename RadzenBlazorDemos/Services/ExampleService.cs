@@ -34,402 +34,7 @@ namespace RadzenBlazorDemos
             Path = "/support",
             Icon = "&#xe94c"
         },
-        new Example()
-        {
-            Name = "General",
-            Children = new [] {
-                new Example()
-                {
-                    Name = "Button",
-                    Path = "button",
-                    Icon = "&#xe86d"
-                },
-                new Example()
-                {
-                    Name = "GoogleMap",
-                    Path = "googlemap",
-                    Icon = "&#xe55b"
-                },
-                new Example()
-                {
-                    Name = "Gravatar",
-                    Path = "gravatar",
-                    Icon = "&#xe84e"
-                },
-                new Example()
-                {
-                    Name = "SplitButton",
-                    Path = "splitbutton",
-                    Icon = "&#xe05f"
-                },
-                new Example()
-                {
-                    Name = "Icon",
-                    Path = "icon",
-                    Icon = "&#xe84f"
-                },
-                new Example()
-                {
-                    Name = "Image",
-                    Path = "image",
-                    Icon = "&#xe8aa"
-                },
-                new Example()
-                {
-                    Name = "Link",
-                    Path = "link",
-                    Icon = "&#xe157"
-                },
-                new Example()
-                {
-                    Name = "Login",
-                    Path = "login",
-                    Icon = "&#xe8e8"
-                },
-                new Example()
-                {
-                    Name = "ProgressBar",
-                    Path = "progressbar",
-                    Icon = "&#xe893",
-                    Tags = new [] { "progress", "spinner" }
-                },
-                new Example()
-                {
-                    Name = "Dialog",
-                    Path = "dialog",
-                    Icon = "&#xe8a7",
-                    Tags = new [] { "popup", "window" }
-                },
-                new Example()
-                {
-                    Name = "Notification",
-                    Path = "notification",
-                    Icon = "&#xe85a",
-                    Tags = new [] { "message", "alert" }
-                },
-                new Example()
-                {
-                    Name = "Tooltip",
-                    Path = "tooltip",
-                    Icon = "&#xe8cd",
-                    Tags = new [] { "popup", "tooltip" }
-                },
-                new Example()
-                {
-                    Name = "Menu",
-                    Path = "menu",
-                    Icon = "&#xe91a",
-                    Tags = new [] { "navigation", "dropdown" }
-                },
-                new Example()
-                {
-                    Name = "PanelMenu",
-                    Path = "panelmenu",
-                    Icon = "&#xe8d2",
-                    Tags = new [] { "navigation", "menu" }
-                },
-                new Example()
-                {
-                    Name = "ContextMenu",
-                    Path = "contextmenu",
-                    Icon = "&#xe8de",
-                    Tags = new [] { "popup", "dropdown", "menu" }
-                },
-                new Example()
-                {
-                    Name = "ProfileMenu",
-                    Path = "profile-menu",
-                    Icon = "&#xe851",
-                    Tags = new [] { "navigation", "dropdown", "menu" }
-                },
-                new Example()
-                {
-                    Name = "Upload",
-                    Path = "example-upload",
-                    Icon = "&#xe2c6",
-                    Tags = new [] { "upload", "file"}
-                }
-            }
-        },
-        new Example()
-        {
-            Name="Containers",
-            Children = new [] {
-                new Example()
-                {
-                    Name = "Accordion",
-                    Path = "accordion",
-                    Icon = "&#xe8ee",
-                    Tags = new [] { "panel", "container" }
-                },
-                new Example()
-                {
-                    Name = "Card",
-                    Path = "card",
-                    Icon = "&#xe919",
-                    Tags = new [] { "container" }
-                },
-                new Example()
-                {
-                    Name = "Fieldset",
-                    Path = "fieldset",
-                    Icon = "&#xe850",
-                    Tags = new [] { "form", "container" }
-                },
-                new Example()
-                {
-                    Name = "Panel",
-                    Path = "panel",
-                    Icon = "&#xe14f",
-                    Tags = new [] { "container" }
-                },
-                new Example()
-                {
-                    Name = "Tabs",
-                    Path = "tabs",
-                    Icon = "&#xe8d8",
-                    Tags = new [] { "tabstrip", "tabview", "container" }
-                },
-                new Example()
-                {
-                    Name = "Steps",
-                    Path = "steps",
-                    Icon = "&#xe044",
-                    Tags = new [] { "step", "steps", "wizard" }
-                },
-            }
-        },
-        new Example()
-        {
-            Name="Forms",
-            Children = new [] {
-                new Example()
-                {
-                    Name = "AutoComplete",
-                    Path = "autocomplete",
-                    Icon = "&#xe03b",
-                    Tags = new [] { "form", "complete", "suggest", "edit" }
-                },
-                new Example()
-                {
-                    Name = "Switch",
-                    Path = "switch",
-                    Icon = "&#xe8e0",
-                    Tags = new [] { "form", "edit", "switch" }
-                },
-                new Example()
-                {
-                    Name = "CheckBox",
-                    Path = "checkbox",
-                    Icon = "&#xe86c",
-                    Tags = new [] { "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "CheckBoxList",
-                    Path = "checkboxlist",
-                    Icon = "&#xe065",
-                    Tags = new [] { "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "ColorPicker",
-                    Path = "colorpicker",
-                    Icon = "&#xe40a",
-                    Tags = new [] { "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "DatePicker",
-                    Path = "datepicker",
-                    Icon = "&#xe916",
-                    Tags = new [] { "calendar", "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "DropDown",
-                    Path = "dropdown",
-                    Icon = "&#xe875",
-                    Tags = new [] { "select", "picker", "form" , "edit" }
-                },
-                new Example()
-                {
-                    Name = "DropDownDataGrid",
-                    Path = "dropdown-datagrid",
-                    Icon = "&#xe8b0",
-                    Tags = new [] { "select", "picker", "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "FileInput",
-                    Path = "fileinput",
-                    Icon = "&#xe226",
-                    Tags = new [] { "upload", "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "ListBox",
-                    Path = "listbox",
-                    Icon = "&#xe8ef",
-                    Tags = new [] { "select", "picker", "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "Numeric",
-                    Path = "numeric",
-                    Icon = "&#xe85b",
-                    Tags = new [] { "input", "number", "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "Password",
-                    Path = "password",
-                    Icon = "&#xe8a1",
-                    Tags = new [] { "input", "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "RadioButtonList",
-                    Path = "radiobuttonlist",
-                    Icon = "&#xe837",
-                    Tags = new [] { "toggle", "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "Rating",
-                    Path = "rating",
-                    Icon = "&#xe839",
-                    Tags = new [] { "star", "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "SelectBar",
-                    Path = "selectbar",
-                    Icon = "&#xe86d",
-                    Tags = new [] { "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "Slider",
-                    Path = "slider",
-                    Icon = "&#xe260",
-                    Tags = new [] { "form", "slider" }
-                },
-                new Example()
-                {
-                    Name = "TemplateForm",
-                    Path = "templateform",
-                    Icon = "&#xe06d",
-                    Tags = new [] { "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "TextBox",
-                    Path = "textbox",
-                    Icon = "&#xe890",
-                    Tags = new [] { "input", "form", "edit" }
-                },
-                new Example()
-                {
-                    Name = "Mask",
-                    Path = "mask",
-                    Icon = "&#xe262",
-                    Tags = new [] { "input", "form", "edit", "mask" }
-                },
-                new Example()
-                {
-                    Name = "TextArea",
-                    Path = "textarea",
-                    Icon = "&#xe873",
-                    Tags = new [] { "input", "form", "edit" }
-                },
-            },
-        },
-        new Example()
-        {
-            Name = "Validators",
-            Children = new [] {
-                new Example()
-                {
-                    Name = "RequiredValidator",
-                    Path = "requiredvalidator",
-                    Icon = "&#xe5ca",
-                    Tags = new [] { "validator", "validation", "required"}
-                },
-                new Example()
-                {
-                    Name = "LengthValidator",
-                    Path = "lengthvalidator",
-                    Icon = "&#xe915",
-                    Tags = new [] { "validator", "validation", "required", "length"}
-                } ,
-                new Example()
-                {
-                    Name = "NumericRangeValidator",
-                    Path = "numericrangevalidator",
-                    Icon = "&#xe3d0",
-                    Tags = new [] { "validator", "validation", "required", "range"}
-                },
-                new Example()
-                {
-                    Name = "CompareValidator",
-                    Path = "comparevalidator",
-                    Icon = "&#xe877",
-                    Tags = new [] { "validator", "validation", "required", "compare"}
-                },
-                new Example()
-                {
-                    Name = "EmailValidator",
-                    Path = "emailvalidator",
-                    Icon = "&#xe0be",
-                    Tags = new [] { "validator", "validation", "required", "email"}
-                },
-                new Example()
-                {
-                    Name = "RegexValidator",
-                    Path = "regexvalidator",
-                    Icon = "&#xe53f",
-                    Tags = new [] { "validator", "validation", "pattern", "regex", "regular", "expression"}
-                }
-            }
-        },
-        new Example()
-        {
-            Name="Data",
-            Children = new [] {
-                new Example()
-                {
-                    Name = "DataList",
-                    Path = "datalist",
-                    Icon = "&#xe896",
-                    Tags = new [] { "dataview", "grid", "table" }
-                },
-
-                new Example()
-                {
-                    Name = "Pager",
-                    Path = "pager",
-                    Icon = "&#xe8be",
-                    Tags = new [] { "pager", "paging" }
-                },
-
-                new Example()
-                {
-                    Name = "Tree",
-                    Path = "tree",
-                    Icon = "&#xe8ef",
-                    Tags = new [] { "tree", "treeview", "nodes", "hierarchy" }
-                },
-
-                new Example()
-                {
-                    Name = "Scheduler",
-                    Path = "scheduler",
-                    Icon = "&#xe616",
-                    Tags = new [] { "scheduler", "calendar", "event", "appointment"}
-                },
-            }
-        },
+   
         new Example()
         {
             Name="DataGrid",
@@ -701,6 +306,43 @@ namespace RadzenBlazorDemos
                 },
             }
         },
+        new Example
+        {
+            Name="Data",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "DataList",
+                    Path = "datalist",
+                    Icon = "&#xe896",
+                    Tags = new [] { "dataview", "grid", "table" }
+                },
+
+                new Example()
+                {
+                    Name = "Pager",
+                    Path = "pager",
+                    Icon = "&#xe8be",
+                    Tags = new [] { "pager", "paging" }
+                },
+
+                new Example()
+                {
+                    Name = "Tree",
+                    Path = "tree",
+                    Icon = "&#xe8ef",
+                    Tags = new [] { "tree", "treeview", "nodes", "hierarchy" }
+                },
+
+                new Example()
+                {
+                    Name = "Scheduler",
+                    Path = "scheduler",
+                    Icon = "&#xe616",
+                    Tags = new [] { "scheduler", "calendar", "event", "appointment"}
+                },
+            }
+        },
         new Example()
         {
             Name="HtmlEditor",
@@ -776,6 +418,250 @@ namespace RadzenBlazorDemos
                 },
             }
         },
+
+        new Example()
+        {
+            Name="Forms",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "AutoComplete",
+                    Path = "autocomplete",
+                    Icon = "&#xe03b",
+                    Tags = new [] { "form", "complete", "suggest", "edit" }
+                },
+                new Example()
+                {
+                    Name = "Switch",
+                    Path = "switch",
+                    Icon = "&#xe8e0",
+                    Tags = new [] { "form", "edit", "switch" }
+                },
+                new Example()
+                {
+                    Name = "CheckBox",
+                    Path = "checkbox",
+                    Icon = "&#xe86c",
+                    Tags = new [] { "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "CheckBoxList",
+                    Path = "checkboxlist",
+                    Icon = "&#xe065",
+                    Tags = new [] { "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "ColorPicker",
+                    Path = "colorpicker",
+                    Icon = "&#xe40a",
+                    Tags = new [] { "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "DatePicker",
+                    Path = "datepicker",
+                    Icon = "&#xe916",
+                    Tags = new [] { "calendar", "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "DropDown",
+                    Path = "dropdown",
+                    Icon = "&#xe875",
+                    Tags = new [] { "select", "picker", "form" , "edit" }
+                },
+                new Example()
+                {
+                    Name = "DropDownDataGrid",
+                    Path = "dropdown-datagrid",
+                    Icon = "&#xe8b0",
+                    Tags = new [] { "select", "picker", "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "FileInput",
+                    Path = "fileinput",
+                    Icon = "&#xe226",
+                    Tags = new [] { "upload", "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "ListBox",
+                    Path = "listbox",
+                    Icon = "&#xe8ef",
+                    Tags = new [] { "select", "picker", "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "Numeric",
+                    Path = "numeric",
+                    Icon = "&#xe85b",
+                    Tags = new [] { "input", "number", "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "Password",
+                    Path = "password",
+                    Icon = "&#xe8a1",
+                    Tags = new [] { "input", "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "RadioButtonList",
+                    Path = "radiobuttonlist",
+                    Icon = "&#xe837",
+                    Tags = new [] { "toggle", "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "Rating",
+                    Path = "rating",
+                    Icon = "&#xe839",
+                    Tags = new [] { "star", "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "SelectBar",
+                    Path = "selectbar",
+                    Icon = "&#xe86d",
+                    Tags = new [] { "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "Slider",
+                    Path = "slider",
+                    Icon = "&#xe260",
+                    Tags = new [] { "form", "slider" }
+                },
+                new Example()
+                {
+                    Name = "TemplateForm",
+                    Path = "templateform",
+                    Icon = "&#xe06d",
+                    Tags = new [] { "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "TextBox",
+                    Path = "textbox",
+                    Icon = "&#xe890",
+                    Tags = new [] { "input", "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "Mask",
+                    Path = "mask",
+                    Icon = "&#xe262",
+                    Tags = new [] { "input", "form", "edit", "mask" }
+                },
+                new Example()
+                {
+                    Name = "TextArea",
+                    Path = "textarea",
+                    Icon = "&#xe873",
+                    Tags = new [] { "input", "form", "edit" }
+                },
+            },
+        },
+        new Example()
+        {
+            Name = "Validators",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "RequiredValidator",
+                    Path = "requiredvalidator",
+                    Icon = "&#xe5ca",
+                    Tags = new [] { "validator", "validation", "required"}
+                },
+                new Example()
+                {
+                    Name = "LengthValidator",
+                    Path = "lengthvalidator",
+                    Icon = "&#xe915",
+                    Tags = new [] { "validator", "validation", "required", "length"}
+                } ,
+                new Example()
+                {
+                    Name = "NumericRangeValidator",
+                    Path = "numericrangevalidator",
+                    Icon = "&#xe3d0",
+                    Tags = new [] { "validator", "validation", "required", "range"}
+                },
+                new Example()
+                {
+                    Name = "CompareValidator",
+                    Path = "comparevalidator",
+                    Icon = "&#xe877",
+                    Tags = new [] { "validator", "validation", "required", "compare"}
+                },
+                new Example()
+                {
+                    Name = "EmailValidator",
+                    Path = "emailvalidator",
+                    Icon = "&#xe0be",
+                    Tags = new [] { "validator", "validation", "required", "email"}
+                },
+                new Example()
+                {
+                    Name = "RegexValidator",
+                    Path = "regexvalidator",
+                    Icon = "&#xe53f",
+                    Tags = new [] { "validator", "validation", "pattern", "regex", "regular", "expression"}
+                }
+            }
+        },
+   
+        new Example()
+        {
+            Name="Containers",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "Accordion",
+                    Path = "accordion",
+                    Icon = "&#xe8ee",
+                    Tags = new [] { "panel", "container" }
+                },
+                new Example()
+                {
+                    Name = "Card",
+                    Path = "card",
+                    Icon = "&#xe919",
+                    Tags = new [] { "container" }
+                },
+                new Example()
+                {
+                    Name = "Fieldset",
+                    Path = "fieldset",
+                    Icon = "&#xe850",
+                    Tags = new [] { "form", "container" }
+                },
+                new Example()
+                {
+                    Name = "Panel",
+                    Path = "panel",
+                    Icon = "&#xe14f",
+                    Tags = new [] { "container" }
+                },
+                new Example()
+                {
+                    Name = "Tabs",
+                    Path = "tabs",
+                    Icon = "&#xe8d8",
+                    Tags = new [] { "tabstrip", "tabview", "container" }
+                },
+                new Example()
+                {
+                    Name = "Steps",
+                    Path = "steps",
+                    Icon = "&#xe044",
+                    Tags = new [] { "step", "steps", "wizard" }
+                },
+            }
+        },
         new Example
         {
             Name="Gauges",
@@ -803,6 +689,124 @@ namespace RadzenBlazorDemos
                 },
             }
         },
+        new Example()
+        {
+            Name = "Misc",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "Button",
+                    Path = "button",
+                    Icon = "&#xe86d"
+                },
+                new Example()
+                {
+                    Name = "GoogleMap",
+                    Path = "googlemap",
+                    Icon = "&#xe55b"
+                },
+                new Example()
+                {
+                    Name = "Gravatar",
+                    Path = "gravatar",
+                    Icon = "&#xe84e"
+                },
+                new Example()
+                {
+                    Name = "SplitButton",
+                    Path = "splitbutton",
+                    Icon = "&#xe05f"
+                },
+                new Example()
+                {
+                    Name = "Icon",
+                    Path = "icon",
+                    Icon = "&#xe84f"
+                },
+                new Example()
+                {
+                    Name = "Image",
+                    Path = "image",
+                    Icon = "&#xe8aa"
+                },
+                new Example()
+                {
+                    Name = "Link",
+                    Path = "link",
+                    Icon = "&#xe157"
+                },
+                new Example()
+                {
+                    Name = "Login",
+                    Path = "login",
+                    Icon = "&#xe8e8"
+                },
+                new Example()
+                {
+                    Name = "ProgressBar",
+                    Path = "progressbar",
+                    Icon = "&#xe893",
+                    Tags = new [] { "progress", "spinner" }
+                },
+                new Example()
+                {
+                    Name = "Dialog",
+                    Path = "dialog",
+                    Icon = "&#xe8a7",
+                    Tags = new [] { "popup", "window" }
+                },
+                new Example()
+                {
+                    Name = "Notification",
+                    Path = "notification",
+                    Icon = "&#xe85a",
+                    Tags = new [] { "message", "alert" }
+                },
+                new Example()
+                {
+                    Name = "Tooltip",
+                    Path = "tooltip",
+                    Icon = "&#xe8cd",
+                    Tags = new [] { "popup", "tooltip" }
+                },
+                new Example()
+                {
+                    Name = "Menu",
+                    Path = "menu",
+                    Icon = "&#xe91a",
+                    Tags = new [] { "navigation", "dropdown" }
+                },
+                new Example()
+                {
+                    Name = "PanelMenu",
+                    Path = "panelmenu",
+                    Icon = "&#xe8d2",
+                    Tags = new [] { "navigation", "menu" }
+                },
+                new Example()
+                {
+                    Name = "ContextMenu",
+                    Path = "contextmenu",
+                    Icon = "&#xe8de",
+                    Tags = new [] { "popup", "dropdown", "menu" }
+                },
+                new Example()
+                {
+                    Name = "ProfileMenu",
+                    Path = "profile-menu",
+                    Icon = "&#xe851",
+                    Tags = new [] { "navigation", "dropdown", "menu" }
+                },
+                new Example()
+                {
+                    Name = "Upload",
+                    Path = "example-upload",
+                    Icon = "&#xe2c6",
+                    Tags = new [] { "upload", "file"}
+                }
+            }
+        },
+
     };
 
         public IEnumerable<Example> Examples
