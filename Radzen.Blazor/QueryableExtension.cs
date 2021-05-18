@@ -35,6 +35,19 @@ namespace Radzen
             {FilterOperator.Contains, "Contains"}
         };
 
+        private static readonly IDictionary<FilterOperator, string> ODataFilterOperators = new Dictionary<FilterOperator, string>
+        {
+            {FilterOperator.Equals, "eq"},
+            {FilterOperator.NotEquals, "ne"},
+            {FilterOperator.LessThan, "lt"},
+            {FilterOperator.LessThanOrEquals, "le"},
+            {FilterOperator.GreaterThan, "gt"},
+            {FilterOperator.GreaterThanOrEquals, "ge"},
+            {FilterOperator.StartsWith, "startswith"},
+            {FilterOperator.EndsWith, "endswith"},
+            {FilterOperator.Contains, "contains"}
+        };
+
         public static IList ToList(IQueryable query)
         {
             var genericToList = typeof(Enumerable).GetMethod("ToList")
@@ -388,7 +401,7 @@ namespace Radzen
             }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
             {
-                return $"{property} {columnFilterOperator} {value}";
+                return $"{property} {ODataFilterOperators[columnFilterOperator]} {value}";
             }
             else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
             {
@@ -399,11 +412,11 @@ namespace Radzen
                     column.FilterPropertyType == typeof(DateTimeOffset) ||
                     column.FilterPropertyType == typeof(DateTimeOffset?))
             {
-                return $"{property} {columnFilterOperator} {DateTime.Parse(value, null, System.Globalization.DateTimeStyles.RoundtripKind).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")}";
+                return $"{property} {ODataFilterOperators[columnFilterOperator]} {DateTime.Parse(value, null, System.Globalization.DateTimeStyles.RoundtripKind).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")}";
             }
             else if (column.FilterPropertyType == typeof(Guid) || column.FilterPropertyType == typeof(Guid?))
             {
-                return $"{property} {columnFilterOperator} {value}";
+                return $"{property} {ODataFilterOperators[columnFilterOperator]} {value}";
             }
 
             return "";
@@ -477,7 +490,7 @@ namespace Radzen
 
                     if (!string.IsNullOrEmpty(value))
                     {
-                        var linqOperator = LinqFilterOperators[column.GetFilterOperator()];
+                        var linqOperator = ODataFilterOperators[column.GetFilterOperator()];
                         if (linqOperator == null)
                         {
                             linqOperator = "==";
