@@ -30,6 +30,8 @@ namespace Radzen
 
         public event Action<dynamic> OnClose;
 
+        internal event Action<Action> CloseRequested;
+
         public event Action OnRefresh;
 
         public event Action<string, Type, Dictionary<string, object>, DialogOptions> OnOpen;
@@ -95,22 +97,28 @@ namespace Radzen
             });
         }
 
-        public void Close(dynamic result = null)
+        public Task Close(dynamic result = null)
         {
             OnClose?.Invoke(result);
 
             var dialog = dialogs.LastOrDefault();
+
             if (dialog != null)
             {
                 dialogs.Remove(dialog);
             }
 
             var task = tasks.LastOrDefault();
-            if (task != null && task.Task != null && !task.Task.IsCompleted)
-            {
-                task.SetResult(result);
-                tasks.Remove(task);
-            }
+
+            CloseRequested?.Invoke(() => {
+                if (task != null && task.Task != null && !task.Task.IsCompleted)
+                {
+                    task.SetResult(result);
+                    tasks.Remove(task);
+                }
+            });
+            
+            return task?.Task;
         }
 
         public void Dispose()
@@ -136,14 +144,14 @@ namespace Radzen
                 b.OpenComponent<Blazor.RadzenButton>(i++);
                 b.AddAttribute(i++, "Text", options != null ? options.OkButtonText : "Ok");
                 b.AddAttribute(i++, "Style", "margin-bottom: 10px; width: 150px");
-                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(true)));
+                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, async () => await ds.Close(true)));
                 b.CloseComponent();
 
                 b.OpenComponent<Blazor.RadzenButton>(i++);
                 b.AddAttribute(i++, "Text", options != null ? options.CancelButtonText : "Cancel");
                 b.AddAttribute(i++, "ButtonStyle", ButtonStyle.Secondary);
                 b.AddAttribute(i++, "Style", "margin-bottom: 10px; margin-left: 10px; width: 150px");
-                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(false)));
+                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, async () => await ds.Close(false)));
                 b.CloseComponent();
                 
                 b.CloseElement();

@@ -79,7 +79,7 @@
         await JSRuntime.InvokeAsync<string>("Radzen.openDialog");
     }
 
-    public async Task Close(dynamic result)
+    public async Task Close(Action callback)
     {
         var lastDialog = dialogs.LastOrDefault();
         if (lastDialog != null)
@@ -88,20 +88,23 @@
             await JSRuntime.InvokeAsync<string>("Radzen.closeDialog");
         }
 
-        await InvokeAsync(() => { StateHasChanged(); });
+        await InvokeAsync(() => { 
+            callback();
+            StateHasChanged(); 
+        });
     }
 
     public void Dispose()
     {
         Service.OnOpen -= OnOpen;
-        Service.OnClose -= OnClose;
+        Service.CloseRequested -= OnClose;
         Service.OnRefresh -= OnRefresh;
     }
 
     protected override void OnInitialized()
     {
         Service.OnOpen += OnOpen;
-        Service.OnClose += OnClose;
+        Service.CloseRequested += OnClose;
         Service.OnRefresh += OnRefresh;
     }
 
