@@ -77,13 +77,14 @@
 
     async Task ShowBusyDialog(bool withMessageAsString)
     {
-        var timer = new Timer(2000);
-        timer.Elapsed += (sender, e) =>
+        InvokeAsync(async () =>
         {
-            timer.Stop();
+            // Simulate background task
+            await Task.Delay(2000);
+
+            // Close the dialog
             DialogService.Close();
-        };
-        timer.Start();
+        });
 
         if (withMessageAsString)
         {
@@ -96,31 +97,37 @@
     }
 
     // Busy dialog from markup
-    async Task BusyDialog() => await DialogService.OpenAsync("", ds =>
-        @<div>
-            <div class="row">
-                <div class="col-md-12">
-                    Loading...
+    async Task BusyDialog()
+    {
+        await DialogService.OpenAsync("", ds =>
+            @<div>
+                <div class="row">
+                    <div class="col-md-12">
+                        Loading...
+                    </div>
                 </div>
-            </div>
-    </div>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });
+        </div>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });
+    }
 
     // Busy dialog from string
-    async Task BusyDialog(string message) => await DialogService.OpenAsync("", ds =>
+    async Task BusyDialog(string message)
     {
-        RenderFragment content = b =>
+        await DialogService.OpenAsync("", ds =>
         {
-            b.OpenElement(0, "div");
-            b.AddAttribute(1, "class", "row");
+            RenderFragment content = b =>
+            {
+                b.OpenElement(0, "div");
+                b.AddAttribute(1, "class", "row");
 
-            b.OpenElement(2, "div");
-            b.AddAttribute(3, "class", "col-md-12");
+                b.OpenElement(2, "div");
+                b.AddAttribute(3, "class", "col-md-12");
 
-            b.AddContent(4, message);
+                b.AddContent(4, message);
 
-            b.CloseElement();
-            b.CloseElement();
-        };
-        return content;
-    }, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });
+                b.CloseElement();
+                b.CloseElement();
+            };
+            return content;
+        }, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });
+    }
 }
