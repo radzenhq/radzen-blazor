@@ -342,6 +342,33 @@
         });
     }
 
+    internal string GetFilterOperatorText(FilterOperator filterOperator)
+    {
+        switch (filterOperator)
+        {
+            case FilterOperator.Contains:
+                return Grid?.ContainsText;
+            case FilterOperator.EndsWith:
+                return Grid?.EndsWithText;
+            case FilterOperator.Equals:
+                return Grid?.EqualsText;
+            case FilterOperator.GreaterThan:
+                return Grid?.GreaterThanText;
+            case FilterOperator. GreaterThanOrEquals:
+                return Grid?.GreaterThanOrEqualsText;
+            case FilterOperator.LessThan:
+                return Grid?.LessThanText;
+            case FilterOperator.LessThanOrEquals:
+                return Grid?.LessThanOrEqualsText;
+            case FilterOperator.StartsWith:
+                return Grid?.StartsWithText;
+            case FilterOperator.NotEquals:
+                return Grid?.NotEqualsText;
+            default:
+                return $"{filterOperator}";
+        }
+    }
+
     public void Dispose()
     {
         Grid?.RemoveColumn(this);
