@@ -1,15 +1,16 @@
 ﻿@page "/dialog"
 @using System.Timers
 @inject DialogService DialogService
+@implements IDisposable
 
-<RadzenExample Name="Dialog" Documentation="true" AdditionalSourceCodePages=@(new List<string>() { "DialogCardPage.razor" })>
+<RadzenExample Name="Dialog" Documentation="true" AdditionalSourceCodePages=@(new [] { "DialogCardPage.razor" })>
     <div class="row">
         <div class="col-xl-6">
-            <h3>Dialog</h3>
-            <RadzenButton Disabled="@orderOpened" Text=@($"Show OrderID: {orderID} details") Click=@OpenOrder />
-            <h3 style="margin-top: 20px;">Simple Dialog</h3>
+            <h3>Open page as a dialog</h3>
+            <RadzenButton Text=@($"Show OrderID: {orderID} details") Click=@OpenOrder />
+            <h3 style="margin-top: 20px;">Inline Dialog</h3>
             <RadzenButton Text="Show dialog with inline Blazor content" Click=@ShowInlineDialog />
-            <h3 style="margin-top: 20px;">Busy Dialog with string message</h3>
+            <h3 style="margin-top: 20px;">Busy Dialog with a string message</h3>
             <RadzenButton Text="Show busy dialog" Click=@(args => ShowBusyDialog(true)) />
             <h3 style="margin-top: 20px;">Busy Dialog with markup</h3>
             <RadzenButton Text="Show busy dialog" Click=@(args => ShowBusyDialog(false)) />
@@ -25,12 +26,18 @@
 @code {
     EventConsole console;
     int orderID = 10248;
-    bool orderOpened;
 
     protected override void OnInitialized()
     {
         DialogService.OnOpen += Open;
         DialogService.OnClose += Close;
+    }
+
+    public void Dispose()
+    {
+        // The DialogService is a singleton so it is advisable to unsubscribe.
+        DialogService.OnOpen -= Open;
+        DialogService.OnClose -= Close;
     }
 
     void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
@@ -40,21 +47,19 @@
 
     void Close(dynamic result)
     {
-        console.Log($"Dialog closed with result: {result}");
+        console.Log($"Dialog closed");
     }
 
     public async Task OpenOrder()
     {
-        orderOpened = true;
-
         await DialogService.OpenAsync<DialogCardPage>($"Order {orderID}",
                new Dictionary<string, object>() { { "OrderID", orderID } },
                new DialogOptions() { Width = "700px", Height = "530px" });
-
-        orderOpened = false;
     }
 
-    async Task ShowInlineDialog() => await DialogService.OpenAsync("Simple Dialog", ds =>
+    async Task ShowInlineDialog()
+    {
+     var result = await DialogService.OpenAsync("Simple Dialog", ds =>
         @<div>
             <p Style="margin-bottom: 1rem">Confirm?</p>
             <div class="row">
@@ -65,7 +70,10 @@
                     Order ID: @orderID
                 </div>
             </div>
-    </div>);
+        </div>);
+    
+      console.Log($"Dialog result: {result}");
+    }
 
     async Task ShowBusyDialog(bool withMessageAsString)
     {
@@ -79,7 +87,7 @@
 
         if (withMessageAsString)
         {
-            await BusyDialog("Busy...");
+            await BusyDialog("Busy ...");
         }
         else
         {
@@ -102,15 +110,13 @@
     {
         RenderFragment content = b =>
         {
-            var i = 0;
+            b.OpenElement(0, "div");
+            b.AddAttribute(1, "class", "row");
 
-            b.OpenElement(i++, "div");
-            b.AddAttribute(i++, "class", "row");
+            b.OpenElement(2, "div");
+            b.AddAttribute(3, "class", "col-md-12");
 
-            b.OpenElement(i++, "div");
-            b.AddAttribute(i++, "class", "col-md-12");
-
-            b.AddContent(i++, message);
+            b.AddContent(4, message);
 
             b.CloseElement();
             b.CloseElement();
