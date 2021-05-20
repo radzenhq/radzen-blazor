@@ -88,9 +88,12 @@
             await JSRuntime.InvokeAsync<string>("Radzen.closeDialog");
         }
 
-        await InvokeAsync(() => { 
-            callback();
-            StateHasChanged(); 
+        await InvokeAsync(() => {
+            if (callback != null)
+            {
+                callback();
+            }
+            StateHasChanged();
         });
     }
 

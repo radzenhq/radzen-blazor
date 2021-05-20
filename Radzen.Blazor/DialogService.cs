@@ -118,12 +118,21 @@ namespace Radzen
                 }
             });
             
-            return task?.Task;
+            return task != null ? task.Task : Task.CompletedTask;
         }
 
         public void Dispose()
         {
             UriHelper.LocationChanged -= UriHelper_OnLocationChanged;
+        }
+
+        internal async Task CloseTrue()
+        {
+            await Close(true);
+        }
+        internal async Task CloseFalse()
+        {
+            await Close(false);
         }
 
         public async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions options = null) => await OpenAsync(title, ds => {
@@ -144,14 +153,14 @@ namespace Radzen
                 b.OpenComponent<Blazor.RadzenButton>(i++);
                 b.AddAttribute(i++, "Text", options != null ? options.OkButtonText : "Ok");
                 b.AddAttribute(i++, "Style", "margin-bottom: 10px; width: 150px");
-                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, async () => await ds.Close(true)));
+                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, CloseTrue));
                 b.CloseComponent();
 
                 b.OpenComponent<Blazor.RadzenButton>(i++);
                 b.AddAttribute(i++, "Text", options != null ? options.CancelButtonText : "Cancel");
                 b.AddAttribute(i++, "ButtonStyle", ButtonStyle.Secondary);
                 b.AddAttribute(i++, "Style", "margin-bottom: 10px; margin-left: 10px; width: 150px");
-                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, async () => await ds.Close(false)));
+                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, CloseFalse));
                 b.CloseComponent();
                 
                 b.CloseElement();
