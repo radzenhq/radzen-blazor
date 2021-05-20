@@ -32,8 +32,8 @@ $input-disabled-color: rgba(#3a3a3a, 0.4) !default;
   }
 
   .rz-inputtext {
-    background-color: transparent;
-    color: inherit;
+    background-color: $input-disabled-background-color;
+    color: $input-disabled-color;
   }
 }
 
