@@ -1,0 +1,76 @@
+@implements IDisposable
+
+<div class="rz-dialog-wrapper">
+    <div class="rz-dialog" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
+        @if (Dialog.Options.ShowTitle)
+        {
+            <div class="rz-dialog-titlebar">
+                <span class="rz-dialog-title" id="rz-dialog-0-label">@Dialog.Title</span>
+                @if (Dialog.Options.ShowClose)
+                {
+                    <a href="javascript:void(0)" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                        <span class="rzi rzi-times"></span>
+                    </a>
+                }
+            </div>
+        }
+        <div class="rz-dialog-content">
+            @if (Dialog.Options.ChildContent != null)
+            {
+                @Dialog.Options.ChildContent(Service)
+            }
+            else
+            {
+                @ChildContent
+            }
+        </div>
+    </div>
+    <div class="rz-dialog-mask" style="z-index: 1000;"></div>
+</div>
+
+@code {
+    [Parameter]
+    public Dialog Dialog { get; set; }
+
+    public void Dispose()
+    {
+        Service.DidCloseDialog();
+    }
+
+    RenderFragment ChildContent => new RenderFragment(builder =>
+        {
+            builder.OpenComponent(0, Dialog.Type);
+
+            if (Dialog.Parameters != null)
+            {
+                foreach (var parameter in Dialog.Parameters)
+                {
+                    builder.AddAttribute(1, parameter.Key, parameter.Value);
+                }
+            }
+
+            builder.CloseComponent();
+        });
+
+    void Close()
+    {
+        Service.Close();
+    }
+
+    string Style
+    {
+        get
+        {
+            var baseStyle = "min-width: 150px; min-height: 150px; z-index: 1001; opacity: 1;position:absolute;";
+            var widthStyle = string.IsNullOrEmpty(Dialog.Options.Width) ? "" : $"width: {Dialog.Options.Width};";
+            var heightStyle = string.IsNullOrEmpty(Dialog.Options.Height) ? "" : $"height: {Dialog.Options.Height};";
+            var topStyle = string.IsNullOrEmpty(Dialog.Options.Top) ? "" : $"top: {Dialog.Options.Top};";
+            var leftStyle = string.IsNullOrEmpty(Dialog.Options.Left) ? "" : $"left: {Dialog.Options.Left};";
+
+            return $"{baseStyle}{widthStyle}{heightStyle}{topStyle}{leftStyle}{Dialog.Options.Style}";
+        }
+    }
+
+    [Inject] 
+    DialogService Service { get; set; }
+}

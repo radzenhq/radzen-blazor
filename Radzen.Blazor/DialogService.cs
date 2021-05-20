@@ -30,8 +30,6 @@ namespace Radzen
 
         public event Action<dynamic> OnClose;
 
-        internal event Action<Action> CloseRequested;
-
         public event Action OnRefresh;
 
         public event Action<string, Type, Dictionary<string, object>, DialogOptions> OnOpen;
@@ -97,42 +95,37 @@ namespace Radzen
             });
         }
 
-        public Task Close(dynamic result = null)
+        private object closingDialog = null;
+
+        public void Close(dynamic result = null)
         {
-            OnClose?.Invoke(result);
-
-            var dialog = dialogs.LastOrDefault();
-
-            if (dialog != null)
+            if (closingDialog == null)
             {
-                dialogs.Remove(dialog);
-            }
+                closingDialog = dialogs.LastOrDefault();
 
-            var task = tasks.LastOrDefault();
+                if (closingDialog != null)
+                {
+                    OnClose?.Invoke(result);
+                    dialogs.Remove(closingDialog);
+                }
 
-            CloseRequested?.Invoke(() => {
+                var task = tasks.LastOrDefault();
                 if (task != null && task.Task != null && !task.Task.IsCompleted)
                 {
                     task.SetResult(result);
                     tasks.Remove(task);
                 }
-            });
-            
-            return task != null ? task.Task : Task.CompletedTask;
+            }
+        }
+
+        internal void DidCloseDialog()
+        {
+            closingDialog = null;
         }
 
         public void Dispose()
         {
             UriHelper.LocationChanged -= UriHelper_OnLocationChanged;
-        }
-
-        internal async Task CloseTrue()
-        {
-            await Close(true);
-        }
-        internal async Task CloseFalse()
-        {
-            await Close(false);
         }
 
         public async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions options = null) => await OpenAsync(title, ds => {
@@ -153,14 +146,14 @@ namespace Radzen
                 b.OpenComponent<Blazor.RadzenButton>(i++);
                 b.AddAttribute(i++, "Text", options != null ? options.OkButtonText : "Ok");
                 b.AddAttribute(i++, "Style", "margin-bottom: 10px; width: 150px");
-                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, CloseTrue));
+                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(true)));
                 b.CloseComponent();
 
                 b.OpenComponent<Blazor.RadzenButton>(i++);
                 b.AddAttribute(i++, "Text", options != null ? options.CancelButtonText : "Cancel");
                 b.AddAttribute(i++, "ButtonStyle", ButtonStyle.Secondary);
                 b.AddAttribute(i++, "Style", "margin-bottom: 10px; margin-left: 10px; width: 150px");
-                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, CloseFalse));
+                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(false)));
                 b.CloseComponent();
                 
                 b.CloseElement();
