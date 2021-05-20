@@ -60,9 +60,24 @@
     [Parameter]
     public EventCallback<MouseEventArgs> Click { get; set; }
 
-    public async System.Threading.Tasks.Task OnClick(MouseEventArgs args)
+    bool clicking;
+    public async Task OnClick(MouseEventArgs args)
     {
-        await Click.InvokeAsync(args);
+        if (clicking)
+        {
+            return;
+        }
+
+        try
+        {
+            clicking = true;
+
+            await Click.InvokeAsync(args);
+        }
+        finally
+        {
+            clicking = false;
+        }
     }
 
     protected override string GetComponentCssClass()
