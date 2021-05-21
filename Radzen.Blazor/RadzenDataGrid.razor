@@ -389,18 +389,18 @@
                 }
             }
 #else
-        int i = 0;
-        foreach (var item in LoadData.HasDelegate ? Data : PagedView)
-        {
-            builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
-            builder.AddAttribute(1, "Columns", visibleColumns);
-            builder.AddAttribute(2, "Index", i);
-            builder.AddAttribute(3, "Grid", this);
-            builder.AddAttribute(4, "TItem", typeof(TItem));
-            builder.AddAttribute(5, "Item", item);
-            builder.CloseComponent();
-            i++;
-        }
+            int i = 0;
+            foreach (var item in LoadData.HasDelegate ? Data : PagedView)
+            {
+                builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
+                builder.AddAttribute(1, "Columns", visibleColumns);
+                builder.AddAttribute(2, "Index", i);
+                builder.AddAttribute(3, "Grid", this);
+                builder.AddAttribute(4, "TItem", typeof(TItem));
+                builder.AddAttribute(5, "Item", item);
+                builder.CloseComponent();
+                i++;
+            }
 #endif
         });
     }
@@ -542,7 +542,7 @@
     protected void OnFilter(ChangeEventArgs args, RadzenDataGridColumn<TItem> column, bool force = false, bool isFirst = true)
     {
         string property = column.GetFilterProperty();
-        if (AllowFiltering && column.Filterable && !string.IsNullOrEmpty(property))
+        if (AllowFiltering && column.Filterable)
         {
             if (!object.Equals(isFirst ? column.GetFilterValue() : column.GetSecondFilterValue(), args.Value) || force)
             {
@@ -577,10 +577,24 @@
 
     protected void OnSort(EventArgs args, RadzenDataGridColumn<TItem> column)
     {
-        string property = column.GetSortProperty();
-        if (AllowSorting && column.Sortable && !string.IsNullOrEmpty(property))
+        if (AllowSorting && column.Sortable)
         {
-            OrderBy(property);
+            var property = column.GetSortProperty();
+            if (!string.IsNullOrEmpty(property))
+            {
+                OrderBy(property);
+            }
+            else
+            {
+                SetColumnSortOrder(column);
+
+                if (LoadData.HasDelegate && AllowVirtualization)
+                {
+                    Data = null;
+                }
+
+                InvokeAsync(Reload);
+            }
         }
     }
 
@@ -1236,6 +1250,30 @@
         return Data != null && typeof(ODataEnumerable<TItem>).IsAssignableFrom(Data.GetType());
     }
 
+    internal void SetColumnSortOrder(RadzenDataGridColumn<TItem> column)
+    {
+        if (!AllowMultiColumnSorting)
+        {
+            foreach (var c in columns.Where(c => c != column))
+            {
+                c.SetSortOrder(null);
+            }
+        }
+
+        if (column.GetSortOrder() == null)
+        {
+            column.SetSortOrder(SortOrder.Ascending);
+        }
+        else if (column.GetSortOrder() == SortOrder.Ascending)
+        {
+            column.SetSortOrder(SortOrder.Descending);
+        }
+        else if (column.GetSortOrder() == SortOrder.Descending)
+        {
+            column.SetSortOrder(null);
+        }
+    }
+
     public void OrderBy(string property)
     {
         var p = IsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
@@ -1243,26 +1281,7 @@
         var column = columns.Where(c => c.GetSortProperty() == property).FirstOrDefault();
         if (column != null)
         {
-            if (!AllowMultiColumnSorting)
-            {
-                foreach (var c in columns.Where(c => c != column))
-                {
-                    c.SetSortOrder(null);
-                }
-            }
-
-            if (column.GetSortOrder() == null)
-            {
-                column.SetSortOrder(SortOrder.Ascending);
-            }
-            else if (column.GetSortOrder() == SortOrder.Ascending)
-            {
-                column.SetSortOrder(SortOrder.Descending);
-            }
-            else if (column.GetSortOrder() == SortOrder.Descending)
-            {
-                column.SetSortOrder(null);
-            }
+            SetColumnSortOrder(column);
         }
 
         if (LoadData.HasDelegate && AllowVirtualization)
