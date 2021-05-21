@@ -1,72 +1,16 @@
 ﻿@implements IDisposable
 @using Microsoft.JSInterop
+@using Radzen.Blazor.Rendering
 @inject IJSRuntime JSRuntime
 
 @foreach (var dialog in dialogs)
 {
-    <div class="rz-dialog-wrapper">
-        <div class="rz-dialog"
-             role="dialog" aria-labelledby="rz-dialog-0-label"
-             style="@getStyle(dialog)">
-            @if (dialog.Options.ShowTitle)
-            {
-                <div class="rz-dialog-titlebar rz-helper-clearfix ">
-                    <span class="rz-dialog-title" id="rz-dialog-0-label">@dialog.Title</span>
-                    @if (dialog.Options.ShowClose)
-                    {
-                        <a href="javascript:void(0)" @onclick="@((args) => Service.Close())" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close ">
-                            <span class="rzi rzi-times"></span>
-                        </a>
-                    }
-                </div>
-            }
-            <div class="rz-dialog-content ">
-                @if (dialog.Options.ChildContent != null)
-                {
-                    @dialog.Options.ChildContent(Service)
-                }
-                else
-                {
-                    @DrawComponent(dialog)
-                }
-            </div>
-        </div>
-        <div class="-overlay rz-dialog-mask" style="z-index: 1000;"></div>
-    </div>
+    <DialogContainer Dialog=@dialog />
 }
 
 @code {
-    string getStyle(Dialog dialog)
-    {
-        var baseStyle = "min-width: 150px; min-height: 150px; z-index: 1001; opacity: 1;position:absolute;";
-        var widthStyle = string.IsNullOrEmpty(dialog.Options.Width) ? "" : $"width: {dialog.Options.Width};";
-        var heightStyle = string.IsNullOrEmpty(dialog.Options.Height) ? "" : $"height: {dialog.Options.Height};";
-        var topStyle = string.IsNullOrEmpty(dialog.Options.Top) ? "" : $"top: {dialog.Options.Top};";
-        var leftStyle = string.IsNullOrEmpty(dialog.Options.Left) ? "" : $"left: {dialog.Options.Left};";
-
-        return $"{baseStyle}{widthStyle}{heightStyle}{topStyle}{leftStyle}{dialog.Options.Style}";
-    }
-
-    [Inject] private DialogService Service { get; set; }
-
-    RenderFragment DrawComponent(Dialog dialog)
-    {
-        return new RenderFragment(builder =>
-        {
-            var i = 0;
-            builder.OpenComponent(i, dialog.Type);
-
-            if (dialog.Parameters != null)
-            {
-                foreach (var parameter in dialog.Parameters)
-                {
-                    builder.AddAttribute(i++, parameter.Key, parameter.Value);
-                }
-            }
-
-            builder.CloseComponent();
-        });
-    }
+    [Inject] 
+    DialogService Service { get; set; }
 
     List<Dialog> dialogs = new List<Dialog>();
 
@@ -88,7 +32,10 @@
             await JSRuntime.InvokeAsync<string>("Radzen.closeDialog");
         }
 
-        await InvokeAsync(() => { StateHasChanged(); });
+        await InvokeAsync(() => 
+        { 
+            StateHasChanged(); 
+        });
     }
 
     public void Dispose()

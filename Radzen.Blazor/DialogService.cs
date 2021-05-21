@@ -95,22 +95,32 @@ namespace Radzen
             });
         }
 
+        private object closingDialog = null;
+
         public void Close(dynamic result = null)
         {
-            OnClose?.Invoke(result);
-
-            var dialog = dialogs.LastOrDefault();
-            if (dialog != null)
+            if (closingDialog == null)
             {
-                dialogs.Remove(dialog);
-            }
+                closingDialog = dialogs.LastOrDefault();
 
-            var task = tasks.LastOrDefault();
-            if (task != null && task.Task != null && !task.Task.IsCompleted)
-            {
-                task.SetResult(result);
-                tasks.Remove(task);
+                if (closingDialog != null)
+                {
+                    OnClose?.Invoke(result);
+                    dialogs.Remove(closingDialog);
+                }
+
+                var task = tasks.LastOrDefault();
+                if (task != null && task.Task != null && !task.Task.IsCompleted)
+                {
+                    task.SetResult(result);
+                    tasks.Remove(task);
+                }
             }
+        }
+
+        internal void DidCloseDialog()
+        {
+            closingDialog = null;
         }
 
         public void Dispose()
