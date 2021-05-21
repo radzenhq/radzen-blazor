@@ -533,6 +533,9 @@ namespace Radzen
 
         public static bool IsNumeric(Type source)
         {
+            if (source == null)
+                return false;
+
             var type = source.IsGenericType ? source.GetGenericArguments()[0] : source;
 
             switch (Type.GetTypeCode(type))
