@@ -156,3 +156,12 @@ $button-styles: map-merge(
     }
   }
 }
+
+@keyframes button-icon-spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+}
