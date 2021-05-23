@@ -34,6 +34,28 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Button_Renders_BusySpinner()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenButton>();
+
+            var icon = "account_circle";
+
+            component.SetParametersAndRender(parameters => parameters
+                .Add(p => p.Icon, icon)
+                .Add(p => p.IsBusy, true)
+            );
+
+            // does not render the actual icon when busy
+            Assert.DoesNotContain(@$"<i class=""rz-button-icon-left rzi"">{icon}</i>", component.Markup);
+
+            // renders the icon with busy spin animation
+            Assert.Contains(@"<i style=""animation: button-icon-spin", component.Markup);
+            Assert.Contains(">refresh</i>", component.Markup);
+        }
+
+        [Fact]
         public void Button_Renders_IconAndTextParameters()
         {
             using var ctx = new TestContext();
@@ -43,9 +65,10 @@ namespace Radzen.Blazor.Tests
             var text = "Test";
             var icon = "account_circle";
 
-            component.SetParametersAndRender(parameters => {
+            component.SetParametersAndRender(parameters =>
+            {
                 parameters.Add(p => p.Text, text);
-                parameters.Add(p => p.Icon, icon); 
+                parameters.Add(p => p.Icon, icon);
             });
 
             Assert.Contains(@$"<i class=""rz-button-icon-left rzi"">{icon}</i>", component.Markup);
@@ -76,7 +99,8 @@ namespace Radzen.Blazor.Tests
             var text = "Test";
             var image = "test.png";
 
-            component.SetParametersAndRender(parameters => {
+            component.SetParametersAndRender(parameters =>
+            {
                 parameters.Add(p => p.Text, text);
                 parameters.Add(p => p.Image, image);
             });
