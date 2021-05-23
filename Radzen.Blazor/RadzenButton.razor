@@ -12,22 +12,36 @@
         }
         else
         {
-            @if (!string.IsNullOrEmpty(@Icon))
+            @if (IsBusy)
             {
-                <i class="rz-button-icon-left rzi">@((MarkupString)Icon)</i>
+                <RadzenIcon Icon="refresh" Style="animation: button-icon-spin 700ms linear infinite" />
+                @if (!string.IsNullOrEmpty(BusyText))
+                {
+                    <span class="rz-button-text">@BusyText</span>
+                }
             }
-            @if (!string.IsNullOrEmpty(Image))
+            else
             {
-                <img class="rz-button-icon-left rzi" src="@Image" />
-            }
-            @if (!string.IsNullOrEmpty(Text))
-            {
-                <span class="rz-button-text">@Text</span>
+                @if (!string.IsNullOrEmpty(@Icon))
+                {
+                    <i class="rz-button-icon-left rzi">@((MarkupString)Icon)</i>
+                }
+                @if (!string.IsNullOrEmpty(Image))
+                {
+                    <img class="rz-button-icon-left rzi" src="@Image" />
+                }
+                @if (!string.IsNullOrEmpty(Text))
+                {
+                    <span class="rz-button-text">@Text</span>
+                }
             }
         }
     </button>
 }
 @code {
+    private bool _isBusy;
+    private bool _originalDisabled;
+
     private string getButtonSize()
     {
         return Size == ButtonSize.Medium ? "md" : "sm";
@@ -59,6 +73,27 @@
 
     [Parameter]
     public EventCallback<MouseEventArgs> Click { get; set; }
+
+    [Parameter]
+    public bool IsBusy 
+    { 
+        get => _isBusy; 
+        set
+        {
+            if (value && !_isBusy)
+            {
+                // store the original Value of disabled property
+                // when entering busy state
+                _originalDisabled = Disabled;
+            }
+            _isBusy = value;
+            // return to original disabled state, when leaving busy state
+            Disabled = value ? value : _originalDisabled;
+        }
+    }
+
+    [Parameter]
+    public string BusyText { get; set; } = "";
 
     bool clicking;
     public async Task OnClick(MouseEventArgs args)

@@ -48,6 +48,24 @@
                 <RadzenButton style="margin-bottom: 16px"   Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
             </div>
         </div>
+        <h4>Busy <RadzenButton Text="Toggle" Click="@(args => IsBusy = !IsBusy)" /></h4>
+        <div class="row">
+            <div class="col-xl-6">
+                <h5>Without Text</h5>
+                <RadzenButton style="margin: 0 1rem 1rem 0" IsBusy="@IsBusy" Click=@(args => OnClick("Primary Busy button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+            </div>
+
+            <div class="col-xl-6">
+                <h5>With Busy Text</h5>
+                <RadzenButton style="margin: 0 1rem 1rem 0" Icon="account_circle" BusyText="Busy Primary" IsBusy="@IsBusy" Click=@(args => OnClick("Primary Busy button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h5>Minimal changed</h5>
+                <RadzenButton style="margin: 0 1rem 1rem 0" Icon="account_circle" IsBusy="@IsBusy" BusyText="Info" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
+            </div>
+        </div>
     </div>
     <div class="col-xl-6">
         <EventConsole @ref=@console />
@@ -57,6 +75,7 @@
 
 @code {
     EventConsole console;
+    bool IsBusy;
 
     void OnClick(string buttonName)
     {
