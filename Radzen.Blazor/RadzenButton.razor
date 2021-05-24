@@ -2,7 +2,7 @@
 
 @if (Visible)
 {
-    <button @ref="@Element" style="@Style" disabled="@Disabled"
+    <button @ref="@Element" style="@Style" disabled="@IsDisabled"
             type="@Enum.GetName(typeof(ButtonType), ButtonType).ToLower()"
             @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
             @onclick="@((args) => OnClick(args))">
@@ -39,9 +39,6 @@
     </button>
 }
 @code {
-    private bool _isBusy;
-    private bool _originalDisabled;
-
     private string getButtonSize()
     {
         return Size == ButtonSize.Medium ? "md" : "sm";
@@ -75,25 +72,12 @@
     public EventCallback<MouseEventArgs> Click { get; set; }
 
     [Parameter]
-    public bool IsBusy 
-    { 
-        get => _isBusy; 
-        set
-        {
-            if (value && !_isBusy)
-            {
-                // store the original Value of disabled property
-                // when entering busy state
-                _originalDisabled = Disabled;
-            }
-            _isBusy = value;
-            // return to original disabled state, when leaving busy state
-            Disabled = value ? value : _originalDisabled;
-        }
-    }
+    public bool IsBusy { get; set; }
 
     [Parameter]
     public string BusyText { get; set; } = "";
+
+    public bool IsDisabled { get => Disabled || IsBusy; }
 
     bool clicking;
     public async Task OnClick(MouseEventArgs args)
@@ -117,6 +101,6 @@
 
     protected override string GetComponentCssClass()
     {
-        return $"rz-button rz-button-{getButtonSize()} btn-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLower()}{(Disabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}";
+        return $"rz-button rz-button-{getButtonSize()} btn-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLower()}{(IsDisabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}";
     }
 }
