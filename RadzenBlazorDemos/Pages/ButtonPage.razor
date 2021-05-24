@@ -52,18 +52,23 @@
         <div class="row">
             <div class="col-xl-6">
                 <h5>Without Text</h5>
-                <RadzenButton style="margin: 0 1rem 1rem 0" IsBusy="@IsBusy" Click=@(args => OnClick("Primary Busy button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+                <RadzenButton style="margin: 0 1rem 1rem 0" IsBusy="@IsBusy" Click=@(args => OnBusyButtonClick("Primary Busy button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
             </div>
 
             <div class="col-xl-6">
                 <h5>With Busy Text</h5>
-                <RadzenButton style="margin: 0 1rem 1rem 0" Icon="account_circle" BusyText="Busy Primary" IsBusy="@IsBusy" Click=@(args => OnClick("Primary Busy button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+                <RadzenButton style="margin: 0 1rem 1rem 0" Icon="account_circle" BusyText="Busy Primary" IsBusy="@IsBusy" Click=@(args => OnBusyButtonClick("Primary Busy button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
             </div>
         </div>
         <div class="row">
-            <div class="col">
+            <div class="col-xl-6">
                 <h5>Minimal changed</h5>
-                <RadzenButton style="margin: 0 1rem 1rem 0" Icon="account_circle" IsBusy="@IsBusy" BusyText="Info" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
+                <RadzenButton style="margin: 0 1rem 1rem 0" Icon="account_circle" IsBusy="@IsBusy" BusyText="Info" Click=@(args => OnBusyButtonClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
+            </div>
+
+            <div class="col-xl-6">
+                <h5>High Latency</h5>
+                <RadzenButton style="margin: 0 1rem 1rem 0" Icon="account_circle" IsBusy="@IsBusy" BusyText="Info" Click=@(async args => await OnSlowBusyButtonClickAsync("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
             </div>
         </div>
     </div>
@@ -80,5 +85,20 @@
     void OnClick(string buttonName)
     {
         console.Log($"{buttonName} clicked");
+    }
+
+    void OnBusyButtonClick(string buttonName)
+    {
+        IsBusy = !IsBusy;
+        OnClick(buttonName);
+    }
+
+    async Task OnSlowBusyButtonClickAsync(string buttonName)
+    {
+        IsBusy = true;
+        OnClick(buttonName);
+        await Task.Delay(10000);
+        IsBusy = false;
+        console.Log($"{buttonName} handler finished");
     }
 }
