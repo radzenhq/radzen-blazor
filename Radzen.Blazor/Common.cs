@@ -326,8 +326,8 @@ namespace Radzen
         public int? Top { get; set; }
         public string OrderBy { get; set; }
         public string Filter { get; set; }
-        public IEnumerable<FilterDescriptor> Filters { get; private set; }
-        public IEnumerable<SortDescriptor> Sorts { get; private set; }
+        public IEnumerable<FilterDescriptor> Filters { get; set; }
+        public IEnumerable<SortDescriptor> Sorts { get; set; }
     }
 
     public class PagerEventArgs
