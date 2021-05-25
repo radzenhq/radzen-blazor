@@ -9,7 +9,7 @@ namespace Radzen
 {
     public static class QueryableExtension
     {
-        private static readonly IDictionary<string, string> FilterOperators = new Dictionary<string, string>
+        internal static readonly IDictionary<string, string> FilterOperators = new Dictionary<string, string>
         {
             {"eq", "="},
             {"ne", "!="},
@@ -22,7 +22,7 @@ namespace Radzen
             {"contains", "Contains"}
         };
 
-        private static readonly IDictionary<FilterOperator, string> LinqFilterOperators = new Dictionary<FilterOperator, string>
+        internal static readonly IDictionary<FilterOperator, string> LinqFilterOperators = new Dictionary<FilterOperator, string>
         {
             {FilterOperator.Equals, "="},
             {FilterOperator.NotEquals, "!="},
@@ -35,7 +35,7 @@ namespace Radzen
             {FilterOperator.Contains, "Contains"}
         };
 
-        private static readonly IDictionary<FilterOperator, string> ODataFilterOperators = new Dictionary<FilterOperator, string>
+        internal static readonly IDictionary<FilterOperator, string> ODataFilterOperators = new Dictionary<FilterOperator, string>
         {
             {FilterOperator.Equals, "eq"},
             {FilterOperator.NotEquals, "ne"},

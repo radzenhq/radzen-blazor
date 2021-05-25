@@ -916,7 +916,27 @@
 
         if (LoadData.HasDelegate)
         {
-            await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = skip, Top = PageSize, OrderBy = orderBy, Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString });
+            await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
+            {
+                Skip = skip,
+                Top = PageSize,
+                OrderBy = orderBy,
+                Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString,
+                Filters = columns.Where(c => c.Filterable && c.Visible && c.GetFilterValue() != null).Select(c => new FilterDescriptor()
+                {
+                    Property = c.GetFilterProperty(),
+                    FilterValue = c.GetFilterValue(),
+                    FilterOperator = c.GetFilterOperator(),
+                    SecondFilterValue = c.GetSecondFilterValue(),
+                    SecondFilterOperator = c.GetSecondFilterOperator(),
+                    LogicalFilterOperator = c.GetLogicalFilterOperator()
+                }),
+                Sorts = columns.Where(c => c.Sortable && c.Visible && c.GetSortOrder() != null).Select(c => new SortDescriptor() 
+                { 
+                    Property = c.GetSortProperty(),
+                    SortOrder = c.GetSortOrder().Value,
+                })
+            }); ;
         }
 
         CalculatePager();

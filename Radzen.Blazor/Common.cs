@@ -304,6 +304,21 @@ namespace Radzen
         public RadzenGridColumn<T> Column { get; internal set; }
         public double Width { get; internal set; }
     }
+    public class FilterDescriptor
+    {
+        public string Property { get; set; }
+        public object FilterValue { get; set; }
+        public FilterOperator FilterOperator { get; set; }
+        public object SecondFilterValue { get; set; }
+        public FilterOperator SecondFilterOperator { get; set; }
+        public LogicalFilterOperator LogicalFilterOperator { get; set; }
+    }
+
+    public class SortDescriptor
+    {
+        public string Property { get; set; }
+        public SortOrder SortOrder { get; set; }
+    }
 
     public class LoadDataArgs
     {
@@ -311,6 +326,8 @@ namespace Radzen
         public int? Top { get; set; }
         public string OrderBy { get; set; }
         public string Filter { get; set; }
+        public IEnumerable<FilterDescriptor> Filters { get; private set; }
+        public IEnumerable<SortDescriptor> Sorts { get; private set; }
     }
 
     public class PagerEventArgs

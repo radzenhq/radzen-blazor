@@ -221,6 +221,7 @@
     FilterOperator? filterOperator;
     object secondFilterValue;
     FilterOperator? secondFilterOperator;
+    LogicalFilterOperator? logicalFilterOperator;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -258,6 +259,11 @@
             secondFilterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(SecondFilterOperator));
         }
 
+        if (parameters.DidParameterChange(nameof(LogicalFilterOperator), LogicalFilterOperator))
+        {
+            logicalFilterOperator = parameters.GetValueOrDefault<LogicalFilterOperator>(nameof(LogicalFilterOperator));
+        }
+
         await base.SetParametersAsync(parameters);
     }
 
@@ -284,6 +290,11 @@
     internal FilterOperator GetSecondFilterOperator()
     {
         return secondFilterOperator ?? SecondFilterOperator;
+    }
+
+    internal LogicalFilterOperator GetLogicalFilterOperator()
+    {
+        return logicalFilterOperator ?? LogicalFilterOperator;
     }
 
     internal void SetFilterValue(object value, bool isFirst = true)
