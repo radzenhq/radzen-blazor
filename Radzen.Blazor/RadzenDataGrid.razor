@@ -827,8 +827,9 @@
     {
 #if NET5
         return AllowVirtualization;
-#endif
+#else
         return false;
+#endif
     }
 
 
