@@ -133,3 +133,21 @@ text-decoration: none;
     font-size: 12px;
     padding: 2px 4px;
 }
+
+.logos {
+  margin: 48px 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.logos img {
+  height: 32px;
+  margin-right: 32px;
+  margin-bottom: 32px;
+}
+
+.logos  .square {
+  height: 48px;
+}
