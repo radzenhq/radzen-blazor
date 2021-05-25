@@ -550,7 +550,7 @@
                 skip = 0;
                 CurrentPage = 0;
 
-                if (LoadData.HasDelegate && AllowVirtualization)
+                if (LoadData.HasDelegate && IsVirtualizationAllowed())
                 {
                     Data = null;
                 }
@@ -588,7 +588,7 @@
             {
                 SetColumnSortOrder(column);
 
-                if (LoadData.HasDelegate && AllowVirtualization)
+                if (LoadData.HasDelegate && IsVirtualizationAllowed())
                 {
                     Data = null;
                 }
@@ -612,7 +612,7 @@
         skip = 0;
         CurrentPage = 0;
 
-        if (LoadData.HasDelegate && AllowVirtualization)
+        if (LoadData.HasDelegate && IsVirtualizationAllowed())
         {
             Data = null;
         }
@@ -737,10 +737,10 @@
             }
         }
     }
-
+#if NET5
     [Parameter]
     public bool AllowVirtualization { get; set; }
-
+#endif
     [Parameter]
     public bool IsLoading { get; set; }
 
@@ -809,7 +809,7 @@
                 }
             }
 
-            if (!LoadData.HasDelegate && (!AllowVirtualization || AllowPaging))
+            if (!LoadData.HasDelegate && (!IsVirtualizationAllowed() || AllowPaging))
             {
                 var count = view.Count();
                 if (count != Count)
@@ -821,6 +821,14 @@
 
             return view;
         }
+    }
+
+    internal bool IsVirtualizationAllowed()
+    {
+#if NET5
+        return AllowVirtualization;
+#endif
+        return false;
     }
 
 
@@ -931,8 +939,8 @@
                     SecondFilterOperator = c.GetSecondFilterOperator(),
                     LogicalFilterOperator = c.GetLogicalFilterOperator()
                 }),
-                Sorts = columns.Where(c => c.Sortable && c.Visible && c.GetSortOrder() != null).Select(c => new SortDescriptor() 
-                { 
+                Sorts = columns.Where(c => c.Sortable && c.Visible && c.GetSortOrder() != null).Select(c => new SortDescriptor()
+                {
                     Property = c.GetSortProperty(),
                     SortOrder = c.GetSortOrder().Value,
                 })
@@ -1304,7 +1312,7 @@
             SetColumnSortOrder(column);
         }
 
-        if (LoadData.HasDelegate && AllowVirtualization)
+        if (LoadData.HasDelegate && IsVirtualizationAllowed())
         {
             Data = null;
         }
