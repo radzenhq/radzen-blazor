@@ -92,33 +92,85 @@
                 }
                 @if (Template != null)
                 {
-                    <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
-                                TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
-                        <Columns>
-                            <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="string">
-                                <Template>
-                                    @Template(context)
-                                </Template>
-                            </RadzenGridColumn>
-                        </Columns>
-                    </RadzenGrid>
+                    @if (AllowVirtualization)
+                    {
+                        <RadzenDataGrid AllowVirtualization="true" ColumnWidth="@ColumnWidth" @ref="virtualGrid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
+                                    TItem="object" PageSize="@PageSize" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
+                            <Columns>
+                                <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)">
+                                    <Template>
+                                        @Template(context)
+                                    </Template>
+                                </RadzenGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    }
+                    else
+                    {
+                        <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
+                                    TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
+                            <Columns>
+                                <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="string">
+                                    <Template>
+                                        @Template(context)
+                                    </Template>
+                                </RadzenGridColumn>
+                            </Columns>
+                        </RadzenGrid>
+                    }
                 }
                 else
                 {
-                    <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
-                                TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
-                        <Columns>
-                            @if (Columns != null)
-                            {
-                                @Columns
-                            }
-                            else
-                            {
-                                <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="string">
+                    @if (AllowVirtualization)
+                    { 
+                        <RadzenDataGrid ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="virtualGrid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
+                                        TItem="object" PageSize="@PageSize" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
+                            <Columns>
+                                @if (Columns != null)
+                                {
+                                    @Columns
+                                }
+                                else
+                                {
+                                    <RadzenDataGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)">
+                                    </RadzenDataGridColumn>
+                                }
+                            </Columns>
+                        </RadzenDataGrid>
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(TextProperty) || Columns != null)
+                        {
+                        <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
+                                    TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
+                            <Columns>
+                                @if (Columns != null)
+                                {
+                                    @Columns
+                                }
+                                else
+                                {
+                                    <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="string">
+                                    </RadzenGridColumn>
+                                }
+                            </Columns>
+                        </RadzenGrid>
+                        }
+                        else
+                        { 
+                            <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
+                                    TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
+                            <Columns>
+                                <RadzenGridColumn TItem="object" Property="it" Title="Item" Type="string">
+                                    <Template>
+                                        @context
+                                    </Template>
                                 </RadzenGridColumn>
-                            }
-                        </Columns>
-                    </RadzenGrid>
+                            </Columns>
+                        </RadzenGrid>
+                        }
+                    }
                 }
             </div>
         </div>
@@ -151,12 +203,10 @@
     public object SelectedValue { get; set; }
 
     [Parameter]
-    public int Count { get; set; }
-
-    [Parameter]
     public RenderFragment Columns { get; set; }
 
     RadzenGrid<object> grid;
+    RadzenDataGrid<object> virtualGrid;
 
     IEnumerable<object> pagedData;
     int count;
@@ -199,11 +249,24 @@
 
     private string GetPropertyFilterExpression(string property, string filterCaseSensitivityOperator)
     {
+        if (property == null)
+        {
+            property = "it";
+        }
         var p = $@"({property} == null ? """" : {property})";
         return $"{p}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)";
     }
 
     private bool IsColumnFilterPropertyTypeString(RadzenGridColumn<object> column)
+    {
+        var property = column.GetFilterProperty();
+        var itemType = Data != null ? Data.AsQueryable().ElementType : typeof(object);
+        var type = PropertyAccess.GetPropertyType(itemType, property);
+
+        return type == typeof(string);
+    }
+
+    private bool IsColumnFilterPropertyTypeString(RadzenDataGridColumn<object> column)
     {
         var property = column.GetFilterProperty();
         var itemType = Data != null ? Data.AsQueryable().ElementType : typeof(object);
@@ -227,9 +290,19 @@
 
                 if (AllowFilteringByAllStringColumns)
                 {
-                    query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
+                    if (IsVirtualizationAllowed())
+                    {
+                        query = query.Where(string.Join(" || ", virtualGrid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
                         .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
                             FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+
+                    }
+                    else
+                    {
+                        query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
+                            .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
+                                FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                    }
                 }
                 else
                 {
@@ -333,7 +406,14 @@
         if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
         await Change.InvokeAsync(Value);
 
-        await grid.Reload();
+        if (IsVirtualizationAllowed())
+        {
+            await virtualGrid.Reload();
+        }
+        else
+        {
+            await grid.Reload();
+        }
 
         StateHasChanged();
     }
@@ -363,7 +443,14 @@
 
                 if (item != null && (!Multiple ? selectedItem != item : true))
                 {
-                    await grid.OnRowSelect(item, false);
+                    if (IsVirtualizationAllowed())
+                    {
+                        await virtualGrid.OnRowSelect(item, false);
+                    }
+                    else
+                    {
+                        await grid.OnRowSelect(item, false);
+                    }
                 }
             }
             catch (Exception)
@@ -401,7 +488,14 @@
             await InvokeAsync(() =>
             {
                 StateHasChanged();
-                grid.FirstPage(true).Wait();
+                if (IsVirtualizationAllowed())
+                {
+                    virtualGrid.FirstPage(true).Wait();
+                }
+                else
+                {
+                    grid.FirstPage(true).Wait();
+                }
             });
         }
     }
@@ -414,7 +508,14 @@
             previousSearch = searchText;
             _view = null;
             StateHasChanged();
-            await grid.FirstPage(true);
+            if (IsVirtualizationAllowed())
+            {
+                virtualGrid.FirstPage(true).Wait();
+            }
+            else
+            {
+                grid.FirstPage(true).Wait();
+            }
         }
     }
 
@@ -426,10 +527,6 @@
 
     [Parameter]
     public bool AllowFilteringByAllStringColumns { get; set; }
-
-    [Parameter]
-    public int PageSize { get; set; } = 5;
-
 
     async Task OnRowSelect(object item)
     {

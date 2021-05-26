@@ -1,0 +1,49 @@
+﻿@using Radzen
+@using System.Linq.Dynamic.Core
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
+@typeparam TValue
+
+@if (DropDown.Multiple)
+{
+    <li class="@(DropDown.isSelected(Item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")"
+        aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)" style="display: block;white-space: nowrap;" @onclick:preventDefault @onclick="@(() => DropDown.OnSelectItemInternal(Item))">
+        <div class="rz-chkbox ">
+            <div class="@(DropDown.isSelected(Item) ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
+                <span class="@(DropDown.isSelected(Item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
+            </div>
+        </div>
+        <span>
+            @if (DropDown.Template != null)
+            {
+                @DropDown.Template(Item)
+            }
+            else
+            {
+                @PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
+            }
+        </span>
+    </li>
+}
+else
+{
+    <li role="option" class="@(DropDown.isSelected(Item) ? "rz-dropdown-item  rz-state-highlight" : "rz-dropdown-item ")" aria-label=">@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)" @onclick:preventDefault @onclick="@(() => DropDown.OnSelectItemInternal(Item))">
+        <span>
+            @if (DropDown.Template != null)
+            {
+                @DropDown.Template(Item)
+            }
+            else
+            {
+                @PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
+            }
+        </span>
+    </li>
+}
+@code {
+    [Parameter]
+    public RadzenDropDown<TValue> DropDown { get; set; }
+
+    [Parameter]
+    public object Item { get; set; }
+}

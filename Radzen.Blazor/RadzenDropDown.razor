@@ -1,17 +1,19 @@
 ﻿@using Radzen
+@using System.Linq
 @using System.Linq.Dynamic.Core
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Rendering
 @typeparam TValue
 @inherits DropDownBase<TValue>
 
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onmousedown="@(args => OpenPopup("ArrowDown", false, true))" style="@Style" tabindex="@TabIndex" 
-        @onkeydown="@((args) => OnKeyPress(args))" id="@GetId()">
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onmousedown="@(args => OpenPopup("ArrowDown", false, true))" style="@Style" tabindex="@TabIndex"
+         @onkeydown="@((args) => OnKeyPress(args))" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" style="width:100%" aria-haspopup="listbox" readonly="" type="text" tabindex="-1"
-                   name="@Name" value="@(Value != null ? Value : "")" 
+                   name="@Name" value="@(Value != null ? Value : "")"
                    aria-label="@(!Multiple && Value != null ? PropertyAccess.GetItemOrValueFromProperty(Value, TextProperty) : "")" />
         </div>
 
@@ -39,7 +41,7 @@
                     else
                     {
                         foreach (var item in selectedItems)
-                        { 
+                        {
                             @Template(item)@(",")
                         }
                     }
@@ -72,7 +74,7 @@
             @if (AllowFiltering && !Multiple)
             {
                 <div class="rz-dropdown-filter-container">
-                    <input id="@SearchID"  @ref="@search" tabindex="@TabIndex" class="rz-dropdown-filter rz-inputtext   " autocomplete="off" type="text"
+                    <input id="@SearchID" @ref="@search" tabindex="@TabIndex" class="rz-dropdown-filter rz-inputtext   " autocomplete="off" type="text"
                            @onchange="@((ChangeEventArgs args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" />
                     <span class="rz-dropdown-filter-icon rzi rzi-search"></span>
                 </div>
@@ -89,7 +91,7 @@
                         </div>
                     </div>
                     @if (!AllowFiltering && !string.IsNullOrEmpty(SelectAllText))
-                    { 
+                    {
                         @SelectAllText
                     }
                     @if (AllowFiltering)
@@ -111,45 +113,7 @@
                 <ul @ref="list" class="@(Multiple ? "rz-multiselect-items rz-multiselect-list    " : "rz-dropdown-items rz-dropdown-list    ")" role="listbox">
                     @if (View != null)
                     {
-                        @foreach (var item in View)
-                        {
-                            @if (Multiple)
-                            {
-                                <li class="@(isSelected(item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")" 
-                                    aria-label="@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)" style="display: block;white-space: nowrap;" @onclick:preventDefault @onclick="@(() => OnSelectItem(item))">
-                                    <div class="rz-chkbox ">
-                                        <div class="@(isSelected(item) ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
-                                            <span class="@(isSelected(item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
-                                        </div>
-                                    </div>
-                                    <span>
-                                        @if (Template != null)
-                                        {
-                                            @Template(item)
-                                        }
-                                        else
-                                        {
-                                            @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
-                                        }
-                                    </span>
-                                </li>
-                            }
-                            else
-                            {
-                                <li role="option" class="@(isSelected(item) ? "rz-dropdown-item  rz-state-highlight" : "rz-dropdown-item ")" aria-label=">@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)" @onclick:preventDefault @onclick="@(() => OnSelectItem(item))">
-                                    <span>
-                                        @if (Template != null)
-                                        {
-                                            @Template(item)
-                                        }
-                                        else
-                                        {
-                                            @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
-                                        }
-                                    </span>
-                                </li>
-                            }
-                        }
+                        @RenderItems()
                     }
                 </ul>
             </div>
@@ -161,6 +125,15 @@
     </div>
 }
 @code {
+    internal override void RenderItem(RenderTreeBuilder builder, object item)
+    {
+        builder.OpenComponent(0, typeof(RadzenDropDownItem<TValue>));
+        builder.AddAttribute(1, "DropDown", this);
+        builder.AddAttribute(2, "Item", item);
+        builder.SetKey(item);
+        builder.CloseComponent();
+    }
+
     [Parameter]
     public int MaxSelectedLabels { get; set; } = 4;
 
@@ -206,7 +179,7 @@
                 bool reload = false;
                 if (LoadData.HasDelegate && Data == null)
                 {
-                    await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { });
+                    await LoadData.InvokeAsync(await GetLoadDataArgs());
                     reload = true;
                 }
 
@@ -232,6 +205,11 @@
         }
 
         await SelectItem(item);
+    }
+
+    internal async System.Threading.Tasks.Task OnSelectItemInternal(object item, bool isFromKey = false)
+    {
+        await OnSelectItem(item, isFromKey);
     }
 
     protected override string GetComponentCssClass()
