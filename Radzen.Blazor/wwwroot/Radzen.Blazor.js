@@ -594,7 +594,7 @@ window.Radzen = {
     var popup = document.getElementById(id);
     if (!popup) return;
 
-    var parentRect = parent ? parent.getBoundingClientRect() : { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0 };
+    var parentRect = parent ? parent.getBoundingClientRect() : { top: y || 0, bottom: 0, left: x || 0, right: 0, width: 0, height: 0 };
 
     if (/Edge/.test(navigator.userAgent)) {
       var scrollLeft = document.body.scrollLeft;
