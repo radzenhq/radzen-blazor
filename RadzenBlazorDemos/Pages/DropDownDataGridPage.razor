@@ -92,7 +92,7 @@
             <div class="col-xl-6 mb-5">
                 <h3>Virtualization using LoadData event</h3>
                 <RadzenDropDownDataGrid TValue="string" LoadData="@LoadData" AllowFiltering="true" AllowClear="true" AllowVirtualization="true"
-                                        Data=@customCustomersData Count="@customCustomersDataVirtualizationCount" TextProperty="CompanyName" ValueProperty="CustomerID"
+                                        Data=@customCustomersDataVirtualization Count="@customCustomersDataVirtualizationCount" TextProperty="CompanyName" ValueProperty="CustomerID"
                                         Change=@(args => OnChange(args, "DropDownDataGrid with virtualization using LoadData event")) Style="width:100%" />
 
             </div>

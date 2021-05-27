@@ -95,7 +95,7 @@
                     @if (AllowVirtualization)
                     {
                         <RadzenDataGrid AllowVirtualization="true" ColumnWidth="@ColumnWidth" @ref="virtualGrid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
-                                    TItem="object" PageSize="@PageSize" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
+                                    TItem="object" PageSize="@PageSize" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" Style="height:285px">
                             <Columns>
                                 <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)">
                                     <Template>
@@ -123,8 +123,8 @@
                 {
                     @if (AllowVirtualization)
                     { 
-                        <RadzenDataGrid ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="virtualGrid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
-                                        TItem="object" PageSize="@PageSize" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
+                        <RadzenDataGrid AllowVirtualization="true" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="virtualGrid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
+                                        TItem="object" PageSize="@PageSize" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" Style="height:285px">
                             <Columns>
                                 @if (Columns != null)
                                 {
@@ -320,7 +320,7 @@
 
             count = query.Count();
 
-            pagedData = QueryableExtension.ToList(query.Skip(args.Skip.HasValue ? args.Skip.Value : 0).Take(PageSize)).Cast<object>();
+            pagedData = QueryableExtension.ToList(query.Skip(args.Skip.HasValue ? args.Skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize)).Cast<object>();
         }
         else
         {
@@ -502,21 +502,7 @@
 
     protected override async Task OnFilter(ChangeEventArgs args)
     {
-        searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
-        if (searchText != previousSearch)
-        {
-            previousSearch = searchText;
-            _view = null;
-            StateHasChanged();
-            if (IsVirtualizationAllowed())
-            {
-                virtualGrid.FirstPage(true).Wait();
-            }
-            else
-            {
-                grid.FirstPage(true).Wait();
-            }
-        }
+        await DebounceFilter();
     }
 
     [Parameter]
