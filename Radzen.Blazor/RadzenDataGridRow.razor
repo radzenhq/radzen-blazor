@@ -180,7 +180,7 @@
     {
         rowArgs = Grid.RowAttributes(Item);
 
-        if (Grid.AllowVirtualization && Item != null)
+        if (Grid.IsVirtualizationAllowed() && Item != null)
         {
             Index = Grid.GetItemIndex(Item);
         }
@@ -188,7 +188,7 @@
 
     public void Dispose()
     {
-        if (Grid.AllowVirtualization && Item != null)
+        if (Grid.IsVirtualizationAllowed() && Item != null)
         {
             Grid?.RemoveItem(Item);
         }
