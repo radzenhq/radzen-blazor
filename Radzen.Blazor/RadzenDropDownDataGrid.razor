@@ -97,11 +97,11 @@
                         <RadzenDataGrid AllowVirtualization="true" ColumnWidth="@ColumnWidth" @ref="virtualGrid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
                                     TItem="object" PageSize="@PageSize" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" Style="height:285px">
                             <Columns>
-                                <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)">
+                                <RadzenDataGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)">
                                     <Template>
                                         @Template(context)
                                     </Template>
-                                </RadzenGridColumn>
+                                </RadzenDataGridColumn>
                             </Columns>
                         </RadzenDataGrid>
                     }
@@ -128,7 +128,9 @@
                             <Columns>
                                 @if (Columns != null)
                                 {
+                                <CascadingValue Value=virtualGrid>
                                     @Columns
+                                </CascadingValue>
                                 }
                                 else
                                 {

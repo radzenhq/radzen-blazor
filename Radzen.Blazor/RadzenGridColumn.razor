@@ -182,6 +182,49 @@
     [Parameter]
     public RenderFragment<RadzenGridColumn<TItem>> FilterTemplate { get; set; }
 
+    RadzenDataGrid<TItem> _dataGrid;
+    [CascadingParameter]
+    public RadzenDataGrid<TItem> DataGrid
+    {
+        get
+        {
+            return _dataGrid;
+        }
+        set
+        {
+            if (_dataGrid != value)
+            {
+                _dataGrid = value;
+                _dataGrid.AddColumn(new RadzenDataGridColumn<TItem>()
+                { 
+                    Grid = value,
+                    CssClass = CssClass,
+                    EditTemplate = EditTemplate,
+                    Filterable = Filterable,
+                    FilterOperator = (FilterOperator)Enum.Parse(typeof(FilterOperator), QueryableExtension.FilterOperators[FilterOperator]),
+                    FilterProperty = FilterProperty,
+                    FilterValue = FilterValue,
+                    FooterCssClass = FooterCssClass,
+                    FooterTemplate = FooterTemplate,
+                    FormatString = FormatString,
+                    HeaderCssClass = HeaderCssClass,
+                    HeaderTemplate = HeaderTemplate,
+                    LogicalFilterOperator = LogicalFilterOperator,
+                    Property = Property,
+                    SecondFilterOperator = (FilterOperator)Enum.Parse(typeof(FilterOperator), QueryableExtension.FilterOperators[SecondFilterOperator]),
+                    SecondFilterValue = SecondFilterValue,
+                    Sortable = Sortable,
+                    SortProperty = SortProperty,
+                    Template = Template,
+                    TextAlign = TextAlign,
+                    Title = Title,
+                    Visible = Visible,
+                    Width = Width,
+                });
+            }
+        }
+    }
+
     RadzenGrid<TItem> _grid;
 
     [CascadingParameter]
