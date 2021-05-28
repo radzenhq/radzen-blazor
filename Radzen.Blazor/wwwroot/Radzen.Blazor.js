@@ -684,7 +684,7 @@ window.Radzen = {
       popup.style.left = parentRect.left + scrollLeft + 'px';
     }
 
-    popup.style.zIndex = 1000;
+    popup.style.zIndex = 2000;
 
     if (!popup.classList.contains('rz-overlaypanel')) {
         popup.classList.add('rz-popup');
