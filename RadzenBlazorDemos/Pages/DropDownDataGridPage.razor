@@ -96,7 +96,7 @@
             </div>
             <div class="col-xl-6 mb-5">
                 <h3>Virtualization using LoadData event</h3>
-                <RadzenDropDownDataGrid TValue="string" LoadData="@LoadData" AllowFiltering="true" AllowClear="true" AllowVirtualization="true"
+                <RadzenDropDownDataGrid TValue="string" LoadData="@LoadDataVirtualization" AllowFiltering="true" AllowClear="true" AllowVirtualization="true"
                                         Data=@customCustomersDataVirtualization Count="@customCustomersDataVirtualizationCount" TextProperty="CompanyName" ValueProperty="CustomerID"
                                         Change=@(args => OnChange(args, "DropDownDataGrid with virtualization using LoadData event")) Style="width:100%" />
 
@@ -176,7 +176,12 @@
             query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()));
         }
 
-        console.Log($"LoadData with virtualization: Skip:{args.Skip}, Top:{args.Top}, Filter:{args.Filter}");
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        console.Log($"LoadData with virtualization: Skip:{args.Skip}, Top:{args.Top}, OrderBy:{args.OrderBy}, Filter:{args.Filter}");
 
         customCustomersDataVirtualizationCount = query.Count();
 
