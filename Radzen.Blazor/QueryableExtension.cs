@@ -206,7 +206,11 @@ namespace Radzen
                 }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "eq")
                 {
-                    return $@"{property} == null ? """" : {property}{filterCaseSensitivityOperator} == {value}{filterCaseSensitivityOperator}";
+                    return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator} == ""{value}""{filterCaseSensitivityOperator}";
+                }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "ne")
+                {
+                    return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator} != ""{value}""{filterCaseSensitivityOperator}";
                 }
             }
             else if (columnType == "number" || columnType == "integer")
@@ -228,11 +232,6 @@ namespace Radzen
             if (property.IndexOf(".") != -1)
             {
                 property = $"({property})";
-            }
-
-            if (column.FilterPropertyType == typeof(string))
-            {
-                property = $@"({property} == null ? """" : {property})";
             }
 
             var columnFilterOperator = !second ? column.GetFilterOperator() : column.GetSecondFilterOperator();
@@ -264,7 +263,11 @@ namespace Radzen
                 }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.Equals)
                 {
-                    return $@"{property} == null ? """" : {property}{filterCaseSensitivityOperator} == {value}{filterCaseSensitivityOperator}";
+                    return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator} == ""{value}""{filterCaseSensitivityOperator}";
+                }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.NotEquals)
+                {
+                    return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator} != ""{value}""{filterCaseSensitivityOperator}";
                 }
             }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
@@ -345,7 +348,15 @@ namespace Radzen
                 }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "eq")
                 {
-                    return $"{property} eq {value}";
+                    return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
+                        $"{property} eq tolower('{value}')" :
+                        $"{property} eq '{value}'";
+                }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "ne")
+                {
+                    return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
+                        $"{property} ne tolower('{value}')" :
+                        $"{property} ne '{value}'";
                 }
             }
             else if (columnType == "number" || columnType == "integer")
@@ -396,7 +407,15 @@ namespace Radzen
                 }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.Equals)
                 {
-                    return $"{property} eq {value}";
+                    return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
+                        $"{property} eq tolower('{value}')" :
+                        $"{property} eq '{value}'";
+                }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.NotEquals)
+                {
+                    return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
+                        $"{property} ne tolower('{value}')" :
+                        $"{property} ne '{value}'";
                 }
             }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
