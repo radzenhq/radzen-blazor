@@ -780,7 +780,7 @@
 
     internal string GetOrderBy()
     {
-        return string.Join(",", columns.Where(c => c.GetSortOrder() != null).Select(c => c.GetSortOrderAsString(IsOData())));
+        return string.Join(",", sorts.Select(d => columns.Where(c => c.GetFilterProperty() == d.Property).FirstOrDefault()).Where(c => c != null).Select(c => c.GetSortOrderAsString(IsOData())));
     }
 
     [Parameter]
@@ -1279,6 +1279,7 @@
         return Data != null && typeof(ODataEnumerable<TItem>).IsAssignableFrom(Data.GetType());
     }
 
+    internal List<SortDescriptor> sorts = new List<SortDescriptor>();
     internal void SetColumnSortOrder(RadzenDataGridColumn<TItem> column)
     {
         if (!AllowMultiColumnSorting)
@@ -1287,19 +1288,38 @@
             {
                 c.SetSortOrder(null);
             }
+            sorts.Clear();
+        }
+
+        var descriptor = sorts.Where(d => d.Property == column?.GetSortProperty()).FirstOrDefault();
+        if (descriptor == null)
+        {
+            descriptor = new SortDescriptor() { Property = column.Property };
         }
 
         if (column.GetSortOrder() == null)
         {
             column.SetSortOrder(SortOrder.Ascending);
+            descriptor.SortOrder = SortOrder.Ascending;
         }
         else if (column.GetSortOrder() == SortOrder.Ascending)
         {
             column.SetSortOrder(SortOrder.Descending);
+            descriptor.SortOrder = SortOrder.Descending;
         }
         else if (column.GetSortOrder() == SortOrder.Descending)
         {
             column.SetSortOrder(null);
+            if (sorts.Where(d => d.Property == column?.GetSortProperty()).Any())
+            {
+                sorts.Remove(descriptor);
+            }
+            descriptor = null;
+        }
+
+        if (descriptor != null && !sorts.Where(d => d.Property == column?.GetSortProperty()).Any())
+        {
+            sorts.Add(descriptor);
         }
     }
 
