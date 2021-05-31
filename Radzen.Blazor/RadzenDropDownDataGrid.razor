@@ -92,8 +92,8 @@
                 }
                 @if (Template != null)
                 {
-                    <RadzenDataGrid AllowVirtualization="@AllowVirtualization" ColumnWidth="@ColumnWidth" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
-                                    TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="@(!AllowVirtualization)" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" Style="@(AllowVirtualization ? "height:285px" : "")">
+                    <RadzenDataGrid ColumnWidth="@ColumnWidth" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
+                                    TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="@(!IsVirtualizationAllowed())" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" Style="@(IsVirtualizationAllowed() ? "height:285px" : "")">
                         <Columns>
                             <RadzenDataGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)">
                                 <Template>
@@ -107,8 +107,8 @@
                 {
                     if (!string.IsNullOrEmpty(TextProperty) || Columns != null)
                     {
-                        <RadzenDataGrid AllowVirtualization="@AllowVirtualization" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
-                                        TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="@(!AllowVirtualization)" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" Style="@(AllowVirtualization ? "height:285px" : "")">
+                        <RadzenDataGrid ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
+                                        TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="@(!IsVirtualizationAllowed())" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" Style="@(IsVirtualizationAllowed() ? "height:285px" : "")">
                             <Columns>
                                 @if (Columns != null)
                                 {
@@ -123,8 +123,8 @@
                     }
                     else
                     {
-                        <RadzenDataGrid AllowVirtualization="@AllowVirtualization" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
-                                        TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="@(!AllowVirtualization)" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" Style="@(AllowVirtualization ? "height:285px" : "")">
+                        <RadzenDataGrid ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
+                                        TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="@(!IsVirtualizationAllowed())" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" Style="@(IsVirtualizationAllowed() ? "height:285px" : "")">
                             <Columns>
                                 <RadzenDataGridColumn TItem="object" Property="it" Title="Item" Type="typeof(string)">
                                     <Template>
@@ -176,6 +176,14 @@
     [Parameter]
     public int MaxSelectedLabels { get; set; } = 4;
 
+#if !NET5
+    [Parameter]
+    public int PageSize { get; set; } = 5;
+
+    [Parameter]
+    public int Count { get; set; }
+#endif
+
     [Parameter]
     public string SelectedItemsText { get; set; } = "items selected";
 
@@ -195,7 +203,12 @@
     protected override void OnDataChanged()
     {
         base.OnDataChanged();
-
+#if NET5
+        if (grid != null)
+        {
+            grid.AllowVirtualization = AllowVirtualization;
+        }
+#endif
         if (!LoadData.HasDelegate)
         {
             searchText = null;
