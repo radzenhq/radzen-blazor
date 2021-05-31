@@ -1,6 +1,7 @@
 @typeparam TItem
 @implements IRadzenForm
 @implements IDisposable
+@{var rowArgs = Grid?.RowAttributes(Item); }
 <tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
 
     @if (Grid.Template != null)
@@ -175,11 +176,8 @@
         return components.Where(component => component.Name == name).FirstOrDefault();
     }
 
-    Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> rowArgs;
     protected override void OnInitialized()
     {
-        rowArgs = Grid.RowAttributes(Item);
-
         if (Grid.IsVirtualizationAllowed() && Item != null)
         {
             Index = Grid.GetItemIndex(Item);
