@@ -1,5 +1,3 @@
-@implements IDisposable
-
 <div class="rz-dialog-wrapper">
     <div class="rz-dialog" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
@@ -31,11 +29,6 @@
 @code {
     [Parameter]
     public Dialog Dialog { get; set; }
-
-    public void Dispose()
-    {
-        Service.DidCloseDialog();
-    }
 
     RenderFragment ChildContent => new RenderFragment(builder =>
         {
