@@ -1107,6 +1107,16 @@
 
     public async System.Threading.Tasks.Task EditRow(TItem item)
     {
+        if(itemToInsert != null)
+        {
+            CancelEditRow(itemToInsert);
+        }
+
+        await EditRowInternal(item);
+    }
+
+    async System.Threading.Tasks.Task EditRowInternal(TItem item)
+    {
         if (EditMode == DataGridEditMode.Single && editedItems.Keys.Any())
         {
             var itemToCancel = editedItems.Keys.FirstOrDefault();
@@ -1194,7 +1204,7 @@
         list.Insert(0, item);
         this._view = list.AsQueryable();
         this.Count = this._view.Count();
-        await EditRow(item);
+        await EditRowInternal(item);
     }
 
     protected void OnSort(EventArgs args, RadzenGridColumn<TItem> column)
