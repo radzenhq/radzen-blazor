@@ -97,6 +97,18 @@ namespace Radzen
 
         }
 
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            bool pageSizeChanged = parameters.DidParameterChange(nameof(PageSize), PageSize);
+
+            await base.SetParametersAsync(parameters);
+
+            if (pageSizeChanged && !firstRender)
+            {
+               await InvokeAsync(Reload);
+            }
+        }
+
         protected override Task OnParametersSetAsync()
         {
             if (Visible && !LoadData.HasDelegate)
@@ -111,8 +123,10 @@ namespace Radzen
             return base.OnParametersSetAsync();
         }
 
+        bool firstRender = true;
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
+            this.firstRender = firstRender;
             if (firstRender && Visible && (LoadData.HasDelegate && Data == null))
             {
                 InvokeAsync(Reload);
