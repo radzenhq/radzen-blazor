@@ -28,7 +28,7 @@
     public IDictionary<string, object> Attributes { get; set; }
     IList<Message> messages = new List<Message>();
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
         {
@@ -45,13 +45,13 @@
     {
         messages.Clear();
 
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     public void Log(string message)
     {
         messages.Add(new Message { Date = DateTime.Now, Text = message });
 
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 }

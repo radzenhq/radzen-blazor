@@ -319,7 +319,7 @@
 
 @code {
 #if NET5
-    Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> virtualize;
+    internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> virtualize;
 
     private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
     {

@@ -17,7 +17,7 @@
             <div class="col-xl-6 mb-5">
                 <h3>ListBox with template</h3>
                 <RadzenListBox @bind-Value=@value Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                    Change=@(args => OnChange(args, "ListBox with template")) Style="height:200px">
+                               Change=@(args => OnChange(args, "ListBox with template")) Style="height:200px">
                     <Template>
                         Company: @((context as Customer).CompanyName)
                     </Template>
@@ -27,25 +27,37 @@
         <div class="row">
             <div class="col-xl-6 mb-5">
                 <h3>ListBox with multiple selection</h3>
-                <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value=@multipleValues Multiple="true" Data=@customers 
-                    TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "ListBox with multiple selection")) Style="height:200px" />
+                <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value=@multipleValues Multiple="true" Data=@customers
+                               TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "ListBox with multiple selection")) Style="height:200px" />
             </div>
             <div class="col-xl-6 mb-5">
                 <h3>ListBox with filtering</h3>
                 <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value=@value Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                    Change=@(args => OnChange(args, "ListBox with filtering")) Style="height:200px" />
+                               Change=@(args => OnChange(args, "ListBox with filtering")) Style="height:200px" />
             </div>
         </div>
         <div class="row">
             <div class="col-xl-6 mb-5">
                 <h3>ListBox with custom filter operator</h3>
                 <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" @bind-Value=@value
-                    Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "ListBox with custom filter operator")) Style="height:200px" />
+                               Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "ListBox with custom filter operator")) Style="height:200px" />
             </div>
             <div class="col-xl-6 mb-5">
                 <h3>ListBox with custom filtering</h3>
-                <RadzenListBox AllowFiltering="true" LoadData=@OnLoadData  @bind-Value=@value Data=@customCustomersData TextProperty="CompanyName" ValueProperty="CustomerID"
-                    Change=@(args => OnChange(args, "ListBox with custom filtering")) Style="height:200px" />
+                <RadzenListBox AllowFiltering="true" LoadData=@OnLoadData @bind-Value=@value Data=@customCustomersData TextProperty="CompanyName" ValueProperty="CustomerID"
+                               Change=@(args => OnChange(args, "ListBox with custom filtering")) Style="height:200px" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-6 mb-5">
+                <h3>ListBox with virtualization using IQueryable</h3>
+                <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" @bind-Value=@value
+                               Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "ListBox with custom filter operator")) Style="height:200px" />
+            </div>
+            <div class="col-xl-6 mb-5">
+                <h3>ListBox with virtualization using LoadData event</h3>
+                <RadzenListBox AllowVirtualization="true" AllowFiltering="true" Count="@count" LoadData=@LoadDataVirtualization @bind-Value=@value Data=@customCustomersDataVirtualization TextProperty="CompanyName" ValueProperty="CustomerID"
+                               Change=@(args => OnChange(args, "ListBox with custom filtering")) Style="height:200px" />
             </div>
         </div>
     </div>
@@ -88,6 +100,26 @@
         console.Log($"LoadData with filter: {args.Filter}");
 
         customCustomersData = query.ToList();
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    IEnumerable<Customer> customCustomersDataVirtualization;
+    int count;
+    void LoadDataVirtualization(LoadDataArgs args)
+    {
+        var query = dbContext.Customers.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()));
+        }
+
+        console.Log($"LoadData with virtualization: Skip:{args.Skip}, Top:{args.Top}, Filter:{args.Filter}");
+
+        count = query.Count();
+
+        customCustomersDataVirtualization = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
 
         InvokeAsync(StateHasChanged);
     }

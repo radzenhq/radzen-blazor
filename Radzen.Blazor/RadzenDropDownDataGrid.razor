@@ -74,7 +74,7 @@
         <div class="rz-dropdown-trigger  rz-corner-right" onclick="@OpenPopupScript()">
             <span class="rz-dropdown-trigger-icon  rzi rzi-chevron-down"></span>
         </div>
-        <div id="@PopupID" class="@(Multiple ? "rz-multiselect-panel    " : "rz-dropdown-panel    ")"
+        <div id="@PopupID" class="@(Multiple ? "rz-multiselect-panel" : "rz-dropdown-panel")"
              style="display:none;min-width:320px;padding:0px;">
             <div class="rz-lookup-panel">
                 @if (AllowFiltering)
@@ -92,33 +92,48 @@
                 }
                 @if (Template != null)
                 {
-                    <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
-                                TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
+                    <RadzenDataGrid ColumnWidth="@ColumnWidth" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
+                                    TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="@(!IsVirtualizationAllowed())" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" Style="@(IsVirtualizationAllowed() ? "height:285px" : "")">
                         <Columns>
-                            <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="string">
+                            <RadzenDataGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)">
                                 <Template>
                                     @Template(context)
                                 </Template>
-                            </RadzenGridColumn>
+                            </RadzenDataGridColumn>
                         </Columns>
-                    </RadzenGrid>
+                    </RadzenDataGrid>
                 }
                 else
                 {
-                    <RadzenGrid Responsive="@Responsive" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
-                                TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="true" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect">
-                        <Columns>
-                            @if (Columns != null)
-                            {
-                                @Columns
-                            }
-                            else
-                            {
-                                <RadzenGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="string">
-                                </RadzenGridColumn>
-                            }
-                        </Columns>
-                    </RadzenGrid>
+                    if (!string.IsNullOrEmpty(TextProperty) || Columns != null)
+                    {
+                        <RadzenDataGrid ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
+                                        TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="@(!IsVirtualizationAllowed())" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" Style="@(IsVirtualizationAllowed() ? "height:285px" : "")">
+                            <Columns>
+                                @if (Columns != null)
+                                {
+                                    @Columns
+                                }
+                                else
+                                {
+                                    <RadzenDataGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)" />
+                                }
+                            </Columns>
+                        </RadzenDataGrid>
+                    }
+                    else
+                    {
+                        <RadzenDataGrid ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(LoadData.HasDelegate ? (Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()) : pagedData)" Count="@(LoadData.HasDelegate ? Count : count)" LoadData="@OnLoadData"
+                                        TItem="object" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" AllowPaging="@(!IsVirtualizationAllowed())" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" Style="@(IsVirtualizationAllowed() ? "height:285px" : "")">
+                            <Columns>
+                                <RadzenDataGridColumn TItem="object" Property="it" Title="Item" Type="typeof(string)">
+                                    <Template>
+                                        @context
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    }
                 }
             </div>
         </div>
@@ -151,18 +166,23 @@
     public object SelectedValue { get; set; }
 
     [Parameter]
-    public int Count { get; set; }
-
-    [Parameter]
     public RenderFragment Columns { get; set; }
 
-    RadzenGrid<object> grid;
+    RadzenDataGrid<object> grid;
 
     IEnumerable<object> pagedData;
     int count;
 
     [Parameter]
     public int MaxSelectedLabels { get; set; } = 4;
+
+#if !NET5
+    [Parameter]
+    public int PageSize { get; set; } = 5;
+
+    [Parameter]
+    public int Count { get; set; }
+#endif
 
     [Parameter]
     public string SelectedItemsText { get; set; } = "items selected";
@@ -171,9 +191,19 @@
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && Visible && (LoadData.HasDelegate && Data == null))
+        if (firstRender)
         {
-            LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
+#if NET5
+            if (grid != null)
+            {
+                grid.AllowVirtualization = AllowVirtualization;
+            }
+#endif            
+            if(Visible && LoadData.HasDelegate && Data == null)
+            {
+                LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
+            }
+
             StateHasChanged();
         }
 
@@ -199,11 +229,15 @@
 
     private string GetPropertyFilterExpression(string property, string filterCaseSensitivityOperator)
     {
+        if (property == null)
+        {
+            property = "it";
+        }
         var p = $@"({property} == null ? """" : {property})";
         return $"{p}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)";
     }
 
-    private bool IsColumnFilterPropertyTypeString(RadzenGridColumn<object> column)
+    private bool IsColumnFilterPropertyTypeString(RadzenDataGridColumn<object> column)
     {
         var property = column.GetFilterProperty();
         var itemType = Data != null ? Data.AsQueryable().ElementType : typeof(object);
@@ -247,7 +281,7 @@
 
             count = query.Count();
 
-            pagedData = QueryableExtension.ToList(query.Skip(args.Skip.HasValue ? args.Skip.Value : 0).Take(PageSize)).Cast<object>();
+            pagedData = QueryableExtension.ToList(query.Skip(args.Skip.HasValue ? args.Skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize)).Cast<object>();
         }
         else
         {
@@ -363,7 +397,7 @@
 
                 if (item != null && (!Multiple ? selectedItem != item : true))
                 {
-                    await grid.OnRowSelect(item, false);
+                    grid.OnRowSelect(item, false);
                 }
             }
             catch (Exception)
@@ -400,22 +434,34 @@
 
             await InvokeAsync(() =>
             {
-                StateHasChanged();
-                grid.FirstPage(true).Wait();
+#if NET5
+                if (grid?.virtualize != null)
+                {
+                    if(string.IsNullOrEmpty(searchText))
+                    {
+                        if(LoadData.HasDelegate)
+                        {
+                            Data = null;
+                        }
+                        else
+                        {
+                            pagedData = null;
+                            StateHasChanged();
+                        }
+                    }
+                    grid.virtualize.RefreshDataAsync().Wait();
+                }
+#endif 
+                 StateHasChanged();
+                 grid.FirstPage(true).Wait();
+
             });
         }
     }
 
     protected override async Task OnFilter(ChangeEventArgs args)
     {
-        searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
-        if (searchText != previousSearch)
-        {
-            previousSearch = searchText;
-            _view = null;
-            StateHasChanged();
-            await grid.FirstPage(true);
-        }
+        await DebounceFilter();
     }
 
     [Parameter]
@@ -426,10 +472,6 @@
 
     [Parameter]
     public bool AllowFilteringByAllStringColumns { get; set; }
-
-    [Parameter]
-    public int PageSize { get; set; } = 5;
-
 
     async Task OnRowSelect(object item)
     {
