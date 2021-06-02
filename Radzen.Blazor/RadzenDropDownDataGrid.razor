@@ -437,7 +437,19 @@
 #if NET5
                 if (grid?.virtualize != null)
                 {
-                    grid.virtualize.RefreshDataAsync();
+                    if(string.IsNullOrEmpty(searchText))
+                    {
+                        if(LoadData.HasDelegate)
+                        {
+                            Data = null;
+                        }
+                        else
+                        {
+                            pagedData = null;
+                            StateHasChanged();
+                        }
+                    }
+                    grid.virtualize.RefreshDataAsync().Wait();
                 }
 #endif 
                  StateHasChanged();
