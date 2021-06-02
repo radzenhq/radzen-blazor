@@ -92,87 +92,129 @@
             @if (ShowTime)
             {
         <div class="rz-timepicker">
-            <RadzenNumeric Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)" TValue="double" Step="@HoursStep"
+            <RadzenNumeric Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)" Min="@(HourFormat == "12" ? 1 : -1)" Max="@(HourFormat == "12" ? 12 : 24)" TValue="double" Step="@HoursStep"
                            Change="@(async v => {
-                                         var step = getStep(StepType.Hours);
-                                         var currentHour = HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour;
-                                         if (v == currentHour - step || v == currentHour + step)
-                                         {
-                                             if (v > currentHour)
-                                             {
-                                                 Value = CurrentDate.AddHours(step);
-                                             }
-                                             else
-                                             {
-                                                 Value = CurrentDate.AddHours(-step);
-                                             }
-                                         }
-                                         else 
-                                         { 
-                                            Value = CurrentDate.AddHours(v - currentHour);
-                                         }
+                                         var newHour = HourFormat == "12" && CurrentDate.Hour > 12 ? (int)v + 12 : (int)v;
 
-                                         await OnChange();
+                                         var newValue = new DateTime(
+                                            CurrentDate.Year, 
+                                            CurrentDate.Month, 
+                                            CurrentDate.Day, 
+                                            newHour > 23 || newHour < 0 ? 0 : newHour, 
+                                            CurrentDate.Minute, 
+                                            CurrentDate.Second);
+
+                                          if(!object.Equals(newValue, Value))
+                                          {
+                                              Value = newValue;
+                                              await OnChange();
+                                          }
                                      } )" class="rz-hour-picker" />
             <div class="rz-separator">
                 <span>:</span>
             </div>
-            <RadzenNumeric Disabled="@Disabled" Value="CurrentDate.Minute" TValue="double" Step="@MinutesStep"
+            <RadzenNumeric Disabled="@Disabled" Value="CurrentDate.Minute" TValue="double" Step="@MinutesStep" Min="0" Max="59"
                            Change="@(async v => {
-                                                 var step = getStep(StepType.Minutes);
-                                                 if (v == CurrentDate.Minute - step || v == CurrentDate.Minute + step)
-                                                 {
-                                                     if (v > CurrentDate.Minute)
-                                                     {
-                                                         Value = CurrentDate.AddMinutes(step);
-                                                     }
-                                                     else
-                                                     {
-                                                         Value = CurrentDate.AddMinutes(-step);
-                                                     }
-                                                 }
-                                                 else 
-                                                 { 
-                                                    Value = CurrentDate.AddMinutes(v - CurrentDate.Minute);
-                                                 }
+                                                var newValue = new DateTime(
+                                                    CurrentDate.Year, 
+                                                    CurrentDate.Month, 
+                                                    CurrentDate.Day, 
+                                                    CurrentDate.Hour, 
+                                                    (int)v, 
+                                                    CurrentDate.Second);
 
-                                                 await OnChange();
+                                                if(!object.Equals(newValue, Value))
+                                                {
+                                                   Value = newValue;
+                                                   await OnChange();
+                                                }
                                              } )" class="rz-minute-picker" />
             @if (ShowSeconds)
             {
                 <div class="rz-separator">
                     <span>:</span>
                 </div>
-                <RadzenNumeric Disabled="@Disabled" Value="CurrentDate.Second" TValue="double" Step="@SecondsStep"
+                <RadzenNumeric Disabled="@Disabled" Value="CurrentDate.Second" TValue="double" Step="@SecondsStep" Min="0" Max="59"
                                Change="@(async v => {
-                                                 var step = getStep(StepType.Seconds);
-                                                 if (v == CurrentDate.Second - step || v == CurrentDate.Second + step)
-                                                 {
-                                                     if (v > CurrentDate.Second)
-                                                     {
-                                                         Value = CurrentDate.AddSeconds(step);
-                                                     }
-                                                     else
-                                                     {
-                                                         Value = CurrentDate.AddSeconds(-step);
-                                                     }
-                                                 }
-                                                 else 
-                                                 { 
-                                                    Value = CurrentDate.AddSeconds(v - CurrentDate.Second);
-                                                 }
+                                                 var newValue = new DateTime(
+                                                    CurrentDate.Year, 
+                                                    CurrentDate.Month, 
+                                                    CurrentDate.Day, 
+                                                    CurrentDate.Hour, 
+                                                    CurrentDate.Minute, 
+                                                    (int)v);
 
-                                                 await OnChange();
+                                                 if(!object.Equals(newValue, Value))
+                                                 {
+                                                   Value = newValue;
+                                                   await OnChange();
+                                                 }
                                              } )" class="rz-second-picker" />
             }
             @if (HourFormat == "12")
             {
                 <div class="rz-ampm-picker">
-                    <a href="javascript:void(0)" @onclick="@(async() => { if (amPm == "am" && !Disabled) { Value = CurrentDate.AddDays(1).AddHours(-12); amPm = "pm"; await OnChange(); } })">
+                    <a href="javascript:void(0)" @onclick="@(async() => { 
+                        if (amPm == "am" && !Disabled) 
+                        { 
+                            amPm = "pm"; 
+                            
+                            var currentHour = ((CurrentDate.Hour + 11) % 12) + 1;
+
+                            var newHour = currentHour - 12;
+
+                            if(newHour < 1)
+                            {
+                                newHour = currentHour;
+                            }
+
+                            var newValue = new DateTime(
+                                CurrentDate.Year, 
+                                CurrentDate.Month, 
+                                CurrentDate.Day, 
+                                newHour, 
+                                CurrentDate.Minute, 
+                                CurrentDate.Second);
+
+                            if(!object.Equals(newValue, Value))
+                            {
+                                Value = newValue;
+                                await OnChange();
+                            } 
+                        } 
+                    })">
                         <span class="rzi rzi-chevron-up"></span>
                     </a>
                     <span>@CurrentDate.ToString("tt")</span>
-                    <a href="javascript:void(0)" @onclick="@(async() => { if (amPm == "pm" && !Disabled) { Value = CurrentDate.AddDays(-1).AddHours(12); amPm = "am"; await OnChange(); } })">
+                    <a href="javascript:void(0)" @onclick="@(async() => { 
+                        if (amPm == "pm" && !Disabled) 
+                        { 
+                            amPm = "am"; 
+
+                            var currentHour = ((CurrentDate.Hour + 11) % 12) + 1;
+
+                            var newHour = currentHour + 12;
+
+                            if(newHour > 23)
+                            {
+                                newHour = 0;
+                            }
+
+                            var newValue = new DateTime(
+                                CurrentDate.Year, 
+                                CurrentDate.Month, 
+                                CurrentDate.Day, 
+                                newHour, 
+                                CurrentDate.Minute, 
+                                CurrentDate.Second);
+
+                            if(!object.Equals(newValue, Value))
+                            {
+                                Value = newValue;
+                                await OnChange();
+                            } 
+                        } 
+                    })">
                         <span class="rzi rzi-chevron-down"></span>
                     </a>
                 </div>
