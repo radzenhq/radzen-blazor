@@ -361,9 +361,18 @@ namespace Radzen
             {
                 if (IsVirtualizationAllowed())
                 {
-                    Data = null;
+#if NET5
+                    if (virtualize != null)
+                    {
+                        await InvokeAsync(virtualize.RefreshDataAsync);
+                    }
+                    await InvokeAsync(() => { StateHasChanged(); });
+#endif 
                 }
-                await LoadData.InvokeAsync(await GetLoadDataArgs());
+                else
+                {
+                    await LoadData.InvokeAsync(await GetLoadDataArgs());
+                }   
             }
         }
 
