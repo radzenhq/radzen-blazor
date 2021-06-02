@@ -95,9 +95,10 @@
             <RadzenNumeric Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)" TValue="double" Step="@HoursStep"
                            Change="@(async v => {
                                          var step = getStep(StepType.Hours);
-                                         if (v == CurrentDate.Hour - step || v == CurrentDate.Hour + step)
+                                         var currentHour = HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour;
+                                         if (v == currentHour - step || v == currentHour + step)
                                          {
-                                             if (v > CurrentDate.Hour)
+                                             if (v > currentHour)
                                              {
                                                  Value = CurrentDate.AddHours(step);
                                              }
@@ -108,7 +109,7 @@
                                          }
                                          else 
                                          { 
-                                            Value = CurrentDate.AddHours(v - CurrentDate.Hour);
+                                            Value = CurrentDate.AddHours(v - currentHour);
                                          }
 
                                          await OnChange();
