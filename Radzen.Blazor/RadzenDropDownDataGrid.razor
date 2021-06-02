@@ -74,7 +74,7 @@
         <div class="rz-dropdown-trigger  rz-corner-right" onclick="@OpenPopupScript()">
             <span class="rz-dropdown-trigger-icon  rzi rzi-chevron-down"></span>
         </div>
-        <div id="@PopupID" class="@(Multiple ? "rz-multiselect-panel    " : "rz-dropdown-panel    ")"
+        <div id="@PopupID" class="@(Multiple ? "rz-multiselect-panel" : "rz-dropdown-panel")"
              style="display:none;min-width:320px;padding:0px;">
             <div class="rz-lookup-panel">
                 @if (AllowFiltering)
@@ -191,9 +191,19 @@
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && Visible && (LoadData.HasDelegate && Data == null))
+        if (firstRender)
         {
-            LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
+#if NET5
+            if (grid != null)
+            {
+                grid.AllowVirtualization = AllowVirtualization;
+            }
+#endif            
+            if(Visible && LoadData.HasDelegate && Data == null)
+            {
+                LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
+            }
+
             StateHasChanged();
         }
 
@@ -203,12 +213,7 @@
     protected override void OnDataChanged()
     {
         base.OnDataChanged();
-#if NET5
-        if (grid != null)
-        {
-            grid.AllowVirtualization = AllowVirtualization;
-        }
-#endif
+
         if (!LoadData.HasDelegate)
         {
             searchText = null;
@@ -429,15 +434,15 @@
 
             await InvokeAsync(() =>
             {
-                StateHasChanged();
-                if (IsVirtualizationAllowed())
+#if NET5
+                if (grid?.virtualize != null)
                 {
-                    OnLoadData(new LoadDataArgs() { Skip = 0, Top = PageSize }).Wait();
+                    grid.virtualize.RefreshDataAsync();
                 }
-                else
-                {
-                    grid.FirstPage(true).Wait();
-                }
+#endif 
+                 StateHasChanged();
+                 grid.FirstPage(true).Wait();
+
             });
         }
     }
