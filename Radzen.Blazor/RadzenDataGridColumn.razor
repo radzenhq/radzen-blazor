@@ -160,7 +160,7 @@
             style.Add($"left:{left}px");
         }
 
-        if (isHeaderOrFooterCell && !Frozen && Grid.ColumnsCollection.Where(c => c.Visible && c.Frozen).Any())
+        if ((isHeaderOrFooterCell && !Frozen || !isHeaderOrFooterCell && Frozen) && Grid.ColumnsCollection.Where(c => c.Visible && c.Frozen).Any())
         {
             style.Add("z-index:0");
         }
