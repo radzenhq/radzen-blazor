@@ -489,7 +489,50 @@ namespace Radzen
         {
             get
             {
-                return (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (View != null ? View : Enumerable.Empty<object>())).OfType<object>();
+                return (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (View != null ? View : Enumerable.Empty<object>())).Cast<object>();
+            }
+        }
+
+        protected override IEnumerable View
+        {
+            get
+            {
+                if (_view == null && Query != null)
+                {
+                    if (!string.IsNullOrEmpty(searchText))
+                    {
+                        var ignoreCase = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive;
+
+                        var query = new List<string>();
+
+                        if (!string.IsNullOrEmpty(TextProperty))
+                        {
+                            query.Add(TextProperty);
+                        }
+
+                        if (ignoreCase)
+                        {
+                            query.Add("ToLower()");
+                        }
+
+                        query.Add($"{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)");
+
+                        _view = Query.Where(String.Join(".", query), ignoreCase ? searchText.ToLower() : searchText);
+                    }
+                    else
+                    {
+                        if (IsVirtualizationAllowed())
+                        {
+                            _view = Query;
+                        }
+                        else
+                        {
+                            _view = (typeof(IQueryable).IsAssignableFrom(Data.GetType())) ? Query.Cast<object>().ToList().AsQueryable() : Query;
+                        }
+                    }
+                }
+
+                return _view;
             }
         }
 
@@ -497,10 +540,13 @@ namespace Radzen
         {
             if (selectedItem != null)
             {
-                var result = Items.Select((x, i) => new { Item = x, Index = i }).FirstOrDefault(itemWithIndex => object.Equals(itemWithIndex.Item, selectedItem));
-                if (result != null)
+                if (typeof(EnumerableQuery).IsAssignableFrom(View.GetType()))
                 {
-                    selectedIndex = result.Index;
+                    var result = Items.Select((x, i) => new { Item = x, Index = i }).FirstOrDefault(itemWithIndex => object.Equals(itemWithIndex.Item, selectedItem));
+                    if (result != null)
+                    {
+                        selectedIndex = result.Index;
+                    }
                 }
             }
             else
