@@ -9,7 +9,7 @@
             @Tabs
         </ul>
         <div class="rz-tabview-panels">
-            @if(RenderMode == RenderMode.Client)
+            @if(RenderMode == TabRenderMode.Client)
             {
                 for (var i = 0; i < tabs.Count; i++)
                 {
@@ -34,7 +34,7 @@
 
 @code {
     [Parameter]
-    public RenderMode RenderMode { get; set; } = RenderMode.Server;
+    public TabRenderMode RenderMode { get; set; } = TabRenderMode.Server;
 
     [Parameter]
     public int SelectedIndex { get; set; } = -1;

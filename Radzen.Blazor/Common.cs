@@ -173,7 +173,7 @@ namespace Radzen
         }
     }
 
-    public enum RenderMode
+    public enum TabRenderMode
     {
         Server,
         Client
