@@ -40,10 +40,20 @@
         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", GetId(), Reference, nameof(OnClose));
     }
 
+    private bool firstRender = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        this.firstRender = firstRender;
+    }
+
     public override void Dispose()
     {
         base.Dispose();
 
-        JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", GetId());
+        if (!firstRender)
+        {
+            JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", GetId());
+        }
     }
 }
