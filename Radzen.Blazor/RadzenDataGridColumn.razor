@@ -194,6 +194,12 @@
         sortOrder = new SortOrder?[] { order };
     }
 
+    internal void ResetSortOrder()
+    {
+        sortOrder = Enumerable.Empty<SortOrder?>();
+        SortOrder = null;
+    }
+
     public string GetFilterProperty()
     {
         if (!string.IsNullOrEmpty(FilterProperty))

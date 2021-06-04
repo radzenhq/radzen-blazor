@@ -10,7 +10,8 @@
 <p>The <code>LoadData</code> event allows you to perform custom paging, sorting and filtering.</p>
 
 <RadzenExample Name="DataGridLoadData" Heading="false" Documentation="false">
-    <RadzenDataGrid Count="@count" Data="@employees" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
+    <RadzenButton Text="Reset" Click="@Reset" Style="margin-bottom: 20px;" />
+    <RadzenDataGrid @ref="grid" Count="@count" Data="@employees" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
@@ -70,8 +71,15 @@ void LoadData(LoadDataArgs args)
     </li>
 </ol>
 @code {
+    RadzenDataGrid<Employee> grid;
     int count;
     IEnumerable<Employee> employees;
+
+    async Task Reset()
+    {
+        grid.Reset(true); 
+        await grid.FirstPage(true);
+    }
 
     void LoadData(LoadDataArgs args)
     {

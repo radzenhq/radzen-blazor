@@ -446,6 +446,13 @@
         if (!columns.Contains(column))
         {
             columns.Add(column);
+
+            var descriptor = sorts.Where(d => d.Property == column?.GetSortProperty()).FirstOrDefault();
+            if (descriptor == null && column.SortOrder.HasValue)
+            {
+                descriptor = new SortDescriptor() { Property = column.Property, SortOrder = column.SortOrder.Value };
+                sorts.Add(descriptor);
+            }                
         }
     }
 
@@ -780,7 +787,7 @@
 
     internal string GetOrderBy()
     {
-        return string.Join(",", sorts.Select(d => columns.Where(c => c.GetFilterProperty() == d.Property).FirstOrDefault()).Where(c => c != null).Select(c => c.GetSortOrderAsString(IsOData())));
+        return string.Join(",", sorts.Select(d => columns.Where(c => c.GetSortProperty() == d.Property).FirstOrDefault()).Where(c => c != null).Select(c => c.GetSortOrderAsString(IsOData())));
     }
 
     [Parameter]
@@ -883,7 +890,7 @@
         Reset(!IsOData() && !LoadData.HasDelegate);
     }
 
-    public void Reset(bool resetColumnFilters = true, bool resetRowState = false)
+    public void Reset(bool resetColumnState = true, bool resetRowState = false)
     {
         _view = null;
         _value = new List<TItem>();
@@ -894,10 +901,12 @@
             expandedItems.Clear();
         }
 
-        if (resetColumnFilters)
+        if (resetColumnState)
         {
             columns.ForEach(c => { c.SetFilterValue(null); c.SetSecondFilterOperator(FilterOperator.Equals); });
-        }
+            columns.ForEach(c => { c.ResetSortOrder(); });
+            sorts.Clear();
+       }
     }
 
     public async override Task Reload()
