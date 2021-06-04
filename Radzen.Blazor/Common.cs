@@ -173,6 +173,12 @@ namespace Radzen
         }
     }
 
+    public enum RenderMode
+    {
+        Server,
+        Client
+    }
+
     public enum PagerPosition
     {
         Top,
