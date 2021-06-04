@@ -1411,9 +1411,12 @@
 
         disposed = true;
 
-        foreach (var column in columns.Where(c => c.Visible))
+        if (IsJSRuntimeAvailable)
         {
-            JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", $"{PopupID}{column.GetFilterProperty()}");
+            foreach (var column in columns.Where(c => c.Visible))
+            {
+                JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", $"{PopupID}{column.GetFilterProperty()}");
+            }
         }
     }
 }

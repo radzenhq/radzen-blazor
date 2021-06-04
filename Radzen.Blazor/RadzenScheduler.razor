@@ -307,6 +307,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await base.OnAfterRenderAsync(firstRender);
+
         if (firstRender)
         {
             var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createScheduler", Element, Reference);
@@ -339,7 +341,11 @@
     public override void Dispose()
     {
         base.Dispose();
-        JSRuntime.InvokeVoidAsync("Radzen.destroyScheduler", Element);
+
+        if (IsJSRuntimeAvailable)
+        {
+            JSRuntime.InvokeVoidAsync("Radzen.destroyScheduler", Element);
+        }
     }
 
     private bool heightIsSet = false;

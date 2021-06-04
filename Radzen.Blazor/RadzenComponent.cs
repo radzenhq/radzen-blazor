@@ -79,6 +79,8 @@ namespace Radzen
 
         [Inject]
         protected IJSRuntime JSRuntime { get; set; }
+        
+        protected bool IsJSRuntimeAvailable { get; set; }
 
         protected override void OnInitialized()
         {
@@ -120,6 +122,8 @@ namespace Radzen
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            IsJSRuntimeAvailable = true;
+
             this.firstRender = firstRender;
 
             if (firstRender || visibleChanged)
@@ -178,19 +182,22 @@ namespace Radzen
             reference?.Dispose();
             reference = null;
 
-            if (ContextMenu.HasDelegate)
+            if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.removeContextMenu", UniqueID);
-            }
+                if (ContextMenu.HasDelegate)
+                {
+                    JSRuntime.InvokeVoidAsync("Radzen.removeContextMenu", UniqueID);
+                }
 
-            if (MouseEnter.HasDelegate)
-            {
-                JSRuntime.InvokeVoidAsync("Radzen.removeMouseEnter", UniqueID);
-            }
+                if (MouseEnter.HasDelegate)
+                {
+                    JSRuntime.InvokeVoidAsync("Radzen.removeMouseEnter", UniqueID);
+                }
 
-            if (MouseLeave.HasDelegate)
-            {
-                JSRuntime.InvokeVoidAsync("Radzen.removeMouseLeave", UniqueID);
+                if (MouseLeave.HasDelegate)
+                {
+                    JSRuntime.InvokeVoidAsync("Radzen.removeMouseLeave", UniqueID);
+                }
             }
         }
 

@@ -40,13 +40,14 @@
         await InvokeAsync(() => { StateHasChanged(); });
     }
 
-    bool firstRender = true;
+    bool IsJSRuntimeAvailable { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        this.firstRender = firstRender;
+        IsJSRuntimeAvailable = true;
 
         var tooltip = tooltips.LastOrDefault();
+
         if (tooltip != null)
         {
             await JSRuntime.InvokeVoidAsync("Radzen.openTooltip",
@@ -71,7 +72,7 @@
 
     public void Dispose()
     {
-        if (!firstRender)
+        if (!IsJSRuntimeAvailable)
         {
             JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
         }

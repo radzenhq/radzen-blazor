@@ -138,6 +138,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await base.OnAfterRenderAsync(firstRender);
+
         this.firstRender = firstRender;
 
         if (firstRender || visibleChanged)
@@ -214,7 +216,7 @@
     {
         base.Dispose();
 
-        if (Visible)
+        if (Visible && IsJSRuntimeAvailable)
         {
             JSRuntime.InvokeVoidAsync("Radzen.destroyEditor", ContentEditable);
         }

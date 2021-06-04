@@ -75,6 +75,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await base.OnAfterRenderAsync(firstRender);
+
         var data = Data != null ? Data : markers;
 
         if (firstRender)
@@ -93,6 +95,9 @@
     {
         base.Dispose();
 
-        JSRuntime.InvokeVoidAsync("Radzen.destroyMap",  UniqueID);
+        if (IsJSRuntimeAvailable)
+        {
+            JSRuntime.InvokeVoidAsync("Radzen.destroyMap",  UniqueID);
+        }
     }
 }

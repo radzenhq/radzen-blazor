@@ -99,7 +99,11 @@
     public override void Dispose()
     {
         base.Dispose();
-        JSRuntime.InvokeVoidAsync("Radzen.destroySlider", UniqueID, Element);
+
+        if (IsJSRuntimeAvailable)
+        {
+            JSRuntime.InvokeVoidAsync("Radzen.destroySlider", UniqueID, Element);
+        }
     }
 
     [JSInvokable("RadzenSlider.OnValueChange")]

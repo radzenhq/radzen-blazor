@@ -732,7 +732,10 @@
 
         Form?.RemoveComponent(this);
 
-        JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+        if (IsJSRuntimeAvailable)
+        {
+            JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+        }
     }
 
     public object GetValue()

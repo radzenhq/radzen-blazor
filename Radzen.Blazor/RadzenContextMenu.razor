@@ -40,8 +40,12 @@
         await InvokeAsync(() => { StateHasChanged(); });
     }
 
+    private bool IsJSRuntimeAvailable { get; set; }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        IsJSRuntimeAvailable = true;
+
         var menu = menus.LastOrDefault();
         if (menu != null)
         {
@@ -66,7 +70,10 @@
 
     public void Dispose()
     {
-        JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+        if (IsJSRuntimeAvailable)
+        {
+            JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+        }
 
         Service.OnOpen -= OnOpen;
         Service.OnClose -= OnClose;

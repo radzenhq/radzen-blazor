@@ -250,7 +250,10 @@
     {
         base.Dispose();
 
-        JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+        if (IsJSRuntimeAvailable)
+        {
+            JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+        }
     }
 
     internal async System.Threading.Tasks.Task ClosePopup()
