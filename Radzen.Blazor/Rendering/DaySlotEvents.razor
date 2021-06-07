@@ -4,6 +4,7 @@
 <div class="rz-events">
 @{
     var eventGroups = AppointmentGroups(); 
+    var lefts = new Dictionary<AppointmentData, double>();
 }
 @for (var date = StartDate; date < EndDate; date = date.AddMinutes(30))
 {
@@ -11,11 +12,19 @@
     var end = start.AddMinutes(30);
 
     var appointments = AppointmentsInSlot(start, end);
+    var existingLefts = ExistingLefts(lefts, appointments);
 
     @foreach (var item in appointments)
     {
         var width = 90.0 / appointments.Max(data => eventGroups[Appointments.IndexOf(data)]);
-        var left = Array.IndexOf(appointments, item) * width;
+
+        if (!lefts.TryGetValue(item, out var left))
+        {
+            left = DetermineLeft(existingLefts, width);
+            lefts.Add(item, left);
+            existingLefts.Add(left);
+        }
+
         var eventStart = item.Start < StartDate ? StartDate : item.Start;
         var eventEnd = item.End > EndDate ? EndDate : item.End;
         var length = eventStart.Subtract(StartDate).TotalMinutes / 30;
@@ -62,6 +71,32 @@
         return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
     }
 
+    double DetermineLeft(HashSet<double> existingLefts, double width)
+    {
+        double left = 0;
+
+        while (existingLefts.Contains(left))
+        {
+            left += width;
+        }
+
+        return left;
+    }
+
+    HashSet<double> ExistingLefts(IDictionary<AppointmentData, double> lefts, IEnumerable<AppointmentData> appointments)
+    {
+        var existingLefts = new HashSet<double>();
+
+        foreach (var appointment in appointments)
+        {
+            if (lefts.TryGetValue(appointment, out var existingLeft))
+            {
+                existingLefts.Add(existingLeft);
+            }
+        }
+
+        return existingLefts;
+    }
     private IDictionary<int, int> AppointmentGroups()
     {
         var groups = new Dictionary<int, int>();
