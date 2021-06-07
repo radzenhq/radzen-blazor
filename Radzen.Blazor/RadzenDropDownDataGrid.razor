@@ -196,7 +196,7 @@
 #if NET5
             if (grid != null)
             {
-                grid.AllowVirtualization = AllowVirtualization;
+                grid.SetAllowVirtualization(AllowVirtualization);
             }
 #endif            
             if(Visible && LoadData.HasDelegate && Data == null)
@@ -397,7 +397,7 @@
 
                 if (item != null && (!Multiple ? selectedItem != item : true))
                 {
-                    grid.OnRowSelect(item, false);
+                    await grid.OnRowSelect(item, false);
                 }
             }
             catch (Exception)

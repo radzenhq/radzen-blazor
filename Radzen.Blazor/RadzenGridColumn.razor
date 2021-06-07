@@ -31,7 +31,9 @@
                 _title = value;
 
                 if (Grid != null)
-                    Grid.ChangeState();
+                {
+                    Grid.ChangeState().Wait();
+                }
             }
         }
     }

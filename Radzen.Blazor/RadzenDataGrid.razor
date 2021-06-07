@@ -319,6 +319,11 @@
 
 @code {
 #if NET5
+    internal void SetAllowVirtualization(bool allowVirtualization)
+    {
+        AllowVirtualization = allowVirtualization;
+    }
+
     internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> virtualize;
 
     private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
@@ -740,7 +745,7 @@
             {
                 _emptyText = value;
 
-                ChangeState();
+                ChangeState().Wait();
             }
         }
     }
