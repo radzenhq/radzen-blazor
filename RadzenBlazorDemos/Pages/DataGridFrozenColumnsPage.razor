@@ -14,7 +14,10 @@
     <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
+            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" Frozen="@frozen">
+                <HeaderTemplate>
+                    <RadzenCheckBox @bind-Value="frozen" title="Pin/Unpin this column" />
+                </HeaderTemplate>
                 <Template Context="data">
                     <RadzenImage Path="@data.Photo" style="width: 32px; height: 32px; border-radius: 50%;" />
                 </Template>
@@ -38,6 +41,7 @@
 </RadzenExample>
 @code {
     IEnumerable<Employee> employees;
+    bool frozen;
 
     protected override void OnInitialized()
     {
