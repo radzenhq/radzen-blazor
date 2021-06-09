@@ -129,7 +129,9 @@ window.Radzen = {
         return false;
       }
     };
-    el.addEventListener('keydown', preventDefault, false);
+    if (el) {
+       el.addEventListener('keydown', preventDefault, false);
+    }
   },
   loadGoogleMaps: function (defaultView, apiKey, resolve, reject) {
     resolveCallbacks.push(resolve);
