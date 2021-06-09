@@ -16,7 +16,7 @@
 {
     var visibleColumns = columns.Where(c => c.Visible).ToList();
 
-    <div style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()">
+    <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()">
         @if (AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
         {
             <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" />
