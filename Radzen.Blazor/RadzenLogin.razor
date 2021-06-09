@@ -7,14 +7,14 @@
             <div class="row form-group">
                 <label class="col-sm-3 col-form-label" for="username">@UserText</label>
                 <div class="col">
-                    <RadzenTextBox style="display: block" Name="Username" @bind-Value=@Username />
+                    <RadzenTextBox AutoComplete=@AutoComplete style="display: block" Name="Username" @bind-Value=@Username />
                     <RadzenRequiredValidator Component="Username" Text=@UserRequired style="position: absolute" />
                 </div>
             </div>
             <div class="row form-group">
                 <label class="col-sm-3 col-form-label" for="password">@PasswordText</label>
                 <div class="col">
-                    <RadzenPassword style="display: block" Name="Password" @bind-Value=@Password />
+                    <RadzenPassword AutoComplete=@AutoComplete style="display: block" Name="Password" @bind-Value=@Password />
                     <RadzenRequiredValidator Component="Password" Text=@PasswordRequired style="position: absolute" />
                 </div>
             </div>
@@ -37,7 +37,10 @@
         }
     </div>
 }
-@code {
+@code {  
+    [Parameter]
+    public bool AutoComplete { get; set; } = true;
+
     protected override string GetComponentCssClass()
     {
         return "login";
