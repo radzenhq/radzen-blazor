@@ -1318,7 +1318,7 @@
         var descriptor = sorts.Where(d => d.Property == column?.GetSortProperty()).FirstOrDefault();
         if (descriptor == null)
         {
-            descriptor = new SortDescriptor() { Property = column.Property };
+            descriptor = new SortDescriptor() { Property = column.GetSortProperty() };
         }
 
         if (column.GetSortOrder() == null)
