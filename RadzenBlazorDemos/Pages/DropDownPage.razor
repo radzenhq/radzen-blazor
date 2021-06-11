@@ -12,10 +12,10 @@
     <div class="col-xl-6">
         <div class="row">
             <div class="col-xl-6 mb-5">
-                <h3>DropDown</h3>
+                <h3>Binding to simple collection</h3>
                 <RadzenDropDown AllowClear="true" TValue="string" Style="width:300px" 
-                                Data=@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())
-                                TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown")) />
+                                Data=@(customers.Select(c => c.CompanyName).Distinct())
+                                Change=@(args => OnChange(args, "DropDown")) />
             </div>
             <div class="col-xl-6 mb-5">
                 <h3>Disabled DropDown</h3>
