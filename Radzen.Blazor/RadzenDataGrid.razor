@@ -241,7 +241,9 @@
                                                     }
                                                     else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
                                                     {
+                                                        <div style="@(column.TextAlign == TextAlign.Center ? "width:100%;text-align:center" : column.TextAlign == TextAlign.Right ? "width:100%;text-align:right" : "")">
                                                         <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
+                                                        </div>
                                                     }
                                                     else
                                                     {
