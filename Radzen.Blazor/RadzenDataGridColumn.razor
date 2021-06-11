@@ -160,9 +160,9 @@
             style.Add($"left:{left}px");
         }
 
-        if ((isHeaderOrFooterCell && !Frozen || !isHeaderOrFooterCell && Frozen) && Grid.ColumnsCollection.Where(c => c.Visible && c.Frozen).Any())
+        if ((isHeaderOrFooterCell && Frozen || isHeaderOrFooterCell && !Frozen || !isHeaderOrFooterCell && Frozen) && Grid.ColumnsCollection.Where(c => c.Visible && c.Frozen).Any())
         {
-            style.Add("z-index:0");
+            style.Add($"z-index:{(!isHeaderOrFooterCell && Frozen ? 999 : isHeaderOrFooterCell && Frozen ? 1000 : 1)}");
         }
 
         return string.Join(";", style);
