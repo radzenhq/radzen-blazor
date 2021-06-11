@@ -64,11 +64,11 @@
                                             </span>
                                             @if (AllowSorting && column.Sortable)
                                             {
-                                                @if (!string.IsNullOrEmpty(orderBy) && orderBy.Contains($"{column.GetSortProperty()} asc"))
+                                                @if (column.SortOrder == SortOrder.Ascending)
                                                 {
                                                     <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
                                                 }
-                                                else if (!string.IsNullOrEmpty(orderBy) && orderBy.Contains($"{column.GetSortProperty()} desc"))
+                                                else if (column.SortOrder == SortOrder.Descending)
                                                 {
                                                     <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
                                                 }
@@ -1277,6 +1277,7 @@
 
     public void OrderBy(string property)
     {
+        SetColumnSortOrder(property);
         var p = IsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
         orderBy = orderBy == $"{p} desc" || orderBy == null || orderBy.IndexOf(p) == -1 ? $"{p} asc" : $"{p} desc";
         InvokeAsync(Reload);
@@ -1284,9 +1285,30 @@
 
     public void OrderByDescending(string property)
     {
+        SetColumnSortOrder(property);
         var p = IsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
         orderBy = $"{p} desc";
         InvokeAsync(Reload);
+    }
+
+    internal void SetColumnSortOrder(string property)
+    {
+        var column = columns.Where(c => c.GetSortProperty() == property).FirstOrDefault();
+        if(column != null)
+        {
+            if (column.SortOrder == null)
+            {
+                column.SortOrder = SortOrder.Ascending;
+            }
+            else if (column.SortOrder == SortOrder.Ascending)
+            {
+                column.SortOrder = SortOrder.Descending;
+            }
+            else if (column.SortOrder == SortOrder.Descending)
+            {
+                column.SortOrder = null;
+            }
+        }
     }
 
     protected override string GetComponentCssClass()
