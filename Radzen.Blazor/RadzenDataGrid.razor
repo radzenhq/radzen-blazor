@@ -348,7 +348,7 @@
             await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = top, OrderBy = orderBy, Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString });
         }
 
-        return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(LoadData.HasDelegate ? Data : view.Skip(request.StartIndex).Take(top), totalItemsCount);
+        return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(LoadData.HasDelegate ? Data : itemToInsert != null ? (new[] { itemToInsert }).Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top), totalItemsCount);
     }
 #endif
     RenderFragment DrawRows(IList<RadzenDataGridColumn<TItem>> visibleColumns)
@@ -1263,12 +1263,25 @@
     {
         if (object.Equals(itemToInsert, item))
         {
-            var list = this.PagedView.ToList();
-            list.Remove(item);
-            this._view = list.AsQueryable();
-            this.Count = this.View.Count();
-            itemToInsert = default(TItem);
-            StateHasChanged();
+            if(!IsVirtualizationAllowed())
+            {
+                var list = this.PagedView.ToList();
+                list.Remove(item);
+                this._view = list.AsQueryable();
+                this.Count = this.View.Count();
+                itemToInsert = default(TItem);
+                StateHasChanged();
+            }
+            else
+            {
+    #if NET5
+                itemToInsert = default(TItem);
+                if (virtualize != null)
+                {
+                    virtualize.RefreshDataAsync();
+                }
+    #endif
+            }
         }
         else
         {
@@ -1293,11 +1306,24 @@
     public async System.Threading.Tasks.Task InsertRow(TItem item)
     {
         itemToInsert = item;
-        var list = this.PagedView.ToList();
-        list.Insert(0, item);
-        this._view = list.AsQueryable();
-        this.Count = this._view.Count();
-        await EditRowInternal(item);
+        if(!IsVirtualizationAllowed())
+        {
+            var list = this.PagedView.ToList();
+            list.Insert(0, item);
+            this._view = list.AsQueryable();
+            this.Count = this._view.Count();
+        }
+        else
+        {
+#if NET5
+            if (virtualize != null)
+            {
+                await virtualize.RefreshDataAsync();
+            }
+#endif
+        }
+            
+       await EditRowInternal(item);
     }
 
     internal bool IsOData()
