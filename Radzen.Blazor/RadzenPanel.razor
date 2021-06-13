@@ -38,6 +38,14 @@
                 </div>
             }
         </div>
+        @if (SummaryTemplate != null)
+        {
+            <div class="rz-panel-content-wrapper" role="region" aria-hidden="false" style="@summaryContentStyle">
+                <div class="rz-panel-content rz-panel-content-summary">
+                    @SummaryTemplate
+                </div>
+            </div>
+        }
     </div>
 }
 @code {
@@ -64,6 +72,9 @@
     public RenderFragment HeaderTemplate { get; set; }
 
     [Parameter]
+    public RenderFragment SummaryTemplate { get; set; } = null;
+
+    [Parameter]
     public RenderFragment FooterTemplate { get; set; }
 
     [Parameter]
@@ -73,11 +84,13 @@
     public EventCallback Collapse { get; set; }
 
     string contentStyle = "display: block;";
+    string summaryContentStyle = "display: none";
 
     async System.Threading.Tasks.Task Toggle(MouseEventArgs args)
     {
         collapsed = !collapsed;
         contentStyle = collapsed ? "display: none;" : "display: block;";
+        summaryContentStyle = !collapsed ? "display: none" : "display: block";
 
         if (collapsed)
         {
@@ -109,6 +122,7 @@
     protected override Task OnParametersSetAsync()
     {
         contentStyle = collapsed ? "display: none;" : "display: block;";
+        summaryContentStyle = !collapsed ? "display: none" : "display: block";
 
         return base.OnParametersSetAsync();
     }
