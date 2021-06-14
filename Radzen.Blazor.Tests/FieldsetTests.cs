@@ -1,4 +1,6 @@
 using Bunit;
+using Microsoft.AspNetCore.Components;
+using System.Linq;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -145,7 +147,8 @@ namespace Radzen.Blazor.Tests
 
             var raised = false;
 
-            component.SetParametersAndRender(parameters => {
+            component.SetParametersAndRender(parameters =>
+            {
                 parameters.Add<bool>(p => p.AllowCollapse, true);
                 parameters.Add(p => p.Collapse, args => { raised = true; });
             });
@@ -159,6 +162,58 @@ namespace Radzen.Blazor.Tests
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Expand, args => { raised = true; }));
 
             component.Find("a").Click();
+        }
+
+        [Fact]
+        public void Fieldset_Renders_SummaryWhenCollapsed()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenFieldset>();
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add<bool>(p => p.AllowCollapse, true);
+                parameters.Add<bool>(p => p.Collapsed, true);
+                parameters.Add<RenderFragment>(p => p.SummaryTemplate, builder =>
+                {
+                    builder.OpenElement(0, "p");
+                    builder.AddContent(0, "SummaryContent");
+                    builder.CloseElement();
+                });
+
+            });
+
+            Assert.Contains("SummaryContent", component.Markup);
+            Assert.Equal(
+                "",
+                component.Find(".rz-fieldset-content-summary").ParentElement.Attributes.First(attr => attr.Name == "style").Value
+            );
+        }
+
+        [Fact]
+        public void Fieldset_DontRenders_SummaryWhenOpen()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenFieldset>();
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add<bool>(p => p.AllowCollapse, true);
+                parameters.Add<bool>(p => p.Collapsed, false);
+                parameters.Add<RenderFragment>(p => p.SummaryTemplate, builder =>
+                {
+                    builder.OpenElement(0, "p");
+                    builder.AddContent(0, "SummaryContent");
+                    builder.CloseElement();
+                });
+
+            });
+
+            Assert.Contains("SummaryContent", component.Markup);
+            Assert.Equal(
+                "display: none",
+                component.Find(".rz-fieldset-content-summary").ParentElement.Attributes.First(attr => attr.Name == "style").Value
+            );
         }
     }
 }
