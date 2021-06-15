@@ -11,7 +11,8 @@
 <p>Lock columns to prevent them from scrolling out of view via the <code>Frozen</code> property.</p>
 
 <RadzenExample Name="DataGridFrozenColumns" Heading="false">
-    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" 
+        ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:300px">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" Frozen="@frozen">
@@ -22,8 +23,16 @@
                     <RadzenImage Path="@data.Photo" style="width: 32px; height: 32px; border-radius: 50%;" />
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" Frozen="true" />
-            <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
+            <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" Frozen="true">
+                <FooterTemplate>
+                    Total employees: <b>@employees.Count()</b>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px">
+                 <FooterTemplate>
+                    Footer
+                </FooterTemplate>
+            </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
             <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
             <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />

@@ -754,7 +754,7 @@ $grid-button-line-height: $grid-button-height !default;
 .rz-grid-table tfoot, .rz-grid-table tfoot td {
     position: sticky;
     bottom: 0;
-    z-index: 1;
+    z-index: 1000;
 }
 
 .rz-grid-table {
