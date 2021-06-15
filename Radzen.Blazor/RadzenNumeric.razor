@@ -191,4 +191,30 @@
 
     [Parameter]
     public decimal? Max { get; set; }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        bool minChanged = parameters.DidParameterChange(nameof(Min), Min);
+        bool maxChanged = parameters.DidParameterChange(nameof(Max), Max);
+
+        await base.SetParametersAsync(parameters);
+
+        if (minChanged && Min.HasValue && Value != null && IsJSRuntimeAvailable)
+        {
+            decimal decimalValue = (decimal)Convert.ChangeType(Value, typeof(decimal));
+            if (decimalValue < Min.Value)
+            {
+                await InternalValueChanged(Min.Value);
+            }
+        }
+
+        if (maxChanged && Max.HasValue && Value != null && IsJSRuntimeAvailable)
+        {
+            decimal decimalValue = (decimal)Convert.ChangeType(Value, typeof(decimal));
+            if (decimalValue > Max.Value)
+            {
+                await InternalValueChanged(Max.Value);
+            }
+        }
+    }
 }
