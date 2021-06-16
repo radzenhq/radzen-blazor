@@ -65,16 +65,9 @@
                             {
                                 @column.Template(Item)
                             }
-                            else if (!string.IsNullOrEmpty(column.Property))
+                            else
                             {
-                                @if (!string.IsNullOrEmpty(column.FormatString))
-                                {
-                                    @(String.Format(column.FormatString, PropertyAccess.GetValue(Item, column.Property)));
-                                }
-                                else if (!string.IsNullOrEmpty(column.Property))
-                                {
-                                    @(PropertyAccess.GetValue(Item, column.Property));
-                                }
+                                @column.GetValue(Item)
                             }
                         </span>
                     </td>
@@ -84,23 +77,16 @@
             {
                 <RadzenDataGridCell Grid="@this.Grid" Item="@Item"
                                     Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + Grid.getFrozenColumnClass(column, Columns))" Attributes="@(cellAttr)">
-                    <span class="rz-cell-data">
+                    <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
                         @if (Item != null)
                         {
                             @if (column.Template != null)
                             {
                                 @column.Template(Item)
                             }
-                            else if (!string.IsNullOrEmpty(column.Property))
+                            else
                             {
-                                @if (!string.IsNullOrEmpty(column.FormatString))
-                                {
-                                    @(String.Format(column.FormatString, PropertyAccess.GetValue(Item, column.Property)));
-                                }
-                                else if (!string.IsNullOrEmpty(column.Property))
-                                {
-                                    @(PropertyAccess.GetValue(Item, column.Property));
-                                }
+                                @column.GetValue(Item)
                             }
                         }
                     </span>

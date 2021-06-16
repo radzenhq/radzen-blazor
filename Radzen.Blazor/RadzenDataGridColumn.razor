@@ -109,7 +109,9 @@
 
     public object GetValue(TItem item)
     {
-        return propertyValueGetter != null ? propertyValueGetter(item) : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
+        var value = propertyValueGetter != null ? propertyValueGetter(item) : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
+
+        return !string.IsNullOrEmpty(FormatString) ? string.Format(FormatString, value) : value;
     }
 
     internal object GetHeader()
