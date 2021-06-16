@@ -51,6 +51,10 @@
                 <span class="rz-paginator-icon rzi rzi-step-forward"></span>
             </a>
         }
+        @if(PageSizeOptions != null && PageSizeOptions.Any())
+        {
+            <RadzenDropDown TValue="int" Data="@PageSizeOptions" Value="@PageSize" Change="@OnPageSizeChanged" />
+        }
     </div>
 }
 @code {
@@ -61,6 +65,12 @@
 
     [Parameter]
     public int PageSize { get; set; } = 10;
+
+    [Parameter]
+    public EventCallback<int> PageSizeChanged { get; set; }
+
+    [Parameter]
+    public IEnumerable<int> PageSizeOptions { get; set; }
 
     [Parameter]
     public int PageNumbersCount { get; set; } = 5;
@@ -92,6 +102,13 @@
         }
 
         return base.OnParametersSetAsync();
+    }
+
+    protected async Task OnPageSizeChanged(object value)
+    {
+        PageSize = (int)value;
+        await InvokeAsync(Reload);
+        await PageSizeChanged.InvokeAsync((int)value);
     }
 
     protected int skip;

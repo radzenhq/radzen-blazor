@@ -49,6 +49,9 @@ namespace Radzen
             }
         }
 
+        [Parameter]
+        public IEnumerable<int> PageSizeOptions { get; set; }
+
         protected IQueryable<T> _view = null;
         public virtual IQueryable<T> PagedView
         {
@@ -145,6 +148,12 @@ namespace Radzen
         {
             skip = args.Skip;
             CurrentPage = args.PageIndex;
+            await InvokeAsync(Reload);
+        }
+
+        protected async Task OnPageSizeChanged(int value)
+        {
+            PageSize = value;
             await InvokeAsync(Reload);
         }
 
