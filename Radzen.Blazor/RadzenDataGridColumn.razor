@@ -156,7 +156,12 @@
                 .TakeWhile((c, i) => Grid.ColumnsCollection.IndexOf(this) > i && c.Frozen)
                 .Sum(c => {
                     var w = !string.IsNullOrEmpty(c.GetWidth()) ? c.GetWidth() : Grid.ColumnWidth;
-                    return !string.IsNullOrEmpty(w) && w.Contains("px") ? int.Parse(w.Replace("px", "")) : 200;
+                    var cw = 200;
+                    if (!string.IsNullOrEmpty(w) && w.Contains("px"))
+                    {
+                        int.TryParse(w.Replace("px", ""), out cw);
+                    }
+                    return cw;
                 });
 
             style.Add($"left:{left}px");
