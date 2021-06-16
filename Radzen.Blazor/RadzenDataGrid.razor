@@ -405,6 +405,7 @@
                 builder.AddAttribute(3, "Grid", this);
                 builder.AddAttribute(4, "TItem", typeof(TItem));
                 builder.AddAttribute(5, "Item", item);
+                builder.AddAttribute(6, "InEditMode", IsRowInEditMode(item));
                 builder.CloseComponent();
                 i++;
             }
