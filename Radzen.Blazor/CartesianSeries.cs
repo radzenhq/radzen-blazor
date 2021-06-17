@@ -250,6 +250,7 @@ namespace Radzen.Blazor
                 }
 
                 Chart.Refresh(false);
+                Chart.DisplayTooltip();
             }
         }
 
