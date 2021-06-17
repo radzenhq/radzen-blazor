@@ -8,7 +8,7 @@
     }
     else
     {
-        <div class="rz-slot-header">@date.ToString("h tt")</div>
+        <div class="rz-slot-header">@date.ToString("t", System.Globalization.CultureInfo.CurrentCulture)</div>
     }
 
     minor = !minor;
