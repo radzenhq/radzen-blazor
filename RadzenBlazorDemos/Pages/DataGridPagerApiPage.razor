@@ -14,7 +14,7 @@
         <RadzenButton Click="@TenthPage" Text="10th page" />
         <RadzenButton Click="@LastPage" Text="Last page" />
     </div>
-   <RadzenDataGrid @ref=@dataGrid Data="@orderDetails" TItem="OrderDetail" AllowPaging="true" AllowSorting="true">
+   <RadzenDataGrid @ref=@dataGrid Data="@orderDetails" TItem="OrderDetail" AllowPaging="true" AllowSorting="true" PageSizeOptions="@pageSizeOptions">
         <Columns>
             <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
             <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
@@ -35,7 +35,7 @@
 
 @code {
     RadzenDataGrid<OrderDetail> dataGrid;
-
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30 };
     IEnumerable<OrderDetail> orderDetails;
 
     async Task FirstPage()
