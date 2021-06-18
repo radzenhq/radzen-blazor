@@ -57,7 +57,7 @@
             <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
             <RadzenDataGridColumn Width="150px" TItem="Order" Property="Employee.LastName" Title="Employee">
                 <Template Context="order">
-                    <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 50%" />
+                    <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
                     @order.Employee?.FirstName @order.Employee?.LastName
                 </Template>
             </RadzenDataGridColumn>

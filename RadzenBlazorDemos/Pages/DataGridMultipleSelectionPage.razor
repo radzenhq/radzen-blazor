@@ -24,7 +24,7 @@
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
             <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
                 <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 32px; height: 32px; border-radius: 50%" />
+                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
                     @data.FirstName @data.LastName
                 </Template>
             </RadzenDataGridColumn>

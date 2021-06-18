@@ -20,7 +20,7 @@
                     <RadzenCheckBox @bind-Value="frozen" title="Pin/Unpin this column" />
                 </HeaderTemplate>
                 <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 32px; height: 32px; border-radius: 50%;" />
+                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" Frozen="true">

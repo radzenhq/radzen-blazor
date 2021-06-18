@@ -23,13 +23,13 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee" Width="300px">
                 <Template Context="order">
-                    <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 50%;" />
+                    <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
                     @order.Employee?.FirstName @order.Employee?.LastName
                 </Template>
                 <EditTemplate Context="order">
                     <RadzenDropDown @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%">
                         <Template>
-                            <RadzenImage Path="@context.Photo" style="width: 32px; height: 32px; border-radius: 50%;" />
+                            <RadzenImage Path="@context.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
                             @context.FirstName @context.LastName
                         </Template>
                     </RadzenDropDown>
