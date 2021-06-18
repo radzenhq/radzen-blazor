@@ -830,6 +830,12 @@
                 if (count != Count)
                 {
                     Count = count;
+
+                    if (skip >= Count && Count > PageSize)
+                    {
+                        skip = Count - PageSize;
+                    }
+
                     StateHasChanged();
                 }
             }
