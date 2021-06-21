@@ -48,7 +48,52 @@
     [Parameter]
     public EventCallback<object> ValueChanged { get; set; }
 
-    void RenderTreeItem(RenderTreeBuilder builder, object data, RenderFragment<RadzenTreeItem> template, Func<object,
+    [Parameter]
+    public bool AllowCheckBoxes { get; set; }
+
+    [Parameter]
+    public bool AllowCheckChildren { get; set; } = true;
+
+    [Parameter]
+    public bool AllowCheckParents { get; set; } = true;
+
+    [Parameter]
+    public IEnumerable<object> CheckedValues { get; set; } = Enumerable.Empty<object>();
+
+    internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
+
+    internal void AddItem(RadzenTreeItem item)
+    {
+        if (items.IndexOf(item) == -1)
+        {
+            items.Add(item);
+        }
+    }
+
+    internal void RemoveItem(RadzenTreeItem item)
+    {
+        if (items.IndexOf(item) != -1)
+        {
+            items.Remove(item);
+        }
+    }
+
+    internal async Task SetCheckedValues(IEnumerable<object> values)
+    {
+        CheckedValues = values.ToList();
+        await CheckedValuesChanged.InvokeAsync(CheckedValues);
+    }
+
+    internal IEnumerable<object> UncheckedValues { get; set; } = Enumerable.Empty<object>();
+    internal void SetUncheckedValues(IEnumerable<object> values)
+    {
+        UncheckedValues = values.ToList();
+    }
+
+    [Parameter]
+    public EventCallback<IEnumerable<object>> CheckedValuesChanged { get; set; }
+
+    void RenderTreeItem(RadzenTreeItem parent, RenderTreeBuilder builder, object data, RenderFragment<RadzenTreeItem> template, Func<object,
     string> text,
     Func<object, bool> hasChildren, Func<object, bool> expanded, Func<object, bool> selected)
     {
@@ -59,6 +104,12 @@
         builder.AddAttribute(4, nameof(RadzenTreeItem.Template), template);
         builder.AddAttribute(5, nameof(RadzenTreeItem.Expanded), expanded(data));
         builder.AddAttribute(6, nameof(RadzenTreeItem.Selected), Value == data || selected(data));
+
+        if (parent != null)
+        {
+            builder.AddAttribute(7, nameof(RadzenTreeItem.ParentItem), parent);
+        }
+
         builder.SetKey(data);
     }
 
@@ -77,7 +128,7 @@
                     text = level.Text ?? Getter<string>(data, level.TextProperty);
                 }
 
-                RenderTreeItem(builder, data, level.Template, text, level.HasChildren, level.Expanded, level.Selected);
+                RenderTreeItem(null, builder, data, level.Template, text, level.HasChildren, level.Expanded, level.Selected);
 
                 var hasChildren = level.HasChildren(data);
 
@@ -144,12 +195,24 @@
                         text = children.Text ?? Getter<string>(data, children.TextProperty);
                     }
 
-                    RenderTreeItem(builder, data, children.Template, text, children.HasChildren, children.Expanded, children.Selected);
+                    RenderTreeItem(item, builder, data, children.Template, text, children.HasChildren, children.Expanded, children.Selected);
                     builder.CloseComponent();
                 }
             });
 
             item.RenderChildContent(childContent);
+
+            if(AllowCheckBoxes && AllowCheckChildren && args.Children.Data != null)
+            {
+                if (CheckedValues != null && CheckedValues.Contains(item.Value))
+                {
+                    await SetCheckedValues(CheckedValues.Union(args.Children.Data.Cast<object>().Except(UncheckedValues)));
+                }
+                else
+                {
+                    await SetCheckedValues(CheckedValues.Except(args.Children.Data.Cast<object>()));
+                }
+            }
         }
     }
 

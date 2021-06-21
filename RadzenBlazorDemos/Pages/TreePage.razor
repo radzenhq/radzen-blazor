@@ -55,7 +55,7 @@
             </div>
             <div class="col-md-4" style="margin-bottom: 16px">
                 <h3>Files and directories</h3>
-                <RadzenTree Change=@OnChange Data=@entries Expand=@LoadFiles Style="width: 100%; height: 300px">
+                <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues="@CheckedValues" Change=@OnChange Data=@entries Expand=@LoadFiles Style="width: 100%; height: 300px">
                     <RadzenTreeLevel Text=@GetTextForNode Template=@FileOrFolderTemplate />
                 </RadzenTree>
             </div>
@@ -70,6 +70,23 @@
 @code {
     // The value of a RadzenTree component must be of type "object" as different levels could be of different type.
     object selectedCategory = null;
+
+    IEnumerable<object> _checkedValues;
+    IEnumerable<object> CheckedValues 
+    {
+        get
+        {
+            return _checkedValues;
+        }
+        set
+        {
+            if(_checkedValues != value)
+            {
+                _checkedValues = value;
+                Log("CheckedValues Changed", $"Checked items: {string.Join(Environment.NewLine, CheckedValues.Cast<string>())}");
+            }
+        }
+    }
 
     IEnumerable<string> entries = null;
     EventConsole console;
@@ -109,6 +126,9 @@
 
                                return !name.StartsWith(".") && name != "bin" && name != "obj";
                            });
+
+        _checkedValues = entries.Where(entry => entry.Contains("Models"));
+
         employees = Northwind.Employees.Include(e => e.Employees1).ToList();
         rootEmployees = employees.Where(e => e.ReportsTo == null);
         categories = Northwind.Categories.Include(c => c.Products);
@@ -127,10 +147,6 @@
 
         builder.OpenComponent<RadzenIcon>(0);
         builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
-        if (!isDirectory)
-        {
-            builder.AddAttribute(2, "Style", "margin-left: 24px");
-        }
         builder.CloseComponent();
         builder.AddContent(3, context.Text);
     };
