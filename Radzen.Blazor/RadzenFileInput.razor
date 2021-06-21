@@ -21,7 +21,7 @@
                         <div>
                             @if (IsImage)
                             {
-                                <img style="width:100px;" src="@Value">
+                                <img style="@ImageStyle" src="@Value">
                             }
                         </div>
                         <div>
@@ -152,4 +152,7 @@
 
     [Parameter]
     public int MaxFileSize { get; set; } = 5 * 1024 * 1024;
+    
+    [Parameter]
+     public string ImageStyle { get; set; } = "width:100px;";
 }
