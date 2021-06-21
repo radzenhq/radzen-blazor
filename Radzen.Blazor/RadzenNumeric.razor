@@ -152,10 +152,20 @@
         await InternalValueChanged(args.Value);
     }
 
+    private string RemoveNonNumericCharacters(object value)
+    {
+        string valueStr = value as string;
+        if (valueStr == null)
+        {
+            valueStr = value.ToString();
+        }
+        return new string(valueStr.Where(c => char.IsDigit(c) || char.IsPunctuation(c)).ToArray());
+    }
+
     private async System.Threading.Tasks.Task InternalValueChanged(object value)
     {
         TValue newValue;
-        BindConverter.TryConvertTo<TValue>($"{value}", System.Globalization.CultureInfo.CurrentCulture, out newValue);
+        BindConverter.TryConvertTo<TValue>(RemoveNonNumericCharacters(value), System.Globalization.CultureInfo.CurrentCulture, out newValue);
 
         decimal? newValueAsDecimal = newValue == null ? default(decimal?) : (decimal)ConvertType.ChangeType(newValue, typeof(decimal));
 
