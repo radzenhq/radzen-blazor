@@ -108,8 +108,8 @@ namespace Radzen
             var task = tasks.LastOrDefault();
             if (task != null && task.Task != null && !task.Task.IsCompleted)
             {
-                task.SetResult(result);
                 tasks.Remove(task);
+                task.SetResult(result);
             }
         }
 
