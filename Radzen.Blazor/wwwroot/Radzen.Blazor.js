@@ -710,6 +710,9 @@ window.Radzen = {
     document.removeEventListener('click', Radzen[id]);
     document.addEventListener('click', Radzen[id]);
 
+    document.removeEventListener('scroll', Radzen[id]);
+    document.addEventListener('scroll', Radzen[id], true);
+
     if (!parent) {
         document.removeEventListener('contextmenu', Radzen[id]);
         document.addEventListener('contextmenu', Radzen[id]);
@@ -721,6 +724,7 @@ window.Radzen = {
       popup.style.display = 'none';
     }
     document.removeEventListener('click', Radzen[id]);
+    document.removeEventListener('scroll', Radzen[id]);
     Radzen[id] = null;
 
     if (instance) {
