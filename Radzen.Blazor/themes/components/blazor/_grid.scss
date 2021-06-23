@@ -775,6 +775,6 @@ $grid-button-line-height: $grid-button-height !default;
     }
 }
 
-.rz-grid-table tbody > ::deep div {
+.rz-grid-table tbody > div {
     display: table-row;
 }
