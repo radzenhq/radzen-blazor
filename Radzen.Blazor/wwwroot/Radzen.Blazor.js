@@ -596,6 +596,8 @@ window.Radzen = {
     var popup = document.getElementById(id);
     if (!popup) return;
 
+    Radzen.activeElement = document.activeElement;
+
     var parentRect = parent ? parent.getBoundingClientRect() : { top: y || 0, bottom: 0, left: x || 0, right: 0, width: 0, height: 0 };
 
     if (/Edge/.test(navigator.userAgent)) {
@@ -720,6 +722,9 @@ window.Radzen = {
   },
   closePopup: function (id, instance, callback) {
     var popup = document.getElementById(id);
+    if (!popup) return;
+    if (popup.style.display == 'none') return;
+
     if (popup) {
       popup.style.display = 'none';
     }
@@ -729,6 +734,11 @@ window.Radzen = {
 
     if (instance) {
       instance.invokeMethodAsync(callback);
+    }
+
+    if (Radzen.activeElement) {
+        Radzen.activeElement.focus();
+        Radzen.activeElement = null;
     }
   },
   togglePopup: function (parent, id, syncWidth, instance, callback) {
