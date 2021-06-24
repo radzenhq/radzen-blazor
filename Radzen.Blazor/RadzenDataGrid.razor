@@ -963,11 +963,7 @@
                     SecondFilterOperator = c.GetSecondFilterOperator(),
                     LogicalFilterOperator = c.GetLogicalFilterOperator()
                 }),
-                Sorts = columns.Where(c => c.Sortable && c.Visible && c.GetSortOrder() != null).Select(c => new SortDescriptor()
-                {
-                    Property = c.GetSortProperty(),
-                    SortOrder = c.GetSortOrder().Value,
-                })
+                Sorts = sorts
             }); ;
         }
 
