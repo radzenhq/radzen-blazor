@@ -784,6 +784,20 @@ window.Radzen = {
     ) {
       document.body.classList.add('no-scroll');
     }
+
+    setTimeout(function () { 
+        var dialogs = document.querySelectorAll('.rz-dialog-content');
+        if (dialogs.length == 0) return;
+        var lastDialog = dialogs[dialogs.length - 1];
+
+        if (lastDialog) {
+            var focusable = lastDialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            var firstFocusable = focusable[0];
+            if (firstFocusable) {
+                firstFocusable.focus();
+            }
+        }
+    }, 500);
   },
   closeDialog: function () {
     document.body.classList.remove('no-scroll');
