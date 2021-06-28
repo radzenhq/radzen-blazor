@@ -374,6 +374,8 @@ namespace Radzen
                     await LoadData.InvokeAsync(await GetLoadDataArgs());
                 }   
             }
+
+            await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
         }
 
         protected async System.Threading.Tasks.Task OnKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)

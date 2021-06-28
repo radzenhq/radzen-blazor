@@ -455,6 +455,7 @@
                  StateHasChanged();
                  grid.FirstPage(true).Wait();
 
+                 JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
             });
         }
     }

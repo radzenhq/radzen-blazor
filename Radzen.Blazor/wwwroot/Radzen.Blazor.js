@@ -592,6 +592,27 @@ window.Radzen = {
     }
     return popups;
   },
+  repositionPopup: function (parent, id) {
+      var popup = document.getElementById(id);
+      if (!popup) return;
+
+      var rect = popup.getBoundingClientRect();
+      var parentRect = parent ? parent.getBoundingClientRect() : { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0 };
+
+      if (/Edge/.test(navigator.userAgent)) {
+          var scrollTop = document.body.scrollTop;
+      } else {
+          var scrollTop = document.documentElement.scrollTop;
+      }
+
+      var top = parentRect.bottom + scrollTop;
+
+      if (top + rect.height > window.innerHeight && parentRect.top > rect.height) {
+          top = parentRect.top - rect.height + scrollTop;
+      }
+
+      popup.style.top = top + 'px';
+  },
   openPopup: function (parent, id, syncWidth, position, x, y, instance, callback) {
     var popup = document.getElementById(id);
     if (!popup) return;
