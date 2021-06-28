@@ -697,7 +697,7 @@ window.Radzen = {
     Radzen[id] = function (e) {
         if (!e.defaultPrevented) {
           if (parent) {
-            if (!parent.contains(e.target) && !popup.contains(e.target)) {
+            if ((e.type == 'click' && !parent.contains(e.target) && !popup.contains(e.target)) || (e.type == 'scroll' && e.target == e.currentTarget)) {
               Radzen.closePopup(id, instance, callback);
             }
           } else {
