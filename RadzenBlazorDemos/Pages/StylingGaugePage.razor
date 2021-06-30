@@ -82,7 +82,7 @@
         {
             var now = DateTime.Now;
 
-            hours = now.Hour + now.Minute / 60.0;
+            hours = now.Hour % 12 + now.Minute / 60.0;
 
             minutes = now.Minute * minorStep + now.Second * 12 / 3600.0;
             seconds = now.Second * minorStep;
