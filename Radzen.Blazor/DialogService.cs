@@ -92,6 +92,7 @@ namespace Radzen
                 ShowClose = options != null ? options.ShowClose : true,
                 ChildContent = options?.ChildContent,
                 Style = options != null ? options.Style : "",
+                AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true
             });
         }
 
@@ -176,6 +177,7 @@ namespace Radzen
         public string Height { get; set; }
         public string Style { get; set; }
         public RenderFragment<DialogService> ChildContent { get; set; }
+        public bool AutoFocusFirstElement { get; set; } = true;
     }
 
     public class ConfirmOptions : DialogOptions

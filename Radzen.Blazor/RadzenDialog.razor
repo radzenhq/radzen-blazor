@@ -20,7 +20,7 @@
 
         await InvokeAsync(() => { StateHasChanged(); });
 
-        await JSRuntime.InvokeAsync<string>("Radzen.openDialog");
+        await JSRuntime.InvokeAsync<string>("Radzen.openDialog", options);
     }
 
     public async Task Close(dynamic result)
