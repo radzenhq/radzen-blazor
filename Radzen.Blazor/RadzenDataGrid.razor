@@ -99,8 +99,7 @@
                                                 {
                                                     @(DrawNumericFilter(column, false))
                                                 }
-                                                else if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?) ||
-                                                    column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
+                                                else if (PropertyAccess.IsDate(column.FilterPropertyType))
                                                 {
                                                     <RadzenDatePicker TValue="@object" ShowTime="true" ShowTimeOkButton="true" DateFormat="@getFilterDateFormat(column)"
                                                                       Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args.Value))" />
@@ -123,8 +122,7 @@
                                                 {
                                                     @(DrawNumericFilter(column, false, false))
                                                 }
-                                                else if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?) ||
-                                                    column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
+                                                else if (PropertyAccess.IsDate(column.FilterPropertyType))
                                                 {
                                                     <RadzenDatePicker TValue="@object"
                                                                       ShowTime="true" ShowTimeOkButton="true" DateFormat="@getFilterDateFormat(column)"

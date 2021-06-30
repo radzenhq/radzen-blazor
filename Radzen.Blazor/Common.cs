@@ -468,6 +468,7 @@ namespace Radzen
 
         public static bool IsDate(Type source)
         {
+            if (source == null) return false;
             var type = source.IsGenericType ? source.GetGenericArguments()[0] : source;
 
             if (type == typeof(DateTime) || type == typeof(DateTimeOffset))

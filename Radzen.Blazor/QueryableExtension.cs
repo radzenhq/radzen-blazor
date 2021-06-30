@@ -114,8 +114,27 @@ namespace Radzen
                 var whereList = new List<string>();
                 foreach (var column in columns.Where(canFilter))
                 {
-                    var value = (string)Convert.ChangeType(column.GetFilterValue(), typeof(string));
-                    var secondValue = (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
+                    string value = "";
+                    string secondValue = "";
+
+                    if (PropertyAccess.IsDate(column.FilterPropertyType))
+                    {
+                        var v = column.GetFilterValue();
+                        var sv = column.GetSecondFilterValue();
+                        if (v != null)
+                        {
+                            value = v is DateTime ? ((DateTime)v).ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : v is DateTimeOffset ? ((DateTimeOffset)v).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : "";
+                        }
+                        if (sv != null)
+                        {
+                            secondValue = sv is DateTime ? ((DateTime)sv).ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : sv is DateTimeOffset ? ((DateTimeOffset)sv).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : "";
+                        }
+                    }
+                    else
+                    {
+                        value = (string)Convert.ChangeType(column.GetFilterValue(), typeof(string));
+                        secondValue = (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
+                    }
 
                     if (!string.IsNullOrEmpty(value))
                     {
@@ -129,11 +148,11 @@ namespace Radzen
 
                         if (string.IsNullOrEmpty(secondValue))
                         {
-                            whereList.Add(GetColumnFilter(column));
+                            whereList.Add(GetColumnFilter(column, value));
                         }
                         else
                         {
-                            whereList.Add($"({GetColumnFilter(column)} {booleanOperator} {GetColumnFilter(column, true)})");
+                            whereList.Add($"({GetColumnFilter(column, value)} {booleanOperator} {GetColumnFilter(column, secondValue, true)})");
                         }
                     }
                 }
@@ -225,7 +244,7 @@ namespace Radzen
             return "";
         }
 
-        private static string GetColumnFilter<T>(RadzenDataGridColumn<T> column, bool second = false)
+        private static string GetColumnFilter<T>(RadzenDataGridColumn<T> column, string value, bool second = false)
         {
             var property = PropertyAccess.GetProperty(column.GetFilterProperty());
 
@@ -241,9 +260,6 @@ namespace Radzen
             {
                 linqOperator = "==";
             }
-
-            var value = !second ? (string)Convert.ChangeType(column.GetFilterValue(), typeof(string)) :
-                (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
 
             if (column.FilterPropertyType == typeof(string))
             {
