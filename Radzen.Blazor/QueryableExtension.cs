@@ -298,8 +298,9 @@ namespace Radzen
                 var dateTimeValue = DateTime.Parse(value, null, System.Globalization.DateTimeStyles.RoundtripKind);
                 var finalDate = dateTimeValue.TimeOfDay == TimeSpan.Zero ? dateTimeValue.Date : dateTimeValue;
                 var dateFormat = dateTimeValue.TimeOfDay == TimeSpan.Zero ? "yyyy-MM-dd" : "yyyy-MM-ddTHH:mm:ssZ";
+                var dateFunction = column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?) ? "DateTimeOffset" : "DateTime";
 
-                return $@"{property} {linqOperator} DateTime(""{finalDate.ToString(dateFormat)}"")";
+                return $@"{property} {linqOperator} {dateFunction}(""{finalDate.ToString(dateFormat)}"")";
             }
             else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
             {

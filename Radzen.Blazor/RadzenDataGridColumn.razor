@@ -312,7 +312,7 @@
 
     internal void SetFilterValue(object value, bool isFirst = true)
     {
-        if (FilterPropertyType == typeof(DateTimeOffset) && value != null && value is DateTime?)
+        if ((FilterPropertyType == typeof(DateTimeOffset) || FilterPropertyType == typeof(DateTimeOffset?)) && value != null && value is DateTime?)
         {
             DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)value, DateTimeKind.Utc);
             value = offset;
