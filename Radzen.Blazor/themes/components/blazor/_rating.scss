@@ -14,6 +14,7 @@ $rating-disabled-color: $cool-grey !default;
 
   a {
     text-decoration: none;
+    cursor: default;
     outline: none;
   }
 
@@ -44,8 +45,9 @@ $rating-disabled-color: $cool-grey !default;
   }
 }
 
-.rz-rating:not(.rz-state-disabled) {
+.rz-rating:not(.rz-state-disabled):not(.rz-state-readonly) {
   .rzi-star-o {
+    cursor: pointer;
     &:hover {
       color: $rating-selected-color;
 

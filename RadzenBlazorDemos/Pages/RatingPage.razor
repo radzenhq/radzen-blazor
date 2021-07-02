@@ -9,6 +9,8 @@
         <RadzenRating Stars="10" Change=@(args => OnChange(args, "Rating with 10 stars")) />
         <h3 style="margin-top: 2rem">Disabled Rating with 10 stars</h3>
         <RadzenRating Disabled="true" Stars="10" />
+        <h3 style="margin-top: 2rem">ReadOnly Rating</h3>
+        <RadzenRating ReadOnly="true" Stars="5" Value="4" />
     </div>
     <div class="col-xl-6">
         <EventConsole @ref=@console />
