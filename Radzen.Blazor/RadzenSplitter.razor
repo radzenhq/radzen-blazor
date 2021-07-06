@@ -1,0 +1,210 @@
+﻿@using Microsoft.JSInterop
+@using System.Globalization
+@inherits RadzenComponent
+
+@if (Visible)
+{
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" style="@Style">
+        <CascadingValue Value=this>
+            @ChildContent
+        </CascadingValue>
+    </div>
+}
+
+@code {
+    private int _sizeautopanes = 0;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public Orientation Orientation { get; set; } = Orientation.Horizontal;
+
+    internal List<RadzenSplitterPane> Panes = new List<RadzenSplitterPane>();
+
+    public void AddPane(RadzenSplitterPane pane)
+    {
+        if (Panes.IndexOf(pane) != -1 || !pane.Visible)
+            return;
+
+        if (string.IsNullOrWhiteSpace(pane.Size))
+        {
+            //no size defined
+            pane.SizeAuto = true;
+            _sizeautopanes++;
+        }
+
+        pane.Index = Panes.Count;
+        Panes.Add(pane);
+
+        foreach (var i_pane in Panes)
+        {
+            if (!i_pane.SizeAuto)
+                continue;
+
+            i_pane.SizeRuntine = (100 / _sizeautopanes) + "%";
+        }
+    }
+
+    public void RemovePane(RadzenSplitterPane pane)
+    {
+        if (Panes.Contains(pane))
+        {
+            Panes.Remove(pane);
+            try
+            {
+                InvokeAsync(StateHasChanged);
+            }
+            catch
+            {
+            }
+        }
+    }
+
+
+    internal void Refresh()
+    {
+        try
+        {
+            InvokeAsync(StateHasChanged);
+        }
+        catch
+        {
+        }
+    }
+
+    internal Task Resize_Exec(MouseEventArgs args, int paneIndex)
+    {
+        var pane = Panes[paneIndex];
+        if (!pane.Resizable)
+            return Task.CompletedTask;
+
+        var panenext_resizable = Panes.Skip(paneIndex + 1).FirstOrDefault(o => o.Resizable && !o.Collapsed);
+
+
+        return JSRuntime.InvokeVoidAsync("Radzen.startSplitterResize",
+            UniqueID,
+            Reference,
+            pane.UniqueID,
+            panenext_resizable?.UniqueID,
+            Orientation.ToString(), Orientation == Orientation.Horizontal ? args.ClientX : args.ClientY,
+            pane.Min,
+            pane.Max,
+            panenext_resizable?.Min,
+            panenext_resizable?.Max).AsTask();
+    }
+
+    [JSInvokable("RadzenSplitter.OnPaneResized")]
+    public async Task OnPaneResized(int paneIndex, double value, int? paneNextIndex, double? valueNext)
+    {
+        var pane = Panes[paneIndex];
+        pane.SizeRuntine = value.ToString("0.##", CultureInfo.InvariantCulture) + "%";
+        if (paneNextIndex.HasValue)
+        {
+            var paneNext = Panes[paneNextIndex.Value];
+            var newvalue = valueNext.Value.ToString("0.##", CultureInfo.InvariantCulture) + "%";
+
+            if (newvalue != paneNext.SizeRuntine)
+            {
+                paneNext.SizeRuntine = newvalue;
+
+                if (OnExpand.HasDelegate)
+                {
+                    var arg = new RadzenSplitterEventArgs {PaneIndex = paneNext.Index};
+                    await OnResized.InvokeAsync(arg);
+                }
+            }
+        }
+
+        if (OnExpand.HasDelegate)
+        {
+            var arg = new RadzenSplitterEventArgs {PaneIndex = pane.Index};
+            await OnResized.InvokeAsync(arg);
+        }
+    }
+
+    internal async Task Collapse_Exec(object args, int paneIndex, string barid)
+    {
+        var pane = Panes[paneIndex];
+        var panenext = pane.Next();
+
+        if (panenext != null && panenext.Collapsible && panenext.IsLast && panenext.Collapsed)
+        {
+            if (OnExpand.HasDelegate)
+            {
+                var arg = new RadzenSplitterEventArgs {PaneIndex = panenext.Index};
+                await OnExpand.InvokeAsync(arg);
+                if (arg.Cancel)
+                    return;
+            }
+
+            panenext.Collapsed = false;
+        }
+        else
+        {
+            if (OnCollapse.HasDelegate)
+            {
+                var arg = new RadzenSplitterEventArgs {PaneIndex = pane.Index};
+                await OnCollapse.InvokeAsync(arg);
+                if (arg.Cancel)
+                    return;
+            }
+
+            pane.Collapsed = true;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    internal async Task Expand_Exec(MouseEventArgs args, int paneIndex, string barid)
+    {
+        var pane = Panes[paneIndex];
+        var panenext = pane.Next();
+
+        if (panenext != null && panenext.Collapsible && panenext.IsLast && !pane.Collapsed)
+        {
+            if (OnCollapse.HasDelegate)
+            {
+                var arg = new RadzenSplitterEventArgs {PaneIndex = panenext.Index};
+                await OnCollapse.InvokeAsync(arg);
+                if (arg.Cancel)
+                    return;
+            }
+
+            panenext.Collapsed = true;
+        }
+        else
+        {
+            if (OnExpand.HasDelegate)
+            {
+                var arg = new RadzenSplitterEventArgs {PaneIndex = pane.Index};
+                await OnExpand.InvokeAsync(arg);
+                if (arg.Cancel)
+                    return;
+            }
+
+            pane.Collapsed = false;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    protected override string GetComponentCssClass()
+    {
+        return $"rz-splitter rz-splitter-{Enum.GetName(typeof(Orientation), Orientation).ToLower()}";
+    }
+
+
+    [Parameter]
+    public EventCallback<RadzenSplitterEventArgs> OnCollapse { get; set; }
+
+    [Parameter]
+    public EventCallback<RadzenSplitterEventArgs> OnExpand { get; set; }
+
+    [Parameter]
+    public EventCallback<RadzenSplitterEventArgs> OnResized { get; set; }
+
+
+
+}
