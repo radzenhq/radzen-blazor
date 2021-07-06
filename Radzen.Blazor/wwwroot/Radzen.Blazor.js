@@ -1218,5 +1218,141 @@ window.Radzen = {
       document.addEventListener('mouseup', Radzen[el].mouseUpHandler);
       document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: true })
       document.addEventListener('touchend', Radzen[el].mouseUpHandler, { passive: true });
-  }
+  },
+      startSplitterResize: function(id,
+        splitter,
+        idpane,
+        idpanenext,
+        orientation,
+        clientPos,
+        minValue,
+        maxValue,
+        minNextValue,
+        maxNextValue) {
+
+        var el = document.getElementById(id);
+        var pane = document.getElementById(idpane);
+        var panenext = document.getElementById(idpanenext);
+        var pane_length;
+        var panenext_length;
+        var pane_perc;
+        var panenext_perc;
+        var orientation_H=orientation == 'Horizontal';
+
+        var total_length = 0.0;
+        Array.from(el.children).forEach(element => {
+            total_length += orientation_H
+                ? element.getBoundingClientRect().width
+                : element.getBoundingClientRect().height;
+        });
+
+        if (pane) {
+            pane_length = orientation_H
+                ? pane.getBoundingClientRect().width
+                : pane.getBoundingClientRect().height;
+
+            pane_perc = (pane_length / total_length * 100) + '%';
+        }
+
+        if (panenext) {
+            panenext_length = orientation_H
+                ? panenext.getBoundingClientRect().width
+                : panenext.getBoundingClientRect().height;
+
+            panenext_perc = (panenext_length / total_length * 100) + '%';
+        }
+
+        function ensurevalue(value) {
+            if (!value)
+                return null;
+
+            value=value.trim().toLowerCase();
+
+            if (value.endsWith("%"))
+                return total_length*parseFloat(value)/100;
+            
+            if (value.endsWith("px"))
+                return parseFloat(value);
+
+            throw 'Invalid value';
+        }
+
+        minValue=ensurevalue(minValue);
+        maxValue=ensurevalue(maxValue);
+        minNextValue=ensurevalue(minNextValue);
+        maxNextValue=ensurevalue(maxNextValue);
+        
+        Radzen[el] = {
+            clientPos: clientPos,
+            panePerc: parseFloat(pane_perc),
+            panenextPerc: isFinite(parseFloat(panenext_perc)) ? parseFloat(panenext_perc) : 0,
+            paneLength: pane_length,
+            panenextLength: isFinite(panenext_length) ? panenext_length : 0,
+            isnextlastresizable: panenext!=null ? panenext.className.toLowerCase().includes('rz-splitter-pane-lastresizable') : false,
+            mouseUpHandler: function(e) {
+                if (Radzen[el]) {
+                    splitter.invokeMethodAsync(
+                        'RadzenSplitter.OnPaneResized',
+                        parseInt(pane.getAttribute('data-index')),
+                        parseFloat(pane.style.flexBasis),
+                        panenext ? parseInt(panenext.getAttribute('data-index')) : null,
+                        panenext ? parseFloat(panenext.style.flexBasis) : null
+                    );
+                    document.removeEventListener('mousemove', Radzen[el].mouseMoveHandler);
+                    document.removeEventListener('mouseup', Radzen[el].mouseUpHandler);
+                    document.removeEventListener('touchmove', Radzen[el].touchMoveHandler);
+                    document.removeEventListener('touchend', Radzen[el].mouseUpHandler);
+                    Radzen[el] = null;
+                }
+            },
+            mouseMoveHandler: function(e) {
+                if (Radzen[el]) {
+
+                    var space_perc = Radzen[el].panePerc + Radzen[el].panenextPerc;
+                    var space_length = Radzen[el].paneLength + Radzen[el].panenextLength;
+
+                    var length = (Radzen[el].paneLength -
+                        (Radzen[el].clientPos - (orientation_H ? e.clientX : e.clientY)));
+                    
+                    if (length > space_length)
+                        length = space_length;
+
+                    if (minValue && length < minValue) length = minValue;
+                    if (maxValue && length > maxValue) length = maxValue;
+
+                    if (panenext) {
+                        var nextspace=space_length-length;
+                        if (minNextValue && nextspace < minNextValue) length = space_length-minNextValue;
+                        if (maxNextValue && nextspace > maxNextValue) length = space_length+maxNextValue;
+                    }
+                    
+                    var perc = length / Radzen[el].paneLength;
+                    if (!isFinite(perc)) {
+                        perc = 1;
+                        Radzen[el].panePerc = 0.1;
+                        Radzen[el].paneLength =orientation_H
+                            ? pane.getBoundingClientRect().width
+                            : pane.getBoundingClientRect().height;
+                    }
+                    
+                    var new_perc =  Radzen[el].panePerc * perc;
+                    if (new_perc < 0) new_perc = 0;
+                    if (new_perc > 100) new_perc = 100;
+                    
+                    pane.style.flexBasis = new_perc + '%';
+                    if (panenext)
+                        panenext.style.flexBasis = (space_perc - new_perc) + '%';
+                }
+            },
+            touchMoveHandler: function(e) {
+                if (e.targetTouches[0]) {
+                    Radzen[el].mouseMoveHandler(e.targetTouches[0]);
+                }
+            }
+        };
+        document.addEventListener('mousemove', Radzen[el].mouseMoveHandler);
+        document.addEventListener('mouseup', Radzen[el].mouseUpHandler);
+        document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: true });
+        document.addEventListener('touchend', Radzen[el].mouseUpHandler, { passive: true });
+    }
 };

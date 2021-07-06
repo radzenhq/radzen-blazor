@@ -733,4 +733,10 @@ namespace Radzen
             return false;
         }
     }
+    public class RadzenSplitterEventArgs
+    {
+        public int PaneIndex { get; set; }
+        public bool Cancel { get; set; }
+
+    }
 }
