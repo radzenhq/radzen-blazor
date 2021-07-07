@@ -22,7 +22,7 @@ $plitter-bar-background-color-hover: #DDDDDD;
         user-select: none;
 
 
-        .compress {
+        > .rz-compress {
             height: 1em;
             line-height: 1em;
 
@@ -35,12 +35,12 @@ $plitter-bar-background-color-hover: #DDDDDD;
             }
         }
 
-        .resizing {
+        > .rz-resize {
             border: 1px solid $plitter-bar-color;
             border-radius: 1px;
         }
 
-        .expand {
+        > .rz-expand {
             height: 1em;
             line-height: 1em;
 
@@ -65,16 +65,16 @@ $plitter-bar-background-color-hover: #DDDDDD;
             flex-direction: column;
             width: 12px;
 
-            .compress:before {
+            > .rz-compress:before {
                 content: 'chevron_left'
             }
 
-            .resizing {
+            > .rz-resize {
                 height: 12px;
                 margin: 2px 0;
             }
 
-            .expand:before {
+            > .rz-expand:before {
                 content: 'chevron_right';
                 width: 12px;
             }
@@ -92,16 +92,16 @@ $plitter-bar-background-color-hover: #DDDDDD;
             flex-direction: row;
             height: 12px;
 
-            .compress:before {
+            > .rz-compress:before {
                 content: 'expand_less'
             }
 
-            .resizing {
+            > .rz-resize {
                 width: 12px;
                 margin: 0 2px;
             }
 
-            .expand:before {
+            > .rz-expand:before {
                 content: 'expand_more'
             }
 

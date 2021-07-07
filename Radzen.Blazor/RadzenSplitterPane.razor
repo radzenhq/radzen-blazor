@@ -1,4 +1,5 @@
-﻿@inherits RadzenComponent
+﻿@using System.Diagnostics
+@inherits RadzenComponent
 
 
 @if (Visible)
@@ -13,23 +14,23 @@
         <div class="@GetComponentBarCssClass()"
              @onclick:preventDefault="true"
              @onclick:stopPropagation="true"
-             @onmousedown=@(args => Splitter.Resize_Exec(args, Index))>
+             @onmousedown=@(args => Splitter.ResizeExec(args, Index))>
 
             @if (IsCollapsible)
             {
-                <span class="compress" @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter.Collapse_Exec(args, Index, UniqueID))>
+                <span class="rz-compress" @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter.CollapseExec(args, Index, UniqueID))>
                 </span>
             }
 
             @if (IsResizable)
             {
-                <span class="resizing">
+                <span class="rz-resize">
                 </span>
             }
 
             @if (IsExpandable)
             {
-                <span class="expand" @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter.Expand_Exec(args, Index, UniqueID))>
+                <span class="rz-expand" @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter.ExpandExec(args, Index, UniqueID))>
                 </span>
             }
 
@@ -66,11 +67,11 @@
     {
         get
         {
-            var nextpane = Next();
+            var paneNext = Next();
 
             if (Collapsed
-                || (Index == Splitter.Panes.Count - 2 && !nextpane.IsResizable)
-                || (IsLastResizable && nextpane != null && nextpane.Collapsed)
+                || (Index == Splitter.Panes.Count - 2 && !paneNext.IsResizable)
+                || (IsLastResizable && paneNext != null && paneNext.Collapsed)
                 )
                 return false;
 
@@ -86,11 +87,11 @@
             if (Collapsible && !Collapsed)
                 return true;
 
-            var panenext = Next();
-            if (panenext == null)
+            var paneNext = Next();
+            if (paneNext == null)
                 return false;
 
-            return panenext.IsLast && panenext.Collapsible && panenext.Collapsed;
+            return paneNext.IsLast && paneNext.Collapsible && paneNext.Collapsed;
         }
     }
 
@@ -101,11 +102,11 @@
             if (Collapsed)
                 return true;
 
-            var panenext = Next();
-            if (panenext == null)
+            var paneNext = Next();
+            if (paneNext == null)
                 return false;
 
-            return panenext.IsLast && panenext.Collapsible && !panenext.Collapsed;
+            return paneNext.IsLast && paneNext.Collapsible && !paneNext.Collapsed;
         }
     }
 
@@ -125,12 +126,10 @@
             return "locked";
         }
     }
-
-
+    
     [Parameter]
     public RenderFragment ChildContent { get; set; }
-
-
+    
     [Parameter]
     public bool Collapsible { get; set; } = true;
 

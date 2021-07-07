@@ -1221,8 +1221,8 @@ window.Radzen = {
   },
       startSplitterResize: function(id,
         splitter,
-        idpane,
-        idpanenext,
+        paneId,
+        paneNextId,
         orientation,
         clientPos,
         minValue,
@@ -1231,35 +1231,35 @@ window.Radzen = {
         maxNextValue) {
 
         var el = document.getElementById(id);
-        var pane = document.getElementById(idpane);
-        var panenext = document.getElementById(idpanenext);
-        var pane_length;
-        var panenext_length;
-        var pane_perc;
-        var panenext_perc;
-        var orientation_H=orientation == 'Horizontal';
+        var pane = document.getElementById(paneId);
+        var paneNext = document.getElementById(paneNextId);
+        var paneLength;
+        var paneNextLength;
+        var panePerc;
+        var paneNextPerc;
+        var isHOrientation=orientation == 'Horizontal';
 
-        var total_length = 0.0;
+        var totalLength = 0.0;
         Array.from(el.children).forEach(element => {
-            total_length += orientation_H
+            totalLength += isHOrientation
                 ? element.getBoundingClientRect().width
                 : element.getBoundingClientRect().height;
         });
 
         if (pane) {
-            pane_length = orientation_H
+            paneLength = isHOrientation
                 ? pane.getBoundingClientRect().width
                 : pane.getBoundingClientRect().height;
 
-            pane_perc = (pane_length / total_length * 100) + '%';
+            panePerc = (paneLength / totalLength * 100) + '%';
         }
 
-        if (panenext) {
-            panenext_length = orientation_H
-                ? panenext.getBoundingClientRect().width
-                : panenext.getBoundingClientRect().height;
+        if (paneNext) {
+            paneNextLength = isHOrientation
+                ? paneNext.getBoundingClientRect().width
+                : paneNext.getBoundingClientRect().height;
 
-            panenext_perc = (panenext_length / total_length * 100) + '%';
+            paneNextPerc = (paneNextLength / totalLength * 100) + '%';
         }
 
         function ensurevalue(value) {
@@ -1269,7 +1269,7 @@ window.Radzen = {
             value=value.trim().toLowerCase();
 
             if (value.endsWith("%"))
-                return total_length*parseFloat(value)/100;
+                return totalLength*parseFloat(value)/100;
             
             if (value.endsWith("px"))
                 return parseFloat(value);
@@ -1284,19 +1284,18 @@ window.Radzen = {
         
         Radzen[el] = {
             clientPos: clientPos,
-            panePerc: parseFloat(pane_perc),
-            panenextPerc: isFinite(parseFloat(panenext_perc)) ? parseFloat(panenext_perc) : 0,
-            paneLength: pane_length,
-            panenextLength: isFinite(panenext_length) ? panenext_length : 0,
-            isnextlastresizable: panenext!=null ? panenext.className.toLowerCase().includes('rz-splitter-pane-lastresizable') : false,
+            panePerc: parseFloat(panePerc),
+            paneNextPerc: isFinite(parseFloat(paneNextPerc)) ? parseFloat(paneNextPerc) : 0,
+            paneLength: paneLength,
+            paneNextLength: isFinite(paneNextLength) ? paneNextLength : 0,
             mouseUpHandler: function(e) {
                 if (Radzen[el]) {
                     splitter.invokeMethodAsync(
                         'RadzenSplitter.OnPaneResized',
                         parseInt(pane.getAttribute('data-index')),
                         parseFloat(pane.style.flexBasis),
-                        panenext ? parseInt(panenext.getAttribute('data-index')) : null,
-                        panenext ? parseFloat(panenext.style.flexBasis) : null
+                        paneNext ? parseInt(paneNext.getAttribute('data-index')) : null,
+                        paneNext ? parseFloat(paneNext.style.flexBasis) : null
                     );
                     document.removeEventListener('mousemove', Radzen[el].mouseMoveHandler);
                     document.removeEventListener('mouseup', Radzen[el].mouseUpHandler);
@@ -1308,40 +1307,40 @@ window.Radzen = {
             mouseMoveHandler: function(e) {
                 if (Radzen[el]) {
 
-                    var space_perc = Radzen[el].panePerc + Radzen[el].panenextPerc;
-                    var space_length = Radzen[el].paneLength + Radzen[el].panenextLength;
+                    var spacePerc = Radzen[el].panePerc + Radzen[el].paneNextPerc;
+                    var spaceLength = Radzen[el].paneLength + Radzen[el].paneNextLength;
 
                     var length = (Radzen[el].paneLength -
-                        (Radzen[el].clientPos - (orientation_H ? e.clientX : e.clientY)));
+                        (Radzen[el].clientPos - (isHOrientation ? e.clientX : e.clientY)));
                     
-                    if (length > space_length)
-                        length = space_length;
+                    if (length > spaceLength)
+                        length = spaceLength;
 
                     if (minValue && length < minValue) length = minValue;
                     if (maxValue && length > maxValue) length = maxValue;
 
-                    if (panenext) {
-                        var nextspace=space_length-length;
-                        if (minNextValue && nextspace < minNextValue) length = space_length-minNextValue;
-                        if (maxNextValue && nextspace > maxNextValue) length = space_length+maxNextValue;
+                    if (paneNext) {
+                        var nextSpace=spaceLength-length;
+                        if (minNextValue && nextSpace < minNextValue) length = spaceLength-minNextValue;
+                        if (maxNextValue && nextSpace > maxNextValue) length = spaceLength+maxNextValue;
                     }
                     
                     var perc = length / Radzen[el].paneLength;
                     if (!isFinite(perc)) {
                         perc = 1;
                         Radzen[el].panePerc = 0.1;
-                        Radzen[el].paneLength =orientation_H
+                        Radzen[el].paneLength =isHOrientation
                             ? pane.getBoundingClientRect().width
                             : pane.getBoundingClientRect().height;
                     }
                     
-                    var new_perc =  Radzen[el].panePerc * perc;
-                    if (new_perc < 0) new_perc = 0;
-                    if (new_perc > 100) new_perc = 100;
+                    var newPerc =  Radzen[el].panePerc * perc;
+                    if (newPerc < 0) newPerc = 0;
+                    if (newPerc > 100) newPerc = 100;
                     
-                    pane.style.flexBasis = new_perc + '%';
-                    if (panenext)
-                        panenext.style.flexBasis = (space_perc - new_perc) + '%';
+                    pane.style.flexBasis = newPerc + '%';
+                    if (paneNext)
+                        paneNext.style.flexBasis = (spacePerc - newPerc) + '%';
                 }
             },
             touchMoveHandler: function(e) {

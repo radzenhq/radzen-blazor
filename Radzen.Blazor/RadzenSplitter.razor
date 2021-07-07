@@ -29,7 +29,7 @@
 
         if (string.IsNullOrWhiteSpace(pane.Size))
         {
-            //no size defined
+    //no size defined
             pane.SizeAuto = true;
             _sizeautopanes++;
         }
@@ -37,12 +37,12 @@
         pane.Index = Panes.Count;
         Panes.Add(pane);
 
-        foreach (var i_pane in Panes)
+        foreach (var iPane in Panes)
         {
-            if (!i_pane.SizeAuto)
+            if (!iPane.SizeAuto)
                 continue;
 
-            i_pane.SizeRuntine = (100 / _sizeautopanes) + "%";
+            iPane.SizeRuntine = (100 / _sizeautopanes) + "%";
         }
     }
 
@@ -62,7 +62,7 @@
     }
 
 
-    internal void Refresh()
+    public void Refresh()
     {
         try
         {
@@ -73,79 +73,87 @@
         }
     }
 
-    internal Task Resize_Exec(MouseEventArgs args, int paneIndex)
+    internal Task ResizeExec(MouseEventArgs args, int paneIndex)
     {
         var pane = Panes[paneIndex];
         if (!pane.Resizable)
             return Task.CompletedTask;
 
-        var panenext_resizable = Panes.Skip(paneIndex + 1).FirstOrDefault(o => o.Resizable && !o.Collapsed);
+        var paneNextResizable = Panes.Skip(paneIndex + 1).FirstOrDefault(o => o.Resizable && !o.Collapsed);
 
 
         return JSRuntime.InvokeVoidAsync("Radzen.startSplitterResize",
             UniqueID,
             Reference,
             pane.UniqueID,
-            panenext_resizable?.UniqueID,
+            paneNextResizable?.UniqueID,
             Orientation.ToString(), Orientation == Orientation.Horizontal ? args.ClientX : args.ClientY,
             pane.Min,
             pane.Max,
-            panenext_resizable?.Min,
-            panenext_resizable?.Max).AsTask();
+            paneNextResizable?.Min,
+            paneNextResizable?.Max).AsTask();
     }
 
     [JSInvokable("RadzenSplitter.OnPaneResized")]
-    public async Task OnPaneResized(int paneIndex, double value, int? paneNextIndex, double? valueNext)
+    public async Task OnPaneResized(int paneIndex, double sizeNew, int? paneNextIndex, double? sizeNextNew)
     {
         var pane = Panes[paneIndex];
-        pane.SizeRuntine = value.ToString("0.##", CultureInfo.InvariantCulture) + "%";
-        if (paneNextIndex.HasValue)
+
+        if (Resize.HasDelegate)
         {
-            var paneNext = Panes[paneNextIndex.Value];
-            var newvalue = valueNext.Value.ToString("0.##", CultureInfo.InvariantCulture) + "%";
-
-            if (newvalue != paneNext.SizeRuntine)
+            var arg = new RadzenSplitterResizeEventArgs {PaneIndex = pane.Index, Pane = pane, NewSize = sizeNew};
+            await Resize.InvokeAsync(arg);
+            if (arg.Cancel)
             {
-                paneNext.SizeRuntine = newvalue;
-
-                if (OnExpand.HasDelegate)
-                {
-                    var arg = new RadzenSplitterEventArgs {PaneIndex = paneNext.Index};
-                    await OnResized.InvokeAsync(arg);
-                }
+                var oldSize = pane.SizeRuntine;
+                pane.SizeRuntine = "0";
+                await InvokeAsync(StateHasChanged);
+                pane.SizeRuntine = oldSize;
+                await InvokeAsync(StateHasChanged);
+                return;
             }
         }
 
-        if (OnExpand.HasDelegate)
+        pane.SizeRuntine = sizeNew.ToString("0.##", CultureInfo.InvariantCulture) + "%";
+
+        if (paneNextIndex.HasValue)
         {
-            var arg = new RadzenSplitterEventArgs {PaneIndex = pane.Index};
-            await OnResized.InvokeAsync(arg);
+            var paneNext = Panes[paneNextIndex.Value];
+
+            if (Expand.HasDelegate)
+            {
+                var arg = new RadzenSplitterResizeEventArgs {PaneIndex = paneNext.Index, Pane = paneNext, NewSize = sizeNextNew.Value};
+                await Resize.InvokeAsync(arg);
+                //cancel omitted because it is managed by the parent panel
+            }
+
+            paneNext.SizeRuntine = sizeNextNew.Value.ToString("0.##", CultureInfo.InvariantCulture) + "%";
         }
     }
 
-    internal async Task Collapse_Exec(object args, int paneIndex, string barid)
+    internal async Task CollapseExec(object args, int paneIndex, string paneId)
     {
         var pane = Panes[paneIndex];
-        var panenext = pane.Next();
+        var paneNext = pane.Next();
 
-        if (panenext != null && panenext.Collapsible && panenext.IsLast && panenext.Collapsed)
+        if (paneNext != null && paneNext.Collapsible && paneNext.IsLast && paneNext.Collapsed)
         {
-            if (OnExpand.HasDelegate)
+            if (Expand.HasDelegate)
             {
-                var arg = new RadzenSplitterEventArgs {PaneIndex = panenext.Index};
-                await OnExpand.InvokeAsync(arg);
+                var arg = new RadzenSplitterEventArgs {PaneIndex = paneNext.Index, Pane = paneNext};
+                await Expand.InvokeAsync(arg);
                 if (arg.Cancel)
                     return;
             }
 
-            panenext.Collapsed = false;
+            paneNext.Collapsed = false;
         }
         else
         {
-            if (OnCollapse.HasDelegate)
+            if (Collapse.HasDelegate)
             {
-                var arg = new RadzenSplitterEventArgs {PaneIndex = pane.Index};
-                await OnCollapse.InvokeAsync(arg);
+                var arg = new RadzenSplitterEventArgs {PaneIndex = pane.Index, Pane = pane};
+                await Collapse.InvokeAsync(arg);
                 if (arg.Cancel)
                     return;
             }
@@ -156,29 +164,29 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    internal async Task Expand_Exec(MouseEventArgs args, int paneIndex, string barid)
+    internal async Task ExpandExec(MouseEventArgs args, int paneIndex, string paneId)
     {
         var pane = Panes[paneIndex];
-        var panenext = pane.Next();
+        var paneNext = pane.Next();
 
-        if (panenext != null && panenext.Collapsible && panenext.IsLast && !pane.Collapsed)
+        if (paneNext != null && paneNext.Collapsible && paneNext.IsLast && !pane.Collapsed)
         {
-            if (OnCollapse.HasDelegate)
+            if (Collapse.HasDelegate)
             {
-                var arg = new RadzenSplitterEventArgs {PaneIndex = panenext.Index};
-                await OnCollapse.InvokeAsync(arg);
+                var arg = new RadzenSplitterEventArgs {PaneIndex = paneNext.Index, Pane = paneNext};
+                await Collapse.InvokeAsync(arg);
                 if (arg.Cancel)
                     return;
             }
 
-            panenext.Collapsed = true;
+            paneNext.Collapsed = true;
         }
         else
         {
-            if (OnExpand.HasDelegate)
+            if (Expand.HasDelegate)
             {
-                var arg = new RadzenSplitterEventArgs {PaneIndex = pane.Index};
-                await OnExpand.InvokeAsync(arg);
+                var arg = new RadzenSplitterEventArgs {PaneIndex = pane.Index, Pane = pane};
+                await Expand.InvokeAsync(arg);
                 if (arg.Cancel)
                     return;
             }
@@ -197,13 +205,13 @@
 
 
     [Parameter]
-    public EventCallback<RadzenSplitterEventArgs> OnCollapse { get; set; }
+    public EventCallback<RadzenSplitterEventArgs> Collapse { get; set; }
 
     [Parameter]
-    public EventCallback<RadzenSplitterEventArgs> OnExpand { get; set; }
+    public EventCallback<RadzenSplitterEventArgs> Expand { get; set; }
 
     [Parameter]
-    public EventCallback<RadzenSplitterEventArgs> OnResized { get; set; }
+    public EventCallback<RadzenSplitterResizeEventArgs> Resize { get; set; }
 
 
 
