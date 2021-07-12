@@ -10,7 +10,7 @@
         {
             Grid.AddColumn(this);
 
-            if (Type == null)
+            if (!string.IsNullOrEmpty(FilterProperty) || Type == null)
             {
                 var property = GetFilterProperty();
 
