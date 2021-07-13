@@ -747,7 +747,7 @@ window.Radzen = {
     document.addEventListener('click', Radzen[id]);
 
     var p = parent;
-    while (p != document.body) {
+    while (p && p != document.body) {
         if (p.scrollWidth > p.clientWidth || p.scrollHeight > p.clientHeight) {
             p.removeEventListener('scroll', Radzen.closePopupsOnScroll);
             p.addEventListener('scroll', Radzen.closePopupsOnScroll);
