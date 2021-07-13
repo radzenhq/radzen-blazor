@@ -31,8 +31,9 @@ else
 @code {
     protected override string GetComponentCssClass()
     {
-        string pill = IsPill ? " badge-pill" : "";
-        return $"badge badge-{BadgeStyle.ToString().ToLower()}{pill}";
+        string pill = IsPill ? " rz-badge-pill" : "";
+        return $"rz-badge rz-badge-{BadgeStyle.ToString().ToLower()}{pill}";
+        //return $"badge badge-{BadgeStyle.ToString().ToLower()}{pill}";
     }
 
     [Parameter]
