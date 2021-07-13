@@ -44,17 +44,16 @@ $badge-styles: map-merge(
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
-    border: 1px solid $black;
+
+    @each $style, $badge in $badge-styles {
+        &.rz-badge-#{$style} {
+            @each $name, $value in $badge {
+                #{$name}: #{$value};
+            }
+        }
+    }
 }
 
 .rz-badge-pill {
     border-radius: $badge-pill-border-radius;
-}
-
-@each $style, $badge in $badge-styles {
-    &.badge-#{$style} {
-        @each $name, $value in $badge {
-            #{$name}: #{$value};
-        }
-    }
 }
