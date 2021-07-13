@@ -1,7 +1,6 @@
 using System;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RadzenBlazorDemos
 {
@@ -34,7 +33,7 @@ namespace RadzenBlazorDemos
             Path = "/support",
             Icon = "&#xe94c"
         },
-   
+
         new Example()
         {
             Name="DataGrid",
@@ -613,7 +612,7 @@ namespace RadzenBlazorDemos
                 }
             }
         },
-   
+
         new Example()
         {
             Name="Containers",
@@ -803,6 +802,13 @@ namespace RadzenBlazorDemos
                     Path = "example-upload",
                     Icon = "&#xe2c6",
                     Tags = new [] { "upload", "file"}
+                },
+                new Example()
+                {
+                    Name = "Badge",
+                    Path = "badge",
+                    Icon = "&#xea67",
+                    Tags = new[] { "badge", "link"}
                 }
             }
         },
