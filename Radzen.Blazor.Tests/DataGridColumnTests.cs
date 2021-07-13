@@ -1,13 +1,5 @@
-using AngleSharp.Dom;
-using Bunit;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
-using Radzen.Blazor.Rendering;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
