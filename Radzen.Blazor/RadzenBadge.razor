@@ -1,7 +1,6 @@
-﻿@using Radzen.Blazor
-@inherits RadzenComponent
+﻿@inherits RadzenComponent
 
-<span class="@GetComponentCssClass()">
+<span @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     @if (ChildContent != null)
     {
         @ChildContent
@@ -15,9 +14,17 @@
 @code {
     protected override string GetComponentCssClass()
     {
-        string pill = IsPill ? " rz-badge-pill" : "";
-        return $"rz-badge rz-badge-{BadgeStyle.ToString().ToLower()}{pill}";
-        //return $"badge badge-{BadgeStyle.ToString().ToLower()}{pill}";
+        var classList = new List<string>();
+
+        classList.Add("rz-badge");
+        classList.Add($"rz-badge-{BadgeStyle.ToString().ToLower()}");
+
+        if (IsPill)
+        {
+            classList.Add("rz-badge-pill");
+        }
+
+        return string.Join(" ", classList);
     }
 
     [Parameter]

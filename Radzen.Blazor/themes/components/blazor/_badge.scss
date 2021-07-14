@@ -34,7 +34,6 @@ $badge-styles: map-merge(
 );
 
 .rz-badge {
-    -webkit-appearance: none;
     color: $white;
     display: inline-block;
     padding: .25em .4em;
@@ -43,13 +42,12 @@ $badge-styles: map-merge(
     line-height: 1;
     text-align: center;
     white-space: nowrap;
-    vertical-align: baseline;
+}
 
-    @each $style, $badge in $badge-styles {
-        &.rz-badge-#{$style} {
-            @each $name, $value in $badge {
-                #{$name}: #{$value};
-            }
+@each $style, $badge in $badge-styles {
+    .rz-badge-#{$style} {
+        @each $name, $value in $badge {
+            #{$name}: #{$value};
         }
     }
 }
