@@ -43,16 +43,5 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains($"badge-{badgeStyle.ToString().ToLower()}", component.Markup);
         }
-
-        [Fact]
-        public void Badge_Renders_Link()
-        {
-            using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenBadge>();
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Path, "https://radzen.com"));
-
-            Assert.Contains("href=\"https://radzen.com\"", component.Markup);
-        }
     }
 }

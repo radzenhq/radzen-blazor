@@ -1,32 +1,16 @@
 ﻿@using Radzen.Blazor
 @inherits RadzenComponent
 
-@if (string.IsNullOrEmpty(Path))
-{
-    <span class="@GetComponentCssClass()">
-        @if (ChildContent != null)
-        {
-            @ChildContent
-        }
-        else
-        {
-            @Text
-        }
-    </span>
-}
-else
-{
-    <Microsoft.AspNetCore.Components.Routing.NavLink style="@Style" href="@Path" @attributes="Attributes" class="@GetComponentCssClass()" target="@Target" id="GetId()">
-        @if (ChildContent != null)
-        {
-            @ChildContent
-        }
-        else
-        {
-            @Text
-        }
-    </Microsoft.AspNetCore.Components.Routing.NavLink>
-}
+<span class="@GetComponentCssClass()">
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else
+    {
+        @Text
+    }
+</span>
 
 @code {
     protected override string GetComponentCssClass()
@@ -47,10 +31,4 @@ else
 
     [Parameter]
     public bool IsPill { get; set; }
-
-    [Parameter]
-    public string Path { get; set; } = "";
-
-    [Parameter]
-    public string Target { get; set; }
 }

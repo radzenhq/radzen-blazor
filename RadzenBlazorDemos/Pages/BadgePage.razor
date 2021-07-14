@@ -19,19 +19,15 @@
     <RadzenBadge BadgeStyle="BadgeStyle.Warning" IsPill="@true" Text="Warning" />
     <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill="@true" Text="Info" />
 
-    <h3 style="margin-top:20px">Links</h3>
-    <RadzenBadge Path="/badge" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
-    <RadzenBadge Path="/badge" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
-    <RadzenBadge Path="/badge" BadgeStyle="BadgeStyle.Light" Text="Light" />
-    <RadzenBadge Path="/badge" BadgeStyle="BadgeStyle.Success" Text="Success" />
-    <RadzenBadge Path="/badge" BadgeStyle="BadgeStyle.Danger" IsPill="@true" Text="Danger" />
-    <RadzenBadge Path="/badge" BadgeStyle="BadgeStyle.Warning" IsPill="@true" Text="Warning" />
-    <RadzenBadge Path="/badge" BadgeStyle="BadgeStyle.Info" IsPill="@true" Text="Info" />
-
     <h3 style="margin-top:20px">In Button</h3>
     <RadzenButton ButtonStyle="ButtonStyle.Info">
         Button
         <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="15" />
+    </RadzenButton>
+
+    <RadzenButton ButtonStyle="ButtonStyle.Light">
+        Button
+        <RadzenBadge BadgeStyle="BadgeStyle.Primary" IsPill="@true" Text="15" />
     </RadzenButton>
 
     <h3 style="margin-top:20px">Child Content</h3>
