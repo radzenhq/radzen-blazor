@@ -10,25 +10,28 @@
         {
             Grid.AddColumn(this);
 
-            var property = GetFilterProperty();
-
-            if (!string.IsNullOrEmpty(property))
+            if (!string.IsNullOrEmpty(FilterProperty) || Type == null)
             {
-                _filterPropertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
+                var property = GetFilterProperty();
 
-                if (_filterPropertyType == null)
+                if (!string.IsNullOrEmpty(property))
                 {
-                    _filterPropertyType = Type;
+                    _filterPropertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
                 }
-                else
-                {
-                    propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
-                }
+            }
+            
+            if (_filterPropertyType == null)
+            {
+                _filterPropertyType = Type;
+            }
+            else
+            {
+                propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
+            }
 
-                if (_filterPropertyType == typeof(string))
-                {
-                    FilterOperator = FilterOperator.Contains;
-                }
+            if (_filterPropertyType == typeof(string))
+            {
+                FilterOperator = FilterOperator.Contains;
             }
         }
     }
