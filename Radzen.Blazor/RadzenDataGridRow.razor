@@ -52,46 +52,26 @@
                 Grid.rowSpans.Add(j, (int)Convert.ChangeType(rowspan, TypeCode.Int32));
             }
 
-            if (Grid.IsRowInEditMode(Item))
-            {
-                <CascadingValue Value=Grid.editContexts[Item]>
-                    <td style="@column.GetStyle(true)" @attributes="@(cellAttr)" class="@Grid.getFrozenColumnClass(column, Columns)">
-                        <span class="rz-cell-data">
-                            @if (column.EditTemplate != null)
-                            {
-                                @column.EditTemplate(Item)
-                            }
-                            else if (column.Template != null)
-                            {
-                                @column.Template(Item)
-                            }
-                            else
-                            {
-                                @column.GetValue(Item)
-                            }
-                        </span>
-                    </td>
-                </CascadingValue>
-            }
-            else
-            {
-                <RadzenDataGridCell Grid="@this.Grid" Item="@Item"
-                                    Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + Grid.getFrozenColumnClass(column, Columns))" Attributes="@(cellAttr)">
-                    <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
-                        @if (Item != null)
+            <RadzenDataGridCell Grid="@this.Grid" Item="@Item"
+                                Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + Grid.getFrozenColumnClass(column, Columns))" Attributes="@(cellAttr)">
+                <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
+                    @if (Item != null)
+                    {
+                        @if (Grid.IsRowInEditMode(Item) && column.EditTemplate != null)
                         {
-                            @if (column.Template != null)
-                            {
-                                @column.Template(Item)
-                            }
-                            else
-                            {
-                                @column.GetValue(Item)
-                            }
+                            @column.EditTemplate(Item)
+                        } 
+                        else if (column.Template != null)
+                        {
+                            @column.Template(Item)
                         }
-                    </span>
-                </RadzenDataGridCell>
-            }
+                        else
+                        {
+                            @column.GetValue(Item)
+                        }
+                    }
+                </span>
+            </RadzenDataGridCell>
         }
     </CascadingValue>
 </tr>
