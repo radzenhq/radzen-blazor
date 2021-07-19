@@ -107,7 +107,7 @@
                                                 }
                                                 else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
                                                 {
-                                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
+                                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args))" />
                                                 }
                                                 else
                                                 {
@@ -131,7 +131,7 @@
                                                 }
                                                 else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
                                                 {
-                                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetSecondFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column, false, false))" />
+                                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetSecondFilterValue()" Change="@(args => column.SetFilterValue(args, false))"/>
                                                 }
                                                 else
                                                 {
