@@ -659,6 +659,13 @@ namespace RadzenBlazorDemos
                     Icon = "&#xe044",
                     Tags = new [] { "step", "steps", "wizard" }
                 },
+				new Example()
+                {
+                    Name = "Splitter",
+                    Path = "splitter",
+                    Icon = "&#xe94f",
+                    Tags = new [] { "splitter"}
+                },
             }
         },
         new Example

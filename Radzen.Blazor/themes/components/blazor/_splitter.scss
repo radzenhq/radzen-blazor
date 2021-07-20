@@ -1,0 +1,129 @@
+$plitter-bar-color: #777777;
+$plitter-bar-background-color: #FAFAFA;
+$plitter-bar-background-color-hover: #DDDDDD;
+
+
+
+.rz-splitter {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    height: 100%;
+
+    > .rz-splitter-bar {
+        flex: 0 0 auto;
+        position: relative;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: $plitter-bar-color;
+        background-color: $plitter-bar-background-color;
+        user-select: none;
+
+
+        > .rz-compress {
+            height: 1em;
+            line-height: 1em;
+
+            &:before {
+                font-family: 'Material Icons';
+            }
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+
+        > .rz-resize {
+            border: 1px solid $plitter-bar-color;
+            border-radius: 1px;
+        }
+
+        > .rz-expand {
+            height: 1em;
+            line-height: 1em;
+
+            &:before {
+                font-family: 'Material Icons';
+            }
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+
+        &-resizable:hover {
+            background-color: $plitter-bar-background-color-hover;
+        }
+    }
+
+    &-horizontal {
+        flex-direction: row;
+
+        > .rz-splitter-bar {
+            flex-direction: column;
+            width: 12px;
+
+            > .rz-compress:before {
+                content: 'chevron_left'
+            }
+
+            > .rz-resize {
+                height: 12px;
+                margin: 2px 0;
+            }
+
+            > .rz-expand:before {
+                content: 'chevron_right';
+                width: 12px;
+            }
+
+            &-resizable:hover {
+                cursor: col-resize;
+            }
+        }
+    }
+
+    &-vertical {
+        flex-direction: column;
+
+        > .rz-splitter-bar {
+            flex-direction: row;
+            height: 12px;
+
+            > .rz-compress:before {
+                content: 'expand_less'
+            }
+
+            > .rz-resize {
+                width: 12px;
+                margin: 0 2px;
+            }
+
+            > .rz-expand:before {
+                content: 'expand_more'
+            }
+
+            &-resizable:hover {
+                cursor: row-resize;
+            }
+        }
+    }
+
+    &-pane {
+        overflow: hidden;
+        position: relative;
+        flex: 0 0 auto;
+
+        &-collapsed {
+            flex: 0 1 0% !important;
+            overflow: hidden !important;
+            display: block !important;
+        }
+
+        &-lastresizable {
+            flex: 1 1 auto;
+        }
+    }
+}
