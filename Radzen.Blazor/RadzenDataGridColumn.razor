@@ -366,7 +366,7 @@
     internal IEnumerable<FilterOperator> GetFilterOperators()
     {
         return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
-            var isStringOperator = o == FilterOperator.Contains || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
+            var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
             return FilterPropertyType == typeof(string) ? isStringOperator || o == FilterOperator.Equals || o == FilterOperator.NotEquals : !isStringOperator;
         });
     }
@@ -377,6 +377,8 @@
         {
             case FilterOperator.Contains:
                 return Grid?.ContainsText;
+            case FilterOperator.DoesNotContain:
+                return Grid?.DoesNotContainText;
             case FilterOperator.EndsWith:
                 return Grid?.EndsWithText;
             case FilterOperator.Equals:

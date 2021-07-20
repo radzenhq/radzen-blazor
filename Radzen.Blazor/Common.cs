@@ -288,7 +288,8 @@ namespace Radzen
         GreaterThanOrEquals,
         Contains,
         StartsWith,
-        EndsWith
+        EndsWith,
+        DoesNotContain
     }
 
     public enum TextAlign
