@@ -15,7 +15,14 @@
                     {
                         <img class="rz-navigation-item-icon" src="@Image" />
                     }
-                    <span class="rz-navigation-item-text">@Text</span>
+                    @if(Template != null)
+                    {
+                        @Template
+                    }
+                    else
+                    {
+                        <span class="rz-navigation-item-text">@Text</span>
+                    }
                     @if (ChildContent != null)
                     {
                         <i class="rzi rz-navigation-item-icon-children">keyboard_arrow_down</i>
@@ -33,7 +40,14 @@
                     {
                         <img class="rz-navigation-item-icon" src="@Image" />
                     }
-                    <span class="rz-navigation-item-text">@Text</span>
+                    @if(Template != null)
+                    {
+                        @Template
+                    }
+                    else
+                    {
+                        <span class="rz-navigation-item-text">@Text</span>
+                    }
                     @if (ChildContent != null)
                     {
                         <i class="rzi rz-navigation-item-icon-children">keyboard_arrow_down</i>
@@ -72,6 +86,9 @@
 
     [Parameter]
     public string Image { get; set; }
+
+    [Parameter]
+    public RenderFragment Template { get; set; }
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }

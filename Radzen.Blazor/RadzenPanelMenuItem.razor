@@ -15,7 +15,14 @@
                     {
                         <img class="rz-navigation-item-icon" src="@Image" />
                     }
-                    <span class="rz-navigation-item-text" @onclick="@Toggle">@Text</span>
+                    @if(Template != null)
+                    {
+                        @Template
+                    }
+                    else
+                    {
+                        <span class="rz-navigation-item-text" @onclick="@Toggle">@Text</span>
+                    }
                     @if (items.Any())
                     {
                         <i class="rzi rz-navigation-item-icon-children" style="@getStyle()" @onclick="@Toggle">keyboard_arrow_down</i>
@@ -33,7 +40,14 @@
                     {
                         <img class="rz-navigation-item-icon" src="@Image" />
                     }
-                    <span class="rz-navigation-item-text">@Text</span>
+                    @if(Template != null)
+                    {
+                        @Template
+                    }
+                    else
+                    {
+                        <span class="rz-navigation-item-text">@Text</span>
+                    }
                     @if (items.Any())
                     {
                         <i class="rzi rz-navigation-item-icon-children" style="@getStyle()">keyboard_arrow_down</i>
@@ -77,6 +91,9 @@
 
     [Parameter]
     public string Image { get; set; }
+
+    [Parameter]
+    public RenderFragment Template { get; set; }
 
     [Parameter]
     public bool Expanded { get; set; } = false;
