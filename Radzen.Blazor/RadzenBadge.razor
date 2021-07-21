@@ -1,5 +1,6 @@
 ﻿@inherits RadzenComponent
-
+@if (Visible)
+{
 <span @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     @if (ChildContent != null)
     {
@@ -10,7 +11,7 @@
         @Text
     }
 </span>
-
+}
 @code {
     protected override string GetComponentCssClass()
     {
