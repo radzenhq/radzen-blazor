@@ -423,7 +423,14 @@
                                 {
                                     <tr class=" rz-datatable-emptymessage-row">
                                         <td class="rz-datatable-emptymessage" colspan="@visibleColumns.Count">
-                                            <span>@EmptyText</span>
+                                            @if (EmptyTemplate != null)
+                                            {
+                                                @EmptyTemplate
+                                            }
+                                            else
+                                            {
+                                                <span>@EmptyText</span>
+                                            }
                                         </td>
                                     </tr>
                                 }
@@ -633,11 +640,13 @@
             if (value != _emptyText)
             {
                 _emptyText = value;
-
                 ChangeState().Wait();
             }
         }
     }
+
+    [Parameter]
+    public RenderFragment EmptyTemplate { get; set; }
 
     [Parameter]
     public bool AllowSorting { get; set; }

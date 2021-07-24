@@ -303,6 +303,14 @@ namespace RadzenBlazorDemos
                     Icon = "&#xe915",
                     Tags = new [] { "related", "parent", "child" }
                 },
+                new Example()
+                {
+                    Name = "Empty Data Grid",
+                    Path = "/datagrid-empty",
+                    Title = "Blazor DataGrid without Data",
+                    Icon = "&#xe661",
+                    Tags = new [] { "datagrid", "databinding" }
+                }
             }
         },
         new Example
