@@ -1473,7 +1473,7 @@
         }
     }
 
-    internal bool ApplyDataCustomFiltering(TItem item, List<RadzenDataGridColumn<TItem>> columns)
+    internal bool ApplyDataCustomFiltering(TItem item, IEnumerable<RadzenDataGridColumn<TItem>> columns)
     {
         bool matched = false;
         foreach (var column in columns)
