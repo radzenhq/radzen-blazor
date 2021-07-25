@@ -404,4 +404,7 @@
     {
         Grid?.RemoveColumn(this);
     }
+
+    [Parameter]
+    public Func<CustomFilteringArgs<TItem>, bool> CustomFiltering { get; set; } = null;
 }

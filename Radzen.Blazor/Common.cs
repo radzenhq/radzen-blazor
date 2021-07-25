@@ -744,4 +744,10 @@ namespace Radzen
             return false;
         }
     }
+
+    public class CustomFilteringArgs<T>
+    {
+        public Blazor.RadzenDataGridColumn<T> Column { get; internal set; }
+        public T Data { get; internal set; }
+    }
 }

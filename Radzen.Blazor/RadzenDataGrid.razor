@@ -817,7 +817,11 @@
             bool serverSideDataOperations = LoadData.HasDelegate;
             var view = base.View;
             if (!serverSideDataOperations)
-            {            
+            {
+                var columnsWithNoCustomFiltering = columns.Where(c => c.CustomFiltering == null);
+                var columnsWithCustomFiltering = columns.Where(c => c.CustomFiltering != null);
+                view = view.Where<TItem>(columnsWithNoCustomFiltering);
+                view = view.Where<TItem>(x => ApplyDataCustomFiltering(x, columnsWithCustomFiltering));
                 var orderBy = GetOrderBy();
 
                 if (!string.IsNullOrEmpty(orderBy))
@@ -1467,5 +1471,23 @@
                 JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", $"{PopupID}{column.GetFilterProperty()}");
             }
         }
+    }
+
+    internal bool ApplyDataCustomFiltering(TItem item, List<RadzenDataGridColumn<TItem>> columns)
+    {
+        bool matched = false;
+        foreach (var column in columns)
+        {
+            if (column.CustomFiltering != null)
+            {
+                var args = new Radzen.CustomFilteringArgs<TItem>() { Data = item, Column = column };
+                matched = column.CustomFiltering(args);
+                if (matched)
+                {
+                    break;
+                }
+            }
+        }
+        return matched;
     }
 }
