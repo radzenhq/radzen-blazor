@@ -571,5 +571,58 @@ namespace Radzen.Blazor.Tests
             Assert.True(newArgs.Skip == 20);
             Assert.True(newArgs.Top == 20);
         }
+
+        [Fact]
+        public void DataGrid_View_Use_ClientSide_Filtering_When_LoadData_Empty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<Tuple<string>>>(parameterBuilder => {
+                parameterBuilder.Add<IEnumerable<Tuple<string>>>(p => p.Data, new[] { new Tuple<string>("Name_0"), new Tuple<string>("Name_1"), new Tuple<string>("Name_2") });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder => {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<Tuple<string>>));
+                    builder.AddAttribute(1, "Property", "Item1");
+                    builder.AddAttribute(2, "Filterable", true);
+                    builder.AddAttribute(3, "FilterOperator", FilterOperator.Equals);
+                    builder.AddAttribute(4, "FilterValue", "Name_1");
+                    builder.AddAttribute(5, "Type", typeof(string));
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+            });
+
+            IEnumerable<Tuple<string>> filtered = null;
+            component.InvokeAsync(() => filtered = component.Instance.View.ToList<Tuple<string>>()).Wait();
+            Assert.Equal<IEnumerable<string>>(filtered.Select(x => x.Item1), new[] { "Name_1" });
+        }
+
+        [Fact]
+        public void DataGrid_View_Use_ServerSide_Filtering_When_LoadData_Used()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<Tuple<string>>>(parameterBuilder => {
+                parameterBuilder.Add<IEnumerable<Tuple<string>>>(p => p.Data, new[] { new Tuple<string>("Name_0"), new Tuple<string>("Name_1"), new Tuple<string>("Name_2") });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder => {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<Tuple<string>>));
+                    builder.AddAttribute(1, "Property", "Item1");
+                    builder.AddAttribute(2, "Filterable", true);
+                    builder.AddAttribute(3, "FilterOperator", FilterOperator.Equals);
+                    builder.AddAttribute(4, "FilterValue", "Name_1");
+                    builder.AddAttribute(5, "Type", typeof(string));
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<LoadDataArgs>(p => p.LoadData, args => { });
+            });
+
+            IEnumerable<Tuple<string>> filtered = null;
+            component.InvokeAsync(() => filtered = component.Instance.View.ToList<Tuple<string>>()).Wait();
+            Assert.Equal<IEnumerable<string>>(filtered.Select(x => x.Item1), new[] { "Name_0", "Name_1", "Name_2" });
+        }
     }
 }

@@ -814,38 +814,42 @@
     {
         get
         {
-            var view = base.View.Where<TItem>(columns);
-            var orderBy = GetOrderBy();
+            bool serverSideDataOperations = LoadData.HasDelegate;
+            var view = base.View;
+            if (!serverSideDataOperations)
+            {            
+                var orderBy = GetOrderBy();
 
-            if (!string.IsNullOrEmpty(orderBy))
-            {
-                if (typeof(TItem) == typeof(object))
+                if (!string.IsNullOrEmpty(orderBy))
                 {
-                    var firstItem = view.FirstOrDefault();
-                    if (firstItem != null)
+                    if (typeof(TItem) == typeof(object))
                     {
-                        view = view.Cast(firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
+                        var firstItem = view.FirstOrDefault();
+                        if (firstItem != null)
+                        {
+                            view = view.Cast(firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
+                        }
+                    }
+                    else
+                    {
+                        view = view.OrderBy(orderBy);
                     }
                 }
-                else
-                {
-                    view = view.OrderBy(orderBy);
-                }
-            }
 
-            if (!LoadData.HasDelegate && (!IsVirtualizationAllowed() || AllowPaging))
-            {
-                var count = view.Count();
-                if (count != Count)
+                if (!IsVirtualizationAllowed() || AllowPaging)
                 {
-                    Count = count;
-
-                    if (skip >= Count && Count > PageSize)
+                    var count = view.Count();
+                    if (count != Count)
                     {
-                        skip = Count - PageSize;
-                    }
+                        Count = count;
 
-                    StateHasChanged();
+                        if (skip >= Count && Count > PageSize)
+                        {
+                            skip = Count - PageSize;
+                        }
+
+                        StateHasChanged();
+                    }
                 }
             }
 
