@@ -1132,6 +1132,8 @@
             expandedItems.Remove(item);
             await RowCollapse.InvokeAsync(item);
         }
+
+        await InvokeAsync(StateHasChanged);
     }
 
     [Parameter]
