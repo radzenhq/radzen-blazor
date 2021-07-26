@@ -819,9 +819,14 @@
             if (!serverSideDataOperations)
             {
                 var columnsWithNoCustomFiltering = columns.Where(c => c.CustomFiltering == null);
-                var columnsWithCustomFiltering = columns.Where(c => c.CustomFiltering != null);
                 view = view.Where<TItem>(columnsWithNoCustomFiltering);
-                view = view.Where<TItem>(x => ApplyDataCustomFiltering(x, columnsWithCustomFiltering));
+
+                var columnsWithCustomFiltering = columns.Where(c => c.CustomFiltering != null);
+                if (columnsWithCustomFiltering.Any())
+                {
+                    view = view.Where<TItem>(x => ApplyDataCustomFiltering(x, columnsWithCustomFiltering));
+                }
+
                 var orderBy = GetOrderBy();
 
                 if (!string.IsNullOrEmpty(orderBy))
@@ -1473,21 +1478,16 @@
         }
     }
 
-    internal bool ApplyDataCustomFiltering(TItem item, IEnumerable<RadzenDataGridColumn<TItem>> columns)
+    bool ApplyDataCustomFiltering(TItem item, IEnumerable<RadzenDataGridColumn<TItem>> columns)
     {
-        bool matched = false;
         foreach (var column in columns)
         {
-            if (column.CustomFiltering != null)
+            var args = new Radzen.CustomFilteringArgs<TItem>() { Data = item, Column = column };
+            if (column.CustomFiltering(args))
             {
-                var args = new Radzen.CustomFilteringArgs<TItem>() { Data = item, Column = column };
-                matched = column.CustomFiltering(args);
-                if (matched)
-                {
-                    break;
-                }
+                return true;
             }
         }
-        return matched;
+        return false;
     }
 }

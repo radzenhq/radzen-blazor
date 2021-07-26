@@ -593,9 +593,7 @@ namespace Radzen.Blazor.Tests
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
             });
 
-            IEnumerable<Tuple<string>> filtered = null;
-            component.InvokeAsync(() => filtered = component.Instance.View.ToList<Tuple<string>>()).Wait();
-            Assert.Equal<IEnumerable<string>>(filtered.Select(x => x.Item1), new[] { "Name_1" });
+            Assert.Equal<IEnumerable<string>>(component.Instance.View.Select(x => x.Item1), new[] { "Name_1" });
         }
 
         [Fact]
@@ -620,9 +618,61 @@ namespace Radzen.Blazor.Tests
                 parameterBuilder.Add<LoadDataArgs>(p => p.LoadData, args => { });
             });
 
-            IEnumerable<Tuple<string>> filtered = null;
-            component.InvokeAsync(() => filtered = component.Instance.View.ToList<Tuple<string>>()).Wait();
-            Assert.Equal<IEnumerable<string>>(filtered.Select(x => x.Item1), new[] { "Name_0", "Name_1", "Name_2" });
+            Assert.Equal<IEnumerable<string>>(component.Instance.View.Select(x => x.Item1), new[] { "Name_0", "Name_1", "Name_2" });
+        }
+
+        [Fact]
+        public void DataGrid_View_Use_Custom_Filtering()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            Func<string, RenderFragment> columnRenderFragmentFunc = (filterValue) => {
+                return delegate (RenderTreeBuilder builder)
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<Tuple<int, List<Tuple<int, string>>>>));
+                    builder.AddAttribute(1, "Property", "Item2");
+                    builder.AddAttribute(2, "Filterable", true);
+                    builder.AddAttribute(3, "FilterOperator", FilterOperator.Contains);
+                    builder.AddAttribute(4, "FilterValue", filterValue);
+                    builder.AddAttribute(5, "Type", typeof(string));
+                    builder.AddAttribute(6, "CustomFiltering", (Func<CustomFilteringArgs<Tuple<int, List<Tuple<int, string>>>>, bool>)(args => {
+                        if (args.Column.Property == "Item2")
+                        {
+                            switch (args.Column.FilterOperator)
+                            {
+                                case FilterOperator.Contains:
+                                    return args.Data.Item2.Any(x => x.Item2.Contains(args.Column.FilterValue as string));
+                                default:
+                                    break;
+                            }
+                        }
+                        return false;
+
+                    }));
+                    builder.CloseComponent();
+                };
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<Tuple<int, List<Tuple<int, string>>>>>(parameterBuilder => {
+                parameterBuilder.Add<IEnumerable<Tuple<int, List<Tuple<int, string>>>>>(p => p.Data, new[] {
+                    new Tuple<int, List<Tuple<int, string>>>(0, new List<Tuple<int, string>>() { new Tuple<int, string>(100, "Detail_00"), new Tuple<int, string>(101, "Detail_01") }),
+                    new Tuple<int, List<Tuple<int, string>>>(1, new List<Tuple<int, string>>() { new Tuple<int, string>(110, "Detail_10"), new Tuple<int, string>(111, "Detail_11") }),
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, columnRenderFragmentFunc("Detail_1"));
+            });
+
+            Assert.Equal<IEnumerable<string>>(component.Instance.View.SelectMany(x => x.Item2).Select(x => x.Item2), new string[] { "Detail_10", "Detail_11" });
+
+            component.SetParametersAndRender(parameters => {
+                parameters.Add<RenderFragment>(p => p.Columns, columnRenderFragmentFunc("nonexistent"));
+            });
+
+            IEnumerable<Tuple<int, List<Tuple<int, string>>>> filtered = null;
+            component.InvokeAsync(() => filtered = component.Instance.View.ToList<Tuple<int, List<Tuple<int, string>>>>()).Wait();
+            Assert.Equal<IEnumerable<string>>(filtered.SelectMany(x => x.Item2).Select(x => x.Item2), new string[] { });
         }
     }
 }
