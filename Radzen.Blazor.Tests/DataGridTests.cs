@@ -580,7 +580,7 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var component = ctx.RenderComponent<RadzenDataGrid<Tuple<string>>>(parameterBuilder => {
-                parameterBuilder.Add<IEnumerable<Tuple<string>>>(p => p.Data, new[] { new Tuple<string>("Name_0"), new Tuple<string>("Name_1"), new Tuple<string>("Name_2") });
+                parameterBuilder.Add(p => p.Data, new[] { new Tuple<string>("Name_0"), new Tuple<string>("Name_1"), new Tuple<string>("Name_2") });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder => {
                     builder.OpenComponent(0, typeof(RadzenDataGridColumn<Tuple<string>>));
                     builder.AddAttribute(1, "Property", "Item1");
@@ -604,7 +604,7 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var component = ctx.RenderComponent<RadzenDataGrid<Tuple<string>>>(parameterBuilder => {
-                parameterBuilder.Add<IEnumerable<Tuple<string>>>(p => p.Data, new[] { new Tuple<string>("Name_0"), new Tuple<string>("Name_1"), new Tuple<string>("Name_2") });
+                parameterBuilder.Add(p => p.Data, new[] { new Tuple<string>("Name_0"), new Tuple<string>("Name_1"), new Tuple<string>("Name_2") });
                 parameterBuilder.Add<RenderFragment>(p => p.Columns, builder => {
                     builder.OpenComponent(0, typeof(RadzenDataGridColumn<Tuple<string>>));
                     builder.AddAttribute(1, "Property", "Item1");
@@ -656,7 +656,7 @@ namespace Radzen.Blazor.Tests
             };
 
             var component = ctx.RenderComponent<RadzenDataGrid<Tuple<int, List<Tuple<int, string>>>>>(parameterBuilder => {
-                parameterBuilder.Add<IEnumerable<Tuple<int, List<Tuple<int, string>>>>>(p => p.Data, new[] {
+                parameterBuilder.Add(p => p.Data, new[] {
                     new Tuple<int, List<Tuple<int, string>>>(0, new List<Tuple<int, string>>() { new Tuple<int, string>(100, "Detail_00"), new Tuple<int, string>(101, "Detail_01") }),
                     new Tuple<int, List<Tuple<int, string>>>(1, new List<Tuple<int, string>>() { new Tuple<int, string>(110, "Detail_10"), new Tuple<int, string>(111, "Detail_11") }),
                 });
@@ -671,8 +671,8 @@ namespace Radzen.Blazor.Tests
             });
 
             IEnumerable<Tuple<int, List<Tuple<int, string>>>> filtered = null;
-            component.InvokeAsync(() => filtered = component.Instance.View.ToList<Tuple<int, List<Tuple<int, string>>>>()).Wait();
-            Assert.Equal<IEnumerable<string>>(filtered.SelectMany(x => x.Item2).Select(x => x.Item2), new string[] { });
+            component.InvokeAsync(() => filtered = component.Instance.View.ToList()).Wait();
+            Assert.Equal<IEnumerable<string>>(filtered.SelectMany(x => x.Item2).Select(x => x.Item2), Enumerable.Empty<string>());
         }
     }
 }
