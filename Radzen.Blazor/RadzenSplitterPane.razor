@@ -18,7 +18,7 @@
 
             @if (IsCollapsible)
             {
-                <span class="rz-compress" @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter.CollapseExec(args, Index, UniqueID))>
+                <span class="rz-collapse" @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter.CollapseExec(args, Index, UniqueID))>
                 </span>
             }
 
