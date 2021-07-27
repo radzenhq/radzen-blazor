@@ -269,7 +269,14 @@
                     {
                         <tr class=" rz-datatable-emptymessage-row">
                             <td class="rz-datatable-emptymessage" colspan="@visibleColumns.Count">
-                                <span>@EmptyText</span>
+                                @if (EmptyTemplate != null)
+                                {
+                                    @EmptyTemplate
+                                }
+                                else
+                                {
+                                    <span>@EmptyText</span>
+                                }
                             </td>
                         </tr>
                     }
@@ -761,6 +768,9 @@
             }
         }
     }
+
+    [Parameter]
+    public RenderFragment EmptyTemplate { get; set; }
 #if NET5
     [Parameter]
     public bool AllowVirtualization { get; set; }
@@ -1135,6 +1145,8 @@
             expandedItems.Remove(item);
             await RowCollapse.InvokeAsync(item);
         }
+
+        await InvokeAsync(StateHasChanged);
     }
 
     [Parameter]
