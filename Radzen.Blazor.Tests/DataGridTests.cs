@@ -725,12 +725,12 @@ namespace Radzen.Blazor.Tests
                     builder.AddAttribute(4, "FilterValue", filterValue);
                     builder.AddAttribute(5, "Type", typeof(string));
                     builder.AddAttribute(6, "CustomFiltering", (Func<CustomFilteringArgs<Tuple<int, List<Tuple<int, string>>>>, bool>)(args => {
-                        if (args.Column.Property == "Item2")
+                        if (args.Property == "Item2")
                         {
-                            switch (args.Column.FilterOperator)
+                            switch (args.FilterOperator)
                             {
                                 case FilterOperator.Contains:
-                                    return args.Data.Item2.Any(x => x.Item2.Contains(args.Column.FilterValue as string));
+                                    return args.Data.Item2.Any(x => x.Item2.Contains(args.FilterValue as string));
                                 default:
                                     break;
                             }

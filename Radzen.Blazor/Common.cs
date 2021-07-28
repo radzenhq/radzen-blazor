@@ -747,7 +747,12 @@ namespace Radzen
 
     public class CustomFilteringArgs<T>
     {
-        public Blazor.RadzenDataGridColumn<T> Column { get; internal set; }
         public T Data { get; internal set; }
+        public string Property { get; set; }
+        public FilterOperator FilterOperator { get; internal set; }
+        public object FilterValue { get; internal set; }
+        public FilterOperator SecondFilterOperator { get; internal set; }
+        public object SecondFilterValue { get; internal set; }
+        public LogicalFilterOperator LogicalFilterOperator { get; internal set; }
     }
 }

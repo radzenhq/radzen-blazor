@@ -1494,7 +1494,15 @@
     {
         foreach (var column in columns)
         {
-            var args = new Radzen.CustomFilteringArgs<TItem>() { Data = item, Column = column };
+            var args = new Radzen.CustomFilteringArgs<TItem>() {
+                Data = item,
+                Property = column.Property,
+                FilterOperator = column.GetFilterOperator(),
+                FilterValue = column.GetFilterValue(),
+                SecondFilterOperator = column.GetSecondFilterOperator(),
+                SecondFilterValue = column.GetSecondFilterValue(),
+                LogicalFilterOperator = column.GetLogicalFilterOperator()
+            };
             if (column.CustomFiltering(args))
             {
                 return true;
