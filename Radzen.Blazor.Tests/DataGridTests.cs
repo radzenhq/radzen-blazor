@@ -715,6 +715,10 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
+            var testSecondFilterOperator = FilterOperator.Equals;
+            object testSecondFilterValue = null;
+            var testLogicalFilterOperator = LogicalFilterOperator.And;
+
             Func<string, RenderFragment> columnRenderFragmentFunc = (filterValue) => {
                 return delegate (RenderTreeBuilder builder)
                 {
@@ -724,9 +728,15 @@ namespace Radzen.Blazor.Tests
                     builder.AddAttribute(3, "FilterOperator", FilterOperator.Contains);
                     builder.AddAttribute(4, "FilterValue", filterValue);
                     builder.AddAttribute(5, "Type", typeof(string));
-                    builder.AddAttribute(6, "CustomFiltering", (Func<CustomFilteringArgs<Tuple<int, List<Tuple<int, string>>>>, bool>)(args => {
+                    builder.AddAttribute(6, "SecondFilterOperator", FilterOperator.DoesNotContain);
+                    builder.AddAttribute(7, "SecondFilterValue", $"second_{filterValue}");
+                    builder.AddAttribute(8, "LogicalFilterOperator", LogicalFilterOperator.Or);
+                    builder.AddAttribute(9, "CustomFiltering", (Func<CustomFilteringArgs<Tuple<int, List<Tuple<int, string>>>>, bool>)(args => {
                         if (args.Property == "Item2")
                         {
+                            testSecondFilterOperator = args.SecondFilterOperator;
+                            testSecondFilterValue = args.SecondFilterValue;
+                            testLogicalFilterOperator = args.LogicalFilterOperator;
                             switch (args.FilterOperator)
                             {
                                 case FilterOperator.Contains:
@@ -752,6 +762,10 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Equal<IEnumerable<string>>(component.Instance.View.SelectMany(x => x.Item2).Select(x => x.Item2), new string[] { "Detail_10", "Detail_11" });
+            Assert.Equal(FilterOperator.DoesNotContain, testSecondFilterOperator);
+            Assert.Equal("second_Detail_1", testSecondFilterValue);
+            Assert.Equal(LogicalFilterOperator.Or, testLogicalFilterOperator);
+
 
             component.SetParametersAndRender(parameters => {
                 parameters.Add<RenderFragment>(p => p.Columns, columnRenderFragmentFunc("nonexistent"));
