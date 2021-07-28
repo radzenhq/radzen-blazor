@@ -834,7 +834,7 @@
                 var columnsWithCustomFiltering = columns.Where(c => c.CustomFiltering != null);
                 if (columnsWithCustomFiltering.Any())
                 {
-                    view = view.Where<TItem>(x => ApplyDataCustomFiltering(x, columnsWithCustomFiltering));
+                    view = view.AsEnumerable<TItem>().Where<TItem>(x => ApplyDataCustomFiltering(x, columnsWithCustomFiltering)).AsQueryable();
                 }
 
                 var orderBy = GetOrderBy();
