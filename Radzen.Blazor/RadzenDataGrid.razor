@@ -337,7 +337,12 @@
     {
         var view = AllowPaging ? PagedView : View;
         var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
-        var top = Math.Min(request.Count, totalItemsCount - request.StartIndex);
+        var top = totalItemsCount > request.Count ? Math.Min(request.Count, totalItemsCount - request.StartIndex) : PageSize;
+
+        if(top <= 0)
+        {
+            top = PageSize;
+        }
 
         if (LoadData.HasDelegate)
         {
@@ -951,9 +956,16 @@
             Count = 1;
         }
 #if NET5
-        if (AllowVirtualization && virtualize != null && !LoadData.HasDelegate)
+        if (AllowVirtualization && virtualize != null)
         {
-            await virtualize.RefreshDataAsync();
+            if(!LoadData.HasDelegate)
+            {
+                await virtualize.RefreshDataAsync();
+            }
+            else
+            {
+                Data = null;
+            }
         }
 #endif
         var orderBy = GetOrderBy();
@@ -992,7 +1004,16 @@
         {
             StateHasChanged();
         }
-    }
+        else
+        {
+#if NET5
+            if (AllowVirtualization && virtualize != null)
+            {
+                await virtualize.RefreshDataAsync();
+            }
+#endif        
+        } 
+   }
 
     internal async Task ChangeState()
     {
@@ -1350,9 +1371,15 @@
        await EditRowInternal(item);
     }
 
+    bool? isOData;
     internal bool IsOData()
     {
-        return Data != null && typeof(ODataEnumerable<TItem>).IsAssignableFrom(Data.GetType());
+        if(isOData == null && Data != null)
+        {
+            isOData = typeof(ODataEnumerable<TItem>).IsAssignableFrom(Data.GetType());
+        }
+
+        return isOData != null ? isOData.Value : false;
     }
 
     internal List<SortDescriptor> sorts = new List<SortDescriptor>();
