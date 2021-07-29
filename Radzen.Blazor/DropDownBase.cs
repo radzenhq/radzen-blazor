@@ -420,6 +420,13 @@ namespace Radzen
 
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+#if NET5
+            var pageSize = parameters.GetValueOrDefault<int>(nameof(PageSize));
+            if(pageSize != default(int))
+            {
+                PageSize = pageSize;
+            }
+#endif
             var shouldClose = false;
 
             if (parameters.DidParameterChange(nameof(Visible), Visible))

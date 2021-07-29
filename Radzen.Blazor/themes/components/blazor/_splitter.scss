@@ -1,0 +1,148 @@
+$splitter-bar-color: #6A6A6A !default;
+$splitter-bar-color-active: #fff !default;
+$splitter-bar-background-color: #E6ECEF !default;
+$splitter-bar-background-color-active: #479CC8 !default;
+$splitter-bar-hover-opacity: 1 !default;
+
+.rz-splitter {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    height: 100%;
+
+    > .rz-splitter-bar {
+        flex: 0 0 auto;
+        position: relative;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: $splitter-bar-color;
+        background-color: $splitter-bar-background-color;
+        opacity: 0.4;
+        user-select: none;
+
+
+        > .rz-collapse {
+            height: 32px;
+            padding-top: 50%;
+
+            &:before {
+                font-family: 'Material Icons';
+            }
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+
+        > .rz-resize {
+            border: 1px solid $splitter-bar-color;
+            border-radius: 1px;
+        }
+
+        > .rz-expand {
+            height: 32px;
+            padding-top: 50%;
+
+            &:before {
+                font-family: 'Material Icons';
+            }
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+
+        &-resizable:hover {
+            background-color: $splitter-bar-background-color;
+            opacity: $splitter-bar-hover-opacity;
+        }
+
+        &-resizable:active {
+            background-color: $splitter-bar-background-color-active;
+            opacity: $splitter-bar-hover-opacity;
+
+            > .rz-expand, > .rz-resize, > .rz-collapse {
+                color: $splitter-bar-color-active;
+            }
+
+            > .rz-resize {
+                border: 1px solid $splitter-bar-color-active;
+            }
+        }
+
+        &-resizable:disabled {
+            opacity: 0.2;
+        }
+    }
+
+    &-horizontal {
+        flex-direction: row;
+
+        > .rz-splitter-bar {
+            flex-direction: column;
+            width: 8px;
+
+            > .rz-collapse:before {
+                content: 'arrow_left'
+            }
+
+            > .rz-resize {
+                height: 16px;
+                margin: 2px 0;
+            }
+
+            > .rz-expand:before {
+                content: 'arrow_right';
+                width: 8px;
+            }
+
+            &-resizable:hover {
+                cursor: col-resize;
+            }
+        }
+    }
+
+    &-vertical {
+        flex-direction: column;
+
+        > .rz-splitter-bar {
+            flex-direction: row;
+            height: 8px;
+
+            > .rz-collapse:before {
+                content: 'arrow_up'
+            }
+
+            > .rz-resize {
+                width: 16px;
+                margin: 0 2px;
+            }
+
+            > .rz-expand:before {
+                content: 'arrow_down'
+            }
+
+            &-resizable:hover {
+                cursor: row-resize;
+            }
+        }
+    }
+
+    &-pane {
+        overflow: hidden;
+        position: relative;
+        flex: 0 0 auto;
+
+        &-collapsed {
+            flex: 0 1 0% !important;
+            overflow: hidden !important;
+            display: block !important;
+        }
+
+        &-lastresizable {
+            flex: 1 1 auto;
+        }
+    }
+}

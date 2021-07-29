@@ -59,6 +59,9 @@ $radio-checked-hover-background-color: $secondary-hover;
 // SplitButton
 $splitbutton-menu-button-border: 1px solid #475359;
 
+// Splitter
+$splitter-bar-background-color-active: #598087 !default;
+
 @import 'bootstrap';
 @import 'fonts';
 @import 'typography';
