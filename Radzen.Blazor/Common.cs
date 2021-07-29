@@ -744,4 +744,16 @@ namespace Radzen
             return false;
         }
     }
+    public class RadzenSplitterEventArgs
+    {
+        public int PaneIndex { get; set; }
+        public RadzenSplitterPane Pane { get; set; }
+        public bool Cancel { get; set; }
+
+    }
+
+    public class RadzenSplitterResizeEventArgs:RadzenSplitterEventArgs
+    {
+        public double NewSize { get; set; }
+    }
 }

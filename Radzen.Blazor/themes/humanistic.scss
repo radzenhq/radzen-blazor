@@ -56,6 +56,9 @@ $slider-handle-hover-background-color: $secondary-hover;
 $dropdown-item-hover-background-color: $secondary-hover;
 $radio-checked-hover-background-color: $secondary-hover;
 
+// Splitter
+$splitter-bar-background-color-active: #3BA5FC !default;
+
 @import 'bootstrap';
 @import 'fonts';
 @import 'typography';

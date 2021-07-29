@@ -258,6 +258,11 @@ $editor-button-background-color: $default-background-color !default;
 $editor-button-selected-color: $white !default;
 $editor-separator-background-color: $body-color !default;
 
+// Splitter
+$splitter-bar-color: #fff !default;
+$splitter-bar-background-color: #4A5A63 !default;
+$splitter-bar-hover-opacity: 0.8 !default;
+
 @import 'bootstrap';
 @import 'fonts';
 @import 'typography';
