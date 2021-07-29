@@ -752,7 +752,7 @@ namespace Radzen
 
     }
 
-    public class RadzenSplitterResizeEventArgs:RadzenSplitterEventArgs
+    public class RadzenSplitterResizeEventArgs : RadzenSplitterEventArgs
     {
         public double NewSize { get; set; }
     }
