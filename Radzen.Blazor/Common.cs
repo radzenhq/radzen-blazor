@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Components;
-using System.Linq.Dynamic.Core;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Radzen.Blazor;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Text.Encodings.Web;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Radzen
 {
@@ -289,7 +288,8 @@ namespace Radzen
         GreaterThanOrEquals,
         Contains,
         StartsWith,
-        EndsWith
+        EndsWith,
+        DoesNotContain
     }
 
     public enum TextAlign
@@ -299,6 +299,17 @@ namespace Radzen
         Center
     }
 
+    public enum BadgeStyle
+    {
+        Primary,
+        Secondary,
+        Light,
+        Success,
+        Danger,
+        Warning,
+        Info
+    }
+
     public class DataGridColumnResizedEventArgs<T>
     {
         public RadzenDataGridColumn<T> Column { get; internal set; }
@@ -306,7 +317,7 @@ namespace Radzen
     }
 
     public class ColumnResizedEventArgs<T>
-    { 
+    {
         public RadzenGridColumn<T> Column { get; internal set; }
         public double Width { get; internal set; }
     }

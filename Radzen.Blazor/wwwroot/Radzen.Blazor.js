@@ -629,8 +629,8 @@ window.Radzen = {
       var scrollTop = document.documentElement.scrollTop;
     }
 
-    var top = y ? y + scrollTop: parentRect.bottom + scrollTop;
-    var left = x ? x + scrollLeft: parentRect.left + scrollLeft;
+    var top = y ? y : parentRect.bottom;
+    var left = x ? x : parentRect.left;
 
     if (syncWidth) {
         popup.style.width = parentRect.width + 'px';
@@ -645,12 +645,8 @@ window.Radzen = {
 
     var smartPosition = !position || position == 'bottom';
 
-    if (
-      smartPosition &&
-      top + rect.height > window.innerHeight &&
-      parentRect.top > rect.height
-    ) {
-      top = parentRect.top - rect.height + scrollTop;
+    if (smartPosition && top + rect.height > window.innerHeight && parentRect.top > rect.height) {
+      top = parentRect.top - rect.height;
 
       if (position) {
         top = top - 40;
@@ -663,12 +659,8 @@ window.Radzen = {
       }
     }
 
-    if (
-      smartPosition &&
-      left + rect.width - scrollLeft > window.innerWidth &&
-      window.innerWidth > rect.width
-    ) {
-      left = window.innerWidth - rect.width + scrollLeft;
+    if (smartPosition && left + rect.width > window.innerWidth && window.innerWidth > rect.width) {
+      left = window.innerWidth - rect.width;
 
       if (position) {
         var tooltipContent = popup.children[0];
@@ -676,8 +668,8 @@ window.Radzen = {
         if (tooltipContent.classList.contains(tooltipContentClassName)) {
           tooltipContent.classList.remove(tooltipContentClassName);
           tooltipContent.classList.add('rz-left-tooltip-content');
-          left = parentRect.left - rect.width - 5 + scrollLeft;
-          top = parentRect.top - parentRect.height + scrollTop;
+          left = parentRect.left - rect.width - 5;
+          top = parentRect.top - parentRect.height;
         }
       }
     }
@@ -686,30 +678,26 @@ window.Radzen = {
       if (position) {
         top = top + 20;
       }
-
-      popup.style.top = top + 'px';
-    }
-
-    if (smartPosition) {
-      popup.style.left = left + 'px';
     }
 
     if (position == 'left') {
-      popup.style.left = parentRect.left - rect.width - 5 + 'px';
-      popup.style.top = parentRect.top + scrollTop + 'px';
+      left = parentRect.left - rect.width - 5;
+      top =  parentRect.top;
     }
 
     if (position == 'right') {
-      popup.style.left = parentRect.right + 10 + 'px';
-      popup.style.top = parentRect.top + scrollTop + 'px';
+      left = parentRect.right + 10;
+      top = parentRect.top;
     }
 
     if (position == 'top') {
-      popup.style.top = parentRect.top + scrollTop - rect.height + 5 + 'px';
-      popup.style.left = parentRect.left + scrollLeft + 'px';
+      top = parentRect.top - rect.height + 5;
+      left = parentRect.left;
     }
 
     popup.style.zIndex = 2000;
+    popup.style.left = left + scrollLeft + 'px';
+    popup.style.top = top + scrollTop + 'px';
 
     if (!popup.classList.contains('rz-overlaypanel')) {
         popup.classList.add('rz-popup');
@@ -718,7 +706,7 @@ window.Radzen = {
     Radzen[id] = function (e) {
         if (!e.defaultPrevented) {
           if (parent) {
-            if ((e.type == 'click' && !parent.contains(e.target) && !popup.contains(e.target)) || (e.type == 'scroll' && e.target == e.currentTarget)) {
+            if (e.type == 'click' && !parent.contains(e.target) && !popup.contains(e.target)) {
               Radzen.closePopup(id, instance, callback);
             }
           } else {
@@ -729,12 +717,31 @@ window.Radzen = {
         }
     };
 
+    if (!Radzen.closePopupsOnScroll) {
+        Radzen.closePopupsOnScroll = function (e) {
+            for (var i = 0; i < Radzen.popups.length; i++) {
+                var p = Radzen.popups[i];
+                Radzen.closePopup(p.id, p.instance, p.callback);
+            }
+            Radzen.popups = [];
+        };
+        Radzen.popups = [];
+    }
+
+    Radzen.popups.push({id, instance, callback});
+
     document.body.appendChild(popup);
     document.removeEventListener('click', Radzen[id]);
     document.addEventListener('click', Radzen[id]);
 
-    document.removeEventListener('scroll', Radzen[id]);
-    document.addEventListener('scroll', Radzen[id], true);
+    var p = parent;
+    while (p && p != document.body) {
+        if (p.scrollWidth > p.clientWidth || p.scrollHeight > p.clientHeight) {
+            p.removeEventListener('scroll', Radzen.closePopupsOnScroll);
+            p.addEventListener('scroll', Radzen.closePopupsOnScroll);
+        }
+        p = p.parentElement;
+    }
 
     if (!parent) {
         document.removeEventListener('contextmenu', Radzen[id]);
@@ -750,7 +757,6 @@ window.Radzen = {
       popup.style.display = 'none';
     }
     document.removeEventListener('click', Radzen[id]);
-    document.removeEventListener('scroll', Radzen[id]);
     Radzen[id] = null;
 
     if (instance) {

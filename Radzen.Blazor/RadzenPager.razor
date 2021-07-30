@@ -4,19 +4,19 @@
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
         @if (skip > 0)
         {
-            <a class="rz-paginator-first rz-paginator-element" href="javascript:void(0)" tabindex="-1" @onclick="@(() => FirstPage())">
+            <a class="rz-paginator-first rz-paginator-element" href="javascript:void(0)" tabindex="-1" @onclick:preventDefault="true" @onclick="@(() => FirstPage())">
                 <span class="rz-paginator-icon rzi rzi-step-backward"></span>
             </a>
-            <a class="rz-paginator-prev rz-paginator-element" href="javascript:void(0)" tabindex="-1" @onclick="@(() => PrevPage())">
+            <a class="rz-paginator-prev rz-paginator-element" href="javascript:void(0)" tabindex="-1" @onclick:preventDefault="true" @onclick="@(() => PrevPage())">
                 <span class="rz-paginator-icon rzi rzi-caret-left"></span>
             </a>
         }
         else
         {
-            <a class="rz-paginator-first rz-paginator-element rz-state-disabled" href="javascript:void(0)" tabindex="-1" @onclick="@(() => FirstPage())">
+            <a class="rz-paginator-first rz-paginator-element rz-state-disabled" href="javascript:void(0)" tabindex="-1" @onclick:preventDefault="true" @onclick="@(() => FirstPage())">
                 <span class="rz-paginator-icon rzi rzi-step-backward"></span>
             </a>
-            <a class="rz-paginator-prev rz-paginator-element   rz-state-disabled" href="javascript:void(0)" tabindex="-1" @onclick="@(() => PrevPage())">
+            <a class="rz-paginator-prev rz-paginator-element   rz-state-disabled" href="javascript:void(0)" tabindex="-1" @onclick:preventDefault="true" @onclick="@(() => PrevPage())">
                 <span class="rz-paginator-icon rzi rzi-caret-left"></span>
             </a>
         }
@@ -25,29 +25,29 @@
             {
                 @if (i == CurrentPage)
                 {
-                    <a class="rz-paginator-page rz-paginator-element rz-state-active" href="javascript:void(0)" @onclick="@(() => GoToPage(i))">@(i + 1)</a>
+                    <a class="rz-paginator-page rz-paginator-element rz-state-active" href="javascript:void(0)" @onclick:preventDefault="true" @onclick="@(() => GoToPage(i))">@(i + 1)</a>
                 }
                 else
                 {
-                    <a class="rz-paginator-page rz-paginator-element" href="javascript:void(0)" @onclick="@(() => GoToPage(i))">@(i + 1)</a>
+                    <a class="rz-paginator-page rz-paginator-element" href="javascript:void(0)" @onclick:preventDefault="true" @onclick="@(() => GoToPage(i))">@(i + 1)</a>
                 }
             }
         </span>
         @if (CurrentPage != numberOfPages - 1)
         {
-            <a class="rz-paginator-next rz-paginator-element" href="javascript:void(0)" tabindex="0" @onclick="@(() => NextPage())">
+            <a class="rz-paginator-next rz-paginator-element" href="javascript:void(0)" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => NextPage())">
                 <span class="rz-paginator-icon rzi rzi-caret-right"></span>
             </a>
-            <a class="rz-paginator-last rz-paginator-element" href="javascript:void(0)" tabindex="0" @onclick="@(() => LastPage())">
+            <a class="rz-paginator-last rz-paginator-element" href="javascript:void(0)" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => LastPage())">
                 <span class="rz-paginator-icon rzi rzi-step-forward"></span>
             </a>
         }
         else
         {
-            <a class="rz-paginator-next rz-paginator-element rz-state-disabled" href="javascript:void(0)" tabindex="0" @onclick="@(() => NextPage())">
+            <a class="rz-paginator-next rz-paginator-element rz-state-disabled" href="javascript:void(0)" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => NextPage())">
                 <span class="rz-paginator-icon rzi rzi-caret-right"></span>
             </a>
-            <a class="rz-paginator-last rz-paginator-element rz-state-disabled" href="javascript:void(0)" tabindex="0" @onclick="@(() => LastPage())">
+            <a class="rz-paginator-last rz-paginator-element rz-state-disabled" href="javascript:void(0)" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => LastPage())">
                 <span class="rz-paginator-icon rzi rzi-step-forward"></span>
             </a>
         }

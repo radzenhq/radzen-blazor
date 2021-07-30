@@ -19,7 +19,8 @@ namespace Radzen
             {"ge", ">="},
             {"startswith", "StartsWith"},
             {"endswith", "EndsWith"},
-            {"contains", "Contains"}
+            {"contains", "Contains"},
+            {"DoesNotContain", "Contains"}
         };
 
         internal static readonly IDictionary<FilterOperator, string> LinqFilterOperators = new Dictionary<FilterOperator, string>
@@ -32,7 +33,8 @@ namespace Radzen
             {FilterOperator.GreaterThanOrEquals, ">="},
             {FilterOperator.StartsWith, "StartsWith"},
             {FilterOperator.EndsWith, "EndsWith"},
-            {FilterOperator.Contains, "Contains"}
+            {FilterOperator.Contains, "Contains"},
+            {FilterOperator.DoesNotContain, "DoesNotContain"}
         };
 
         internal static readonly IDictionary<FilterOperator, string> ODataFilterOperators = new Dictionary<FilterOperator, string>
@@ -45,7 +47,8 @@ namespace Radzen
             {FilterOperator.GreaterThanOrEquals, "ge"},
             {FilterOperator.StartsWith, "startswith"},
             {FilterOperator.EndsWith, "endswith"},
-            {FilterOperator.Contains, "contains"}
+            {FilterOperator.Contains, "contains"},
+            {FilterOperator.DoesNotContain, "DoesNotContain"}
         };
 
         public static IList ToList(IQueryable query)
@@ -215,6 +218,10 @@ namespace Radzen
                 {
                     return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator}.Contains(""{value}""{filterCaseSensitivityOperator})";
                 }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "DoesNotContain")
+                {
+                    return $@"({property} == null ? """" : !{property}){filterCaseSensitivityOperator}.Contains(""{value}""{filterCaseSensitivityOperator})";
+                }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "startswith")
                 {
                     return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator}.StartsWith(""{value}""{filterCaseSensitivityOperator})";
@@ -268,6 +275,10 @@ namespace Radzen
                 if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.Contains)
                 {
                     return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator}.Contains(""{value}""{filterCaseSensitivityOperator})";
+                }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.DoesNotContain)
+                {
+                    return $@"({property} == null ? """" : !{property}){filterCaseSensitivityOperator}.Contains(""{value}""{filterCaseSensitivityOperator})";
                 }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.StartsWith)
                 {
@@ -351,6 +362,12 @@ namespace Radzen
                         $"contains({property}, tolower('{value}'))" : 
                         $"contains({property}, '{value}')";
                 }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "DoesNotContain")
+                {
+                    return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
+                        $"not(contains({property}, tolower('{value}')))" :
+                        $"not(contains({property}, '{value}'))";
+                }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "startswith")
                 {
                     return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? 
@@ -409,6 +426,12 @@ namespace Radzen
                     return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
                         $"contains({property}, tolower('{value}'))" :
                         $"contains({property}, '{value}')";
+                }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.DoesNotContain)
+                {
+                    return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
+                        $"not(contains({property}, tolower('{value}')))" :
+                        $"not(contains({property}, '{value}'))";
                 }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.StartsWith)
                 {
@@ -591,6 +614,11 @@ namespace Radzen
                             whereList.Add($@"{property}{filterCaseSensitivityOperator}.{comparison}(@{index}{filterCaseSensitivityOperator})", new object[] { column.FilterValue });
                             index++;
                         }
+                        else if (comparison == "DoesNotContain")
+                        {
+                            whereList.Add($@"!{property}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator})", new object[] { column.FilterValue });
+                            index++;
+                        }
                         else
                         {
                             whereList.Add($@"{property}{filterCaseSensitivityOperator} {comparison} @{index}{filterCaseSensitivityOperator}", new object[] { column.FilterValue });
@@ -601,12 +629,14 @@ namespace Radzen
                     {
                         var firstFilter = comparison == "StartsWith" || comparison == "EndsWith" || comparison == "Contains" ?
                             $@"{property}{filterCaseSensitivityOperator}.{comparison}(@{index}{filterCaseSensitivityOperator})" :
+                            comparison == "DoesNotContain" ? $@"!{property}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator})" :
                             $@"{property}{filterCaseSensitivityOperator} {comparison} @{index}{filterCaseSensitivityOperator}";
                         index++;
 
                         var secondComparison = FilterOperators[column.SecondFilterOperator];
                         var secondFilter = secondComparison == "StartsWith" || secondComparison == "EndsWith" || secondComparison == "Contains" ?
                             $@"{property}{filterCaseSensitivityOperator}.{secondComparison}(@{index}{filterCaseSensitivityOperator})" :
+                            secondComparison == "DoesNotContain" ? $@"!{property}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator})" :
                             $@"{property}{filterCaseSensitivityOperator} {secondComparison} @{index}{filterCaseSensitivityOperator}";
                         index++;
 
@@ -660,6 +690,11 @@ namespace Radzen
                             whereList.Add($@"{property}{filterCaseSensitivityOperator}.{comparison}(@{index}{filterCaseSensitivityOperator})", new object[] { column.GetFilterValue() });
                             index++;
                         }
+                        else if (comparison == "DoesNotContain")
+                        {
+                            whereList.Add($@"!{property}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator})", new object[] { column.GetFilterValue() });
+                            index++;
+                        }
                         else
                         {
                             whereList.Add($@"{property}{filterCaseSensitivityOperator} {comparison} @{index}{filterCaseSensitivityOperator}", new object[] { column.GetFilterValue() });
@@ -670,12 +705,14 @@ namespace Radzen
                     {
                         var firstFilter = comparison == "StartsWith" || comparison == "EndsWith" || comparison == "Contains" ?
                             $@"{property}{filterCaseSensitivityOperator}.{comparison}(@{index}{filterCaseSensitivityOperator})" :
+                            comparison == "DoesNotContain" ? $@"!{property}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator})" :
                             $@"{property}{filterCaseSensitivityOperator} {comparison} @{index}{filterCaseSensitivityOperator}";
                         index++;
 
                         var secondComparison = LinqFilterOperators[column.GetSecondFilterOperator()];
                         var secondFilter = secondComparison == "StartsWith" || secondComparison == "EndsWith" || secondComparison == "Contains" ?
                             $@"{property}{filterCaseSensitivityOperator}.{secondComparison}(@{index}{filterCaseSensitivityOperator})" :
+                            secondComparison == "DoesNotContain" ? $@"!{property}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator})" :
                             $@"{property}{filterCaseSensitivityOperator} {secondComparison} @{index}{filterCaseSensitivityOperator}";
                         index++;
 

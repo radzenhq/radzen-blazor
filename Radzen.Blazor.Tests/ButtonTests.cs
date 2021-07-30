@@ -51,7 +51,7 @@ namespace Radzen.Blazor.Tests
             Assert.DoesNotContain(@$"<i class=""rz-button-icon-left rzi"">{icon}</i>", component.Markup);
 
             // renders the icon with busy spin animation
-            Assert.Contains(@"<i style=""animation: button-icon-spin", component.Markup);
+            Assert.Contains(@"<i style=""animation: rotation", component.Markup);
             Assert.Contains(">refresh</i>", component.Markup);
         }
 

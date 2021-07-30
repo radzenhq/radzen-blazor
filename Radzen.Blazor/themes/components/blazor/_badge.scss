@@ -1,0 +1,57 @@
+﻿$badge-pill-border-radius: $border-radius !default;
+
+$badge-styles: () !default;
+
+$badge-styles: map-merge(
+  (
+    primary: (
+      background-color: $primary
+    ),
+    light: (
+      background-color: $light,
+      color: $charcoal-grey
+    ),
+    secondary: (
+      background-color: $secondary
+    ),
+    info: (
+      background-color: $info
+    ),
+    warning: (
+      background-color: $warning
+    ),
+    error: (
+      background-color: $danger
+    ),
+    danger: (
+      background-color: $danger
+    ),
+    success: (
+      background-color: $success
+    )
+  ),
+  $badge-styles
+);
+
+.rz-badge {
+    color: $white;
+    display: inline-block;
+    padding: .25em .4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+
+@each $style, $badge in $badge-styles {
+    .rz-badge-#{$style} {
+        @each $name, $value in $badge {
+            #{$name}: #{$value};
+        }
+    }
+}
+
+.rz-badge-pill {
+    border-radius: $badge-pill-border-radius;
+}

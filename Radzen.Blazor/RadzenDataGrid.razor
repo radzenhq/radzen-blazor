@@ -107,7 +107,7 @@
                                                 }
                                                 else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
                                                 {
-                                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column))" />
+                                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args))" />
                                                 }
                                                 else
                                                 {
@@ -131,7 +131,7 @@
                                                 }
                                                 else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
                                                 {
-                                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetSecondFilterValue()" Change="@((args) => OnFilter(new ChangeEventArgs() { Value = args }, column, false))" />
+                                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@column.GetSecondFilterValue()" Change="@(args => column.SetFilterValue(args, false))"/>
                                                 }
                                                 else
                                                 {
@@ -269,7 +269,14 @@
                     {
                         <tr class=" rz-datatable-emptymessage-row">
                             <td class="rz-datatable-emptymessage" colspan="@visibleColumns.Count">
-                                <span>@EmptyText</span>
+                                @if (EmptyTemplate != null)
+                                {
+                                    @EmptyTemplate
+                                }
+                                else
+                                {
+                                    <span>@EmptyText</span>
+                                }
                             </td>
                         </tr>
                     }
@@ -312,7 +319,7 @@
 
         @if (AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
         {
-            <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" />
+            <RadzenPager @ref="bottomPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" />
         }
     </div>
 }
@@ -330,7 +337,12 @@
     {
         var view = AllowPaging ? PagedView : View;
         var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
-        var top = Math.Min(request.Count, totalItemsCount - request.StartIndex);
+        var top = totalItemsCount > request.Count ? Math.Min(request.Count, totalItemsCount - request.StartIndex) : PageSize;
+
+        if(top <= 0)
+        {
+            top = PageSize;
+        }
 
         if (LoadData.HasDelegate)
         {
@@ -716,6 +728,9 @@
     public string ContainsText { get; set; } = "Contains";
 
     [Parameter]
+    public string DoesNotContainText { get; set; } = "Does not contain";
+
+    [Parameter]
     public string StartsWithText { get; set; } = "Starts with";
 
     internal class NumericFilterEventCallback
@@ -758,6 +773,9 @@
             }
         }
     }
+
+    [Parameter]
+    public RenderFragment EmptyTemplate { get; set; }
 #if NET5
     [Parameter]
     public bool AllowVirtualization { get; set; }
@@ -938,9 +956,16 @@
             Count = 1;
         }
 #if NET5
-        if (AllowVirtualization && virtualize != null && !LoadData.HasDelegate)
+        if (AllowVirtualization && virtualize != null)
         {
-            await virtualize.RefreshDataAsync();
+            if(!LoadData.HasDelegate)
+            {
+                await virtualize.RefreshDataAsync();
+            }
+            else
+            {
+                Data = null;
+            }
         }
 #endif
         var orderBy = GetOrderBy();
@@ -979,7 +1004,16 @@
         {
             StateHasChanged();
         }
-    }
+        else
+        {
+#if NET5
+            if (AllowVirtualization && virtualize != null)
+            {
+                await virtualize.RefreshDataAsync();
+            }
+#endif        
+        } 
+   }
 
     internal async Task ChangeState()
     {
@@ -1119,6 +1153,8 @@
             expandedItems.Remove(item);
             await RowCollapse.InvokeAsync(item);
         }
+
+        await InvokeAsync(StateHasChanged);
     }
 
     [Parameter]
@@ -1335,9 +1371,15 @@
        await EditRowInternal(item);
     }
 
+    bool? isOData;
     internal bool IsOData()
     {
-        return Data != null && typeof(ODataEnumerable<TItem>).IsAssignableFrom(Data.GetType());
+        if(isOData == null && Data != null)
+        {
+            isOData = typeof(ODataEnumerable<TItem>).IsAssignableFrom(Data.GetType());
+        }
+
+        return isOData != null ? isOData.Value : false;
     }
 
     internal List<SortDescriptor> sorts = new List<SortDescriptor>();

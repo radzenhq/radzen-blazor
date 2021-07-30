@@ -10,25 +10,28 @@
         {
             Grid.AddColumn(this);
 
-            var property = GetFilterProperty();
-
-            if (!string.IsNullOrEmpty(property))
+            if (!string.IsNullOrEmpty(FilterProperty) || Type == null)
             {
-                _filterPropertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
+                var property = GetFilterProperty();
 
-                if (_filterPropertyType == null)
+                if (!string.IsNullOrEmpty(property))
                 {
-                    _filterPropertyType = Type;
+                    _filterPropertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
                 }
-                else
-                {
-                    propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
-                }
+            }
+            
+            if (_filterPropertyType == null)
+            {
+                _filterPropertyType = Type;
+            }
+            else
+            {
+                propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
+            }
 
-                if (_filterPropertyType == typeof(string))
-                {
-                    FilterOperator = FilterOperator.Contains;
-                }
+            if (_filterPropertyType == typeof(string))
+            {
+                FilterOperator = FilterOperator.Contains;
             }
         }
     }
@@ -109,7 +112,7 @@
 
     public object GetValue(TItem item)
     {
-        var value = propertyValueGetter != null ? propertyValueGetter(item) : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
+        var value = propertyValueGetter != null && !string.IsNullOrEmpty(Property) && !Property.Contains('.') ? propertyValueGetter(item) : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
 
         return !string.IsNullOrEmpty(FormatString) ? string.Format(FormatString, value) : value;
     }
@@ -363,7 +366,7 @@
     internal IEnumerable<FilterOperator> GetFilterOperators()
     {
         return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
-            var isStringOperator = o == FilterOperator.Contains || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
+            var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
             return FilterPropertyType == typeof(string) ? isStringOperator || o == FilterOperator.Equals || o == FilterOperator.NotEquals : !isStringOperator;
         });
     }
@@ -374,6 +377,8 @@
         {
             case FilterOperator.Contains:
                 return Grid?.ContainsText;
+            case FilterOperator.DoesNotContain:
+                return Grid?.DoesNotContainText;
             case FilterOperator.EndsWith:
                 return Grid?.EndsWithText;
             case FilterOperator.Equals:
