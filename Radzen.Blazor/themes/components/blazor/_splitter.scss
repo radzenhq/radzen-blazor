@@ -22,13 +22,13 @@ $splitter-bar-hover-opacity: 1 !default;
         opacity: 0.4;
         user-select: none;
 
-
         > .rz-collapse {
-            height: 32px;
-            padding-top: 50%;
+            display: table;
 
             &:before {
                 font-family: 'Material Icons';
+                line-height: normal;
+                display: table-cell;
             }
 
             &:hover {
@@ -42,11 +42,12 @@ $splitter-bar-hover-opacity: 1 !default;
         }
 
         > .rz-expand {
-            height: 32px;
-            padding-top: 50%;
+            display: table;
 
             &:before {
                 font-family: 'Material Icons';
+                line-height: normal;
+                display: table-cell;
             }
 
             &:hover {
@@ -85,7 +86,7 @@ $splitter-bar-hover-opacity: 1 !default;
             width: 8px;
 
             > .rz-collapse:before {
-                content: 'arrow_left'
+                content: 'arrow_left';
             }
 
             > .rz-resize {
@@ -95,7 +96,6 @@ $splitter-bar-hover-opacity: 1 !default;
 
             > .rz-expand:before {
                 content: 'arrow_right';
-                width: 8px;
             }
 
             &-resizable:hover {
@@ -112,7 +112,7 @@ $splitter-bar-hover-opacity: 1 !default;
             height: 8px;
 
             > .rz-collapse:before {
-                content: 'arrow_up'
+                content: 'arrow_drop_up'
             }
 
             > .rz-resize {
@@ -121,7 +121,7 @@ $splitter-bar-hover-opacity: 1 !default;
             }
 
             > .rz-expand:before {
-                content: 'arrow_down'
+                content: 'arrow_drop_down'
             }
 
             &-resizable:hover {
