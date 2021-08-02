@@ -675,7 +675,7 @@ namespace Radzen
                                     item = View.AsQueryable().Where($@"{ValueProperty} == @0", v).FirstOrDefault();
                                 }
 
-                                if (item != null && selectedItems.IndexOf(item) == -1)
+                                if (!object.Equals(item, null) && selectedItems.IndexOf(item) == -1)
                                 {
                                     selectedItems.Add(item);
                                 }
