@@ -44,9 +44,16 @@
                     }
                     @foreach (var column in visibleColumns)
                     {
+                        var columnIndex = visibleColumns.IndexOf(column);
                         var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
-                        <th class="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}")" scope="col" style="@column.GetStyle(true, true)">
+                        <th class="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}")" scope="col" style="@column.GetStyle(true, true)" @onmouseup=@(args => EndColumnReorder(args, columnIndex))>
                             <div @onclick='@((args) => OnSort(args, column))' style="width:100%">
+                                @if (AllowColumnReorder && column.Reorderable)
+                                {
+                                    <span id="@getColumnResizerId(columnIndex)" class="rz-column-drag" 
+                                         @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                         @onmousedown=@(args => StartColumnReorder(args, columnIndex))>&nbsp;</span>
+                                }
                                 <span class="rz-column-title">
                                     @if (column.HeaderTemplate != null)
                                     {
@@ -72,9 +79,8 @@
                                         <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
                                     }
                                 }
-                                @if (AllowColumnResize)
+                                @if (AllowColumnResize && column.Resizable)
                                 {
-                                    var columnIndex = visibleColumns.IndexOf(column);
                                     <div id="@getColumnResizerId(columnIndex)" style="cursor:col-resize;float:right;"
                                          @onclick:preventDefault="true" @onclick:stopPropagation="true"
                                          @onmousedown=@(args => StartColumnResize(args, columnIndex))>&nbsp;</div>
@@ -325,7 +331,7 @@
 }
 
 @code {
-#if NET5
+    #if NET5
     internal void SetAllowVirtualization(bool allowVirtualization)
     {
         AllowVirtualization = allowVirtualization;
@@ -795,6 +801,9 @@
     [Parameter]
     public bool AllowColumnResize { get; set; }
 
+    [Parameter]
+    public bool AllowColumnReorder { get; set; }
+
     internal string getColumnResizerId(int columnIndex)
     {
         return string.Join("", $"{UniqueID}".Split('.')) + columnIndex;
@@ -803,6 +812,37 @@
     internal async Task StartColumnResize(MouseEventArgs args, int columnIndex)
     {
         await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnResizerId(columnIndex), Reference, columnIndex, args.ClientX);
+    }
+
+    int? indexOfColumnToReoder;
+
+    internal async Task StartColumnReorder(MouseEventArgs args, int columnIndex)
+    {
+        indexOfColumnToReoder = columnIndex;
+        await JSRuntime.InvokeVoidAsync("Radzen.startColumnReorder", getColumnResizerId(columnIndex));
+    }
+
+    internal async Task EndColumnReorder(MouseEventArgs args, int columnIndex)
+    {
+        if(indexOfColumnToReoder != null)
+        {
+            var columnToReorder = columns.Where(c => c.Visible).ElementAtOrDefault(indexOfColumnToReoder.Value);
+
+            if(columnToReorder != null)
+            {
+                columns.Remove(columnToReorder);
+                columns.Insert(columnIndex, columnToReorder);
+
+                await ColumnReordered.InvokeAsync(new DataGridColumnReorderedEventArgs<TItem>
+                {
+                    Column = columnToReorder,
+                    OldIndex = indexOfColumnToReoder.Value,
+                    NewIndex = columnIndex
+                });
+            }
+
+            indexOfColumnToReoder = null;
+        }
     }
 
     [JSInvokable("RadzenGrid.OnColumnResized")]
@@ -824,6 +864,9 @@
 
     [Parameter]
     public EventCallback<DataGridColumnResizedEventArgs<TItem>> ColumnResized { get; set; }
+
+    [Parameter]
+    public EventCallback<DataGridColumnReorderedEventArgs<TItem>> ColumnReordered { get; set; }
 
     public override IQueryable<TItem> View
     {

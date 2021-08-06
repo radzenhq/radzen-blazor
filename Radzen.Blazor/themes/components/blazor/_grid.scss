@@ -778,3 +778,22 @@ $grid-button-line-height: $grid-button-height !default;
 .rz-grid-table tbody > div {
     display: table-row;
 }
+
+.rz-column-drag {
+    @extend .rzi;
+
+    cursor: grab;
+    font-size: small;
+
+    &:after {
+        content: 'more_vert';
+    }
+
+    &:active {
+        cursor: grabbing;
+    }
+}
+
+.rz-column-draggable {
+    background-color: $grid-header-background-color;
+}

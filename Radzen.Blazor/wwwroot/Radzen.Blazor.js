@@ -1174,6 +1174,43 @@ window.Radzen = {
     document.removeEventListener('touchmove', ref.touchMoveHandler)
     document.removeEventListener('touchend', ref.mouseUpHandler);
   },
+  startColumnReorder: function(id) {
+      var el = document.getElementById(id);
+      var cell = el.parentNode.parentNode;
+      var visual = document.createElement("th");
+      visual.className = cell.className + ' rz-column-draggable';
+      visual.style = cell.style;
+      visual.style.display = 'none';
+      visual.style.position = 'absolute';
+      visual.style.height = cell.offsetHeight + 'px';
+      visual.style.width = cell.offsetWidth + 'px';
+      visual.style.zIndex = 2000;
+      visual.innerHTML = cell.innerHTML;
+      visual.id = id + 'visual';
+      document.body.appendChild(visual);
+
+      Radzen[id + 'end'] = function (e) {
+          var el = document.getElementById(id + 'visual');
+          if (el) {
+              document.body.removeChild(el);
+              Radzen[id + 'end'] = null;
+              Radzen[id + 'move'] = null;
+          }
+      }
+      document.removeEventListener('click', Radzen[id + 'end']);
+      document.addEventListener('click', Radzen[id + 'end']);
+
+      Radzen[id + 'move'] = function (e) {
+          var el = document.getElementById(id + 'visual');
+          if (el) {
+              el.style.display = 'block';
+              el.style.top = e.clientY + 10 + 'px';
+              el.style.left = e.clientX + 10 + 'px';
+          }
+      }
+      document.removeEventListener('mousemove', Radzen[id + 'move']);
+      document.addEventListener('mousemove', Radzen[id + 'move']);
+  },
   startColumnResize: function(id, grid, columnIndex, clientX) {
       var el = document.getElementById(id);
       var cell = el.parentNode.parentNode;

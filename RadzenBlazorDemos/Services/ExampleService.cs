@@ -118,6 +118,13 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Reorder",
+                            Path = "datagrid-column-reorder",
+                            Title = "Blazor DataGrid column reorder",
+                            Tags = new [] { "column", "reorder", "grid", "datagrid", "table"}
+                        },
+                        new Example
+                        {
                             Name = "Footer Totals",
                             Path = "datagrid-footer-totals",
                             Title = "Blazor DataGrid footer totals",
