@@ -85,6 +85,12 @@
     public bool Frozen { get; set; }
 
     [Parameter]
+    public bool Resizable { get; set; } = true;
+
+    [Parameter]
+    public bool Reorderable { get; set; } = true;
+
+    [Parameter]
     public TextAlign TextAlign { get; set; } = TextAlign.Left;
 
     [Parameter]

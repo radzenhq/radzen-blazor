@@ -316,6 +316,13 @@ namespace Radzen
         public double Width { get; internal set; }
     }
 
+    public class DataGridColumnReorderedEventArgs<T>
+    {
+        public RadzenDataGridColumn<T> Column { get; internal set; }
+        public int OldIndex { get; internal set; }
+        public int NewIndex { get; internal set; }
+    }
+
     public class ColumnResizedEventArgs<T>
     {
         public RadzenGridColumn<T> Column { get; internal set; }
