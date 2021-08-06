@@ -840,6 +840,9 @@ namespace RadzenBlazorDemos
 
         public IEnumerable<Example> Filter(string term)
         {
+            if (string.IsNullOrEmpty(term))
+                return allExamples;
+
             bool contains(string value) => value.Contains(term, StringComparison.OrdinalIgnoreCase);
 
             bool filter(Example example) => contains(example.Name) || (example.Tags != null && example.Tags.Any(contains));
