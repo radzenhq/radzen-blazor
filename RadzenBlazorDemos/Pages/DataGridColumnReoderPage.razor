@@ -11,6 +11,7 @@
 <p>Enable column reorder by setting the AllowColumnReorder property to true.</p
 
 <RadzenExample Name="DataGrid" Heading="false" Documentation="false">
+    <RadzenButton Text="Change page state" Click="@((args) => { StateHasChanged(); })" Style="margin-bottom:20px" />
     <RadzenDataGrid AllowColumnReorder="true" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" Reorderable="false" Resizable="false" />
