@@ -1,5 +1,5 @@
 ﻿@inherits RadzenComponent
-@if (Visible && Count > PageSize)
+@if (GetVisible())
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
         @if (skip > 0)
@@ -86,6 +86,11 @@
         }
     }
 
+    protected bool GetVisible()
+    {
+        return Visible && (Count > PageSize || (PageSizeOptions != null && PageSizeOptions.Any()));
+    }
+
     [Parameter]
     public EventCallback<PagerEventArgs> PageChanged { get; set; }
 
@@ -96,7 +101,7 @@
 
     protected override Task OnParametersSetAsync()
     {
-        if (Visible)
+        if (GetVisible())
         {
             InvokeAsync(Reload);
         }
