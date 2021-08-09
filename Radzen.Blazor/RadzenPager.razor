@@ -106,9 +106,21 @@
 
     protected async Task OnPageSizeChanged(object value)
     {
+        bool isFirstPage = CurrentPage == 0;
+        bool isLastPage = CurrentPage == numberOfPages - 1;
+        int prevSkip = skip;
         PageSize = (int)value;
         await InvokeAsync(Reload);
         await PageSizeChanged.InvokeAsync((int)value);
+        if (isLastPage)
+        {
+            await LastPage();
+        }
+        else if (!isFirstPage)
+        {
+            int newPage = (int)Math.Floor((decimal)(prevSkip / (PageSize > 0 ? PageSize : 10)));
+            await GoToPage(newPage, true);
+        }
     }
 
     protected int skip;
@@ -146,9 +158,9 @@
         return (int)Math.Floor((decimal)(skip / (PageSize > 0 ? PageSize : 10)));
     }
 
-    public async Task GoToPage(int page)
+    public async Task GoToPage(int page, bool forceReload = false)
     {
-        if (CurrentPage != page)
+        if (CurrentPage != page || forceReload)
         {
             skip = page * PageSize;
             await InvokeAsync(Reload);
