@@ -17,6 +17,28 @@
     var visibleColumns = columns.Where(c => c.Visible).ToList();
 
     <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()">
+        @if(AllowGrouping)
+        {
+            <div class="rz-group-header" @onmouseup=@(args => EndColumnDropToGroup())>
+            @if(groups.Any())
+            {
+                @foreach(var gd in groups)
+                {
+                    <div class="rz-group-header-item">
+                        <span class="rz-group-header-item-title">@gd.GetTitle()</span>
+                        <a href="javascript:void(0)" @onclick=@(args => { groups.Remove(gd); _groupedPagedView = null; }) role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                            <span class="rzi rzi-times"></span>
+                        </a>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="rz-group-header-drop">@GroupHeaderText</div>
+            }
+            </div>
+        }
+
         @if (AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
         {
             <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" />
@@ -25,6 +47,10 @@
     <div class="rz-data-grid-data">
         <table class="rz-grid-table rz-grid-table-fixed">
             <colgroup>
+                @foreach(var g in groups)
+                {
+                    <col>
+                }
                 @if (Template != null)
                 {
                     <col>
@@ -36,6 +62,12 @@
             </colgroup>
             <thead>
                 <tr>
+                    @foreach(var g in groups)
+                    {
+                        <th class="rz-col-icon rz-unselectable-text" scope="col">
+                            <span class="rz-column-title"></span>
+                        </th>
+                    }
                     @if (Template != null)
                     {
                         <th class="rz-col-icon rz-unselectable-text" scope="col">
@@ -48,7 +80,7 @@
                         var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
                         <th class="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}")" scope="col" style="@column.GetStyle(true, true)" @onmouseup=@(args => EndColumnReorder(args, columnIndex))>
                             <div @onclick='@((args) => OnSort(args, column))' style="width:100%">
-                                @if (AllowColumnReorder && column.Reorderable)
+                                @if (AllowColumnReorder && column.Reorderable || AllowGrouping)
                                 {
                                     <span id="@getColumnResizerId(columnIndex)" class="rz-column-drag" 
                                          @onclick:preventDefault="true" @onclick:stopPropagation="true"
@@ -161,6 +193,12 @@
                 @if (AllowFiltering && FilterMode == FilterMode.Simple && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())
                 {
                     <tr>
+                        @foreach(var g in groups)
+                        {
+                            <th class="rz-col-icon  rz-unselectable-text" scope="col">
+                                <span class="rz-column-title"></span>
+                            </th>
+                        }
                         @if (Template != null)
                         {
                             <th class="rz-col-icon  rz-unselectable-text" scope="col">
@@ -292,6 +330,12 @@
             {
                 <tfoot class="rz-datatable-tfoot">
                     <tr class="">
+                        @foreach(var g in groups)
+                        {
+                            <td class="rz-col-icon rz-unselectable-text" scope="col">
+                                <span class="rz-column-title"></span>
+                            </td>
+                        }
                         @if (Template != null)
                         {
                             <td class="rz-col-icon rz-unselectable-text" scope="col">
@@ -397,21 +441,30 @@
             }
             else
             {
-                int i = 0;
-                foreach (var item in LoadData.HasDelegate ? Data : PagedView)
-                {
-                    builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
-                    builder.AddAttribute(1, "Columns", visibleColumns);
-                    builder.AddAttribute(2, "Index", i);
-                    builder.AddAttribute(3, "Grid", this);
-                    builder.AddAttribute(4, "TItem", typeof(TItem));
-                    builder.AddAttribute(5, "Item", item);
-                    builder.AddAttribute(6, "InEditMode", IsRowInEditMode(item));
-                    builder.CloseComponent();
-                    i++;
-                }
+                DrawGroupOrDataRows(builder, visibleColumns);
             }
 #else
+            DrawGroupOrDataRows(builder, visibleColumns);
+#endif
+        });
+    }
+
+    internal void DrawGroupOrDataRows(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, IList<RadzenDataGridColumn<TItem>> visibleColumns)
+    {
+        if(groups.Any())
+        {
+            foreach (var group in GroupedPagedView)
+            {
+                builder.OpenComponent(0, typeof(RadzenDataGridGroupRow<TItem>));
+                builder.AddAttribute(1, "Columns", visibleColumns);
+                builder.AddAttribute(3, "Grid", this);
+                builder.AddAttribute(5, "Group", group);
+                builder.AddAttribute(6, "Builder", builder);
+                builder.CloseComponent();
+            }
+        }
+        else
+        {
             int i = 0;
             foreach (var item in LoadData.HasDelegate ? Data : PagedView)
             {
@@ -425,8 +478,20 @@
                 builder.CloseComponent();
                 i++;
             }
-#endif
-        });
+        }
+    }   
+
+    IEnumerable<GroupResult> _groupedPagedView;
+    public IEnumerable<GroupResult> GroupedPagedView
+    {
+        get
+        {
+            if(_groupedPagedView == null)
+            {
+                _groupedPagedView = PagedView.GroupByMany(groups.Select(g => g.Property).ToArray()).ToList();
+             }
+            return _groupedPagedView;
+        }
     }
 
     internal string getFrozenColumnClass(RadzenDataGridColumn<TItem> column, IList<RadzenDataGridColumn<TItem>> visibleColumns)
@@ -476,7 +541,7 @@
             {
                 descriptor = new SortDescriptor() { Property = column.Property, SortOrder = column.SortOrder.Value };
                 sorts.Add(descriptor);
-            }                
+            }
         }
     }
 
@@ -804,6 +869,15 @@
     [Parameter]
     public bool AllowColumnReorder { get; set; }
 
+    [Parameter]
+    public bool AllowGrouping { get; set; }
+
+    [Parameter]
+    public RenderFragment<GroupResult> GroupHeaderTemplate { get; set; }
+
+    [Parameter]
+    public string GroupHeaderText { get; set; } = "Drag a column header here and drop it to group by that column";
+
     internal string getColumnResizerId(int columnIndex)
     {
         return string.Join("", $"{UniqueID}".Split('.')) + columnIndex;
@@ -976,6 +1050,7 @@
 
     public void Reset(bool resetColumnState = true, bool resetRowState = false)
     {
+        _groupedPagedView = null;
         _view = null;
         _value = new List<TItem>();
 
@@ -995,6 +1070,7 @@
 
     public async override Task Reload()
     {
+        _groupedPagedView = null;
         _view = null;
 
         if (Data != null && !LoadData.HasDelegate)
@@ -1080,6 +1156,16 @@
         return Task.CompletedTask;
     }
 
+    internal Dictionary<GroupResult, bool> collapsedGroupItems = new Dictionary<GroupResult, bool>();
+    internal string ExpandedGroupItemStyle(GroupResult item)
+    {
+        return collapsedGroupItems.Keys.Contains(item) ? "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-right" : "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-down";
+    }
+
+    internal bool IsGroupItemExpanded(GroupResult item)
+    {
+        return !collapsedGroupItems.Keys.Contains(item) ;
+    }
 
     internal Dictionary<TItem, bool> expandedItems = new Dictionary<TItem, bool>();
     internal string ExpandedItemStyle(TItem item)
@@ -1198,6 +1284,20 @@
         {
             expandedItems.Remove(item);
             await RowCollapse.InvokeAsync(item);
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    internal async System.Threading.Tasks.Task ExpandGroupItem(GroupResult item)
+    {
+        if (!collapsedGroupItems.Keys.Contains(item))
+        {
+            collapsedGroupItems.Add(item, true);
+        }
+        else
+        {
+            collapsedGroupItems.Remove(item);
         }
 
         await InvokeAsync(StateHasChanged);
@@ -1470,6 +1570,28 @@
         {
             sorts.Add(descriptor);
         }
+    }
+
+    internal List<GroupDescriptor> groups = new List<GroupDescriptor>();
+    internal void EndColumnDropToGroup()
+    {
+        if(indexOfColumnToReoder != null)
+        {
+            var column = columns.Where(c => c.Visible).ElementAtOrDefault(indexOfColumnToReoder.Value);
+
+            if(column != null && column.Groupable && !string.IsNullOrEmpty(column.GetGroupProperty()))
+            {
+                var descriptor = groups.Where(d => d.Property == column.GetGroupProperty()).FirstOrDefault();
+                if (descriptor == null)
+                {
+                    descriptor = new GroupDescriptor() { Property = column.GetGroupProperty(), Title = column.Title };
+                    groups.Add(descriptor);
+                    _groupedPagedView = null;
+                }
+            }
+
+            indexOfColumnToReoder = null;
+        }  
     }
 
     public void OrderBy(string property)

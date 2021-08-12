@@ -52,6 +52,9 @@
     public string SortProperty { get; set; }
 
     [Parameter]
+    public string GroupProperty { get; set; }
+
+    [Parameter]
     public string FilterProperty { get; set; }
 
     [Parameter]
@@ -89,6 +92,9 @@
 
     [Parameter]
     public bool Reorderable { get; set; } = true;
+
+    [Parameter]
+    public bool Groupable { get; set; } = true;
 
     [Parameter]
     public TextAlign TextAlign { get; set; } = TextAlign.Left;
@@ -214,6 +220,18 @@
     {
         sortOrder = Enumerable.Empty<SortOrder?>();
         SortOrder = null;
+    }
+
+    public string GetGroupProperty()
+    {
+        if (!string.IsNullOrEmpty(GroupProperty))
+        {
+            return GroupProperty;
+        }
+        else
+        {
+            return Property;
+        }
     }
 
     public string GetFilterProperty()

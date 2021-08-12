@@ -341,7 +341,18 @@ namespace Radzen
     public class SortDescriptor
     {
         public string Property { get; set; }
-        public SortOrder SortOrder { get; set; }
+        public SortOrder? SortOrder { get; set; }
+    }
+
+    public class GroupDescriptor
+    {
+        public string Property { get; set; }
+        public string Title { get; set; }
+
+        public string GetTitle()
+        {
+            return !string.IsNullOrEmpty(Title) ? Title : Property;
+        }
     }
 
     public class LoadDataArgs
