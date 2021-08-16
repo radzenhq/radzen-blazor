@@ -519,6 +519,8 @@ namespace Radzen
                             query.Add(TextProperty);
                         }
 
+                        query.Add("ToString()");
+
                         if (ignoreCase)
                         {
                             query.Add("ToLower()");
