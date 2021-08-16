@@ -824,20 +824,23 @@
 
     internal async Task EndColumnReorder(MouseEventArgs args, int columnIndex)
     {
-        if(indexOfColumnToReoder != null)
+        if (indexOfColumnToReoder != null)
         {
-            var columnToReorder = columns.Where(c => c.Visible).ElementAtOrDefault(indexOfColumnToReoder.Value);
+            var visibleColumns = columns.Where(c => c.Visible).ToList();
+            var columnToReorder = visibleColumns.ElementAtOrDefault(indexOfColumnToReoder.Value);
+            var columnToReorderTo = visibleColumns.ElementAtOrDefault(columnIndex);
 
-            if(columnToReorder != null)
+            if (columnToReorder != null && columnToReorderTo != null)
             {
+                var actualColumnIndex = columns.IndexOf(columnToReorderTo);
                 columns.Remove(columnToReorder);
-                columns.Insert(columnIndex, columnToReorder);
+                columns.Insert(actualColumnIndex, columnToReorder);
 
                 await ColumnReordered.InvokeAsync(new DataGridColumnReorderedEventArgs<TItem>
                 {
                     Column = columnToReorder,
                     OldIndex = indexOfColumnToReoder.Value,
-                    NewIndex = columnIndex
+                    NewIndex = actualColumnIndex
                 });
             }
 
