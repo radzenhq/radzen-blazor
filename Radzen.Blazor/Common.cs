@@ -355,6 +355,13 @@ namespace Radzen
         }
     }
 
+    public class Group
+    {
+        public GroupResult Data { get; set; }
+        public GroupDescriptor GroupDescriptor { get; set; }
+        public int Level { get; set; }
+    }
+
     public class LoadDataArgs
     {
         public int? Skip { get; set; }

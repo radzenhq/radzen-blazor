@@ -458,7 +458,7 @@
                 builder.OpenComponent(0, typeof(RadzenDataGridGroupRow<TItem>));
                 builder.AddAttribute(1, "Columns", visibleColumns);
                 builder.AddAttribute(3, "Grid", this);
-                builder.AddAttribute(5, "Group", group);
+                builder.AddAttribute(5, "GroupResult", group);
                 builder.AddAttribute(6, "Builder", builder);
                 builder.CloseComponent();
             }
@@ -873,7 +873,7 @@
     public bool AllowGrouping { get; set; }
 
     [Parameter]
-    public RenderFragment<GroupResult> GroupHeaderTemplate { get; set; }
+    public RenderFragment<Group> GroupHeaderTemplate { get; set; }
 
     [Parameter]
     public string GroupHeaderText { get; set; } = "Drag a column header here and drop it to group by that column";
@@ -1156,13 +1156,13 @@
         return Task.CompletedTask;
     }
 
-    internal Dictionary<GroupResult, bool> collapsedGroupItems = new Dictionary<GroupResult, bool>();
-    internal string ExpandedGroupItemStyle(GroupResult item)
+    internal Dictionary<Group, bool> collapsedGroupItems = new Dictionary<Group, bool>();
+    internal string ExpandedGroupItemStyle(Group item)
     {
         return collapsedGroupItems.Keys.Contains(item) ? "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-right" : "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-down";
     }
 
-    internal bool IsGroupItemExpanded(GroupResult item)
+    internal bool IsGroupItemExpanded(Group item)
     {
         return !collapsedGroupItems.Keys.Contains(item) ;
     }
@@ -1289,7 +1289,7 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    internal async System.Threading.Tasks.Task ExpandGroupItem(GroupResult item)
+    internal async System.Threading.Tasks.Task ExpandGroupItem(Group item)
     {
         if (!collapsedGroupItems.Keys.Contains(item))
         {

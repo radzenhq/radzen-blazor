@@ -13,7 +13,7 @@
             <span class="@(Grid.ExpandedGroupItemStyle(Group))"></span>
         </a>
     </td>
-    <td colspan="@(Columns.Count + Grid.groups.Count - 1 - GetLevel())">
+    <td colspan="@(Columns.Count + Grid.groups.Count - 1 - Group.Level)">
         <span class="rz-cell-data">
             @if (Grid.GroupHeaderTemplate != null)
             {
@@ -21,7 +21,7 @@
             }
             else
             {
-                @(Grid.groups[GetLevel()].GetTitle() + ": " + Group.Key)
+                @(Group.GroupDescriptor.GetTitle() + ": " + Group.Data.Key)
             }
         </span>
     </td>
@@ -35,7 +35,7 @@
         public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
 
         [Parameter]
-        public GroupResult Group { get; set; }
+        public GroupResult GroupResult { get; set; }
 
         [Parameter]
         public RadzenDataGrid<TItem> Grid { get; set; }
@@ -50,15 +50,15 @@
         {
             return new RenderFragment(builder =>
             {
-                if(Group.Subgroups != null)
+                if(GroupResult.Subgroups != null)
                 {
-                    foreach(var g in Group.Subgroups)
+                    foreach(var g in GroupResult.Subgroups)
                     {
                         builder.OpenComponent(0, typeof(RadzenDataGridGroupRow<TItem>));
                         builder.AddAttribute(1, "Columns", Columns);
                         builder.AddAttribute(3, "Grid", Grid);
                         builder.AddAttribute(3, "Parent", this);
-                        builder.AddAttribute(5, "Group", g);
+                        builder.AddAttribute(5, "GroupResult", g);
                         builder.AddAttribute(6, "Builder", builder);
                         builder.CloseComponent();
                     }
@@ -66,7 +66,7 @@
                 else
                 {
                     int i = 0;
-                    foreach(var item in Group.Items)
+                    foreach(var item in GroupResult.Items)
                     {
                         builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
                         builder.AddAttribute(1, "Columns", Columns);
@@ -80,6 +80,19 @@
                     }
                 }
             });
+        }
+
+        public Group Group { get; set; }
+
+        protected override void OnInitialized()
+        {
+            var level = GetLevel();
+            Group = new Group()
+            {
+                Level = level,
+                GroupDescriptor = Grid.groups[level],
+                Data = GroupResult
+            };
         }
 
         int GetLevel()

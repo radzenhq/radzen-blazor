@@ -14,7 +14,7 @@
     <RadzenDataGrid @ref="ordersGrid"  AllowGrouping="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
             Data="@orders" TItem="Order">
         <GroupHeaderTemplate>
-            Key: @context.Key, Group items count: @context.Count, Last order date: @(context.Items.Cast<Order>().OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)
+            @context.GroupDescriptor.GetTitle(): @context.Data.Key, Group items count: @context.Data.Count, Last order date: @(context.Data.Items.Cast<Order>().OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)
         </GroupHeaderTemplate>
         <Columns>
             <RadzenDataGridColumn Width="50px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
