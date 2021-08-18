@@ -13,7 +13,7 @@
             <span class="@(Grid.ExpandedGroupItemStyle(Group))"></span>
         </a>
     </td>
-    <td colspan="@(Columns.Count + 1)">
+    <td colspan="@(Columns.Count + Grid.groups.Count - 1 - GetLevel())">
         <span class="rz-cell-data">
             @if (Grid.GroupHeaderTemplate != null)
             {
@@ -21,7 +21,7 @@
             }
             else
             {
-                @Group.Key
+                @(Grid.groups[GetLevel()].GetTitle() + ": " + Group.Key)
             }
         </span>
     </td>
