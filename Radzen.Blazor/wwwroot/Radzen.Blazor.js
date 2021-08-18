@@ -763,7 +763,7 @@ window.Radzen = {
       instance.invokeMethodAsync(callback);
     }
 
-    if (Radzen.activeElement) {
+    if (Radzen.activeElement && Radzen.activeElement == document.activeElement ) {
         Radzen.activeElement.focus();
         Radzen.activeElement = null;
     }
