@@ -34,7 +34,7 @@
             }
             else
             {
-                <div class="rz-group-header-drop">@GroupHeaderText</div>
+                <div class="rz-group-header-drop">@GroupPanelText</div>
             }
             </div>
         }
@@ -876,7 +876,7 @@
     public RenderFragment<Group> GroupHeaderTemplate { get; set; }
 
     [Parameter]
-    public string GroupHeaderText { get; set; } = "Drag a column header here and drop it to group by that column";
+    public string GroupPanelText { get; set; } = "Drag a column header here and drop it to group by that column";
 
     internal string getColumnResizerId(int columnIndex)
     {
