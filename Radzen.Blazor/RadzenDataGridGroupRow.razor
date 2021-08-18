@@ -1,0 +1,110 @@
+@typeparam TItem
+@using System.Linq.Dynamic.Core
+<tr>
+    @for(var i = 0; i < GetLevel(); i++)
+    {
+        <td class="rz-col-icon">
+            <span class="rz-column-title"></span>
+        </td>
+    }
+    <td class="rz-col-icon">
+        <span class="rz-column-title"></span>
+        <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandGroupItem(Group))">
+            <span class="@(Grid.ExpandedGroupItemStyle(Group))"></span>
+        </a>
+    </td>
+    <td colspan="@(Columns.Count + Grid.groups.Count - 1 - Group.Level)">
+        <span class="rz-cell-data">
+            @if (Grid.GroupHeaderTemplate != null)
+            {
+                @Grid.GroupHeaderTemplate(Group)
+            }
+            else
+            {
+                @(Group.GroupDescriptor.GetTitle() + ": " + Group.Data.Key)
+            }
+        </span>
+    </td>
+</tr>
+@if(Grid != null && Grid.IsGroupItemExpanded(Group))
+{
+   @DrawDataRows()
+}
+@code {
+        [Parameter]
+        public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
+
+        [Parameter]
+        public GroupResult GroupResult { get; set; }
+
+        [Parameter]
+        public RadzenDataGrid<TItem> Grid { get; set; }
+
+        [Parameter]
+        public RadzenDataGridGroupRow<TItem> Parent { get; set; }
+
+        [Parameter]
+        public Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder Builder { get; set; }
+
+        RenderFragment DrawDataRows()
+        {
+            return new RenderFragment(builder =>
+            {
+                if(GroupResult.Subgroups != null)
+                {
+                    foreach(var g in GroupResult.Subgroups)
+                    {
+                        builder.OpenComponent(0, typeof(RadzenDataGridGroupRow<TItem>));
+                        builder.AddAttribute(1, "Columns", Columns);
+                        builder.AddAttribute(3, "Grid", Grid);
+                        builder.AddAttribute(3, "Parent", this);
+                        builder.AddAttribute(5, "GroupResult", g);
+                        builder.AddAttribute(6, "Builder", builder);
+                        builder.CloseComponent();
+                    }
+                }
+                else
+                {
+                    int i = 0;
+                    foreach(var item in GroupResult.Items)
+                    {
+                        builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
+                        builder.AddAttribute(1, "Columns", Columns);
+                        builder.AddAttribute(2, "Index", i);
+                        builder.AddAttribute(3, "Grid", Grid);
+                        builder.AddAttribute(4, "TItem", typeof(TItem));
+                        builder.AddAttribute(5, "Item", item);
+                        builder.AddAttribute(6, "InEditMode", Grid.IsRowInEditMode((TItem)item));
+                        builder.CloseComponent();
+                        i++;
+                    }
+                }
+            });
+        }
+
+        public Group Group { get; set; }
+
+        protected override void OnInitialized()
+        {
+            var level = GetLevel();
+            Group = new Group()
+            {
+                Level = level,
+                GroupDescriptor = Grid.groups[level],
+                Data = GroupResult
+            };
+        }
+
+        int GetLevel()
+        {
+            int i = 0;
+            var p = Parent;
+            while(p != null)
+            {
+                p = p.Parent;
+                i++;
+            }
+
+            return i;
+        }
+}

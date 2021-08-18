@@ -797,3 +797,21 @@ $grid-button-line-height: $grid-button-height !default;
 .rz-column-draggable {
     background-color: $grid-header-background-color;
 }
+
+.rz-group-header {
+    background-color: $grid-header-background-color;
+    padding: 15px;
+    border-bottom: $grid-cell-border;
+}
+
+.rz-group-header-item {
+    border: $grid-cell-border;
+    padding: 10px;
+    margin:5px;
+    width: fit-content;
+    float:left;
+}
+
+.rz-group-header-item-title {
+    margin-right: 5px;
+}

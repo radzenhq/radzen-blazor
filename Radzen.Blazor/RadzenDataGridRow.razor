@@ -3,7 +3,12 @@
 @implements IDisposable
 @{var rowArgs = Grid?.RowAttributes(Item); }
 <tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
-
+    @foreach(var g in Grid.groups)
+    {
+        <td class="rz-col-icon">
+            <span class="rz-column-title"></span>
+        </td>
+    }
     @if (Grid.Template != null)
     {
         <td class="rz-col-icon">

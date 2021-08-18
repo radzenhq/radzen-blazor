@@ -277,6 +277,28 @@ namespace RadzenBlazorDemos
                         }
                     }
                 },
+                new Example
+                {
+                    Name = "Grouping",
+                    Icon = "&#xf1be",
+                    Children = new []
+                    {
+                        new Example
+                        {
+                            Name = "Grouping API",
+                            Path = "datagrid-grouping-api",
+                            Title = "Blazor DataGrid pager position",
+                            Tags = new [] { "group", "grouping", "datagrid", "table", "dataview", "api" }
+                        },
+                        new Example
+                        {
+                            Name = "Group Header Template",
+                            Path = "datagrid-group-header-template",
+                            Title = "Blazor DataGrid pager API",
+                            Tags = new [] { "group", "grouping", "template", "datagrid", "table", "dataview" }
+                        }
+                    }
+                },
                 new Example()
                 {
                     Name = "InLine Editing",
