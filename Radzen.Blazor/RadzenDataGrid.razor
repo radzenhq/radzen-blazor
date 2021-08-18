@@ -1572,6 +1572,19 @@
         }
     }
 
+    public List<GroupDescriptor> Groups 
+    { 
+        get
+        {
+            return groups;
+        }
+        set
+        {
+            groups = value;
+        }
+ 
+     }
+
     internal List<GroupDescriptor> groups = new List<GroupDescriptor>();
     internal void EndColumnDropToGroup()
     {
