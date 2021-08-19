@@ -34,8 +34,30 @@
         [Parameter]
         public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
 
+        GroupResult _groupResult;
         [Parameter]
-        public GroupResult GroupResult { get; set; }
+        public GroupResult GroupResult 
+        { 
+            get
+            {
+                return _groupResult;
+            }
+            set
+            {
+                if(_groupResult != value)
+                {
+                    _groupResult = value;
+
+                    var level = GetLevel();
+                    Group = new Group()
+                    {
+                        Level = level,
+                        GroupDescriptor = Grid.groups[level],
+                        Data = _groupResult
+                    };
+                }
+            }
+        }
 
         [Parameter]
         public RadzenDataGrid<TItem> Grid { get; set; }
@@ -83,17 +105,6 @@
         }
 
         public Group Group { get; set; }
-
-        protected override void OnInitialized()
-        {
-            var level = GetLevel();
-            Group = new Group()
-            {
-                Level = level,
-                GroupDescriptor = Grid.groups[level],
-                Data = GroupResult
-            };
-        }
 
         int GetLevel()
         {
