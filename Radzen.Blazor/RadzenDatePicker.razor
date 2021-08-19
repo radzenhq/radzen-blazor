@@ -13,7 +13,7 @@
         @if (!Inline)
         {
             <span class="@($"rz-calendar rz-calendar-w-btn{(Disabled ? " rz-state-disabled" : "")}")" style="width:100%">
-                <input @ref="@input" disabled="@Disabled" readonly="@ReadOnly" value="@FormattedValue" tabindex="@TabIndex"
+                <input @ref="@input" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@TabIndex"
                        @onchange="@ParseDate" autocomplete="off" type="text" 
                        class="rz-inputtext" id="@Name" placeholder="@Placeholder" />
                 <button onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
@@ -139,10 +139,10 @@
 
     async Task AmToPm()
     {
-        if (amPm == "am" && !Disabled) 
-        { 
-            amPm = "pm"; 
-                            
+        if (amPm == "am" && !Disabled)
+        {
+            amPm = "pm";
+
             var currentHour = ((CurrentDate.Hour + 11) % 12) + 1;
 
             var newHour = currentHour - 12;
@@ -158,15 +158,15 @@
             {
                 Value = newValue;
                 await OnChange();
-            } 
-        } 
+            }
+        }
     }
 
     async Task PmToAm()
     {
-        if (amPm == "pm" && !Disabled) 
-        { 
-            amPm = "am"; 
+        if (amPm == "pm" && !Disabled)
+        {
+            amPm = "am";
 
             var currentHour = ((CurrentDate.Hour + 11) % 12) + 1;
 
@@ -183,10 +183,10 @@
             {
                 Value = newValue;
                 await OnChange();
-            } 
-        } 
+            }
+        }
     }
-    
+
     int? hour;
     void OnUpdateHourInput(ChangeEventArgs args)
     {
@@ -257,8 +257,8 @@
 
     async Task OkClick()
     {
-        if (!Disabled) 
-        { 
+        if (!Disabled)
+        {
             DateTime date = CurrentDate;
 
             if(CurrentDate.Hour != hour && hour != null)
@@ -279,17 +279,17 @@
 
             Value = date;
 
-            await OnChange(); 
-        
+            await OnChange();
+
             if(monthDropDown != null)
             {
                 await monthDropDown.ClosePopup();
-            } 
-        
-            if(yearDropDown != null) 
-            { 
+            }
+
+            if(yearDropDown != null)
+            {
                 await yearDropDown.ClosePopup();
-            } 
+            }
         }
     }
 
@@ -548,6 +548,11 @@
 
     [Parameter]
     public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public bool AllowInput { get; set; } = true;
+
+    private bool IsReadonly => ReadOnly || !AllowInput;
 
     [Parameter]
     public bool Disabled { get; set; }
