@@ -13,7 +13,6 @@
         @if (!Inline)
         {
             <span class="@($"rz-calendar rz-calendar-w-btn{(Disabled ? " rz-state-disabled" : "")}")" style="width:100%">
-
                 <input @ref="@input" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@TabIndex"
                        @onchange="@ParseDate" autocomplete="off" type="text" 
                        class="rz-inputtext" id="@Name" placeholder="@Placeholder" />
