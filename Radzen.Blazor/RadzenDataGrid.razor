@@ -430,6 +430,12 @@
                         b.AddAttribute(6, "TItem", typeof(TItem));
                         b.AddAttribute(7, "Item", context);
                         b.AddAttribute(8, "InEditMode", IsRowInEditMode(context));
+
+                        if (editContexts.ContainsKey(context))
+                        {
+                            b.AddAttribute(9, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[context]);
+                        }
+
                         b.SetKey(context);
                         b.CloseComponent();
                     });
@@ -451,7 +457,7 @@
 
     internal void DrawGroupOrDataRows(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, IList<RadzenDataGridColumn<TItem>> visibleColumns)
     {
-        if(groups.Any())
+        if (groups.Any())
         {
             foreach (var group in GroupedPagedView)
             {
@@ -468,13 +474,19 @@
             int i = 0;
             foreach (var item in LoadData.HasDelegate ? Data : PagedView)
             {
-                builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
+                builder.OpenComponent<RadzenDataGridRow<TItem>>(0);
                 builder.AddAttribute(1, "Columns", visibleColumns);
                 builder.AddAttribute(2, "Index", i);
                 builder.AddAttribute(3, "Grid", this);
                 builder.AddAttribute(4, "TItem", typeof(TItem));
                 builder.AddAttribute(5, "Item", item);
                 builder.AddAttribute(6, "InEditMode", IsRowInEditMode(item));
+
+                if (editContexts.ContainsKey(item))
+                {
+                    builder.AddAttribute(7, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[item]);
+                }
+
                 builder.CloseComponent();
                 i++;
             }
