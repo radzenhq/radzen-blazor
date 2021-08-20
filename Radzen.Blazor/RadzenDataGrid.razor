@@ -472,7 +472,7 @@
         else
         {
             int i = 0;
-            foreach (var item in LoadData.HasDelegate ? Data : PagedView)
+            foreach (var item in PagedView)
             {
                 builder.OpenComponent<RadzenDataGridRow<TItem>>(0);
                 builder.AddAttribute(1, "Columns", visibleColumns);
@@ -1471,7 +1471,7 @@
                 var list = this.PagedView.ToList();
                 list.Remove(item);
                 this._view = list.AsQueryable();
-                this.Count = this.View.Count();
+                this.Count--;
                 itemToInsert = default(TItem);
                 StateHasChanged();
             }
