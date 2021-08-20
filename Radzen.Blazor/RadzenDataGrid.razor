@@ -1514,7 +1514,7 @@
             var list = this.PagedView.ToList();
             list.Insert(0, item);
             this._view = list.AsQueryable();
-            this.Count = this._view.Count();
+            this.Count++;
         }
         else
         {
