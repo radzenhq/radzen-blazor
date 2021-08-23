@@ -102,12 +102,19 @@ namespace RadzenBlazorDemos.Services
 
             if (File.Exists(cacheFile))
             {
-                var json = await File.ReadAllTextAsync(cacheFile);
-                var cache = JsonSerializer.Deserialize<IssueCache>(json, options);
-
-                if (date.Subtract(cache.Date).TotalHours < 24)
+                try
                 {
-                    issues = cache.Issues;
+                    var json = await File.ReadAllTextAsync(cacheFile);
+                    var cache = JsonSerializer.Deserialize<IssueCache>(json, options);
+
+                    if (date.Subtract(cache.Date).TotalHours < 24)
+                    {
+                        issues = cache.Issues;
+                    }
+                }
+                catch
+                {
+                    File.Delete(cacheFile);
                 }
             }
 

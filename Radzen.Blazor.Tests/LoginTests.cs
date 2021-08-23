@@ -36,7 +36,7 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenLogin>();
 
-            Assert.Contains(@$"<input name=""userName"" class=""rz-textbox""", component.Markup);
+            Assert.Contains(@$"<input name=""Username""", component.Markup);
         }
 
         [Fact]
@@ -87,30 +87,6 @@ namespace Radzen.Blazor.Tests
             component.Find("button").Click();
 
             Assert.True(!clicked);
-        }
-
-        [Fact]
-        public void Login_Validates_UsernameParameter()
-        {
-            using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenLogin>();
-
-            component.Find("button").Click();
-
-            Assert.Contains(@$"Username is required", component.Markup);
-        }
-
-        [Fact]
-        public void Login_Validates_PasswordParameter()
-        {
-            using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenLogin>();
-
-            component.Find("button").Click();
-
-            Assert.Contains(@$"Password is required", component.Markup);
         }
 
         [Fact]
@@ -214,7 +190,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Register, args => { clicked = true; });
             });
 
-            component.Find(".btn-secondary").Click();
+            component.Find(".register > button").Click();
 
             Assert.True(clicked);
         }
@@ -256,18 +232,6 @@ namespace Radzen.Blazor.Tests
             component.Find("a").Click();
 
             Assert.True(!clicked);
-        }
-
-        [Fact]
-        public void Login_Validates_UsernameParameter_OnResetPasswordEvent()
-        {
-            using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenLogin>();
-
-            component.Find("a").Click();
-
-            Assert.Contains(@$"Username is required", component.Markup);
         }
     }
 }

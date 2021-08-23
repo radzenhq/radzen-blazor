@@ -118,6 +118,13 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Reorder",
+                            Path = "datagrid-column-reorder",
+                            Title = "Blazor DataGrid column reorder",
+                            Tags = new [] { "column", "reorder", "grid", "datagrid", "table"}
+                        },
+                        new Example
+                        {
                             Name = "Footer Totals",
                             Path = "datagrid-footer-totals",
                             Title = "Blazor DataGrid footer totals",
@@ -267,6 +274,28 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-pager-api",
                             Title = "Blazor DataGrid pager API",
                             Tags = new [] { "pager", "paging", "api", "datagrid", "table", "dataview" }
+                        }
+                    }
+                },
+                new Example
+                {
+                    Name = "Grouping",
+                    Icon = "&#xf1be",
+                    Children = new []
+                    {
+                        new Example
+                        {
+                            Name = "Grouping API",
+                            Path = "datagrid-grouping-api",
+                            Title = "Blazor DataGrid pager position",
+                            Tags = new [] { "group", "grouping", "datagrid", "table", "dataview", "api" }
+                        },
+                        new Example
+                        {
+                            Name = "Group Header Template",
+                            Path = "datagrid-group-header-template",
+                            Title = "Blazor DataGrid pager API",
+                            Tags = new [] { "group", "grouping", "template", "datagrid", "table", "dataview" }
                         }
                     }
                 },
@@ -840,6 +869,9 @@ namespace RadzenBlazorDemos
 
         public IEnumerable<Example> Filter(string term)
         {
+            if (string.IsNullOrEmpty(term))
+                return allExamples;
+
             bool contains(string value) => value.Contains(term, StringComparison.OrdinalIgnoreCase);
 
             bool filter(Example example) => contains(example.Name) || (example.Tags != null && example.Tags.Any(contains));

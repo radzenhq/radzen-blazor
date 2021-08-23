@@ -1,4 +1,4 @@
-﻿@page "/datagrid"
+﻿@page "/datagrid-grouping-api"
 
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
@@ -8,14 +8,14 @@
 
 <h1>DataGrid</h1>
 
-<p>Display tabular data with ease. Perform paging, sorting and filtering through Entity Framework without extra code.</p>
+<p>Set AllowGrouping="true" to enable group by column and GroupPanelText to localize the group panel text. Set Groupable="false" for column to disable grouping by that column.</p>
 
-<RadzenExample Name="DataGrid" Heading="false">
-    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" 
-        Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+<RadzenExample Name="DataGrid" Heading="false" Documentation="false">
+    <RadzenDataGrid AllowGrouping="true" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" 
+        Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Render="@OnRender">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
+            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Groupable="false" Width="200px" >
                 <Template Context="data">
                     <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
                 </Template>
@@ -43,5 +43,14 @@
     protected override void OnInitialized()
     {
         employees = dbContext.Employees;
+    }
+
+    void OnRender(DataGridRenderEventArgs<Employee> args)
+    {
+        if(args.FirstRender)
+        {
+            args.Grid.Groups.Add(new GroupDescriptor(){ Property = "Title" });
+            StateHasChanged();
+        }
     }
 }

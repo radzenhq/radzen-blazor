@@ -519,6 +519,11 @@ namespace Radzen
                             query.Add(TextProperty);
                         }
 
+                        if (typeof(EnumerableQuery).IsAssignableFrom(Query.GetType()))
+                        {
+                            query.Add("ToString()");
+                        }
+
                         if (ignoreCase)
                         {
                             query.Add("ToLower()");
@@ -675,7 +680,7 @@ namespace Radzen
                                     item = View.AsQueryable().Where($@"{ValueProperty} == @0", v).FirstOrDefault();
                                 }
 
-                                if (item != null && selectedItems.IndexOf(item) == -1)
+                                if (!object.Equals(item, null) && selectedItems.IndexOf(item) == -1)
                                 {
                                     selectedItems.Add(item);
                                 }

@@ -1,9 +1,15 @@
+@using Microsoft.AspNetCore.Components.Forms
 @typeparam TItem
 @implements IRadzenForm
 @implements IDisposable
 @{var rowArgs = Grid?.RowAttributes(Item); }
 <tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
-
+    @foreach(var g in Grid.groups)
+    {
+        <td class="rz-col-icon">
+            <span class="rz-column-title"></span>
+        </td>
+    }
     @if (Grid.Template != null)
     {
         <td class="rz-col-icon">
@@ -16,6 +22,7 @@
             }
         </td>
     }
+    <CascadingValue Value=@EditContext>
     <CascadingValue Value=this>
         @for (var j = 0; j < Columns.Count; j++)
         {
@@ -74,6 +81,7 @@
             </RadzenDataGridCell>
         }
     </CascadingValue>
+    </CascadingValue>
 </tr>
 @if (Grid.Template != null && Grid.expandedItems.Keys.Contains(Item))
 {
@@ -109,6 +117,9 @@
 
         [Parameter]
         public bool InEditMode { get; set; }
+
+        [Parameter]
+        public EditContext EditContext { get; set; }
 
         List<IRadzenFormComponent> components;
 

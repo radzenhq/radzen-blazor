@@ -1,4 +1,4 @@
-﻿@page "/datagrid"
+﻿@page "/datagrid-column-reorder"
 
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
@@ -8,13 +8,14 @@
 
 <h1>DataGrid</h1>
 
-<p>Display tabular data with ease. Perform paging, sorting and filtering through Entity Framework without extra code.</p>
+<p>Enable column reorder by setting the AllowColumnReorder property to true.</p
 
-<RadzenExample Name="DataGrid" Heading="false">
-    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" 
-        Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+<RadzenExample Name="DataGrid" Heading="false" Documentation="false">
+    <RadzenButton Text="Change page state" Click="@((args) => { StateHasChanged(); })" Style="margin-bottom:20px" />
+    <RadzenDataGrid AllowColumnReorder="true" ColumnReordered="@OnColumnReordered"
+        AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" Reorderable="false" Resizable="false" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
                 <Template Context="data">
                     <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
@@ -37,11 +38,21 @@
         </Columns>
     </RadzenDataGrid>
 </RadzenExample>
+
+<EventConsole @ref=@console />
+
 @code {
+    EventConsole console;
+
     IEnumerable<Employee> employees;
 
     protected override void OnInitialized()
     {
         employees = dbContext.Employees;
+    }
+
+    void OnColumnReordered(DataGridColumnReorderedEventArgs<Employee> args)
+    {
+        console.Log($"Reordered {args.Column.Title}. Old index: {args.OldIndex}, New index: {args.NewIndex}");
     }
 }

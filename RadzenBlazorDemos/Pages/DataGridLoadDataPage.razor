@@ -62,9 +62,11 @@ void LoadData(LoadDataArgs args)
         query = query.OrderBy(args.OrderBy);
     }
 
+    count = query.Count();
+
     employees = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
 
-    count = dbContext.Employees.Count();
+   
 } 
         </code>
     </pre>
@@ -98,10 +100,10 @@ void LoadData(LoadDataArgs args)
             query = query.OrderBy(args.OrderBy);
         }
 
+        // Important!!! Make sure the Count property of RadzenDataGrid is set.
+        count = query.Count();
+
         // Perform paginv via Skip and Take.
         employees = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
-
-        // Important!!! Make sure the Count property of RadzenDataGrid is set.
-        count = dbContext.Employees.Count();
     }
 }

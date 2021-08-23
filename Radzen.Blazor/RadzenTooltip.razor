@@ -72,7 +72,7 @@
 
     public void Dispose()
     {
-        if (!IsJSRuntimeAvailable)
+        if (IsJSRuntimeAvailable)
         {
             JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
         }
