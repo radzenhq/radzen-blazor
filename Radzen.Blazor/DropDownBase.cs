@@ -519,7 +519,10 @@ namespace Radzen
                             query.Add(TextProperty);
                         }
 
-                        query.Add("ToString()");
+                        if (typeof(EnumerableQuery).IsAssignableFrom(Query.GetType()))
+                        {
+                            query.Add("ToString()");
+                        }
 
                         if (ignoreCase)
                         {
