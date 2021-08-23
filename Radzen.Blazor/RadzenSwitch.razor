@@ -3,7 +3,7 @@
 @inherits FormComponent<bool>
 @if (Visible)
 {
-<div @ref="@Element" @attributes="Attributes" class="@GetCssClass()"
+<div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
      @onmouseup="@OnMouseUp" @onkeypress="@(async (args) => { if (args.Code == "Space") { await Toggle(); } })" style="outline: 0 none;@Style" tabindex="@TabIndex">
     <div class="rz-helper-hidden-accessible">
         <input type="checkbox" name="@Name" value="@Value" tabindex="-1">
