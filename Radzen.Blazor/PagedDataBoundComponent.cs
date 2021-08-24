@@ -161,11 +161,13 @@ namespace Radzen
         {
             if (topPager != null)
             {
+                bottomPager.SetCount(Count);
                 topPager.SetCurrentPage(CurrentPage);
             }
 
             if (bottomPager != null)
             {
+                bottomPager.SetCount(Count);
                 bottomPager.SetCurrentPage(CurrentPage);
             }
         }
