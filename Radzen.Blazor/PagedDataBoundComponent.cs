@@ -161,7 +161,7 @@ namespace Radzen
         {
             if (topPager != null)
             {
-                bottomPager.SetCount(Count);
+                topPager.SetCount(Count);
                 topPager.SetCurrentPage(CurrentPage);
             }
 
