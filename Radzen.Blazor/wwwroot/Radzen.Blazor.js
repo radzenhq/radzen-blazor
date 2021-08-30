@@ -1204,8 +1204,17 @@ window.Radzen = {
           var el = document.getElementById(id + 'visual');
           if (el) {
               el.style.display = 'block';
-              el.style.top = e.clientY + 10 + 'px';
-              el.style.left = e.clientX + 10 + 'px';
+
+              if (/Edge/.test(navigator.userAgent)) {
+                  var scrollLeft = document.body.scrollLeft;
+                  var scrollTop = document.body.scrollTop;
+              } else {
+                  var scrollLeft = document.documentElement.scrollLeft;
+                  var scrollTop = document.documentElement.scrollTop;
+              }
+
+              el.style.top = e.clientY + scrollTop + 10 + 'px';
+              el.style.left = e.clientX + scrollLeft + 10 + 'px';
           }
       }
       document.removeEventListener('mousemove', Radzen[id + 'move']);
