@@ -961,6 +961,11 @@
     {
         get
         {
+            if(LoadData.HasDelegate)
+            {
+                return base.View;
+            }
+
             var view = base.View.Where<TItem>(columns);
             var orderBy = GetOrderBy();
 
@@ -980,7 +985,7 @@
                 }
             }
 
-            if (!LoadData.HasDelegate && (!IsVirtualizationAllowed() || AllowPaging))
+            if (!IsVirtualizationAllowed() || AllowPaging)
             {
                 var count = view.Count();
                 if (count != Count)
