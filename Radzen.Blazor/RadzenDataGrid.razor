@@ -80,7 +80,7 @@
                         var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
                         <th class="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}")" scope="col" style="@column.GetStyle(true, true)" @onmouseup=@(args => EndColumnReorder(args, columnIndex))>
                             <div @onclick='@((args) => OnSort(args, column))' style="width:100%">
-                                @if (AllowColumnReorder && column.Reorderable || AllowGrouping)
+                                @if (AllowColumnReorder && column.Reorderable || AllowGrouping && column.Groupable)
                                 {
                                     <span id="@getColumnResizerId(columnIndex)" class="rz-column-drag" 
                                          @onclick:preventDefault="true" @onclick:stopPropagation="true"
