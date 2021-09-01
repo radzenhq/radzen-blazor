@@ -114,7 +114,7 @@
                                 @if (AllowColumnResize && column.Resizable)
                                 {
                                     <div id="@getColumnResizerId(columnIndex)" style="cursor:col-resize;float:right;"
-                                         @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                         @onclick:preventDefault="true" @onclick:stopPropagation="true" class="rz-column-resizer" 
                                          @onmousedown=@(args => StartColumnResize(args, columnIndex))>&nbsp;</div>
                                 }
                                 @if (AllowFiltering && column.Filterable && FilterMode == FilterMode.Advanced)
