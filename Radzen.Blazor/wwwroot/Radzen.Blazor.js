@@ -546,7 +546,7 @@ window.Radzen = {
       e.preventDefault();
     }
   },
-  numericKeyPress: function (e) {
+  numericKeyPress: function (e, isInteger) {
     if (
       e.metaKey ||
       e.ctrlKey ||
@@ -559,7 +559,7 @@ window.Radzen = {
 
     var ch = String.fromCharCode(e.charCode);
 
-    if (/^[-\d,.]$/.test(ch)) {
+    if ((isInteger ? /^[-\d]$/ : /^[-\d,.]$/).test(ch)) {
       return;
     }
 
