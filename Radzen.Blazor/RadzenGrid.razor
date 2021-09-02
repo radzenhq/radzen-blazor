@@ -838,9 +838,9 @@
                 {
                     Property = c.GetFilterProperty(),
                     FilterValue = c.FilterValue,
-                    FilterOperator = (FilterOperator)Enum.Parse(typeof(FilterOperator), QueryableExtension.FilterOperators[c.FilterOperator]),
+                    FilterOperator = QueryableExtension.FilterOperatorEnumMappings[c.FilterOperator],
                     SecondFilterValue = c.SecondFilterValue,
-                    SecondFilterOperator = (FilterOperator)Enum.Parse(typeof(FilterOperator), QueryableExtension.FilterOperators[c.SecondFilterOperator]),
+                    SecondFilterOperator = QueryableExtension.FilterOperatorEnumMappings[c.SecondFilterOperator],
                     LogicalFilterOperator = c.LogicalFilterOperator
                 }),
                 Sorts = columns.Where(c => c.Sortable && c.Visible && (orderBy.Contains($"{c.GetSortProperty()} asc") || orderBy.Contains($"{c.GetSortProperty()} desc"))).Select(c => new SortDescriptor()

@@ -9,6 +9,20 @@ namespace Radzen
 {
     public static class QueryableExtension
     {
+        internal static readonly IDictionary<string, FilterOperator> FilterOperatorEnumMappings = new Dictionary<string, FilterOperator>
+        {
+            {"eq", FilterOperator.Equals},
+            {"ne", FilterOperator.NotEquals},
+            {"lt", FilterOperator.LessThan},
+            {"le", FilterOperator.LessThanOrEquals},
+            {"gt", FilterOperator.GreaterThan},
+            {"ge", FilterOperator.GreaterThanOrEquals},
+            {"startswith", FilterOperator.StartsWith},
+            {"endswith", FilterOperator.EndsWith},
+            {"contains", FilterOperator.Contains},
+            {"DoesNotContain", FilterOperator.DoesNotContain}
+        };
+
         internal static readonly IDictionary<string, string> FilterOperators = new Dictionary<string, string>
         {
             {"eq", "="},
