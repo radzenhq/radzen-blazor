@@ -513,7 +513,15 @@
         if (DateTimeValue != newValue && (newValue != null || nullable))
         {
             DateTimeValue = newValue;
-            await ValueChanged.InvokeAsync((TValue)Value);
+            if ((typeof(TValue) == typeof(DateTimeOffset) || typeof(TValue) == typeof(DateTimeOffset?)) && Value != null)
+            {
+                DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)Value, DateTimeKind.Utc);
+                await ValueChanged.InvokeAsync((TValue)(object)offset);
+            }
+            else
+            {
+                await ValueChanged.InvokeAsync((TValue)Value);
+            }
 
             if (FieldIdentifier.FieldName != null)
             {
