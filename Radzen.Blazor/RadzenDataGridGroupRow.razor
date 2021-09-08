@@ -9,8 +9,8 @@
     }
     <td class="rz-col-icon">
         <span class="rz-column-title"></span>
-        <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandGroupItem(Group))">
-            <span class="@(Grid.ExpandedGroupItemStyle(Group))"></span>
+        <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandGroupItem(this))">
+            <span class="@(Grid.ExpandedGroupItemStyle(this))"></span>
         </a>
     </td>
     <td colspan="@(Columns.Count + Grid.groups.Count - 1 - Group.Level)">
@@ -26,7 +26,7 @@
         </span>
     </td>
 </tr>
-@if(Grid != null && Grid.IsGroupItemExpanded(Group))
+@if(Grid != null && Grid.IsGroupItemExpanded(this))
 {
    @DrawDataRows()
 }

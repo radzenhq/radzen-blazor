@@ -1173,15 +1173,29 @@
         return Task.CompletedTask;
     }
 
-    internal Dictionary<Group, bool> collapsedGroupItems = new Dictionary<Group, bool>();
-    internal string ExpandedGroupItemStyle(Group item)
+    internal Dictionary<RadzenDataGridGroupRow<TItem>, bool> collapsedGroupItems = new Dictionary<RadzenDataGridGroupRow<TItem>, bool>();
+    internal string ExpandedGroupItemStyle(RadzenDataGridGroupRow<TItem> item)
     {
         return collapsedGroupItems.Keys.Contains(item) ? "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-right" : "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-down";
     }
 
-    internal bool IsGroupItemExpanded(Group item)
+    internal bool IsGroupItemExpanded(RadzenDataGridGroupRow<TItem> item)
     {
         return !collapsedGroupItems.Keys.Contains(item) ;
+    }
+    
+    internal async System.Threading.Tasks.Task ExpandGroupItem(RadzenDataGridGroupRow<TItem> item)
+    {
+        if (!collapsedGroupItems.Keys.Contains(item))
+        {
+            collapsedGroupItems.Add(item, true);
+        }
+        else
+        {
+            collapsedGroupItems.Remove(item);
+        }
+
+        await InvokeAsync(StateHasChanged);
     }
 
     internal Dictionary<TItem, bool> expandedItems = new Dictionary<TItem, bool>();
@@ -1301,20 +1315,6 @@
         {
             expandedItems.Remove(item);
             await RowCollapse.InvokeAsync(item);
-        }
-
-        await InvokeAsync(StateHasChanged);
-    }
-
-    internal async System.Threading.Tasks.Task ExpandGroupItem(Group item)
-    {
-        if (!collapsedGroupItems.Keys.Contains(item))
-        {
-            collapsedGroupItems.Add(item, true);
-        }
-        else
-        {
-            collapsedGroupItems.Remove(item);
         }
 
         await InvokeAsync(StateHasChanged);
