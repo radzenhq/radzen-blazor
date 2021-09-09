@@ -383,6 +383,14 @@
 
     internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> virtualize;
 
+    public Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> Virtualize
+    {
+        get
+        {
+            return virtualize;
+        }
+    }
+
     private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
     {
         var view = AllowPaging ? PagedView : View;
