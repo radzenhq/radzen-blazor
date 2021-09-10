@@ -166,12 +166,17 @@
 
     internal async System.Threading.Tasks.Task SelectTabOnClient(RadzenTabsItem tab)
     { 
-        selectedIndex = IndexOf(tab);
-        await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
+        var index = IndexOf(tab);
+        if (index != selectedIndex)
+        {
+            selectedIndex = index;
 
-        shouldRender = false;
-        await Change.InvokeAsync(selectedIndex);
-        await SelectedIndexChanged.InvokeAsync(selectedIndex);
-        shouldRender = true;
+            await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
+
+            shouldRender = false;
+            await Change.InvokeAsync(selectedIndex);
+            await SelectedIndexChanged.InvokeAsync(selectedIndex);
+            shouldRender = true;
+        }
     }
 }
