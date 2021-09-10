@@ -133,6 +133,24 @@ window.Radzen = {
        el.addEventListener('keydown', preventDefault, false);
     }
   },
+  selectTab: function (id, index) {
+    var el = document.getElementById(id);
+    if (el && el.parentNode) {
+        for (var i = 0; i < el.parentNode.children.length; i++) {
+            var child = el.parentNode.children[i];
+            child.style.display = i == index ? 'block' : 'none';
+        }
+        for (var i = 0; i < el.parentNode.previousElementSibling.children.length; i++) {
+            var child = el.parentNode.previousElementSibling.children[i];
+            if (i == index) {
+               child.classList.add('rz-tabview-selected');
+            }
+            else {
+               child.classList.remove('rz-tabview-selected');
+            }
+        }
+    }
+  },
   loadGoogleMaps: function (defaultView, apiKey, resolve, reject) {
     resolveCallbacks.push(resolve);
     rejectCallbacks.push(reject);
