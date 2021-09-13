@@ -135,18 +135,21 @@ window.Radzen = {
   },
   selectTab: function (id, index) {
     var el = document.getElementById(id);
-    if (el && el.parentNode) {
-        for (var i = 0; i < el.parentNode.children.length; i++) {
-            var child = el.parentNode.children[i];
-            child.style.display = i == index ? 'block' : 'none';
-        }
-        for (var i = 0; i < el.parentNode.previousElementSibling.children.length; i++) {
-            var child = el.parentNode.previousElementSibling.children[i];
-            if (i == index) {
-               child.classList.add('rz-tabview-selected');
+    if (el && el.parentNode && el.parentNode.previousElementSibling) {
+        var count = el.parentNode.children.length;
+        for (var i = 0; i < count; i++) {
+            var content = el.parentNode.children[i];
+            if (content) {
+                content.style.display = i == index ? 'block' : 'none';
             }
-            else {
-               child.classList.remove('rz-tabview-selected');
+            var header = el.parentNode.previousElementSibling.children[i];
+            if (header) {
+                if (i == index) {
+                    header.classList.add('rz-tabview-selected');
+                }
+                else {
+                    header.classList.remove('rz-tabview-selected');
+                }
             }
         }
     }
