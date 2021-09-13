@@ -427,6 +427,26 @@ video {
     opacity: 1;
 }
 
+/* Demos Content */
+
+p code,
+ul code {
+    display: inline-block;
+}
+
+p code,
+ul code,
+pre {
+    padding: 0 0.5rem;
+    font-size: 0.8125rem !important;
+    line-height: 1.5rem;
+    background:rgba(0,0,0,.08);
+    border-radius: 0.25rem;
+}
+
+
+
+
 /* Responsive */
 
 @media (max-width: 767px) {
