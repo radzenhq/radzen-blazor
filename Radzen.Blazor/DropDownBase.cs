@@ -17,6 +17,14 @@ namespace Radzen
 #if NET5
         internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<object> virtualize;
 
+        public Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<object> Virtualize
+        {
+            get
+            {
+                return virtualize;
+            }
+        }
+
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
             var data = Data != null ? Data.Cast<object>() : Enumerable.Empty<object>();
@@ -519,7 +527,10 @@ namespace Radzen
                             query.Add(TextProperty);
                         }
 
-                        query.Add("ToString()");
+                        if (typeof(EnumerableQuery).IsAssignableFrom(Query.GetType()))
+                        {
+                            query.Add("ToString()");
+                        }
 
                         if (ignoreCase)
                         {

@@ -47,16 +47,30 @@
             }
         }
     }
+    @if(ShowStepsButtons)
+    {
     <div class="rz-steps-buttons">
         <a class='@($"rz-steps-prev {(IsFirstVisibleStep() ?  "rz-state-disabled" : "")}")' @onclick="@PrevStep" href="javascript:void(0)"><i class="rzi">navigate_before</i>@PreviousText</a>
         <a class='@($"rz-steps-next {(IsLastVisibleStep() ?  "rz-state-disabled" : "")}")' @onclick="@NextStep" href="javascript:void(0)">@NextText<i class="rzi">navigate_next</i></a>
     </div>
+    }
 </div>
 }
 
 @code {
+    [Parameter]
+    public bool ShowStepsButtons { get; set; } = true;
+
     [CascadingParameter]
     public EditContext EditContext { get; set; }
+
+    public IList<RadzenStepsItem> StepsCollection
+    {
+        get
+        {
+            return steps;
+        }
+    }
 
     bool IsFirstVisibleStep()
     {
@@ -80,7 +94,7 @@
         return false;
     }
 
-    async System.Threading.Tasks.Task NextStep()
+    public async System.Threading.Tasks.Task NextStep()
     {
         if(!IsLastVisibleStep())
         {
@@ -100,7 +114,7 @@
         }
     }
 
-    async System.Threading.Tasks.Task PrevStep()
+    public async System.Threading.Tasks.Task PrevStep()
     {
         if(!IsFirstVisibleStep())
         {

@@ -9,8 +9,8 @@
     }
     <td class="rz-col-icon">
         <span class="rz-column-title"></span>
-        <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandGroupItem(Group))">
-            <span class="@(Grid.ExpandedGroupItemStyle(Group))"></span>
+        <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandGroupItem(this))">
+            <span class="@(Grid.ExpandedGroupItemStyle(this))"></span>
         </a>
     </td>
     <td colspan="@(Columns.Count + Grid.groups.Count - 1 - Group.Level)">
@@ -26,7 +26,7 @@
         </span>
     </td>
 </tr>
-@if(Grid != null && Grid.IsGroupItemExpanded(Group))
+@if(Grid != null && Grid.IsGroupItemExpanded(this))
 {
    @DrawDataRows()
 }
@@ -34,8 +34,30 @@
         [Parameter]
         public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
 
+        GroupResult _groupResult;
         [Parameter]
-        public GroupResult GroupResult { get; set; }
+        public GroupResult GroupResult 
+        { 
+            get
+            {
+                return _groupResult;
+            }
+            set
+            {
+                if(_groupResult != value)
+                {
+                    _groupResult = value;
+
+                    var level = GetLevel();
+                    Group = new Group()
+                    {
+                        Level = level,
+                        GroupDescriptor = Grid.groups[level],
+                        Data = _groupResult
+                    };
+                }
+            }
+        }
 
         [Parameter]
         public RadzenDataGrid<TItem> Grid { get; set; }
@@ -83,17 +105,6 @@
         }
 
         public Group Group { get; set; }
-
-        protected override void OnInitialized()
-        {
-            var level = GetLevel();
-            Group = new Group()
-            {
-                Level = level,
-                GroupDescriptor = Grid.groups[level],
-                Data = GroupResult
-            };
-        }
 
         int GetLevel()
         {

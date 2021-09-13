@@ -10,7 +10,7 @@
         <input @ref="@input" type="text" inputmode="decimal" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
                class="rz-spinner-input rz-inputtext" tabindex="@TabIndex"
                placeholder="@Placeholder" autocomplete="@(AutoComplete ? "on" : "off")" value="@FormattedValue" @onchange="@OnChange"
-               onkeypress="Radzen.numericKeyPress(event)" onpaste="Radzen.numericOnPaste(event)" />
+               onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower())" onpaste="Radzen.numericOnPaste(event)" />
         @if (ShowUpDown)
         {
             <button type="button" class="rz-spinner-button rz-spinner-up rz-corner-tr rz-button" tabindex="-1"
@@ -132,6 +132,26 @@
             case TypeCode.Decimal:
             case TypeCode.Double:
             case TypeCode.Single:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private bool IsInteger()
+    {
+        var type = typeof(TValue).IsGenericType ? typeof(TValue).GetGenericArguments()[0] : typeof(TValue);
+
+        switch (Type.GetTypeCode(type))
+        {
+            case TypeCode.Byte:
+            case TypeCode.SByte:
+            case TypeCode.UInt16:
+            case TypeCode.UInt32:
+            case TypeCode.UInt64:
+            case TypeCode.Int16:
+            case TypeCode.Int32:
+            case TypeCode.Int64:
                 return true;
             default:
                 return false;

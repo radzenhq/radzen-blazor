@@ -80,7 +80,7 @@
                         var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
                         <th class="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}")" scope="col" style="@column.GetStyle(true, true)" @onmouseup=@(args => EndColumnReorder(args, columnIndex))>
                             <div @onclick='@((args) => OnSort(args, column))' style="width:100%">
-                                @if (AllowColumnReorder && column.Reorderable || AllowGrouping)
+                                @if (AllowColumnReorder && column.Reorderable || AllowGrouping && column.Groupable)
                                 {
                                     <span id="@getColumnResizerId(columnIndex)" class="rz-column-drag" 
                                          @onclick:preventDefault="true" @onclick:stopPropagation="true"
@@ -114,7 +114,7 @@
                                 @if (AllowColumnResize && column.Resizable)
                                 {
                                     <div id="@getColumnResizerId(columnIndex)" style="cursor:col-resize;float:right;"
-                                         @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                                         @onclick:preventDefault="true" @onclick:stopPropagation="true" class="rz-column-resizer" 
                                          @onmousedown=@(args => StartColumnResize(args, columnIndex))>&nbsp;</div>
                                 }
                                 @if (AllowFiltering && column.Filterable && FilterMode == FilterMode.Advanced)
@@ -383,6 +383,14 @@
 
     internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> virtualize;
 
+    public Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> Virtualize
+    {
+        get
+        {
+            return virtualize;
+        }
+    }
+
     private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
     {
         var view = AllowPaging ? PagedView : View;
@@ -430,6 +438,12 @@
                         b.AddAttribute(6, "TItem", typeof(TItem));
                         b.AddAttribute(7, "Item", context);
                         b.AddAttribute(8, "InEditMode", IsRowInEditMode(context));
+
+                        if (editContexts.ContainsKey(context))
+                        {
+                            b.AddAttribute(9, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[context]);
+                        }
+
                         b.SetKey(context);
                         b.CloseComponent();
                     });
@@ -451,7 +465,7 @@
 
     internal void DrawGroupOrDataRows(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, IList<RadzenDataGridColumn<TItem>> visibleColumns)
     {
-        if(groups.Any())
+        if (groups.Any())
         {
             foreach (var group in GroupedPagedView)
             {
@@ -466,15 +480,21 @@
         else
         {
             int i = 0;
-            foreach (var item in LoadData.HasDelegate ? Data : PagedView)
+            foreach (var item in PagedView)
             {
-                builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
+                builder.OpenComponent<RadzenDataGridRow<TItem>>(0);
                 builder.AddAttribute(1, "Columns", visibleColumns);
                 builder.AddAttribute(2, "Index", i);
                 builder.AddAttribute(3, "Grid", this);
                 builder.AddAttribute(4, "TItem", typeof(TItem));
                 builder.AddAttribute(5, "Item", item);
                 builder.AddAttribute(6, "InEditMode", IsRowInEditMode(item));
+
+                if (editContexts.ContainsKey(item))
+                {
+                    builder.AddAttribute(7, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[item]);
+                }
+
                 builder.CloseComponent();
                 i++;
             }
@@ -949,6 +969,11 @@
     {
         get
         {
+            if(LoadData.HasDelegate)
+            {
+                return base.View;
+            }
+
             var view = base.View.Where<TItem>(columns);
             var orderBy = GetOrderBy();
 
@@ -968,7 +993,7 @@
                 }
             }
 
-            if (!LoadData.HasDelegate && (!IsVirtualizationAllowed() || AllowPaging))
+            if (!IsVirtualizationAllowed() || AllowPaging)
             {
                 var count = view.Count();
                 if (count != Count)
@@ -1156,15 +1181,29 @@
         return Task.CompletedTask;
     }
 
-    internal Dictionary<Group, bool> collapsedGroupItems = new Dictionary<Group, bool>();
-    internal string ExpandedGroupItemStyle(Group item)
+    internal Dictionary<RadzenDataGridGroupRow<TItem>, bool> collapsedGroupItems = new Dictionary<RadzenDataGridGroupRow<TItem>, bool>();
+    internal string ExpandedGroupItemStyle(RadzenDataGridGroupRow<TItem> item)
     {
         return collapsedGroupItems.Keys.Contains(item) ? "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-right" : "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-down";
     }
 
-    internal bool IsGroupItemExpanded(Group item)
+    internal bool IsGroupItemExpanded(RadzenDataGridGroupRow<TItem> item)
     {
         return !collapsedGroupItems.Keys.Contains(item) ;
+    }
+    
+    internal async System.Threading.Tasks.Task ExpandGroupItem(RadzenDataGridGroupRow<TItem> item)
+    {
+        if (!collapsedGroupItems.Keys.Contains(item))
+        {
+            collapsedGroupItems.Add(item, true);
+        }
+        else
+        {
+            collapsedGroupItems.Remove(item);
+        }
+
+        await InvokeAsync(StateHasChanged);
     }
 
     internal Dictionary<TItem, bool> expandedItems = new Dictionary<TItem, bool>();
@@ -1284,20 +1323,6 @@
         {
             expandedItems.Remove(item);
             await RowCollapse.InvokeAsync(item);
-        }
-
-        await InvokeAsync(StateHasChanged);
-    }
-
-    internal async System.Threading.Tasks.Task ExpandGroupItem(Group item)
-    {
-        if (!collapsedGroupItems.Keys.Contains(item))
-        {
-            collapsedGroupItems.Add(item, true);
-        }
-        else
-        {
-            collapsedGroupItems.Remove(item);
         }
 
         await InvokeAsync(StateHasChanged);
@@ -1459,7 +1484,7 @@
                 var list = this.PagedView.ToList();
                 list.Remove(item);
                 this._view = list.AsQueryable();
-                this.Count = this.View.Count();
+                this.Count--;
                 itemToInsert = default(TItem);
                 StateHasChanged();
             }
@@ -1502,7 +1527,7 @@
             var list = this.PagedView.ToList();
             list.Insert(0, item);
             this._view = list.AsQueryable();
-            this.Count = this._view.Count();
+            this.Count++;
         }
         else
         {

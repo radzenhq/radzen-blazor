@@ -94,7 +94,14 @@
     {
         if (!Disabled)
         {
-            await Tabs.SelectTab(this, true);
+            if (Tabs.RenderMode == TabRenderMode.Server)
+            {
+                await Tabs.SelectTab(this, true);
+            }
+            else
+            {
+                await Tabs.SelectTabOnClient(this);
+            }
         }
     }
 

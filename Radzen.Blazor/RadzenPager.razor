@@ -181,6 +181,12 @@
         }
     }
 
+    internal void SetCount(int count)
+    {
+        Count = count;
+        CalculatePager();
+    }
+
     public async Task FirstPage(bool forceReload = false)
     {
         if (CurrentPage != 0 || forceReload)

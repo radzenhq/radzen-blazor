@@ -59,7 +59,7 @@ namespace Radzen
             {
                 if (_view == null)
                 {
-                    _view = (AllowPaging ? View.Skip(skip).Take(PageSize) : View).ToList().AsQueryable();
+                    _view = (AllowPaging && !LoadData.HasDelegate ? View.Skip(skip).Take(PageSize) : View).ToList().AsQueryable();
                 }
                 return _view;
             }
@@ -161,11 +161,13 @@ namespace Radzen
         {
             if (topPager != null)
             {
+                topPager.SetCount(Count);
                 topPager.SetCurrentPage(CurrentPage);
             }
 
             if (bottomPager != null)
             {
+                bottomPager.SetCount(Count);
                 bottomPager.SetCurrentPage(CurrentPage);
             }
         }

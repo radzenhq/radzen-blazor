@@ -276,7 +276,7 @@
 
         if (parameters.DidParameterChange(nameof(SortOrder), SortOrder))
         {
-            sortOrder = new SortOrder?[] { parameters.GetValueOrDefault<SortOrder>(nameof(SortOrder)) };
+            sortOrder = new SortOrder?[] { parameters.GetValueOrDefault<SortOrder?>(nameof(SortOrder)) };
         }
 
         if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))
