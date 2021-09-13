@@ -353,7 +353,6 @@ namespace RadzenBlazorDemos
                     Icon = "&#xe896",
                     Tags = new [] { "dataview", "grid", "table" }
                 },
-
                 new Example()
                 {
                     Name = "Pager",
@@ -361,15 +360,6 @@ namespace RadzenBlazorDemos
                     Icon = "&#xe8be",
                     Tags = new [] { "pager", "paging" }
                 },
-
-                new Example()
-                {
-                    Name = "Tree",
-                    Path = "tree",
-                    Icon = "&#xe8ef",
-                    Tags = new [] { "tree", "treeview", "nodes", "hierarchy" }
-                },
-
                 new Example()
                 {
                     Name = "Scheduler",
@@ -377,84 +367,135 @@ namespace RadzenBlazorDemos
                     Icon = "&#xe616",
                     Tags = new [] { "scheduler", "calendar", "event", "appointment"}
                 },
+                new Example()
+                {
+                    Name = "Tree",
+                    Path = "tree",
+                    Icon = "&#xe8ef",
+                    Tags = new [] { "tree", "treeview", "nodes", "hierarchy" }
+                },
             }
         },
         new Example()
         {
-            Name="HtmlEditor",
+            Name="Images",
             Children = new [] {
                 new Example()
                 {
-                    Name = "Default Tools",
-                    Path = "html-editor",
-                    Icon = "&#xe3c9",
-                    Tags = new [] { "html", "editor", "rich", "text" }
+                    Name = "Gravatar",
+                    Path = "gravatar",
+                    Icon = "&#xe84e"
                 },
                 new Example()
                 {
-                    Name = "Custom Tools",
-                    Path = "html-editor-custom-tools",
-                    Icon = "&#xe8b8",
-                    Tags = new [] { "html", "editor", "rich", "text", "tool", "custom" }
+                    Name = "Icon",
+                    Path = "icon",
+                    Icon = "&#xe84f"
+                },
+                new Example()
+                {
+                    Name = "Image",
+                    Path = "image",
+                    Icon = "&#xe8aa"
                 },
             }
         },
-        new Example
+        new Example()
         {
-            Name="Charts",
-            Children= new [] {
-                new Example
+            Name="Layout & Navigation",
+            Children = new [] {
+                new Example()
                 {
-                    Name = "Line Chart",
-                    Path = "line-chart",
-                    Icon = "&#xe922",
-                    Tags = new [] { "chart", "graph", "line" }
+                    Name = "Accordion",
+                    Path = "accordion",
+                    Icon = "&#xe8ee",
+                    Tags = new [] { "panel", "container" }
                 },
-                new Example
+                new Example()
                 {
-                    Name = "Area Chart",
-                    Path = "area-chart",
-                    Icon = "&#xe251",
-                    Tags = new [] { "chart", "graph", "area" }
+                    Name = "Card",
+                    Path = "card",
+                    Icon = "&#xe919",
+                    Tags = new [] { "container" }
                 },
-                new Example
+                new Example()
                 {
-                    Name = "Column Chart",
-                    Path = "column-chart",
-                    Icon = "&#xe24b",
-                    Tags = new [] { "chart", "graph", "column", "bar" }
+                    Name = "ContextMenu",
+                    Path = "contextmenu",
+                    Icon = "&#xe8de",
+                    Tags = new [] { "popup", "dropdown", "menu" }
                 },
-                new Example
+                new Example()
                 {
-                    Name = "Bar Chart",
-                    Path = "bar-chart",
-                    Icon = "&#xe164",
-                    Tags = new [] { "chart", "graph", "column", "bar" }
+                    Name = "Dialog",
+                    Path = "dialog",
+                    Icon = "&#xe8a7",
+                    Tags = new [] { "popup", "window" }
                 },
-                new Example
+                new Example()
                 {
-                    Name = "Pie Chart",
-                    Path = "pie-chart",
-                    Icon = "&#xe6c4",
-                    Tags = new [] { "chart", "graph", "pie" }
+                    Name = "Link",
+                    Path = "link",
+                    Icon = "&#xe157"
                 },
-                new Example
+                new Example()
                 {
-                    Name = "Donut Chart",
-                    Path = "donut-chart",
-                    Icon = "&#xe917",
-                    Tags = new [] { "chart", "graph", "donut" }
+                    Name = "Login",
+                    Path = "login",
+                    Icon = "&#xe8e8"
                 },
-                new Example
+                new Example()
                 {
-                    Name = "Styling",
-                    Path = "styling-chart",
-                    Icon = "&#xe41d",
-                    Tags = new [] { "chart", "graph", "styling" }
+                    Name = "Menu",
+                    Path = "menu",
+                    Icon = "&#xe91a",
+                    Tags = new [] { "navigation", "dropdown" }
                 },
+                new Example()
+                {
+                    Name = "Panel",
+                    Path = "panel",
+                    Icon = "&#xe14f",
+                    Tags = new [] { "container" }
+                },
+                new Example()
+                {
+                    Name = "PanelMenu",
+                    Path = "panelmenu",
+                    Icon = "&#xe8d2",
+                    Tags = new [] { "navigation", "menu" }
+                },
+                new Example()
+                {
+                    Name = "ProfileMenu",
+                    Path = "profile-menu",
+                    Icon = "&#xe851",
+                    Tags = new [] { "navigation", "dropdown", "menu" }
+                },
+				new Example()
+                {
+                    Name = "Splitter",
+                    Path = "splitter",
+                    Icon = "&#xe94f",
+                    Tags = new [] { "splitter"}
+                },
+                new Example()
+                {
+                    Name = "Steps",
+                    Path = "steps",
+                    Icon = "&#xe044",
+                    Tags = new [] { "step", "steps", "wizard" }
+                },
+                new Example()
+                {
+                    Name = "Tabs",
+                    Path = "tabs",
+                    Icon = "&#xe8d8",
+                    Tags = new [] { "tabstrip", "tabview", "container" }
+                },
+                
             }
         },
-
         new Example()
         {
             Name="Forms",
@@ -468,10 +509,9 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
-                    Name = "Switch",
-                    Path = "switch",
-                    Icon = "&#xe8e0",
-                    Tags = new [] { "form", "edit", "switch" }
+                    Name = "Button",
+                    Path = "button",
+                    Icon = "&#xe86d"
                 },
                 new Example()
                 {
@@ -517,6 +557,13 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "Fieldset",
+                    Path = "fieldset",
+                    Icon = "&#xe850",
+                    Tags = new [] { "form", "container" }
+                },
+                new Example()
+                {
                     Name = "FileInput",
                     Path = "fileinput",
                     Icon = "&#xe226",
@@ -524,10 +571,38 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name="HtmlEditor",
+                    Icon = "&#xe3c9",
+                    Children = new [] {
+                        new Example()
+                        {
+                            Name = "Default Tools",
+                            Path = "html-editor",
+                            Icon = "&#xe3c9",
+                            Tags = new [] { "html", "editor", "rich", "text" }
+                        },
+                        new Example()
+                        {
+                            Name = "Custom Tools",
+                            Path = "html-editor-custom-tools",
+                            Icon = "&#xe8b8",
+                            Tags = new [] { "html", "editor", "rich", "text", "tool", "custom" }
+                        },
+                    }
+                },
+                new Example()
+                {
                     Name = "ListBox",
                     Path = "listbox",
                     Icon = "&#xe8ef",
                     Tags = new [] { "select", "picker", "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "Mask",
+                    Path = "mask",
+                    Icon = "&#xe262",
+                    Tags = new [] { "input", "form", "edit", "mask" }
                 },
                 new Example()
                 {
@@ -573,10 +648,30 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "SplitButton",
+                    Path = "splitbutton",
+                    Icon = "&#xe05f"
+                },
+                new Example()
+                {
+                    Name = "Switch",
+                    Path = "switch",
+                    Icon = "&#xe8e0",
+                    Tags = new [] { "form", "edit", "switch" }
+                },
+                new Example()
+                {
                     Name = "TemplateForm",
                     Path = "templateform",
                     Icon = "&#xe06d",
                     Tags = new [] { "form", "edit" }
+                },
+                new Example()
+                {
+                    Name = "TextArea",
+                    Path = "textarea",
+                    Icon = "&#xe873",
+                    Tags = new [] { "input", "form", "edit" }
                 },
                 new Example()
                 {
@@ -587,19 +682,128 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
-                    Name = "Mask",
-                    Path = "mask",
-                    Icon = "&#xe262",
-                    Tags = new [] { "input", "form", "edit", "mask" }
+                    Name = "Upload",
+                    Path = "example-upload",
+                    Icon = "&#xe2c6",
+                    Tags = new [] { "upload", "file"}
+                },
+            },
+        },
+        new Example
+        {
+            Name="Data Visualization",
+            Children= new [] {
+                new Example
+                {
+                    Name = "Area Chart",
+                    Path = "area-chart",
+                    Icon = "&#xe251",
+                    Tags = new [] { "chart", "graph", "area" }
+                },
+                new Example
+                {
+                    Name = "Bar Chart",
+                    Path = "bar-chart",
+                    Icon = "&#xe164",
+                    Tags = new [] { "chart", "graph", "column", "bar" }
+                },
+                new Example
+                {
+                    Name = "Column Chart",
+                    Path = "column-chart",
+                    Icon = "&#xe24b",
+                    Tags = new [] { "chart", "graph", "column", "bar" }
+                },
+                new Example
+                {
+                    Name = "Donut Chart",
+                    Path = "donut-chart",
+                    Icon = "&#xe917",
+                    Tags = new [] { "chart", "graph", "donut" }
+                },
+                new Example
+                {
+                    Name = "Line Chart",
+                    Path = "line-chart",
+                    Icon = "&#xe922",
+                    Tags = new [] { "chart", "graph", "line" }
+                },
+                new Example
+                {
+                    Name = "Pie Chart",
+                    Path = "pie-chart",
+                    Icon = "&#xe6c4",
+                    Tags = new [] { "chart", "graph", "pie" }
+                },
+                new Example
+                {
+                    Name = "Styling Chart",
+                    Path = "styling-chart",
+                    Icon = "&#xe41d",
+                    Tags = new [] { "chart", "graph", "styling" }
+                },
+                new Example
+                {
+                    Name = "Arc Gauge",
+                    Path = "arc-gauge",
+                    Icon = "&#xe3fc",
+                    Tags = new [] { "gauge", "graph", "arc", "progress" }
+                },
+                new Example
+                {
+                    Name = "Radial Gauge",
+                    Path = "radial-gauge",
+                    Icon = "&#xe01b",
+                    Tags = new [] { "gauge", "graph", "radial", "circle" }
+                },
+                new Example
+                {
+                    Name = "Styling Gauge",
+                    Path = "styling-gauge",
+                    Icon = "&#xe41d",
+                    Tags = new [] { "gauge", "graph", "styling" }
                 },
                 new Example()
                 {
-                    Name = "TextArea",
-                    Path = "textarea",
-                    Icon = "&#xe873",
-                    Tags = new [] { "input", "form", "edit" }
+                    Name = "GoogleMap",
+                    Path = "googlemap",
+                    Icon = "&#xe55b"
                 },
-            },
+            }
+        },
+        new Example()
+        {
+            Name="Feedback",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "Badge",
+                    Path = "badge",
+                    Icon = "&#xea67",
+                    Tags = new[] { "badge", "link"}
+                },
+                new Example()
+                {
+                    Name = "Notification",
+                    Path = "notification",
+                    Icon = "&#xe85a",
+                    Tags = new [] { "message", "alert" }
+                },
+                new Example()
+                {
+                    Name = "ProgressBar",
+                    Path = "progressbar",
+                    Icon = "&#xe893",
+                    Tags = new [] { "progress", "spinner" }
+                },
+                new Example()
+                {
+                    Name = "Tooltip",
+                    Path = "tooltip",
+                    Icon = "&#xe8cd",
+                    Tags = new [] { "popup", "tooltip" }
+                },
+            }
         },
         new Example()
         {
@@ -607,10 +811,17 @@ namespace RadzenBlazorDemos
             Children = new [] {
                 new Example()
                 {
-                    Name = "RequiredValidator",
-                    Path = "requiredvalidator",
-                    Icon = "&#xe5ca",
-                    Tags = new [] { "validator", "validation", "required"}
+                    Name = "CompareValidator",
+                    Path = "comparevalidator",
+                    Icon = "&#xe877",
+                    Tags = new [] { "validator", "validation", "required", "compare"}
+                },
+                new Example()
+                {
+                    Name = "EmailValidator",
+                    Path = "emailvalidator",
+                    Icon = "&#xe0be",
+                    Tags = new [] { "validator", "validation", "required", "email"}
                 },
                 new Example()
                 {
@@ -628,232 +839,19 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
-                    Name = "CompareValidator",
-                    Path = "comparevalidator",
-                    Icon = "&#xe877",
-                    Tags = new [] { "validator", "validation", "required", "compare"}
-                },
-                new Example()
-                {
-                    Name = "EmailValidator",
-                    Path = "emailvalidator",
-                    Icon = "&#xe0be",
-                    Tags = new [] { "validator", "validation", "required", "email"}
-                },
-                new Example()
-                {
                     Name = "RegexValidator",
                     Path = "regexvalidator",
                     Icon = "&#xe53f",
                     Tags = new [] { "validator", "validation", "pattern", "regex", "regular", "expression"}
-                }
-            }
-        },
-
-        new Example()
-        {
-            Name="Containers",
-            Children = new [] {
-                new Example()
-                {
-                    Name = "Accordion",
-                    Path = "accordion",
-                    Icon = "&#xe8ee",
-                    Tags = new [] { "panel", "container" }
                 },
                 new Example()
                 {
-                    Name = "Card",
-                    Path = "card",
-                    Icon = "&#xe919",
-                    Tags = new [] { "container" }
+                    Name = "RequiredValidator",
+                    Path = "requiredvalidator",
+                    Icon = "&#xe5ca",
+                    Tags = new [] { "validator", "validation", "required"}
                 },
-                new Example()
-                {
-                    Name = "Fieldset",
-                    Path = "fieldset",
-                    Icon = "&#xe850",
-                    Tags = new [] { "form", "container" }
-                },
-                new Example()
-                {
-                    Name = "Panel",
-                    Path = "panel",
-                    Icon = "&#xe14f",
-                    Tags = new [] { "container" }
-                },
-                new Example()
-                {
-                    Name = "Tabs",
-                    Path = "tabs",
-                    Icon = "&#xe8d8",
-                    Tags = new [] { "tabstrip", "tabview", "container" }
-                },
-                new Example()
-                {
-                    Name = "Steps",
-                    Path = "steps",
-                    Icon = "&#xe044",
-                    Tags = new [] { "step", "steps", "wizard" }
-                },
-				new Example()
-                {
-                    Name = "Splitter",
-                    Path = "splitter",
-                    Icon = "&#xe94f",
-                    Tags = new [] { "splitter"}
-                },
-            }
-        },
-        new Example
-        {
-            Name="Gauges",
-            Children= new [] {
-                new Example
-                {
-                    Name = "Radial Gauge",
-                    Path = "radial-gauge",
-                    Icon = "&#xe01b",
-                    Tags = new [] { "gauge", "graph", "radial", "circle" }
-                },
-                new Example
-                {
-                    Name = "Arc Gauge",
-                    Path = "arc-gauge",
-                    Icon = "&#xe3fc",
-                    Tags = new [] { "gauge", "graph", "arc", "progress" }
-                },
-                new Example
-                {
-                    Name = "Styling Gauge",
-                    Path = "styling-gauge",
-                    Icon = "&#xe41d",
-                    Tags = new [] { "gauge", "graph", "styling" }
-                },
-            }
-        },
-        new Example()
-        {
-            Name = "Misc",
-            Children = new [] {
-                new Example()
-                {
-                    Name = "Button",
-                    Path = "button",
-                    Icon = "&#xe86d"
-                },
-                new Example()
-                {
-                    Name = "GoogleMap",
-                    Path = "googlemap",
-                    Icon = "&#xe55b"
-                },
-                new Example()
-                {
-                    Name = "Gravatar",
-                    Path = "gravatar",
-                    Icon = "&#xe84e"
-                },
-                new Example()
-                {
-                    Name = "SplitButton",
-                    Path = "splitbutton",
-                    Icon = "&#xe05f"
-                },
-                new Example()
-                {
-                    Name = "Icon",
-                    Path = "icon",
-                    Icon = "&#xe84f"
-                },
-                new Example()
-                {
-                    Name = "Image",
-                    Path = "image",
-                    Icon = "&#xe8aa"
-                },
-                new Example()
-                {
-                    Name = "Link",
-                    Path = "link",
-                    Icon = "&#xe157"
-                },
-                new Example()
-                {
-                    Name = "Login",
-                    Path = "login",
-                    Icon = "&#xe8e8"
-                },
-                new Example()
-                {
-                    Name = "ProgressBar",
-                    Path = "progressbar",
-                    Icon = "&#xe893",
-                    Tags = new [] { "progress", "spinner" }
-                },
-                new Example()
-                {
-                    Name = "Dialog",
-                    Path = "dialog",
-                    Icon = "&#xe8a7",
-                    Tags = new [] { "popup", "window" }
-                },
-                new Example()
-                {
-                    Name = "Notification",
-                    Path = "notification",
-                    Icon = "&#xe85a",
-                    Tags = new [] { "message", "alert" }
-                },
-                new Example()
-                {
-                    Name = "Tooltip",
-                    Path = "tooltip",
-                    Icon = "&#xe8cd",
-                    Tags = new [] { "popup", "tooltip" }
-                },
-                new Example()
-                {
-                    Name = "Menu",
-                    Path = "menu",
-                    Icon = "&#xe91a",
-                    Tags = new [] { "navigation", "dropdown" }
-                },
-                new Example()
-                {
-                    Name = "PanelMenu",
-                    Path = "panelmenu",
-                    Icon = "&#xe8d2",
-                    Tags = new [] { "navigation", "menu" }
-                },
-                new Example()
-                {
-                    Name = "ContextMenu",
-                    Path = "contextmenu",
-                    Icon = "&#xe8de",
-                    Tags = new [] { "popup", "dropdown", "menu" }
-                },
-                new Example()
-                {
-                    Name = "ProfileMenu",
-                    Path = "profile-menu",
-                    Icon = "&#xe851",
-                    Tags = new [] { "navigation", "dropdown", "menu" }
-                },
-                new Example()
-                {
-                    Name = "Upload",
-                    Path = "example-upload",
-                    Icon = "&#xe2c6",
-                    Tags = new [] { "upload", "file"}
-                },
-                new Example()
-                {
-                    Name = "Badge",
-                    Path = "badge",
-                    Icon = "&#xea67",
-                    Tags = new[] { "badge", "link"}
-                }
+                
             }
         },
 
