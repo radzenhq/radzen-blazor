@@ -9,7 +9,7 @@ namespace RadzenBlazorDemos
         Example[] allExamples = new[] {
         new Example()
         {
-            Name = "First Look",
+            Name = "Overview",
             Path = "/",
             Icon = "&#xe88a"
         },
@@ -901,7 +901,7 @@ namespace RadzenBlazorDemos
 
         public string TitleFor(Example example)
         {
-            if (example != null && example.Name != "First Look")
+            if (example != null && example.Name != "Overview")
             {
                 return example.Title ?? $"Blazor {example.Name} | a free UI component by Radzen";
             }
