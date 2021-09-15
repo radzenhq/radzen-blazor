@@ -264,6 +264,8 @@ body {
     line-height: 1.25rem;
     letter-spacing: 0.05em;
     text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
     padding: 1rem 2rem;
     margin: 1rem .5rem 0;
     border-radius: .75rem;
@@ -274,8 +276,8 @@ body {
 }
 
 .dark .cta-button {
-    border-color: #828491;
-    color: #828491 !important;
+    border-color: rgba(255,255,255,.3);
+    color: #ffffff !important;
 }
 
 .cta-button.primary {
@@ -444,7 +446,27 @@ pre {
     border-radius: 0.25rem;
 }
 
+.body {
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+}
 
+.rz-sidebar {
+    bottom: 0 !important;
+    border-right: 0 !important;
+}
+
+.content-footer {
+    background-image: url("../images/background.svg");
+    background-repeat: no-repeat;
+    background-position: right -450px top -200px;
+}
+
+.content-footer h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 100%;
+}
 
 
 /* Responsive */

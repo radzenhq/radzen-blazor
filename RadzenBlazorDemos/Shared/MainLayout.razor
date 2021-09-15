@@ -20,15 +20,16 @@
 <RadzenHeader>
     <ChildContent>
         <div class="row justify-content-start align-items-center">
-            <div class="col-6 d-flex align-items-center">
+            <div class="col-5 d-flex align-items-center">
                 <RadzenSidebarToggle Click="@(args => { sidebarExpanded = !sidebarExpanded; bodyExpanded = !bodyExpanded; })">
                 </RadzenSidebarToggle>
                 <RadzenLabel Text="Radzen Blazor Components">
                 </RadzenLabel>
             </div>
-            <div class="col-6 d-flex align-items-center justify-content-end">
+            <div class="col-7 d-flex align-items-center justify-content-end">
                 <div class="d-none d-md-inline-flex align-items-center">
-                  <Social /> 
+                    <a href="https://www.radzen.com/documentation/blazor/" title="Radzen Blazor Components Documentation" class="mx-3">Documentation</a>
+                    <a href="https://www.radzen.com/" title="Create .NET Core web applications fast & easy" class="text-nowrap mx-3">About Radzen</a> 
                 </div>
                 <label class="d-none d-sm-inline-block" style="margin-left: 1rem">Theme:</label>
                 <RadzenDropDown style="margin:0 .5rem" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" />
@@ -40,7 +41,33 @@
     <RadzenBody @ref="@body0" @bind-Expanded="@bodyExpanded">
         <ChildContent>
             <RadzenContentContainer Name="main">
-                @Body
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 pt-4 pb-5 px-3 px-lg-5">
+                            @Body
+                            <RadzenCard class="mt-5 content-footer">
+                                <div class="row align-items-center">
+                                    <div class="col-12 col-lg-7 px-5 py-3 text-center text-lg-left">
+                                        <h2 class="mb-3">Boost your Blazor development with Radzen</h2>
+                                        <p class="mb-2">Radzen is a desktop tool that gives you the power to create line of business applications. Build and launch Blazor apps visually, while we generate clean code for you.</p>
+                                    </div>
+                                    <div class="col-12 col-lg-5 px-5 text-center text-lg-right">
+                                        <NavLink class="cta-button primary ml-0 my-2" href="https://www.radzen.com/download/" target="_blank">Download Radzen</NavLink>
+                                        <NavLink class="cta-button my-2" href="https://www.radzen.com/features/" target="_blank">Learn More</NavLink>
+                                    </div>
+                                </div>
+                            </RadzenCard>
+                            <p class="mt-5 md-3 text-center">
+                                <RadzenLabel Text="Radzen Blazor Components, &copy; 2021 Radzen."></RadzenLabel>
+                                <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed 
+                                <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a>
+                            </p>
+                            <p class="text-center">
+                                <Social />
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </RadzenContentContainer>
         </ChildContent>
     </RadzenBody>
@@ -79,13 +106,6 @@
         </RadzenPanelMenu>
     </ChildContent>
 </RadzenSidebar>
-<RadzenFooter>
-    <ChildContent>
-        <RadzenLabel Text="Radzen Blazor Components, Copyright &copy; 2020">
-        </RadzenLabel>
-        <RadzenLink Text="[source]" Path="https://github.com/radzenhq/radzen-blazor" Target="_blank" Style="margin-left:5px;vertical-align:bottom;" />
-    </ChildContent>
-</RadzenFooter>
 @code {
     RadzenSidebar sidebar0;
     RadzenBody body0;
