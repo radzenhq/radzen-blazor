@@ -440,7 +440,7 @@ p code,
 ul code,
 pre {
     padding: 0 0.5rem;
-    font-size: 0.8125rem !important;
+    font-size: 0.8125em !important;
     line-height: 1.5rem;
     background:rgba(0,0,0,.08);
     border-radius: 0.25rem;
@@ -466,6 +466,22 @@ pre {
     font-size: 2rem;
     font-weight: 700;
     line-height: 100%;
+}
+
+.rz-card.docu p,
+.rz-card.docu ul {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-weight: 400;
+    color: #515256;
+}
+
+.docu img {
+    display: block;
+    max-width: 800px;
+    margin: 4rem auto;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 
