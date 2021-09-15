@@ -468,6 +468,12 @@ pre {
     line-height: 100%;
 }
 
+.docu h2 {
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 2.5rem;
+    letter-spacing: -0.02em;
+}
 .rz-card.docu p,
 .rz-card.docu ul {
     font-size: 18px;
@@ -478,7 +484,8 @@ pre {
 
 .docu img {
     display: block;
-    max-width: 800px;
+    width: 100%;
+    max-width: 700px;
     margin: 4rem auto;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.06);
 }
