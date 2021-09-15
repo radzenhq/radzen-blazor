@@ -474,7 +474,6 @@ pre {
     line-height: 1.6;
     margin-bottom: 1rem;
     font-weight: 400;
-    color: #515256;
 }
 
 .docu img {
@@ -484,6 +483,11 @@ pre {
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.06);
 }
 
+img.illustration {
+    box-shadow: none;
+    max-width: 300px;
+    min-height: 220px;
+}
 
 /* Responsive */
 
