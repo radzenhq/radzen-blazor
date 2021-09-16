@@ -21,7 +21,7 @@
                 {
                     @foreach (var item in LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (View != null ? View : Enumerable.Empty<object>()))
                     {
-                        <li role="option" class="rz-autocomplete-list-item" @onclick="@(() => OnSelectItem(item))">
+                        <li role="option" class="rz-autocomplete-list-item" @onclick="@(() => OnSelectItem(item))" onmousedown="Radzen.activeElement = null">
                             <span>@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)</span>
                         </li>
                     }
