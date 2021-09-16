@@ -45,20 +45,16 @@
                 Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side WebAssembly Blazor) and include a theme CSS file by adding this snippet:
             </p>
 <pre>
-<code>
-&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css"&gt;
-</code>
+<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css"&gt;</code>
 </pre>
             <p>
-                This version requires only the Radzen Blazor CSS. Optionally, you can include Bootstrap.
+                Optionally include Bootstrap.
             </p>
             <p>
-                Alternatively, you can embed Bootstrap by including:
+                Radzen also ships with themes that include some vital parts of Bootstrap (mostly layout). To use a theme bundled with Bootstrap include the file without <code>-base</code> suffix:
             </p>
 <pre>
-<code>
-&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css"&gt;
-</code>
+<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css"&gt;</code>
 </pre>
         </div>
     </div>
@@ -70,8 +66,11 @@
         <div class="col-xl-8">
             <h2 class="mt-5 mb-3">4. Include Radzen.Blazor.js</h2>
             <p>
-                Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side WebAssembly Blazor) and include this snippet <code>&lt;script src="_content/Radzen.Blazor/Radzen.Blazor.js"&gt;&lt;/script&gt;</code>
+                Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side WebAssembly Blazor) and include this snippet
             </p>
+<pre>
+<code>&lt;script src="_content/Radzen.Blazor/Radzen.Blazor.js"&gt;&lt;/script&gt;</code>
+</pre>
         </div>
     </div>
 
@@ -185,7 +184,9 @@
             <p>
                 Hooray! You have successfuly added Radzen Blazor Components to your Blazor app. Now let's take a deeper look and explore more components and demos.
             </p>
-            <a class="cta-button primary ml-0 mb-4" href="/datagrid">Explore Demos</a>
+            <p class="text-center text-lg-left">
+                <a class="cta-button primary ml-0 mb-4" href="/datagrid">Explore Demos</a>
+            </p>
         </div>
     </div>
 </RadzenCard>
