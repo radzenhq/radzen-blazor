@@ -3,17 +3,19 @@
 
 <h1>Radzen Blazor Chart bar series</h1>
 <RadzenExample DocumentationUrl="https://www.radzen.com/documentation/blazor/chart/" Heading="false" Name="BarChart">
-    <div class="row">
-        <div class="col-md-6 col-sm-12 p-4">
-            <RadzenChart>
-                <RadzenBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
-                <RadzenBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
-                <RadzenValueAxis Formatter="@FormatAsUSD">
-                    <RadzenGridLines Visible="true" />
-                    <RadzenAxisTitle Text="Revenue in USD" />
-                </RadzenValueAxis>
-                <RadzenBarOptions Radius="5" />
-            </RadzenChart>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 my-5">
+                <RadzenChart>
+                    <RadzenBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
+                    <RadzenBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
+                    <RadzenValueAxis Formatter="@FormatAsUSD">
+                        <RadzenGridLines Visible="true" />
+                        <RadzenAxisTitle Text="Revenue in USD" />
+                    </RadzenValueAxis>
+                    <RadzenBarOptions Radius="5" />
+                </RadzenChart>
+            </div>
         </div>
     </div>
 </RadzenExample>

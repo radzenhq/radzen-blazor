@@ -2,11 +2,13 @@
 
 <h1>Radzen Blazor Chart pie series</h1>
 <RadzenExample Name="PieChart" DocumentationUrl="https://www.radzen.com/documentation/blazor/chart/" Heading="false">
-    <div class="row">
-        <div class="col-md-6 col-sm-12 p-4">
-            <RadzenChart>
-                <RadzenPieSeries Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
-            </RadzenChart>
+    <div class="container">
+            <div class="row">
+                <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
+                <RadzenChart>
+                    <RadzenPieSeries Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
+                </RadzenChart>
+            </div>
         </div>
     </div>
 </RadzenExample>
