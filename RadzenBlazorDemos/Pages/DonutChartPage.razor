@@ -2,18 +2,20 @@
 
 <h1>Radzen Blazor Chart donut series</h1>
 <RadzenExample Name="DonutChart" DocumentationUrl="https://www.radzen.com/documentation/blazor/chart/" Heading="false">
-    <div class="row">
-        <div class="col-md-6 col-sm-12 p-4">
-            <RadzenChart>
-                <RadzenDonutSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue">
-                    <TitleTemplate>
-                        <div class="rz-donut-content">
-                            <div>Revenue</div> 
-                            <div>for 2020</div>
-                        </div>
-                    </TitleTemplate>
-                </RadzenDonutSeries>
-            </RadzenChart>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
+                <RadzenChart>
+                    <RadzenDonutSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue">
+                        <TitleTemplate>
+                            <div class="rz-donut-content">
+                                <div>Revenue</div> 
+                                <div>for 2020</div>
+                            </div>
+                        </TitleTemplate>
+                    </RadzenDonutSeries>
+                </RadzenChart>
+            </div>
         </div>
     </div>
 </RadzenExample>
