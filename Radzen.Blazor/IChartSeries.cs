@@ -13,7 +13,8 @@ namespace Radzen.Blazor
         RenderFragment RenderTooltip(object data, double marginLeft, double marginTop);
         RenderFragment RenderLegendItem();
         string Color { get; }
-        bool Visible { get; set; }
+        bool Visible { get; }
+        bool ShowInLegend { get; }
         int RenderingOrder { get; set; }
         bool Contains(double x, double y);
         object DataAt(double x, double y);

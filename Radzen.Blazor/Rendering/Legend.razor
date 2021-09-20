@@ -5,7 +5,10 @@
         <ul class="rz-legend-items">
         @foreach (var series in Chart.Series)
         {
-            @series.RenderLegendItem()
+            @if (series.ShowInLegend)
+            {
+                @series.RenderLegendItem()
+            }
         }
         </ul>
     </div>

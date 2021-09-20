@@ -115,6 +115,7 @@
         ValueScale = new LinearScale { Output = ValueScale.Output };
 
         var visibleSeries = Series.Where(series => series.Visible).ToList();
+        var invisibleSeries = Series.Where(series => series.Visible == false).ToList();
 
         if (!visibleSeries.Any() && invisibleSeries.Any())
         {
@@ -286,24 +287,6 @@
                 StateHasChanged();
             }
         }
-    }
-
-    private IList<IChartSeries> invisibleSeries = new List<IChartSeries>();
-
-    internal void ToggleSeries(IChartSeries series)
-    {
-        series.Visible = !series.Visible;
-
-        if (series.Visible)
-        {
-            invisibleSeries.Remove(series);
-        }
-        else
-        {
-            invisibleSeries.Add(series);
-        }
-
-        Refresh();
     }
 
     private bool widthAndHeightAreSet = false;

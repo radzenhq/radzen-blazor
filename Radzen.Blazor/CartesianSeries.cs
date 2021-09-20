@@ -90,7 +90,20 @@ namespace Radzen.Blazor
         [Parameter]
         public string CategoryProperty { get; set; }
 
+        [Parameter]
         public bool Visible { get; set; } = true;
+
+        bool IsVisible { get; set; } = true;
+
+        bool IChartSeries.Visible
+        {
+            get
+            {
+                return IsVisible;
+            }
+        }
+
+        public bool ShowInLegend { get => Visible; }
 
         [Parameter]
         public string ValueProperty { get; set; }
@@ -221,8 +234,15 @@ namespace Radzen.Blazor
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var shouldRefresh = parameters.DidParameterChange(nameof(Data), Data);
+            var visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
             await base.SetParametersAsync(parameters);
+
+            if (visibleChanged)
+            {
+                IsVisible = Visible;
+                shouldRefresh = true;
+            }
 
             if (shouldRefresh)
             {
@@ -345,7 +365,7 @@ namespace Radzen.Blazor
         {
             var style = new List<string>();
 
-            if (Visible == false)
+            if (IsVisible == false)
             {
                 style.Add("text-decoration: line-through");
             }
@@ -381,7 +401,8 @@ namespace Radzen.Blazor
 
         private void OnLegendItemClick()
         {
-            Chart.ToggleSeries(this);
+            IsVisible = !IsVisible;
+            Chart.Refresh();
         }
 
         public string GetTitle()
