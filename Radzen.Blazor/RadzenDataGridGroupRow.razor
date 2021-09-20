@@ -100,6 +100,16 @@
                         builder.CloseComponent();
                         i++;
                     }
+
+                    if (Columns.Where(c => c.GroupFooterTemplate != null).Any())
+                    {
+                        builder.OpenComponent(7, typeof(RadzenDataGridGroupFooterRow<TItem>));
+                        builder.AddAttribute(8, "Columns", Columns);
+                        builder.AddAttribute(9, "Grid", Grid);
+                        builder.AddAttribute(10, "GroupResult", GroupResult);
+                        builder.AddAttribute(11, "Builder", builder);
+                        builder.CloseComponent();
+                    }
                 }
             });
         }

@@ -79,6 +79,9 @@
     public string FooterCssClass { get; set; }
 
     [Parameter]
+    public string GroupFooterCssClass { get; set; }
+
+    [Parameter]
     public bool Filterable { get; set; } = true;
 
     [Parameter]
@@ -110,6 +113,9 @@
 
     [Parameter]
     public RenderFragment FooterTemplate { get; set; }
+
+    [Parameter]
+    public RenderFragment<Group> GroupFooterTemplate { get; set; }
 
     [Parameter]
     public RenderFragment<RadzenDataGridColumn<TItem>> FilterTemplate { get; set; }

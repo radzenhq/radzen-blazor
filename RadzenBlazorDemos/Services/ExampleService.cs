@@ -294,8 +294,15 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Group Header Template",
                             Path = "datagrid-group-header-template",
-                            Title = "Blazor DataGrid pager API",
+                            Title = "Blazor DataGrid group header template",
                             Tags = new [] { "group", "grouping", "template", "datagrid", "table", "dataview" }
+                        },
+                        new Example
+                        {
+                            Name = "Group Footer Template",
+                            Path = "datagrid-group-footer-template",
+                            Title = "Blazor DataGrid group footer template",
+                            Tags = new [] { "group", "grouping", "footer", "template", "datagrid", "table", "dataview" }
                         }
                     }
                 },

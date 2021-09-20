@@ -1,0 +1,74 @@
+@typeparam TItem
+@using System.Linq.Dynamic.Core
+<tr>
+    @for(var i = 0; i < GetLevel() + 1; i++)
+    {
+        <td class="rz-col-icon">
+            <span class="rz-column-title"></span>
+        </td>
+    }
+    @foreach (var column in Columns)
+    {
+        <td class="@($" {column.GroupFooterCssClass} {Grid.getFrozenColumnClass(column, Columns)}".Trim())" style="@column.GetStyle(true, true)">
+            <span class="rz-column-footer">
+                @if (column.GroupFooterTemplate != null)
+                {
+                    @column.GroupFooterTemplate(Group)
+                }
+            </span>
+        </td>
+    }
+</tr>
+@code {
+        [Parameter]
+        public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
+
+        GroupResult _groupResult;
+        [Parameter]
+        public GroupResult GroupResult 
+        { 
+            get
+            {
+                return _groupResult;
+            }
+            set
+            {
+                if(_groupResult != value)
+                {
+                    _groupResult = value;
+
+                    var level = GetLevel();
+                    Group = new Group()
+                    {
+                        Level = level,
+                        GroupDescriptor = Grid.groups[level],
+                        Data = _groupResult
+                    };
+                }
+            }
+        }
+
+        [Parameter]
+        public RadzenDataGrid<TItem> Grid { get; set; }
+
+        [Parameter]
+        public RadzenDataGridGroupRow<TItem> Parent { get; set; }
+
+        [Parameter]
+        public Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder Builder { get; set; }
+
+        public Group Group { get; set; }
+
+        int GetLevel()
+        {
+            int i = 0;
+            var p = Parent;
+            while(p != null)
+            {
+                p = p.Parent;
+                i++;
+            }
+
+            return i;
+        }
+}
