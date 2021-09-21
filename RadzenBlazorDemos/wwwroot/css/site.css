@@ -149,7 +149,6 @@ body {
     background-image: url("../images/background.svg");
     background-repeat: no-repeat;
     background-position: 50% -700px;
-    background-attachment: fixed; 
 }
 
 .dark {
@@ -373,12 +372,14 @@ video {
 .popular-components a {
     font-size: 1.125rem;
     font-weight: 600;
-    color: #050A23;
+    color: #1151f3;
     transition: all 0.2s;
+    border-bottom: 1px solid transparent;
 }
 
 .popular-components a:hover {
-    color: #FF504D;
+    color: #0E44CC;
+    border-bottom-color: #0E44CC;
 }
 
 .popular-components .component-icon {
@@ -405,10 +406,15 @@ video {
 }
 
 .all-components a {
-    font-weight: 300;
     line-height: 200%;
-    color: #050A23;
+    color: #1151f3;
     transition: all 0.2s;
+    border-bottom: 1px solid transparent;
+}
+
+.all-components a:hover {
+    color: #0E44CC;
+    border-bottom-color: #0E44CC; 
 }
 
 /* Footer */
