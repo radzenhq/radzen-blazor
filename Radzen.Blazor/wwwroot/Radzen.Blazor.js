@@ -364,6 +364,7 @@ window.Radzen = {
     var el = document.getElementById(elementId);
     if (el) {
       el.focus();
+      Radzen.activeElement = document.activeElement;
     }
   },
   selectListItem: function (input, ul, index) {

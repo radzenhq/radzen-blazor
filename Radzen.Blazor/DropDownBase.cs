@@ -266,7 +266,7 @@ namespace Radzen
                 return;
 
             await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, true);
-            await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
+            await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? SearchID : UniqueID);
 
             await JSRuntime.InvokeVoidAsync("Radzen.selectListItem", search, list, selectedIndex);
         }
