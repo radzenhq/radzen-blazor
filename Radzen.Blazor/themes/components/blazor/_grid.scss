@@ -508,7 +508,7 @@ $grid-button-line-height: $grid-button-height !default;
 
     &:hover {
       &:not(.rz-state-highlight) {
-        > td {
+        > td:not(.rz-frozen-cell) {
           background-color: $grid-hover-background-color;
         }
 
