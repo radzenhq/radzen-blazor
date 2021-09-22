@@ -81,8 +81,8 @@
             }
             @if (Multiple)
             {
-                <div class=" rz-multiselect-header rz-helper-clearfix" @onclick="@SelectAll" @onclick:preventDefault>
-                    <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)">
+                <div class=" rz-multiselect-header rz-helper-clearfix" @onclick:preventDefault>
+                    <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)" @onclick="@SelectAll">
                         <div class="rz-helper-hidden-accessible">
                             <input readonly="readonly" type="checkbox">
                         </div>
@@ -92,7 +92,7 @@
                     </div>
                     @if (!AllowFiltering && !string.IsNullOrEmpty(SelectAllText))
                     {
-                        @SelectAllText
+                        <span style="cursor:pointer" @onclick="@SelectAll">@SelectAllText</span>
                     }
                     @if (AllowFiltering)
                     {
