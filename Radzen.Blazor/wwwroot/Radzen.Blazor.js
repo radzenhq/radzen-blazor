@@ -653,9 +653,10 @@ window.Radzen = {
     var top = y ? y : parentRect.bottom;
     var left = x ? x : parentRect.left;
 
-    if (syncWidth) {
+      if (syncWidth) {
         popup.style.width = parentRect.width + 'px';
         if (!popup.style.minWidth) {
+            popup.minWidth = true;
             popup.style.minWidth = parentRect.width + 'px';
         }
     } 
@@ -725,6 +726,10 @@ window.Radzen = {
     }
 
     Radzen[id] = function (e) {
+        if (e.type == 'resize') {
+            Radzen.closePopup(id, instance, callback);
+            return;
+        }
         if (!e.defaultPrevented) {
           if (parent) {
             if (e.type == 'click' && !parent.contains(e.target) && !popup.contains(e.target)) {
@@ -754,6 +759,8 @@ window.Radzen = {
     document.body.appendChild(popup);
     document.removeEventListener('click', Radzen[id]);
     document.addEventListener('click', Radzen[id]);
+    window.removeEventListener('resize', Radzen[id]);
+    window.addEventListener('resize', Radzen[id]);
 
     var p = parent;
     while (p && p != document.body) {
@@ -775,9 +782,13 @@ window.Radzen = {
     if (popup.style.display == 'none') return;
 
     if (popup) {
+      if (popup.minWidth) {
+          popup.style.minWidth = '';
+      }
       popup.style.display = 'none';
     }
     document.removeEventListener('click', Radzen[id]);
+    window.removeEventListener('resize', Radzen[id]);
     Radzen[id] = null;
 
     if (instance) {
