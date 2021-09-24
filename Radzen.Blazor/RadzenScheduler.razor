@@ -1,4 +1,5 @@
 @using Radzen
+@using System.Globalization;
 @using System.Linq.Dynamic.Core;
 @using Microsoft.JSInterop
 @inherits RadzenComponent
@@ -71,6 +72,9 @@
 
     [Parameter]
     public EventCallback<SchedulerLoadDataEventArgs> LoadData { get; set; }
+
+    [Parameter]
+    public CultureInfo Culture { get; set; } = CultureInfo.CurrentCulture;
 
     IList<ISchedulerView> Views { get; set; } = new List<ISchedulerView>();
 

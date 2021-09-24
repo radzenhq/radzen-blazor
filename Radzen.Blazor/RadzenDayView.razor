@@ -8,6 +8,9 @@
     public override string Text { get; set; } = "Day";
 
     [Parameter]
+    public string TimeFormat { get; set; } = "h tt";
+
+    [Parameter]
     public TimeSpan StartTime { get; set; } = TimeSpan.FromHours(8);
 
     [Parameter]
@@ -17,7 +20,7 @@
     {
         get
         {
-            return Scheduler.CurrentDate.ToShortDateString();
+            return Scheduler.CurrentDate.ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern);
         }
     }
 
@@ -44,7 +47,7 @@
         var appointments = Scheduler.GetAppointmentsInRange(date, date.AddDays(1)).ToList();
 
         return @<CascadingValue Value=@Scheduler>
-                    <DayView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments />
+                    <DayView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments TimeFormat="@TimeFormat" />
                 </CascadingValue>;
     }
 
