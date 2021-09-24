@@ -217,14 +217,14 @@
         if (!LoadData.HasDelegate)
         {
             searchText = null;
-            OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize }).Wait();
+            OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize }).WaitAndUnwrapException();
         }
     }
 
     public void Reload()
     {
         searchText = null;
-        OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize }).Wait();
+        OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize }).WaitAndUnwrapException();
     }
 
     private string GetPropertyFilterExpression(string property, string filterCaseSensitivityOperator)
@@ -449,11 +449,11 @@
                             StateHasChanged();
                         }
                     }
-                    grid.virtualize.RefreshDataAsync().Wait();
+                    grid.virtualize.RefreshDataAsync().WaitAndUnwrapException();
                 }
 #endif 
                  StateHasChanged();
-                 grid.FirstPage(true).Wait();
+                 grid.FirstPage(true).WaitAndUnwrapException();
 
                  JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
             });

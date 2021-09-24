@@ -13,6 +13,14 @@ using System.Threading.Tasks;
 
 namespace Radzen
 {
+    public static class TaskExtensions
+    {
+        public static void WaitAndUnwrapException(this Task task)
+        {
+            task.GetAwaiter().GetResult();
+        }
+    }
+
     [EventHandler("onmouseenter", typeof(EventArgs), true, true)]
     [EventHandler("onmouseleave", typeof(EventArgs), true, true)]
     public static class EventHandlers

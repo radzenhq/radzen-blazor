@@ -860,7 +860,7 @@
             {
                 _emptyText = value;
 
-                ChangeState().Wait();
+                ChangeState().WaitAndUnwrapException();
             }
         }
     }

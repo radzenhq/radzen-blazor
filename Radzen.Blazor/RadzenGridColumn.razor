@@ -32,7 +32,7 @@
 
                 if (Grid != null)
                 {
-                    Grid.ChangeState().Wait();
+                    Grid.ChangeState().WaitAndUnwrapException();
                 }
             }
         }

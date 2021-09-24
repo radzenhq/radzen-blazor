@@ -497,7 +497,7 @@ namespace Radzen
                 if (selectedItem != value)
                 {
                     selectedItem = object.Equals(value, "null") ? null : value;
-                    SelectItem(selectedItem, false).Wait();
+                    SelectItem(selectedItem, false).WaitAndUnwrapException();
                 }
             }
         }

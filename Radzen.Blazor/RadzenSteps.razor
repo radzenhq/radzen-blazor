@@ -167,7 +167,7 @@
 
                     if (stepToSelect != null)
                     {
-                        SelectStep(stepToSelect).Wait();
+                        SelectStep(stepToSelect).WaitAndUnwrapException();
                     }
                 }
             }
@@ -292,7 +292,7 @@
 
         if (selectedItemIndex != SelectedIndex && SelectedIndex >= 0 && SelectedIndex < steps.Count)
         {
-            SelectStep(steps[SelectedIndex]).Wait();
+            SelectStep(steps[SelectedIndex]).WaitAndUnwrapException();
         }
 
         return base.OnParametersSetAsync();
