@@ -8,21 +8,24 @@
     public override string Text { get; set; } = "Week";
 
     [Parameter]
+    public string TimeFormat { get; set; } = "h tt";
+
+    [Parameter]
     public TimeSpan StartTime { get; set; } = TimeSpan.FromHours(8);
 
     [Parameter]
     public TimeSpan EndTime { get; set; } = TimeSpan.FromHours(24);
 
     public override DateTime StartDate
-    { 
+    {
         get
         {
             return Scheduler.CurrentDate.Date.StartOfWeek();
         }
     }
 
-    public override DateTime EndDate 
-    { 
+    public override DateTime EndDate
+    {
         get
         {
             return StartDate.EndOfWeek().AddDays(1);
@@ -33,7 +36,7 @@
     {
         get
         {
-            return $"{StartDate.ToShortDateString()} - {StartDate.EndOfWeek().ToShortDateString()}";
+            return $"{StartDate.ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)} - {StartDate.EndOfWeek().ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)}";
         }
     }
 
@@ -42,7 +45,7 @@
         var appointments = Scheduler.GetAppointmentsInRange(StartDate, EndDate).ToList();
 
         return @<CascadingValue Value=@Scheduler>
-                <WeekView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments />
+                <WeekView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments TimeFormat="@TimeFormat" />
             </CascadingValue>;
     }
 

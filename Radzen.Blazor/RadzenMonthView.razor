@@ -8,7 +8,9 @@
     {
         get
         {
-            return Scheduler.CurrentDate.ToString("MMMM yyyy");
+            var sb = new System.Text.StringBuilder(Scheduler.CurrentDate.ToString("MMMM yyyy", Scheduler.Culture));
+            sb[0] = char.ToUpper(sb[0], Scheduler.Culture);
+            return sb.ToString();
         }
     }
 
@@ -45,12 +47,12 @@
 
         if (MaxAppointmentsInSlot != null)
         {
-          maxAppointmentsInSlot = MaxAppointmentsInSlot.Value;
+            maxAppointmentsInSlot = MaxAppointmentsInSlot.Value;
         }
         else
         {
-          var slotHeight = (Scheduler.Height - 60) / 6;
-          maxAppointmentsInSlot = Convert.ToInt32(Math.Floor(slotHeight / 24)) - 1;
+            var slotHeight = (Scheduler.Height - 60) / 6;
+            maxAppointmentsInSlot = Convert.ToInt32(Math.Floor(slotHeight / 24)) - 1;
         }
 
         return @<CascadingValue Value=@Scheduler>

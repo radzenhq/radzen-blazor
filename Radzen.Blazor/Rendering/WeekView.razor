@@ -7,12 +7,12 @@
     @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
     {
         <div class="rz-slot-header">
-            @day.ToString("ddd")
+            @day.ToString("ddd", Scheduler.Culture)
         </div>
     }
     </div>
     <div class="rz-view-content">
-        <Hours Start=@StartTime End=@EndTime />
+        <Hours Start=@StartTime End=@EndTime TimeFormat="@TimeFormat" />
         <div class="rz-week-view-content">
         @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
         {
@@ -50,6 +50,9 @@
 
     [Parameter]
     public TimeSpan EndTime { get; set; }
+
+    [Parameter]
+    public string TimeFormat { get; set; }
 
     [Parameter]
     public IList<AppointmentData> Appointments { get; set; }
