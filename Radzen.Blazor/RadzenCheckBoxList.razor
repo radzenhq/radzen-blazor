@@ -1,6 +1,7 @@
 ﻿@using System.Linq
 @using System.Collections
 @using Radzen
+@using Radzen.Blazor.Rendering
 @using Microsoft.AspNetCore.Components.Forms
 @typeparam TValue
 @inherits FormComponent<IEnumerable<TValue>>
@@ -21,27 +22,23 @@
                     <div class="rz-helper-hidden-accessible">
                         <input type="checkbox" name="@Name" value="@item.Value" disabled="@Disabled" tabindex="-1">
                     </div>
-
-                    @if (IsSelected(item))
-                    {
-                        <div class="@($"rz-chkbox-box rz-state-active{getDisabledState(item)}")">
-                            <span class="rz-chkbox-icon rzi rzi-check"></span>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="@($"rz-chkbox-box {getDisabledState(item)}")">
-                            <span class="rz-chkbox-icon "></span>
-                        </div>
-                    }
+                    <div class=@ItemClassList(item)>
+                        <span class=@IconClassList(item)></span>
+                    </div>
                 </div>
                 <label class="rz-chkbox-label">@item.Text</label>
             </div>
         }
     </div>
 }
-
 @code {
+    ClassList ItemClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-box")
+                                                                        .Add("rz-state-active", IsSelected(item))
+                                                                        .AddDisabled(Disabled || item.Disabled);
+
+    ClassList IconClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-icon")
+                                                                        .Add("rzi rzi-check", IsSelected(item));
+
     [Parameter]
     public string ValueProperty { get; set; }
 
@@ -82,9 +79,7 @@
 
     protected override string GetComponentCssClass()
     {
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-
-        return $"{(Orientation == Orientation.Horizontal ? "rz-checkbox-list-horizontal" : "rz-checkbox-list-vertical")} {fieldCssClass}";
+        return GetClassList(Orientation == Orientation.Horizontal ? "rz-checkbox-list-horizontal" : "rz-checkbox-list-vertical").ToString();
     }
 
     public override bool HasValue
