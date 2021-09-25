@@ -31,28 +31,7 @@
 @code {
     protected override string GetComponentCssClass()
     {
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-
-        var classList = new List<string>();
-
-        classList.Add("rz-rating");
-
-        if (Disabled)
-        {
-            classList.Add("rz-state-disabled");
-        }
-
-        if (ReadOnly)
-        {
-            classList.Add("rz-state-readonly");
-        }
-
-        if (!string.IsNullOrEmpty(fieldCssClass))
-        {
-            classList.Add(fieldCssClass);
-        }
-
-        return string.Join(" ", classList);
+        return GetClassList("rz-rating").Add("rz-state-readonly", ReadOnly).ToString();
     }
 
     [Parameter]
