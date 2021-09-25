@@ -1,4 +1,5 @@
 ﻿@using Radzen
+@using Radzen.Blazor.Rendering
 @using System.Collections
 @using System.Linq.Dynamic.Core
 @using Microsoft.AspNetCore.Components.Forms
@@ -13,7 +14,7 @@
             <input @ref="@search" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
                    onfocus="@OpenScript()" onkeypress="@OpenScript()" tabindex="@TabIndex"  @onchange="@OnChange"
                    aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
-                   class="@getCssClasses()"
+                   class="@InputClassList"
                    type="text" id="@Name" aria-expanded="true" placeholder="@Placeholder" />
         </span><div id="@PopupID" class="rz-autocomplete-panel" style="display:none; transform: none; box-sizing: border-box; max-height: 200px;">
             <ul @ref="@list" class="rz-autocomplete-items rz-autocomplete-list" role="listbox">
@@ -165,10 +166,8 @@
         StateHasChanged();
     }
 
-    private string getCssClasses()
-    {
-        return $"rz-inputtext rz-autocomplete-input{(Disabled ? " rz-state-disabled" : "")}";
-    }
+    ClassList InputClassList => ClassList.Create("rz-inputtext rz-autocomplete-input")
+                                         .AddDisabled(Disabled);
 
     private string OpenScript()
     {
@@ -182,9 +181,7 @@
 
     protected override string GetComponentCssClass()
     {
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-
-        return $"{base.GetComponentCssClass()} {fieldCssClass}";
+        return GetClassList("").ToString();
     }
 
     public override void Dispose()
