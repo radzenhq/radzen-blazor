@@ -485,26 +485,7 @@
 
     protected override string GetComponentCssClass()
     {
-        var classList = new List<string>();
-
-        classList.Add("rz-dropdown");
-
-        if (FieldIdentifier.FieldName != null && EditContext != null)
-        {
-            classList.Add(EditContext?.FieldCssClass(FieldIdentifier));
-        }
-
-        if (Disabled)
-        {
-            classList.Add("rz-state-disabled");
-        }
-
-        if (AllowClear)
-        {
-            classList.Add("rz-clear");
-        }
-
-        return String.Join(" ", classList);
+        return GetClassList("rz-dropdown").Add("rz-clear", AllowClear).ToString();
     }
 
     public override void Dispose()

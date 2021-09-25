@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Radzen.Blazor;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen
 {
@@ -212,5 +213,10 @@ namespace Radzen
         {
             return Value;
         }
+
+
+        protected ClassList GetClassList(string className) => ClassList.Create(className)
+                                                                       .AddDisabled(Disabled)
+                                                                       .Add(FieldIdentifier, EditContext);
     }
 }
