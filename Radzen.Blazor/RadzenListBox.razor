@@ -20,19 +20,19 @@
                         <div class="rz-helper-hidden-accessible">
                             <input id="@($"{UniqueID}sa")" readonly="readonly" type="checkbox">
                         </div>
-                        <div class="@(View != null && selectedItems.Count == View.Cast<object>().Count() ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
-                            <span class="@(View != null && selectedItems.Count == View.Cast<object>().Count() ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
+                        <div class="@(View != null && selectedItems.Count == View.Cast<object>().Count() ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box")">
+                            <span class="@(View != null && selectedItems.Count == View.Cast<object>().Count() ? "rz-chkbox-icon rzi rzi-check" : "rz-chkbox-icon")"></span>
                         </div>
                     </div>
                     @if (!AllowFiltering && !string.IsNullOrEmpty(Placeholder))
                     {
-                        <label for="@($"{UniqueID}sa")" class="rz-dropdown-label rz-inputtext " style="width:100%;">@Placeholder</label>
+                        <label for="@($"{UniqueID}sa")" class="rz-dropdown-label rz-inputtext" style="width:100%;">@Placeholder</label>
                     }
                 }
                 @if (AllowFiltering)
                 {
                     <div class="rz-listbox-filter-container">
-                        <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext   " role="textbox" type="text" placeholder="@Placeholder"
+                        <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@Placeholder"
                                @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" @onkeydown:stopPropagation="true" />
                         <span class="rz-listbox-filter-icon rzi rzi-search"></span>
                     </div>
@@ -135,8 +135,6 @@
 
     protected override string GetComponentCssClass()
     {
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-
-        return $"rz-listbox rz-inputtext  {(Disabled ? " rz-state-disabled" : "")} {fieldCssClass}";
+        return GetClassList("rz-listbox rz-inputtext").ToString();
     }
 }
