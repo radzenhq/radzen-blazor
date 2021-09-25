@@ -13,11 +13,11 @@
                onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower())" onpaste="Radzen.numericOnPaste(event)" />
         @if (ShowUpDown)
         {
-            <button type="button" class="rz-spinner-button rz-spinner-up rz-corner-tr rz-button" tabindex="-1"
+            <button type="button" class="rz-spinner-button rz-spinner-up rz-button" tabindex="-1"
                     @onclick="@((args) => UpdateValueWithStep(true))">
                 <span class="rz-spinner-button-icon rzi rzi-caret-up"></span>
             </button>
-            <button type="button" class="rz-spinner-button rz-spinner-down rz-corner-br rz-button" tabindex="-1"
+            <button type="button" class="rz-spinner-button rz-spinner-down rz-button" tabindex="-1"
                     @onclick="@((args) => UpdateValueWithStep(false))">
                 <span class="rz-spinner-button-icon rzi rzi-caret-down"></span>
             </button>
@@ -29,9 +29,7 @@
 
     protected override string GetComponentCssClass()
     {
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-
-        return $"rz-spinner {(Disabled ? " rz-state-disabled" : "")} {fieldCssClass}";
+        return GetClassList("rz-spinner").ToString();
     }
 
     async System.Threading.Tasks.Task UpdateValueWithStep(bool stepUp)
