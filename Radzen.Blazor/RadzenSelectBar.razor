@@ -1,4 +1,5 @@
-﻿@using System.Linq
+﻿@using Radzen.Blazor.Rendering
+@using System.Linq
 @using System.Collections
 @using System.Linq.Dynamic.Core
 @typeparam TValue
@@ -16,11 +17,15 @@
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         @foreach (var item in allItems.Where(i => i.Visible))
         {<div @onclick="@(args => SelectItem(item))" @onkeypress="@(async args => { if (args.Code == "Space") { await SelectItem(item); } })" @attributes="item.Attributes" style="@item.Style"
-              class="@($"rz-button   rz-button-text-only{getActiveState(item)}{getDisabledState()}")" aria-label="@item.Text" tabindex="@TabIndex"><span class="rz-button-text ">@item.Text</span></div>}
+              class=@ButtonClassList(item) aria-label="@item.Text" tabindex="@TabIndex"><span class="rz-button-text">@item.Text</span></div>}
     </div>
 }
 
 @code {
+    ClassList ButtonClassList(RadzenSelectBarItem item) => ClassList.Create("rz-button rz-button-text-only")
+                        .Add("rz-state-active", IsSelected(item))
+                        .AddDisabled(Disabled);
+
     [Parameter]
     public string ValueProperty { get; set; }
 
@@ -61,8 +66,7 @@
 
     protected override string GetComponentCssClass()
     {
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-        return $"rz-selectbutton rz-buttonset   rz-buttonset-{items.Count} {fieldCssClass}";
+        return GetClassList("rz-selectbutton rz-buttonset").Add($"rz-buttonset-{items.Count}").ToString();
     }
 
     [Parameter]
@@ -148,15 +152,5 @@
         await Change.InvokeAsync(Value);
 
         StateHasChanged();
-    }
-
-    private string getDisabledState()
-    {
-        return Disabled ? " rz-state-disabled" : "";
-    }
-
-    private string getActiveState(RadzenSelectBarItem item)
-    {
-        return IsSelected(item) ? " rz-state-active" : "";
     }
 }
