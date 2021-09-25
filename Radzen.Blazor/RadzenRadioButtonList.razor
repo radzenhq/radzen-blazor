@@ -1,4 +1,5 @@
-﻿@using System.Linq
+﻿@using Radzen.Blazor.Rendering
+@using System.Linq
 @using System.Collections
 @using Radzen
 @using Microsoft.AspNetCore.Components.Forms
@@ -21,19 +22,9 @@
                     <div class="rz-helper-hidden-accessible">
                         <input type="radio" disabled="@Disabled" name="@Name" value="@item.Value" tabindex="-1">
                     </div>
-
-                    @if (IsSelected(item))
-                    {
-                        <div class="@($"rz-radiobutton-box rz-state-active{getDisabledState(item)}")">
-                            <span class="rz-radiobutton-icon  rzi rzi-circle-on"></span>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="@($"rz-radiobutton-box {getDisabledState(item)}")">
-                            <span class="rz-radiobutton-icon "></span>
-                        </div>
-                    }
+                    <div class=@ItemClassList(item)>
+                        <span class=@IconClassList(item)></span>
+                    </div>
                 </div>
                 <label class="rz-radiobutton-label">@item.Text</label>
             </div>
@@ -42,6 +33,12 @@
 }
 
 @code {
+    ClassList ItemClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-box")
+                                                                        .Add("rz-state-active", IsSelected(item))
+                                                                        .AddDisabled(Disabled || item.Disabled);
+
+    ClassList IconClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-icon")
+                                                                        .Add("rzi rzi-circle-on", IsSelected(item));
     [Parameter]
     public string ValueProperty { get; set; }
 
@@ -82,9 +79,7 @@
 
     protected override string GetComponentCssClass()
     {
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-
-        return $"{(Orientation == Orientation.Horizontal ? "rz-radio-button-list-horizontal" : "rz-radio-button-list-vertical")} {fieldCssClass}";
+        return GetClassList(Orientation == Orientation.Horizontal ? "rz-radio-button-list-horizontal" : "rz-radio-button-list-vertical").ToString();
     }
 
     [Parameter]
@@ -133,11 +128,6 @@
         await Change.InvokeAsync(Value);
 
         StateHasChanged();
-    }
-
-    private string getDisabledState(RadzenRadioButtonListItem<TValue> item)
-    {
-        return Disabled || item.Disabled ? " rz-state-disabled" : "";
     }
 
     public void Refresh()
