@@ -1,4 +1,5 @@
 ﻿@using Radzen
+@using Radzen.Blazor.Rendering
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components.Forms
 @typeparam TValue
@@ -8,15 +9,15 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         <div class="rz-fileupload-buttonbar ">
-            <span class="@getChooseCss()" icon="rzi-upload" label="Choose"  tabindex="@TabIndex">
+            <span class="@ChooseClassList" icon="rzi-upload" label="Choose" tabindex="@TabIndex">
                 <input disabled="@Disabled" @ref="@fileUpload" name="@Name" type="file" accept="@Accept" @onchange="@OnChange" />
-                <span class="rz-button-icon-left  rzi  rzi-upload"></span><span class="rz-button-text ">@ChooseText</span>
+                <span class="rz-button-icon-left rzi rzi-upload"></span><span class="rz-button-text ">@ChooseText</span>
             </span>
         </div>
-        <div class="rz-fileupload-content  rz-corner-bottom">
+        <div class="rz-fileupload-content rz-corner-bottom">
             @if (!object.Equals(Value, default(TValue)))
             {
-                <div class="rz-fileupload-files" style="">
+                <div class="rz-fileupload-files">
                     <div class="rz-fileupload-row">
                         <div>
                             @if (IsImage)
@@ -41,7 +42,7 @@
                             }
                         </div>
                         <div  tabindex="@TabIndex">
-                            <button disabled="@Disabled" icon="rz-icon-trash" type="button" class="@getButtonCss()">
+                            <button disabled="@Disabled" type="button" class="@ButtonClassList">
                                 <span class="rz-button-icon-left rz-icon-trash" style="display:block" @onclick="@Remove"></span>
                             </button>
                         </div>
@@ -59,22 +60,14 @@
     [Parameter]
     public string Title { get; set; }
 
-    string getChooseCss()
-    {
-        return $"rz-fileupload-choose rz-button    rz-button-text-icon-left{(Disabled ? " rz-state-disabled" : "")}";
-    }
-    string getButtonCss()
-    {
-        return $"rz-button    rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}";
-    }
+    ClassList ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button rz-button-text-icon-left")
+                                          .AddDisabled(Disabled);
+    ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only")
+                                          .AddDisabled(Disabled);
 
     protected override string GetComponentCssClass()
     {
-        var disabledCss = Disabled ? "rz-state-disabled" : "";
-
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-
-        return $"rz-fileupload  {disabledCss} {fieldCssClass}";
+        return GetClassList("rz-fileupload").ToString();
     }
 
     string name = "";
