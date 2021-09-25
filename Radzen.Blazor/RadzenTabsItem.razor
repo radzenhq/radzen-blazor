@@ -1,6 +1,8 @@
-﻿@if (Visible)
+﻿@using Radzen.Blazor.Rendering
+
+@if (Visible)
 {
- <li role="presentation" class=@Class @attributes=@Attributes style=@Style>
+ <li role="presentation" @attributes=@Attributes style=@Style class=@ClassList>
     <a @onclick=@OnClick role="tab" href="javascript: void(0)" id="@($"{Tabs.Id}-tabpanel-{Index}-label")" aria-selected=@(IsSelected? "true" : "false")  aria-controls="@($"{Tabs.Id}-tabpanel-{Index}")">
         @if (!string.IsNullOrEmpty(Icon))
         {
@@ -43,25 +45,10 @@
     [Parameter]
     public bool Disabled { get; set; }
 
-    string Class
-    {
-        get
-        {
-            var classList = new List<string> { "", "rz-state-active" };
-
-            if (IsSelected)
-            {
-                classList.Add("rz-tabview-selected");
-            }
-
-            if (Disabled)
-            {
-                classList.Add("rz-state-disabled");
-            }
-
-            return string.Join(" ", classList);
-        }
-    }
+    ClassList ClassList => ClassList.Create("rz-state-active")
+                                    .Add("rz-tabview-selected", IsSelected)
+                                    .Add("rz-state-disabled", Disabled)
+                                    .Add(Attributes);
 
     public int Index
     {
