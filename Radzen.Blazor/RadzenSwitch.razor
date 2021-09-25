@@ -14,8 +14,7 @@
 @code {
     protected override string GetComponentCssClass()
     {
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-        return $"rz-switch {(Value ? " rz-switch-checked " : "")} {fieldCssClass}";
+        return GetClassList("rz-switch").Add("rz-switch-checked", Value).ToString();
     }
 
     public async Task OnMouseUp(MouseEventArgs args)
