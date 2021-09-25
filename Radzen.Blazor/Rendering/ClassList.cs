@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace Radzen.Blazor.Rendering
 {
@@ -38,6 +39,21 @@ namespace Radzen.Blazor.Rendering
             }
 
             return this;
+        }
+
+        public ClassList Add(FieldIdentifier field, EditContext context)
+        {
+            if (field.FieldName != null && context != null)
+            {
+                return Add(context.FieldCssClass(field));
+            }
+
+            return this;
+        }
+
+        public ClassList AddDisabled(bool condition = true)
+        {
+            return Add("rz-state-disabled", condition);
         }
 
         public override string ToString()

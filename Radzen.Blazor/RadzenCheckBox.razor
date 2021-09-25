@@ -1,4 +1,5 @@
 ﻿@using Radzen
+@using Radzen.Blazor.Rendering
 @using Microsoft.AspNetCore.Components.Forms
 @typeparam TValue
 @inherits FormComponent<TValue>
@@ -9,8 +10,8 @@
         <div class="rz-helper-hidden-accessible">
             <input type="checkbox" @onchange=@Toggle name=@Name id=@Name checked=@(Object.Equals(Value, true)) tabindex="-1">
         </div>
-        <div class="@getInnerCssClass()">
-            <span class="@getCheckBoxCssClass()"></span>
+        <div class=@BoxClassList>
+            <span class=@IconClassList></span>
         </div>
     </div>
 }
@@ -18,35 +19,20 @@
     [Parameter]
     public bool TriState { get; set; } = false;
 
-    string getInnerCssClass()
-    {
-        string activeState = !object.Equals(Value, false) ? " rz-state-active" : "";
-        string disabledState = Disabled ? " rz-state-disabled" : "";
-        return $"rz-chkbox-box {activeState}{disabledState}";
-    }
+    ClassList BoxClassList => ClassList.Create("rz-chkbox-box")
+                                       .Add("rz-state-active", !object.Equals(Value, false))
+                                       .AddDisabled(Disabled);
 
-    string getCheckBoxCssClass()
-    {
-        if (object.Equals(Value, true))
-        {
-            return "rz-chkbox-icon rzi rzi-check";
-        }
-        else if (object.Equals(Value, false))
-        {
-            return "rz-chkbox-icon";
-        }
-        else if (object.Equals(Value, null))
-        {
-            return "rz-chkbox-icon rzi rzi-times";
-        }
-
-        return "";
-    }
+    ClassList IconClassList => ClassList.Create("rz-chkbox-icon")
+                                        .Add("rzi rzi-check", object.Equals(Value, true))
+                                        .Add("rzi rzi-times", object.Equals(Value, null));
 
     protected override string GetComponentCssClass()
     {
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-        return $"rz-chkbox {(Disabled ? " rz-state-disabled" : "")} {fieldCssClass}";
+        return ClassList.Create("rz-chkbox")
+                        .AddDisabled(Disabled)
+                        .Add(FieldIdentifier, EditContext)
+                        .ToString();
     }
 
     async Task OnKeyPress(KeyboardEventArgs args)

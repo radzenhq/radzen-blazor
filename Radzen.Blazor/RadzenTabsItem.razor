@@ -47,7 +47,7 @@
 
     ClassList ClassList => ClassList.Create("rz-state-active")
                                     .Add("rz-tabview-selected", IsSelected)
-                                    .Add("rz-state-disabled", Disabled)
+                                    .AddDisabled(Disabled)
                                     .Add(Attributes);
 
     public int Index
