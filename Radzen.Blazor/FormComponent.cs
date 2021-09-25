@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen
 {
@@ -135,5 +136,9 @@ namespace Radzen
 
             return Task.CompletedTask;
         }
+
+        protected ClassList GetClassList(string className) => ClassList.Create(className)
+                                                                       .AddDisabled(Disabled)
+                                                                       .Add(FieldIdentifier, EditContext);
     }
 }

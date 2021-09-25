@@ -29,10 +29,7 @@
 
     protected override string GetComponentCssClass()
     {
-        return ClassList.Create("rz-chkbox")
-                        .AddDisabled(Disabled)
-                        .Add(FieldIdentifier, EditContext)
-                        .ToString();
+        return GetClassList("rz-checkbox").ToString();
     }
 
     async Task OnKeyPress(KeyboardEventArgs args)

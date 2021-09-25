@@ -30,10 +30,6 @@
 
     protected override string GetComponentCssClass()
     {
-        var disabledCss = Disabled ? "rz-state-disabled" : "";
-
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-
-        return $"rz-textarea {disabledCss} {fieldCssClass}";
+        return GetClassList("rz-textarea").ToString();
     }
 }

@@ -1,5 +1,4 @@
 ﻿@using Radzen
-@using Radzen.Blazor.Rendering
 @using Microsoft.AspNetCore.Components.Forms
 @inherits FormComponent<string>
 @if (Visible)
@@ -28,9 +27,6 @@
 
     protected override string GetComponentCssClass()
     {
-        return ClassList.Create("rz-textbox")
-                        .AddDisabled(Disabled)
-                        .Add(FieldIdentifier, EditContext)
-                        .ToString();
+        return GetClassList("rz-textbox").ToString();
     }
 }
