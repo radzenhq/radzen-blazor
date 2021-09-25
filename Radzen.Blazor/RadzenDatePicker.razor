@@ -1,4 +1,5 @@
 ﻿@using Radzen
+@using Radzen.Blazor.Rendering
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Linq.Expressions
 @using System.Globalization
@@ -695,23 +696,10 @@
 
     protected override string GetComponentCssClass()
     {
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-
-        var classNames = new List<string>();
-
-        classNames.Add(base.GetComponentCssClass());
-
-        if (Inline)
-        {
-            classNames.Add("rz-calendar-inline");
-        }
-
-        if (!string.IsNullOrEmpty(fieldCssClass))
-        {
-            classNames.Add(fieldCssClass);
-        }
-
-        return string.Join(" ", classNames);
+        return ClassList.Create()
+                        .Add("rz-calendar-inline", Inline)
+                        .Add(FieldIdentifier, EditContext)
+                        .ToString();
     }
 
     private async System.Threading.Tasks.Task SetDay(DateTime newValue)
