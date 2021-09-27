@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
@@ -22,6 +23,18 @@ namespace Radzen
         [Parameter]
         public EventCallback<Microsoft.AspNetCore.Components.Web.MouseEventArgs> ContextMenu { get; set; }
 
+        [Parameter]
+        public CultureInfo Culture
+        {
+            get => culture ?? DefaultCulture ?? CultureInfo.CurrentCulture;
+            set => culture  = value;
+        }
+
+        [CascadingParameter(Name = nameof(DefaultCulture))]
+        public CultureInfo DefaultCulture { get; set; }
+
+        private CultureInfo culture;
+        
         public async Task OnMouseEnter()
         {
             await MouseEnter.InvokeAsync(Element);
@@ -42,7 +55,7 @@ namespace Radzen
 
         [Parameter]
         public virtual bool Visible { get; set; } = true;
-
+        
         protected string GetCssClass()
         {
             if (Attributes != null && Attributes.TryGetValue("class", out var @class) && !string.IsNullOrEmpty(Convert.ToString(@class)))
@@ -61,6 +74,11 @@ namespace Radzen
             }
 
             return UniqueID;
+        }
+
+        protected virtual CultureInfo GetComponentCulture()
+        {
+            return Culture;
         }
 
         protected virtual string GetComponentCssClass()

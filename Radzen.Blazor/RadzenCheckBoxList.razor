@@ -52,7 +52,7 @@
             return items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
             {
                 var item = new RadzenCheckBoxListItem<TValue>();
-                item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
+                item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty).ToCulturedString(Culture));
                 item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
                 return item;
             }));

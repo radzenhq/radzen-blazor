@@ -4,6 +4,7 @@
 @using System.Linq.Dynamic.Core
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
+@using Radzen.Blazor.Rendering
 @typeparam TValue
 @inherits DropDownBase<TValue>
 
@@ -13,7 +14,7 @@
          style="@Style" tabindex="@TabIndex" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" style="width:100%" aria-haspopup="listbox" readonly="" type="text"
-                   name="@Name" aria-label="@(!Multiple && Value != null ? PropertyAccess.GetItemOrValueFromProperty(Value, TextProperty) : "")" />
+                   name="@Name" aria-label="@(!Multiple && Value != null ? PropertyAccess.GetItemOrValueFromProperty(Value, TextProperty).ToCulturedString(Culture) : "")" />
 
         </div>
 
@@ -26,7 +27,7 @@
         else if (selectedItem != null)
         {
             <label class="rz-dropdown-label rz-inputtext " onclick="@OpenPopupScript()" style="width:100%;">
-                @PropertyAccess.GetItemOrValueFromProperty(selectedItem, TextProperty)
+                @PropertyAccess.GetItemOrValueFromProperty(selectedItem, TextProperty).ToCulturedString(Culture)
             </label>
         }
         else if (selectedItems.Count > 0)
@@ -36,7 +37,7 @@
                 {
                     @if (Template == null)
                     {
-                        @(string.Join(",", selectedItems.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, TextProperty))))
+                        @(string.Join(",", selectedItems.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, TextProperty).ToCulturedString(Culture))))
                     }
                     else
                     {
@@ -55,7 +56,7 @@
         else if (SelectedValue != null)
         {
             <label class="rz-dropdown-label rz-inputtext rz-corner-all" onclick="@OpenPopupScript()" style="width:100%;">
-                @PropertyAccess.GetItemOrValueFromProperty(SelectedValue, TextProperty)
+                @PropertyAccess.GetItemOrValueFromProperty(SelectedValue, TextProperty).ToCulturedString(Culture)
             </label>
         }
         else if (!string.IsNullOrEmpty(Placeholder))

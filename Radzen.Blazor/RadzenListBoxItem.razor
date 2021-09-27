@@ -2,9 +2,10 @@
 @using System.Linq.Dynamic.Core
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
+@using Radzen.Blazor.Rendering
 @typeparam TValue
 
-<li class="@(ListBox.isSelected(Item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")" aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, ListBox.TextProperty)" style="display: block;" @onclick="@(async () => { if (!ListBox.Disabled) { await ListBox.SelectItemInternal(Item); } })">
+<li class="@(ListBox.isSelected(Item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")" aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, ListBox.TextProperty).ToCulturedString(ListBox.Culture)" style="display: block;" @onclick="@(async () => { if (!ListBox.Disabled) { await ListBox.SelectItemInternal(Item); } })">
     @if (ListBox.Multiple)
     {
         <div class="rz-chkbox ">
@@ -20,7 +21,7 @@
         }
         else
         {
-            @PropertyAccess.GetItemOrValueFromProperty(Item, ListBox.TextProperty)
+            @PropertyAccess.GetItemOrValueFromProperty(Item, ListBox.TextProperty).ToCulturedString(ListBox.Culture)
         }
     </span>
 </li>

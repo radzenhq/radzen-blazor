@@ -2,12 +2,13 @@
 @using System.Linq.Dynamic.Core
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
+@using Radzen.Blazor.Rendering
 @typeparam TValue
 
 @if (DropDown.Multiple)
 {
     <li class="@(DropDown.isSelected(Item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")"
-        aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)" style="display: block;white-space: nowrap;" @onclick:preventDefault @onclick="@(() => DropDown.OnSelectItemInternal(Item))">
+        aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty).ToCulturedString(DropDown.Culture)" style="display: block;white-space: nowrap;" @onclick:preventDefault @onclick="@(() => DropDown.OnSelectItemInternal(Item))">
         <div class="rz-chkbox ">
             <div class="@(DropDown.isSelected(Item) ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
                 <span class="@(DropDown.isSelected(Item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
@@ -20,14 +21,14 @@
             }
             else
             {
-                @PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
+                @PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty).ToCulturedString(DropDown.Culture)
             }
         </span>
     </li>
 }
 else
 {
-    <li role="option" class="@(DropDown.isSelected(Item) ? "rz-dropdown-item  rz-state-highlight" : "rz-dropdown-item ")" aria-label=">@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)" @onclick:preventDefault @onclick="@(() => DropDown.OnSelectItemInternal(Item))">
+    <li role="option" class="@(DropDown.isSelected(Item) ? "rz-dropdown-item  rz-state-highlight" : "rz-dropdown-item ")" aria-label=">@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty).ToCulturedString(DropDown.Culture)" @onclick:preventDefault @onclick="@(() => DropDown.OnSelectItemInternal(Item))">
         <span>
             @if (DropDown.Template != null)
             {
@@ -35,7 +36,7 @@ else
             }
             else
             {
-                @PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
+                @PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty).ToCulturedString(DropDown.Culture)
             }
         </span>
     </li>

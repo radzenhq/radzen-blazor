@@ -422,14 +422,14 @@
             {
                 _abbreviatedDayNames = new List<string>();
 
-                for (int i = (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek; i < 7; i++)
+                for (int i = (int)Culture.DateTimeFormat.FirstDayOfWeek; i < 7; i++)
                 {
-                    _abbreviatedDayNames.Add(CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedDayNames[i]);
+                    _abbreviatedDayNames.Add(Culture.DateTimeFormat.AbbreviatedDayNames[i]);
                 }
 
-                for (int i = 0; i < (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek; i++)
+                for (int i = 0; i < (int)Culture.DateTimeFormat.FirstDayOfWeek; i++)
                 {
-                    _abbreviatedDayNames.Add(CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedDayNames[i]);
+                    _abbreviatedDayNames.Add(Culture.DateTimeFormat.AbbreviatedDayNames[i]);
                 }
             }
             return _abbreviatedDayNames;
