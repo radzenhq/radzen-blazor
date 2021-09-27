@@ -6,12 +6,7 @@
 @code {    
     public override string Title
     {
-        get
-        {
-            var sb = new System.Text.StringBuilder(Scheduler.CurrentDate.ToString("MMMM yyyy", Scheduler.Culture));
-            sb[0] = char.ToUpper(sb[0], Scheduler.Culture);
-            return sb.ToString();
-        }
+        get => Scheduler.CurrentDate.ToString("MMMM yyyy", Scheduler.Culture);
     }
 
     [Parameter]
