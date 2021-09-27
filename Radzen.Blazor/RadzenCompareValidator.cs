@@ -30,7 +30,7 @@ namespace Radzen.Blazor
             switch (componentValue)
             {
                 case String stringValue:
-                    return String.Compare(stringValue, (string)Value, false, CultureInfo.CurrentCulture);
+                    return String.Compare(stringValue, (string)Value, false, GetComponentCulture());
                 case IComparable comparable:
                     return comparable.CompareTo(Value);
                 default:
