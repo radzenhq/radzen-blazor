@@ -640,7 +640,6 @@
             if (value != _emptyText)
             {
                 _emptyText = value;
-                ChangeState().WaitAndUnwrapException();
             }
         }
     }
@@ -921,6 +920,12 @@
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
+        var emptyTextChanged = parameters.DidParameterChange(nameof(EmptyText), EmptyText);
+        if (emptyTextChanged)
+        {
+            await ChangeState();
+        }
+
         visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
         await base.SetParametersAsync(parameters);

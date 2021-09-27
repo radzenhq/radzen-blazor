@@ -210,21 +210,21 @@
         return base.OnAfterRenderAsync(firstRender);
     }
 
-    protected override void OnDataChanged()
+    protected override async Task OnDataChanged()
     {
-        base.OnDataChanged();
+        await base.OnDataChanged();
 
         if (!LoadData.HasDelegate)
         {
             searchText = null;
-            OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize }).WaitAndUnwrapException();
+            await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
         }
     }
 
-    public void Reload()
+    public async Task Reload()
     {
         searchText = null;
-        OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize }).WaitAndUnwrapException();
+        await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
     }
 
     private string GetPropertyFilterExpression(string property, string filterCaseSensitivityOperator)
@@ -432,32 +432,34 @@
             previousSearch = searchText;
             _view = null;
 
-            await InvokeAsync(() =>
-            {
-#if NET5
-                if (grid?.virtualize != null)
-                {
-                    if(string.IsNullOrEmpty(searchText))
-                    {
-                        if(LoadData.HasDelegate)
-                        {
-                            Data = null;
-                        }
-                        else
-                        {
-                            pagedData = null;
-                            StateHasChanged();
-                        }
-                    }
-                    grid.virtualize.RefreshDataAsync().WaitAndUnwrapException();
-                }
-#endif 
-                 StateHasChanged();
-                 grid.FirstPage(true).WaitAndUnwrapException();
-
-                 JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
-            });
+            await InvokeAsync(RefreshAfterFilter);
         }
+    }
+
+    async Task RefreshAfterFilter()
+    {
+#if NET5
+        if (grid?.virtualize != null)
+        {
+            if(string.IsNullOrEmpty(searchText))
+            {
+                if(LoadData.HasDelegate)
+                {
+                    Data = null;
+                }
+                else
+                {
+                    pagedData = null;
+                    StateHasChanged();
+                }
+            }
+            await grid.virtualize.RefreshDataAsync();
+        }
+#endif 
+        StateHasChanged();
+        await grid.FirstPage(true);
+
+        await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
     }
 
     protected override async Task OnFilter(ChangeEventArgs args)

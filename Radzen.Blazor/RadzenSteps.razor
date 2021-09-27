@@ -160,16 +160,6 @@
             if (_selectedIndex != value)
             {
                 _selectedIndex = value;
-
-                if (value >= 0 && value < steps.Count)
-                {
-                    var stepToSelect = steps[_selectedIndex];
-
-                    if (stepToSelect != null)
-                    {
-                        SelectStep(stepToSelect).WaitAndUnwrapException();
-                    }
-                }
             }
         }
     }
@@ -285,17 +275,23 @@
         return "rz-steps";
     }
 
-    protected override Task OnParametersSetAsync()
+    public override async Task SetParametersAsync(ParameterView parameters)
     {
-        var selectedStep = steps.Where(t => t.Selected).FirstOrDefault();
-        var selectedItemIndex = selectedStep != null ? steps.IndexOf(selectedStep) : 0;
-
-        if (selectedItemIndex != SelectedIndex && SelectedIndex >= 0 && SelectedIndex < steps.Count)
+        var selectedIndexChanged = parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex);
+        if (selectedIndexChanged)
         {
-            SelectStep(steps[SelectedIndex]).WaitAndUnwrapException();
+            if (SelectedIndex >= 0 && SelectedIndex < steps.Count)
+            {
+                var stepToSelect = steps[SelectedIndex];
+
+                if (stepToSelect != null)
+                {
+                    await SelectStep(stepToSelect);
+                }
+            }
         }
 
-        return base.OnParametersSetAsync();
+        await base.SetParametersAsync(parameters);
     }
 
     public override void Dispose()

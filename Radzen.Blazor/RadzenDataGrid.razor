@@ -859,8 +859,6 @@
             if (value != _emptyText)
             {
                 _emptyText = value;
-
-                ChangeState().WaitAndUnwrapException();
             }
         }
     }
@@ -1236,6 +1234,12 @@
     private bool firstRender = true;
     public override async Task SetParametersAsync(ParameterView parameters)
     {
+        var emptyTextChanged = parameters.DidParameterChange(nameof(EmptyText), EmptyText);
+        if (emptyTextChanged)
+        {
+            await ChangeState();
+        }
+
         visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
         bool valueChanged = parameters.DidParameterChange(nameof(Value), Value);

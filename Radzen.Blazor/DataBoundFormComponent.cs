@@ -114,15 +114,14 @@ namespace Radzen
                     _view = null;
                     _value = null;
                     _data = value;
-                    OnDataChanged();
                     StateHasChanged();
                 }
             }
         }
 
-        protected virtual void OnDataChanged()
+        protected virtual async Task OnDataChanged()
         {
-
+            await Task.CompletedTask;
         }
 
         protected virtual IQueryable Query
@@ -179,8 +178,14 @@ namespace Radzen
 
         [Parameter]
         public Expression<Func<T>> ValueExpression { get; set; }
-        public override Task SetParametersAsync(ParameterView parameters)
+        public override async Task SetParametersAsync(ParameterView parameters)
         {
+            var dataChanged = parameters.DidParameterChange(nameof(Data), Data);
+            if (dataChanged)
+            {
+                await OnDataChanged();
+            }
+
             var result = base.SetParametersAsync(parameters);
 
             if (EditContext != null && ValueExpression != null && FieldIdentifier.Model != EditContext.Model)
@@ -189,7 +194,7 @@ namespace Radzen
                 EditContext.OnValidationStateChanged += ValidationStateChanged;
             }
 
-            return result;
+            await result;
         }
 
         private void ValidationStateChanged(object sender, ValidationStateChangedEventArgs e)

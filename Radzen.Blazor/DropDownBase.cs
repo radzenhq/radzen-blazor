@@ -435,6 +435,12 @@ namespace Radzen
                 PageSize = pageSize;
             }
 #endif
+            var selectedItemChanged = parameters.DidParameterChange(nameof(SelectedItem), SelectedItem);
+            if (selectedItemChanged)
+            {
+                await SelectItem(selectedItem, false);
+            }
+
             var shouldClose = false;
 
             if (parameters.DidParameterChange(nameof(Visible), Visible))
@@ -497,7 +503,6 @@ namespace Radzen
                 if (selectedItem != value)
                 {
                     selectedItem = object.Equals(value, "null") ? null : value;
-                    SelectItem(selectedItem, false).WaitAndUnwrapException();
                 }
             }
         }
