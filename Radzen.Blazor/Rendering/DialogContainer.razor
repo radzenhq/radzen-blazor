@@ -59,8 +59,9 @@
             var heightStyle = string.IsNullOrEmpty(Dialog.Options.Height) ? "" : $"height: {Dialog.Options.Height};";
             var topStyle = string.IsNullOrEmpty(Dialog.Options.Top) ? "" : $"top: {Dialog.Options.Top};";
             var leftStyle = string.IsNullOrEmpty(Dialog.Options.Left) ? "" : $"left: {Dialog.Options.Left};";
+            var resizeStyle = Dialog.Options.Resizable ? "resize:both;" : "";
 
-            return $"{baseStyle}{widthStyle}{heightStyle}{topStyle}{leftStyle}{Dialog.Options.Style}";
+            return $"{baseStyle}{widthStyle}{heightStyle}{topStyle}{leftStyle}{resizeStyle}{Dialog.Options.Style}";
         }
     }
 
