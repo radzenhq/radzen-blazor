@@ -76,11 +76,6 @@ namespace Radzen
             return UniqueID;
         }
 
-        protected virtual CultureInfo GetComponentCulture()
-        {
-            return Culture;
-        }
-
         protected virtual string GetComponentCssClass()
         {
             return "";
