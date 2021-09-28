@@ -168,11 +168,6 @@
         }
     }
 
-    internal void CollapseItem(RadzenTreeItem item)
-    {
-        ExpandedItem = null;
-    }
-
     internal async Task ExpandItem(RadzenTreeItem item)
     {
         var args = new TreeExpandEventArgs()
@@ -181,13 +176,6 @@
             Value = item?.Value,
             Children = new TreeItemSettings()
         };
-
-        if (SingleExpand && ExpandedItem != null && !ExpandedItem.Contains(item))
-        {
-            await ExpandedItem.Toggle();
-        }
-
-        ExpandedItem = item;
 
         await Expand.InvokeAsync(args);
 

@@ -102,11 +102,23 @@
 
         if (expanded)
         {
-            await Tree?.ExpandItem(this);
-        }
-        else
-        {
-            Tree?.CollapseItem(this);
+            if (Tree != null)
+            {
+                await Tree.ExpandItem(this);
+
+                if (Tree.SingleExpand)
+                {
+                    var siblings = ParentItem?.items ?? Tree.items;
+
+                    foreach (var sibling in siblings)
+                    {
+                        if (sibling != this && sibling.expanded)
+                        {
+                            sibling.Toggle();
+                        }
+                    }
+                }
+            }
         }
     }
 
