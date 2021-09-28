@@ -27,7 +27,7 @@ namespace Radzen
         public CultureInfo Culture
         {
             get => culture ?? DefaultCulture ?? CultureInfo.CurrentCulture;
-            set => culture  = value;
+            set => culture = value;
         }
 
         [CascadingParameter(Name = nameof(DefaultCulture))]

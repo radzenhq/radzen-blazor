@@ -307,7 +307,7 @@
     {
         base.OnInitialized();
 
-        months = Enumerable.Range(1, 12).Select(i => new NameValue() { Name = DateTimeFormatInfo.CurrentInfo.GetMonthName(i), Value = i }).ToList();
+        months = Enumerable.Range(1, 12).Select(i => new NameValue() { Name = Culture.DateTimeFormat.GetMonthName(i), Value = i }).ToList();
         years = Enumerable.Range(int.Parse(YearRange.Split(':').First()), int.Parse(YearRange.Split(':').Last()) - int.Parse(YearRange.Split(':').First()) + 1)
             .Select(i => new NameValue() { Name = $"{i}", Value = i }).ToList();
     }
@@ -408,7 +408,7 @@
         {
             var firstDayOfTheMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
 
-            int diff = (7 + (firstDayOfTheMonth.DayOfWeek - DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek)) % 7;
+            int diff = (7 + (firstDayOfTheMonth.DayOfWeek - Culture.DateTimeFormat.FirstDayOfWeek)) % 7;
             return firstDayOfTheMonth.AddDays(-1 * diff).Date;
         }
     }
