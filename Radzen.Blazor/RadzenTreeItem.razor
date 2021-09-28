@@ -20,9 +20,11 @@
     </div>
     @if (ChildContent != null && expanded)
     {
+    <CascadingValue Value=this>
     <ul class="rz-treenode-children">
         @ChildContent
     </ul>
+    </CascadingValue>
     }
 </li>
 
@@ -55,28 +57,8 @@
     [CascadingParameter]
     public RadzenTree Tree { get; set; }
 
-    RadzenTreeItem _parentItem;
-
-    [Parameter]
-    public RadzenTreeItem ParentItem
-    {
-        get
-        {
-            return _parentItem;
-        }
-        set
-        {
-            if (_parentItem != value)
-            {
-                _parentItem = value;
-
-                if (_parentItem != null)
-                {
-                    _parentItem.AddItem(this);
-                }
-            }
-        }
-    }
+    [CascadingParameter]
+    public RadzenTreeItem ParentItem { get; set; }
 
     internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
 
@@ -102,19 +84,23 @@
         {
             ParentItem.RemoveItem(this);
         }
-        else if(Tree != null)
+        else if (Tree != null)
         {
             Tree.RemoveItem(this);
         }
     }
 
-    async Task Toggle()
+    internal async Task Toggle()
     {
         expanded = !expanded;
 
         if (expanded)
         {
             await Tree?.ExpandItem(this);
+        }
+        else
+        {
+            Tree?.CollapseItem(this);
         }
     }
 
@@ -154,6 +140,11 @@
         if (Tree != null && ParentItem == null)
         {
             Tree.AddItem(this);
+        }
+
+        if (ParentItem != null)
+        {
+            ParentItem.AddItem(this);
         }
     }
 
@@ -310,5 +301,22 @@
         }
 
         return checkedValues;
+    }
+
+    internal bool Contains(RadzenTreeItem child)
+    {
+        var parent = child.ParentItem;
+
+        while (parent != null)
+        {
+            if (parent == this)
+            {
+                return true;
+            }
+
+            parent = parent.ParentItem;
+        }
+
+        return false;
     }
 }

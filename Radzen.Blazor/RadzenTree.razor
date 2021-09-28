@@ -28,6 +28,8 @@
 
     internal RadzenTreeItem SelectedItem { get; private set; }
 
+    RadzenTreeItem ExpandedItem { get; set; }
+
     IList<RadzenTreeLevel> Levels { get; set; } = new List<RadzenTreeLevel>();
 
     [Parameter]
@@ -56,6 +58,9 @@
 
     [Parameter]
     public bool AllowCheckParents { get; set; } = true;
+
+    [Parameter]
+    public bool SingleExpand { get; set; }
 
     [Parameter]
     public IEnumerable<object> CheckedValues { get; set; } = Enumerable.Empty<object>();
@@ -93,9 +98,8 @@
     [Parameter]
     public EventCallback<IEnumerable<object>> CheckedValuesChanged { get; set; }
 
-    void RenderTreeItem(RadzenTreeItem parent, RenderTreeBuilder builder, object data, RenderFragment<RadzenTreeItem> template, Func<object,
-    string> text,
-    Func<object, bool> hasChildren, Func<object, bool> expanded, Func<object, bool> selected)
+    void RenderTreeItem(RenderTreeBuilder builder, object data, RenderFragment<RadzenTreeItem> template, Func<object, string> text,
+        Func<object, bool> hasChildren, Func<object, bool> expanded, Func<object, bool> selected)
     {
         builder.OpenComponent<RadzenTreeItem>(0);
         builder.AddAttribute(1, nameof(RadzenTreeItem.Text), text(data));
@@ -104,12 +108,6 @@
         builder.AddAttribute(4, nameof(RadzenTreeItem.Template), template);
         builder.AddAttribute(5, nameof(RadzenTreeItem.Expanded), expanded(data));
         builder.AddAttribute(6, nameof(RadzenTreeItem.Selected), Value == data || selected(data));
-
-        if (parent != null)
-        {
-            builder.AddAttribute(7, nameof(RadzenTreeItem.ParentItem), parent);
-        }
-
         builder.SetKey(data);
     }
 
@@ -128,7 +126,7 @@
                     text = level.Text ?? Getter<string>(data, level.TextProperty);
                 }
 
-                RenderTreeItem(null, builder, data, level.Template, text, level.HasChildren, level.Expanded, level.Selected);
+                RenderTreeItem(builder, data, level.Template, text, level.HasChildren, level.Expanded, level.Selected);
 
                 var hasChildren = level.HasChildren(data);
 
@@ -170,6 +168,11 @@
         }
     }
 
+    internal void CollapseItem(RadzenTreeItem item)
+    {
+        ExpandedItem = null;
+    }
+
     internal async Task ExpandItem(RadzenTreeItem item)
     {
         var args = new TreeExpandEventArgs()
@@ -178,6 +181,13 @@
             Value = item?.Value,
             Children = new TreeItemSettings()
         };
+
+        if (SingleExpand && ExpandedItem != null && !ExpandedItem.Contains(item))
+        {
+            await ExpandedItem.Toggle();
+        }
+
+        ExpandedItem = item;
 
         await Expand.InvokeAsync(args);
 
@@ -195,7 +205,7 @@
                         text = children.Text ?? Getter<string>(data, children.TextProperty);
                     }
 
-                    RenderTreeItem(item, builder, data, children.Template, text, children.HasChildren, children.Expanded, children.Selected);
+                    RenderTreeItem(builder, data, children.Template, text, children.HasChildren, children.Expanded, children.Selected);
                     builder.CloseComponent();
                 }
             });
