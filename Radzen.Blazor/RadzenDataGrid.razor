@@ -1213,7 +1213,7 @@
     internal Dictionary<TItem, bool> selectedItems = new Dictionary<TItem, bool>();
     internal string RowStyle(TItem item, int index)
     {
-        var evenOrOdd = index % 2 == 0 ? "rz-datatable-even" : "rz-datatable-odd";
+        var evenOrOdd = IsVirtualizationAllowed() ? "" : index % 2 == 0 ? "rz-datatable-even" : "rz-datatable-odd";
 
         return (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
     }
