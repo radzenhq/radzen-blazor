@@ -2,24 +2,13 @@
 @if (GetVisible())
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
-        @if (skip > 0)
-        {
-            <a class="rz-paginator-first rz-paginator-element" href="javascript:void(0)" tabindex="-1" @onclick:preventDefault="true" @onclick="@(() => FirstPage())">
-                <span class="rz-paginator-icon rzi rzi-step-backward"></span>
-            </a>
-            <a class="rz-paginator-prev rz-paginator-element" href="javascript:void(0)" tabindex="-1" @onclick:preventDefault="true" @onclick="@(() => PrevPage())">
-                <span class="rz-paginator-icon rzi rzi-caret-left"></span>
-            </a>
-        }
-        else
-        {
-            <a class="rz-paginator-first rz-paginator-element rz-state-disabled" href="javascript:void(0)" tabindex="-1" @onclick:preventDefault="true" @onclick="@(() => FirstPage())">
-                <span class="rz-paginator-icon rzi rzi-step-backward"></span>
-            </a>
-            <a class="rz-paginator-prev rz-paginator-element   rz-state-disabled" href="javascript:void(0)" tabindex="-1" @onclick:preventDefault="true" @onclick="@(() => PrevPage())">
-                <span class="rz-paginator-icon rzi rzi-caret-left"></span>
-            </a>
-        }
+        <a class="rz-paginator-first rz-paginator-element @((skip > 0) ? "": "rz-state-disabled")" href="javascript:void(0)" tabindex="-1" @onclick:preventDefault="true" @onclick="@(() => FirstPage())">
+            <span class="rz-paginator-icon rzi rzi-step-backward"></span>
+        </a>
+        <a class="rz-paginator-prev rz-paginator-element @((skip > 0) ? "": "rz-state-disabled")" href="javascript:void(0)" tabindex="-1" @onclick:preventDefault="true" @onclick="@(() => PrevPage())">
+            <span class="rz-paginator-icon rzi rzi-caret-left"></span>
+        </a>
+
         <span class="rz-paginator-pages">
             @foreach (var i in Enumerable.Range(startPage, Math.Min(endPage + 1, PageNumbersCount)))
             {
@@ -33,24 +22,13 @@
                 }
             }
         </span>
-        @if (CurrentPage != numberOfPages - 1)
-        {
-            <a class="rz-paginator-next rz-paginator-element" href="javascript:void(0)" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => NextPage())">
-                <span class="rz-paginator-icon rzi rzi-caret-right"></span>
-            </a>
-            <a class="rz-paginator-last rz-paginator-element" href="javascript:void(0)" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => LastPage())">
-                <span class="rz-paginator-icon rzi rzi-step-forward"></span>
-            </a>
-        }
-        else
-        {
-            <a class="rz-paginator-next rz-paginator-element rz-state-disabled" href="javascript:void(0)" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => NextPage())">
-                <span class="rz-paginator-icon rzi rzi-caret-right"></span>
-            </a>
-            <a class="rz-paginator-last rz-paginator-element rz-state-disabled" href="javascript:void(0)" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => LastPage())">
-                <span class="rz-paginator-icon rzi rzi-step-forward"></span>
-            </a>
-        }
+        <a class="rz-paginator-next rz-paginator-element @((CurrentPage != numberOfPages - 1) ? "": "rz-state-disabled")" href="javascript:void(0)" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => NextPage())">
+            <span class="rz-paginator-icon rzi rzi-caret-right"></span>
+        </a>
+        <a class="rz-paginator-last rz-paginator-element  @((CurrentPage != numberOfPages - 1) ? "": "rz-state-disabled")" href="javascript:void(0)" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => LastPage())">
+            <span class="rz-paginator-icon rzi rzi-step-forward"></span>
+        </a>
+
         @if(PageSizeOptions != null && PageSizeOptions.Any())
         {
             <RadzenDropDown TValue="int" Data="@PageSizeOptions" Value="@PageSize" Change="@OnPageSizeChanged" />
