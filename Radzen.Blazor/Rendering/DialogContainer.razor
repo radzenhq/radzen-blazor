@@ -2,15 +2,32 @@
     <div class="rz-dialog" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
         {
-            <div class="rz-dialog-titlebar">
-                <span class="rz-dialog-title" id="rz-dialog-0-label">@Dialog.Title</span>
-                @if (Dialog.Options.ShowClose)
-                {
-                    <a href="javascript:void(0)" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
-                        <span class="rzi rzi-times"></span>
-                    </a>
-                }
-            </div>
+            @if (Dialog.Options.Draggable)
+            {
+                <Draggable Drag="@OnDrag" DragStart="@OnDragStart">
+                    <div class="rz-dialog-titlebar">
+                        <span class="rz-dialog-title" id="rz-dialog-0-label">@Dialog.Title</span>
+                        @if (Dialog.Options.ShowClose)
+                        {
+                            <a href="javascript:void(0)" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                                <span class="rzi rzi-times"></span>
+                            </a>
+                        }
+                    </div>
+                </Draggable>
+            }
+            else
+            {
+                <div class="rz-dialog-titlebar">
+                    <span class="rz-dialog-title" id="rz-dialog-0-label">@Dialog.Title</span>
+                    @if (Dialog.Options.ShowClose)
+                    {
+                        <a href="javascript:void(0)" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                            <span class="rzi rzi-times"></span>
+                        </a>
+                    }
+                </div>                
+            }
         }
         <div class="rz-dialog-content">
             @if (Dialog.Options.ChildContent != null)
@@ -27,6 +44,24 @@
 </div>
 
 @code {
+    string left;
+    string top;
+
+    double clientX;
+    double clientY;
+
+    void OnDragStart(DraggableEventArgs args)
+    {
+        clientX = args.ClientX;
+        clientY = args.ClientY;
+    }
+
+    void OnDrag(DraggableEventArgs args)
+    {
+        left = $"left: {args.Rect.Left + (args.ClientX - clientX)}px;";
+        top = $"top: {args.Rect.Top + (args.ClientY - clientY)}px;";
+    }
+
     [Parameter]
     public Dialog Dialog { get; set; }
 
@@ -57,8 +92,8 @@
             var baseStyle = "min-width: 150px; min-height: 150px; z-index: 1001; opacity: 1;position:absolute;";
             var widthStyle = string.IsNullOrEmpty(Dialog.Options.Width) ? "" : $"width: {Dialog.Options.Width};";
             var heightStyle = string.IsNullOrEmpty(Dialog.Options.Height) ? "" : $"height: {Dialog.Options.Height};";
-            var topStyle = string.IsNullOrEmpty(Dialog.Options.Top) ? "" : $"top: {Dialog.Options.Top};";
-            var leftStyle = string.IsNullOrEmpty(Dialog.Options.Left) ? "" : $"left: {Dialog.Options.Left};";
+            var topStyle = !string.IsNullOrEmpty(top) ? top : string.IsNullOrEmpty(Dialog.Options.Top) ? "" : $"top: {Dialog.Options.Top};";
+            var leftStyle = !string.IsNullOrEmpty(left) ? left :string.IsNullOrEmpty(Dialog.Options.Left) ? "" : $"left: {Dialog.Options.Left};";
             var resizeStyle = Dialog.Options.Resizable ? "resize:both;" : "";
 
             return $"{baseStyle}{widthStyle}{heightStyle}{topStyle}{leftStyle}{resizeStyle}{Dialog.Options.Style}";
