@@ -1,5 +1,7 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
 <div class="rz-dialog-wrapper">
-    <div class="rz-dialog" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
+    <div @ref="dialog" class="rz-dialog" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
         {
             @if (Dialog.Options.Draggable)
@@ -44,8 +46,12 @@
 </div>
 
 @code {
+    ElementReference dialog;
+
     string left;
     string top;
+    string height;
+    string width;
 
     double clientX;
     double clientY;
@@ -56,10 +62,14 @@
         clientY = args.ClientY;
     }
 
-    void OnDrag(DraggableEventArgs args)
+    async Task OnDrag(DraggableEventArgs args)
     {
         left = $"left: {args.Rect.Left + (args.ClientX - clientX)}px;";
         top = $"top: {args.Rect.Top + (args.ClientY - clientY)}px;";
+
+        var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", dialog);
+        height = $"height: {rect.Height}px;";
+        width = $"width: {rect.Width}px;";
     }
 
     [Parameter]
@@ -90,8 +100,8 @@
         get
         {
             var baseStyle = "min-width: 150px; min-height: 150px; z-index: 1001; opacity: 1;position:absolute;";
-            var widthStyle = string.IsNullOrEmpty(Dialog.Options.Width) ? "" : $"width: {Dialog.Options.Width};";
-            var heightStyle = string.IsNullOrEmpty(Dialog.Options.Height) ? "" : $"height: {Dialog.Options.Height};";
+            var widthStyle = !string.IsNullOrEmpty(width) ? width : string.IsNullOrEmpty(Dialog.Options.Width) ? "" : $"width: {Dialog.Options.Width};";
+            var heightStyle = !string.IsNullOrEmpty(height) ? height : string.IsNullOrEmpty(Dialog.Options.Height) ? "" : $"height: {Dialog.Options.Height};";
             var topStyle = !string.IsNullOrEmpty(top) ? top : string.IsNullOrEmpty(Dialog.Options.Top) ? "" : $"top: {Dialog.Options.Top};";
             var leftStyle = !string.IsNullOrEmpty(left) ? left :string.IsNullOrEmpty(Dialog.Options.Left) ? "" : $"left: {Dialog.Options.Left};";
             var resizeStyle = Dialog.Options.Resizable ? "resize:both;" : "";
