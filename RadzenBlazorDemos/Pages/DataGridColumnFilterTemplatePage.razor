@@ -11,15 +11,16 @@
     }
     else
     {
-        <RadzenDataGrid Data=@filteredEmployees FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
+        <RadzenDataGrid @ref="grid" Data=@filteredEmployees FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
             <Columns>
                 <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />
                 <RadzenDataGridColumn TItem="Employee" Property="Name" Title="Name" />
-                <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy">
+                <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" 
+                    FilterValue="@currentTOC">
                     <FilterTemplate>
                         <RadzenDropDown @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%"
                                         Change=@OnChange
-                                        Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy>().Select(t => new { Text = $"{t}", Value = t }))" />
+                                        Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy?>().Select(t => new { Text = $"{t}", Value = t == TitleOfCourtesy.All ? null : t }))" />
 
                     </FilterTemplate>
                 </RadzenDataGridColumn>
@@ -29,6 +30,9 @@
 </RadzenExample>
 
 @code {
+    RadzenDataGrid<Employee> grid;
+    TitleOfCourtesy? currentTOC;
+
     public enum TitleOfCourtesy
     {
         Ms,
@@ -44,13 +48,17 @@
 
     }
 
-    void OnChange()
+    async Task OnChange()
     {
-        filteredEmployees = employees.Where(e => currentTOC >= 0 ? e.TitleOfCourtesy == currentTOC : true);
+        if (currentTOC == TitleOfCourtesy.All)
+        {
+            currentTOC = null;
+        }
+
+        await grid.Reload();
     }
 
-    IEnumerable<Employee> employees;
-    TitleOfCourtesy currentTOC;
+    IEnumerable<Employee> employees; 
     IEnumerable<Employee> filteredEmployees;
 
     protected override async Task OnInitializedAsync()
