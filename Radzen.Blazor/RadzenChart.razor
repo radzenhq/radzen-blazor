@@ -49,6 +49,9 @@
     [Parameter]
     public ColorScheme ColorScheme { get; set; }
 
+    [Parameter]
+    public EventCallback<SeriesClickEventArgs> SeriesClick { get; set; }
+
     double? Width { get; set; }
 
     double? Height { get; set; }
@@ -258,13 +261,32 @@
         DisplayTooltip();
     }
 
+    [JSInvokable]
+    public async Task Click(double x, double y)
+    {
+        foreach (var series in Series)
+        {
+            if (series.Visible && series.Contains(mouseX - MarginLeft, mouseY - MarginTop, 5))
+            {
+                var data = series.DataAt(mouseX - MarginLeft, mouseY - MarginTop);
+
+                if (data != null)
+                {
+                    await series.InvokeClick(SeriesClick, data);
+                }
+
+                return;
+            }
+        }
+    }
+
     internal void DisplayTooltip()
     {
         if (Tooltip.Visible)
         {
             foreach (var series in Series)
             {
-                if (series.Visible && series.Contains(mouseX - MarginLeft, mouseY - MarginTop))
+                if (series.Visible && series.Contains(mouseX - MarginLeft, mouseY - MarginTop, 25))
                 {
                     var data = series.DataAt(mouseX - MarginLeft, mouseY - MarginTop);
 

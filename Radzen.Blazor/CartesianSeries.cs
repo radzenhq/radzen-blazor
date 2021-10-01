@@ -279,7 +279,7 @@ namespace Radzen.Blazor
             Chart.AddSeries(this);
         }
 
-        public virtual bool Contains(double x, double y)
+        public virtual bool Contains(double x, double y, double tolerance)
         {
             return false;
         }
@@ -466,6 +466,24 @@ namespace Radzen.Blazor
         public void Dispose()
         {
             Chart?.RemoveSeries(this);
+        }
+
+        public async Task InvokeClick(EventCallback<SeriesClickEventArgs> handler, object data)
+        {
+            var category = Category(Chart.CategoryScale);
+
+            await handler.InvokeAsync(new SeriesClickEventArgs
+            {
+                Data = data,
+                Title = GetTitle(),
+                Category = PropertyAccess.GetValue(data, CategoryProperty),
+                Value = PropertyAccess.GetValue(data, ValueProperty),
+                Point = new SeriesPoint
+                {
+                    Category = category((TItem)data),
+                    Value = Value((TItem)data)
+                }
+            });
         }
     }
 }

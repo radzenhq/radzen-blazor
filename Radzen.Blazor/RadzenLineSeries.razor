@@ -26,9 +26,8 @@
       return Stroke;
     }
   }
-    public override bool Contains(double x, double y)
+    public override bool Contains(double x, double y, double tolerance)
     {
-        var tolerance = 25;
         var category = ComposeCategory(Chart.CategoryScale);
         var value = ComposeValue(Chart.ValueScale);
 

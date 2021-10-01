@@ -412,11 +412,26 @@ namespace Radzen
         public string Html { get; set; }
     }
 
+    public class SeriesPoint
+    {
+        public double Category { get; set; }
+        public double Value { get; set; }
+    }
+
+    public class SeriesClickEventArgs
+    {
+        public object Data { get; set; }
+        public object Value { get; set; }
+        public object Category { get; set; }
+        public string Title { get; set; }
+        public SeriesPoint Point { get; set; }
+    }
+
     public class HtmlEditorExecuteEventArgs
     {
-        public Radzen.Blazor.RadzenHtmlEditor Editor { get; set; }
+        public RadzenHtmlEditor Editor { get; set; }
 
-        internal HtmlEditorExecuteEventArgs(Radzen.Blazor.RadzenHtmlEditor editor)
+        internal HtmlEditorExecuteEventArgs(RadzenHtmlEditor editor)
         {
             Editor = editor;
         }
