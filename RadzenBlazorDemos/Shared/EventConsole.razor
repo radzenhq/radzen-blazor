@@ -1,3 +1,4 @@
+@using System.Text.Json
 @inject IJSRuntime JSRuntime
 <div class="console" @attributes=@Attributes>
     <div class="console-header">
@@ -53,5 +54,10 @@
         messages.Add(new Message { Date = DateTime.Now, Text = message });
 
         InvokeAsync(StateHasChanged);
+    }
+
+    public void Log(object value)
+    {
+        Log(JsonSerializer.Serialize(value));
     }
 }

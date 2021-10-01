@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
@@ -16,10 +17,11 @@ namespace Radzen.Blazor
         bool Visible { get; }
         bool ShowInLegend { get; }
         int RenderingOrder { get; set; }
-        bool Contains(double x, double y);
+        bool Contains(double x, double y, double tolerance);
         object DataAt(double x, double y);
         string Title { get; set; }
         string GetTitle();
         double MeasureLegend();
+        Task InvokeClick(EventCallback<SeriesClickEventArgs> handler, object data);
     }
 }
