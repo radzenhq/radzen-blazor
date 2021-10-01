@@ -56,20 +56,29 @@
     double clientX;
     double clientY;
 
-    void OnDragStart(DraggableEventArgs args)
+    async Task OnDragStart(DraggableEventArgs args)
     {
         clientX = args.ClientX;
         clientY = args.ClientY;
-    }
 
-    async Task OnDrag(DraggableEventArgs args)
-    {
-        left = $"left: {args.Rect.Left + (args.ClientX - clientX)}px;";
-        top = $"top: {args.Rect.Top + (args.ClientY - clientY)}px;";
-
+        shouldRender = false;
         var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", dialog);
         height = $"height: {rect.Height}px;";
         width = $"width: {rect.Width}px;";
+
+        shouldRender = true;
+    }
+
+    void OnDrag(DraggableEventArgs args)
+    {
+        left = $"left: {args.Rect.Left + (args.ClientX - clientX)}px;";
+        top = $"top: {args.Rect.Top + (args.ClientY - clientY)}px;";
+    }
+
+    bool shouldRender = true;
+    protected override bool ShouldRender()
+    {
+        return shouldRender;
     }
 
     [Parameter]
