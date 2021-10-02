@@ -488,12 +488,14 @@
         var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
 
         var valid = DateTime.TryParseExact(inputValue, DateFormat, null, DateTimeStyles.None, out value);
-        var nullable = Nullable.GetUnderlyingType(typeof(TValue)) != null;
+        var nullable = Nullable.GetUnderlyingType(typeof(TValue)) != null;        
 
         if (!valid)
         {
-            valid = DateTime.TryParse(inputValue, out value);
+            valid = DateTime.TryParse(inputValue, out value);            
         }
+
+        valid = !DateAttributes(value).Disabled;
 
         if (valid)
         {
