@@ -12,14 +12,14 @@
     <div @ref="Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         @if (Range)
         {
-            <span class="rz-slider-range" style="left: @((MinValue() / Max * 100).ToInvariantString())%; width: @(((MaxValue() / Max * 100) - (MinValue() / Max * 100)).ToInvariantString())%;"></span>
-            <span @ref="minHandle" class="rz-slider-handle" style="left: @((MinValue() / Max * 100).ToInvariantString())%; bottom: auto;"></span>
-            <span @ref="maxHandle"class="rz-slider-handle rz-slider-handle-active" style="left: @((MaxValue() / Max * 100).ToInvariantString())%; bottom: auto;"></span>
+            <span class="rz-slider-range" style="left: @(Left.ToInvariantString())%; width: @((SecondLeft - Left).ToInvariantString())%;"></span>
+            <span @ref="minHandle" class="rz-slider-handle" style="left: @(Left.ToInvariantString())%; bottom: auto;"></span>
+            <span @ref="maxHandle"class="rz-slider-handle rz-slider-handle-active" style="left: @(SecondLeft.ToInvariantString())%; bottom: auto;"></span>
         }
         else
         {
-            <span class="rz-slider-range rz-slider-range-min" style="width: @((MinValue() / Max * 100).ToInvariantString())%;"></span>
-            <span @ref="handle" class="rz-slider-handle" style="left: @((MinValue() / Max * 100).ToInvariantString())%;"></span>
+            <span class="rz-slider-range rz-slider-range-min" style="width: @(Left.ToInvariantString())%;"></span>
+            <span @ref="handle" class="rz-slider-handle" style="left: @(Left.ToInvariantString())%;"></span>
         }
     </div>
 }
@@ -35,6 +35,9 @@
     private bool rangeChanged = false;
     private bool stepChanged = false;
     private bool firstRender = true;
+
+    decimal Left => ((MinValue() - Min) * 100) / (Max - Min);
+    decimal SecondLeft => ((MaxValue() - Min) * 100) / (Max - Min);
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {

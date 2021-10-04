@@ -280,7 +280,7 @@ window.Radzen = {
           : e.pageX - handle.getBoundingClientRect().left;
       var percent = (handle.offsetLeft + offsetX) / parent.offsetWidth;
 
-      var newValue = percent * max;
+      var newValue = percent * (max - min) + min;
       var oldValue = range ? value[slider.isMin ? 0 : 1] : value;
 
       if (
