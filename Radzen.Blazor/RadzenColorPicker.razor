@@ -18,16 +18,16 @@
                 <Draggable class="rz-saturation-picker rz-colorpicker-section" style=@($"background-color: {HSV.ToRGB().ToCSS()}") Drag=@OnSaturationMove>
                     <div class="rz-saturation-white">
                         <div class="rz-saturation-black"></div>
-                        <div class="rz-saturation-handle" style=@($"top: {SaturationHandleTop*100}%; left: {SaturationHandleLeft * 100}%")></div>
+                        <div class="rz-saturation-handle" style=@($"top: {(SaturationHandleTop*100).ToInvariantString()}%; left: {(SaturationHandleLeft * 100).ToInvariantString()}%")></div>
                     </div>
                 </Draggable>
                 <div class="rz-colorpicker-preview-area rz-colorpicker-section">
                     <div class="rz-hue-and-alpha">
                         <Draggable class="rz-hue-picker" Drag=@OnHueMove>
-                            <div class="rz-hue-handle" style=@($"top: 0; left: {HueHandleLeft * 100}%")></div>
+                            <div class="rz-hue-handle" style=@($"top: 0; left: {(HueHandleLeft * 100).ToInvariantString()}%")></div>
                         </Draggable>
                         <Draggable style=@($"background-image: linear-gradient(to right, {AlphaGradientStart} 0%, {AlphaGradientEnd} 100%)") class="rz-alpha-picker" Drag=@OnAlphaMove>
-                            <div class="rz-alpha-handle" style=@($"top: 0; left: {AlphaHandleLeft * 100}%")></div>
+                            <div class="rz-alpha-handle" style=@($"top: 0; left: {(AlphaHandleLeft * 100).ToInvariantString()}%")></div>
                         </Draggable>
                     </div>
                     <div class="rz-colorpicker-preview" style=@($"background-color: {Color}")></div>
