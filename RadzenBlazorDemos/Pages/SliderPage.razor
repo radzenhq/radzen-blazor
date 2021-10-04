@@ -5,10 +5,14 @@
     <div class="col-xl-6">
         <h3>Slider from 0 to 100</h3>
         <RadzenSlider @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => OnChange(args, "Slider from 0 to 100")) />
+        <h3 style="margin-top: 2rem">Slider from -100 to 100</h3>
+        <RadzenSlider @bind-Value=@negativeValue TValue="int" Min="-100" Max="100" Change=@(args => OnChange(args, "Slider from -100 to 100")) />
         <h3 style="margin-top: 2rem">Slider with Step 10</h3>
         <RadzenSlider @bind-Value=@valueWithStep TValue="int" Step="10" Change=@(args => OnChange(args, "Slider with Step 10")) />
         <h3 style="margin-top: 2rem">Range Slider</h3>
         <RadzenSlider Range="true" @bind-Value=@values TValue="IEnumerable<int>" Change=@(args => OnChange(args, "Range Slider")) />
+        <h3 style="margin-top: 2rem">Range Slider with negative values</h3>
+        <RadzenSlider Range="true" @bind-Value=@negativeValues Min="-100" Max="100" TValue="IEnumerable<int>" Change=@(args => OnChange(args, "Range Slider with negative values")) />
     </div>
     <div class="col-xl-6">
         <EventConsole @ref=@console />
@@ -18,7 +22,9 @@
 
 @code {
     IEnumerable<int> values = new int[] { 14, 78 };
+    IEnumerable<int> negativeValues = new int[] { -100, 100 };
     int value = 67;
+    int negativeValue = 0;
     int valueWithStep = 30;
 
     EventConsole console;
