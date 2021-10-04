@@ -593,17 +593,17 @@ namespace Radzen
 
         public static bool TryGetItemOrValueFromProperty<T>(object item, string property, out T result)
         {
-            result = default(T);
-
             object r = GetItemOrValueFromProperty(item, property);
 
-            var tryResult = (r != null);
-            if (tryResult)
+            if (r == null)
             {
                 result = (T)r;
+                return true;
+            } else
+            {
+                result = default;
+                return false;
             }
-
-            return tryResult;
         }
 
         public static object GetItemOrValueFromProperty(object item, string property)
