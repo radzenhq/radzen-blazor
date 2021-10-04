@@ -46,7 +46,8 @@
         </RadzenRadioButtonList>
         
         <h3 style="margin-top: 2rem">RadioButtonList using foreach</h3>
-        <RadzenRadioButtonList @bind-Value=@value TValue="int">
+        <RadzenRadioButtonList @bind-Value=@value TValue="int"
+            Change=@(args => OnChange(args, "RadioButtonList using foreach"))>
             <Items>
                 @foreach (var dataItem in data)
                 {
@@ -55,9 +56,9 @@
             </Items>
         </RadzenRadioButtonList>
 
-        <h3 style="margin-top: 2rem">RadioButtonList with items from data using DisabledProperty & VisibleProperty</h3>
+        <h3 style="margin-top: 2rem">RadioButtonList with items from data using optional DisabledProperty and VisibleProperty</h3>
         <RadzenRadioButtonList @bind-Value=@value Data="@data" TextProperty="Name" ValueProperty="Id" DisabledProperty="IsDisabled" VisibleProperty="IsVisible" TValue="int" 
-            Change=@(args => OnChange(args, "RadioButtonList with declared items and items from data"))>
+            Change=@(args => OnChange(args, "RadioButtonList with items from data using optional DisabledProperty and VisibleProperty"))>
         </RadzenRadioButtonList>
     </div>
     <div class="col-xl-6">
@@ -93,7 +94,6 @@
             Id = 4,
             Name = "Companies",
             IsDisabled = true,
-            IsVisible = true
         }, 
         new MyObject() {
             Id = 5,
