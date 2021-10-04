@@ -52,11 +52,11 @@ namespace RadzenBlazorDemos
 
             services.AddLocalization();
 
-            /* --> Uncomment to enable localization
-            var supportedCultures = new[]
-            {
+            //--> Uncomment to enable localization
+           var supportedCultures = new[]
+           {
                 new System.Globalization.CultureInfo("de-DE"),
-            };
+           };
 
             services.Configure<RequestLocalizationOptions>(options =>
             {
@@ -64,7 +64,7 @@ namespace RadzenBlazorDemos
                 options.SupportedCultures = supportedCultures;
                 options.SupportedUICultures = supportedCultures;
             });
-            */
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
