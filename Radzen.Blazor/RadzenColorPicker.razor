@@ -18,16 +18,16 @@
                 <Draggable class="rz-saturation-picker rz-colorpicker-section" style=@($"background-color: {HSV.ToRGB().ToCSS()}") Drag=@OnSaturationMove>
                     <div class="rz-saturation-white">
                         <div class="rz-saturation-black"></div>
-                        <div class="rz-saturation-handle" style=@($"top: {SaturationHandleTop*100}%; left: {SaturationHandleLeft * 100}%")></div>
+                        <div class="rz-saturation-handle" style=@($"top: {(SaturationHandleTop*100).ToInvariantString()}%; left: {(SaturationHandleLeft * 100).ToInvariantString()}%")></div>
                     </div>
                 </Draggable>
                 <div class="rz-colorpicker-preview-area rz-colorpicker-section">
                     <div class="rz-hue-and-alpha">
                         <Draggable class="rz-hue-picker" Drag=@OnHueMove>
-                            <div class="rz-hue-handle" style=@($"top: 0; left: {HueHandleLeft * 100}%")></div>
+                            <div class="rz-hue-handle" style=@($"top: 0; left: {(HueHandleLeft * 100).ToInvariantString()}%")></div>
                         </Draggable>
                         <Draggable style=@($"background-image: linear-gradient(to right, {AlphaGradientStart} 0%, {AlphaGradientEnd} 100%)") class="rz-alpha-picker" Drag=@OnAlphaMove>
-                            <div class="rz-alpha-handle" style=@($"top: 0; left: {AlphaHandleLeft * 100}%")></div>
+                            <div class="rz-alpha-handle" style=@($"top: 0; left: {(AlphaHandleLeft * 100).ToInvariantString()}%")></div>
                         </Draggable>
                     </div>
                     <div class="rz-colorpicker-preview" style=@($"background-color: {Color}")></div>
@@ -35,37 +35,37 @@
             }
             @if (ShowRGBA)
             {
-                <div class="rz-colorpicker-rgba rz-colorpicker-section" @onmousedown:stopPropagation> 
+                <div class="rz-colorpicker-rgba rz-colorpicker-section" @onmousedown:stopPropagation>
                     <div class="rz-color-box">
                         <RadzenTextBox Value=@Hex @oninput=@(args => ChangeRGB(args.Value)) />
                         @HexText
                     </div>
                     <div class="rz-color-box">
-                        <RadzenNumeric TValue="double" Value=@Red Min="0" Max="255" 
-                            @oninput=@(args => ChangeColor(args.Value, (color, value) => color.Red = value)) 
-                            Change=@(red => ChangeColor(red, (color, value) => color.Red = value)) 
-                        />
+                        <RadzenNumeric TValue="double" Value=@Red Min="0" Max="255"
+                                       @oninput=@(args => ChangeColor(args.Value, (color, value) => color.Red = value))
+                                       Change=@(red => ChangeColor(red, (color, value) => color.Red = value))
+                                       />
                         @RedText
                     </div>
                     <div class="rz-color-box">
-                        <RadzenNumeric TValue="double" Value=@Green Min="0" Max="255" 
-                            @oninput=@(args => ChangeColor(args.Value, (color, value) => color.Green = value)) 
-                            Change=@(green => ChangeColor(green, (color, value) => color.Green = value)) 
-                        />
+                        <RadzenNumeric TValue="double" Value=@Green Min="0" Max="255"
+                                       @oninput=@(args => ChangeColor(args.Value, (color, value) => color.Green = value))
+                                       Change=@(green => ChangeColor(green, (color, value) => color.Green = value))
+                                       />
                         @GreenText
                     </div>
                     <div class="rz-color-box">
-                        <RadzenNumeric TValue="double" Value=@Blue Min="0" Max="255" 
-                            @oninput=@(args => ChangeColor(args.Value, (color, value) => color.Blue = value)) 
-                            Change=@(blue => ChangeColor(blue, (color, value) => color.Blue = value)) 
-                        />
+                        <RadzenNumeric TValue="double" Value=@Blue Min="0" Max="255"
+                                       @oninput=@(args => ChangeColor(args.Value, (color, value) => color.Blue = value))
+                                       Change=@(blue => ChangeColor(blue, (color, value) => color.Blue = value))
+                                       />
                         @BlueText
                     </div>
                     <div class="rz-color-box">
-                        <RadzenNumeric TValue="double" Value=@Alpha Min="0" Max="100" 
-                            @oninput=@(args => ChangeAlpha(args.Value)) 
-                            Change=@(alpha => ChangeAlpha(alpha)) 
-                        />
+                        <RadzenNumeric TValue="double" Value=@Alpha Min="0" Max="100"
+                                       @oninput=@(args => ChangeAlpha(args.Value))
+                                       Change=@(alpha => ChangeAlpha(alpha))
+                                       />
                         @AlphaText
                     </div>
                 </div>
@@ -74,35 +74,35 @@
             {
                 <div class="rz-colorpicker-colors rz-colorpicker-section">
                     <CascadingValue Value=@this>
-                    @if (ChildContent != null)
-                    {
-                        @ChildContent
-                    }
-                    else
-                    {
-                        <RadzenColorPickerItem Value="ff2800" />
-                        <RadzenColorPickerItem Value="fe9300" />
-                        <RadzenColorPickerItem Value="fefb00" />
-                        <RadzenColorPickerItem Value="02f900" />
-                        <RadzenColorPickerItem Value="00fdff" />
-                        <RadzenColorPickerItem Value="0433ff" />
-                        <RadzenColorPickerItem Value="ff40ff" />
-                        <RadzenColorPickerItem Value="942292" />
-                        <RadzenColorPickerItem Value="aa7942" />
-                        <RadzenColorPickerItem Value="ffffff" />
-                        <RadzenColorPickerItem Value="000000" />
-                        <RadzenColorPickerItem Value="53d5fd" />
-                        <RadzenColorPickerItem Value="73a7fe" />
-                        <RadzenColorPickerItem Value="874efe" />
-                        <RadzenColorPickerItem Value="d357fe" />
-                        <RadzenColorPickerItem Value="ed719e" />
-                        <RadzenColorPickerItem Value="ff8c82" />
-                        <RadzenColorPickerItem Value="ffa57d" />
-                        <RadzenColorPickerItem Value="ffc677" />
-                        <RadzenColorPickerItem Value="fff995" />
-                        <RadzenColorPickerItem Value="ebf38f" />
-                        <RadzenColorPickerItem Value="b1dd8c" />
-                    }
+                        @if (ChildContent != null)
+                        {
+                            @ChildContent
+                        }
+                        else
+                        {
+                            <RadzenColorPickerItem Value="ff2800" />
+                            <RadzenColorPickerItem Value="fe9300" />
+                            <RadzenColorPickerItem Value="fefb00" />
+                            <RadzenColorPickerItem Value="02f900" />
+                            <RadzenColorPickerItem Value="00fdff" />
+                            <RadzenColorPickerItem Value="0433ff" />
+                            <RadzenColorPickerItem Value="ff40ff" />
+                            <RadzenColorPickerItem Value="942292" />
+                            <RadzenColorPickerItem Value="aa7942" />
+                            <RadzenColorPickerItem Value="ffffff" />
+                            <RadzenColorPickerItem Value="000000" />
+                            <RadzenColorPickerItem Value="53d5fd" />
+                            <RadzenColorPickerItem Value="73a7fe" />
+                            <RadzenColorPickerItem Value="874efe" />
+                            <RadzenColorPickerItem Value="d357fe" />
+                            <RadzenColorPickerItem Value="ed719e" />
+                            <RadzenColorPickerItem Value="ff8c82" />
+                            <RadzenColorPickerItem Value="ffa57d" />
+                            <RadzenColorPickerItem Value="ffc677" />
+                            <RadzenColorPickerItem Value="fff995" />
+                            <RadzenColorPickerItem Value="ebf38f" />
+                            <RadzenColorPickerItem Value="b1dd8c" />
+                        }
                     </CascadingValue>
                 </div>
 
