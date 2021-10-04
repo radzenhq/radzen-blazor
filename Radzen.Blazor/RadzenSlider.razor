@@ -18,8 +18,8 @@
         }
         else
         {
-            <span class="rz-slider-range rz-slider-range-min" style="width: @((MinValue() / Max * 100).ToInvariantString())%;"></span>
-            <span @ref="handle" class="rz-slider-handle" style="left: @((MinValue() / Max * 100).ToInvariantString())%;"></span>
+            <span class="rz-slider-range rz-slider-range-min" style="width: @(Left.ToInvariantString())%;"></span>
+            <span @ref="handle" class="rz-slider-handle" style="left: @(Left.ToInvariantString())%;"></span>
         }
     </div>
 }
@@ -35,6 +35,8 @@
     private bool rangeChanged = false;
     private bool stepChanged = false;
     private bool firstRender = true;
+
+    decimal Left => ((MinValue() - Min) * 100) / (Max - Min);
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
