@@ -595,7 +595,7 @@ namespace Radzen
         {
             object r = GetItemOrValueFromProperty(item, property);
 
-            if (r == null)
+            if (r != null)
             {
                 result = (T)r;
                 return true;
@@ -604,6 +604,7 @@ namespace Radzen
                 result = default;
                 return false;
             }
+
         }
 
         public static object GetItemOrValueFromProperty(object item, string property)
