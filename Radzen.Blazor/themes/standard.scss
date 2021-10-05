@@ -1,0 +1,401 @@
+@import 'colors';
+@import 'variables';
+
+// Color tokens
+
+$rz-white: #ffffff;
+
+$rz-base-100: #f4f5f9;
+$rz-base-200: #e9eaed;
+$rz-base-300: #e0e1e4;
+$rz-base-400: #c9cacd;
+$rz-base-500: #afafb2;
+$rz-base-600: #8d8e90;
+$rz-base-700: #707072;
+$rz-base-800: #4f4f50;
+$rz-base-900: #262526;
+
+$rz-primary: #1151F3;
+$rz-primary-light: #376df5; /*lighten($rz-primary, 8%);*/
+$rz-primary-dark: #0e44cc; /*darken($rz-primary, 10%);*/
+
+$rz-secondary: rgba($rz-primary, .16);
+
+$rz-info: #12a4f5;
+
+$rz-info-light: #38b3f7;
+$rz-info-dark: #0f8ace;
+$rz-info-secondary: rgba($rz-info, .16);
+
+$rz-success: #009B51;
+$rz-success-light: #29AB6D;
+$rz-success-dark: #008244;
+$rz-success-secondary: rgba($rz-success, .16);
+
+$rz-warning: #FFAE11;
+$rz-warning-light: #FFBE41;
+$rz-warning-dark: #EBA010;
+$rz-warning-secondary: rgba($rz-warning, .16);
+
+$rz-danger: #F31155;
+$rz-danger-light: #F53770;
+$rz-danger-dark: #CC0E47;
+$rz-danger-secondary: rgba($rz-danger, .16);
+
+$rz-series-1: $rz-primary;
+$rz-series-2: #64DFDF;
+$rz-series-3: #3809A3;
+$rz-series-4: #8611D3;
+$rz-series-5: #F72585;
+
+// Theme colors
+$primary-color: $rz-primary !default;
+$secondary: $rz-secondary !default;
+$tertiary: $rz-base-200 !default;
+$additional-1: $rz-success !default;
+$additional-2: $rz-success !default;
+$additional-3: $rz-danger !default;
+$contrast: $rz-base-900 !default;
+
+$default-background-color: $rz-white !default;
+$button-hover-background-color: $rz-primary-light !default;
+$button-active-background-color: $rz-primary-dark !default;
+$sidebar-background-color: $rz-white !default;
+
+// Bootstrap overrides
+$primary: $primary-color !default;
+$danger: $rz-danger !default;
+$info: $rz-info !default;
+$success: $rz-success !default;
+$warning: $rz-warning !default;
+$light: $rz-base-200 !default;
+$body-color: $rz-base-800 !default;
+$link-color: $rz-primary;
+$link-hover-color: $rz-primary-dark;
+$state-success-bg: $success;
+$state-warning-bg: $warning;
+$state-danger-bg: $danger;
+$state-info-bg: $info;
+
+$body-bg: $rz-base-100 !default;
+$font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
+  'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
+  'Segoe UI Emoji', 'Segoe UI Symbol' !default;
+
+$rz-border-radius: 0.25rem !default;
+
+
+// Button
+
+$button-hover-shadow: none !default;
+$button-hover-gradient: none !default;
+$button-active-shadow: none !default;
+$button-active-gradient: none !default;
+$button-border-radius: $rz-border-radius !default;
+$button-shadow: none !default;
+$button-transition: all .1s linear !default;
+$button-disabled-opacity: 0.5 !default;
+
+$button-sizes: (
+  md: (
+    font-size: 0.875rem,
+    padding: 0.5rem 1rem,
+    line-height: 1.25rem,
+    height: auto,
+    font-weight: 600,
+    icon: (
+      font-size: 1.25rem,
+      height: auto,
+      line-height: 1.25rem,
+      width: 1.25rem
+    ),
+    text-with-icon-padding: 0.5rem 1rem 0.5rem 0.5rem,
+    icon-only-padding: 0.5rem
+  ),
+  sm: (
+    font-size: 0.875rem,
+    padding: 0 1rem,
+    line-height: 1.75rem,
+    height: 1.75rem,
+    icon: (
+      font-size: 0.9375rem,
+      height: auto,
+      line-height: 1.75rem,
+      width: 1.125rem
+    ),
+    text-with-icon-padding: 0 1.375rem,
+    icon-only-padding: 0 0.3125rem
+  )
+) !default;
+
+$button-styles: () !default;
+$button-styles: map-merge(
+  (
+    primary: (
+      background-color: $rz-primary
+    ),
+    light: (
+      background-color: $rz-base-200,
+      color: $rz-base-800
+    ),
+    secondary: (
+      background-color: $rz-secondary,
+      color: $rz-primary
+    ),
+    info: (
+      background-color: $rz-info
+    ),
+    warning: (
+      background-color: $rz-warning
+    ),
+    error: (
+      background-color: $rz-danger
+    ),
+    danger: (
+      background-color: $rz-danger
+    ),
+    success: (
+      background-color: $rz-success
+    )
+  ),
+  $button-styles
+);
+
+$button-hover-styles: () !default;
+$button-hover-styles: map-merge(
+  (
+    primary: (
+      background-color: $rz-primary-light
+    ),
+    light: (
+      background-color: $rz-base-300,
+      color: $rz-base-900
+    ),
+    secondary: (
+      background-color: $rz-primary-light,
+      color: $rz-white
+    ),
+    info: (
+      background-color: $rz-info-light
+    ),
+    warning: (
+      background-color: $rz-warning-light
+    ),
+    error: (
+      background-color: $rz-danger-light
+    ),
+    danger: (
+      background-color: $rz-danger-light
+    ),
+    success: (
+      background-color: $rz-success-light
+    )
+  ),
+  $button-hover-styles
+);
+
+$button-active-styles: () !default;
+$button-active-styles: map-merge(
+  (
+    primary: (
+      background-color: $rz-primary-dark
+    ),
+    light: (
+      background-color: $rz-base-400,
+      color: $rz-base-900
+    ),
+    secondary: (
+      background-color: $rz-primary-dark,
+      color: $rz-white
+    ),
+    info: (
+      background-color: $rz-info-dark
+    ),
+    warning: (
+      background-color: $rz-warning-dark
+    ),
+    error: (
+      background-color: $rz-danger-dark
+    ),
+    danger: (
+      background-color: $rz-danger-dark
+    ),
+    success: (
+      background-color: $rz-success-dark
+    )
+  ),
+  $button-active-styles
+);
+
+$rz-primary-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-primary, 0.2) !default;
+$rz-info-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-info, 0.3) !default;
+$rz-warning-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-warning, 0.4) !default;
+$rz-danger-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-danger, 0.3) !default;
+$rz-success-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-success, 0.3) !default;
+
+
+$button-focus-styles: () !default;
+$button-focus-styles: map-merge(
+  (
+    primary: (box-shadow: $rz-primary-focus),
+    light: (box-shadow: $rz-primary-focus),
+    secondary: (box-shadow: $rz-primary-focus),
+    info: (box-shadow: $rz-info-focus),
+    warning: (box-shadow: $rz-warning-focus),
+    error:  (box-shadow: $rz-danger-focus),
+    danger:  (box-shadow: $rz-danger-focus),
+    success:  (box-shadow: $rz-success-focus)
+  ),
+  $button-focus-styles
+);
+
+.rz-button {
+
+  &:not(.rz-state-disabled) {
+
+    @each $style, $shadow in $button-focus-styles {
+      &.btn-#{$style} {
+        &:focus {
+          @each $name, $value in $shadow {
+            #{$name}: #{$value};
+          }
+
+          &:hover {
+            @each $name, $value in $shadow {
+              #{$name}: #{$value};
+            }
+
+            &:not(:active) {
+              @each $name, $value in $shadow {
+                #{$name}: #{$value};
+              }
+            }
+          }
+        }
+      }
+    }
+
+    @each $style, $button in $button-hover-styles {
+      &.btn-#{$style} {
+        &:hover {
+          &:not(:active) {
+            @each $name, $value in $button {
+              #{$name}: #{$value};
+            }
+          }
+        }
+      }
+    }
+
+    @each $style, $button in $button-active-styles {
+      &.btn-#{$style} {
+        &:active {
+          @each $name, $value in $button {
+            #{$name}: #{$value};
+          }
+        }
+      }
+    }
+  }
+}
+
+// Header
+
+$header-background-color: $rz-white !default;
+$header-min-height: 3.25rem !default;
+$header-z: 2 !default;
+$header-border: none !default;
+$header-color: $body-color !default;
+$header-shadow: 0px 4px 12px rgba(0, 0, 0, 0.04) !default;
+
+// Input components
+$input-background-color: transparent !default;
+$input-border: 1px solid $rz-base-300 !default;
+$input-hover-border: 1px solid $rz-primary-light !default;
+$input-focus-border: 1px solid $rz-primary-light !default;
+$input-shadow: none !default;
+$input-hover-shadow: none !default;
+$input-disabled-border: 1px solid rgba($rz-base-300, .5) !default;
+$input-disabled-background-color: transparent !default;
+$input-disabled-shadow: none !default;
+$input-disabled-color: rgba($rz-base-800, .5) !default;
+
+// Checkbox
+$checkbox-width: 1.25rem !default;
+$checkbox-height: $checkbox-width !default;
+$checkbox-border-radius: 0.25rem;
+$checkbox-label-margin: 0 1rem 0 0.5rem;
+$checkbox-margin: 0;
+
+$checkbox-checked-background-color: $rz-primary !default;
+$checkbox-checked-hover-background-color: $rz-primary-light !default;
+$checkbox-checked-color: $rz-white !default;
+$checkbox-checked-shadow: none !default;
+$checkbox-checked-border: $input-border !default;
+
+$checkbox-icon-width: 0.75rem !default;
+$checkbox-icon-height: $checkbox-icon-width !default;
+$checkbox-icon-font-size: 0.75rem !default;
+
+// Scrollbar
+$scrollbar-background-color: $rz-base-100 !default;
+$scrollbar-color: $rz-base-400 !default;
+
+@import 'bootstrap';
+@import 'fonts';
+@import 'typography';
+@import 'components';
+
+
+// Headings
+
+$heading-color: $rz-base-900;
+
+$headings: (
+  h1: (font-size: 3rem, font-weight: 700, letter-spacing: -0.04em, color: $heading-color),
+  h2: (font-size: 2rem, font-weight: 700, letter-spacing: -0.04em, color: $heading-color),
+  h3: (font-size: 1.5rem, font-weight: 700, letter-spacing: -0.03em, color: $heading-color),
+  h4: (font-size: 1.25rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color),
+  h5: (font-size: 1rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color),
+  h6: (font-size: 0.875rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color)
+);
+
+@each $name, $heading in $headings {
+  #{$name} {
+    @each $name, $value in $heading {
+      #{$name}: #{$value};
+    }
+  }
+}
+
+$headings-light: (
+  h1: (font-size: 3rem, font-weight: 300),
+  h2: (font-size: 2rem, font-weight: 300),
+  h3: (font-size: 1.5rem, font-weight: 300),
+  h4: (font-size: 1.25rem, font-weight: 300),
+  h5: (font-size: 1rem, font-weight: 300),
+  h6: (font-size: 0.875rem, font-weight: 300)
+);
+
+@each $name, $heading in $headings-light {
+  #{$name}.text-thin {
+    @each $name, $value in $heading {
+      #{$name}: #{$value};
+    }
+  }
+}
+
+// Paragraph
+$paragraph-line-height: 1.25 !default;
+
+p {
+  line-height: $paragraph-line-height;
+}
+
+label {
+  margin-bottom: 0;
+}
+
+body {
+  line-height: 1.25;
+}
