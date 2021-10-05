@@ -25,91 +25,173 @@ namespace Radzen
         void RemoveItem(RadzenSelectBarItem item);
     }
 
+    /// <summary>RadzenDatePicker DateRender event arguments.<br /></summary>
     public class DateRenderEventArgs
     {
+        /// <summary>Gets or sets the attributes that will be applied when RadzenDatePicker date cell is rendered.</summary>
+        /// <value>The attributes.</value>
         public IDictionary<string, object> Attributes { get; private set; } = new Dictionary<string, object>();
+        /// <summary>Gets the date.</summary>
+        /// <value>The date.</value>
         public DateTime Date { get; internal set; }
+        /// <summary>Gets or sets a value indicating whether this date is disabled.</summary>
+        /// <value>
+        ///   <c>true</c> if disabled; otherwise, <c>false</c>.</value>
         public bool Disabled { get; set; }
     }
 
+    /// <summary>Class used to specify RadzenGoogleMap position.</summary>
     public class GoogleMapPosition
     {
+        /// <summary>Gets or sets the latitude.</summary>
+        /// <value>The latitude.</value>
         public double Lat { get; set; }
+        /// <summary>Gets or sets the longitude.</summary>
+        /// <value>The longitude.</value>
         public double Lng { get; set; }
     }
 
+    /// <summary>RadzenGoogleMap Click event arguments.</summary>
     public class GoogleMapClickEventArgs
     {
+        /// <summary>Gets or sets the position.</summary>
+        /// <value>The position.</value>
         public GoogleMapPosition Position { get; set; }
     }
 
+    /// <summary>RadzenContextMenu Click event arguments.</summary>
     public class MenuItemEventArgs
     {
+        /// <summary>Gets the item text.</summary>
+        /// <value>The text.</value>
         public string Text { get; internal set; }
+        /// <summary>Gets the item value.</summary>
+        /// <value>The value.</value>
         public object Value { get; internal set; }
+        /// <summary>Gets the item path.</summary>
+        /// <value>The path.</value>
         public string Path { get; internal set; }
     }
 
+    /// <summary>RadzenUpload and RadzenFileInput Error event arguments.</summary>
     public class UploadErrorEventArgs
     {
+        /// <summary>Gets or sets the message.</summary>
+        /// <value>The message.</value>
         public string Message { get; set; }
     }
 
+    /// <summary>RadzenDataGrid RowRender event arguments.</summary>
+    /// <typeparam name="T"></typeparam>
     public class RowRenderEventArgs<T>
     {
+        /// <summary>Gets or sets the row attributes.</summary>
+        /// <value>The attributes.</value>
         public IDictionary<string, object> Attributes { get; private set; } = new Dictionary<string, object>();
 
+        /// <summary>Gets the row data item.</summary>
+        /// <value>The data.</value>
         public T Data { get; internal set; }
 
+        /// <summary>Gets or sets a value indicating whether this row is expandable.</summary>
+        /// <value>
+        ///   <c>true</c> if expandable; otherwise, <c>false</c>.</value>
         public bool Expandable { get; set; }
     }
 
+    /// <summary>RadzenGrid Render event arguments.</summary>
+    /// <typeparam name="T"></typeparam>
     public class GridRenderEventArgs<T>
     {
+        /// <summary>Gets the grid.</summary>
+        /// <value>The grid.</value>
         public RadzenGrid<T> Grid { get; internal set; }
+        /// <summary>Gets a value indicating whether is first render.</summary>
+        /// <value>
+        ///   <c>true</c> if [first render]; otherwise, <c>false</c>.</value>
         public bool FirstRender { get; internal set; }
     }
 
+    /// <summary>RadzenDataGrid Render event arguments.</summary>
+    /// <typeparam name="T"></typeparam>
     public class DataGridRenderEventArgs<T>
     {
+        /// <summary>Gets the grid.</summary>
+        /// <value>The grid.</value>
         public RadzenDataGrid<T> Grid { get; internal set; }
+        /// <summary>Gets a value indicating whether is first render.</summary>
+        /// <value>
+        ///   <c>true</c> if [first render]; otherwise, <c>false</c>.</value>
         public bool FirstRender { get; internal set; }
     }
 
+    /// <summary>RadzenGrid CellRender event arguments.</summary>
+    /// <typeparam name="T"></typeparam>
     public class CellRenderEventArgs<T> : RowRenderEventArgs<T>
     {
+        /// <summary>Gets the column.</summary>
+        /// <value>The column.</value>
         public Blazor.RadzenGridColumn<T> Column { get; internal set; }
     }
 
+    /// <summary>RadzenDataGrid CellRender event arguments.</summary>
+    /// <typeparam name="T"></typeparam>
     public class DataGridCellRenderEventArgs<T> : RowRenderEventArgs<T>
     {
+        /// <summary>Gets the column.</summary>
+        /// <value>The column.</value>
         public Blazor.RadzenDataGridColumn<T> Column { get; internal set; }
     }
 
 
+    /// <summary>RadzenDataGrid RowClick and RowDoubleClick events arguments.</summary>
+    /// <typeparam name="T"></typeparam>
     public class DataGridRowMouseEventArgs<T> : Microsoft.AspNetCore.Components.Web.MouseEventArgs
     {
+        /// <summary>Gets the row data item.</summary>
+        /// <value>The data.</value>
         public T Data { get; internal set; }
     }
 
+    /// <summary>RadzenUpload Change event arguments.</summary>
     public class UploadChangeEventArgs
     {
+        /// <summary>Gets the files.</summary>
+        /// <value>The files.</value>
         public IEnumerable<FileInfo> Files { get; set; }
     }
 
+    /// <summary>RadzenUpload Progress event arguments.</summary>
     public class UploadProgressArgs
     {
+        /// <summary>Gets or sets the number of loaded bytes.</summary>
+        /// <value>The loaded bytes.</value>
         public int Loaded { get; set; }
+        /// <summary>
+        ///   <para>
+        /// Gets the total bytes.
+        /// </para>
+        /// </summary>
+        /// <value>The total bytes.</value>
         public int Total { get; set; }
+        /// <summary>Gets the progress.</summary>
+        /// <value>The progress.</value>
         public int Progress { get; set; }
 
+        /// <summary>Gets the files.</summary>
+        /// <value>The files.</value>
         public IEnumerable<FileInfo> Files { get; set; }
     }
 
+    /// <summary>RadzenUpload Complete event arguments.</summary>
     public class UploadCompleteEventArgs
     {
+        /// <summary>Gets the json response.</summary>
+        /// <value>The json response.</value>
         public JsonDocument JsonResponse { get; set; }
 
+        /// <summary>Gets the raw response.</summary>
+        /// <value>The raw response.</value>
         public string RawResponse { get; set; }
     }
 
