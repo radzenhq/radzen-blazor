@@ -98,6 +98,19 @@ namespace RadzenBlazorDemos
             });
             */
 
+            // Serve documentation without .html extension
+            app.Use(async (ctx, next) =>
+            {
+                await next();
+
+                if (ctx.Response.StatusCode == 404 && ctx.Request.Path.StartsWithSegments(PathString.FromUriComponent("/docs")))
+                {
+                    ctx.Request.Path = $"{ctx.Request.Path.Value}.html";
+
+                    await next();
+                }
+            });
+
             app.UseStaticFiles();
 
             app.UseRouting();
