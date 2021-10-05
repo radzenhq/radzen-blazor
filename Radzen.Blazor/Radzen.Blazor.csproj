@@ -18,6 +18,7 @@
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Title>Radzen Components for Blazor</Title>
     <RepositoryUrl>https://github.com/radzenhq/radzen-blazor</RepositoryUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net5.0'">
     <DefineConstants>NET5</DefineConstants>
