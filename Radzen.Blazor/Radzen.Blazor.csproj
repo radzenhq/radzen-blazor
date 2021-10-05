@@ -8,7 +8,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>Radzen.Blazor</PackageId>
     <Product>Radzen.Blazor</Product>
-    <Version>3.11.1</Version>
+    <Version>3.11.2</Version>
     <Copyright>Radzen Ltd.</Copyright>
     <Authors>Radzen Ltd.</Authors>
     <Description>Native Blazor UI components by Radzen Ltd.</Description>
