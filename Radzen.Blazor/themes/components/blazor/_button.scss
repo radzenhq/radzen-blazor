@@ -7,6 +7,7 @@ $button-border-radius: $border-radius !default;
 $button-shadow: none !default;
 $button-transition: none !default;
 $button-disabled-opacity: 0.2 !default;
+$button-line-height: initial !default;
 
 $button-sizes: () !default;
 
@@ -89,7 +90,7 @@ $button-styles: map-merge(
   color: $white;
   border: none;
   outline: none;
-  line-height: initial;
+  line-height: $button-line-height;
   font-size: 1.0625rem;
   box-shadow: $button-shadow;
   transition: $button-transition;
