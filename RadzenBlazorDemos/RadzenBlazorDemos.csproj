@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Radzen.Blazor" Version="3.11.1" Condition="'$(Configuration)' == 'Release'"/>
+    <PackageReference Include="Radzen.Blazor" Version="3.11.2" Condition="'$(Configuration)' == 'Release'"/>
     <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" Condition="'$(Configuration)' != 'Release'" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.0" />
