@@ -7,6 +7,7 @@
           "src": "../Radzen.Blazor/"
         }
       ],
+      "filter": "filter.yml",
       "dest": "api",
       "disableGitFeatures": false,
       "disableDefaultFilter": false
