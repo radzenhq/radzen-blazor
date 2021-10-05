@@ -44,6 +44,12 @@
 
     [Parameter]
     public string TextProperty { get; set; }
+    
+    [Parameter]
+    public string DisabledProperty { get; set; }
+
+    [Parameter]
+    public string VisibleProperty { get; set; }
 
     IEnumerable<RadzenRadioButtonListItem<TValue>> allItems
     {
@@ -54,6 +60,17 @@
                 var item = new RadzenRadioButtonListItem<TValue>();
                 item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
                 item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
+
+                if (DisabledProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, DisabledProperty, out var disabledResult))
+                {
+                    item.SetDisabled(disabledResult);
+                }
+
+                if (VisibleProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, VisibleProperty, out var visibleResult))
+                {
+                    item.SetVisible(visibleResult);
+                }
+
                 return item;
             }));
         }

@@ -673,6 +673,22 @@ namespace Radzen
             return Expression.Lambda<Func<object, T>>(body, arg).Compile();
         }
 
+        public static bool TryGetItemOrValueFromProperty<T>(object item, string property, out T result)
+        {
+            object r = GetItemOrValueFromProperty(item, property);
+
+            if (r != null)
+            {
+                result = (T)r;
+                return true;
+            } else
+            {
+                result = default;
+                return false;
+            }
+
+        }
+
         public static object GetItemOrValueFromProperty(object item, string property)
         {
             if (item == null)
