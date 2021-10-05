@@ -334,3 +334,9 @@ issues.json
 
 Radzen.Blazor/wwwroot/css/
 project.csproj
+RadzenBlazorDemos/wwwroot/docs/
+Radzen.DocFX/obj/
+Radzen.DocFX/_site/
+Radzen.DocFX/_exported_templates
+Radzen.DocFX/api/*.yml
+Radzen.DocFX/api/.manifest
