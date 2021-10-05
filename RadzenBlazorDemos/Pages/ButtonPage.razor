@@ -2,69 +2,87 @@
 @page "/button"
 
 <RadzenExample Name="Button">
-<div class="row">
-    <div class="col-xl-6">
-        <div class="row">
-            <div class="col-xl-6">
-                <h4>Button with text</h4>
-                <RadzenButton Click=@(args => OnClick("Button with text")) Text="Button" Style="margin-bottom: 20px; width: 150px" />
-            </div>
-            <div class="col-xl-6">
-                <h4>Button with text and icon</h4>
-                <RadzenButton Click=@(args => OnClick("Button with text and icon")) Text="Button" Icon="account_circle" Style="margin-bottom: 20px; width: 150px" />
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xl-6">
-                <h4>Button with icon</h4>
-                <RadzenButton Click=@(args => OnClick("Button with icon")) Icon="account_circle" Style="margin-bottom: 20px; width: 80px" />
-            </div>
-            <div class="col-xl-6">
-                <h4>Button with image</h4>
-                <RadzenButton Click=@(args => OnClick("Button with image")) Image="images/radzen-nuget.png" ButtonStyle="ButtonStyle.Light" Style="margin-bottom: 20px; width: 80px" />
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xl-6">
-                <h4>Button with content</h4>
-                <RadzenButton Click=@(args => OnClick("Button with content")) Image="images/radzen-nuget.png" ButtonStyle="ButtonStyle.Light" Style="margin-bottom: 20px; width: 200px">
-                    Some text
-                    <RadzenImage Path="images/radzen-nuget.png" Style="width:20px;margin-left: 10px;" />
-                </RadzenButton>
-            </div>
-            <div class="col-xl-6">
-                <h4>Disabled Button</h4>
-                <RadzenButton Disabled="true" Text="Button" Style="margin-bottom: 20px; width: 150px" />
-            </div>
-        </div>
-        <h4>Button styles</h4>
-        <div class="row">
-            <div class="col">
-                <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
-                <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-                <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => OnClick("Light button")) Text="Light" ButtonStyle="ButtonStyle.Light" />
-                <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
-                <RadzenButton style="margin: 0 1rem 1rem 0" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
-                <RadzenButton style="margin-bottom: 16px"   Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
-            </div>
-        </div>
-        <h4>Busy Indicator</h4>
-        <div class="row">
-            <div class="col-xl-6">
-                <h5>Without BusyText</h5>
-                <RadzenButton style="margin: 0 1rem 1rem 0; width: 150px" IsBusy=@busy Click=@OnBusyClick Text="Save" />
-            </div>
-
-            <div class="col-xl-6">
-                <h5>With Busy Text</h5>
-                <RadzenButton style="margin: 0 1rem 1rem 0; width: 200px" Icon="save" BusyText="Saving ..." IsBusy=@busy Click=@OnBusyClick Text="Save" />
-            </div>
+<div class="button-demo">
+    <div class="row mb-4">
+        <div class="col">
+            <h4 class="text-thin">Button Styles</h4>
+            <RadzenButton Click=@(args => OnClick("Default button")) Text="Default" />
+            <RadzenButton Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
+            <RadzenButton Click=@(args => OnClick("Light button")) Text="Light" ButtonStyle="ButtonStyle.Light" />
+            <RadzenButton Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
+            <RadzenButton Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
+            <RadzenButton Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
+            <RadzenButton Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
         </div>
     </div>
-    <div class="col-xl-6">
-        <EventConsole @ref=@console />
+    <div class="row mb-4">
+        <div class="col">
+            <h4 class="text-thin">Icon</h4>
+            <RadzenButton Click=@(args => OnClick("Primary icon button")) Icon="add_circle_outline" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton Click=@(args => OnClick("Secondary icon button")) Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
+            <RadzenButton Click=@(args => OnClick("Light icon button")) Icon="refresh" ButtonStyle="ButtonStyle.Light" />
+            <RadzenButton Click=@(args => OnClick("Info icon button")) Icon="privacy_tip" ButtonStyle="ButtonStyle.Info" />
+            <RadzenButton Click=@(args => OnClick("Success icon button ")) Icon="check_circle" ButtonStyle="ButtonStyle.Success" />
+            <RadzenButton Click=@(args => OnClick("Warning icon button ")) Icon="warning_amber" ButtonStyle="ButtonStyle.Warning" />
+            <RadzenButton Click=@(args => OnClick("Danger icon button")) Icon="report" ButtonStyle="ButtonStyle.Danger" />
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <h4 class="text-thin">Icon and text</h4>
+            <RadzenButton Click=@(args => OnClick("Primary button with text and icon")) Text="Add New" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton Click=@(args => OnClick("Secondary button with text and icon")) Text="Add New" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
+            <RadzenButton Click=@(args => OnClick("Light button with text and icon")) Text="Refresh" Icon="refresh" ButtonStyle="ButtonStyle.Light" />
+            <RadzenButton Click=@(args => OnClick("Info button with text and icon")) Text="Privacy tip" Icon="privacy_tip" ButtonStyle="ButtonStyle.Info" />
+            <RadzenButton Click=@(args => OnClick("Success button with text and icon")) Text="Publish" Icon="check_circle" ButtonStyle="ButtonStyle.Success" />
+            <RadzenButton Click=@(args => OnClick("Warning button with text and icon")) Text="Warning" Icon="warning_amber" ButtonStyle="ButtonStyle.Warning" />
+            <RadzenButton Click=@(args => OnClick("Danger button with text and icon")) Text="Report" Icon="report" ButtonStyle="ButtonStyle.Danger" />
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <h4 class="text-thin">Images</h4>
+            <RadzenButton Click=@(args => OnClick("Button with image")) Image="images/radzen-nuget.png" ButtonStyle="ButtonStyle.Light" />
+            <RadzenButton Click=@(args => OnClick("Button with content")) Image="images/radzen-nuget.png" ButtonStyle="ButtonStyle.Light">
+                <span class="rz-button-text">Button with content</span>
+                <RadzenImage Path="images/radzen-nuget.png" Style="width: 20px; height: 20px; margin-left: 8px;" />
+            </RadzenButton>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <h4 class="text-thin">Disabled Button</h4>
+            <RadzenButton Disabled="true" Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton Disabled="true" Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
+            <RadzenButton Disabled="true" Text="Light" ButtonStyle="ButtonStyle.Light" />
+            <RadzenButton Disabled="true" Text="Info" ButtonStyle="ButtonStyle.Info" />
+            <RadzenButton Disabled="true" Text="Success" ButtonStyle="ButtonStyle.Success" />
+            <RadzenButton Disabled="true" Text="Warning" ButtonStyle="ButtonStyle.Warning" />
+            <RadzenButton Disabled="true" Text="Danger" ButtonStyle="ButtonStyle.Danger" />
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col">
+            <h4 class="text-thin">Busy Indicator</h4>
+            <RadzenButton IsBusy=@busy Click=@OnBusyClick Text="Save" />
+            <RadzenButton Icon="save" BusyText="Saving ..." IsBusy=@busy Click=@OnBusyClick Text="Save" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <EventConsole @ref=@console />
+        </div>
     </div>
 </div>
+<style>
+    .button-demo .rz-button {
+        margin: 0 0.5rem 0.5rem 0;
+    }
+</style>
 </RadzenExample>
 
 @code {
