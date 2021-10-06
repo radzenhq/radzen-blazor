@@ -42,14 +42,11 @@
       </EmbeddedResource>
   </ItemGroup>
   
-  <UsingTask
-  TaskName="RemoveSourceMap"
-  TaskFactory="RoslynCodeTaskFactory"
-  AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+  <UsingTask TaskName="RemoveSourceMap" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <Task>
-      <Using Namespace="System"/>
-      <Using Namespace="System.IO"/>
-      <Using Namespace="System.Text"/>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text" />
       <Code Type="Fragment" Language="cs">
         <![CDATA[
           foreach (var file in Directory.EnumerateFiles("./wwwroot/css", "*.css"))
