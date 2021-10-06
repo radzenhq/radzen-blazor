@@ -391,6 +391,8 @@
         }
     }
 
+    List<TItem> virtualDataItems = new List<TItem>();
+
     private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
     {
         var view = AllowPaging ? PagedView : View;
@@ -416,7 +418,9 @@
             await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = top, OrderBy = orderBy, Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString });
         }
 
-        return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(LoadData.HasDelegate ? Data : itemToInsert != null ? (new[] { itemToInsert }).Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top), totalItemsCount);
+        virtualDataItems = (LoadData.HasDelegate ? Data : itemToInsert != null ? (new[] { itemToInsert }).Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top)).ToList();
+
+        return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(virtualDataItems, totalItemsCount);
     }
 #endif
     RenderFragment DrawRows(IList<RadzenDataGridColumn<TItem>> visibleColumns)
@@ -438,10 +442,11 @@
                         b.AddAttribute(6, "TItem", typeof(TItem));
                         b.AddAttribute(7, "Item", context);
                         b.AddAttribute(8, "InEditMode", IsRowInEditMode(context));
+                        b.AddAttribute(9, "Index", virtualDataItems.IndexOf(context));
 
                         if (editContexts.ContainsKey(context))
                         {
-                            b.AddAttribute(9, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[context]);
+                            b.AddAttribute(10, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[context]);
                         }
 
                         b.SetKey(context);
@@ -577,31 +582,10 @@
         }
     }
 
-    readonly List<TItem> items = new List<TItem>();
-
-    internal int GetItemIndex(TItem item)
-    {
-        if (!items.Contains(item))
-        {
-            items.Add(item);
-        }
-
-        return items.IndexOf(item);
-    }
-
-    internal void RemoveItem(TItem item)
-    {
-        if (items.Contains(item))
-        {
-            items.Remove(item);
-        }
-    }
-
     string getFilterInputId(RadzenDataGridColumn<TItem> column)
     {
         return string.Join("", $"{UniqueID}".Split('.')) + column.GetFilterProperty();
     }
-
 
     string getFilterDateFormat(RadzenDataGridColumn<TItem> column)
     {
@@ -1213,7 +1197,7 @@
     internal Dictionary<TItem, bool> selectedItems = new Dictionary<TItem, bool>();
     internal string RowStyle(TItem item, int index)
     {
-        var evenOrOdd = IsVirtualizationAllowed() ? "" : index % 2 == 0 ? "rz-datatable-even" : "rz-datatable-odd";
+        var evenOrOdd = index % 2 == 0 ? "rz-datatable-even" : "rz-datatable-odd";
 
         return (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item) ? $"rz-state-highlight {evenOrOdd} " : $"{evenOrOdd} ";
     }

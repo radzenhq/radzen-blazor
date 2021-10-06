@@ -1,7 +1,6 @@
 @using Microsoft.AspNetCore.Components.Forms
 @typeparam TItem
 @implements IRadzenForm
-@implements IDisposable
 @{var rowArgs = Grid?.RowAttributes(Item); }
 <tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
     @foreach(var g in Grid.groups)
@@ -151,21 +150,5 @@
     public IRadzenFormComponent FindComponent(string name)
     {
         return components.Where(component => component.Name == name).FirstOrDefault();
-    }
-
-    protected override void OnInitialized()
-    {
-        if (Grid.IsVirtualizationAllowed() && Item != null)
-        {
-            Index = Grid.GetItemIndex(Item);
-        }
-    }
-
-    public void Dispose()
-    {
-        if (Grid.IsVirtualizationAllowed() && Item != null)
-        {
-            Grid?.RemoveItem(Item);
-        }
     }
 }
