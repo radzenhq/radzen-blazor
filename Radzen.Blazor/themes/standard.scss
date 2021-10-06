@@ -88,15 +88,18 @@ $rz-border-radius: 0.25rem !default;
 // Button
 
 $button-hover-shadow: none !default;
-$button-hover-gradient: none !default;
+$button-hover-gradient: linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%), linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0) 100%) !default;
 $button-active-shadow: none !default;
-$button-active-gradient: none !default;
+$button-active-gradient: $button-hover-gradient !default;
 $button-border-radius: $rz-border-radius !default;
 $button-shadow: none !default;
 $button-transition: all .1s linear !default;
 $button-disabled-opacity: 0.5 !default;
 $button-line-height: 1.25rem !default;
 $button-vertical-align: top !default;
+$button-background-size: 100% 0%, 100% 0% !default;
+$button-hover-background-size: 100% 200%, 100% 0%  !default;
+$button-active-background-size: 100% 0%, 100% 200%  !default;
 
 $button-sizes: (
   md: (
@@ -167,7 +170,8 @@ $button-hover-styles: () !default;
 $button-hover-styles: map-merge(
   (
     primary: (
-      background-color: $rz-primary-light
+      background-color: $rz-primary-light,
+      color: $rz-white
     ),
     light: (
       background-color: $rz-base-300,
@@ -178,19 +182,24 @@ $button-hover-styles: map-merge(
       color: $rz-white
     ),
     info: (
-      background-color: $rz-info-light
+      background-color: $rz-info-light,
+      color: $rz-white
     ),
     warning: (
-      background-color: $rz-warning-light
+      background-color: $rz-warning-light,
+      color: $rz-white
     ),
     error: (
-      background-color: $rz-danger-light
+      background-color: $rz-danger-light,
+      color: $rz-white
     ),
     danger: (
-      background-color: $rz-danger-light
+      background-color: $rz-danger-light,
+      color: $rz-white
     ),
     success: (
-      background-color: $rz-success-light
+      background-color: $rz-success-light,
+      color: $rz-white
     )
   ),
   $button-hover-styles
@@ -200,7 +209,8 @@ $button-active-styles: () !default;
 $button-active-styles: map-merge(
   (
     primary: (
-      background-color: $rz-primary-dark
+      background-color: $rz-primary-dark,
+      color: $rz-white
     ),
     light: (
       background-color: $rz-base-400,
@@ -211,19 +221,24 @@ $button-active-styles: map-merge(
       color: $rz-white
     ),
     info: (
-      background-color: $rz-info-dark
+      background-color: $rz-info-dark,
+      color: $rz-white
     ),
     warning: (
-      background-color: $rz-warning-dark
+      background-color: $rz-warning-dark,
+      color: $rz-white
     ),
     error: (
-      background-color: $rz-danger-dark
+      background-color: $rz-danger-dark,
+      color: $rz-white
     ),
     danger: (
-      background-color: $rz-danger-dark
+      background-color: $rz-danger-dark,
+      color: $rz-white
     ),
     success: (
-      background-color: $rz-success-dark
+      background-color: $rz-success-dark,
+      color: $rz-white
     )
   ),
   $button-active-styles
@@ -254,6 +269,18 @@ $button-focus-styles: map-merge(
 .rz-button {
 
   &:not(.rz-state-disabled) {
+
+    &:hover {
+      &:not(:active) {
+        background-color: $rz-base-300;
+        color: $rz-base-900;
+      }
+    }
+  
+    &:active {
+      background-color: $rz-base-400;
+      color: $rz-base-900;
+    }
     
     @each $style, $shadow in $button-focus-styles {
       &.btn-#{$style} {

@@ -9,6 +9,9 @@ $button-transition: none !default;
 $button-disabled-opacity: 0.2 !default;
 $button-line-height: initial !default;
 $button-vertical-align: middle !default;
+$button-background-size: auto !default;
+$button-hover-background-size: $button-background-size !default;
+$button-active-background-size: $button-background-size !default;
 
 $button-sizes: () !default;
 
@@ -95,6 +98,8 @@ $button-styles: map-merge(
   font-size: 1.0625rem;
   box-shadow: $button-shadow;
   transition: $button-transition;
+  background-size: $button-background-size;
+  background-repeat: no-repeat;
 
   &:focus {
     outline: $button-focus-outline;
@@ -106,12 +111,14 @@ $button-styles: map-merge(
     &:hover {
       &:not(:active) {
         background-image: $button-hover-gradient;
+        background-size: $button-hover-background-size;
         box-shadow: $button-hover-shadow;
       }
     }
 
     &:active {
       background-image: $button-active-gradient;
+      background-size: $button-active-background-size;
       box-shadow: $button-active-shadow;
     }
   }
