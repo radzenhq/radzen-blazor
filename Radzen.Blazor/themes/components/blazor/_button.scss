@@ -8,6 +8,7 @@ $button-shadow: none !default;
 $button-transition: none !default;
 $button-disabled-opacity: 0.2 !default;
 $button-line-height: initial !default;
+$button-vertical-align: middle !default;
 
 $button-sizes: () !default;
 
@@ -120,12 +121,12 @@ $button-styles: map-merge(
   }
 
   .rz-button-text {
-    vertical-align: middle;
+    vertical-align: $button-vertical-align;
     line-height: 1.5rem;
   }
 
   .rzi {
-    vertical-align: middle;
+    vertical-align: $button-vertical-align;
   }
 
   @each $style, $button in $button-styles {
