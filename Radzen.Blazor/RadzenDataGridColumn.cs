@@ -1,0 +1,447 @@
+﻿using Microsoft.AspNetCore.Components;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
+
+namespace Radzen.Blazor
+{
+    public partial class RadzenDataGridColumn<TItem> : ComponentBase, IDisposable
+    { 
+        [CascadingParameter]
+        public RadzenDataGrid<TItem> Grid { get; set; }
+
+        protected override void OnInitialized()
+        {
+            if (Grid != null)
+            {
+                Grid.AddColumn(this);
+
+                if (!string.IsNullOrEmpty(FilterProperty) || Type == null)
+                {
+                    var property = GetFilterProperty();
+
+                    if (!string.IsNullOrEmpty(property))
+                    {
+                        _filterPropertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
+                    }
+                }
+            
+                if (_filterPropertyType == null)
+                {
+                    _filterPropertyType = Type;
+                }
+                else
+                {
+                    propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
+                }
+
+                if (_filterPropertyType == typeof(string))
+                {
+                    FilterOperator = FilterOperator.Contains;
+                }
+            }
+        }
+
+        [Parameter]
+        public SortOrder? SortOrder { get; set; }
+
+        [Parameter]
+        public bool Visible { get; set; } = true;
+
+        [Parameter]
+        public string Title { get; set; }
+
+        [Parameter]
+        public string Property { get; set; }
+
+        [Parameter]
+        public string SortProperty { get; set; }
+
+        [Parameter]
+        public string GroupProperty { get; set; }
+
+        [Parameter]
+        public string FilterProperty { get; set; }
+
+        [Parameter]
+        public object FilterValue { get; set; }
+
+        [Parameter]
+        public object SecondFilterValue { get; set; }
+
+        [Parameter]
+        public string Width { get; set; }
+
+        [Parameter]
+        public string FormatString { get; set; }
+
+        [Parameter]
+        public string CssClass { get; set; }
+
+        [Parameter]
+        public string HeaderCssClass { get; set; }
+
+        [Parameter]
+        public string FooterCssClass { get; set; }
+
+        [Parameter]
+        public string GroupFooterCssClass { get; set; }
+
+        [Parameter]
+        public bool Filterable { get; set; } = true;
+
+        [Parameter]
+        public bool Sortable { get; set; } = true;
+
+        [Parameter]
+        public bool Frozen { get; set; }
+
+        [Parameter]
+        public bool Resizable { get; set; } = true;
+
+        [Parameter]
+        public bool Reorderable { get; set; } = true;
+
+        [Parameter]
+        public bool Groupable { get; set; } = true;
+
+        [Parameter]
+        public TextAlign TextAlign { get; set; } = TextAlign.Left;
+
+        [Parameter]
+        public RenderFragment<TItem> Template { get; set; }
+
+        [Parameter]
+        public RenderFragment<TItem> EditTemplate { get; set; }
+
+        [Parameter]
+        public RenderFragment HeaderTemplate { get; set; }
+
+        [Parameter]
+        public RenderFragment FooterTemplate { get; set; }
+
+        [Parameter]
+        public RenderFragment<Group> GroupFooterTemplate { get; set; }
+
+        [Parameter]
+        public RenderFragment<RadzenDataGridColumn<TItem>> FilterTemplate { get; set; }
+
+        [Parameter]
+        public LogicalFilterOperator LogicalFilterOperator { get; set; } = LogicalFilterOperator.And;
+
+        [Parameter]
+        public Type Type { get; set; }
+
+        Func<TItem, object> propertyValueGetter;
+
+        public object GetValue(TItem item)
+        {
+            var value = propertyValueGetter != null && !string.IsNullOrEmpty(Property) && !Property.Contains('.') ? propertyValueGetter(item) : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
+
+            return !string.IsNullOrEmpty(FormatString) ? string.Format(FormatString, value, Grid?.Culture ?? CultureInfo.CurrentCulture) : Convert.ToString(value, Grid?.Culture ?? CultureInfo.CurrentCulture);
+        }
+
+        internal object GetHeader()
+        {
+            if (HeaderTemplate != null)
+            {
+                return HeaderTemplate;
+            }
+            else if (!string.IsNullOrEmpty(Title))
+            {
+                return Title;
+            }
+            else
+            {
+                return Property;
+            }
+        }
+
+        public string GetStyle(bool forCell = false, bool isHeaderOrFooterCell = false)
+        {
+            var style = new List<string>();
+
+            var width = GetWidth();
+
+            if (width != null)
+            {
+                style.Add($"width:{width}");
+            }
+            else if (Grid != null && Grid.ColumnWidth != null)
+            {
+                style.Add($"width:{Grid.ColumnWidth}");
+            }
+
+            if (forCell && TextAlign != TextAlign.Left)
+            {
+                style.Add($"text-align:{Enum.GetName(typeof(TextAlign), TextAlign).ToLower()};");
+            }
+
+            if (forCell && Frozen)
+            {
+                var left = Grid.ColumnsCollection
+                    .TakeWhile((c, i) => Grid.ColumnsCollection.IndexOf(this) > i && c.Frozen)
+                    .Sum(c => {
+                        var w = !string.IsNullOrEmpty(c.GetWidth()) ? c.GetWidth() : Grid.ColumnWidth;
+                        var cw = 200;
+                        if (!string.IsNullOrEmpty(w) && w.Contains("px"))
+                        {
+                            int.TryParse(w.Replace("px", ""), out cw);
+                        }
+                        return cw;
+                    });
+
+                style.Add($"left:{left}px");
+            }
+
+            if ((isHeaderOrFooterCell && Frozen || isHeaderOrFooterCell && !Frozen || !isHeaderOrFooterCell && Frozen) && Grid.ColumnsCollection.Where(c => c.Visible && c.Frozen).Any())
+            {
+                style.Add($"z-index:{(isHeaderOrFooterCell && Frozen ? 2 : 1)}");
+            }
+
+            return string.Join(";", style);
+        }
+
+        public string GetSortProperty()
+        {
+            if (!string.IsNullOrEmpty(SortProperty))
+            {
+                return SortProperty;
+            }
+            else
+            {
+                return Property;
+            }
+        }
+
+        internal string GetSortOrderAsString(bool isOData)
+        {
+            var property = GetSortProperty();
+            if (string.IsNullOrEmpty(property))
+                return "";
+            var p = isOData ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
+            return $"{p} {(GetSortOrder() == Radzen.SortOrder.Ascending ? "asc" : "desc")}";
+        }
+
+        internal void SetSortOrder(SortOrder? order)
+        {
+            sortOrder = new SortOrder?[] { order };
+        }
+
+        internal void ResetSortOrder()
+        {
+            sortOrder = Enumerable.Empty<SortOrder?>();
+            SortOrder = null;
+        }
+
+        public string GetGroupProperty()
+        {
+            if (!string.IsNullOrEmpty(GroupProperty))
+            {
+                return GroupProperty;
+            }
+            else
+            {
+                return Property;
+            }
+        }
+
+        public string GetFilterProperty()
+        {
+            if (!string.IsNullOrEmpty(FilterProperty))
+            {
+                return FilterProperty;
+            }
+            else
+            {
+                return Property;
+            }
+        }
+
+        Type _filterPropertyType;
+
+        internal Type FilterPropertyType
+        {
+            get
+            {
+                return _filterPropertyType;
+            }
+        }
+
+        IEnumerable<SortOrder?> sortOrder = Enumerable.Empty<SortOrder?>();
+        object filterValue;
+        FilterOperator? filterOperator;
+        object secondFilterValue;
+        FilterOperator? secondFilterOperator;
+        LogicalFilterOperator? logicalFilterOperator;
+
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            if (parameters.DidParameterChange(nameof(Visible), Visible) ||
+                parameters.DidParameterChange(nameof(Title), Title))
+            {
+                if (Grid != null)
+                {
+                    await Grid.ChangeState();
+                }
+            }
+
+            if (parameters.DidParameterChange(nameof(SortOrder), SortOrder))
+            {
+                sortOrder = new SortOrder?[] { parameters.GetValueOrDefault<SortOrder?>(nameof(SortOrder)) };
+            }
+
+            if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))
+            {
+                filterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
+            }
+
+            if (parameters.DidParameterChange(nameof(FilterOperator), FilterOperator))
+            {
+                filterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(FilterOperator));
+            }
+
+            if (parameters.DidParameterChange(nameof(SecondFilterValue), SecondFilterValue))
+            {
+                secondFilterValue = parameters.GetValueOrDefault<object>(nameof(SecondFilterValue));
+            }
+
+            if (parameters.DidParameterChange(nameof(SecondFilterOperator), SecondFilterOperator))
+            {
+                secondFilterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(SecondFilterOperator));
+            }
+
+            if (parameters.DidParameterChange(nameof(LogicalFilterOperator), LogicalFilterOperator))
+            {
+                logicalFilterOperator = parameters.GetValueOrDefault<LogicalFilterOperator>(nameof(LogicalFilterOperator));
+            }
+
+            await base.SetParametersAsync(parameters);
+        }
+
+        internal SortOrder? GetSortOrder()
+        {
+            return sortOrder.Any() ? sortOrder.FirstOrDefault() : SortOrder;
+        }
+
+        internal object GetFilterValue()
+        {
+            return filterValue ?? FilterValue;
+        }
+
+        internal FilterOperator GetFilterOperator()
+        {
+            return filterOperator ?? FilterOperator;
+        }
+
+        internal object GetSecondFilterValue()
+        {
+            return secondFilterValue ?? SecondFilterValue;
+        }
+
+        internal FilterOperator GetSecondFilterOperator()
+        {
+            return secondFilterOperator ?? SecondFilterOperator;
+        }
+
+        internal LogicalFilterOperator GetLogicalFilterOperator()
+        {
+            return logicalFilterOperator ?? LogicalFilterOperator;
+        }
+
+        internal void SetFilterValue(object value, bool isFirst = true)
+        {
+            if ((FilterPropertyType == typeof(DateTimeOffset) || FilterPropertyType == typeof(DateTimeOffset?)) && value != null && value is DateTime?)
+            {
+                DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)value, DateTimeKind.Utc);
+                value = offset;
+            }
+
+            if (isFirst)
+            {
+                filterValue = value;
+            }
+            else
+            {
+                secondFilterValue = value;
+            }
+        }
+
+        [Parameter]
+        public FilterOperator FilterOperator { get; set; }
+
+        [Parameter]
+        public FilterOperator SecondFilterOperator { get; set; }
+
+        internal void SetFilterOperator(FilterOperator? value)
+        {
+            filterOperator = value;
+        }
+
+        internal void SetSecondFilterOperator(FilterOperator? value)
+        {
+            secondFilterOperator = value;
+        }
+
+        internal void SetLogicalFilterOperator(LogicalFilterOperator value)
+        {
+            LogicalFilterOperator = value;
+        }
+
+        string runtimeWidth;
+        internal void SetWidth(string value)
+        {
+            runtimeWidth = value;
+        }
+
+        internal string GetWidth()
+        {
+            return !string.IsNullOrEmpty(runtimeWidth) ? runtimeWidth : Width;
+        }
+
+        internal IEnumerable<FilterOperator> GetFilterOperators()
+        {
+            return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
+                var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
+                return FilterPropertyType == typeof(string) ? isStringOperator || o == FilterOperator.Equals || o == FilterOperator.NotEquals : !isStringOperator;
+            });
+        }
+
+        internal string GetFilterOperatorText(FilterOperator filterOperator)
+        {
+            switch (filterOperator)
+            {
+                case FilterOperator.Contains:
+                    return Grid?.ContainsText;
+                case FilterOperator.DoesNotContain:
+                    return Grid?.DoesNotContainText;
+                case FilterOperator.EndsWith:
+                    return Grid?.EndsWithText;
+                case FilterOperator.Equals:
+                    return Grid?.EqualsText;
+                case FilterOperator.GreaterThan:
+                    return Grid?.GreaterThanText;
+                case FilterOperator. GreaterThanOrEquals:
+                    return Grid?.GreaterThanOrEqualsText;
+                case FilterOperator.LessThan:
+                    return Grid?.LessThanText;
+                case FilterOperator.LessThanOrEquals:
+                    return Grid?.LessThanOrEqualsText;
+                case FilterOperator.StartsWith:
+                    return Grid?.StartsWithText;
+                case FilterOperator.NotEquals:
+                    return Grid?.NotEqualsText;
+                default:
+                    return $"{filterOperator}";
+            }
+        }
+
+        public void Dispose()
+        {
+            Grid?.RemoveColumn(this);
+        }
+    }
+}
