@@ -26,6 +26,8 @@ $paginator-summary-padding: 0 1.25rem 0 0.625rem !default;
 $paginator-summary-font-size: 0.875rem !default;
 $paginator-summary-color: $battleship-grey !default;
 
+$paginator-button-size: ".rz-button-sm" !default;
+
 .rz-paginator {
   display: flex;
   align-items: center;
@@ -84,7 +86,7 @@ $paginator-summary-color: $battleship-grey !default;
 }
 
 .rz-paginator-element {
-  @extend .rz-button, .rz-button-sm, .rz-button-icon-only;
+  @extend .rz-button, #{$paginator-button-size}, .rz-button-icon-only;
 }
 
 .rz-paginator-first {

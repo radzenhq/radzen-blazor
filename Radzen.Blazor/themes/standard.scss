@@ -96,6 +96,7 @@ $button-shadow: none !default;
 $button-transition: all .1s linear !default;
 $button-disabled-opacity: 0.5 !default;
 $button-line-height: 1.25rem !default;
+$button-vertical-align: top !default;
 
 $button-sizes: (
   md: (
@@ -106,26 +107,26 @@ $button-sizes: (
     font-weight: 600,
     icon: (
       font-size: 1.25rem,
-      height: auto,
       line-height: 1.25rem,
-      width: 1.25rem
+      width: 1.25rem,
+      height: 1.25rem
     ),
     text-with-icon-padding: 0.5rem 1rem 0.5rem 0.5rem,
     icon-only-padding: 0.5rem
   ),
   sm: (
     font-size: 0.875rem,
-    padding: 0 1rem,
-    line-height: 1.75rem,
-    height: 1.75rem,
+    padding: 0.25rem 0.75rem,
+    line-height: 1.25rem,
+    height: auto,
     icon: (
-      font-size: 0.9375rem,
-      height: auto,
-      line-height: 1.75rem,
-      width: 1.125rem
+      font-size: 1.25rem,
+      line-height: 1.25rem,
+      width: 1.25rem,
+      height: 1.25rem
     ),
-    text-with-icon-padding: 0 1.375rem,
-    icon-only-padding: 0 0.3125rem
+    text-with-icon-padding: 0.25rem 0.75rem 0.25rem 0.25rem,
+    icon-only-padding: 0.25rem
   )
 ) !default;
 
@@ -298,6 +299,15 @@ $button-focus-styles: map-merge(
       }
     }
   }
+
+  &:not(.rz-button-icon-only) .rz-button-icon-left {
+    margin-right: 0.25rem;
+  }
+
+  &:not(.rz-button-icon-only) .rz-button-icon-left {
+    margin-right: 0.25rem;
+  }
+
 }
 
 // Pager
@@ -308,7 +318,7 @@ $paginator-padding: 0.5rem 1rem !default;
 $paginator-numeric-button-background-color: $rz-base-200 !default;
 $paginator-numeric-button-color: $rz-base-800 !default;
 $paginator-numeric-button-margin: 0 0.125rem !default;
-$paginator-numeric-button-padding: 0.25rem 0.75rem !default;
+$paginator-numeric-button-padding: 0.5rem 1rem !default;
 $paginator-numeric-button-selected-background-color: $rz-secondary !default;
 $paginator-numeric-button-selected-color: $primary-color !default;
 $paginator-numeric-button-selected-border: none !default;
@@ -317,14 +327,16 @@ $paginator-numeric-button-selected-padding: $paginator-numeric-button-padding !d
 $paginator-back-button-background-color: $rz-base-200 !default;
 $paginator-back-button-color: $rz-base-800 !default;
 
-$paginator-first-button-margin: 0 0.625rem 0 0 !default;
-$paginator-last-button-margin: 0 0 0 0.625rem !default;
+$paginator-first-button-margin: 0 0.5rem 0 0 !default;
+$paginator-last-button-margin: 0 0 0 0.5rem !default;
 
 $paginator-next-button-background-color: $rz-base-200 !default;
 $paginator-next-button-color: $rz-base-800 !default;
 
 $paginator-dropdown-width: 80px !default;
 $paginator-dropdown-margin: $paginator-last-button-margin !default;
+
+$paginator-button-size: ".rz-button-md" !default;
 
 // Header
 
