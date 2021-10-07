@@ -391,33 +391,35 @@ $input-disabled-background-color: transparent !default;
 $input-disabled-shadow: none !default;
 $input-disabled-color: rgba($rz-base-800, .5) !default;
 
-
-
 // Slider
 
 $slider-border: 1px solid $rz-base-300 !default;
 $slider-background-color: $rz-white !default;
 
-$slider-horizontal-height: 0.8125rem !default;
+$slider-horizontal-height: 0.75rem !default;
 $slider-horizontal-width: 10rem !default;
 
-$slider-range-background-color: $rz-primary !default;
-$slider-range-border: 1px solid $rz-primary !default;
+$slider-range-background-color: $rz-secondary !default;
+$slider-range-border: 1px solid $rz-secondary !default;
 
-$slider-handle-background-color: $default-link !default;
-$slider-handle-width: 1rem !default;
-$slider-handle-height: 1.75rem !default;
-$slider-handle-border-radius: 2px !default;
-$slider-handle-hover-background-color: #59a6cd !default;
-$slider-handle-hover-shadow: inset 0 -3px 0 0 rgba(#fff, 0.2) !default;
-$slider-handle-color: $white !default;
+$slider-handle-background-color: $rz-white !default;
+$slider-handle-width: 1.25rem !default;
+$slider-handle-height: 1.25rem !default;
+$slider-handle-border: 0.25rem solid $rz-primary;
+$slider-handle-border-radius: $rz-border-radius*4 !default;
+$slider-handle-hover-border: $slider-handle-border !default;
+$slider-handle-hover-background-color: $rz-primary !default;
+$slider-handle-hover-shadow: none !default;
+$slider-handle-color: $rz-white !default;
+$slider-handle-icon-display: none !default;
+$slider-handle-transition: background-color 0.1s linear, color 0.1s linear, border 0.1s linear !default;
 
 $slider-disabled-range-background-color: rgba(211, 217, 219, 0.5) !default;
 $slider-disabled-range-border: solid 1px rgba(211, 217, 219, 0.3) !default;
 $slider-disabled-background-color: rgba(211, 217, 219, 0.1) !default;
 $slider-disabled-border: solid 1px #dadfe2 !default;
 $slider-disabled-handle-background-color: #d3d9db !default;
-$slider-border-radius: $rz-border-radius !default;
+$slider-border-radius: $rz-border-radius*2 !default;
 
 // Checkbox
 
