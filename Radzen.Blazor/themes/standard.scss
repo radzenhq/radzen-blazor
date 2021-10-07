@@ -365,6 +365,11 @@ $paginator-dropdown-margin: $paginator-last-button-margin !default;
 
 $paginator-button-size: ".rz-button-md" !default;
 
+
+// Switch
+$switch-background-color: $rz-base-200 !default;
+$switch-checked-background-color: $rz-primary !default;
+
 // Header
 
 $header-background-color: $rz-white !default;
@@ -386,24 +391,107 @@ $input-disabled-background-color: transparent !default;
 $input-disabled-shadow: none !default;
 $input-disabled-color: rgba($rz-base-800, .5) !default;
 
+
+
+// Slider
+
+$slider-border: 1px solid $rz-base-300 !default;
+$slider-background-color: $rz-white !default;
+
+$slider-horizontal-height: 0.8125rem !default;
+$slider-horizontal-width: 10rem !default;
+
+$slider-range-background-color: $rz-primary !default;
+$slider-range-border: 1px solid $rz-primary !default;
+
+$slider-handle-background-color: $default-link !default;
+$slider-handle-width: 1rem !default;
+$slider-handle-height: 1.75rem !default;
+$slider-handle-border-radius: 2px !default;
+$slider-handle-hover-background-color: #59a6cd !default;
+$slider-handle-hover-shadow: inset 0 -3px 0 0 rgba(#fff, 0.2) !default;
+$slider-handle-color: $white !default;
+
+$slider-disabled-range-background-color: rgba(211, 217, 219, 0.5) !default;
+$slider-disabled-range-border: solid 1px rgba(211, 217, 219, 0.3) !default;
+$slider-disabled-background-color: rgba(211, 217, 219, 0.1) !default;
+$slider-disabled-border: solid 1px #dadfe2 !default;
+$slider-disabled-handle-background-color: #d3d9db !default;
+$slider-border-radius: $rz-border-radius !default;
+
 // Checkbox
+
 $checkbox-width: 1.25rem !default;
 $checkbox-height: $checkbox-width !default;
-$checkbox-border-radius: 0.25rem;
+$checkbox-border-radius: $rz-border-radius;
 $checkbox-label-margin: 0 1rem 0 0.5rem;
-$checkbox-margin: 0;
+$checkbox-margin: 1rem 0;
 
-$checkbox-checked-background-color: $rz-primary !default;
-$checkbox-checked-hover-background-color: $rz-primary-light !default;
+$checkbox-checked-background-color: $rz-white !default;
+$checkbox-checked-hover-background-color: $rz-white !default;
 $checkbox-checked-color: $rz-white !default;
 $checkbox-checked-shadow: none !default;
 $checkbox-checked-border: $input-border !default;
+$checkbox-checked-icon-background-color: $rz-primary !default;
+$checkbox-checked-icon-border-radius: $rz-border-radius/2 !default;
 
-$checkbox-icon-width: 0.75rem !default;
+$checkbox-icon-width: 0.875rem !default;
 $checkbox-icon-height: $checkbox-icon-width !default;
-$checkbox-icon-font-size: 0.75rem !default;
+$checkbox-icon-font-size: 0.875rem !default;
+
+.rz-checkbox-list-vertical,
+.rz-checkbox-list-horizontal {
+
+  &.rz-state-disabled > div > .rz-chkbox-label {
+    opacity: 0.5;
+  }
+
+  &:not(.rz-state-disabled) > div > .rz-chkbox-label:hover {
+    color: $rz-primary-light;
+    cursor: pointer;
+  }
+}
+
+// Radio Button
+
+$radio-width: 1.25rem !default;
+$radio-height: $radio-width !default;
+$radio-border-radius: 50%;
+$radio-label-margin: 0 1rem 0 0.5rem;
+$radio-margin: 1rem 0;
+
+$radio-active-background-color: $rz-white !default;
+$radio-active-shadow: none !default;
+
+$radio-checked-background-color: $rz-white !default;
+$radio-checked-hover-background-color: $rz-white !default;
+$radio-checked-hover-shadow: none !default;
+
+$radio-checked-color: $rz-white !default;
+
+$radio-circle-background-color: $rz-primary !default;
+$radio-circle-shadow: none;
+$radio-circle-hover-background-color: $rz-primary-light !default;
+
+$radio-icon-width: 0.75rem !default;
+$radio-icon-height: $radio-icon-width !default;
+$radio-checked-border: $input-border !default;
+
+.rz-radio-button-list-vertical,
+.rz-radio-button-list-horizontal {
+
+  &.rz-state-disabled > div > .rz-radiobutton-label {
+    opacity: 0.5;
+  }
+
+  &:not(.rz-state-disabled) > div > .rz-radiobutton-label:hover {
+    color: $rz-primary-light;
+    cursor: pointer;
+  }
+}
 
 // Scrollbar
+
 $scrollbar-background-color: $rz-base-100 !default;
 $scrollbar-color: $rz-base-400 !default;
 
