@@ -1,0 +1,95 @@
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Radzen.Blazor
+{
+    public partial class RadzenGoogleMap : RadzenComponent
+    {
+        [Parameter]
+        public IEnumerable<RadzenGoogleMapMarker> Data { get; set; }
+
+        [Parameter]
+        public EventCallback<GoogleMapClickEventArgs> MapClick { get; set; }
+
+        [Parameter]
+        public EventCallback<RadzenGoogleMapMarker> MarkerClick { get; set; }
+
+        [Parameter]
+        public string ApiKey { get; set; }
+
+        [Parameter]
+        public double Zoom { get; set; } = 8;
+
+        [Parameter]
+        public GoogleMapPosition Center { get; set; } = new GoogleMapPosition() { Lat = 0, Lng = 0 };
+
+        [Parameter]
+        public RenderFragment Markers { get; set; }
+
+        List<RadzenGoogleMapMarker> markers = new List<RadzenGoogleMapMarker>();
+
+        public void AddMarker(RadzenGoogleMapMarker marker)
+        {
+            if (markers.IndexOf(marker) == -1)
+            {
+                markers.Add(marker);
+            }
+        }
+
+        public void RemoveMarker(RadzenGoogleMapMarker marker)
+        {
+            if (markers.IndexOf(marker) != -1)
+            {
+                markers.Remove(marker);
+            }
+        }
+
+        protected override string GetComponentCssClass()
+        {
+            return "rz-map";
+        }
+
+        [JSInvokable("RadzenGoogleMap.OnMapClick")]
+        public async System.Threading.Tasks.Task OnMapClick(GoogleMapClickEventArgs args)
+        {
+            await MapClick.InvokeAsync(args);
+        }
+
+        [JSInvokable("RadzenGoogleMap.OnMarkerClick")]
+        public async System.Threading.Tasks.Task OnMarkerClick(RadzenGoogleMapMarker marker)
+        {
+            await MarkerClick.InvokeAsync(marker);
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            var data = Data != null ? Data : markers;
+
+            if (firstRender)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center,
+                     data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }));
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, Zoom, Center,
+                             data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }));
+            }
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            if (IsJSRuntimeAvailable)
+            {
+                JSRuntime.InvokeVoidAsync("Radzen.destroyMap", UniqueID);
+            }
+        }
+    }
+}
