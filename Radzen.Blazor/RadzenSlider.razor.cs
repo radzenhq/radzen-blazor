@@ -9,23 +9,72 @@ using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
+    /// <summary>
+    /// Class RadzenSlider.
+    /// Implements the <see cref="Radzen.FormComponent{TValue}" />
+    /// </summary>
+    /// <typeparam name="TValue">The type of the t value.</typeparam>
+    /// <seealso cref="Radzen.FormComponent{TValue}" />
     public partial class RadzenSlider<TValue> : FormComponent<TValue>
     {
+        /// <summary>
+        /// The handle
+        /// </summary>
         ElementReference handle;
+        /// <summary>
+        /// The minimum handle
+        /// </summary>
         ElementReference minHandle;
+        /// <summary>
+        /// The maximum handle
+        /// </summary>
         ElementReference maxHandle;
 
+        /// <summary>
+        /// The visible changed
+        /// </summary>
         private bool visibleChanged = false;
+        /// <summary>
+        /// The disabled changed
+        /// </summary>
         private bool disabledChanged = false;
+        /// <summary>
+        /// The maximum changed
+        /// </summary>
         private bool maxChanged = false;
+        /// <summary>
+        /// The minimum changed
+        /// </summary>
         private bool minChanged = false;
+        /// <summary>
+        /// The range changed
+        /// </summary>
         private bool rangeChanged = false;
+        /// <summary>
+        /// The step changed
+        /// </summary>
         private bool stepChanged = false;
+        /// <summary>
+        /// The first render
+        /// </summary>
         private bool firstRender = true;
 
+        /// <summary>
+        /// Gets the left.
+        /// </summary>
+        /// <value>The left.</value>
         decimal Left => ((MinValue() - Min) * 100) / (Max - Min);
+        /// <summary>
+        /// Gets the second left.
+        /// </summary>
+        /// <value>The second left.</value>
         decimal SecondLeft => ((MaxValue() - Min) * 100) / (Max - Min);
 
+        /// <summary>
+        /// Set parameters as an asynchronous operation.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
@@ -46,6 +95,11 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// On after render as an asynchronous operation.
+        /// </summary>
+        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -86,6 +140,9 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Disposes this instance.
+        /// </summary>
         public override void Dispose()
         {
             base.Dispose();
@@ -96,6 +153,11 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Called when [value change].
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="isMin">if set to <c>true</c> [is minimum].</param>
         [JSInvokable("RadzenSlider.OnValueChange")]
         public async System.Threading.Tasks.Task OnValueChange(decimal value, bool isMin)
         {
@@ -173,11 +235,19 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets the component CSS class.
+        /// </summary>
+        /// <returns>System.String.</returns>
         protected override string GetComponentCssClass()
         {
             return $"rz-slider {(Disabled ? "rz-state-disabled " : "")}rz-slider-horizontal";
         }
 
+        /// <summary>
+        /// Gets or sets the value.
+        /// </summary>
+        /// <value>The value.</value>
         [Parameter]
         public override TValue Value
         {
@@ -218,6 +288,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this instance has value.
+        /// </summary>
+        /// <value><c>true</c> if this instance has value; otherwise, <c>false</c>.</value>
         public override bool HasValue
         {
             get
@@ -226,6 +300,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Minimums the value.
+        /// </summary>
+        /// <returns>System.Decimal.</returns>
         decimal MinValue()
         {
             if (Range)
@@ -241,6 +319,10 @@ namespace Radzen.Blazor
             return HasValue ? (decimal)Convert.ChangeType(Value, typeof(decimal)) : Min;
         }
 
+        /// <summary>
+        /// Maximums the value.
+        /// </summary>
+        /// <returns>System.Decimal.</returns>
         decimal MaxValue()
         {
             if (Range)
@@ -256,15 +338,31 @@ namespace Radzen.Blazor
             return HasValue ? (decimal)Convert.ChangeType(Value, typeof(decimal)) : Min;
         }
 
+        /// <summary>
+        /// Gets or sets the step.
+        /// </summary>
+        /// <value>The step.</value>
         [Parameter]
         public string Step { get; set; } = "1";
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenSlider{TValue}"/> is range.
+        /// </summary>
+        /// <value><c>true</c> if range; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Range { get; set; } = false;
 
+        /// <summary>
+        /// Determines the minimum of the parameters.
+        /// </summary>
+        /// <value>The minimum.</value>
         [Parameter]
         public decimal Min { get; set; } = 0;
 
+        /// <summary>
+        /// Determines the maximum of the parameters.
+        /// </summary>
+        /// <value>The maximum.</value>
         [Parameter]
         public decimal Max { get; set; } = 100;
     }

@@ -5,10 +5,21 @@ using System.Text;
 
 namespace Radzen
 {
+    /// <summary>
+    /// Class NotificationService.
+    /// </summary>
     public class NotificationService
     {
+        /// <summary>
+        /// Gets the messages.
+        /// </summary>
+        /// <value>The messages.</value>
         public ObservableCollection<NotificationMessage> Messages { get; private set; } = new ObservableCollection<NotificationMessage>();
 
+        /// <summary>
+        /// Notifies the specified message.
+        /// </summary>
+        /// <param name="message">The message.</param>
         public void Notify(NotificationMessage message)
         {
             var newMessage = new NotificationMessage()
@@ -26,6 +37,13 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Notifies the specified severity.
+        /// </summary>
+        /// <param name="severity">The severity.</param>
+        /// <param name="summary">The summary.</param>
+        /// <param name="detail">The detail.</param>
+        /// <param name="duration">The duration.</param>
         public void Notify(NotificationSeverity severity = NotificationSeverity.Info, string summary = "", string detail = "", double duration = 3000)
         {
             var newMessage = new NotificationMessage()
@@ -43,12 +61,35 @@ namespace Radzen
         }
     }
 
+    /// <summary>
+    /// Class NotificationMessage.
+    /// </summary>
     public class NotificationMessage
     {
+        /// <summary>
+        /// Gets or sets the duration.
+        /// </summary>
+        /// <value>The duration.</value>
         public double? Duration { get; set; }
+        /// <summary>
+        /// Gets or sets the severity.
+        /// </summary>
+        /// <value>The severity.</value>
         public NotificationSeverity Severity { get; set; }
+        /// <summary>
+        /// Gets or sets the summary.
+        /// </summary>
+        /// <value>The summary.</value>
         public string Summary { get; set; }
+        /// <summary>
+        /// Gets or sets the detail.
+        /// </summary>
+        /// <value>The detail.</value>
         public string Detail { get; set; }
+        /// <summary>
+        /// Gets or sets the style.
+        /// </summary>
+        /// <value>The style.</value>
         public string Style { get; set; }
     }
 }

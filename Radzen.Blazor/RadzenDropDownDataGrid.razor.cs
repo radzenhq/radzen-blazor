@@ -10,53 +10,124 @@ using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
+    /// <summary>
+    /// Class RadzenDropDownDataGrid.
+    /// Implements the <see cref="Radzen.DropDownBase{TValue}" />
+    /// </summary>
+    /// <typeparam name="TValue">The type of the t value.</typeparam>
+    /// <seealso cref="Radzen.DropDownBase{TValue}" />
     public partial class RadzenDropDownDataGrid<TValue> : DropDownBase<TValue>
     {
+        /// <summary>
+        /// Gets or sets the width of the column.
+        /// </summary>
+        /// <value>The width of the column.</value>
         [Parameter]
         public string ColumnWidth { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenDropDownDataGrid{TValue}"/> is responsive.
+        /// </summary>
+        /// <value><c>true</c> if responsive; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Responsive { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [show search].
+        /// </summary>
+        /// <value><c>true</c> if [show search]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowSearch { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets the page numbers count.
+        /// </summary>
+        /// <value>The page numbers count.</value>
         [Parameter]
         public int PageNumbersCount { get; set; } = 2;
 
+        /// <summary>
+        /// Gets or sets the empty text.
+        /// </summary>
+        /// <value>The empty text.</value>
         [Parameter]
         public string EmptyText { get; set; } = "No records to display.";
 
+        /// <summary>
+        /// Gets or sets the search text.
+        /// </summary>
+        /// <value>The search text.</value>
         [Parameter]
         public string SearchText { get; set; } = "Search...";
 
+        /// <summary>
+        /// Gets or sets the selected value.
+        /// </summary>
+        /// <value>The selected value.</value>
         [Parameter]
         public object SelectedValue { get; set; }
 
+        /// <summary>
+        /// Gets or sets the columns.
+        /// </summary>
+        /// <value>The columns.</value>
         [Parameter]
         public RenderFragment Columns { get; set; }
 
+        /// <summary>
+        /// The grid
+        /// </summary>
         RadzenDataGrid<object> grid;
 
+        /// <summary>
+        /// The paged data
+        /// </summary>
         IEnumerable<object> pagedData;
+        /// <summary>
+        /// The count
+        /// </summary>
         int count;
 
+        /// <summary>
+        /// Gets or sets the maximum selected labels.
+        /// </summary>
+        /// <value>The maximum selected labels.</value>
         [Parameter]
         public int MaxSelectedLabels { get; set; } = 4;
 
-    #if !NET5
+#if !NET5
+        /// <summary>
+        /// Gets or sets the size of the page.
+        /// </summary>
+        /// <value>The size of the page.</value>
         [Parameter]
         public int PageSize { get; set; } = 5;
 
+        /// <summary>
+        /// Gets or sets the count.
+        /// </summary>
+        /// <value>The count.</value>
         [Parameter]
         public int Count { get; set; }
-    #endif
+#endif
 
+        /// <summary>
+        /// Gets or sets the selected items text.
+        /// </summary>
+        /// <value>The selected items text.</value>
         [Parameter]
         public string SelectedItemsText { get; set; } = "items selected";
 
+        /// <summary>
+        /// The popup
+        /// </summary>
         protected ElementReference popup;
 
+        /// <summary>
+        /// Called when [after render asynchronous].
+        /// </summary>
+        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
+        /// <returns>Task.</returns>
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -78,6 +149,9 @@ namespace Radzen.Blazor
             return base.OnAfterRenderAsync(firstRender);
         }
 
+        /// <summary>
+        /// Called when [data changed].
+        /// </summary>
         protected override async Task OnDataChanged()
         {
             await base.OnDataChanged();
@@ -89,12 +163,21 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Reloads this instance.
+        /// </summary>
         public async Task Reload()
         {
             searchText = null;
             await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
         }
 
+        /// <summary>
+        /// Gets the property filter expression.
+        /// </summary>
+        /// <param name="property">The property.</param>
+        /// <param name="filterCaseSensitivityOperator">The filter case sensitivity operator.</param>
+        /// <returns>System.String.</returns>
         private string GetPropertyFilterExpression(string property, string filterCaseSensitivityOperator)
         {
             if (property == null)
@@ -105,6 +188,11 @@ namespace Radzen.Blazor
             return $"{p}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)";
         }
 
+        /// <summary>
+        /// Determines whether [is column filter property type string] [the specified column].
+        /// </summary>
+        /// <param name="column">The column.</param>
+        /// <returns><c>true</c> if [is column filter property type string] [the specified column]; otherwise, <c>false</c>.</returns>
         private bool IsColumnFilterPropertyTypeString(RadzenDataGridColumn<object> column)
         {
             var property = column.GetFilterProperty();
@@ -114,6 +202,10 @@ namespace Radzen.Blazor
             return type == typeof(string);
         }
 
+        /// <summary>
+        /// Called when [load data].
+        /// </summary>
+        /// <param name="args">The arguments.</param>
         async Task OnLoadData(LoadDataArgs args)
         {
             if (!LoadData.HasDelegate)
@@ -157,7 +249,14 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// The internal view
+        /// </summary>
         IEnumerable _internalView = Enumerable.Empty<object>();
+        /// <summary>
+        /// Gets the view.
+        /// </summary>
+        /// <value>The view.</value>
         public new IEnumerable View
         {
             get
@@ -166,6 +265,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets the items.
+        /// </summary>
+        /// <value>The items.</value>
         protected override IEnumerable<object> Items
         {
             get
@@ -174,6 +277,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Selects the item from value.
+        /// </summary>
+        /// <param name="value">The value.</param>
         protected override void SelectItemFromValue(object value)
         {
             if (value != null && Query != null)
@@ -220,6 +327,9 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Clears this instance.
+        /// </summary>
         async System.Threading.Tasks.Task Clear()
         {
             if (Disabled)
@@ -240,7 +350,14 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        /// <summary>
+        /// The previous search
+        /// </summary>
         string previousSearch;
+        /// <summary>
+        /// Handles the <see cref="E:FilterKeyPress" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="KeyboardEventArgs"/> instance containing the event data.</param>
         protected override async Task OnFilterKeyPress(KeyboardEventArgs args)
         {
             var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (pagedData != null ? pagedData : Enumerable.Empty<object>())).OfType<object>().ToList();
@@ -292,6 +409,9 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Debounces the filter.
+        /// </summary>
         async Task DebounceFilter()
         {
             searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
@@ -304,6 +424,9 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Refreshes the after filter.
+        /// </summary>
         async Task RefreshAfterFilter()
         {
     #if NET5
@@ -330,20 +453,40 @@ namespace Radzen.Blazor
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
         }
 
+        /// <summary>
+        /// Handles the <see cref="E:Filter" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected override async Task OnFilter(ChangeEventArgs args)
         {
             await DebounceFilter();
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [allow sorting].
+        /// </summary>
+        /// <value><c>true</c> if [allow sorting]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowSorting { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [allow filtering].
+        /// </summary>
+        /// <value><c>true</c> if [allow filtering]; otherwise, <c>false</c>.</value>
         [Parameter]
         public override bool AllowFiltering { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [allow filtering by all string columns].
+        /// </summary>
+        /// <value><c>true</c> if [allow filtering by all string columns]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowFilteringByAllStringColumns { get; set; }
 
+        /// <summary>
+        /// Called when [row select].
+        /// </summary>
+        /// <param name="item">The item.</param>
         async Task OnRowSelect(object item)
         {
             await SelectItem(item);
@@ -353,11 +496,18 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets the component CSS class.
+        /// </summary>
+        /// <returns>System.String.</returns>
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-dropdown").Add("rz-clear", AllowClear).ToString();
         }
 
+        /// <summary>
+        /// Disposes this instance.
+        /// </summary>
         public override void Dispose()
         {
             base.Dispose();

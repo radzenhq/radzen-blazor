@@ -7,8 +7,14 @@ using System.Linq.Dynamic.Core;
 
 namespace Radzen
 {
+    /// <summary>
+    /// Class QueryableExtension.
+    /// </summary>
     public static class QueryableExtension
     {
+        /// <summary>
+        /// The filter operators
+        /// </summary>
         internal static readonly IDictionary<string, string> FilterOperators = new Dictionary<string, string>
         {
             {"eq", "="},
@@ -23,6 +29,9 @@ namespace Radzen
             {"DoesNotContain", "Contains"}
         };
 
+        /// <summary>
+        /// The linq filter operators
+        /// </summary>
         internal static readonly IDictionary<FilterOperator, string> LinqFilterOperators = new Dictionary<FilterOperator, string>
         {
             {FilterOperator.Equals, "="},
@@ -37,6 +46,9 @@ namespace Radzen
             {FilterOperator.DoesNotContain, "DoesNotContain"}
         };
 
+        /// <summary>
+        /// The o data filter operators
+        /// </summary>
         internal static readonly IDictionary<FilterOperator, string> ODataFilterOperators = new Dictionary<FilterOperator, string>
         {
             {FilterOperator.Equals, "eq"},
@@ -51,6 +63,11 @@ namespace Radzen
             {FilterOperator.DoesNotContain, "DoesNotContain"}
         };
 
+        /// <summary>
+        /// Converts to list.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>IList.</returns>
         public static IList ToList(IQueryable query)
         {
             var genericToList = typeof(Enumerable).GetMethod("ToList")
@@ -58,6 +75,12 @@ namespace Radzen
             return (IList)genericToList.Invoke(null, new[] { query });
         }
 
+        /// <summary>
+        /// Converts to filterstring.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="columns">The columns.</param>
+        /// <returns>System.String.</returns>
         public static string ToFilterString<T>(this IEnumerable<RadzenGridColumn<T>> columns)
         {
             Func<RadzenGridColumn<T>, bool> canFilter = (c) => c.Filterable && !string.IsNullOrEmpty(c.Type) &&
@@ -104,6 +127,12 @@ namespace Radzen
             return "";
         }
 
+        /// <summary>
+        /// Converts to filterstring.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="columns">The columns.</param>
+        /// <returns>System.String.</returns>
         public static string ToFilterString<T>(this IEnumerable<RadzenDataGridColumn<T>> columns)
         {
             Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
@@ -166,6 +195,13 @@ namespace Radzen
             return "";
         }
 
+        /// <summary>
+        /// Gets the column filter.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="column">The column.</param>
+        /// <param name="second">if set to <c>true</c> [second].</param>
+        /// <returns>System.String.</returns>
         private static string GetColumnFilter<T>(RadzenGridColumn<T> column, bool second = false)
         {
             var property = PropertyAccess.GetProperty(column.GetFilterProperty());
@@ -251,6 +287,14 @@ namespace Radzen
             return "";
         }
 
+        /// <summary>
+        /// Gets the column filter.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="column">The column.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="second">if set to <c>true</c> [second].</param>
+        /// <returns>System.String.</returns>
         private static string GetColumnFilter<T>(RadzenDataGridColumn<T> column, string value, bool second = false)
         {
             var property = PropertyAccess.GetProperty(column.GetFilterProperty());
@@ -325,6 +369,13 @@ namespace Radzen
             return "";
         }
 
+        /// <summary>
+        /// Gets the column o data filter.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="column">The column.</param>
+        /// <param name="second">if set to <c>true</c> [second].</param>
+        /// <returns>System.String.</returns>
         private static string GetColumnODataFilter<T>(RadzenGridColumn<T> column, bool second = false)
         {
             var columnType = column.Type;
@@ -405,6 +456,13 @@ namespace Radzen
             return "";
         }
 
+        /// <summary>
+        /// Gets the column o data filter.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="column">The column.</param>
+        /// <param name="second">if set to <c>true</c> [second].</param>
+        /// <returns>System.String.</returns>
         private static string GetColumnODataFilter<T>(RadzenDataGridColumn<T> column, bool second = false)
         {
             var property = column.GetFilterProperty().Replace('.', '/');
@@ -481,6 +539,12 @@ namespace Radzen
             return "";
         }
 
+        /// <summary>
+        /// Converts to odatafilterstring.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="columns">The columns.</param>
+        /// <returns>System.String.</returns>
         public static string ToODataFilterString<T>(this IEnumerable<RadzenGridColumn<T>> columns)
         {
             Func<RadzenGridColumn<T>, bool> canFilter = (c) => c.Filterable && !string.IsNullOrEmpty(c.Type) &&
@@ -529,6 +593,12 @@ namespace Radzen
             return "";
         }
 
+        /// <summary>
+        /// Converts to odatafilterstring.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="columns">The columns.</param>
+        /// <returns>System.String.</returns>
         public static string ToODataFilterString<T>(this IEnumerable<RadzenDataGridColumn<T>> columns)
         {
             Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
@@ -574,6 +644,13 @@ namespace Radzen
             return "";
         }
 
+        /// <summary>
+        /// Wheres the specified columns.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">The source.</param>
+        /// <param name="columns">The columns.</param>
+        /// <returns>IQueryable&lt;T&gt;.</returns>
         public static IQueryable<T> Where<T>(this IQueryable<T> source, IEnumerable<RadzenGridColumn<T>> columns)
         {
             Func<RadzenGridColumn<T>, bool> canFilter = (c) => c.Filterable && !string.IsNullOrEmpty(c.Type) &&
@@ -650,6 +727,13 @@ namespace Radzen
             return source;
         }
 
+        /// <summary>
+        /// Wheres the specified columns.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">The source.</param>
+        /// <param name="columns">The columns.</param>
+        /// <returns>IQueryable&lt;T&gt;.</returns>
         public static IQueryable<T> Where<T>(this IQueryable<T> source, IEnumerable<RadzenDataGridColumn<T>> columns)
         {
             Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
@@ -726,11 +810,24 @@ namespace Radzen
             return source;
         }
 
+        /// <summary>
+        /// Ases the o data enumerable.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">The source.</param>
+        /// <returns>ODataEnumerable&lt;T&gt;.</returns>
         public static ODataEnumerable<T> AsODataEnumerable<T>(this IEnumerable<T> source)
         {
             return new ODataEnumerable<T>(source);
         }
 
+        /// <summary>
+        /// Selects the many recursive.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">The source.</param>
+        /// <param name="selector">The selector.</param>
+        /// <returns>IEnumerable&lt;T&gt;.</returns>
         public static IEnumerable<T> SelectManyRecursive<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>> selector)
         {
             var result = source.SelectMany(selector);

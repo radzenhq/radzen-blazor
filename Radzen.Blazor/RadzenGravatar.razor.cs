@@ -3,11 +3,24 @@ using System.Linq;
 
 namespace Radzen.Blazor
 {
+    /// <summary>
+    /// Class RadzenGravatar.
+    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// </summary>
+    /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenGravatar : RadzenComponent
     {
+        /// <summary>
+        /// Gets or sets the email.
+        /// </summary>
+        /// <value>The email.</value>
         [Parameter]
         public string Email { get; set; }
 
+        /// <summary>
+        /// Gets the URL.
+        /// </summary>
+        /// <value>The URL.</value>
         protected string Url
         {
             get
@@ -33,6 +46,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets the component CSS class.
+        /// </summary>
+        /// <returns>System.String.</returns>
         protected override string GetComponentCssClass()
         {
             return "rz-gravatar";

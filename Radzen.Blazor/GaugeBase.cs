@@ -6,21 +6,49 @@ using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
+    /// <summary>
+    /// Class GaugeBase.
+    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// </summary>
+    /// <seealso cref="Radzen.RadzenComponent" />
     public abstract class GaugeBase : RadzenComponent
     {
+        /// <summary>
+        /// Gets or sets the content of the child.
+        /// </summary>
+        /// <value>The content of the child.</value>
         [Parameter]
         public RenderFragment ChildContent
         {
             get; set;
         }
 
+        /// <summary>
+        /// Gets or sets the width.
+        /// </summary>
+        /// <value>The width.</value>
         public double? Width { get; set; }
 
+        /// <summary>
+        /// Gets or sets the height.
+        /// </summary>
+        /// <value>The height.</value>
         public double? Height { get; set; }
 
+        /// <summary>
+        /// The width and height are set
+        /// </summary>
         bool widthAndHeightAreSet = false;
+        /// <summary>
+        /// The first render
+        /// </summary>
         bool firstRender = true;
 
+        /// <summary>
+        /// On after render as an asynchronous operation.
+        /// </summary>
+        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             this.firstRender = firstRender;
@@ -43,6 +71,9 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Called when [initialized].
+        /// </summary>
         protected override void OnInitialized()
         {
             base.OnInitialized();
@@ -50,6 +81,11 @@ namespace Radzen.Blazor
             Initialize();
         }
 
+        /// <summary>
+        /// Resizes the specified width.
+        /// </summary>
+        /// <param name="width">The width.</param>
+        /// <param name="height">The height.</param>
         [JSInvokable]
         public void Resize(double width, double height)
         {
@@ -73,6 +109,9 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Initializes this instance.
+        /// </summary>
         private void Initialize()
         {
             double width = 0;
@@ -107,8 +146,16 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// The visible changed
+        /// </summary>
         private bool visibleChanged = false;
 
+        /// <summary>
+        /// Set parameters as an asynchronous operation.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             bool shouldRefresh = parameters.DidParameterChange(nameof(Style), Style);
@@ -131,6 +178,9 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Disposes this instance.
+        /// </summary>
         public override void Dispose()
         {
             base.Dispose();
@@ -141,6 +191,9 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Reloads this instance.
+        /// </summary>
         public void Reload()
         {
             StateHasChanged();

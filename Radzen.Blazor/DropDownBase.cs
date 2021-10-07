@@ -12,6 +12,12 @@ using Radzen.Blazor;
 
 namespace Radzen
 {
+    /// <summary>
+    /// Class DropDownBase.
+    /// Implements the <see cref="Radzen.DataBoundFormComponent{T}" />
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <seealso cref="Radzen.DataBoundFormComponent{T}" />
     public class DropDownBase<T> : DataBoundFormComponent<T>
     {
 #if NET5
@@ -49,6 +55,10 @@ namespace Radzen
         [Parameter]
         public int PageSize { get; set; } = 5;
 #endif
+        /// <summary>
+        /// Determines whether [is virtualization allowed].
+        /// </summary>
+        /// <returns><c>true</c> if [is virtualization allowed]; otherwise, <c>false</c>.</returns>
         internal bool IsVirtualizationAllowed()
         {
 #if NET5
@@ -58,6 +68,10 @@ namespace Radzen
 #endif
         }
 
+        /// <summary>
+        /// Renders the items.
+        /// </summary>
+        /// <returns>RenderFragment.</returns>
         internal virtual RenderFragment RenderItems()
         {
             return new RenderFragment(builder =>
@@ -95,32 +109,70 @@ namespace Radzen
             });
         }
 
+        /// <summary>
+        /// Renders the item.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="item">The item.</param>
         internal virtual void RenderItem(RenderTreeBuilder builder, object item)
         {
             //
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [allow filtering].
+        /// </summary>
+        /// <value><c>true</c> if [allow filtering]; otherwise, <c>false</c>.</value>
         [Parameter]
         public virtual bool AllowFiltering { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [allow clear].
+        /// </summary>
+        /// <value><c>true</c> if [allow clear]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowClear { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="DropDownBase{T}"/> is multiple.
+        /// </summary>
+        /// <value><c>true</c> if multiple; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Multiple { get; set; }
 
+        /// <summary>
+        /// Gets or sets the template.
+        /// </summary>
+        /// <value>The template.</value>
         [Parameter]
         public RenderFragment<dynamic> Template { get; set; }
 
+        /// <summary>
+        /// Gets or sets the value property.
+        /// </summary>
+        /// <value>The value property.</value>
         [Parameter]
         public string ValueProperty { get; set; }
 
+        /// <summary>
+        /// Gets or sets the selected item changed.
+        /// </summary>
+        /// <value>The selected item changed.</value>
         [Parameter]
         public Action<object> SelectedItemChanged { get; set; }
 
+        /// <summary>
+        /// The selected items
+        /// </summary>
         protected List<object> selectedItems = new List<object>();
+        /// <summary>
+        /// The selected item
+        /// </summary>
         protected object selectedItem = null;
 
+        /// <summary>
+        /// Selects all.
+        /// </summary>
         protected async System.Threading.Tasks.Task SelectAll()
         {
             if (Disabled)
@@ -156,12 +208,18 @@ namespace Radzen
             StateHasChanged();
         }
 
+        /// <summary>
+        /// Resets this instance.
+        /// </summary>
         public void Reset()
         {
             InvokeAsync(ClearAll);
             InvokeAsync(DebounceFilter);
         }
 
+        /// <summary>
+        /// Clears all.
+        /// </summary>
         protected async System.Threading.Tasks.Task ClearAll()
         {
             if (Disabled)
@@ -186,8 +244,15 @@ namespace Radzen
             StateHasChanged();
         }
 
+        /// <summary>
+        /// The data
+        /// </summary>
         IEnumerable _data;
 
+        /// <summary>
+        /// Gets or sets the data.
+        /// </summary>
+        /// <value>The data.</value>
         [Parameter]
         public override IEnumerable Data
         {
@@ -217,6 +282,10 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Gets the popup identifier.
+        /// </summary>
+        /// <value>The popup identifier.</value>
         protected string PopupID
         {
             get
@@ -225,6 +294,10 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Gets the search identifier.
+        /// </summary>
+        /// <value>The search identifier.</value>
         protected string SearchID
         {
             get
@@ -233,6 +306,10 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Opens the popup script.
+        /// </summary>
+        /// <returns>System.String.</returns>
         protected string OpenPopupScript()
         {
             if (Disabled)
@@ -243,6 +320,10 @@ namespace Radzen
             return $"Radzen.togglePopup(this.parentNode, '{PopupID}', true);Radzen.focusElement('{SearchID}');";
         }
 
+        /// <summary>
+        /// Opens the popup script from parent.
+        /// </summary>
+        /// <returns>System.String.</returns>
         protected string OpenPopupScriptFromParent()
         {
             if (Disabled)
@@ -253,13 +334,32 @@ namespace Radzen
             return $"Radzen.togglePopup(this, '{PopupID}', true);Radzen.focusElement('{SearchID}');";
         }
 
+        /// <summary>
+        /// Gets or sets the filter delay.
+        /// </summary>
+        /// <value>The filter delay.</value>
         [Parameter]
         public int FilterDelay { get; set; } = 500;
 
+        /// <summary>
+        /// The search
+        /// </summary>
         protected ElementReference search;
+        /// <summary>
+        /// The list
+        /// </summary>
         protected ElementReference list;
+        /// <summary>
+        /// The selected index
+        /// </summary>
         protected int selectedIndex = -1;
 
+        /// <summary>
+        /// Opens the popup.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
+        /// <param name="isFromClick">if set to <c>true</c> [is from click].</param>
         protected virtual async System.Threading.Tasks.Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
         {
             if (Disabled)
@@ -271,6 +371,11 @@ namespace Radzen
             await JSRuntime.InvokeVoidAsync("Radzen.selectListItem", search, list, selectedIndex);
         }
 
+        /// <summary>
+        /// Handles the key press.
+        /// </summary>
+        /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.KeyboardEventArgs"/> instance containing the event data.</param>
+        /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
         private async System.Threading.Tasks.Task HandleKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args, bool isFilter = false)
         {
             if (Disabled)
@@ -339,11 +444,18 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="E:FilterKeyPress" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.KeyboardEventArgs"/> instance containing the event data.</param>
         protected virtual async System.Threading.Tasks.Task OnFilterKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
         {
             await HandleKeyPress(args, true);
         }
 
+        /// <summary>
+        /// Debounces the filter.
+        /// </summary>
         async Task DebounceFilter()
         {
             if (!LoadData.HasDelegate)
@@ -386,21 +498,38 @@ namespace Radzen
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
         }
 
+        /// <summary>
+        /// Handles the <see cref="E:KeyPress" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.KeyboardEventArgs"/> instance containing the event data.</param>
         protected async System.Threading.Tasks.Task OnKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
         {
             await HandleKeyPress(args);
         }
 
+        /// <summary>
+        /// Called when [select item].
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <param name="isFromKey">if set to <c>true</c> [is from key].</param>
         protected virtual async System.Threading.Tasks.Task OnSelectItem(object item, bool isFromKey = false)
         {
             await SelectItem(item);
         }
 
+        /// <summary>
+        /// Handles the <see cref="E:Filter" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected virtual async System.Threading.Tasks.Task OnFilter(ChangeEventArgs args)
         {
             await DebounceFilter();
         }
 
+        /// <summary>
+        /// Gets the load data arguments.
+        /// </summary>
+        /// <returns>LoadDataArgs.</returns>
         internal virtual async System.Threading.Tasks.Task<LoadDataArgs> GetLoadDataArgs()
         {
 #if NET5
@@ -417,8 +546,16 @@ namespace Radzen
 #endif
         }
 
+        /// <summary>
+        /// The first render
+        /// </summary>
         private bool firstRender = true;
 
+        /// <summary>
+        /// Called when [after render asynchronous].
+        /// </summary>
+        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
+        /// <returns>Task.</returns>
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             this.firstRender = firstRender;
@@ -426,6 +563,11 @@ namespace Radzen
             return base.OnAfterRenderAsync(firstRender);
         }
 
+        /// <summary>
+        /// Set parameters as an asynchronous operation.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
 #if NET5
@@ -457,6 +599,10 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Called when [parameters set asynchronous].
+        /// </summary>
+        /// <returns>Task.</returns>
         protected override Task OnParametersSetAsync()
         {
             var valueAsEnumerable = Value as IEnumerable;
@@ -474,11 +620,20 @@ namespace Radzen
             return base.OnParametersSetAsync();
         }
 
+        /// <summary>
+        /// Handles the <see cref="E:Change" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected void OnChange(ChangeEventArgs args)
         {
             Value = args.Value;
         }
 
+        /// <summary>
+        /// Determines whether the specified item is selected.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns><c>true</c> if the specified item is selected; otherwise, <c>false</c>.</returns>
         internal bool isSelected(object item)
         {
             if (Multiple)
@@ -491,6 +646,10 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Gets or sets the selected item.
+        /// </summary>
+        /// <value>The selected item.</value>
         [Parameter]
         public object SelectedItem
         {
@@ -507,6 +666,10 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Gets the items.
+        /// </summary>
+        /// <value>The items.</value>
         protected virtual IEnumerable<object> Items
         {
             get
@@ -515,6 +678,10 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Gets the view.
+        /// </summary>
+        /// <value>The view.</value>
         protected override IEnumerable View
         {
             get
@@ -563,6 +730,9 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Sets the selected index from selected item.
+        /// </summary>
         void SetSelectedIndexFromSelectedItem()
         {
             if (selectedItem != null)
@@ -582,11 +752,21 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Selects the item internal.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <param name="raiseChange">if set to <c>true</c> [raise change].</param>
         internal async System.Threading.Tasks.Task SelectItemInternal(object item, bool raiseChange = true)
         {
             await SelectItem(item, raiseChange);
         }
 
+        /// <summary>
+        /// Selects the item.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <param name="raiseChange">if set to <c>true</c> [raise change].</param>
         protected async System.Threading.Tasks.Task SelectItem(object item, bool raiseChange = true)
         {
             if (!Multiple)
@@ -647,6 +827,10 @@ namespace Radzen
             StateHasChanged();
         }
 
+        /// <summary>
+        /// Selects the item from value.
+        /// </summary>
+        /// <param name="value">The value.</param>
         protected virtual void SelectItemFromValue(object value)
         {
             if (value != null && View != null)

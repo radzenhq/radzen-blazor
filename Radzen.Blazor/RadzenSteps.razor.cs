@@ -6,14 +6,31 @@ using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
+    /// <summary>
+    /// Class RadzenSteps.
+    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// </summary>
+    /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenSteps : RadzenComponent
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether [show steps buttons].
+        /// </summary>
+        /// <value><c>true</c> if [show steps buttons]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowStepsButtons { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets the edit context.
+        /// </summary>
+        /// <value>The edit context.</value>
         [CascadingParameter]
         public EditContext EditContext { get; set; }
 
+        /// <summary>
+        /// Gets the steps collection.
+        /// </summary>
+        /// <value>The steps collection.</value>
         public IList<RadzenStepsItem> StepsCollection
         {
             get
@@ -22,6 +39,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Determines whether [is first visible step].
+        /// </summary>
+        /// <returns><c>true</c> if [is first visible step]; otherwise, <c>false</c>.</returns>
         bool IsFirstVisibleStep()
         {
             var firstVisibleStep = steps.Where(s => s.Visible).FirstOrDefault();
@@ -33,6 +54,10 @@ namespace Radzen.Blazor
             return false;
         }
 
+        /// <summary>
+        /// Determines whether [is last visible step].
+        /// </summary>
+        /// <returns><c>true</c> if [is last visible step]; otherwise, <c>false</c>.</returns>
         bool IsLastVisibleStep()
         {
             var lastVisibleStep = steps.Where(s => s.Visible).LastOrDefault();
@@ -44,6 +69,9 @@ namespace Radzen.Blazor
             return false;
         }
 
+        /// <summary>
+        /// Nexts the step.
+        /// </summary>
         public async System.Threading.Tasks.Task NextStep()
         {
             if (!IsLastVisibleStep())
@@ -64,6 +92,9 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Previouses the step.
+        /// </summary>
         public async System.Threading.Tasks.Task PrevStep()
         {
             if (!IsFirstVisibleStep())
@@ -84,6 +115,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Selects the index of the step from.
+        /// </summary>
+        /// <param name="index">The index.</param>
         async System.Threading.Tasks.Task SelectStepFromIndex(int index)
         {
             if (index >= 0 && index < steps.Count)
@@ -97,7 +132,14 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// The selected index
+        /// </summary>
         int _selectedIndex = 0;
+        /// <summary>
+        /// Gets or sets the index of the selected.
+        /// </summary>
+        /// <value>The index of the selected.</value>
         [Parameter]
         public int SelectedIndex
         {
@@ -114,13 +156,28 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets or sets the selected index changed.
+        /// </summary>
+        /// <value>The selected index changed.</value>
         [Parameter]
         public EventCallback<int> SelectedIndexChanged { get; set; }
 
+        /// <summary>
+        /// Gets or sets the change.
+        /// </summary>
+        /// <value>The change.</value>
         [Parameter]
         public EventCallback<int> Change { get; set; }
 
+        /// <summary>
+        /// The next step
+        /// </summary>
         private string _nextStep = "Next";
+        /// <summary>
+        /// Gets or sets the next text.
+        /// </summary>
+        /// <value>The next text.</value>
         [Parameter]
         public string NextText
         {
@@ -136,7 +193,14 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// The previous text
+        /// </summary>
         private string _previousText = "Previous";
+        /// <summary>
+        /// Gets or sets the previous text.
+        /// </summary>
+        /// <value>The previous text.</value>
         [Parameter]
         public string PreviousText
         {
@@ -152,11 +216,22 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets or sets the steps.
+        /// </summary>
+        /// <value>The steps.</value>
         [Parameter]
         public RenderFragment Steps { get; set; }
 
+        /// <summary>
+        /// The steps
+        /// </summary>
         List<RadzenStepsItem> steps = new List<RadzenStepsItem>();
 
+        /// <summary>
+        /// Adds the step.
+        /// </summary>
+        /// <param name="step">The step.</param>
         public void AddStep(RadzenStepsItem step)
         {
             if (steps.IndexOf(step) == -1)
@@ -171,6 +246,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Removes the step.
+        /// </summary>
+        /// <param name="item">The item.</param>
         public void RemoveStep(RadzenStepsItem item)
         {
             if (steps.Contains(item))
@@ -181,16 +260,30 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Refreshes this instance.
+        /// </summary>
         internal void Refresh()
         {
             StateHasChanged();
         }
 
+        /// <summary>
+        /// Determines whether the specified index is selected.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <param name="step">The step.</param>
+        /// <returns><c>true</c> if the specified index is selected; otherwise, <c>false</c>.</returns>
         protected bool IsSelected(int index, RadzenStepsItem step)
         {
             return SelectedIndex == index;
         }
 
+        /// <summary>
+        /// Selects the step.
+        /// </summary>
+        /// <param name="step">The step.</param>
+        /// <param name="raiseChange">if set to <c>true</c> [raise change].</param>
         internal async System.Threading.Tasks.Task SelectStep(RadzenStepsItem step, bool raiseChange = false)
         {
             var valid = true;
@@ -215,16 +308,28 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Selects the first.
+        /// </summary>
         internal void SelectFirst()
         {
             SelectedIndex = 0;
         }
 
+        /// <summary>
+        /// Gets the component CSS class.
+        /// </summary>
+        /// <returns>System.String.</returns>
         protected override string GetComponentCssClass()
         {
             return "rz-steps";
         }
 
+        /// <summary>
+        /// Set parameters as an asynchronous operation.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var selectedIndexChanged = parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex);
@@ -244,6 +349,9 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
+        /// <summary>
+        /// Disposes this instance.
+        /// </summary>
         public override void Dispose()
         {
             base.Dispose();

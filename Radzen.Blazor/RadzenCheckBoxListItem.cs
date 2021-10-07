@@ -2,19 +2,44 @@
 
 namespace Radzen.Blazor
 {
+    /// <summary>
+    /// Class RadzenCheckBoxListItem.
+    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// </summary>
+    /// <typeparam name="TValue">The type of the t value.</typeparam>
+    /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenCheckBoxListItem<TValue> : RadzenComponent
     {
+        /// <summary>
+        /// Gets or sets the text.
+        /// </summary>
+        /// <value>The text.</value>
         [Parameter]
         public string Text { get; set; }
 
+        /// <summary>
+        /// Gets or sets the value.
+        /// </summary>
+        /// <value>The value.</value>
         [Parameter]
         public TValue Value { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenCheckBoxListItem{TValue}"/> is disabled.
+        /// </summary>
+        /// <value><c>true</c> if disabled; otherwise, <c>false</c>.</value>
         [Parameter]
         public virtual bool Disabled { get; set; }
 
+        /// <summary>
+        /// The check box list
+        /// </summary>
         RadzenCheckBoxList<TValue> _checkBoxList;
 
+        /// <summary>
+        /// Gets or sets the CheckBox list.
+        /// </summary>
+        /// <value>The CheckBox list.</value>
         [CascadingParameter]
         public RadzenCheckBoxList<TValue> CheckBoxList
         {
@@ -32,17 +57,28 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Disposes this instance.
+        /// </summary>
         public override void Dispose()
         {
             base.Dispose();
             CheckBoxList?.RemoveItem(this);
         }
 
+        /// <summary>
+        /// Sets the text.
+        /// </summary>
+        /// <param name="value">The value.</param>
         internal void SetText(string value)
         {
             Text = value;
         }
 
+        /// <summary>
+        /// Sets the value.
+        /// </summary>
+        /// <param name="value">The value.</param>
         internal void SetValue(TValue value)
         {
             Value = value;

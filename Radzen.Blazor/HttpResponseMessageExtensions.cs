@@ -7,8 +7,21 @@ using System.Xml.Linq;
 
 namespace Radzen
 {
+    /// <summary>
+    /// Class HttpResponseMessageExtensions.
+    /// </summary>
     public static class HttpResponseMessageExtensions
     {
+        /// <summary>
+        /// Read as an asynchronous operation.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="response">The response.</param>
+        /// <returns>A Task&lt;T&gt; representing the asynchronous operation.</returns>
+        /// <exception cref="Exception">Unable to parse the response.</exception>
+        /// <exception cref="Exception"></exception>
+        /// <exception cref="Exception">Unable to parse the response.</exception>
+        /// <exception cref="Exception"></exception>
         public static async Task<T> ReadAsync<T>(this HttpResponseMessage response)
         {
             try

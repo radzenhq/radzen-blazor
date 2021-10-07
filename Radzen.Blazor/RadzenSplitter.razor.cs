@@ -9,18 +9,41 @@ using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
+    /// <summary>
+    /// Class RadzenSplitter.
+    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// </summary>
+    /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenSplitter : RadzenComponent
     {
+        /// <summary>
+        /// The sizeautopanes
+        /// </summary>
         private int _sizeautopanes = 0;
 
+        /// <summary>
+        /// Gets or sets the content of the child.
+        /// </summary>
+        /// <value>The content of the child.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
+        /// <summary>
+        /// Gets or sets the orientation.
+        /// </summary>
+        /// <value>The orientation.</value>
         [Parameter]
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
+        /// <summary>
+        /// The panes
+        /// </summary>
         internal List<RadzenSplitterPane> Panes = new List<RadzenSplitterPane>();
 
+        /// <summary>
+        /// Adds the pane.
+        /// </summary>
+        /// <param name="pane">The pane.</param>
         public void AddPane(RadzenSplitterPane pane)
         {
             if (Panes.IndexOf(pane) != -1 || !pane.Visible)
@@ -45,6 +68,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Removes the pane.
+        /// </summary>
+        /// <param name="pane">The pane.</param>
         public void RemovePane(RadzenSplitterPane pane)
         {
             if (Panes.Contains(pane))
@@ -61,6 +88,9 @@ namespace Radzen.Blazor
         }
 
 
+        /// <summary>
+        /// Refreshes this instance.
+        /// </summary>
         public void Refresh()
         {
             try
@@ -72,6 +102,12 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Resizes the execute.
+        /// </summary>
+        /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
+        /// <param name="paneIndex">Index of the pane.</param>
+        /// <returns>Task.</returns>
         internal Task ResizeExec(MouseEventArgs args, int paneIndex)
         {
             var pane = Panes[paneIndex];
@@ -93,6 +129,13 @@ namespace Radzen.Blazor
                 paneNextResizable?.Max).AsTask();
         }
 
+        /// <summary>
+        /// Called when [pane resized].
+        /// </summary>
+        /// <param name="paneIndex">Index of the pane.</param>
+        /// <param name="sizeNew">The size new.</param>
+        /// <param name="paneNextIndex">Index of the pane next.</param>
+        /// <param name="sizeNextNew">The size next new.</param>
         [JSInvokable("RadzenSplitter.OnPaneResized")]
         public async Task OnPaneResized(int paneIndex, double sizeNew, int? paneNextIndex, double? sizeNextNew)
         {
@@ -130,6 +173,12 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Collapses the execute.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <param name="paneIndex">Index of the pane.</param>
+        /// <param name="paneId">The pane identifier.</param>
         internal async Task CollapseExec(object args, int paneIndex, string paneId)
         {
             var pane = Panes[paneIndex];
@@ -163,6 +212,12 @@ namespace Radzen.Blazor
             await InvokeAsync(StateHasChanged);
         }
 
+        /// <summary>
+        /// Expands the execute.
+        /// </summary>
+        /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
+        /// <param name="paneIndex">Index of the pane.</param>
+        /// <param name="paneId">The pane identifier.</param>
         internal async Task ExpandExec(MouseEventArgs args, int paneIndex, string paneId)
         {
             var pane = Panes[paneIndex];
@@ -197,17 +252,33 @@ namespace Radzen.Blazor
         }
 
 
+        /// <summary>
+        /// Gets the component CSS class.
+        /// </summary>
+        /// <returns>System.String.</returns>
         protected override string GetComponentCssClass()
         {
             return $"rz-splitter rz-splitter-{Enum.GetName(typeof(Orientation), Orientation).ToLower()}";
         }
 
+        /// <summary>
+        /// Gets or sets the collapse.
+        /// </summary>
+        /// <value>The collapse.</value>
         [Parameter]
         public EventCallback<RadzenSplitterEventArgs> Collapse { get; set; }
 
+        /// <summary>
+        /// Gets or sets the expand.
+        /// </summary>
+        /// <value>The expand.</value>
         [Parameter]
         public EventCallback<RadzenSplitterEventArgs> Expand { get; set; }
 
+        /// <summary>
+        /// Gets or sets the resize.
+        /// </summary>
+        /// <value>The resize.</value>
         [Parameter]
         public EventCallback<RadzenSplitterResizeEventArgs> Resize { get; set; }
     }

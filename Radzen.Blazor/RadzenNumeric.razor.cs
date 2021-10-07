@@ -7,15 +7,32 @@ using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
+    /// <summary>
+    /// Class RadzenNumeric.
+    /// Implements the <see cref="Radzen.FormComponent{TValue}" />
+    /// </summary>
+    /// <typeparam name="TValue">The type of the t value.</typeparam>
+    /// <seealso cref="Radzen.FormComponent{TValue}" />
     public partial class RadzenNumeric<TValue> : FormComponent<TValue>
     {
+        /// <summary>
+        /// The input
+        /// </summary>
         protected ElementReference input;
 
+        /// <summary>
+        /// Gets the component CSS class.
+        /// </summary>
+        /// <returns>System.String.</returns>
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-spinner").ToString();
         }
 
+        /// <summary>
+        /// Updates the value with step.
+        /// </summary>
+        /// <param name="stepUp">if set to <c>true</c> [step up].</param>
         async System.Threading.Tasks.Task UpdateValueWithStep(bool stepUp)
         {
             if (Disabled || ReadOnly)
@@ -43,6 +60,10 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        /// <summary>
+        /// Gets or sets the value.
+        /// </summary>
+        /// <value>The value.</value>
         [Parameter]
         public override TValue Value
         {
@@ -59,6 +80,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets or sets the formatted value.
+        /// </summary>
+        /// <value>The formatted value.</value>
         protected string FormattedValue
         {
             get
@@ -83,6 +108,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this instance has value.
+        /// </summary>
+        /// <value><c>true</c> if this instance has value; otherwise, <c>false</c>.</value>
         public override bool HasValue
         {
             get
@@ -91,12 +120,24 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets or sets the format.
+        /// </summary>
+        /// <value>The format.</value>
         [Parameter]
         public string Format { get; set; }
 
+        /// <summary>
+        /// Gets or sets the step.
+        /// </summary>
+        /// <value>The step.</value>
         [Parameter]
         public string Step { get; set; }
 
+        /// <summary>
+        /// Determines whether [is type supported].
+        /// </summary>
+        /// <returns><c>true</c> if [is type supported]; otherwise, <c>false</c>.</returns>
         private bool IsTypeSupported()
         {
             var type = typeof(TValue).IsGenericType ? typeof(TValue).GetGenericArguments()[0] : typeof(TValue);
@@ -120,6 +161,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Determines whether this instance is integer.
+        /// </summary>
+        /// <returns><c>true</c> if this instance is integer; otherwise, <c>false</c>.</returns>
         private bool IsInteger()
         {
             var type = typeof(TValue).IsGenericType ? typeof(TValue).GetGenericArguments()[0] : typeof(TValue);
@@ -140,20 +185,41 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [read only].
+        /// </summary>
+        /// <value><c>true</c> if [read only]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ReadOnly { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [automatic complete].
+        /// </summary>
+        /// <value><c>true</c> if [automatic complete]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AutoComplete { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [show up down].
+        /// </summary>
+        /// <value><c>true</c> if [show up down]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowUpDown { get; set; } = true;
 
+        /// <summary>
+        /// Handles the <see cref="E:Change" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
         {
             await InternalValueChanged(args.Value);
         }
 
+        /// <summary>
+        /// Removes the non numeric characters.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>System.String.</returns>
         private string RemoveNonNumericCharacters(object value)
         {
             string valueStr = value as string;
@@ -164,6 +230,10 @@ namespace Radzen.Blazor
             return new string(valueStr.Where(c => char.IsDigit(c) || char.IsPunctuation(c)).ToArray());
         }
 
+        /// <summary>
+        /// Internals the value changed.
+        /// </summary>
+        /// <param name="value">The value.</param>
         private async System.Threading.Tasks.Task InternalValueChanged(object value)
         {
             TValue newValue;
@@ -198,12 +268,25 @@ namespace Radzen.Blazor
             await Change.InvokeAsync(Value);
         }
 
+        /// <summary>
+        /// Determines the minimum of the parameters.
+        /// </summary>
+        /// <value>The minimum.</value>
         [Parameter]
         public decimal? Min { get; set; }
 
+        /// <summary>
+        /// Determines the maximum of the parameters.
+        /// </summary>
+        /// <value>The maximum.</value>
         [Parameter]
         public decimal? Max { get; set; }
 
+        /// <summary>
+        /// Set parameters as an asynchronous operation.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             bool minChanged = parameters.DidParameterChange(nameof(Min), Min);

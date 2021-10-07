@@ -3,11 +3,25 @@ using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
 {
+    /// <summary>
+    /// Class RadzenEmailValidator.
+    /// Implements the <see cref="Radzen.Blazor.ValidatorBase" />
+    /// </summary>
+    /// <seealso cref="Radzen.Blazor.ValidatorBase" />
     public class RadzenEmailValidator : ValidatorBase
     {
+        /// <summary>
+        /// Gets or sets the text.
+        /// </summary>
+        /// <value>The text.</value>
         [Parameter]
         public override string Text { get; set; } = "Invalid email";
 
+        /// <summary>
+        /// Validates the specified component.
+        /// </summary>
+        /// <param name="component">The component.</param>
+        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         protected override bool Validate(IRadzenFormComponent component)
         {
             var email = new EmailAddressAttribute();

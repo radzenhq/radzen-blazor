@@ -6,26 +6,62 @@ using System.Linq;
 
 namespace Radzen.Blazor
 {
+    /// <summary>
+    /// Class RadzenRadioButtonList.
+    /// Implements the <see cref="Radzen.FormComponent{TValue}" />
+    /// </summary>
+    /// <typeparam name="TValue">The type of the t value.</typeparam>
+    /// <seealso cref="Radzen.FormComponent{TValue}" />
     public partial class RadzenRadioButtonList<TValue> : FormComponent<TValue>
     {
+        /// <summary>
+        /// Items the class list.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>ClassList.</returns>
         ClassList ItemClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-box")
                                                                             .Add("rz-state-active", IsSelected(item))
                                                                             .AddDisabled(Disabled || item.Disabled);
 
+        /// <summary>
+        /// Icons the class list.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>ClassList.</returns>
         ClassList IconClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-icon")
                                                                             .Add("rzi rzi-circle-on", IsSelected(item));
+        /// <summary>
+        /// Gets or sets the value property.
+        /// </summary>
+        /// <value>The value property.</value>
         [Parameter]
         public string ValueProperty { get; set; }
 
+        /// <summary>
+        /// Gets or sets the text property.
+        /// </summary>
+        /// <value>The text property.</value>
         [Parameter]
         public string TextProperty { get; set; }
 
+        /// <summary>
+        /// Gets or sets the disabled property.
+        /// </summary>
+        /// <value>The disabled property.</value>
         [Parameter]
         public string DisabledProperty { get; set; }
 
+        /// <summary>
+        /// Gets or sets the visible property.
+        /// </summary>
+        /// <value>The visible property.</value>
         [Parameter]
         public string VisibleProperty { get; set; }
 
+        /// <summary>
+        /// Gets all items.
+        /// </summary>
+        /// <value>All items.</value>
         IEnumerable<RadzenRadioButtonListItem<TValue>> allItems
         {
             get
@@ -51,7 +87,14 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// The data
+        /// </summary>
         IEnumerable _data = null;
+        /// <summary>
+        /// Gets or sets the data.
+        /// </summary>
+        /// <value>The data.</value>
         [Parameter]
         public virtual IEnumerable Data
         {
@@ -69,19 +112,38 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets the component CSS class.
+        /// </summary>
+        /// <returns>System.String.</returns>
         protected override string GetComponentCssClass()
         {
             return GetClassList(Orientation == Orientation.Horizontal ? "rz-radio-button-list-horizontal" : "rz-radio-button-list-vertical").ToString();
         }
 
+        /// <summary>
+        /// Gets or sets the orientation.
+        /// </summary>
+        /// <value>The orientation.</value>
         [Parameter]
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
+        /// <summary>
+        /// Gets or sets the items.
+        /// </summary>
+        /// <value>The items.</value>
         [Parameter]
         public RenderFragment Items { get; set; }
 
+        /// <summary>
+        /// The items
+        /// </summary>
         List<RadzenRadioButtonListItem<TValue>> items = new List<RadzenRadioButtonListItem<TValue>>();
 
+        /// <summary>
+        /// Adds the item.
+        /// </summary>
+        /// <param name="item">The item.</param>
         public void AddItem(RadzenRadioButtonListItem<TValue> item)
         {
             if (items.IndexOf(item) == -1)
@@ -91,6 +153,10 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Removes the item.
+        /// </summary>
+        /// <param name="item">The item.</param>
         public void RemoveItem(RadzenRadioButtonListItem<TValue> item)
         {
             if (items.Contains(item))
@@ -102,11 +168,20 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Determines whether the specified item is selected.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns><c>true</c> if the specified item is selected; otherwise, <c>false</c>.</returns>
         protected bool IsSelected(RadzenRadioButtonListItem<TValue> item)
         {
             return object.Equals(Value, item.Value);
         }
 
+        /// <summary>
+        /// Selects the item.
+        /// </summary>
+        /// <param name="item">The item.</param>
         protected async System.Threading.Tasks.Task SelectItem(RadzenRadioButtonListItem<TValue> item)
         {
             if (Disabled || item.Disabled)
@@ -122,6 +197,9 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        /// <summary>
+        /// Refreshes this instance.
+        /// </summary>
         public void Refresh()
         {
             StateHasChanged();
