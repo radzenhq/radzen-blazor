@@ -48,6 +48,11 @@ $rz-series-3: #3809A3;
 $rz-series-4: #8611D3;
 $rz-series-5: #F72585;
 
+
+// Shadows
+
+$rz-shadow-level-2: 0 4px 12px 0 rgba(0, 0, 0, 0.04);
+
 // Theme colors
 $primary-color: $rz-primary !default;
 $secondary: $rz-secondary !default;
@@ -337,10 +342,140 @@ $button-focus-styles: map-merge(
 
 }
 
+// Grid
+
+$grid-border-radius: 0;
+
+$grid-data-border-shadow: 0 1px 0 0 $rz-base-200, 0 -1px 0 0 $rz-base-200;
+
+$grid-cell-border: 1px solid $rz-base-200 !default;
+$grid-right-cell-border: 1px solid $rz-base-200 !default;
+$grid-bottom-cell-border: $grid-cell-border !default;
+$grid-cell-padding: 0.5rem !default;
+$grid-cell-color: $rz-base-800 !default;
+$grid-cell-font-size: 0.875rem !default;
+
+$grid-hover-background-color: $rz-secondary !default;
+$grid-hover-color: $rz-primary!default;
+
+$grid-selected-background-color: lighten($rz-secondary, 20%) !default;
+$grid-selected-color: $rz-primary !default;
+
+$grid-stripe-background-color: lighten($rz-base-100, 1%) !default;
+
+$grid-toolbar-background-color: $rz-white !default;
+$grid-header-cell-border: 1px solid $rz-base-200  !default;
+$grid-header-background-color: $rz-base-100 !default;
+$grid-header-font-size: $grid-cell-font-size !default;
+$grid-header-line-height: 1.25rem !default;
+$grid-header-font-weight: 600 !default;
+$grid-header-text-transform: none !default;
+$grid-header-color: $rz-base-900 !default;
+$grid-header-cell-padding: 0.5rem 0 !default;
+$grid-header-title-padding: 0 0.125rem 0 0.5rem !default;
+$grid-header-title-vertical-align: middle !default;
+$grid-header-sorted-background-color: $rz-base-100 !default;
+
+$grid-header-padding: 1rem !default;
+
+$grid-foot-cell-color: $rz-base-900 !default;
+$grid-foot-background-color: $rz-base-200 !default;
+
+$grid-filter-background-color: #f6f8f9 !default;
+$grid-filter-padding: 0.25rem 0.625rem !default;
+$grid-filter-border: $grid-cell-border !default;
+$grid-filter-icon-width: 0.875rem !default;
+$grid-filter-icon-height: 0.875rem !default;
+$grid-filter-icon-margin: 0 0.3125rem 0 0 !default;
+$grid-filter-color: $rz-base-400 !default;
+$grid-filter-focus-color: $rz-base-900 !default;
+$grid-filter-font-size: 0.8125rem !default;
+$grid-filter-operator-margin: 1.25rem !default;
+$grid-filter-buttons-padding: 0.325rem 1.25rem !default;
+$grid-filter-buttons-border: 1px solid rgba(#979797, 0.2) !default;
+$grid-filter-buttons-background-color: $white !default;
+
+$grid-clear-filter-button-background-color: #e6ecef !default;
+$grid-clear-filter-button-color: $cool-grey !default;
+$grid-apply-filter-button-background-color: $default-link !default;
+
+$grid-header-filter-icon-margin: 0.25rem 0.5rem 0 0 !default;
+$grid-header-filter-icon-hover-color: $rz-base-900 !default;
+
+$grid-border: none !default;
+
+$grid-sort-icon-width: 1rem !default;
+$grid-sort-icon-height: $grid-sort-icon-width !default;
+$grid-sort-icon-color: $rz-base-400 !default;
+
+$grid-shadow: none !default;
+$grid-background-color: $rz-white !default;
+
+$grid-column-resizer-width: 0.5rem !default;
+$grid-column-resizer-helper-width: 0.25rem !default;
+$grid-column-resizer-helper-background-color: $default-link !default;
+
+$grid-column-icon-width: 2rem !default;
+$grid-column-icon-padding: 0 !default;
+
+$grid-detail-template-border: 1px solid rgba(71, 156, 200, 0.2) !default;
+$grid-detail-template-border-radius: 2px !default;
+$grid-detail-template-padding: 0.625rem !default;
+$grid-detail-template-background-color: $white !default;
+
+$grid-loading-indicator-background-color: $rz-secondary !default;
+$grid-button-icon-only-padding: 0 0.25rem !default;
+$grid-button-text-padding: 0 0.6875rem !default;
+$grid-button-font-size: 0.75rem !default;
+$grid-button-icon-width: 0.75rem !default;
+$grid-button-icon-height: $grid-button-icon-width !default;
+$grid-button-height: 1.25rem !default;
+$grid-button-line-height: $grid-button-height !default;
+
+$grid-frozen-cell-border: 1px solid $rz-base-200 !default;
+$grid-frozen-cell-background-color: $rz-base-100 !default;
+
+$grid-state-transition: all 0.1s linear !default;
+
+$grid-group-header-padding: 0.5rem !default;
+$grid-group-header-item-padding: 0.5rem !default;
+$grid-group-header-item-margin: 0 0.5rem 0 0 !default;
+
+$column-drag-handle-color: $rz-base-400 !default;
+
+$column-drag-handle-hover-color: $rz-base-900 !default;
+
+.rz-selectable {
+  .rz-datatable-even,
+  .rz-datatable-odd {
+    td,
+    .rz-cell-data {
+      transition: background-color 0.1s linear, color 0.1s linear;
+    }
+
+    &:hover {
+      > td:not(.rz-frozen-cell) {
+        background-color: $grid-hover-background-color;
+        
+      }
+
+      .rz-cell-data {
+        color: $grid-hover-color;
+      }
+    }
+  }
+}
+
+// Overlay Panel
+
+$overlay-shadow: $rz-shadow-level-2 !default;
+$overlay-border: solid 1px $rz-base-200 !default;
+$overlay-background-color: $body-bg !default;
+
 // Pager
 
 $paginator-background-color: transparent !default;
-$paginator-padding: 0.5rem 1rem !default;
+$paginator-padding: 0.5rem !default;
 
 $paginator-numeric-button-background-color: $rz-base-200 !default;
 $paginator-numeric-button-color: $rz-base-800 !default;
@@ -377,10 +512,10 @@ $header-min-height: 3.25rem !default;
 $header-z: 2 !default;
 $header-border: none !default;
 $header-color: $body-color !default;
-$header-shadow: 0px 4px 12px rgba(0, 0, 0, 0.04) !default;
+$header-shadow: $rz-shadow-level-2 !default;
 
 // Input components
-$input-background-color: transparent !default;
+$input-background-color: $rz-white !default;
 $input-border: 1px solid $rz-base-300 !default;
 $input-hover-border: 1px solid $rz-primary-light !default;
 $input-focus-border: 1px solid $rz-primary-light !default;

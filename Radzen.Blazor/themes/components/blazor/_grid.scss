@@ -1,4 +1,10 @@
+$grid-border-radius: $border-radius !default;
+
+$grid-data-border-shadow: none;
+
 $grid-cell-border: solid 1px #dfe7eb !default;
+$grid-right-cell-border: $grid-cell-border !default;
+$grid-bottom-cell-border: $grid-cell-border !default;
 $grid-cell-padding: 0.5rem 0.625rem 0.5rem 0.625rem !default;
 $grid-cell-color: #48606c !default;
 $grid-cell-font-size: 0.875rem !default;
@@ -12,15 +18,22 @@ $grid-selected-color: $white !default;
 $grid-stripe-background-color: #f7f9fa !default;
 
 $grid-toolbar-background-color: $white !default;
+$grid-header-cell-border: $grid-cell-border !default;
 $grid-header-background-color: #e6ecef !default;
 $grid-header-font-size: 0.75rem !default;
+$grid-header-line-height: inherit !default;
+$grid-header-font-weight: normal !default;
 $grid-header-text-transform: uppercase !default;
 $grid-header-color: $charcoal-grey !default;
 $grid-header-cell-padding: 0.5rem 0 0 0 !default;
 $grid-header-title-padding: 0 0 0.625rem 0.625rem !default;
+$grid-header-title-vertical-align: unset !default;
 $grid-header-sorted-background-color: #e2e9ee !default;
 
 $grid-header-padding: 0.625rem !default;
+
+$grid-foot-cell-color: $grid-cell-color !default;
+$grid-foot-background-color: $grid-header-background-color !default;
 
 $grid-filter-background-color: #f6f8f9 !default;
 $grid-filter-padding: 0.25rem 0.625rem !default;
@@ -40,10 +53,14 @@ $grid-clear-filter-button-background-color: #e6ecef !default;
 $grid-clear-filter-button-color: $cool-grey !default;
 $grid-apply-filter-button-background-color: $default-link !default;
 
+$grid-header-filter-icon-margin: 5px 5px 0 0 !default;
+$grid-header-filter-icon-hover-color: inherit !default;
+
 $grid-border: 1px solid #e6ecef !default;
 
 $grid-sort-icon-width: 1rem !default;
 $grid-sort-icon-height: $grid-sort-icon-width !default;
+$grid-sort-icon-color: $grid-header-color !default;
 
 $grid-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $grid-background-color: $white !default;
@@ -69,14 +86,27 @@ $grid-button-icon-height: $grid-button-icon-width !default;
 $grid-button-height: 1.25rem !default;
 $grid-button-line-height: $grid-button-height !default;
 
+$grid-frozen-cell-border: none !default;
+
+$grid-frozen-cell-background-color: $grid-header-background-color !default;
+
+$grid-state-transition: none !default;
+
+$grid-group-header-padding: 15px !default;
+$grid-group-header-item-padding: 10px !default;
+$grid-group-header-item-margin: 5px !default;
+
+$column-drag-handle-color: $grid-header-color !default;
+$column-drag-handle-hover-color: $column-drag-handle-color !default;
+
 .rz-datatable {
   position: relative;
   box-shadow: $grid-shadow;
   border: $grid-cell-border;
   background-color: $grid-background-color;
 
-  border-bottom-right-radius: $border-radius;
-  border-bottom-left-radius: $border-radius;
+  border-bottom-right-radius: $grid-border-radius;
+  border-bottom-left-radius: $grid-border-radius;
 
   .rz-col-icon {
     text-align: center;
@@ -182,9 +212,6 @@ $grid-button-line-height: $grid-button-height !default;
 }
 
 .rz-datatable-thead, .rz-grid-table thead {
-  .rzi {
-    color: $grid-cell-color;
-  }
 
   th {
     background-color: $grid-header-background-color;
@@ -192,29 +219,35 @@ $grid-button-line-height: $grid-button-height !default;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    
 
     @if $material == false and $fluent == false {
+      border-bottom: $grid-header-cell-border;
+      
       &:not(:last-child) {
-        border-right: $grid-cell-border;
+        border-right: $grid-header-cell-border;
+        
       }
     }
 
     .rz-column-title {
       display: inline-block;
       font-size: $grid-header-font-size;
+      line-height: $grid-header-line-height;
       text-transform: $grid-header-text-transform;
       color: $grid-header-color;
       padding: $grid-header-title-padding;
-      font-weight: normal;
+      font-weight: $grid-header-font-weight;
+      vertical-align: $grid-header-title-vertical-align;
     }
   }
 }
 
 .rz-datatable-tfoot, .rz-grid-table tfoot {
   td {
-    background-color: $grid-header-background-color;
+    background-color: $grid-foot-background-color;
     font-size: $grid-cell-font-size;
-    color: $grid-cell-color;
+    color: $grid-foot-cell-color;
     padding: $grid-cell-padding;
     white-space: nowrap;
     overflow: hidden;
@@ -222,7 +255,7 @@ $grid-button-line-height: $grid-button-height !default;
 
     @if $material == false and $fluent == false {
       &:not(:last-child) {
-        border-right: $grid-cell-border;
+        border-right: $grid-right-cell-border;
       }
     }
   }
@@ -230,7 +263,7 @@ $grid-button-line-height: $grid-button-height !default;
 
 .rz-datatable-scrollable-header {
   background-color: $grid-header-background-color;
-  border-bottom: $grid-cell-border;
+  border-bottom: $grid-bottom-cell-border;
 }
 
 .rz-datatable-scrollable-body {
@@ -266,14 +299,22 @@ $grid-button-line-height: $grid-button-height !default;
   }
 
   .rzi-sort {
-    color: $grid-header-color;
+    color: $grid-sort-icon-color;
+    transition: $grid-state-transition;
+
     &:before {
       content: 'sort';
+    }
+
+    &:hover,
+    &:active {
+      color: $grid-header-color;
     }
   }
 
   .rzi-sort-asc {
     color: $grid-header-color;
+
     &:before {
       content: 'arrow_drop_up';
     }
@@ -281,6 +322,7 @@ $grid-button-line-height: $grid-button-height !default;
 
   .rzi-sort-desc {
     color: $grid-header-color;
+
     &:before {
       content: 'arrow_drop_down';
     }
@@ -324,11 +366,11 @@ $grid-button-line-height: $grid-button-height !default;
 .rz-datatable-data, .rz-grid-table {
   td {
     padding: $grid-cell-padding;
-    border-bottom: $grid-cell-border;
+    border-bottom: $grid-bottom-cell-border;
 
     @if $material == false and $fluent == false {
       &:not(:last-child) {
-        border-right: $grid-cell-border;
+        border-right: $grid-right-cell-border;
       }
     }
     .rz-cell-data {
@@ -407,7 +449,7 @@ $grid-button-line-height: $grid-button-height !default;
 .rz-datatable-header {
   background-color: $grid-toolbar-background-color;
   padding: $grid-header-padding;
-  border-bottom: $grid-cell-border;
+  border-bottom: $grid-bottom-cell-border;
 
   .rzi-plus {
     @extend .rzi;
@@ -683,7 +725,13 @@ $grid-button-line-height: $grid-button-height !default;
   .rz-textbox,
   .rz-grid-filter-label {
     display: block;
-    margin: 1rem 0;
+    margin: 0.5rem 0;
+    width: 100%;
+  }
+
+  .rz-grid-filter-label {
+    margin-top: 1rem;
+    font-weight: 600;
   }
 }
 
@@ -694,12 +742,14 @@ $grid-button-line-height: $grid-button-height !default;
 }
 
 .rz-grid-filter-icon {
-  color: $grid-header-color;
-  margin: 5px 5px 0 0;
+  color: $grid-filter-color;
+  margin: $grid-header-filter-icon-margin;
   float: right;
   font-size: 1rem;
+  transition: $grid-state-transition;
   &:hover {
     cursor: pointer;
+    color: $grid-header-filter-icon-hover-color;
   }
 
   &:after {
@@ -719,10 +769,11 @@ $grid-button-line-height: $grid-button-height !default;
 .rz-data-grid-data {
     overflow: auto;
     flex: 1;
+    box-shadow: $grid-data-border-shadow;
 }
 
 .rz-grid-table td, .rz-grid-table th {
-    padding: .5rem;
+    padding: $grid-cell-padding;
 }
 
 .rz-grid-table thead {
@@ -746,7 +797,8 @@ $grid-button-line-height: $grid-button-height !default;
     .rz-frozen-cell {
         position: -webkit-sticky;
         position: sticky;
-        background: $grid-header-background-color;
+        background: $grid-frozen-cell-background-color;
+        border-right: $grid-frozen-cell-border !important;
         z-index: 1;
     }
 }
@@ -783,13 +835,21 @@ $grid-button-line-height: $grid-button-height !default;
     @extend .rzi;
 
     cursor: grab;
-    font-size: small;
+    font-size: inherit;
+    vertical-align: middle;
+    color: $column-drag-handle-color;
+    transition: $grid-state-transition;
 
     &:after {
         content: 'more_vert';
     }
 
+    &:hover {
+      color: $column-drag-handle-hover-color;
+    }
+
     &:active {
+        color: $column-drag-handle-hover-color;
         cursor: grabbing;
     }
 }
@@ -800,14 +860,14 @@ $grid-button-line-height: $grid-button-height !default;
 
 .rz-group-header {
     background-color: $grid-header-background-color;
-    padding: 15px;
-    border-bottom: $grid-cell-border;
+    padding: $grid-group-header-padding;
+    border-bottom: $grid-bottom-cell-border;
 }
 
 .rz-group-header-item {
     border: $grid-cell-border;
-    padding: 10px;
-    margin:5px;
+    padding: $grid-group-header-item-padding;
+    margin: $grid-group-header-item-margin;
     width: fit-content;
     float:left;
 }
