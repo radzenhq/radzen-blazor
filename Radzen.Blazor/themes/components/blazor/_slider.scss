@@ -10,10 +10,14 @@ $slider-range-border: 1px solid #459cca !default;
 $slider-handle-background-color: $default-link !default;
 $slider-handle-width: 1rem !default;
 $slider-handle-height: 1.75rem !default;
+$slider-handle-border: none !default;
 $slider-handle-border-radius: 2px !default;
+$slider-handle-hover-border: $slider-handle-border !default;
 $slider-handle-hover-background-color: #59a6cd !default;
 $slider-handle-hover-shadow: inset 0 -3px 0 0 rgba(#fff, 0.2) !default;
 $slider-handle-color: $white !default;
+$slider-handle-icon-display: inline-block !default;
+$slider-handle-transition: none !default;
 
 $slider-disabled-range-background-color: rgba(211, 217, 219, 0.5) !default;
 $slider-disabled-range-border: solid 1px rgba(211, 217, 219, 0.3) !default;
@@ -55,8 +59,8 @@ $slider-border-radius: $input-border-radius !default;
   bottom: -1px;
   left: -1px;
 
-  border-top-left-radius: $input-border-radius;
-  border-bottom-left-radius: $input-border-radius;
+  border-top-left-radius: $slider-border-radius;
+  border-bottom-left-radius: $slider-border-radius;
   background-color: $slider-range-background-color;
   border: $slider-range-border;
 }
@@ -67,12 +71,14 @@ $slider-border-radius: $input-border-radius !default;
   top: 50%;
   margin-left: -$slider-handle-width/2;
   background-color: $slider-handle-background-color;
+  border: $slider-handle-border;
   border-radius: $slider-handle-border-radius;
   width: $slider-handle-width;
   height: $slider-handle-height;
+  transition: $slider-handle-transition;
 
   &:before {
-    display: inline-block;
+    display: $slider-handle-icon-display;
     color: $slider-handle-color;
     transform: rotate(90deg);
     vertical-align: middle;
@@ -83,9 +89,13 @@ $slider-border-radius: $input-border-radius !default;
 
 .rz-slider:not(.rz-state-disabled) {
   .rz-slider-handle {
-    &:hover {
+    &:hover,
+    &:focus,
+    &:active {
       background-color: $slider-handle-hover-background-color;
       box-shadow: $slider-handle-hover-shadow;
+      border: $slider-handle-hover-border;
+      cursor: pointer;
     }
   }
 }
