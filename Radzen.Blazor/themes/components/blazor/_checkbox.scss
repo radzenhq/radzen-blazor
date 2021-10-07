@@ -9,6 +9,8 @@ $checkbox-checked-hover-background-color: #59a6cd !default;
 $checkbox-checked-color: $white !default;
 $checkbox-checked-shadow: inset 0 -3px 0 0 rgba(255, 255, 255, 0.2) !default;
 $checkbox-checked-border: $input-border !default;
+$checkbox-checked-icon-background-color: transparent !default;
+$checkbox-checked-icon-border-radius: 0 !default;
 
 $checkbox-icon-width: 0.875rem !default;
 $checkbox-icon-height: $checkbox-icon-width !default;
@@ -30,9 +32,12 @@ $checkbox-icon-font-size: 0.875rem !default;
   }
 }
 
+.rz-state-disabled .rz-checkbox {
+  cursor: initial;
+}
+
 .rz-chkbox-label {
   margin: $checkbox-label-margin;
-  cursor: pointer;
 }
 
 .rz-chkbox {
@@ -72,6 +77,7 @@ $checkbox-icon-font-size: 0.875rem !default;
 
   &.rz-state-disabled {
     @extend %input-disabled;
+    cursor: initial;
   }
 
   .rzi {
@@ -80,6 +86,8 @@ $checkbox-icon-font-size: 0.875rem !default;
     font-size: $checkbox-icon-font-size;
     color: $checkbox-checked-color;
     vertical-align: middle;
+    background-color: $checkbox-checked-icon-background-color;
+    border-radius: $checkbox-checked-icon-border-radius;
   }
 
   .rzi-check {
@@ -100,7 +108,19 @@ $checkbox-icon-font-size: 0.875rem !default;
 
     &:hover {
       background-color: $checkbox-checked-hover-background-color;
+    }
+  }
+
+  &.rz-state-disabled {
+
+    &.rz-state-active {
+      background-color: $checkbox-checked-background-color;
       border: $checkbox-checked-border;
+      opacity: 0.5;
+
+      &:hover {
+        background-color: $checkbox-checked-background-color;
+      }
     }
   }
 }
