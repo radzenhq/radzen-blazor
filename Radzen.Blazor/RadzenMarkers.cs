@@ -1,0 +1,36 @@
+using Microsoft.AspNetCore.Components;
+
+namespace Radzen.Blazor
+{
+    public class RadzenMarkers : RadzenChartComponentBase
+    {
+      [Parameter]
+      public string Fill { get; set; }
+
+      [Parameter]
+      public string Stroke { get; set; }
+
+      [Parameter]
+      public double StrokeWidth { get; set; } = 2;
+
+      [Parameter]
+      public double Size { get; set; } = 5;
+
+      [Parameter]
+      public MarkerType MarkerType { get; set; } = MarkerType.None;
+
+      [CascadingParameter]
+      public IChartSeries Series 
+      {
+        set
+        {
+          value.Markers = this;
+        }
+      } 
+
+      protected override bool ShouldRefreshChart(ParameterView parameters)
+      {
+          return parameters.DidParameterChange(nameof(MarkerType), MarkerType);
+      }
+    }
+}
