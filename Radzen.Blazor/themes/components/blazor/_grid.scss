@@ -37,13 +37,15 @@ $grid-foot-background-color: $grid-header-background-color !default;
 
 $grid-filter-background-color: #f6f8f9 !default;
 $grid-filter-padding: 0.25rem 0.625rem !default;
+$grid-filter-margin: 0 !default;
 $grid-filter-border: $grid-cell-border !default;
+$grid-filter-font-size: 0.8125rem !default;
 $grid-filter-icon-width: 0.875rem !default;
 $grid-filter-icon-height: 0.875rem !default;
 $grid-filter-icon-margin: 0 0.3125rem 0 0 !default;
+$grid-filter-icon-font-size: $grid-filter-font-size !default;
 $grid-filter-color: $cool-grey !default;
 $grid-filter-focus-color: $default-link !default;
-$grid-filter-font-size: 0.8125rem !default;
 $grid-filter-operator-margin: 1.25rem !default;
 $grid-filter-buttons-padding: 0.325rem 1.25rem !default;
 $grid-filter-buttons-border: 1px solid rgba(#979797, 0.2) !default;
@@ -463,6 +465,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
 .rz-cell-filter {
   padding: $grid-filter-padding;
+  margin: $grid-filter-margin;
   background-color: $grid-filter-background-color;
   border-top: $grid-filter-border;
   font-size: $grid-filter-font-size;
@@ -476,7 +479,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
       > .rzi {
         width: $grid-filter-icon-width;
         height: $grid-filter-icon-height;
-        font-size: $grid-filter-font-size;
+        font-size: $grid-filter-icon-font-size;
         margin: $grid-filter-icon-margin;
         color: $grid-filter-color;
 
@@ -521,6 +524,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
       padding: 0;
       background-color: transparent;
       color: $grid-filter-color;
+      font-size: $grid-filter-font-size;
       line-height: 1;
 
       &:focus {

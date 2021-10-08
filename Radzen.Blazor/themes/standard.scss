@@ -73,10 +73,13 @@ $danger: $rz-danger !default;
 $info: $rz-info !default;
 $success: $rz-success !default;
 $warning: $rz-warning !default;
+$default-link: $primary-color;
+
 $light: $rz-base-200 !default;
 $body-color: $rz-base-800 !default;
 $link-color: $rz-primary;
 $link-hover-color: $rz-primary-dark;
+
 $state-success-bg: $success;
 $state-warning-bg: $warning;
 $state-danger-bg: $danger;
@@ -381,23 +384,25 @@ $grid-header-padding: 1rem !default;
 $grid-foot-cell-color: $rz-base-900 !default;
 $grid-foot-background-color: $rz-base-200 !default;
 
-$grid-filter-background-color: #f6f8f9 !default;
-$grid-filter-padding: 0.25rem 0.625rem !default;
-$grid-filter-border: $grid-cell-border !default;
-$grid-filter-icon-width: 0.875rem !default;
-$grid-filter-icon-height: 0.875rem !default;
-$grid-filter-icon-margin: 0 0.3125rem 0 0 !default;
-$grid-filter-color: $rz-base-400 !default;
+$grid-filter-background-color: $rz-base-100 !default;
+$grid-filter-padding: 0 0.5rem !default;
+$grid-filter-margin: -0.5rem 0 !default;
+$grid-filter-border: none !default;
+$grid-filter-font-size: 0.875rem !default;
+$grid-filter-icon-width: 1.25rem !default;
+$grid-filter-icon-height: 1.25rem !default;
+$grid-filter-icon-margin: 0 0.25rem 0 0 !default;
+$grid-filter-icon-font-size: 1.25rem !default;
+$grid-filter-color: $rz-base-800 !default;
 $grid-filter-focus-color: $rz-base-900 !default;
-$grid-filter-font-size: 0.8125rem !default;
-$grid-filter-operator-margin: 1.25rem !default;
-$grid-filter-buttons-padding: 0.325rem 1.25rem !default;
-$grid-filter-buttons-border: 1px solid rgba(#979797, 0.2) !default;
+$grid-filter-operator-margin: 1rem !default;
+$grid-filter-buttons-padding: 1rem !default;
+$grid-filter-buttons-border: 1px solid $rz-base-200 !default;
 $grid-filter-buttons-background-color: $white !default;
 
-$grid-clear-filter-button-background-color: #e6ecef !default;
-$grid-clear-filter-button-color: $cool-grey !default;
-$grid-apply-filter-button-background-color: $default-link !default;
+$grid-clear-filter-button-background-color: $rz-base-200 !default;
+$grid-clear-filter-button-color: $rz-base-800 !default;
+$grid-apply-filter-button-background-color: $rz-primary !default;
 
 $grid-header-filter-icon-margin: 0.25rem 0.5rem 0 0 !default;
 $grid-header-filter-icon-hover-color: $rz-base-900 !default;
