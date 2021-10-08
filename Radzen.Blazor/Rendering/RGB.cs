@@ -215,7 +215,7 @@ namespace Radzen.Blazor.Rendering
                 var red = int.Parse(match.Groups["r"].Value);
                 var green = int.Parse(match.Groups["g"].Value);
                 var blue = int.Parse(match.Groups["b"].Value);
-                var alpha = double.Parse(match.Groups["a"].Value);
+                var alpha = double.Parse(match.Groups["a"].Value, CultureInfo.InvariantCulture);
 
                 return new RGB { Red = red, Green = green, Blue = blue, Alpha = alpha };
             }
@@ -282,7 +282,7 @@ namespace Radzen.Blazor.Rendering
             var max = Math.Max(red, Math.Max(green, blue));
             var delta = max - min;
             double hue;
-            double saturation = 0; 
+            double saturation = 0;
             var value = max;
 
             if (max != 0)
