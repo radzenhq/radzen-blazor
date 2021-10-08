@@ -1,8 +1,9 @@
-$accordion-item-padding: 0.625rem !default;
+$accordion-item-padding: 0 !default;
 $accordion-item-margin: 0.3125rem 0 !default;
 $accordion-item-background-color: $white !default;
 $accordion-item-color: $body-color !default;
 $accordion-item-line-height: 1.5rem !default;
+$accordion-item-font-size: inherit !default;
 $accordion-item-font-weight: 600 !default;
 $accordion-icon-width: 1.5rem !default;
 $accordion-icon-height: $accordion-icon-width !default;
@@ -21,17 +22,26 @@ $accordion-shadow: none !default;
 
 .rz-accordion-header {
   background-color: $accordion-item-background-color;
+
   a[role='tab'] {
+    padding: $accordion-item-padding;
     color: $accordion-item-color;
     line-height: $accordion-item-line-height;
     text-decoration: none;
     color: inherit;
     display: flex;
     align-items: center;
+    font-size: $accordion-item-font-size;
     font-weight: $accordion-item-font-weight;
   }
+
   &:hover {
-    color: $accordion-selected-color;
+    color: $accordion-hover-color;
+  }
+
+  .rzi {
+    font-size: 1.25rem;
+    margin: $accordion-icon-margin;
   }
 }
 
