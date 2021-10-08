@@ -12,6 +12,7 @@ $accordion-icon-margin: 0 0.375rem 0 0 !default;
 $accordion-selected-color: $default-link !default;
 $accordion-hover-color: $accordion-selected-color !default;
 $accordion-content-padding: 0.5rem 0.5rem 0.5rem 2rem !default;
+$accordion-content-font-size: $accordion-item-font-size !default;
 $accordion-border-radius: $border-radius !default;
 $accordion-item-border: none !default;
 $accordion-shadow: none !default;
@@ -75,6 +76,7 @@ $accordion-shadow: none !default;
 }
 
 .rz-accordion-content {
+  font-size: $accordion-content-font-size;
   background-color: $accordion-item-background-color;
   padding: $accordion-content-padding;
 }
