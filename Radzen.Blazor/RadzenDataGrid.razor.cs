@@ -780,6 +780,13 @@ namespace Radzen.Blazor
         public bool AllowGrouping { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether group footers are visible even when the group is collapsed.
+        /// </summary>
+        /// <value><c>true</c> if group footers are visible when the group is collapsed otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool GroupFootersAlwaysVisible { get; set; }
+
+        /// <summary>
         /// Gets or sets the group header template.
         /// </summary>
         /// <value>The group header template.</value>
