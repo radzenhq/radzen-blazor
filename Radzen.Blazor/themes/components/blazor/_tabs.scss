@@ -1,8 +1,9 @@
 $tabs-tab-background-color: #e6ecef !default;
 $tabs-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $tabs-border: solid 1px #dfe7ec !default;
-$tabs-tab-color: rgba($charcoal-grey, 0.5) !default;
+$tabs-tab-color: $default-link !default;
 $tabs-selected-tab-color: $charcoal-grey !default;
+$tabs-tab-font-size: inherit !default;
 $tabs-tab-font-weight: 600 !default;
 $tabs-background-color: $white !default;
 $tabs-tab-padding: 0.375rem 1.875rem !default;
@@ -11,6 +12,9 @@ $tabs-tab-selected-top-border-color: $default-link !default;
 $tabs-hover-color: $default-link !default;
 $tabs-hover-background-color: $tabs-background-color !default;
 $tabs-border-radius: $border-radius !default;
+$tabs-icon-font-size: 1.0625rem !default;
+$tabs-icon-margin: 0 !default;
+$tabs-transition: none !default;
 
 .rz-tabview {
   display: flex;
@@ -29,6 +33,7 @@ $tabs-border-radius: $border-radius !default;
     border-bottom-color: $tabs-tab-background-color;
     background-color: $tabs-tab-background-color;
     border-radius: $tabs-border-radius $tabs-border-radius 0 0;
+    transition: $tabs-transition;
 
     &:hover {
       &:not(.rz-tabview-selected) {
@@ -48,6 +53,7 @@ $tabs-border-radius: $border-radius !default;
       align-items: center;
       color: $tabs-tab-color;
       padding: $tabs-tab-padding;
+      font-size: $tabs-tab-font-size;
       font-weight: $tabs-tab-font-weight;
 
       &:hover {
@@ -93,5 +99,6 @@ $tabs-border-radius: $border-radius !default;
 }
 
 .rz-tabview-left-icon {
-  font-size: 1.0625rem;
+  font-size: $tabs-icon-font-size;
+  margin: $tabs-icon-margin;
 }
