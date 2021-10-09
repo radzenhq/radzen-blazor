@@ -280,7 +280,7 @@ window.Radzen = {
           : e.pageX - handle.getBoundingClientRect().left;
       var percent = (handle.offsetLeft + offsetX) / parent.offsetWidth;
 
-      var newValue = percent * max;
+      var newValue = percent * (max - min) + min;
       var oldValue = range ? value[slider.isMin ? 0 : 1] : value;
 
       if (
@@ -971,6 +971,10 @@ window.Radzen = {
       ref.removeEventListener('mousemove', ref.mouseMoveHandler);
       delete ref.mouseMoveHandler;
     }
+    if (ref.clickHandler) {
+      ref.removeEventListener('click', ref.clickHandler);
+      delete ref.clickHandler;
+    }
 
     this.destroyResizable(ref);
   },
@@ -1012,8 +1016,15 @@ window.Radzen = {
       var y = e.clientY - rect.top;
       instance.invokeMethodAsync('MouseMove', x, y);
     };
+    ref.clickHandler = function (e) {
+      var rect = ref.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      instance.invokeMethodAsync('Click', x, y);
+    };
 
     ref.addEventListener('mousemove', ref.mouseMoveHandler);
+    ref.addEventListener('click', ref.clickHandler);
 
     return this.createResizable(ref, instance);
   },

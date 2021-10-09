@@ -8,7 +8,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>Radzen.Blazor</PackageId>
     <Product>Radzen.Blazor</Product>
-    <Version>3.11.1</Version>
+    <Version>3.11.3</Version>
     <Copyright>Radzen Ltd.</Copyright>
     <Authors>Radzen Ltd.</Authors>
     <Description>Native Blazor UI components by Radzen Ltd.</Description>
@@ -42,14 +42,11 @@
       </EmbeddedResource>
   </ItemGroup>
   
-  <UsingTask
-  TaskName="RemoveSourceMap"
-  TaskFactory="RoslynCodeTaskFactory"
-  AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+  <UsingTask TaskName="RemoveSourceMap" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <Task>
-      <Using Namespace="System"/>
-      <Using Namespace="System.IO"/>
-      <Using Namespace="System.Text"/>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text" />
       <Code Type="Fragment" Language="cs">
         <![CDATA[
           foreach (var file in Directory.EnumerateFiles("./wwwroot/css", "*.css"))

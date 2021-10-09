@@ -5,15 +5,23 @@
     <div class="container">
             <div class="row">
                 <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
-                <RadzenChart>
+                <RadzenChart SeriesClick=@OnSeriesClick>
                     <RadzenPieSeries Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
                 </RadzenChart>
             </div>
         </div>
+        <EventConsole @ref=@console />
     </div>
 </RadzenExample>
 
 @code {
+    EventConsole console;
+
+    void OnSeriesClick(SeriesClickEventArgs args)
+    {
+        console.Log(args);
+    }
+
     class DataItem
     {
         public string Quarter { get; set; }

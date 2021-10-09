@@ -5,17 +5,3 @@
         <i class="rzi d-flex align-items-center">menu</i>
     </button>
 }
-@code {
-    [Parameter]
-    public EventCallback<EventArgs> Click { get; set; }
-
-    public async System.Threading.Tasks.Task OnClick(EventArgs args)
-    {
-        await Click.InvokeAsync(args);
-    }
-
-    protected override string GetComponentCssClass()
-    {
-        return "sidebar-toggle";
-    }
-}
