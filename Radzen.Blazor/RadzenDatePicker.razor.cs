@@ -532,7 +532,7 @@ namespace Radzen.Blazor
                 valid = DateTime.TryParse(inputValue, out value);
             }
 
-            if (valid)
+            if (valid && !DateAttributes(value).Disabled)
             {
                 newValue = value;
             }
