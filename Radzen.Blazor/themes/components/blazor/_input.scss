@@ -16,6 +16,10 @@ $input-disabled-background-color: rgba(#fff, 0.7) !default;
 $input-disabled-border: solid 1px #eaeaea !default;
 $input-disabled-color: rgba(#3a3a3a, 0.4) !default;
 
+$input-transition: none !default;
+
+$input-focus-shadow: none !default;
+
 %input-hover {
   box-shadow: $input-hover-shadow;
   border: $input-hover-border;
@@ -63,14 +67,23 @@ input {
   line-height: $input-line-height;
   color: $input-value-color;
   font-size: $input-font-size;
+  transition: $input-transition;
+  outline: none;
 
   @extend %input-base;
 
-  &:hover {
-    &:not(:focus) {
+  &:not(:disabled) {
+    &:hover {
       @extend %input-hover;
     }
+
+    &:focus {
+      @extend %input-hover;
+      box-shadow: $input-focus-shadow;
+    }
   }
+
+
 
   &:disabled {
     @extend %input-disabled;
