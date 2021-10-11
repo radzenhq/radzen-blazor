@@ -702,11 +702,14 @@ $dropdown-items-margin: 0 (-$dropdown-horizontal-padding) !default;
 
 $dropdown-item-padding: 0.25rem $dropdown-horizontal-padding !default;
 $dropdown-item-font-size: $input-font-size !default;
-$dropdown-item-hover-background-color: $rz-base-200 !default;
-$dropdown-item-selected-background-color: $rz-secondary !default;
+$dropdown-item-hover-background-color: $rz-secondary !default;
+$dropdown-item-selected-background-color: lighten($rz-secondary, 20%) !default;
 $dropdown-item-selected-shadow: none !default;
-$dropdown-item-hover-color: $rz-base-900 !default;
+$dropdown-item-hover-color: $rz-primary !default;
 $dropdown-item-selected-color: $rz-primary !default;
+$dropdown-item-selected-hover-background-color: $rz-secondary !default;
+$dropdown-item-selected-hover-color: $dropdown-item-selected-color !default;
+$dropdown-item-transition: all 0.1s linear !default;
 
 $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 $dropdown-label-padding: 0 $dropdown-trigger-icon-width 0 0 !default;
@@ -716,6 +719,24 @@ $dropdown-filter-padding: 0.5rem 0 !default;
 $dropdown-open-background-color: $input-background-color !default;
 $dropdown-open-border: $input-border !default;
 $dropdown-panel-border: $dropdown-open-border !default;
+
+// ListBox
+
+$listbox-background-color: $input-background-color !default;
+$listbox-border-radius: $input-border-radius !default;
+$listbox-border: $input-border !default;
+$listbox-filter-border: $input-border !default;
+$listbox-padding: 0 !default;
+
+$listbox-item-padding: $dropdown-item-padding !default;
+$listbox-item-margin: 0 !default;
+
+$listbox-checkbox-margin: 0 0.5rem 0 0 !default;
+
+$listbox-header-padding: 0.5rem !default;
+$listbox-header-icon-width: 1.25rem !default;
+$listbox-header-icon-height: $listbox-header-icon-width !default;
+$listbox-header-icon-margin: 0 !default;
 
 // ColorPicker
 

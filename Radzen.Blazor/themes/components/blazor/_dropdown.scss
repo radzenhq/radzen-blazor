@@ -13,6 +13,9 @@ $dropdown-item-selected-background-color: $default-link !default;
 $dropdown-item-selected-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $dropdown-item-hover-color: $white !default;
 $dropdown-item-selected-color: $dropdown-item-hover-color !default;
+$dropdown-item-selected-hover-background-color: $dropdown-item-selected-background-color !default;
+$dropdown-item-selected-hover-color: $dropdown-item-selected-color !default;
+$dropdown-item-transition: none !default;
 
 $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 $dropdown-label-padding: 0 $dropdown-trigger-icon-width 0 0 !default;
@@ -188,6 +191,11 @@ $dropdown-panel-border: $dropdown-open-border !default;
     @if $radius {
       border-radius: $radius;
     }
+
+    &:hover {
+      background-color: $dropdown-item-selected-hover-background-color;
+      color: $dropdown-item-selected-hover-color;
+    }
   }
 }
 
@@ -203,6 +211,7 @@ $dropdown-panel-border: $dropdown-open-border !default;
 
 .rz-dropdown-item {
   padding: $dropdown-item-padding;
+  transition: $dropdown-item-transition;
 
   @include dropdown-item(0);
   @include dropdown-item-hover(0);
