@@ -2,6 +2,25 @@ $colorpicker-panel-border: $dropdown-panel-border !default;
 $colorpicker-panel-background-color: $dropdown-open-background-color !default;
 $colorpicker-panel-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06) !default;
 $colorpicker-panel-padding: 0.625rem !default;
+$colorpicker-panel-max-width: 280px !default;
+$colorpicker-saturation-height: 150px !default;
+
+$colorpicker-value-border-radius: $input-border-radius !default;
+
+$colorpicker-item-size: 16px !default;
+$colorpicker-item-border-radius: $input-border-radius !default;
+$colorpicker-item-margin: 4px !default;
+$colorpicker-item-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.25) 0px 0px 4px inset !default;
+
+$colorpicker-handle-size: 12px !default;
+$colorpicker-handle-border: 1px solid #fff !default;
+$colorpicker-handle-shadow: rgb(255, 255, 255) 0px 0px 0px 1px, rgba(0, 0, 0, 0.3) 0px 0px 1px 1px inset, rgba(0, 0, 0, 0.4) 0px 0px 1px 2px !default;
+
+$colorpicker-hex-input-padding: 0 3px !default;
+$colorpicker-hex-input-height: 30px !default;
+$colorpicker-rgba-input-padding: 1px 3px !default;
+$colorpicker-rgba-input-height: 30px !default;
+
 
 .rz-colorpicker {
   display: inline-flex;
@@ -16,7 +35,7 @@ $colorpicker-panel-padding: 0.625rem !default;
   }
 }
 
-.rz-colorpicker-trigger {
+button.rz-colorpicker-trigger {
   border: none;
   appearance: none;
   padding: 0;
@@ -24,6 +43,7 @@ $colorpicker-panel-padding: 0.625rem !default;
   align-items: center;
   color: $editor-button-color;
   background-color: inherit;
+  outline: none;
 
   .rzi {
     &:before {
@@ -39,26 +59,28 @@ $colorpicker-panel-padding: 0.625rem !default;
   background-color: $colorpicker-panel-background-color;
   box-shadow: $colorpicker-panel-shadow;
   min-width: 200px;
-  max-width: 280px;
+  max-width: $colorpicker-panel-max-width;
   padding: $colorpicker-panel-padding;
   border-radius: $border-radius;
 }
 
 .rz-colorpicker-value {
   flex: 1;
-  border-radius: $input-border-radius;
+  border-radius: $colorpicker-value-border-radius;
   border: $input-border;
   min-width: 20px;
   min-height: 20px;
 }
 .rz-saturation-picker {
-  height: 150px;
+  height: $colorpicker-saturation-height;
   position: relative;
   touch-action: none;
+  border-radius: $input-border-radius;
 }
 
 .rz-saturation-white {
   background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
 }
 
 .rz-saturation-black,
@@ -68,6 +90,8 @@ $colorpicker-panel-padding: 0.625rem !default;
   left: 0;
   right: 0;
   bottom: 0;
+  border-radius: $input-border-radius;
+  border-top-left-radius: $input-border-radius - 1px;
 }
 
 .rz-saturation-black {
@@ -76,17 +100,16 @@ $colorpicker-panel-padding: 0.625rem !default;
 
 .rz-saturation-handle {
   position: absolute;
-  width: 8px;
-  height: 8px;
-  border: 1px solid #fff;
+  width: $colorpicker-handle-size;
+  height: $colorpicker-handle-size;
+  border: $colorpicker-handle-border;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: rgb(255, 255, 255) 0px 0px 0px 1.5px,
-    rgba(0, 0, 0, 0.3) 0px 0px 1px 1px inset, rgba(0, 0, 0, 0.4) 0px 0px 1px 2px;
+  box-shadow: $colorpicker-handle-shadow;
 }
 
 .rz-hue-picker {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   touch-action: none;
   position: relative;
   background-image: linear-gradient(
@@ -99,24 +122,28 @@ $colorpicker-panel-padding: 0.625rem !default;
     rgb(255, 0, 255) 83%,
     rgb(255, 0, 0) 100%
   );
-  height: 12px;
+  border-radius: $input-border-radius;
+  height: $colorpicker-handle-size;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
 }
 
 .rz-alpha-picker {
   touch-action: none;
   position: relative;
-  height: 16px;
+  border-radius: $input-border-radius;
+  height: $colorpicker-handle-size;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
 }
 
 .rz-hue-handle,
 .rz-alpha-handle {
   position: absolute;
   height: 100%;
-  width: 6px;
-  border: 1px solid #fff;
+  width: 8px;
+  border: $colorpicker-handle-border;
+  border-radius: $input-border-radius/2;
   transform: translateX(-50%);
-  box-shadow: rgb(255, 255, 255) 0px 0px 0px 1.5px,
-    rgba(0, 0, 0, 0.3) 0px 0px 1px 1px inset, rgba(0, 0, 0, 0.4) 0px 0px 1px 2px;
+  box-shadow: $colorpicker-handle-shadow;
 }
 
 .rz-colorpicker-preview-area {
@@ -125,7 +152,7 @@ $colorpicker-panel-padding: 0.625rem !default;
 
 .rz-hue-and-alpha {
   flex: 1;
-  padding-right: 10px;
+  padding-right: 8px;
 }
 
 .rz-alpha-picker,
@@ -138,12 +165,13 @@ $colorpicker-panel-padding: 0.625rem !default;
     left: 0;
     bottom: 0;
     right: 0;
-    background-image: linear-gradient(45deg, #808080 25%, transparent 25%),
-      linear-gradient(-45deg, #808080 25%, transparent 25%),
-      linear-gradient(45deg, transparent 75%, #808080 75%),
-      linear-gradient(-45deg, transparent 75%, #808080 75%);
-    background-size: 16px 16px;
-    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    border-radius: $input-border-radius;
+    background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%),
+      linear-gradient(-45deg, #cccccc 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #cccccc 75%),
+      linear-gradient(-45deg, transparent 75%, #cccccc 75%);
+    background-size: 8px 8px;
+    background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
   }
 }
 
@@ -153,6 +181,7 @@ $colorpicker-panel-padding: 0.625rem !default;
   height: 32px;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px 1px inset,
     rgba(0, 0, 0, 0.25) 0px 0px 4px inset;
+  border-radius: $input-border-radius;
 }
 
 .rz-colorpicker-rgba {
@@ -164,27 +193,35 @@ $colorpicker-panel-padding: 0.625rem !default;
   flex-direction: column;
   align-items: center;
   flex: 1;
+  color: $input-disabled-color;
+  font-size: 0.75rem;
+  text-transform: uppercase;
 
   &:not(:last-child) {
     margin-right: 4px;
   }
 
   .rz-textbox {
-    width: 100px;
-    padding: 0 3px;
-    height: 30px;
+    width: 80px;
+    margin-right: 4px;
+    padding: $colorpicker-hex-input-padding;
+    height: $colorpicker-hex-input-height;
   }
 
   .rz-spinner {
-    padding: 1px 3px;
-    height: 30px;
+    padding: $colorpicker-rgba-input-padding;
+    height: $colorpicker-rgba-input-height;
 
     .rz-spinner-input {
       padding: 0;
+      outline: none;
     }
 
     button {
       display: none;
+    }
+    button:hover {
+      display: initial;
     }
   }
 }
@@ -196,7 +233,7 @@ $colorpicker-panel-padding: 0.625rem !default;
 
 .rz-colorpicker-section {
   &:not(:last-child) {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 }
 
@@ -208,10 +245,10 @@ $colorpicker-panel-padding: 0.625rem !default;
 }
 
 .rz-colorpicker-item {
-  width: 16px;
-  height: 16px;
-  margin: 4px;
+  width: $colorpicker-item-size;
+  height: $colorpicker-item-size;
+  border-radius: $colorpicker-item-border-radius;
+  margin: $colorpicker-item-margin;
+  box-shadow: $colorpicker-item-shadow;
   cursor: pointer;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px 1px inset,
-    rgba(0, 0, 0, 0.25) 0px 0px 4px inset;
 }
