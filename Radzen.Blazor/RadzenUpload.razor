@@ -8,10 +8,10 @@
 {
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     <div class="rz-fileupload-buttonbar">
-        <span class="rz-fileupload-choose rz-button rz-button-text-icon-left">
+        <span class="rz-fileupload-choose rz-button btn-secondary">
             <input id="@Id" @ref="@fileUpload" type="file" multiple="@Multiple" accept="@Accept"
                    onchange="Radzen.uploadInputChange(event, '@Url', @Auto.ToString().ToLower(), @Multiple.ToString().ToLower(), true)" />
-            <span aria-hidden="true" class="rz-button-icon-left rzi rzi-plus"></span><span class="rz-button-text ">@ChooseText</span>
+            <span class="rz-button-text">@ChooseText</span>
         </span>
     </div>
     @if (files.Any())
@@ -26,7 +26,7 @@
                     <div>@file.Name</div>
                     <div>@(file.Size / 1024) KB</div>
                     <div>
-                        <button @onclick="@(args => OnRemove(file))" type="button" class="rz-button rz-button-icon-only"><span class="rz-icon-trash" style="display:block"></span></button>
+                        <button @onclick="@(args => OnRemove(file))" type="button" class="rz-button rz-button-icon-only btn-light"><span class="rz-icon-trash" style="display:block"></span></button>
                     </div>
                 </div>
                 }

@@ -8,14 +8,15 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-        <div class="rz-fileupload-buttonbar ">
-            <span class="@ChooseClassList" icon="rzi-upload" label="Choose" tabindex="@TabIndex">
-                <input disabled="@Disabled" @ref="@fileUpload" name="@Name" type="file" accept="@Accept" @onchange="@OnChange" />
-                <span class="rz-button-icon-left rzi rzi-upload"></span><span class="rz-button-text ">@ChooseText</span>
-            </span>
-        </div>
-        <div class="rz-fileupload-content rz-corner-bottom">
-            @if (!object.Equals(Value, default(TValue)))
+    <div class="rz-fileupload-buttonbar">
+        <span class="@ChooseClassList" label="Choose" tabindex="@TabIndex">
+            <input disabled="@Disabled" @ref="@fileUpload" name="@Name" type="file" accept="@Accept"
+                @onchange="@OnChange" />
+            <span class="rz-button-text">@ChooseText</span>
+        </span>
+    </div>
+    <div class="rz-fileupload-content rz-corner-bottom">
+        @if (!object.Equals(Value, default(TValue)))
             {
                 <div class="rz-fileupload-files">
                     <div class="rz-fileupload-row">
@@ -28,11 +29,11 @@
                         <div>
                             @if (!string.IsNullOrEmpty(Title))
                             {
-                            <span>@Title</span>
-                            } 
+                                <span>@Title</span>
+                            }
                             else if (!string.IsNullOrEmpty(name))
                             {
-                            <span>@name</span>
+                                <span>@name</span>
                             }
                         </div>
                         <div>
@@ -41,7 +42,7 @@
                                 <span>@size</span>
                             }
                         </div>
-                        <div  tabindex="@TabIndex">
+                        <div tabindex="@TabIndex">
                             <button disabled="@Disabled" type="button" class="@ButtonClassList">
                                 <span class="rz-button-icon-left rz-icon-trash" style="display:block" @onclick="@Remove"></span>
                             </button>

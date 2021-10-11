@@ -32,9 +32,23 @@ namespace Radzen.Blazor
         [Parameter]
         public string Title { get; set; }
 
+<<<<<<< HEAD
         ClassList ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button rz-button-text-icon-left")
                                               .AddDisabled(Disabled);
         ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only")
+=======
+        /// <summary>
+        /// Gets the choose class list.
+        /// </summary>
+        /// <value>The choose class list.</value>
+        ClassList ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button btn-secondary")
+                                              .AddDisabled(Disabled);
+        /// <summary>
+        /// Gets the button class list.
+        /// </summary>
+        /// <value>The button class list.</value>
+        ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only btn-light")
+>>>>>>> Add standard theme Upload and FileInput styles
                                               .AddDisabled(Disabled);
 
         /// <inheritdoc />
@@ -65,7 +79,7 @@ namespace Radzen.Blazor
                 }
                 else if (Value is byte[])
                 {
-                    return  $"{System.Text.Encoding.Default.GetString((byte[])(object)Value)}".StartsWith("data:image");
+                    return $"{System.Text.Encoding.Default.GetString((byte[])(object)Value)}".StartsWith("data:image");
                 }
 
                 return false;
@@ -95,7 +109,7 @@ namespace Radzen.Blazor
 
                 StateHasChanged();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 await Error.InvokeAsync(new UploadErrorEventArgs() { Message = $"Unable to read file as base64 string. {ex.Message}" });
             }
@@ -138,6 +152,6 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The image style.</value>
         [Parameter]
-         public string ImageStyle { get; set; } = "width:100px;";
+        public string ImageStyle { get; set; } = "width:100px;";
     }
 }

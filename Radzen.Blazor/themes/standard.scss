@@ -690,6 +690,33 @@ $radio-checked-border: $input-border !default;
   }
 }
 
+// DropDown
+
+$dropdown-trigger-icon-width: 1.25rem !default;
+$dropdown-trigger-icon-height: $dropdown-trigger-icon-width !default;
+$dropdown-trigger-icon-margin: 0 0.5rem 0 0 !default;
+
+$dropdown-horizontal-padding: 0.5rem !default;
+$dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
+$dropdown-items-margin: 0 (-$dropdown-horizontal-padding) !default;
+
+$dropdown-item-padding: 0.25rem $dropdown-horizontal-padding !default;
+$dropdown-item-font-size: $input-font-size !default;
+$dropdown-item-hover-background-color: $rz-base-200 !default;
+$dropdown-item-selected-background-color: $rz-secondary !default;
+$dropdown-item-selected-shadow: none !default;
+$dropdown-item-hover-color: $rz-base-900 !default;
+$dropdown-item-selected-color: $rz-primary !default;
+
+$multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
+$dropdown-label-padding: 0 $dropdown-trigger-icon-width 0 0 !default;
+$dropdown-filter-border: 1px solid rgba(#979797, 0.1) !default;
+$dropdown-filter-padding: 0.5rem 0 !default;
+
+$dropdown-open-background-color: $input-background-color !default;
+$dropdown-open-border: $input-border !default;
+$dropdown-panel-border: $dropdown-open-border !default;
+
 // ColorPicker
 
 $colorpicker-panel-border: $overlay-border !default;
@@ -714,6 +741,25 @@ $colorpicker-hex-input-padding: 0.25rem 0.5rem !default;
 $colorpicker-hex-input-height: 2rem !default;
 $colorpicker-rgba-input-padding: 0.25rem 0.5rem !default;
 $colorpicker-rgba-input-height: 2rem !default;
+
+
+// Upload
+
+$upload-button-bar-background-color: $rz-base-100 !default;
+$upload-button-bar-padding: 0.5rem !default;
+
+$upload-files-background-color: $rz-white !default;
+$upload-files-padding: 0.5rem 0 !default;
+$upload-files-remove-background-color: #dadfe2 !default;
+$upload-files-remove-color: $rz-white !default;
+
+$upload-files-margin: 0 0.5rem !default;
+
+$upload-choose-background-color: $rz-primary !default;
+$upload-cancel-background-color: $rz-base-300 !default;
+$upload-cancel-color: $rz-base-800 !default;
+$upload-button-background-color: $primary !default;
+
 
 
 // Scrollbar
