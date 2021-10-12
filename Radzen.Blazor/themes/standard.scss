@@ -94,6 +94,8 @@ $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
 
 $rz-border-radius: 0.25rem !default;
 
+$line-height-base: 1.25 !default;
+
 
 // Button
 
@@ -807,6 +809,15 @@ $colorpicker-hex-input-height: 2rem !default;
 $colorpicker-rgba-input-padding: 0.25rem 0.5rem !default;
 $colorpicker-rgba-input-height: 2rem !default;
 
+// Rating
+
+$rating-color: $rz-base-500 !default;
+$rating-opacity: 1 !default;
+$rating-font-size: 1.25rem !default;
+$rating-selected-color: $rz-primary !default;
+$rating-disabled-color: $rating-color !default;
+$rating-disabled-opacity: 0.5 !default;
+$rating-ban-icon: "highlight_off" !default;
 
 // Upload
 
@@ -824,8 +835,6 @@ $upload-choose-background-color: $rz-primary !default;
 $upload-cancel-background-color: $rz-base-300 !default;
 $upload-cancel-color: $rz-base-800 !default;
 $upload-button-background-color: $primary !default;
-
-
 
 // Scrollbar
 
@@ -894,6 +903,12 @@ $color-schemes: (
   )
 ) !default;
 
+// Paragraph
+$paragraph-line-height: 1.25rem !default;
+
+body {
+  line-height: $paragraph-line-height;
+}
 
 @import 'bootstrap';
 @import 'fonts';
@@ -938,12 +953,6 @@ $headings-light: (
   }
 }
 
-// Paragraph
-$paragraph-line-height: 1.25rem !default;
-
-body {
-  line-height: $paragraph-line-height;
-}
 
 
 
