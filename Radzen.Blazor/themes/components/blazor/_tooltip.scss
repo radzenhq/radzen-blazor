@@ -1,3 +1,9 @@
+$tooltip-background-color: #84d2c8 !default;
+$tooltip-color: #fff !default;
+$tooltip-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15) !default;
+$tooltip-padding: 0.25rem 1rem !default;
+$tooltip-border-radius: $input-border-radius !default;
+$tooltip-font-size: inherit !default;
 
 .rz-tooltip {
   position: absolute;
@@ -6,11 +12,12 @@
   left: 0; }
 
 .rz-tooltip-content {
-  background: #84d2c8;
-  color: #fff;
-  box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15);
-  padding: 0.25rem 1rem;
-  border-radius: 4px;
+  background: $tooltip-background-color;
+  color: $tooltip-color;
+  box-shadow: $tooltip-shadow;
+  padding: $tooltip-padding;
+  border-radius: $tooltip-border-radius;
+  font-size: $tooltip-font-size;
   white-space: nowrap; }
 
 .rz-tooltip .rz-top-tooltip-content {

@@ -377,6 +377,8 @@ $panel-menu-icon-height: $panel-menu-icon-width !default;
 $panel-menu-icon-margin: 0 0.5rem 0 0 !default;
 $panel-menu-icon-2nd-level-margin: 0 0.75rem 0 -2.25rem !default;
 
+$panel-menu-font-size: 0.875rem !default;
+
 // Accordion
 
 $accordion-item-padding: 0.25rem 0 !default;
@@ -830,6 +832,14 @@ $upload-button-background-color: $primary !default;
 $scrollbar-background-color: $rz-base-100 !default;
 $scrollbar-color: $rz-base-400 !default;
 
+// Tooltip
+
+$tooltip-background-color: $rz-base-900 !default;
+$tooltip-color: $rz-white !default;
+$tooltip-shadow: $rz-shadow-level-2 !default;
+$tooltip-padding: 0.25rem 0.5rem !default;
+$tooltip-border-radius: $input-border-radius !default;
+$tooltip-font-size: 0.875rem !default;
 
 // Charts
 
