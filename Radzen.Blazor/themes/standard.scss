@@ -68,7 +68,6 @@ $contrast: $rz-base-900 !default;
 $default-background-color: $rz-white !default;
 $button-hover-background-color: $rz-primary-light !default;
 $button-active-background-color: $rz-primary-dark !default;
-$sidebar-background-color: $rz-white !default;
 
 // Bootstrap overrides
 $primary: $primary-color !default;
@@ -347,6 +346,37 @@ $button-focus-styles: map-merge(
   }
 
 }
+
+// PanelMenu
+
+$panel-menu-color: $rz-base-800 !default;
+$panel-menu-background-color: $rz-white !default;
+$panel-menu-hover-background-color: $rz-secondary !default;
+$panel-menu-hover-color: $rz-primary !default;
+
+$panel-menu-item-line-height: 1.25rem !default;
+$panel-menu-item-margin: 0 1rem !default;
+$panel-menu-item-padding: 0.5rem 0 !default;
+$panel-menu-item-border: solid 1px $rz-base-200 !default;
+$panel-menu-item-active-background-color: $rz-white !default;
+$panel-menu-item-offset: 0.75rem !default;
+
+$panel-menu-item-2nd-level-padding: 0.25rem 0 !default;
+$panel-menu-item-2nd-level-offset: 3.625rem !default;
+$panel-menu-item-2nd-level-font-size: 0.875rem !default;
+$panel-menu-item-2nd-level-hover-background-color: $rz-secondary !default;
+$panel-menu-item-2nd-level-hover-color: inherit !default;
+$panel-menu-item-2nd-level-color: inherit !default;
+$panel-menu-item-3rd-level-hover-background-color: $rz-secondary !default;
+$panel-menu-item-3rd-level-hover-color: inherit !default;
+
+$panel-menu-icon-width: 1.25rem !default;
+$panel-menu-icon-font-size: 1.25rem !default;
+$panel-menu-icon-color: $panel-menu-color !default;
+$panel-menu-icon-height: $panel-menu-icon-width !default;
+$panel-menu-icon-margin: 0 0.5rem 0 0 !default;
+$panel-menu-icon-2nd-level-margin: 0 0.75rem 0 -2.25rem !default;
+
 // Accordion
 
 $accordion-item-padding: 0.25rem 0 !default;
@@ -562,6 +592,18 @@ $header-z: 2 !default;
 $header-border: none !default;
 $header-color: $body-color !default;
 $header-shadow: $rz-shadow-level-2 !default;
+
+// Sidebar
+$sidebar-border-right: 1px solid $rz-base-300 !default;
+$sidebar-background-color: $rz-white !default;
+
+// SidebarToggle
+$sidebar-toggle-border: 1px solid $rz-base-200 !default;
+$sidebar-toggle-hover-color: $rz-base-900 !default;
+$sidebar-toggle-background-color: $rz-white !default;
+$sidebar-toggle-color: $rz-base-800 !default;
+$sidebar-toggle-hover-background-color: $rz-white !default;
+$sidebar-toggle-hover-border-radius: 0 !default;
 
 // Input components
 $input-font-size: 0.875rem !default;
@@ -788,17 +830,77 @@ $upload-button-background-color: $primary !default;
 $scrollbar-background-color: $rz-base-100 !default;
 $scrollbar-color: $rz-base-400 !default;
 
+
+// Charts
+
+$chart-axis-color: $rz-base-300 !default;
+$chart-axis-label-color: $rz-base-600 !default;
+$chart-axis-font-size: 0.75rem !default;
+$chart-tooltip-background: $rz-white !default;
+$chart-tooltip-color: $rz-base-900 !default;
+
+$color-schemes: (
+  palette: (
+    #240093,
+    #5a0a8e,
+    #8f1389,
+    #c41d84,
+    #f9267f,
+    #fc695a,
+    #fe8e50,
+    #ffa14b,
+    #ffb346    
+  ),
+  pastel: (
+    #376DF5,
+    #64DFDF,
+    #F68769,
+    #C161E2,
+    #FDD07A,
+    #F8629B,
+    #74D062,
+    #84A7FF
+  ),
+  monochrome: (
+    #04247b,
+    #0734a6,
+    #0d45d4,
+    #2659fa,
+    #5a74fb,
+    #7d8efc,
+    #9ca8fd,
+    #b9c0fd
+  ),
+  divergent: (
+    #5d07d7,
+    #8436ca,
+    #ac67bb,
+    #d397ad,
+    #fdca9f,
+    #ffab83,
+    #ff8564,
+    #ff5e44,
+    #ff3725,
+  )
+) !default;
+
+
+@import 'bootstrap';
+@import 'fonts';
+@import 'typography';
+@import 'components';
+
 // Headings
 
 $heading-color: $rz-base-900;
 
 $headings: (
-  h1: (font-size: 2rem, font-weight: 700, letter-spacing: -0.04em, color: $heading-color),
-  h2: (font-size: 1.5rem, font-weight: 700, letter-spacing: -0.03em, color: $heading-color),
-  h3: (font-size: 1.25rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color),
-  h4: (font-size: 1rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color),
-  h5: (font-size: 0.875rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color),
-  h6: (font-size: 0.75rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color)
+  h1: (font-size: 2rem, font-weight: 700, letter-spacing: -0.04em, color: $heading-color, margin-bottom: 1.25rem),
+  h2: (font-size: 1.5rem, font-weight: 700, letter-spacing: -0.03em, color: $heading-color, margin-bottom: 1rem),
+  h3: (font-size: 1.25rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.75rem),
+  h4: (font-size: 1rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem),
+  h5: (font-size: 0.875rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem),
+  h6: (font-size: 0.75rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem)
 );
 
 @each $name, $heading in $headings {
@@ -833,9 +935,6 @@ body {
   line-height: $paragraph-line-height;
 }
 
-@import 'bootstrap';
-@import 'fonts';
-@import 'typography';
-@import 'components';
+
 
 

@@ -26,6 +26,7 @@ $panel-menu-icon-height: $panel-menu-icon-width !default;
 $panel-menu-icon-margin: 0 0.9375rem 0 0 !default;
 $panel-menu-icon-2nd-level-margin: 0 0.75rem 0 -2.25rem !default;
 
+$panel-menu-font-size: inherit !default;
 $panel-menu-toggle-icon-font-size: 1.5rem !default;
 
 .rz-panel-menu {
@@ -33,6 +34,7 @@ $panel-menu-toggle-icon-font-size: 1.5rem !default;
   padding: 0;
   margin-bottom: 0;
   overflow: auto;
+  font-size: $panel-menu-font-size;
 
   color: $panel-menu-color;
   background-color: $panel-menu-background-color;
@@ -92,6 +94,7 @@ $panel-menu-toggle-icon-font-size: 1.5rem !default;
     width: $panel-menu-icon-width;
     color: $panel-menu-icon-color;
     margin: $panel-menu-icon-margin;
+    font-size: $panel-menu-icon-font-size;
   }
 
   .rz-navigation-menu {
