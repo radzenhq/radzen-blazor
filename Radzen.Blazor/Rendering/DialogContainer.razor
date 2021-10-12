@@ -28,7 +28,7 @@
                             <span class="rzi rzi-times"></span>
                         </a>
                     }
-                </div>                
+                </div>
             }
         }
         <div class="rz-dialog-content">
@@ -42,7 +42,14 @@
             }
         </div>
     </div>
-    <div class="rz-dialog-mask" style="z-index: 1000;"></div>
+    @if (Dialog.Options.CloseDialogOnOverlayClick)
+    {
+        <div @onclick="@Close" class="rz-dialog-mask" style="z-index: 1000;"></div>
+    }
+    else
+    {
+        <div class="rz-dialog-mask" style="z-index: 1000;"></div>
+    }
 </div>
 
 @code {
