@@ -165,7 +165,8 @@ namespace Radzen
                 Draggable = options != null ? options.Draggable : false,
                 ChildContent = options?.ChildContent,
                 Style = options != null ? options.Style : "",
-                AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true
+                AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true,
+                CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
             });
         }
 
@@ -320,6 +321,11 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> if [automatic focus first element]; otherwise, <c>false</c>.</value>
         public bool AutoFocusFirstElement { get; set; } = true;
+        /// <summary>
+        /// Gets or sets a value indicating whether the dialog should be closed by clicking the overlay.
+        /// </summary>
+        /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
+        public bool CloseDialogOnOverlayClick { get; set; } = false;
     }
 
     /// <summary>
