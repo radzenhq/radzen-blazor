@@ -324,7 +324,7 @@ namespace Radzen
         /// <summary>
         /// Gets or sets a value indicating whether the dialog should be closed by clicking the overlay.
         /// </summary>
-        /// <value><c>true</c> if closable; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
         public bool CloseDialogOnOverlayClick { get; set; } = false;
     }
 
