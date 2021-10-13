@@ -67,7 +67,7 @@ namespace Radzen.Blazor
 
             if (shouldRefresh)
             {
-                Chart.Refresh();
+                await Chart.Refresh();
             }
         }
 
