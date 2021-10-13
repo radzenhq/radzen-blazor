@@ -1,5 +1,6 @@
 @import 'colors';
 @import 'variables';
+$standard: true;
 
 // Color tokens
 
@@ -346,6 +347,51 @@ $button-focus-styles: map-merge(
   }
 
 }
+
+// Badge
+
+$badge-border-radius: $rz-border-radius !default;
+$badge-pill-border-radius: $rz-border-radius * 4 !default;
+$badge-padding: 0.125rem 0.25rem !default;
+$badge-pill-padding: 0.125rem 0.5rem !default;
+$badge-font-weight: 600 !default;
+$badge-line-height: 1rem !default;
+$badge-text-transform: uppercase !default;
+$badge-letter-spacing: 0.02rem !default;
+
+$badge-styles: () !default;
+
+$badge-styles: map-merge(
+  (
+    primary: (
+      background-color: $rz-primary
+    ),
+    light: (
+      background-color: $rz-base-200,
+      color: $rz-base-800
+    ),
+    secondary: (
+      background-color: $rz-secondary,
+      color: $rz-primary
+    ),
+    info: (
+      background-color: $rz-info
+    ),
+    warning: (
+      background-color: $rz-warning
+    ),
+    error: (
+      background-color: $rz-danger
+    ),
+    danger: (
+      background-color: $rz-danger
+    ),
+    success: (
+      background-color: $rz-success
+    )
+  ),
+  $badge-styles
+);
 
 // PanelMenu
 

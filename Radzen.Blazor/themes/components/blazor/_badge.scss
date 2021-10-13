@@ -1,4 +1,11 @@
-﻿$badge-pill-border-radius: $border-radius !default;
+﻿$badge-border-radius: 0 !default;
+$badge-pill-border-radius: $border-radius !default;
+$badge-padding: 0.25em 0.4em !default;
+$badge-pill-padding: $badge-padding !default;
+$badge-font-weight: 700 !default;
+$badge-line-height: 1 !default;
+$badge-text-transform: none !default;
+$badge-letter-spacing: 0 !default;
 
 $badge-styles: () !default;
 
@@ -36,12 +43,22 @@ $badge-styles: map-merge(
 .rz-badge {
     color: $white;
     display: inline-block;
-    padding: .25em .4em;
+    padding: $badge-padding;
     font-size: 75%;
-    font-weight: 700;
-    line-height: 1;
+    font-weight: $badge-font-weight;
+    line-height: $badge-line-height;
     text-align: center;
+    text-transform: $badge-text-transform;
     white-space: nowrap;
+    border-radius: $badge-border-radius;
+    letter-spacing: $badge-letter-spacing;
+
+    @if $standard == true {
+      .rz-button & {
+        vertical-align: top;
+        margin: 0 0.25rem;
+      }
+    }
 }
 
 @each $style, $badge in $badge-styles {
@@ -54,4 +71,5 @@ $badge-styles: map-merge(
 
 .rz-badge-pill {
     border-radius: $badge-pill-border-radius;
+    padding: $badge-pill-padding;
 }
