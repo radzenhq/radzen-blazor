@@ -289,7 +289,7 @@ namespace Radzen.Blazor
         /// <param name="width">The width.</param>
         /// <param name="height">The height.</param>
         [JSInvokable]
-        public void Resize(double width, double height)
+        public async Task Resize(double width, double height)
         {
             var stateHasChanged = false;
 
@@ -311,7 +311,7 @@ namespace Radzen.Blazor
 
             if (stateHasChanged)
             {
-                Refresh();
+                await Refresh();
             }
         }
 
@@ -338,12 +338,12 @@ namespace Radzen.Blazor
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
         [JSInvokable]
-        public void MouseMove(double x, double y)
+        public async Task MouseMove(double x, double y)
         {
             mouseX = x;
             mouseY = y;
 
-            DisplayTooltip();
+            await DisplayTooltip();
         }
 
         /// <summary>
@@ -373,7 +373,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Displays the tooltip.
         /// </summary>
-        internal void DisplayTooltip()
+        internal async Task DisplayTooltip()
         {
             if (Tooltip.Visible)
             {
@@ -388,6 +388,7 @@ namespace Radzen.Blazor
                             tooltipData = data;
                             tooltip = series.RenderTooltip(data, MarginLeft, MarginTop);
                             StateHasChanged();
+                            await Task.Yield();
                         }
 
                         return;
@@ -400,6 +401,7 @@ namespace Radzen.Blazor
                     tooltip = null;
 
                     StateHasChanged();
+                    await Task.Yield();
                 }
             }
         }
@@ -538,15 +540,17 @@ namespace Radzen.Blazor
         /// Refreshes the specified force.
         /// </summary>
         /// <param name="force">if set to <c>true</c> [force].</param>
-        internal void Refresh(bool force = true)
+        internal async Task Refresh(bool force = true)
         {
             if (widthAndHeightAreSet)
             {
+
                 var stateHasChanged = UpdateScales();
 
                 if (stateHasChanged || force)
                 {
                     StateHasChanged();
+                    await DisplayTooltip();
                 }
             }
         }
@@ -554,9 +558,9 @@ namespace Radzen.Blazor
         /// <summary>
         /// Reloads this instance.
         /// </summary>
-        public void Reload()
+        public async Task Reload()
         {
-            Refresh(true);
+            await Refresh(true);
         }
 
         /// <summary>

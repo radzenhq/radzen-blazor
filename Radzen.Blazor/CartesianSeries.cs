@@ -400,8 +400,7 @@ namespace Radzen.Blazor
                     }
                 }
 
-                Chart.Refresh(false);
-                Chart.DisplayTooltip();
+                await Chart.Refresh(false);
             }
         }
 
@@ -578,10 +577,10 @@ namespace Radzen.Blazor
         /// <summary>
         /// Called when [legend item click].
         /// </summary>
-        private void OnLegendItemClick()
+        private async Task OnLegendItemClick()
         {
             IsVisible = !IsVisible;
-            Chart.Refresh();
+            await Chart.Refresh();
         }
 
         /// <summary>
