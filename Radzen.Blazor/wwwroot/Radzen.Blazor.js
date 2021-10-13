@@ -326,7 +326,7 @@ window.Radzen = {
 
     document.addEventListener('mousemove', Radzen[id].mouseMoveHandler);
     document.addEventListener('touchmove', Radzen[id].mouseMoveHandler, {
-      passive: true
+      passive: false, capture: true
     });
 
     document.addEventListener('mouseup', Radzen[id].mouseUpHandler);
