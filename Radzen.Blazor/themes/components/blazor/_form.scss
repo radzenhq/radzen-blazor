@@ -3,6 +3,7 @@ $form-error-font-size: 0.75rem !default;
 $validator-background-color: $danger !default;
 $validator-color: $white !default;
 $validator-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15) !default;
+$validator-text-padding: 0 !default;
 $validator-padding: 4px 12px !default;
 $validator-pointer-size: 6px !default;
 $validator-transform: translateY(16px) !default;
@@ -26,6 +27,7 @@ $validator-transform: translateY(16px) !default;
   display: inline-block;
   color: $form-error-color;
   font-size: $form-error-font-size;
+  padding: $validator-text-padding;
 }
 
 .rz-message-popup {

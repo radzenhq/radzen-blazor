@@ -94,8 +94,6 @@ $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
 
 $rz-border-radius: 0.25rem !default;
 
-$line-height-base: 1.25 !default;
-
 
 // Button
 
@@ -611,7 +609,7 @@ $sidebar-toggle-hover-border-radius: 0 !default;
 
 // Input components
 $input-font-size: 0.875rem !default;
-$input-height: auto !important;
+$input-height: 2.25rem;
 $input-line-height: 1.429 !default;
 $input-padding: 0.4375rem !default;
 $input-value-color: $rz-base-800 !default;
@@ -634,6 +632,49 @@ $input-disabled-shadow: none !default;
 $input-disabled-color: rgba($rz-base-800, .5) !default;
 
 $input-transition: all 0.1s linear !default; 
+
+// Numeric
+
+$numeric-line-height: 1.25rem !default;
+$numeric-input-padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+$numeric-button-width: 1rem !default;
+$numeric-button-height: $numeric-button-width !default;
+$numeric-button-offset: 1px !default;
+$numeric-button-border-radius: $rz-border-radius / 2 !default;
+$numeric-button-background-color: $rz-white !default;
+$numeric-button-disabled-background-color: $rz-white !default;
+$numeric-button-disabled-color: rgba($rz-base-800, .5) !default;
+$numeric-button-color: $rz-base-800 !default;
+
+
+// Forms
+
+$form-error-color: $rz-danger !default;
+$form-error-font-size: 0.75rem !default;
+$validator-background-color: $danger !default;
+$validator-color: $white !default;
+$validator-shadow: 0 6px 14px 0 rgba($rz-danger, 0.3) !default;
+$validator-text-padding: 0.25rem 0 0 0 !default;
+$validator-padding: 0.5rem !default;
+$validator-pointer-size: 0.25rem !default;
+$validator-transform: translateY(12px) !default;
+
+// Fieldset
+
+$fieldset-border: 1px solid $rz-base-300 !default;
+$fieldset-border-radius: $rz-border-radius !default;
+$fieldset-padding: 1.25rem !default;
+$fieldset-legend-color: $rz-base-800 !default;
+$fieldset-legend-font-size: 0.875rem !default;
+$fieldset-legend-padding: 0 1rem !default;
+
+$fieldset-toggle-width: 1.125rem !default;
+$fieldset-toggle-margin: 0 0.5rem 0 0 !default;
+$fieldset-toggle-height: $fieldset-toggle-width !default;
+$fieldset-toggle-background-color: $rz-base-200 !default;
+$fieldset-toggle-color: $rz-base-800 !default;
+$fieldset-toggle-font-size: 1rem !default;
+$fieldset-toggle-border: none !default;
 
 // Slider
 
@@ -903,6 +944,12 @@ $color-schemes: (
   )
 ) !default;
 
+
+@import 'bootstrap';
+@import 'fonts';
+@import 'typography';
+@import 'components';
+
 // Paragraph
 $paragraph-line-height: 1.25rem !default;
 
@@ -910,22 +957,18 @@ body {
   line-height: $paragraph-line-height;
 }
 
-@import 'bootstrap';
-@import 'fonts';
-@import 'typography';
-@import 'components';
 
 // Headings
 
 $heading-color: $rz-base-900;
 
 $headings: (
-  h1: (font-size: 2rem, font-weight: 700, letter-spacing: -0.04em, color: $heading-color, margin-bottom: 1.25rem),
-  h2: (font-size: 1.5rem, font-weight: 700, letter-spacing: -0.03em, color: $heading-color, margin-bottom: 1rem),
-  h3: (font-size: 1.25rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.75rem),
-  h4: (font-size: 1rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem),
-  h5: (font-size: 0.875rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem),
-  h6: (font-size: 0.75rem, font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem)
+  h1: (font-size: 2rem, line-height: 1.1875em, font-weight: 700, letter-spacing: -0.04em, color: $heading-color, margin-bottom: 1rem),
+  h2: (font-size: 1.5rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.03em, color: $heading-color, margin-bottom: 1rem),
+  h3: (font-size: 1.25rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.75rem),
+  h4: (font-size: 1rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem),
+  h5: (font-size: 0.875rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem),
+  h6: (font-size: 0.75rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem)
 );
 
 @each $name, $heading in $headings {
@@ -952,8 +995,3 @@ $headings-light: (
     }
   }
 }
-
-
-
-
-
