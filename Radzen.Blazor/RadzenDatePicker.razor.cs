@@ -53,8 +53,7 @@ namespace Radzen.Blazor
 
                 if (!object.Equals(newValue, Value))
                 {
-                    Value = newValue;
-                    await OnChange();
+                    await UpdateValueFromTime(newValue);
                 }
             }
         }
@@ -81,8 +80,7 @@ namespace Radzen.Blazor
 
                 if (!object.Equals(newValue, Value))
                 {
-                    Value = newValue;
-                    await OnChange();
+                    await UpdateValueFromTime(newValue);
                 }
             }
         }
@@ -138,6 +136,19 @@ namespace Radzen.Blazor
             }
         }
 
+        async Task UpdateValueFromTime(DateTime newValue)
+        {
+            if (ShowTimeOkButton)
+            {
+                CurrentDate = newValue;
+            }
+            else
+            {
+                Value = newValue;
+                await OnChange();
+            }
+        }
+
         /// <summary>
         /// Updates the hour.
         /// </summary>
@@ -151,8 +162,7 @@ namespace Radzen.Blazor
             if (!object.Equals(newValue, Value))
             {
                 hour = newValue.Hour;
-                Value = newValue;
-                await OnChange();
+                await UpdateValueFromTime(newValue);
             }
         }
 
@@ -167,8 +177,7 @@ namespace Radzen.Blazor
             if (!object.Equals(newValue, Value))
             {
                 minutes = newValue.Minute;
-                Value = newValue;
-                await OnChange();
+                await UpdateValueFromTime(newValue);
             }
         }
 
@@ -183,8 +192,7 @@ namespace Radzen.Blazor
             if (!object.Equals(newValue, Value))
             {
                 seconds = newValue.Second;
-                Value = newValue;
-                await OnChange();
+                await UpdateValueFromTime(newValue);
             }
         }
 
@@ -391,6 +399,7 @@ namespace Radzen.Blazor
             }
         }
 
+        DateTime _currentDate;
         /// <summary>
         /// Gets the current date.
         /// </summary>
@@ -399,7 +408,15 @@ namespace Radzen.Blazor
         {
             get
             {
-                return HasValue && DateTimeValue.Value != default(DateTime) ? DateTimeValue.Value : DateTime.Today;
+                if (_currentDate == default(DateTime))
+                {
+                    _currentDate = HasValue && DateTimeValue.Value != default(DateTime) ? DateTimeValue.Value : DateTime.Today;
+                }
+                return _currentDate;
+            }
+            set 
+            {
+                _currentDate = value;
             }
         }
 
@@ -863,13 +880,21 @@ namespace Radzen.Blazor
         /// <param name="newValue">The new value.</param>
         private async System.Threading.Tasks.Task SetDay(DateTime newValue)
         {
-            var currentValue = HasValue ? DateTimeValue.Value : CurrentDate;
-
-            if (newValue != DateTimeValue)
+            if (ShowTimeOkButton)
             {
-                DateTimeValue = newValue;
-                await OnChange();
-                Close();
+                CurrentDate = new DateTime(CurrentDate.Year, CurrentDate.Month,newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
+                await OkClick();
+            }
+            else
+            {
+                var currentValue = HasValue ? DateTimeValue.Value : CurrentDate;
+
+                if (newValue != DateTimeValue)
+                {
+                    DateTimeValue = newValue;
+                    await OnChange();
+                    Close();
+                }
             }
         }
 
@@ -884,8 +909,7 @@ namespace Radzen.Blazor
 
             if (newValue != DateTimeValue)
             {
-                DateTimeValue = newValue;
-                await OnChange();
+                CurrentDate = newValue;
                 Close();
             }
         }
@@ -901,8 +925,7 @@ namespace Radzen.Blazor
 
             if (newValue != DateTimeValue)
             {
-                DateTimeValue = newValue;
-                await OnChange();
+                CurrentDate = newValue;
                 Close();
             }
         }
