@@ -7,27 +7,17 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenRadioButtonList.
+    /// RadzenRadioButtonList component.
     /// Implements the <see cref="Radzen.FormComponent{TValue}" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.FormComponent{TValue}" />
     public partial class RadzenRadioButtonList<TValue> : FormComponent<TValue>
     {
-        /// <summary>
-        /// Items the class list.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>ClassList.</returns>
         ClassList ItemClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-box")
                                                                             .Add("rz-state-active", IsSelected(item))
                                                                             .AddDisabled(Disabled || item.Disabled);
 
-        /// <summary>
-        /// Icons the class list.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>ClassList.</returns>
         ClassList IconClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-icon")
                                                                             .Add("rzi rzi-circle-on", IsSelected(item));
         /// <summary>
@@ -58,10 +48,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string VisibleProperty { get; set; }
 
-        /// <summary>
-        /// Gets all items.
-        /// </summary>
-        /// <value>All items.</value>
         IEnumerable<RadzenRadioButtonListItem<TValue>> allItems
         {
             get
@@ -87,10 +73,8 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The data
-        /// </summary>
         IEnumerable _data = null;
+
         /// <summary>
         /// Gets or sets the data.
         /// </summary>

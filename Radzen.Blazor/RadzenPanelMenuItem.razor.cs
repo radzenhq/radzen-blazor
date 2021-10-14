@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenPanelMenuItem.
+    /// RadzenPanelMenuItem component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
@@ -29,9 +29,9 @@ namespace Radzen.Blazor
         public string Target { get; set; }
 
         /// <summary>
-        /// Gets or sets the expanded changed.
+        /// Gets or sets the expanded changed callback.
         /// </summary>
-        /// <value>The expanded changed.</value>
+        /// <value>The expanded changed callback.</value>
         [Parameter]
         public EventCallback<bool> ExpandedChanged { get; set; }
 
@@ -98,9 +98,6 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
-        /// <summary>
-        /// Toggles this instance.
-        /// </summary>
         async System.Threading.Tasks.Task Toggle()
         {
             expanded = !expanded;
@@ -108,36 +105,22 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Gets the style.
-        /// </summary>
-        /// <returns>System.String.</returns>
         string getStyle()
         {
             string deg = expanded ? "180" : "0";
             return $@"transform: rotate({deg}deg);";
         }
 
-        /// <summary>
-        /// Gets the item style.
-        /// </summary>
-        /// <returns>System.String.</returns>
         string getItemStyle()
         {
             return expanded ? "" : "display:none";
         }
 
-        /// <summary>
-        /// Expands this instance.
-        /// </summary>
         void Expand()
         {
             expanded = true;
         }
 
-        /// <summary>
-        /// The parent
-        /// </summary>
         RadzenPanelMenu _parent;
 
         /// <summary>
@@ -161,9 +144,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The parent item
-        /// </summary>
         RadzenPanelMenuItem _parentItem;
 
         /// <summary>
@@ -189,9 +169,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The items
-        /// </summary>
         List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
 
         /// <summary>
@@ -208,7 +185,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Selects the specified value.
+        /// Selects the specified item by value.
         /// </summary>
         /// <param name="value">if set to <c>true</c> [value].</param>
         public void Select(bool value)
@@ -218,9 +195,6 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Ensures the visible.
-        /// </summary>
         void EnsureVisible()
         {
             if (Selected)
@@ -235,9 +209,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The expanded
-        /// </summary>
         private bool expanded = false;
 
         /// <summary>

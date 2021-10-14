@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenRegexValidator.
+    /// RadzenRegexValidator component.
     /// Implements the <see cref="Radzen.Blazor.ValidatorBase" />
     /// </summary>
     /// <seealso cref="Radzen.Blazor.ValidatorBase" />

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenPager.
+    /// RadzenPager component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
@@ -23,16 +23,16 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the size of the page.
+        /// Gets or sets the page size.
         /// </summary>
-        /// <value>The size of the page.</value>
+        /// <value>The page size.</value>
         [Parameter]
         public int PageSize { get; set; } = 10;
 
         /// <summary>
-        /// Gets or sets the page size changed.
+        /// Gets or sets the page size changed callback.
         /// </summary>
-        /// <value>The page size changed.</value>
+        /// <value>The page size changed callback.</value>
         [Parameter]
         public EventCallback<int> PageSizeChanged { get; set; }
 
@@ -65,9 +65,9 @@ namespace Radzen.Blazor
         public int PageNumbersCount { get; set; } = 5;
 
         /// <summary>
-        /// Gets or sets the count.
+        /// Gets or sets the total items count.
         /// </summary>
-        /// <value>The count.</value>
+        /// <value>The total items count.</value>
         [Parameter]
         public int Count { get; set; }
 
@@ -93,9 +93,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the page changed.
+        /// Gets or sets the page changed callback.
         /// </summary>
-        /// <value>The page changed.</value>
+        /// <value>The page changed callback.</value>
         [Parameter]
         public EventCallback<PagerEventArgs> PageChanged { get; set; }
 
@@ -108,7 +108,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [parameters set asynchronous].
+        /// Called when parameters set asynchronous.
         /// </summary>
         /// <returns>Task.</returns>
         protected override Task OnParametersSetAsync()
@@ -122,7 +122,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [page size changed].
+        /// Called when page size changed.
         /// </summary>
         /// <param name="value">The value.</param>
         protected async Task OnPageSizeChanged(object value)
@@ -144,25 +144,10 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The skip
-        /// </summary>
         protected int skip;
-        /// <summary>
-        /// The number of page links
-        /// </summary>
         protected int numberOfPageLinks = 5;
-        /// <summary>
-        /// The start page
-        /// </summary>
         protected int startPage;
-        /// <summary>
-        /// The end page
-        /// </summary>
         protected int endPage;
-        /// <summary>
-        /// The number of pages
-        /// </summary>
         protected int numberOfPages;
 
         /// <summary>
@@ -202,7 +187,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Goes to page.
+        /// Goes to specified page.
         /// </summary>
         /// <param name="page">The page.</param>
         /// <param name="forceReload">if set to <c>true</c> [force reload].</param>
@@ -216,10 +201,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Sets the current page.
-        /// </summary>
-        /// <param name="page">The page.</param>
         internal void SetCurrentPage(int page)
         {
             if (CurrentPage != page)
@@ -228,10 +209,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Sets the count.
-        /// </summary>
-        /// <param name="count">The count.</param>
         internal void SetCount(int count)
         {
             Count = count;
@@ -239,7 +216,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Firsts the page.
+        /// Goes to first page.
         /// </summary>
         /// <param name="forceReload">if set to <c>true</c> [force reload].</param>
         public async Task FirstPage(bool forceReload = false)
@@ -253,7 +230,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Previouses the page.
+        /// Goes to previous page.
         /// </summary>
         public async Task PrevPage()
         {
@@ -267,7 +244,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Nexts the page.
+        /// Goes to next page.
         /// </summary>
         public async Task NextPage()
         {
@@ -281,7 +258,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Lasts the page.
+        /// Goes to last page.
         /// </summary>
         public async Task LastPage()
         {

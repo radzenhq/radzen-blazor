@@ -4,7 +4,7 @@ using System;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenProgressBar.
+    /// RadzenProgressBar component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
@@ -41,23 +41,23 @@ namespace Radzen.Blazor
         public double Value { get; set; }
 
         /// <summary>
-        /// Determines the maximum of the parameters.
+        /// Determines the maximum value.
         /// </summary>
-        /// <value>The maximum.</value>
+        /// <value>The maximum value.</value>
         [Parameter]
         public double Max { get; set; } = 100;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show value].
+        /// Gets or sets a value indicating whether value is shown.
         /// </summary>
-        /// <value><c>true</c> if [show value]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if value is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowValue { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the value changed.
+        /// Gets or sets the value changed callback.
         /// </summary>
-        /// <value>The value changed.</value>
+        /// <value>The value changed callback.</value>
         [Parameter]
         public Action<double> ValueChanged { get; set; }
     }

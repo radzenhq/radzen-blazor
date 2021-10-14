@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenPanel.
+    /// RadzenPanel component.
     /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponentWithChildren" />
@@ -21,15 +21,12 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow collapse].
+        /// Gets or sets a value indicating whether collapse is allowed.
         /// </summary>
         /// <value><c>true</c> if [allow collapse]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowCollapse { get; set; }
 
-        /// <summary>
-        /// The collapsed
-        /// </summary>
         private bool collapsed;
 
         /// <summary>
@@ -75,32 +72,22 @@ namespace Radzen.Blazor
         public RenderFragment FooterTemplate { get; set; }
 
         /// <summary>
-        /// Gets or sets the expand.
+        /// Gets or sets the expand callback.
         /// </summary>
-        /// <value>The expand.</value>
+        /// <value>The expand callback.</value>
         [Parameter]
         public EventCallback Expand { get; set; }
 
         /// <summary>
-        /// Gets or sets the collapse.
+        /// Gets or sets the collapse callback.
         /// </summary>
-        /// <value>The collapse.</value>
+        /// <value>The collapse callback.</value>
         [Parameter]
         public EventCallback Collapse { get; set; }
 
-        /// <summary>
-        /// The content style
-        /// </summary>
         string contentStyle = "display: block;";
-        /// <summary>
-        /// The summary content style
-        /// </summary>
         string summaryContentStyle = "display: none";
 
-        /// <summary>
-        /// Toggles the specified arguments.
-        /// </summary>
-        /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         async System.Threading.Tasks.Task Toggle(MouseEventArgs args)
         {
             collapsed = !collapsed;
@@ -120,7 +107,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [initialized].
+        /// Called when initialized.
         /// </summary>
         protected override void OnInitialized()
         {
@@ -143,7 +130,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [parameters set asynchronous].
+        /// Called when parameters set asynchronous.
         /// </summary>
         /// <returns>Task.</returns>
         protected override Task OnParametersSetAsync()

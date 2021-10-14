@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenMenu.
+    /// RadzenMenu component.
     /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponentWithChildren" />
@@ -17,10 +17,6 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Responsive { get; set; } = true;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is open.
-        /// </summary>
-        /// <value><c>true</c> if this instance is open; otherwise, <c>false</c>.</value>
         private bool IsOpen { get; set; } = false;
 
         /// <summary>
@@ -48,18 +44,15 @@ namespace Radzen.Blazor
             return string.Join(" ", classList);
         }
 
-        /// <summary>
-        /// Called when [toggle].
-        /// </summary>
         void OnToggle()
         {
             IsOpen = !IsOpen;
         }
 
         /// <summary>
-        /// Gets or sets the click.
+        /// Gets or sets the click callback.
         /// </summary>
-        /// <value>The click.</value>
+        /// <value>The click callback.</value>
         [Parameter]
         public EventCallback<MenuItemEventArgs> Click { get; set; }
     }

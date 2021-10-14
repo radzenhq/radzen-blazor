@@ -3,17 +3,15 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenRadioButtonListItem.
+    /// RadzenRadioButtonListItem component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.RadzenComponent" />
     public class RadzenRadioButtonListItem<TValue> : RadzenComponent
     {
-        /// <summary>
-        /// The text
-        /// </summary>
         private string _text;
+
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
@@ -51,9 +49,6 @@ namespace Radzen.Blazor
         [Parameter]
         public virtual bool Disabled { get; set; }
 
-        /// <summary>
-        /// The list
-        /// </summary>
         RadzenRadioButtonList<TValue> _list;
 
         /// <summary>
@@ -86,37 +81,21 @@ namespace Radzen.Blazor
             List?.RemoveItem(this);
         }
 
-        /// <summary>
-        /// Sets the text.
-        /// </summary>
-        /// <param name="value">The value.</param>
         internal void SetText(string value)
         {
             Text = value;
         }
 
-        /// <summary>
-        /// Sets the value.
-        /// </summary>
-        /// <param name="value">The value.</param>
         internal void SetValue(TValue value)
         {
             Value = value;
         }
 
-        /// <summary>
-        /// Sets the disabled.
-        /// </summary>
-        /// <param name="value">if set to <c>true</c> [value].</param>
         internal void SetDisabled(bool value)
         {
             Disabled = value;
         }
 
-        /// <summary>
-        /// Sets the visible.
-        /// </summary>
-        /// <param name="value">if set to <c>true</c> [value].</param>
         internal void SetVisible(bool value)
         {
             Visible = value;
