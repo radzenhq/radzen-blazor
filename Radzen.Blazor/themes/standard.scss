@@ -20,7 +20,10 @@ $rz-primary: #1151F3;
 $rz-primary-light: #376df5; /*lighten($rz-primary, 8%);*/
 $rz-primary-dark: #0e44cc; /*darken($rz-primary, 10%);*/
 
-$rz-secondary: rgba($rz-primary, .16);
+$rz-secondary: $rz-primary;
+$rz-secondary-light: $rz-primary-light;
+$rz-secondary-dark: $rz-primary-dark;
+$rz-secondary-lighter: rgba($rz-secondary, .16);
 
 $rz-info: #12a4f5;
 
@@ -155,8 +158,8 @@ $button-styles: map-merge(
       color: $rz-base-800
     ),
     secondary: (
-      background-color: $rz-secondary,
-      color: $rz-primary
+      background-color: $rz-secondary-lighter,
+      color: $rz-secondary
     ),
     info: (
       background-color: $rz-info
@@ -189,7 +192,7 @@ $button-hover-styles: map-merge(
       color: $rz-base-900
     ),
     secondary: (
-      background-color: $rz-primary-light,
+      background-color: $rz-secondary-light,
       color: $rz-white
     ),
     info: (
@@ -228,7 +231,7 @@ $button-active-styles: map-merge(
       color: $rz-base-900
     ),
     secondary: (
-      background-color: $rz-primary-dark,
+      background-color: $rz-secondary-dark,
       color: $rz-white
     ),
     info: (
@@ -348,6 +351,16 @@ $button-focus-styles: map-merge(
 
 }
 
+// SelectButton
+$selectbar-background-color: transparent !default;
+$selectbar-color: $rz-base-800 !default;
+$selectbar-border: solid 1px $rz-base-300 !default;
+
+$selectbar-selected-background-color: $rz-primary !default;
+$selectbar-selected-color: $rz-white !default;
+$selectbar-selected-border: solid 1px $rz-primary !default;
+$selectbar-border-radius: $border-radius !default;
+
 // Badge
 
 $badge-border-radius: $rz-border-radius !default;
@@ -371,8 +384,8 @@ $badge-styles: map-merge(
       color: $rz-base-800
     ),
     secondary: (
-      background-color: $rz-secondary,
-      color: $rz-primary
+      background-color: $rz-secondary-lighter,
+      color: $rz-secondary
     ),
     info: (
       background-color: $rz-info
@@ -397,8 +410,8 @@ $badge-styles: map-merge(
 
 $panel-menu-color: $rz-base-800 !default;
 $panel-menu-background-color: $rz-white !default;
-$panel-menu-hover-background-color: $rz-secondary !default;
-$panel-menu-hover-color: $rz-primary !default;
+$panel-menu-hover-background-color: $rz-secondary-lighter !default;
+$panel-menu-hover-color: $rz-secondary !default;
 
 $panel-menu-item-line-height: 1.25rem !default;
 $panel-menu-item-margin: 0 1rem !default;
@@ -410,10 +423,10 @@ $panel-menu-item-offset: 0.75rem !default;
 $panel-menu-item-2nd-level-padding: 0.25rem 0 !default;
 $panel-menu-item-2nd-level-offset: 3.625rem !default;
 $panel-menu-item-2nd-level-font-size: 0.875rem !default;
-$panel-menu-item-2nd-level-hover-background-color: $rz-secondary !default;
+$panel-menu-item-2nd-level-hover-background-color: $rz-secondary-lighter !default;
 $panel-menu-item-2nd-level-hover-color: inherit !default;
 $panel-menu-item-2nd-level-color: inherit !default;
-$panel-menu-item-3rd-level-hover-background-color: $rz-secondary !default;
+$panel-menu-item-3rd-level-hover-background-color: $rz-secondary-lighter !default;
 $panel-menu-item-3rd-level-hover-color: inherit !default;
 
 $panel-menu-icon-width: 1.25rem !default;
@@ -480,11 +493,11 @@ $grid-cell-padding: 0.5rem !default;
 $grid-cell-color: $rz-base-800 !default;
 $grid-cell-font-size: 0.875rem !default;
 
-$grid-hover-background-color: $rz-secondary !default;
-$grid-hover-color: $rz-primary!default;
+$grid-hover-background-color: $rz-secondary-lighter !default;
+$grid-hover-color: $rz-secondary !default;
 
-$grid-selected-background-color: lighten($rz-secondary, 20%) !default;
-$grid-selected-color: $rz-primary !default;
+$grid-selected-background-color: lighten($rz-secondary-lighter, 20%) !default;
+$grid-selected-color: $rz-secondary !default;
 
 $grid-stripe-background-color: lighten($rz-base-100, 1%) !default;
 
@@ -550,7 +563,7 @@ $grid-detail-template-border-radius: 2px !default;
 $grid-detail-template-padding: 0.625rem !default;
 $grid-detail-template-background-color: $white !default;
 
-$grid-loading-indicator-background-color: $rz-secondary !default;
+$grid-loading-indicator-background-color: $rz-secondary-lighter !default;
 $grid-button-icon-only-padding: 0 0.25rem !default;
 $grid-button-text-padding: 0 0.6875rem !default;
 $grid-button-font-size: 0.75rem !default;
@@ -608,8 +621,8 @@ $paginator-numeric-button-background-color: $rz-base-200 !default;
 $paginator-numeric-button-color: $rz-base-800 !default;
 $paginator-numeric-button-margin: 0 0.125rem !default;
 $paginator-numeric-button-padding: 0.5rem 1rem !default;
-$paginator-numeric-button-selected-background-color: $rz-secondary !default;
-$paginator-numeric-button-selected-color: $primary-color !default;
+$paginator-numeric-button-selected-background-color: $rz-secondary-lighter !default;
+$paginator-numeric-button-selected-color: $rz-secondary !default;
 $paginator-numeric-button-selected-border: none !default;
 $paginator-numeric-button-selected-padding: $paginator-numeric-button-padding !default;
 
@@ -730,8 +743,8 @@ $slider-background-color: $rz-white !default;
 $slider-horizontal-height: 0.75rem !default;
 $slider-horizontal-width: 10rem !default;
 
-$slider-range-background-color: $rz-secondary !default;
-$slider-range-border: 1px solid $rz-secondary !default;
+$slider-range-background-color: $rz-secondary-lighter !default;
+$slider-range-border: 1px solid $rz-secondary-lighter !default;
 
 $slider-handle-background-color: $rz-white !default;
 $slider-handle-width: 1.25rem !default;
@@ -835,12 +848,12 @@ $dropdown-items-margin: 0 (-$dropdown-horizontal-padding) !default;
 
 $dropdown-item-padding: 0.25rem $dropdown-horizontal-padding !default;
 $dropdown-item-font-size: $input-font-size !default;
-$dropdown-item-hover-background-color: $rz-secondary !default;
-$dropdown-item-selected-background-color: lighten($rz-secondary, 20%) !default;
+$dropdown-item-hover-background-color: $rz-secondary-lighter !default;
+$dropdown-item-selected-background-color: lighten($rz-secondary-lighter, 20%) !default;
 $dropdown-item-selected-shadow: none !default;
-$dropdown-item-hover-color: $rz-primary !default;
-$dropdown-item-selected-color: $rz-primary !default;
-$dropdown-item-selected-hover-background-color: $rz-secondary !default;
+$dropdown-item-hover-color: $rz-secondary !default;
+$dropdown-item-selected-color: $rz-secondary !default;
+$dropdown-item-selected-hover-background-color: $rz-secondary-lighter !default;
 $dropdown-item-selected-hover-color: $dropdown-item-selected-color !default;
 $dropdown-item-transition: all 0.1s linear !default;
 
