@@ -6,29 +6,23 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class SchedulerViewBase.
-    /// Implements the <see cref="ComponentBase" />
-    /// Implements the <see cref="Radzen.Blazor.ISchedulerView" />
-    /// Implements the <see cref="IDisposable" />
+    /// A base class for scheduler views.
     /// </summary>
-    /// <seealso cref="ComponentBase" />
-    /// <seealso cref="Radzen.Blazor.ISchedulerView" />
-    /// <seealso cref="IDisposable" />
     public abstract class SchedulerViewBase : ComponentBase, ISchedulerView, IDisposable
     {
         /// <summary>
-        /// Gets the title.
+        /// Gets the title of the view. It is displayed in the RadzenScheduler title area.
         /// </summary>
         /// <value>The title.</value>
         public abstract string Title { get; }
         /// <summary>
-        /// Gets the text.
+        /// Gets the text of the view. It is displayed in the view switching UI.
         /// </summary>
         /// <value>The text.</value>
         public abstract string Text { get; set; }
 
         /// <summary>
-        /// Gets or sets the scheduler.
+        /// Gets or sets the scheduler instance.
         /// </summary>
         /// <value>The scheduler.</value>
         [CascadingParameter]
@@ -43,10 +37,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Set parameters as an asynchronous operation.
+        /// Called by the Blazor runtime when parameters are set.
         /// </summary>
         /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             if (parameters.DidParameterChange(nameof(Text), Text))
@@ -63,21 +56,20 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Nexts this instance.
+        /// Returns a new date when the user clicks the next button of RadzenScheduler.
         /// </summary>
-        /// <returns>DateTime.</returns>
+        /// <returns>The next date. For example a day view will return the next day, a week view will return the next week.</returns>
         public abstract DateTime Next();
 
         /// <summary>
-        /// Previouses this instance.
+        /// Returns a new date when the user clicks the previous button of RadzenScheduler.
         /// </summary>
-        /// <returns>DateTime.</returns>
+        /// <returns>The previous date. For example a day view will return the previous day, a week view will return the previous week.</returns>
         public abstract DateTime Prev();
 
         /// <summary>
         /// Renders this instance.
         /// </summary>
-        /// <returns>RenderFragment.</returns>
         public abstract RenderFragment Render();
 
         /// <summary>

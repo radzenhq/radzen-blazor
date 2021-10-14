@@ -4,31 +4,31 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Interface ISchedulerView
+    /// Interface that has to be implemented by a view in order to by supported by <see cref="RadzenScheduler" />.
     /// </summary>
     public interface ISchedulerView
     {
         /// <summary>
-        /// Gets the title.
+        /// Gets the title of the view. It is displayed in the RadzenScheduler title area.
         /// </summary>
         /// <value>The title.</value>
         string Title { get; }
         /// <summary>
-        /// Gets the text.
+        /// Gets the text of the view. It is displayed in the view switching UI.
         /// </summary>
         /// <value>The text.</value>
         string Text { get; }
 
         /// <summary>
-        /// Nexts this instance.
+        /// Returns a new date when the user clicks the next button of RadzenScheduler.
         /// </summary>
-        /// <returns>DateTime.</returns>
+        /// <returns>The next date. For example a day view will return the next day, a week view will return the next week.</returns>
         DateTime Next();
 
         /// <summary>
-        /// Previouses this instance.
+        /// Returns a new date when the user clicks the previous button of RadzenScheduler.
         /// </summary>
-        /// <returns>DateTime.</returns>
+        /// <returns>The previous date. For example a day view will return the previous day, a week view will return the previous week.</returns>
         DateTime Prev();
 
         /// <summary>
@@ -40,12 +40,10 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the start date.
         /// </summary>
-        /// <value>The start date.</value>
         DateTime StartDate { get; }
         /// <summary>
         /// Gets the end date.
         /// </summary>
-        /// <value>The end date.</value>
         DateTime EndDate { get; }
     }
 }

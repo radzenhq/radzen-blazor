@@ -7,35 +7,34 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Interface IScheduler
+    /// The common <see cref="RadzenScheduler" /> API injected as a cascading parameter to is views.
     /// </summary>
     public interface IScheduler
     {
         /// <summary>
-        /// Gets the appointments in range.
+        /// Gets the appointments in the specifed range.
         /// </summary>
-        /// <param name="start">The start.</param>
-        /// <param name="end">The end.</param>
-        /// <returns>IEnumerable&lt;AppointmentData&gt;.</returns>
+        /// <param name="start">The start of the range.</param>
+        /// <param name="end">The end of the range.</param>
+        /// <returns>A collection of appointments within the specified range.</returns>
         IEnumerable<AppointmentData> GetAppointmentsInRange(DateTime start, DateTime end);
         /// <summary>
-        /// Determines whether [is appointment in range] [the specified item].
+        /// Determines whether an appointment is within the specified range.
         /// </summary>
-        /// <param name="item">The item.</param>
-        /// <param name="start">The start.</param>
-        /// <param name="end">The end.</param>
-        /// <returns><c>true</c> if [is appointment in range] [the specified item]; otherwise, <c>false</c>.</returns>
+        /// <param name="item">The appointment to check.</param>
+        /// <param name="start">The start of the range.</param>
+        /// <param name="end">The end of the range.</param>
+        /// <returns><c>true</c> if the appointment is within the specified range; otherwise, <c>false</c>.</returns>
         bool IsAppointmentInRange(AppointmentData item, DateTime start, DateTime end);
         /// <summary>
-        /// Adds the view.
+        /// Adds a view. Must be called when a <see cref="ISchedulerView" /> is initialized.
         /// </summary>
-        /// <param name="view">The view.</param>
-        /// <returns>Task.</returns>
+        /// <param name="view">The view to add.</param>
         Task AddView(ISchedulerView view);
         /// <summary>
-        /// Removes the view.
+        /// Removes a view. Must be called when a <see cref="ISchedulerView" /> is disposed.
         /// </summary>
-        /// <param name="view">The view.</param>
+        /// <param name="view">The view to remove.</param>
         void RemoveView(ISchedulerView view);
         /// <summary>
         /// Determines whether the specified view is selected.
@@ -49,23 +48,21 @@ namespace Radzen.Blazor
         /// <value>The current date.</value>
         DateTime CurrentDate { get; set; }
         /// <summary>
-        /// Selects the appointment.
+        /// Selects the specified appointment.
         /// </summary>
-        /// <param name="data">The data.</param>
-        /// <returns>Task.</returns>
+        /// <param name="data">The appointment to select.</param>
         Task SelectAppointment(AppointmentData data);
         /// <summary>
-        /// Selects the slot.
+        /// Selects the specified slot.
         /// </summary>
         /// <param name="start">The start.</param>
         /// <param name="end">The end.</param>
-        /// <returns>Task.</returns>
         Task SelectSlot(DateTime start, DateTime end);
         /// <summary>
-        /// Gets the appointment attributes.
+        /// Gets the appointment HTML attributes.
         /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>IDictionary&lt;System.String, System.Object&gt;.</returns>
+        /// <param name="item">The appointment.</param>
+        /// <returns>A dictionary containing the HTML attributes for the specified appointment.</returns>
         IDictionary<string, object> GetAppointmentAttributes(AppointmentData item);
         /// <summary>
         /// Renders the appointment.
@@ -76,14 +73,12 @@ namespace Radzen.Blazor
         /// <summary>
         /// Reloads this instance.
         /// </summary>
-        /// <returns>Task.</returns>
         Task Reload();
         /// <summary>
         /// Gets the height.
         /// </summary>
         /// <value>The height.</value>
         double Height { get; }
-
         /// <summary>
         /// Gets or sets the culture.
         /// </summary>
