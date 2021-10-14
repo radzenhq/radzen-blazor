@@ -24,9 +24,17 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         protected override bool Validate(IRadzenFormComponent component)
         {
+            var value = component.GetValue();
+            var valueAsString = value as string;
+
+            if (string.IsNullOrEmpty(valueAsString))
+            {
+                return true;
+            }
+
             var email = new EmailAddressAttribute();
 
-            return email.IsValid(component.GetValue());
+            return email.IsValid(valueAsString);
         }
     }
 }
