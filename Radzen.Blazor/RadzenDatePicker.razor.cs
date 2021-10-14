@@ -887,8 +887,6 @@ namespace Radzen.Blazor
             }
             else
             {
-                var currentValue = HasValue ? DateTimeValue.Value : CurrentDate;
-
                 if (newValue != DateTimeValue)
                 {
                     DateTimeValue = newValue;
@@ -904,7 +902,7 @@ namespace Radzen.Blazor
         /// <param name="month">The month.</param>
         private async System.Threading.Tasks.Task SetMonth(int month)
         {
-            var currentValue = HasValue ? DateTimeValue.Value : CurrentDate;
+            var currentValue = CurrentDate;
             var newValue = new DateTime(currentValue.Year, month, Math.Min(currentValue.Day, DateTime.DaysInMonth(currentValue.Year, month)), currentValue.Hour, currentValue.Minute, currentValue.Second);
 
             if (newValue != DateTimeValue)
@@ -920,7 +918,7 @@ namespace Radzen.Blazor
         /// <param name="year">The year.</param>
         private async System.Threading.Tasks.Task SetYear(int year)
         {
-            var currentValue = HasValue ? DateTimeValue.Value : CurrentDate;
+            var currentValue = CurrentDate;
             var newValue = new DateTime(year, currentValue.Month, Math.Min(currentValue.Day, DateTime.DaysInMonth(year, currentValue.Month)), currentValue.Hour, currentValue.Minute, currentValue.Second);
 
             if (newValue != DateTimeValue)
