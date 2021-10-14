@@ -3,7 +3,7 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenDataList.
+    /// RadzenDataList component.
     /// Implements the <see cref="Radzen.PagedDataBoundComponent{TItem}" />
     /// </summary>
     /// <typeparam name="TItem">The type of the t item.</typeparam>
@@ -20,9 +20,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [wrap items].
+        /// Gets or sets a value indicating whether to wrap items.
         /// </summary>
-        /// <value><c>true</c> if [wrap items]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if wrap items; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool WrapItems { get; set; }
     }
