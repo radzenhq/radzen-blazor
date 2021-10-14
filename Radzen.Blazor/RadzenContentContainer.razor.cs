@@ -3,7 +3,7 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenContentContainer.
+    /// RadzenContentContainer component.
     /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponentWithChildren" />
