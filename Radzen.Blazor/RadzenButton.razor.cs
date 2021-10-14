@@ -6,16 +6,12 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenButton.
+    /// RadzenButton component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenButton : RadzenComponent
     {
-        /// <summary>
-        /// Gets the size of the button.
-        /// </summary>
-        /// <returns>System.String.</returns>
         private string getButtonSize()
         {
             return Size == ButtonSize.Medium ? "md" : "sm";
@@ -78,16 +74,16 @@ namespace Radzen.Blazor
         public bool Disabled { get; set; }
 
         /// <summary>
-        /// Gets or sets the click.
+        /// Gets or sets the click callback.
         /// </summary>
-        /// <value>The click.</value>
+        /// <value>The click callback.</value>
         [Parameter]
         public EventCallback<MouseEventArgs> Click { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is busy.
+        /// Gets or sets a value indicating whether this instance busy text is shown.
         /// </summary>
-        /// <value><c>true</c> if this instance is busy; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if this instance busy text is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool IsBusy { get; set; }
 
@@ -104,9 +100,7 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if this instance is disabled; otherwise, <c>false</c>.</value>
         public bool IsDisabled { get => Disabled || IsBusy; }
 
-        /// <summary>
-        /// The clicking
-        /// </summary>
+
         bool clicking;
         /// <summary>
         /// Handles the <see cref="E:Click" /> event.
