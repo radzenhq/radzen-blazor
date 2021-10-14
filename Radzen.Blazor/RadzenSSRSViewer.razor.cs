@@ -5,30 +5,30 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSSRSViewer.
+    /// RadzenSSRSViewer component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenSSRSViewer : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets a value indicating whether [use proxy].
+        /// Gets or sets a value indicating whether to use proxy.
         /// </summary>
-        /// <value><c>true</c> if [use proxy]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if proxy is enabled; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool UseProxy { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets the report server.
+        /// Gets or sets the report server URL.
         /// </summary>
-        /// <value>The report server.</value>
+        /// <value>The report server URL.</value>
         [Parameter]
         public string ReportServer { get; set; }
 
         /// <summary>
-        /// Gets or sets the local server.
+        /// Gets or sets the local server URL.
         /// </summary>
-        /// <value>The local server.</value>
+        /// <value>The local server URL.</value>
         [Parameter]
         public string LocalServer { get; set; }
 
@@ -83,9 +83,6 @@ namespace Radzen.Blazor
             InvokeAsync(StateHasChanged);
         }
 
-        /// <summary>
-        /// The parameters
-        /// </summary>
         List<RadzenSSRSViewerParameter> parameters = new List<RadzenSSRSViewerParameter>();
 
         /// <summary>

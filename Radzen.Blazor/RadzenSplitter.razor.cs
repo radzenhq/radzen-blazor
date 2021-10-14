@@ -10,15 +10,12 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSplitter.
+    /// RadzenSplitter component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenSplitter : RadzenComponent
     {
-        /// <summary>
-        /// The sizeautopanes
-        /// </summary>
         private int _sizeautopanes = 0;
 
         /// <summary>
@@ -35,9 +32,6 @@ namespace Radzen.Blazor
         [Parameter]
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
-        /// <summary>
-        /// The panes
-        /// </summary>
         internal List<RadzenSplitterPane> Panes = new List<RadzenSplitterPane>();
 
         /// <summary>
@@ -102,12 +96,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Resizes the execute.
-        /// </summary>
-        /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        /// <param name="paneIndex">Index of the pane.</param>
-        /// <returns>Task.</returns>
         internal Task ResizeExec(MouseEventArgs args, int paneIndex)
         {
             var pane = Panes[paneIndex];
@@ -130,7 +118,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [pane resized].
+        /// Called when pane resized.
         /// </summary>
         /// <param name="paneIndex">Index of the pane.</param>
         /// <param name="sizeNew">The size new.</param>
@@ -173,12 +161,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Collapses the execute.
-        /// </summary>
-        /// <param name="args">The arguments.</param>
-        /// <param name="paneIndex">Index of the pane.</param>
-        /// <param name="paneId">The pane identifier.</param>
         internal async Task CollapseExec(object args, int paneIndex, string paneId)
         {
             var pane = Panes[paneIndex];
@@ -212,12 +194,6 @@ namespace Radzen.Blazor
             await InvokeAsync(StateHasChanged);
         }
 
-        /// <summary>
-        /// Expands the execute.
-        /// </summary>
-        /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        /// <param name="paneIndex">Index of the pane.</param>
-        /// <param name="paneId">The pane identifier.</param>
         internal async Task ExpandExec(MouseEventArgs args, int paneIndex, string paneId)
         {
             var pane = Panes[paneIndex];
@@ -262,23 +238,23 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the collapse.
+        /// Gets or sets the collapse callback.
         /// </summary>
-        /// <value>The collapse.</value>
+        /// <value>The collapse callback.</value>
         [Parameter]
         public EventCallback<RadzenSplitterEventArgs> Collapse { get; set; }
 
         /// <summary>
-        /// Gets or sets the expand.
+        /// Gets or sets the expand callback.
         /// </summary>
-        /// <value>The expand.</value>
+        /// <value>The expand callback.</value>
         [Parameter]
         public EventCallback<RadzenSplitterEventArgs> Expand { get; set; }
 
         /// <summary>
-        /// Gets or sets the resize.
+        /// Gets or sets the resize callback.
         /// </summary>
-        /// <value>The resize.</value>
+        /// <value>The resize callback.</value>
         [Parameter]
         public EventCallback<RadzenSplitterResizeEventArgs> Resize { get; set; }
     }

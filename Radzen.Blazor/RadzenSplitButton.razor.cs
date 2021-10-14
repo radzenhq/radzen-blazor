@@ -5,7 +5,7 @@ using Microsoft.JSInterop;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSplitButton.
+    /// RadzenSplitButton component.
     /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponentWithChildren" />
@@ -40,9 +40,9 @@ namespace Radzen.Blazor
         public bool Disabled { get; set; }
 
         /// <summary>
-        /// Gets or sets the click.
+        /// Gets or sets the click callback.
         /// </summary>
-        /// <value>The click.</value>
+        /// <value>The click callback.</value>
         [Parameter]
         public EventCallback<RadzenSplitButtonItem> Click { get; set; }
 
@@ -59,7 +59,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Closes this instance.
+        /// Closes this instance popup.
         /// </summary>
         public void Close()
         {
@@ -78,28 +78,16 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the button CSS.
-        /// </summary>
-        /// <returns>System.String.</returns>
         private string getButtonCss()
         {
             return $"rz-button  rz-button-text-icon-left{(Disabled ? " rz-state-disabled" : "")}";
         }
 
-        /// <summary>
-        /// Gets the popup button CSS.
-        /// </summary>
-        /// <returns>System.String.</returns>
         private string getPopupButtonCss()
         {
             return $"rz-splitbutton-menubutton rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}";
         }
 
-        /// <summary>
-        /// Opens the popup script.
-        /// </summary>
-        /// <returns>System.String.</returns>
         private string OpenPopupScript()
         {
             if (Disabled)

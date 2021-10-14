@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSwitch.
+    /// RadzenSwitch component.
     /// Implements the <see cref="Radzen.FormComponent{System.Boolean}" />
     /// </summary>
     /// <seealso cref="Radzen.FormComponent{System.Boolean}" />
@@ -28,9 +28,6 @@ namespace Radzen.Blazor
             await Toggle();
         }
 
-        /// <summary>
-        /// Toggles this instance.
-        /// </summary>
         async System.Threading.Tasks.Task Toggle()
         {
             if (Disabled)

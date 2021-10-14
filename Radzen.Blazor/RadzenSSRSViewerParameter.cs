@@ -5,15 +5,12 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSSRSViewerParameter.
+    /// RadzenSSRSViewerParameter component.
     /// Implements the <see cref="ComponentBase" />
     /// </summary>
     /// <seealso cref="ComponentBase" />
     public class RadzenSSRSViewerParameter : ComponentBase
     {
-        /// <summary>
-        /// The parameter name
-        /// </summary>
         string _parameterName;
 
         /// <summary>
@@ -40,9 +37,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The value
-        /// </summary>
         string _value;
 
         /// <summary>
@@ -69,9 +63,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The viewer
-        /// </summary>
         RadzenSSRSViewer _viewer;
 
         /// <summary>

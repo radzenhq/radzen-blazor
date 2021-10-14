@@ -4,58 +4,28 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSplitterPane.
+    /// RadzenSplitterPane component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenSplitterPane : RadzenComponent
     {
-        /// <summary>
-        /// The splitter
-        /// </summary>
         RadzenSplitter _splitter;
-        /// <summary>
-        /// The size
-        /// </summary>
         private string _size;
 
-        /// <summary>
-        /// Gets or sets the size runtine.
-        /// </summary>
-        /// <value>The size runtine.</value>
         internal string SizeRuntine { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether [size automatic].
-        /// </summary>
-        /// <value><c>true</c> if [size automatic]; otherwise, <c>false</c>.</value>
         internal bool SizeAuto { get; set; }
 
-        /// <summary>
-        /// Gets or sets the index.
-        /// </summary>
-        /// <value>The index.</value>
         internal int Index { get; set; }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is last resizable.
-        /// </summary>
-        /// <value><c>true</c> if this instance is last resizable; otherwise, <c>false</c>.</value>
         internal bool IsLastResizable
         {
             get { return Splitter.Panes.Last(o => o.Resizable && !o.Collapsed) == this; }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is last.
-        /// </summary>
-        /// <value><c>true</c> if this instance is last; otherwise, <c>false</c>.</value>
         internal bool IsLast => Splitter.Panes.Count - 1 == Index;
 
-        /// <summary>
-        /// Nexts this instance.
-        /// </summary>
-        /// <returns>RadzenSplitterPane.</returns>
         internal RadzenSplitterPane Next()
         {
             return Index <= Splitter.Panes.Count - 2
@@ -63,10 +33,6 @@ namespace Radzen.Blazor
                 : null;
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is resizable.
-        /// </summary>
-        /// <value><c>true</c> if this instance is resizable; otherwise, <c>false</c>.</value>
         internal bool IsResizable
         {
             get
@@ -84,10 +50,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is collapsible.
-        /// </summary>
-        /// <value><c>true</c> if this instance is collapsible; otherwise, <c>false</c>.</value>
         internal bool IsCollapsible
         {
             get
@@ -103,10 +65,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is expandable.
-        /// </summary>
-        /// <value><c>true</c> if this instance is expandable; otherwise, <c>false</c>.</value>
         internal bool IsExpandable
         {
             get
@@ -122,10 +80,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the name of the class.
-        /// </summary>
-        /// <value>The name of the class.</value>
         internal string ClassName
         {
             get
@@ -172,16 +126,16 @@ namespace Radzen.Blazor
         public bool Resizable { get; set; } = true;
 
         /// <summary>
-        /// Determines the maximum of the parameters.
+        /// Determines the maximum value.
         /// </summary>
-        /// <value>The maximum.</value>
+        /// <value>The maximum value.</value>
         [Parameter]
         public string Max { get; set; }
 
         /// <summary>
-        /// Determines the minimum of the parameters.
+        /// Determines the minimum value.
         /// </summary>
-        /// <value>The minimum.</value>
+        /// <value>The minimum value.</value>
         [Parameter]
         public string Min { get; set; }
 
