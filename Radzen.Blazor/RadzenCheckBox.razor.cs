@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenCheckBox.
+    /// RadzenCheckBox component.
     /// Implements the <see cref="Radzen.FormComponent{TValue}" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
@@ -14,24 +14,16 @@ namespace Radzen.Blazor
     public partial class RadzenCheckBox<TValue> : FormComponent<TValue>
     {
         /// <summary>
-        /// Gets or sets a value indicating whether [tri state].
+        /// Gets or sets a value indicating whether is tri-state (true, false or null).
         /// </summary>
-        /// <value><c>true</c> if [tri state]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if tri-state; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool TriState { get; set; } = false;
 
-        /// <summary>
-        /// Gets the box class list.
-        /// </summary>
-        /// <value>The box class list.</value>
         ClassList BoxClassList => ClassList.Create("rz-chkbox-box")
                                            .Add("rz-state-active", !object.Equals(Value, false))
                                            .AddDisabled(Disabled);
 
-        /// <summary>
-        /// Gets the icon class list.
-        /// </summary>
-        /// <value>The icon class list.</value>
         ClassList IconClassList => ClassList.Create("rz-chkbox-icon")
                                             .Add("rzi rzi-check", object.Equals(Value, true))
                                             .Add("rzi rzi-times", object.Equals(Value, null));
@@ -62,7 +54,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Toggles this instance.
+        /// Toggles this instance value.
         /// </summary>
         async Task Toggle()
         {

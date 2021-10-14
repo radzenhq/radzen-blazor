@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenCard.
+    /// RadzenCard component.
     /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponentWithChildren" />
