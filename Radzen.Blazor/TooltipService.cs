@@ -173,9 +173,9 @@ namespace Radzen
         /// <value>The text.</value>
         public string Text { get; set; }
         /// <summary>
-        /// Gets or sets the content of the child.
+        /// Gets or sets the child content.
         /// </summary>
-        /// <value>The content of the child.</value>
+        /// <value>The child content.</value>
         public RenderFragment<TooltipService> ChildContent { get; set; }
     }
 

@@ -312,9 +312,9 @@ namespace Radzen
         /// <value>The style.</value>
         public string Style { get; set; }
         /// <summary>
-        /// Gets or sets the content of the child.
+        /// Gets or sets the child content.
         /// </summary>
-        /// <value>The content of the child.</value>
+        /// <value>The child content.</value>
         public RenderFragment<DialogService> ChildContent { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether [automatic focus first element].

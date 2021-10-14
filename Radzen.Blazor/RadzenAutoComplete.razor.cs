@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenAutoComplete.
+    /// RadzenAutoComplete component.
     /// Implements the <see cref="Radzen.DataBoundFormComponent{System.String}" />
     /// </summary>
     /// <seealso cref="Radzen.DataBoundFormComponent{System.String}" />
@@ -33,22 +33,9 @@ namespace Radzen.Blazor
         [Parameter]
         public int FilterDelay { get; set; } = 500;
 
-        /// <summary>
-        /// The search
-        /// </summary>
         protected ElementReference search;
-        /// <summary>
-        /// The list
-        /// </summary>
         protected ElementReference list;
-        /// <summary>
-        /// The custom search text
-        /// </summary>
         string customSearchText;
-
-        /// <summary>
-        /// The selected index
-        /// </summary>
         int selectedIndex = -1;
 
         /// <summary>
@@ -92,9 +79,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Debounces the filter.
-        /// </summary>
         async Task DebounceFilter()
         {
             var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
@@ -114,10 +98,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the popup identifier.
-        /// </summary>
-        /// <value>The popup identifier.</value>
         private string PopupID
         {
             get
@@ -126,10 +106,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Called when [select item].
-        /// </summary>
-        /// <param name="item">The item.</param>
         private async Task OnSelectItem(object item)
         {
             await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
@@ -138,9 +114,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets the query.
+        /// Gets the IQueryable.
         /// </summary>
-        /// <value>The query.</value>
+        /// <value>The IQueryable.</value>
         protected override IQueryable Query
         {
             get
@@ -150,7 +126,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets the view.
+        /// Gets the view - the Query with filtering applied.
         /// </summary>
         /// <value>The view.</value>
         protected override IEnumerable View
@@ -182,10 +158,6 @@ namespace Radzen.Blazor
             await Change.InvokeAsync(Value);
         }
 
-        /// <summary>
-        /// Selects the item.
-        /// </summary>
-        /// <param name="item">The item.</param>
         async System.Threading.Tasks.Task SelectItem(object item)
         {
             if (!string.IsNullOrEmpty(TextProperty))
@@ -204,17 +176,9 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Gets the input class list.
-        /// </summary>
-        /// <value>The input class list.</value>
         ClassList InputClassList => ClassList.Create("rz-inputtext rz-autocomplete-input")
                                              .AddDisabled(Disabled);
 
-        /// <summary>
-        /// Opens the script.
-        /// </summary>
-        /// <returns>System.String.</returns>
         private string OpenScript()
         {
             if (Disabled)
@@ -247,15 +211,12 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The first render
-        /// </summary>
         private bool firstRender = true;
 
         /// <summary>
-        /// Called when [after render asynchronous].
+        /// Called on after render asynchronous.
         /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
+        /// <param name="firstRender">if set to <c>true</c> is first render.</param>
         /// <returns>Task.</returns>
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
