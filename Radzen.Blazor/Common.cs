@@ -1724,6 +1724,7 @@ namespace Radzen
             return false;
         }
     }
+
     /// <summary>
     /// Supplies information about a <see cref="RadzenSplitter.Expand" /> or <see cref="RadzenSplitter.Collapse" /> event that is being raised.
     /// </summary>
@@ -1743,7 +1744,6 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> to cancel the event; otherwise, <c>false</c>.</value>
         public bool Cancel { get; set; }
-
     }
 
     /// <summary>
