@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSteps.
+    /// RadzenSteps component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenSteps : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets a value indicating whether [show steps buttons].
+        /// Gets or sets a value indicating whether to show steps buttons.
         /// </summary>
-        /// <value><c>true</c> if [show steps buttons]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if steps buttons are shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowStepsButtons { get; set; } = true;
 
@@ -39,10 +39,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Determines whether [is first visible step].
-        /// </summary>
-        /// <returns><c>true</c> if [is first visible step]; otherwise, <c>false</c>.</returns>
         bool IsFirstVisibleStep()
         {
             var firstVisibleStep = steps.Where(s => s.Visible).FirstOrDefault();
@@ -54,10 +50,6 @@ namespace Radzen.Blazor
             return false;
         }
 
-        /// <summary>
-        /// Determines whether [is last visible step].
-        /// </summary>
-        /// <returns><c>true</c> if [is last visible step]; otherwise, <c>false</c>.</returns>
         bool IsLastVisibleStep()
         {
             var lastVisibleStep = steps.Where(s => s.Visible).LastOrDefault();
@@ -70,7 +62,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Nexts the step.
+        /// Goes to next step.
         /// </summary>
         public async System.Threading.Tasks.Task NextStep()
         {
@@ -93,7 +85,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Previouses the step.
+        /// Goes to previous step.
         /// </summary>
         public async System.Threading.Tasks.Task PrevStep()
         {
@@ -115,10 +107,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Selects the index of the step from.
-        /// </summary>
-        /// <param name="index">The index.</param>
         async System.Threading.Tasks.Task SelectStepFromIndex(int index)
         {
             if (index >= 0 && index < steps.Count)
@@ -132,14 +120,11 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The selected index
-        /// </summary>
         int _selectedIndex = 0;
         /// <summary>
-        /// Gets or sets the index of the selected.
+        /// Gets or sets the selected index.
         /// </summary>
-        /// <value>The index of the selected.</value>
+        /// <value>The selected index.</value>
         [Parameter]
         public int SelectedIndex
         {
@@ -157,27 +142,25 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the selected index changed.
+        /// Gets or sets the selected index changed callback.
         /// </summary>
-        /// <value>The selected index changed.</value>
+        /// <value>The selected index changed callback.</value>
         [Parameter]
         public EventCallback<int> SelectedIndexChanged { get; set; }
 
         /// <summary>
-        /// Gets or sets the change.
+        /// Gets or sets the change callback.
         /// </summary>
-        /// <value>The change.</value>
+        /// <value>The change callback.</value>
         [Parameter]
         public EventCallback<int> Change { get; set; }
 
-        /// <summary>
-        /// The next step
-        /// </summary>
         private string _nextStep = "Next";
+
         /// <summary>
-        /// Gets or sets the next text.
+        /// Gets or sets the next button text.
         /// </summary>
-        /// <value>The next text.</value>
+        /// <value>The next button text.</value>
         [Parameter]
         public string NextText
         {
@@ -193,14 +176,11 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The previous text
-        /// </summary>
         private string _previousText = "Previous";
         /// <summary>
-        /// Gets or sets the previous text.
+        /// Gets or sets the previous button text.
         /// </summary>
-        /// <value>The previous text.</value>
+        /// <value>The previous button text.</value>
         [Parameter]
         public string PreviousText
         {
@@ -223,9 +203,6 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Steps { get; set; }
 
-        /// <summary>
-        /// The steps
-        /// </summary>
         List<RadzenStepsItem> steps = new List<RadzenStepsItem>();
 
         /// <summary>
@@ -260,9 +237,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Refreshes this instance.
-        /// </summary>
         internal void Refresh()
         {
             StateHasChanged();
@@ -279,11 +253,6 @@ namespace Radzen.Blazor
             return SelectedIndex == index;
         }
 
-        /// <summary>
-        /// Selects the step.
-        /// </summary>
-        /// <param name="step">The step.</param>
-        /// <param name="raiseChange">if set to <c>true</c> [raise change].</param>
         internal async System.Threading.Tasks.Task SelectStep(RadzenStepsItem step, bool raiseChange = false)
         {
             var valid = true;
@@ -308,9 +277,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Selects the first.
-        /// </summary>
         internal void SelectFirst()
         {
             SelectedIndex = 0;

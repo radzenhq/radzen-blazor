@@ -98,9 +98,6 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Items { get; set; }
 
-        /// <summary>
-        /// The items
-        /// </summary>
         List<RadzenSelectBarItem> items = new List<RadzenSelectBarItem>();
 
         /// <summary>
