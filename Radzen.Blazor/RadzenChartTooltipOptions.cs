@@ -3,39 +3,31 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenChartTooltipOptions.
-    /// Implements the <see cref="Radzen.Blazor.RadzenChartComponentBase" />
+    /// Contains <see cref="RadzenChart" /> tooltip configuration.
     /// </summary>
-    /// <seealso cref="Radzen.Blazor.RadzenChartComponentBase" />
     public partial class RadzenChartTooltipOptions : RadzenChartComponentBase
     {
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="RadzenChartTooltipOptions"/> is visible.
+        /// Gets or sets a value indicating whether to show tooltips. By defaults RadzenChart displays tooltips.
         /// </summary>
-        /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> to display tooltips; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Visible { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the style.
+        /// Gets or sets the CSS style of the tooltip.
         /// </summary>
         /// <value>The style.</value>
         [Parameter]
         public string Style { get; set; }
 
-        /// <summary>
-        /// Initializes this instance.
-        /// </summary>
+        /// <inheritdoc />
         protected override void Initialize()
         {
             Chart.Tooltip = this;
         }
 
-        /// <summary>
-        /// Shoulds the refresh chart.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        /// <inheritdoc />
         protected override bool ShouldRefreshChart(ParameterView parameters)
         {
             return parameters.DidParameterChange(nameof(Style), Style);

@@ -9,22 +9,15 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class CartesianSeries.
-    /// Implements the <see cref="Radzen.Blazor.RadzenChartComponentBase" />
-    /// Implements the <see cref="Radzen.Blazor.IChartSeries" />
-    /// Implements the <see cref="IDisposable" />
+    /// Base class of <see cref="RadzenChart" /> series.
     /// </summary>
-    /// <typeparam name="TItem">The type of the t item.</typeparam>
-    /// <seealso cref="Radzen.Blazor.RadzenChartComponentBase" />
-    /// <seealso cref="Radzen.Blazor.IChartSeries" />
-    /// <seealso cref="IDisposable" />
+    /// <typeparam name="TItem">The type of the series data.</typeparam>
     public abstract class CartesianSeries<TItem> : RadzenChartComponentBase, IChartSeries, IDisposable
     {
         /// <summary>
-        /// Categories the specified scale.
+        /// Creates a getter function that returns a value from the specified category scale for the specified data item.
         /// </summary>
         /// <param name="scale">The scale.</param>
-        /// <returns>Func&lt;TItem, System.Double&gt;.</returns>
         protected Func<TItem, double> Category(ScaleBase scale)
         {
             if (IsNumeric(CategoryProperty))
@@ -50,27 +43,23 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Composes the category.
+        /// Helper function. Used internally.
         /// </summary>
-        /// <param name="scale">The scale.</param>
-        /// <returns>Func&lt;TItem, System.Double&gt;.</returns>
         protected Func<TItem, double> ComposeCategory(ScaleBase scale)
         {
             return scale.Compose(Category(scale));
         }
 
         /// <summary>
-        /// Composes the value.
+        /// Helper function. Used internally.
         /// </summary>
-        /// <param name="scale">The scale.</param>
-        /// <returns>Func&lt;TItem, System.Double&gt;.</returns>
         protected Func<TItem, double> ComposeValue(ScaleBase scale)
         {
             return scale.Compose(Value);
         }
 
         /// <summary>
-        /// Determines whether the specified property name is date.
+        /// Determines whether the property with the specified name is <see cref="DateTime" />
         /// </summary>
         /// <param name="propertyName">Name of the property.</param>
         /// <returns><c>true</c> if the specified property name is date; otherwise, <c>false</c>.</returns>
@@ -93,7 +82,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Determines whether the specified property name is numeric.
+        /// Determines whether the property with the specified name is numeric.
         /// </summary>
         /// <param name="propertyName">Name of the property.</param>
         /// <returns><c>true</c> if the specified property name is numeric; otherwise, <c>false</c>.</returns>
@@ -115,10 +104,7 @@ namespace Radzen.Blazor
             return PropertyAccess.IsNumeric(property);
         }
 
-        /// <summary>
-        /// Gets or sets the title.
-        /// </summary>
-        /// <value>The title.</value>
+        /// <inheritdoc />
         [Parameter]
         public string Title { get; set; }
 
@@ -137,9 +123,8 @@ namespace Radzen.Blazor
         public RenderFragment<TItem> TooltipTemplate { get; set; }
 
         /// <summary>
-        /// Gets or sets the category property.
+        /// The name of the property of <typeparamref name="TItem" /> that provides the X axis (a.k.a. category axis) values.
         /// </summary>
-        /// <value>The category property.</value>
         [Parameter]
         public string CategoryProperty { get; set; }
 
@@ -150,16 +135,8 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Visible { get; set; } = true;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is visible.
-        /// </summary>
-        /// <value><c>true</c> if this instance is visible; otherwise, <c>false</c>.</value>
         bool IsVisible { get; set; } = true;
 
-        /// <summary>
-        /// Gets a value indicating whether this <see cref="CartesianSeries{TItem}"/> is visible.
-        /// </summary>
-        /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         bool IChartSeries.Visible
         {
             get
@@ -168,28 +145,21 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether [show in legend].
-        /// </summary>
-        /// <value><c>true</c> if [show in legend]; otherwise, <c>false</c>.</value>
+        /// <inheritdoc />
         public bool ShowInLegend { get => Visible; }
 
         /// <summary>
-        /// Gets or sets the value property.
+        /// The name of the property of <typeparamref name="TItem" /> that provides the Y axis (a.k.a. value axis) values.
         /// </summary>
-        /// <value>The value property.</value>
         [Parameter]
         public string ValueProperty { get; set; }
 
-        /// <summary>
-        /// Gets or sets the rendering order.
-        /// </summary>
-        /// <value>The rendering order.</value>
+        /// <inheritdoc />
         [Parameter]
         public int RenderingOrder { get; set; }
 
         /// <summary>
-        /// Gets the value.
+        /// Creates a getter function that returns a value from the specifid data item. Uses <see cref="ValueProperty" />.
         /// </summary>
         /// <value>The value.</value>
         /// <exception cref="ArgumentException">ValueProperty shoud not be empty</exception>
@@ -207,28 +177,22 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the data.
+        /// Gets or sets the data of the series. The data is enumerated and its items are displayed by the series.
         /// </summary>
         /// <value>The data.</value>
         [Parameter]
         public IEnumerable<TItem> Data { get; set; }
 
         /// <summary>
-        /// Gets or sets the items.
+        /// Stores <see cref="Data" /> as an IList of <typeparamref name="TItem"/>.
         /// </summary>
         /// <value>The items.</value>
         protected IList<TItem> Items { get; set; } = new List<TItem>();
 
-        /// <summary>
-        /// Gets or sets the markers.
-        /// </summary>
-        /// <value>The markers.</value>
+        /// <inheritdoc />
         public RadzenMarkers Markers { get; set; } = new RadzenMarkers();
 
-        /// <summary>
-        /// Gets the type of the marker.
-        /// </summary>
-        /// <value>The type of the marker.</value>
+        /// <inheritdoc />
         public virtual MarkerType MarkerType
         {
             get
@@ -253,11 +217,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Transforms the category scale.
-        /// </summary>
-        /// <param name="scale">The scale.</param>
-        /// <returns>ScaleBase.</returns>
+        /// <inheritdoc />
         public virtual ScaleBase TransformCategoryScale(ScaleBase scale)
         {
             if (Items == null)
@@ -315,11 +275,7 @@ namespace Radzen.Blazor
             };
         }
 
-        /// <summary>
-        /// Transforms the value scale.
-        /// </summary>
-        /// <param name="scale">The scale.</param>
-        /// <returns>ScaleBase.</returns>
+        /// <inheritdoc />
         public virtual ScaleBase TransformValueScale(ScaleBase scale)
         {
             if (Items != null)
@@ -333,35 +289,13 @@ namespace Radzen.Blazor
             return scale;
         }
 
-        /// <summary>
-        /// Renders the specified category scale.
-        /// </summary>
-        /// <param name="categoryScale">The category scale.</param>
-        /// <param name="valueScale">The value scale.</param>
-        /// <returns>RenderFragment.</returns>
+        /// <inheritdoc />
         public abstract RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale);
-        /// <summary>
-        /// Gets the color.
-        /// </summary>
-        /// <value>The color.</value>
+
+        /// <inheritdoc />
         public abstract string Color { get; }
 
-        /// <summary>
-        /// Gets or sets the minimum value.
-        /// </summary>
-        /// <value>The minimum value.</value>
-        double MinValue { get; set; }
-        /// <summary>
-        /// Gets or sets the maximum value.
-        /// </summary>
-        /// <value>The maximum value.</value>
-        double MaxValue { get; set; }
-
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var shouldRefresh = parameters.DidParameterChange(nameof(Data), Data);
@@ -392,53 +326,36 @@ namespace Radzen.Blazor
                     {
                         Items = Items.AsQueryable().OrderBy(CategoryProperty).ToList();
                     }
-
-                    if (Items.Any())
-                    {
-                        MinValue = Items.Min(Value);
-                        MaxValue = Items.Max(Value);
-                    }
                 }
 
                 await Chart.Refresh(false);
             }
         }
 
-        /// <summary>
-        /// Initializes this instance.
-        /// </summary>
+        /// <inheritdoc />
         protected override void Initialize()
         {
             Chart.AddSeries(this);
         }
 
-        /// <summary>
-        /// Determines whether this instance contains the object.
-        /// </summary>
-        /// <param name="x">The x.</param>
-        /// <param name="y">The y.</param>
-        /// <param name="tolerance">The tolerance.</param>
-        /// <returns><c>true</c> if [contains] [the specified x]; otherwise, <c>false</c>.</returns>
+        /// <inheritdoc />
         public virtual bool Contains(double x, double y, double tolerance)
         {
             return false;
         }
 
-        /// <summary>
-        /// Measures the legend.
-        /// </summary>
-        /// <returns>System.Double.</returns>
+        /// <inheritdoc />
         public virtual double MeasureLegend()
         {
             return TextMeasurer.TextWidth(GetTitle());
         }
 
         /// <summary>
-        /// Insides the polygon.
+        /// Determines if the provided point is inside the provided polygon.
         /// </summary>
         /// <param name="point">The point.</param>
         /// <param name="polygon">The polygon.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        /// <returns><c>true</c> if the polygon contains the point, <c>false</c> otherwise.</returns>
         protected bool InsidePolygon(Point point, Point[] polygon)
         {
             var minX = polygon[0].X;
@@ -474,13 +391,7 @@ namespace Radzen.Blazor
             return inside;
         }
 
-        /// <summary>
-        /// Renders the tooltip.
-        /// </summary>
-        /// <param name="data">The data.</param>
-        /// <param name="marginLeft">The margin left.</param>
-        /// <param name="marginTop">The margin top.</param>
-        /// <returns>RenderFragment.</returns>
+        /// <inheritdoc />
         public virtual RenderFragment RenderTooltip(object data, double marginLeft, double marginTop)
         {
             var item = (TItem)data;
@@ -509,29 +420,24 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Tooltips the style.
+        /// Gets the tooltip inline style.
         /// </summary>
         /// <param name="item">The item.</param>
-        /// <returns>System.String.</returns>
         protected virtual string TooltipStyle(TItem item)
         {
             return Chart.Tooltip.Style;
         }
 
         /// <summary>
-        /// Tooltips the class.
+        /// Gets the tooltip CSS class.
         /// </summary>
         /// <param name="item">The item.</param>
-        /// <returns>System.String.</returns>
         protected virtual string TooltipClass(TItem item)
         {
             return $"rz-series-{Chart.Series.IndexOf(this)}-tooltip";
         }
 
-        /// <summary>
-        /// Renders the legend item.
-        /// </summary>
-        /// <returns>RenderFragment.</returns>
+        /// <inheritdoc />
         public virtual RenderFragment RenderLegendItem()
         {
             var style = new List<string>();
@@ -555,10 +461,7 @@ namespace Radzen.Blazor
             };
         }
 
-        /// <summary>
-        /// Gets the size of the marker.
-        /// </summary>
-        /// <value>The size of the marker.</value>
+        /// <inheritdoc />
         public double MarkerSize
         {
             get
@@ -574,39 +477,31 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Called when [legend item click].
-        /// </summary>
         private async Task OnLegendItemClick()
         {
             IsVisible = !IsVisible;
             await Chart.Refresh();
         }
 
-        /// <summary>
-        /// Gets the title.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         public string GetTitle()
         {
             return String.IsNullOrEmpty(Title) ? $"Series {Chart.Series.IndexOf(this) + 1}" : Title;
         }
 
         /// <summary>
-        /// Tooltips the label.
+        /// Gets the label of the tooltip displayed for this item.
         /// </summary>
         /// <param name="item">The item.</param>
-        /// <returns>System.String.</returns>
         protected virtual string TooltipLabel(TItem item)
         {
             return GetTitle();
         }
 
         /// <summary>
-        /// Tooltips the title.
+        /// Gets the title of the tooltip displayed for this item.
         /// </summary>
         /// <param name="item">The item.</param>
-        /// <returns>System.String.</returns>
         protected virtual string TooltipTitle(TItem item)
         {
             var category = Category(Chart.CategoryScale);
@@ -614,7 +509,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Tooltips the value.
+        /// Gets the value of the tooltip displayed for this item.
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns>System.String.</returns>
@@ -624,10 +519,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Tooltips the x.
+        /// Gets the X coordinate of the tooltip of the specified item.
         /// </summary>
         /// <param name="item">The item.</param>
-        /// <returns>System.Double.</returns>
         protected virtual double TooltipX(TItem item)
         {
             var category = Category(Chart.CategoryScale);
@@ -635,21 +529,15 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Tooltips the y.
+        /// Gets the Y coordinate of the tooltip of the specified item.
         /// </summary>
         /// <param name="item">The item.</param>
-        /// <returns>System.Double.</returns>
         protected virtual double TooltipY(TItem item)
         {
             return Chart.ValueScale.Scale(Value(item), true);
         }
 
-        /// <summary>
-        /// Datas at.
-        /// </summary>
-        /// <param name="x">The x.</param>
-        /// <param name="y">The y.</param>
-        /// <returns>System.Object.</returns>
+        /// <inheritdoc />
         public virtual object DataAt(double x, double y)
         {
             var first = Items.FirstOrDefault();
@@ -667,12 +555,11 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Picks the color.
+        /// Returns a color from the specified list of colors. Rotates colors.
         /// </summary>
         /// <param name="index">The index.</param>
         /// <param name="colors">The colors.</param>
         /// <param name="defaultValue">The default value.</param>
-        /// <returns>System.String.</returns>
         protected string PickColor(int index, IEnumerable<string> colors, string defaultValue = null)
         {
             if (colors == null || !colors.Any())
@@ -683,19 +570,13 @@ namespace Radzen.Blazor
             return colors.ElementAt(index % colors.Count());
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public void Dispose()
         {
             Chart?.RemoveSeries(this);
         }
 
-        /// <summary>
-        /// Invokes the click.
-        /// </summary>
-        /// <param name="handler">The handler.</param>
-        /// <param name="data">The data.</param>
+        /// <inheritdoc />
         public async Task InvokeClick(EventCallback<SeriesClickEventArgs> handler, object data)
         {
             var category = Category(Chart.CategoryScale);

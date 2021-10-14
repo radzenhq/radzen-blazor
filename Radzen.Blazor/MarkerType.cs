@@ -1,32 +1,32 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Enum MarkerType
+    /// Specifies the type of marker that <see cref="RadzenChart" /> displays for data points.
     /// </summary>
     public enum MarkerType
     {
         /// <summary>
-        /// The none
+        /// Do not display a marker for data points.
         /// </summary>
         None,
         /// <summary>
-        /// The automatic
+        /// Cycle between markers.
         /// </summary>
         Auto,
         /// <summary>
-        /// The circle
+        /// Use a circle marker.
         /// </summary>
         Circle,
         /// <summary>
-        /// The triangle
+        /// Use a triangle marker.
         /// </summary>
         Triangle,
         /// <summary>
-        /// The square
+        /// Use a square marker.
         /// </summary>
         Square,
         /// <summary>
-        /// The diamond
+        /// Use a diamond marker.
         /// </summary>
         Diamond
     }

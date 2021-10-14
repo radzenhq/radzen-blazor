@@ -4,22 +4,18 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class AxisBase.
-    /// Implements the <see cref="Radzen.Blazor.RadzenChartComponentBase" />
-    /// Implements the <see cref="Radzen.Blazor.IChartAxis" />
+    /// Base class for an axis in <see cref="RadzenChart" />.
     /// </summary>
-    /// <seealso cref="Radzen.Blazor.RadzenChartComponentBase" />
-    /// <seealso cref="Radzen.Blazor.IChartAxis" />
     public abstract class AxisBase : RadzenChartComponentBase, IChartAxis
     {
         /// <summary>
-        /// Gets or sets the stroke.
+        /// Gets or sets the stroke (line color) of the axis.
         /// </summary>
         /// <value>The stroke.</value>
         [Parameter]
         public string Stroke { get; set; }
         /// <summary>
-        /// Gets or sets the width of the stroke.
+        /// Gets or sets the pixel width of axis.
         /// </summary>
         /// <value>The width of the stroke.</value>
         [Parameter]
@@ -33,68 +29,63 @@ namespace Radzen.Blazor
         public RenderFragment ChildContent { get; set; }
 
         /// <summary>
-        /// Gets or sets the format string.
+        /// Gets or sets the format string used to display the axis values.
         /// </summary>
         /// <value>The format string.</value>
         [Parameter]
         public string FormatString { get; set; }
 
         /// <summary>
-        /// Gets or sets the formatter.
+        /// Gets or sets a formatter function that formats the acis values.
         /// </summary>
         /// <value>The formatter.</value>
         [Parameter]
         public Func<object, string> Formatter { get; set; }
 
         /// <summary>
-        /// Gets or sets the type of the line.
+        /// Gets or sets the type of the line used to display the axis.
         /// </summary>
         /// <value>The type of the line.</value>
         [Parameter]
         public LineType LineType { get; set; }
 
         /// <summary>
-        /// Gets or sets the grid lines.
+        /// Gets or sets the grid lines configuration of the current axis.
         /// </summary>
         /// <value>The grid lines.</value>
         public RadzenGridLines GridLines { get; set; } = new RadzenGridLines();
 
         /// <summary>
-        /// Gets or sets the title.
+        /// Gets or sets the title configuration.
         /// </summary>
         /// <value>The title.</value>
         public RadzenAxisTitle Title { get; set; } = new RadzenAxisTitle();
 
         /// <summary>
-        /// Gets or sets the ticks.
+        /// Gets or sets the ticks configuration.
         /// </summary>
         /// <value>The ticks.</value>
         public RadzenTicks Ticks { get; set; } = new RadzenTicks();
 
-        /// <summary>
-        /// Gets or sets the tick distance.
-        /// </summary>
-        /// <value>The tick distance.</value>
         internal int TickDistance { get; set; } = 100;
 
         /// <summary>
-        /// Determines the minimum of the parameters.
+        /// Specifies the mimimum value of the axis.
         /// </summary>
         /// <value>The minimum.</value>
         [Parameter]
         public object Min { get; set; }
 
         /// <summary>
-        /// Determines the maximum of the parameters.
+        /// Specifies the maximum value of the axis.
         /// </summary>
         /// <value>The maximum.</value>
         [Parameter]
         public object Max { get; set; }
 
         /// <summary>
-        /// Gets or sets the step.
+        /// Specifies the step of the axis.
         /// </summary>
-        /// <value>The step.</value>
         [Parameter]
         public object Step { get; set; }
 
@@ -105,11 +96,7 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Visible { get; set; } = true;
 
-        /// <summary>
-        /// Shoulds the refresh chart.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        /// <inheritdoc />
         protected override bool ShouldRefreshChart(ParameterView parameters)
         {
             return DidParameterChange(parameters, nameof(Min), Min) ||
@@ -118,12 +105,6 @@ namespace Radzen.Blazor
                    DidParameterChange(parameters, nameof(Step), Step);
         }
 
-        /// <summary>
-        /// Formats the specified scale.
-        /// </summary>
-        /// <param name="scale">The scale.</param>
-        /// <param name="idx">The index.</param>
-        /// <returns>System.String.</returns>
         internal string Format(ScaleBase scale, double idx)
         {
             var value = scale.Value(idx);
@@ -131,12 +112,6 @@ namespace Radzen.Blazor
             return Format(scale, value);
         }
 
-        /// <summary>
-        /// Formats the specified scale.
-        /// </summary>
-        /// <param name="scale">The scale.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>System.String.</returns>
         internal string Format(ScaleBase scale, object value)
         {
             if (Formatter != null)
@@ -149,10 +124,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the size.
-        /// </summary>
-        /// <value>The size.</value>
         internal abstract double Size { get; }
     }
 }

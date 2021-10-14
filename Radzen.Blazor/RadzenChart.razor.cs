@@ -1,8 +1,6 @@
 using Microsoft.JSInterop;
-using Radzen.Blazor;
 using Radzen.Blazor.Rendering;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,120 +9,72 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenChart.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// Displays line, area, donut, pie, bar or column series.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    ///   &lt;RadzenChart&gt;
+    ///       &lt;RadzenColumnSeries Data=@revenue CategoryProperty="Quarter" ValueProperty="Revenue" /&gt;
+    ///   &lt;/RadzenChart&gt;
+    ///   @code {
+    ///       class DataItem
+    ///       {
+    ///           public string Quarter { get; set; }
+    ///           public double Revenue { get; set; }
+    ///       }
+    ///       DataItem[] revenue = new DataItem[]
+    ///       {
+    ///           new DataItem { Quarter = "Q1", Revenue = 234000 },
+    ///           new DataItem { Quarter = "Q2", Revenue = 284000 },
+    ///           new DataItem { Quarter = "Q3", Revenue = 274000 },
+    ///           new DataItem { Quarter = "Q4", Revenue = 294000 }
+    ///       };
+    ///   }
+    /// </code>
+    /// </example>
     public partial class RadzenChart : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the color scheme.
+        /// Gets or sets the color scheme used to render the series.
         /// </summary>
         /// <value>The color scheme.</value>
         [Parameter]
         public ColorScheme ColorScheme { get; set; }
 
         /// <summary>
-        /// Gets or sets the series click.
+        /// A callback that will be invoked when the user clicks on a series. 
         /// </summary>
-        /// <value>The series click.</value>
         [Parameter]
         public EventCallback<SeriesClickEventArgs> SeriesClick { get; set; }
 
-        /// <summary>
-        /// Gets or sets the width.
-        /// </summary>
-        /// <value>The width.</value>
         double? Width { get; set; }
 
-        /// <summary>
-        /// Gets or sets the height.
-        /// </summary>
-        /// <value>The height.</value>
         double? Height { get; set; }
 
-        /// <summary>
-        /// Gets or sets the margin top.
-        /// </summary>
-        /// <value>The margin top.</value>
         double MarginTop { get; set; }
 
-        /// <summary>
-        /// Gets or sets the margin left.
-        /// </summary>
-        /// <value>The margin left.</value>
         double MarginLeft { get; set; }
 
-        /// <summary>
-        /// Gets or sets the margin right.
-        /// </summary>
-        /// <value>The margin right.</value>
         double MarginRight { get; set; }
 
-        /// <summary>
-        /// Gets or sets the margin bottom.
-        /// </summary>
-        /// <value>The margin bottom.</value>
         double MarginBottom { get; set; }
 
         /// <summary>
-        /// Gets or sets the child content.
+        /// Gets or sets the child content. Used to specify series and other configuration.
         /// </summary>
         /// <value>The child content.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
-        /// <summary>
-        /// Gets or sets the category scale.
-        /// </summary>
-        /// <value>The category scale.</value>
         internal ScaleBase CategoryScale { get; set; } = new LinearScale();
-        /// <summary>
-        /// Gets or sets the value scale.
-        /// </summary>
-        /// <value>The value scale.</value>
         internal ScaleBase ValueScale { get; set; } = new LinearScale();
-        /// <summary>
-        /// Gets or sets the series.
-        /// </summary>
-        /// <value>The series.</value>
         internal IList<IChartSeries> Series { get; set; } = new List<IChartSeries>();
-        /// <summary>
-        /// Gets or sets the column options.
-        /// </summary>
-        /// <value>The column options.</value>
         internal RadzenColumnOptions ColumnOptions { get; set; } = new RadzenColumnOptions();
-        /// <summary>
-        /// Gets or sets the bar options.
-        /// </summary>
-        /// <value>The bar options.</value>
         internal RadzenBarOptions BarOptions { get; set; } = new RadzenBarOptions();
-
-        /// <summary>
-        /// Gets or sets the legend.
-        /// </summary>
-        /// <value>The legend.</value>
         internal RadzenLegend Legend { get; set; } = new RadzenLegend();
-        /// <summary>
-        /// Gets or sets the category axis.
-        /// </summary>
-        /// <value>The category axis.</value>
         internal RadzenCategoryAxis CategoryAxis { get; set; } = new RadzenCategoryAxis();
-        /// <summary>
-        /// Gets or sets the value axis.
-        /// </summary>
-        /// <value>The value axis.</value>
         internal RadzenValueAxis ValueAxis { get; set; } = new RadzenValueAxis();
-        /// <summary>
-        /// Gets or sets the tooltip.
-        /// </summary>
-        /// <value>The tooltip.</value>
         internal RadzenChartTooltipOptions Tooltip { get; set; } = new RadzenChartTooltipOptions();
-
-        /// <summary>
-        /// Adds the series.
-        /// </summary>
-        /// <param name="series">The series.</param>
         internal void AddSeries(IChartSeries series)
         {
             if (!Series.Contains(series))
@@ -133,19 +83,11 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Removes the series.
-        /// </summary>
-        /// <param name="series">The series.</param>
         internal void RemoveSeries(IChartSeries series)
         {
             Series.Remove(series);
         }
 
-        /// <summary>
-        /// Shoulds the render axes.
-        /// </summary>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         private bool ShouldRenderAxes()
         {
             var pieType = typeof(RadzenPieSeries<>);
@@ -159,19 +101,11 @@ namespace Radzen.Blazor
             });
         }
 
-        /// <summary>
-        /// Shoulds the invert axes.
-        /// </summary>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         internal bool ShouldInvertAxes()
         {
             return Series.Count > 0 && Series.All(series => series is IChartBarSeries);
         }
 
-        /// <summary>
-        /// Updates the scales.
-        /// </summary>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         private bool UpdateScales()
         {
             var valueScale = ValueScale;
@@ -284,7 +218,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Resizes the specified width.
+        /// Invoked via interop when the RadzenChart resizes. Display the series with the new dimensions.
         /// </summary>
         /// <param name="width">The width.</param>
         /// <param name="height">The height.</param>
@@ -315,25 +249,13 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The tooltip
-        /// </summary>
         RenderFragment tooltip;
-        /// <summary>
-        /// The tooltip data
-        /// </summary>
         object tooltipData;
-        /// <summary>
-        /// The mouse x
-        /// </summary>
         double mouseX;
-        /// <summary>
-        /// The mouse y
-        /// </summary>
         double mouseY;
 
         /// <summary>
-        /// Mouses the move.
+        /// Invoked via interop when the user moves the mouse over the RadzenChart. Displays the tooltip.
         /// </summary>
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
@@ -347,7 +269,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Clicks the specified x.
+        /// Invoked via interop when the user clicks the RadzenChart. Raises the <see cref="SeriesClick" /> handler.
         /// </summary>
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
@@ -370,9 +292,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Displays the tooltip.
-        /// </summary>
         internal async Task DisplayTooltip()
         {
             if (Tooltip.Visible)
@@ -406,20 +325,10 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The width and height are set
-        /// </summary>
         private bool widthAndHeightAreSet = false;
-        /// <summary>
-        /// The first render
-        /// </summary>
         private bool firstRender = true;
 
-        /// <summary>
-        /// On after render as an asynchronous operation.
-        /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -444,15 +353,9 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets or sets the clip path.
-        /// </summary>
-        /// <value>The clip path.</value>
         internal string ClipPath { get; set; }
 
-        /// <summary>
-        /// Called when [initialized].
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             base.OnInitialized();
@@ -464,9 +367,6 @@ namespace Radzen.Blazor
             Initialize();
         }
 
-        /// <summary>
-        /// Initializes this instance.
-        /// </summary>
         private void Initialize()
         {
             double width = 0;
@@ -504,16 +404,9 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The visible changed
-        /// </summary>
         private bool visibleChanged = false;
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             bool shouldRefresh = parameters.DidParameterChange(nameof(Style), Style);
@@ -536,10 +429,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Refreshes the specified force.
-        /// </summary>
-        /// <param name="force">if set to <c>true</c> [force].</param>
         internal async Task Refresh(bool force = true)
         {
             if (widthAndHeightAreSet)
@@ -556,16 +445,14 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Reloads this instance.
+        /// Causes all series to refresh. Use it when <see cref="CartesianSeries{TItem}.Data" /> has changed.
         /// </summary>
         public async Task Reload()
         {
             await Refresh(true);
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();
@@ -576,10 +463,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return $"rz-chart rz-scheme-{ColorScheme.ToString().ToLower()}";

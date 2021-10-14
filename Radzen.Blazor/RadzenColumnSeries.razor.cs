@@ -6,61 +6,54 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenColumnSeries.
-    /// Implements the <see cref="Radzen.Blazor.CartesianSeries{TItem}" />
-    /// Implements the <see cref="Radzen.Blazor.IChartColumnSeries" />
+    /// Renders column series in <see cref="RadzenChart" />
     /// </summary>
-    /// <typeparam name="TItem">The type of the t item.</typeparam>
-    /// <seealso cref="Radzen.Blazor.CartesianSeries{TItem}" />
-    /// <seealso cref="Radzen.Blazor.IChartColumnSeries" />
+    /// <typeparam name="TItem">The type of the series data item.</typeparam>
     public partial class RadzenColumnSeries<TItem> : CartesianSeries<TItem>, IChartColumnSeries
     {
         /// <summary>
-        /// Gets or sets the fill.
+        /// Specifies the fill (background color) of the column series.
         /// </summary>
         /// <value>The fill.</value>
         [Parameter]
         public string Fill { get; set; }
 
         /// <summary>
-        /// Gets or sets the fills.
+        /// Specifies a list of colors that will be used to set the individual column backrounds.
         /// </summary>
         /// <value>The fills.</value>
         [Parameter]
         public IEnumerable<string> Fills { get; set; }
 
         /// <summary>
-        /// Gets or sets the stroke.
+        /// Specifies the stroke (border color) of the column series.
         /// </summary>
         /// <value>The stroke.</value>
         [Parameter]
         public string Stroke { get; set; }
 
         /// <summary>
-        /// Gets or sets the strokes.
+        /// Specifies a list of colors that will be used to set the individual column borders.
         /// </summary>
         /// <value>The strokes.</value>
         [Parameter]
         public IEnumerable<string> Strokes { get; set; }
 
         /// <summary>
-        /// Gets or sets the width of the stroke.
+        /// Gets or sets the width of the stroke (border).
         /// </summary>
         /// <value>The width of the stroke.</value>
         [Parameter]
         public double StrokeWidth { get; set; }
 
         /// <summary>
-        /// Gets or sets the type of the line.
+        /// Gets or sets the type of the line used to render the column border.
         /// </summary>
         /// <value>The type of the line.</value>
         [Parameter]
         public LineType LineType { get; set; }
 
-        /// <summary>
-        /// Gets the color.
-        /// </summary>
-        /// <value>The color.</value>
+        /// <inheritdoc />
         public override string Color
         {
             get
@@ -69,10 +62,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the count.
-        /// </summary>
-        /// <value>The count.</value>
         int IChartColumnSeries.Count
         {
             get
@@ -86,10 +75,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the column series.
-        /// </summary>
-        /// <value>The column series.</value>
         private IList<IChartSeries> ColumnSeries
         {
             get
@@ -98,10 +83,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the visible column series.
-        /// </summary>
-        /// <value>The visible column series.</value>
         private IList<IChartSeries> VisibleColumnSeries
         {
             get
@@ -110,10 +91,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the width of the band.
-        /// </summary>
-        /// <value>The width of the band.</value>
         private double BandWidth
         {
             get
@@ -124,23 +101,13 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Determines whether this instance contains the object.
-        /// </summary>
-        /// <param name="x">The x.</param>
-        /// <param name="y">The y.</param>
-        /// <param name="tolerance">The tolerance.</param>
-        /// <returns><c>true</c> if [contains] [the specified x]; otherwise, <c>false</c>.</returns>
+        /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
             return DataAt(x, y) != null;
         }
 
-        /// <summary>
-        /// Tooltips the x.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>System.Double.</returns>
+        /// <inheritdoc />
         protected override double TooltipX(TItem item)
         {
             var columnSeries = VisibleColumnSeries;
@@ -154,11 +121,7 @@ namespace Radzen.Blazor
             return x + width / 2;
         }
 
-        /// <summary>
-        /// Tooltips the y.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>System.Double.</returns>
+        /// <inheritdoc />
         protected override double TooltipY(TItem item)
         {
             var y = base.TooltipY(item);
@@ -167,12 +130,8 @@ namespace Radzen.Blazor
 
             return Math.Min(y, y0);
         }
-        /// <summary>
-        /// Datas at.
-        /// </summary>
-        /// <param name="x">The x.</param>
-        /// <param name="y">The y.</param>
-        /// <returns>System.Object.</returns>
+
+        /// <inheritdoc />
         public override object DataAt(double x, double y)
         {
             var category = ComposeCategory(Chart.CategoryScale);
