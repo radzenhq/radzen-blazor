@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenDataGridColumn.
+    /// RadzenDataGridColumn component.
     /// Implements the <see cref="ComponentBase" />
     /// Implements the <see cref="IDisposable" />
     /// </summary>
-    /// <typeparam name="TItem">The type of the t item.</typeparam>
+    /// <typeparam name="TItem">The type of the DataGrid item.</typeparam>
     /// <seealso cref="ComponentBase" />
     /// <seealso cref="IDisposable" />
     public partial class RadzenDataGridColumn<TItem> : ComponentBase, IDisposable
@@ -26,7 +26,7 @@ namespace Radzen.Blazor
         public RadzenDataGrid<TItem> Grid { get; set; }
 
         /// <summary>
-        /// Called when [initialized].
+        /// Called when initialized.
         /// </summary>
         protected override void OnInitialized()
         {
@@ -82,30 +82,30 @@ namespace Radzen.Blazor
         public string Title { get; set; }
 
         /// <summary>
-        /// Gets or sets the property.
+        /// Gets or sets the property name.
         /// </summary>
-        /// <value>The property.</value>
+        /// <value>The property name.</value>
         [Parameter]
         public string Property { get; set; }
 
         /// <summary>
-        /// Gets or sets the sort property.
+        /// Gets or sets the sort property name.
         /// </summary>
-        /// <value>The sort property.</value>
+        /// <value>The sort property name.</value>
         [Parameter]
         public string SortProperty { get; set; }
 
         /// <summary>
-        /// Gets or sets the group property.
+        /// Gets or sets the group property name.
         /// </summary>
-        /// <value>The group property.</value>
+        /// <value>The group property name.</value>
         [Parameter]
         public string GroupProperty { get; set; }
 
         /// <summary>
-        /// Gets or sets the filter property.
+        /// Gets or sets the filter property name.
         /// </summary>
-        /// <value>The filter property.</value>
+        /// <value>The filter property name.</value>
         [Parameter]
         public string FilterProperty { get; set; }
 
@@ -138,30 +138,30 @@ namespace Radzen.Blazor
         public string FormatString { get; set; }
 
         /// <summary>
-        /// Gets or sets the CSS class.
+        /// Gets or sets the CSS class applied to data cells.
         /// </summary>
-        /// <value>The CSS class.</value>
+        /// <value>The CSS class applied to data cells.</value>
         [Parameter]
         public string CssClass { get; set; }
 
         /// <summary>
-        /// Gets or sets the header CSS class.
+        /// Gets or sets the header CSS class applied to header cell.
         /// </summary>
-        /// <value>The header CSS class.</value>
+        /// <value>The header CSS class applied to header cell.</value>
         [Parameter]
         public string HeaderCssClass { get; set; }
 
         /// <summary>
-        /// Gets or sets the footer CSS class.
+        /// Gets or sets the footer CSS class applied to footer cell.
         /// </summary>
-        /// <value>The footer CSS class.</value>
+        /// <value>The footer CSS class applied to footer cell.</value>
         [Parameter]
         public string FooterCssClass { get; set; }
 
         /// <summary>
-        /// Gets or sets the group footer CSS class.
+        /// Gets or sets the group footer CSS class applied to group footer cell.
         /// </summary>
-        /// <value>The group footer CSS class.</value>
+        /// <value>The group footer CSS class applied to group footer cell.</value>
         [Parameter]
         public string GroupFooterCssClass { get; set; }
 
@@ -264,19 +264,16 @@ namespace Radzen.Blazor
         public LogicalFilterOperator LogicalFilterOperator { get; set; } = LogicalFilterOperator.And;
 
         /// <summary>
-        /// Gets or sets the type.
+        /// Gets or sets the data type.
         /// </summary>
-        /// <value>The type.</value>
+        /// <value>The data type.</value>
         [Parameter]
         public Type Type { get; set; }
 
-        /// <summary>
-        /// The property value getter
-        /// </summary>
         Func<TItem, object> propertyValueGetter;
 
         /// <summary>
-        /// Gets the value.
+        /// Gets the value for specified item.
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns>System.Object.</returns>
@@ -287,10 +284,6 @@ namespace Radzen.Blazor
             return !string.IsNullOrEmpty(FormatString) ? string.Format(FormatString, value, Grid?.Culture ?? CultureInfo.CurrentCulture) : Convert.ToString(value, Grid?.Culture ?? CultureInfo.CurrentCulture);
         }
 
-        /// <summary>
-        /// Gets the header.
-        /// </summary>
-        /// <returns>System.Object.</returns>
         internal object GetHeader()
         {
             if (HeaderTemplate != null)
@@ -308,7 +301,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets the style.
+        /// Gets the cell style.
         /// </summary>
         /// <param name="forCell">if set to <c>true</c> [for cell].</param>
         /// <param name="isHeaderOrFooterCell">if set to <c>true</c> [is header or footer cell].</param>
@@ -374,11 +367,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the sort order as string.
-        /// </summary>
-        /// <param name="isOData">if set to <c>true</c> [is o data].</param>
-        /// <returns>System.String.</returns>
         internal string GetSortOrderAsString(bool isOData)
         {
             var property = GetSortProperty();
@@ -388,28 +376,16 @@ namespace Radzen.Blazor
             return $"{p} {(GetSortOrder() == Radzen.SortOrder.Ascending ? "asc" : "desc")}";
         }
 
-        /// <summary>
-        /// Sets the sort order.
-        /// </summary>
-        /// <param name="order">The order.</param>
         internal void SetSortOrder(SortOrder? order)
         {
             sortOrder = new SortOrder?[] { order };
         }
-
-        /// <summary>
-        /// Resets the sort order.
-        /// </summary>
         internal void ResetSortOrder()
         {
             sortOrder = Enumerable.Empty<SortOrder?>();
             SortOrder = null;
         }
 
-        /// <summary>
-        /// Gets the group property.
-        /// </summary>
-        /// <returns>System.String.</returns>
         public string GetGroupProperty()
         {
             if (!string.IsNullOrEmpty(GroupProperty))
@@ -438,15 +414,8 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The filter property type
-        /// </summary>
         Type _filterPropertyType;
 
-        /// <summary>
-        /// Gets the type of the filter property.
-        /// </summary>
-        /// <value>The type of the filter property.</value>
         internal Type FilterPropertyType
         {
             get
@@ -455,29 +424,11 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The sort order
-        /// </summary>
         IEnumerable<SortOrder?> sortOrder = Enumerable.Empty<SortOrder?>();
-        /// <summary>
-        /// The filter value
-        /// </summary>
         object filterValue;
-        /// <summary>
-        /// The filter operator
-        /// </summary>
         FilterOperator? filterOperator;
-        /// <summary>
-        /// The second filter value
-        /// </summary>
         object secondFilterValue;
-        /// <summary>
-        /// The second filter operator
-        /// </summary>
         FilterOperator? secondFilterOperator;
-        /// <summary>
-        /// The logical filter operator
-        /// </summary>
         LogicalFilterOperator? logicalFilterOperator;
 
         /// <summary>
@@ -529,65 +480,36 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        /// <summary>
-        /// Gets the sort order.
-        /// </summary>
-        /// <returns>System.Nullable&lt;SortOrder&gt;.</returns>
         internal SortOrder? GetSortOrder()
         {
             return sortOrder.Any() ? sortOrder.FirstOrDefault() : SortOrder;
         }
 
-        /// <summary>
-        /// Gets the filter value.
-        /// </summary>
-        /// <returns>System.Object.</returns>
         internal object GetFilterValue()
         {
             return filterValue ?? FilterValue;
         }
 
-        /// <summary>
-        /// Gets the filter operator.
-        /// </summary>
-        /// <returns>FilterOperator.</returns>
         internal FilterOperator GetFilterOperator()
         {
             return filterOperator ?? FilterOperator;
         }
 
-        /// <summary>
-        /// Gets the second filter value.
-        /// </summary>
-        /// <returns>System.Object.</returns>
         internal object GetSecondFilterValue()
         {
             return secondFilterValue ?? SecondFilterValue;
         }
 
-        /// <summary>
-        /// Gets the second filter operator.
-        /// </summary>
-        /// <returns>FilterOperator.</returns>
         internal FilterOperator GetSecondFilterOperator()
         {
             return secondFilterOperator ?? SecondFilterOperator;
         }
 
-        /// <summary>
-        /// Gets the logical filter operator.
-        /// </summary>
-        /// <returns>LogicalFilterOperator.</returns>
         internal LogicalFilterOperator GetLogicalFilterOperator()
         {
             return logicalFilterOperator ?? LogicalFilterOperator;
         }
 
-        /// <summary>
-        /// Sets the filter value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <param name="isFirst">if set to <c>true</c> [is first].</param>
         internal void SetFilterValue(object value, bool isFirst = true)
         {
             if ((FilterPropertyType == typeof(DateTimeOffset) || FilterPropertyType == typeof(DateTimeOffset?)) && value != null && value is DateTime?)
@@ -620,59 +542,33 @@ namespace Radzen.Blazor
         [Parameter]
         public FilterOperator SecondFilterOperator { get; set; }
 
-        /// <summary>
-        /// Sets the filter operator.
-        /// </summary>
-        /// <param name="value">The value.</param>
         internal void SetFilterOperator(FilterOperator? value)
         {
             filterOperator = value;
         }
 
-        /// <summary>
-        /// Sets the second filter operator.
-        /// </summary>
-        /// <param name="value">The value.</param>
         internal void SetSecondFilterOperator(FilterOperator? value)
         {
             secondFilterOperator = value;
         }
 
-        /// <summary>
-        /// Sets the logical filter operator.
-        /// </summary>
-        /// <param name="value">The value.</param>
         internal void SetLogicalFilterOperator(LogicalFilterOperator value)
         {
             LogicalFilterOperator = value;
         }
 
-        /// <summary>
-        /// The runtime width
-        /// </summary>
         string runtimeWidth;
-        /// <summary>
-        /// Sets the width.
-        /// </summary>
-        /// <param name="value">The value.</param>
+
         internal void SetWidth(string value)
         {
             runtimeWidth = value;
         }
 
-        /// <summary>
-        /// Gets the width.
-        /// </summary>
-        /// <returns>System.String.</returns>
         internal string GetWidth()
         {
             return !string.IsNullOrEmpty(runtimeWidth) ? runtimeWidth : Width;
         }
 
-        /// <summary>
-        /// Gets the filter operators.
-        /// </summary>
-        /// <returns>IEnumerable&lt;FilterOperator&gt;.</returns>
         internal IEnumerable<FilterOperator> GetFilterOperators()
         {
             return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
@@ -681,11 +577,6 @@ namespace Radzen.Blazor
             });
         }
 
-        /// <summary>
-        /// Gets the filter operator text.
-        /// </summary>
-        /// <param name="filterOperator">The filter operator.</param>
-        /// <returns>System.String.</returns>
         internal string GetFilterOperatorText(FilterOperator filterOperator)
         {
             switch (filterOperator)
