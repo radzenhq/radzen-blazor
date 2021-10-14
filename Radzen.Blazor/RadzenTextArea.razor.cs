@@ -3,7 +3,7 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenTextArea.
+    /// RadzenTextArea component.
     /// Implements the <see cref="Radzen.FormComponent{System.String}" />
     /// </summary>
     /// <seealso cref="Radzen.FormComponent{System.String}" />
@@ -17,23 +17,23 @@ namespace Radzen.Blazor
         public long? MaxLength { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [read only].
+        /// Gets or sets a value indicating whether is read only.
         /// </summary>
-        /// <value><c>true</c> if [read only]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ReadOnly { get; set; }
 
         /// <summary>
-        /// Gets or sets the rows.
+        /// Gets or sets the number of rows.
         /// </summary>
-        /// <value>The rows.</value>
+        /// <value>The number of rows.</value>
         [Parameter]
         public int Rows { get; set; } = 2;
 
         /// <summary>
-        /// Gets or sets the cols.
+        /// Gets or sets the number of cols.
         /// </summary>
-        /// <value>The cols.</value>
+        /// <value>The number of cols.</value>
         [Parameter]
         public int Cols { get; set; } = 20;
 

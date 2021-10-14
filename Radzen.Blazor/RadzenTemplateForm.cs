@@ -11,7 +11,7 @@ using Microsoft.JSInterop;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenTemplateForm.
+    /// RadzenTemplateForm component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// Implements the <see cref="Radzen.IRadzenForm" />
     /// </summary>
@@ -21,7 +21,7 @@ namespace Radzen.Blazor
     public class RadzenTemplateForm<TItem> : RadzenComponent, IRadzenForm
     {
         /// <summary>
-        /// Returns true if ... is valid.
+        /// Returns true if valid.
         /// </summary>
         /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
         public bool IsValid
@@ -52,16 +52,16 @@ namespace Radzen.Blazor
         public RenderFragment<EditContext> ChildContent { get; set; }
 
         /// <summary>
-        /// Gets or sets the submit.
+        /// Gets or sets the submit callback.
         /// </summary>
-        /// <value>The submit.</value>
+        /// <value>The submit callback.</value>
         [Parameter]
         public EventCallback<TItem> Submit { get; set; }
 
         /// <summary>
-        /// Gets or sets the on invalid submit.
+        /// Gets or sets the on invalid submit callback.
         /// </summary>
-        /// <value>The on invalid submit.</value>
+        /// <value>The on invalid submit callback.</value>
         [Parameter]
         [Obsolete]
         public EventCallback<FormInvalidSubmitEventArgs> OnInvalidSubmit
@@ -77,29 +77,26 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the invalid submit.
+        /// Gets or sets the invalid submit callback.
         /// </summary>
-        /// <value>The invalid submit.</value>
+        /// <value>The invalid submit callback.</value>
         [Parameter]
         public EventCallback<FormInvalidSubmitEventArgs> InvalidSubmit { get; set; }
 
         /// <summary>
-        /// Gets or sets the method.
+        /// Gets or sets the form method.
         /// </summary>
-        /// <value>The method.</value>
+        /// <value>The form method.</value>
         [Parameter]
         public string Method { get; set; }
 
         /// <summary>
-        /// Gets or sets the action.
+        /// Gets or sets the form action.
         /// </summary>
-        /// <value>The action.</value>
+        /// <value>The form action.</value>
         [Parameter]
         public string Action { get; set; }
 
-        /// <summary>
-        /// The handle submit delegate
-        /// </summary>
         private readonly Func<Task> handleSubmitDelegate;
 
         /// <summary>
@@ -111,7 +108,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [submit].
+        /// Called on submit.
         /// </summary>
         protected async Task OnSubmit()
         {
@@ -142,9 +139,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The components
-        /// </summary>
         List<IRadzenFormComponent> components = new List<IRadzenFormComponent>();
 
         /// <summary>

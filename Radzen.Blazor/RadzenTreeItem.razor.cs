@@ -8,22 +8,14 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenTreeItem.
+    /// RadzenTreeItem component.
     /// Implements the <see cref="IDisposable" />
     /// </summary>
     /// <seealso cref="IDisposable" />
     public partial class RadzenTreeItem : IDisposable
     {
-        /// <summary>
-        /// Gets the content class list.
-        /// </summary>
-        /// <value>The content class list.</value>
         ClassList ContentClassList => ClassList.Create("rz-treenode-content")
                                                .Add("rz-treenode-content-selected", selected);
-        /// <summary>
-        /// Gets the icon class list.
-        /// </summary>
-        /// <value>The icon class list.</value>
         ClassList IconClassList => ClassList.Create("rz-tree-toggler rzi")
                                                .Add("rzi-caret-down", expanded)
                                                .Add("rzi-caret-right", !expanded);
@@ -48,9 +40,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string Text { get; set; }
 
-        /// <summary>
-        /// The expanded
-        /// </summary>
         private bool expanded;
 
         /// <summary>
@@ -74,9 +63,6 @@ namespace Radzen.Blazor
         [Parameter]
         public bool HasChildren { get; set; }
 
-        /// <summary>
-        /// The selected
-        /// </summary>
         private bool selected;
 
         /// <summary>
@@ -100,15 +86,8 @@ namespace Radzen.Blazor
         [CascadingParameter]
         public RadzenTreeItem ParentItem { get; set; }
 
-        /// <summary>
-        /// The items
-        /// </summary>
         internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
 
-        /// <summary>
-        /// Adds the item.
-        /// </summary>
-        /// <param name="item">The item.</param>
         internal void AddItem(RadzenTreeItem item)
         {
             if (items.IndexOf(item) == -1)
@@ -117,10 +96,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Removes the item.
-        /// </summary>
-        /// <param name="item">The item.</param>
         internal void RemoveItem(RadzenTreeItem item)
         {
             if (items.IndexOf(item) != -1)
@@ -144,9 +119,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Toggles this instance.
-        /// </summary>
         internal async Task Toggle()
         {
             expanded = !expanded;
@@ -165,7 +137,7 @@ namespace Radzen.Blazor
                         {
                             if (sibling != this && sibling.expanded)
                             {
-                                sibling.Toggle();
+                                await sibling.Toggle();
                             }
                         }
                     }
@@ -173,35 +145,25 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Selects this instance.
-        /// </summary>
         void Select()
         {
             selected = true;
             Tree?.SelectItem(this);
         }
 
-        /// <summary>
-        /// Unselects this instance.
-        /// </summary>
         internal void Unselect()
         {
             selected = false;
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Renders the content of the child.
-        /// </summary>
-        /// <param name="content">The content.</param>
         internal void RenderChildContent(RenderFragment content)
         {
             ChildContent = content;
         }
 
         /// <summary>
-        /// Called when [initialized].
+        /// Called when initialized.
         /// </summary>
         override protected void OnInitialized()
         {
@@ -271,10 +233,6 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        /// <summary>
-        /// Checkeds the change.
-        /// </summary>
-        /// <param name="value">if set to <c>true</c> [value].</param>
         async Task CheckedChange(bool? value)
         {
             if (Tree != null)
@@ -321,10 +279,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Determines whether this instance is checked.
-        /// </summary>
-        /// <returns><c>true</c> if this instance is checked; otherwise, <c>false</c>.</returns>
         bool? IsChecked()
         {
             var checkedValues = GetCheckedValues();
@@ -337,20 +291,11 @@ namespace Radzen.Blazor
             return checkedValues.Contains(Value);
         }
 
-        /// <summary>
-        /// Gets the checked values.
-        /// </summary>
-        /// <returns>IEnumerable&lt;System.Object&gt;.</returns>
         IEnumerable<object> GetCheckedValues()
         {
             return Tree.CheckedValues != null ? Tree.CheckedValues : Enumerable.Empty<object>();
         }
 
-        /// <summary>
-        /// Gets all child values.
-        /// </summary>
-        /// <param name="predicate">The predicate.</param>
-        /// <returns>IEnumerable&lt;System.Object&gt;.</returns>
         IEnumerable<object> GetAllChildValues(Func<object, bool> predicate = null)
         {
             var children = items.Concat(items.SelectManyRecursive(i => i.items)).Select(i => i.Value);
@@ -358,63 +303,35 @@ namespace Radzen.Blazor
             return predicate != null ? children.Where(predicate) : children;
         }
 
-        /// <summary>
-        /// Gets the value and all child values.
-        /// </summary>
-        /// <returns>IEnumerable&lt;System.Object&gt;.</returns>
         IEnumerable<object> GetValueAndAllChildValues()
         {
             return new object[] { Value }.Concat(GetAllChildValues());
         }
 
-        /// <summary>
-        /// Ares all children checked.
-        /// </summary>
-        /// <param name="predicate">The predicate.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         bool AreAllChildrenChecked(Func<object, bool> predicate = null)
         {
             var checkedValues = GetCheckedValues();
             return GetAllChildValues(predicate).All(i => checkedValues.Contains(i));
         }
 
-        /// <summary>
-        /// Ares all children unchecked.
-        /// </summary>
-        /// <param name="predicate">The predicate.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         bool AreAllChildrenUnchecked(Func<object, bool> predicate = null)
         {
             var checkedValues = GetCheckedValues();
             return GetAllChildValues(predicate).All(i => !checkedValues.Contains(i));
         }
 
-        /// <summary>
-        /// Determines whether [is one child unchecked].
-        /// </summary>
-        /// <returns><c>true</c> if [is one child unchecked]; otherwise, <c>false</c>.</returns>
         bool IsOneChildUnchecked()
         {
             var checkedValues = GetCheckedValues();
             return GetAllChildValues().Any(i => !checkedValues.Contains(i));
         }
 
-        /// <summary>
-        /// Determines whether [is one child checked].
-        /// </summary>
-        /// <returns><c>true</c> if [is one child checked]; otherwise, <c>false</c>.</returns>
         bool IsOneChildChecked()
         {
             var checkedValues = GetCheckedValues();
             return GetAllChildValues().Any(i => checkedValues.Contains(i));
         }
 
-        /// <summary>
-        /// Updates the checked values with parents.
-        /// </summary>
-        /// <param name="checkedValues">The checked values.</param>
-        /// <param name="value">if set to <c>true</c> [value].</param>
-        /// <returns>IEnumerable&lt;System.Object&gt;.</returns>
         IEnumerable<object> UpdateCheckedValuesWithParents(IEnumerable<object> checkedValues, bool? value)
         {
             var p = ParentItem;
@@ -435,11 +352,6 @@ namespace Radzen.Blazor
             return checkedValues;
         }
 
-        /// <summary>
-        /// Determines whether this instance contains the object.
-        /// </summary>
-        /// <param name="child">The child.</param>
-        /// <returns><c>true</c> if [contains] [the specified child]; otherwise, <c>false</c>.</returns>
         internal bool Contains(RadzenTreeItem child)
         {
             var parent = child.ParentItem;
