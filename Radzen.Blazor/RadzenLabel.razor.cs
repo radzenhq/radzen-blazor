@@ -3,16 +3,16 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenLabel.
+    /// RadzenLabel component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenLabel : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the component.
+        /// Gets or sets the component name for the label.
         /// </summary>
-        /// <value>The component.</value>
+        /// <value>The component name for the label.</value>
         [Parameter]
         public string Component { get; set; }
 

@@ -6,18 +6,13 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenListBox.
+    /// RadzenListBox component.
     /// Implements the <see cref="Radzen.DropDownBase{TValue}" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.DropDownBase{TValue}" />
     public partial class RadzenListBox<TValue> : DropDownBase<TValue>
     {
-        /// <summary>
-        /// Renders the item.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        /// <param name="item">The item.</param>
         internal override void RenderItem(RenderTreeBuilder builder, object item)
         {
             builder.OpenComponent(0, typeof(RadzenListBoxItem<TValue>));
@@ -47,17 +42,8 @@ namespace Radzen.Blazor
             await OnKeyPress(args);
         }
 
-        /// <summary>
-        /// The visible changed
-        /// </summary>
         private bool visibleChanged = false;
-        /// <summary>
-        /// The disabled changed
-        /// </summary>
         private bool disabledChanged = false;
-        /// <summary>
-        /// The first render
-        /// </summary>
         private bool firstRender = true;
 
         /// <summary>
@@ -121,9 +107,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [read only].
+        /// Gets or sets a value indicating whether is read only.
         /// </summary>
-        /// <value><c>true</c> if [read only]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ReadOnly { get; set; }
 

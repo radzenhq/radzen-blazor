@@ -3,7 +3,7 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenHtml.
+    /// RadzenHtml component.
     /// Implements the <see cref="ComponentBase" />
     /// </summary>
     /// <seealso cref="ComponentBase" />
