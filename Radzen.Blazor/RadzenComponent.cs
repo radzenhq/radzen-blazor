@@ -8,52 +8,46 @@ using Microsoft.JSInterop;
 namespace Radzen
 {
     /// <summary>
-    /// Class RadzenComponent.
-    /// Implements the <see cref="ComponentBase" />
-    /// Implements the <see cref="IDisposable" />
+    ///   Base class of Radzen Blazor components.
     /// </summary>
-    /// <seealso cref="ComponentBase" />
-    /// <seealso cref="IDisposable" />
     public class RadzenComponent : ComponentBase, IDisposable
     {
         /// <summary>
-        /// Gets or sets the attributes.
+        /// Specifies additional custom attributes that will be rendered by the component.
         /// </summary>
         /// <value>The attributes.</value>
         [Parameter(CaptureUnmatchedValues = true)]
         public IReadOnlyDictionary<string, object> Attributes { get; set; }
 
         /// <summary>
-        /// Gets the element.
+        /// Gets a reference to the HTML element rendered by the component.
         /// </summary>
-        /// <value>The element.</value>
         public ElementReference Element { get; internal set; }
 
         /// <summary>
-        /// Gets or sets the mouse enter.
+        /// A callback that will be invoked when the user hovers the component. Commonly used to display a tooltip via 
+        /// <see cref="TooltipService.Open(ElementReference, string, TooltipOptions)" />.
         /// </summary>
-        /// <value>The mouse enter.</value>
         [Parameter]
         public EventCallback<ElementReference> MouseEnter { get; set; }
 
         /// <summary>
-        /// Gets or sets the mouse leave.
+        /// A callback that will be invoked when the user moves the mouse out of the component. Commonly used to hide a tooltip via 
+        /// <see cref="TooltipService.Close" />.
         /// </summary>
-        /// <value>The mouse leave.</value>
         [Parameter]
         public EventCallback<ElementReference> MouseLeave { get; set; }
 
         /// <summary>
-        /// Gets or sets the context menu.
+        /// A callback that will be invoked when the user right-clicks the component. Commonly used to display a context menu via 
+        /// <see cref="ContextMenuService.Open(Microsoft.AspNetCore.Components.Web.MouseEventArgs, IEnumerable{ContextMenuItem}, Action{MenuItemEventArgs})" />.
         /// </summary>
-        /// <value>The context menu.</value>
         [Parameter]
         public EventCallback<Microsoft.AspNetCore.Components.Web.MouseEventArgs> ContextMenu { get; set; }
 
         /// <summary>
-        /// Gets or sets the culture.
+        /// Gets or sets the culture used to display localizable data (numbers, dates). Set by default to <see cref="CultureInfo.CurrentCulture" />.
         /// </summary>
-        /// <value>The culture.</value>
         [Parameter]
         public CultureInfo Culture
         {
@@ -62,19 +56,16 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Gets or sets the default culture.
+        /// Gets or sets the culture set by a parent componen.
         /// </summary>
-        /// <value>The default culture.</value>
+        /// <summary>
         [CascadingParameter(Name = nameof(DefaultCulture))]
         public CultureInfo DefaultCulture { get; set; }
 
-        /// <summary>
-        /// The culture
-        /// </summary>
         private CultureInfo culture;
 
         /// <summary>
-        /// Called when [mouse enter].
+        /// Raises <see cref="MouseEnter" />.
         /// </summary>
         public async Task OnMouseEnter()
         {
@@ -82,7 +73,7 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Called when [mouse leave].
+        /// Raises <see cref="MouseLeave" />.
         /// </summary>
         public async Task OnMouseLeave()
         {
@@ -90,7 +81,7 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Handles the <see cref="E:ContextMenu" /> event.
+        /// Raises <see cref="ContextMenu" />.
         /// </summary>
         /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.MouseEventArgs"/> instance containing the event data.</param>
         public virtual async Task OnContextMenu(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
@@ -99,23 +90,22 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Gets or sets the style.
+        /// Gets or sets the inline CSS style.
         /// </summary>
         /// <value>The style.</value>
         [Parameter]
         public virtual string Style { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="RadzenComponent"/> is visible.
+        /// Gets or sets a value indicating whether this <see cref="RadzenComponent"/> is visible. Invisible components are not rendered.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         [Parameter]
         public virtual bool Visible { get; set; } = true;
 
         /// <summary>
-        /// Gets the CSS class.
+        /// Gets the final CSS class rendered by the component. Combines it with a <c>class</c> custom attribute.
         /// </summary>
-        /// <returns>System.String.</returns>
         protected string GetCssClass()
         {
             if (Attributes != null && Attributes.TryGetValue("class", out var @class) && !string.IsNullOrEmpty(Convert.ToString(@class)))
@@ -127,9 +117,9 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Gets the identifier.
+        /// Gets the unique identifier. 
         /// </summary>
-        /// <returns>System.String.</returns>
+        /// <returns>Returns the <c>id</c> attribute (if specified) or generates a random one.</returns>
         protected string GetId()
         {
             if (Attributes != null && Attributes.TryGetValue("id", out var id) && !string.IsNullOrEmpty(Convert.ToString(@id)))
@@ -143,15 +133,11 @@ namespace Radzen
         /// <summary>
         /// Gets the component CSS class.
         /// </summary>
-        /// <returns>System.String.</returns>
         protected virtual string GetComponentCssClass()
         {
             return "";
         }
 
-        /// <summary>
-        /// The debouncer
-        /// </summary>
         Debouncer debouncer = new Debouncer();
 
         /// <summary>
@@ -178,33 +164,26 @@ namespace Radzen
         protected IJSRuntime JSRuntime { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is js runtime available.
+        /// Gets or sets a value indicating whether <see cref="JSRuntime" /> is available.
         /// </summary>
-        /// <value><c>true</c> if this instance is js runtime available; otherwise, <c>false</c>.</value>
         protected bool IsJSRuntimeAvailable { get; set; }
 
         /// <summary>
-        /// Called when [initialized].
+        /// Called by the Blazor runtime.
         /// </summary>
         protected override void OnInitialized()
         {
-            UniqueID = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("/", "-").Replace("+", "-").Substring(0, 10);            
+            UniqueID = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("/", "-").Replace("+", "-").Substring(0, 10);
         }
 
-        /// <summary>
-        /// The visible changed
-        /// </summary>
         private bool visibleChanged = false;
-        /// <summary>
-        /// The first render
-        /// </summary>
         private bool firstRender = true;
 
         /// <summary>
-        /// Set parameters as an asynchronous operation.
+        /// Called by the Blazor runtime when parameters are set.
         /// </summary>
         /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <summary>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
@@ -220,13 +199,10 @@ namespace Radzen
             }
         }
 
-        /// <summary>
-        /// The reference
-        /// </summary>
         private DotNetObjectReference<RadzenComponent> reference;
 
         /// <summary>
-        /// Gets the reference.
+        /// Gets the reference for the current component.
         /// </summary>
         /// <value>The reference.</value>
         protected DotNetObjectReference<RadzenComponent> Reference
@@ -243,10 +219,8 @@ namespace Radzen
         }
 
         /// <summary>
-        /// On after render as an asynchronous operation.
+        /// Called by the Blazor runtime.
         /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             IsJSRuntimeAvailable = true;
@@ -278,7 +252,7 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Raises the context menu.
+        /// Invoked via interop when the browser "oncontextmenu" event is raised for this component.
         /// </summary>
         /// <param name="e">The <see cref="Microsoft.AspNetCore.Components.Web.MouseEventArgs"/> instance containing the event data.</param>
         [JSInvokable("RadzenComponent.RaiseContextMenu")]
@@ -291,7 +265,7 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Raises the mouse enter.
+        /// Invoked via interop when the browser "onmouseenter" event is raised for this component.
         /// </summary>
         [JSInvokable("RadzenComponent.RaiseMouseEnter")]
         public async System.Threading.Tasks.Task RaiseMouseEnter()
@@ -303,7 +277,7 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Raises the mouse leave.
+        /// Invoked via interop when the browser "onmouseleave" event is raised for this component.
         /// </summary>
         [JSInvokable("RadzenComponent.RaiseMouseLeave")]
         public async System.Threading.Tasks.Task RaiseMouseLeave()
@@ -315,7 +289,7 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Disposes this instance.
+        /// Detaches event handlers and disposes <see cref="Reference" />.
         /// </summary>
         public virtual void Dispose()
         {
@@ -342,9 +316,9 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Gets the current style.
+        /// Gets the current style as a dictionary.
         /// </summary>
-        /// <value>The current style.</value>
+        /// <value>The current style as a dictionary of keys and values.</value>
         protected IDictionary<string, string> CurrentStyle
         {
             get

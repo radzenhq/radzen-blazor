@@ -129,9 +129,9 @@ namespace Radzen.Blazor
         /// &lt;RadzenScheduler Data=@appointments SlotSelect=@OnSlotSelect&gt;
         /// &lt;/RadzenScheduler&gt;
         /// @code {
-        /// . void OnSlotSelect(SchedulerSlotSelectEventArgs args) 
-        /// . {
-        /// . }
+        ///  void OnSlotSelect(SchedulerSlotSelectEventArgs args) 
+        ///  {
+        ///  }
         /// }
         /// </code>
         /// </example>
@@ -146,9 +146,9 @@ namespace Radzen.Blazor
         /// &lt;RadzenScheduler Data=@appointments AppointmentSelect=@OnAppointmentSelect&gt;
         /// &lt;/RadzenScheduler&gt;
         /// @code {
-        /// . void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs&lt;TItem&gt; args) 
-        /// . {
-        /// . }
+        ///  void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs&lt;TItem&gt; args) 
+        ///  {
+        ///  }
         /// }
         /// </code>
         /// </example>
@@ -296,9 +296,7 @@ namespace Radzen.Blazor
             Views.Remove(view);
         }
 
-        /// <summary>
-        /// Called by the Blazor runtime.
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             CurrentDate = Date;
@@ -332,10 +330,8 @@ namespace Radzen.Blazor
         Func<TItem, DateTime> startGetter;
         Func<TItem, DateTime> endGetter;
         Func<TItem, string> textGetter;
-        /// <summary>
-        /// Called by the Blazor runtime when parameters are set.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
+
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var needsReload = false;
@@ -431,9 +427,7 @@ namespace Radzen.Blazor
             public double Height { get; set; }
         }
 
-        /// <summary>
-        /// Called by the Blazor runtime.
-        /// </summary>
+        /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);

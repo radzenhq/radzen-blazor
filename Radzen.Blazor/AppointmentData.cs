@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Represents an appointment in <see cref="RadzenScheduler" />
+    /// Represents an appointment in <see cref="RadzenScheduler{TItem}" />
     /// </summary>
     public class AppointmentData
     {
