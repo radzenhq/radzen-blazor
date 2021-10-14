@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenDropDownDataGrid.
+    /// RadzenDropDownDataGrid component.
     /// Implements the <see cref="Radzen.DropDownBase{TValue}" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
@@ -19,9 +19,9 @@ namespace Radzen.Blazor
     public partial class RadzenDropDownDataGrid<TValue> : DropDownBase<TValue>
     {
         /// <summary>
-        /// Gets or sets the width of the column.
+        /// Gets or sets the width of all columns.
         /// </summary>
-        /// <value>The width of the column.</value>
+        /// <value>The width of all columns.</value>
         [Parameter]
         public string ColumnWidth { get; set; }
 
@@ -33,9 +33,9 @@ namespace Radzen.Blazor
         public bool Responsive { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show search].
+        /// Gets or sets a value indicating whether search button is shown.
         /// </summary>
-        /// <value><c>true</c> if [show search]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if search button is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowSearch { get; set; } = true;
 
@@ -54,9 +54,9 @@ namespace Radzen.Blazor
         public string EmptyText { get; set; } = "No records to display.";
 
         /// <summary>
-        /// Gets or sets the search text.
+        /// Gets or sets the search input placeholder text.
         /// </summary>
-        /// <value>The search text.</value>
+        /// <value>The search input placeholder text.</value>
         [Parameter]
         public string SearchText { get; set; } = "Search...";
 
@@ -74,22 +74,12 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Columns { get; set; }
 
-        /// <summary>
-        /// The grid
-        /// </summary>
         RadzenDataGrid<object> grid;
-
-        /// <summary>
-        /// The paged data
-        /// </summary>
         IEnumerable<object> pagedData;
-        /// <summary>
-        /// The count
-        /// </summary>
         int count;
 
         /// <summary>
-        /// Gets or sets the maximum selected labels.
+        /// Gets or sets the number of maximum selected labels.
         /// </summary>
         /// <value>The maximum selected labels.</value>
         [Parameter]
@@ -97,16 +87,16 @@ namespace Radzen.Blazor
 
 #if !NET5
         /// <summary>
-        /// Gets or sets the size of the page.
+        /// Gets or sets the page size.
         /// </summary>
-        /// <value>The size of the page.</value>
+        /// <value>The page size.</value>
         [Parameter]
         public int PageSize { get; set; } = 5;
 
         /// <summary>
-        /// Gets or sets the count.
+        /// Gets or sets the total items count.
         /// </summary>
-        /// <value>The count.</value>
+        /// <value>The total items count.</value>
         [Parameter]
         public int Count { get; set; }
 #endif
@@ -118,9 +108,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string SelectedItemsText { get; set; } = "items selected";
 
-        /// <summary>
-        /// The popup
-        /// </summary>
         protected ElementReference popup;
 
         /// <summary>
@@ -150,7 +137,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [data changed].
+        /// Called when data is changed.
         /// </summary>
         protected override async Task OnDataChanged()
         {
@@ -172,12 +159,6 @@ namespace Radzen.Blazor
             await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
         }
 
-        /// <summary>
-        /// Gets the property filter expression.
-        /// </summary>
-        /// <param name="property">The property.</param>
-        /// <param name="filterCaseSensitivityOperator">The filter case sensitivity operator.</param>
-        /// <returns>System.String.</returns>
         private string GetPropertyFilterExpression(string property, string filterCaseSensitivityOperator)
         {
             if (property == null)
@@ -188,11 +169,6 @@ namespace Radzen.Blazor
             return $"{p}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)";
         }
 
-        /// <summary>
-        /// Determines whether [is column filter property type string] [the specified column].
-        /// </summary>
-        /// <param name="column">The column.</param>
-        /// <returns><c>true</c> if [is column filter property type string] [the specified column]; otherwise, <c>false</c>.</returns>
         private bool IsColumnFilterPropertyTypeString(RadzenDataGridColumn<object> column)
         {
             var property = column.GetFilterProperty();
@@ -202,10 +178,6 @@ namespace Radzen.Blazor
             return type == typeof(string);
         }
 
-        /// <summary>
-        /// Called when [load data].
-        /// </summary>
-        /// <param name="args">The arguments.</param>
         async Task OnLoadData(LoadDataArgs args)
         {
             if (!LoadData.HasDelegate)
@@ -249,12 +221,10 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The internal view
-        /// </summary>
         IEnumerable _internalView = Enumerable.Empty<object>();
+
         /// <summary>
-        /// Gets the view.
+        /// Gets the view. The data with sorting, filtering and paging applied.
         /// </summary>
         /// <value>The view.</value>
         public new IEnumerable View
@@ -327,9 +297,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Clears this instance.
-        /// </summary>
         async System.Threading.Tasks.Task Clear()
         {
             if (Disabled)
@@ -350,10 +317,9 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// The previous search
-        /// </summary>
+
         string previousSearch;
+
         /// <summary>
         /// Handles the <see cref="E:FilterKeyPress" /> event.
         /// </summary>
@@ -409,9 +375,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Debounces the filter.
-        /// </summary>
         async Task DebounceFilter()
         {
             searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
@@ -424,9 +387,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Refreshes the after filter.
-        /// </summary>
         async Task RefreshAfterFilter()
         {
     #if NET5
@@ -463,30 +423,26 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow sorting].
+        /// Gets or sets a value indicating whether sorting is allowed.
         /// </summary>
-        /// <value><c>true</c> if [allow sorting]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if sorting is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowSorting { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow filtering].
+        /// Gets or sets a value indicating whether filtering is allowed.
         /// </summary>
-        /// <value><c>true</c> if [allow filtering]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if filtering is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public override bool AllowFiltering { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow filtering by all string columns].
+        /// Gets or sets a value indicating whether filtering by all string columns is allowed.
         /// </summary>
-        /// <value><c>true</c> if [allow filtering by all string columns]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if filtering by all string columns is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowFilteringByAllStringColumns { get; set; }
 
-        /// <summary>
-        /// Called when [row select].
-        /// </summary>
-        /// <param name="item">The item.</param>
         async Task OnRowSelect(object item)
         {
             await SelectItem(item);

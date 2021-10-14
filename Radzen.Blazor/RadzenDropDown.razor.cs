@@ -6,18 +6,13 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenDropDown.
+    /// RadzenDropDown component.
     /// Implements the <see cref="Radzen.DropDownBase{TValue}" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.DropDownBase{TValue}" />
     public partial class RadzenDropDown<TValue> : DropDownBase<TValue>
     {
-        /// <summary>
-        /// Renders the item.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        /// <param name="item">The item.</param>
         internal override void RenderItem(RenderTreeBuilder builder, object item)
         {
             builder.OpenComponent(0, typeof(RadzenDropDownItem<TValue>));
@@ -28,9 +23,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the maximum selected labels.
+        /// Gets or sets the number of maximum selected labels.
         /// </summary>
-        /// <value>The maximum selected labels.</value>
+        /// <value>The number of maximum selected labels.</value>
         [Parameter]
         public int MaxSelectedLabels { get; set; } = 4;
 
@@ -48,17 +43,8 @@ namespace Radzen.Blazor
         [Parameter]
         public string SelectAllText { get; set; }
 
-        /// <summary>
-        /// The visible changed
-        /// </summary>
         private bool visibleChanged = false;
-        /// <summary>
-        /// The disabled changed
-        /// </summary>
         private bool disabledChanged = false;
-        /// <summary>
-        /// The first render
-        /// </summary>
         private bool firstRender = true;
 
         /// <summary>
@@ -122,7 +108,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [select item].
+        /// Called when item is selected.
         /// </summary>
         /// <param name="item">The item.</param>
         /// <param name="isFromKey">if set to <c>true</c> [is from key].</param>
@@ -136,11 +122,6 @@ namespace Radzen.Blazor
             await SelectItem(item);
         }
 
-        /// <summary>
-        /// Called when [select item internal].
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <param name="isFromKey">if set to <c>true</c> [is from key].</param>
         internal async System.Threading.Tasks.Task OnSelectItemInternal(object item, bool isFromKey = false)
         {
             await OnSelectItem(item, isFromKey);
@@ -156,20 +137,6 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Closes the popup script.
-        /// </summary>
-        /// <returns>System.String.</returns>
-        private string ClosePopupScript()
-        {
-            if (Disabled)
-            {
-                return string.Empty;
-            }
-
-            return $"Radzen.closePopup('{PopupID}')";
-        }
-
-        /// <summary>
         /// Disposes this instance.
         /// </summary>
         public override void Dispose()
@@ -182,9 +149,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Closes the popup.
-        /// </summary>
         internal async System.Threading.Tasks.Task ClosePopup()
         {
             await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
