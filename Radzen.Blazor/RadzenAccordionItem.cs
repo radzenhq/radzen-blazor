@@ -32,15 +32,13 @@ namespace Radzen.Blazor
         public bool Selected { get; set; }
 
         /// <summary>
-        /// Gets or sets the content of the child.
+        /// Gets or sets the child content.
         /// </summary>
-        /// <value>The content of the child.</value>
+        /// <value>The child content.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
-        /// <summary>
-        /// The visible
-        /// </summary>
+
         bool _visible = true;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenAccordionItem"/> is visible.
@@ -63,9 +61,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The accordion
-        /// </summary>
         RadzenAccordion _accordion;
 
         /// <summary>
