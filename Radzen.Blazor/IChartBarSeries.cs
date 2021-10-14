@@ -1,7 +1,7 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Interface IChartBarSeries
+    /// Marker interface for <see cref="RadzenBarSeries{TItem}" />.
     /// </summary>
     public interface IChartBarSeries
     {

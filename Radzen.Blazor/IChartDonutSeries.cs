@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Interface IChartDonutSeries
+    /// Marker interface for <see cref="RadzenColumnSeries{TItem}" />.
     /// </summary>
     public interface IChartDonutSeries
     {

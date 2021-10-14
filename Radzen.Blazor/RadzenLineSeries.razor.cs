@@ -4,45 +4,37 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenLineSeries.
-    /// Implements the <see cref="Radzen.Blazor.CartesianSeries{TItem}" />
+    /// Renders line series in <see cref="RadzenChart" />.
     /// </summary>
-    /// <typeparam name="TItem">The type of the t item.</typeparam>
-    /// <seealso cref="Radzen.Blazor.CartesianSeries{TItem}" />
+    /// <typeparam name="TItem">The type of the series data item.</typeparam>
     public partial class RadzenLineSeries<TItem> : CartesianSeries<TItem>
     {
         /// <summary>
-        /// Gets or sets the stroke.
+        /// Specifies the color of the line.
         /// </summary>
         /// <value>The stroke.</value>
         [Parameter]
         public string Stroke { get; set; }
 
         /// <summary>
-        /// Gets or sets the width of the stroke.
+        /// Specifies the pixel width of the line. Set to <c>2</c> by default.
         /// </summary>
-        /// <value>The width of the stroke.</value>
         [Parameter]
         public double StrokeWidth { get; set; } = 2;
 
         /// <summary>
-        /// Gets or sets the type of the line.
+        /// Specifies the line type.
         /// </summary>
-        /// <value>The type of the line.</value>
         [Parameter]
         public LineType LineType { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="RadzenLineSeries{TItem}"/> is smooth.
+        /// Specifies whether to render a smooth line. Set to <c>false</c> by default.
         /// </summary>
-        /// <value><c>true</c> if smooth; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Smooth { get; set; }
 
-        /// <summary>
-        /// Gets the color.
-        /// </summary>
-        /// <value>The color.</value>
+        /// <inheritdoc />
         public override string Color
         {
             get
@@ -50,13 +42,8 @@ namespace Radzen.Blazor
                 return Stroke;
             }
         }
-        /// <summary>
-        /// Determines whether this instance contains the object.
-        /// </summary>
-        /// <param name="x">The x.</param>
-        /// <param name="y">The y.</param>
-        /// <param name="tolerance">The tolerance.</param>
-        /// <returns><c>true</c> if [contains] [the specified x]; otherwise, <c>false</c>.</returns>
+
+        /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
             var category = ComposeCategory(Chart.CategoryScale);

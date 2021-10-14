@@ -4,18 +4,8 @@ using System.Collections.Generic;
 
 namespace Radzen.Blazor
 {
-    /// <summary>
-    /// Class DateScale.
-    /// Implements the <see cref="Radzen.Blazor.LinearScale" />
-    /// </summary>
-    /// <seealso cref="Radzen.Blazor.LinearScale" />
     internal class DateScale : LinearScale
     {
-        /// <summary>
-        /// Tickses the specified distance.
-        /// </summary>
-        /// <param name="distance">The distance.</param>
-        /// <returns>System.ValueTuple&lt;System.Double, System.Double, System.Double&gt;.</returns>
         public override (double Start, double End, double Step) Ticks(int distance)
         {
             var start = Input.Start;
@@ -51,21 +41,11 @@ namespace Radzen.Blazor
             return (start, end, step);
         }
 
-        /// <summary>
-        /// Values the specified value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>System.Object.</returns>
         public override object Value(double value)
         {
             return FromTicks(value);
         }
 
-        /// <summary>
-        /// Resizes the specified minimum.
-        /// </summary>
-        /// <param name="min">The minimum.</param>
-        /// <param name="max">The maximum.</param>
         public override void Resize(object min, object max)
         {
             if (min != null)
@@ -83,22 +63,11 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Froms the ticks.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>DateTime.</returns>
         private DateTime FromTicks(double value)
         {
             return new DateTime(Convert.ToInt64(value));
         }
 
-        /// <summary>
-        /// Formats the tick.
-        /// </summary>
-        /// <param name="format">The format.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>System.String.</returns>
         public override string FormatTick(string format, object value)
         {
             if (string.IsNullOrEmpty(format))
@@ -109,10 +78,6 @@ namespace Radzen.Blazor
             return base.FormatTick(format, value);
         }
 
-        /// <summary>
-        /// Fits the specified distance.
-        /// </summary>
-        /// <param name="distance">The distance.</param>
         public override void Fit(int distance)
         {
             var ticks = Ticks(distance);

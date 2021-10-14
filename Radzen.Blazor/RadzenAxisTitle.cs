@@ -3,21 +3,19 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenAxisTitle.
-    /// Implements the <see cref="Radzen.Blazor.RadzenChartComponentBase" />
+    /// Represents the title configuration of a <see cref="AxisBase" />.
     /// </summary>
-    /// <seealso cref="Radzen.Blazor.RadzenChartComponentBase" />
     public class RadzenAxisTitle : RadzenChartComponentBase
     {
         /// <summary>
-        /// Gets or sets the text.
+        /// Gets or sets the text displayed by the title.
         /// </summary>
         /// <value>The text.</value>
         [Parameter]
         public string Text { get; set; }
 
         /// <summary>
-        /// Sets the axis.
+        /// Sets the axis whith this configuratiton applies to.
         /// </summary>
         /// <value>The axis.</value>
         [CascadingParameter]
@@ -29,10 +27,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the size.
-        /// </summary>
-        /// <value>The size.</value>
         internal double Size
         {
             get
@@ -41,11 +35,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Shoulds the refresh chart.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        /// <inheritdoc />
         protected override bool ShouldRefreshChart(ParameterView parameters)
         {
             return DidParameterChange(parameters, nameof(Text), Text);

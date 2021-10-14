@@ -7,59 +7,54 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenPieSeries.
-    /// Implements the <see cref="Radzen.Blazor.CartesianSeries{TItem}" />
+    /// Renders pie series in <see cref="RadzenChart" />.
     /// </summary>
-    /// <typeparam name="TItem">The type of the t item.</typeparam>
-    /// <seealso cref="Radzen.Blazor.CartesianSeries{TItem}" />
-    public partial class RadzenPieSeries<TItem> : Radzen.Blazor.CartesianSeries<TItem>
+    /// <typeparam name="TItem">The type of the series data item.</typeparam>
+    /// <summary>
+    public partial class RadzenPieSeries<TItem> : CartesianSeries<TItem>
     {
         /// <summary>
-        /// Gets or sets the x.
+        /// Specifies the x coordinate of the pie center. Not set by default which centers pie horizontally.
         /// </summary>
         /// <value>The x.</value>
         [Parameter]
         public double? X { get; set; }
 
         /// <summary>
-        /// Gets or sets the y.
+        /// Specifies the y coordinate of the pie center. Not set by default which centers pie vertically.
         /// </summary>
         /// <value>The y.</value>
         [Parameter]
         public double? Y { get; set; }
 
         /// <summary>
-        /// Gets or sets the radius.
+        /// Specifies the radius of the pie. Not set by default - the pie takes as much size of the chart as possible.
         /// </summary>
-        /// <value>The radius.</value>
         [Parameter]
         public double? Radius { get; set; }
 
         /// <summary>
-        /// Gets or sets the fills.
+        /// The fill colors of the pie segments. Used as the background of the segments.
         /// </summary>
-        /// <value>The fills.</value>
         [Parameter]
         public IEnumerable<string> Fills { get; set; }
 
         /// <summary>
-        /// Gets or sets the strokes.
+        /// The stroke colors of the pie segments.
         /// </summary>
-        /// <value>The strokes.</value>
         [Parameter]
         public IEnumerable<string> Strokes { get; set; }
 
         /// <summary>
-        /// Gets or sets the width of the stroke.
+        /// The stroke width of the segments in pixels. By default set to <c>0</c>.
         /// </summary>
         /// <value>The width of the stroke.</value>
         [Parameter]
         public double StrokeWidth { get; set; }
 
         /// <summary>
-        /// Gets the current radius.
+        /// Returns the current radius - either a specified <see cref="Radius" /> or automatically calculated one.
         /// </summary>
-        /// <value>The current radius.</value>
         protected double CurrentRadius
         {
             get
@@ -69,9 +64,8 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets the center x.
+        /// Gets the current X coordiante of the center.
         /// </summary>
-        /// <value>The center x.</value>
         protected double CenterX
         {
             get
@@ -81,9 +75,8 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets the center y.
-        /// </summary>
-        /// <value>The center y.</value>
+        /// Gets the current Y coordiante of the center.
+        /// <summary>
         protected double CenterY
         {
             get
@@ -91,10 +84,7 @@ namespace Radzen.Blazor
                 return Y ?? Chart.ValueScale.Output.Mid;
             }
         }
-        /// <summary>
-        /// Gets the color.
-        /// </summary>
-        /// <value>The color.</value>
+        /// <inheritdoc />
         public override string Color
         {
             get
@@ -103,10 +93,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Measures the legend.
-        /// </summary>
-        /// <returns>System.Double.</returns>
+        /// <inheritdoc />
         public override double MeasureLegend()
         {
             if (Items.Any())
@@ -117,10 +104,7 @@ namespace Radzen.Blazor
             return 0;
         }
 
-        /// <summary>
-        /// Renders the legend item.
-        /// </summary>
-        /// <returns>RenderFragment.</returns>
+        /// <inheritdoc />
         public override RenderFragment RenderLegendItem()
         {
             return builder =>
@@ -138,13 +122,7 @@ namespace Radzen.Blazor
             };
         }
 
-        /// <summary>
-        /// Determines whether this instance contains the object.
-        /// </summary>
-        /// <param name="x">The x.</param>
-        /// <param name="y">The y.</param>
-        /// <param name="tolerance">The tolerance.</param>
-        /// <returns><c>true</c> if [contains] [the specified x]; otherwise, <c>false</c>.</returns>
+        /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
             if (Items.Any())
@@ -157,12 +135,7 @@ namespace Radzen.Blazor
             return false;
         }
 
-        /// <summary>
-        /// Datas at.
-        /// </summary>
-        /// <param name="x">The x.</param>
-        /// <param name="y">The y.</param>
-        /// <returns>System.Object.</returns>
+        /// <inheritdoc />
         public override object DataAt(double x, double y)
         {
             var angle = 90 - Math.Atan((CenterY - y) / (x - CenterX)) * 180 / Math.PI;
@@ -190,20 +163,14 @@ namespace Radzen.Blazor
 
             return null;
         }
-        /// <summary>
-        /// Tooltips the class.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>System.String.</returns>
+
+        /// <inheritdoc />
         protected override string TooltipClass(TItem item)
         {
             return $"{base.TooltipClass(item)} rz-pie-tooltip rz-series-item-{Items.IndexOf(item)}";
         }
-        /// <summary>
-        /// Tooltips the style.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>System.String.</returns>
+
+        /// <inheritdoc />
         protected override string TooltipStyle(TItem item)
         {
             var style = base.TooltipStyle(item);
@@ -218,11 +185,7 @@ namespace Radzen.Blazor
             return style;
         }
 
-        /// <summary>
-        /// Tooltips the x.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>System.Double.</returns>
+        /// <inheritdoc />
         protected override double TooltipX(TItem item)
         {
             var sum = Items.Sum(Value);
@@ -247,11 +210,7 @@ namespace Radzen.Blazor
             return CenterX + CurrentRadius * Math.Cos(DegToRad(90 - angle));
         }
 
-        /// <summary>
-        /// Tooltips the y.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>System.Double.</returns>
+        /// <inheritdoc />
         protected override double TooltipY(TItem item)
         {
             var sum = Items.Sum(Value);
@@ -277,10 +236,8 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Degs to RAD.
+        /// Converts degrees to radians.
         /// </summary>
-        /// <param name="degrees">The degrees.</param>
-        /// <returns>System.Double.</returns>
         protected double DegToRad(double degrees)
         {
             var radians = (degrees) * Math.PI / 180;
@@ -289,13 +246,12 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Converts to cartesian.
+        /// Converts radial coordinates to to cartesian.
         /// </summary>
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
         /// <param name="radius">The radius.</param>
         /// <param name="degrees">The degrees.</param>
-        /// <returns>System.ValueTuple&lt;System.Double, System.Double&gt;.</returns>
         protected (double X, double Y) ToCartesian(double x, double y, double radius, double degrees)
         {
             var radians = (degrees) * Math.PI / 180;
@@ -304,7 +260,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Segments the specified x.
+        /// Creates SVG path that renders the specified segment.
         /// </summary>
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
@@ -312,7 +268,6 @@ namespace Radzen.Blazor
         /// <param name="innerRadius">The inner radius.</param>
         /// <param name="startAngle">The start angle.</param>
         /// <param name="endAngle">The end angle.</param>
-        /// <returns>System.String.</returns>
         protected string Segment(double x, double y, double radius, double innerRadius, double startAngle, double endAngle)
         {
             var start = ToCartesian(x, y, radius, startAngle);

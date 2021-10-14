@@ -1,7 +1,7 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Interface IChartColumnSeries
+    /// Marker interface for <see cref="RadzenColumnSeries{TItem}" />.
     /// </summary>
     public interface IChartColumnSeries
     {

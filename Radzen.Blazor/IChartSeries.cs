@@ -4,29 +4,26 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Interface IChartSeries
+    /// Specifies the common API that <see cref="RadzenChart" /> series must implement.
     /// </summary>
     public interface IChartSeries
     {
         /// <summary>
-        /// Transforms the category scale.
+        /// Transforms a category scale to new one.
         /// </summary>
         /// <param name="scale">The scale.</param>
-        /// <returns>ScaleBase.</returns>
         ScaleBase TransformCategoryScale(ScaleBase scale);
         /// <summary>
-        /// Transforms the value scale.
+        /// Transforms a category scale to new one.
         /// </summary>
         /// <param name="scale">The scale.</param>
-        /// <returns>ScaleBase.</returns>
         ScaleBase TransformValueScale(ScaleBase scale);
         /// <summary>
-        /// Gets or sets the markers.
+        /// Gets or sets the series marker configuration.
         /// </summary>
-        /// <value>The markers.</value>
         RadzenMarkers Markers { get; set; }
         /// <summary>
-        /// Gets the type of the marker.
+        /// Gets the series marker type.
         /// </summary>
         /// <value>The type of the marker.</value>
         MarkerType MarkerType { get; }
@@ -36,18 +33,18 @@ namespace Radzen.Blazor
         /// <value>The size of the marker.</value>
         double MarkerSize { get; }
         /// <summary>
-        /// Renders the specified category scale.
+        /// Renders the siries with the specified category and value scales.
         /// </summary>
         /// <param name="categoryScale">The category scale.</param>
         /// <param name="valueScale">The value scale.</param>
         /// <returns>RenderFragment.</returns>
         RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale);
         /// <summary>
-        /// Renders the tooltip.
+        /// Renders the series tooltip.
         /// </summary>
         /// <param name="data">The data.</param>
-        /// <param name="marginLeft">The margin left.</param>
-        /// <param name="marginTop">The margin top.</param>
+        /// <param name="marginLeft">The left margin.</param>
+        /// <param name="marginTop">The right margin.</param>
         /// <returns>RenderFragment.</returns>
         RenderFragment RenderTooltip(object data, double marginLeft, double marginTop);
         /// <summary>
@@ -66,9 +63,9 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         bool Visible { get; }
         /// <summary>
-        /// Gets a value indicating whether [show in legend].
+        /// Gets a value indicating whether this series should appear in the legend.
         /// </summary>
-        /// <value><c>true</c> if [show in legend]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if the series appears in the legend; otherwise, <c>false</c>.</value>
         bool ShowInLegend { get; }
         /// <summary>
         /// Gets or sets the rendering order.
@@ -76,29 +73,27 @@ namespace Radzen.Blazor
         /// <value>The rendering order.</value>
         int RenderingOrder { get; set; }
         /// <summary>
-        /// Determines whether this instance contains the object.
+        /// Determines if the series contains the specified coordinates with a given tolerance.
         /// </summary>
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
         /// <param name="tolerance">The tolerance.</param>
-        /// <returns><c>true</c> if [contains] [the specified x]; otherwise, <c>false</c>.</returns>
+        /// <returns><c>true</c> if the series contains the coordinates; otherwise, <c>false</c>.</returns>
         bool Contains(double x, double y, double tolerance);
         /// <summary>
-        /// Datas at.
+        /// Returns the data at the specified coordinates;
         /// </summary>
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
-        /// <returns>System.Object.</returns>
         object DataAt(double x, double y);
         /// <summary>
-        /// Gets or sets the title.
+        /// Gets or sets the title of the series. The title is displayed in tooltips and the legend.
         /// </summary>
         /// <value>The title.</value>
         string Title { get; set; }
         /// <summary>
         /// Gets the title.
         /// </summary>
-        /// <returns>System.String.</returns>
         string GetTitle();
         /// <summary>
         /// Measures the legend.
@@ -106,11 +101,10 @@ namespace Radzen.Blazor
         /// <returns>System.Double.</returns>
         double MeasureLegend();
         /// <summary>
-        /// Invokes the click.
+        /// Invokes the click handler with the provided data item.
         /// </summary>
         /// <param name="handler">The handler.</param>
         /// <param name="data">The data.</param>
-        /// <returns>Task.</returns>
         Task InvokeClick(EventCallback<SeriesClickEventArgs> handler, object data);
     }
 }

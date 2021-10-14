@@ -3,17 +3,14 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenDonutSeries.
-    /// Implements the <see cref="Radzen.Blazor.RadzenPieSeries{TItem}" />
-    /// Implements the <see cref="Radzen.Blazor.IChartDonutSeries" />
+    /// Renders donut series in <see cref="RadzenChart" />.
     /// </summary>
-    /// <typeparam name="TItem">The type of the t item.</typeparam>
-    /// <seealso cref="Radzen.Blazor.RadzenPieSeries{TItem}" />
-    /// <seealso cref="Radzen.Blazor.IChartDonutSeries" />
-    public partial class RadzenDonutSeries<TItem> : Radzen.Blazor.RadzenPieSeries<TItem>, Radzen.Blazor.IChartDonutSeries
+    /// <typeparam name="TItem">The type of the series data item.</typeparam>
+    /// <summary>
+    public partial class RadzenDonutSeries<TItem> : RadzenPieSeries<TItem>, IChartDonutSeries
     {
         /// <summary>
-        /// Gets or sets the inner radius.
+        /// Gets or sets the inner radius of the donut.
         /// </summary>
         /// <value>The inner radius.</value>
         [Parameter]

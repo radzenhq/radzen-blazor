@@ -1,24 +1,24 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Enum ColorScheme
+    /// Specifies the <see cref="RadzenChart" /> color schemes used when rendering the series.
     /// </summary>
     public enum ColorScheme
     {
         /// <summary>
-        /// The pastel
+        /// Pastel color scheme.
         /// </summary>
         Pastel,
         /// <summary>
-        /// The palette
+        /// Palette color scheme.
         /// </summary>
         Palette,
         /// <summary>
-        /// The divergent
+        /// Divergent color scheme.
         /// </summary>
         Divergent,
         /// <summary>
-        /// The monochrome
+        /// Monochrome color scheme
         /// </summary>
         Monochrome
     }
