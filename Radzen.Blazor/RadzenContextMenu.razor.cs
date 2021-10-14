@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenContextMenu.
+    /// RadzenContextMenu component.
     /// </summary>
     public partial class RadzenContextMenu
     {
@@ -20,18 +20,15 @@ namespace Radzen.Blazor
         public string UniqueID { get; set; }
 
         /// <summary>
-        /// Gets or sets the service.
+        /// Gets or sets the ContextMenuService.
         /// </summary>
-        /// <value>The service.</value>
+        /// <value>The ContextMenuService.</value>
         [Inject] private ContextMenuService Service { get; set; }
 
-        /// <summary>
-        /// The menus
-        /// </summary>
         List<ContextMenu> menus = new List<ContextMenu>();
 
         /// <summary>
-        /// Opens the specified arguments.
+        /// Opens the menu.
         /// </summary>
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         /// <param name="options">The options.</param>
@@ -43,10 +40,6 @@ namespace Radzen.Blazor
             await InvokeAsync(() => { StateHasChanged(); });
         }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is js runtime available.
-        /// </summary>
-        /// <value><c>true</c> if this instance is js runtime available; otherwise, <c>false</c>.</value>
         private bool IsJSRuntimeAvailable { get; set; }
 
         /// <summary>
@@ -99,7 +92,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [initialized].
+        /// Called when initialized.
         /// </summary>
         protected override void OnInitialized()
         {
@@ -110,27 +103,16 @@ namespace Radzen.Blazor
             Service.OnNavigate += OnNavigate;
         }
 
-        /// <summary>
-        /// Called when [open].
-        /// </summary>
-        /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        /// <param name="options">The options.</param>
         void OnOpen(MouseEventArgs args, ContextMenuOptions options)
         {
             Open(args, options).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Raises the Close event.
-        /// </summary>
         void OnClose()
         {
             Close().ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Called when [navigate].
-        /// </summary>
         void OnNavigate()
         {
             JSRuntime.InvokeVoidAsync("Radzen.closePopup", UniqueID);
