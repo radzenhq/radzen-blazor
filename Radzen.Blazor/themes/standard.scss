@@ -703,7 +703,58 @@ $numeric-button-border-radius: $rz-border-radius / 2 !default;
 $numeric-button-background-color: $rz-white !default;
 $numeric-button-disabled-background-color: $rz-white !default;
 $numeric-button-disabled-color: rgba($rz-base-800, .5) !default;
-$numeric-button-color: $rz-base-800 !default;
+$numeric-button-color: $rz-base-600 !default;
+
+// DatePicker
+
+$datepicker-trigger-icon-width: 1.25rem !default;
+$datepicker-trigger-icon-height: $datepicker-trigger-icon-width !default;
+$datepicker-line-height: 1.25rem !default;
+$datepicker-trigger-icon-color: $rz-base-800 !default;
+$datepicker-trigger-icon-hover-color: $rz-base-900 !default;
+
+$datepicker-panel-border: $overlay-border !default;
+$datepicker-panel-background-color: $rz-white !default;
+$datepicker-panel-shadow: $rz-shadow-level-2 !default;
+$datepicker-panel-margin: 0 !default;
+$datepicker-header-background-color: $rz-white !default;
+$datepicker-header-color: $rz-base-800 !default;
+$datepicker-header-padding: 0 1rem !default;
+$datepicker-header-line-height: 2.8125rem !default;
+$datepicker-header-border: none !default;
+
+$datepicker-calendar-padding: 0.5rem 0.875rem !default;
+$datepicker-calendar-header-font-size: 0.625rem !default;
+$datepicker-calendar-header-text-transform: uppercase !default;
+$datepicker-calendar-header-color: $rz-base-500 !default;
+$datepicker-calendar-font-size: 0.875rem !default;
+$datepicker-calendar-color: $body-color !default;
+$datepicker-calendar-hover-color: $rz-secondary !default;
+$datepicker-calendar-hover-background-color: $rz-secondary-lighter !default;
+$datepicker-calendar-selected-color: $rz-white !default;
+$datepicker-calendar-selected-background-color: $rz-secondary !default;
+$datepicker-calendar-selected-hover-color: $rz-white !default;
+$datepicker-calendar-selected-hover-background-color: $rz-secondary-light !default;
+$datepicker-calendar-border: none !default;
+$datepicker-calendar-border-radius: $rz-border-radius !default;
+$datepicker-calendar-transition: all 0.1s linear !default;
+
+$datepicker-title-height: 45px !important;
+
+$timepicker-background-color: $datepicker-header-background-color !default;
+$timepicker-color: $body-color !default;
+$timepicker-separator-color: $rz-base-500 !default;
+$timepicker-padding: 0.5rem !default;
+$timepicker-hour-padding: 0.5rem !default;
+$timepicker-button-background-color: $rz-secondary !default;
+$timepicker-button-color: $rz-white !default;
+$timepicker-button-width: 0.875rem !default;
+$timepicker-button-height: $timepicker-button-width !default;
+$timepicker-button-border-radius: $rz-border-radius !default;
+$timepicker-button-padding: 0.5rem 1rem !important;
+$timepicker-separator-margin: 0 0.5rem !default;
+$timepicker-border: none !default;
+
 
 
 // Forms
