@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenArcGaugeScaleValue.
+    /// RadzenArcGaugeScaleValue component.
     /// Implements the <see cref="ComponentBase" />
     /// </summary>
     /// <seealso cref="ComponentBase" />
@@ -46,9 +46,9 @@ namespace Radzen.Blazor
         public string Fill { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show value].
+        /// Gets or sets a value indicating whether to show value.
         /// </summary>
-        /// <value><c>true</c> if [show value]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if value is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowValue { get; set; } = true;
 
@@ -74,7 +74,7 @@ namespace Radzen.Blazor
         public RadzenArcGauge Gauge { get; set; }
 
         /// <summary>
-        /// Called when [initialized].
+        /// Called when initialized.
         /// </summary>
         protected override void OnInitialized()
         {

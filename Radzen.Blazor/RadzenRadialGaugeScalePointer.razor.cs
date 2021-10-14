@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenRadialGaugeScalePointer.
+    /// RadzenRadialGaugeScalePointer component.
     /// Implements the <see cref="ComponentBase" />
     /// </summary>
     /// <seealso cref="ComponentBase" />
@@ -25,9 +25,9 @@ namespace Radzen.Blazor
         public double Value { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show value].
+        /// Gets or sets a value indicating whether to show value.
         /// </summary>
-        /// <value><c>true</c> if [show value]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if value is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowValue { get; set; } = true;
 
@@ -45,10 +45,6 @@ namespace Radzen.Blazor
         [Parameter]
         public double? Width { get; set; }
 
-        /// <summary>
-        /// Gets the width of the current.
-        /// </summary>
-        /// <value>The width of the current.</value>
         double CurrentWidth
         {
             get
@@ -71,10 +67,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string FormatString { get; set; }
 
-        /// <summary>
-        /// Gets the length of the current.
-        /// </summary>
-        /// <value>The length of the current.</value>
         double CurrentLength
         {
             get
@@ -119,7 +111,7 @@ namespace Radzen.Blazor
         public RadzenRadialGauge Gauge { get; set; }
 
         /// <summary>
-        /// Called when [initialized].
+        /// Called when initialized.
         /// </summary>
         protected override void OnInitialized()
         {

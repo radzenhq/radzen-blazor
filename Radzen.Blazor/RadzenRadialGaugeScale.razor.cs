@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenRadialGaugeScale.
+    /// RadzenRadialGaugeScale component.
     /// Implements the <see cref="ComponentBase" />
     /// </summary>
     /// <seealso cref="ComponentBase" />
@@ -69,9 +69,9 @@ namespace Radzen.Blazor
         public string FormatString { get; set; }
 
         /// <summary>
-        /// Gets or sets the formatter.
+        /// Gets or sets the formatter function.
         /// </summary>
-        /// <value>The formatter.</value>
+        /// <value>The formatter function.</value>
         [Parameter]
         public Func<double, string> Formatter { get; set; } = value => value.ToString();
 
@@ -104,23 +104,23 @@ namespace Radzen.Blazor
         public double Radius { get; set; } = 1;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show first tick].
+        /// Gets or sets a value indicating whether to show first tick.
         /// </summary>
-        /// <value><c>true</c> if [show first tick]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if first tick is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowFirstTick { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show last tick].
+        /// Gets or sets a value indicating whether to show last tick.
         /// </summary>
-        /// <value><c>true</c> if [show last tick]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if last tick is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowLastTick { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show tick labels].
+        /// Gets or sets a value indicating whether to show tick labels.
         /// </summary>
-        /// <value><c>true</c> if [show tick labels]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if tick labels are shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowTickLabels { get; set; } = true;
 
@@ -132,16 +132,16 @@ namespace Radzen.Blazor
         public double X { get; set; } = 0.5;
 
         /// <summary>
-        /// Determines the minimum of the parameters.
+        /// Determines the minimum value.
         /// </summary>
-        /// <value>The minimum.</value>
+        /// <value>The minimum value.</value>
         [Parameter]
         public double Min { get; set; } = 0;
 
         /// <summary>
-        /// Determines the maximum of the parameters.
+        /// Determines the maximum value.
         /// </summary>
-        /// <value>The maximum.</value>
+        /// <value>The maximum value.</value>
         [Parameter]
         public double Max { get; set; } = 100;
 
