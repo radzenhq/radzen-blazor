@@ -36,7 +36,7 @@ namespace Radzen.Blazor
     }
 
     /// <summary>
-    /// Class RadzenCompareValidator.
+    /// RadzenCompareValidator component.
     /// Implements the <see cref="Radzen.Blazor.ValidatorBase" />
     /// </summary>
     /// <seealso cref="Radzen.Blazor.ValidatorBase" />
