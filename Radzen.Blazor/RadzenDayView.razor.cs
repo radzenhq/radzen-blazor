@@ -4,23 +4,25 @@ using System;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenDayView.
-    /// Implements the <see cref="Radzen.Blazor.SchedulerViewBase" />
+    /// Displays the appointments for the current day in <see cref="RadzenScheduler" />
     /// </summary>
-    /// <seealso cref="Radzen.Blazor.SchedulerViewBase" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenScheduler Data="@appointments"&gt;
+    ///     &lt;RadzenDayView /&gt;
+    /// &lt;/RadzenScheduler&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenDayView : SchedulerViewBase
     {
-        /// <summary>
-        /// Gets the text.
-        /// </summary>
-        /// <value>The text.</value>
+        /// <inheritdoc />
         [Parameter]
         public override string Text { get; set; } = "Day";
 
         /// <summary>
         /// Gets or sets the time format.
         /// </summary>
-        /// <value>The time format.</value>
+        /// <value>The time format. Set to <c>h tt</c> by default.</value>
         [Parameter]
         public string TimeFormat { get; set; } = "h tt";
 
@@ -38,10 +40,7 @@ namespace Radzen.Blazor
         [Parameter]
         public TimeSpan EndTime { get; set; } = TimeSpan.FromHours(24);
 
-        /// <summary>
-        /// Gets the title.
-        /// </summary>
-        /// <value>The title.</value>
+        /// <inheritdoc />
         public override string Title
         {
             get
@@ -50,10 +49,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the start date.
-        /// </summary>
-        /// <value>The start date.</value>
+        /// <inheritdoc />
         public override DateTime StartDate
         {
             get
@@ -62,10 +58,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the end date.
-        /// </summary>
-        /// <value>The end date.</value>
+        /// <inheritdoc />
         public override DateTime EndDate
         {
             get
@@ -73,19 +66,14 @@ namespace Radzen.Blazor
                 return Scheduler.CurrentDate.Date.Add(EndTime);
             }
         }
-        /// <summary>
-        /// Nexts this instance.
-        /// </summary>
-        /// <returns>DateTime.</returns>
+
+        /// <inheritdoc />
         public override DateTime Next()
         {
             return Scheduler.CurrentDate.Date.AddDays(1);
         }
 
-        /// <summary>
-        /// Previouses this instance.
-        /// </summary>
-        /// <returns>DateTime.</returns>
+        /// <inheritdoc />
         public override DateTime Prev()
         {
             return Scheduler.CurrentDate.Date.AddDays(-1);
