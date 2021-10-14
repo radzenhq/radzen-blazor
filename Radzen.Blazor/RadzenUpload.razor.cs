@@ -8,25 +8,14 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenUpload.
+    /// RadzenUpload component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenUpload : RadzenComponent
     {
-        /// <summary>
-        /// The file upload
-        /// </summary>
         protected ElementReference fileUpload;
-
-        /// <summary>
-        /// The identifier
-        /// </summary>
         string _Id;
-        /// <summary>
-        /// Gets the identifier.
-        /// </summary>
-        /// <value>The identifier.</value>
         string Id
         {
             get
@@ -41,16 +30,16 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="RadzenUpload"/> is automatic.
+        /// Gets or sets a value indicating whether this <see cref="RadzenUpload"/> upload is automatic.
         /// </summary>
-        /// <value><c>true</c> if automatic; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if upload automatic; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Auto { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the choose text.
+        /// Gets or sets the choose button text.
         /// </summary>
-        /// <value>The choose text.</value>
+        /// <value>The choose button text.</value>
         [Parameter]
         public string ChooseText { get; set; } = "Choose";
 
@@ -62,9 +51,9 @@ namespace Radzen.Blazor
         public string Url { get; set; }
 
         /// <summary>
-        /// Gets or sets the accept.
+        /// Gets or sets the accepted MIME types.
         /// </summary>
-        /// <value>The accept.</value>
+        /// <value>The accepted MIME types.</value>
         [Parameter]
         public string Accept { get; set; }
 
@@ -83,43 +72,26 @@ namespace Radzen.Blazor
         public RenderFragment ChildContent { get; set; }
 
         /// <summary>
-        /// Uploads this instance.
+        /// Uploads this instance selected files.
         /// </summary>
         public async Task Upload()
         {
             await JSRuntime.InvokeAsync<string>("Radzen.upload", fileUpload, Url, Multiple);
         }
 
-        /// <summary>
-        /// The headers
-        /// </summary>
         IDictionary<string, string> headers = new Dictionary<string, string>();
 
-        /// <summary>
-        /// Adds the header.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <param name="value">The value.</param>
         internal void AddHeader(string name, string value)
         {
             headers.Add(name, value);
         }
 
-        /// <summary>
-        /// Removes the header.
-        /// </summary>
-        /// <param name="name">The name.</param>
         internal void RemoveHeader(string name)
         {
             headers.Remove(name);
         }
-        /// <summary>
-        /// The visible changed
-        /// </summary>
+
         private bool visibleChanged = false;
-        /// <summary>
-        /// The first render
-        /// </summary>
         private bool firstRender = true;
 
         /// <summary>
@@ -175,36 +147,33 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the change.
+        /// Gets or sets the change callback.
         /// </summary>
-        /// <value>The change.</value>
+        /// <value>The change callback.</value>
         [Parameter]
         public EventCallback<UploadChangeEventArgs> Change { get; set; }
 
         /// <summary>
-        /// Gets or sets the progress.
+        /// Gets or sets the progress callback.
         /// </summary>
-        /// <value>The progress.</value>
+        /// <value>The progress callback.</value>
         [Parameter]
         public EventCallback<UploadProgressArgs> Progress { get; set; }
 
         /// <summary>
-        /// Gets or sets the complete.
+        /// Gets or sets the complete callback.
         /// </summary>
-        /// <value>The complete.</value>
+        /// <value>The complete callback.</value>
         [Parameter]
         public EventCallback<UploadCompleteEventArgs> Complete { get; set; }
 
         /// <summary>
-        /// Gets or sets the error.
+        /// Gets or sets the error callback.
         /// </summary>
-        /// <value>The error.</value>
+        /// <value>The error callback.</value>
         [Parameter]
         public EventCallback<UploadErrorEventArgs> Error { get; set; }
 
-        /// <summary>
-        /// The files
-        /// </summary>
         List<PreviewFileInfo> files = Enumerable.Empty<PreviewFileInfo>().ToList();
 
         /// <summary>
@@ -220,7 +189,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [remove].
+        /// Called on file remove.
         /// </summary>
         /// <param name="file">The file.</param>
         protected async System.Threading.Tasks.Task OnRemove(PreviewFileInfo file)
@@ -231,7 +200,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [change].
+        /// Called on file change.
         /// </summary>
         /// <param name="files">The files.</param>
         [JSInvokable("RadzenUpload.OnChange")]
@@ -245,7 +214,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [progress].
+        /// Called on progress.
         /// </summary>
         /// <param name="progress">The progress.</param>
         /// <param name="loaded">The loaded.</param>
@@ -258,7 +227,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [complete].
+        /// Called when upload is complete.
         /// </summary>
         /// <param name="response">The response.</param>
         [JSInvokable("RadzenUpload.OnComplete")]
@@ -282,7 +251,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [error].
+        /// Called on upload error.
         /// </summary>
         /// <param name="error">The error.</param>
         [JSInvokable("RadzenUpload.OnError")]
