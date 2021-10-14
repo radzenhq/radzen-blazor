@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Interface that has to be implemented by a view in order to by supported by <see cref="RadzenScheduler" />.
+    /// Interface that has to be implemented by a view in order to by supported by <see cref="RadzenScheduler{TItem}" />.
     /// </summary>
     public interface ISchedulerView
     {

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// A base class for scheduler views.
+    /// A base class for <see cref="RadzenScheduler{TItem}" /> views.
     /// </summary>
     public abstract class SchedulerViewBase : ComponentBase, ISchedulerView, IDisposable
     {
