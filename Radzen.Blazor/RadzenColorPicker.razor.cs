@@ -7,23 +7,23 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenColorPicker.
+    /// RadzenColorPicker component.
     /// Implements the <see cref="Radzen.FormComponent{System.String}" />
     /// </summary>
     /// <seealso cref="Radzen.FormComponent{System.String}" />
     public partial class RadzenColorPicker : FormComponent<string>
     {
         /// <summary>
-        /// Gets or sets the open.
+        /// Gets or sets the open callback.
         /// </summary>
-        /// <value>The open.</value>
+        /// <value>The open callback.</value>
         [Parameter]
         public EventCallback Open { get; set; }
 
         /// <summary>
-        /// Gets or sets the close.
+        /// Gets or sets the close callback.
         /// </summary>
-        /// <value>The close.</value>
+        /// <value>The close callback.</value>
         [Parameter]
         public EventCallback Close { get; set; }
 
@@ -35,35 +35,35 @@ namespace Radzen.Blazor
         public string Icon { get; set; }
 
         /// <summary>
-        /// Gets or sets the hexadecimal text.
+        /// Gets or sets the hexadecimal color label text.
         /// </summary>
         /// <value>The hexadecimal text.</value>
         [Parameter]
         public string HexText { get; set; } = "Hex";
 
         /// <summary>
-        /// Gets or sets the red text.
+        /// Gets or sets the red color label text.
         /// </summary>
         /// <value>The red text.</value>
         [Parameter]
         public string RedText { get; set; } = "R";
 
         /// <summary>
-        /// Gets or sets the green text.
+        /// Gets or sets the green color label text.
         /// </summary>
         /// <value>The green text.</value>
         [Parameter]
         public string GreenText { get; set; } = "G";
 
         /// <summary>
-        /// Gets or sets the blue text.
+        /// Gets or sets the blue color label text.
         /// </summary>
         /// <value>The blue text.</value>
         [Parameter]
         public string BlueText { get; set; } = "B";
 
         /// <summary>
-        /// Gets or sets the alpha text.
+        /// Gets or sets the alpha label text.
         /// </summary>
         /// <value>The alpha text.</value>
         [Parameter]
@@ -76,16 +76,8 @@ namespace Radzen.Blazor
         [Parameter]
         public string ButtonText { get; set; } = "OK";
 
-        /// <summary>
-        /// Gets or sets the popup.
-        /// </summary>
-        /// <value>The popup.</value>
         Popup Popup { get; set; }
 
-        /// <summary>
-        /// Gets the alpha gradient start.
-        /// </summary>
-        /// <value>The alpha gradient start.</value>
         string AlphaGradientStart
         {
             get
@@ -96,10 +88,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the alpha gradient end.
-        /// </summary>
-        /// <value>The alpha gradient end.</value>
         string AlphaGradientEnd
         {
             get
@@ -110,10 +98,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the hexadecimal.
-        /// </summary>
-        /// <value>The hexadecimal.</value>
         string Hex
         {
             get
@@ -129,11 +113,6 @@ namespace Radzen.Blazor
             }
         }
 
-
-        /// <summary>
-        /// Gets the red.
-        /// </summary>
-        /// <value>The red.</value>
         double Red
         {
             get
@@ -143,10 +122,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the alpha.
-        /// </summary>
-        /// <value>The alpha.</value>
         double Alpha
         {
             get
@@ -155,10 +130,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the green.
-        /// </summary>
-        /// <value>The green.</value>
         double Green
         {
             get
@@ -168,10 +139,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the blue.
-        /// </summary>
-        /// <value>The blue.</value>
         double Blue
         {
             get
@@ -181,11 +148,6 @@ namespace Radzen.Blazor
             }
         }
 
-
-        /// <summary>
-        /// Handles the <see cref="E:SaturationMove" /> event.
-        /// </summary>
-        /// <param name="args">The <see cref="DraggableEventArgs"/> instance containing the event data.</param>
         void OnSaturationMove(DraggableEventArgs args)
         {
             SaturationHandleLeft = Math.Clamp((args.ClientX - args.Rect.Left) / args.Rect.Width, 0, 1);
@@ -198,9 +160,6 @@ namespace Radzen.Blazor
             TriggerChange();
         }
 
-        /// <summary>
-        /// Triggers the change.
-        /// </summary>
         void TriggerChange()
         {
             if (!ShowButton)
@@ -212,19 +171,11 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Changes the RGB.
-        /// </summary>
-        /// <param name="value">The value.</param>
         void ChangeRGB(object value)
         {
             SetValue(value as string);
         }
 
-        /// <summary>
-        /// Sets the value.
-        /// </summary>
-        /// <param name="value">The value.</param>
         void SetValue(string value)
         {
             var rgb = RGB.Parse(value);
@@ -236,10 +187,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Selects the color.
-        /// </summary>
-        /// <param name="value">The value.</param>
         internal async Task SelectColor(string value)
         {
             SetValue(value);
@@ -250,10 +197,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Updates the color.
-        /// </summary>
-        /// <param name="rgb">The RGB.</param>
         void UpdateColor(RGB rgb)
         {
             Color = rgb.ToCSS();
@@ -267,10 +210,6 @@ namespace Radzen.Blazor
             TriggerChange();
         }
 
-        /// <summary>
-        /// Changes the alpha.
-        /// </summary>
-        /// <param name="value">The value.</param>
         void ChangeAlpha(double value)
         {
             if (value >= 0 && value <= 100)
@@ -284,10 +223,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Changes the alpha.
-        /// </summary>
-        /// <param name="alpha">The alpha.</param>
         void ChangeAlpha(object alpha)
         {
             if (Double.TryParse((string)alpha, out var value))
@@ -296,11 +231,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Changes the color.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <param name="update">The update.</param>
         void ChangeColor(double value, Action<RGB, double> update)
         {
             if (value >= 0 && value <= 255)
@@ -313,11 +243,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Changes the color.
-        /// </summary>
-        /// <param name="color">The color.</param>
-        /// <param name="update">The update.</param>
         void ChangeColor(object color, Action<RGB, double> update)
         {
             if (Double.TryParse((string)color, out var value))
@@ -326,10 +251,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Handles the <see cref="E:AlphaMove" /> event.
-        /// </summary>
-        /// <param name="args">The <see cref="DraggableEventArgs"/> instance containing the event data.</param>
         void OnAlphaMove(DraggableEventArgs args)
         {
             AlphaHandleLeft = Math.Round(Math.Clamp((args.ClientX - args.Rect.Left) / args.Rect.Width, 0, 1), 2);
@@ -343,10 +264,6 @@ namespace Radzen.Blazor
             TriggerChange();
         }
 
-        /// <summary>
-        /// Handles the <see cref="E:HueMove" /> event.
-        /// </summary>
-        /// <param name="args">The <see cref="DraggableEventArgs"/> instance containing the event data.</param>
         void OnHueMove(DraggableEventArgs args)
         {
             HueHandleLeft = Math.Clamp((args.ClientX - args.Rect.Left) / args.Rect.Width, 0, 1);
@@ -360,8 +277,6 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [click].
-        /// </summary>
         async Task OnClick()
         {
             await ValueChanged.InvokeAsync(Color);
@@ -370,30 +285,30 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show button].
+        /// Gets or sets a value indicating whether button is shown.
         /// </summary>
-        /// <value><c>true</c> if [show button]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if button shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowButton { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show HSV].
+        /// Gets or sets a value indicating whether HSV is shown.
         /// </summary>
-        /// <value><c>true</c> if [show HSV]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if HSV is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowHSV { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show rgba].
+        /// Gets or sets a value indicating whether RGBA is shown.
         /// </summary>
-        /// <value><c>true</c> if [show rgba]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if RGBA is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowRGBA { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show colors].
+        /// Gets or sets a value indicating whether colors are shown.
         /// </summary>
-        /// <value><c>true</c> if [show colors]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if colors are shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowColors { get; set; } = true;
 
@@ -404,42 +319,13 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
-        /// <summary>
-        /// Gets or sets the saturation handle left.
-        /// </summary>
-        /// <value>The saturation handle left.</value>
         double SaturationHandleLeft { get; set; }
-        /// <summary>
-        /// Gets or sets the hue handle left.
-        /// </summary>
-        /// <value>The hue handle left.</value>
         double HueHandleLeft { get; set; }
-        /// <summary>
-        /// Gets or sets the alpha handle left.
-        /// </summary>
-        /// <value>The alpha handle left.</value>
         double AlphaHandleLeft { get; set; } = 1;
-        /// <summary>
-        /// Gets or sets the saturation handle top.
-        /// </summary>
-        /// <value>The saturation handle top.</value>
         double SaturationHandleTop { get; set; }
-
-        /// <summary>
-        /// Gets or sets the HSV.
-        /// </summary>
-        /// <value>The HSV.</value>
         HSV HSV { get; set; } = new HSV { Hue = 0, Saturation = 1, Value = 1 };
-
-        /// <summary>
-        /// Gets or sets the color.
-        /// </summary>
-        /// <value>The color.</value>
         string Color { get; set; } = "rgb(255, 255, 255)";
 
-        /// <summary>
-        /// Toggles this instance.
-        /// </summary>
         async Task Toggle()
         {
             if (!Disabled)
@@ -464,7 +350,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [initialized].
+        /// Called when initialized.
         /// </summary>
         protected override void OnInitialized()
         {
@@ -473,9 +359,6 @@ namespace Radzen.Blazor
             base.OnInitialized();
         }
 
-        /// <summary>
-        /// Initializes this instance.
-        /// </summary>
         void Init()
         {
             var value = Value;
