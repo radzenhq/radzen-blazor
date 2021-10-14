@@ -3,7 +3,7 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenLengthValidator.
+    /// RadzenLengthValidator component.
     /// Implements the <see cref="Radzen.Blazor.ValidatorBase" />
     /// </summary>
     /// <seealso cref="Radzen.Blazor.ValidatorBase" />
@@ -17,14 +17,14 @@ namespace Radzen.Blazor
         public override string Text { get; set; } = "Invalid length";
 
         /// <summary>
-        /// Determines the minimum of the parameters.
+        /// Determines the minimum value.
         /// </summary>
         /// <value>The minimum.</value>
         [Parameter]
         public int? Min { get; set; }
 
         /// <summary>
-        /// Determines the maximum of the parameters.
+        /// Determines the maximum value.
         /// </summary>
         /// <value>The maximum.</value>
         [Parameter]

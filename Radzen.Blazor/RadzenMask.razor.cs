@@ -3,23 +3,23 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenMask.
+    /// RadzenMask component.
     /// Implements the <see cref="Radzen.FormComponent{System.String}" />
     /// </summary>
     /// <seealso cref="Radzen.FormComponent{System.String}" />
     public partial class RadzenMask : FormComponent<string>
     {
         /// <summary>
-        /// Gets or sets a value indicating whether [read only].
+        /// Gets or sets a value indicating whether is read only.
         /// </summary>
-        /// <value><c>true</c> if [read only]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ReadOnly { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [automatic complete].
+        /// Gets or sets a value indicating whether input automatic complete is enabled.
         /// </summary>
-        /// <value><c>true</c> if [automatic complete]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if input automatic complete is enabled; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AutoComplete { get; set; } = true;
 

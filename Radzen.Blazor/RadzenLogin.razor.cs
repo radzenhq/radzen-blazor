@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenLogin.
+    /// RadzenLogin component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenLogin : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets a value indicating whether [automatic complete].
+        /// Gets or sets a value indicating whether automatic complete of inputs is enabled.
         /// </summary>
-        /// <value><c>true</c> if [automatic complete]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if automatic complete of inputs is enabled; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AutoComplete { get; set; } = true;
 
@@ -27,9 +27,6 @@ namespace Radzen.Blazor
             return "login";
         }
 
-        /// <summary>
-        /// The username
-        /// </summary>
         string _username;
         /// <summary>
         /// Gets or sets the username.
@@ -51,9 +48,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The password
-        /// </summary>
         string _password;
         /// <summary>
         /// Gets or sets the password.
@@ -76,37 +70,37 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the login.
+        /// Gets or sets the login callback.
         /// </summary>
-        /// <value>The login.</value>
+        /// <value>The login callback.</value>
         [Parameter]
         public EventCallback<Radzen.LoginArgs> Login { get; set; }
 
         /// <summary>
-        /// Gets or sets the register.
+        /// Gets or sets the register callback.
         /// </summary>
-        /// <value>The register.</value>
+        /// <value>The register callback.</value>
         [Parameter]
         public EventCallback Register { get; set; }
 
         /// <summary>
-        /// Gets or sets the reset password.
+        /// Gets or sets the reset password callback.
         /// </summary>
-        /// <value>The reset password.</value>
+        /// <value>The reset password callback.</value>
         [Parameter]
         public EventCallback<string> ResetPassword { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow register].
+        /// Gets or sets a value indicating whether register is allowed.
         /// </summary>
-        /// <value><c>true</c> if [allow register]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if register is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowRegister { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow reset password].
+        /// Gets or sets a value indicating whether reset password is allowed.
         /// </summary>
-        /// <value><c>true</c> if [allow reset password]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if reset password is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowResetPassword { get; set; } = true;
 
@@ -146,9 +140,9 @@ namespace Radzen.Blazor
         public string UserText { get; set; } = "Username";
 
         /// <summary>
-        /// Gets or sets the user required.
+        /// Gets or sets the user required text.
         /// </summary>
-        /// <value>The user required.</value>
+        /// <value>The user required text.</value>
         [Parameter]
         public string UserRequired { get; set; } = "Username is required";
 
@@ -167,7 +161,7 @@ namespace Radzen.Blazor
         public string PasswordRequired { get; set; } = "Password is required";
 
         /// <summary>
-        /// Called when [login].
+        /// Called when login.
         /// </summary>
         protected async Task OnLogin()
         {
@@ -190,7 +184,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [register].
+        /// Called when register.
         /// </summary>
         protected async Task OnRegister()
         {

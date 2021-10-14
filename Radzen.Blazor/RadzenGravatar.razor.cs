@@ -4,7 +4,7 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenGravatar.
+    /// RadzenGravatar component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
@@ -17,10 +17,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string Email { get; set; }
 
-        /// <summary>
-        /// Gets the URL.
-        /// </summary>
-        /// <value>The URL.</value>
         protected string Url
         {
             get
