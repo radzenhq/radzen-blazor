@@ -12,8 +12,18 @@ namespace Radzen.Blazor
     /// RadzenCheckBoxList component.
     /// Implements the <see cref="Radzen.FormComponent{IEnumerable{TValue}}" />
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <seealso cref="Radzen.FormComponent{IEnumerable{TValue}}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenCheckBoxList @bind-Value=@checkedValues TValue="int" &gt;
+    ///     &lt;Items&gt;
+    ///         &lt;RadzenCheckBoxListItem Text="Orders" Value="1" /&gt;
+    ///         &lt;RadzenCheckBoxListItem Text="Employees" Value="2" /&gt;
+    ///     &lt;/Items&gt;
+    /// &lt;/RadzenCheckBoxList&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenCheckBoxList<TValue> : FormComponent<IEnumerable<TValue>>
     {
         ClassList ItemClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-box")

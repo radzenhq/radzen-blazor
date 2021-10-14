@@ -11,6 +11,11 @@ namespace Radzen.Blazor
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.FormComponent{TValue}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenCheckBox @bind-Value=@someValue TValue="bool" Change=@(args => Console.WriteLine($"Is checked: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenCheckBox<TValue> : FormComponent<TValue>
     {
         /// <summary>

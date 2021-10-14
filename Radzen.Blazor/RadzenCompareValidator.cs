@@ -40,6 +40,11 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.Blazor.ValidatorBase" />
     /// </summary>
     /// <seealso cref="Radzen.Blazor.ValidatorBase" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenCompareValidator Value=@password Component="RepeatPassword" Text="Passwords should be the same" /&gt;
+    /// </code>
+    /// </example>
     public class RadzenCompareValidator : ValidatorBase
     {
         /// <summary>

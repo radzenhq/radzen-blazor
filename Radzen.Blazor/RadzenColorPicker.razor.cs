@@ -11,6 +11,11 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.FormComponent{System.String}" />
     /// </summary>
     /// <seealso cref="Radzen.FormComponent{System.String}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenColorPicker @bind-Value=@color Change=@(args => Console.WriteLine($"Selected color: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenColorPicker : FormComponent<string>
     {
         /// <summary>

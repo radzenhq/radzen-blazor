@@ -10,6 +10,11 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenButton Click=@(args => Console.WriteLine("Button clicked")) Text="Button" /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenButton : RadzenComponent
     {
         private string getButtonSize()

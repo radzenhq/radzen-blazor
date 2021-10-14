@@ -8,6 +8,11 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Primary" /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenBadge : RadzenComponent
     {
         /// <summary>

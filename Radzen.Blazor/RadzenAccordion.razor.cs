@@ -9,6 +9,20 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenAccordion&gt;
+    ///     &lt;Items&gt;
+    ///         &lt;RadzenAccordionItem Text="Orders" Icon="account_balance_wallet"&gt;
+    ///             Details for Orders
+    ///         &lt;/RadzenAccordionItem&gt;
+    ///         &lt;RadzenAccordionItem Text="Employees" Icon="account_box"&gt;
+    ///             Details for Employees
+    ///         &lt;/RadzenAccordionItem&gt;
+    ///     &lt;/Items&gt;
+    /// &lt;/RadzenAccordion&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenAccordion : RadzenComponent
     {
         /// <summary>
