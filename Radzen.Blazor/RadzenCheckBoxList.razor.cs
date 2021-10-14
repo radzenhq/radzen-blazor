@@ -9,27 +9,17 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenCheckBoxList.
+    /// RadzenCheckBoxList component.
     /// Implements the <see cref="Radzen.FormComponent{IEnumerable{TValue}}" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.FormComponent{IEnumerable{TValue}}" />
     public partial class RadzenCheckBoxList<TValue> : FormComponent<IEnumerable<TValue>>
     {
-        /// <summary>
-        /// Items the class list.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>ClassList.</returns>
         ClassList ItemClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-box")
                                                                             .Add("rz-state-active", IsSelected(item))
                                                                             .AddDisabled(Disabled || item.Disabled);
 
-        /// <summary>
-        /// Icons the class list.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>ClassList.</returns>
         ClassList IconClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-icon")
                                                                             .Add("rzi rzi-check", IsSelected(item));
 
@@ -47,10 +37,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string TextProperty { get; set; }
 
-        /// <summary>
-        /// Gets all items.
-        /// </summary>
-        /// <value>All items.</value>
         IEnumerable<RadzenCheckBoxListItem<TValue>> allItems
         {
             get
@@ -65,12 +51,9 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The data
-        /// </summary>
         IEnumerable _data = null;
         /// <summary>
-        /// Gets or sets the data.
+        /// Gets or sets the data used to generate items.
         /// </summary>
         /// <value>The data.</value>
         [Parameter]
@@ -119,15 +102,12 @@ namespace Radzen.Blazor
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
         /// <summary>
-        /// Gets or sets the items.
+        /// Gets or sets the items that will be concatenated with generated items from Data.
         /// </summary>
         /// <value>The items.</value>
         [Parameter]
         public RenderFragment Items { get; set; }
 
-        /// <summary>
-        /// The items
-        /// </summary>
         List<RadzenCheckBoxListItem<TValue>> items = new List<RadzenCheckBoxListItem<TValue>>();
 
         /// <summary>
