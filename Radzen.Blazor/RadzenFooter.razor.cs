@@ -1,7 +1,7 @@
 ﻿namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenFooter.
+    /// RadzenFooter component.
     /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponentWithChildren" />

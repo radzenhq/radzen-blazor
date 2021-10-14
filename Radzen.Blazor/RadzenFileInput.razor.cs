@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenFileInput.
+    /// RadzenFileInput component.
     /// Implements the <see cref="Radzen.FormComponent{TValue}" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
@@ -16,9 +16,9 @@ namespace Radzen.Blazor
     {
 
         /// <summary>
-        /// Gets or sets the choose text.
+        /// Gets or sets the choose button text.
         /// </summary>
-        /// <value>The choose text.</value>
+        /// <value>The choose button text.</value>
         [Parameter]
         public string ChooseText { get; set; } = "Choose";
 
@@ -29,16 +29,8 @@ namespace Radzen.Blazor
         [Parameter]
         public string Title { get; set; }
 
-        /// <summary>
-        /// Gets the choose class list.
-        /// </summary>
-        /// <value>The choose class list.</value>
         ClassList ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button rz-button-text-icon-left")
                                               .AddDisabled(Disabled);
-        /// <summary>
-        /// Gets the button class list.
-        /// </summary>
-        /// <value>The button class list.</value>
         ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only")
                                               .AddDisabled(Disabled);
 
@@ -51,24 +43,10 @@ namespace Radzen.Blazor
             return GetClassList("rz-fileupload").ToString();
         }
 
-        /// <summary>
-        /// The name
-        /// </summary>
         string name = "";
-        /// <summary>
-        /// The size
-        /// </summary>
         string size = "";
-
-        /// <summary>
-        /// The file upload
-        /// </summary>
         protected ElementReference fileUpload;
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is image.
-        /// </summary>
-        /// <value><c>true</c> if this instance is image; otherwise, <c>false</c>.</value>
         private bool IsImage
         {
             get
@@ -90,9 +68,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Called when [change].
-        /// </summary>
         async Task OnChange()
         {
             string uploadValue;
@@ -123,17 +98,12 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the error.
+        /// Gets or sets the error callback.
         /// </summary>
-        /// <value>The error.</value>
+        /// <value>The error callback.</value>
         [Parameter]
         public EventCallback<UploadErrorEventArgs> Error { get; set; }
 
-
-        /// <summary>
-        /// Removes the specified arguments.
-        /// </summary>
-        /// <param name="args">The <see cref="EventArgs"/> instance containing the event data.</param>
         async System.Threading.Tasks.Task Remove(EventArgs args)
         {
             Value = default(TValue);
@@ -146,9 +116,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the accept.
+        /// Gets or sets the comma-separated accepted MIME types.
         /// </summary>
-        /// <value>The accept.</value>
+        /// <value>The comma-separated accepted MIME types.</value>
         [Parameter]
         public string Accept { get; set; } = "image/*";
 
