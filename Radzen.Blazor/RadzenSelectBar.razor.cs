@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSelectBar.
+    /// RadzenSelectBar component.
     /// Implements the <see cref="Radzen.FormComponent{TValue}" />
     /// Implements the <see cref="Radzen.IRadzenSelectBar" />
     /// </summary>
@@ -20,11 +20,6 @@ namespace Radzen.Blazor
     /// <seealso cref="Radzen.IRadzenSelectBar" />
     public partial class RadzenSelectBar<TValue> : FormComponent<TValue>, IRadzenSelectBar
     {
-        /// <summary>
-        /// Buttons the class list.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>ClassList.</returns>
         ClassList ButtonClassList(RadzenSelectBarItem item) => ClassList.Create("rz-button rz-button-text-only")
                             .Add("rz-state-active", IsSelected(item))
                             .AddDisabled(Disabled);
@@ -43,10 +38,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string TextProperty { get; set; }
 
-        /// <summary>
-        /// Gets all items.
-        /// </summary>
-        /// <value>All items.</value>
         IEnumerable<RadzenSelectBarItem> allItems
         {
             get
@@ -61,10 +52,8 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The data
-        /// </summary>
         IEnumerable _data = null;
+
         /// <summary>
         /// Gets or sets the data.
         /// </summary>

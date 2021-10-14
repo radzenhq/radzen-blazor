@@ -3,7 +3,7 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenPassword.
+    /// RadzenPassword component.
     /// Implements the <see cref="Radzen.FormComponent{System.String}" />
     /// Implements the <see cref="Radzen.IRadzenFormComponent" />
     /// </summary>
@@ -12,16 +12,16 @@ namespace Radzen.Blazor
     public partial class RadzenPassword : FormComponent<string>, IRadzenFormComponent
     {
         /// <summary>
-        /// Gets or sets a value indicating whether [read only].
+        /// Gets or sets a value indicating whether is read only.
         /// </summary>
-        /// <value><c>true</c> if [read only]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ReadOnly { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [automatic complete].
+        /// Gets or sets a value indicating whether input automatic complete is allowed.
         /// </summary>
-        /// <value><c>true</c> if [automatic complete]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if input automatic complete is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AutoComplete { get; set; } = true;
 

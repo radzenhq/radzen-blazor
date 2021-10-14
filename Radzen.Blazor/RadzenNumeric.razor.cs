@@ -8,16 +8,13 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenNumeric.
+    /// RadzenNumeric component.
     /// Implements the <see cref="Radzen.FormComponent{TValue}" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.FormComponent{TValue}" />
     public partial class RadzenNumeric<TValue> : FormComponent<TValue>
     {
-        /// <summary>
-        /// The input
-        /// </summary>
         protected ElementReference input;
 
         /// <summary>
@@ -29,10 +26,6 @@ namespace Radzen.Blazor
             return GetClassList("rz-spinner").ToString();
         }
 
-        /// <summary>
-        /// Updates the value with step.
-        /// </summary>
-        /// <param name="stepUp">if set to <c>true</c> [step up].</param>
         async System.Threading.Tasks.Task UpdateValueWithStep(bool stepUp)
         {
             if (Disabled || ReadOnly)
@@ -134,37 +127,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string Step { get; set; }
 
-        /// <summary>
-        /// Determines whether [is type supported].
-        /// </summary>
-        /// <returns><c>true</c> if [is type supported]; otherwise, <c>false</c>.</returns>
-        private bool IsTypeSupported()
-        {
-            var type = typeof(TValue).IsGenericType ? typeof(TValue).GetGenericArguments()[0] : typeof(TValue);
-
-            switch (Type.GetTypeCode(type))
-            {
-                //case TypeCode.Byte:
-                //case TypeCode.SByte:
-                //case TypeCode.UInt16:
-                case TypeCode.UInt32:
-                //case TypeCode.UInt64:
-                //case TypeCode.Int16:
-                case TypeCode.Int32:
-                //case TypeCode.Int64:
-                case TypeCode.Decimal:
-                case TypeCode.Double:
-                case TypeCode.Single:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        /// <summary>
-        /// Determines whether this instance is integer.
-        /// </summary>
-        /// <returns><c>true</c> if this instance is integer; otherwise, <c>false</c>.</returns>
         private bool IsInteger()
         {
             var type = typeof(TValue).IsGenericType ? typeof(TValue).GetGenericArguments()[0] : typeof(TValue);
@@ -186,23 +148,23 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [read only].
+        /// Gets or sets a value indicating whether is read only.
         /// </summary>
-        /// <value><c>true</c> if [read only]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ReadOnly { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [automatic complete].
+        /// Gets or sets a value indicating whether input automatic complete is enabled.
         /// </summary>
-        /// <value><c>true</c> if [automatic complete]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if input automatic complete is enabled; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AutoComplete { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show up down].
+        /// Gets or sets a value indicating whether up down buttons are shown.
         /// </summary>
-        /// <value><c>true</c> if [show up down]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if up down buttons are shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowUpDown { get; set; } = true;
 
@@ -215,11 +177,6 @@ namespace Radzen.Blazor
             await InternalValueChanged(args.Value);
         }
 
-        /// <summary>
-        /// Removes the non numeric characters.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>System.String.</returns>
         private string RemoveNonNumericCharacters(object value)
         {
             string valueStr = value as string;
@@ -230,10 +187,6 @@ namespace Radzen.Blazor
             return new string(valueStr.Where(c => char.IsDigit(c) || char.IsPunctuation(c)).ToArray());
         }
 
-        /// <summary>
-        /// Internals the value changed.
-        /// </summary>
-        /// <param name="value">The value.</param>
         private async System.Threading.Tasks.Task InternalValueChanged(object value)
         {
             TValue newValue;
@@ -269,16 +222,16 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Determines the minimum of the parameters.
+        /// Determines the minimum value.
         /// </summary>
-        /// <value>The minimum.</value>
+        /// <value>The minimum value.</value>
         [Parameter]
         public decimal? Min { get; set; }
 
         /// <summary>
-        /// Determines the maximum of the parameters.
+        /// Determines the maximum value.
         /// </summary>
-        /// <value>The maximum.</value>
+        /// <value>The maximum value.</value>
         [Parameter]
         public decimal? Max { get; set; }
 

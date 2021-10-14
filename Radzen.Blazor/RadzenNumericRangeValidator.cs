@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenNumericRangeValidator.
+    /// RadzenNumericRangeValidator component.
     /// Implements the <see cref="Radzen.Blazor.ValidatorBase" />
     /// </summary>
     /// <seealso cref="Radzen.Blazor.ValidatorBase" />
@@ -18,18 +18,19 @@ namespace Radzen.Blazor
         public override string Text { get; set; } = "Not in the valid range";
 
         /// <summary>
-        /// Determines the minimum of the parameters.
+        /// Determines the minimum value.
         /// </summary>
-        /// <value>The minimum.</value>
+        /// <value>The minimumvalue.</value>
         [Parameter]
         public dynamic Min { get; set; }
 
         /// <summary>
-        /// Determines the maximum of the parameters.
+        /// Determines the maximum value.
         /// </summary>
-        /// <value>The maximum.</value>
+        /// <value>The maximumvalue.</value>
         [Parameter]
         public dynamic Max { get; set; }
+
         /// <summary>
         /// Validates the specified component.
         /// </summary>

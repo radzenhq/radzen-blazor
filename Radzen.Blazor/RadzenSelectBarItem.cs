@@ -3,7 +3,7 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSelectBarItem.
+    /// RadzenSelectBarItem component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
@@ -23,9 +23,6 @@ namespace Radzen.Blazor
         [Parameter]
         public object Value { get; set; }
 
-        /// <summary>
-        /// The select bar
-        /// </summary>
         IRadzenSelectBar _selectBar;
 
         /// <summary>
@@ -58,19 +55,11 @@ namespace Radzen.Blazor
             SelectBar?.RemoveItem(this);
         }
 
-        /// <summary>
-        /// Sets the text.
-        /// </summary>
-        /// <param name="value">The value.</param>
         internal void SetText(string value)
         {
             Text = value;
         }
 
-        /// <summary>
-        /// Sets the value.
-        /// </summary>
-        /// <param name="value">The value.</param>
         internal void SetValue(object value)
         {
             Value = value;
