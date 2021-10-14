@@ -1359,8 +1359,7 @@ namespace Radzen
 
             if (propertyName.IndexOf(".") != -1)
             {
-                return $"{propertyName.Split('.')[0]} == null ? null : {propertyName}";
-
+                return $"np({propertyName})";
             }
 
             return propertyName;

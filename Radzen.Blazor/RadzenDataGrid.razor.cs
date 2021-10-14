@@ -173,7 +173,7 @@ namespace Radzen.Blazor
             {
                 if(_groupedPagedView == null)
                 {
-                    _groupedPagedView = PagedView.GroupByMany(groups.Select(g => g.Property).ToArray()).ToList();
+                    _groupedPagedView = PagedView.GroupByMany(groups.Select(g => $"np({g.Property})").ToArray()).ToList();
                  }
                 return _groupedPagedView;
             }
