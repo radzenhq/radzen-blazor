@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenEmailValidator.
+    /// RadzenEmailValidator component.
     /// Implements the <see cref="Radzen.Blazor.ValidatorBase" />
     /// </summary>
     /// <seealso cref="Radzen.Blazor.ValidatorBase" />

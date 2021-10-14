@@ -7,37 +7,37 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenGoogleMap.
+    /// RadzenGoogleMap component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenGoogleMap : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the data.
+        /// Gets or sets the data - collection of RadzenGoogleMapMarker.
         /// </summary>
         /// <value>The data.</value>
         [Parameter]
         public IEnumerable<RadzenGoogleMapMarker> Data { get; set; }
 
         /// <summary>
-        /// Gets or sets the map click.
+        /// Gets or sets the map click callback.
         /// </summary>
-        /// <value>The map click.</value>
+        /// <value>The map click callback.</value>
         [Parameter]
         public EventCallback<GoogleMapClickEventArgs> MapClick { get; set; }
 
         /// <summary>
-        /// Gets or sets the marker click.
+        /// Gets or sets the marker click callback.
         /// </summary>
-        /// <value>The marker click.</value>
+        /// <value>The marker click callback.</value>
         [Parameter]
         public EventCallback<RadzenGoogleMapMarker> MarkerClick { get; set; }
 
         /// <summary>
-        /// Gets or sets the API key.
+        /// Gets or sets the Google API key.
         /// </summary>
-        /// <value>The API key.</value>
+        /// <value>The Google API key.</value>
         [Parameter]
         public string ApiKey { get; set; }
 
@@ -49,7 +49,7 @@ namespace Radzen.Blazor
         public double Zoom { get; set; } = 8;
 
         /// <summary>
-        /// Gets or sets the center.
+        /// Gets or sets the center map position.
         /// </summary>
         /// <value>The center.</value>
         [Parameter]
@@ -62,9 +62,6 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Markers { get; set; }
 
-        /// <summary>
-        /// The markers
-        /// </summary>
         List<RadzenGoogleMapMarker> markers = new List<RadzenGoogleMapMarker>();
 
         /// <summary>
@@ -111,7 +108,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [marker click].
+        /// Called when marker click.
         /// </summary>
         /// <param name="marker">The marker.</param>
         [JSInvokable("RadzenGoogleMap.OnMarkerClick")]
