@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// The common <see cref="RadzenScheduler" /> API injected as a cascading parameter to is views.
+    /// The common <see cref="RadzenScheduler{TItem}" /> API injected as a cascading parameter to is views.
     /// </summary>
     public interface IScheduler
     {

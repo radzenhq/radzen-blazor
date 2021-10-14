@@ -5,46 +5,42 @@ using System;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenMonthView.
-    /// Implements the <see cref="Radzen.Blazor.SchedulerViewBase" />
+    /// Displays the appointments in a month day in <see cref="RadzenScheduler{TItem}" />
     /// </summary>
-    /// <seealso cref="Radzen.Blazor.SchedulerViewBase" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenScheduler Data="@appointments"&gt;
+    ///     &lt;RadzenMonthView /&gt;
+    /// &lt;/RadzenScheduler&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenMonthView : SchedulerViewBase
     {
-        /// <summary>
-        /// Gets the title.
-        /// </summary>
-        /// <value>The title.</value>
+        /// <inheritdoc />
         public override string Title
         {
             get => Scheduler.CurrentDate.ToString("MMMM yyyy", Scheduler.Culture);
         }
 
-        /// <summary>
-        /// Gets the text.
-        /// </summary>
-        /// <value>The text.</value>
+        /// <inheritdoc />
         [Parameter]
         public override string Text { get; set; } = "Month";
 
         /// <summary>
-        /// Gets or sets the maximum appointments in slot.
+        /// Specifies the maximum appointnments to render in a slot.
         /// </summary>
         /// <value>The maximum appointments in slot.</value>
         [Parameter]
         public int? MaxAppointmentsInSlot { get; set; }
 
         /// <summary>
-        /// Gets or sets the more text.
+        /// Specifies the text displayed when there are more appointments in a slot than <see cref="MaxAppintmentsInSlot" />.
         /// </summary>
-        /// <value>The more text.</value>
+        /// <value>The more text. Set to <c><+ {0} more</c> by default.</value>
         [Parameter]
         public string MoreText { get; set; } = "+ {0} more";
 
-        /// <summary>
-        /// Gets the start date.
-        /// </summary>
-        /// <value>The start date.</value>
+        /// <inheritdoc />
         public override DateTime StartDate
         {
             get
@@ -53,10 +49,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the end date.
-        /// </summary>
-        /// <value>The end date.</value>
+        /// <inheritdoc />
         public override DateTime EndDate
         {
             get
@@ -65,19 +58,13 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Nexts this instance.
-        /// </summary>
-        /// <returns>DateTime.</returns>
+        /// <inheritdoc />
         public override DateTime Next()
         {
             return Scheduler.CurrentDate.Date.StartOfMonth().AddMonths(1);
         }
 
-        /// <summary>
-        /// Previouses this instance.
-        /// </summary>
-        /// <returns>DateTime.</returns>
+        /// <inheritdoc />
         public override DateTime Prev()
         {
             return Scheduler.CurrentDate.Date.StartOfMonth().AddMonths(-1);

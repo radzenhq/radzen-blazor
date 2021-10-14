@@ -9,127 +9,182 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenScheduler.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
-    /// Implements the <see cref="Radzen.Blazor.IScheduler" />
+    /// Displays a collection of <see cref="AppointmentData" /> in day, week or month view.
     /// </summary>
-    /// <typeparam name="TItem">The type of the t item.</typeparam>
-    /// <seealso cref="Radzen.RadzenComponent" />
-    /// <seealso cref="Radzen.Blazor.IScheduler" />
+    /// <typeparam name="TItem">The type of the value item.</typeparam>
+    /// <example>
+    /// <code>
+    /// &lt;RadzenScheduler Data="@data" TItem="DataItem" StartProperty="Start" EndProperty="End" TextProperty="Text"&gt;
+    ///     &lt;RadzenMonthView /&gt;
+    /// &lt;/RadzenScheduler&gt;
+    /// @code {
+    ///     class DataItem
+    ///     {
+    ///         public DateTime Start { get; set; }
+    ///         public DateTime End { get; set; }
+    ///         public string Text { get; set; }
+    ///     }
+    ///     DataItem[] data = new DataItem[]
+    ///     {
+    ///         new DataItem
+    ///         {
+    ///             Start = DateTime.Today,
+    ///             End = DateTime.Today.AddDays(1),
+    ///             Text = "Birthday"
+    ///         },
+    ///     };
+    /// }
+    /// </code>
+    /// </example>
     public partial class RadzenScheduler<TItem> : RadzenComponent, IScheduler
     {
         /// <summary>
-        /// Gets or sets the child content.
+        /// Gets or sets the child content of the scheduler. Use to specify what views to render.
         /// </summary>
         /// <value>The child content.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
         /// <summary>
-        /// Gets or sets the template.
+        /// Gets or sets the template used to render appointments.
         /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data="@data" TItem="DataItem" StartProperty="Start" EndProperty="End" TextProperty="Text"&gt;
+        ///    &lt;Template Context="data"&gt;
+        ///       &lt;strong&gt;@data.Text&lt;/strong&gt;
+        ///    &lt;/Template&gt;
+        ///    &lt;ChildContent&gt;
+        ///       &lt;RadzenMonthView /&gt;
+        ///     &lt;/ChildContent&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// </code>
+        /// </example>
         /// <value>The template.</value>
         [Parameter]
         public RenderFragment<TItem> Template { get; set; }
 
         /// <summary>
-        /// Gets or sets the data.
+        /// Gets or sets the data of RadzenScheduler. It will display an appointment for every item of the collection which is within the current view date range.
         /// </summary>
         /// <value>The data.</value>
         [Parameter]
         public IEnumerable<TItem> Data { get; set; }
 
         /// <summary>
-        /// Gets or sets the start property.
+        /// Specifies the property of <typeparamref name="TItem" /> which will set <see cref="AppointmentData.Start" />.
         /// </summary>
-        /// <value>The start property.</value>
+        /// <value>The name of the property. Must be a <c>DateTime</c> property.</value>
         [Parameter]
         public string StartProperty { get; set; }
 
         /// <summary>
-        /// Gets or sets the end property.
+        /// Specifies the property of <typeparamref name="TItem" /> which will set <see cref="AppointmentData.End" />.
         /// </summary>
-        /// <value>The end property.</value>
+        /// <value>The name of the property. Must be a <c>DateTime</c> property.</value>
         [Parameter]
         public string EndProperty { get; set; }
 
-        /// <summary>
-        /// Gets or sets the index of the selected.
-        /// </summary>
-        /// <value>The index of the selected.</value>
         private int selectedIndex { get; set; }
+
         /// <summary>
-        /// Gets or sets the index of the selected.
+        /// Specifies the initially selected view.
         /// </summary>
         /// <value>The index of the selected.</value>
         [Parameter]
         public int SelectedIndex { get; set; }
 
         /// <summary>
-        /// Gets or sets the today text.
+        /// Gets or sets the text of the today button. Set to <c>Today</c> by default.
         /// </summary>
         /// <value>The today text.</value>
         [Parameter]
         public string TodayText { get; set; } = "Today";
 
         /// <summary>
-        /// Gets or sets the date.
+        /// Gets or sets the initial date displayed by the selected view. Set to <c>DateTime.Today</c> by default.
         /// </summary>
         /// <value>The date.</value>
         [Parameter]
         public DateTime Date { get; set; } = DateTime.Today;
 
         /// <summary>
-        /// Gets or sets the current date.
+        /// Gets or sets the current date displayed by the selected view. Initially set to <see cref="Date" />. Changes during navigation.
         /// </summary>
         /// <value>The current date.</value>
         public DateTime CurrentDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the text property.
+        /// Specifies the property of <typeparamref name="TItem" /> which will set <see cref="AppointmentData.Text" />.
         /// </summary>
-        /// <value>The text property.</value>
+        /// <value>The name of the property. Must be a <c>DateTime</c> property.</value>
         [Parameter]
         public string TextProperty { get; set; }
 
         /// <summary>
-        /// Gets or sets the slot select.
+        /// A callback that will be invoked when the user clicks a slot in the current view. Commonly used to add new appointments.
         /// </summary>
-        /// <value>The slot select.</value>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments SlotSelect=@OnSlotSelect&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        /// . void OnSlotSelect(SchedulerSlotSelectEventArgs args) 
+        /// . {
+        /// . }
+        /// }
+        /// </code>
+        /// </example>
         [Parameter]
         public EventCallback<SchedulerSlotSelectEventArgs> SlotSelect { get; set; }
 
         /// <summary>
-        /// Gets or sets the appointment select.
+        /// A callback that will be invoked when the user clicks an appointment in the current view. Commonly used to edit existing appointments.
         /// </summary>
-        /// <value>The appointment select.</value>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments AppointmentSelect=@OnAppointmentSelect&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        /// . void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs&lt;TItem&gt; args) 
+        /// . {
+        /// . }
+        /// }
+        /// </code>
+        /// </example>
         [Parameter]
         public EventCallback<SchedulerAppointmentSelectEventArgs<TItem>> AppointmentSelect { get; set; }
 
         /// <summary>
-        /// Gets or sets the appointment render.
+        /// An action that will be invoked when the current view renders an appointment. Never call <c>StateHasChanged</c> when handling AppointmentRender.
         /// </summary>
-        /// <value>The appointment render.</value>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments AppointmentRender=@OnAppointmentRendert&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        ///   void OnAppintmentRender(SchedulerAppointmentRenderEventArgs&lt;TItem&gt; args) 
+        ///   {
+        ///     if (args.Data.Text == "Birthday")
+        ///     {
+        ///        args.Attributes["style"] = "color: red;"
+        ///     }
+        ///.  }
+        /// }
+        /// </code>
+        /// </example>
         [Parameter]
         public Action<SchedulerAppointmentRenderEventArgs<TItem>> AppointmentRender { get; set; }
 
         /// <summary>
-        /// Gets or sets the load data.
+        /// A callback that will be invoked when the scheduler needs data for the current view. Commonly used to filter the
+        /// data assigned to <see cref="Data" />.
         /// </summary>
-        /// <value>The load data.</value>
         [Parameter]
         public EventCallback<SchedulerLoadDataEventArgs> LoadData { get; set; }
 
-        /// <summary>
-        /// Gets or sets the views.
-        /// </summary>
-        /// <value>The views.</value>
         IList<ISchedulerView> Views { get; set; } = new List<ISchedulerView>();
 
-        /// <summary>
-        /// Gets the selected view.
-        /// </summary>
-        /// <value>The selected view.</value>
         ISchedulerView SelectedView
         {
             get
@@ -138,28 +193,17 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the appointment attributes.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>IDictionary&lt;System.String, System.Object&gt;.</returns>
+        /// <inheritdoc />
         public IDictionary<string, object> GetAppointmentAttributes(AppointmentData item)
         {
             var args = new SchedulerAppointmentRenderEventArgs<TItem> { Data = (TItem)item.Data, Start = item.Start, End = item.End };
 
-            if (AppointmentRender != null)
-            {
-                AppointmentRender(args);
-            }
+            AppointmentRender?.Invoke(args);
 
             return args.Attributes;
         }
 
-        /// <summary>
-        /// Renders the appointment.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>RenderFragment.</returns>
+        /// <inheritdoc />
         public RenderFragment RenderAppointment(AppointmentData item)
         {
             if (Template != null)
@@ -171,32 +215,19 @@ namespace Radzen.Blazor
             return builder => builder.AddContent(0, item.Text);
         }
 
-        /// <summary>
-        /// Selects the slot.
-        /// </summary>
-        /// <param name="start">The start.</param>
-        /// <param name="end">The end.</param>
-        /// <returns>Task.</returns>
+        /// <inheritdoc />
         public async Task SelectSlot(DateTime start, DateTime end)
         {
             await SlotSelect.InvokeAsync(new SchedulerSlotSelectEventArgs { Start = start, End = end });
         }
 
-        /// <summary>
-        /// Selects the appointment.
-        /// </summary>
-        /// <param name="data">The data.</param>
-        /// <returns>Task.</returns>
+        /// <inheritdoc />
         public async Task SelectAppointment(AppointmentData data)
         {
             await AppointmentSelect.InvokeAsync(new SchedulerAppointmentSelectEventArgs<TItem> { Start = data.Start, End = data.End, Data = (TItem)data.Data });
         }
 
-        /// <summary>
-        /// Adds the view.
-        /// </summary>
-        /// <param name="view">The view.</param>
-        /// <returns>Task.</returns>
+        /// <inheritdoc />
         public async Task AddView(ISchedulerView view)
         {
             if (!Views.Contains(view))
@@ -213,9 +244,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Reloads this instance.
+        /// Causes the current scheduler view to render. Enumerates the items of <see cref="Data" /> and creates instances of <see cref="AppointmentData" /> to
+        /// display in the current view. Use it when <see cref="Data" /> has changed.
         /// </summary>
-        /// <returns>Task.</returns>
         public async Task Reload()
         {
             appointments = null;
@@ -225,20 +256,12 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Determines whether the specified view is selected.
-        /// </summary>
-        /// <param name="view">The view.</param>
-        /// <returns><c>true</c> if the specified view is selected; otherwise, <c>false</c>.</returns>
+        /// <inheritdoc />
         public bool IsSelected(ISchedulerView view)
         {
             return selectedIndex == Views.IndexOf(view);
         }
 
-        /// <summary>
-        /// Called when [change view].
-        /// </summary>
-        /// <param name="view">The view.</param>
         async Task OnChangeView(ISchedulerView view)
         {
             selectedIndex = Views.IndexOf(view);
@@ -246,9 +269,6 @@ namespace Radzen.Blazor
             await InvokeLoadData();
         }
 
-        /// <summary>
-        /// Called when [previous].
-        /// </summary>
         async Task OnPrev()
         {
             CurrentDate = SelectedView.Prev();
@@ -256,9 +276,6 @@ namespace Radzen.Blazor
             await InvokeLoadData();
         }
 
-        /// <summary>
-        /// Called when [today].
-        /// </summary>
         async Task OnToday()
         {
             CurrentDate = DateTime.Now.Date;
@@ -266,9 +283,6 @@ namespace Radzen.Blazor
             await InvokeLoadData();
         }
 
-        /// <summary>
-        /// Called when [next].
-        /// </summary>
         async Task OnNext()
         {
             CurrentDate = SelectedView.Next();
@@ -276,17 +290,14 @@ namespace Radzen.Blazor
             await InvokeLoadData();
         }
 
-        /// <summary>
-        /// Removes the view.
-        /// </summary>
-        /// <param name="view">The view.</param>
+        /// <inheritdoc />
         public void RemoveView(ISchedulerView view)
         {
             Views.Remove(view);
         }
 
         /// <summary>
-        /// Called when [initialized].
+        /// Called by the Blazor runtime.
         /// </summary>
         protected override void OnInitialized()
         {
@@ -315,37 +326,16 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The appointments
-        /// </summary>
         IEnumerable<AppointmentData> appointments;
-        /// <summary>
-        /// The range start
-        /// </summary>
         DateTime rangeStart;
-        /// <summary>
-        /// The range end
-        /// </summary>
         DateTime rangeEnd;
-
-        /// <summary>
-        /// The start getter
-        /// </summary>
         Func<TItem, DateTime> startGetter;
-        /// <summary>
-        /// The end getter
-        /// </summary>
         Func<TItem, DateTime> endGetter;
-        /// <summary>
-        /// The text getter
-        /// </summary>
         Func<TItem, string> textGetter;
-
         /// <summary>
-        /// Set parameters as an asynchronous operation.
+        /// Called by the Blazor runtime when parameters are set.
         /// </summary>
         /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var needsReload = false;
@@ -390,9 +380,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Invokes the load data.
-        /// </summary>
         private async Task InvokeLoadData()
         {
             if (SelectedView != null)
@@ -401,13 +388,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Determines whether [is appointment in range] [the specified item].
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <param name="start">The start.</param>
-        /// <param name="end">The end.</param>
-        /// <returns><c>true</c> if [is appointment in range] [the specified item]; otherwise, <c>false</c>.</returns>
+        /// <inheritdoc />
         public bool IsAppointmentInRange(AppointmentData item, DateTime start, DateTime end)
         {
             if (item.Start == item.End && item.Start >= start && item.End < end)
@@ -418,12 +399,7 @@ namespace Radzen.Blazor
             return item.End > start && item.Start < end;
         }
 
-        /// <summary>
-        /// Gets the appointments in range.
-        /// </summary>
-        /// <param name="start">The start.</param>
-        /// <param name="end">The end.</param>
-        /// <returns>IEnumerable&lt;AppointmentData&gt;.</returns>
+        /// <inheritdoc />
         public IEnumerable<AppointmentData> GetAppointmentsInRange(DateTime start, DateTime end)
         {
             if (Data == null)
@@ -449,28 +425,15 @@ namespace Radzen.Blazor
             return appointments;
         }
 
-        /// <summary>
-        /// Class Rect.
-        /// </summary>
         class Rect
         {
-            /// <summary>
-            /// Gets or sets the width.
-            /// </summary>
-            /// <value>The width.</value>
             public double Width { get; set; }
-            /// <summary>
-            /// Gets or sets the height.
-            /// </summary>
-            /// <value>The height.</value>
             public double Height { get; set; }
         }
 
         /// <summary>
-        /// On after render as an asynchronous operation.
+        /// Called by the Blazor runtime.
         /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -488,7 +451,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Resizes the specified width.
+        /// Invoked from client-side via interop when the scheduler size changes.
         /// </summary>
         /// <param name="width">The width.</param>
         /// <param name="height">The height.</param>
@@ -522,20 +485,8 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The height is set
-        /// </summary>
         private bool heightIsSet = false;
-        /// <summary>
-        /// Gets the height.
-        /// </summary>
-        /// <value>The height.</value>
         private double Height { get; set; } = 400; // Default height set from theme.
-
-        /// <summary>
-        /// Gets the height.
-        /// </summary>
-        /// <value>The height.</value>
         double IScheduler.Height
         {
             get
@@ -543,10 +494,7 @@ namespace Radzen.Blazor
                 return Height;
             }
         }
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return $"rz-scheduler";

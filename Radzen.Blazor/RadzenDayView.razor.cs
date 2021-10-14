@@ -4,7 +4,7 @@ using System;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Displays the appointments for the current day in <see cref="RadzenScheduler" />
+    /// Displays the appointments in a single day in <see cref="RadzenScheduler{TItem}" />
     /// </summary>
     /// <example>
     /// <code>
