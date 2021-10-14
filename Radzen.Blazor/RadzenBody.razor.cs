@@ -4,7 +4,7 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenBody.
+    /// RadzenBody component.
     /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponentWithChildren" />
@@ -27,7 +27,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Toggles this instance.
+        /// Toggles this instance width and left margin.
         /// </summary>
         public void Toggle()
         {
@@ -64,9 +64,9 @@ namespace Radzen.Blazor
         public bool Expanded { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets the expanded changed.
+        /// Gets or sets a callback raised when the component is expanded or collapsed.
         /// </summary>
-        /// <value>The expanded changed.</value>
+        /// <value>The expanded changed callback.</value>
         [Parameter]
         public EventCallback<bool> ExpandedChanged { get; set; }
     }
