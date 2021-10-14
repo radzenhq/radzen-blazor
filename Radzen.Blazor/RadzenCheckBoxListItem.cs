@@ -3,7 +3,7 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenCheckBoxListItem.
+    /// RadzenCheckBoxListItem component.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
@@ -31,9 +31,6 @@ namespace Radzen.Blazor
         [Parameter]
         public virtual bool Disabled { get; set; }
 
-        /// <summary>
-        /// The check box list
-        /// </summary>
         RadzenCheckBoxList<TValue> _checkBoxList;
 
         /// <summary>
@@ -66,19 +63,11 @@ namespace Radzen.Blazor
             CheckBoxList?.RemoveItem(this);
         }
 
-        /// <summary>
-        /// Sets the text.
-        /// </summary>
-        /// <param name="value">The value.</param>
         internal void SetText(string value)
         {
             Text = value;
         }
 
-        /// <summary>
-        /// Sets the value.
-        /// </summary>
-        /// <param name="value">The value.</param>
         internal void SetValue(TValue value)
         {
             Value = value;
