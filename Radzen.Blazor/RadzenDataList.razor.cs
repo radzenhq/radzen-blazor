@@ -8,6 +8,15 @@ namespace Radzen.Blazor
     /// </summary>
     /// <typeparam name="TItem">The type of the t item.</typeparam>
     /// <seealso cref="Radzen.PagedDataBoundComponent{TItem}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenDataList @data=@orders TItem="Order" AllowPaging="true" WrapItems="true"&gt;
+    ///     &lt;Template&gt;
+    ///         @context.OrderId
+    ///     &lt;/Template&gt;
+    /// &lt;/RadzenDataList&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenDataList<TItem> : PagedDataBoundComponent<TItem>
     {
         /// <summary>

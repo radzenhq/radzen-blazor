@@ -12,6 +12,7 @@ namespace Radzen.Blazor
     /// RadzenDataGridColumn component.
     /// Implements the <see cref="ComponentBase" />
     /// Implements the <see cref="IDisposable" />
+    /// Must be placed inside a <see cref="RadzenDataGrid{TItem}" />
     /// </summary>
     /// <typeparam name="TItem">The type of the DataGrid item.</typeparam>
     /// <seealso cref="ComponentBase" />
