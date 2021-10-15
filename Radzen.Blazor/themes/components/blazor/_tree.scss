@@ -14,6 +14,7 @@ $tree-node-toggle-color: inherit !default;
 $tree-node-toggle-hover-color: inherit !default;
 $tree-icon-right: 'arrow_right' !default;
 $tree-icon-down: 'arrow_drop_down' !default;
+$tree-transition: none !default;
 
 .rz-tree {
   display: inline-block;
@@ -37,6 +38,7 @@ $tree-icon-down: 'arrow_drop_down' !default;
   line-height: 1.5rem;
   text-align: center;
   color: $tree-node-toggle-color;
+  transition: $tree-transition;
 
   &.rzi-caret-right {
     &:before {
@@ -83,8 +85,12 @@ $tree-icon-down: 'arrow_drop_down' !default;
   margin: 0;
 }
 
-.rz-treenode-content-selected .rz-treenode-label {
-  border-radius: $tree-node-selected-border-radius;
-  color: $tree-node-selected-color;
-  background-color: $tree-node-selected-background-color;
+.rz-treenode-label {
+  transition: $tree-transition;
+  
+  .rz-treenode-content-selected & {
+    border-radius: $tree-node-selected-border-radius;
+    color: $tree-node-selected-color;
+    background-color: $tree-node-selected-background-color;
+  }
 }
