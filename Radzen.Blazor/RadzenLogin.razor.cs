@@ -5,10 +5,36 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenLogin component.
+    /// RadzenLogin component. Must be placed in RadzenTemplateForm.
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenTemplateForm Data=@("Login")&gt;
+    ///         &lt;RadzenLogin AllowRegister="true" AllowResetPassword="true"
+    ///                         Login=@OnLogin
+    ///                         ResetPassword=@OnResetPassword
+    ///                         Register=@OnRegister /&gt;
+    /// &lt;/RadzenTemplateForm&gt;
+    /// @code {
+    ///   void OnLogin(LoginArgs args, string name)
+    ///   {
+    ///     Console.WriteLine($"{name} -> Username: {args.Username} and password: {args.Password}");
+    ///   }
+    ///   
+    ///   void OnRegister(string name)
+    ///   {
+    ///     Console.WriteLine($"{name} -> Register");
+    ///   }
+    ///   
+    ///   void OnResetPassword(string value, string name)
+    ///   {
+    ///     Console.WriteLine($"{name} -> ResetPassword for user: {value}");
+    ///   }
+    /// }
+    /// </code>
+    /// </example>
     public partial class RadzenLogin : RadzenComponent
     {
         /// <summary>
