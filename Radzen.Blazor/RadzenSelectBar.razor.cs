@@ -18,6 +18,17 @@ namespace Radzen.Blazor
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.FormComponent{TValue}" />
     /// <seealso cref="Radzen.IRadzenSelectBar" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenSelectBar @bind-Value=@values TValue="IEnumerable&lt;int&gt;" Multiple="true"&gt;
+    ///     &lt;Items&gt;
+    ///         &lt;RadzenSelectBarItem Text="Orders" Value="1" /&gt;
+    ///         &lt;RadzenSelectBarItem Text="Employees" Value="2" /&gt;
+    ///         &lt;RadzenSelectBarItem Text="Customers" Value="3" /&gt;
+    ///     &lt;/Items&gt;
+    /// &lt;/RadzenSelectBar&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenSelectBar<TValue> : FormComponent<TValue>, IRadzenSelectBar
     {
         ClassList ButtonClassList(RadzenSelectBarItem item) => ClassList.Create("rz-button rz-button-text-only")

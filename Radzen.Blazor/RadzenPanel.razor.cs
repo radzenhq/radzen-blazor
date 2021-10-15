@@ -9,6 +9,21 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponentWithChildren" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenPanel AllowCollapse="true""&gt;
+    ///     &lt;HeaderTemplate&gt;
+    ///         Header
+    ///     &lt;/HeaderTemplate&gt;
+    ///     &lt;ChildContent&gt;
+    ///         Content
+    ///     &lt;/ChildContent&gt;
+    ///     &lt;SummaryTemplate&gt;
+    ///         Summary
+    ///     &lt;/SummaryTemplate&gt;
+    /// &lt;/RadzenPanel&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenPanel : RadzenComponentWithChildren
     {
         /// <summary>

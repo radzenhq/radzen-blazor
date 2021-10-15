@@ -7,6 +7,11 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.FormComponent{System.Int32}" />
     /// </summary>
     /// <seealso cref="Radzen.FormComponent{System.Int32}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenRating Stars="10" Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenRating : FormComponent<int>
     {
         /// <summary>

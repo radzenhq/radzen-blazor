@@ -9,6 +9,11 @@ namespace Radzen.Blazor
     /// </summary>
     /// <seealso cref="Radzen.FormComponent{System.String}" />
     /// <seealso cref="Radzen.IRadzenFormComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenPassword Placeholder="Enter password..." Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenPassword : FormComponent<string>, IRadzenFormComponent
     {
         /// <summary>

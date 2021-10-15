@@ -8,6 +8,11 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenProgressBar @bind-Value="@value" Max="200" /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenProgressBar : RadzenComponent
     {
         /// <summary>
