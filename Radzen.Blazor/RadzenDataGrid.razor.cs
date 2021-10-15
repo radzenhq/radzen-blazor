@@ -16,6 +16,16 @@ namespace Radzen.Blazor
     /// </summary>
     /// <typeparam name="TItem">The type of the DataGrid data item.</typeparam>
     /// <seealso cref="Radzen.PagedDataBoundComponent{TItem}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenDataGrid @data=@orders TItem="Order" AllowSorting="true" AllowPaging="true" AllowFiltering="true"&gt;
+    ///     &lt;Columns&gt;
+    ///         &lt;RadzenDataGridColumn TItem="Order" Property="OrderId" Title="OrderId" /&gt;
+    ///         &lt;RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="OrderDate" /&gt;
+    ///     &lt;/Columns&gt;
+    /// &lt;/RadzenDataGrid&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem>
     {
 #if NET5
