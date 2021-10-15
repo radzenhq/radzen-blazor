@@ -1,19 +1,8 @@
-@using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 @inherits RadzenHtmlEditorColorBase
 
-<EditorColorPicker Title=@Title @bind-Value=@Value Icon="title" Change=@OnChange 
-    ShowHSV=@ShowHSV ShowRGBA=@ShowRGBA ShowColors=@ShowColors ShowButton=@ShowButton  
-    HexText=@HexText RedText=@RedText GreenText=@GreenText BlueText=@BlueText AlphaText=@AlphaText ButtonText=@ButtonText>
+<EditorColorPicker Title=@Title @bind-Value=@Value Icon="title" Change=@OnChange ShowHSV=@ShowHSV ShowRGBA=@ShowRGBA
+    ShowColors=@ShowColors ShowButton=@ShowButton HexText=@HexText RedText=@RedText GreenText=@GreenText
+    BlueText=@BlueText AlphaText=@AlphaText ButtonText=@ButtonText>
     @ChildContent
 </EditorColorPicker>
-
-@code {
-    protected override string CommandName => "foreColor";
-
-    [Parameter]
-    public string Value { get; set; } = "rgb(255, 0, 0)";
-
-    [Parameter]
-    public string Title { get; set; } = "Text color";
-}

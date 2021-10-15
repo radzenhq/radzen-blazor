@@ -1,7 +1,7 @@
-@using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 
-<EditorDropDown Title=@Title Value=@Editor.State.FormatBlock Change=@OnChange Placeholder="Format block" PopupStyle="width: 200px; max-height: 200px; overflow: auto;">
+<EditorDropDown Title=@Title Value=@Editor.State.FormatBlock Change=@OnChange Placeholder="Format block"
+    PopupStyle="width: 200px; max-height: 200px; overflow: auto;">
     <EditorDropDownItem Text="Normal" Value="p">
         <p style="margin:0">@context.Text</p>
     </EditorDropDownItem>
@@ -24,15 +24,3 @@
         <h6>@context.Text</h6>
     </EditorDropDownItem>
 </EditorDropDown>
-@code {
-    [CascadingParameter]
-    public RadzenHtmlEditor Editor { get; set; }
-
-    [Parameter]
-    public string Title { get; set; } = "Text style";
-
-    async Task OnChange(string value)
-    {
-        await Editor.ExecuteCommandAsync("formatBlock", value);
-    }
-}

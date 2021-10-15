@@ -1,12 +1,4 @@
-@using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 @inherits RadzenHtmlEditorButtonBase
 
 <EditorButton Title=@Title Click=@OnClick Icon="link_off" Disabled=@(!Editor.State.Unlink) />
-
-@code {
-    protected override string CommandName => "unlink"; 
-
-    [Parameter]
-    public string Title { get; set; } = "Remove link";
-}

@@ -4,27 +4,24 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenHtmlEditorButtonBase.
-    /// Implements the <see cref="ComponentBase" />
+    /// Base class that RadzenHtmlEditor color picker tools inherit from.
     /// </summary>
-    /// <seealso cref="ComponentBase" />
     public abstract class RadzenHtmlEditorButtonBase : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the editor.
+        /// The RadzenHtmlEditor component which this tool is part of.
         /// </summary>
-        /// <value>The editor.</value>
         [CascadingParameter]
         public RadzenHtmlEditor Editor { get; set; }
 
         /// <summary>
-        /// Gets the name of the command.
+        /// Specifies the name of the command. It is available as <see cref="HtmlEditorExecuteEventArgs.CommandName" /> when
+        /// <see cref="RadzenHtmlEditor.Execute" /> is raised.
         /// </summary>
-        /// <value>The name of the command.</value>
         protected virtual string CommandName { get; }
 
         /// <summary>
-        /// Called when [click].
+        /// Handles the click event of the button. Executes the command.
         /// </summary>
         protected virtual async Task OnClick()
         {
