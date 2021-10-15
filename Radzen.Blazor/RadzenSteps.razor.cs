@@ -11,6 +11,20 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenSteps Change=@(args => Console.WriteLine($"Selected index is: {args}"))&gt;
+    ///     &lt;Steps&gt;
+    ///         &lt;RadzenStepsItem Text="Orders"&gt;
+    ///             Details for Orders
+    ///         &lt;/RadzenStepsItem&gt;
+    ///         &lt;RadzenStepsItem Text="Employees"&gt;
+    ///             Details for Employees
+    ///         &lt;/RadzenStepsItem&gt;
+    ///     &lt;/Steps&gt;
+    /// &lt;/RadzenTabs&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenSteps : RadzenComponent
     {
         /// <summary>
