@@ -3,37 +3,31 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenTicks.
-    /// Implements the <see cref="ComponentBase" />
+    /// Tick configuration of <see cref="IChartAxis" />. 
     /// </summary>
-    /// <seealso cref="ComponentBase" />
     public class RadzenTicks : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the stroke.
+        /// Specifies the color of the ticks lines.
         /// </summary>
-        /// <value>The stroke.</value>
         [Parameter]
         public string Stroke { get; set; }
 
         /// <summary>
-        /// Gets or sets the width of the stroke.
+        /// Specifies the width of the tick lines. Set to <c>1</c> by default.
         /// </summary>
-        /// <value>The width of the stroke.</value>
         [Parameter]
         public double StrokeWidth { get; set; } = 1;
 
         /// <summary>
-        /// Gets or sets the type of the line.
+        /// Specifies the type of line used to render the ticks.
         /// </summary>
-        /// <value>The type of the line.</value>
         [Parameter]
         public LineType LineType { get; set; }
 
         /// <summary>
-        /// Sets the chart axis.
+        /// The axis which this configuration applies to.
         /// </summary>
-        /// <value>The chart axis.</value>
         [CascadingParameter]
         public AxisBase ChartAxis
         {
