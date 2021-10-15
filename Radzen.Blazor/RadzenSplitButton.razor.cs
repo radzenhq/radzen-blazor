@@ -12,11 +12,11 @@ namespace Radzen.Blazor
     /// <example>
     /// <code>
     /// &lt;RadzenSplitButton Click=@(args => Console.WriteLine($"Value is: {args.Value}"))&gt;
-    ///     &lt;Items&gt;
+    ///     &lt;ChildContent&gt;
     ///         &lt;RadzenSplitButtonItem Text="Orders" Value="1" /&gt;
     ///         &lt;RadzenSplitButtonItem Text="Employees" Value="2" /&gt;
     ///         &lt;RadzenSplitButtonItem Text="Customers" Value="3" /&gt;
-    ///     &lt;/Items&gt;
+    ///     &lt;/ChildContent&gt;
     /// &lt;/RadzenSelectBar&gt;
     /// </code>
     /// </example>
