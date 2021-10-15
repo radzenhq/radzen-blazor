@@ -8,10 +8,8 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenTreeItem component.
-    /// Implements the <see cref="IDisposable" />
+    /// A component which is an item in a <see cref="RadzenTree" />
     /// </summary>
-    /// <seealso cref="IDisposable" />
     public partial class RadzenTreeItem : IDisposable
     {
         ClassList ContentClassList => ClassList.Create("rz-treenode-content")
@@ -27,62 +25,54 @@ namespace Radzen.Blazor
         public RenderFragment ChildContent { get; set; }
 
         /// <summary>
-        /// Gets or sets the template.
+        /// Gets or sets the template. Use it to customize the appearance of a tree item.
         /// </summary>
-        /// <value>The template.</value>
         [Parameter]
         public RenderFragment<RadzenTreeItem> Template { get; set; }
 
         /// <summary>
-        /// Gets or sets the text.
+        /// Gets or sets the text displayed by the tree item.
         /// </summary>
-        /// <value>The text.</value>
         [Parameter]
         public string Text { get; set; }
 
         private bool expanded;
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="RadzenTreeItem"/> is expanded.
+        /// Specifies whether this item is expanded. Set to <c>false</c> by default.
         /// </summary>
-        /// <value><c>true</c> if expanded; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Expanded { get; set; }
 
         /// <summary>
-        /// Gets or sets the value.
+        /// Gets or sets the value of the tree item.
         /// </summary>
-        /// <value>The value.</value>
         [Parameter]
         public object Value { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance has children.
         /// </summary>
-        /// <value><c>true</c> if this instance has children; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool HasChildren { get; set; }
 
         private bool selected;
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="RadzenTreeItem"/> is selected.
+        /// Specifies whether this item is selected or not. Set to <c>false</c> by default.
         /// </summary>
-        /// <value><c>true</c> if selected; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Selected { get; set; }
 
         /// <summary>
-        /// Gets or sets the tree.
+        /// The RadzenTree which this item is part of.
         /// </summary>
-        /// <value>The tree.</value>
         [CascadingParameter]
         public RadzenTree Tree { get; set; }
 
         /// <summary>
-        /// Gets or sets the parent item.
+        /// The RadzenTreeItem which contains this item.
         /// </summary>
-        /// <value>The parent item.</value>
         [CascadingParameter]
         public RadzenTreeItem ParentItem { get; set; }
 
@@ -104,9 +94,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public void Dispose()
         {
             if (ParentItem != null)
@@ -162,9 +150,7 @@ namespace Radzen.Blazor
             ChildContent = content;
         }
 
-        /// <summary>
-        /// Called when initialized.
-        /// </summary>
+        /// <inheritdoc />
         override protected void OnInitialized()
         {
             expanded = Expanded;
@@ -192,11 +178,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var shouldExpand = false;

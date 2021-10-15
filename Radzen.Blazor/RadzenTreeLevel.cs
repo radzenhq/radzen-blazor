@@ -4,69 +4,92 @@ using System;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenTreeLevel.
-    /// Implements the <see cref="ComponentBase" />
+    /// Configures a level of nodes in a <see cref="RadzenTree" /> during data-binding.
     /// </summary>
-    /// <seealso cref="ComponentBase" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenTree Data=@rootEmployees&gt;
+    ///     &lt;RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1"  HasChildren=@(e =&gt; (e as Employee).Employees1.Any()) /&gt;
+    /// &lt;/RadzenTree&gt;
+    /// @code {
+    ///  IEnumerable&lt;Employee&gt; rootEmployees; 
+    ///  protected override void OnInitialized()
+    ///  {
+    ///     rootEmployees = NorthwindDbContext.Employees.Where(e => e.ReportsTo == null);
+    ///  }
+    /// }
+    /// </code>
+    /// </example>
     public class RadzenTreeLevel : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the text property.
+        /// Specifies the name of the property which provides values for the <see cref="RadzenTreeItem.Text" /> property of the child items.
         /// </summary>
-        /// <value>The text property.</value>
         [Parameter]
         public string TextProperty { get; set; }
 
         /// <summary>
-        /// Gets or sets the children property.
+        /// Specifies the name of the property which returns child data. The value returned by that property should be IEnumerable
         /// </summary>
-        /// <value>The children property.</value>
         [Parameter]
         public string ChildrenProperty { get; set; }
 
         /// <summary>
-        /// Gets or sets the has children function.
+        /// Determines if a child item has children or not. Set to <c>value =&gt; true</c> by default.
         /// </summary>
-        /// <value>The has children function.</value>
+        /// <example>
+        /// <code>
+        ///     &lt;RadzenTreeLevel HasChildren=@(e =&gt; (e as Employee).Employees1.Any()) /&gt;
+        /// </code>
+        /// </example>
         [Parameter]
         public Func<object, bool> HasChildren { get; set; } = value => true;
 
         /// <summary>
-        /// Gets or sets the expanded function.
+        /// Determines if a child item is expanded or not. Set to <c>value =&gt; false</c> by default.
         /// </summary>
-        /// <value>The expanded function.</value>
+        /// <example>
+        /// <code>
+        ///     &lt;RadzenTreeLevel Expanded=@(e =&gt; (e as Employee).Employees1.Any()) /&gt;
+        /// </code>
+        /// </example>
         [Parameter]
         public Func<object, bool> Expanded { get; set; } = value => false;
 
         /// <summary>
-        /// Gets or sets the selected function.
+        /// Determines if a child item is selected or not. Set to <c>value =&gt; false</c> by default.
         /// </summary>
-        /// <value>The selected function.</value>
+        /// <example>
+        /// <code>
+        ///     &lt;RadzenTreeLevel Selected=@(e =&gt; (e as Employee).LastName == "Fuller") /&gt;
+        /// </code>
+        /// </example>
         [Parameter]
         public Func<object, bool> Selected { get; set; } = value => false;
 
         /// <summary>
-        /// Gets or sets the text function.
+        /// Determines the text of a child item.
         /// </summary>
-        /// <value>The text function.</value>
+        /// <example>
+        /// <code>
+        ///     &lt;RadzenTreeLevel Text=@(e =&gt; (e as Employee).LastName) /&gt;
+        /// </code>
+        /// </example>
         [Parameter]
         public Func<object, string> Text { get; set; }
 
         /// <summary>
         /// Gets or sets the template.
         /// </summary>
-        /// <value>The template.</value>
         [Parameter]
         public RenderFragment<RadzenTreeItem> Template { get; set; }
 
         /// <summary>
-        /// Gets or sets the tree.
+        /// The RadzenTree which this item is part of.
         /// </summary>
-        /// <value>The tree.</value>
-        /// <exception cref="NotImplementedException"></exception>
         [CascadingParameter]
-        public RadzenTree Tree 
-        { 
+        public RadzenTree Tree
+        {
             get
             {
                 throw new NotImplementedException();
