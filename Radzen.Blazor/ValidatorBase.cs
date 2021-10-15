@@ -48,8 +48,10 @@ namespace Radzen.Blazor
         [CascadingParameter]
         public EditContext EditContext { get; set; }
 
+        /// <summary>
+        /// Stores the validation messages.
+        /// </summary>
         protected ValidationMessageStore messages;
-
         private FieldIdentifier FieldIdentifier { get; set; }
 
         /// <inheritdoc />

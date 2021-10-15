@@ -6,7 +6,6 @@ namespace Radzen.Blazor
     /// Renders donut series in <see cref="RadzenChart" />.
     /// </summary>
     /// <typeparam name="TItem">The type of the series data item.</typeparam>
-    /// <summary>
     public partial class RadzenDonutSeries<TItem> : RadzenPieSeries<TItem>, IChartDonutSeries
     {
         /// <summary>

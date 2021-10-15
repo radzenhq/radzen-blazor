@@ -10,7 +10,6 @@ namespace Radzen.Blazor
     /// Renders pie series in <see cref="RadzenChart" />.
     /// </summary>
     /// <typeparam name="TItem">The type of the series data item.</typeparam>
-    /// <summary>
     public partial class RadzenPieSeries<TItem> : CartesianSeries<TItem>
     {
         /// <summary>
@@ -76,7 +75,7 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets the current Y coordiante of the center.
-        /// <summary>
+        /// </summary>
         protected double CenterY
         {
             get

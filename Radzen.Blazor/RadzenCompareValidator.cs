@@ -36,7 +36,7 @@ namespace Radzen.Blazor
 
     /// <summary>
     /// A validator component which compares a component value with a specified value.
-    /// Must be placed inside a <see cref="RadenTemplateForm{TItem}" />
+    /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}" />
     /// </summary>
     /// <example>
     /// <code>
