@@ -7,6 +7,11 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.FormComponent{System.String}" />
     /// </summary>
     /// <seealso cref="Radzen.FormComponent{System.String}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenTextArea Cols="30" Rows="3" @bind-Value=@value Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenTextArea : FormComponent<string>
     {
         /// <summary>
