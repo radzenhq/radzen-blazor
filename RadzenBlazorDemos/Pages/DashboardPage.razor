@@ -20,42 +20,49 @@
         </RadzenCard>
     </RadzenCard>
 <div class="row">
-    <div class="col-xl-3 col-lg-6 py-2">
+    <div class="col-xl-3 col-lg-6 py-3">
         <RadzenCard>
-            <h3>Open Issues <label style="color: #28a745; position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@openIssues?.Count()</label></h3>
-            <RadzenChart style="width: 100%; height: 200px">
-                <RadzenColumnSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="#28a745" />
-                <RadzenCategoryAxis FormatString="{0:dd MMM}" Padding="50" />
+            <h3>Open Issues</h3>
+            <label style="color: #009B51; position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@openIssues?.Count()</label>
+            <RadzenChart style="width: 100%; height: 120px; margin-bottom: -30px;">
+                <RadzenColumnSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="#009B51" />
+                <RadzenValueAxis Visible="false" />
+                <RadzenCategoryAxis Visible="false" />
                 <RadzenColumnOptions Margin="10" />
                 <RadzenLegend Visible="false" />
             </RadzenChart>
         </RadzenCard>
     </div>
-    <div class="col-xl-3 col-lg-6 py-2">
+    <div class="col-xl-3 col-lg-6 py-3">
         <RadzenCard>
-            <h3>Closed Issues <label style="color: #cb2431; position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@closedIssues?.Count()</label></h3>
-            <RadzenChart style="width: 100%; height: 200px">
-                <RadzenColumnSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="#cb2431" />
-                <RadzenCategoryAxis FormatString="{0:dd MMM}" Padding="50" />
+            <h3>Closed Issues</h3>
+            <label style="color: #F31155; position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@closedIssues?.Count()</label>
+            <RadzenChart style="width: 100%; height: 120px; margin-bottom: -30px;">
+                <RadzenColumnSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="#F31155" />
+                <RadzenValueAxis Visible="false" />
+                <RadzenCategoryAxis Visible="false" />
                 <RadzenColumnOptions Margin="10" />
                 <RadzenLegend Visible="false" />
             </RadzenChart>
         </RadzenCard>
     </div>
-    <div class="col-xl-3 col-lg-6 py-2">
+    <div class="col-xl-3 col-lg-6 py-3">
         <RadzenCard>
-            <h3>All Issues <label style="position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@issues?.Count()</label></h3>
-            <RadzenChart style="width: 100%; height: 200px">
-                <RadzenLineSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" Stroke="#28a745" />
-                <RadzenLineSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" Stroke="#cb2431" />
-                <RadzenCategoryAxis FormatString="{0:dd MMM}" />
+            <h3>All Issues</h3>
+            <label style="position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@issues?.Count()</label>
+            <RadzenChart style="width: 100%; height: 120px; margin-bottom: -30px;">
+                <RadzenLineSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" Stroke="#009B51" />
+                <RadzenLineSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" Stroke="#F31155" />
+                <RadzenValueAxis Visible="false" />
+                <RadzenCategoryAxis Visible="false" />
+                <RadzenLegend Visible="false" />
             </RadzenChart>
         </RadzenCard>
     </div>
-    <div class="col-xl-3 col-lg-6 py-2">
+    <div class="col-xl-3 col-lg-6 py-3">
         <RadzenCard>
             <h3>Progress</h3>
-            <RadzenArcGauge style="width: 100%; height: 200px">
+            <RadzenArcGauge style="width: 100%; height: 120px; margin-top: -30px;">
                 <RadzenArcGaugeScale Max="1" Y="0.8" Radius="2">
                     <RadzenArcGaugeScaleValue Value=@closeRatio FormatString="{0:P0}" />
                 </RadzenArcGaugeScale>
@@ -64,7 +71,40 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-xl-6 col-lg-12 py-2">
+    <div class="col-lg-9 py-3">
+        <div class="row">
+            <div class="col-lg-6">
+                <RadzenCard style="height: 280px">
+                    <h3>Top Issue Labels</h3>
+                    <RadzenChart style="width: 100%; height: 200px">
+                        <RadzenDonutSeries Data=@labelGroups CategoryProperty="Label" ValueProperty="Count" Title="Issues" Fills=@labelColors />
+                    </RadzenChart>
+                </RadzenCard>
+            </div>
+            <div class="col-lg-6">
+                <RadzenCard style="height: 280px">
+                    <h3>Top Contributors</h3>
+                    <RadzenChart style="width: 100%; height: 200px">
+                        <RadzenPieSeries Data=@openByGroups CategoryProperty="Name" ValueProperty="Count" Title="Issues" />
+                    </RadzenChart>
+                </RadzenCard>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 py-3">
+        <RadzenCard style="height: 280px">
+            <h3>Most Active Member</h3>
+            <div class="text-center">
+                <img style="width: 120px; border-radius: 50%; margin: 20px 0;" src=@mostActiveMember?.AvatarUrl /> 
+                <h4>
+                    @mostActiveMember?.Login
+                </h4>
+            </div>
+        </RadzenCard>
+    </div>
+</div>
+<div class="row">
+    <div class="col py-3">
         <RadzenCard>
             <h3>Issue List</h3>
             <RadzenDataGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true" AllowSorting="true">
@@ -74,16 +114,16 @@
                             <RadzenDropDown AllowClear="true" AllowFiltering="true" Data=@users TextProperty="Login" @bind-Value="selectedUser" Change=@FilterIssues>
                                 <Template Context="user">
                                     <div style="white-space: nowrap">
-                                        <img style="width: 30px; height: 30px; border-radius: 50%;" src=@user.AvatarUrl /> @user.Login
+                                        <img style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;" src=@user.AvatarUrl />@user.Login
                                     </div>
                                 </Template>
                             </RadzenDropDown>
                         </FilterTemplate>
                         <Template Context="issue">
-                            <img style="width: 40px; height: 40px; border-radius: 50%;" src=@issue.User.AvatarUrl />@issue.User.Login
+                            <img style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; border: 1px solid #cccccc;" src=@issue.User.AvatarUrl /><b>@issue.User.Login</b>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Issue" Property="Title" Title="Title" Width="200px">
+                    <RadzenDataGridColumn TItem="Issue" Property="Title" Title="Title" Width="400px">
                         <Template Context="issue">
                             <RadzenLink Path=@issue.Url Text=@issue.Title Target="_blank" />
                         </Template>
@@ -129,36 +169,6 @@
                 </Columns>
             </RadzenDataGrid>
         </RadzenCard>
-    </div>
-    <div class="col-xl-3 col-lg-6 py-2">
-        <RadzenCard>
-            <h3>Top Contributors</h3>
-            <RadzenChart style="width: 100%; height: 500px">
-                <RadzenPieSeries Data=@openByGroups CategoryProperty="Name" ValueProperty="Count" Title="Issues" />
-                <RadzenLegend Position="LegendPosition.Bottom" />
-            </RadzenChart>
-        </RadzenCard>
-    </div>
-    <div class="col-xl-3 col-lg-6">
-        <div class="row">
-            <div class="col-xl-12 py-2">
-                <RadzenCard style="height: 200px">
-                    <h3>Most Active Member</h3>
-                    <h4>
-                        <img style="width: 25%; border-radius: 50%;" src=@mostActiveMember?.AvatarUrl />
-                        @mostActiveMember?.Login
-                    </h4>
-                </RadzenCard>
-            </div>
-            <div class="col-xl-12 py-2">
-                <RadzenCard>
-                    <h3>Top Issue Labels</h3>
-                    <RadzenChart style="width: 100%; height: 284px">
-                        <RadzenDonutSeries Data=@labelGroups CategoryProperty="Label" ValueProperty="Count" Title="Issues" Fills=@labelColors />
-                    </RadzenChart>
-                </RadzenCard>
-            </div>
-        </div>
     </div>
 </div>
 </div>
