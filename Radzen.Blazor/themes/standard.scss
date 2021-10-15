@@ -528,7 +528,7 @@ $grid-filter-icon-width: 1.25rem !default;
 $grid-filter-icon-height: 1.25rem !default;
 $grid-filter-icon-margin: 0 0.25rem 0 0 !default;
 $grid-filter-icon-font-size: 1.25rem !default;
-$grid-filter-color: $rz-base-800 !default;
+$grid-filter-color: $rz-base-400 !default;
 $grid-filter-focus-color: $rz-base-900 !default;
 $grid-filter-operator-margin: 1rem !default;
 $grid-filter-buttons-padding: 1rem !default;
@@ -761,6 +761,7 @@ $timepicker-border: none !default;
 
 $form-error-color: $rz-danger !default;
 $form-error-font-size: 0.75rem !default;
+$form-group-margin-bottom: 1.5rem !default; // Bootstrap override
 $validator-background-color: $danger !default;
 $validator-color: $white !default;
 $validator-shadow: 0 6px 14px 0 rgba($rz-danger, 0.3) !default;
@@ -992,6 +993,14 @@ $upload-button-background-color: $primary !default;
 $scrollbar-background-color: $rz-base-100 !default;
 $scrollbar-color: $rz-base-400 !default;
 
+// Splitter
+
+$splitter-bar-color: $rz-base-600 !default;
+$splitter-bar-color-active: $rz-secondary !default;
+$splitter-bar-background-color: $rz-base-200 !default;
+$splitter-bar-background-color-active: $rz-secondary-lighter !default;
+$splitter-bar-hover-opacity: 1 !default;
+
 // Tooltip
 
 $tooltip-background-color: $rz-base-900 !default;
@@ -1064,6 +1073,7 @@ $color-schemes: (
 $paragraph-line-height: 1.25rem !default;
 
 body {
+  font-size: 0.875rem;
   line-height: $paragraph-line-height;
 }
 
