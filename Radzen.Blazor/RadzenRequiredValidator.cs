@@ -22,7 +22,7 @@ namespace Radzen.Blazor
     ///  Model model = new Model();
     /// }
     /// </code>
-    /// </example>/// </summary>
+    /// </example>
     public class RadzenRequiredValidator : ValidatorBase
     {
         /// <summary>

@@ -11,19 +11,30 @@ using Microsoft.JSInterop;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenTemplateForm component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
-    /// Implements the <see cref="Radzen.IRadzenForm" />
+    /// A component which represents a <c>form</c>. Provides validation support.
     /// </summary>
-    /// <typeparam name="TItem">The type of the t item.</typeparam>
-    /// <seealso cref="Radzen.RadzenComponent" />
-    /// <seealso cref="Radzen.IRadzenForm" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenTemplateForm TItem="Model" Data=@model&gt;
+    ///   &lt;RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email /&gt;
+    ///   &lt;RadzenRequiredValidator Component="Email" Text="Email is required" Style="position: absolute" /&gt;
+    /// &lt;/RadzenTemplateForm&gt;
+    /// @code {
+    ///  class Model
+    //   {
+    ///    public string Email { get; set; }
+    ///  }
+    ///  
+    ///  Model model = new Model();
+    /// }
+    /// </code>
+    /// </example>
     public class RadzenTemplateForm<TItem> : RadzenComponent, IRadzenForm
     {
         /// <summary>
-        /// Returns true if valid.
+        /// Returns the validity of the form.
         /// </summary>
-        /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if all validators in the form a valid; otherwise, <c>false</c>.</value>
         public bool IsValid
         {
             get
@@ -38,30 +49,47 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the data.
+        /// Specifies the model of the form. Required to support validation.
         /// </summary>
-        /// <value>The data.</value>
         [Parameter]
         public TItem Data { get; set; }
 
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
-        /// <value>The child content.</value>
         [Parameter]
         public RenderFragment<EditContext> ChildContent { get; set; }
 
         /// <summary>
-        /// Gets or sets the submit callback.
+        /// A callback that will be invoked when the user submits the form and <see cref="IsValid" /> is <c>true</c>.
         /// </summary>
-        /// <value>The submit callback.</value>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenTemplateForm TItem="Model" Submit=@OnSubmit Data=@model&gt;
+        ///   &lt;RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email /&gt;
+        ///   &lt;RadzenRequiredValidator Component="Email" Text="Email is required" Style="position: absolute" /&gt;
+        /// &lt;/RadzenTemplateForm&gt;
+        /// @code {
+        ///  class Model
+        //   {
+        ///    public string Email { get; set; }
+        ///  }
+        ///  
+        ///  Model model = new Model();
+        ///
+        ///  void OnSubmit(Model value)
+        ///  {
+        ///  
+        ///  }
+        /// }
+        /// </code>
+        /// </example>
         [Parameter]
         public EventCallback<TItem> Submit { get; set; }
 
         /// <summary>
-        /// Gets or sets the on invalid submit callback.
+        /// Obsolete. Use <see cref="InvalidSubmit" /> instead.
         /// </summary>
-        /// <value>The on invalid submit callback.</value>
         [Parameter]
         [Obsolete]
         public EventCallback<FormInvalidSubmitEventArgs> OnInvalidSubmit
@@ -77,23 +105,57 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the invalid submit callback.
+        /// A callback that will be invoked when the user submits the form and <see cref="IsValid" /> is <c>false</c>.
         /// </summary>
-        /// <value>The invalid submit callback.</value>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenTemplateForm TItem="Model" InvalidSubmit=@OnInvalidSubmit Data=@model&gt;
+        ///   &lt;RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email /&gt;
+        ///   &lt;RadzenRequiredValidator Component="Email" Text="Email is required" Style="position: absolute" /&gt;
+        /// &lt;/RadzenTemplateForm&gt;
+        /// @code {
+        ///  class Model
+        //   {
+        ///    public string Email { get; set; }
+        ///  }
+        ///  
+        ///  Model model = new Model();
+        ///
+        ///  void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+        ///  {
+        ///  
+        ///  }
+        /// }
+        /// </code>
+        /// </example>
         [Parameter]
         public EventCallback<FormInvalidSubmitEventArgs> InvalidSubmit { get; set; }
 
         /// <summary>
-        /// Gets or sets the form method.
+        /// Specifies the form <c>method</c> attribute. Used together with <see cref="Action" />.
         /// </summary>
-        /// <value>The form method.</value>
+        /// </code>
+        /// </example>
+        /// &lt;RadzenTemplateForm TItem="Model" Method="post" Action="/register" Data=@model&gt;
+        ///   &lt;RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email /&gt;
+        ///   &lt;RadzenRequiredValidator Component="Email" Text="Email is required" Style="position: absolute" /&gt;
+        /// &lt;/RadzenTemplateForm&gt;
+        /// </code>
+        /// </example>
         [Parameter]
         public string Method { get; set; }
 
         /// <summary>
-        /// Gets or sets the form action.
+        /// Specifies the form <c>action</c> attribute. When set the form submits to the specified URL.
         /// </summary>
-        /// <value>The form action.</value>
+        /// </code>
+        /// </example>
+        /// &lt;RadzenTemplateForm TItem="Model" Method="post" Action="/register" Data=@model&gt;
+        ///   &lt;RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email /&gt;
+        ///   &lt;RadzenRequiredValidator Component="Email" Text="Email is required" Style="position: absolute" /&gt;
+        /// &lt;/RadzenTemplateForm&gt;
+        /// </code>
+        /// </example>
         [Parameter]
         public string Action { get; set; }
 
@@ -108,7 +170,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called on submit.
+        /// Handles the submit event of the form.
         /// </summary>
         protected async Task OnSubmit()
         {
@@ -141,10 +203,7 @@ namespace Radzen.Blazor
 
         List<IRadzenFormComponent> components = new List<IRadzenFormComponent>();
 
-        /// <summary>
-        /// Adds the component.
-        /// </summary>
-        /// <param name="component">The component.</param>
+        /// <inheritdoc />
         public void AddComponent(IRadzenFormComponent component)
         {
             if (components.IndexOf(component) == -1)
@@ -153,20 +212,13 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Removes the component.
-        /// </summary>
-        /// <param name="component">The component.</param>
+        /// <inheritdoc />
         public void RemoveComponent(IRadzenFormComponent component)
         {
             components.Remove(component);
         }
 
-        /// <summary>
-        /// Finds the component.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>IRadzenFormComponent.</returns>
+        /// <inheritdoc />
         public IRadzenFormComponent FindComponent(string name)
         {
             return components.Where(component => component.Name == name).FirstOrDefault();
@@ -178,9 +230,7 @@ namespace Radzen.Blazor
         /// <value>The edit context.</value>
         public EditContext EditContext { get; set; }
 
-        /// <summary>
-        /// Called when [parameters set].
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnParametersSet()
         {
             if (Data != null && (EditContext == null || EditContext.Model != (object)Data))
@@ -189,10 +239,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Builds the render tree.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
+        /// <inheritdoc />
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
             if (Visible)
