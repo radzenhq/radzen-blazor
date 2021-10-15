@@ -11,6 +11,30 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenContextMenu component.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// @inject ContextMenuService ContextMenuService
+    /// 
+    /// &lt;RadzenButton Text="Show context menu" ContextMenu=@(args => ShowContextMenuWithItems(args)) /&gt;
+    /// 
+    /// @code {
+    ///   void ShowContextMenuWithItems(MouseEventArgs args)
+    ///   {
+    ///     ContextMenuService.Open(args,
+    ///         new List&lt;ContextMenuItem&gt {
+    ///             new ContextMenuItem() { Text = "Context menu item 1", Value = 1 },
+    ///             new ContextMenuItem() { Text = "Context menu item 2", Value = 2 },
+    ///             new ContextMenuItem() { Text = "Context menu item 3", Value = 3 },
+    ///      }, OnMenuItemClick);
+    ///   }
+    ///   
+    ///   void OnMenuItemClick(MenuItemEventArgs args)
+    ///   {
+    ///     Console.WriteLine($"Menu item with Value={args.Value} clicked");
+    ///   }
+    /// }
+    /// </code>
+    /// </example>
     public partial class RadzenContextMenu
     {
         /// <summary>
