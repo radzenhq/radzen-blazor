@@ -12,6 +12,11 @@ namespace Radzen.Blazor
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.FormComponent{TValue}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenFileInput @bind-Value=@employee.Photo TValue="string" Change=@(args => Console.WriteLine($"File content as base64 string: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenFileInput<TValue> : FormComponent<TValue>
     {
 
