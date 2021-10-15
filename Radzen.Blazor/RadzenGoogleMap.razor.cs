@@ -11,6 +11,27 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenGoogleMap Zoom="3" Center=@(new GoogleMapPosition() { Lat = 42.6977, Lng = 23.3219 }) MapClick=@OnMapClick MarkerClick=@OnMarkerClick"&gt;
+    ///     &lt;Markers&gt;
+    ///         &lt;RadzenGoogleMapMarker Title="London" Label="London" Position=@(new GoogleMapPosition() { Lat = 51.5074, Lng = 0.1278 }) /&gt;
+    ///         &lt;RadzenGoogleMapMarker Title="Paris " Label="Paris" Position=@(new GoogleMapPosition() { Lat = 48.8566, Lng = 2.3522 }) /&gt;
+    ///     &lt;/Markers&gt;
+    /// &lt;/RadzenGoogleMap&gt;
+    /// @code {
+    ///   void OnMapClick(GoogleMapClickEventArgs args)
+    ///   {
+    ///     Console.WriteLine($"Map clicked at Lat: {args.Position.Lat}, Lng: {args.Position.Lng}");
+    ///   }
+    ///   
+    ///   void OnMarkerClick(RadzenGoogleMapMarker marker)
+    ///   {
+    ///     Console.WriteLine($"Map {marker.Title} marker clicked. Marker position -> Lat: {marker.Position.Lat}, Lng: {marker.Position.Lng}");
+    ///   }
+    /// }
+    /// </code>
+    /// </example>
     public partial class RadzenGoogleMap : RadzenComponent
     {
         /// <summary>
