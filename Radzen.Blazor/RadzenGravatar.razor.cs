@@ -8,6 +8,11 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenGravatar Email="info@radzen.com" /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenGravatar : RadzenComponent
     {
         /// <summary>
