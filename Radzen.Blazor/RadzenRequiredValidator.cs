@@ -4,33 +4,42 @@ using System.Collections.Generic;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenRequiredValidator component.
-    /// Implements the <see cref="Radzen.Blazor.ValidatorBase" />
+    /// A validator component which checks if a component has value.
+    /// Must be placed inside a <see cref="RadenTemplateForm{TItem}" />
     /// </summary>
-    /// <seealso cref="Radzen.Blazor.ValidatorBase" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenTemplateForm TItem="Model" Data=@model&gt;
+    ///   &lt;RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email /&gt;
+    ///   &lt;RadzenRequiredValidator Component="Email" Text="Email is required" Style="position: absolute" /&gt;
+    /// &lt;/RadzenTemplateForm&gt;
+    /// @code {
+    ///  class Model
+    //   {
+    ///    public string Email { get; set; }
+    ///  }
+    ///  
+    ///  Model model = new Model();
+    /// }
+    /// </code>
+    /// </example>/// </summary>
     public class RadzenRequiredValidator : ValidatorBase
     {
         /// <summary>
-        /// Gets or sets the text.
+        /// Gets or sets the message displayed when the component is invalid. Set to <c>"Required"</c> by default.
         /// </summary>
-        /// <value>The text.</value>
         [Parameter]
         public override string Text { get; set; } = "Required";
 
-        /// <summary>
-        /// Validates the specified component.
-        /// </summary>
-        /// <param name="component">The component.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
             return component.HasValue && !object.Equals(DefaultValue, component.GetValue());
         }
 
         /// <summary>
-        /// Gets or sets the default value.
+        /// Specifies a default value. If the component value is equal to <c>DefaultValue</c> it is considered invalid.
         /// </summary>
-        /// <value>The default value.</value>
         [Parameter]
         public object DefaultValue { get; set; }
     }

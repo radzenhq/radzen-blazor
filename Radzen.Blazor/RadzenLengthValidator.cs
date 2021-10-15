@@ -3,38 +3,45 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenLengthValidator component.
-    /// Implements the <see cref="Radzen.Blazor.ValidatorBase" />
+    /// A validator component which checks if then component value length is within a specified range.
+    /// Must be placed inside a <see cref="RadenTemplateForm{TItem}" />
     /// </summary>
-    /// <seealso cref="Radzen.Blazor.ValidatorBase" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenTemplateForm TItem="Model" Data=@model&gt;
+    ///    &lt;RadzenTextBox style="display: block" Name="FirstName" @bind-Value=@model.FirstName /&gt;
+    ///    &lt;RadzenLengthValidator Component="FirstName" Min="3" Text="First name should be at least 3 characters" Style="position: absolute" /&gt;
+    /// &lt;/RadzenTemplateForm&gt;
+    /// @code {
+    ///    class Model
+    ///    {
+    ///       public string FirstName { get; set; }
+    ///    }
+    ///    Model model = new Model(); 
+    /// }
+    /// </code>
+    /// </example>
     public class RadzenLengthValidator : ValidatorBase
     {
         /// <summary>
-        /// Gets or sets the text.
+        /// Gets or sets the message displayed when the component is invalid. Set to <c>"Invalid length"</c> by default.
         /// </summary>
-        /// <value>The text.</value>
         [Parameter]
         public override string Text { get; set; } = "Invalid length";
 
         /// <summary>
-        /// Determines the minimum value.
+        /// Specifies the minium accepted length. The component value length should be greater than the minimum in order to be valid.
         /// </summary>
-        /// <value>The minimum.</value>
         [Parameter]
         public int? Min { get; set; }
 
         /// <summary>
-        /// Determines the maximum value.
+        /// Specifies the maximum accepted length. The component value length should be less than the maximum in order to be valid.
         /// </summary>
-        /// <value>The maximum.</value>
         [Parameter]
         public int? Max { get; set; }
 
-        /// <summary>
-        /// Validates the specified component.
-        /// </summary>
-        /// <param name="component">The component.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
             string value = component.GetValue() as string;
