@@ -1,12 +1,4 @@
-@using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 @inherits RadzenHtmlEditorButtonBase
 
 <EditorButton Title=@Title Click=@OnClick Icon="format_align_center" Selected=@Editor.State.JustifyCenter />
-
-@code {
-    protected override string CommandName => "justifyCenter"; 
-
-    [Parameter]
-    public string Title { get; set; } = "Align center";
-}

@@ -1,20 +1,3 @@
-@using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 
 <EditorDropDownItem Text=@Text Value=@Value style=@($"font-family: {Value}") />
-
-@code {
-    [Parameter]
-    public string Text { get; set; }
-
-    [Parameter]
-    public string Value { get; set; }
-
-    [CascadingParameter]
-    public RadzenHtmlEditorFontName Parent { get; set; }
-
-    protected override void OnInitialized()
-    {
-        Parent.AddFont(this);
-    }
-}

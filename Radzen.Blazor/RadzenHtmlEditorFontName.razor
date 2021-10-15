@@ -1,47 +1,22 @@
-@using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 
-<EditorDropDown Title=@Title Value=@Editor.State.FontName Change=@OnChange Placeholder="Font" PopupStyle="width: 200px; max-height: 200px; overflow: auto;">
+<EditorDropDown Title=@Title Value=@Editor.State.FontName Change=@OnChange Placeholder="Font"
+    PopupStyle="width: 200px; max-height: 200px; overflow: auto;">
     <CascadingValue Value=@this>
-    @if (ChildContent != null)
-    {
-        @ChildContent
-    }
-    else 
-    {
-        <RadzenHtmlEditorFontNameItem Text="Arial" Value="Arial" />
-        <RadzenHtmlEditorFontNameItem Text="Georgia" Value="Georgia" />
-        <RadzenHtmlEditorFontNameItem Text="Helvetica" Value="Helvetica" />
-        <RadzenHtmlEditorFontNameItem Text="Monospace" Value="monospace" />
-        <RadzenHtmlEditorFontNameItem Text="Segoe UI" Value='"Segoe UI"' />
-        <RadzenHtmlEditorFontNameItem Text="Tahoma" Value="Tahoma" />
-        <RadzenHtmlEditorFontNameItem Text="Times New Roman" Value='"Times New Roman"' />
-        <RadzenHtmlEditorFontNameItem Text="Verdana" Value="Verdana" />
-    }
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            <RadzenHtmlEditorFontNameItem Text="Arial" Value="Arial" />
+            <RadzenHtmlEditorFontNameItem Text="Georgia" Value="Georgia" />
+            <RadzenHtmlEditorFontNameItem Text="Helvetica" Value="Helvetica" />
+            <RadzenHtmlEditorFontNameItem Text="Monospace" Value="monospace" />
+            <RadzenHtmlEditorFontNameItem Text="Segoe UI" Value='"Segoe UI"' />
+            <RadzenHtmlEditorFontNameItem Text="Tahoma" Value="Tahoma" />
+            <RadzenHtmlEditorFontNameItem Text="Times New Roman" Value='"Times New Roman"' />
+            <RadzenHtmlEditorFontNameItem Text="Verdana" Value="Verdana" />
+        }
     </CascadingValue>
 </EditorDropDown>
-@code {
-    IList<RadzenHtmlEditorFontNameItem> fonts = new List<RadzenHtmlEditorFontNameItem>();
-
-    internal void AddFont(RadzenHtmlEditorFontNameItem font)
-    {
-        if (!fonts.Contains(font))
-        {
-            fonts.Add(font);
-        }
-    }
-
-    [Parameter]
-    public RenderFragment ChildContent { get; set; }
-
-    [Parameter]
-    public string Title { get; set; } = "Font name";
- 
-    [CascadingParameter]
-    public RadzenHtmlEditor Editor { get; set; }
-
-    async Task OnChange(string value)
-    {
-        await Editor.ExecuteCommandAsync("fontName", value);
-    }
-}

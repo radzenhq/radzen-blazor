@@ -1,4 +1,3 @@
-@using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 
 @if (Visible)
@@ -6,40 +5,9 @@
     @if (Template == null)
     {
         <EditorButton Title=@Title Click=@OnClick Icon=@Icon Selected=@Selected Disabled=@Disabled />
-    } 
+    }
     else
     {
         <div class="rz-html-editor-custom-tool">@Template(Editor)</div>
-    }
-}
-
-@code {
-    [Parameter]
-    public bool Visible { get; set; } = true;
-
-    [Parameter]
-    public string Icon { get; set; } = "settings";
-
-    [Parameter]
-    public RenderFragment<RadzenHtmlEditor> Template { get; set; }
-
-    [Parameter]
-    public bool Selected { get; set; }
-
-    [Parameter]
-    public bool Disabled { get; set; }
-
-    [Parameter]
-    public string CommandName { get; set; }
-
-    [CascadingParameter]
-    public RadzenHtmlEditor Editor { get; set; }
-
-    [Parameter]
-    public string Title { get; set; }
-
-    async Task OnClick()
-    {
-        await Editor.OnExecuteAsync(CommandName);
     }
 }

@@ -1,12 +1,4 @@
-@using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 @inherits RadzenHtmlEditorButtonBase
 
 <EditorButton Title=@Title Click=@OnClick Icon="undo" Disabled=@(!Editor.State.Undo) />
-
-@code {
-    protected override string CommandName => "undo"; 
-
-    [Parameter]
-    public string Title { get; set; } = "Undo";
-}

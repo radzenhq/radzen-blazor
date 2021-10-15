@@ -6,10 +6,16 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenHtmlEditor.
-    /// Implements the <see cref="Radzen.FormComponent{System.String}" />
+    /// A component which edits HTML content. Provides built-in upload capabilities.
     /// </summary>
-    /// <seealso cref="Radzen.FormComponent{System.String}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenHtmlEditor @bind-Value=@html /&gt;
+    /// @code {
+    ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!"; 
+    /// }
+    /// </code>
+    /// </example>
     public partial class RadzenHtmlEditor : FormComponent<string>
     {
         /// <summary>
@@ -20,55 +26,68 @@ namespace Radzen.Blazor
         public RenderFragment ChildContent { get; set; }
 
         /// <summary>
-        /// Gets or sets the upload headers.
+        /// Specifies custom headers that will be submit during uploads.
         /// </summary>
-        /// <value>The upload headers.</value>
         [Parameter]
         public IDictionary<string, string> UploadHeaders { get; set; }
 
         /// <summary>
-        /// Gets or sets the paste.
+        /// A callback that will be invoked when the user pastes content in the editor. Commonly used to filter unwanted HTML.
         /// </summary>
-        /// <value>The paste.</value>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenHtmlEditor @bind-Value=@html Paste=@OnPaste /&gt;
+        /// @code {
+        ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!"; 
+        ///   void OnPaste(HtmlEditorPasteEventArgs args)
+        ///   {
+        ///     // Set args.Html to filter unwanted tags.
+        ///     args.Html = args.Html.Replace("&lt;br>&gt;", "");
+        ///   }
+        /// </code>
+        /// </example>
         [Parameter]
         public EventCallback<HtmlEditorPasteEventArgs> Paste { get; set; }
 
         /// <summary>
-        /// Gets or sets the execute.
+        /// A callback that will be invoked when the user executes a command of the editor (e.g. by clicking one of the tools).
         /// </summary>
-        /// <value>The execute.</value>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenHtmlEditor Execute=@OnExecute&gt;
+        ///   &lt;RadzenHtmlEditorCustomTool CommandName="InsertToday" Icon="today" Title="Insert today" /&gt;
+        /// &lt;/RadzenHtmlEditor&gt;
+        /// @code {
+        ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!"; 
+        ///   async Task OnExecute(HtmlEditorExecuteEventArgs args)
+        ///   {
+        ///     if (args.CommandName == "InsertToday")
+        ///     {
+        ///       await args.Editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, DateTime.Today.ToLongDateString());
+        ///     }
+        ///  }
+        /// </code>
+        /// </example>
         [Parameter]
         public EventCallback<HtmlEditorExecuteEventArgs> Execute { get; set; }
 
         /// <summary>
-        /// Gets or sets the upload URL.
+        /// Specifies the URL to which RadzenHtmlEditor will submit files.
         /// </summary>
-        /// <value>The upload URL.</value>
         [Parameter]
         public string UploadUrl { get; set; }
 
-        /// <summary>
-        /// Gets or sets the content editable.
-        /// </summary>
-        /// <value>The content editable.</value>
         ElementReference ContentEditable { get; set; }
 
-        /// <summary>
-        /// Gets or sets the state.
-        /// </summary>
-        /// <value>The state.</value>
         internal RadzenHtmlEditorCommandState State { get; set; } = new RadzenHtmlEditorCommandState();
 
-        /// <summary>
-        /// Called when [focus].
-        /// </summary>
         async Task OnFocus()
         {
             await UpdateCommandState();
         }
 
         /// <summary>
-        /// Called when [selection change].
+        /// Invoked by interop when the RadzenHtmlEditor selection changes.
         /// </summary>
         [JSInvokable]
         public async Task OnSelectionChange()
@@ -77,9 +96,8 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets the headers.
+        /// Invoked by interop during uploads. Provides the custom headers.
         /// </summary>
-        /// <returns>IDictionary&lt;System.String, System.String&gt;.</returns>
         [JSInvokable("GetHeaders")]
         public IDictionary<string, string> GetHeaders()
         {
@@ -87,11 +105,10 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Execute command as an asynchronous operation.
+        /// Executes the requested command with the provided value. Check <see cref="HtmlEditorCommands" /> for the list of supported commands.
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="value">The value.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
         public async Task ExecuteCommandAsync(string name, string value = null)
         {
             State = await JSRuntime.InvokeAsync<RadzenHtmlEditorCommandState>("Radzen.execCommand", ContentEditable, name, value);
@@ -100,20 +117,12 @@ namespace Radzen.Blazor
             await OnChange();
         }
 
-        /// <summary>
-        /// Called when [change].
-        /// </summary>
         async Task OnChange()
         {
             await Change.InvokeAsync(Html);
             await ValueChanged.InvokeAsync(Html);
         }
 
-        /// <summary>
-        /// On execute as an asynchronous operation.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
         internal async Task OnExecuteAsync(string name)
         {
             await Execute.InvokeAsync(new HtmlEditorExecuteEventArgs(this) { CommandName = name });
@@ -122,26 +131,21 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Save selection as an asynchronous operation.
+        /// Saves the current selection. RadzenHtmlEditor will lose its selection when it loses focus. Use this method to persist the current selection.
         /// </summary>
-        /// <returns>A Task representing the asynchronous operation.</returns>
         public async Task SaveSelectionAsync()
         {
             await JSRuntime.InvokeVoidAsync("Radzen.saveSelection", ContentEditable);
         }
 
         /// <summary>
-        /// Restore selection as an asynchronous operation.
+        /// Restores the last saved selection.
         /// </summary>
-        /// <returns>A Task representing the asynchronous operation.</returns>
         public async Task RestoreSelectionAsync()
         {
             await JSRuntime.InvokeVoidAsync("Radzen.restoreSelection", ContentEditable);
         }
 
-        /// <summary>
-        /// Updates the state of the command.
-        /// </summary>
         async Task UpdateCommandState()
         {
             State = await JSRuntime.InvokeAsync<RadzenHtmlEditorCommandState>("Radzen.queryCommands", ContentEditable);
@@ -149,28 +153,15 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Called when [blur].
-        /// </summary>
         async Task OnBlur()
         {
             await OnChange();
         }
 
-        /// <summary>
-        /// The visible changed
-        /// </summary>
         bool visibleChanged = false;
-        /// <summary>
-        /// The first render
-        /// </summary>
         bool firstRender = true;
 
-        /// <summary>
-        /// On after render as an asynchronous operation.
-        /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -200,22 +191,16 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets or sets the HTML.
-        /// </summary>
-        /// <value>The HTML.</value>
         string Html { get; set; }
 
-        /// <summary>
-        /// Called when [initialized].
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             Html = Value;
         }
 
         /// <summary>
-        /// Called when [change].
+        /// Invoked via interop when the value of RadzenHtmlEditor changes.
         /// </summary>
         /// <param name="html">The HTML.</param>
         [JSInvokable]
@@ -225,10 +210,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [paste].
+        /// Invoked via interop when the user pastes content in RadzenHtmlEditor. Invokes <see cref="Paste" />.
         /// </summary>
         /// <param name="html">The HTML.</param>
-        /// <returns>System.String.</returns>
         [JSInvokable]
         public async Task<string> OnPaste(string html)
         {
@@ -239,16 +223,9 @@ namespace Radzen.Blazor
             return args.Html;
         }
 
-        /// <summary>
-        /// The value changed
-        /// </summary>
         bool valueChanged = false;
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             if (parameters.DidParameterChange(nameof(Value), Value))
@@ -266,18 +243,13 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-html-editor";
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();
