@@ -12,6 +12,27 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenUpload Url="upload/single" Progress=@(args => OnProgress(args, "Single file upload"))
+    /// @code {
+    ///  void OnProgress(UploadProgressArgs args, string name)
+    ///  {
+    ///    this.info = $"% '{name}' / {args.Loaded} of {args.Total} bytes.";
+    ///    this.progress = args.Progress;
+    ///    if (args.Progress == 100)
+    ///    {
+    ///        console.Clear();
+    ///
+    ///        foreach (var file in args.Files)
+    ///        {
+    ///            console.Log($"Uploaded: {file.Name} / {file.Size} bytes");
+    ///        }
+    ///    }
+    ///  }
+    /// }
+    /// </code>
+    /// </example>
     public partial class RadzenUpload : RadzenComponent
     {
         protected ElementReference fileUpload;
