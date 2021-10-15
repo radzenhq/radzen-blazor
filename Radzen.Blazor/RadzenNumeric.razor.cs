@@ -13,6 +13,11 @@ namespace Radzen.Blazor
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.FormComponent{TValue}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenNumeric TValue="int" Min="1" Max="10" Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenNumeric<TValue> : FormComponent<TValue>
     {
         protected ElementReference input;

@@ -12,6 +12,16 @@ namespace Radzen.Blazor
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.FormComponent{TValue}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" &gt;
+    ///     &lt;Items&gt;
+    ///         &lt;RadzenRadioButtonListItem Text="Orders" Value="1" /&gt;
+    ///         &lt;RadzenRadioButtonListItem Text="Employees" Value="2" /&gt;
+    ///     &lt;/Items&gt;
+    /// &lt;/RadzenRadioButtonList&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenRadioButtonList<TValue> : FormComponent<TValue>
     {
         ClassList ItemClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-box")

@@ -9,6 +9,16 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponentWithChildren" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenPanelMenu&gt;
+    ///     &lt;RadzenPanelMenuItem Text="Data"&gt;
+    ///         &lt;RadzenPanelMenuItem Text="Orders" Path="orders" /&gt;
+    ///         &lt;RadzenPanelMenuItem Text="Employees" Path="employees" /&gt;
+    ///     &lt;/RadzenPanelMenuItemItem&gt;
+    /// &lt;/RadzenPanelMenu&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenPanelMenu : RadzenComponentWithChildren
     {
         /// <summary>

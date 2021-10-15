@@ -7,6 +7,11 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.FormComponent{System.String}" />
     /// </summary>
     /// <seealso cref="Radzen.FormComponent{System.String}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" @bind-Value=@phone Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenMask : FormComponent<string>
     {
         /// <summary>
