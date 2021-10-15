@@ -1004,6 +1004,27 @@ $upload-cancel-background-color: $rz-base-300 !default;
 $upload-cancel-color: $rz-base-800 !default;
 $upload-button-background-color: $primary !default;
 
+
+// Dialog
+
+$dialog-background-color: $rz-white !default;
+$dialog-shadow: 0 22px 64px 0 rgba(0, 0, 0, 0.22) !default;
+$dialog-title-background-color: $dialog-background-color !default;
+$dialog-title-border: none !default;
+$dialog-title-padding: 1.25rem 1.25rem 0.5rem !default;
+$dialog-title-font-size: 1.5rem !default;
+$dialog-title-line-height: 1.25em !default;
+$dialog-title-font-weight: 700 !default;
+$dialog-title-letter-spacing: -0.03em !default;
+$dialog-title-color: $rz-base-900 !default;
+$dialog-close-font-size: 1.25rem !default;
+$dialog-close-color: $rz-base-500 !default;
+$dialog-close-hover-color: $rz-base-900!default;
+$dialog-close-vertical-align: top !default;
+$dialog-content-padding: 1.25rem !default;
+$dialog-mask-background-color: $rz-base-600 !default;
+$dialog-border-radius: $rz-border-radius * 2 !default;
+
 // Scrollbar
 
 $scrollbar-background-color: $rz-base-100 !default;
