@@ -1,41 +1,47 @@
-﻿using System;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenNumericRangeValidator component.
-    /// Implements the <see cref="Radzen.Blazor.ValidatorBase" />
+    /// A validator component which checks if a component value is within a specified range.
+    /// Must be placed inside a <see cref="RadenTemplateForm{TItem}" />
     /// </summary>
-    /// <seealso cref="Radzen.Blazor.ValidatorBase" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenTemplateForm TItem="Model" Data=@model&gt;
+    ///    &lt;RadzenNumeric style="display: block" Name="Quantity" @bind-Value=@model.Quantity /&gt;
+    ///    &lt;RadzenNumericRangeValidator Component="Quantity" Min="1" Max="10" Text="Quantity should be between 1 and 10" Style="position: absolute" /&gt; 
+    /// &lt;/RadzenTemplateForm&gt;
+    /// @code {
+    ///    class Model
+    ///    {
+    ///       public decimal Quantity { get; set; }
+    ///    }
+    ///    Model model = new Model(); 
+    /// }
+    /// </code>
+    /// </example>>
     public class RadzenNumericRangeValidator : ValidatorBase
     {
         /// <summary>
-        /// Gets or sets the text.
+        /// Gets or sets the message displayed when the component is invalid. Set to <c>"Not in the valid range"</c> by default.
         /// </summary>
-        /// <value>The text.</value>
         [Parameter]
         public override string Text { get; set; } = "Not in the valid range";
 
         /// <summary>
-        /// Determines the minimum value.
+        /// Specifies the minimum value. The component value should be greater than the minimum in order to be valid.
         /// </summary>
-        /// <value>The minimumvalue.</value>
         [Parameter]
         public dynamic Min { get; set; }
 
         /// <summary>
-        /// Determines the maximum value.
+        /// Specifies the maximum value. The component value should be less than the maximum in order to be valid.
         /// </summary>
-        /// <value>The maximumvalue.</value>
         [Parameter]
         public dynamic Max { get; set; }
 
-        /// <summary>
-        /// Validates the specified component.
-        /// </summary>
-        /// <param name="component">The component.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
             dynamic value = component.GetValue();
