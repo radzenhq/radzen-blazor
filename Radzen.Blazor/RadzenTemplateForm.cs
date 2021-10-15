@@ -21,7 +21,7 @@ namespace Radzen.Blazor
     /// &lt;/RadzenTemplateForm&gt;
     /// @code {
     ///  class Model
-    //   {
+    ///  {
     ///    public string Email { get; set; }
     ///  }
     ///  
