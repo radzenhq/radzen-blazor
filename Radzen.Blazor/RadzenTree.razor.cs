@@ -66,7 +66,6 @@ namespace Radzen.Blazor
         /// 
         ///   }
         /// }
-        ///   </code>
         /// </code>
         /// </example>
         [Parameter]
@@ -97,7 +96,6 @@ namespace Radzen.Blazor
         /// 
         ///   }
         /// }
-        ///   </code>
         /// </code>
         /// </example>
         [Parameter]

@@ -5,7 +5,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// A validator component which matches a component value against a specified regular expression pattern.
-    /// Must be placed inside a <see cref="RadenTemplateForm{TItem}" />
+    /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}" />
     /// </summary>
     /// <example>
     /// <code>

@@ -34,9 +34,9 @@ namespace Radzen.Blazor
         public int? MaxAppointmentsInSlot { get; set; }
 
         /// <summary>
-        /// Specifies the text displayed when there are more appointments in a slot than <see cref="MaxAppintmentsInSlot" />.
+        /// Specifies the text displayed when there are more appointments in a slot than <see cref="MaxAppointmentsInSlot" />.
         /// </summary>
-        /// <value>The more text. Set to <c><+ {0} more</c> by default.</value>
+        /// <value>The more text. Set to <c>"+ {0} more"</c> by default.</value>
         [Parameter]
         public string MoreText { get; set; } = "+ {0} more";
 

@@ -5,7 +5,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// A validator component which checks if a component has value.
-    /// Must be placed inside a <see cref="RadenTemplateForm{TItem}" />
+    /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}" />
     /// </summary>
     /// <example>
     /// <code>
@@ -15,7 +15,7 @@ namespace Radzen.Blazor
     /// &lt;/RadzenTemplateForm&gt;
     /// @code {
     ///  class Model
-    //   {
+    ///  {
     ///    public string Email { get; set; }
     ///  }
     ///  

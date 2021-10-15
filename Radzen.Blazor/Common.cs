@@ -917,7 +917,7 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Supplies information about a <see cref="RadzenDataGrid{TItem}.LoadData" /> event that is being raised.
+    /// Supplies information about a <see cref="PagedDataBoundComponent{TItem}.LoadData" /> event that is being raised.
     /// </summary>
     public class LoadDataArgs
     {

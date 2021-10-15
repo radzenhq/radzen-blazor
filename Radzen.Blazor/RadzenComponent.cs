@@ -58,7 +58,6 @@ namespace Radzen
         /// <summary>
         /// Gets or sets the culture set by a parent componen.
         /// </summary>
-        /// <summary>
         [CascadingParameter(Name = nameof(DefaultCulture))]
         public CultureInfo DefaultCulture { get; set; }
 
@@ -183,7 +182,6 @@ namespace Radzen
         /// Called by the Blazor runtime when parameters are set.
         /// </summary>
         /// <param name="parameters">The parameters.</param>
-        /// <summary>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);

@@ -71,7 +71,7 @@ namespace Radzen.Blazor
         /// &lt;/RadzenTemplateForm&gt;
         /// @code {
         ///  class Model
-        //   {
+        ///   {
         ///    public string Email { get; set; }
         ///  }
         ///  
@@ -115,7 +115,7 @@ namespace Radzen.Blazor
         /// &lt;/RadzenTemplateForm&gt;
         /// @code {
         ///  class Model
-        //   {
+        ///  {
         ///    public string Email { get; set; }
         ///  }
         ///  
@@ -134,8 +134,8 @@ namespace Radzen.Blazor
         /// <summary>
         /// Specifies the form <c>method</c> attribute. Used together with <see cref="Action" />.
         /// </summary>
-        /// </code>
-        /// </example>
+        /// <example>
+        /// <code>
         /// &lt;RadzenTemplateForm TItem="Model" Method="post" Action="/register" Data=@model&gt;
         ///   &lt;RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email /&gt;
         ///   &lt;RadzenRequiredValidator Component="Email" Text="Email is required" Style="position: absolute" /&gt;
@@ -148,8 +148,8 @@ namespace Radzen.Blazor
         /// <summary>
         /// Specifies the form <c>action</c> attribute. When set the form submits to the specified URL.
         /// </summary>
-        /// </code>
-        /// </example>
+        /// <example>
+        /// <code>
         /// &lt;RadzenTemplateForm TItem="Model" Method="post" Action="/register" Data=@model&gt;
         ///   &lt;RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email /&gt;
         ///   &lt;RadzenRequiredValidator Component="Email" Text="Email is required" Style="position: absolute" /&gt;
