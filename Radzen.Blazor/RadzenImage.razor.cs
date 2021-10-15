@@ -8,6 +8,11 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponentWithChildren" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenImage Path="someimage.png" /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenImage : RadzenComponentWithChildren
     {
         /// <summary>
