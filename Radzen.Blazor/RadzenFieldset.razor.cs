@@ -9,6 +9,21 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenFieldset AllowCollapse="true""&gt;
+    ///     &lt;HeaderTemplate&gt;
+    ///         Header
+    ///     &lt;/HeaderTemplate&gt;
+    ///     &lt;ChildContent&gt;
+    ///         Content
+    ///     &lt;/ChildContent&gt;
+    ///     &lt;SummaryTemplate&gt;
+    ///         Summary
+    ///     &lt;/SummaryTemplate&gt;
+    /// &lt;/RadzenFieldset&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenFieldset : RadzenComponent
     {
         /// <summary>
