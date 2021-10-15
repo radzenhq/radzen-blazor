@@ -7,6 +7,12 @@ namespace Radzen.Blazor
     /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
     /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenLabel Text="CompanyName" Component="CompanyName" /&gt;
+    /// &lt;RadzenTextBox Name="CompanyName" /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenLabel : RadzenComponent
     {
         /// <summary>
