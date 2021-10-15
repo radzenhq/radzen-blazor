@@ -16,6 +16,11 @@ namespace Radzen.Blazor
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.DropDownBase{TValue}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenDropDownDataGrid @bind-Value=@customerID TValue="string" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => Console.WriteLine($"Selected CustomerID: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenDropDownDataGrid<TValue> : DropDownBase<TValue>
     {
         /// <summary>
