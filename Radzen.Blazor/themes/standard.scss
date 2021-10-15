@@ -640,6 +640,20 @@ $paginator-dropdown-margin: $paginator-last-button-margin !default;
 
 $paginator-button-size: ".rz-button-md" !default;
 
+// Tree
+
+$tree-node-padding: 0.25rem !default;
+$tree-node-selected-background-color: $rz-secondary !default;
+$tree-node-selected-color: $rz-white !default;
+$tree-node-selected-border-radius: $rz-border-radius !default;
+$tree-node-margin: 1px 0 !default;
+$tree-node-hover-background-color: $rz-secondary-lighter !default;
+$tree-node-hover-color: $rz-secondary !default;
+$tree-node-toggle-color: $rz-base-600 !default;
+$tree-node-toggle-hover-color: $rz-base-900 !default;
+$tree-icon-right: 'arrow_right' !default;
+$tree-icon-down: 'arrow_drop_down' !default;
+
 
 // Switch
 $switch-background-color: $rz-base-200 !default;
@@ -1086,7 +1100,7 @@ $heading-color: $rz-base-900;
 $headings: (
   h1: (font-size: 2rem, line-height: 1.1875em, font-weight: 700, letter-spacing: -0.04em, color: $heading-color, margin-bottom: 1rem),
   h2: (font-size: 1.5rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.03em, color: $heading-color, margin-bottom: 1rem),
-  h3: (font-size: 1.25rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.75rem),
+  h3: (font-size: 1.125rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.75rem),
   h4: (font-size: 1rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem),
   h5: (font-size: 0.875rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem),
   h6: (font-size: 0.75rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem)
@@ -1111,6 +1125,14 @@ $headings-light: (
 
 @each $name, $heading in $headings-light {
   #{$name}.text-thin {
+    @each $name, $value in $heading {
+      #{$name}: #{$value};
+    }
+  }
+}
+
+@each $name, $heading in $headings-light {
+  .#{$name}.text-thin {
     @each $name, $value in $heading {
       #{$name}: #{$value};
     }

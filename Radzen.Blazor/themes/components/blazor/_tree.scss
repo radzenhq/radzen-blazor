@@ -1,16 +1,17 @@
 $tree-background-color: $white !default;
 $tree-border: 1px solid #cecece !default;
 $tree-padding: 0.6875rem !default;
+$tree-border-radius: $border-radius !default;
 
 $tree-node-padding: 0.375rem 0.25rem !default;
 $tree-node-selected-background-color: $default-link !default;
 $tree-node-selected-color: $white !default;
 $tree-node-selected-border-radius: 2px !default;
-$tree-node-children-padding: 0 0 0 1rem !default;
 $tree-node-margin: 1px 0 !default;
 $tree-node-hover-background-color: #59a6cd !default;
 $tree-node-hover-color: $white !default;
-$tree-border-radius: $border-radius !default;
+$tree-node-toggle-color: inherit !default;
+$tree-node-toggle-hover-color: inherit !default;
 $tree-icon-right: 'arrow_right' !default;
 $tree-icon-down: 'arrow_drop_down' !default;
 
@@ -23,19 +24,36 @@ $tree-icon-down: 'arrow_drop_down' !default;
   visibility: hidden;
  }
 
+ .rz-treenode {
+   padding-left: 1rem;
+ }
+
 .rz-tree-toggler {
   cursor: pointer;
+  margin-left: -1rem;
+  width: 1rem;
+  height: 1.5rem;
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  text-align: center;
+  color: $tree-node-toggle-color;
 
   &.rzi-caret-right {
     &:before {
       content: $tree-icon-right;
+      margin-left: -0.125rem;
     }
   }
 
   &.rzi-caret-down {
     &:before {
       content: $tree-icon-down;
+      margin-left: -0.125rem;
     }
+  }
+
+  &:hover {
+    color: $tree-node-toggle-hover-color;
   }
 }
 
@@ -43,12 +61,14 @@ $tree-icon-down: 'arrow_drop_down' !default;
   display: flex;
   align-items: center;
   cursor: pointer;
-
-  padding: $tree-node-padding;
   margin: $tree-node-margin;
 
+  .rz-treenode-label {
+    padding: $tree-node-padding;
+  }
+
   &:not(.rz-treenode-content-selected) {
-    &:hover {
+    &:hover .rz-treenode-label {
       background-color: $tree-node-hover-background-color;
       color: $tree-node-hover-color;
       border-radius: $tree-node-selected-border-radius;
@@ -63,11 +83,7 @@ $tree-icon-down: 'arrow_drop_down' !default;
   margin: 0;
 }
 
-.rz-treenode-children {
-  padding: $tree-node-children-padding;
-}
-
-.rz-treenode-content-selected {
+.rz-treenode-content-selected .rz-treenode-label {
   border-radius: $tree-node-selected-border-radius;
   color: $tree-node-selected-color;
   background-color: $tree-node-selected-background-color;
