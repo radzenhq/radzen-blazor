@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Gtid line configuration for <see cref="IChartAxis" />.
+    /// Grid line configuration of <see cref="IChartAxis" />.
     /// </summary>
     public class RadzenGridLines : RadzenChartComponentBase
     {
