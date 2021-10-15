@@ -11,6 +11,11 @@ namespace Radzen.Blazor
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.DropDownBase{TValue}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenDropDown @bind-Value=@customerID TValue="string" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => Console.WriteLine($"Selected CustomerID: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenDropDown<TValue> : DropDownBase<TValue>
     {
         internal override void RenderItem(RenderTreeBuilder builder, object item)
