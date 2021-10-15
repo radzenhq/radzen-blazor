@@ -20,6 +20,11 @@ namespace Radzen.Blazor
     /// <typeparam name="TValue">The type of the t value.</typeparam>
     /// <seealso cref="Radzen.RadzenComponent" />
     /// <seealso cref="Radzen.IRadzenFormComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenDatePicker @bind-Value=@someValue TValue="DateTime" Change=@(args => Console.WriteLine($"Selected date: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenDatePicker<TValue> : RadzenComponent, IRadzenFormComponent
     {
         RadzenDropDown<int> monthDropDown;
