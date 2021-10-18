@@ -14,7 +14,7 @@ namespace Radzen.Blazor
     /// <seealso cref="Radzen.RadzenComponent" />
     /// <example>
     /// <code>
-    /// &lt;RadzenUpload Url="upload/single" Progress=@(args => OnProgress(args, "Single file upload"))
+    /// &lt;RadzenUpload Url="upload/single" Progress=@(args => OnProgress(args, "Single file upload"))/&gt;
     /// @code {
     ///  void OnProgress(UploadProgressArgs args, string name)
     ///  {
