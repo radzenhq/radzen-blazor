@@ -11,6 +11,8 @@ namespace Radzen
     /// Class ContextMenuService. Contains variuos methods with options to open and close context menus. 
     /// Should be added as scoped service in the application services and RadzenContextMenu should be added in application main layout.
     /// Implements the <see cref="IDisposable" />
+    /// </summary>
+    /// <seealso cref="IDisposable" />
     /// <example>
     /// <code>
     /// @inject ContextMenuService ContextMenuService
@@ -35,8 +37,6 @@ namespace Radzen
     /// }
     /// </code>
     /// </example>
-    /// </summary>
-    /// <seealso cref="IDisposable" />
     public class ContextMenuService : IDisposable
     {
         /// <summary>
