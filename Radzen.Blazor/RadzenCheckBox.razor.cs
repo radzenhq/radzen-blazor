@@ -36,6 +36,10 @@ namespace Radzen.Blazor
                                             .Add("rzi rzi-check", object.Equals(Value, true))
                                             .Add("rzi rzi-times", object.Equals(Value, null));
 
+        string CheckBoxValue => CheckBoxChecked ? "true" : "false";
+
+        bool CheckBoxChecked => object.Equals(Value, true);
+
         /// <summary>
         /// Gets the component CSS class.
         /// </summary>
@@ -71,7 +75,7 @@ namespace Radzen.Blazor
             {
                 if (TriState)
                 {
-                    Value = default(TValue);
+                    Value = default;
                 }
                 else
                 {
