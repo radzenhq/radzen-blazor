@@ -1,6 +1,7 @@
 ﻿@using System.Linq
 @using System.Collections
 @using Radzen
+@using Radzen.Blazor.Rendering
 @using Microsoft.AspNetCore.Components.Forms
 @typeparam TValue
 @inherits FormComponent<IEnumerable<TValue>>
@@ -21,138 +22,12 @@
                     <div class="rz-helper-hidden-accessible">
                         <input type="checkbox" name="@Name" value="@item.Value" disabled="@Disabled" tabindex="-1">
                     </div>
-
-                    @if (IsSelected(item))
-                    {
-                        <div class="@($"rz-chkbox-box rz-state-active{getDisabledState(item)}")">
-                            <span class="rz-chkbox-icon rzi rzi-check"></span>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="@($"rz-chkbox-box {getDisabledState(item)}")">
-                            <span class="rz-chkbox-icon "></span>
-                        </div>
-                    }
+                    <div class=@ItemClassList(item)>
+                        <span class=@IconClassList(item)></span>
+                    </div>
                 </div>
                 <label class="rz-chkbox-label">@item.Text</label>
             </div>
         }
     </div>
-}
-
-@code {
-    [Parameter]
-    public string ValueProperty { get; set; }
-
-    [Parameter]
-    public string TextProperty { get; set; }
-
-    IEnumerable<RadzenCheckBoxListItem<TValue>> allItems
-    {
-        get
-        {
-            return items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
-            {
-                var item = new RadzenCheckBoxListItem<TValue>();
-                item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
-                item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
-                return item;
-            }));
-        }
-    }
-
-    IEnumerable _data = null;
-    [Parameter]
-    public virtual IEnumerable Data
-    {
-        get
-        {
-            return _data;
-        }
-        set
-        {
-            if (_data != value)
-            {
-                _data = value;
-                StateHasChanged();
-            }
-        }
-    }
-
-    protected override string GetComponentCssClass()
-    {
-        var fieldCssClass = FieldIdentifier.FieldName != null ? EditContext?.FieldCssClass(FieldIdentifier) : "";
-
-        return $"{(Orientation == Orientation.Horizontal ? "rz-checkbox-list-horizontal" : "rz-checkbox-list-vertical")} {fieldCssClass}";
-    }
-
-    public override bool HasValue
-    {
-        get
-        {
-            return Value != null && Value.Any();
-        }
-    }
-
-    [Parameter]
-    public Orientation Orientation { get; set; } = Orientation.Horizontal;
-
-    [Parameter]
-    public RenderFragment Items { get; set; }
-
-    List<RadzenCheckBoxListItem<TValue>> items = new List<RadzenCheckBoxListItem<TValue>>();
-
-    public void AddItem(RadzenCheckBoxListItem<TValue> item)
-    {
-        if (items.IndexOf(item) == -1)
-        {
-            items.Add(item);
-            StateHasChanged();
-        }
-    }
-
-    public void RemoveItem(RadzenCheckBoxListItem<TValue> item)
-    {
-        if (items.Contains(item))
-        {
-            items.Remove(item);
-            try { InvokeAsync(StateHasChanged); } catch { }
-        }
-    }
-
-    protected bool IsSelected(RadzenCheckBoxListItem<TValue> item)
-    {
-        return Value != null && Value.Contains(item.Value);
-    }
-
-    protected async System.Threading.Tasks.Task SelectItem(RadzenCheckBoxListItem<TValue> item)
-    {
-        if (Disabled || item.Disabled)
-            return;
-
-        List<TValue> selectedValues = new List<TValue>(Value != null ? Value : Enumerable.Empty<TValue>());
-
-        if (!selectedValues.Contains(item.Value))
-        {
-            selectedValues.Add(item.Value);
-        }
-        else
-        {
-            selectedValues.Remove(item.Value);
-        }
-
-        Value = selectedValues;
-
-        await ValueChanged.InvokeAsync(Value);
-        if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
-        await Change.InvokeAsync(Value);
-
-        StateHasChanged();
-    }
-
-    private string getDisabledState(RadzenCheckBoxListItem<TValue> item)
-    {
-        return Disabled || item.Disabled ? " rz-state-disabled" : "";
-    }
 }

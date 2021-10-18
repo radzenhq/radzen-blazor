@@ -508,7 +508,7 @@ $grid-button-line-height: $grid-button-height !default;
 
     &:hover {
       &:not(.rz-state-highlight) {
-        > td {
+        > td:not(.rz-frozen-cell) {
           background-color: $grid-hover-background-color;
         }
 
@@ -612,7 +612,7 @@ $grid-button-line-height: $grid-button-height !default;
   right: 0;
   bottom: 0;
   background-color: $grid-loading-indicator-background-color;
-  z-index: 1;
+  z-index: 2;
 }
 
 .rz-datatable-loading-content {

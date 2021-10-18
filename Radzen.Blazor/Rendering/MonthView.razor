@@ -8,7 +8,7 @@
             @for(var date = StartDate; date <= StartDate.EndOfWeek(); date = date.AddDays(1))
             {
                 <div class="rz-slot-header">
-                    @date.ToString("ddd")
+                    @date.ToString("ddd", Scheduler.Culture)
                 </div>
             }
         </div>

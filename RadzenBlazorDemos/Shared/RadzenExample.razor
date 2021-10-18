@@ -10,11 +10,11 @@
 
 @if (!String.IsNullOrEmpty(DocumentationUrl))
 {
-    <a class="documentation-link" target="blank" href="@DocumentationUrl"><RadzenIcon Icon="help" /> Documentation </a>
+    <a class="documentation-link" target="blank" href="@DocumentationUrl"><RadzenIcon Icon="help_outline" style="font-size: 1rem; margin-right: 4px;" />  @Name Docs </a>
 }
 else if (Documentation)
 {
-    <a class="documentation-link" target="blank" href="https://www.radzen.com/documentation/blazor/@Name.ToLower()/"><RadzenIcon Icon="help" /> Documentation </a>
+    <a class="documentation-link" target="blank" href="https://www.radzen.com/documentation/blazor/@Name.ToLower()/"><RadzenIcon Icon="help_outline" style="font-size: 1rem; margin-right: 4px;" /> @Name Docs </a>
 }
 
 <RadzenTabs>

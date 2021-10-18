@@ -68,7 +68,7 @@ namespace RadzenBlazorDemos
                     try
                     {
                         System.IO.File.Delete(file);
-                    } 
+                    }
                     catch
                     {
 

@@ -48,6 +48,7 @@ namespace Radzen.Blazor.Tests
             component.SetParametersAndRender(parameters =>
             {
                 component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; }));
+                parameters.Add<double>(p => p.Value, minValue);
                 parameters.Add<decimal?>(p => p.Min, minValue);
             });
 

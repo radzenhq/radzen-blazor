@@ -9,7 +9,7 @@
 
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onmousedown="@(args => OpenPopup("ArrowDown", false, true))" style="@Style" tabindex="@TabIndex"
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" onmousedown="Radzen.activeElement = null" @onclick="@(args => OpenPopup("ArrowDown", false, true))" style="@Style" tabindex="@TabIndex"
          @onkeydown="@((args) => OnKeyPress(args))" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" style="width:100%" aria-haspopup="listbox" readonly="" type="text" tabindex="-1"
@@ -81,8 +81,8 @@
             }
             @if (Multiple)
             {
-                <div class=" rz-multiselect-header rz-helper-clearfix" @onclick="@SelectAll" @onclick:preventDefault>
-                    <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)">
+                <div class=" rz-multiselect-header rz-helper-clearfix" @onclick:preventDefault>
+                    <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)" @onclick="@SelectAll">
                         <div class="rz-helper-hidden-accessible">
                             <input readonly="readonly" type="checkbox">
                         </div>
@@ -92,7 +92,7 @@
                     </div>
                     @if (!AllowFiltering && !string.IsNullOrEmpty(SelectAllText))
                     {
-                        @SelectAllText
+                        <span style="cursor:pointer" @onclick="@SelectAll">@SelectAllText</span>
                     }
                     @if (AllowFiltering)
                     {
@@ -123,141 +123,4 @@
             <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@ClearAll" @onclick:stopPropagation="true"></i>
         }
     </div>
-}
-@code {
-    internal override void RenderItem(RenderTreeBuilder builder, object item)
-    {
-        builder.OpenComponent(0, typeof(RadzenDropDownItem<TValue>));
-        builder.AddAttribute(1, "DropDown", this);
-        builder.AddAttribute(2, "Item", item);
-        builder.SetKey(item);
-        builder.CloseComponent();
-    }
-
-    [Parameter]
-    public int MaxSelectedLabels { get; set; } = 4;
-
-    [Parameter]
-    public string SelectedItemsText { get; set; } = "items selected";
-
-    [Parameter]
-    public string SelectAllText { get; set; }
-
-    private bool visibleChanged = false;
-    private bool disabledChanged = false;
-    private bool firstRender = true;
-
-    public override async Task SetParametersAsync(ParameterView parameters)
-    {
-        visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
-        disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
-
-        await base.SetParametersAsync(parameters);
-
-        if (visibleChanged && !firstRender)
-        {
-            if (Visible == false)
-            {
-                Dispose();
-            }
-        }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-
-        this.firstRender = firstRender;
-
-        if (firstRender || visibleChanged || disabledChanged)
-        {
-            visibleChanged = false;
-            disabledChanged = false;
-
-            if (Visible)
-            {
-                bool reload = false;
-                if (LoadData.HasDelegate && Data == null)
-                {
-                    await LoadData.InvokeAsync(await GetLoadDataArgs());
-                    reload = true;
-                }
-
-                if (!Disabled)
-                {
-                    await JSRuntime.InvokeVoidAsync("Radzen.preventArrows", Element);
-                    reload = true;
-                }
-
-                if (reload)
-                {
-                    StateHasChanged();
-                }
-            }
-        }
-    }
-
-    protected override async System.Threading.Tasks.Task OnSelectItem(object item, bool isFromKey = false)
-    {
-        if (!Multiple && !isFromKey)
-        {
-            await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
-        }
-
-        await SelectItem(item);
-    }
-
-    internal async System.Threading.Tasks.Task OnSelectItemInternal(object item, bool isFromKey = false)
-    {
-        await OnSelectItem(item, isFromKey);
-    }
-
-    protected override string GetComponentCssClass()
-    {
-        var classList = new List<string>();
-
-        classList.Add("rz-dropdown");
-
-        if (FieldIdentifier.FieldName != null && EditContext != null)
-        {
-            classList.Add(EditContext?.FieldCssClass(FieldIdentifier));
-        }
-
-        if (Disabled)
-        {
-            classList.Add("rz-state-disabled");
-        }
-
-        if (AllowClear)
-        {
-            classList.Add("rz-clear");
-        }
-
-        return String.Join(" ", classList);
-    }
-
-    private string ClosePopupScript()
-    {
-        if (Disabled)
-        {
-            return string.Empty;
-        }
-
-        return $"Radzen.closePopup('{PopupID}')";
-    }
-
-    public override void Dispose()
-    {
-        base.Dispose();
-
-        if (IsJSRuntimeAvailable)
-        {
-            JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
-        }
-    }
-
-    internal async System.Threading.Tasks.Task ClosePopup()
-    {
-        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
-    }
 }

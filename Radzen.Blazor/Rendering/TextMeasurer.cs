@@ -2,14 +2,31 @@ using System.Collections.Generic;
 
 namespace Radzen.Blazor.Rendering
 {
+    /// <summary>
+    /// Class FontData.
+    /// </summary>
     class FontData
     {
+        /// <summary>
+        /// Gets or sets the average.
+        /// </summary>
+        /// <value>The average.</value>
         public double Average { get; set; }
+        /// <summary>
+        /// Gets or sets the chars.
+        /// </summary>
+        /// <value>The chars.</value>
         public IDictionary<char, double> Chars { get; set; }
     }
 
+    /// <summary>
+    /// Class TextMeasurer.
+    /// </summary>
     static class TextMeasurer
     {
+        /// <summary>
+        /// The fonts
+        /// </summary>
         private static readonly IDictionary<string, FontData> fonts = new Dictionary<string, FontData> {
             {"Roboto",
             new FontData {
@@ -218,6 +235,13 @@ namespace Radzen.Blazor.Rendering
             }
         };
 
+        /// <summary>
+        /// Texts the width.
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <param name="fontSize">Size of the font.</param>
+        /// <param name="fontFamily">The font family.</param>
+        /// <returns>System.Double.</returns>
         public static double TextWidth(string text, double fontSize = 14, string fontFamily = "Roboto")
         {
             if (!fonts.TryGetValue(fontFamily, out FontData font))

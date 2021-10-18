@@ -2,8 +2,18 @@ using System;
 
 namespace Radzen.Blazor.Rendering
 {
+    /// <summary>
+    /// Class AxisMeasurer.
+    /// </summary>
     public static class AxisMeasurer
     {
+        /// <summary>
+        /// ies the axis.
+        /// </summary>
+        /// <param name="scale">The scale.</param>
+        /// <param name="axis">The axis.</param>
+        /// <param name="title">The title.</param>
+        /// <returns>System.Double.</returns>
         public static double YAxis(ScaleBase scale, AxisBase axis, RadzenAxisTitle title)
         {
             var ticks = scale.Ticks(axis.TickDistance);
@@ -27,6 +37,11 @@ namespace Radzen.Blazor.Rendering
             return Math.Max(24, length);
         }
 
+        /// <summary>
+        /// xes the axis.
+        /// </summary>
+        /// <param name="title">The title.</param>
+        /// <returns>System.Double.</returns>
         public static double XAxis(RadzenAxisTitle title)
         {
             var size = 16 * 0.875 + 12;

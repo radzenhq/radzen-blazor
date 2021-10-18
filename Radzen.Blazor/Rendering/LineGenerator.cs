@@ -4,8 +4,18 @@ using System.Text;
 
 namespace Radzen.Blazor.Rendering
 {
+    /// <summary>
+    /// Class LineGenerator.
+    /// Implements the <see cref="Radzen.Blazor.Rendering.IPathGenerator" />
+    /// </summary>
+    /// <seealso cref="Radzen.Blazor.Rendering.IPathGenerator" />
     public class LineGenerator : IPathGenerator
     {
+        /// <summary>
+        /// Pathes the specified data.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <returns>System.String.</returns>
         public string Path(IEnumerable<Point> data)
         {
             var path = new StringBuilder();

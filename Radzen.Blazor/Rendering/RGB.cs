@@ -5,8 +5,14 @@ using System.Text.RegularExpressions;
 
 namespace Radzen.Blazor.Rendering
 {
+    /// <summary>
+    /// Class RGB.
+    /// </summary>
     public class RGB
     {
+        /// <summary>
+        /// The known colors
+        /// </summary>
         private static Dictionary<string, string> knownColors = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
         {
             ["black"] = "000000",
@@ -159,11 +165,32 @@ namespace Radzen.Blazor.Rendering
             ["rebeccapurple"] = "663399"
         };
 
+        /// <summary>
+        /// Gets or sets the red.
+        /// </summary>
+        /// <value>The red.</value>
         public double Red { get; set; }
+        /// <summary>
+        /// Gets or sets the green.
+        /// </summary>
+        /// <value>The green.</value>
         public double Green { get; set; }
+        /// <summary>
+        /// Gets or sets the blue.
+        /// </summary>
+        /// <value>The blue.</value>
         public double Blue { get; set; }
+        /// <summary>
+        /// Gets or sets the alpha.
+        /// </summary>
+        /// <value>The alpha.</value>
         public double Alpha { get; set; } = 1;
 
+        /// <summary>
+        /// Parses the specified color.
+        /// </summary>
+        /// <param name="color">The color.</param>
+        /// <returns>RGB.</returns>
         public static RGB Parse(string color)
         {
             var rgb = new Regex(@"rgb\((?<r>\d{1,3}),\s*(?<g>\d{1,3}),\s*(?<b>\d{1,3})\)");
@@ -188,7 +215,7 @@ namespace Radzen.Blazor.Rendering
                 var red = int.Parse(match.Groups["r"].Value);
                 var green = int.Parse(match.Groups["g"].Value);
                 var blue = int.Parse(match.Groups["b"].Value);
-                var alpha = double.Parse(match.Groups["a"].Value);
+                var alpha = double.Parse(match.Groups["a"].Value, CultureInfo.InvariantCulture);
 
                 return new RGB { Red = red, Green = green, Blue = blue, Alpha = alpha };
             }
@@ -214,6 +241,10 @@ namespace Radzen.Blazor.Rendering
             return null;
         }
 
+        /// <summary>
+        /// Converts to hex.
+        /// </summary>
+        /// <returns>System.String.</returns>
         public string ToHex()
         {
             var red = Convert.ToInt32(Red);
@@ -222,6 +253,10 @@ namespace Radzen.Blazor.Rendering
             return $"{red.ToString("X2")}{green.ToString("X2")}{blue.ToString("X2")}";
         }
 
+        /// <summary>
+        /// Converts to css.
+        /// </summary>
+        /// <returns>System.String.</returns>
         public string ToCSS()
         {
             if (Alpha == 1)
@@ -234,6 +269,10 @@ namespace Radzen.Blazor.Rendering
             }
         }
 
+        /// <summary>
+        /// Converts to hsv.
+        /// </summary>
+        /// <returns>HSV.</returns>
         public HSV ToHSV()
         {
             double red = Red / 255.0;
@@ -243,7 +282,7 @@ namespace Radzen.Blazor.Rendering
             var max = Math.Max(red, Math.Max(green, blue));
             var delta = max - min;
             double hue;
-            double saturation = 0; 
+            double saturation = 0;
             var value = max;
 
             if (max != 0)

@@ -20,18 +20,24 @@
 <RadzenHeader>
     <ChildContent>
         <div class="row justify-content-start align-items-center">
-            <div class="col-6 d-flex align-items-center">
+            <div class="col-5 d-flex align-items-center">
                 <RadzenSidebarToggle Click="@(args => { sidebarExpanded = !sidebarExpanded; bodyExpanded = !bodyExpanded; })">
                 </RadzenSidebarToggle>
                 <RadzenLabel Text="Radzen Blazor Components">
                 </RadzenLabel>
             </div>
-            <div class="col-6 d-flex align-items-center justify-content-end">
+            <div class="col-7 d-flex align-items-center justify-content-end">
                 <div class="d-none d-md-inline-flex align-items-center">
-                  <Social /> 
+                    <a href="https://www.radzen.com/documentation/blazor/get-started/" title="Radzen Blazor Components Documentation" class="mx-2 mx-lg-3" target="_blank">Documentation</a>
+                    <a href="https://www.radzen.com/" title="Create .NET Core web applications fast & easy" class="text-nowrap mx-2 mx-lg-3" target="_blank">About Radzen</a>
                 </div>
-                <label class="d-none d-sm-inline-block" style="margin-left: 1rem">Theme:</label>
-                <RadzenDropDown style="margin:0 .5rem" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" />
+                <RadzenDropDown class="mx-0 mx-lg-3" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" />
+                <a href="https://github.com/radzenhq/radzen-blazor" title="GitHub" target="_blank" class="mx-3">
+                    <svg width="24" height="24" viewBox="0 0 512 499.36" xmlns="http://www.w3.org/2000/svg">
+                    <title>GitHub</title>
+                    <path fill="black" fill-rule="evenodd" d="M256 0C114.64 0 0 114.61 0 256c0 113.09 73.34 209 175.08 242.9 12.8 2.35 17.47-5.56 17.47-12.34 0-6.08-.22-22.18-.35-43.54-71.2 15.49-86.2-34.34-86.2-34.34-11.64-29.57-28.42-37.45-28.42-37.45-23.27-15.84 1.73-15.55 1.73-15.55 25.69 1.81 39.21 26.38 39.21 26.38 22.84 39.12 59.92 27.82 74.5 21.27 2.33-16.54 8.94-27.82 16.25-34.22-56.84-6.43-116.6-28.43-116.6-126.49 0-27.95 10-50.8 26.35-68.69-2.63-6.48-11.42-32.5 2.51-67.75 0 0 21.49-6.88 70.4 26.24a242.65 242.65 0 0 1 128.18 0c48.87-33.13 70.33-26.24 70.33-26.24 14 35.25 5.18 61.27 2.55 67.75 16.41 17.9 26.31 40.75 26.31 68.69 0 98.35-59.85 120-116.88 126.32 9.19 7.9 17.38 23.53 17.38 47.41 0 34.22-.31 61.83-.31 70.23 0 6.85 4.61 14.81 17.6 12.31C438.72 464.97 512 369.08 512 256.02 512 114.62 397.37 0 256 0z"></path>
+                    </svg>
+                </a>
             </div>
         </div>
     </ChildContent>
@@ -40,7 +46,33 @@
     <RadzenBody @ref="@body0" @bind-Expanded="@bodyExpanded">
         <ChildContent>
             <RadzenContentContainer Name="main">
-                @Body
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 pt-4 pb-5 px-3 px-lg-5">
+                            @Body
+                            <RadzenCard class="mt-5 content-footer">
+                                <div class="row align-items-center">
+                                    <div class="col-12 col-lg-7 px-5 py-3 text-center text-lg-left">
+                                        <h2 class="mb-3">Boost your Blazor development with Radzen</h2>
+                                        <p class="mb-2">Radzen is a desktop tool that gives you the power to create line of business applications. Build and launch Blazor apps visually, while we generate clean code for you.</p>
+                                    </div>
+                                    <div class="col-12 col-lg-5 px-5 text-center text-lg-right">
+                                        <NavLink class="cta-button primary ml-0 my-2" href="https://www.radzen.com/download/" target="_blank">Download Radzen</NavLink>
+                                        <NavLink class="cta-button my-2" href="https://www.radzen.com/features/" target="_blank">Learn More</NavLink>
+                                    </div>
+                                </div>
+                            </RadzenCard>
+                            <p class="mt-5 md-3 text-center">
+                                <RadzenLabel Text="Radzen Blazor Components, &copy; 2021 Radzen."></RadzenLabel>
+                                <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under
+                                <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a>
+                            </p>
+                            <p class="text-center">
+                                <Social />
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </RadzenContentContainer>
         </ChildContent>
     </RadzenBody>
@@ -79,13 +111,6 @@
         </RadzenPanelMenu>
     </ChildContent>
 </RadzenSidebar>
-<RadzenFooter>
-    <ChildContent>
-        <RadzenLabel Text="Radzen Blazor Components, Copyright &copy; 2020">
-        </RadzenLabel>
-        <RadzenLink Text="[source]" Path="https://github.com/radzenhq/radzen-blazor" Target="_blank" Style="margin-left:5px;vertical-align:bottom;" />
-    </ChildContent>
-</RadzenFooter>
 @code {
     RadzenSidebar sidebar0;
     RadzenBody body0;
@@ -94,10 +119,10 @@
 
     dynamic themes = new[]
     {
-        new { Text = "Default", Value = "default"},
-        new { Text = "Dark", Value="dark" },
-        new { Text = "Software", Value = "software"},
-        new { Text = "Humanistic", Value = "humanistic" }
+        new { Text = "Default Theme", Value = "default"},
+        new { Text = "Dark Theme", Value="dark" },
+        new { Text = "Software Theme", Value = "software"},
+        new { Text = "Humanistic Theme", Value = "humanistic" }
     };
 
     IEnumerable<Example> examples;

@@ -16,6 +16,8 @@
             <RadzenButton Text="Show busy dialog" Click=@(args => ShowBusyDialog(false)) />
             <h3 style="margin-top: 20px;">Confirm Dialog</h3>
             <RadzenButton Text="Show confirm dialog" Click=@(args => DialogService.Confirm("Are you sure?", "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })) />
+            <h3 style="margin-top: 20px;">Close Dialog by clicking outside</h3>
+            <RadzenButton Text="Show dialog with clickable overlay" Click=@ShowCloseableFromOverlayDialog />
         </div>
         <div class="col-xl-6">
             <EventConsole @ref=@console />
@@ -54,7 +56,7 @@
     {
         await DialogService.OpenAsync<DialogCardPage>($"Order {orderID}",
                new Dictionary<string, object>() { { "OrderID", orderID } },
-               new DialogOptions() { Width = "700px", Height = "530px" });
+               new DialogOptions() { Width = "700px", Height = "530px", Resizable = true, Draggable = true });
     }
 
     async Task ShowInlineDialog()
@@ -73,6 +75,14 @@
         </div>);
     
       console.Log($"Dialog result: {result}");
+    }
+
+    async Task ShowCloseableFromOverlayDialog()
+    {
+     await DialogService.OpenAsync("Closeable from overlay Dialog", ds =>
+        @<div>
+            Click outside to close this Dialog
+        </div>, new DialogOptions() { CloseDialogOnOverlayClick = true });
     }
 
     async Task ShowBusyDialog(bool withMessageAsString)

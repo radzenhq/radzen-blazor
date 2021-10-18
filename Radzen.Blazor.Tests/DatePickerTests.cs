@@ -3,6 +3,7 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -315,6 +316,72 @@ namespace Radzen.Blazor.Tests
 
             Assert.True(raised);
             Assert.True(((DateTime)newValue) < DateTime.Now);
+        }
+
+        [Fact]
+        public void DatePicker_Raises_ValueChangedEvent_Returns_PreviousDateOnInputOnDisabledDates()
+        {
+            IEnumerable<DateTime> dates = new DateTime[] { DateTime.Today };
+            DateTime previousDay = DateTime.Today.AddDays(-1);
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;            
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>();
+            
+            var raised = false;
+            object newValue = null;            
+
+            component.SetParametersAndRender(parameters => {
+                parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; })
+                          .Add(p => p.DateRender, args => { args.Disabled = dates.Contains(args.Date); });
+            });
+
+            var inputElement = component.Find(".rz-inputtext");
+
+            // initialize DateTimeValue
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(previousDay.ToShortDateString());
+            inputElement.Change(previousDay.AddDays(-1));
+
+            // try to enter disabled date
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(DateTime.Today.ToShortDateString());
+            inputElement.Change(DateTime.Today);
+
+            Assert.True(raised);
+            Assert.Equal(previousDay, (DateTime)newValue);
+        }
+
+        [Fact]
+        public void DatePicker_Clears_InputOnDisabledDates()
+        {
+            IEnumerable<DateTime> dates = new DateTime[] { DateTime.Today };
+            DateTime previousDay = DateTime.Today.AddDays(-1);
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime?>>();
+
+            var raised = false;
+            object newValue = null;
+
+            component.SetParametersAndRender(parameters => {
+                parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; })
+                          .Add(p => p.DateRender, args => { args.Disabled = dates.Contains(args.Date); });
+            });
+
+            var inputElement = component.Find(".rz-inputtext");
+
+            // initialize DateTimeValue
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(previousDay.ToShortDateString());
+            inputElement.Change(previousDay.AddDays(-1));
+
+            // try to enter disabled date
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(DateTime.Today.ToShortDateString());
+            inputElement.Change(DateTime.Today);
+
+            Assert.True(raised);
+            Assert.Null(newValue);
         }
     }
 }

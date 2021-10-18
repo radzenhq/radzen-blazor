@@ -5,7 +5,7 @@
 @code {
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (parameters.DidParameterChange(nameof(Visible), Visible))
+        if (parameters.DidParameterChange(nameof(Visible), Visible) || parameters.DidParameterChange(nameof(Title), Title))
         {
             if (Grid != null)
             {
@@ -29,11 +29,6 @@
             if (_title != value)
             {
                 _title = value;
-
-                if (Grid != null)
-                {
-                    Grid.ChangeState().Wait();
-                }
             }
         }
     }

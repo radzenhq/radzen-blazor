@@ -9,8 +9,8 @@
     }
     <td class="rz-col-icon">
         <span class="rz-column-title"></span>
-        <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandGroupItem(Group))">
-            <span class="@(Grid.ExpandedGroupItemStyle(Group))"></span>
+        <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandGroupItem(this))">
+            <span class="@(Grid.ExpandedGroupItemStyle(this))"></span>
         </a>
     </td>
     <td colspan="@(Columns.Count + Grid.groups.Count - 1 - Group.Level)">
@@ -26,9 +26,16 @@
         </span>
     </td>
 </tr>
-@if(Grid != null && Grid.IsGroupItemExpanded(Group))
+@if(Grid != null)
 {
-   @DrawDataRows()
+    if (Grid.IsGroupItemExpanded(this))
+    {
+        @DrawDataRows()
+    }
+    else if(Grid.GroupFootersAlwaysVisible)
+    {
+        @DrawDataRows(true)
+    }
 }
 @code {
         [Parameter]
@@ -68,7 +75,7 @@
         [Parameter]
         public Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder Builder { get; set; }
 
-        RenderFragment DrawDataRows()
+        RenderFragment DrawDataRows(bool groupFootersOnly = false)
         {
             return new RenderFragment(builder =>
             {
@@ -87,18 +94,31 @@
                 }
                 else
                 {
-                    int i = 0;
-                    foreach(var item in GroupResult.Items)
+                    if(!groupFootersOnly)
                     {
-                        builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
-                        builder.AddAttribute(1, "Columns", Columns);
-                        builder.AddAttribute(2, "Index", i);
-                        builder.AddAttribute(3, "Grid", Grid);
-                        builder.AddAttribute(4, "TItem", typeof(TItem));
-                        builder.AddAttribute(5, "Item", item);
-                        builder.AddAttribute(6, "InEditMode", Grid.IsRowInEditMode((TItem)item));
+                        int i = 0;
+                        foreach(var item in GroupResult.Items)
+                        {
+                            builder.OpenComponent(0, typeof(RadzenDataGridRow<TItem>));
+                            builder.AddAttribute(1, "Columns", Columns);
+                            builder.AddAttribute(2, "Index", i);
+                            builder.AddAttribute(3, "Grid", Grid);
+                            builder.AddAttribute(4, "TItem", typeof(TItem));
+                            builder.AddAttribute(5, "Item", item);
+                            builder.AddAttribute(6, "InEditMode", Grid.IsRowInEditMode((TItem)item));
+                            builder.CloseComponent();
+                            i++;
+                        }
+                    }
+
+                    if (Columns.Where(c => c.GroupFooterTemplate != null).Any())
+                    {
+                        builder.OpenComponent(7, typeof(RadzenDataGridGroupFooterRow<TItem>));
+                        builder.AddAttribute(8, "Columns", Columns);
+                        builder.AddAttribute(9, "Grid", Grid);
+                        builder.AddAttribute(10, "GroupResult", GroupResult);
+                        builder.AddAttribute(11, "Builder", builder);
                         builder.CloseComponent();
-                        i++;
                     }
                 }
             });

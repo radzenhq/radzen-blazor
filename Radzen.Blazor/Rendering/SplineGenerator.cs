@@ -5,25 +5,68 @@ using System.Text;
 
 namespace Radzen.Blazor.Rendering
 {
+    /// <summary>
+    /// Class SplineGenerator.
+    /// Implements the <see cref="Radzen.Blazor.Rendering.IPathGenerator" />
+    /// </summary>
+    /// <seealso cref="Radzen.Blazor.Rendering.IPathGenerator" />
     public class SplineGenerator : IPathGenerator
     {
+        /// <summary>
+        /// Class SplinePoint.
+        /// </summary>
         class SplinePoint
         {
+            /// <summary>
+            /// The x
+            /// </summary>
             public double X;
+            /// <summary>
+            /// The y
+            /// </summary>
             public double Y;
+            /// <summary>
+            /// The control point previous x
+            /// </summary>
             public double ControlPointPreviousX;
+            /// <summary>
+            /// The control point previous y
+            /// </summary>
             public double ControlPointPreviousY;
+            /// <summary>
+            /// The control point next x
+            /// </summary>
             public double ControlPointNextX;
+            /// <summary>
+            /// The control point next y
+            /// </summary>
             public double ControlPointNextY;
         }
 
+        /// <summary>
+        /// Class PointWithTanget.
+        /// </summary>
         class PointWithTanget
         {
+            /// <summary>
+            /// The point
+            /// </summary>
             public SplinePoint Point;
+            /// <summary>
+            /// The delta
+            /// </summary>
             public double Delta;
+            /// <summary>
+            /// The mk
+            /// </summary>
             public double MK;
         }
 
+        /// <summary>
+        /// Curves the monotone.
+        /// </summary>
+        /// <param name="points">The points.</param>
+        /// <returns>IList&lt;PointWithTanget&gt;.</returns>
         IList<PointWithTanget> CurveMonotone(IList<SplinePoint> points)
         {
             var pointsWithTangents = points.Select(point => new PointWithTanget { Point = point, Delta = 0, MK = 0 }).ToList();
@@ -112,6 +155,11 @@ namespace Radzen.Blazor.Rendering
             return pointsWithTangents;
         }
 
+        /// <summary>
+        /// Pathes the specified data.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <returns>System.String.</returns>
         public string Path(IEnumerable<Point> data)
         {
             var path = new StringBuilder();
