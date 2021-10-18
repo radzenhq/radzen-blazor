@@ -6,8 +6,15 @@ using System.Text;
 namespace Radzen
 {
     /// <summary>
-    /// Class NotificationService.
+    /// Class NotificationService. Contains variuos methods with options to open and close context menus. 
+    /// Should be added as scoped service in the application services and RadzenNotification should be added in application main layout.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// @inject NotificationService NotificationService
+    /// &lt;RadzenButton Text="Show info notification" Click=@(args => NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Summary", Detail = "Info Detail", Duration = 4000 })) / &gt;
+    /// </code>
+    /// </example>
     public class NotificationService
     {
         /// <summary>
