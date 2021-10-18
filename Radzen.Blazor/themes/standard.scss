@@ -766,6 +766,7 @@ $sidebar-border-right: 1px solid $rz-base-800 !default;
 $sidebar-background-color: $rz-base-900 !default;
 
 // SidebarToggle
+
 $sidebar-toggle-border: 1px solid $rz-base-200 !default;
 $sidebar-toggle-hover-color: $rz-base-900 !default;
 $sidebar-toggle-background-color: $rz-white !default;
@@ -773,7 +774,27 @@ $sidebar-toggle-color: $rz-base-800 !default;
 $sidebar-toggle-hover-background-color: $rz-white !default;
 $sidebar-toggle-hover-border-radius: 0 !default;
 
+// Menu
+
+$menu-background-color: $default-background-color !default;
+$menu-border-radius: $rz-border-radius !default;
+
+$menu-item-padding: 0.5rem !default;
+$menu-item-color: $body-color !default;
+$menu-item-selected-color: $rz-secondary !default;
+$menu-item-icon-margin: 0 0.5rem 0 0 !default;
+$menu-item-hover-background-color: $rz-secondary-lighter !default;
+$menu-item-hover-color: $rz-secondary !default;
+$menu-item-offset: 1rem;
+
+$menu-top-item-padding: 0.5rem !default;
+$menu-top-item-hover-color: $rz-secondary !default;
+$menu-top-item-background-color: $menu-background-color !default;
+$menu-top-item-color: $menu-item-color !default;
+
+
 // Input components
+
 $input-font-size: 0.875rem !default;
 $input-height: 2.25rem;
 $input-line-height: 1.429 !default;
