@@ -493,6 +493,23 @@ $card-shadow: $rz-shadow-level-1, $rz-shadow-level-2 !default;
 $card-border-radius: $rz-border-radius !default;
 $card-heading-margin-bottom: 0.5rem !default;
 
+// Steps
+
+$steps-color: $body-color !default;
+
+$steps-number-width: 2rem !default;
+$steps-number-height: $steps-number-width !default;
+$steps-number-background-color: #e6ecef !default;
+$steps-number-border-radius: 50% !default;
+$steps-number-color: $body-color !default;
+$steps-number-padding: 0.5rem 0 !default;
+$steps-number-selected-background: $rz-secondary !default;
+$steps-number-selected-color: $rz-white !default;
+
+$steps-title-selected-color: $rz-secondary !default;
+$steps-title-margin: 0 1rem 0 0.5rem !default;
+$steps-button-color: $rz-secondary !default;
+
 // Accordion
 
 $accordion-item-padding: 0.25rem 0 !default;
