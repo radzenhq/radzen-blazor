@@ -1,8 +1,10 @@
+$icon-base-font-size: 1.5em !default; /* Preferred icon size */
+
 .rzi {
   font-family: 'Material Icons';
   font-weight: normal;
   font-style: normal;
-  font-size: 1.5em; /* Preferred icon size */
+  font-size: $icon-base-font-size;
   display: inline-block;
   width: 1em;
   height: 1em;

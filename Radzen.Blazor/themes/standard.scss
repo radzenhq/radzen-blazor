@@ -98,6 +98,8 @@ $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
 
 $rz-border-radius: 0.25rem !default;
 
+$icon-base-font-size: 1.25rem !default;
+
 
 // Button
 
@@ -792,6 +794,27 @@ $menu-top-item-hover-color: $rz-secondary !default;
 $menu-top-item-background-color: $menu-background-color !default;
 $menu-top-item-color: $menu-item-color !default;
 
+// ProfileMenu
+
+$profile-menu-background-color: $default-background-color !default;
+$profile-menu-top-item-background-color: $profile-menu-background-color !default;
+$profile-menu-border: 1px solid $rz-base-200 !default;
+$profile-menu-padding: 0.625rem 1rem !default;
+$profile-menu-border-radius: $rz-border-radius !default;
+$profile-menu-toggle-button-color: $body-color !default;
+
+$profile-menu-item-hover-background-color: $rz-secondary-lighter !default;
+$profile-menu-item-icon-width: 1.25rem !default;
+$profile-menu-item-icon-height: $profile-menu-item-icon-width !default;
+$profile-menu-item-icon-font-size: $profile-menu-item-icon-height !default;
+$profile-menu-item-icon-margin: 0 0.5rem 0 0 !default;
+
+// Gravatar
+
+$gravatar-width: 2rem !default;
+$gravatar-height: $gravatar-width !default;
+$gravatar-border-radius: 50% !default;
+$gravatar-box-shadow: $rz-shadow-inset-level-1 !default;
 
 // Input components
 

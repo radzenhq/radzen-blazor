@@ -1,10 +1,12 @@
 $gravatar-width: 2rem !default;
 $gravatar-height: $gravatar-width !default;
-$gravatar-border-radius: 50%;
+$gravatar-border-radius: 50% !default;
+$gravatar-box-shadow: none !default;
 
 .rz-gravatar {
   width: $gravatar-width;
   height: $gravatar-height;
   display: inline-block;
   border-radius: $gravatar-border-radius;
+  box-shadow: $gravatar-box-shadow;
 }
