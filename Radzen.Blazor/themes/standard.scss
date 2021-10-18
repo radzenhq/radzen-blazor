@@ -407,7 +407,7 @@ $badge-styles: map-merge(
 );
 
 // PanelMenu
-
+/* Light
 $panel-menu-color: $rz-base-800 !default;
 $panel-menu-background-color: $rz-white !default;
 $panel-menu-hover-background-color: $rz-secondary-lighter !default;
@@ -437,6 +437,39 @@ $panel-menu-icon-margin: 0 0.5rem 0 0 !default;
 $panel-menu-icon-2nd-level-margin: 0 0.75rem 0 -2.25rem !default;
 
 $panel-menu-font-size: 0.875rem !default;
+*/
+
+$panel-menu-color: $rz-white !default;
+$panel-menu-background-color: $rz-base-900 !default;
+$panel-menu-hover-background-color: $rz-secondary-lighter !default;
+$panel-menu-hover-color: $rz-secondary !default;
+
+$panel-menu-item-line-height: 1.25rem !default;
+$panel-menu-item-margin: 0 1rem !default;
+$panel-menu-item-padding: 0.5rem 0 !default;
+$panel-menu-item-border: solid 1px $rz-base-800 !default;
+$panel-menu-item-active-background-color: $rz-base-900 !default;
+$panel-menu-item-offset: 0.75rem !default;
+
+$panel-menu-item-2nd-level-padding: 0.25rem 0 !default;
+$panel-menu-item-2nd-level-offset: 3.625rem !default;
+$panel-menu-item-2nd-level-font-size: 0.875rem !default;
+$panel-menu-item-2nd-level-hover-background-color: $rz-secondary-lighter !default;
+$panel-menu-item-2nd-level-hover-color: inherit !default;
+$panel-menu-item-2nd-level-color: inherit !default;
+$panel-menu-item-3rd-level-hover-background-color: $rz-secondary-lighter !default;
+$panel-menu-item-3rd-level-hover-color: inherit !default;
+
+$panel-menu-icon-width: 1.25rem !default;
+$panel-menu-icon-font-size: 1.25rem !default;
+$panel-menu-icon-color: $panel-menu-color !default;
+$panel-menu-icon-height: $panel-menu-icon-width !default;
+$panel-menu-icon-margin: 0 0.5rem 0 0 !default;
+$panel-menu-icon-2nd-level-margin: 0 0.75rem 0 -2.25rem !default;
+
+$panel-menu-font-size: 0.875rem !default;
+
+
 
 // Accordion
 
@@ -671,8 +704,12 @@ $header-color: $body-color !default;
 $header-shadow: $rz-shadow-level-2 !default;
 
 // Sidebar
+/* Light
 $sidebar-border-right: 1px solid $rz-base-300 !default;
 $sidebar-background-color: $rz-white !default;
+*/
+$sidebar-border-right: 1px solid $rz-base-800 !default;
+$sidebar-background-color: $rz-base-900 !default;
 
 // SidebarToggle
 $sidebar-toggle-border: 1px solid $rz-base-200 !default;
@@ -1027,8 +1064,8 @@ $dialog-border-radius: $rz-border-radius * 2 !default;
 
 // Scrollbar
 
-$scrollbar-background-color: $rz-base-100 !default;
-$scrollbar-color: $rz-base-400 !default;
+$scrollbar-background-color: transparent !default;
+$scrollbar-color: rgba($rz-base-600, 0.5) !default;
 
 // Splitter
 
