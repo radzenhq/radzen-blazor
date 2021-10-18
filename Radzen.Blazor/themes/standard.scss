@@ -820,6 +820,21 @@ $gravatar-height: $gravatar-width !default;
 $gravatar-border-radius: 50% !default;
 $gravatar-box-shadow: $rz-shadow-inset-level-1 !default;
 
+// Panel
+
+$panel-background-color: $default-background-color !default;
+$panel-padding: 0.5rem !default;
+$panel-title-line-height: 1.25rem !default;
+$panel-title-font-weight: 600 !default;
+$panel-content-margin: 0 !default;
+$panel-toggle-icon-width: 1.5rem !default;
+$panel-toggle-icon-height: $panel-toggle-icon-width !default;
+$panel-toggle-icon-border-radius: $rz-border-radius !default;
+$panel-toggle-icon-background-color: $rz-base-200 !default;
+$panel-hover-color: $rz-secondary !default;
+$panel-border-radius: $rz-border-radius !default;
+$panel-shadow: none !default;
+
 // Input components
 
 $input-font-size: 0.875rem !default;
