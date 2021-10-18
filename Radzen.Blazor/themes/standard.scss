@@ -485,7 +485,13 @@ $panel-menu-icon-2nd-level-margin: 0 0.75rem 0 -2.25rem !default;
 
 $panel-menu-font-size: 0.875rem !default;
 
+// Card
 
+$card-padding: 1.25rem !default;
+$card-background-color: $default-background-color !default;
+$card-shadow: $rz-shadow-level-1, $rz-shadow-level-2 !default;
+$card-border-radius: $rz-border-radius !default;
+$card-heading-margin-bottom: 0.5rem !default;
 
 // Accordion
 
@@ -658,7 +664,7 @@ $column-drag-handle-hover-color: $rz-base-900 !default;
 // DataList
 
 $datalist-background-color: transparent !default;
-$datalist-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
+$datalist-shadow: none !default;
 $datalist-padding: 0.5rem !default;
 $datalist-border: 1px solid $rz-base-200 !default;
 
