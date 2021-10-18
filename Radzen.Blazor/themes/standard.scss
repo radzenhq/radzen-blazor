@@ -354,13 +354,14 @@ $button-focus-styles: map-merge(
 }
 
 // SelectButton
+
 $selectbar-background-color: transparent !default;
 $selectbar-color: $rz-base-800 !default;
-$selectbar-border: solid 1px $rz-base-300 !default;
+$selectbar-border: solid 1px $rz-base-200 !default;
 
-$selectbar-selected-background-color: $rz-primary !default;
-$selectbar-selected-color: $rz-white !default;
-$selectbar-selected-border: solid 1px $rz-primary !default;
+$selectbar-selected-background-color: lighten($rz-secondary-lighter, 20%) !default;
+$selectbar-selected-color: $rz-secondary !default;
+$selectbar-selected-border: $selectbar-border !default;
 $selectbar-border-radius: $border-radius !default;
 
 
