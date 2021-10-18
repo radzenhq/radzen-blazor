@@ -779,7 +779,8 @@ $sidebar-toggle-hover-border-radius: 0 !default;
 // Menu
 
 $menu-background-color: $default-background-color !default;
-$menu-border-radius: $rz-border-radius !default;
+$menu-border: none !default;
+$menu-border-radius: 0 !default;
 
 $menu-item-padding: 0.5rem !default;
 $menu-item-color: $body-color !default;
@@ -791,8 +792,11 @@ $menu-item-offset: 1rem;
 
 $menu-top-item-padding: 0.5rem !default;
 $menu-top-item-hover-color: $rz-secondary !default;
+$menu-top-item-hover-background-color: $rz-secondary-lighter !default;
 $menu-top-item-background-color: $menu-background-color !default;
 $menu-top-item-color: $menu-item-color !default;
+
+$context-menu-box-shadow: $rz-shadow-level-2 !default;
 
 // ProfileMenu
 

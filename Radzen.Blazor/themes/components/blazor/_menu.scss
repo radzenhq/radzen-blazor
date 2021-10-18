@@ -1,4 +1,5 @@
 $menu-background-color: $default-background-color !default;
+$menu-border: $input-border !default;
 $menu-border-radius: 2px !default;
 
 $menu-item-padding: 0.375rem 1.25rem !default;
@@ -11,16 +12,20 @@ $menu-item-offset: 0.75rem;
 
 $menu-top-item-padding: 0.8125rem 0.625rem !default;
 $menu-top-item-hover-color: $default-link !default;
+$menu-top-item-hover-background-color: transparent !default;
 $menu-top-item-background-color: $menu-background-color !default;
 $menu-top-item-color: $menu-item-color !default;
+
+$context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
 
 .rz-context-menu .rz-menu {
     flex-direction: column;
 }
 
 .rz-context-menu .rz-menu, .rz-context-menu .rz-navigation-menu {
-  box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06);
-  border: $input-border;
+  box-shadow: $context-menu-box-shadow;
+  border: $menu-border;
+  border-radius: $menu-border-radius;
 }
 
 .rz-menu:not(.rz-profile-menu) {
@@ -40,6 +45,8 @@ $menu-top-item-color: $menu-item-color !default;
     padding: $menu-top-item-padding;
 
     &:hover {
+      background-color: $menu-top-item-hover-background-color;
+
       .rz-navigation-item-link {
         color: $menu-top-item-hover-color;
       }
@@ -78,7 +85,7 @@ $menu-top-item-color: $menu-item-color !default;
     padding: 0;
     margin: 0;
     min-width: 100%;
-    box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06);
+    box-shadow: $context-menu-box-shadow;
 
     border-radius: $menu-border-radius;
     background-color: $menu-background-color;
