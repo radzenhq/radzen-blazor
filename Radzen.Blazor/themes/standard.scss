@@ -362,7 +362,7 @@ $selectbar-border: solid 1px $rz-base-200 !default;
 $selectbar-selected-background-color: lighten($rz-secondary-lighter, 20%) !default;
 $selectbar-selected-color: $rz-secondary !default;
 $selectbar-selected-border: $selectbar-border !default;
-$selectbar-border-radius: $border-radius !default;
+$selectbar-border-radius: $rz-border-radius !default;
 
 
 // SplitButton
@@ -504,7 +504,7 @@ $accordion-selected-color: $rz-base-900 !default;
 $accordion-hover-color: $rz-primary !default;
 $accordion-content-padding: 0.5rem 0.5rem 0.5rem 1.5rem !default;
 $accordion-content-font-size: $accordion-item-font-size;
-$accordion-border-radius: $border-radius !default;
+$accordion-border-radius: $rz-border-radius !default;
 $accordion-item-border: none !default;
 $accordion-shadow: none !default;
 
@@ -654,6 +654,21 @@ $column-drag-handle-hover-color: $rz-base-900 !default;
     }
   }
 }
+
+// DataList
+
+$datalist-background-color: transparent !default;
+$datalist-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
+$datalist-padding: 0.5rem !default;
+$datalist-border: 1px solid $rz-base-200 !default;
+
+$datalist-item-shadow: none !default;
+$datalist-item-border: 1px solid $rz-base-200 !default;
+$datalist-item-vertical-margin: 0.5rem 0 !default;
+$datalist-item-horizontal-margin: 0.5rem !default;
+$datalist-item-padding: 1rem !default;
+$datalist-item-background-color: $rz-white !default;
+$datalist-border-radius: $rz-border-radius !default;
 
 // Overlay Panel
 
