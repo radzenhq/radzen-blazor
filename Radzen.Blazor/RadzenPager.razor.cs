@@ -44,6 +44,13 @@ namespace Radzen.Blazor
         public IEnumerable<int> PageSizeOptions { get; set; }
 
         /// <summary>
+        /// Gets or sets the pager summary visibility.
+        /// </summary>
+        /// <value>The pager summary visibility.</value>
+        [Parameter]
+        public bool ShowSummary { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the page numbers count.
         /// </summary>
         /// <value>The page numbers count.</value>
