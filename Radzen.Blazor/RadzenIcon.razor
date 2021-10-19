@@ -4,12 +4,3 @@
 {
     <i @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">@((MarkupString)Icon)</i>
 }
-@code {
-    [Parameter]
-    public string Icon { get; set; }
-
-    protected override string GetComponentCssClass()
-    {
-        return "rzi d-inline-flex justify-content-center align-items-center";
-    }
-}

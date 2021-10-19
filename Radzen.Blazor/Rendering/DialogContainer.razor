@@ -1,5 +1,7 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
 <div class="rz-dialog-wrapper">
-    <div class="rz-dialog" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
+    <div @ref="dialog" class="rz-dialog" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
         {
             @if (Dialog.Options.Draggable)
@@ -26,7 +28,7 @@
                             <span class="rzi rzi-times"></span>
                         </a>
                     }
-                </div>                
+                </div>
             }
         }
         <div class="rz-dialog-content">
@@ -40,26 +42,50 @@
             }
         </div>
     </div>
-    <div class="rz-dialog-mask" style="z-index: 1000;"></div>
+    @if (Dialog.Options.CloseDialogOnOverlayClick)
+    {
+        <div @onclick="@Close" class="rz-dialog-mask" style="z-index: 1000;"></div>
+    }
+    else
+    {
+        <div class="rz-dialog-mask" style="z-index: 1000;"></div>
+    }
 </div>
 
 @code {
+    ElementReference dialog;
+
     string left;
     string top;
+    string height;
+    string width;
 
     double clientX;
     double clientY;
 
-    void OnDragStart(DraggableEventArgs args)
+    async Task OnDragStart(DraggableEventArgs args)
     {
         clientX = args.ClientX;
         clientY = args.ClientY;
+
+        shouldRender = false;
+        var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", dialog);
+        height = $"height: {rect.Height}px;";
+        width = $"width: {rect.Width}px;";
+
+        shouldRender = true;
     }
 
     void OnDrag(DraggableEventArgs args)
     {
         left = $"left: {args.Rect.Left + (args.ClientX - clientX)}px;";
         top = $"top: {args.Rect.Top + (args.ClientY - clientY)}px;";
+    }
+
+    bool shouldRender = true;
+    protected override bool ShouldRender()
+    {
+        return shouldRender;
     }
 
     [Parameter]
@@ -90,8 +116,8 @@
         get
         {
             var baseStyle = "min-width: 150px; min-height: 150px; z-index: 1001; opacity: 1;position:absolute;";
-            var widthStyle = string.IsNullOrEmpty(Dialog.Options.Width) ? "" : $"width: {Dialog.Options.Width};";
-            var heightStyle = string.IsNullOrEmpty(Dialog.Options.Height) ? "" : $"height: {Dialog.Options.Height};";
+            var widthStyle = !string.IsNullOrEmpty(width) ? width : string.IsNullOrEmpty(Dialog.Options.Width) ? "" : $"width: {Dialog.Options.Width};";
+            var heightStyle = !string.IsNullOrEmpty(height) ? height : string.IsNullOrEmpty(Dialog.Options.Height) ? "" : $"height: {Dialog.Options.Height};";
             var topStyle = !string.IsNullOrEmpty(top) ? top : string.IsNullOrEmpty(Dialog.Options.Top) ? "" : $"top: {Dialog.Options.Top};";
             var leftStyle = !string.IsNullOrEmpty(left) ? left :string.IsNullOrEmpty(Dialog.Options.Left) ? "" : $"left: {Dialog.Options.Left};";
             var resizeStyle = Dialog.Options.Resizable ? "resize:both;" : "";

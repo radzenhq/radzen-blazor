@@ -8,12 +8,6 @@
 </CascadingValue>
 
 @code {
-    [Parameter]
-    public double? InnerRadius { get; set; }
-
-    [Parameter]
-    public RenderFragment TitleTemplate { get; set; }
-
     public RenderFragment RenderTitle(double x, double y)
     {
       if (TitleTemplate == null)
@@ -34,7 +28,7 @@
             </div>;
       }
 
-    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+   public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
    {
         var className = $"rz-donut-series rz-series-{Chart.Series.IndexOf(this)}";
         var x = CenterX;

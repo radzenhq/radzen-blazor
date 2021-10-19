@@ -4,10 +4,3 @@
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">@ChildContent</div>
 }
-
-@code {
-    protected override string GetComponentCssClass()
-    {
-        return "rz-card card";
-    }
-}

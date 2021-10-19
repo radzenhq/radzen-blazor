@@ -5,70 +5,14 @@
 @inherits FormComponent<TValue>
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" 
-         @onmouseup=@Toggle @onkeypress=@OnKeyPress @onkeypress:preventDefault style="@Style" tabindex="@TabIndex" id="@GetId()">
-        <div class="rz-helper-hidden-accessible">
-            <input type="checkbox" @onchange=@Toggle name=@Name id=@Name checked=@(Object.Equals(Value, true)) tabindex="-1">
-        </div>
-        <div class=@BoxClassList>
-            <span class=@IconClassList></span>
-        </div>
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onmouseup=@Toggle @onkeypress=@OnKeyPress
+    @onkeypress:preventDefault style="@Style" tabindex="@TabIndex" id="@GetId()">
+    <div class="rz-helper-hidden-accessible">
+        <input type="checkbox" @onchange=@Toggle value=@CheckBoxValue name=@Name id=@Name checked=@CheckBoxChecked
+            tabindex="-1">
     </div>
-}
-@code {
-    [Parameter]
-    public bool TriState { get; set; } = false;
-
-    ClassList BoxClassList => ClassList.Create("rz-chkbox-box")
-                                       .Add("rz-state-active", !object.Equals(Value, false))
-                                       .AddDisabled(Disabled);
-
-    ClassList IconClassList => ClassList.Create("rz-chkbox-icon")
-                                        .Add("rzi rzi-check", object.Equals(Value, true))
-                                        .Add("rzi rzi-times", object.Equals(Value, null));
-
-    protected override string GetComponentCssClass()
-    {
-        return GetClassList("rz-chkbox").ToString();
-    }
-
-    async Task OnKeyPress(KeyboardEventArgs args)
-    {
-        if (args.Code == "Space")
-        {
-            await Toggle();
-        }
-    }
-
-    async Task Toggle()
-    {
-        if (Disabled)
-        {
-            return;
-        }
-
-        if (object.Equals(Value, false))
-        {
-            if (TriState)
-            {
-                Value = default(TValue);
-            }
-            else
-            {
-                Value = (TValue)(object)true;
-            }
-        }
-        else if (Value == null)
-        {
-            Value = (TValue)(object)true;
-        }
-        else if (object.Equals(Value, true))
-        {
-            Value = (TValue)(object)false;
-        }
-
-        await ValueChanged.InvokeAsync(Value);
-        if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
-        await Change.InvokeAsync(Value);
-    }
+    <div class=@BoxClassList>
+        <span class=@IconClassList></span>
+    </div>
+</div>
 }

@@ -2,13 +2,36 @@ using System;
 
 namespace Radzen.Blazor.Rendering
 {
+    /// <summary>
+    /// Class HSV.
+    /// </summary>
     public class HSV
     {
+        /// <summary>
+        /// Gets or sets the hue.
+        /// </summary>
+        /// <value>The hue.</value>
         public double Hue { get; set; }
+        /// <summary>
+        /// Gets or sets the saturation.
+        /// </summary>
+        /// <value>The saturation.</value>
         public double Saturation { get; set; }
+        /// <summary>
+        /// Gets or sets the value.
+        /// </summary>
+        /// <value>The value.</value>
         public double Value { get; set; }
+        /// <summary>
+        /// Gets or sets the alpha.
+        /// </summary>
+        /// <value>The alpha.</value>
         public double Alpha { get; set; } = 1;
 
+        /// <summary>
+        /// Converts to rgb.
+        /// </summary>
+        /// <returns>RGB.</returns>
         public RGB ToRGB()
         {
             var hue = Hue * 6;
