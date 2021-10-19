@@ -22,6 +22,10 @@ $paginator-next-button-color: $white !default;
 $paginator-dropdown-width: 80px !default;
 $paginator-dropdown-margin: $paginator-last-button-margin !default;
 
+$paginator-summary-padding: 0.625rem !default;
+$paginator-summary-font-size: 0.875rem !default;
+$paginator-summary-color: $battleship-grey !default;
+
 .rz-paginator {
   display: flex;
   align-items: center;
@@ -136,6 +140,12 @@ $paginator-dropdown-margin: $paginator-last-button-margin !default;
     border: $paginator-numeric-button-selected-border;
     padding: $paginator-numeric-button-selected-padding;
   }
+}
+
+.rz-paginator-summary {
+    padding: $paginator-summary-padding;
+    font-size: $paginator-summary-font-size;
+    color: $paginator-summary-color;
 }
 
 @media (max-width: 768px) {
