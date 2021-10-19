@@ -1251,6 +1251,21 @@ $dialog-border-radius: $rz-border-radius * 2 !default;
 $scrollbar-background-color: transparent !default;
 $scrollbar-color: rgba($rz-base-600, 0.5) !default;
 
+// Editor
+
+$editor-border: 1px solid $rz-base-200 !default;
+$editor-border-radius: $rz-border-radius !default;
+$editor-toolbar-background-color: $rz-base-100 !default;
+$editor-toolbar-item-margin: 0.25rem 0.125rem !default;
+$editor-button-padding: 0.5rem !default;
+$editor-button-background-color: $rz-base-100 !default;
+$editor-button-color: $body-color !default;
+$editor-button-disabled-color: $input-disabled-color !default;
+$editor-button-selected-background-color: $rz-secondary !default;
+$editor-button-selected-color: $rz-white !default;
+$editor-separator-background-color: $rz-base-200 !default;
+$editor-content-background-color: $input-background-color !default;
+
 // Splitter
 
 $splitter-bar-color: $rz-base-600 !default;
