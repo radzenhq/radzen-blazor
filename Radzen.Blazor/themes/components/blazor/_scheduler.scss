@@ -13,19 +13,25 @@ $scheduler-toolbar-button-width: 1.125rem !default;
 $scheduler-toolbar-button-height: 1.125rem !default;
 $scheduler-toolbar-text-transform: uppercase;
 
+$scheduler-toolbar-title-font-size: inherit !default;
+$scheduler-toolbar-title-font-weight: inherit !default;
+
 $scheduler-button-padding: 0 0.875rem !default;
 $scheduler-button-font-size: 0.6875rem !default;
+$scheduler-prev-next-button-padding: $scheduler-button-padding !default;
+$scheduler-prev-next-button-font-size: $scheduler-button-font-size !default;
 $scheduler-button-line-height: 1.75rem !default;
 
 $scheduler-view-button-border: solid 1px #dadfe2 !default;
 $scheduler-view-button-color: $cool-grey !default;
 $scheduler-view-button-background-color: $white !default;
 $scheduler-view-selected-background-color: $default-link !default;
+$scheduler-view-selected-border-color: $scheduler-view-selected-background-color !default;
 $scheduler-view-selected-color: $white !default;
 
 $scheduler-header-background-color: rgba(#e6ecef, 0.4) !default;
 $scheduler-header-font-size: 0.6875rem !default;
-$scheduler-header-color: #544848 !default;
+$scheduler-header-color: inherit !default;
 $scheduler-header-border: solid 1px #dfe7ec !default;
 $scheduler-header-padding: 0.5rem 0 !default;
 
@@ -33,9 +39,12 @@ $scheduler-border-color: #dfe7eb !default;
 $scheduler-minor-border-color: rgba(#dfe7eb, 0.2) !default;
 $scheduler-color: #6a6a6a !default;
 
+$scheduler-slot-title-padding: 0 11px !default;
+
 $scheduler-event-color: $white !default;
 $scheduler-event-background-color: $tip !default;
 $scheduler-event-font-size: 0.6875rem !default;
+$scheduler-event-line-height: 12px !default;
 $scheduler-event-padding: 2px 1px !default;
 $scheduler-event-content-padding: 4px !default;
 
@@ -104,7 +113,7 @@ $scheduler-border-radius: $border-radius !default;
   height: 100%;
   padding: $scheduler-event-content-padding;
   font-size: $scheduler-event-font-size;
-  line-height: 12px;
+  line-height: $scheduler-event-line-height;
   overflow: hidden;
 }
 
@@ -122,7 +131,7 @@ $scheduler-border-radius: $border-radius !default;
 
 .rz-slot-title {
   text-align: right;
-  padding: 0 11px;
+  padding: $scheduler-slot-title-padding;
 }
 
 .rz-scheduler-nav {
@@ -130,6 +139,13 @@ $scheduler-border-radius: $border-radius !default;
   justify-content: space-between;
   padding: $scheduler-toolbar-padding;
   background: $scheduler-toolbar-background-color;
+
+  .rz-scheduler-nav-title {
+    display: flex;
+    align-self: center;
+    font-size: $scheduler-toolbar-title-font-size;
+    font-weight: $scheduler-toolbar-title-font-weight;
+  }
 }
 
 .rz-view-header {
@@ -137,6 +153,7 @@ $scheduler-border-radius: $border-radius !default;
   border-bottom: $scheduler-header-border;
   background-color: $scheduler-header-background-color;
   text-transform: $scheduler-toolbar-text-transform;
+  color: $scheduler-header-color;
   display: flex;
 
   .rz-slot-header {
@@ -240,7 +257,7 @@ $scheduler-border-radius: $border-radius !default;
 
   .rz-state-active {
     background-color: $scheduler-view-selected-background-color;
-    border-color: $scheduler-view-selected-background-color;
+    border-color: $scheduler-view-selected-border-color;
     color: $scheduler-view-selected-color;
   }
 }
@@ -252,22 +269,26 @@ $scheduler-border-radius: $border-radius !default;
     margin-left: 16px;
   }
 
-  .rz-prev {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  .rz-next {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-
   .rz-button {
     background-color: $scheduler-toolbar-button-background-color;
     color: $scheduler-toolbar-color;
     text-transform: $scheduler-toolbar-text-transform;
     padding: $scheduler-button-padding;
     font-size: $scheduler-button-font-size;
+  }
+
+  .rz-prev {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    padding: $scheduler-prev-next-button-padding;
+    font-size: $scheduler-prev-next-button-font-size;
+  }
+
+  .rz-next {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: $scheduler-prev-next-button-padding;
+    font-size: $scheduler-prev-next-button-font-size;
   }
 }
 

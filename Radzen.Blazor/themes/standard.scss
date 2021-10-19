@@ -46,11 +46,14 @@ $rz-danger-light: #F53770;
 $rz-danger-dark: #CC0E47;
 $rz-danger-secondary: rgba($rz-danger, .16);
 
-$rz-series-1: $rz-primary;
+$rz-series-1: #376DF5;
 $rz-series-2: #64DFDF;
-$rz-series-3: #3809A3;
-$rz-series-4: #8611D3;
-$rz-series-5: #F72585;
+$rz-series-3: #F68769;
+$rz-series-4: #C161E2;
+$rz-series-5: #FDD07A;
+$rz-series-6: #F8629B;
+$rz-series-7: #74D062;
+$rz-series-8: #84A7FF;
 
 
 // Shadows
@@ -512,6 +515,14 @@ $steps-title-selected-color: $rz-secondary !default;
 $steps-title-margin: 0 1rem 0 0.5rem !default;
 $steps-button-color: $rz-secondary !default;
 
+// ProgressBar
+
+$progressbar-value-background-color: $rz-secondary-lighter !default;
+$progressbar-background-color: $rz-base-200 !default;
+$progressbar-font-size: 0.875rem !default;
+$progressbar-height: 1.25rem !default;
+$progressbar-border-radius: $rz-border-radius !default;
+
 // Accordion
 
 $accordion-item-padding: 0.25rem 0 !default;
@@ -694,6 +705,61 @@ $datalist-item-horizontal-margin: 0.5rem !default;
 $datalist-item-padding: 1rem !default;
 $datalist-item-background-color: $rz-white !default;
 $datalist-border-radius: $rz-border-radius !default;
+
+// Scheduler
+
+$scheduler-border: solid 1px $rz-base-200 !default;
+$scheduler-shadow: none !default;
+$scheduler-padding: 0.5rem !default;
+$scheduler-background-color: $rz-white !default;
+
+$scheduler-toolbar-padding: 0.5rem !default;
+$scheduler-toolbar-background-color: $rz-base-100 !default;
+$scheduler-toolbar-font-size: 0.875rem !default;
+$scheduler-toolbar-color: $body-color !default;
+$scheduler-toolbar-button-background-color: $rz-base-200 !default;
+$scheduler-toolbar-button-font-size: 0.875rem !default;
+$scheduler-toolbar-button-width: 1.25rem !default;
+$scheduler-toolbar-button-height: 1.25rem !default;
+$scheduler-toolbar-text-transform: uppercase !default;
+
+$scheduler-toolbar-title-font-size: 1rem !default;
+$scheduler-toolbar-title-font-weight: 700 !default;
+
+$scheduler-button-padding: 0.4375rem 1rem !default;
+$scheduler-button-font-size: 0.75rem !default;
+$scheduler-prev-next-button-padding: 0.5rem !default;
+$scheduler-prev-next-button-font-size: 1.25rem !default;
+$scheduler-button-line-height: 1.25rem !default;
+
+$scheduler-view-button-border: solid 1px $rz-base-200 !default;
+$scheduler-view-button-color: $rz-base-800 !default;
+$scheduler-view-button-background-color: transparent !default;
+$scheduler-view-selected-background-color: lighten($rz-secondary-lighter, 20%) !default;
+$scheduler-view-selected-border-color: transparent !default;
+$scheduler-view-selected-color: $rz-secondary !default;
+
+$scheduler-header-background-color: $rz-base-100 !default;
+$scheduler-header-font-size: 0.75rem !default;
+$scheduler-header-color: $rz-base-600 !default; // Not used
+$scheduler-header-border: 1px solid $rz-base-200 !default;
+$scheduler-header-padding: 0.5rem 0 !default;
+
+$scheduler-border-color: $rz-base-200 !default;
+$scheduler-minor-border-color: $rz-base-100 !default;
+$scheduler-color: $body-color !default;
+
+$scheduler-slot-title-padding: 0 0.25rem !default;
+
+$scheduler-event-color: $body-color !default;
+$scheduler-event-background-color: $rz-series-2 !default;
+$scheduler-event-font-size: 0.75rem !default;
+$scheduler-event-line-height: 1rem !default;
+$scheduler-event-padding: 0 1px 1px 1px !default;
+$scheduler-event-content-padding: 0.125rem 0.25rem !default;
+
+$scheduler-day-number-padding: 0 0.5rem !default;
+$scheduler-border-radius: $rz-border-radius !default;
 
 // Overlay Panel
 
@@ -1262,6 +1328,11 @@ $color-schemes: (
 
 // Paragraph
 $paragraph-line-height: 1.25rem !default;
+
+::selection {
+  color: $rz-white;
+  background-color: $rz-primary-light;
+}
 
 body {
   font-size: 0.875rem;
