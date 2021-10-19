@@ -731,6 +731,7 @@ $scheduler-button-font-size: 0.75rem !default;
 $scheduler-prev-next-button-padding: 0.5rem !default;
 $scheduler-prev-next-button-font-size: 1.25rem !default;
 $scheduler-button-line-height: 1.25rem !default;
+$scheduler-today-button-margin-left: 0.5rem !default;
 
 $scheduler-view-button-border: solid 1px $rz-base-200 !default;
 $scheduler-view-button-color: $rz-base-800 !default;
@@ -1330,8 +1331,7 @@ $color-schemes: (
 $paragraph-line-height: 1.25rem !default;
 
 ::selection {
-  color: $rz-white;
-  background-color: $rz-primary-light;
+  background-color: $rz-secondary-lighter;
 }
 
 body {

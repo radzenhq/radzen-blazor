@@ -21,6 +21,7 @@ $scheduler-button-font-size: 0.6875rem !default;
 $scheduler-prev-next-button-padding: $scheduler-button-padding !default;
 $scheduler-prev-next-button-font-size: $scheduler-button-font-size !default;
 $scheduler-button-line-height: 1.75rem !default;
+$scheduler-today-button-margin-left: 16px !default;
 
 $scheduler-view-button-border: solid 1px #dadfe2 !default;
 $scheduler-view-button-color: $cool-grey !default;
@@ -266,7 +267,7 @@ $scheduler-border-radius: $border-radius !default;
   display: flex;
 
   .rz-today {
-    margin-left: 16px;
+    margin-left: $scheduler-today-button-margin-left;
   }
 
   .rz-button {
