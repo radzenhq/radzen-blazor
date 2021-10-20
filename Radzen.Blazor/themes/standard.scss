@@ -428,67 +428,49 @@ $badge-styles: map-merge(
 );
 
 // PanelMenu
-/* Light
-$panel-menu-color: $rz-base-800 !default;
-$panel-menu-background-color: $rz-white !default;
-$panel-menu-hover-background-color: $rz-secondary-lighter !default;
-$panel-menu-hover-color: $rz-secondary !default;
-
-$panel-menu-item-line-height: 1.25rem !default;
-$panel-menu-item-margin: 0 1rem !default;
-$panel-menu-item-padding: 0.5rem 0 !default;
-$panel-menu-item-border: solid 1px $rz-base-200 !default;
-$panel-menu-item-active-background-color: $rz-white !default;
-$panel-menu-item-offset: 0.75rem !default;
-
-$panel-menu-item-2nd-level-padding: 0.25rem 0 !default;
-$panel-menu-item-2nd-level-offset: 3.625rem !default;
-$panel-menu-item-2nd-level-font-size: 0.875rem !default;
-$panel-menu-item-2nd-level-hover-background-color: $rz-secondary-lighter !default;
-$panel-menu-item-2nd-level-hover-color: inherit !default;
-$panel-menu-item-2nd-level-color: inherit !default;
-$panel-menu-item-3rd-level-hover-background-color: $rz-secondary-lighter !default;
-$panel-menu-item-3rd-level-hover-color: inherit !default;
-
-$panel-menu-icon-width: 1.25rem !default;
-$panel-menu-icon-font-size: 1.25rem !default;
-$panel-menu-icon-color: $panel-menu-color !default;
-$panel-menu-icon-height: $panel-menu-icon-width !default;
-$panel-menu-icon-margin: 0 0.5rem 0 0 !default;
-$panel-menu-icon-2nd-level-margin: 0 0.75rem 0 -2.25rem !default;
-
-$panel-menu-font-size: 0.875rem !default;
-*/
 
 $panel-menu-color: $rz-white !default;
 $panel-menu-background-color: $rz-base-900 !default;
-$panel-menu-hover-background-color: $rz-secondary-lighter !default;
-$panel-menu-hover-color: $rz-secondary !default;
+$panel-menu-hover-background-color: lighten($rz-base-900, 8%) !default;
+$panel-menu-hover-color: inherit !default;
 
 $panel-menu-item-line-height: 1.25rem !default;
-$panel-menu-item-margin: 0 1rem !default;
-$panel-menu-item-padding: 0.5rem 0 !default;
-$panel-menu-item-border: solid 1px $rz-base-800 !default;
+$panel-menu-item-margin: 0.5rem 1rem !default;
+$panel-menu-item-padding: 0.25rem 0 !default;
+$panel-menu-item-border: 1px solid lighten($rz-base-900, 6%) !default;
 $panel-menu-item-active-background-color: $rz-base-900 !default;
+$panel-menu-item-active-color: inherit !default;
+$panel-menu-item-active-indicator: $rz-secondary !default;
 $panel-menu-item-offset: 0.75rem !default;
+$panel-menu-item-transition: all 0.1s linear !default;
 
-$panel-menu-item-2nd-level-padding: 0.25rem 0 !default;
-$panel-menu-item-2nd-level-offset: 3.625rem !default;
+$panel-menu-item-2nd-level-padding: 0 !default;
+$panel-menu-item-2nd-level-offset: 2.75rem !default;
 $panel-menu-item-2nd-level-font-size: 0.875rem !default;
-$panel-menu-item-2nd-level-hover-background-color: $rz-secondary-lighter !default;
-$panel-menu-item-2nd-level-hover-color: inherit !default;
 $panel-menu-item-2nd-level-color: inherit !default;
-$panel-menu-item-3rd-level-hover-background-color: $rz-secondary-lighter !default;
+
+$panel-menu-item-2nd-level-hover-background-color: lighten($rz-base-900, 8%) !default;
+$panel-menu-item-2nd-level-hover-color: inherit !default;
+
+$panel-menu-item-2nd-level-active-background-color: lighten($rz-base-900, 6%)  !default;
+$panel-menu-item-2nd-level-active-color: inherit !default;
+
+$panel-menu-item-3rd-level-hover-background-color: lighten($rz-base-900, 10%) !default;
 $panel-menu-item-3rd-level-hover-color: inherit !default;
+
+$panel-menu-item-3rd-level-active-background-color: lighten($rz-base-900, 12%) !default;
+$panel-menu-item-3rd-level-active-color: inherit !default;
 
 $panel-menu-icon-width: 1.25rem !default;
 $panel-menu-icon-font-size: 1.25rem !default;
 $panel-menu-icon-color: $panel-menu-color !default;
 $panel-menu-icon-height: $panel-menu-icon-width !default;
 $panel-menu-icon-margin: 0 0.5rem 0 0 !default;
-$panel-menu-icon-2nd-level-margin: 0 0.75rem 0 -2.25rem !default;
+$panel-menu-icon-2nd-level-margin: 0 0.5rem 0 -1.75rem !default;
 
 $panel-menu-font-size: 0.875rem !default;
+$panel-menu-toggle-icon-font-size: 1.25rem !default;
+$panel-menu-toggle-icon-opacity: 0.7 !default;
 
 // Card
 
