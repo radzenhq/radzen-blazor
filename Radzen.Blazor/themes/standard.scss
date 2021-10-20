@@ -1117,7 +1117,7 @@ $dropdown-horizontal-padding: 0.5rem !default;
 $dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
 $dropdown-items-margin: 0 (-$dropdown-horizontal-padding) !default;
 
-$dropdown-item-padding: 0.25rem $dropdown-horizontal-padding !default;
+$dropdown-item-padding: $dropdown-horizontal-padding !default;
 $dropdown-item-font-size: $input-font-size !default;
 $dropdown-item-hover-background-color: $rz-secondary-lighter !default;
 $dropdown-item-selected-background-color: lighten($rz-secondary-lighter, 20%) !default;
