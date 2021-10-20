@@ -2,7 +2,7 @@
 @if (GetVisible())
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
-        @if(ShowSummary)
+        @if(PageShowSummary)
         {
         <label class="rz-paginator-summary">@($"Page {CurrentPage + 1} of {numberOfPages} ({Count} items)")</label>        
         }

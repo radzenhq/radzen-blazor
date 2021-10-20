@@ -62,7 +62,7 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenPager>(parameters => {
                 parameters.Add<int>(p => p.PageSize, 10);
                 parameters.Add<int>(p => p.Count, 100);
-                parameters.Add<bool>(p => p.ShowSummary, true);
+                parameters.Add<bool>(p => p.PageShowSummary, true);
             });
             await component.Instance.GoToPage(2);
             component.Render();
@@ -71,7 +71,7 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(@$"Page 3 of 10 (100 items)", component.Markup); 
             
             component.SetParametersAndRender(parameters => {
-                parameters.Add<bool>(p => p.ShowSummary, false);
+                parameters.Add<bool>(p => p.PageShowSummary, false);
             });
             Assert.DoesNotContain(@$"rz-paginator-summary", component.Markup);
         }

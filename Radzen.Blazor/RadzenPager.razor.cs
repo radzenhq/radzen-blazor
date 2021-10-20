@@ -48,7 +48,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The pager summary visibility.</value>
         [Parameter]
-        public bool ShowSummary { get; set; } = true;
+        public bool PageShowSummary { get; set; }
 
         /// <summary>
         /// Gets or sets the page numbers count.
