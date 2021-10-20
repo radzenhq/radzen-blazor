@@ -53,5 +53,28 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(@$"rz-dropdown-trigger", component.Markup);
         }
 
+        [Fact]
+        public async void RadzenPager_Renders_Summary() {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPager>(parameters => {
+                parameters.Add<int>(p => p.PageSize, 10);
+                parameters.Add<int>(p => p.Count, 100);
+                parameters.Add<bool>(p => p.ShowSummary, true);
+            });
+            await component.Instance.GoToPage(2);
+            component.Render();
+
+            Assert.Contains(@$"rz-paginator-summary", component.Markup); 
+            Assert.Contains(@$"Page 3 of 10 (100 items)", component.Markup); 
+            
+            component.SetParametersAndRender(parameters => {
+                parameters.Add<bool>(p => p.ShowSummary, false);
+            });
+            Assert.DoesNotContain(@$"rz-paginator-summary", component.Markup);
+        }
+
     }
 }
