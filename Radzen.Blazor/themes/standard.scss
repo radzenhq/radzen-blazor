@@ -437,7 +437,7 @@ $panel-menu-hover-color: inherit !default;
 $panel-menu-item-line-height: 1.25rem !default;
 $panel-menu-item-margin: 0.5rem 1rem !default;
 $panel-menu-item-padding: 0.25rem 0 !default;
-$panel-menu-item-border: 1px solid lighten($rz-base-900, 6%) !default;
+$panel-menu-item-border: 1px solid lighten($rz-base-900, 8%) !default;
 $panel-menu-item-active-background-color: $rz-base-900 !default;
 $panel-menu-item-active-color: inherit !default;
 $panel-menu-item-active-indicator: $rz-secondary !default;
@@ -470,7 +470,7 @@ $panel-menu-icon-2nd-level-margin: 0 0.5rem 0 -1.75rem !default;
 
 $panel-menu-font-size: 0.875rem !default;
 $panel-menu-toggle-icon-font-size: 1.25rem !default;
-$panel-menu-toggle-icon-opacity: 0.7 !default;
+$panel-menu-toggle-icon-opacity: 0.4 !default;
 
 // Card
 
