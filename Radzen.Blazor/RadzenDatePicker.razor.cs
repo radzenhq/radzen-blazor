@@ -906,11 +906,8 @@ namespace Radzen.Blazor
             var currentValue = CurrentDate;
             var newValue = new DateTime(currentValue.Year, month, Math.Min(currentValue.Day, DateTime.DaysInMonth(currentValue.Year, month)), currentValue.Hour, currentValue.Minute, currentValue.Second);
 
-            if (newValue != DateTimeValue)
-            {
-                CurrentDate = newValue;
-                Close();
-            }
+            CurrentDate = newValue;
+            Close();
         }
 
         /// <summary>
@@ -922,11 +919,8 @@ namespace Radzen.Blazor
             var currentValue = CurrentDate;
             var newValue = new DateTime(year, currentValue.Month, Math.Min(currentValue.Day, DateTime.DaysInMonth(year, currentValue.Month)), currentValue.Hour, currentValue.Minute, currentValue.Second);
 
-            if (newValue != DateTimeValue)
-            {
-                CurrentDate = newValue;
-                Close();
-            }
+            CurrentDate = newValue;
+            Close();
         }
 
         /// <summary>
