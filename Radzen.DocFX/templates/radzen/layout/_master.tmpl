@@ -14,16 +14,13 @@
         {{^_disableNavbar}}
         {{>partials/navbar}}
         {{/_disableNavbar}}
-        {{^_disableBreadcrumb}}
-        {{>partials/breadcrumb}}
-        {{/_disableBreadcrumb}}
       </header>
       {{#_enableSearch}}
-      <div class="container body-content">
+      <div class="container-fluid body-content">
         {{>partials/searchResults}}
       </div>
       {{/_enableSearch}}
-      <div role="main" class="container body-content hide-when-search">
+      <div role="main" class="container-fluid body-content hide-when-search">
       {{^_disableToc}}
         {{>partials/toc}}
         <div class="article row grid-right">
@@ -37,6 +34,9 @@
           {{^_disableAffix}}
           <div class="col-md-10">
           {{/_disableAffix}}
+            {{^_disableBreadcrumb}}
+            {{>partials/breadcrumb}}
+            {{/_disableBreadcrumb}}
             <article class="content wrap" id="_content" data-uid="{{uid}}">
                 {{!body}}
             </article>
