@@ -72,7 +72,7 @@
                                             {
                                                 <td @attributes="@(dateArgs.Attributes)" onmouseup=@(Inline || ShowTime ? "" : $"Radzen.closePopup('{PopupID}')")
                                                     @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
-                                                    <span class=@($"rz-state-default{(CurrentDate.Year == date.Year && CurrentDate.Day == date.Day ? " rz-state-active" : "")}{(!dateArgs.Disabled ? "" : " rz-state-disabled")}")>@date.Day</span>
+                                                    <span class=@($"rz-state-default{(DateTimeValue.HasValue && DateTimeValue.Value.Year == date.Year && DateTimeValue.Value.Month == date.Month && DateTimeValue.Value.Day == date.Day ? " rz-state-active" : "")}{(!dateArgs.Disabled ? "" : " rz-state-disabled")}")>@date.Day</span>
                                                 </td>
                                             }
                                             else
