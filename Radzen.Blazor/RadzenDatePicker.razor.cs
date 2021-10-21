@@ -145,6 +145,7 @@ namespace Radzen.Blazor
             else
             {
                 Value = newValue;
+                CurrentDate = newValue;
                 await OnChange();
             }
         }
