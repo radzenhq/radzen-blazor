@@ -70,7 +70,6 @@ namespace Radzen.Blazor
         {
             if (Menu != null)
             {
-                Menu.Close();
                 await Menu.Click.InvokeAsync(this);
             }
         }

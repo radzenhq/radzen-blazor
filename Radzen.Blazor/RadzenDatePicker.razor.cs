@@ -145,6 +145,7 @@ namespace Radzen.Blazor
             else
             {
                 Value = newValue;
+                CurrentDate = newValue;
                 await OnChange();
             }
         }
@@ -874,10 +875,6 @@ namespace Radzen.Blazor
                             .ToString();
         }
 
-        /// <summary>
-        /// Sets the day.
-        /// </summary>
-        /// <param name="newValue">The new value.</param>
         private async System.Threading.Tasks.Task SetDay(DateTime newValue)
         {
             if (ShowTimeOkButton)
@@ -896,42 +893,24 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Sets the month.
-        /// </summary>
-        /// <param name="month">The month.</param>
-        private async System.Threading.Tasks.Task SetMonth(int month)
+        private void SetMonth(int month)
         {
             var currentValue = CurrentDate;
             var newValue = new DateTime(currentValue.Year, month, Math.Min(currentValue.Day, DateTime.DaysInMonth(currentValue.Year, month)), currentValue.Hour, currentValue.Minute, currentValue.Second);
 
-            if (newValue != DateTimeValue)
-            {
-                CurrentDate = newValue;
-                Close();
-            }
+            CurrentDate = newValue;
+            Close();
         }
 
-        /// <summary>
-        /// Sets the year.
-        /// </summary>
-        /// <param name="year">The year.</param>
-        private async System.Threading.Tasks.Task SetYear(int year)
+        private void SetYear(int year)
         {
             var currentValue = CurrentDate;
             var newValue = new DateTime(year, currentValue.Month, Math.Min(currentValue.Day, DateTime.DaysInMonth(year, currentValue.Month)), currentValue.Hour, currentValue.Minute, currentValue.Second);
 
-            if (newValue != DateTimeValue)
-            {
-                CurrentDate = newValue;
-                Close();
-            }
+            CurrentDate = newValue;
+            Close();
         }
 
-        /// <summary>
-        /// Gets the open popup.
-        /// </summary>
-        /// <returns>System.String.</returns>
         private string getOpenPopup()
         {
             return !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
