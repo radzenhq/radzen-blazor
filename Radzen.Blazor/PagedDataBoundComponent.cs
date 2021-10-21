@@ -102,7 +102,7 @@ namespace Radzen
         /// </summary>
         /// <value>The pager summary visibility.</value>
         [Parameter]
-        public bool PageShowSummary { get; set; } = true;
+        public bool PageShowSummary { get; set; } = false;
 
         /// <summary>
         /// The view
