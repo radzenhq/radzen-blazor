@@ -42,7 +42,10 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
   }
 
   .rz-navigation-item-wrapper {
-    padding: $menu-top-item-padding;
+
+    .rz-navigation-item-link {
+      padding: $menu-top-item-padding;
+    }
 
     &:hover {
       background-color: $menu-top-item-hover-background-color;
@@ -91,7 +94,10 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
     background-color: $menu-background-color;
 
     .rz-navigation-item-wrapper {
-      padding: $menu-item-padding;
+
+      .rz-navigation-item-link {
+        padding: $menu-item-padding;
+      }
 
       &:hover {
         background-color: $menu-item-hover-background-color;
