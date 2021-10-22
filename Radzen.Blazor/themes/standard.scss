@@ -1011,7 +1011,7 @@ $fieldset-toggle-border: none !default;
 $slider-border: 1px solid $rz-base-300 !default;
 $slider-background-color: $rz-white !default;
 
-$slider-horizontal-height: 0.75rem !default;
+$slider-horizontal-height: 0.5rem !default;
 $slider-horizontal-width: 10rem !default;
 
 $slider-range-background-color: $rz-secondary-lighter !default;
@@ -1021,7 +1021,7 @@ $slider-handle-background-color: $rz-white !default;
 $slider-handle-width: 1.25rem !default;
 $slider-handle-height: 1.25rem !default;
 $slider-handle-border: 0.25rem solid $rz-primary;
-$slider-handle-border-radius: $rz-border-radius*4 !default;
+$slider-handle-border-radius: $rz-border-radius * 4 !default;
 $slider-handle-hover-border: $slider-handle-border !default;
 $slider-handle-hover-background-color: $rz-primary !default;
 $slider-handle-hover-shadow: none !default;
