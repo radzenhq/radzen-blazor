@@ -2,6 +2,7 @@
 $badge-pill-border-radius: $border-radius !default;
 $badge-padding: 0.25em 0.4em !default;
 $badge-pill-padding: $badge-padding !default;
+$badge-font-size: 75% !default;
 $badge-font-weight: 700 !default;
 $badge-line-height: 1 !default;
 $badge-text-transform: none !default;
@@ -44,7 +45,7 @@ $badge-styles: map-merge(
     color: $white;
     display: inline-block;
     padding: $badge-padding;
-    font-size: 75%;
+    font-size: $badge-font-size;
     font-weight: $badge-font-weight;
     line-height: $badge-line-height;
     text-align: center;

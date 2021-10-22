@@ -388,6 +388,7 @@ $badge-border-radius: $rz-border-radius !default;
 $badge-pill-border-radius: $rz-border-radius * 4 !default;
 $badge-padding: 0.125rem 0.25rem !default;
 $badge-pill-padding: 0.125rem 0.5rem !default;
+$badge-font-size: 0.75rem !default;
 $badge-font-weight: 600 !default;
 $badge-line-height: 1rem !default;
 $badge-text-transform: uppercase !default;
@@ -435,8 +436,7 @@ $panel-menu-hover-background-color: lighten($rz-base-900, 8%) !default;
 $panel-menu-hover-color: inherit !default;
 
 $panel-menu-item-line-height: 1.25rem !default;
-$panel-menu-item-margin: 0.5rem 1rem !default;
-$panel-menu-item-padding: 0.25rem 0 !default;
+$panel-menu-item-padding: 0.75rem 1rem !default;
 $panel-menu-item-border: 1px solid lighten($rz-base-900, 8%) !default;
 $panel-menu-item-active-background-color: $rz-base-900 !default;
 $panel-menu-item-active-color: inherit !default;
@@ -444,7 +444,7 @@ $panel-menu-item-active-indicator: $rz-secondary !default;
 $panel-menu-item-offset: 0.75rem !default;
 $panel-menu-item-transition: all 0.1s linear !default;
 
-$panel-menu-item-2nd-level-padding: 0 !default;
+$panel-menu-item-2nd-level-padding: 0.5rem 1rem !default;
 $panel-menu-item-2nd-level-offset: 2.75rem !default;
 $panel-menu-item-2nd-level-font-size: 0.875rem !default;
 $panel-menu-item-2nd-level-color: inherit !default;

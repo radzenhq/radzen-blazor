@@ -4,8 +4,7 @@ $panel-menu-hover-background-color: #28363c !default;
 $panel-menu-hover-color: $panel-menu-color !default;
 
 $panel-menu-item-line-height: 1.575 !default;
-$panel-menu-item-margin: 0 1.25rem 0 1.25rem !default;
-$panel-menu-item-padding: 0.625rem 0 !default;
+$panel-menu-item-padding: 0.625rem 1.25rem !default;
 $panel-menu-item-border: solid 1px #363d40 !default;
 $panel-menu-item-active-background-color: #28363c !default;
 $panel-menu-item-active-color: $panel-menu-color !default;
@@ -13,7 +12,7 @@ $panel-menu-item-active-indicator: $default-link !default;
 $panel-menu-item-offset: 0.75rem !default;
 $panel-menu-item-transition: none !default;
 
-$panel-menu-item-2nd-level-padding: 0.25rem 0 !default;
+$panel-menu-item-2nd-level-padding: 0.25rem 1.25rem !default;
 $panel-menu-item-2nd-level-offset: 3.625rem !default;
 $panel-menu-item-2nd-level-font-size: 0.875rem !default;
 $panel-menu-item-2nd-level-color: inherit !default;
@@ -27,7 +26,7 @@ $panel-menu-item-3rd-level-active-background-color: $panel-menu-item-3rd-level-h
 $panel-menu-item-3rd-level-active-color: $panel-menu-item-3rd-level-hover-color !default;
 
 $panel-menu-icon-width: 1.5rem !default;
-$panel-menu-icon-font-size: 1.125rem !default;
+$panel-menu-icon-font-size: 1.5em !default;
 $panel-menu-icon-color: $cool-grey !default;
 $panel-menu-icon-height: $panel-menu-icon-width !default;
 $panel-menu-icon-margin: 0 0.9375rem 0 0 !default;
@@ -54,7 +53,6 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   .rz-navigation-item-wrapper {
     position: relative;
     line-height: $panel-menu-item-line-height;
-    padding: $panel-menu-item-padding;
     transition: $panel-menu-item-transition;
 
     &:hover {
@@ -78,7 +76,7 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   }
 
   .rz-navigation-item-link {
-    padding: $panel-menu-item-margin;
+    padding: $panel-menu-item-padding;
     color: inherit;
     cursor: pointer;
   }
@@ -111,7 +109,6 @@ $panel-menu-toggle-icon-opacity: 1 !default;
     overflow: hidden;
 
     .rz-navigation-item-wrapper {
-      padding: $panel-menu-item-2nd-level-padding;
       background-color: $panel-menu-item-active-background-color;
 
       &:hover {
@@ -158,6 +155,7 @@ $panel-menu-toggle-icon-opacity: 1 !default;
       font-size: $panel-menu-item-2nd-level-font-size;
 
       .rz-navigation-item-link {
+        padding: $panel-menu-item-2nd-level-padding;
         padding-left: $panel-menu-item-2nd-level-offset;
       }
     }
