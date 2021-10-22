@@ -72,7 +72,7 @@ input {
 
   @extend %input-base;
 
-  &:not(:disabled) {
+  &:not(:disabled):not(.rz-state-disabled) {
     &:hover {
       @extend %input-hover;
     }
