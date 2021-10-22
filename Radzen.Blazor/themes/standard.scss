@@ -625,10 +625,10 @@ $grid-column-resizer-helper-background-color: $default-link !default;
 $grid-column-icon-width: 2rem !default;
 $grid-column-icon-padding: 0 !default;
 
-$grid-detail-template-border: 1px solid rgba(71, 156, 200, 0.2) !default;
-$grid-detail-template-border-radius: 2px !default;
-$grid-detail-template-padding: 0.625rem !default;
-$grid-detail-template-background-color: $white !default;
+$grid-detail-template-border: none !default;
+$grid-detail-template-border-radius: 0 !default;
+$grid-detail-template-padding: 0 !default;
+$grid-detail-template-background-color: $rz-base-100 !default;
 
 $grid-loading-indicator-background-color: $rz-secondary-lighter !default;
 $grid-button-icon-only-padding: 0 0.25rem !default;
