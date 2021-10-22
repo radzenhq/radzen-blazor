@@ -100,9 +100,14 @@ $dropdown-panel-border: $dropdown-open-border !default;
   display: flex;
   align-items: center;
   font-size: $dropdown-trigger-icon-height;
+  opacity: 0.4;
 
   &:before {
     content: 'close';
+  }
+
+  &:hover {
+    opacity: 1;
   }
 }
 
@@ -244,12 +249,12 @@ $dropdown-panel-border: $dropdown-open-border !default;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  margin-right: $dropdown-trigger-icon-width;
+  padding-right: $dropdown-trigger-icon-width;
 }
 
 .rz-clear {
   .rz-multiselect-label-container,
   .rz-dropdown-label {
-    margin-right: 2 * $dropdown-trigger-icon-width;
+    padding-right: 2 * $dropdown-trigger-icon-width;
   }
 }
