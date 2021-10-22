@@ -16,6 +16,10 @@ $checkbox-icon-width: 0.875rem !default;
 $checkbox-icon-height: $checkbox-icon-width !default;
 $checkbox-icon-font-size: 0.875rem !default;
 
+$checkbox-tri-icon-width: $checkbox-icon-width !default;
+$checkbox-tri-icon-height: $checkbox-icon-width !default;
+$checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
+
 .rz-checkbox-list-vertical {
   .rz-checkbox {
     display: flex;
@@ -46,6 +50,7 @@ $checkbox-icon-font-size: 0.875rem !default;
   position: relative;
 
   width: $checkbox-width;
+  min-width: $checkbox-width;
   height: $checkbox-height;
 
   .rz-helper-hidden-accessible {
@@ -97,6 +102,10 @@ $checkbox-icon-font-size: 0.875rem !default;
   }
 
   .rzi-times {
+    width: $checkbox-tri-icon-width;
+    height: $checkbox-tri-icon-height;
+    font-size: $checkbox-tri-icon-font-size;
+    
     &:before {
       content: 'close';
     }

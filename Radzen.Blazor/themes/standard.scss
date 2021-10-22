@@ -1034,7 +1034,7 @@ $slider-disabled-range-border: solid 1px rgba(211, 217, 219, 0.3) !default;
 $slider-disabled-background-color: rgba(211, 217, 219, 0.1) !default;
 $slider-disabled-border: solid 1px #dadfe2 !default;
 $slider-disabled-handle-background-color: #d3d9db !default;
-$slider-border-radius: $rz-border-radius*2 !default;
+$slider-border-radius: $rz-border-radius * 2 !default;
 
 // Checkbox
 
@@ -1046,15 +1046,19 @@ $checkbox-margin: 1rem 0;
 
 $checkbox-checked-background-color: $rz-white !default;
 $checkbox-checked-hover-background-color: $rz-white !default;
-$checkbox-checked-color: $rz-white !default;
+$checkbox-checked-color: $rz-primary !default;
 $checkbox-checked-shadow: none !default;
-$checkbox-checked-border: $input-border !default;
+$checkbox-checked-border: 1px solid $rz-primary !default;
 $checkbox-checked-icon-background-color: $rz-primary !default;
-$checkbox-checked-icon-border-radius: $rz-border-radius/2 !default;
+$checkbox-checked-icon-border-radius: $rz-border-radius / 2 !default;
 
-$checkbox-icon-width: 0.875rem !default;
+$checkbox-icon-width: 0.625rem !default;
 $checkbox-icon-height: $checkbox-icon-width !default;
-$checkbox-icon-font-size: 0.875rem !default;
+$checkbox-icon-font-size: 0 !default;
+
+$checkbox-tri-icon-width: $checkbox-icon-width !default;
+$checkbox-tri-icon-height: 0.125rem !default;
+$checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
 
 .rz-checkbox-list-vertical,
 .rz-checkbox-list-horizontal {
@@ -1090,9 +1094,9 @@ $radio-circle-background-color: $rz-primary !default;
 $radio-circle-shadow: none;
 $radio-circle-hover-background-color: $rz-primary-light !default;
 
-$radio-icon-width: 0.75rem !default;
+$radio-icon-width: 0.625rem !default;
 $radio-icon-height: $radio-icon-width !default;
-$radio-checked-border: $input-border !default;
+$radio-checked-border: 1px solid $rz-primary !default;
 
 .rz-radio-button-list-vertical,
 .rz-radio-button-list-horizontal {
