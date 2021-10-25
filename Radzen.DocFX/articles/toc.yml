@@ -16,109 +16,109 @@
     href: getting-started/tooltip.md
 - name: Components
   items:
-    - title: Accordion
+    - name: Accordion
       href: components/accordion.md
-    - title: Autocomplete
+    - name: Autocomplete
       href: components/autocomplete.md
-    - title: Button
+    - name: Button
       href: components/button.md
-    - title: SplitButton
+    - name: SplitButton
       href: components/splitbutton.md
-    - title: Chart
+    - name: Chart
       href: components/chart.md
-    - title: CheckBox
+    - name: CheckBox
       href: components/checkbox.md
-    - title: CheckBoxList
+    - name: CheckBoxList
       href: components/checkboxlist.md
-    - title: ColorPicker
+    - name: ColorPicker
       href: components/colorpicker.md
-    - title: Dialog
+    - name: Dialog
       href: components/dialog.md
-    - title: DataGrid
+    - name: DataGrid
       href: components/datagrid.md
-    - title: DataList
+    - name: DataList
       href: components/datalist.md
-    - title: Pager
+    - name: Pager
       href: components/pager.md
-    - title: DatePicker
+    - name: DatePicker
       href: components/datepicker.md
-    - title: DropDown
+    - name: DropDown
       href: components/dropdown.md
-    - title: DropDownDataGrid
+    - name: DropDownDataGrid
       href: components/dropdown-datagrid.md
-    - title: Fieldset
+    - name: Fieldset
       href: components/fieldset.md
-    - title: FileInput
+    - name: FileInput
       href: components/fileinput.md
-    - title: Gauge
+    - name: Gauge
       href: components/gauge.md
-    - title: Gravatar
+    - name: Gravatar
       href: components/gravatar.md
-    - title: GoogleMap
+    - name: GoogleMap
       href: components/googlemap.md
-    - title: Image
+    - name: Image
       href: components/image.md
-    - title: Icon
+    - name: Icon
       href: components/icon.md
-    - title: Link
+    - name: Link
       href: components/link.md
-    - title: HtmlEditor
+    - name: HtmlEditor
       href: components/htmleditor.md
-    - title: Label
+    - name: Label
       href: components/label.md
-    - title: ListBox
+    - name: ListBox
       href: components/listbox.md
-    - title: Menu
+    - name: Menu
       href: components/menu.md
-    - title: ProfileMenu
+    - name: ProfileMenu
       href: components/profilemenu.md
-    - title: PanelMenu
+    - name: PanelMenu
       href: components/panelmenu.md
-    - title: ContextMenu
+    - name: ContextMenu
       href: components/contextmenu.md
-    - title: Login
+    - name: Login
       href: components/login.md
-    - title: Notification
+    - name: Notification
       href: components/notification.md
-    - title: Tooltip
+    - name: Tooltip
       href: components/tooltip.md
-    - title: Numeric
+    - name: Numeric
       href: components/numeric.md
-    - title: Panel
+    - name: Panel
       href: components/panel.md
-    - title: Password
+    - name: Password
       href: components/password.md
-    - title: ProgressBar
+    - name: ProgressBar
       href: components/progressbar.md
-    - title: RadioButtonList
+    - name: RadioButtonList
       href: components/radiobuttonlist.md
-    - title: Rating
+    - name: Rating
       href: components/rating.md
-    - title: Scheduler
+    - name: Scheduler
       href: components/scheduler.md
-    - title: SelectBar
+    - name: SelectBar
       href: components/selectbar.md
-    - title: Slider
+    - name: Slider
       href: components/slider.md
-    - title: Steps
+    - name: Steps
       href: components/steps.md
-    - title: SSRSViewer
+    - name: SSRSViewer
       href: components/ssrsviewer.md
-    - title: Splitter
+    - name: Splitter
       href: components/splitter.md
-    - title: Switch
+    - name: Switch
       href: components/switch.md
-    - title: Tabs
+    - name: Tabs
       href: components/tabs.md
-    - title: TemplateForm
+    - name: TemplateForm
       href: components/template-form.md
-    - title: TextBox
+    - name: TextBox
       href: components/textbox.md
-    - title: TextArea
+    - name: TextArea
       href: components/textarea.md
-    - title: Mask
+    - name: Mask
       href: components/mask.md
-    - title: Tree
+    - name: Tree
       href: components/tree.md
-    - title: Upload
+    - name: Upload
       href: components/upload.md
