@@ -1,6 +1,6 @@
 # Welcome to Radzen.Blazor!
 
-Congratulations! You have discovered the Radzen Blazor commponents - the most complete, free and open source component library for Blazor. Here you will find helpful instructions and tutorial that will allow you to get productive fast.
+Congratulations! You have discovered the Radzen Blazor commponents - the most complete, free and open source component library for Blazor. Here you will find helpful instructions and article that will allow you to get productive fast.
 
 ## Where to start
 

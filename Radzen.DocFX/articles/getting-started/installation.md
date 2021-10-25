@@ -1,5 +1,5 @@
 # Installation
-This tutorial shows you how to add Radzen Blazor components to your project.
+This article shows you how to add Radzen Blazor components to your project.
 
 1. [Install the Nuget package](#install-the-nuget-package)
 1. [Import the namespaces](#import-the-namespaces)

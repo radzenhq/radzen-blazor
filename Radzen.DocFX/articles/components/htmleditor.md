@@ -1,5 +1,5 @@
 # HtmlEditor component
-This guide demonstrates how to use RadzenHtmlEditor.
+This article demonstrates how to use RadzenHtmlEditor.
 
 ## Get and set the value
 As all Radzen Blazor input components the HtmlEditor has a `Value` property which gets and sets the value of the component.
