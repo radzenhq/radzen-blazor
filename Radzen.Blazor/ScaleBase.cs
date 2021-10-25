@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class ScaleBase.
+    /// Base class for RadzenChart scales.
     /// </summary>
     public abstract class ScaleBase
     {
@@ -34,18 +34,16 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Tickses the specified distance.
+        /// Calculates the number of ticks with the specified distance.
         /// </summary>
         /// <param name="distance">The distance.</param>
-        /// <returns>System.ValueTuple&lt;System.Double, System.Double, System.Double&gt;.</returns>
         abstract public (double Start, double End, double Step) Ticks(int distance);
 
         /// <summary>
-        /// Scales the specified value.
+        /// Converts the specified value to a value from this scale with optional padding.
         /// </summary>
         /// <param name="value">The value.</param>
-        /// <param name="padding">if set to <c>true</c> [padding].</param>
-        /// <returns>System.Double.</returns>
+        /// <param name="padding">Whether to apply padding.</param>
         abstract public double Scale(double value, bool padding = false);
 
         /// <summary>
@@ -53,7 +51,6 @@ namespace Radzen.Blazor
         /// </summary>
         /// <typeparam name="TItem">The type of the t item.</typeparam>
         /// <param name="selector">The selector.</param>
-        /// <returns>Func&lt;TItem, System.Double&gt;.</returns>
         public virtual Func<TItem, double> Compose<TItem>(Func<TItem, double> selector)
         {
             return (value) => Scale(selector(value), true);
@@ -66,7 +63,7 @@ namespace Radzen.Blazor
         public object Step { get; set; }
 
         /// <summary>
-        /// Resizes the specified minimum.
+        /// Resizes the scale to the specified values.
         /// </summary>
         /// <param name="min">The minimum.</param>
         /// <param name="max">The maximum.</param>
@@ -86,11 +83,10 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Nices the number.
+        /// Returns a "nice" number (closest power of 10).
         /// </summary>
         /// <param name="range">The range.</param>
-        /// <param name="round">if set to <c>true</c> [round].</param>
-        /// <returns>System.Double.</returns>
+        /// <param name="round">Wether to round.</param>
         public double NiceNumber(double range, bool round)
         {
             var exponent = Math.Floor(Math.Log10(range));
@@ -123,7 +119,7 @@ namespace Radzen.Blazor
         public double Padding { get; set; }
 
         /// <summary>
-        /// Fits the specified distance.
+        /// Fits the scale within the distance.
         /// </summary>
         /// <param name="distance">The distance.</param>
         public virtual void Fit(int distance)
@@ -137,14 +133,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Values the specified value.
+        /// Returns a value from the scale.
         /// </summary>
         /// <param name="value">The value.</param>
-        /// <returns>System.Object.</returns>
         public abstract object Value(double value);
 
         /// <summary>
-        /// Formats the tick.
+        /// Formats the tick value.
         /// </summary>
         /// <param name="format">The format.</param>
         /// <param name="value">The value.</param>
@@ -158,10 +153,10 @@ namespace Radzen.Blazor
         public bool Round { get; set; } = true;
 
         /// <summary>
-        /// Determines whether [is equal to] [the specified scale].
+        /// Determines whether the specified scale is equal to the current one.
         /// </summary>
         /// <param name="scale">The scale.</param>
-        /// <returns><c>true</c> if [is equal to] [the specified scale]; otherwise, <c>false</c>.</returns>
+        /// <returns><c>true</c> if the scales are equal; otherwise, <c>false</c>.</returns>
         public bool IsEqualTo(ScaleBase scale)
         {
             if (GetType() != scale.GetType())

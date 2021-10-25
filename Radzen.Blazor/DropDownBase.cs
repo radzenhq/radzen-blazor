@@ -64,9 +64,9 @@ namespace Radzen
         public int PageSize { get; set; } = 5;
 #endif
         /// <summary>
-        /// Determines whether [is virtualization allowed].
+        /// Determines whether virtualization is allowed.
         /// </summary>
-        /// <returns><c>true</c> if [is virtualization allowed]; otherwise, <c>false</c>.</returns>
+        /// <returns><c>true</c> if virtualization is allowed; otherwise, <c>false</c>.</returns>
         internal bool IsVirtualizationAllowed()
         {
 #if NET5
@@ -128,16 +128,16 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow filtering].
+        /// Gets or sets a value indicating whether filtering is allowed. Set to <c>false</c> by default.
         /// </summary>
-        /// <value><c>true</c> if [allow filtering]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if filtering is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public virtual bool AllowFiltering { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow clear].
+        /// Gets or sets a value indicating whether the user can clear the value. Set to <c>false</c> by default.
         /// </summary>
-        /// <value><c>true</c> if [allow clear]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if clearing is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowClear { get; set; }
 

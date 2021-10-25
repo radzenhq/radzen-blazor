@@ -56,16 +56,11 @@ namespace Radzen
             }
         }
 
-        /// <summary>
-        /// Handles the OnLocationChanged event of the UriHelper control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs"/> instance containing the event data.</param>
         private void UriHelper_OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
         {
             if (dialogs.Count > 0)
             {
-                this.Close();
+                Close();
             }
         }
 
@@ -80,24 +75,24 @@ namespace Radzen
         public event Action OnRefresh;
 
         /// <summary>
-        /// Occurs when [on open].
+        /// Occurs when a new dialog is open.
         /// </summary>
         public event Action<string, Type, Dictionary<string, object>, DialogOptions> OnOpen;
 
         /// <summary>
-        /// Opens the specified title.
+        /// Opens a dialog with the specified arguments.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="title">The title.</param>
-        /// <param name="parameters">The parameters.</param>
-        /// <param name="options">The options.</param>
+        /// <typeparam name="T">The type of the Blazor component which will be displayed in a dialog.</typeparam>
+        /// <param name="title">The text displayed in the title bar of the dialog.</param>
+        /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T" />.</param>
+        /// <param name="options">The dialog options.</param>
         public void Open<T>(string title, Dictionary<string, object> parameters = null, DialogOptions options = null) where T : ComponentBase
         {
             OpenDialog<T>(title, parameters, options);
         }
 
         /// <summary>
-        /// Refreshes this instance.
+        /// Invokes <see cref="OnRefresh" />.
         /// </summary>
         public void Refresh()
         {
@@ -110,13 +105,13 @@ namespace Radzen
         protected List<TaskCompletionSource<dynamic>> tasks = new List<TaskCompletionSource<dynamic>>();
 
         /// <summary>
-        /// Opens the asynchronous.
+        /// Opens a dialog with the specified arguments.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="title">The title.</param>
-        /// <param name="parameters">The parameters.</param>
-        /// <param name="options">The options.</param>
-        /// <returns>Task&lt;dynamic&gt;.</returns>
+        /// <typeparam name="T">The type of the Blazor component which will be displayed in a dialog.</typeparam>
+        /// <param name="title">The text displayed in the title bar of the dialog.</param>
+        /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T" />.</param>
+        /// <param name="options">The dialog options.</param>
+        /// <returns>The value passed as argument to <see cref="Close" />.</returns>
         public Task<dynamic> OpenAsync<T>(string title, Dictionary<string, object> parameters = null, DialogOptions options = null) where T : ComponentBase
         {
             var task = new TaskCompletionSource<dynamic>();
@@ -126,13 +121,14 @@ namespace Radzen
 
             return task.Task;
         }
+
         /// <summary>
-        /// Opens the asynchronous.
+        /// Opens a dialog with the specified content.
         /// </summary>
-        /// <param name="title">The title.</param>
-        /// <param name="childContent">Content of the child.</param>
-        /// <param name="options">The options.</param>
-        /// <returns>Task&lt;dynamic&gt;.</returns>
+        /// <param name="title">The text displayed in the title bar of the dialog.</param>
+        /// <param name="childContent">The content displayed in the dialog.</param>
+        /// <param name="options">The dialog options.</param>
+        /// <returns>The value passed as argument to <see cref="Close" />.</returns>
         public Task<dynamic> OpenAsync(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
         {
             var task = new TaskCompletionSource<dynamic>();
@@ -148,11 +144,11 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Opens the specified title.
+        /// Opens a dialog with the specified content.
         /// </summary>
-        /// <param name="title">The title.</param>
-        /// <param name="childContent">Content of the child.</param>
-        /// <param name="options">The options.</param>
+        /// <param name="title">The text displayed in the title bar of the dialog.</param>
+        /// <param name="childContent">The content displayed in the dialog.</param>
+        /// <param name="options">The dialog options.</param>
         public void Open(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
         {
             options = options ?? new DialogOptions();
@@ -166,13 +162,7 @@ namespace Radzen
         /// The dialogs
         /// </summary>
         protected List<object> dialogs = new List<object>();
-        /// <summary>
-        /// Opens the dialog.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="title">The title.</param>
-        /// <param name="parameters">The parameters.</param>
-        /// <param name="options">The options.</param>
+
         private void OpenDialog<T>(string title, Dictionary<string, object> parameters, DialogOptions options)
         {
             dialogs.Add(new object());
@@ -194,7 +184,7 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Closes the specified result.
+        /// Closes the last opened dialog with optional result.
         /// </summary>
         /// <param name="result">The result.</param>
         public void Close(dynamic result = null)
@@ -215,21 +205,19 @@ namespace Radzen
             }
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public void Dispose()
         {
             UriHelper.LocationChanged -= UriHelper_OnLocationChanged;
         }
 
         /// <summary>
-        /// Confirms the specified message.
+        /// Displays a confirmation dialog.
         /// </summary>
-        /// <param name="message">The message.</param>
-        /// <param name="title">The title.</param>
+        /// <param name="message">The message displayed to the user.</param>
+        /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="options">The options.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
         public async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions options = null) => await OpenAsync(title, ds => {
             RenderFragment content = b =>
             {
@@ -285,52 +273,54 @@ namespace Radzen
     public class DialogOptions
     {
         /// <summary>
-        /// Gets or sets a value indicating whether [show title].
+        /// Gets or sets a value indicating whether to show the title bar. Set to <c>true</c> by default.
         /// </summary>
-        /// <value><c>true</c> if [show title]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if title bar is shown; otherwise, <c>false</c>.</value>
         public bool ShowTitle { get; set; } = true;
+
         /// <summary>
-        /// Gets or sets a value indicating whether [show close].
+        /// Gets or sets a value indicating whether to show the close button. Set to <c>true</c> by default.
         /// </summary>
-        /// <value><c>true</c> if [show close]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if the close button is shown; otherwise, <c>false</c>.</value>
         public bool ShowClose { get; set; } = true;
+
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="DialogOptions"/> is resizable.
+        /// Gets or sets a value indicating whether the dialog is resizable. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if resizable; otherwise, <c>false</c>.</value>
         public bool Resizable { get; set; } = false;
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="DialogOptions"/> is draggable.
+        /// Gets or sets a value indicating whether the dialog is draggable. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if draggable; otherwise, <c>false</c>.</value>
         public bool Draggable { get; set; } = false;
         /// <summary>
-        /// Gets or sets the left.
+        /// Gets or sets the X coordinate of the dialog. Maps to the <c>left</c> CSS attribute.
         /// </summary>
         /// <value>The left.</value>
         public string Left { get; set; }
         /// <summary>
-        /// Gets or sets the top.
+        /// Gets or sets the Y coordinate of the dialog. Maps to the <c>top</c> CSS attribute.
         /// </summary>
         /// <value>The top.</value>
         public string Top { get; set; }
         /// <summary>
-        /// Gets or sets the bottom.
+        /// Specifies the <c>bottom</c> CSS attribute.
         /// </summary>
         /// <value>The bottom.</value>
         public string Bottom { get; set; }
         /// <summary>
-        /// Gets or sets the width.
+        /// Gets or sets the width of the dialog.
         /// </summary>
         /// <value>The width.</value>
         public string Width { get; set; }
         /// <summary>
-        /// Gets or sets the height.
+        /// Gets or sets the height of the dialog.
         /// </summary>
         /// <value>The height.</value>
         public string Height { get; set; }
         /// <summary>
-        /// Gets or sets the style.
+        /// Gets or sets the CSS style of the dialog
         /// </summary>
         /// <value>The style.</value>
         public string Style { get; set; }
@@ -340,10 +330,10 @@ namespace Radzen
         /// <value>The child content.</value>
         public RenderFragment<DialogService> ChildContent { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether [automatic focus first element].
+        /// Gets or sets a value indicating whether to focus the first focusable HTML element. Set to <c>true</c> by default.
         /// </summary>
-        /// <value><c>true</c> if [automatic focus first element]; otherwise, <c>false</c>.</value>
         public bool AutoFocusFirstElement { get; set; } = true;
+
         /// <summary>
         /// Gets or sets a value indicating whether the dialog should be closed by clicking the overlay.
         /// </summary>
@@ -353,20 +343,16 @@ namespace Radzen
 
     /// <summary>
     /// Class ConfirmOptions.
-    /// Implements the <see cref="Radzen.DialogOptions" />
     /// </summary>
-    /// <seealso cref="Radzen.DialogOptions" />
     public class ConfirmOptions : DialogOptions
     {
         /// <summary>
-        /// Gets or sets the ok button text.
+        /// Gets or sets the text of the OK button.
         /// </summary>
-        /// <value>The ok button text.</value>
         public string OkButtonText { get; set; }
         /// <summary>
-        /// Gets or sets the cancel button text.
+        /// Gets or sets the text of the Cancel button.
         /// </summary>
-        /// <value>The cancel button text.</value>
         public string CancelButtonText { get; set; }
     }
 
