@@ -41,11 +41,11 @@ Open `_Host.cshtml` (server-side Blazor) or `wwwroot/index.html` (client-side Bl
 
 ## Next steps
 
-You are now ready to use a Radzen Blazor components!. Check [Using a component](articles/getting-started/using.md) to see how to add
-a Radzen Blazor component to your page.
+You are now ready to use Radzen Blazor components! Check [Using a component](use-component.md) to see how to add a Radzen Blazor component to your page.
 
 Some components require additional setup:
 
-- [Dialogs](articles/getting-started/dialog.md)
-- [Tooltips](articles/getting-started/tooltip.md)
-- [Context menu](articles/getting-started/context-menu.md)
+- [Context menu](context-menu.md)
+- [Dialog](dialog.md)
+- [Notification](context-menu.md)
+- [Tooltip](tooltip.md)
