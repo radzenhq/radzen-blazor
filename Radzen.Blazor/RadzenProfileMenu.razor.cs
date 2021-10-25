@@ -18,10 +18,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenProfileMenu : RadzenComponentWithChildren
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-menu rz-profile-menu";

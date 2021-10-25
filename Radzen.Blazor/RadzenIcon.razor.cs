@@ -19,10 +19,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string Icon { get; set; }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rzi d-inline-flex justify-content-center align-items-center";

@@ -50,11 +50,7 @@ namespace Radzen.Blazor
         private bool disabledChanged = false;
         private bool firstRender = true;
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
@@ -71,11 +67,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// On after render as an asynchronous operation.
-        /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -130,18 +122,13 @@ namespace Radzen.Blazor
             await OnSelectItem(item, isFromKey);
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-dropdown").Add("rz-clear", AllowClear).ToString();
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();

@@ -10,10 +10,7 @@ namespace Radzen.Blazor
     /// </summary>
     public partial class RadzenCard : RadzenComponentWithChildren
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-card card";

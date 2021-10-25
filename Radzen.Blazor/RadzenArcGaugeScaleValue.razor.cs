@@ -71,20 +71,14 @@ namespace Radzen.Blazor
         [CascadingParameter]
         public RadzenArcGauge Gauge { get; set; }
 
-        /// <summary>
-        /// Called when initialized.
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             base.OnInitialized();
 
             Gauge.AddValue(this);
         }
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var shouldRefresh = false;

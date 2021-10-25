@@ -27,10 +27,7 @@ namespace Radzen.Blazor
 
         private bool IsOpen { get; set; } = false;
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             var classList = new List<string>();

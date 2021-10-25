@@ -24,10 +24,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenPanel : RadzenComponentWithChildren
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-panel";
@@ -119,19 +116,13 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Called when initialized.
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             collapsed = Collapsed;
         }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             if (parameters.DidParameterChange(nameof(Collapsed), Collapsed))

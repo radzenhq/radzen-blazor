@@ -335,10 +335,7 @@ namespace Radzen.Blazor
                 await Popup.ToggleAsync(Element);
             }
         }
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             var classList = new List<string>() { "rz-colorpicker" };
@@ -351,9 +348,7 @@ namespace Radzen.Blazor
             return string.Join(" ", classList);
         }
 
-        /// <summary>
-        /// Called when initialized.
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             Init();
@@ -387,11 +382,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var valueChanged = parameters.DidParameterChange(nameof(Value), Value);

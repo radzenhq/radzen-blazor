@@ -466,9 +466,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();

@@ -294,20 +294,13 @@ namespace Radzen.Blazor
             SelectedIndex = 0;
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-steps";
         }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var selectedIndexChanged = parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex);
@@ -327,9 +320,7 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();

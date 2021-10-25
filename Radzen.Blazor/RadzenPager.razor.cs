@@ -16,10 +16,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenPager : RadzenComponent
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-paginator rz-unselectable-text rz-helper-clearfix";

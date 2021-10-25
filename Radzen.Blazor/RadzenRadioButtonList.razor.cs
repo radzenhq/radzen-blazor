@@ -104,10 +104,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList(Orientation == Orientation.Horizontal ? "rz-radio-button-list-horizontal" : "rz-radio-button-list-vertical").ToString();

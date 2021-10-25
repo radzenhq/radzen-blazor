@@ -1149,11 +1149,7 @@ namespace Radzen.Blazor
         private bool visibleChanged = false;
         private bool firstRender = true;
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var emptyTextChanged = parameters.DidParameterChange(nameof(EmptyText), EmptyText);
@@ -1199,11 +1195,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// On after render as an asynchronous operation.
-        /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -1658,10 +1650,7 @@ namespace Radzen.Blazor
             InvokeAsync(Reload);
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             var additionalClasses = new List<string>();
@@ -1701,9 +1690,7 @@ namespace Radzen.Blazor
 
         internal bool disposed = false;
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();

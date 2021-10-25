@@ -15,10 +15,7 @@ namespace Radzen.Blazor
         [Parameter]
         public override string Style { get; set; } = "margin-top: 51px; margin-bottom: 57px; margin-left:250px;";
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "body";

@@ -23,10 +23,7 @@ namespace Radzen.Blazor
         /// </summary>
         protected ElementReference input;
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-spinner").ToString();
@@ -241,11 +238,7 @@ namespace Radzen.Blazor
         [Parameter]
         public decimal? Max { get; set; }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             bool minChanged = parameters.DidParameterChange(nameof(Min), Min);

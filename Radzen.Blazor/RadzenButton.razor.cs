@@ -128,10 +128,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return $"rz-button rz-button-{getButtonSize()} btn-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLower()}{(IsDisabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}";

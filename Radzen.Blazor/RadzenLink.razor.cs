@@ -12,10 +12,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenLink : RadzenComponent
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-link";
