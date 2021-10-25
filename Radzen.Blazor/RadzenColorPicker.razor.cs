@@ -8,9 +8,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenColorPicker component.
-    /// Implements the <see cref="Radzen.FormComponent{System.String}" />
     /// </summary>
-    /// <seealso cref="Radzen.FormComponent{System.String}" />
     /// <example>
     /// <code>
     /// &lt;RadzenColorPicker @bind-Value=@color Change=@(args => Console.WriteLine($"Selected color: {args}")) /&gt;
@@ -281,7 +279,6 @@ namespace Radzen.Blazor
             TriggerChange();
         }
 
-        /// <summary>
         async Task OnClick()
         {
             await ValueChanged.InvokeAsync(Color);

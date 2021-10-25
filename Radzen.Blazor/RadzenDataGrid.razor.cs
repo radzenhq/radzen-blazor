@@ -12,10 +12,8 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenDataGrid component.
-    /// Implements the <see cref="Radzen.PagedDataBoundComponent{TItem}" />
     /// </summary>
     /// <typeparam name="TItem">The type of the DataGrid data item.</typeparam>
-    /// <seealso cref="Radzen.PagedDataBoundComponent{TItem}" />
     /// <example>
     /// <code>
     /// &lt;RadzenDataGrid @data=@orders TItem="Order" AllowSorting="true" AllowPaging="true" AllowFiltering="true"&gt;
