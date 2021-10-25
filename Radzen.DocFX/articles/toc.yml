@@ -6,3 +6,115 @@
     href: getting-started/installation.md
   - name: Using a component
     href: getting-started/use-component.md
+- name: Components
+  items:
+  - title: Accordion
+      href: components/accordion.md
+    - title: Autocomplete
+      href: components/autocomplete.md
+    - title: Button
+      href: components/button.md
+    - title: SplitButton
+      href: components/splitbutton.md
+    - title: Card
+      href: components/card.md
+    - title: Chart
+      href: components/chart.md
+    - title: CheckBox
+      href: components/checkbox.md
+    - title: CheckBoxList
+      href: components/checkboxlist.md
+    - title: ColorPicker
+      href: components/colorpicker.md
+    - title: Dialog
+      href: components/dialog.md
+    - title: DataGrid
+      href: components/datagrid.md
+    - title: DataList
+      href: components/datalist.md
+    - title: Pager
+      href: components/pager.md
+    - title: DatePicker
+      href: components/datepicker.md
+    - title: DropDown
+      href: components/dropdown.md
+    - title: DropDownDataGrid
+      href: components/dropdown-datagrid.md
+    - title: Fieldset
+      href: components/fieldset.md
+    - title: FileInput
+      href: components/fileinput.md
+    - title: Gauge
+      href: components/gauge.md
+    - title: Gravatar
+      href: components/gravatar.md
+    - title: GoogleMap
+      href: components/googlemap.md
+    - title: Image
+      href: components/image.md
+    - title: Icon
+      href: components/icon.md
+    - title: Link
+      href: components/link.md
+    - title: HTML
+      href: components/html.md
+    - title: HtmlEditor
+      href: components/htmleditor.md
+    - title: Label
+      href: components/label.md
+    - title: ListBox
+      href: components/listbox.md
+    - title: Menu
+      href: components/menu.md
+    - title: ProfileMenu
+      href: components/profilemenu.md
+    - title: PanelMenu
+      href: components/panelmenu.md
+    - title: ContextMenu
+      href: components/contextmenu.md
+    - title: Login
+      href: components/login.md
+    - title: Notification
+      href: components/notification.md
+    - title: Tooltip
+      href: components/tooltip.md
+    - title: Numeric
+      href: components/numeric.md
+    - title: Panel
+      href: components/panel.md
+    - title: Password
+      href: components/password.md
+    - title: ProgressBar
+      href: components/progressbar.md
+    - title: RadioButtonList
+      href: components/radiobuttonlist.md
+    - title: Rating
+      href: components/rating.md
+    - title: Scheduler
+      href: components/scheduler.md
+    - title: SelectBar
+      href: components/selectbar.md
+    - title: Slider
+      href: components/slider.md
+    - title: Steps
+      href: components/steps.md
+    - title: SSRSViewer
+      href: components/ssrsviewer.md
+    - title: Splitter
+      href: components/splitter.md
+    - title: Switch
+      href: components/switch.md
+    - title: Tabs
+      href: components/tabs.md
+    - title: TemplateForm
+      href: components/template-form.md
+    - title: TextBox
+      href: components/textbox.md
+    - title: TextArea
+      href: components/textarea.md
+    - title: Mask
+      href: components/mask.md
+    - title: Tree
+      href: components/tree.md
+    - title: Upload
+      href: components/upload.md
