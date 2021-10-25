@@ -5,9 +5,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// Class RadzenLegend.
-    /// Implements the <see cref="Radzen.Blazor.RadzenChartComponentBase" />
     /// </summary>
-    /// <seealso cref="Radzen.Blazor.RadzenChartComponentBase" />
     public class RadzenLegend : RadzenChartComponentBase
     {
         /// <summary>

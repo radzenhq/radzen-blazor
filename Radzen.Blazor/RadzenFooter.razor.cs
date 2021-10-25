@@ -2,9 +2,7 @@
 {
     /// <summary>
     /// RadzenFooter component.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
     public partial class RadzenFooter : RadzenComponentWithChildren
     {
         /// <summary>
