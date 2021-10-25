@@ -8,6 +8,12 @@
     href: getting-started/use-component.md
   - name: Context menu setup
     href: getting-started/context-menu.md
+  - name: Dialog setup
+    href: getting-started/dialog.md
+  - name: Notification setup
+    href: getting-started/notification.md
+  - name: Tooltip setup
+    href: getting-started/tooltip.md
 - name: Components
   items:
     - title: Accordion
