@@ -17,10 +17,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenDataList<TItem> : PagedDataBoundComponent<TItem>
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-datalist-content";

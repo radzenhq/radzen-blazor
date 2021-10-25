@@ -35,10 +35,7 @@ namespace Radzen.Blazor
 
         bool CheckBoxChecked => object.Equals(Value, true);
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-chkbox").ToString();

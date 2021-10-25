@@ -66,11 +66,7 @@ namespace Radzen.Blazor
 
         private bool IsJSRuntimeAvailable { get; set; }
 
-        /// <summary>
-        /// On after render as an asynchronous operation.
-        /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             IsJSRuntimeAvailable = true;
@@ -100,9 +96,7 @@ namespace Radzen.Blazor
             await InvokeAsync(() => { StateHasChanged(); });
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public void Dispose()
         {
             if (IsJSRuntimeAvailable)
@@ -115,9 +109,7 @@ namespace Radzen.Blazor
             Service.OnNavigate -= OnNavigate;
         }
 
-        /// <summary>
-        /// Called when initialized.
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             UniqueID = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("/", "-").Replace("+", "-").Substring(0, 10);

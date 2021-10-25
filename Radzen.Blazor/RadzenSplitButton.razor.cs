@@ -107,10 +107,7 @@ namespace Radzen.Blazor
             return $"Radzen.togglePopup(this.parentNode, '{PopupID}')";
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return Disabled ? "rz-splitbutton rz-buttonset rz-state-disabled" : "rz-splitbutton rz-buttonset";

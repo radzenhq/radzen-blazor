@@ -12,10 +12,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenRating : FormComponent<int>
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-rating").Add("rz-state-readonly", ReadOnly).ToString();

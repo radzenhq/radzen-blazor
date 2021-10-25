@@ -42,9 +42,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Called when initialized.
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             UriHelper.LocationChanged += UriHelper_OnLocationChanged;
@@ -58,9 +56,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();
@@ -86,10 +82,7 @@ namespace Radzen.Blazor
             item.Select(selected);
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-panel-menu";

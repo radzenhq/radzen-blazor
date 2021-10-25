@@ -167,19 +167,14 @@ namespace Radzen.Blazor
         }
 
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();
             Splitter?.RemovePane(this);
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return $"rz-splitter-pane rz-splitter-pane-{ClassName}";

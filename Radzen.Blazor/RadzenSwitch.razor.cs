@@ -13,10 +13,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenSwitch : FormComponent<bool>
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-switch").Add("rz-switch-checked", Value).ToString();

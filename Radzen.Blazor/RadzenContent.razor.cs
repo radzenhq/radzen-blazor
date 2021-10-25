@@ -14,10 +14,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string Container { get; set; }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "content";

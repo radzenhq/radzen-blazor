@@ -134,11 +134,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var selectedChanged = parameters.DidParameterChange(nameof(Selected), Selected);
@@ -160,9 +156,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public void Dispose()
         {
             Tabs?.RemoveItem(this);

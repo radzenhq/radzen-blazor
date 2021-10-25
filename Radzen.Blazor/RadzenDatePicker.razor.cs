@@ -211,9 +211,7 @@ namespace Radzen.Blazor
         IList<NameValue> months;
         IList<NameValue> years;
 
-        /// <summary>
-        /// Called when initialized.
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             base.OnInitialized();
@@ -734,10 +732,7 @@ namespace Radzen.Blazor
 
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return ClassList.Create()
@@ -808,11 +803,7 @@ namespace Radzen.Blazor
         [Parameter]
         public Expression<Func<TValue>> ValueExpression { get; set; }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var shouldClose = false;
@@ -842,9 +833,7 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();

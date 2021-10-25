@@ -42,10 +42,7 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AutoComplete { get; set; } = true;
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "login";

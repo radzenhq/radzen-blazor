@@ -37,10 +37,7 @@ namespace Radzen.Blazor
         ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only")
                                               .AddDisabled(Disabled);
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-fileupload").ToString();

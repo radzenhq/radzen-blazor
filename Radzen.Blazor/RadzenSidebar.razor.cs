@@ -14,10 +14,7 @@ namespace Radzen.Blazor
         [Parameter]
         public override string Style { get; set; } = "top:51px;bottom:57px;width:250px;";
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-sidebar";

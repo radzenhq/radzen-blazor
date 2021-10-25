@@ -21,10 +21,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string Size { get; set; } = "H1";
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-heading";

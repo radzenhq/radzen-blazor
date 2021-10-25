@@ -10,10 +10,7 @@ namespace Radzen.Blazor
     /// </summary>
     public partial class RadzenPanelMenuItem : RadzenComponent
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-navigation-item";
@@ -209,11 +206,7 @@ namespace Radzen.Blazor
 
         private bool expanded = false;
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             if (parameters.DidParameterChange(nameof(Expanded), Expanded))

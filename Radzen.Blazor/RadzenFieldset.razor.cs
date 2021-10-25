@@ -24,10 +24,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenFieldset : RadzenComponent
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return AllowCollapse ? "rz-fieldset rz-fieldset-toggleable" : "rz-fieldset";
@@ -119,19 +116,13 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Called when initialized.
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             collapsed = Collapsed;
         }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             if (parameters.DidParameterChange(nameof(Collapsed), Collapsed))
@@ -142,10 +133,7 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        /// <summary>
-        /// Called when parameters are set asynchronous.
-        /// </summary>
-        /// <returns>Task.</returns>
+        /// <inheritdoc />
         protected override Task OnParametersSetAsync()
         {
             contentStyle = collapsed ? "display: none;" : "";

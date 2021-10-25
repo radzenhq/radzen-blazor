@@ -23,10 +23,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenAccordion : RadzenComponent
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-accordion";
