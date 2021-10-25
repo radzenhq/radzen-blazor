@@ -6,9 +6,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenSSRSViewerParameter component.
-    /// Implements the <see cref="ComponentBase" />
     /// </summary>
-    /// <seealso cref="ComponentBase" />
     public class RadzenSSRSViewerParameter : ComponentBase
     {
         string _parameterName;

@@ -9,7 +9,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenRadioButtonList component.
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <example>
     /// <code>
     /// &lt;RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" &gt;
@@ -127,9 +127,6 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Items { get; set; }
 
-        /// <summary>
-        /// The items
-        /// </summary>
         List<RadzenRadioButtonListItem<TValue>> items = new List<RadzenRadioButtonListItem<TValue>>();
 
         /// <summary>

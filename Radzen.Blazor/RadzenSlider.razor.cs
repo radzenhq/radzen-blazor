@@ -12,7 +12,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenSlider component.
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <example>
     /// <code>
     /// &lt;RadzenSlider @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
