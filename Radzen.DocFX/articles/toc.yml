@@ -10,7 +10,7 @@
     href: getting-started/context-menu.md
 - name: Components
   items:
-  - title: Accordion
+    - title: Accordion
       href: components/accordion.md
     - title: Autocomplete
       href: components/autocomplete.md
