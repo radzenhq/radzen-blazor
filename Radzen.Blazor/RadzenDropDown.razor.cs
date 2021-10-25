@@ -7,10 +7,8 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenDropDown component.
-    /// Implements the <see cref="Radzen.DropDownBase{TValue}" />
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.DropDownBase{TValue}" />
+    /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <example>
     /// <code>
     /// &lt;RadzenDropDown @bind-Value=@customerID TValue="string" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => Console.WriteLine($"Selected CustomerID: {args}")) /&gt;

@@ -6,9 +6,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenFieldset component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     /// <example>
     /// <code>
     /// &lt;RadzenFieldset AllowCollapse="true""&gt;

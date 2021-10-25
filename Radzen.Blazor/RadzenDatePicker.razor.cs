@@ -14,12 +14,8 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenDatePicker component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
-    /// Implements the <see cref="Radzen.IRadzenFormComponent" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.RadzenComponent" />
-    /// <seealso cref="Radzen.IRadzenFormComponent" />
     /// <example>
     /// <code>
     /// &lt;RadzenDatePicker @bind-Value=@someValue TValue="DateTime" Change=@(args => Console.WriteLine($"Selected date: {args}")) /&gt;
@@ -703,10 +699,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the popup style.
-        /// </summary>
-        /// <value>The popup style.</value>
         private string PopupStyle
         {
             get
@@ -876,10 +868,6 @@ namespace Radzen.Blazor
             return Value;
         }
 
-        /// <summary>
-        /// Gets the popup identifier.
-        /// </summary>
-        /// <value>The popup identifier.</value>
         private string PopupID
         {
             get
