@@ -28,14 +28,13 @@ namespace Radzen.Blazor
         public RenderFragment ChildContent { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show colors].
+        /// Sets <see cref="RadzenColorPicker.ShowColors" /> of the built-in RadzenColorPicker.
         /// </summary>
-        /// <value><c>true</c> if [show colors]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowColors { get; set; } = true;
 
         /// <summary>
-        /// Sets <see cref="RadzenColorPicker.ShowColors" /> of the built-in RadzenColorPicker.
+        /// Sets <see cref="RadzenColorPicker.ShowButton" /> of the built-in RadzenColorPicker.
         /// </summary>
         [Parameter]
         public bool ShowButton { get; set; } = true;

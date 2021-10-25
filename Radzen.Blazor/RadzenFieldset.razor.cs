@@ -31,9 +31,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether collapse is allowed.
+        /// Gets or sets a value indicating whether collapsing is allowed. Set to <c>false</c> by default.
         /// </summary>
-        /// <value><c>true</c> if [allow collapse]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if collapsing is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowCollapse { get; set; }
 

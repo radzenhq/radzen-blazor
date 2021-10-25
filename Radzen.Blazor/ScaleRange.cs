@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class ScaleRange.
+    /// Represents a rane of values.
     /// </summary>
     public class ScaleRange
     {
@@ -13,20 +13,19 @@ namespace Radzen.Blazor
         /// Gets or sets the start.
         /// </summary>
         /// <value>The start.</value>
-        public double Start { get; set; } = Double.PositiveInfinity;
+        public double Start { get; set; } = double.PositiveInfinity;
         /// <summary>
         /// Gets or sets the end.
         /// </summary>
         /// <value>The end.</value>
-        public double End { get; set; } = Double.NegativeInfinity;
+        public double End { get; set; } = double.NegativeInfinity;
 
         /// <summary>
-        /// Froms the specified data.
+        /// Creates a <c>ScaleRange</c> from the specified data.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Type of the data item.</typeparam>
         /// <param name="data">The data.</param>
         /// <param name="selector">The selector.</param>
-        /// <returns>ScaleRange.</returns>
         public static ScaleRange From<T>(IEnumerable<T> data, Func<T, double> selector)
         {
             var start = data.Min(selector);
@@ -36,10 +35,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Clamps the specified value.
+        /// Clamps the specified value within the current <see cref="Start" /> and <see cref="End" />.
         /// </summary>
         /// <param name="value">The value.</param>
-        /// <returns>System.Double.</returns>
         public double Clamp(double value)
         {
             if (value > End)
@@ -90,10 +88,10 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Determines whether [is equal to] [the specified range].
+        /// Determines whether the current range is equal to the specified one.
         /// </summary>
         /// <param name="range">The range.</param>
-        /// <returns><c>true</c> if [is equal to] [the specified range]; otherwise, <c>false</c>.</returns>
+        /// <returns><c>true</c> if the ranges are equal; otherwise, <c>false</c>.</returns>
         public bool IsEqualTo(ScaleRange range)
         {
             return Start == range.Start && End == range.End;
