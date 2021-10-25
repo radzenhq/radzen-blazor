@@ -10,13 +10,9 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenDataGridColumn component.
-    /// Implements the <see cref="ComponentBase" />
-    /// Implements the <see cref="IDisposable" />
     /// Must be placed inside a <see cref="RadzenDataGrid{TItem}" />
     /// </summary>
     /// <typeparam name="TItem">The type of the DataGrid item.</typeparam>
-    /// <seealso cref="ComponentBase" />
-    /// <seealso cref="IDisposable" />
     public partial class RadzenDataGridColumn<TItem> : ComponentBase, IDisposable
     {
         /// <summary>
@@ -387,6 +383,10 @@ namespace Radzen.Blazor
             SortOrder = null;
         }
 
+        /// <summary>
+        /// Gets the group property.
+        /// </summary>
+        /// <returns>System.String.</returns>
         public string GetGroupProperty()
         {
             if (!string.IsNullOrEmpty(GroupProperty))
