@@ -3,26 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
-using Radzen.Blazor;
 
 namespace Radzen
 {
     /// <summary>
-    /// Class DropDownBase.
-    /// Implements the <see cref="Radzen.DataBoundFormComponent{T}" />
+    /// Base class of components that display a list of items.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <seealso cref="Radzen.DataBoundFormComponent{T}" />
     public class DropDownBase<T> : DataBoundFormComponent<T>
     {
 #if NET5
         internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<object> virtualize;
 
+        /// <summary>
+        /// The Virtualize instance.
+        /// </summary>
         public Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<object> Virtualize
         {
             get
@@ -46,12 +45,21 @@ namespace Radzen
             return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>(LoadData.HasDelegate ? Data.Cast<object>() : view.Skip(request.StartIndex).Take(top), LoadData.HasDelegate ? Count : totalItemsCount);
         }
 
+        /// <summary>
+        /// Specifies the total number of items in the data source.
+        /// </summary>
         [Parameter]
         public int Count { get; set; }
 
+        /// <summary>
+        /// Specifies wether virtualization is enabled. Set to <c>false</c> by default.
+        /// </summary>
         [Parameter]
         public bool AllowVirtualization { get; set; }
 
+        /// <summary>
+        /// Specifies the default page size. Set to <c>5</c> by default.
+        /// </summary>
         [Parameter]
         public int PageSize { get; set; } = 5;
 #endif
