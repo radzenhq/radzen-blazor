@@ -13,7 +13,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenSelectBar component.
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <example>
     /// <code>
     /// &lt;RadzenSelectBar @bind-Value=@values TValue="IEnumerable&lt;int&gt;" Multiple="true"&gt;

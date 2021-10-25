@@ -4,9 +4,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenSelectBarItem component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     public class RadzenSelectBarItem : RadzenComponent
     {
         /// <summary>

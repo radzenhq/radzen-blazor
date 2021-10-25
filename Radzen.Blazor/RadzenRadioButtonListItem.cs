@@ -4,10 +4,8 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenRadioButtonListItem component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <typeparam name="TValue">The type of the value.</typeparam>
     public class RadzenRadioButtonListItem<TValue> : RadzenComponent
     {
         private string _text;
