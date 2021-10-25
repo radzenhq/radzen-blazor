@@ -1,2 +1,3 @@
-# PLACEHOLDER
-TODO: Add .NET projects to the *src* folder and run `docfx` to generate **REAL** *API Documentation*!
+# Radzen Blazor components API reference
+
+Search for a component by its name or part of the name e.g. `DataGrid`.
