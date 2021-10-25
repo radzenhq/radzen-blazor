@@ -111,6 +111,7 @@ namespace RadzenBlazorDemos
                 }
             });
 
+            app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
