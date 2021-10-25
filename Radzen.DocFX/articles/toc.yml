@@ -6,6 +6,8 @@
     href: getting-started/installation.md
   - name: Using a component
     href: getting-started/use-component.md
+  - name: Context menu setup
+    href: getting-started/context-menu.md
 - name: Components
   items:
   - title: Accordion
