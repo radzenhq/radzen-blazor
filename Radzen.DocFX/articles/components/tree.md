@@ -48,7 +48,7 @@ The second `RadzenTreeLevel` says that the second level of items have their `Tex
 > [!NOTE] 
 > Check how this example uses the `Include` Entity Framework method to load the related products of a category. If this isn't done the children items won't populate.
 
-## Load on demand
+### Load on demand
 The previous example loads all tree items instantly. Sometimes you would like to have full control over when children data is loaded. In that case you should use the `Expand` event.
 
 ```
@@ -70,7 +70,7 @@ The previous example loads all tree items instantly. Sometimes you would like to
 Here we have only one level (for the categories). Children are populated in the `OnExpand` method that handles the `Expand` event.
 To populate items on demand you need to configure the `Children` property of the `args` - set `Data`, `TextProperty` and `HasChildren`.
 
-## Load mixed data
+### Mixed data
 The examples so far dealt with trees that had the same type of node per level - first level was categories and second level was products.
 Here is how to have mixed types of nodes per level - files and directories in this case.
 
