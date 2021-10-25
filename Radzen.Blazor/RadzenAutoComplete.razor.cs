@@ -36,8 +36,16 @@ namespace Radzen.Blazor
         [Parameter]
         public int FilterDelay { get; set; } = 500;
 
+        /// <summary>
+        /// Gets search input reference.
+        /// </summary>
         protected ElementReference search;
+
+        /// <summary>
+        /// Gets list element reference.
+        /// </summary>
         protected ElementReference list;
+
         string customSearchText;
         int selectedIndex = -1;
 

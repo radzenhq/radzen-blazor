@@ -48,6 +48,10 @@ namespace Radzen.Blazor
 
         string name = "";
         string size = "";
+
+        /// <summary>
+        /// Gets file input reference.
+        /// </summary>
         protected ElementReference fileUpload;
 
         private bool IsImage

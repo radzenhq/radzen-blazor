@@ -147,10 +147,29 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets or sets number of recrods to skip.
+        /// </summary>
         protected int skip;
+
+        /// <summary>
+        /// Gets or sets number of page links.
+        /// </summary>
         protected int numberOfPageLinks = 5;
+
+        /// <summary>
+        /// Gets or sets start page.
+        /// </summary>
         protected int startPage;
+
+        /// <summary>
+        /// Gets or sets end page.
+        /// </summary>
         protected int endPage;
+
+        /// <summary>
+        /// Gets or sets number of pages.
+        /// </summary>
         protected int numberOfPages;
 
         /// <summary>

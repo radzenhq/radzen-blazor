@@ -111,6 +111,9 @@ namespace Radzen.Blazor
         [Parameter]
         public string SelectedItemsText { get; set; } = "items selected";
 
+        /// <summary>
+        /// Gets popup element reference.
+        /// </summary>
         protected ElementReference popup;
 
         /// <summary>
