@@ -7,10 +7,8 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenCheckBox component.
-    /// Implements the <see cref="Radzen.FormComponent{TValue}" />
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.FormComponent{TValue}" />
+    /// <typeparam name="TValue">The type of the the value.</typeparam>
     /// <example>
     /// <code>
     /// &lt;RadzenCheckBox @bind-Value=@someValue TValue="bool" Change=@(args => Console.WriteLine($"Is checked: {args}")) /&gt;
@@ -46,10 +44,6 @@ namespace Radzen.Blazor
             return GetClassList("rz-chkbox").ToString();
         }
 
-        /// <summary>
-        /// Handles the <see cref="E:KeyPress" /> event.
-        /// </summary>
-        /// <param name="args">The <see cref="KeyboardEventArgs"/> instance containing the event data.</param>
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             if (args.Code == "Space")
@@ -58,9 +52,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Toggles this instance value.
-        /// </summary>
         async Task Toggle()
         {
             if (Disabled)

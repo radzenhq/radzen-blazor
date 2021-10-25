@@ -5,9 +5,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenBody component.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
     public partial class RadzenBody : RadzenComponentWithChildren
     {
         /// <summary>
