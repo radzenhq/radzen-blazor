@@ -1,5 +1,5 @@
 # Tree component
-This guide demonstrates how to use RadzenBlazorTree.
+This article demonstrates how to use RadzenBlazorTree.
 
 ## Inline definition
 The most straight forward way to configure a RadzenTree is to specify its items inline.

@@ -1,6 +1,6 @@
 # Chart component
 
-This guide demonstrates how to use RadzenBlazorChart.
+This article demonstrates how to use RadzenBlazorChart.
 
 ## Series
 The chart can display data as bar, column, line, area, pie and donut series. The chart series needs
