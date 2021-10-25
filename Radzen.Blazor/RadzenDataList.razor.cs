@@ -4,10 +4,8 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenDataList component.
-    /// Implements the <see cref="Radzen.PagedDataBoundComponent{TItem}" />
     /// </summary>
-    /// <typeparam name="TItem">The type of the t item.</typeparam>
-    /// <seealso cref="Radzen.PagedDataBoundComponent{TItem}" />
+    /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <example>
     /// <code>
     /// &lt;RadzenDataList @data=@orders TItem="Order" AllowPaging="true" WrapItems="true"&gt;

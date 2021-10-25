@@ -9,9 +9,7 @@ namespace Radzen
     /// <summary>
     /// Class DialogService. Contains variuos methods with options to open and close dialogs. 
     /// Should be added as scoped service in the application services and RadzenDialog should be added in application main layout.
-    /// Implements the <see cref="IDisposable" />
     /// </summary>
-    /// <seealso cref="IDisposable" />
     /// <example>
     /// <code>
     /// @inject DialogService DialogService
@@ -19,18 +17,18 @@ namespace Radzen
     /// @code {
     ///  async Task ShowInlineDialog()
     ///  {
-    ///    var result = await DialogService.OpenAsync("Simple Dialog", ds =>
-    ///      @<div>
-    ///          <p Style="margin-bottom: 1rem">Confirm?</p>
-    ///          <div class="row">
-    ///              <div class="col-md-12">
-    ///                  <RadzenButton Text="Ok" Click="() => ds.Close(true)" Style="margin-bottom: 10px; width: 150px" />
-    ///                  <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary"  Style="margin-bottom: 10px; width: 150px"/>
-    ///                  <RadzenButton Text="Refresh" Click="(() => { orderID = 10249; ds.Refresh(); })" ButtonStyle="ButtonStyle.Info"  Style="margin-bottom: 10px; width: 150px"/>
+    ///    var result = await DialogService.OpenAsync("Simple Dialog", ds =&gt;
+    ///      @&lt;div&gt;
+    ///          &lt;p Style="margin-bottom: 1rem"&gt;Confirm?&lt;/p&gt;
+    ///          &lt;div class="row"&gt;
+    ///              &lt;div class="col-md-12"&gt;
+    ///                  &lt;RadzenButton Text="Ok" Click="() =&gt; ds.Close(true)" Style="margin-bottom: 10px; width: 150px" /&gt;
+    ///                  &lt;RadzenButton Text="Cancel" Click="() =&gt; ds.Close(false)" ButtonStyle="ButtonStyle.Secondary"  Style="margin-bottom: 10px; width: 150px"/&gt;
+    ///                  &lt;RadzenButton Text="Refresh" Click="(() =&gt; { orderID = 10249; ds.Refresh(); })" ButtonStyle="ButtonStyle.Info"  Style="margin-bottom: 10px; width: 150px"/&gt;
     ///                  Order ID: @orderID
-    ///              </div>
-    ///          </div>
-    ///      </div>);
+    ///              &lt;/div&gt;
+    ///          &lt;/div&gt;
+    ///      &lt;/div&gt;);
     ///    Console.WriteLine($"Dialog result: {result}");
     ///  }
     /// }
