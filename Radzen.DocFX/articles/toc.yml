@@ -4,3 +4,5 @@
   items:
   - name: Installation
     href: getting-started/installation.md
+  - name: Using a component
+    href: getting-started/use-component.md
