@@ -379,6 +379,7 @@ namespace Radzen.Blazor
                 if (_value != value)
                 {
                     _value = value;
+                    _currentDate = default(DateTime);
 
                     DateTimeOffset? offset = value as DateTimeOffset?;
                     if (offset != null && offset.HasValue)
