@@ -6,9 +6,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenAccordion component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     /// <example>
     /// <code>
     /// &lt;RadzenAccordion&gt;
@@ -130,15 +128,8 @@ namespace Radzen.Blazor
             return expandedIdexes.Contains(index);
         }
 
-        /// <summary>
-        /// The expanded idexes
-        /// </summary>
         List<int> expandedIdexes = new List<int>();
 
-        /// <summary>
-        /// Selects the item.
-        /// </summary>
-        /// <param name="item">The item.</param>
         internal async System.Threading.Tasks.Task SelectItem(RadzenAccordionItem item)
         {
             await CollapseAll(item);
@@ -163,10 +154,6 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Collapses all items.
-        /// </summary>
-        /// <param name="item">The item.</param>
         async System.Threading.Tasks.Task CollapseAll(RadzenAccordionItem item)
         {
             if (!Multiple && items.Count > 1)

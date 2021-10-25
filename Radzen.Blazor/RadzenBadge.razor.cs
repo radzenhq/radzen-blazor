@@ -5,9 +5,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenBadge component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     /// <example>
     /// <code>
     /// &lt;RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Primary" /&gt;

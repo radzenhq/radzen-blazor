@@ -14,9 +14,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenAutoComplete component.
-    /// Implements the <see cref="Radzen.DataBoundFormComponent{System.String}" />
     /// </summary>
-    /// <seealso cref="Radzen.DataBoundFormComponent{System.String}" />
     /// <example>
     /// <code>
     /// &lt;RadzenAutoComplete Data=@customers TextProperty="CompanyName" Change=@(args => Console.WriteLine($"Selected text: {args}")) /&gt;

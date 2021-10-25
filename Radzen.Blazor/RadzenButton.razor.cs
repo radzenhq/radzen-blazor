@@ -7,9 +7,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenButton component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     /// <example>
     /// <code>
     /// &lt;RadzenButton Click=@(args => Console.WriteLine("Button clicked")) Text="Button" /&gt;

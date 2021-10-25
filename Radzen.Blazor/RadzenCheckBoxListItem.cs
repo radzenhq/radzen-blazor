@@ -4,10 +4,8 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenCheckBoxListItem component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <typeparam name="TValue">The type of the the value.</typeparam>
     public partial class RadzenCheckBoxListItem<TValue> : RadzenComponent
     {
         /// <summary>

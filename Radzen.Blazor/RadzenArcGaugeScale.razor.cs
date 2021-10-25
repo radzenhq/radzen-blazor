@@ -6,9 +6,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenArcGaugeScale component.
-    /// Implements the <see cref="ComponentBase" />
     /// </summary>
-    /// <seealso cref="ComponentBase" />
     public partial class RadzenArcGaugeScale: ComponentBase
     {
         /// <summary>

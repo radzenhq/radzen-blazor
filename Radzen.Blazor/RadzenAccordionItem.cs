@@ -5,9 +5,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// Class RadzenAccordionItem.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenAccordionItem : RadzenComponent
     {
         /// <summary>

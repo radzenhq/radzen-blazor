@@ -10,10 +10,8 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenCheckBoxList component.
-    /// Implements the <see cref="Radzen.FormComponent{IEnumerable{TValue}}" />
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <seealso cref="Radzen.FormComponent{IEnumerable{TValue}}" />
     /// <example>
     /// <code>
     /// &lt;RadzenCheckBoxList @bind-Value=@checkedValues TValue="int" &gt;
@@ -185,11 +183,6 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Gets the state of the disabled.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>System.String.</returns>
         private string getDisabledState(RadzenCheckBoxListItem<TValue> item)
         {
             return Disabled || item.Disabled ? " rz-state-disabled" : "";
