@@ -1,2 +1,6 @@
 - name: Introduction
   href: index.md
+- name: Getting Started
+  items:
+  - name: Installation
+    href: getting-started/installation.md
