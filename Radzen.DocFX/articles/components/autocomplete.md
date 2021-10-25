@@ -1,5 +1,5 @@
 # Accordion component
-This guide demonstrates how to use the AutoComplete component.
+This article demonstrates how to use the AutoComplete component.
 
 ## Populate data when initialized
 ```
