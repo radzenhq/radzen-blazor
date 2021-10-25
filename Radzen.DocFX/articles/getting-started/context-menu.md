@@ -1,9 +1,10 @@
 # Context menu setup
-
 This article shows the additional setup steps required to use the RadzenContextMenu component.
 
-## Service registration
+1. [Register](#service-registration) the service.
+1. [Add](#add-to-layout) the component to your layout.
 
+## Service registration
 The RadzenContextMenu is used via the [ContextMenuService](xref:Radzen.ContextMenuService) class which must be registered as a service.
 
 # [Server-side Blazor](#tab/server-side)
@@ -36,3 +37,9 @@ The RadzenContextMenu is used via the [ContextMenuService](xref:Radzen.ContextMe
        // Other registrations
    }
    ```
+***
+## Add to layout
+You also need to add the RadzeContextMenu component to the layout used by your pages (most commonly `MainLayout.razor`). 
+```
+<RadzenContextMenu />
+```

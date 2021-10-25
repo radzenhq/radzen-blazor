@@ -15,14 +15,11 @@ start with a common prefix `Radzen` to make it easier for you to find in auto co
 
 To set a component property assign the corresponding attribute to the desired value.
 
-### Constant
-
+### [Constant](#tab/constant)
 ```
 <RadzenButton Text="Hello world!" />
 ```
-
-### Property or field
-
+### [Property or field](#tab/property)
 ```
 <RadzenButton Text=@text />
 @code {
@@ -30,8 +27,8 @@ To set a component property assign the corresponding attribute to the desired va
 }
 ```
 
+***
 ## Handle events
-
 To handle an event create a method and assign the corresponding attribute to the method name. 
 
 ```
