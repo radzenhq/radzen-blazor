@@ -22,11 +22,6 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Visible { get; set; } = true;
 
-        /// <summary>
-        /// Measures the specified chart.
-        /// </summary>
-        /// <param name="chart">The chart.</param>
-        /// <returns>System.Double.</returns>
         internal double Measure(RadzenChart chart)
         {
             if (!Visible)
