@@ -34,6 +34,9 @@ namespace Radzen.Blazor
 
         internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> virtualize;
 
+        /// <summary>
+        /// Gets Virtualize component reference.
+        /// </summary>
         public Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> Virtualize
         {
             get
