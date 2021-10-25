@@ -8,10 +8,8 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenRadioButtonList component.
-    /// Implements the <see cref="Radzen.FormComponent{TValue}" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.FormComponent{TValue}" />
     /// <example>
     /// <code>
     /// &lt;RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" &gt;

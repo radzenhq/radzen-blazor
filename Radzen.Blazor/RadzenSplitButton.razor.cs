@@ -6,9 +6,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenSplitButton component.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
     /// <example>
     /// <code>
     /// &lt;RadzenSplitButton Click=@(args => Console.WriteLine($"Value is: {args.Value}"))&gt;

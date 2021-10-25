@@ -8,9 +8,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenTabsItem component.
-    /// Implements the <see cref="IDisposable" />
     /// </summary>
-    /// <seealso cref="IDisposable" />
     public partial class RadzenTabsItem : IDisposable
     {
         /// <summary>

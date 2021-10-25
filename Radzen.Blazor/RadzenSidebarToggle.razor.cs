@@ -5,9 +5,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenSidebarToggle component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenSidebarToggle : RadzenComponent
     {
         /// <summary>

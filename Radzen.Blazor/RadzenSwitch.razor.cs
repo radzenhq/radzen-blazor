@@ -5,9 +5,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenSwitch component.
-    /// Implements the <see cref="Radzen.FormComponent{System.Boolean}" />
     /// </summary>
-    /// <seealso cref="Radzen.FormComponent{System.Boolean}" />
     /// <example>
     /// <code>
     /// &lt;RadzenSwitch @bind-Value=@value Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;

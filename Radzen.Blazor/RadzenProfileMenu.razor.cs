@@ -5,9 +5,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenProfileMenu component.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
     /// <example>
     /// <code>
     /// &lt;RadzenProfileMenu&gt;

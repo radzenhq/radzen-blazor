@@ -8,9 +8,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenTabs component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     /// <example>
     /// <code>
     /// &lt;RadzenTabs RenderMode="TabRenderMode.Client" Change=@(args => Console.WriteLine($"Selected index is: {args}"))&gt;

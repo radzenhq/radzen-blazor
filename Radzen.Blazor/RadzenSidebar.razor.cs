@@ -4,9 +4,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenSidebar component.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
     public partial class RadzenSidebar : RadzenComponentWithChildren
     {
         /// <summary>

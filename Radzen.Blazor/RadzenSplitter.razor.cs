@@ -11,9 +11,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenSplitter component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenSplitter : RadzenComponent
     {
         private int _sizeautopanes = 0;

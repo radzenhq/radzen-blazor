@@ -11,10 +11,8 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenSlider component.
-    /// Implements the <see cref="Radzen.FormComponent{TValue}" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.FormComponent{TValue}" />
     /// <example>
     /// <code>
     /// &lt;RadzenSlider @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;

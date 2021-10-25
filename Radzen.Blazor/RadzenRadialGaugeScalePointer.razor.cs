@@ -5,9 +5,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenRadialGaugeScalePointer component.
-    /// Implements the <see cref="ComponentBase" />
     /// </summary>
-    /// <seealso cref="ComponentBase" />
     public partial class RadzenRadialGaugeScalePointer : ComponentBase
     {
         /// <summary>
