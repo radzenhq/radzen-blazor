@@ -21,7 +21,7 @@ namespace Radzen.Blazor
     ///   void ShowContextMenuWithItems(MouseEventArgs args)
     ///   {
     ///     ContextMenuService.Open(args,
-    ///         new List&lt;ContextMenuItem&gt {
+    ///         new List&lt;ContextMenuItem&gt; {
     ///             new ContextMenuItem() { Text = "Context menu item 1", Value = 1 },
     ///             new ContextMenuItem() { Text = "Context menu item 2", Value = 2 },
     ///             new ContextMenuItem() { Text = "Context menu item 3", Value = 3 },

@@ -12,12 +12,8 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenSelectBar component.
-    /// Implements the <see cref="Radzen.FormComponent{TValue}" />
-    /// Implements the <see cref="Radzen.IRadzenSelectBar" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.FormComponent{TValue}" />
-    /// <seealso cref="Radzen.IRadzenSelectBar" />
     /// <example>
     /// <code>
     /// &lt;RadzenSelectBar @bind-Value=@values TValue="IEnumerable&lt;int&gt;" Multiple="true"&gt;

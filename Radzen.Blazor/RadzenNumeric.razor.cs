@@ -9,10 +9,8 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenNumeric component.
-    /// Implements the <see cref="Radzen.FormComponent{TValue}" />
     /// </summary>
     /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.FormComponent{TValue}" />
     /// <example>
     /// <code>
     /// &lt;RadzenNumeric TValue="int" Min="1" Max="10" Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;

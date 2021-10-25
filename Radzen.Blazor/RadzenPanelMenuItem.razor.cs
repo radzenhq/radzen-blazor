@@ -7,9 +7,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenPanelMenuItem component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenPanelMenuItem : RadzenComponent
     {
         /// <summary>

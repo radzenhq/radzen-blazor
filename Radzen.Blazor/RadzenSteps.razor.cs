@@ -8,9 +8,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenSteps component.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     /// <example>
     /// <code>
     /// &lt;RadzenSteps Change=@(args => Console.WriteLine($"Selected index is: {args}"))&gt;

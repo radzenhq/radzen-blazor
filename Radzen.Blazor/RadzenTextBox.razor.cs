@@ -4,9 +4,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenTextBox component.
-    /// Implements the <see cref="Radzen.FormComponent{System.String}" />
     /// </summary>
-    /// <seealso cref="Radzen.FormComponent{System.String}" />
     /// <example>
     /// <code>
     /// &lt;RadzenTextBox @bind-Value=@value Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;

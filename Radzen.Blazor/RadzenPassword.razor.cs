@@ -4,11 +4,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// RadzenPassword component.
-    /// Implements the <see cref="Radzen.FormComponent{System.String}" />
-    /// Implements the <see cref="Radzen.IRadzenFormComponent" />
     /// </summary>
-    /// <seealso cref="Radzen.FormComponent{System.String}" />
-    /// <seealso cref="Radzen.IRadzenFormComponent" />
     /// <example>
     /// <code>
     /// &lt;RadzenPassword Placeholder="Enter password..." Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
