@@ -18,6 +18,9 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenNumeric<TValue> : FormComponent<TValue>
     {
+        /// <summary>
+        /// Gets input reference.
+        /// </summary>
         protected ElementReference input;
 
         /// <summary>

@@ -20,6 +20,9 @@ namespace Radzen.Blazor
         [Parameter]
         public string Email { get; set; }
 
+        /// <summary>
+        /// Gets gravatar URL.
+        /// </summary>
         protected string Url
         {
             get

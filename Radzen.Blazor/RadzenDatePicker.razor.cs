@@ -442,6 +442,9 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets input reference.
+        /// </summary>
         protected ElementReference input;
 
         /// <summary>

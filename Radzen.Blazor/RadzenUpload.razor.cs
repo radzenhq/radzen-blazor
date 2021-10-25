@@ -33,6 +33,9 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenUpload : RadzenComponent
     {
+        /// <summary>
+        /// Gets file input reference.
+        /// </summary>
         protected ElementReference fileUpload;
         string _Id;
         string Id
