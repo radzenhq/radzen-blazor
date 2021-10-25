@@ -24,8 +24,6 @@
       href: components/button.md
     - title: SplitButton
       href: components/splitbutton.md
-    - title: Card
-      href: components/card.md
     - title: Chart
       href: components/chart.md
     - title: CheckBox
@@ -64,8 +62,6 @@
       href: components/icon.md
     - title: Link
       href: components/link.md
-    - title: HTML
-      href: components/html.md
     - title: HtmlEditor
       href: components/htmleditor.md
     - title: Label
