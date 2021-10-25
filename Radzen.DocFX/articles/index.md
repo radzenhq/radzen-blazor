@@ -4,7 +4,7 @@ Congratulations! You have discovered the Radzen Blazor commponents - the most co
 
 ## Where to start
 
-To immediately jump to development check the [Installation](articles/getting-started/installation) article. It will show
+To immediately jump to development check the [Installation](getting-started/installation.md) article. It will show
 you how to add the Radzen.Blazor Nuget package to your application.
 
 ## License
