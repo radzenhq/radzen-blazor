@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RadzenBlazorDemos.Data;
@@ -14,7 +8,7 @@ using RadzenBlazorDemos.Services;
 
 namespace RadzenBlazorDemos
 {
-    public class ThemeState
+	public class ThemeState
     {
         public string CurrentTheme { get; set; } = "default";
     }
@@ -97,19 +91,6 @@ namespace RadzenBlazorDemos
                 SupportedUICultures = supportedCultures
             });
             */
-
-            // Serve documentation without .html extension
-            app.Use(async (ctx, next) =>
-            {
-                await next();
-
-                if (ctx.Response.StatusCode == 404 && ctx.Request.Path.StartsWithSegments(PathString.FromUriComponent("/docs")))
-                {
-                    ctx.Request.Path = $"{ctx.Request.Path.Value}.html";
-
-                    await next();
-                }
-            });
 
             app.UseDefaultFiles();
             app.UseStaticFiles();

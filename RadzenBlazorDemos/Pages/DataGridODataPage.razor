@@ -8,7 +8,7 @@
 
 <p>Use the <code>LoadData</code> event to get data from a REST service.</p>
 
-<RadzenExample Name="DataGridOData" Heading="false" Documentation="false" AdditionalSourceCodePages="@(new [] {"../Services/NorthwindODataService.cs"})">
+<RadzenExample Name="DataGrid" Source="DataGridOData" Heading="false" AdditionalSourceCodePages="@(new [] {"../Services/NorthwindODataService.cs"})">
 <RadzenDataGrid IsLoading="@isLoading" Count="@count" Data="@employees" LoadData="@LoadData" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
