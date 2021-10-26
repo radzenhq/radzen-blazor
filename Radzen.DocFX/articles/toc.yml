@@ -32,6 +32,8 @@
       href: components/checkboxlist.md
     - name: ColorPicker
       href: components/colorpicker.md
+    - name: CompareValidator
+      href: components/comparevalidator.md
     - name: Dialog
       href: components/dialog.md
     - name: DataGrid
