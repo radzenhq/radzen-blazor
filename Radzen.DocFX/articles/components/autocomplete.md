@@ -1,7 +1,11 @@
 # Accordion component
 This article demonstrates how to use the AutoComplete component.
 
-## Populate data when initialized
+## Data-binding
+To display data in AutoComplete component you need to set collection of items (`IEnumerable<>`) to `Data` property and `TextProperty` to the string property name of the item in the collection.
+
+### Populate data when initialized
+
 ```
 <RadzenAutoComplete Data="@customers" TextProperty="CompanyName" Change="@Changed" />
 @code {
@@ -19,7 +23,8 @@ This article demonstrates how to use the AutoComplete component.
 }
 ```
 
-## Populate data on demand using LoadData event.
+### Populate data on demand using LoadData event.
+
 ```
 <RadzenAutoComplete Data="@customers" TextProperty="CompanyName" Change="@Changed" LoadData=@OnLoadData />
 @code {
@@ -38,5 +43,16 @@ This article demonstrates how to use the AutoComplete component.
 
         InvokeAsync(StateHasChanged);
     }
+}
+```
+
+## Get and set the value
+As all Radzen Blazor input components the AutoComplete has a `Value` property which gets and sets the value of the component.
+Use `@bind-Value` to get the user input.
+
+```
+<RadzenAutoComplete @bind-Value=@value />
+@code {
+  string value = "SomeValue";
 }
 ```
