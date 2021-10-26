@@ -258,8 +258,128 @@ Use `AllowVirtualization` to allow virtualization. It is supported for both __IQ
 <RadzenDataGrid Data="@orderDetails" TItem="OrderDetail" AllowVirtualization="true" Style="height:400px" ...
 ```
 
+
 ## Hierarchy
+
+Use DataGrid `Template` property to define child content when the row is expanded. Use `RowRender` event to set if a row is expandable or not and use `ExpandRow()` method of the DataGrid to expand desired row/item. Use `ExpandMode` to specify if multiple or single rows can be expanded at once.
+
+```
+<RadzenDataGrid @ref="grid" RowRender="@RowRender" ExpandMode="DataGridExpandMode.Single" Data="@orders" TItem="Order">
+    ...
+    <Template Context="order">
+        <RadzenDataGrid Data="@order.OrderDetails" TItem="OrderDetail">
+            <Columns>
+                <RadzenDataGridColumn TItem="OrderDetail" Property="Order.CustomerID" Title="Order" />
+                <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+                <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
+                    <Template Context="detail">
+                        @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+                <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
+                    <Template Context="detail">
+                        @String.Format("{0}%", detail.Discount * 100)
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+        ...
+@code {
+    IEnumerable<Order> orders;
+    RadzenDataGrid<Order> grid;
+
+    protected override void OnInitialized()
+    {
+        orders = dbContext.Orders.Include("Customer").Include("Employee").Include("OrderDetails").Include("OrderDetails.Product").ToList();
+    }
+
+    void RowRender(RowRenderEventArgs<Order> args)
+    {
+        args.Expandable = args.Data.ShipCountry == "France" || args.Data.ShipCountry == "Brazil";
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            grid.ExpandRow(orders.FirstOrDefault());
+            StateHasChanged();
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+}
+```
 
 ## Selection
 
+Bind DataGrid `Value` property or assign callback for `RowSelect` event to enable selection. Use `SelectionMode` to specify if selecting of single or multiple items is allowed.
+
+```
+<RadzenDataGrid Data="@employees" TItem="Employee" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees>
+        <Columns>
+        ...
+@code {
+    IEnumerable<Employee> employees;
+    IList<Employee> selectedEmployees;
+
+    void ClearSelection()
+    {
+        selectedEmployees = null;
+    }
+
+    protected override void OnInitialized()
+    {
+        employees = dbContext.Employees;
+        selectedEmployees = employees.Take(1).ToList();
+    }
+}        
+```
+
 ## Conditional formatting
+
+Use `RowRender` and `CellRender` events to specify various row/cell attributes.
+
+```
+<RadzenDataGrid Data="@orderDetails" TItem="OrderDetail" RowRender="@RowRender" CellRender="@CellRender">
+                ...
+@code {
+    IEnumerable<OrderDetail> orderDetails;
+
+    protected override void OnInitialized()
+    {
+        orderDetails = dbContext.OrderDetails.Include("Product").ToList();
+    }
+
+    void RowRender(RowRenderEventArgs<OrderDetail> args)
+    {
+        args.Attributes.Add("style", $"font-weight: {(args.Data.Quantity > 20 ? "bold" : "normal")};");
+    }
+
+    void CellRender(DataGridCellRenderEventArgs<OrderDetail> args)
+    {
+        if (args.Column.Property == "Quantity")
+        {
+            args.Attributes.Add("style", $"background-color: {(args.Data.Quantity > 20 ? "#ff6d41" : "white")};");
+
+            if (args.Data.Discount == 0)
+            {
+                args.Attributes.Add("colspan", 2);
+            }
+        }
+
+        if (args.Column.Property == "OrderID")
+        {
+            if (args.Data.OrderID == 10248 && args.Data.ProductID == 11 || args.Data.OrderID == 10250 && args.Data.ProductID == 41)
+            {
+                args.Attributes.Add("rowspan", 3);
+            }
+
+            if (args.Data.OrderID == 10249 && args.Data.ProductID == 14 || args.Data.OrderID == 10251 && args.Data.ProductID == 22)
+            {
+                args.Attributes.Add("rowspan", 2);
+            }
+        }
+    }
+```
