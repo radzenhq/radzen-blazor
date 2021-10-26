@@ -45,7 +45,7 @@
     - name: DropDown
       href: components/dropdown.md
     - name: DropDownDataGrid
-      href: components/dropdown-datagrid.md
+      href: components/dropdowndatagrid.md
     - name: Fieldset
       href: components/fieldset.md
     - name: FileInput
@@ -111,7 +111,7 @@
     - name: Tabs
       href: components/tabs.md
     - name: TemplateForm
-      href: components/template-form.md
+      href: components/templateform.md
     - name: TextBox
       href: components/textbox.md
     - name: TextArea
