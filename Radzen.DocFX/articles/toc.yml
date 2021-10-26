@@ -66,6 +66,8 @@
       href: components/icon.md
     - name: Link
       href: components/link.md
+    - name: LengthValidator
+      href: components/lengthvalidator.md
     - name: HtmlEditor
       href: components/htmleditor.md
     - name: Label
