@@ -102,6 +102,8 @@
       href: components/radiobuttonlist.md
     - name: Rating
       href: components/rating.md
+    - name: RegexValidator
+      href: components/regexvalidator.md
     - name: Scheduler
       href: components/scheduler.md
     - name: SelectBar
