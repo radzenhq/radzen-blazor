@@ -104,6 +104,8 @@
       href: components/rating.md
     - name: RegexValidator
       href: components/regexvalidator.md
+    - name: RequiredValidator
+      href: components/requiredvalidator.md
     - name: Scheduler
       href: components/scheduler.md
     - name: SelectBar
