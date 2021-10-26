@@ -30,7 +30,7 @@ This article demonstrates how to use the Dialog component. Use `DialogService` t
 ```
 
 # Show component/page as dialog
-Use `DialogOptions` to specify various dialog properties and provide parameters as `Dictionary<string, object>`
+Use `DialogOptions` to specify various dialog properties and provide parameters as `Dictionary<string, object>`.
 
 ```
 @inject DialogService DialogService
