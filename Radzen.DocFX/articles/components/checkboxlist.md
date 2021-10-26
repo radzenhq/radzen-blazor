@@ -1,7 +1,14 @@
 # CheckBoxList component
 This article demonstrates how to use the CheckBoxList component.
 
-## Statically declared items
+## Get and set the value
+As all Radzen Blazor input components the CheckBoxList has a `Value` property which gets and sets the value of the component.
+Use `@bind-Value` to get the user input. The `TValue` property should be set to the `Value` property type.
+
+## Data-binding
+To display data in CheckBoxList component you can statically declare items in the markup and/or set collection of items (`IEnumerable<>`) to `Data` property, `TextProperty` to the string property name of the item in the collection and  `ValueProperty` to the property name with unique values in the collection.
+
+### Statically declared items
 ```
 <RadzenCheckBoxList @bind-Value=@values TValue="int" Change=@OnChange>
     <Items>
@@ -20,7 +27,7 @@ This article demonstrates how to use the CheckBoxList component.
 }
 ```
 
-## Items populated from data
+### Items populated from data
 ```
 <RadzenCheckBoxList Data="@data" TextProperty="Name" ValueProperty="Id" @bind-Value=@values TValue="int" Change=@OnChange />
 @code {
@@ -35,7 +42,7 @@ This article demonstrates how to use the CheckBoxList component.
 }
 ```
 
-## Statically declared and populated from data items
+### Statically declared and populated from data items
 ```
 <RadzenCheckBoxList Data="@data" TextProperty="Name" ValueProperty="Id" @bind-Value=@values TValue="int" Change=@OnChange>
     <Items>
