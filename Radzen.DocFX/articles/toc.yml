@@ -86,6 +86,8 @@
       href: components/login.md
     - name: Notification
       href: components/notification.md
+    - name: NumericRangeValidator
+      href: components/numericrangevalidator.md
     - name: Tooltip
       href: components/tooltip.md
     - name: Numeric
