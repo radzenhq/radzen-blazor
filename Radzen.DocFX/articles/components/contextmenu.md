@@ -9,8 +9,6 @@ This article demonstrates how to use the ContextMenu component. Use `ContextMenu
 <RadzenButton Text="Show context menu" ContextMenu=@(args => ShowContextMenuWithItems(args)) />
 
 @code {
-    EventConsole console;
-
     void ShowContextMenuWithItems(MouseEventArgs args)
     {
         ContextMenuService.Open(args,
