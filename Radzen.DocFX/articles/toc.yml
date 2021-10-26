@@ -48,6 +48,8 @@
       href: components/dropdown.md
     - name: DropDownDataGrid
       href: components/dropdowndatagrid.md
+    - name: EmailValidator
+      href: components/emailvalidator.md
     - name: Fieldset
       href: components/fieldset.md
     - name: FileInput
