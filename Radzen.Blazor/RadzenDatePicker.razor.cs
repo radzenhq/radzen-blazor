@@ -160,11 +160,8 @@ namespace Radzen.Blazor
 
             var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, newHour > 23 || newHour < 0 ? 0 : newHour, CurrentDate.Minute, CurrentDate.Second);
 
-            if (!object.Equals(newValue, Value))
-            {
-                hour = newValue.Hour;
-                await UpdateValueFromTime(newValue);
-            }
+            hour = newValue.Hour;
+            await UpdateValueFromTime(newValue);
         }
 
         /// <summary>
@@ -175,11 +172,8 @@ namespace Radzen.Blazor
         {
             var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, CurrentDate.Hour, v, CurrentDate.Second);
 
-            if (!object.Equals(newValue, Value))
-            {
-                minutes = newValue.Minute;
-                await UpdateValueFromTime(newValue);
-            }
+            minutes = newValue.Minute;
+            await UpdateValueFromTime(newValue);
         }
 
         /// <summary>
@@ -190,11 +184,8 @@ namespace Radzen.Blazor
         {
             var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, CurrentDate.Hour, CurrentDate.Minute, v);
 
-            if (!object.Equals(newValue, Value))
-            {
-                seconds = newValue.Second;
-                await UpdateValueFromTime(newValue);
-            }
+            seconds = newValue.Second;
+            await UpdateValueFromTime(newValue);
         }
 
         /// <summary>
