@@ -5,6 +5,14 @@ body {
   height: 100%;
   background-color: #f4f5f9;
   color: #4f4f50;
+  font-size: 16px;
+}
+.home { 
+  background-image: url("../images/background.svg");
+  background-repeat: no-repeat;
+  background-position: 50% -700px;
+  background-attachment: scroll;
+  overflow-y: scroll;
 }
 button,
 a {
@@ -146,7 +154,8 @@ h3,
 .h3 {
   margin-top: 15px;
   margin-bottom: 10px;
-  font-weight: 400;
+  font-weight: bold;
+  color: #050A23;
 }
 h4,
 .h4,
@@ -156,7 +165,24 @@ h6,
 .h6 {
   margin-top: 10px;
   margin-bottom: 5px;
+  color: #050A23;
 }
+
+h1,
+.h1 {
+  font-size: 72px;
+  letter-spacing: -0.02em;
+}
+
+h3,
+.h3 {
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 2.5rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+
 .navbar {
   margin-bottom: 0;
 }
@@ -206,6 +232,28 @@ header .main-nav {
 .navbar-brand {
   font-size: inherit;
   padding: 11px 0;
+  position: relative;
+}
+.navbar-brand:after {
+  content: "DOCS";
+  display: block;
+  position: absolute;
+  right: -48px;
+  top: 16px;
+  padding: 4px;
+  height: 18px;
+  border-radius: 4px;
+  background-color: #C9CACD;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 10px;
+  letter-spacing: 0.04em;
+  transition: all .2s linear;
+}
+.navbar-brand:hover:after,
+.navbar-brand:focus:after {
+  background-color: #000000;
 }
 .navbar-collapse {
   margin: 0 -15px;
@@ -217,6 +265,11 @@ header .main-nav {
 .inheritance h5, .inheritedMembers h5{
   padding-bottom: 5px;
   border-bottom: 1px solid #ccc;
+}
+
+article h1 {
+  margin-bottom: 20px;
+  font-size: 60px;
 }
 
 article h1, article h2, article h3, article h4{
@@ -321,7 +374,7 @@ article section {
   font-size: 14px;
   border: 0;
   width: 120%;
-  color: #555;
+  color: ##050A23;
 }
 .docs-search > .search-query:focus {
   outline: 0;
@@ -409,16 +462,20 @@ article section {
 }
 
 #search-results .sr-items {
-  font-size: 24px;
+  font-size: 20px;
 }
 
 .sr-item {
   margin-bottom: 25px;
 }
 
+.sr-item>.item-title {
+  font-weight: 600;
+}
+
 .sr-item>.item-href {
   font-size: 14px;
-  color: #093;
+  color: #000;
 }
 
 .sr-item>.item-brief {
@@ -441,7 +498,20 @@ article section {
 .pagination>.active>a:hover {
     background-color: #376df5;
     border-color: #376df5;
-  }
+}
+
+#search-results.home-search-results {
+  margin-top: 0;
+}
+
+#search-results.home-search-results .item-brief,
+#search-results.home-search-results .search-list {
+  display: none;
+}
+
+.home-search-results .sr-item {
+  margin-bottom: 12px;
+}
 
 .fixed_header {
   position: fixed;
@@ -477,7 +547,7 @@ article section {
   padding-bottom: 20px;
 }
 
-.sidetoc::-webkit-scrollbar,
+/*.sidetoc::-webkit-scrollbar,
 html::-webkit-scrollbar {
     background-color: transparent;
 }
@@ -493,7 +563,7 @@ html::-webkit-scrollbar-thumb {
 .sidetoc::-webkit-scrollbar-corner,
 html::-webkit-scrollbar-corner {
     background-color: transparent;
-}
+}*/
 
 .sidetoc.shiftup {
   bottom: 50px;
@@ -667,7 +737,7 @@ body .toc{
 }
 .sideaffix {
   margin-top: 50px;
-  font-size: 12px;
+  font-size: 14px;
   max-height: 100%;
   overflow: hidden;
   top: 60px;
@@ -823,6 +893,9 @@ footer {
   .topnav .navbar-nav > li {
     float: none;
     display: inline-block;
+  }
+  #autocollapse .navbar-form .form-group {
+    width: 200px;
   }
 }
 @media only screen and (max-width: 768px) {
@@ -1077,6 +1150,13 @@ div.embeddedvideo iframe {
     margin-top: 2em;
 }
 
+.form-control.large {
+  height: 52px;
+  padding: 8px 16px;
+  font-size: 16px;
+  box-shadow: none;
+} 
+
 .form-control:hover {
     border-color: #1151F3;
 }
@@ -1085,4 +1165,47 @@ div.embeddedvideo iframe {
     border-color: #1151F3;
     outline: 0;
     box-shadow: 0px 0px 0px 1px white, 0px 0px 0px 3px rgba(17, 81, 243, 0.2);
+}
+
+.home-search h1 {
+  margin-top: 140px;
+  margin-bottom: 40px
+}
+
+.home-search {
+  margin-bottom: 20px
+}
+
+.subtitle {
+  font-weight: 100;
+  font-size: 24px;
+  line-height: 1.3em;
+  margin: 2rem 0;
+}
+
+img.illustration {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  height: 220px;
+  margin: 2rem auto 1rem;
+}
+
+.card-link {
+  display: block;
+  margin: 20px 0 0;
+  padding: 0 20px 20px;
+  background-color: transparent;
+  color: #4f4f50;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all .1s linear;
+}
+
+.card-link:hover,
+.card-link:focus {
+  background-color: #ffffff;
+  color: #000000;
+  box-shadow: 0 4px 12px 0 rgba(0,0,0,.16);
+  transform: scale(1.045)
 }
