@@ -157,8 +157,17 @@ namespace Radzen.Blazor
         async Task UpdateHour(int v)
         {
             var newHour = HourFormat == "12" && CurrentDate.Hour > 12 ? v + 12 : v;
+            var newMinute = CurrentDate.Minute;
+            var newSecond = CurrentDate.Second;
 
-            var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, newHour > 23 || newHour < 0 ? 0 : newHour, CurrentDate.Minute, CurrentDate.Second);
+            if (v < 0)
+            {
+                newHour = 23;
+                newMinute = 59;
+                newSecond = 59;
+            }
+
+            var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, newHour > 23 || newHour < 0 ? 0 : newHour, newMinute, newSecond);
 
             hour = newValue.Hour;
             await UpdateValueFromTime(newValue);
