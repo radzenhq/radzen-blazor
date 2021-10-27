@@ -1,3 +1,121 @@
+/* Fonts */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-weight: 200;
+  font-style: normal;
+  font-stretch: normal;
+  src: local('SourceSansPro-ExtraLight'), local('Source Sans Pro'),
+    url('../../fonts/SourceSansPro-ExtraLight.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-weight: 300;
+  font-style: normal;
+  font-stretch: normal;
+  src: local('SourceSansPro-Light'), local('Source Sans Pro'),
+    url('../../fonts/SourceSansPro-Light.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+  src: local('SourceSansPro-Regular'), local('Source Sans Pro'),
+    url('../../fonts/SourceSansPro-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  src: local('SourceSansPro-Semibold'), local('Source Sans Pro Semibold'),
+    url('../../fonts/SourceSansPro-Semibold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-weight: 700;
+  font-style: normal;
+  font-stretch: normal;
+  src: local('SourceSansPro-Bold'), local('Source Sans Pro Bold'),
+    url('../../fonts/SourceSansPro-Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-weight: 900;
+  font-style: normal;
+  font-stretch: normal;
+  src: local('SourceSansPro-Black'), local('Source Sans Pro Black'),
+    url('../../fonts/SourceSansPro-Black.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-weight: 200;
+  font-style: italic;
+  font-stretch: normal;
+  src: local('SourceSansPro-ExtraLightIt'), local('Source Sans Pro'),
+    url('../../fonts/SourceSansPro-ExtraLightIt.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-weight: 300;
+  font-style: italic;
+  font-stretch: normal;
+  src: local('SourceSansPro-LightIt'), local('Source Sans Pro'),
+    url('../../fonts/SourceSansPro-LightIt.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-weight: 400;
+  font-style: italic;
+  font-stretch: normal;
+  src: local('SourceSansPro-It'), local('Source Sans Pro'),
+    url('../../fonts/SourceSansPro-It.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-weight: 600;
+  font-style: italic;
+  font-stretch: normal;
+  src: local('SourceSansPro-SemiboldIt'), local('Source Sans Pro'),
+    url('../../fonts/SourceSansPro-SemiboldIt.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-weight: 700;
+  font-style: italic;
+  font-stretch: normal;
+  src: local('SourceSansPro-BoldIt'), local('Source Sans Pro'),
+    url('../../fonts/SourceSansPro-BoldIt.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-weight: 900;
+  font-style: italic;
+  font-stretch: normal;
+  src: local('SourceSansPro-BlackIt'), local('Source Sans Pro'),
+    url('../../fonts/SourceSansPro-BlackIt.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Source Code Pro';
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  src: local('SourceCodePro-Regular'), local('Source Code Pro'),
+    url('../fonts/SourceCodePro-Regular.woff') format('woff');
+}
+
 /* Radzen Docs Styles */
 html,
 body {
@@ -134,6 +252,10 @@ span.languagekeyword{
 .table {
   margin-bottom: 10px;
 }
+.table-bordered>thead>tr>td,
+.table-bordered>thead>tr>th {
+  border-bottom-width: 1px;
+}
 table p {
   margin-bottom: 0;
 }
@@ -265,29 +387,6 @@ header .main-nav {
 .inheritance h5, .inheritedMembers h5{
   padding-bottom: 5px;
   border-bottom: 1px solid #ccc;
-}
-
-article h1 {
-  margin-bottom: 20px;
-  font-size: 60px;
-}
-
-article h1, article h2, article h3, article h4{
-  margin-top: 25px;
-}
-
-article h4{
-  border: 0;
-  font-weight: bold;
-  margin-top: 2em;
-}
-
-article span.small.pull-right{
-  margin-top: 20px;
-}
-
-article section {
-  margin-left: 0;
 }
 
 /*.expand-all {
@@ -732,8 +831,57 @@ body .toc{
   margin-top: 5px;
   margin-bottom: 5px;
 }
-.article img {
-  max-width: 100%;
+
+article h1 {
+  font-size: 60px;
+  margin-bottom: 20px;
+}
+
+article h2 {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+article h3 {
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+article h1,
+article h2,
+article h3,
+article h4{
+  margin-top: 20px;
+  padding-top: 16px;
+}
+
+article h4{
+  border: 0;
+  font-weight: bold;
+  margin-top: 16px;
+}
+
+article span.small.pull-right{
+  margin-top: 20px;
+}
+
+article section {
+  margin-left: 0;
+}
+
+article p,
+article ul,
+article ol,
+article dl {
+  margin: 0 0 16px;
+  line-height: 1.6em;
+}
+article img {
+  display: block;
+  max-width: 800px;
+  margin: 40px auto;
+  border-radius: 4px;
+  box-shadow: 0px 4px 20px rgb(0 0 0 / 6%);
 }
 .sideaffix {
   margin-top: 50px;
@@ -792,7 +940,7 @@ body .toc{
   color: #1151F3;
 }
 .affix ul > li > a {
-  padding: 5px 12px;
+  padding: 4px 12px;
   color: #4f4f50;
 }
 .affix > ul > li.active:last-child {
@@ -993,14 +1141,18 @@ footer {
 }
 
 /* Code snippet */
+code, kbd, pre, samp {
+  font-family: "Source Code Pro", Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
 code {
-  color: #717374;
-  background-color: #f1f2f3;
+  color: #262526;
+  background-color: rgba(0,0,0,.06);
 }
 
 a code {
   color: #1151F3;
-  background-color: #f1f2f3;
+  background-color: rgba(0,0,0,.06);
 }
 
 a code:hover {
@@ -1017,6 +1169,13 @@ a code:hover {
 
 pre {
   border: 0;
+  background-color: rgba(0,0,0,.05);
+  margin: 20px 0;
+}
+
+pre code,
+pre .hljs {
+  background-color: transparent;
 }
 
 /* For code snippet line highlight */
@@ -1027,7 +1186,7 @@ pre > code .line-highlight {
 /* Alerts */
 .alert h5 {
     text-transform: uppercase;
-    font-weight: bold;
+    font-weight: 600;
     margin-top: 0;
 }
 
@@ -1053,6 +1212,46 @@ pre > code .line-highlight {
 
 .alert-danger h5:before {
     content:"\e107"
+}
+
+.alert-info {
+  color: #4f4f50;
+  background-color: rgba(18,164,245,.2);
+  border-color: transparent;
+}
+
+.alert-info h5 {
+  color: #0F8ACE;
+}
+
+.alert-danger {
+  color: #4f4f50;
+  background-color: rgba(243,17,85,.1);
+  border-color: transparent;
+}
+
+.alert-danger h5 {
+  color: #CC0E47;
+}
+
+.alert-warning {
+  color: #4f4f50;
+  background-color: rgba(255,174,17,.2);
+  border-color: transparent;
+}
+
+.alert-warning h5 {
+  color: #EBA010;
+}
+
+.alert-success {
+  color: #4f4f50;
+  background-color: rgba(0,155,81,.2);
+  border-color: transparent;
+}
+
+.alert-success h5 {
+  color: #008244;
 }
 
 /* For Embedded Video */
@@ -1092,47 +1291,50 @@ div.embeddedvideo iframe {
 /* For tabbed content */
 
 .tabGroup {
-  margin-top: 1rem; }
+  margin-top: 20px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0px 4px 20px rgb(0 0 0 / 6%);
+  padding-top: 8px; }
   .tabGroup ul[role="tablist"] {
     margin: 0;
     padding: 0;
-    list-style: none; }
+    list-style: none;
+    display: flex; }
     .tabGroup ul[role="tablist"] > li {
       list-style: none;
-      display: inline-block; }
+      display: inline-flex; }
   .tabGroup a[role="tab"] {
-    color: #6e6e6e;
+    color: #4f4f50;
     box-sizing: border-box;
     display: inline-block;
     padding: 5px 7.5px;
     text-decoration: none;
-    border-bottom: 2px solid #fff; }
+    border-bottom: 2px solid transparent; }
     .tabGroup a[role="tab"]:hover, .tabGroup a[role="tab"]:focus, .tabGroup a[role="tab"][aria-selected="true"] {
-      border-bottom: 2px solid #0050C5; }
+      border-bottom: 2px solid #1151F3; }
     .tabGroup a[role="tab"][aria-selected="true"] {
       color: #222; }
     .tabGroup a[role="tab"]:hover, .tabGroup a[role="tab"]:focus {
-      color: #0050C5; }
+      color: #1151F3; }
     .tabGroup a[role="tab"]:focus {
-      outline: 1px solid #0050C5;
+      outline: none;
       outline-offset: -1px; }
   @media (min-width: 768px) {
     .tabGroup a[role="tab"] {
       padding: 5px 15px; } }
   .tabGroup section[role="tabpanel"] {
-    border: 1px solid #e0e0e0;
+    border-top: 1px solid #e9eaed;
     padding: 15px;
     margin: 0;
     overflow: hidden; }
     .tabGroup section[role="tabpanel"] > .codeHeader,
-    .tabGroup section[role="tabpanel"] > pre {
-      margin-left: -16px;
-      margin-right: -16px; }
+    .tabGroup section[role="tabpanel"] > pre { }
     .tabGroup section[role="tabpanel"] > :first-child {
       margin-top: 0; }
     .tabGroup section[role="tabpanel"] > pre:last-child {
       display: block;
-      margin-bottom: -16px; }
+      margin-bottom: 0; }
 
 .mainContainer[dir='rtl'] main ul[role="tablist"] {
   margin: 0; }
@@ -1153,9 +1355,19 @@ div.embeddedvideo iframe {
 .form-control.large {
   height: 52px;
   padding: 8px 16px;
-  font-size: 16px;
+  font-size: 20px;
   box-shadow: none;
-} 
+  border-radius: 0;
+  border: 0;
+  background-color: transparent;
+  box-shadow: inset 0 -1px 0 0 #050A23;
+  transition: all .1s linear;
+}
+
+.form-control.large::placeholder {
+  color: #707072;
+  font-weight: 100;
+}
 
 .form-control:hover {
     border-color: #1151F3;
@@ -1167,8 +1379,15 @@ div.embeddedvideo iframe {
     box-shadow: 0px 0px 0px 1px white, 0px 0px 0px 3px rgba(17, 81, 243, 0.2);
 }
 
+.form-control.large:hover,
+.form-control.large:focus {
+  box-shadow: inset 0 -2px 0 0 #050A23;
+}
+
+
+
 .home-search h1 {
-  margin-top: 140px;
+  margin-top: 160px;
   margin-bottom: 40px
 }
 
@@ -1189,6 +1408,8 @@ img.illustration {
   max-width: 300px;
   height: 220px;
   margin: 2rem auto 1rem;
+  opacity: 0.9;
+  transition: opacity .1s linear;
 }
 
 .card-link {
@@ -1197,7 +1418,7 @@ img.illustration {
   padding: 0 20px 20px;
   background-color: transparent;
   color: #4f4f50;
-  border-radius: 8px;
+  border-radius: 4px;
   text-decoration: none;
   transition: all .1s linear;
 }
@@ -1206,6 +1427,11 @@ img.illustration {
 .card-link:focus {
   background-color: #ffffff;
   color: #000000;
-  box-shadow: 0 4px 12px 0 rgba(0,0,0,.16);
-  transform: scale(1.045)
+  box-shadow: 0px 4px 20px rgb(0 0 0 / 6%);
+  transform: scale(1.02)
+}
+
+.card-link:hover img.illustration,
+.card-link:focus img.illustration {
+  opacity: 1;
 }

@@ -34,12 +34,16 @@
           {{^_disableAffix}}
           <div class="col-md-10">
           {{/_disableAffix}}
-            {{^_disableBreadcrumb}}
-            {{>partials/breadcrumb}}
-            {{/_disableBreadcrumb}}
-            <article class="content wrap" id="_content" data-uid="{{uid}}">
-                {{!body}}
-            </article>
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+                {{^_disableBreadcrumb}}
+                {{>partials/breadcrumb}}
+                {{/_disableBreadcrumb}}
+                <article class="content wrap" id="_content" data-uid="{{uid}}">
+                    {{!body}}
+                </article>
+              </div>
+            </div>
           </div>
           {{^_disableAffix}}
           {{>partials/affix}}
