@@ -38,7 +38,7 @@ documentType: index
     <div class="col-md-4 col-md-offset-2">
         <img class="illustration" src="images/premium.svg">
         <h3>Dedicated Support</h3>
-        <p class="text-left">Radzen offers dedicated support with the Radzen Professional and Enterprise subscriptions.</p>
+        <p class="text-left">Radzen offers dedicated support with the <a href="https://www.radzen.com/pricing/" target="_blank" title="See Pricing">Radzen Professional and Enterprise subscriptions</a>.</p>
         <p >A Radzen subscription provides:</p>
         <ul class="text-left">
             <li>Dedicated support over email with guaranteed response time (24 hours for Radzen Professional and 16 hours for Radzen Enterprise).</li>
