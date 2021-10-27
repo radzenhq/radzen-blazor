@@ -61,3 +61,9 @@ To display data in CheckBoxList component you can statically declare items in th
     }
 }
 ```
+
+### Orientation
+Use Orientation property to set if CheckBoxList orientation is horizontal or vertical.
+```
+<RadzenCheckBoxList Orientation="Orientation.Vertical" ...
+```
