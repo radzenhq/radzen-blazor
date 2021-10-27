@@ -1163,7 +1163,12 @@ pre {
   border: 0;
   background-color: #ffffff;
   margin: 20px 0;
-  box-shadow: 0px 4px 20px rgb(0 0 0 / 6%);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 6%);
+}
+
+.tabGroup pre {
+  border: 1px solid #e9eaed;
+  box-shadow: none;
 }
 
 pre code,
