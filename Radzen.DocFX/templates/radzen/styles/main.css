@@ -1159,18 +1159,11 @@ a code:hover {
   text-decoration: underline;
 }
 
-.hljs-keyword {
-  color: rgb(86,156,214);
-}
-
-.hljs-string {
-  color: rgb(214, 157, 133);
-}
-
 pre {
   border: 0;
-  background-color: rgba(0,0,0,.05);
+  background-color: #ffffff;
   margin: 20px 0;
+  box-shadow: 0px 4px 20px rgb(0 0 0 / 6%);
 }
 
 pre code,
@@ -1182,6 +1175,90 @@ pre .hljs {
 pre > code .line-highlight {
   background-color: #ffffcc;
 }
+
+
+.hljs {
+  color: #383a42;
+}
+
+
+.hljs-comment,
+
+.hljs-quote {
+  color: #a0a1a7;
+  font-style: italic;
+}
+
+
+.hljs-doctag,
+.hljs-formula,
+.hljs-keyword {
+  color: #a626a4;
+}
+
+
+.hljs-deletion,
+.hljs-name,
+.hljs-section,
+.hljs-selector-tag,
+.hljs-subst {
+  color: #FF504D;
+}
+
+.hljs-literal {
+  color: #0184bb;
+}
+
+
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta 
+.hljs-string,
+.hljs-regexp,
+.hljs-string {
+  color: #009B51;
+}
+
+.hljs-attr,
+.hljs-number,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-pseudo,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable {
+  color: #FF504D;
+}
+
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-symbol,
+.hljs-title {
+  color: #4078f2;
+}
+
+.hljs-built_in,
+.hljs-class 
+.hljs-title,
+-title.class_ {
+  color: #c18401;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 700;
+}
+
+.hljs-link {
+  text-decoration: underline;
+}
+
+
 
 /* Alerts */
 .alert h5 {
@@ -1329,7 +1406,11 @@ div.embeddedvideo iframe {
     margin: 0;
     overflow: hidden; }
     .tabGroup section[role="tabpanel"] > .codeHeader,
-    .tabGroup section[role="tabpanel"] > pre { }
+    .tabGroup section[role="tabpanel"] > pre { 
+      margin-left: -8px;
+      margin-right: -8px;
+      box-shadow: none;
+    }
     .tabGroup section[role="tabpanel"] > :first-child {
       margin-top: 0; }
     .tabGroup section[role="tabpanel"] > pre:last-child {
@@ -1350,6 +1431,10 @@ div.embeddedvideo iframe {
 #fields, #properties, #methods, #events {
     font-weight: bold;
     margin-top: 2em;
+}
+
+.form-control {
+  box-shadow: none;
 }
 
 .form-control.large {
