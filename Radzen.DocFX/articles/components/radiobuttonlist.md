@@ -20,9 +20,9 @@ To display data in RadioBoxList component you can statically declare items in th
 @code {
     int value = 1;
 
-    void OnChange(IEnumerable<int> value)
+    void OnChange(int? value)
     {
-        Console.WriteLine($"Value changed to {string.Join(", ", value)}");
+        Console.WriteLine($"Value changed to {value}");
     }
 }
 ```
@@ -35,9 +35,9 @@ To display data in RadioBoxList component you can statically declare items in th
     IEnumerable<MyObject> data = new MyObject[] {
         new MyObject(){ Id = 1 , Name = "Orders"}, new MyObject() { Id = 2 , Name = "Employees"}, new MyObject() { Id = 3 , Name = "Customers" } };
 
-    void OnChange(IEnumerable<int> value)
+    void OnChange(int? value)
     {
-        Console.WriteLine($"Value changed to {string.Join(", ", value)}");
+        Console.WriteLine($"Value changed to {value}");
     }
 }
 ```
@@ -55,9 +55,9 @@ To display data in RadioBoxList component you can statically declare items in th
     IEnumerable<MyObject> data = new MyObject[] {
         new MyObject(){ Id = 1 , Name = "Orders"}, new MyObject() { Id = 2 , Name = "Employees"}, new MyObject() { Id = 3 , Name = "Customers" } };
 
-    void OnChange(IEnumerable<int> value)
+    void OnChange(int? value)
     {
-        Console.WriteLine($"Value changed to {string.Join(", ", value)}");
+        Console.WriteLine($"Value changed to {value}");
     }
 }
 ```
