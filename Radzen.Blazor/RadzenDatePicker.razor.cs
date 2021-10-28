@@ -885,9 +885,10 @@ namespace Radzen.Blazor
             }
             else
             {
-                if (newValue != DateTimeValue)
+                var v = new DateTime(CurrentDate.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
+                if (v != DateTimeValue)
                 {
-                    DateTimeValue = newValue;
+                    DateTimeValue = v;
                     await OnChange();
                     Close();
                 }
