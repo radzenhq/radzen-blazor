@@ -1307,10 +1307,16 @@ pre > code .line-highlight {
 
 
 /* Alerts */
+
+.alert {
+  padding: 20px;
+}
 .alert h5 {
     text-transform: uppercase;
+    font-size: 12px;
     font-weight: 600;
     margin-top: 0;
+    margin-bottom: 12px;
 }
 
 .alert h5:before {
@@ -1339,7 +1345,7 @@ pre > code .line-highlight {
 
 .alert-info {
   color: #4f4f50;
-  background-color: rgba(18,164,245,.2);
+  background-color: #D0EDFD;
   border-color: transparent;
 }
 
@@ -1349,7 +1355,7 @@ pre > code .line-highlight {
 
 .alert-danger {
   color: #4f4f50;
-  background-color: rgba(243,17,85,.1);
+  background-color: #FEE7EE;
   border-color: transparent;
 }
 
@@ -1359,17 +1365,17 @@ pre > code .line-highlight {
 
 .alert-warning {
   color: #4f4f50;
-  background-color: rgba(255,174,17,.2);
+  background-color: #F6E7CB;
   border-color: transparent;
 }
 
 .alert-warning h5 {
-  color: #EBA010;
+  color: #FFEFCF;
 }
 
 .alert-success {
   color: #4f4f50;
-  background-color: rgba(0,155,81,.2);
+  background-color: #CCEBDC;
   border-color: transparent;
 }
 
