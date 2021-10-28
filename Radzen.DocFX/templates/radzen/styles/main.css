@@ -520,7 +520,7 @@ header .main-nav {
   padding: 15px;
   line-height: 20px;
   color: #050A23;
-  transition: all .1s linear;
+  transition: color .1s linear;
 }
 
 #autocollapse .collapse.in .external-links,
@@ -536,7 +536,7 @@ header .main-nav {
 .navbar-default .navbar-nav>.active>a,
 .navbar-default .navbar-text {
   color: #050A23;
-  transition: all .1s linear;
+  transition: color .1s linear;
 }
 
 .navbar .external-links a:hover,
