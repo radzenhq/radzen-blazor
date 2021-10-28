@@ -1,6 +1,6 @@
 {{!Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.}}
 
-<nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+<nav id="autocollapse" class="navbar navbar-default ng-scope main-nav homepage-nav" role="navigation">
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
@@ -12,7 +12,10 @@
       {{>partials/logo}}
     </div>
     <div class="collapse navbar-collapse" id="navbar">
-
+      <div class="navbar-right external-links">
+        <a href="https://blazor.radzen.com/" target="_blank">Demos</a>
+        <a href="https://www.radzen.com/features/" target="_blank">About Radzen</a>
+      </div>
     </div>
   </div>
 </nav>

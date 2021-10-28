@@ -454,41 +454,115 @@ header .main-nav {
   display: block !important;
 }
 #autocollapse.collapsed .collapse.in .navbar-right,
-#autocollapse.collapsed .collapsing .navbar-right {
+#autocollapse.collapsed .collapsing .navbar-right,
+#autocollapse.collapsed .collapse.in .navbar-left,
+#autocollapse.collapsed .collapsing .navbar-left {
   float: none !important;
 }
+
+#autocollapse.collapsed .collapse.in .navbar-left,
+#autocollapse.collapsed .collapsing .navbar-left {
+  width: 100%;
+  margin: 0;
+}
+
+#autocollapse .navbar-form {
+  margin-left: 100px;
+  min-width: 35%;
+}
+
+#autocollapse .collapse.in .navbar-form,
+#autocollapse .collapsing .navbar-form {
+  margin-left: -15px;
+}
+
 #autocollapse .form-group {
   width: 100%;
 }
+
 #autocollapse .form-control {
   width: 100%;
 }
+
 #autocollapse .navbar-header {
   margin-left: 0;
   margin-right: 0;
 }
+
 #autocollapse .navbar-brand {
   margin-left: 0;
 }
+
 .collapse.in,
 .collapsing {
   text-align: center;
 }
+
 .collapsing .navbar-form {
   margin: 0 auto;
-  max-width: 400px;
   padding: 10px 15px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.1);
 }
+
 .collapsed .collapse.in .navbar-form {
   margin: 0 auto;
-  max-width: 400px;
   padding: 10px 15px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.1);
 }
-.navbar .navbar-nav {
+
+.navbar .navbar-nav,
+.navbar .external-links {
   display: inline-block;
 }
+
+.navbar .external-links a {
+  display: inline-block;
+  padding: 15px;
+  line-height: 20px;
+  color: #050A23;
+  transition: all .1s linear;
+}
+
+#autocollapse .collapse.in .external-links,
+#autocollapse .collapsing .external-links,
+#autocollapse .collapse.in .external-links a,
+#autocollapse .collapsing .external-links a,
+#autocollapse .collapse.in .navbar-nav,
+#autocollapse .collapsing .navbar-nav  {
+  display: block;
+}
+
+.navbar-default .navbar-nav>li>a,
+.navbar-default .navbar-nav>.active>a,
+.navbar-default .navbar-text {
+  color: #050A23;
+  transition: all .1s linear;
+}
+
+.navbar .external-links a:hover,
+.navbar .external-links a:focus,
+.navbar-default .navbar-nav>li>a:hover,
+.navbar-default .navbar-nav>li>a:focus,
+.navbar-default .navbar-nav>.active>a:hover,
+.navbar-default .navbar-nav>.active>a:focus {
+  color: #FF504D;
+}
+
+.navbar-default .navbar-nav>.active>a,
+.navbar-default .navbar-nav>.active>a:hover,
+.navbar-default .navbar-nav>.active>a:focus {
+  background-color: #e9eaed;
+}
+
+.navbar-default .navbar-toggle {
+  border-color: transparent;
+  margin-right: 0;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+  background-color: #050A23;
+}
+
 .docs-search {
   background: white;
   vertical-align: middle;
@@ -824,7 +898,8 @@ body .toc{
   color: #4f4f50;
   padding: 8px 28px;
   width: 100%;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 300;
   line-height: 20px;
   transition: all .1s linear;
 }
@@ -1075,6 +1150,16 @@ footer {
   background-color: #ffffff;
   padding: 15px 0;
 }
+@media only screen and (max-width: 1200px) {
+  #autocollapse .navbar-form {
+    min-width: 30%;
+    margin-left: 60px;
+  }
+  .navbar:not(.homepage-nav) .external-links {
+    display: none;
+  }
+}
+
 @media (min-width: 768px) {
   #sidetoggle.collapse {
     display: block;
@@ -1086,9 +1171,6 @@ footer {
   .topnav .navbar-nav > li {
     float: none;
     display: inline-block;
-  }
-  #autocollapse .navbar-form .form-group {
-    width: 200px;
   }
 }
 @media only screen and (max-width: 768px) {
@@ -1370,12 +1452,12 @@ pre > code .line-highlight {
 }
 
 .alert-warning h5 {
-  color: #FFEFCF;
+  color: #FFAE11;
 }
 
 .alert-success {
   color: #4f4f50;
-  background-color: #CCEBDC;
+  background-color: #FFEFCF;
   border-color: transparent;
 }
 
@@ -1494,9 +1576,11 @@ div.embeddedvideo iframe {
 .form-control {
   box-shadow: none;
   border-color: #e0e1e4;
+  font-size: 16px;
+  font-weight: 300;
 }
 
-.form-control::placeholder
+.form-control::placeholder,
 .toc-filter > input::placeholder {
   color: #707072;
 }
@@ -1511,11 +1595,6 @@ div.embeddedvideo iframe {
   background-color: transparent;
   box-shadow: inset 0 -1px 0 0 #050A23;
   transition: all .1s linear;
-}
-
-.form-control.large::placeholder {
-  color: #707072;
-  font-weight: 100;
 }
 
 .form-control:hover {
