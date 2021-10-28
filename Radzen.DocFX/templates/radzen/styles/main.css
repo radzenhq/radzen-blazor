@@ -249,8 +249,15 @@ span.languagekeyword{
   margin-left: 10px;
   margin-top: 5px;
 }
-.table {
-  margin-bottom: 10px;
+.table-responsive {
+  margin: 20px 0;
+}
+.table th {
+  font-size: 11px;
+  letter-spacing: 1px;
+  font-weight: normal;
+  text-transform: uppercase;
+  color: #8d8e90;
 }
 .table-bordered>thead>tr>td,
 .table-bordered>thead>tr>th {
@@ -261,6 +268,10 @@ table p {
 }
 table a {
   display: inline-block;
+}
+
+.table-striped>tbody>tr:nth-of-type(odd) {
+  background-color: #f4f5f9;
 }
 
 /* Make hidden attribute compatible with old browser.*/
@@ -303,6 +314,16 @@ h3,
   line-height: 2.5rem;
   letter-spacing: -0.02em;
   margin-bottom: 1.25rem;
+}
+
+h5,
+.h5 {
+  font-size: 1rem;
+}
+
+h6,
+.h6 {
+  font-size: 0.875rem;
 }
 
 .navbar {
@@ -384,9 +405,12 @@ header .main-nav {
   min-height: 40px;
 }
 
-.inheritance h5, .inheritedMembers h5{
-  padding-bottom: 5px;
-  border-bottom: 1px solid #ccc;
+.inheritance h5,
+.inheritedMembers h5,
+.implements h5 {
+  padding-bottom: 10px;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 /*.expand-all {
@@ -635,7 +659,7 @@ header .main-nav {
 .sidetoc {
   position: fixed;
   width: 260px;
-  top: 110px;
+  top: 115px;
   bottom: 0;
   overflow-x: hidden;
   overflow-y: auto;
@@ -787,32 +811,46 @@ body .toc{
   z-index: 1;
 }
 .toc-filter {
-  border-radius: 5px;
-  background: #fff;
+  border-radius: 0;
+  background: transparent;
   color: #4f4f50;
-  padding: 5px;
+  padding: 0;
   position: relative;
   margin: 0;
 }
 .toc-filter > input {
-  border: 0;
+  border: 1px solid #e0e1e4;
+  border-radius: 4px;
   color: #4f4f50;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding: 8px 28px;
   width: 100%;
+  font-size: 14px;
+  line-height: 20px;
+  transition: all .1s linear;
+}
+.toc-filter > input:hover,
+.toc-filter > input:focus {
+  border-color: #1151F3;
+  outline: none;
 }
 .toc-filter > input:focus {
-  outline: 0;
+  box-shadow: 0px 0px 0px 1px white, 0px 0px 0px 3px rgba(17, 81, 243, 0.2);
 }
 .toc-filter > .filter-icon {
   position: absolute;
-  top: 10px;
-  left: 5px;
+  top: 13px;
+  left: 8px;
+  color: #afafb0;
 }
 .toc-filter > .clear-icon {
   position: absolute;
-  top: 10px;
-  right: 5px;
+  top: 12px;
+  right: 8px;
+  color: #afafb0;
+}
+
+.toc-filter > .clear-icon:hover {
+  color: #707072;
 }
 .article {
   margin-top: 80px;
@@ -876,6 +914,13 @@ article dl {
   margin: 0 0 16px;
   line-height: 1.6em;
 }
+
+article > ul li,
+article > ol li,
+article > dl dt,
+article > dl dd {
+  margin-bottom: 8px;
+}
 article img {
   display: block;
   max-width: 800px;
@@ -907,12 +952,12 @@ article img {
   margin-bottom: 20px;
 }
 .sideaffix > div.contribution > ul > li > a.contribution-link {
-  padding: 6px 10px;
-  font-weight: bold;
-  font-size: 14px;
+  padding: 4px 12px;
+  font-weight: normal;
+  font-size: 12px;
 }
 .sideaffix > div.contribution > ul > li > a.contribution-link:hover {
-  background-color: #ffffff;
+  background-color: transparent;
 }
 .sideaffix ul.nav > li > a:focus {
   background: none;
@@ -920,7 +965,7 @@ article img {
 .affix h5 {
   font-weight: bold;
   text-transform: uppercase;
-  padding-left: 10px;
+  padding-left: 12px;
   font-size: 12px;
 }
 .affix > ul.level1 {
@@ -1161,15 +1206,11 @@ a code:hover {
 
 pre {
   border: 0;
-  background-color: #ffffff;
+  background-color: rgba(0,0,0,.03);
   margin: 20px 0;
-  box-shadow: 0 4px 20px rgb(0 0 0 / 6%);
+  padding: 20px;
 }
 
-.tabGroup pre {
-  border: 1px solid #e9eaed;
-  box-shadow: none;
-}
 
 pre code,
 pre .hljs {
@@ -1374,9 +1415,7 @@ div.embeddedvideo iframe {
 
 .tabGroup {
   margin-top: 20px;
-  background-color: #fff;
   border-radius: 4px;
-  box-shadow: 0px 4px 20px rgb(0 0 0 / 6%);
   padding-top: 8px; }
   .tabGroup ul[role="tablist"] {
     margin: 0;
@@ -1412,8 +1451,8 @@ div.embeddedvideo iframe {
     overflow: hidden; }
     .tabGroup section[role="tabpanel"] > .codeHeader,
     .tabGroup section[role="tabpanel"] > pre { 
-      margin-left: -8px;
-      margin-right: -8px;
+      margin-left: 0;
+      margin-right: 0;
       box-shadow: none;
     }
     .tabGroup section[role="tabpanel"] > :first-child {
@@ -1428,18 +1467,32 @@ div.embeddedvideo iframe {
 /* Color theme */
 
 /* These are not important, tune down **/
-.decalaration, .fieldValue, .parameters, .returns {
-  color: #a2a2a2;
+.decalaration,
+.propertyValue,
+.fieldValue,
+.parameters,
+.returns {
+  color: #8d8e90;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 /* Major sections, increase visibility **/
 #fields, #properties, #methods, #events {
     font-weight: bold;
-    margin-top: 2em;
+    margin-top: 1em;
 }
 
 .form-control {
   box-shadow: none;
+  border-color: #e0e1e4;
+}
+
+.form-control::placeholder
+.toc-filter > input::placeholder {
+  color: #707072;
 }
 
 .form-control.large {
@@ -1524,4 +1577,56 @@ img.illustration {
 .card-link:hover img.illustration,
 .card-link:focus img.illustration {
   opacity: 1;
+}
+
+.radzen-banner {
+  margin: 80px 0 60px;
+  padding: 1.25rem 1.5rem 1.5rem;
+  border-radius: 4px;
+  box-shadow: 0 6px 14px 0 rgb(0 0 0 / 6%);
+  background-color: #ffffff;
+  background-image: url("../images/background.svg");
+  background-repeat: no-repeat;
+  background-position: right -450px top -200px;
+}
+
+.cta-button {
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+  padding: 1rem 2rem;
+  margin: 0;
+  border-radius: 0.75rem;
+  border: 1px solid #050A23;
+  box-sizing: border-box;
+  color: #050A23 !important;
+  transition: all 0.3s ease-in-out;
+}
+
+.cta-button.primary {
+  font-weight: 600;
+  color: #ffffff !important;
+  border-color: #FF504D;
+  background: #FF504D;
+}
+
+.cta-button:hover {
+  text-decoration: none;
+  color: #ffffff !important;
+  border-color: #050A23;
+  background: #050A23;
+}
+
+.radzen-banner .cta-button {
+  margin: 20px 0 0;
+}
+
+.radzen-banner .cta-button.download {
+  margin: 70px 30px;
 }
