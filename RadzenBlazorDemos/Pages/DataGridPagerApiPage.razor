@@ -16,7 +16,7 @@
         <RadzenCheckBox @bind-Value=@showPagerSummary Name="CheckBox1" Style="margin-left: 5px;" />
         <RadzenLabel Text="Show pager summary" Component="CheckBox1" Style="margin-left: 5px;" />
     </div>
-   <RadzenDataGrid @ref=@dataGrid Data="@orderDetails" TItem="OrderDetail" AllowPaging="true" AllowSorting="true" PageSizeOptions="@pageSizeOptions" PageShowSummary="@showPagerSummary">
+   <RadzenDataGrid @ref=@dataGrid Data="@orderDetails" TItem="OrderDetail" AllowPaging="true" AllowSorting="true" PageSizeOptions="@pageSizeOptions" ShowPagingSummary="@showPagerSummary">
         <Columns>
             <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
             <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
