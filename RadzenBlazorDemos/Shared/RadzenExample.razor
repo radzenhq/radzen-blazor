@@ -43,7 +43,7 @@
     [Parameter]
     public bool Documentation { get; set; } = true;
 
-    string DocumentationHref => $"/docs/articles/components/{Name.ToLower()}.html";
+    string DocumentationHref => $"/docs/guides/components/{Name.ToLower()}.html";
 
     [Parameter]
     public IEnumerable<string> AdditionalSourceCodePages { get; set; } = Enumerable.Empty<string>();

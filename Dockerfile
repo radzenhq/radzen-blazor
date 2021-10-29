@@ -11,10 +11,10 @@ RUN apt-get update && apt-get install unzip wget git -y && wget -q -P /tmp https
     rm -rf /tmp/*
 
 COPY Radzen.Blazor /app/Radzen.Blazor
-COPY Radzen.DocFX /app/Radzen.DocFX
+COPY Radzen.DocFX /app/DocFX
 COPY RadzenBlazorDemos /app/RadzenBlazorDemos
 WORKDIR /app
-RUN docfx Radzen.DocFX/docfx.json
+RUN docfx DocFX/docfx.json
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-focal
 
