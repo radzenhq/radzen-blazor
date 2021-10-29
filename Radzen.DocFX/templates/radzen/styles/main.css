@@ -467,7 +467,7 @@ header .main-nav {
 }
 
 #autocollapse .navbar-form {
-  margin-left: 7.6%;
+  margin-left: 12.6%;
   min-width: 35%;
 }
 
@@ -1153,7 +1153,6 @@ footer {
 @media only screen and (max-width: 1200px) {
   #autocollapse .navbar-form {
     min-width: 30%;
-    margin-left: 60px;
   }
   .navbar:not(.homepage-nav) .external-links {
     display: none;
