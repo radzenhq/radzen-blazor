@@ -96,6 +96,20 @@ namespace Radzen
         /// <value>The page size options.</value>
         [Parameter]
         public IEnumerable<int> PageSizeOptions { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the pager summary visibility.
+        /// </summary>
+        /// <value>The pager summary visibility.</value>
+        [Parameter]
+        public bool ShowPagingSummary { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the pager summary format.
+        /// </summary>
+        /// <value>The pager summary format.</value>
+        [Parameter]
+        public string PagingSummaryFormat { get; set; } = "Page {0} of {1} ({2} items)";
 
         /// <summary>
         /// The view
