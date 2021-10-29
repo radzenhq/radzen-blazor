@@ -1,4 +1,4 @@
-<button @onclick=@OnClick class=@Class disabled=@(Editor.Disabled || Disabled) @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@Title>
+<button tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor.Disabled || Disabled) @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@Title>
     <i class="rzi">@Icon</i>
 </button>
 @code {
