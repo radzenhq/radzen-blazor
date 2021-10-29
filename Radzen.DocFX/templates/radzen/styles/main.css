@@ -999,6 +999,7 @@ article > dl dd {
 }
 article img {
   display: block;
+  width: 100%;
   max-width: 800px;
   margin: 40px auto;
   border-radius: 4px;
