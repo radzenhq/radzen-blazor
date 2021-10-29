@@ -40,4 +40,11 @@
     </div>
     {{>partials/scripts}}
   </body>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      setTimeout(function() {
+        $("#search-query").focus();
+      }, 10);
+    });
+  </script>
 </html>
