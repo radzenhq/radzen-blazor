@@ -36,23 +36,6 @@ This article demonstrates how to use the Accordion component.
     </Items>
 </RadzenAccordion>
 ```
-## Single item expand
-
-```
-<RadzenAccordion>
-    <Items>
-        <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
-            Details for Orders
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Text="Employees" Icon="account_box">
-            Details for Employees
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Text="Customers" Icon="accessibility">
-            Details for Customers
-        </RadzenAccordionItem>
-    </Items>
-</RadzenAccordion>
-```
 
 ## Expand/Collapse events
 
