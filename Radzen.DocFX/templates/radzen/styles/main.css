@@ -499,6 +499,11 @@ header .main-nav {
   text-align: center;
 }
 
+.sidetoggle.collapse.in,
+.sidetoggle.collapsing {
+  text-align: left;
+}
+
 .collapsing .navbar-form {
   margin: 0 auto;
   padding: 10px 15px;
@@ -875,6 +880,10 @@ body .toc{
   display: none;
   margin: 0 15px 0px 15px;
 }
+.btn.toc-toggle.active,
+.btn.toc-toggle:active {
+  box-shadow: none;
+}
 .sidefilter {
   position: fixed;
   top: 50px;
@@ -1190,7 +1199,6 @@ footer {
   }
   .sidenav {
     padding: 15px 0;
-    margin-left: -15px;
     margin-right: -15px;
   }
   .sidefilter {
@@ -1198,6 +1206,7 @@ footer {
     width: auto;
     float: none;
     border: none;
+
   }
   .sidetoc {
     position: static;
@@ -1205,7 +1214,7 @@ footer {
     float: none;
     border: none;
   }
-  .toc .nav > li, .toc .nav > li >a {
+  /*.toc .nav > li, .toc .nav > li >a {
     display: inline-block;
   }
   .toc li:after {
@@ -1213,7 +1222,7 @@ footer {
     margin-right: 5px;
     content: ", ";
     color: #4f4f50;
-  }
+  }*/
   .toc .level1 > li {
     display: block;
   }
