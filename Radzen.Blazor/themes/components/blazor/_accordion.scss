@@ -41,7 +41,7 @@ $accordion-shadow: none !default;
   }
 
   .rzi {
-    font-size: 1.25rem;
+    font-size: $accordion-icon-font-size;
     margin: $accordion-icon-margin;
   }
 }
