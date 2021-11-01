@@ -177,6 +177,27 @@ namespace Radzen.Blazor
         public Action<SchedulerAppointmentRenderEventArgs<TItem>> AppointmentRender { get; set; }
 
         /// <summary>
+        /// An action that will be invoked when the current view renders an slot. Never call <c>StateHasChanged</c> when handling SlotRender.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments SlotRender=@OnSlotRender&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        ///   void OnSlotRender(SchedulerSlotRenderEventArgs args) 
+        ///   {
+        ///     if (args.View.Text == "Month" &amp;&amp; args.Start.Date == DateTime.Today)
+        ///     {
+        ///        args.Attributes["style"] = "background: red;";
+        ///     }
+        ///   }
+        /// }
+        /// </code>
+        /// </example>
+        [Parameter]
+        public Action<SchedulerSlotRenderEventArgs> SlotRender { get; set; }
+
+        /// <summary>
         /// A callback that will be invoked when the scheduler needs data for the current view. Commonly used to filter the
         /// data assigned to <see cref="Data" />.
         /// </summary>
@@ -199,6 +220,16 @@ namespace Radzen.Blazor
             var args = new SchedulerAppointmentRenderEventArgs<TItem> { Data = (TItem)item.Data, Start = item.Start, End = item.End };
 
             AppointmentRender?.Invoke(args);
+
+            return args.Attributes;
+        }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end)
+        {
+            var args = new SchedulerSlotRenderEventArgs { Start = start, End = end, View = SelectedView };
+
+            SlotRender?.Invoke(args);
 
             return args.Attributes;
         }
