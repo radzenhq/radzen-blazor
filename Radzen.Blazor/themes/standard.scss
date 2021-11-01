@@ -58,7 +58,7 @@ $rz-series-8: #84A7FF;
 
 // Shadows
 
-$rz-shadow-level-1: 0px 2px 2px rgba(0, 0, 0, 0.08);
+$rz-shadow-level-1: 0 2px 2px 0 rgba(0, 0, 0, 0.08), 0 0 2px 0 rgba(0, 0, 0, 0.08);
 $rz-shadow-level-2: 0 4px 12px 0 rgba(0, 0, 0, 0.04);
 
 $rz-shadow-inset-level-1: inset 0px 0px 2px rgba(0, 0, 0, 0.2);
@@ -570,6 +570,7 @@ $grid-stripe-background-color: lighten($rz-base-100, 1%) !default;
 
 $grid-toolbar-background-color: $rz-white !default;
 $grid-header-cell-border: 1px solid $rz-base-200  !default;
+$grid-header-cell-border-bottom: $grid-header-cell-border !default;
 $grid-header-background-color: $rz-base-100 !default;
 $grid-header-font-size: $grid-cell-font-size !default;
 $grid-header-line-height: 1.25rem !default;
@@ -1046,10 +1047,10 @@ $checkbox-margin: 1rem 0;
 
 $checkbox-checked-background-color: $rz-white !default;
 $checkbox-checked-hover-background-color: $rz-white !default;
-$checkbox-checked-color: $rz-primary !default;
+$checkbox-checked-color: $rz-secondary !default;
 $checkbox-checked-shadow: none !default;
-$checkbox-checked-border: 1px solid $rz-primary !default;
-$checkbox-checked-icon-background-color: $rz-primary !default;
+$checkbox-checked-border: 1px solid $rz-base-300 !default;
+$checkbox-checked-icon-background-color: $rz-secondary !default;
 $checkbox-checked-icon-border-radius: $rz-border-radius / 2 !default;
 
 $checkbox-icon-width: 0.625rem !default;
@@ -1090,13 +1091,13 @@ $radio-checked-hover-shadow: none !default;
 
 $radio-checked-color: $rz-white !default;
 
-$radio-circle-background-color: $rz-primary !default;
+$radio-circle-background-color: $rz-secondary !default;
 $radio-circle-shadow: none;
-$radio-circle-hover-background-color: $rz-primary-light !default;
+$radio-circle-hover-background-color: $rz-secondary-light !default;
 
 $radio-icon-width: 0.625rem !default;
 $radio-icon-height: $radio-icon-width !default;
-$radio-checked-border: 1px solid $rz-primary !default;
+$radio-checked-border: 1px solid $rz-base-300 !default;
 
 .rz-radio-button-list-vertical,
 .rz-radio-button-list-horizontal {
@@ -1106,7 +1107,7 @@ $radio-checked-border: 1px solid $rz-primary !default;
   }
 
   &:not(.rz-state-disabled) > div > .rz-radiobutton-label:hover {
-    color: $rz-primary-light;
+    color: $rz-secondary-light;
     cursor: pointer;
   }
 }
@@ -1340,7 +1341,6 @@ body {
   line-height: $paragraph-line-height;
 }
 
-
 // Headings
 
 $heading-color: $rz-base-900;
@@ -1355,14 +1355,15 @@ $headings: (
 );
 
 @each $name, $heading in $headings {
-  #{$name} {
+  #{$name},
+  .#{$name} {
     @each $name, $value in $heading {
       #{$name}: #{$value};
     }
   }
 }
 
-$headings-light: (
+$headings-thin: (
   h1: (font-size: 3rem, font-weight: 300),
   h2: (font-size: 2rem, font-weight: 300),
   h3: (font-size: 1.25rem, font-weight: 300),
@@ -1371,16 +1372,9 @@ $headings-light: (
   h6: (font-size: 0.75rem, font-weight: 300)
 );
 
-@each $name, $heading in $headings-light {
-  #{$name}.text-thin {
-    @each $name, $value in $heading {
-      #{$name}: #{$value};
-    }
-  }
-}
-
-@each $name, $heading in $headings-light {
-  .#{$name}.text-thin {
+@each $name, $heading in $headings-thin {
+  #{$name}.text-thin,
+  .#{$name}.text-thin  {
     @each $name, $value in $heading {
       #{$name}: #{$value};
     }

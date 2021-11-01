@@ -19,6 +19,7 @@ $grid-stripe-background-color: #f7f9fa !default;
 
 $grid-toolbar-background-color: $white !default;
 $grid-header-cell-border: $grid-cell-border !default;
+$grid-header-cell-border-bottom: none !default;
 $grid-header-background-color: #e6ecef !default;
 $grid-header-font-size: 0.75rem !default;
 $grid-header-line-height: inherit !default;
@@ -88,8 +89,7 @@ $grid-button-icon-height: $grid-button-icon-width !default;
 $grid-button-height: 1.25rem !default;
 $grid-button-line-height: $grid-button-height !default;
 
-$grid-frozen-cell-border: none !default;
-
+$grid-frozen-cell-border: $grid-cell-border !default;
 $grid-frozen-cell-background-color: $grid-header-background-color !default;
 
 $grid-state-transition: none !default;
@@ -224,7 +224,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     
 
     @if $material == false and $fluent == false {
-      border-bottom: $grid-header-cell-border;
+      border-bottom: $grid-header-cell-border-bottom;
       
       &:not(:last-child) {
         border-right: $grid-header-cell-border;
