@@ -1,5 +1,4 @@
 @using Radzen.Blazor
-@using Radzen.Blazor.Rendering
 
 <div class="rz-view rz-day-view">
     <div class="rz-view-header">
@@ -15,15 +14,7 @@
             @for (var date = StartDate; date < EndDate; date = date.AddMinutes(30))
             {
                 var slotDate = date;
-
-                @if (date.Minute == 30)
-                {
-                    <div class="rz-slot rz-slot-minor" @onclick=@(args => OnSlotClick(slotDate))></div>
-                }
-                else
-                {
-                    <div class="rz-slot" @onclick=@(args => OnSlotClick(slotDate))></div>
-                }
+                <div @onclick=@(args => OnSlotClick(slotDate)) @attributes=@Attributes(date)></div>
             }
         </div>
     </div>
@@ -54,5 +45,12 @@
     async Task OnSlotClick(DateTime date)
     {
         await Scheduler.SelectSlot(date, date.AddMinutes(30));
+    }
+
+    IDictionary<string, object> Attributes(DateTime date)
+    {
+        var attributes = Scheduler.GetSlotAttributes(date, date.AddMinutes(30));
+        attributes["class"] = ClassList.Create("rz-slot").Add("rz-slot-minor", date.Minute == 30).Add(attributes).ToString();
+        return attributes;
     }
 } 

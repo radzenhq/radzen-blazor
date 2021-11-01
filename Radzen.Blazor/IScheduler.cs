@@ -65,6 +65,13 @@ namespace Radzen.Blazor
         /// <returns>A dictionary containing the HTML attributes for the specified appointment.</returns>
         IDictionary<string, object> GetAppointmentAttributes(AppointmentData item);
         /// <summary>
+        /// Gets the slot HTML attributes.
+        /// </summary>
+        /// <param name="start">The start of the slot.</param>
+        /// <param name="end">The end of the slot.</param>
+        /// <returns>A dictionary containing the HTML attributes for the specified slot.</returns>
+        IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end);
+        /// <summary>
         /// Renders the appointment.
         /// </summary>
         /// <param name="item">The item.</param>
