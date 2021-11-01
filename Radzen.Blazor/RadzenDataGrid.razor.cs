@@ -930,6 +930,13 @@ namespace Radzen.Blazor
         public EventCallback<DataGridRowMouseEventArgs<TItem>> RowDoubleClick { get; set; }
 
         /// <summary>
+        /// Gets or sets the row click callback.
+        /// </summary>
+        /// <value>The row click callback.</value>
+        [Parameter]
+        public EventCallback<DataGridCellMouseEventArgs<TItem>> CellContextMenu { get; set; }
+
+        /// <summary>
         /// Gets or sets the row expand callback.
         /// </summary>
         /// <value>The row expand callback.</value>
@@ -1265,6 +1272,11 @@ namespace Radzen.Blazor
         /// <value>The selection mode.</value>
         [Parameter]
         public DataGridSelectionMode SelectionMode { get; set; } = DataGridSelectionMode.Single;
+
+        internal async Task OnCellContextMenu(DataGridCellMouseEventArgs<TItem> args)
+        {
+            await CellContextMenu.InvokeAsync(args);
+        }
 
         internal async Task OnRowClick(DataGridRowMouseEventArgs<TItem> args)
         {

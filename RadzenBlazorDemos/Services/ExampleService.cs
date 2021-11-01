@@ -308,6 +308,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "Cell Context Menu",
+                    Path = "datagrid-cell-contextmenu",
+                    Title = "Blazor DataGrid Cell Context Menu",
+                    Icon = "&#xe22b",
+                    Tags = new [] { "cell", "row", "contextmenu", "menu", "rightclick" }
+                },
+
+                new Example()
+                {
                     Name = "InLine Editing",
                     Path = "datagrid-inline-edit",
                     Title = "Blazor DataGrid InLine Editing",

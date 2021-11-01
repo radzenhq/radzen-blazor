@@ -58,7 +58,7 @@
                 Grid.rowSpans.Add(j, (int)Convert.ChangeType(rowspan, TypeCode.Int32));
             }
 
-            <RadzenDataGridCell Grid="@this.Grid" Item="@Item"
+            <RadzenDataGridCell Grid="@this.Grid" Item="@Item" Column="@column"
                                 Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + Grid.getFrozenColumnClass(column, Columns))" Attributes="@(cellAttr)">
                 <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
                     @if (Item != null)
