@@ -32,11 +32,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string Title { get; set; }
 
-<<<<<<< HEAD
-        ClassList ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button rz-button-text-icon-left")
-                                              .AddDisabled(Disabled);
-        ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only")
-=======
         /// <summary>
         /// Gets the choose class list.
         /// </summary>
@@ -48,7 +43,6 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The button class list.</value>
         ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only btn-light")
->>>>>>> Add standard theme Upload and FileInput styles
                                               .AddDisabled(Disabled);
 
         /// <inheritdoc />
