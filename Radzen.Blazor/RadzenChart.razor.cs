@@ -347,7 +347,7 @@ namespace Radzen.Blazor
                     {
                         widthAndHeightAreSet = true;
 
-                        Resize(rect.Width, rect.Height);
+                        await Resize(rect.Width, rect.Height);
                     }
                 }
             }
