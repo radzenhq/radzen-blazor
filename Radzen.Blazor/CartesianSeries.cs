@@ -309,6 +309,11 @@ namespace Radzen.Blazor
                 shouldRefresh = true;
             }
 
+            if (Data != null && Data.Count() != Items.Count)
+            {
+                shouldRefresh = true;
+            }
+
             if (shouldRefresh)
             {
                 if (Data != null)
