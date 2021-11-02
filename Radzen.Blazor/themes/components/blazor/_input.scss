@@ -18,7 +18,7 @@ $input-disabled-color: rgba(#3a3a3a, 0.4) !default;
 
 $input-transition: none !default;
 
-$input-focus-shadow: none !default;
+$input-focus-shadow: $input-shadow !default;
 
 %input-hover {
   box-shadow: $input-hover-shadow;
