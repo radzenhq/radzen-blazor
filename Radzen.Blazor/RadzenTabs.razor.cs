@@ -176,21 +176,15 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            if (RenderMode == TabRenderMode.Server)
+            if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))
             {
-                if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))
-                {
-                    selectedIndex = parameters.GetValueOrDefault<int>(nameof(SelectedIndex));
-                }
-
-                await base.SetParametersAsync(parameters);
+                selectedIndex = parameters.GetValueOrDefault<int>(nameof(SelectedIndex));
             }
-            else
+
+            await base.SetParametersAsync(parameters);
+
+            if (RenderMode == TabRenderMode.Client)
             {
-                if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))
-                {
-                    selectedIndex = parameters.GetValueOrDefault<int>(nameof(SelectedIndex));
-                }
                 await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
             }
         }
