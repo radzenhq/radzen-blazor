@@ -9,6 +9,7 @@ $menu-item-icon-margin: 0 0.625rem 0 0 !default;
 $menu-item-hover-background-color: $default-link !default;
 $menu-item-hover-color: $white !default;
 $menu-item-offset: 0.75rem;
+$menu-item-transition: none !default;
 
 $menu-top-item-padding: 0.8125rem 0.625rem !default;
 $menu-top-item-hover-color: $default-link !default;
@@ -139,6 +140,12 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
   .rzi:not(.rz-navigation-item-icon-children) {
     margin: $menu-item-icon-margin;
   }
+}
+
+.rz-navigation-item-wrapper,
+.rz-navigation-item-link,
+.rz-navigation-item-text {
+    transition: $menu-item-transition;
 }
 
 .rz-menu-toggle-item {
