@@ -19,6 +19,7 @@ $rz-base-900: #262526;
 $rz-primary: #1151F3;
 $rz-primary-light: #376df5; /*lighten($rz-primary, 8%);*/
 $rz-primary-dark: #0e44cc; /*darken($rz-primary, 10%);*/
+$rz-primary-lighter: rgba($rz-primary, .16);
 
 $rz-secondary: $rz-primary;
 $rz-secondary-light: $rz-primary-light;
@@ -266,6 +267,7 @@ $button-active-styles: map-merge(
 );
 
 $rz-primary-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-primary, 0.2) !default;
+$rz-secondary-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-secondary, 0.2) !default;
 $rz-info-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-info, 0.3) !default;
 $rz-warning-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-warning, 0.4) !default;
 $rz-danger-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-danger, 0.3) !default;
@@ -277,7 +279,7 @@ $button-focus-styles: map-merge(
   (
     primary: (box-shadow: $rz-primary-focus),
     light: (box-shadow: $rz-primary-focus),
-    secondary: (box-shadow: $rz-primary-focus),
+    secondary: (box-shadow: $rz-secondary-focus),
     info: (box-shadow: $rz-info-focus),
     warning: (box-shadow: $rz-warning-focus),
     error:  (box-shadow: $rz-danger-focus),
@@ -364,8 +366,8 @@ $selectbar-background-color: transparent !default;
 $selectbar-color: $rz-base-800 !default;
 $selectbar-border: solid 1px $rz-base-200 !default;
 
-$selectbar-selected-background-color: lighten($rz-secondary-lighter, 20%) !default;
-$selectbar-selected-color: $rz-secondary !default;
+$selectbar-selected-background-color: lighten($rz-primary-lighter, 20%) !default;
+$selectbar-selected-color: $rz-primary !default;
 $selectbar-selected-border: $selectbar-border !default;
 $selectbar-border-radius: $rz-border-radius !default;
 
@@ -440,7 +442,7 @@ $panel-menu-item-padding: 0.75rem 1rem !default;
 $panel-menu-item-border: 1px solid lighten($rz-base-900, 8%) !default;
 $panel-menu-item-active-background-color: $rz-base-900 !default;
 $panel-menu-item-active-color: inherit !default;
-$panel-menu-item-active-indicator: $rz-secondary !default;
+$panel-menu-item-active-indicator: $rz-primary !default;
 $panel-menu-item-offset: 0.75rem !default;
 $panel-menu-item-transition: all 0.1s linear !default;
 
@@ -490,16 +492,16 @@ $steps-number-background-color: #e6ecef !default;
 $steps-number-border-radius: 50% !default;
 $steps-number-color: $body-color !default;
 $steps-number-padding: 0.5rem 0 !default;
-$steps-number-selected-background: $rz-secondary !default;
+$steps-number-selected-background: $rz-primary !default;
 $steps-number-selected-color: $rz-white !default;
 
-$steps-title-selected-color: $rz-secondary !default;
+$steps-title-selected-color: $rz-primary !default;
 $steps-title-margin: 0 1rem 0 0.5rem !default;
-$steps-button-color: $rz-secondary !default;
+$steps-button-color: $rz-primary !default;
 
 // ProgressBar
 
-$progressbar-value-background-color: $rz-secondary-lighter !default;
+$progressbar-value-background-color: $rz-primary-lighter !default;
 $progressbar-background-color: $rz-base-200 !default;
 $progressbar-font-size: 0.875rem !default;
 $progressbar-height: 1.25rem !default;
@@ -560,11 +562,11 @@ $grid-cell-padding: 0.5rem !default;
 $grid-cell-color: $rz-base-800 !default;
 $grid-cell-font-size: 0.875rem !default;
 
-$grid-hover-background-color: $rz-secondary-lighter !default;
-$grid-hover-color: $rz-secondary !default;
+$grid-hover-background-color: $rz-primary-lighter !default;
+$grid-hover-color: $rz-primary !default;
 
-$grid-selected-background-color: lighten($rz-secondary-lighter, 20%) !default;
-$grid-selected-color: $rz-secondary !default;
+$grid-selected-background-color: lighten($rz-primary-lighter, 20%) !default;
+$grid-selected-color: $rz-primary !default;
 
 $grid-stripe-background-color: lighten($rz-base-100, 1%) !default;
 
@@ -631,7 +633,7 @@ $grid-detail-template-border-radius: 0 !default;
 $grid-detail-template-padding: 0 !default;
 $grid-detail-template-background-color: $rz-base-100 !default;
 
-$grid-loading-indicator-background-color: $rz-secondary-lighter !default;
+$grid-loading-indicator-background-color: $rz-primary-lighter !default;
 $grid-button-icon-only-padding: 0 0.25rem !default;
 $grid-button-text-padding: 0 0.6875rem !default;
 $grid-button-font-size: 0.75rem !default;
@@ -719,9 +721,9 @@ $scheduler-today-button-margin-left: 0.5rem !default;
 $scheduler-view-button-border: solid 1px $rz-base-200 !default;
 $scheduler-view-button-color: $rz-base-800 !default;
 $scheduler-view-button-background-color: transparent !default;
-$scheduler-view-selected-background-color: lighten($rz-secondary-lighter, 20%) !default;
+$scheduler-view-selected-background-color: lighten($rz-primary-lighter, 20%) !default;
 $scheduler-view-selected-border-color: transparent !default;
-$scheduler-view-selected-color: $rz-secondary !default;
+$scheduler-view-selected-color: $rz-primary !default;
 
 $scheduler-header-background-color: $rz-base-100 !default;
 $scheduler-header-font-size: 0.75rem !default;
@@ -760,8 +762,8 @@ $paginator-numeric-button-background-color: $rz-base-200 !default;
 $paginator-numeric-button-color: $rz-base-800 !default;
 $paginator-numeric-button-margin: 0 0.125rem !default;
 $paginator-numeric-button-padding: 0.5rem 1rem !default;
-$paginator-numeric-button-selected-background-color: $rz-secondary-lighter !default;
-$paginator-numeric-button-selected-color: $rz-secondary !default;
+$paginator-numeric-button-selected-background-color: $rz-primary-lighter !default;
+$paginator-numeric-button-selected-color: $rz-primary !default;
 $paginator-numeric-button-selected-border: none !default;
 $paginator-numeric-button-selected-padding: $paginator-numeric-button-padding !default;
 
@@ -782,12 +784,12 @@ $paginator-button-size: ".rz-button-md" !default;
 // Tree
 
 $tree-node-padding: 0.25rem !default;
-$tree-node-selected-background-color: $rz-secondary !default;
+$tree-node-selected-background-color: $rz-primary !default;
 $tree-node-selected-color: $rz-white !default;
 $tree-node-selected-border-radius: $rz-border-radius !default;
 $tree-node-margin: 1px 0 !default;
-$tree-node-hover-background-color: $rz-secondary-lighter !default;
-$tree-node-hover-color: $rz-secondary !default;
+$tree-node-hover-background-color: $rz-primary-lighter !default;
+$tree-node-hover-color: $rz-primary !default;
 $tree-node-toggle-color: $rz-base-600 !default;
 $tree-node-toggle-hover-color: $rz-base-900 !default;
 $tree-icon-right: 'arrow_right' !default;
@@ -834,15 +836,15 @@ $menu-border-radius: 0 !default;
 
 $menu-item-padding: 0.5rem !default;
 $menu-item-color: $body-color !default;
-$menu-item-selected-color: $rz-secondary !default;
+$menu-item-selected-color: $rz-primary !default;
 $menu-item-icon-margin: 0 0.5rem 0 0 !default;
-$menu-item-hover-background-color: $rz-secondary-lighter !default;
-$menu-item-hover-color: $rz-secondary !default;
+$menu-item-hover-background-color: $rz-primary-lighter !default;
+$menu-item-hover-color: $rz-primary !default;
 $menu-item-offset: 1rem;
 
 $menu-top-item-padding: 0.5rem !default;
-$menu-top-item-hover-color: $rz-secondary !default;
-$menu-top-item-hover-background-color: $rz-secondary-lighter !default;
+$menu-top-item-hover-color: $rz-primary !default;
+$menu-top-item-hover-background-color: $rz-primary-lighter !default;
 $menu-top-item-background-color: $menu-background-color !default;
 $menu-top-item-color: $menu-item-color !default;
 
@@ -857,7 +859,7 @@ $profile-menu-padding: 0.625rem 1rem !default;
 $profile-menu-border-radius: $rz-border-radius !default;
 $profile-menu-toggle-button-color: $body-color !default;
 
-$profile-menu-item-hover-background-color: $rz-secondary-lighter !default;
+$profile-menu-item-hover-background-color: $rz-primary-lighter !default;
 $profile-menu-item-icon-width: 1.25rem !default;
 $profile-menu-item-icon-height: $profile-menu-item-icon-width !default;
 $profile-menu-item-icon-font-size: $profile-menu-item-icon-height !default;
@@ -881,7 +883,7 @@ $panel-toggle-icon-width: 1.5rem !default;
 $panel-toggle-icon-height: $panel-toggle-icon-width !default;
 $panel-toggle-icon-border-radius: $rz-border-radius !default;
 $panel-toggle-icon-background-color: $rz-base-200 !default;
-$panel-hover-color: $rz-secondary !default;
+$panel-hover-color: $rz-primary !default;
 $panel-border-radius: $rz-border-radius !default;
 $panel-shadow: none !default;
 
@@ -949,12 +951,12 @@ $datepicker-calendar-header-text-transform: uppercase !default;
 $datepicker-calendar-header-color: $rz-base-500 !default;
 $datepicker-calendar-font-size: 0.875rem !default;
 $datepicker-calendar-color: $body-color !default;
-$datepicker-calendar-hover-color: $rz-secondary !default;
-$datepicker-calendar-hover-background-color: $rz-secondary-lighter !default;
+$datepicker-calendar-hover-color: $rz-primary !default;
+$datepicker-calendar-hover-background-color: $rz-primary-lighter !default;
 $datepicker-calendar-selected-color: $rz-white !default;
-$datepicker-calendar-selected-background-color: $rz-secondary !default;
+$datepicker-calendar-selected-background-color: $rz-primary !default;
 $datepicker-calendar-selected-hover-color: $rz-white !default;
-$datepicker-calendar-selected-hover-background-color: $rz-secondary-light !default;
+$datepicker-calendar-selected-hover-background-color: $rz-primary-light !default;
 $datepicker-calendar-border: none !default;
 $datepicker-calendar-border-radius: $rz-border-radius !default;
 $datepicker-calendar-transition: all 0.1s linear !default;
@@ -966,7 +968,7 @@ $timepicker-color: $body-color !default;
 $timepicker-separator-color: $rz-base-500 !default;
 $timepicker-padding: 0.5rem !default;
 $timepicker-hour-padding: 0.5rem !default;
-$timepicker-button-background-color: $rz-secondary !default;
+$timepicker-button-background-color: $rz-primary !default;
 $timepicker-button-color: $rz-white !default;
 $timepicker-button-width: 0.875rem !default;
 $timepicker-button-height: $timepicker-button-width !default;
@@ -1015,8 +1017,8 @@ $slider-background-color: $rz-white !default;
 $slider-horizontal-height: 0.5rem !default;
 $slider-horizontal-width: 10rem !default;
 
-$slider-range-background-color: $rz-secondary-lighter !default;
-$slider-range-border: 1px solid $rz-secondary-lighter !default;
+$slider-range-background-color: $rz-primary-lighter !default;
+$slider-range-border: 1px solid $rz-primary-lighter !default;
 
 $slider-handle-background-color: $rz-white !default;
 $slider-handle-width: 1.25rem !default;
@@ -1047,10 +1049,10 @@ $checkbox-margin: 1rem 0;
 
 $checkbox-checked-background-color: $rz-white !default;
 $checkbox-checked-hover-background-color: $rz-white !default;
-$checkbox-checked-color: $rz-secondary !default;
+$checkbox-checked-color: $rz-primary !default;
 $checkbox-checked-shadow: none !default;
 $checkbox-checked-border: 1px solid $rz-base-300 !default;
-$checkbox-checked-icon-background-color: $rz-secondary !default;
+$checkbox-checked-icon-background-color: $rz-primary !default;
 $checkbox-checked-icon-border-radius: $rz-border-radius / 2 !default;
 
 $checkbox-icon-width: 0.625rem !default;
@@ -1091,9 +1093,9 @@ $radio-checked-hover-shadow: none !default;
 
 $radio-checked-color: $rz-white !default;
 
-$radio-circle-background-color: $rz-secondary !default;
+$radio-circle-background-color: $rz-primary !default;
 $radio-circle-shadow: none;
-$radio-circle-hover-background-color: $rz-secondary-light !default;
+$radio-circle-hover-background-color: $rz-primary-light !default;
 
 $radio-icon-width: 0.625rem !default;
 $radio-icon-height: $radio-icon-width !default;
@@ -1107,7 +1109,7 @@ $radio-checked-border: 1px solid $rz-base-300 !default;
   }
 
   &:not(.rz-state-disabled) > div > .rz-radiobutton-label:hover {
-    color: $rz-secondary-light;
+    color: $rz-primary-light;
     cursor: pointer;
   }
 }
@@ -1124,12 +1126,12 @@ $dropdown-items-margin: 0 (-$dropdown-horizontal-padding) !default;
 
 $dropdown-item-padding: $dropdown-horizontal-padding !default;
 $dropdown-item-font-size: $input-font-size !default;
-$dropdown-item-hover-background-color: $rz-secondary-lighter !default;
-$dropdown-item-selected-background-color: lighten($rz-secondary-lighter, 20%) !default;
+$dropdown-item-hover-background-color: $rz-primary-lighter !default;
+$dropdown-item-selected-background-color: lighten($rz-primary-lighter, 20%) !default;
 $dropdown-item-selected-shadow: none !default;
-$dropdown-item-hover-color: $rz-secondary !default;
-$dropdown-item-selected-color: $rz-secondary !default;
-$dropdown-item-selected-hover-background-color: $rz-secondary-lighter !default;
+$dropdown-item-hover-color: $rz-primary !default;
+$dropdown-item-selected-color: $rz-primary !default;
+$dropdown-item-selected-hover-background-color: $rz-primary-lighter !default;
 $dropdown-item-selected-hover-color: $dropdown-item-selected-color !default;
 $dropdown-item-transition: all 0.1s linear !default;
 
@@ -1248,7 +1250,7 @@ $editor-button-padding: 0.5rem !default;
 $editor-button-background-color: $rz-base-100 !default;
 $editor-button-color: $body-color !default;
 $editor-button-disabled-color: $input-disabled-color !default;
-$editor-button-selected-background-color: $rz-secondary !default;
+$editor-button-selected-background-color: $rz-primary !default;
 $editor-button-selected-color: $rz-white !default;
 $editor-separator-background-color: $rz-base-200 !default;
 $editor-content-background-color: $input-background-color !default;
@@ -1256,9 +1258,9 @@ $editor-content-background-color: $input-background-color !default;
 // Splitter
 
 $splitter-bar-color: $rz-base-600 !default;
-$splitter-bar-color-active: $rz-secondary !default;
+$splitter-bar-color-active: $rz-primary !default;
 $splitter-bar-background-color: $rz-base-200 !default;
-$splitter-bar-background-color-active: $rz-secondary-lighter !default;
+$splitter-bar-background-color-active: $rz-primary-lighter !default;
 $splitter-bar-hover-opacity: 1 !default;
 
 // Tooltip
@@ -1333,7 +1335,7 @@ $color-schemes: (
 $paragraph-line-height: 1.25rem !default;
 
 ::selection {
-  background-color: $rz-secondary-lighter;
+  background-color: $rz-primary-lighter;
 }
 
 body {
