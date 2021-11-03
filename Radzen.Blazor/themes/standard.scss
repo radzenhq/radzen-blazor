@@ -57,6 +57,10 @@ $rz-series-7: #74D062;
 $rz-series-8: #84A7FF;
 
 
+$rz-transition: 0.1s linear;
+$rz-transition-all: all $rz-transition;
+
+
 // Shadows
 
 $rz-shadow-level-1: 0 2px 2px 0 rgba(0, 0, 0, 0.08), 0 0 2px 0 rgba(0, 0, 0, 0.08);
@@ -115,7 +119,7 @@ $button-active-shadow: none !default;
 $button-active-gradient: $button-hover-gradient !default;
 $button-border-radius: $rz-border-radius !default;
 $button-shadow: none !default;
-$button-transition: all .1s linear !default;
+$button-transition: $rz-transition-all !default;
 $button-disabled-opacity: 0.5 !default;
 $button-line-height: 1.25rem !default;
 $button-vertical-align: top !default;
@@ -444,7 +448,7 @@ $panel-menu-item-active-background-color: $rz-base-900 !default;
 $panel-menu-item-active-color: inherit !default;
 $panel-menu-item-active-indicator: $rz-primary !default;
 $panel-menu-item-offset: 0.75rem !default;
-$panel-menu-item-transition: all 0.1s linear !default;
+$panel-menu-item-transition: $rz-transition-all !default;
 
 $panel-menu-item-2nd-level-padding: 0.5rem 1rem !default;
 $panel-menu-item-2nd-level-offset: 2.75rem !default;
@@ -546,7 +550,7 @@ $tabs-hover-background-color: $tabs-background-color !default;
 $tabs-border-radius: $rz-border-radius !default;
 $tabs-icon-font-size: 1.25rem !default;
 $tabs-icon-margin: 0 0.25rem 0 -0.25rem !default;
-$tabs-transition: all 0.1s linear !default;
+$tabs-transition: $rz-transition-all !default;
 
 
 // Grid
@@ -645,7 +649,7 @@ $grid-button-line-height: $grid-button-height !default;
 $grid-frozen-cell-border: 1px solid $rz-base-200 !default;
 $grid-frozen-cell-background-color: $rz-base-100 !default;
 
-$grid-state-transition: all 0.1s linear !default;
+$grid-state-transition: $rz-transition-all !default;
 
 $grid-group-header-padding: 0.5rem !default;
 $grid-group-header-item-padding: 0.5rem !default;
@@ -660,7 +664,7 @@ $column-drag-handle-hover-color: $rz-base-900 !default;
   .rz-datatable-odd {
     td,
     .rz-cell-data {
-      transition: background-color 0.1s linear, color 0.1s linear;
+      transition: background-color $rz-transition, color $rz-transition;
     }
 
     &:hover {
@@ -794,7 +798,7 @@ $tree-node-toggle-color: $rz-base-600 !default;
 $tree-node-toggle-hover-color: $rz-base-900 !default;
 $tree-icon-right: 'arrow_right' !default;
 $tree-icon-down: 'arrow_drop_down' !default;
-$tree-transition: all 0.1s linear !default; 
+$tree-transition: $rz-transition-all !default; 
 
 
 // Switch
@@ -912,7 +916,7 @@ $input-disabled-background-color: transparent !default;
 $input-disabled-shadow: none !default;
 $input-disabled-color: rgba($rz-base-800, .5) !default;
 
-$input-transition: all 0.1s linear !default; 
+$input-transition: $rz-transition-all !default; 
 
 // Numeric
 
@@ -959,7 +963,7 @@ $datepicker-calendar-selected-hover-color: $rz-white !default;
 $datepicker-calendar-selected-hover-background-color: $rz-primary-light !default;
 $datepicker-calendar-border: none !default;
 $datepicker-calendar-border-radius: $rz-border-radius !default;
-$datepicker-calendar-transition: all 0.1s linear !default;
+$datepicker-calendar-transition: $rz-transition-all !default;
 
 $datepicker-title-height: 45px !important;
 
@@ -1030,7 +1034,7 @@ $slider-handle-hover-background-color: $rz-primary !default;
 $slider-handle-hover-shadow: none !default;
 $slider-handle-color: $rz-white !default;
 $slider-handle-icon-display: none !default;
-$slider-handle-transition: background-color 0.1s linear, color 0.1s linear, border 0.1s linear !default;
+$slider-handle-transition: background-color 0.1s $rz-transition, color $rz-transition, border $rz-transition !default;
 
 $slider-disabled-range-background-color: rgba(211, 217, 219, 0.5) !default;
 $slider-disabled-range-border: solid 1px rgba(211, 217, 219, 0.3) !default;
@@ -1133,7 +1137,7 @@ $dropdown-item-hover-color: $rz-primary !default;
 $dropdown-item-selected-color: $rz-primary !default;
 $dropdown-item-selected-hover-background-color: $rz-primary-lighter !default;
 $dropdown-item-selected-hover-color: $dropdown-item-selected-color !default;
-$dropdown-item-transition: all 0.1s linear !default;
+$dropdown-item-transition: $rz-transition-all !default;
 
 $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 $dropdown-label-padding: 0 $dropdown-trigger-icon-width 0 0 !default;
