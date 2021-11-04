@@ -40,7 +40,7 @@ namespace Radzen.Blazor
                         _filterPropertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
                     }
                 }
-            
+
                 if (_filterPropertyType == null)
                 {
                     _filterPropertyType = Type;
@@ -111,14 +111,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The filter value.</value>
         [Parameter]
-        public object FilterValue { get; set; }
+        public object FilterValue { get { return filterValue; } set { filterValue = value; } }
 
         /// <summary>
         /// Gets or sets the second filter value.
         /// </summary>
         /// <value>The second filter value.</value>
         [Parameter]
-        public object SecondFilterValue { get; set; }
+        public object SecondFilterValue { get { return secondFilterValue; } set { secondFilterValue = value; } }
 
         /// <summary>
         /// Gets or sets the width.
@@ -258,7 +258,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The logical filter operator.</value>
         [Parameter]
-        public LogicalFilterOperator LogicalFilterOperator { get; set; } = LogicalFilterOperator.And;
+        public LogicalFilterOperator LogicalFilterOperator { get { return logicalFilterOperator == null ? LogicalFilterOperator.And : (LogicalFilterOperator)logicalFilterOperator; } set { logicalFilterOperator = (LogicalFilterOperator?)value; } }
 
         /// <summary>
         /// Gets or sets the data type.
@@ -534,14 +534,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The filter operator.</value>
         [Parameter]
-        public FilterOperator FilterOperator { get; set; }
+        public FilterOperator FilterOperator { get { return filterOperator ?? FilterOperator.Contains; } set { filterOperator = (FilterOperator?)value; } }
 
         /// <summary>
         /// Gets or sets the second filter operator.
         /// </summary>
         /// <value>The second filter operator.</value>
         [Parameter]
-        public FilterOperator SecondFilterOperator { get; set; }
+        public FilterOperator SecondFilterOperator { get { return secondFilterOperator ?? FilterOperator.Contains; } set { secondFilterOperator = (FilterOperator?)value; } }
 
         internal void SetFilterOperator(FilterOperator? value)
         {
@@ -573,7 +573,7 @@ namespace Radzen.Blazor
         internal IEnumerable<FilterOperator> GetFilterOperators()
         {
             return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
-                var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
+                var isStringOperator = o == FilterOperator.Contains || o == FilterOperator.DoesNotContain || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
                 return FilterPropertyType == typeof(string) ? isStringOperator || o == FilterOperator.Equals || o == FilterOperator.NotEquals : !isStringOperator;
             });
         }
@@ -592,7 +592,7 @@ namespace Radzen.Blazor
                     return Grid?.EqualsText;
                 case FilterOperator.GreaterThan:
                     return Grid?.GreaterThanText;
-                case FilterOperator. GreaterThanOrEquals:
+                case FilterOperator.GreaterThanOrEquals:
                     return Grid?.GreaterThanOrEqualsText;
                 case FilterOperator.LessThan:
                     return Grid?.LessThanText;
