@@ -434,6 +434,14 @@ $badge-styles: map-merge(
   $badge-styles
 );
 
+.rz-badge {
+  .rz-button & {
+    vertical-align: top;
+    margin: 0 0.25rem;
+  }
+}
+
+
 // PanelMenu
 
 $panel-menu-color: $rz-white !default;
