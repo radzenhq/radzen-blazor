@@ -25,7 +25,7 @@
                     }
                     @if (items.Any())
                     {
-                        <i class="rzi rz-navigation-item-icon-children" style="@getStyle()" @onclick="@Toggle">keyboard_arrow_down</i>
+                        <i class="rzi rz-navigation-item-icon-children" style="@getStyle()" @onclick="@Toggle" @onclick:preventDefault>keyboard_arrow_down</i>
                     }
                 </Microsoft.AspNetCore.Components.Routing.NavLink>
             }
