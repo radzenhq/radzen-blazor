@@ -500,7 +500,7 @@ $steps-color: $body-color !default;
 
 $steps-number-width: 2rem !default;
 $steps-number-height: $steps-number-width !default;
-$steps-number-background-color: #e6ecef !default;
+$steps-number-background-color: $rz-base-300 !default;
 $steps-number-border-radius: 50% !default;
 $steps-number-color: $body-color !default;
 $steps-number-padding: 0.5rem 0 !default;
@@ -1152,7 +1152,7 @@ $dropdown-item-transition: $rz-transition-all !default;
 
 $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 $dropdown-label-padding: 0 $dropdown-trigger-icon-width 0 0 !default;
-$dropdown-filter-border: 1px solid rgba(#979797, 0.1) !default;
+$dropdown-filter-border: 1px solid $rz-base-200 !default;
 $dropdown-filter-padding: 0.5rem 0 !default;
 
 $dropdown-open-background-color: $input-background-color !default;
