@@ -920,10 +920,12 @@ $input-hover-border: 1px solid $rz-primary-light !default;
 $input-focus-border: 1px solid $rz-primary-light !default;
 $input-focus-shadow: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-primary, 0.2) !default;
 
-$input-disabled-border: 1px solid rgba($rz-base-300, .5) !default;
-$input-disabled-background-color: transparent !default;
+$input-disabled-border: 1px solid $rz-base-300 !default;
+$input-disabled-background-color: $rz-base-100 !default;
 $input-disabled-shadow: none !default;
-$input-disabled-color: rgba($rz-base-800, .5) !default;
+$input-disabled-color: $rz-base-800 !default;
+$input-disabled-placeholder-color: $rz-base-600 !default;
+$input-disabled-opacity: .5 !default;
 
 $input-transition: $rz-transition-all !default; 
 
@@ -936,7 +938,7 @@ $numeric-button-height: $numeric-button-width !default;
 $numeric-button-offset: 1px !default;
 $numeric-button-border-radius: $rz-border-radius / 2 !default;
 $numeric-button-background-color: $rz-white !default;
-$numeric-button-disabled-background-color: $rz-white !default;
+$numeric-button-disabled-background-color: $rz-base-100 !default;
 $numeric-button-disabled-color: rgba($rz-base-800, .5) !default;
 $numeric-button-color: $rz-base-600 !default;
 

@@ -45,7 +45,11 @@ $numeric-button-color: $white !default;
 
       &:active,
       &:hover {
+        background-color: $numeric-button-disabled-background-color;
+        color: $numeric-button-disabled-color;
+        background-image: none;
         box-shadow: none;
+        cursor: initial;
       }
     }
   }
