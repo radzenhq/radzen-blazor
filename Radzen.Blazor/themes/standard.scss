@@ -386,6 +386,7 @@ $splitbutton-menu-shadow: none !default;
 $splitbutton-menu-min-width: 10rem !default;
 
 $splitbutton-padding: 0.5rem !default;
+$splitbutton-background-color: $rz-primary !default;
 $splitbutton-border-radius: $rz-border-radius !default;
 
 // Badge
@@ -552,8 +553,8 @@ $tabs-tab-font-weight: normal !default;
 $tabs-background-color: $rz-white !default;
 $tabs-tab-padding: 0.5rem 1rem !default;
 $tabs-padding: 1.25rem !default;
-$tabs-tab-selected-top-border-color: $default-link !default;
-$tabs-hover-color: $default-link !default;
+$tabs-tab-selected-top-border-color: $rz-primary !default;
+$tabs-hover-color: $rz-primary !default;
 $tabs-hover-background-color: $tabs-background-color !default;
 $tabs-border-radius: $rz-border-radius !default;
 $tabs-icon-font-size: 1.25rem !default;
@@ -822,6 +823,14 @@ $header-z: 2 !default;
 $header-border: none !default;
 $header-color: $body-color !default;
 $header-shadow: $rz-shadow-level-2 !default;
+
+// Footer
+
+$footer-padding: 1rem !default;
+$footer-background-color: $rz-white !default;
+$footer-border: none !default;
+$footer-color: $body-color !default;
+$footer-z: 2 !default;
 
 // Sidebar
 /* Light
@@ -1287,6 +1296,16 @@ $tooltip-shadow: $rz-shadow-level-2 !default;
 $tooltip-padding: 0.25rem 0.5rem !default;
 $tooltip-border-radius: $input-border-radius !default;
 $tooltip-font-size: 0.875rem !default;
+
+// Gauge
+
+$gauge-scale-color: $rz-base-300 !default;
+$gauge-scale-label-color: $rz-base-600 !default;
+$gauge-scale-font-size: 0.875rem !default;
+$gauge-pointer-color: $rz-primary !default;
+$gauge-arc-scale-color: $rz-base-300 !default;
+$gauge-arc-scale-label-color: $rz-base-600 !default;
+$gauge-arc-value-color: $rz-primary !default;
 
 // Charts
 
