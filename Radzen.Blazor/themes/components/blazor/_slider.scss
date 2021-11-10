@@ -22,6 +22,7 @@ $slider-handle-transition: none !default;
 $slider-disabled-range-background-color: rgba(211, 217, 219, 0.5) !default;
 $slider-disabled-range-border: solid 1px rgba(211, 217, 219, 0.3) !default;
 $slider-disabled-background-color: rgba(211, 217, 219, 0.1) !default;
+$slider-disabled-handle-border: none !default;
 $slider-disabled-border: solid 1px #dadfe2 !default;
 $slider-disabled-handle-background-color: #d3d9db !default;
 $slider-border-radius: $input-border-radius !default;
@@ -44,6 +45,7 @@ $slider-border-radius: $input-border-radius !default;
 
     .rz-slider-handle {
       background-color: $slider-disabled-handle-background-color;
+      border: $slider-disabled-handle-border;
     }
   }
 }

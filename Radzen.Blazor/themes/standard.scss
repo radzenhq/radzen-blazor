@@ -939,7 +939,7 @@ $numeric-button-offset: 1px !default;
 $numeric-button-border-radius: $rz-border-radius / 2 !default;
 $numeric-button-background-color: $rz-white !default;
 $numeric-button-disabled-background-color: $rz-base-100 !default;
-$numeric-button-disabled-color: rgba($rz-base-800, .5) !default;
+$numeric-button-disabled-color: $rz-base-500 !default;
 $numeric-button-color: $rz-base-600 !default;
 
 // DatePicker
@@ -1047,11 +1047,12 @@ $slider-handle-color: $rz-white !default;
 $slider-handle-icon-display: none !default;
 $slider-handle-transition: background-color 0.1s $rz-transition, color $rz-transition, border $rz-transition !default;
 
-$slider-disabled-range-background-color: rgba(211, 217, 219, 0.5) !default;
-$slider-disabled-range-border: solid 1px rgba(211, 217, 219, 0.3) !default;
-$slider-disabled-background-color: rgba(211, 217, 219, 0.1) !default;
-$slider-disabled-border: solid 1px #dadfe2 !default;
-$slider-disabled-handle-background-color: #d3d9db !default;
+$slider-disabled-range-background-color: $rz-base-200 !default;
+$slider-disabled-range-border: 1px solid $rz-base-300 !default;
+$slider-disabled-background-color: $rz-white !default;
+$slider-disabled-border: solid 1px $rz-base-200 !default;
+$slider-disabled-handle-background-color: $rz-white !default;
+$slider-disabled-handle-border: 0.25rem solid $rz-base-400;
 $slider-border-radius: $rz-border-radius * 2 !default;
 
 // Checkbox
