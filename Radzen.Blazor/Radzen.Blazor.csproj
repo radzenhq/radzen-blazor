@@ -72,6 +72,5 @@
     <Delete Files="@(CssFiles)" />
     <Delete Files="@(BootstrapFiles)" />
     <RemoveDir Directories="$(MSBuildProjectDirectory)\wwwroot\css\bootstrap" />
-    <RemoveSourceMap />
   </Target>
 </Project>
