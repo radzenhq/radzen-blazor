@@ -568,7 +568,7 @@ $grid-border-radius: 0;
 $grid-data-border-shadow: 0 1px 0 0 $rz-base-200, 0 -1px 0 0 $rz-base-200;
 
 $grid-cell-border: 1px solid $rz-base-200 !default;
-$grid-right-cell-border: 1px solid $rz-base-200 !default;
+$grid-right-cell-border: $grid-cell-border !default;
 $grid-bottom-cell-border: $grid-cell-border !default;
 $grid-cell-padding: 0.5rem !default;
 $grid-cell-color: $rz-base-800 !default;
@@ -583,7 +583,7 @@ $grid-selected-color: $rz-primary !default;
 $grid-stripe-background-color: lighten($rz-base-100, 1%) !default;
 
 $grid-toolbar-background-color: $rz-white !default;
-$grid-header-cell-border: 1px solid $rz-base-200  !default;
+$grid-header-cell-border: $grid-cell-border  !default;
 $grid-header-cell-border-bottom: $grid-header-cell-border !default;
 $grid-header-background-color: $rz-base-100 !default;
 $grid-header-font-size: $grid-cell-font-size !default;
@@ -615,7 +615,7 @@ $grid-filter-focus-color: $rz-base-900 !default;
 $grid-filter-operator-margin: 1rem !default;
 $grid-filter-buttons-padding: 1rem !default;
 $grid-filter-buttons-border: 1px solid $rz-base-200 !default;
-$grid-filter-buttons-background-color: $white !default;
+$grid-filter-buttons-background-color: $rz-white !default;
 
 $grid-clear-filter-button-background-color: $rz-base-200 !default;
 $grid-clear-filter-button-color: $rz-base-800 !default;
@@ -635,7 +635,7 @@ $grid-background-color: $rz-white !default;
 
 $grid-column-resizer-width: 0.5rem !default;
 $grid-column-resizer-helper-width: 0.25rem !default;
-$grid-column-resizer-helper-background-color: $default-link !default;
+$grid-column-resizer-helper-background-color: $rz-primary !default;
 
 $grid-column-icon-width: 2rem !default;
 $grid-column-icon-padding: 0 !default;
@@ -654,8 +654,8 @@ $grid-button-icon-height: $grid-button-icon-width !default;
 $grid-button-height: 1.25rem !default;
 $grid-button-line-height: $grid-button-height !default;
 
-$grid-frozen-cell-border: 1px solid $rz-base-200 !default;
-$grid-frozen-cell-background-color: $rz-base-100 !default;
+$grid-frozen-cell-border: $grid-cell-border !default;
+$grid-frozen-cell-background-color: $grid-header-background-color !default;
 
 $grid-state-transition: $rz-transition-all !default;
 
@@ -1220,15 +1220,15 @@ $upload-button-bar-padding: 0.5rem !default;
 
 $upload-files-background-color: $rz-white !default;
 $upload-files-padding: 0.5rem 0 !default;
-$upload-files-remove-background-color: #dadfe2 !default;
-$upload-files-remove-color: $rz-white !default;
+$upload-files-remove-background-color: $rz-base-300 !default;
+$upload-files-remove-color: $rz-base-800 !default;
 
 $upload-files-margin: 0 0.5rem !default;
 
 $upload-choose-background-color: $rz-primary !default;
 $upload-cancel-background-color: $rz-base-300 !default;
 $upload-cancel-color: $rz-base-800 !default;
-$upload-button-background-color: $primary !default;
+$upload-button-background-color: $rz-primary !default;
 
 
 // Dialog
@@ -1265,7 +1265,7 @@ $editor-toolbar-item-margin: 0.25rem 0.125rem !default;
 $editor-button-padding: 0.5rem !default;
 $editor-button-background-color: $rz-base-100 !default;
 $editor-button-color: $body-color !default;
-$editor-button-disabled-color: $input-disabled-color !default;
+$editor-button-disabled-color: $rz-base-400 !default;
 $editor-button-selected-background-color: $rz-primary !default;
 $editor-button-selected-color: $rz-white !default;
 $editor-separator-background-color: $rz-base-200 !default;
