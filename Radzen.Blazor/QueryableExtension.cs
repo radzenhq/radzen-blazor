@@ -162,6 +162,27 @@ namespace Radzen
                             secondValue = sv is DateTime ? ((DateTime)sv).ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : sv is DateTimeOffset ? ((DateTimeOffset)sv).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : "";
                         }
                     }
+                    else if (PropertyAccess.GetElementType(column.GetFilterValue().GetType()) == typeof(string))
+                    {
+                        var linqOperator = LinqFilterOperators[column.GetFilterOperator()];
+                        if (linqOperator == null)
+                        {
+                            linqOperator = "==";
+                        }
+
+                        var booleanOperator = column.LogicalFilterOperator == LogicalFilterOperator.And ? " and " : " or ";
+
+                        List<string> multivalueFilterList = new List<string>();
+                        IEnumerable<string> filterValues = (IEnumerable<string>)column.GetFilterValue();
+                        //Combine all the above linqoperator stuff
+                        foreach (string item in filterValues)
+                        {
+                            multivalueFilterList.Add(GetColumnFilter(column, item));
+                        }
+
+                        if (multivalueFilterList.Count > 0)
+                            whereList.Add($"({String.Join(booleanOperator, multivalueFilterList)})");
+                    }
                     else
                     {
                         value = (string)Convert.ChangeType(column.GetFilterValue(), typeof(string));
@@ -224,7 +245,7 @@ namespace Radzen
                 linqOperator = "==";
             }
 
-            var value = !second ? (string)Convert.ChangeType(column.FilterValue, typeof(string)) : 
+            var value = !second ? (string)Convert.ChangeType(column.FilterValue, typeof(string)) :
                 (string)Convert.ChangeType(column.SecondFilterValue, typeof(string));
 
             var columnType = column.Type;
@@ -345,9 +366,9 @@ namespace Radzen
             {
                 return $"{property} {linqOperator} {value}";
             }
-            else if (column.FilterPropertyType == typeof(DateTime) || 
+            else if (column.FilterPropertyType == typeof(DateTime) ||
                     column.FilterPropertyType == typeof(DateTime?) ||
-                    column.FilterPropertyType == typeof(DateTimeOffset) || 
+                    column.FilterPropertyType == typeof(DateTimeOffset) ||
                     column.FilterPropertyType == typeof(DateTimeOffset?))
             {
                 var dateTimeValue = DateTime.Parse(value, null, System.Globalization.DateTimeStyles.RoundtripKind);
@@ -409,8 +430,8 @@ namespace Radzen
                 }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "contains")
                 {
-                    return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? 
-                        $"contains({property}, tolower('{value}'))" : 
+                    return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
+                        $"contains({property}, tolower('{value}'))" :
                         $"contains({property}, '{value}')";
                 }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "DoesNotContain")
@@ -421,14 +442,14 @@ namespace Radzen
                 }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "startswith")
                 {
-                    return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? 
+                    return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
                         $"startswith({property}, tolower('{value}'))" :
                         $"startswith({property}, '{value}')";
                 }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "endswith")
                 {
                     return column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
-                        $"endswith({property}, tolower('{value}'))" : 
+                        $"endswith({property}, tolower('{value}'))" :
                         $"endswith({property}, '{value}')";
                 }
                 else if (!string.IsNullOrEmpty(value) && columnFilterOperator == "eq")
@@ -702,7 +723,7 @@ namespace Radzen
                             index++;
                         }
                     }
-                    else 
+                    else
                     {
                         var firstFilter = comparison == "StartsWith" || comparison == "EndsWith" || comparison == "Contains" ?
                             $@"{property}{filterCaseSensitivityOperator}.{comparison}(@{index}{filterCaseSensitivityOperator})" :
