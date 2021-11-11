@@ -16,7 +16,7 @@ COPY RadzenBlazorDemos /app/RadzenBlazorDemos
 WORKDIR /app
 RUN docfx DocFX/docfx.json
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-focal
+FROM mcr.microsoft.com/dotnet/sdk:6.0-focal
 
 COPY --from=0 /app/RadzenBlazorDemos /app
 WORKDIR /app
