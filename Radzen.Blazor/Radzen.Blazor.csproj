@@ -63,6 +63,7 @@
     <Exec Command="dotnet tool restore" StandardOutputImportance="high" />
   </Target>
   <Target Name="PreBuild" AfterTargets="ToolRestore">
+    <!--<Exec Command="dotnet tool run webcompiler -r themes -o wwwroot/css -z disable -m disable -p disable" StandardOutputImportance="high" />-->
     <ItemGroup>
       <CssFiles Include="$(MSBuildProjectDirectory)\themes\*.css" />
     </ItemGroup>
@@ -72,5 +73,6 @@
     <Delete Files="@(CssFiles)" />
     <Delete Files="@(BootstrapFiles)" />
     <RemoveDir Directories="$(MSBuildProjectDirectory)\wwwroot\css\bootstrap" />
+    <RemoveSourceMap />
   </Target>
 </Project>
