@@ -20,6 +20,7 @@ $colorpicker-hex-input-padding: 0 3px !default;
 $colorpicker-hex-input-height: 30px !default;
 $colorpicker-rgba-input-padding: 1px 3px !default;
 $colorpicker-rgba-input-height: 30px !default;
+$colorpicker-input-labels-color: $input-disabled-color !default;
 
 
 .rz-colorpicker {
@@ -193,7 +194,7 @@ button.rz-colorpicker-trigger {
   flex-direction: column;
   align-items: center;
   flex: 1;
-  color: $input-disabled-color;
+  color: $colorpicker-input-labels-color;
   font-size: 0.75rem;
   text-transform: uppercase;
 

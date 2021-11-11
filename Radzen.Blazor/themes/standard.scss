@@ -4,69 +4,68 @@ $standard: true;
 
 // Color tokens
 
-$rz-white: #ffffff;
+$rz-white: #ffffff !default;
 
-$rz-base-100: #f4f5f9;
-$rz-base-200: #e9eaed;
-$rz-base-300: #e0e1e4;
-$rz-base-400: #c9cacd;
-$rz-base-500: #afafb2;
-$rz-base-600: #8d8e90;
-$rz-base-700: #707072;
-$rz-base-800: #4f4f50;
-$rz-base-900: #262526;
+$rz-base-100: #f4f5f9 !default;
+$rz-base-200: #e9eaed !default;
+$rz-base-300: #e0e1e4 !default;
+$rz-base-400: #c9cacd !default;
+$rz-base-500: #afafb2 !default;
+$rz-base-600: #8d8e90 !default;
+$rz-base-700: #707072 !default;
+$rz-base-800: #4f4f50 !default;
+$rz-base-900: #262526 !default;
 
-$rz-primary: #1151F3;
-$rz-primary-light: #376df5; /*lighten($rz-primary, 8%);*/
-$rz-primary-dark: #0e44cc; /*darken($rz-primary, 10%);*/
-$rz-primary-lighter: rgba($rz-primary, .16);
+$rz-primary: #1151F3 !default;
+$rz-primary-light: #376df5 !default; /*lighten($rz-primary, 8%);*/
+$rz-primary-dark: #0e44cc !default; /*darken($rz-primary, 10%);*/
+$rz-primary-lighter: rgba($rz-primary, .16) !default;
 
-$rz-secondary: $rz-primary;
-$rz-secondary-light: $rz-primary-light;
-$rz-secondary-dark: $rz-primary-dark;
-$rz-secondary-lighter: rgba($rz-secondary, .16);
+$rz-secondary: $rz-primary !default;
+$rz-secondary-light: $rz-primary-light !default;
+$rz-secondary-dark: $rz-primary-dark !default;
+$rz-secondary-lighter: rgba($rz-secondary, .16) !default;
 
-$rz-info: #12a4f5;
+$rz-info: #12a4f5 !default;
+$rz-info-light: #38b3f7 !default;
+$rz-info-dark: #0f8ace !default;
+$rz-info-secondary: rgba($rz-info, .16) !default;
 
-$rz-info-light: #38b3f7;
-$rz-info-dark: #0f8ace;
-$rz-info-secondary: rgba($rz-info, .16);
+$rz-success: #009B51 !default;
+$rz-success-light: #29AB6D !default;
+$rz-success-dark: #008244 !default;
+$rz-success-secondary: rgba($rz-success, .16) !default;
 
-$rz-success: #009B51;
-$rz-success-light: #29AB6D;
-$rz-success-dark: #008244;
-$rz-success-secondary: rgba($rz-success, .16);
+$rz-warning: #FFAE11 !default;
+$rz-warning-light: #FFBE41 !default;
+$rz-warning-dark: #EBA010 !default;
+$rz-warning-secondary: rgba($rz-warning, .16) !default;
 
-$rz-warning: #FFAE11;
-$rz-warning-light: #FFBE41;
-$rz-warning-dark: #EBA010;
-$rz-warning-secondary: rgba($rz-warning, .16);
+$rz-danger: #F31155 !default;
+$rz-danger-light: #F53770 !default;
+$rz-danger-dark: #CC0E47 !default;
+$rz-danger-secondary: rgba($rz-danger, .16) !default;
 
-$rz-danger: #F31155;
-$rz-danger-light: #F53770;
-$rz-danger-dark: #CC0E47;
-$rz-danger-secondary: rgba($rz-danger, .16);
-
-$rz-series-1: #376DF5;
-$rz-series-2: #64DFDF;
-$rz-series-3: #F68769;
-$rz-series-4: #C161E2;
-$rz-series-5: #FDD07A;
-$rz-series-6: #F8629B;
-$rz-series-7: #74D062;
-$rz-series-8: #84A7FF;
+$rz-series-1: #376DF5 !default;
+$rz-series-2: #64DFDF !default;
+$rz-series-3: #F68769 !default;
+$rz-series-4: #C161E2 !default;
+$rz-series-5: #FDD07A !default;
+$rz-series-6: #F8629B !default;
+$rz-series-7: #74D062 !default;
+$rz-series-8: #84A7FF !default;
 
 
-$rz-transition: 0.1s linear;
-$rz-transition-all: all $rz-transition;
+$rz-transition: 0.1s linear !default;
+$rz-transition-all: all $rz-transition !default;
 
 
 // Shadows
 
-$rz-shadow-level-1: 0 2px 2px 0 rgba(0, 0, 0, 0.08), 0 0 2px 0 rgba(0, 0, 0, 0.08);
-$rz-shadow-level-2: 0 4px 12px 0 rgba(0, 0, 0, 0.04);
+$rz-shadow-level-1: 0 2px 2px 0 rgba(0, 0, 0, 0.08), 0 0 2px 0 rgba(0, 0, 0, 0.08) !default;
+$rz-shadow-level-2: 0 4px 12px 0 rgba(0, 0, 0, 0.04) !default;
 
-$rz-shadow-inset-level-1: inset 0px 0px 2px rgba(0, 0, 0, 0.2);
+$rz-shadow-inset-level-1: inset 0px 0px 2px rgba(0, 0, 0, 0.2) !default;
 
 // Theme colors
 $primary-color: $rz-primary !default;
@@ -87,17 +86,17 @@ $danger: $rz-danger !default;
 $info: $rz-info !default;
 $success: $rz-success !default;
 $warning: $rz-warning !default;
-$default-link: $primary-color;
+$default-link: $primary-color !default;
 
 $light: $rz-base-200 !default;
 $body-color: $rz-base-800 !default;
-$link-color: $rz-primary;
-$link-hover-color: $rz-primary-dark;
+$link-color: $rz-primary !default;
+$link-hover-color: $rz-primary-dark !default;
 
-$state-success-bg: $success;
-$state-warning-bg: $warning;
-$state-danger-bg: $danger;
-$state-info-bg: $info;
+$state-success-bg: $success !default;
+$state-warning-bg: $warning !default;
+$state-danger-bg: $danger !default;
+$state-info-bg: $info !default;
 
 $body-bg: $rz-base-100 !default;
 $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
@@ -163,7 +162,8 @@ $button-styles: () !default;
 $button-styles: map-merge(
   (
     primary: (
-      background-color: $rz-primary
+      background-color: $rz-primary,
+      color: $rz-white
     ),
     light: (
       background-color: $rz-base-200,
@@ -174,19 +174,24 @@ $button-styles: map-merge(
       color: $rz-secondary
     ),
     info: (
-      background-color: $rz-info
+      background-color: $rz-info,
+      color: $rz-white
     ),
     warning: (
-      background-color: $rz-warning
+      background-color: $rz-warning,
+      color: $rz-white
     ),
     error: (
-      background-color: $rz-danger
+      background-color: $rz-danger,
+      color: $rz-white
     ),
     danger: (
-      background-color: $rz-danger
+      background-color: $rz-danger,
+      color: $rz-white
     ),
     success: (
-      background-color: $rz-success
+      background-color: $rz-success,
+      color: $rz-white
     )
   ),
   $button-styles
@@ -792,6 +797,10 @@ $paginator-next-button-color: $rz-base-800 !default;
 $paginator-dropdown-width: 80px !default;
 $paginator-dropdown-margin: $paginator-last-button-margin !default;
 
+$paginator-summary-padding: 0 1.25rem 0 0 !default;
+$paginator-summary-font-size: 0.875rem !default;
+$paginator-summary-color: $rz-base-600 !default;
+
 $paginator-button-size: ".rz-button-md" !default;
 
 // Tree
@@ -1211,6 +1220,7 @@ $colorpicker-hex-input-padding: 0.25rem 0.5rem !default;
 $colorpicker-hex-input-height: 2rem !default;
 $colorpicker-rgba-input-padding: 0.25rem 0.5rem !default;
 $colorpicker-rgba-input-height: 2rem !default;
+$colorpicker-input-labels-color: $rz-base-500 !default;
 
 // Rating
 
