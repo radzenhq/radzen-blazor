@@ -738,7 +738,7 @@ window.Radzen = {
         }
         if (!e.defaultPrevented) {
           if (parent) {
-            if (e.type == 'click' && !parent.contains(e.target) && !popup.contains(e.target)) {
+            if (e.type == 'mousedown' && !parent.contains(e.target) && !popup.contains(e.target)) {
               Radzen.closePopup(id, instance, callback);
             }
           } else {
@@ -763,8 +763,8 @@ window.Radzen = {
     Radzen.popups.push({id, instance, callback});
 
     document.body.appendChild(popup);
-    document.removeEventListener('click', Radzen[id]);
-    document.addEventListener('click', Radzen[id]);
+    document.removeEventListener('mousedown', Radzen[id]);
+    document.addEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
     window.addEventListener('resize', Radzen[id]);
 
@@ -793,7 +793,7 @@ window.Radzen = {
       }
       popup.style.display = 'none';
     }
-    document.removeEventListener('click', Radzen[id]);
+    document.removeEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
     Radzen[id] = null;
 
@@ -820,7 +820,7 @@ window.Radzen = {
     if (popup) {
       popup.parentNode.removeChild(popup);
     }
-    document.removeEventListener('click', Radzen[id]);
+    document.removeEventListener('mousedown', Radzen[id]);
   },
   scrollDataGrid: function (e) {
     var scrollLeft =

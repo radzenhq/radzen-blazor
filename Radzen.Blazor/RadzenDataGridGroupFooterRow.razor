@@ -1,7 +1,7 @@
 @typeparam TItem
 @using System.Linq.Dynamic.Core
 <tr>
-    @for(var i = 0; i < GetLevel() + 1; i++)
+    @for(var i = 0; i < GetLevel(); i++)
     {
         <td class="rz-col-icon">
             <span class="rz-column-title"></span>
@@ -37,7 +37,9 @@
                 {
                     _groupResult = value;
 
-                    var level = GetLevel();
+                    var l = GetLevel();
+                    var level = l > 0 ? l - 1 : l;
+
                     Group = new Group()
                     {
                         Level = level,
