@@ -7,37 +7,56 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenGoogleMap.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenGoogleMap component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenGoogleMap Zoom="3" Center=@(new GoogleMapPosition() { Lat = 42.6977, Lng = 23.3219 }) MapClick=@OnMapClick MarkerClick=@OnMarkerClick"&gt;
+    ///     &lt;Markers&gt;
+    ///         &lt;RadzenGoogleMapMarker Title="London" Label="London" Position=@(new GoogleMapPosition() { Lat = 51.5074, Lng = 0.1278 }) /&gt;
+    ///         &lt;RadzenGoogleMapMarker Title="Paris " Label="Paris" Position=@(new GoogleMapPosition() { Lat = 48.8566, Lng = 2.3522 }) /&gt;
+    ///     &lt;/Markers&gt;
+    /// &lt;/RadzenGoogleMap&gt;
+    /// @code {
+    ///   void OnMapClick(GoogleMapClickEventArgs args)
+    ///   {
+    ///     Console.WriteLine($"Map clicked at Lat: {args.Position.Lat}, Lng: {args.Position.Lng}");
+    ///   }
+    ///   
+    ///   void OnMarkerClick(RadzenGoogleMapMarker marker)
+    ///   {
+    ///     Console.WriteLine($"Map {marker.Title} marker clicked. Marker position -> Lat: {marker.Position.Lat}, Lng: {marker.Position.Lng}");
+    ///   }
+    /// }
+    /// </code>
+    /// </example>
     public partial class RadzenGoogleMap : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the data.
+        /// Gets or sets the data - collection of RadzenGoogleMapMarker.
         /// </summary>
         /// <value>The data.</value>
         [Parameter]
         public IEnumerable<RadzenGoogleMapMarker> Data { get; set; }
 
         /// <summary>
-        /// Gets or sets the map click.
+        /// Gets or sets the map click callback.
         /// </summary>
-        /// <value>The map click.</value>
+        /// <value>The map click callback.</value>
         [Parameter]
         public EventCallback<GoogleMapClickEventArgs> MapClick { get; set; }
 
         /// <summary>
-        /// Gets or sets the marker click.
+        /// Gets or sets the marker click callback.
         /// </summary>
-        /// <value>The marker click.</value>
+        /// <value>The marker click callback.</value>
         [Parameter]
         public EventCallback<RadzenGoogleMapMarker> MarkerClick { get; set; }
 
         /// <summary>
-        /// Gets or sets the API key.
+        /// Gets or sets the Google API key.
         /// </summary>
-        /// <value>The API key.</value>
+        /// <value>The Google API key.</value>
         [Parameter]
         public string ApiKey { get; set; }
 
@@ -49,7 +68,7 @@ namespace Radzen.Blazor
         public double Zoom { get; set; } = 8;
 
         /// <summary>
-        /// Gets or sets the center.
+        /// Gets or sets the center map position.
         /// </summary>
         /// <value>The center.</value>
         [Parameter]
@@ -62,9 +81,6 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Markers { get; set; }
 
-        /// <summary>
-        /// The markers
-        /// </summary>
         List<RadzenGoogleMapMarker> markers = new List<RadzenGoogleMapMarker>();
 
         /// <summary>
@@ -91,10 +107,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-map";
@@ -111,7 +124,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [marker click].
+        /// Called when marker click.
         /// </summary>
         /// <param name="marker">The marker.</param>
         [JSInvokable("RadzenGoogleMap.OnMarkerClick")]
@@ -120,11 +133,7 @@ namespace Radzen.Blazor
             await MarkerClick.InvokeAsync(marker);
         }
 
-        /// <summary>
-        /// On after render as an asynchronous operation.
-        /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -143,9 +152,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();

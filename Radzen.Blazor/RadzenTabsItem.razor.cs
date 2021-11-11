@@ -7,16 +7,14 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenTabsItem.
-    /// Implements the <see cref="IDisposable" />
+    /// RadzenTabsItem component.
     /// </summary>
-    /// <seealso cref="IDisposable" />
     public partial class RadzenTabsItem : IDisposable
     {
         /// <summary>
-        /// Gets or sets the attributes.
+        /// Gets or sets the arbitrary attributes.
         /// </summary>
-        /// <value>The attributes.</value>
+        /// <value>The arbitrary attributes.</value>
         [Parameter(CaptureUnmatchedValues = true)]
         public IDictionary<string, object> Attributes { get; set; }
 
@@ -69,10 +67,6 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Disabled { get; set; }
 
-        /// <summary>
-        /// Gets the class list.
-        /// </summary>
-        /// <value>The class list.</value>
         ClassList ClassList => ClassList.Create("rz-state-active")
                                         .Add("rz-tabview-selected", IsSelected)
                                         .AddDisabled(Disabled)
@@ -103,9 +97,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the content of the child.
+        /// Gets or sets the child content.
         /// </summary>
-        /// <value>The content of the child.</value>
+        /// <value>The child content.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
@@ -125,9 +119,6 @@ namespace Radzen.Blazor
             await Tabs.AddTab(this);
         }
 
-        /// <summary>
-        /// Called when [click].
-        /// </summary>
         async Task OnClick()
         {
             if (!Disabled)
@@ -143,11 +134,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var selectedChanged = parameters.DidParameterChange(nameof(Selected), Selected);
@@ -169,9 +156,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public void Dispose()
         {
             Tabs?.RemoveItem(this);

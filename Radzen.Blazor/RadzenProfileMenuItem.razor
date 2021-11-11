@@ -5,7 +5,7 @@
         <div class="rz-navigation-item-wrapper">
             @if (!string.IsNullOrEmpty(Path))
             {
-                <Microsoft.AspNetCore.Components.Routing.NavLink target="@Target" class="rz-navigation-item-link" href="@Path" @onclick="@OnClick">
+                <Microsoft.AspNetCore.Components.Routing.NavLink target="@Target" class="rz-navigation-item-link" href="@Path">
                     @if (!string.IsNullOrEmpty(Icon))
                     {
                         <i class="rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>

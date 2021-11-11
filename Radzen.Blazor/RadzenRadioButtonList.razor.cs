@@ -7,27 +7,25 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenRadioButtonList.
-    /// Implements the <see cref="Radzen.FormComponent{TValue}" />
+    /// RadzenRadioButtonList component.
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.FormComponent{TValue}" />
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <example>
+    /// <code>
+    /// &lt;RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" &gt;
+    ///     &lt;Items&gt;
+    ///         &lt;RadzenRadioButtonListItem Text="Orders" Value="1" /&gt;
+    ///         &lt;RadzenRadioButtonListItem Text="Employees" Value="2" /&gt;
+    ///     &lt;/Items&gt;
+    /// &lt;/RadzenRadioButtonList&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenRadioButtonList<TValue> : FormComponent<TValue>
     {
-        /// <summary>
-        /// Items the class list.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>ClassList.</returns>
         ClassList ItemClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-box")
                                                                             .Add("rz-state-active", IsSelected(item))
                                                                             .AddDisabled(Disabled || item.Disabled);
 
-        /// <summary>
-        /// Icons the class list.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>ClassList.</returns>
         ClassList IconClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-icon")
                                                                             .Add("rzi rzi-circle-on", IsSelected(item));
         /// <summary>
@@ -58,10 +56,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string VisibleProperty { get; set; }
 
-        /// <summary>
-        /// Gets all items.
-        /// </summary>
-        /// <value>All items.</value>
         IEnumerable<RadzenRadioButtonListItem<TValue>> allItems
         {
             get
@@ -87,10 +81,8 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The data
-        /// </summary>
         IEnumerable _data = null;
+
         /// <summary>
         /// Gets or sets the data.
         /// </summary>
@@ -112,10 +104,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList(Orientation == Orientation.Horizontal ? "rz-radio-button-list-horizontal" : "rz-radio-button-list-vertical").ToString();
@@ -135,9 +124,6 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Items { get; set; }
 
-        /// <summary>
-        /// The items
-        /// </summary>
         List<RadzenRadioButtonListItem<TValue>> items = new List<RadzenRadioButtonListItem<TValue>>();
 
         /// <summary>

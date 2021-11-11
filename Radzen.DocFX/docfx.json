@@ -1,0 +1,50 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": ["Radzen.Blazor.csproj"],
+          "src": "../Radzen.Blazor/"
+        }
+      ],
+      "filter": "filter.yml",
+      "dest": "api",
+      "disableGitFeatures": false,
+      "disableDefaultFilter": false
+    }
+  ],
+  "build": {
+    "sitemap":{
+      "baseUrl": "https://blazor.radzen.com/docs"
+    },
+    "content": [
+      {
+        "files": ["api/**.yml", "api/index.md"]
+      },
+      {
+        "files": ["guides/**.md", "guides/**/toc.yml", "toc.yml", "*.md"]
+      }
+    ],
+    "resource": [
+      {
+        "files": ["images/**"]
+      }
+    ],
+    "overwrite": [
+      {
+        "files": ["apidoc/**.md"],
+        "exclude": ["obj/**", "_site/**"]
+      }
+    ],
+    "dest": "../RadzenBlazorDemos/wwwroot/docs",
+    "globalMetadataFiles": [],
+    "fileMetadataFiles": [],
+    "template": ["templates/radzen"],
+    "postProcessors": ["ExtractSearchIndex"],
+    "markdownEngineName": "markdig",
+    "noLangKeyword": false,
+    "keepFileLink": false,
+    "cleanupCacheHistory": false,
+    "disableGitFeatures": false
+  }
+}

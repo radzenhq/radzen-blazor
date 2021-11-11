@@ -4,10 +4,8 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenBody.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
+    /// RadzenBody component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
     public partial class RadzenBody : RadzenComponentWithChildren
     {
         /// <summary>
@@ -17,17 +15,14 @@ namespace Radzen.Blazor
         [Parameter]
         public override string Style { get; set; } = "margin-top: 51px; margin-bottom: 57px; margin-left:250px;";
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "body";
         }
 
         /// <summary>
-        /// Toggles this instance.
+        /// Toggles this instance width and left margin.
         /// </summary>
         public void Toggle()
         {
@@ -64,9 +59,9 @@ namespace Radzen.Blazor
         public bool Expanded { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets the expanded changed.
+        /// Gets or sets a callback raised when the component is expanded or collapsed.
         /// </summary>
-        /// <value>The expanded changed.</value>
+        /// <value>The expanded changed callback.</value>
         [Parameter]
         public EventCallback<bool> ExpandedChanged { get; set; }
     }

@@ -1,4 +1,3 @@
-@using Radzen.Blazor
 @using System.Text
 @using Radzen.Blazor.Rendering
 @using Microsoft.JSInterop
@@ -9,39 +8,14 @@
 <EditorButton Title=@Title Click=@OnClick Icon="insert_link" />
 
 @code {
-    class LinkAttributes
-    {
-        public string InnerText { get; set; }
-        public string InnerHtml { get; set; }
-        public string Href { get; set; }
-        public string Target { get; set; }
-    }
-
-    [Parameter]
-    public string Title { get; set; } = "Insert link";
-
-    [Parameter]
-    public string UrlText { get; set; } = "Web address";
-
-    [Parameter]
-    public string OpenInNewWindowText { get; set; } = "Open in new window";
-
-    [Parameter]
-    public string LinkText { get; set; } = "Text";
-
-    [Parameter]
-    public string OkText { get; set; } = "OK";
-
-    [Parameter]
-    public string CancelText { get; set; } = "Cancel";
-
     protected override async Task OnClick()
     {
         await Editor.SaveSelectionAsync();
 
         bool blank = false;
 
-        var attributes = await JSRuntime.InvokeAsync<LinkAttributes>("Radzen.selectionAttributes", "a", new [] {"innerText", "href", "target" });
+        var attributes = await JSRuntime.InvokeAsync<LinkAttributes>("Radzen.selectionAttributes", "a", new[] {"innerText",
+"href", "target" });
 
         if (attributes.Target == "_blank")
         {
@@ -49,17 +23,17 @@
         }
 
         var result = await DialogService.OpenAsync(Title, ds =>
-        @<div class="rz-html-editor-dialog">
-            <div class="rz-html-editor-dialog-item">
-                <label>@UrlText</label>
-                <RadzenTextBox @bind-Value=@attributes.Href style="width: 100%" />
-            </div>
-            @if (string.IsNullOrEmpty(attributes.InnerHtml))
+    @<div class="rz-html-editor-dialog">
+        <div class="rz-html-editor-dialog-item">
+            <label>@UrlText</label>
+            <RadzenTextBox @bind-Value=@attributes.Href style="width: 100%" />
+        </div>
+        @if (string.IsNullOrEmpty(attributes.InnerHtml))
             {
-            <div class="rz-html-editor-dialog-item">
-                <label>@LinkText</label>
-                <RadzenTextBox @bind-Value=@attributes.InnerText style="width: 100%" />
-            </div>
+                <div class="rz-html-editor-dialog-item">
+                    <label>@LinkText</label>
+                    <RadzenTextBox @bind-Value=@attributes.InnerText style="width: 100%" />
+                </div>
             }
             <div class="rz-html-editor-dialog-item">
                 <RadzenCheckBox @bind-Value=@blank />
@@ -67,10 +41,10 @@
             </div>
             <div class="rz-html-editor-dialog-buttons">
                 <RadzenButton Text=@OkText Click="()=> ds.Close(true)" />
-                <RadzenButton Text=@CancelText Click="()=> ds.Close(false)" ButtonStyle="ButtonStyle.Secondary"  />
+                <RadzenButton Text=@CancelText Click="()=> ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
             </div>
         </div>
-        );
+    );
 
         await Editor.RestoreSelectionAsync();
 

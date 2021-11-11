@@ -10,7 +10,7 @@
 
 <p>This page demonstrates how to configure the Razden Blazor DataGrid for inline editing</p>
 
-<RadzenExample Name="DataGridInLineEdit" Heading="false" Documentation="false">
+<RadzenExample Name="DataGrid" Source="DataGridInLineEdit" Heading="false">
     <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Text="Add" Click="@InsertRow" />
     <RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" EditMode="DataGridEditMode.Single"
                 Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow">

@@ -1,23 +1,17 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenChartComponentBase.
-    /// Implements the <see cref="ComponentBase" />
+    /// Base class of components that are rendered inside a <see cref="RadzenChart" />.
     /// </summary>
-    /// <seealso cref="ComponentBase" />
     public abstract class RadzenChartComponentBase : ComponentBase
     {
-        /// <summary>
-        /// The chart
-        /// </summary>
         private RadzenChart chart;
 
         /// <summary>
-        /// Gets or sets the chart.
+        /// Used to inject the RadzenChart instance. Invokes <see cref="Initialize" />.
         /// </summary>
         /// <value>The chart.</value>
         [CascadingParameter]
@@ -35,7 +29,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Initializes this instance.
+        /// Perform initialization when <see cref="Chart" /> is set.
         /// </summary>
         protected virtual void Initialize()
         {
@@ -43,20 +37,15 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Shoulds the refresh chart.
+        /// Determines if RadzenChart should render.
         /// </summary>
         /// <param name="parameters">The parameters.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         protected virtual bool ShouldRefreshChart(ParameterView parameters)
         {
             return false;
         }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             bool shouldRefresh = ShouldRefreshChart(parameters);
@@ -79,13 +68,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Dids the parameter change.
+        /// Checks if the specified parameter changed.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="parameters">The parameters.</param>
         /// <param name="parameterName">Name of the parameter.</param>
         /// <param name="parameterValue">The parameter value.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        /// <returns><c>true</c> if the parameter changed, <c>false</c> otherwise.</returns>
         protected bool DidParameterChange<T>(ParameterView parameters, string parameterName, T parameterValue)
         {
             return parameters.DidParameterChange(parameterName, parameterValue);

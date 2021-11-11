@@ -1,16 +1,11 @@
 ﻿namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenFooter.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
+    /// RadzenFooter component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
     public partial class RadzenFooter : RadzenComponentWithChildren
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "footer fixed";

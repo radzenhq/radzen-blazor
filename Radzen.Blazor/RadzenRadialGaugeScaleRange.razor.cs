@@ -3,10 +3,8 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenRadialGaugeScaleRange.
-    /// Implements the <see cref="ComponentBase" />
+    /// RadzenRadialGaugeScaleRange component.
     /// </summary>
-    /// <seealso cref="ComponentBase" />
     public partial class RadzenRadialGaugeScaleRange : ComponentBase
     {
         /// <summary>
@@ -17,7 +15,7 @@ namespace Radzen.Blazor
         public double From { get; set; }
 
         /// <summary>
-        /// Gets or sets to.
+        /// Gets or sets to position.
         /// </summary>
         /// <value>To.</value>
         [Parameter]

@@ -1,14 +1,13 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Interface IChartAxis
+    /// Common axis API of <see cref="RadzenChart" />
     /// </summary>
     public interface IChartAxis
     {
         /// <summary>
-        /// Gets or sets the grid lines.
+        /// Gets or sets the grid lines configuration of this axis.
         /// </summary>
-        /// <value>The grid lines.</value>
         RadzenGridLines GridLines { get; set; }
     }
 }

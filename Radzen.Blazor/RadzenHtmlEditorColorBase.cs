@@ -4,94 +4,82 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenHtmlEditorColorBase.
-    /// Implements the <see cref="Radzen.Blazor.RadzenHtmlEditorButtonBase" />
+    /// Base class that RadzenHtmlEditor color picker tools inherit from.
     /// </summary>
-    /// <seealso cref="Radzen.Blazor.RadzenHtmlEditorButtonBase" />
     public abstract class RadzenHtmlEditorColorBase : RadzenHtmlEditorButtonBase
     {
         /// <summary>
-        /// Gets or sets a value indicating whether [show HSV].
+        /// Sets <see cref="RadzenColorPicker.ShowHSV" /> of the built-in RadzenColorPicker.
         /// </summary>
-        /// <value><c>true</c> if [show HSV]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowHSV { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show rgba].
+        /// Sets <see cref="RadzenColorPicker.ShowRGBA" /> of the built-in RadzenColorPicker.
         /// </summary>
-        /// <value><c>true</c> if [show rgba]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowRGBA { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the content of the child.
+        /// Gets or sets the child content.
         /// </summary>
-        /// <value>The content of the child.</value>
+        /// <value>The child content.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show colors].
+        /// Sets <see cref="RadzenColorPicker.ShowColors" /> of the built-in RadzenColorPicker.
         /// </summary>
-        /// <value><c>true</c> if [show colors]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowColors { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show button].
+        /// Sets <see cref="RadzenColorPicker.ShowButton" /> of the built-in RadzenColorPicker.
         /// </summary>
-        /// <value><c>true</c> if [show button]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowButton { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the hexadecimal text.
+        /// Sets <see cref="RadzenColorPicker.HexText" /> of the built-in RadzenColorPicker.
         /// </summary>
-        /// <value>The hexadecimal text.</value>
         [Parameter]
         public string HexText { get; set; } = "Hex";
 
         /// <summary>
-        /// Gets or sets the red text.
+        /// Sets <see cref="RadzenColorPicker.RedText" /> of the built-in RadzenColorPicker.
         /// </summary>
-        /// <value>The red text.</value>
         [Parameter]
         public string RedText { get; set; } = "R";
 
         /// <summary>
-        /// Gets or sets the green text.
+        /// Sets <see cref="RadzenColorPicker.GreenText" /> of the built-in RadzenColorPicker.
         /// </summary>
-        /// <value>The green text.</value>
         [Parameter]
         public string GreenText { get; set; } = "G";
 
         /// <summary>
-        /// Gets or sets the blue text.
+        /// Sets <see cref="RadzenColorPicker.BlueText" /> of the built-in RadzenColorPicker.
         /// </summary>
-        /// <value>The blue text.</value>
         [Parameter]
         public string BlueText { get; set; } = "B";
 
         /// <summary>
-        /// Gets or sets the alpha text.
+        /// Sets <see cref="RadzenColorPicker.AlphaText" /> of the built-in RadzenColorPicker.
         /// </summary>
-        /// <value>The alpha text.</value>
         [Parameter]
         public string AlphaText { get; set; } = "A";
 
         /// <summary>
-        /// Gets or sets the button text.
+        /// Sets <see cref="RadzenColorPicker.ButtonText" /> of the built-in RadzenColorPicker.
         /// </summary>
-        /// <value>The button text.</value>
         [Parameter]
         public string ButtonText { get; set; } = "OK";
 
 
         /// <summary>
-        /// Called when [change].
+        /// Handles the change event of built-in RadzenColorPicker.
         /// </summary>
-        /// <param name="value">The value.</param>
+        /// <param name="value">The new color.</param>
         protected async Task OnChange(string value)
         {
             await Editor.ExecuteCommandAsync(CommandName, value);

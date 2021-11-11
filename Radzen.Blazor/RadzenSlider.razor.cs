@@ -10,71 +10,32 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSlider.
-    /// Implements the <see cref="Radzen.FormComponent{TValue}" />
+    /// RadzenSlider component.
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.FormComponent{TValue}" />
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <example>
+    /// <code>
+    /// &lt;RadzenSlider @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenSlider<TValue> : FormComponent<TValue>
     {
-        /// <summary>
-        /// The handle
-        /// </summary>
         ElementReference handle;
-        /// <summary>
-        /// The minimum handle
-        /// </summary>
         ElementReference minHandle;
-        /// <summary>
-        /// The maximum handle
-        /// </summary>
         ElementReference maxHandle;
 
-        /// <summary>
-        /// The visible changed
-        /// </summary>
-        private bool visibleChanged = false;
-        /// <summary>
-        /// The disabled changed
-        /// </summary>
-        private bool disabledChanged = false;
-        /// <summary>
-        /// The maximum changed
-        /// </summary>
-        private bool maxChanged = false;
-        /// <summary>
-        /// The minimum changed
-        /// </summary>
-        private bool minChanged = false;
-        /// <summary>
-        /// The range changed
-        /// </summary>
-        private bool rangeChanged = false;
-        /// <summary>
-        /// The step changed
-        /// </summary>
-        private bool stepChanged = false;
-        /// <summary>
-        /// The first render
-        /// </summary>
-        private bool firstRender = true;
+        bool visibleChanged = false;
+        bool disabledChanged = false;
+        bool maxChanged = false;
+        bool minChanged = false;
+        bool rangeChanged = false;
+        bool stepChanged = false;
+        bool firstRender = true;
 
-        /// <summary>
-        /// Gets the left.
-        /// </summary>
-        /// <value>The left.</value>
         decimal Left => ((MinValue() - Min) * 100) / (Max - Min);
-        /// <summary>
-        /// Gets the second left.
-        /// </summary>
-        /// <value>The second left.</value>
         decimal SecondLeft => ((MaxValue() - Min) * 100) / (Max - Min);
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
@@ -95,11 +56,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// On after render as an asynchronous operation.
-        /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -140,9 +97,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
+        /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();
@@ -154,7 +109,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [value change].
+        /// Called when value changed.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="isMin">if set to <c>true</c> [is minimum].</param>
@@ -235,10 +190,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return $"rz-slider {(Disabled ? "rz-state-disabled " : "")}rz-slider-horizontal";
@@ -300,10 +252,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Minimums the value.
-        /// </summary>
-        /// <returns>System.Decimal.</returns>
         decimal MinValue()
         {
             if (Range)
@@ -319,10 +267,6 @@ namespace Radzen.Blazor
             return HasValue ? (decimal)Convert.ChangeType(Value, typeof(decimal)) : Min;
         }
 
-        /// <summary>
-        /// Maximums the value.
-        /// </summary>
-        /// <returns>System.Decimal.</returns>
         decimal MaxValue()
         {
             if (Range)
@@ -353,16 +297,16 @@ namespace Radzen.Blazor
         public bool Range { get; set; } = false;
 
         /// <summary>
-        /// Determines the minimum of the parameters.
+        /// Determines the minimum value.
         /// </summary>
-        /// <value>The minimum.</value>
+        /// <value>The minimum value.</value>
         [Parameter]
         public decimal Min { get; set; } = 0;
 
         /// <summary>
-        /// Determines the maximum of the parameters.
+        /// Determines the maximum value.
         /// </summary>
-        /// <value>The maximum.</value>
+        /// <value>The maximum value.</value>
         [Parameter]
         public decimal Max { get; set; } = 100;
     }

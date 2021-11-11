@@ -1,21 +1,20 @@
 using System;
+using Radzen.Blazor;
 
 namespace Radzen
 {
     /// <summary>
-    /// Class SchedulerLoadDataEventArgs.
+    /// Supplies information about a <see cref="RadzenScheduler{TItem}.LoadData" /> event that is being raised.
     /// </summary>
     public class SchedulerLoadDataEventArgs
     {
         /// <summary>
-        /// Gets or sets the start.
+        /// The start of the currently rendered period.
         /// </summary>
-        /// <value>The start.</value>
         public DateTime Start { get; set; }
         /// <summary>
-        /// Gets or sets the end.
+        /// The start of the currently rendered period.
         /// </summary>
-        /// <value>The end.</value>
         public DateTime End { get; set; }
     }
 }

@@ -1,0 +1,50 @@
+{{!Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.}}
+{{!include(/^styles/.*/)}}
+{{!include(/^fonts/.*/)}}
+{{!include(favicon.ico)}}
+{{!include(logo.svg)}}
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  {{>partials/head}}
+  <body data-spy="scroll" data-target="#affix" class="home">
+    <div id="wrapper">
+      <header>
+        {{^_disableNavbar}}
+        {{>partials/indexNavbar}}
+        {{/_disableNavbar}}
+      </header>
+      <div class="container">
+        <div class="row home-search">
+          <div class="col col-md-8 col-md-offset-2 text-center">
+          <h1>How can we help?</h1>
+          <form class="" role="search" id="search">
+            <div class="form-group">
+              <input type="text" class="form-control large" id="search-query" placeholder="{{__global.search}}" autocomplete="off">
+            </div>
+          </form>
+          </div>
+        </div>
+        {{#_enableSearch}}
+        <div class="row">
+          <div class="col col-md-8 col-md-offset-2">
+            {{>partials/indexSearchResults}}
+          </div>
+        </div>
+        {{/_enableSearch}}
+      </div>
+      <div class="container hide-when-search">
+        {{{conceptual}}}
+      </div>
+      {{>partials/footer}}
+    </div>
+    {{>partials/scripts}}
+  </body>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      setTimeout(function() {
+        $("#search-query").focus();
+      }, 10);
+    });
+  </script>
+</html>

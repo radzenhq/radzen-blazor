@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSwitch.
-    /// Implements the <see cref="Radzen.FormComponent{System.Boolean}" />
+    /// RadzenSwitch component.
     /// </summary>
-    /// <seealso cref="Radzen.FormComponent{System.Boolean}" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenSwitch @bind-Value=@value Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenSwitch : FormComponent<bool>
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-switch").Add("rz-switch-checked", Value).ToString();
@@ -28,9 +28,6 @@ namespace Radzen.Blazor
             await Toggle();
         }
 
-        /// <summary>
-        /// Toggles this instance.
-        /// </summary>
         async System.Threading.Tasks.Task Toggle()
         {
             if (Disabled)

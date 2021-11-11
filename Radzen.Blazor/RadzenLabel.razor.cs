@@ -3,16 +3,20 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenLabel.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenLabel component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenLabel Text="CompanyName" Component="CompanyName" /&gt;
+    /// &lt;RadzenTextBox Name="CompanyName" /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenLabel : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the component.
+        /// Gets or sets the component name for the label.
         /// </summary>
-        /// <value>The component.</value>
+        /// <value>The component name for the label.</value>
         [Parameter]
         public string Component { get; set; }
 

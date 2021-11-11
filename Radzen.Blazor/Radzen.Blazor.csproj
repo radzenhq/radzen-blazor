@@ -8,7 +8,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>Radzen.Blazor</PackageId>
     <Product>Radzen.Blazor</Product>
-    <Version>3.11.7</Version>
+    <Version>3.12.0</Version>
     <Copyright>Radzen Ltd.</Copyright>
     <Authors>Radzen Ltd.</Authors>
     <Description>Native Blazor UI components by Radzen Ltd.</Description>
@@ -18,6 +18,7 @@
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Title>Radzen Components for Blazor</Title>
     <RepositoryUrl>https://github.com/radzenhq/radzen-blazor</RepositoryUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net5.0'">
     <DefineConstants>NET5</DefineConstants>

@@ -7,10 +7,22 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenTabs.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenTabs component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenTabs RenderMode="TabRenderMode.Client" Change=@(args => Console.WriteLine($"Selected index is: {args}"))&gt;
+    ///     &lt;Tabs&gt;
+    ///         &lt;RadzenTabsItem Text="Orders"&gt;
+    ///             Details for Orders
+    ///         &lt;/RadzenTabsItem&gt;
+    ///         &lt;RadzenTabsItem Text="Employees"&gt;
+    ///             Details for Employees
+    ///         &lt;/RadzenTabsItem&gt;
+    ///     &lt;/Tabs&gt;
+    /// &lt;/RadzenTabs&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenTabs : RadzenComponent
     {
         /// <summary>
@@ -21,28 +33,25 @@ namespace Radzen.Blazor
         public TabRenderMode RenderMode { get; set; } = TabRenderMode.Server;
 
         /// <summary>
-        /// Gets or sets the index of the selected.
+        /// Gets or sets the selected index.
         /// </summary>
-        /// <value>The index of the selected.</value>
+        /// <value>The selected index.</value>
         [Parameter]
         public int SelectedIndex { get; set; } = -1;
 
-        /// <summary>
-        /// The selected index
-        /// </summary>
         private int selectedIndex = -1;
 
         /// <summary>
-        /// Gets or sets the selected index changed.
+        /// Gets or sets the selected index changed callback.
         /// </summary>
-        /// <value>The selected index changed.</value>
+        /// <value>The selected index changed callback.</value>
         [Parameter]
         public EventCallback<int> SelectedIndexChanged { get; set; }
 
         /// <summary>
-        /// Gets or sets the change.
+        /// Gets or sets the change callback.
         /// </summary>
-        /// <value>The change.</value>
+        /// <value>The change callback.</value>
         [Parameter]
         public EventCallback<int> Change { get; set; }
 
@@ -53,9 +62,6 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Tabs { get; set; }
 
-        /// <summary>
-        /// The tabs
-        /// </summary>
         List<RadzenTabsItem> tabs = new List<RadzenTabsItem>();
 
         /// <summary>
@@ -84,10 +90,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the identifier.
-        /// </summary>
-        /// <value>The identifier.</value>
         internal string Id
         {
             get
@@ -96,10 +98,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the selected tab.
-        /// </summary>
-        /// <value>The selected tab.</value>
         RadzenTabsItem SelectedTab
         {
             get
@@ -137,31 +135,16 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Determines whether the specified tab is selected.
-        /// </summary>
-        /// <param name="tab">The tab.</param>
-        /// <returns><c>true</c> if the specified tab is selected; otherwise, <c>false</c>.</returns>
         internal bool IsSelected(RadzenTabsItem tab)
         {
             return IndexOf(tab) == selectedIndex;
         }
 
-        /// <summary>
-        /// Indexes the of.
-        /// </summary>
-        /// <param name="tab">The tab.</param>
-        /// <returns>System.Int32.</returns>
         internal int IndexOf(RadzenTabsItem tab)
         {
             return tabs.IndexOf(tab);
         }
 
-        /// <summary>
-        /// Selects the tab.
-        /// </summary>
-        /// <param name="tab">The tab.</param>
-        /// <param name="raiseChange">if set to <c>true</c> [raise change].</param>
         internal async Task SelectTab(RadzenTabsItem tab, bool raiseChange = false)
         {
             selectedIndex = IndexOf(tab);
@@ -176,18 +159,13 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-tabview";
         }
 
-        /// <summary>
-        /// Called when [initialized].
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             selectedIndex = SelectedIndex;
@@ -195,11 +173,7 @@ namespace Radzen.Blazor
             base.OnInitialized();
         }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))
@@ -208,25 +182,22 @@ namespace Radzen.Blazor
             }
 
             await base.SetParametersAsync(parameters);
+
+            if (RenderMode == TabRenderMode.Client)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
+            }
         }
 
-        /// <summary>
-        /// The should render
-        /// </summary>
         bool shouldRender = true;
         /// <summary>
-        /// Shoulds the render.
+        /// Should render.
         /// </summary>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         protected override bool ShouldRender()
         {
             return shouldRender;
         }
 
-        /// <summary>
-        /// Selects the tab on client.
-        /// </summary>
-        /// <param name="tab">The tab.</param>
         internal async System.Threading.Tasks.Task SelectTabOnClient(RadzenTabsItem tab)
         {
             var index = IndexOf(tab);

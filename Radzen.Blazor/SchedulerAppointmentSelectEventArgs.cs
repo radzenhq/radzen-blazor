@@ -1,25 +1,24 @@
 using System;
+using Radzen.Blazor;
 
 namespace Radzen
 {
     /// <summary>
-    /// Class SchedulerAppointmentSelectEventArgs.
+    /// Supplies information about a <see cref="RadzenScheduler{TItem}.AppointmentSelect" /> event that is being raised.
     /// </summary>
-    /// <typeparam name="TItem">The type of the t item.</typeparam>
+    /// <typeparam name="TItem">The type of the data item.</typeparam>
     public class SchedulerAppointmentSelectEventArgs<TItem>
     {
         /// <summary>
-        /// Gets or sets the start.
+        /// The start date of the appointment.
         /// </summary>
-        /// <value>The start.</value>
         public DateTime Start { get; set; }
         /// <summary>
-        /// Gets or sets the end.
+        /// The end date of the appointment.
         /// </summary>
-        /// <value>The end.</value>
         public DateTime End { get; set; }
         /// <summary>
-        /// Gets or sets the data.
+        /// The data item for which the appointment is created.
         /// </summary>
         /// <value>The data.</value>
         public TItem Data { get; set; }

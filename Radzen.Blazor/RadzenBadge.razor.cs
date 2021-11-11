@@ -4,16 +4,16 @@ using System.Collections.Generic;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenBadge.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenBadge component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Primary" /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenBadge : RadzenComponent
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             var classList = new List<string>();
@@ -30,9 +30,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the content of the child.
+        /// Gets or sets the child content.
         /// </summary>
-        /// <value>The content of the child.</value>
+        /// <value>The child content.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 

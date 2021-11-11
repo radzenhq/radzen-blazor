@@ -1,33 +1,31 @@
 using System;
 using System.Collections.Generic;
+using Radzen.Blazor;
 
 namespace Radzen
 {
     /// <summary>
-    /// Class SchedulerAppointmentRenderEventArgs.
+    /// Supplies information about a <see cref="RadzenScheduler{TItem}.AppointmentRender" /> event that is being raised.
     /// </summary>
-    /// <typeparam name="TItem">The type of the t item.</typeparam>
+    /// <typeparam name="TItem">The type of the data item.</typeparam>
     public class SchedulerAppointmentRenderEventArgs<TItem>
     {
         /// <summary>
-        /// Gets or sets the start.
+        /// The start date of the appointment.
         /// </summary>
-        /// <value>The start.</value>
         public DateTime Start { get; set; }
         /// <summary>
-        /// Gets or sets the end.
+        /// The end date of the appointment.
         /// </summary>
-        /// <value>The end.</value>
         public DateTime End { get; set; }
         /// <summary>
-        /// Gets or sets the data.
+        /// The data item for which the appointment is created.
         /// </summary>
         /// <value>The data.</value>
         public TItem Data { get; set; }
         /// <summary>
-        /// Gets or sets the attributes.
+        /// HTML attributes to apply to the appointment element.
         /// </summary>
-        /// <value>The attributes.</value>
         public IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
     }
 }

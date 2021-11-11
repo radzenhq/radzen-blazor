@@ -6,18 +6,16 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenListBox.
-    /// Implements the <see cref="Radzen.DropDownBase{TValue}" />
+    /// RadzenListBox component.
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.DropDownBase{TValue}" />
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <example>
+    /// <code>
+    /// &lt;RadzenListBox @bind-Value=@customerID TValue="string" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => Console.WriteLine($"Selected CustomerID: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenListBox<TValue> : DropDownBase<TValue>
     {
-        /// <summary>
-        /// Renders the item.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        /// <param name="item">The item.</param>
         internal override void RenderItem(RenderTreeBuilder builder, object item)
         {
             builder.OpenComponent(0, typeof(RadzenListBoxItem<TValue>));
@@ -47,24 +45,11 @@ namespace Radzen.Blazor
             await OnKeyPress(args);
         }
 
-        /// <summary>
-        /// The visible changed
-        /// </summary>
         private bool visibleChanged = false;
-        /// <summary>
-        /// The disabled changed
-        /// </summary>
         private bool disabledChanged = false;
-        /// <summary>
-        /// The first render
-        /// </summary>
         private bool firstRender = true;
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
@@ -81,11 +66,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// On after render as an asynchronous operation.
-        /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -121,16 +102,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [read only].
+        /// Gets or sets a value indicating whether is read only.
         /// </summary>
-        /// <value><c>true</c> if [read only]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ReadOnly { get; set; }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-listbox rz-inputtext").ToString();

@@ -20,7 +20,7 @@
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     @if (AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
     {
-        <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" />
+        <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" ShowPagingSummary="@ShowPagingSummary" />
     }
     <div class="rz-datatable-scrollable-wrapper rz-helper-clearfix" style="">
         <div class="rz-datatable-scrollable-view">
@@ -484,7 +484,7 @@
 
         @if (AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
         {
-            <RadzenPager @ref="bottomPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" class="rz-paginator-bottom" />
+            <RadzenPager @ref="bottomPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" ShowPagingSummary="@ShowPagingSummary" class="rz-paginator-bottom" />
         }
     </div>
     }

@@ -9,27 +9,25 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenCheckBoxList.
-    /// Implements the <see cref="Radzen.FormComponent{IEnumerable{TValue}}" />
+    /// RadzenCheckBoxList component.
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.FormComponent{IEnumerable{TValue}}" />
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <example>
+    /// <code>
+    /// &lt;RadzenCheckBoxList @bind-Value=@checkedValues TValue="int" &gt;
+    ///     &lt;Items&gt;
+    ///         &lt;RadzenCheckBoxListItem Text="Orders" Value="1" /&gt;
+    ///         &lt;RadzenCheckBoxListItem Text="Employees" Value="2" /&gt;
+    ///     &lt;/Items&gt;
+    /// &lt;/RadzenCheckBoxList&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenCheckBoxList<TValue> : FormComponent<IEnumerable<TValue>>
     {
-        /// <summary>
-        /// Items the class list.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>ClassList.</returns>
         ClassList ItemClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-box")
                                                                             .Add("rz-state-active", IsSelected(item))
                                                                             .AddDisabled(Disabled || item.Disabled);
 
-        /// <summary>
-        /// Icons the class list.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>ClassList.</returns>
         ClassList IconClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-icon")
                                                                             .Add("rzi rzi-check", IsSelected(item));
 
@@ -47,10 +45,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string TextProperty { get; set; }
 
-        /// <summary>
-        /// Gets all items.
-        /// </summary>
-        /// <value>All items.</value>
         IEnumerable<RadzenCheckBoxListItem<TValue>> allItems
         {
             get
@@ -65,12 +59,9 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The data
-        /// </summary>
         IEnumerable _data = null;
         /// <summary>
-        /// Gets or sets the data.
+        /// Gets or sets the data used to generate items.
         /// </summary>
         /// <value>The data.</value>
         [Parameter]
@@ -90,10 +81,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList(Orientation == Orientation.Horizontal ? "rz-checkbox-list-horizontal" : "rz-checkbox-list-vertical").ToString();
@@ -119,15 +107,12 @@ namespace Radzen.Blazor
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
         /// <summary>
-        /// Gets or sets the items.
+        /// Gets or sets the items that will be concatenated with generated items from Data.
         /// </summary>
         /// <value>The items.</value>
         [Parameter]
         public RenderFragment Items { get; set; }
 
-        /// <summary>
-        /// The items
-        /// </summary>
         List<RadzenCheckBoxListItem<TValue>> items = new List<RadzenCheckBoxListItem<TValue>>();
 
         /// <summary>
@@ -195,11 +180,6 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Gets the state of the disabled.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>System.String.</returns>
         private string getDisabledState(RadzenCheckBoxListItem<TValue> item)
         {
             return Disabled || item.Disabled ? " rz-state-disabled" : "";

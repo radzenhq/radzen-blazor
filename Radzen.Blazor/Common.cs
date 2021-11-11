@@ -208,6 +208,22 @@ namespace Radzen
         public RadzenDataGridColumn<T> Column { get; internal set; }
     }
 
+    /// <summary>
+    /// Supplies information about a <see cref="RadzenDataGrid{TItem}.CellContextMenu" /> event that is being raised.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class DataGridCellMouseEventArgs<T> : Microsoft.AspNetCore.Components.Web.MouseEventArgs
+    {
+        /// <summary>
+        /// Gets the data item which the clicked DataGrid row represents.
+        /// </summary>
+        public T Data { get; internal set; }
+
+        /// <summary>
+        /// Gets the RadzenDataGridColumn which this cells represents.
+        /// </summary>
+        public RadzenDataGridColumn<T> Column { get; internal set; }
+    }
 
     /// <summary>
     /// Supplies information about a <see cref="RadzenDataGrid{TItem}.RowClick" /> or <see cref="RadzenDataGrid{TItem}.RowDoubleClick" /> event that is being raised.
@@ -917,7 +933,7 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Supplies information about a <see cref="RadzenDataGrid{TItem}.LoadData" /> event that is being raised.
+    /// Supplies information about a <see cref="PagedDataBoundComponent{TItem}.LoadData" /> event that is being raised.
     /// </summary>
     public class LoadDataArgs
     {
@@ -1724,6 +1740,7 @@ namespace Radzen
             return false;
         }
     }
+
     /// <summary>
     /// Supplies information about a <see cref="RadzenSplitter.Expand" /> or <see cref="RadzenSplitter.Collapse" /> event that is being raised.
     /// </summary>
@@ -1743,7 +1760,6 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> to cancel the event; otherwise, <c>false</c>.</value>
         public bool Cancel { get; set; }
-
     }
 
     /// <summary>

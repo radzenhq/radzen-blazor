@@ -1,24 +1,24 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Enum LegendPosition
+    /// Specifies the legend position in a <see cref="RadzenChart" />.
     /// </summary>
     public enum LegendPosition
     {
         /// <summary>
-        /// The right
+        /// The legend is at the right side of the series.
         /// </summary>
         Right,
         /// <summary>
-        /// The left
+        /// The legend is at the left side of the series.
         /// </summary>
         Left,
         /// <summary>
-        /// The top
+        /// The legend is above the series.
         /// </summary>
         Top,
         /// <summary>
-        /// The bottom
+        /// The legend is below the series.
         /// </summary>
         Bottom
     }

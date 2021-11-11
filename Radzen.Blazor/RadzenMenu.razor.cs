@@ -4,10 +4,18 @@ using System.Collections.Generic;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenMenu.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
+    /// RadzenMenu component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenMenu&gt;
+    ///     &lt;RadzenMenuItem Text="Data"&gt;
+    ///         &lt;RadzenMenuItem Text="Orders" Path="orders" /&gt;
+    ///         &lt;RadzenMenuItem Text="Employees" Path="employees" /&gt;
+    ///     &lt;/RadzenMenuItemItem&gt;
+    /// &lt;/RadzenMenu&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenMenu : RadzenComponentWithChildren
     {
         /// <summary>
@@ -17,16 +25,9 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Responsive { get; set; } = true;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is open.
-        /// </summary>
-        /// <value><c>true</c> if this instance is open; otherwise, <c>false</c>.</value>
         private bool IsOpen { get; set; } = false;
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             var classList = new List<string>();
@@ -48,18 +49,15 @@ namespace Radzen.Blazor
             return string.Join(" ", classList);
         }
 
-        /// <summary>
-        /// Called when [toggle].
-        /// </summary>
         void OnToggle()
         {
             IsOpen = !IsOpen;
         }
 
         /// <summary>
-        /// Gets or sets the click.
+        /// Gets or sets the click callback.
         /// </summary>
-        /// <value>The click.</value>
+        /// <value>The click callback.</value>
         [Parameter]
         public EventCallback<MenuItemEventArgs> Click { get; set; }
     }

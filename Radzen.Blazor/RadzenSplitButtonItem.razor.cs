@@ -4,10 +4,8 @@ using Microsoft.AspNetCore.Components.Web;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSplitButtonItem.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenSplitButtonItem component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenSplitButtonItem : RadzenComponent
     {
         /// <summary>

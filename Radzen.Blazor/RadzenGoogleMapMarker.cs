@@ -3,10 +3,8 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenGoogleMapMarker.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenGoogleMapMarker component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     public class RadzenGoogleMapMarker : RadzenComponent
     {
         /// <summary>
@@ -30,9 +28,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string Label { get; set; }
 
-        /// <summary>
-        /// The map
-        /// </summary>
         RadzenGoogleMap _map;
 
         /// <summary>

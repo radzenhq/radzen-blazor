@@ -1,5 +1,5 @@
 @typeparam TItem
-<td @attributes="@Attributes" style="@GetStyle()" class="@GetCssClass()" @onclick="@OnClick" @ondblclick="@OnDblClick" >
+<td @attributes="@Attributes" style="@GetStyle()" class="@GetCssClass()" @onclick="@OnClick" @ondblclick="@OnDblClick" @oncontextmenu="@OnContextMenu" @oncontextmenu:preventDefault="@Grid.CellContextMenu.HasDelegate">
     <CascadingValue Value=this>
         @ChildContent
     </CascadingValue>
@@ -21,7 +21,57 @@
     public TItem Item { get; set; }
 
     [Parameter]
+    public RadzenDataGridColumn<TItem> Column { get; set; }
+
+    [Parameter]
     public RadzenDataGrid<TItem> Grid { get; set; }
+
+    async Task OnContextMenu(MouseEventArgs args)
+    {
+        if (Grid != null)
+        {
+#if NET5
+            await Grid.OnCellContextMenu(new DataGridCellMouseEventArgs<TItem>
+            {
+                Data = Item,
+                AltKey = args.AltKey,
+                Button = args.Button,
+                Buttons = args.Buttons,
+                ClientX = args.ClientX,
+                ClientY = args.ClientY,
+                CtrlKey = args.CtrlKey,
+                Detail = args.Detail,
+                MetaKey = args.MetaKey,
+                OffsetX = args.OffsetX,
+                OffsetY = args.OffsetY,
+                ScreenX = args.ScreenX,
+                ScreenY = args.ScreenY,
+                ShiftKey = args.ShiftKey,
+                Type = args.Type,
+                Column = Column
+            });
+#else
+            await Grid.OnCellContextMenu(new DataGridCellMouseEventArgs<TItem>
+            {
+                Data = Item,
+                AltKey = args.AltKey,
+                Button = args.Button,
+                Buttons = args.Buttons,
+                ClientX = args.ClientX,
+                ClientY = args.ClientY,
+                CtrlKey = args.CtrlKey,
+                Detail = args.Detail,
+                MetaKey = args.MetaKey,
+                ScreenX = args.ScreenX,
+                ScreenY = args.ScreenY,
+                ShiftKey = args.ShiftKey,
+                Type = args.Type,
+                Column = Column
+            });
+#endif
+        }
+    }
+
 
     async Task OnClick(MouseEventArgs args)
     {

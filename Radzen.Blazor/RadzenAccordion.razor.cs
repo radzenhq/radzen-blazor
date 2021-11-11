@@ -5,44 +5,53 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenAccordion.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenAccordion component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenAccordion&gt;
+    ///     &lt;Items&gt;
+    ///         &lt;RadzenAccordionItem Text="Orders" Icon="account_balance_wallet"&gt;
+    ///             Details for Orders
+    ///         &lt;/RadzenAccordionItem&gt;
+    ///         &lt;RadzenAccordionItem Text="Employees" Icon="account_box"&gt;
+    ///             Details for Employees
+    ///         &lt;/RadzenAccordionItem&gt;
+    ///     &lt;/Items&gt;
+    /// &lt;/RadzenAccordion&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenAccordion : RadzenComponent
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-accordion";
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="RadzenAccordion"/> is multiple.
+        /// Gets or sets a value indicating whether multiple items can be expanded.
         /// </summary>
-        /// <value><c>true</c> if multiple; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if multiple items can be expanded; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Multiple { get; set; }
 
         /// <summary>
-        /// Gets or sets the index of the selected.
+        /// Gets or sets the index of the selected item.
         /// </summary>
-        /// <value>The index of the selected.</value>
+        /// <value>The index of the selected item.</value>
         [Parameter]
         public int SelectedIndex { get; set; } = 0;
 
         /// <summary>
-        /// Gets or sets the expand.
+        /// Gets or sets a callback raised when the item is expanded.
         /// </summary>
         /// <value>The expand.</value>
         [Parameter]
         public EventCallback<int> Expand { get; set; }
 
         /// <summary>
-        /// Gets or sets the collapse.
+        /// Gets or sets a callback raised when the item is collapsed.
         /// </summary>
         /// <value>The collapse.</value>
         [Parameter]
@@ -55,9 +64,6 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Items { get; set; }
 
-        /// <summary>
-        /// The items
-        /// </summary>
         List<RadzenAccordionItem> items = new List<RadzenAccordionItem>();
 
         /// <summary>
@@ -119,15 +125,8 @@ namespace Radzen.Blazor
             return expandedIdexes.Contains(index);
         }
 
-        /// <summary>
-        /// The expanded idexes
-        /// </summary>
         List<int> expandedIdexes = new List<int>();
 
-        /// <summary>
-        /// Selects the item.
-        /// </summary>
-        /// <param name="item">The item.</param>
         internal async System.Threading.Tasks.Task SelectItem(RadzenAccordionItem item)
         {
             await CollapseAll(item);
@@ -152,10 +151,6 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Collapses all.
-        /// </summary>
-        /// <param name="item">The item.</param>
         async System.Threading.Tasks.Task CollapseAll(RadzenAccordionItem item)
         {
             if (!Multiple && items.Count > 1)

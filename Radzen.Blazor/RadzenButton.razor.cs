@@ -6,25 +6,24 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenButton.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenButton component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenButton Click=@(args => Console.WriteLine("Button clicked")) Text="Button" /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenButton : RadzenComponent
     {
-        /// <summary>
-        /// Gets the size of the button.
-        /// </summary>
-        /// <returns>System.String.</returns>
         private string getButtonSize()
         {
             return Size == ButtonSize.Medium ? "md" : "sm";
         }
 
         /// <summary>
-        /// Gets or sets the content of the child.
+        /// Gets or sets the child content.
         /// </summary>
-        /// <value>The content of the child.</value>
+        /// <value>The child content.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
@@ -78,16 +77,16 @@ namespace Radzen.Blazor
         public bool Disabled { get; set; }
 
         /// <summary>
-        /// Gets or sets the click.
+        /// Gets or sets the click callback.
         /// </summary>
-        /// <value>The click.</value>
+        /// <value>The click callback.</value>
         [Parameter]
         public EventCallback<MouseEventArgs> Click { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is busy.
+        /// Gets or sets a value indicating whether this instance busy text is shown.
         /// </summary>
-        /// <value><c>true</c> if this instance is busy; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if this instance busy text is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool IsBusy { get; set; }
 
@@ -104,9 +103,7 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if this instance is disabled; otherwise, <c>false</c>.</value>
         public bool IsDisabled { get => Disabled || IsBusy; }
 
-        /// <summary>
-        /// The clicking
-        /// </summary>
+
         bool clicking;
         /// <summary>
         /// Handles the <see cref="E:Click" /> event.
@@ -131,10 +128,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return $"rz-button rz-button-{getButtonSize()} btn-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLower()}{(IsDisabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}";

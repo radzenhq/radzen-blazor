@@ -1,20 +1,20 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Enum LineType
+    /// Specified the line drawing style.
     /// </summary>
     public enum LineType
     {
         /// <summary>
-        /// The solid
+        /// Solid lines.
         /// </summary>
         Solid,
         /// <summary>
-        /// The dashed
+        /// Dashed lines.
         /// </summary>
         Dashed,
         /// <summary>
-        /// The dotted
+        /// Dotted lines.
         /// </summary>
         Dotted
     }

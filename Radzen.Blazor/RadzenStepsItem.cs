@@ -4,15 +4,10 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenStepsItem.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenStepsItem component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     public class RadzenStepsItem : RadzenComponent
     {
-        /// <summary>
-        /// The text
-        /// </summary>
         private string _text;
         /// <summary>
         /// Gets or sets the text.
@@ -45,9 +40,6 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Selected { get; set; }
 
-        /// <summary>
-        /// The visible
-        /// </summary>
         bool _visible = true;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenComponent" /> is visible.
@@ -73,9 +65,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The disabled
-        /// </summary>
         bool _disabled;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenStepsItem"/> is disabled.
@@ -102,15 +91,12 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the content of the child.
+        /// Gets or sets the child content.
         /// </summary>
-        /// <value>The content of the child.</value>
+        /// <value>The child content.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
-        /// <summary>
-        /// The steps
-        /// </summary>
         RadzenSteps _steps;
 
         /// <summary>

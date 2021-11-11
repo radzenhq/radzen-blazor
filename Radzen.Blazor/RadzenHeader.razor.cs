@@ -1,16 +1,11 @@
 ﻿namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenHeader.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
+    /// RadzenHeader component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
     public partial class RadzenHeader : RadzenComponentWithChildren
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "header fixed";

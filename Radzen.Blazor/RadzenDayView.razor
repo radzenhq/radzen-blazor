@@ -2,7 +2,7 @@
 @using Radzen.Blazor.Rendering
 
 @inherits SchedulerViewBase
-    
+
 @code {
     public override RenderFragment Render()
     {
@@ -10,8 +10,11 @@
 
         var appointments = Scheduler.GetAppointmentsInRange(date, date.AddDays(1)).ToList();
 
-        return @<CascadingValue Value=@Scheduler>
-                    <DayView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments TimeFormat="@TimeFormat" />
-                </CascadingValue>;
+        return 
+    @<CascadingValue Value=@Scheduler>
+        <DayView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments
+        TimeFormat="@TimeFormat" />
+    </CascadingValue>
+    ;
     }
 }

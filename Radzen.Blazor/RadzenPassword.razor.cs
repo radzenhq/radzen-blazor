@@ -3,25 +3,26 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenPassword.
-    /// Implements the <see cref="Radzen.FormComponent{System.String}" />
-    /// Implements the <see cref="Radzen.IRadzenFormComponent" />
+    /// RadzenPassword component.
     /// </summary>
-    /// <seealso cref="Radzen.FormComponent{System.String}" />
-    /// <seealso cref="Radzen.IRadzenFormComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenPassword Placeholder="Enter password..." Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenPassword : FormComponent<string>, IRadzenFormComponent
     {
         /// <summary>
-        /// Gets or sets a value indicating whether [read only].
+        /// Gets or sets a value indicating whether is read only.
         /// </summary>
-        /// <value><c>true</c> if [read only]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ReadOnly { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [automatic complete].
+        /// Gets or sets a value indicating whether input automatic complete is allowed.
         /// </summary>
-        /// <value><c>true</c> if [automatic complete]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if input automatic complete is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AutoComplete { get; set; } = true;
 
@@ -38,10 +39,7 @@ namespace Radzen.Blazor
             await Change.InvokeAsync(Value);
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-textbox").ToString();

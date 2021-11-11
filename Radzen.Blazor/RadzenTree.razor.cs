@@ -9,125 +9,156 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenTree.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// A component which displays a hierarchy of items. Supports inline definition and data-binding.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    ///   <code>
+    /// &lt;RadzenTree&gt;
+    ///     &lt;RadzenTreeItem Text="BMW"&gt;
+    ///         &lt;RadzenTreeItem Text="M3" /&gt;
+    ///         &lt;RadzenTreeItem Text="M5" /&gt;
+    ///     &lt;/RadzenTreeItem&gt;
+    ///     &lt;RadzenTreeItem Text="Audi"&gt;
+    ///         &lt;RadzenTreeItem Text="RS4" /&gt;
+    ///         &lt;RadzenTreeItem Text="RS6" /&gt;
+    ///     &lt;/RadzenTreeItem&gt;
+    ///     &lt;RadzenTreeItem Text="Mercedes"&gt;
+    ///         &lt;RadzenTreeItem Text="C63 AMG" /&gt;
+    ///         &lt;RadzenTreeItem Text="S63 AMG" /&gt;
+    ///     &lt;/RadzenTreeItem&gt;
+    /// &lt;/RadzenTree&gt;
+    ///   </code>
+    /// </example>
     public partial class RadzenTree : RadzenComponent
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-tree";
         }
 
-        /// <summary>
-        /// Gets the selected item.
-        /// </summary>
-        /// <value>The selected item.</value>
         internal RadzenTreeItem SelectedItem { get; private set; }
 
-        /// <summary>
-        /// Gets or sets the expanded item.
-        /// </summary>
-        /// <value>The expanded item.</value>
-        RadzenTreeItem ExpandedItem { get; set; }
-
-        /// <summary>
-        /// Gets or sets the levels.
-        /// </summary>
-        /// <value>The levels.</value>
         IList<RadzenTreeLevel> Levels { get; set; } = new List<RadzenTreeLevel>();
 
         /// <summary>
-        /// Gets or sets the change.
+        /// A callback that will be invoked when the user selects an item.
         /// </summary>
-        /// <value>The change.</value>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenTree Change=@OnChange&gt;
+        ///     &lt;RadzenTreeItem Text="BMW"&gt;
+        ///         &lt;RadzenTreeItem Text="M3" /&gt;
+        ///         &lt;RadzenTreeItem Text="M5" /&gt;
+        ///     &lt;/RadzenTreeItem&gt;
+        ///     &lt;RadzenTreeItem Text="Audi"&gt;
+        ///         &lt;RadzenTreeItem Text="RS4" /&gt;
+        ///         &lt;RadzenTreeItem Text="RS6" /&gt;
+        ///     &lt;/RadzenTreeItem&gt;
+        ///     &lt;RadzenTreeItem Text="Mercedes"&gt;
+        ///         &lt;RadzenTreeItem Text="C63 AMG" /&gt;
+        ///         &lt;RadzenTreeItem Text="S63 AMG" /&gt;
+        ///     &lt;/RadzenTreeItem&gt;
+        /// &lt;/RadzenTree&gt;
+        /// @code {
+        ///   void OnChange(TreeEventArgs args) 
+        ///   {
+        /// 
+        ///   }
+        /// }
+        /// </code>
+        /// </example>
         [Parameter]
         public EventCallback<TreeEventArgs> Change { get; set; }
 
         /// <summary>
-        /// Gets or sets the expand.
+        /// A callback that will be invoked when the user expands an item.
         /// </summary>
-        /// <value>The expand.</value>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenTree Expand=@OnExpand&gt;
+        ///     &lt;RadzenTreeItem Text="BMW"&gt;
+        ///         &lt;RadzenTreeItem Text="M3" /&gt;
+        ///         &lt;RadzenTreeItem Text="M5" /&gt;
+        ///     &lt;/RadzenTreeItem&gt;
+        ///     &lt;RadzenTreeItem Text="Audi"&gt;
+        ///         &lt;RadzenTreeItem Text="RS4" /&gt;
+        ///         &lt;RadzenTreeItem Text="RS6" /&gt;
+        ///     &lt;/RadzenTreeItem&gt;
+        ///     &lt;RadzenTreeItem Text="Mercedes"&gt;
+        ///         &lt;RadzenTreeItem Text="C63 AMG" /&gt;
+        ///         &lt;RadzenTreeItem Text="S63 AMG" /&gt;
+        ///     &lt;/RadzenTreeItem&gt;
+        /// &lt;/RadzenTree&gt;
+        /// @code {
+        ///   void OnExpand(TreeExpandEventArgs args) 
+        ///   {
+        /// 
+        ///   }
+        /// }
+        /// </code>
+        /// </example>
         [Parameter]
         public EventCallback<TreeExpandEventArgs> Expand { get; set; }
 
         /// <summary>
-        /// Gets or sets the content of the child.
+        /// Gets or sets the child content.
         /// </summary>
-        /// <value>The content of the child.</value>
+        /// <value>The child content.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
         /// <summary>
-        /// Gets or sets the data.
+        /// Specifies the collection of data items which RadzenTree will create its items from.
         /// </summary>
-        /// <value>The data.</value>
         [Parameter]
         public IEnumerable Data { get; set; }
 
         /// <summary>
-        /// Gets or sets the value.
+        /// Specifies the selected value. Use with <c>@bind-Value</c> to sync it with a property.
         /// </summary>
-        /// <value>The value.</value>
         [Parameter]
         public object Value { get; set; }
 
         /// <summary>
-        /// Gets or sets the value changed.
+        /// A callback which will be invoked when <see cref="Value" /> changes.
         /// </summary>
-        /// <value>The value changed.</value>
         [Parameter]
         public EventCallback<object> ValueChanged { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow check boxes].
+        /// Specifies whether RadzenTree displays check boxes. Set to <c>false</c> by default.
         /// </summary>
-        /// <value><c>true</c> if [allow check boxes]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if check boxes are displayed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowCheckBoxes { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow check children].
+        /// Specifies what hapepens when a parent item is checked. If set to <c>true</c> checking parent items also checks all of its children.
         /// </summary>
-        /// <value><c>true</c> if [allow check children]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowCheckChildren { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow check parents].
+        /// Specifies what hapepens with a parent item when one of its children is checked. If set to <c>true</c> checking a child item will affect the checked state of its parents.
         /// </summary>
-        /// <value><c>true</c> if [allow check parents]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowCheckParents { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [single expand].
+        /// Specifies whether siblings items are collapsed. Set to <c>false</c> by default.
         /// </summary>
-        /// <value><c>true</c> if [single expand]; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool SingleExpand { get; set; }
 
         /// <summary>
-        /// Gets or sets the checked values.
+        /// Gets or sets the checked values. Use with <c>@bind-CheckedValues</c> to sync it with a property.
         /// </summary>
-        /// <value>The checked values.</value>
         [Parameter]
         public IEnumerable<object> CheckedValues { get; set; } = Enumerable.Empty<object>();
 
-        /// <summary>
-        /// The items
-        /// </summary>
         internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
 
-        /// <summary>
-        /// Adds the item.
-        /// </summary>
-        /// <param name="item">The item.</param>
         internal void AddItem(RadzenTreeItem item)
         {
             if (items.IndexOf(item) == -1)
@@ -136,10 +167,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Removes the item.
-        /// </summary>
-        /// <param name="item">The item.</param>
         internal void RemoveItem(RadzenTreeItem item)
         {
             if (items.IndexOf(item) != -1)
@@ -148,47 +175,25 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Sets the checked values.
-        /// </summary>
-        /// <param name="values">The values.</param>
         internal async Task SetCheckedValues(IEnumerable<object> values)
         {
             CheckedValues = values.ToList();
             await CheckedValuesChanged.InvokeAsync(CheckedValues);
         }
 
-        /// <summary>
-        /// Gets or sets the unchecked values.
-        /// </summary>
-        /// <value>The unchecked values.</value>
         internal IEnumerable<object> UncheckedValues { get; set; } = Enumerable.Empty<object>();
-        /// <summary>
-        /// Sets the unchecked values.
-        /// </summary>
-        /// <param name="values">The values.</param>
+
         internal void SetUncheckedValues(IEnumerable<object> values)
         {
             UncheckedValues = values.ToList();
         }
 
         /// <summary>
-        /// Gets or sets the checked values changed.
+        /// A callback which will be invoked when <see cref="CheckedValues" /> changes.
         /// </summary>
-        /// <value>The checked values changed.</value>
         [Parameter]
         public EventCallback<IEnumerable<object>> CheckedValuesChanged { get; set; }
 
-        /// <summary>
-        /// Renders the tree item.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        /// <param name="data">The data.</param>
-        /// <param name="template">The template.</param>
-        /// <param name="text">The text.</param>
-        /// <param name="hasChildren">The has children.</param>
-        /// <param name="expanded">The expanded.</param>
-        /// <param name="selected">The selected.</param>
         void RenderTreeItem(RenderTreeBuilder builder, object data, RenderFragment<RadzenTreeItem> template, Func<object, string> text,
             Func<object, bool> hasChildren, Func<object, bool> expanded, Func<object, bool> selected)
         {
@@ -202,12 +207,6 @@ namespace Radzen.Blazor
             builder.SetKey(data);
         }
 
-        /// <summary>
-        /// Renders the children.
-        /// </summary>
-        /// <param name="children">The children.</param>
-        /// <param name="depth">The depth.</param>
-        /// <returns>RenderFragment.</returns>
         RenderFragment RenderChildren(IEnumerable children, int depth)
         {
             var level = depth < Levels.Count() ? Levels.ElementAt(depth) : Levels.Last();
@@ -242,10 +241,6 @@ namespace Radzen.Blazor
             });
         }
 
-        /// <summary>
-        /// Selects the item.
-        /// </summary>
-        /// <param name="item">The item.</param>
         internal async Task SelectItem(RadzenTreeItem item)
         {
             var selectedItem = SelectedItem;
@@ -269,10 +264,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Expands the item.
-        /// </summary>
-        /// <param name="item">The item.</param>
         internal async Task ExpandItem(RadzenTreeItem item)
         {
             var args = new TreeExpandEventArgs()
@@ -319,13 +310,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Getters the specified data.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="data">The data.</param>
-        /// <param name="property">The property.</param>
-        /// <returns>Func&lt;System.Object, T&gt;.</returns>
         Func<object, T> Getter<T>(object data, string property)
         {
             if (string.IsNullOrEmpty(property))
@@ -336,11 +320,7 @@ namespace Radzen.Blazor
             return PropertyAccess.Getter<T>(data, property);
         }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             if (parameters.DidParameterChange(nameof(Value), Value))
@@ -356,10 +336,6 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        /// <summary>
-        /// Adds the level.
-        /// </summary>
-        /// <param name="level">The level.</param>
         internal void AddLevel(RadzenTreeLevel level)
         {
             if (!Levels.Contains(level))

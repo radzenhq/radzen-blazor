@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenRadialGaugeScalePointer.
-    /// Implements the <see cref="ComponentBase" />
+    /// RadzenRadialGaugeScalePointer component.
     /// </summary>
-    /// <seealso cref="ComponentBase" />
     public partial class RadzenRadialGaugeScalePointer : ComponentBase
     {
         /// <summary>
@@ -25,9 +23,9 @@ namespace Radzen.Blazor
         public double Value { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [show value].
+        /// Gets or sets a value indicating whether to show value.
         /// </summary>
-        /// <value><c>true</c> if [show value]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if value is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowValue { get; set; } = true;
 
@@ -45,10 +43,6 @@ namespace Radzen.Blazor
         [Parameter]
         public double? Width { get; set; }
 
-        /// <summary>
-        /// Gets the width of the current.
-        /// </summary>
-        /// <value>The width of the current.</value>
         double CurrentWidth
         {
             get
@@ -71,10 +65,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string FormatString { get; set; }
 
-        /// <summary>
-        /// Gets the length of the current.
-        /// </summary>
-        /// <value>The length of the current.</value>
         double CurrentLength
         {
             get
@@ -118,9 +108,7 @@ namespace Radzen.Blazor
         [CascadingParameter]
         public RadzenRadialGauge Gauge { get; set; }
 
-        /// <summary>
-        /// Called when [initialized].
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             base.OnInitialized();
@@ -128,11 +116,7 @@ namespace Radzen.Blazor
             Gauge.AddPointer(this);
         }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var shouldRefresh = false;

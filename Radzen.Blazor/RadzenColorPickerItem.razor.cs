@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenColorPickerItem.
+    /// RadzenColorPickerItem component.
     /// </summary>
     public partial class RadzenColorPickerItem
     {
@@ -16,10 +16,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string Value { get; set; }
 
-        /// <summary>
-        /// Gets the background.
-        /// </summary>
-        /// <value>The background.</value>
         string Background
         {
             get
@@ -37,9 +33,6 @@ namespace Radzen.Blazor
         [CascadingParameter]
         public RadzenColorPicker ColorPicker { get; set; }
 
-        /// <summary>
-        /// Called when [click].
-        /// </summary>
         async Task OnClick()
         {
             await ColorPicker.SelectColor(Value);

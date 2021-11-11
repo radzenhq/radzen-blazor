@@ -11,20 +11,22 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSelectBar.
-    /// Implements the <see cref="Radzen.FormComponent{TValue}" />
-    /// Implements the <see cref="Radzen.IRadzenSelectBar" />
+    /// RadzenSelectBar component.
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
-    /// <seealso cref="Radzen.FormComponent{TValue}" />
-    /// <seealso cref="Radzen.IRadzenSelectBar" />
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <example>
+    /// <code>
+    /// &lt;RadzenSelectBar @bind-Value=@values TValue="IEnumerable&lt;int&gt;" Multiple="true"&gt;
+    ///     &lt;Items&gt;
+    ///         &lt;RadzenSelectBarItem Text="Orders" Value="1" /&gt;
+    ///         &lt;RadzenSelectBarItem Text="Employees" Value="2" /&gt;
+    ///         &lt;RadzenSelectBarItem Text="Customers" Value="3" /&gt;
+    ///     &lt;/Items&gt;
+    /// &lt;/RadzenSelectBar&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenSelectBar<TValue> : FormComponent<TValue>, IRadzenSelectBar
     {
-        /// <summary>
-        /// Buttons the class list.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>ClassList.</returns>
         ClassList ButtonClassList(RadzenSelectBarItem item) => ClassList.Create("rz-button rz-button-text-only")
                             .Add("rz-state-active", IsSelected(item))
                             .AddDisabled(Disabled);
@@ -43,10 +45,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string TextProperty { get; set; }
 
-        /// <summary>
-        /// Gets all items.
-        /// </summary>
-        /// <value>All items.</value>
         IEnumerable<RadzenSelectBarItem> allItems
         {
             get
@@ -61,10 +59,8 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// The data
-        /// </summary>
         IEnumerable _data = null;
+
         /// <summary>
         /// Gets or sets the data.
         /// </summary>
@@ -86,10 +82,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-selectbutton rz-buttonset").Add($"rz-buttonset-{items.Count}").ToString();
@@ -109,9 +102,6 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Items { get; set; }
 
-        /// <summary>
-        /// The items
-        /// </summary>
         List<RadzenSelectBarItem> items = new List<RadzenSelectBarItem>();
 
         /// <summary>

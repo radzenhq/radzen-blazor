@@ -4,16 +4,11 @@ using Microsoft.AspNetCore.Components.Web;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenProfileMenuItem.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenProfileMenuItem component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenProfileMenuItem : RadzenComponent
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-navigation-item";
@@ -70,7 +65,6 @@ namespace Radzen.Blazor
         {
             if (Menu != null)
             {
-                Menu.Close();
                 await Menu.Click.InvokeAsync(this);
             }
         }

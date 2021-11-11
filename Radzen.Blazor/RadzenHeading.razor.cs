@@ -3,10 +3,8 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenHeading.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenHeading component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenHeading : RadzenComponent
     {
         /// <summary>
@@ -23,10 +21,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string Size { get; set; } = "H1";
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-heading";

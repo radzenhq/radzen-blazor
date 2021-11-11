@@ -1,12 +1,4 @@
-@using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 @inherits RadzenHtmlEditorButtonBase
 
 <EditorButton Title=@Title Click=@OnClick Icon="format_italic" Selected=@Editor.State.Italic />
-
-@code {
-    protected override string CommandName => "italic"; 
-    
-    [Parameter]
-    public string Title { get; set; } = "Italic";
-}

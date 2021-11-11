@@ -1,0 +1,15 @@
+{% comment -%}Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.{% endcomment -%}
+<footer>
+  <div class="footer">
+    <div class="container-fluid">
+      <span class="pull-right">
+        <a href="#top">Back to top</a>
+      </span>
+    {%- if _appFooter -%}
+    {{_appFooter}}
+    {%- else -%}
+    <span>Radzen Blazor Components, © 2021 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+    {%- endif -%}
+    </div>
+  </div>
+</footer>

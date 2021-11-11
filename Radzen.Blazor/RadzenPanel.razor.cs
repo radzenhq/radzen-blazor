@@ -5,31 +5,38 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenPanel.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
+    /// RadzenPanel component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenPanel AllowCollapse="true""&gt;
+    ///     &lt;HeaderTemplate&gt;
+    ///         Header
+    ///     &lt;/HeaderTemplate&gt;
+    ///     &lt;ChildContent&gt;
+    ///         Content
+    ///     &lt;/ChildContent&gt;
+    ///     &lt;SummaryTemplate&gt;
+    ///         Summary
+    ///     &lt;/SummaryTemplate&gt;
+    /// &lt;/RadzenPanel&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenPanel : RadzenComponentWithChildren
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-panel";
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow collapse].
+        /// Gets or sets a value indicating whether collapsing is allowed. Set to <c>false</c> by default.
         /// </summary>
-        /// <value><c>true</c> if [allow collapse]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if collapsing is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowCollapse { get; set; }
 
-        /// <summary>
-        /// The collapsed
-        /// </summary>
         private bool collapsed;
 
         /// <summary>
@@ -75,32 +82,22 @@ namespace Radzen.Blazor
         public RenderFragment FooterTemplate { get; set; }
 
         /// <summary>
-        /// Gets or sets the expand.
+        /// Gets or sets the expand callback.
         /// </summary>
-        /// <value>The expand.</value>
+        /// <value>The expand callback.</value>
         [Parameter]
         public EventCallback Expand { get; set; }
 
         /// <summary>
-        /// Gets or sets the collapse.
+        /// Gets or sets the collapse callback.
         /// </summary>
-        /// <value>The collapse.</value>
+        /// <value>The collapse callback.</value>
         [Parameter]
         public EventCallback Collapse { get; set; }
 
-        /// <summary>
-        /// The content style
-        /// </summary>
         string contentStyle = "display: block;";
-        /// <summary>
-        /// The summary content style
-        /// </summary>
         string summaryContentStyle = "display: none";
 
-        /// <summary>
-        /// Toggles the specified arguments.
-        /// </summary>
-        /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         async System.Threading.Tasks.Task Toggle(MouseEventArgs args)
         {
             collapsed = !collapsed;
@@ -119,19 +116,13 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Called when [initialized].
-        /// </summary>
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             collapsed = Collapsed;
         }
 
-        /// <summary>
-        /// Set parameters as an asynchronous operation.
-        /// </summary>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             if (parameters.DidParameterChange(nameof(Collapsed), Collapsed))
@@ -143,7 +134,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Called when [parameters set asynchronous].
+        /// Called when parameters set asynchronous.
         /// </summary>
         /// <returns>Task.</returns>
         protected override Task OnParametersSetAsync()

@@ -1,12 +1,4 @@
-@using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 @inherits RadzenHtmlEditorButtonBase
 
 <EditorButton Title=@Title Click=@OnClick Icon="format_bold" Selected=@Editor.State.Bold />
-
-@code {
-    protected override string CommandName => "bold";
-
-    [Parameter]
-    public string Title { get; set; } = "Bold";
-}

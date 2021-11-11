@@ -4,9 +4,7 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// Class RadzenMarkers.
-    /// Implements the <see cref="Radzen.Blazor.RadzenChartComponentBase" />
     /// </summary>
-    /// <seealso cref="Radzen.Blazor.RadzenChartComponentBase" />
     public class RadzenMarkers : RadzenChartComponentBase
     {
         /// <summary>

@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Components.Web;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenImage.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
+    /// RadzenImage component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenImage Path="someimage.png" /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenImage : RadzenComponentWithChildren
     {
         /// <summary>
@@ -18,9 +21,9 @@ namespace Radzen.Blazor
         public string Path { get; set; }
 
         /// <summary>
-        /// Gets or sets the click.
+        /// Gets or sets the click callback.
         /// </summary>
-        /// <value>The click.</value>
+        /// <value>The click callback.</value>
         [Parameter]
         public EventCallback<MouseEventArgs> Click { get; set; }
 

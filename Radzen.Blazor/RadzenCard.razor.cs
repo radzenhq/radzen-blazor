@@ -6,16 +6,11 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenCard.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
+    /// RadzenCard component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
     public partial class RadzenCard : RadzenComponentWithChildren
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-card card";

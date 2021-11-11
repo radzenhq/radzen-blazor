@@ -3,16 +3,16 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenLink.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenLink component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenLink Path="https://www.radzen.com" Text="Go to url" Target="_blank" /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenLink : RadzenComponent
     {
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-link";

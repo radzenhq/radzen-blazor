@@ -1,12 +1,4 @@
-@using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 @inherits RadzenHtmlEditorButtonBase
 
 <EditorButton Title=@Title Click=@OnClick Icon="format_underline" Selected=@Editor.State.Underline />
-
-@code {
-    protected override string CommandName => "underline"; 
-
-    [Parameter]
-    public string Title { get; set; } = "Underline";
-}

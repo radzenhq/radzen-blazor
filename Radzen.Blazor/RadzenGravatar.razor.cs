@@ -4,10 +4,13 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenGravatar.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenGravatar component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenGravatar Email="info@radzen.com" /&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenGravatar : RadzenComponent
     {
         /// <summary>
@@ -18,9 +21,8 @@ namespace Radzen.Blazor
         public string Email { get; set; }
 
         /// <summary>
-        /// Gets the URL.
+        /// Gets gravatar URL.
         /// </summary>
-        /// <value>The URL.</value>
         protected string Url
         {
             get
@@ -46,10 +48,7 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-gravatar";

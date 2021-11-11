@@ -1,0 +1,75 @@
+{{!Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.}}
+{{!include(/^styles/.*/)}}
+{{!include(/^fonts/.*/)}}
+{{!include(favicon.ico)}}
+{{!include(logo.svg)}}
+{{!include(search-stopwords.json)}}
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  {{>partials/head}}
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        {{^_disableNavbar}}
+        {{>partials/navbar}}
+        {{/_disableNavbar}}
+      </header>
+      {{#_enableSearch}}
+      <div class="container-fluid body-content">
+        {{>partials/searchResults}}
+      </div>
+      {{/_enableSearch}}
+      <div role="main" class="container-fluid body-content hide-when-search">
+      {{^_disableToc}}
+        {{>partials/toc}}
+        <div class="article row grid-right">
+      {{/_disableToc}}
+      {{#_disableToc}}
+        <div class="article row grid">
+        {{/_disableToc}}
+          {{#_disableAffix}}
+          <div class="col-md-12">
+          {{/_disableAffix}}
+          {{^_disableAffix}}
+          <div class="col-md-10">
+          {{/_disableAffix}}
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+                {{^_disableBreadcrumb}}
+                {{>partials/breadcrumb}}
+                {{/_disableBreadcrumb}}
+                <article class="content wrap" id="_content" data-uid="{{uid}}">
+                    {{!body}}
+                </article>
+                {{>partials/radzenBanner}}
+              </div>
+            </div>
+          </div>
+          {{^_disableAffix}}
+          {{>partials/affix}}
+          {{/_disableAffix}}
+        </div>
+      </div>
+      {{^_disableFooter}}
+      {{>partials/footer}}
+      {{/_disableFooter}}
+    </div>
+    {{>partials/scripts}}
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

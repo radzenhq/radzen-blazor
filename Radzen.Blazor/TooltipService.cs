@@ -7,10 +7,24 @@ using System.Threading.Tasks;
 namespace Radzen
 {
     /// <summary>
-    /// Class TooltipService.
+    /// Class TooltipService. Contains variuos methods with options to open and close tooltips. 
+    /// Should be added as scoped service in the application services and RadzenTooltip should be added in application main layout.
     /// Implements the <see cref="IDisposable" />
     /// </summary>
     /// <seealso cref="IDisposable" />
+    /// <example>
+    /// <code>
+    /// @inject TooltipService tooltipService
+    /// &lt;RadzenButton Text="Show tooltip" MouseEnter="@(args =&gt; ShowTooltipWithHtml(args, new TooltipOptions(){ Style = "color:#000", Duration = null }))" /&gt;
+    /// @code {
+    ///     void ShowTooltipWithHtml(ElementReference elementReference, TooltipOptions options = null) =&gt; tooltipService.Open(elementReference, ds =&gt;
+    ///         @&lt;div&gt;
+    ///             Some&lt;b&gt;HTML&lt;/b&gt; content
+    ///         &lt;/div&gt;, options);
+    ///     }
+    /// }
+    /// </code>
+    /// </example>
     public class TooltipService : IDisposable
     {
         /// <summary>
@@ -173,9 +187,9 @@ namespace Radzen
         /// <value>The text.</value>
         public string Text { get; set; }
         /// <summary>
-        /// Gets or sets the content of the child.
+        /// Gets or sets the child content.
         /// </summary>
-        /// <value>The content of the child.</value>
+        /// <value>The child content.</value>
         public RenderFragment<TooltipService> ChildContent { get; set; }
     }
 

@@ -9,24 +9,22 @@ using Radzen.Blazor;
 namespace Radzen
 {
     /// <summary>
-    /// Class PagedDataBoundComponent.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// Base classes of components that support paging.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <seealso cref="Radzen.RadzenComponent" />
+    /// <typeparam name="T">The type of the data item</typeparam>
     public class PagedDataBoundComponent<T> : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the pager position.
+        /// Gets or sets the pager position. Set to <c>PagerPosition.Bottom</c> by default.
         /// </summary>
         /// <value>The pager position.</value>
         [Parameter]
         public PagerPosition PagerPosition { get; set; } = PagerPosition.Bottom;
 
         /// <summary>
-        /// Gets or sets a value indicating whether [allow paging].
+        /// Gets or sets a value indicating whether paging is allowed. Set to <c>false</c> by default.
         /// </summary>
-        /// <value><c>true</c> if [allow paging]; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if paging is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowPaging { get; set; }
 
@@ -96,6 +94,20 @@ namespace Radzen
         /// <value>The page size options.</value>
         [Parameter]
         public IEnumerable<int> PageSizeOptions { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the pager summary visibility.
+        /// </summary>
+        /// <value>The pager summary visibility.</value>
+        [Parameter]
+        public bool ShowPagingSummary { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the pager summary format.
+        /// </summary>
+        /// <value>The pager summary format.</value>
+        [Parameter]
+        public string PagingSummaryFormat { get; set; } = "Page {0} of {1} ({2} items)";
 
         /// <summary>
         /// The view

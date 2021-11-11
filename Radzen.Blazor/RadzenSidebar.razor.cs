@@ -3,10 +3,8 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSidebar.
-    /// Implements the <see cref="Radzen.RadzenComponentWithChildren" />
+    /// RadzenSidebar component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponentWithChildren" />
     public partial class RadzenSidebar : RadzenComponentWithChildren
     {
         /// <summary>
@@ -16,17 +14,14 @@ namespace Radzen.Blazor
         [Parameter]
         public override string Style { get; set; } = "top:51px;bottom:57px;width:250px;";
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-sidebar";
         }
 
         /// <summary>
-        /// Toggles this instance.
+        /// Toggles this instance expanded state.
         /// </summary>
         public void Toggle()
         {
@@ -52,9 +47,9 @@ namespace Radzen.Blazor
         public bool Expanded { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the expanded changed.
+        /// Gets or sets the expanded changed callback.
         /// </summary>
-        /// <value>The expanded changed.</value>
+        /// <value>The expanded changed callback.</value>
         [Parameter]
         public EventCallback<bool> ExpandedChanged { get; set; }
     }

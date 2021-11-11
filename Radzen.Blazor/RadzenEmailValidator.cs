@@ -4,24 +4,34 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenEmailValidator.
-    /// Implements the <see cref="Radzen.Blazor.ValidatorBase" />
+    /// A validator component which checks if a component value is a valid email address.
+    /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}" />
     /// </summary>
-    /// <seealso cref="Radzen.Blazor.ValidatorBase" />
+    /// <example>
+    /// <code>
+    /// &lt;RadzenTemplateForm TItem="Model" Data=@model&gt;
+    ///   &lt;RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email /&gt;
+    ///   &lt;RadzenEmailValidator Component="Email" Style="position: absolute" /&gt;
+    /// &lt;/RadzenTemplateForm&gt;
+    /// @code {
+    ///  class Model
+    ///   {
+    ///    public string Email { get; set; }
+    ///  }
+    ///  
+    ///  Model model = new Model();
+    /// }
+    /// </code>
+    /// </example>
     public class RadzenEmailValidator : ValidatorBase
     {
         /// <summary>
-        /// Gets or sets the text.
+        /// Gets or sets the message displayed when the component is invalid. Set to <c>"Invalid email"</c> by default.
         /// </summary>
-        /// <value>The text.</value>
         [Parameter]
         public override string Text { get; set; } = "Invalid email";
 
-        /// <summary>
-        /// Validates the specified component.
-        /// </summary>
-        /// <param name="component">The component.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
             var value = component.GetValue();

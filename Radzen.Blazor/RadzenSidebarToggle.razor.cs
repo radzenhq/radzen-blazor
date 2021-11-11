@@ -4,16 +4,14 @@ using System;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Class RadzenSidebarToggle.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
+    /// RadzenSidebarToggle component.
     /// </summary>
-    /// <seealso cref="Radzen.RadzenComponent" />
     public partial class RadzenSidebarToggle : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the click.
+        /// Gets or sets the click callback.
         /// </summary>
-        /// <value>The click.</value>
+        /// <value>The click callback.</value>
         [Parameter]
         public EventCallback<EventArgs> Click { get; set; }
 
@@ -26,10 +24,7 @@ namespace Radzen.Blazor
             await Click.InvokeAsync(args);
         }
 
-        /// <summary>
-        /// Gets the component CSS class.
-        /// </summary>
-        /// <returns>System.String.</returns>
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "sidebar-toggle";
