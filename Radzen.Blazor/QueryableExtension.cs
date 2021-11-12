@@ -174,7 +174,7 @@ namespace Radzen
 
                         List<string> multivalueFilterList = new List<string>();
                         IEnumerable<string> filterValues = (IEnumerable<string>)column.GetFilterValue();
-                        //Combine all the above linqoperator stuff
+                        //Combine the linq queries for all filter values selected
                         foreach (string item in filterValues)
                         {
                             multivalueFilterList.Add(GetColumnFilter(column, item));
