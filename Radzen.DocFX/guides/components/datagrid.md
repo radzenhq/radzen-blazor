@@ -64,6 +64,8 @@ To display data in DataGrid component you need to set collection of items (`IEnu
 
         // Perform paging via Skip and Take.
         customers = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+        
+        // Add StateHasChanged(); for DataGrid to update if your LoadData method is async.
     }
 }
 ```
