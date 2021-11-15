@@ -60,7 +60,7 @@
 
     protected async Task OnLoadData(LoadDataArgs args)
     {
-        filteredEmployees = employees.Where(args.Filter).ToList();
+        filteredEmployees =String.IsNullOrWhiteSpace(args.Filter) ? employees.ToList() : employees.Where(args.Filter).ToList();
         itemCount = filteredEmployees.Count();
     }
 

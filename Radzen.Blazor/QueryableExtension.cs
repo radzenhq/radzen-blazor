@@ -362,6 +362,10 @@ namespace Radzen
                     return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator} != ""{value}""{filterCaseSensitivityOperator}";
                 }
             }
+            else if (column.FilterPropertyType == typeof(System.Enum) || column.FilterPropertyType.BaseType == typeof(System.Enum))
+            {
+                return $@"{property} {linqOperator} ""{value}""";
+            }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
             {
                 return $"{property} {linqOperator} {value}";
