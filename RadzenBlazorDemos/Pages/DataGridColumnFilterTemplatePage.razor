@@ -18,7 +18,7 @@
                 <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />
                 <RadzenDataGridColumn TItem="Employee" Property="CompanyName" Title="Customer" FilterValue="@CompanyNameFilter" FilterOperator="FilterOperator.Equals" LogicalFilterOperator="LogicalFilterOperator.Or">
                     <FilterTemplate>
-                        <RadzenDropDown @bind-Value=@CompanyNameFilter Change=@OnChange Data="@(CompanyNames)" AllowClear="true" Multiple="true" />
+                        <RadzenDropDown @bind-Value=@CompanyNameFilter Change=@(args => OnLoadDataMultiselect(args, 1)) Data="@(CompanyNames)" AllowClear="true" Multiple="true" />
                     </FilterTemplate>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="Employee" Property="Name" Title="Name" />
@@ -62,6 +62,17 @@
     {
         filteredEmployees =String.IsNullOrWhiteSpace(args.Filter) ? employees.ToList() : employees.Where(args.Filter).ToList();
         itemCount = filteredEmployees.Count();
+    }
+
+    protected async Task OnLoadDataMultiselect(object value, int columnIndex)
+    {
+        //Have to force a SetParameters call otherwise the multi-select doesn't get it's parameters set until after the reload
+        var parameterDictionary = new Dictionary<string, object>();
+        parameterDictionary.Add("FilterValue", value);
+        ParameterView view = ParameterView.FromDictionary(parameterDictionary);
+        await grid.ColumnsCollection[columnIndex].SetParametersAsync(view);
+
+        await grid.Reload();
     }
 
     async Task OnChange()
