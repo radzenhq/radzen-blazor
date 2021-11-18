@@ -1,4 +1,5 @@
 ﻿@page "/datagrid-filter-template"
+@using System.Linq.Dynamic.Core
 
 <h1>DataGrid custom Column FilterTemplate</h1>
 
@@ -11,15 +12,22 @@
     }
     else
     {
-        <RadzenDataGrid @ref="grid" Data=@filteredEmployees FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
+        <h3>Custom filtering template with IQueryable binding</h3>
+         <RadzenDataGrid @ref="grid" Data=@employees FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
             <Columns>
                 <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />
-                <RadzenDataGridColumn TItem="Employee" Property="Name" Title="Name" />
+                <RadzenDataGridColumn TItem="Employee" Title="Customer" Property="CompanyName" Type="typeof(IEnumerable<string>)" 
+                        FilterValue="@selectedCompanyNames" FilterOperator="FilterOperator.Contains" LogicalFilterOperator="LogicalFilterOperator.Or">
+                    <FilterTemplate>
+                        <RadzenDropDown @bind-Value=@selectedCompanyNames Style="width:100%"
+                            Change=@OnSelectedCompanyNamesChange Data="@(companyNames)" AllowClear="true" Multiple="true" />
+                    </FilterTemplate>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" 
                     FilterValue="@currentTOC">
                     <FilterTemplate>
                         <RadzenDropDown @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%"
-                                        Change=@OnChange
+                                        Change=@OnSelectedTOCChange
                                         Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy?>().Select(t => new { Text = $"{t}", Value = t == TitleOfCourtesy.All ? null : t }))" />
 
                     </FilterTemplate>
@@ -31,7 +39,11 @@
 
 @code {
     RadzenDataGrid<Employee> grid;
+
     TitleOfCourtesy? currentTOC;
+    IEnumerable<string> selectedCompanyNames;
+
+    List<string> companyNames = new List<string> {"Vins et alcools Chevalier", "Toms Spezialitäten", "Hanari Carnes", "Richter Supermarkt", "Wellington Importadora", "Centro comercial Moctezuma" };
 
     public enum TitleOfCourtesy
     {
@@ -43,23 +55,27 @@
     public class Employee
     {
         public int ID { get; set; }
-        public string Name { get; set; }
+        public string CompanyName { get; set; }
         public TitleOfCourtesy TitleOfCourtesy { get; set; }
-
     }
 
-    async Task OnChange()
+    void OnSelectedCompanyNamesChange(object value)
+    {
+        if (selectedCompanyNames != null && !selectedCompanyNames.Any())
+        {
+            selectedCompanyNames = null;  
+        }
+    }
+
+    void OnSelectedTOCChange(object value)
     {
         if (currentTOC == TitleOfCourtesy.All)
         {
             currentTOC = null;
         }
-
-        await grid.Reload();
     }
 
     IEnumerable<Employee> employees; 
-    IEnumerable<Employee> filteredEmployees;
 
     protected override async Task OnInitializedAsync()
     {
@@ -67,10 +83,8 @@
             new Employee
             {
                 ID = i,
-                Name = $"Name{i}",
+                CompanyName = i < 4 ? companyNames[0] : companyNames[i - 4],
                 TitleOfCourtesy = i < 5 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms
-            }));
-        
-        filteredEmployees = employees;
+            }).AsQueryable());
     }
 }
