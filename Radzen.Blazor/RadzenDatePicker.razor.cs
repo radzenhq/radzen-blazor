@@ -288,6 +288,12 @@ namespace Radzen.Blazor
             return args;
         }
 
+        /// <summary>
+        /// Gets or sets the kind of DateTime bind to control
+        /// </summary>
+        [Parameter]
+        public DateTimeKind Kind { get; set; } = DateTimeKind.Unspecified;
+
         object _value;
 
         /// <summary>
@@ -316,7 +322,14 @@ namespace Radzen.Blazor
                     }
                     else
                     {
-                        DateTimeValue = value as DateTime?;
+                        if (value is DateTime dateTime)
+                        {
+                            DateTimeValue = DateTime.SpecifyKind(dateTime, Kind);
+                        }
+                        else
+                        {
+                            DateTimeValue = null;
+                        }
 
                         if (DateTimeValue.HasValue && DateTimeValue.Value == default(DateTime))
                         {
