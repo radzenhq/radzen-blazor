@@ -383,5 +383,36 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.Null(newValue);
         }
+        
+        [Theory]
+        [InlineData(DateTimeKind.Local)]
+        [InlineData(DateTimeKind.Unspecified)]
+        [InlineData(DateTimeKind.Utc)]
+        public void DatePicker_Respects_DateTimeKind(DateTimeKind kind)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(x => x.Kind, kind);
+                parameters.Add(x => x.ShowTime, true);
+            });
+
+            var raised = false;
+            object newValue = null;
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Change, args => { raised = true; newValue = args; });
+            });
+
+            component.Find(".rz-datepicker-next-icon").Click();
+            component.FindAll(".rz-button-text").First(x => x.TextContent == "Ok").Click();
+
+            Assert.True(raised);
+            Assert.Equal(kind, ((DateTime)newValue).Kind);
+        }
     }
 }
