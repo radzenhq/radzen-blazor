@@ -56,7 +56,7 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Gets or sets the culture set by a parent componen.
+        /// Gets or sets the culture set by a parent component.
         /// </summary>
         [CascadingParameter(Name = nameof(DefaultCulture))]
         public CultureInfo DefaultCulture { get; set; }

@@ -36,7 +36,7 @@ namespace Radzen.Blazor
         public string FormatString { get; set; }
 
         /// <summary>
-        /// Gets or sets a formatter function that formats the acis values.
+        /// Gets or sets a formatter function that formats the axis values.
         /// </summary>
         /// <value>The formatter.</value>
         [Parameter]
@@ -70,7 +70,7 @@ namespace Radzen.Blazor
         internal int TickDistance { get; set; } = 100;
 
         /// <summary>
-        /// Specifies the mimimum value of the axis.
+        /// Specifies the minimum value of the axis.
         /// </summary>
         /// <value>The minimum.</value>
         [Parameter]

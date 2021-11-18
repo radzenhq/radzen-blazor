@@ -30,7 +30,7 @@ namespace Radzen.Blazor
         public override string Text { get; set; } = "Invalid length";
 
         /// <summary>
-        /// Specifies the minium accepted length. The component value length should be greater than the minimum in order to be valid.
+        /// Specifies the minimum accepted length. The component value length should be greater than the minimum in order to be valid.
         /// </summary>
         [Parameter]
         public int? Min { get; set; }

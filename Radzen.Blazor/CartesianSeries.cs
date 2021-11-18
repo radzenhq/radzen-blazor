@@ -159,17 +159,17 @@ namespace Radzen.Blazor
         public int RenderingOrder { get; set; }
 
         /// <summary>
-        /// Creates a getter function that returns a value from the specifid data item. Uses <see cref="ValueProperty" />.
+        /// Creates a getter function that returns a value from the specified data item. Uses <see cref="ValueProperty" />.
         /// </summary>
         /// <value>The value.</value>
-        /// <exception cref="ArgumentException">ValueProperty shoud not be empty</exception>
+        /// <exception cref="ArgumentException">ValueProperty should not be empty</exception>
         protected Func<TItem, double> Value
         {
             get
             {
                 if (String.IsNullOrEmpty(ValueProperty))
                 {
-                    throw new ArgumentException("ValueProperty shoud not be empty");
+                    throw new ArgumentException("ValueProperty should not be empty");
                 }
 
                 return PropertyAccess.Getter<TItem, double>(ValueProperty);

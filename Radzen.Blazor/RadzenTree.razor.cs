@@ -134,13 +134,13 @@ namespace Radzen.Blazor
         public bool AllowCheckBoxes { get; set; }
 
         /// <summary>
-        /// Specifies what hapepens when a parent item is checked. If set to <c>true</c> checking parent items also checks all of its children.
+        /// Specifies what happens when a parent item is checked. If set to <c>true</c> checking parent items also checks all of its children.
         /// </summary>
         [Parameter]
         public bool AllowCheckChildren { get; set; } = true;
 
         /// <summary>
-        /// Specifies what hapepens with a parent item when one of its children is checked. If set to <c>true</c> checking a child item will affect the checked state of its parents.
+        /// Specifies what happens with a parent item when one of its children is checked. If set to <c>true</c> checking a child item will affect the checked state of its parents.
         /// </summary>
         [Parameter]
         public bool AllowCheckParents { get; set; } = true;

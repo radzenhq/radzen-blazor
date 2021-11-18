@@ -175,7 +175,7 @@ namespace Radzen.Blazor
                 if(_groupedPagedView == null)
                 {
                     _groupedPagedView = PagedView.GroupByMany(groups.Select(g => $"np({g.Property})").ToArray()).ToList();
-                 }
+                }
                 return _groupedPagedView;
             }
         }
@@ -700,9 +700,9 @@ namespace Radzen.Blazor
         public bool AllowColumnResize { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether column reoder is allowed.
+        /// Gets or sets a value indicating whether column reorder is allowed.
         /// </summary>
-        /// <value><c>true</c> if column reoder is allowed; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if column reorder is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowColumnReorder { get; set; }
 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Represents a rane of values.
+    /// Represents a range of values.
     /// </summary>
     public class ScaleRange
     {
