@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Radzen
 {
     /// <summary>
-    /// Class TooltipService. Contains variuos methods with options to open and close tooltips. 
+    /// Class TooltipService. Contains various methods with options to open and close tooltips. 
     /// Should be added as scoped service in the application services and RadzenTooltip should be added in application main layout.
     /// Implements the <see cref="IDisposable" />
     /// </summary>

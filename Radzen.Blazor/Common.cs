@@ -157,7 +157,7 @@ namespace Radzen
     public class GridRenderEventArgs<T>
     {
         /// <summary>
-        /// Gets the intance of the RadzenGrid component which has rendered.
+        /// Gets the instance of the RadzenGrid component which has rendered.
         /// </summary>
         public RadzenGrid<T> Grid { get; internal set; }
         /// <summary>
@@ -174,7 +174,7 @@ namespace Radzen
     public class DataGridRenderEventArgs<T>
     {
         /// <summary>
-        /// Gets the intance of the RadzenDataGrid component which has rendered.
+        /// Gets the instance of the RadzenDataGrid component which has rendered.
         /// </summary>
         public RadzenDataGrid<T> Grid { get; internal set; }
         /// <summary>
@@ -634,7 +634,7 @@ namespace Radzen
     public enum FilterCaseSensitivity
     {
         /// <summary>
-        /// Relies on the underlying provider (LINQ to Objects, Entity Framework etc.) to handle case sensitivity. LINQ to Objects is case sensitive. Entity Framework relies on the database collaction settings.
+        /// Relies on the underlying provider (LINQ to Objects, Entity Framework etc.) to handle case sensitivity. LINQ to Objects is case sensitive. Entity Framework relies on the database collection settings.
         /// </summary>
         Default,
         /// <summary>

@@ -8,7 +8,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenCheckBox component.
     /// </summary>
-    /// <typeparam name="TValue">The type of the the value.</typeparam>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <example>
     /// <code>
     /// &lt;RadzenCheckBox @bind-Value=@someValue TValue="bool" Change=@(args => Console.WriteLine($"Is checked: {args}")) /&gt;

@@ -36,9 +36,9 @@ namespace Radzen.Blazor
         public bool Popup { get; set; }
 
         /// <summary>
-        /// Returns the valididity status.
+        /// Returns the validity status.
         /// </summary>
-        /// <value><c>true</c> if this valiidator is valid; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if this validator is valid; otherwise, <c>false</c>.</value>
         public bool IsValid { get; protected set; } = true;
 
         /// <summary>

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Radzen
 {
     /// <summary>
-    /// Class DialogService. Contains variuos methods with options to open and close dialogs. 
+    /// Class DialogService. Contains various methods with options to open and close dialogs. 
     /// Should be added as scoped service in the application services and RadzenDialog should be added in application main layout.
     /// </summary>
     /// <example>
