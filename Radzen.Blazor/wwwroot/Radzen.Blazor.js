@@ -736,15 +736,17 @@ window.Radzen = {
             Radzen.closePopup(id, instance, callback);
             return;
         }
-        if (!e.defaultPrevented) {
-          if (parent) {
-            if (e.type == 'mousedown' && !parent.contains(e.target) && !popup.contains(e.target)) {
-              Radzen.closePopup(id, instance, callback);
-            }
-          } else {
-            if (!popup.contains(e.target)) {
-              Radzen.closePopup(id, instance, callback);
-            }
+        var closestPopup = e.target.closest('.rz-popup');
+        if (closestPopup && closestPopup != popup) {
+          return;
+        }
+        if (parent) {
+          if (e.type == 'mousedown' && !parent.contains(e.target) && !popup.contains(e.target)) {
+            Radzen.closePopup(id, instance, callback);
+          }
+        } else {
+          if (!popup.contains(e.target)) {
+            Radzen.closePopup(id, instance, callback);
           }
         }
     };
