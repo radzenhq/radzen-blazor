@@ -460,6 +460,7 @@ namespace Radzen.Blazor
                 {
                     FilterValue = filterValue;
                     await Grid.Reload();
+                    return;
                 }
             }
 

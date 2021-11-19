@@ -517,8 +517,9 @@ namespace Radzen
 
             var columnFilterOperator = !second ? column.GetFilterOperator() : column.GetSecondFilterOperator();
 
-            var value = !second ? (string)Convert.ChangeType(column.GetFilterValue(), typeof(string)) :
-                (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
+            var value = typeof(IEnumerable).IsAssignableFrom(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) ? null :
+                    !second ? (string)Convert.ChangeType(column.GetFilterValue(), typeof(string)) :
+                        (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
 
             if (column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive && column.FilterPropertyType == typeof(string))
             {
@@ -566,7 +567,21 @@ namespace Radzen
             }
             else if (typeof(IEnumerable).IsAssignableFrom(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
             {
-                
+                var v = !second ? column.GetFilterValue() : column.GetSecondFilterValue();
+
+                var enumerableValue = ((IEnumerable)(v != null ? v : Enumerable.Empty<object>())).AsQueryable();
+
+                var enumerableValueAsString = "(" + String.Join(",",
+                        (enumerableValue.ElementType == typeof(string) ? enumerableValue.Cast<string>().Select(i => $@"'{i}'").Cast<object>() : enumerableValue.Cast<object>())) + ")";
+
+                if (enumerableValue.Any() && columnFilterOperator == FilterOperator.Contains)
+                {
+                    return $"{property} in {enumerableValueAsString}";
+                }
+                else if (enumerableValue.Any() && columnFilterOperator == FilterOperator.DoesNotContain)
+                {
+                    return $"not({property} in {enumerableValueAsString})";
+                }
             }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
             {
@@ -666,10 +681,10 @@ namespace Radzen
                 {
                     var property = column.GetFilterProperty().Replace('.', '/');
 
-                    var value = (string)Convert.ChangeType(column.GetFilterValue(), typeof(string));
-                    var secondValue = (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
+                    var value = column.GetFilterValue();
+                    var secondValue = column.GetSecondFilterValue();
 
-                    if (!string.IsNullOrEmpty(value))
+                    if (value != null)
                     {
                         var linqOperator = ODataFilterOperators[column.GetFilterOperator()];
                         if (linqOperator == null)
@@ -679,12 +694,12 @@ namespace Radzen
 
                         var booleanOperator = column.LogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
 
-                        if (string.IsNullOrEmpty(secondValue))
+                        if (secondValue == null)
                         {
                             whereList.Add(GetColumnODataFilter(column));
                         }
                         else
-                        {
+                        {   
                             whereList.Add($"({GetColumnODataFilter(column)} {booleanOperator} {GetColumnODataFilter(column, true)})");
                         }
                     }
