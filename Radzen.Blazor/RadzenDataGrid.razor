@@ -312,7 +312,7 @@
                     else
                     {
                         <tr class=" rz-datatable-emptymessage-row">
-                            <td class="rz-datatable-emptymessage" colspan="@visibleColumns.Count">
+                            <td class="rz-datatable-emptymessage" colspan="@(visibleColumns.Count + (Template != null ? 1 : 0))">
                                 @if (EmptyTemplate != null)
                                 {
                                     @EmptyTemplate
