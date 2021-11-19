@@ -1,6 +1,4 @@
-﻿@using Radzen
-@using Microsoft.AspNetCore.Components.Forms
-@inherits FormComponent<string>
+﻿@inherits FormComponent<string>
 @if (Visible)
 {
     <input @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@TabIndex"

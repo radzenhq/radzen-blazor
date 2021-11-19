@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenTextBox component.
+    /// An input component for single line text entry.
     /// </summary>
     /// <example>
     /// <code>
@@ -20,29 +21,45 @@ namespace Radzen.Blazor
         public bool ReadOnly { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether input automatic complete is enabled.
+        /// Gets or sets a value indicating the browser built-in autocomplete is enabled.
         /// </summary>
         /// <value><c>true</c> if input automatic complete is enabled; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AutoComplete { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the maximum length.
+        /// Gets or sets the maximum allowed text length.
         /// </summary>
         /// <value>The maximum length.</value>
         [Parameter]
         public long? MaxLength { get; set; }
 
         /// <summary>
-        /// Handles the <see cref="E:Change" /> event.
+        /// Specifies whether to remove any leading or trailing whitespace from the value. Set to <c>false</c> by default.
         /// </summary>
-        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
-        protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
+        /// <value><c>true</c> if trimming is enabled; otherwise, <c>false</c>. </value>
+        [Parameter]
+        public bool Trim { get; set; }
+
+        /// <summary>
+        /// Handles change event of the built-in <c>input</c> elementt.
+        /// </summary>
+        protected async Task OnChange(ChangeEventArgs args)
         {
             Value = $"{args.Value}";
 
+            if (Trim)
+            {
+                Value = Value.Trim();
+            }
+
             await ValueChanged.InvokeAsync(Value);
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+
+            if (FieldIdentifier.FieldName != null)
+            {
+                EditContext?.NotifyFieldChanged(FieldIdentifier);
+            }
+
             await Change.InvokeAsync(Value);
         }
 
