@@ -48,7 +48,7 @@ namespace Radzen.Blazor
         public string Pattern { get; set; }
 
         /// <summary>
-        /// Gets or sets the pattern that will be used to match all valid characters with regular expression.
+        /// Gets or sets the pattern that will be used to match all valid characters with regular expression. If both Pattern and CharacterPattern are set CharacterPattern will be used.
         /// </summary>
         /// <value>The valid characters pattern.</value>
         [Parameter]
