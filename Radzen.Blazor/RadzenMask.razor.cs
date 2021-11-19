@@ -41,11 +41,18 @@ namespace Radzen.Blazor
         public string Mask { get; set; }
 
         /// <summary>
-        /// Gets or sets the pattern.
+        /// Gets or sets the pattern that will be used to replace all invalid characters with regular expression.
         /// </summary>
-        /// <value>The pattern.</value>
+        /// <value>The invalid characters pattern.</value>
         [Parameter]
         public string Pattern { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pattern that will be used to match all valid characters with regular expression.
+        /// </summary>
+        /// <value>The valid characters pattern.</value>
+        [Parameter]
+        public string CharacterPattern { get; set; }
 
         /// <summary>
         /// Handles the <see cref="E:Change" /> event.

@@ -23,8 +23,8 @@ window.Radzen = {
   mask: function (id, mask, pattern) {
       var el = document.getElementById(id);
       if (el) {
-          var format = function (value, mask, pattern) {
-              var strippedValue = value.replace(new RegExp(pattern, "g"), "");
+          var format = function (value, mask, pattern, characterPattern) {
+              var strippedValue = !characterPattern ? value.replace(new RegExp(pattern, "g"), "") : value.match(new RegExp(characterPattern, "g"));
               var chars = strippedValue.split('');
               var count = 0;
 
