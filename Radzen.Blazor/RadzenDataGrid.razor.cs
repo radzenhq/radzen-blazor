@@ -484,7 +484,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The expandable indicator column visibility.</value>
         [Parameter]
-        public bool ShowExpandableIndicatorColumn { get; set; } = true;
+        public bool ShowExpandColumn { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the edit mode.
