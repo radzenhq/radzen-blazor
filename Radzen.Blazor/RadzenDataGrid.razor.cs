@@ -480,6 +480,13 @@ namespace Radzen.Blazor
         public DataGridExpandMode ExpandMode { get; set; } = DataGridExpandMode.Multiple;
 
         /// <summary>
+        /// Gets or sets whether the expandable indicator column is visible.
+        /// </summary>
+        /// <value>The expandable indicator column visibility.</value>
+        [Parameter]
+        public bool ShowExpandColumn { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the edit mode.
         /// </summary>
         /// <value>The edit mode.</value>
