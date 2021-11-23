@@ -30,7 +30,7 @@ window.Radzen = {
               var formatted = '';
               for (var i = 0; i < mask.length; i++) {
                   const c = mask[i];
-                  if (chars[count]) {
+                  if (chars && chars[count]) {
                       if (/\*/.test(c)) {
                           formatted += chars[count];
                           count++;
