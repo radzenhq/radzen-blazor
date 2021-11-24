@@ -68,6 +68,7 @@ $rz-shadow-level-2: 0 4px 12px 0 rgba(0, 0, 0, 0.04) !default;
 $rz-shadow-inset-level-1: inset 0px 0px 2px rgba(0, 0, 0, 0.2) !default;
 
 // Theme colors
+
 $primary-color: $rz-primary !default;
 $secondary: $rz-secondary !default;
 $tertiary: $rz-base-200 !default;
@@ -81,6 +82,7 @@ $button-hover-background-color: $rz-primary-light !default;
 $button-active-background-color: $rz-primary-dark !default;
 
 // Bootstrap overrides
+
 $primary: $primary-color !default;
 $danger: $rz-danger !default;
 $info: $rz-info !default;
@@ -820,6 +822,7 @@ $tree-transition: $rz-transition-all !default;
 
 
 // Switch
+
 $switch-background-color: $rz-base-200 !default;
 $switch-checked-background-color: $rz-primary !default;
 $switch-box-shadow: $rz-shadow-level-1, $rz-shadow-level-2 !default;
@@ -827,9 +830,9 @@ $switch-box-shadow: $rz-shadow-level-1, $rz-shadow-level-2 !default;
 // Header
 
 $header-background-color: $rz-white !default;
-$header-min-height: 3.25rem !default;
+$header-min-height: 3.125rem !default;
 $header-z: 2 !default;
-$header-border: none !default;
+$header-border: 1px solid $rz-white !default;
 $header-color: $body-color !default;
 $header-shadow: $rz-shadow-level-2 !default;
 
@@ -842,10 +845,7 @@ $footer-color: $body-color !default;
 $footer-z: 2 !default;
 
 // Sidebar
-/* Light
-$sidebar-border-right: 1px solid $rz-base-300 !default;
-$sidebar-background-color: $rz-white !default;
-*/
+
 $sidebar-border-right: 1px solid $rz-base-800 !default;
 $sidebar-background-color: $rz-base-900 !default;
 
@@ -1009,8 +1009,6 @@ $timepicker-button-border-radius: $rz-border-radius !default;
 $timepicker-button-padding: 0.5rem 1rem !important;
 $timepicker-separator-margin: 0 0.5rem !default;
 $timepicker-border: none !default;
-
-
 
 // Forms
 
@@ -1249,7 +1247,6 @@ $upload-cancel-background-color: $rz-base-300 !default;
 $upload-cancel-color: $rz-base-800 !default;
 $upload-button-background-color: $rz-primary !default;
 
-
 // Dialog
 
 $dialog-background-color: $rz-white !default;
@@ -1377,7 +1374,8 @@ $color-schemes: (
 @import 'components';
 
 // Paragraph
-$paragraph-line-height: 1.25rem !default;
+
+$paragraph-line-height: 1.429;
 
 ::selection {
   background-color: $rz-primary-lighter;
