@@ -1,5 +1,7 @@
 $body-padding: 1rem !default;
+$body-background: none !default;
 
 .body {
   padding: $body-padding;
+  background: $body-background;
 }
