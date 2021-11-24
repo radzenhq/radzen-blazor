@@ -17,7 +17,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-sidebar";
+            return Expanded ? "rz-sidebar rz-sidebar-expanded" : "rz-sidebar";
         }
 
         /// <summary>

@@ -9,6 +9,12 @@
   }
 }
 
+.rz-state-disabled {
+  .rz-autocomplete {
+    @extend %input-disabled;
+  }
+}
+
 .rz-autocomplete-input {
   padding: $input-padding;
   background-color: $input-background-color;

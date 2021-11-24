@@ -41,6 +41,10 @@ $radio-checked-border: $input-border !default;
   cursor: pointer;
 }
 
+.rz-state-disabled .rz-radiobutton {
+  cursor: initial;
+}
+
 .rz-radiobutton-label {
   margin: $radio-label-margin;
 }
@@ -80,7 +84,7 @@ $radio-checked-border: $input-border !default;
     @extend %input-hover;
   }
 
-  &:active {
+  &:active:not(.rz-state-disabled) {
     background-color: $radio-active-background-color;
     box-shadow: $radio-active-shadow;
   }
@@ -113,6 +117,27 @@ $radio-checked-border: $input-border !default;
     &:hover {
       background-color: $radio-checked-hover-background-color;
       box-shadow: $radio-checked-hover-shadow;
+    }
+  }
+
+  &.rz-state-disabled {
+
+    .rzi-circle-on {
+    
+      &:hover {
+        background-color: $radio-circle-background-color;
+      }
+    }
+
+    &.rz-state-active {
+      background-color: $radio-checked-background-color;
+      border: $radio-checked-border;
+      opacity: 0.5;
+
+      &:hover {
+        background-color: $radio-checked-background-color;
+        border: $radio-checked-border; 
+      }
     }
   }
 }

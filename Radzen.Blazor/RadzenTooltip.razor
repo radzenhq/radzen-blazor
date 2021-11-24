@@ -9,10 +9,10 @@
             @if (!string.IsNullOrEmpty(tooltip.Options.Text))
             {
                 <div>
-                    @tooltip.Options.Text
+                    @((MarkupString)tooltip.Options.Text)
                 </div>
             }
-            else @if (tooltip.Options.ChildContent != null)
+            else if (tooltip.Options.ChildContent != null)
        {
         @tooltip.Options.ChildContent(Service)
     }

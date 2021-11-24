@@ -1,4 +1,5 @@
 $fieldset-border: 1px solid #dadfe2 !default;
+$fieldset-border-radius: 0 !default;
 $fieldset-padding: 1.25rem !default;
 $fieldset-legend-color: $cool-grey !default;
 $fieldset-legend-font-size: 0.875rem !default;
@@ -14,6 +15,7 @@ $fieldset-toggle-border: none !default;
 
 .rz-fieldset {
   border: $fieldset-border;
+  border-radius: $fieldset-border-radius;
 }
 
 .rz-fieldset-content {

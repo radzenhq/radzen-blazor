@@ -18,7 +18,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "body";
+            return Expanded ? "body body-expanded" : "body";
         }
 
         /// <summary>
