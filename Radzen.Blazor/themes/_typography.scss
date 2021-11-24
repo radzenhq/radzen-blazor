@@ -21,7 +21,7 @@ $headings: (
 $paragraph-line-height: 1.38 !default;
 
 p {
-  line-height: 1.38;
+  line-height: $paragraph-line-height;
 }
 
 $link-color: $default-link !default;

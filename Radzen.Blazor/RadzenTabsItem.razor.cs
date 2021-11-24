@@ -67,7 +67,11 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Disabled { get; set; }
 
-        ClassList ClassList => ClassList.Create("rz-state-active")
+        /// <summary>
+        /// Gets the class list.
+        /// </summary>
+        /// <value>The class list.</value>
+        ClassList ClassList => ClassList.Create()
                                         .Add("rz-tabview-selected", IsSelected)
                                         .AddDisabled(Disabled)
                                         .Add(Attributes);

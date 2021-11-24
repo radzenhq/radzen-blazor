@@ -46,7 +46,7 @@ $color-schemes: (
     #e27076,
     #d43d51
   )
-);
+) !default;
 
 .chart,
 .pie {
@@ -123,7 +123,7 @@ $color-schemes: (
 }
 
 .rz-axis {
-  stroke: #a0a0a0;
+  stroke: $chart-axis-color;
   font-size: 0.875em;
 }
 

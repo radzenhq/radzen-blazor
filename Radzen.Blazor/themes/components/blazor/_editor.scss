@@ -1,6 +1,8 @@
 $editor-border: $input-border !default;
 $editor-border-radius: $border-radius !default;
 $editor-toolbar-background-color: $white !default;
+$editor-toolbar-item-margin: 0.5rem !default;
+$editor-button-padding: 0.625rem !default;
 $editor-button-background-color: $white !default;
 $editor-button-color: $body-color !default;
 $editor-button-disabled-color: $input-disabled-color !default;
@@ -36,7 +38,7 @@ $editor-content-background-color: $input-background-color !default;
   }
 
   > * {
-    margin: 0.5rem;
+    margin: $editor-toolbar-item-margin;
   }
 }
 
@@ -45,7 +47,7 @@ $editor-content-background-color: $input-background-color !default;
   align-items: center;
   justify-content: center;
   background: $editor-button-background-color;
-  padding: 0.625rem;
+  padding: $editor-button-padding;
 
   .rz-colorpicker-trigger {
     color: inherit;
@@ -99,7 +101,7 @@ $editor-content-background-color: $input-background-color !default;
   align-items: center;
   justify-content: center;
   background: $editor-button-background-color;
-  padding: 0.625rem;
+  padding: $editor-button-padding;
 
   &.rz-selected {
     background-color: $editor-button-selected-background-color;
@@ -114,7 +116,7 @@ $editor-content-background-color: $input-background-color !default;
 
 .rz-html-editor-dropdown {
   display: inline-flex;
-  padding: 0.625rem;
+  padding: $editor-button-padding;
   align-items: center;
   cursor: pointer;
 

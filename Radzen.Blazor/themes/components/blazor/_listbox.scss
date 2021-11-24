@@ -74,6 +74,7 @@ $listbox-header-icon-margin: 0 !default;
     flex: auto;
     width: 0;
     border: none;
+    line-height: $input-line-height;
 
     &:focus {
       outline: none;

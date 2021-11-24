@@ -5,8 +5,13 @@ $dialog-title-border: none !default;
 $dialog-title-padding: 0.6875rem 1.25rem !default;
 $dialog-title-font-size: 1.25rem !default;
 $dialog-title-line-height: 1.875rem !default;
+$dialog-title-font-weight: normal !default;
+$dialog-title-letter-spacing: normal !default;
+$dialog-title-color: inherit !default;
 $dialog-close-font-size: 1.25rem !default;
 $dialog-close-color: $cool-grey !default;
+$dialog-close-hover-color: $cool-grey !default;
+$dialog-close-vertical-align: middle !default;
 $dialog-content-padding: 1.25rem !default;
 $dialog-mask-background-color: $charcoal-grey !default;
 $dialog-border-radius: $border-radius !default;
@@ -28,17 +33,27 @@ $dialog-border-radius: $border-radius !default;
   border-bottom: $dialog-title-border;
 }
 
+.rz-dialog-title {
+  font-weight: $dialog-title-font-weight;
+  letter-spacing: $dialog-title-letter-spacing;
+  color: $dialog-title-color;
+}
+
 .rz-dialog-titlebar-close {
   float: right;
 
   .rzi-times {
     font-size: $dialog-close-font-size;
     color: $dialog-close-color;
-    vertical-align: middle;
+    vertical-align: $dialog-close-vertical-align;
 
     &:before {
       content: 'close';
     }
+  }
+
+  &:hover .rzi-times {
+    color: $dialog-close-hover-color;
   }
 }
 

@@ -40,7 +40,10 @@ ul.rz-profile-menu {
     white-space: nowrap;
 
     .rz-navigation-item-wrapper {
-      padding: $menu-item-padding;
+
+      .rz-navigation-item-link {
+        padding: $menu-item-padding;
+      }
 
       &:hover {
         background-color: $profile-menu-item-hover-background-color;

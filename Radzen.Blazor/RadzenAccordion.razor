@@ -17,7 +17,7 @@
         if (!item.Visible)
             continue;
 
-        <div class="rz-accordion-header rz-state-active" @attributes="item.Attributes" style="@item.Style">
+        <div class="rz-accordion-header" @attributes="item.Attributes" style="@item.Style">
             <a @onclick="@((args) => SelectItem(item))" href="javascript:void(0)" role="tab" tabindex="0"
                id="@($"rz-accordiontab-{items.IndexOf(item)}")" aria-controls="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-expanded="true">
                 @if (IsSelected(i, item))
