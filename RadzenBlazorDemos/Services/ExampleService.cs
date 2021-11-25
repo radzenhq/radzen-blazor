@@ -386,9 +386,40 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "Tree",
-                    Path = "tree",
                     Icon = "&#xe8ef",
-                    Tags = new [] { "tree", "treeview", "nodes", "hierarchy" }
+                    Tags = new [] { "tree", "treeview", "nodes", "hierarchy" },
+                    Children = new [] {
+                        new Example
+                        {
+                            Name = "Inline definition",
+                            Path = "tree",
+                            Tags = new [] { "tree", "treeview", "nodes", "inline" },
+                        },
+                        new Example
+                        {
+                            Name = "Data-binding",
+                            Path = "tree-data-binding",
+                            Tags = new [] { "tree", "treeview", "nodes", "data", "table" },
+                        },
+                        new Example
+                        {
+                            Name = "Files and directories",
+                            Path = "tree-file-system",
+                            Tags = new [] { "tree", "treeview", "nodes", "file", "directory" },
+                        },
+                        new Example
+                        {
+                            Name = "Selection",
+                            Path = "tree-selection",
+                            Tags = new [] { "tree", "treeview", "nodes", "selection" },
+                        },
+                        new Example
+                        {
+                            Name = "Checkboxes",
+                            Path = "tree-checkboxes",
+                            Tags = new [] { "tree", "treeview", "nodes", "check" },
+                        }
+                    }
                 },
             }
         },

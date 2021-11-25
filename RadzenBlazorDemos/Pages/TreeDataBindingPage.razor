@@ -1,0 +1,71 @@
+@page "/tree-data-binding"
+@using Microsoft.EntityFrameworkCore
+@using RadzenBlazorDemos.Models.Northwind
+@inject RadzenBlazorDemos.Data.NorthwindContext Northwind
+
+<h1>Tree data-binding</h1>
+<p>Populate RadzenTree from a database via Entity Framework</p>
+<RadzenExample Name="Tree" Source="TreeDataBindingPage" Heading="false">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <h3>Data-bindinig to Categories &#8250; Products</h3>
+            <h4>(data from different tables)</h4>
+            <RadzenTree Style="height: 300px" Data=@categories>
+                <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
+                <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
+            </RadzenTree>
+        </div>
+        <div class="col-md-4 mb-4">
+            <h3>Data-bindinig to Employees</h3>
+            <h4>(data from a single self-referencing table)</h4>
+            <RadzenTree Data=@employees Style="height: 300px">
+                <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1" 
+                    Expanded=@ShouldExpand HasChildren=@(e => (e as Employee).Employees1.Any()) 
+                />
+            </RadzenTree>
+        </div>
+        <div class="col-md-4 mb-4">
+            <h3>Load children on demand</h3>
+            <h4>(populate children on parent expand)</h4>
+            <RadzenTree Data=@categories Expand=@OnExpand Style="height: 300px">
+                <RadzenTreeLevel TextProperty="CategoryName"/>
+            </RadzenTree>
+        </div>
+    </div>
+</RadzenExample>
+
+@code {
+    IEnumerable<Category> categories;
+    IEnumerable<Employee> employees;
+    
+    bool ShouldExpand(object data)
+    {
+        var employee = data as Employee;
+
+        return employee.LastName == "Fuller";
+    }
+
+    void OnExpand(TreeExpandEventArgs args)
+    {
+        var category = args.Value as Category;
+
+        args.Children.Data = category.Products;
+        args.Children.TextProperty = "ProductName";
+        args.Children.HasChildren = (product) => false;
+
+        /* Optional template
+        args.Children.Template = context => builder => {
+            builder.OpenElement(1, "strong");
+            builder.AddContent(2, (context.Value as Product).ProductName);
+            builder.CloseElement();
+        };
+        */
+    }
+
+    protected override void OnInitialized()
+    {
+        categories = Northwind.Categories.Include(c => c.Products);
+        var allEmployees = Northwind.Employees.Include(e => e.Employees1).ToList();
+        employees = allEmployees.Where(e => e.ReportsTo == null);
+    }
+}
