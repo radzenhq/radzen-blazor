@@ -218,7 +218,7 @@
                                             }
                                             else
                                             {
-                                                <label class="rz-cell-filter-label" style="height:35px">
+                                                <label class="rz-cell-filter-label" style="height:35px" onclick="event.preventDefault()">
                                                     @if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?) || column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
                                                     {
                                                         <i onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")"
