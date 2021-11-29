@@ -794,7 +794,7 @@ namespace Radzen.Blazor
         public async Task OnColumnResized(int columnIndex, double value)
         {
             var column = columns.Where(c => c.Visible).ToList()[columnIndex];
-            column.SetWidth($"{value}px");
+            column.SetWidth($"{Math.Round(value)}px");
             await ColumnResized.InvokeAsync(new DataGridColumnResizedEventArgs<TItem>
             {
                 Column = column,
