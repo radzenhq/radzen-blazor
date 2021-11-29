@@ -356,8 +356,15 @@ namespace Radzen.Blazor
             set 
             {
                 _currentDate = value;
+                CurrentDateChanged.InvokeAsync(value);
             }
         }
+
+        /// <summary>
+        /// Gets or set the current date changed callback.
+        /// </summary>
+        [Parameter]
+        public EventCallback<DateTime> CurrentDateChanged { get; set; }
 
         private DateTime StartDate
         {
