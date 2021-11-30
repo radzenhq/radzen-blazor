@@ -371,7 +371,9 @@ namespace Radzen.Blazor
 
         private string getFilterIconCss(RadzenDataGridColumn<TItem> column)
         {
-            var additionalStyle = column.GetFilterValue() != null || column.GetSecondFilterValue() != null ? "rz-grid-filter-active" : "";
+            var additionalStyle = column.GetFilterValue() != null || column.GetSecondFilterValue() != null || 
+                column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull 
+                    ? "rz-grid-filter-active" : "";
             return $"rzi rz-grid-filter-icon {additionalStyle}";
         }
 
@@ -597,6 +599,20 @@ namespace Radzen.Blazor
         /// <value>The starts with text.</value>
         [Parameter]
         public string StartsWithText { get; set; } = "Starts with";
+
+        /// <summary>
+        /// Gets or sets the not null text.
+        /// </summary>
+        /// <value>The not null text.</value>
+        [Parameter]
+        public string IsNotNullText { get; set; } = "Is not null";
+
+        /// <summary>
+        /// Gets or sets the is null text.
+        /// </summary>
+        /// <value>The null text.</value>
+        [Parameter]
+        public string IsNullText { get; set; } = "Is null";
 
         internal class NumericFilterEventCallback
         {
@@ -1053,7 +1069,8 @@ namespace Radzen.Blazor
                     Top = PageSize,
                     OrderBy = orderBy,
                     Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString,
-                    Filters = columns.Where(c => c.Filterable && c.Visible && c.GetFilterValue() != null).Select(c => new FilterDescriptor()
+                    Filters = columns.Where(c => c.Filterable && c.Visible && (c.GetFilterValue() != null 
+                        || c.FilterOperator == FilterOperator.IsNotNull || c.FilterOperator == FilterOperator.IsNull)).Select(c => new FilterDescriptor()
                     {
                         Property = c.GetFilterProperty(),
                         FilterValue = c.GetFilterValue(),

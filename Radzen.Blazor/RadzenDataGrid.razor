@@ -255,6 +255,12 @@
                                                                                 <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThanOrEquals))" style="display: block;">
                                                                                     <span>@GreaterThanOrEqualsText</span>
                                                                                 </li>
+                                                                                <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNull))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNull))" style="display: block;">
+                                                                                    <span>@IsNullText</span>
+                                                                                </li>
+                                                                                <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNotNull))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNotNull))" style="display: block;">
+                                                                                    <span>@IsNotNullText</span>
+                                                                                </li>
                                                                             </ul>
                                                                         </div>
                                                                     </div>

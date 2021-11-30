@@ -721,7 +721,15 @@ namespace Radzen
         /// <summary>
         /// Satisfied if the current value does not contain the specified value.
         /// </summary>
-        DoesNotContain
+        DoesNotContain,
+        /// <summary>
+        /// Satisfied if the current value is null.
+        /// </summary>
+        IsNull,
+        /// <summary>
+        /// Satisfied if the current value is not null.
+        /// </summary>
+        IsNotNull
     }
 
     /// <summary>

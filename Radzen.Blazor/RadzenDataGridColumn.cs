@@ -580,7 +580,9 @@ namespace Radzen.Blazor
         {
             return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
                 var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
-                return FilterPropertyType == typeof(string) ? isStringOperator || o == FilterOperator.Equals || o == FilterOperator.NotEquals : !isStringOperator;
+                return FilterPropertyType == typeof(string) ? isStringOperator 
+                    || o == FilterOperator.Equals || o == FilterOperator.NotEquals || o == FilterOperator.IsNull || o == FilterOperator.IsNotNull
+                        : !isStringOperator;
             });
         }
 
@@ -608,6 +610,10 @@ namespace Radzen.Blazor
                     return Grid?.StartsWithText;
                 case FilterOperator.NotEquals:
                     return Grid?.NotEqualsText;
+                case FilterOperator.IsNull:
+                    return Grid?.IsNullText;
+                case FilterOperator.IsNotNull:
+                    return Grid?.IsNotNullText;
                 default:
                     return $"{filterOperator}";
             }
