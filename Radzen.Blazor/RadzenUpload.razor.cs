@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,6 +86,27 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if multiple; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Multiple { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenUpload"/> is disabled.
+        /// </summary>
+        /// <value><c>true</c> if disabled; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Disabled { get; set; }
+
+        /// <summary>
+        /// Gets the choose class list.
+        /// </summary>
+        /// <value>The choose class list.</value>
+        ClassList ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button btn-secondary")
+                                              .AddDisabled(Disabled);
+
+        /// <summary>
+        /// Gets the button class list.
+        /// </summary>
+        /// <value>The button class list.</value>
+        ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only btn-light")
+                                              .AddDisabled(Disabled);
 
         /// <summary>
         /// Gets or sets the child content.
