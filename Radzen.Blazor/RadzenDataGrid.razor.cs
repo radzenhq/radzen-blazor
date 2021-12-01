@@ -785,15 +785,16 @@ namespace Radzen.Blazor
 
                 if (columnToReorder != null && columnToReorderTo != null)
                 {
-                    var actualColumnIndex = columns.IndexOf(columnToReorderTo);
+                    var actualColumnIndexFrom = columns.IndexOf(columnToReorder);
+                    var actualColumnIndexTo = columns.IndexOf(columnToReorderTo);
                     columns.Remove(columnToReorder);
-                    columns.Insert(actualColumnIndex, columnToReorder);
+                    columns.Insert(actualColumnIndexTo, columnToReorder);
 
                     await ColumnReordered.InvokeAsync(new DataGridColumnReorderedEventArgs<TItem>
                     {
                         Column = columnToReorder,
-                        OldIndex = indexOfColumnToReoder.Value,
-                        NewIndex = actualColumnIndex
+                        OldIndex = actualColumnIndexFrom,
+                        NewIndex = actualColumnIndexTo
                     });
                 }
 
