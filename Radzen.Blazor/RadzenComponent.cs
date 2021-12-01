@@ -216,6 +216,8 @@ namespace Radzen
             }
         }
 
+        internal string userAgent = "";
+
         /// <summary>
         /// Called by the Blazor runtime.
         /// </summary>
@@ -245,6 +247,8 @@ namespace Radzen
                     {
                         await JSRuntime.InvokeVoidAsync("Radzen.addMouseLeave", UniqueID, Reference);
                     }
+
+                    userAgent = await JSRuntime.InvokeAsync<string>("Radzen.userAgent");
                 }
             }
         }

@@ -51,7 +51,7 @@ namespace Radzen.Blazor
         {
             var view = AllowPaging ? PagedView : View;
             var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
-            var top = totalItemsCount > request.Count ? Math.Min(request.Count, totalItemsCount - request.StartIndex) : PageSize;
+            var top = userAgent.Contains("Firefox") ? request.Count : totalItemsCount > request.Count ? Math.Min(request.Count, totalItemsCount - request.StartIndex) : PageSize;
 
             if(top <= 0)
             {

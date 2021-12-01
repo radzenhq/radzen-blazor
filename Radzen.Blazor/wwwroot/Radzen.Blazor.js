@@ -618,6 +618,7 @@ window.Radzen = {
     }
     return popups;
   },
+  userAgent: function () { return navigator.userAgent; },
   repositionPopup: function (parent, id) {
       var popup = document.getElementById(id);
       if (!popup) return;
