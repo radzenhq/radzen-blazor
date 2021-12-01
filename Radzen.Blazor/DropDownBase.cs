@@ -729,7 +729,7 @@ namespace Radzen
                         }
                         else
                         {
-                            _view = (typeof(IQueryable).IsAssignableFrom(Data.GetType())) ? Query.Cast<object>().ToList().AsQueryable() : Query;
+                            _view = (typeof(IQueryable).IsAssignableFrom(Data.GetType())) ? (Query as IEnumerable).Cast<object>().ToList().AsQueryable() : Query;
                         }
                     }
                 }
