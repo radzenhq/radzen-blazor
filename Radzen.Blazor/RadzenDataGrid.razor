@@ -311,9 +311,12 @@
             <tbody>
                 @if (Data != null)
                 {
-                    @if (Count > 0 && columns.Count > 0)
+                    @if (Count > 0)
                     {
-                        @DrawRows(visibleColumns)
+                        if (columns.Count > 0)
+                        {
+                            @DrawRows(visibleColumns)
+                        }
                     }
                     else
                     {
