@@ -248,6 +248,8 @@ namespace Radzen.Blazor
                     descriptor = new SortDescriptor() { Property = column.Property, SortOrder = column.SortOrder.Value };
                     sorts.Add(descriptor);
                 }
+
+                StateHasChanged();
             }
         }
 
@@ -1213,18 +1215,6 @@ namespace Radzen.Blazor
                 {
                     Dispose();
                 }
-            }
-        }
-
-        /// <summary>
-        /// Called after render.
-        /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> first render.</param>
-        protected override void OnAfterRender(bool firstRender)
-        {
-            if (firstRender)
-            {
-                StateHasChanged();
             }
         }
 
