@@ -193,8 +193,8 @@ namespace Radzen.Blazor
             if (skip == Count)
             {
                 skip = pageSize * (numberOfPages - 1);
-                InvokeAsync(Reload);
-                PageChanged.InvokeAsync(new PagerEventArgs() { Skip = skip, Top = PageSize, PageIndex = CurrentPage });
+                //InvokeAsync(Reload);
+                //PageChanged.InvokeAsync(new PagerEventArgs() { Skip = skip, Top = PageSize, PageIndex = CurrentPage });
             }
         }
 
