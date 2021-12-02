@@ -11,7 +11,7 @@
 <p>This page demonstrates how to configure the Razden Blazor DataGrid for inline editing</p>
 
 <RadzenExample Name="DataGrid" Source="DataGridInLineEdit" Heading="false">
-    <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Text="Add" Click="@InsertRow" />
+    <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Text="Add" Click="@InsertRow" Disabled=@(orderToInsert != null) />
     <RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" EditMode="DataGridEditMode.Single"
                 Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow">
         <Columns>
@@ -103,13 +103,18 @@
         //orders = dbContext.Orders.Include("Customer").Include("Employee");
     }
 
-    void EditRow(Order order)
+    async Task EditRow(Order order)
     {
-        ordersGrid.EditRow(order);
+        await ordersGrid.EditRow(order);
     }
 
     void OnUpdateRow(Order order)
     {
+        if (order == orderToInsert)
+        {
+            orderToInsert = null;
+        }
+
         dbContext.Update(order);
 
         // For demo purposes only
@@ -120,13 +125,23 @@
         //dbContext.SaveChanges();
     }
 
-    void SaveRow(Order order)
+    async Task SaveRow(Order order)
     {
-        ordersGrid.UpdateRow(order);
+        if (order == orderToInsert)
+        {
+            orderToInsert = null;
+        }
+
+        await ordersGrid.UpdateRow(order);
     }
 
     void CancelEdit(Order order)
     {
+        if (order == orderToInsert)
+        {
+            orderToInsert = null;
+        }
+
         ordersGrid.CancelEditRow(order);
 
         // For production
@@ -138,8 +153,13 @@
         }
     }
 
-    void DeleteRow(Order order)
+    async Task DeleteRow(Order order)
     {
+        if (order == orderToInsert)
+        {
+            orderToInsert = null;
+        }
+
         if (orders.Contains(order))
         {
             dbContext.Remove<Order>(order);
@@ -150,7 +170,7 @@
             // For production
             //dbContext.SaveChanges();
 
-            ordersGrid.Reload();
+            await ordersGrid.Reload();
         }
         else
         {
@@ -158,9 +178,12 @@
         }
     }
 
-    void InsertRow()
+    Order orderToInsert;
+
+    async Task InsertRow()
     {
-        ordersGrid.InsertRow(new Order());
+        orderToInsert = new Order();
+        await ordersGrid.InsertRow(orderToInsert);
     }
 
     void OnCreateRow(Order order)
