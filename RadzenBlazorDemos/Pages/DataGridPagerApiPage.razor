@@ -10,9 +10,9 @@
 
 <RadzenExample Name="DataGrid" Source="DataGridPagerApi" Heading="false">
     <div style="margin-bottom: 16px">
-        <RadzenButton Click="@FirstPage" Text="First page" />
-        <RadzenButton Click="@TenthPage" Text="10th page" />
-        <RadzenButton Click="@LastPage" Text="Last page" />
+        <RadzenButton Click="@FirstPage" Text="First page" Class="mr-2" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenButton Click="@TenthPage" Text="10th page" Class="mr-2" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenButton Click="@LastPage" Text="Last page" Class="mr-2" ButtonStyle="ButtonStyle.Secondary" />
         <RadzenCheckBox @bind-Value=@showPagerSummary Name="CheckBox1" Style="margin-left: 5px;" />
         <RadzenLabel Text="Show pager summary" Component="CheckBox1" Style="margin-left: 5px;" />
     </div>
