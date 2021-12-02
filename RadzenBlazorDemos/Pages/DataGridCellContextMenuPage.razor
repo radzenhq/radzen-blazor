@@ -8,18 +8,19 @@
 <h1>DataGrid <strong>Cell context menu</strong></h1>
 
 <RadzenExample Name="DataGrid" Source="DataGridCellContextMenu" Heading="false">
+    <p>Right click on a table cell to open the context menu.</p>
     <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                 AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
                 SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees CellContextMenu="@OnCellContextMenu">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
             <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
                 <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px;" />
                     @data.FirstName @data.LastName
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
+            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
             <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
             <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
             <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
