@@ -75,7 +75,7 @@
             <span class="rz-dropdown-trigger-icon  rzi rzi-chevron-down"></span>
         </div>
         <div id="@PopupID" class="@(Multiple ? "rz-multiselect-panel" : "rz-dropdown-panel")"
-             style="display:none;min-width:320px;padding:0px;">
+             style="display:none;padding:0px;min-width:@PanelMinWidth;">
             <div class="rz-lookup-panel">
                 @if (AllowFiltering)
                 {

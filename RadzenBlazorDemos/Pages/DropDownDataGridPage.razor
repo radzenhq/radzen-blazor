@@ -13,7 +13,7 @@
                 <h3>Binding to simple collection</h3>
                 <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true"
                                         Data=@(customers.Select(c => c.CompanyName).Distinct().AsQueryable())
-                                        Change=@(args => OnChange(args, "DropDownDataGrid")) Style="width:100%" />
+                                        Change=@(args => OnChange(args, "DropDownDataGrid")) Style="width:100%"   PanelMinWidth="1000px"/>
             </div>
             <div class="col-xl-6 mb-5">
                 <h3>Filtering by all string columns</h3>

@@ -27,6 +27,12 @@ namespace Radzen.Blazor
         /// <value>The width of all columns.</value>
         [Parameter]
         public string ColumnWidth { get; set; }
+        /// <summary>
+        /// Gets or sets the minimum width of the panel.
+        /// </summary>
+        /// <value>The minimum width of the panel.</value>
+        [Parameter]
+        public string PanelMinWidth { get; set; } = "320px";
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenDropDownDataGrid{TValue}"/> is responsive.
