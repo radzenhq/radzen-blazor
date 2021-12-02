@@ -2,7 +2,9 @@
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -75,7 +77,12 @@ namespace Radzen.Blazor
                 }
             }
         }
-
+        /// <summary>
+        /// Gets or sets the 3 digits ISO currency symbol used to provide the currency symbol .
+        /// </summary>
+        /// <value>The 3 digits ISO currency symbol.</value>
+        [Parameter]
+        public string ISOCurrencySymbol { get; set; }
         /// <summary>
         /// Gets or sets the formatted value.
         /// </summary>
@@ -89,7 +96,19 @@ namespace Radzen.Blazor
                     if (Format != null)
                     {
                         decimal decimalValue = (decimal)Convert.ChangeType(Value, typeof(decimal));
-                        return decimalValue.ToString(Format);
+                        string symbol = GetCurrencySymbol(ISOCurrencySymbol);
+
+                        if (!string.IsNullOrWhiteSpace(symbol))
+                        {
+                            var myCulture = new CultureInfo(Thread.CurrentThread.CurrentCulture.Name);
+                            myCulture.NumberFormat.CurrencySymbol = symbol;
+
+                            return decimalValue.ToString(Format, myCulture);
+                        }
+                        else {
+                            return decimalValue.ToString(Format);
+
+                        }
                     }
                     return Value.ToString();
                 }
@@ -102,6 +121,31 @@ namespace Radzen.Blazor
             {
                 _ = InternalValueChanged(value);
             }
+        }
+
+        private static string GetCurrencySymbol(string ISOCurrencySymbol)
+        {
+            if (string.IsNullOrWhiteSpace(ISOCurrencySymbol))
+            {
+                return null;
+            }
+            return CultureInfo
+.GetCultures(CultureTypes.AllCultures)
+.Where(c => !c.IsNeutralCulture)
+.Select(culture =>
+{
+    try
+    {
+        return new RegionInfo(culture.Name);
+    }
+    catch
+    {
+        return null;
+    }
+})
+.Where(ri => ri != null && ri.ISOCurrencySymbol == ISOCurrencySymbol)
+.Select(ri => ri.CurrencySymbol)
+.FirstOrDefault();
         }
 
         /// <summary>
