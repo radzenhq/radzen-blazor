@@ -35,7 +35,12 @@ namespace Radzen
             var data = Data != null ? Data.Cast<object>() : Enumerable.Empty<object>();
             var view = (LoadData.HasDelegate ? data : View).Cast<object>().AsQueryable();
             var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
-            var top = userAgent.Contains("Firefox") ? request.Count : Math.Min(request.Count, totalItemsCount - request.StartIndex);
+            var top = request.Count;
+
+            if(top <= 0)
+            {
+                top = PageSize;
+            }
 
             if (LoadData.HasDelegate)
             {
