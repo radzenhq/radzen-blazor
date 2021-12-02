@@ -19,19 +19,19 @@ else
 {
     <div class="row">
         <div class="col-md-6">
-            <RadzenDataGrid ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" Data="@orders" TItem="Order" @bind-Value="@SelectedOrders">
+            <RadzenDataGrid ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" Data="@orders" TItem="Order" @bind-Value="@SelectedOrders">
                 <Columns>
-                    <RadzenDataGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
-                    <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
-                    <RadzenDataGridColumn Width="150px" TItem="Order" Property="Employee.LastName" Title="Employee">
+                    <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID" Width="120px" />
+                    <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" Width="200px" />
+                    <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee" Width="200px" >
                         <Template Context="order">
-                            <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                            <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 16px; margin-right: 6px;" />
                             @order.Employee?.FirstName @order.Employee?.LastName
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}" />
-                    <RadzenDataGridColumn TItem="Order" Property="RequiredDate" Title="Required Date" FormatString="{0:d}" />
-                    <RadzenDataGridColumn TItem="Order" Property="ShippedDate" Title="Shipped Date" FormatString="{0:d}" />
+                    <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}" Width="140px" />
+                    <RadzenDataGridColumn TItem="Order" Property="RequiredDate" Title="Required Date" FormatString="{0:d}" Width="140px" />
+                    <RadzenDataGridColumn TItem="Order" Property="ShippedDate" Title="Shipped Date" FormatString="{0:d}" Width="140px" />
                     <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
                     <RadzenDataGridColumn TItem="Order" Property="ShipCountry" Title="Ship Country" />
                 </Columns>
