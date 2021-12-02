@@ -48,6 +48,15 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowSearch { get; set; } = true;
 
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the grid columns are resizable.
+        /// </summary>
+        /// <value><c>true</c> if the grid columns are resizable; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowColumnResize { get; set; }  
+
+
         /// <summary>
         /// Gets or sets the page numbers count.
         /// </summary>
