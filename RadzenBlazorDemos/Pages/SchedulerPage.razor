@@ -2,8 +2,6 @@
 @inject DialogService DialogService
 
 <RadzenExample Name="Scheduler" AdditionalSourceCodePages=@(new List<string>() { "AddAppointmentPage.razor", "EditAppointmentPage.razor" })>
-<div class="row">
-    <div class="col-xl-6">
     <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
         TextProperty="Text" SelectedIndex="2"
         SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender>
@@ -11,12 +9,11 @@
         <RadzenWeekView />
         <RadzenMonthView />
     </RadzenScheduler>
-    </div>
-    <div class="col-xl-6">
-        <EventConsole @ref=@console />
-    </div>
-</div>
 </RadzenExample>
+
+<RadzenCard Class="mt-4">
+    <EventConsole @ref=@console />
+</RadzenCard>
 
 @code {
     RadzenScheduler<Appointment> scheduler;
