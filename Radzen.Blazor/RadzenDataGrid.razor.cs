@@ -884,6 +884,12 @@ namespace Radzen.Blazor
                             skip = Count - PageSize;
                         }
 
+                        if (Count <= PageSize)
+                        {
+                            skip = 0;
+                            CurrentPage = 0;
+                        }
+
                         StateHasChanged();
                     }
                 }
