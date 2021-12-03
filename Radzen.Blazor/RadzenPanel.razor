@@ -3,13 +3,19 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         <div class="rz-panel-titlebar">
-            <div>
-                @if (!string.IsNullOrEmpty(Icon))
-                {
-                    <i class="rzi">@((MarkupString)Icon)</i>
-                }
-                <span>@Text</span>
-            </div>
+            @if (!string.IsNullOrEmpty(Text) || !string.IsNullOrEmpty(Icon))
+            {
+                <div>
+                    @if (!string.IsNullOrEmpty(Icon))
+                    {
+                        <i class="rzi">@((MarkupString)Icon)</i>
+                    }
+                    @if (!string.IsNullOrEmpty(Text))
+                    {
+                        <span>@Text</span>
+                    }
+                </div>
+            }
             @HeaderTemplate
             @if (AllowCollapse)
             {

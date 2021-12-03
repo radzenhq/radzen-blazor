@@ -27,7 +27,9 @@
         </Columns>
     </RadzenDataGrid>
 </RadzenExample>
-<EventConsole @ref=@console />
+<RadzenCard Class="mt-4">
+    <EventConsole @ref=@console />
+</RadzenCard>
 @code {
     IEnumerable<Employee> employees;
     IList<Employee> selectedEmployees;
