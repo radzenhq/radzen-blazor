@@ -350,5 +350,24 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains($" value=\"{valueToTest.ToString(format)}\"", component.Markup);
         }
+        [Fact]
+        public void Numeric_FormattedWithCurrency()
+        {
+            using var ctx = new TestContext();
+
+            double valueToTest = 100.235;
+            string currencyToTest = "EUR";
+            string format = "c";
+
+            var component = ctx.RenderComponent<RadzenNumeric<double>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<double>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<double>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.ISOCurrencySymbol), currencyToTest)
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"100,24 &#x20AC;\"", component.Markup);
+        }
     }
 }
