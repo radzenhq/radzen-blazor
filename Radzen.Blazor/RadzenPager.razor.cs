@@ -51,6 +51,15 @@ namespace Radzen.Blazor
         public bool ShowPagingSummary { get; set; }
 
         /// <summary>
+        /// Gets or sets the pages dropdown visibility.If set to true the spans with page numbers disappear and a dropdown with a list of all pages appears.
+        /// </summary>
+        /// <value>The pages  dropdown visibility.</value>
+        [Parameter]
+        public bool ShowPagesDropDown { get; set; } 
+
+
+
+        /// <summary>
         /// Gets or sets the pager summary format.
         /// </summary>
         /// <value>The pager summary format.</value>
@@ -82,7 +91,10 @@ namespace Radzen.Blazor
                 return GetPage();
             }
         }
-
+        protected IEnumerable<int> GetAvailablePages()
+        {
+            return Enumerable.Range(1, numberOfPages);
+        }
         /// <summary>
         /// Gets the visible.
         /// </summary>
