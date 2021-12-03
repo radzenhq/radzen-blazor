@@ -5,11 +5,12 @@
 <RadzenExample Name="ContextMenu">
     <div class="row">
         <div class="col-xl-6">
-            <h3 style="margin-top: 20px;">Show context menu for Radzen component</h3>
+            <p>Right click on a button to show context menu.</p>
+            <h3 style="margin-top: 20px;">Defaul Radzen ContextMenu</h3>
             <RadzenButton Text="Show context menu" ContextMenu=@(args => ShowContextMenuWithItems(args)) />
-            <h3 style="margin-top: 20px;">Show context menu with custom content</h3>
+            <h3 style="margin-top: 20px;">Context menu with custom content</h3>
             <RadzenButton Text="Show context menu" ContextMenu=@(args => ShowContextMenuWithContent(args)) />
-            <h3 style="margin-top: 20px;">Show context menu with custom content for HTML elment</h3>
+            <h3 style="margin-top: 20px;">Context menu with custom content for HTML elment</h3>
             <button @oncontextmenu=@(args => ShowContextMenuWithContent(args)) @oncontextmenu:preventDefault="true">
                 Show context menu
             </button>
