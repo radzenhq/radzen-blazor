@@ -11,7 +11,7 @@
 
 <RadzenExample Name="DataGrid" Source="DataGridLoadData" Heading="false">
     <RadzenButton Text="Reset" Click="@Reset" Style="margin-bottom: 20px;" />
-    <RadzenDataGrid @ref="grid" Count="@count" Data="@employees" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
+    <RadzenDataGrid style="height: 335px" @ref="grid" IsLoading=@isLoading Count="@count" Data="@employees" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Employee" ColumnWidth="200px">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="60px" >
@@ -84,6 +84,7 @@ void LoadData(LoadDataArgs args)
     RadzenDataGrid<Employee> grid;
     int count;
     IEnumerable<Employee> employees;
+    bool isLoading = false;
 
     List<string> titles = new List<string> {"Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
     IEnumerable<string> selectedTitles;
@@ -102,8 +103,12 @@ void LoadData(LoadDataArgs args)
         await grid.FirstPage(true);
     }
 
-    void LoadData(LoadDataArgs args)
+    async Task LoadData(LoadDataArgs args)
     {
+        isLoading = true;
+
+        await Task.Yield();
+
         // This demo is using https://dynamic-linq.net
         var query = dbContext.Employees.AsQueryable();
 
@@ -124,5 +129,7 @@ void LoadData(LoadDataArgs args)
 
         // Perform paginv via Skip and Take.
         employees = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+        isLoading = false;
     }
 }
