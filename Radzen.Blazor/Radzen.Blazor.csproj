@@ -42,6 +42,10 @@
         <LogicalName>$(MSBuildProjectName).xml</LogicalName>
       </EmbeddedResource>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\css\" />
+  </ItemGroup>
   
   <UsingTask TaskName="RemoveSourceMap" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <Task>
@@ -63,7 +67,7 @@
     <Exec Command="dotnet tool restore" StandardOutputImportance="high" />
   </Target>
   <Target Name="PreBuild" AfterTargets="ToolRestore">
-    <!--<Exec Command="dotnet webcompiler -r themes -o wwwroot/css -z disable -m disable -p disable" StandardOutputImportance="high" />-->
+    <Exec Command="dotnet webcompiler -r themes -o wwwroot/css -z disable -m disable -p disable" StandardOutputImportance="high" />
     <ItemGroup>
       <CssFiles Include="$(MSBuildProjectDirectory)\themes\*.css" />
     </ItemGroup>

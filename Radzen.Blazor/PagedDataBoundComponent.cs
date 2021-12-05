@@ -102,6 +102,15 @@ namespace Radzen
         [Parameter]
         public bool ShowPagingSummary { get; set; } = false;
 
+
+        /// <summary>
+        /// Gets or sets the pages dropdown visibility.If set to true the spans with page numbers disappear and a dropdown with a list of all pages appears.
+        /// </summary>
+        /// <value>The pages  dropdown visibility.</value>
+        [Parameter]
+        public bool ShowPagesDropDown { get; set; }
+
+
         /// <summary>
         /// Gets or sets the pager summary format.
         /// </summary>
