@@ -410,7 +410,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 }
 
 .rz-datatable-reflow {
-  .rz-datatable-data {
+  tbody {
     td {
       > .rz-column-title {
         display: none;
@@ -691,6 +691,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
 @media (max-width: 768px) {
   .rz-datatable-reflow {
+    .rz-data-grid-data,
     .rz-datatable-tablewrapper,
     .rz-datatable-scrollable-header-box,
     .rz-datatable-scrollable-table-wrapper {
@@ -699,7 +700,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
       }
     }
 
-    .rz-datatable-thead {
+    thead {
       th {
         display: none;
       }

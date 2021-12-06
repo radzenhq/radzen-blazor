@@ -161,6 +161,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether DataGrid is responsive.
+        /// </summary>
+        /// <value><c>true</c> if DataGrid is Responsive; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Responsive { get; set; }
+
+        /// <summary>
         /// The grouped and paged View
         /// </summary>
         IEnumerable<GroupResult> _groupedPagedView;
@@ -1697,6 +1704,11 @@ namespace Radzen.Blazor
             if (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple)
             {
                 additionalClasses.Add("rz-selectable");
+            }
+
+            if (Responsive)
+            {
+                additionalClasses.Add("rz-datatable-reflow");
             }
 
             return $"rz-has-paginator rz-datatable  rz-datatable-scrollable {String.Join(" ", additionalClasses)}";
