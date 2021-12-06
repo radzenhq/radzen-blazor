@@ -1,42 +1,49 @@
 ﻿@page "/login"
 
 <RadzenExample Name="Login">
-<div class="row">
-    <div class="col-xl-6">
-        <h3>Simple login</h3>
-        <RadzenCard>
+<div class="row d-flex">
+    <div class="col-xl-4 d-flex mb-4">
+        <RadzenCard Style="width: 100%;">
+            <h2 class="mb-4">Simple login</h2>
             <RadzenTemplateForm Data=@("SimpleLogin") Action="http://www.google.com">
-                <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login=@(args => OnLogin(args, "Simple login")) Style="margin-bottom: 20px;" />
+                <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login=@(args => OnLogin(args, "Simple login")) />
             </RadzenTemplateForm>
         </RadzenCard>
-        <h3 style="margin-top: 1rem">Login with register</h3>
+    </div>
+    <div class="col-xl-4 mb-4">
         <RadzenCard>
+            <h2 class="mb-4">Login with register</h2>
             <RadzenTemplateForm Data=@("LoginWithRegister")>
             <RadzenLogin AllowResetPassword="false" 
                             Login=@(args => OnLogin(args, "Login with register")) 
-                            Register=@(args => OnRegister("Login with register")) Style="margin-bottom: 20px;" />
+                            Register=@(args => OnRegister("Login with register")) />
             </RadzenTemplateForm>
         </RadzenCard>
-        <h3 style="margin-top: 1rem">Login with register and password reset</h3>
+    </div>
+    <div class="col-xl-4 mb-4">
         <RadzenCard>
+            <h2 class="mb-4">Register and password reset</h2>
             <RadzenTemplateForm Data=@("LoginWithRegisterAndReset")>
             <RadzenLogin Login=@(args => OnLogin(args, "Login with register and password reset")) 
                             ResetPassword=@(args => OnResetPassword(args, "Login with register and password reset"))
-                            Register=@(args => OnRegister("Login with register and password reset")) Style="margin-bottom: 20px;" />
+                            Register=@(args => OnRegister("Login with register and password reset")) />
             </RadzenTemplateForm>
         </RadzenCard>
-        <h3 style="margin-top: 1rem">Login with default values</h3>
+    </div>
+    <div class="col-xl-4 mb-4">
         <RadzenCard>
+            <h2 class="mb-4">Default values</h2>
             <RadzenTemplateForm Data=@("LoginWithDefaultValues")>
             <RadzenLogin AllowRegister="true" AllowResetPassword="true" Username=@userName Password=@password
                             Login=@(args => OnLogin(args, "Login with default values"))
                             ResetPassword=@(args => OnResetPassword(args, "Login with default values"))
-                            Register=@(args => OnRegister("Login with default values"))
-                            Style="margin-bottom: 20px;" />
+                            Register=@(args => OnRegister("Login with default values")) />
             </RadzenTemplateForm>
         </RadzenCard>
-        <h3 style="margin-top: 1rem">Localization</h3>
+    </div>
+    <div class="col-xl-4 mb-4">
         <RadzenCard>
+            <h2 class="mb-4">Localization</h2>
             <RadzenTemplateForm Data=@("Localization")>
             <RadzenLogin AllowRegister="true" AllowResetPassword="true"
                             LoginText="Einloggen" UserText="Benutzername" PasswordText="Passwort"
@@ -47,16 +54,16 @@
                             ResetPasswordText="Passwort zurücksetzen"
                             Login=@(args => OnLogin(args, "Localized login"))
                             ResetPassword=@(args => OnResetPassword(args, "Localized login"))
-                            Register=@(args => OnRegister("Localized login"))
-                            Style="margin-bottom: 20px;" />
+                            Register=@(args => OnRegister("Localized login")) />
             </RadzenTemplateForm>
         </RadzenCard>
     </div>
-    <div class="col-md-6">
-        <EventConsole @ref=@console />
-    </div>
 </div>
 </RadzenExample>
+
+<RadzenCard Class="mt-4">
+    <EventConsole @ref=@console/>
+</RadzenCard>
 
 @code {
     string userName = "admin";
