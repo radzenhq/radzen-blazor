@@ -1781,6 +1781,7 @@ namespace Radzen
         public double NewSize { get; set; }
     }
 
+    /// <inheritdoc />
     public class MD5
     {
         /*
@@ -1815,12 +1816,14 @@ namespace Radzen
             0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
         };
 
+        /// <inheritdoc />
         public static uint leftRotate(uint x, int c)
         {
             return (x << c) | (x >> (32 - c));
         }
 
         // assumes whole bytes as input
+        /// <inheritdoc />
         public static string Calculate(byte[] input)
         {
             uint a0 = 0x67452301;   // A
