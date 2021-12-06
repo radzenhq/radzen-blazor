@@ -7,58 +7,53 @@
 @inject NorthwindContext dbContext
 
 <RadzenExample Name="Panel">
-<div class="row">
-    <div class="col-xl-6">
-        <h3>Panel</h3>
-        <RadzenPanel AllowCollapse="true" Style="width:600px;margin-bottom: 20px; height:500px;"
-                        Expand=@(() => Change("Panel expanded")) Collapse=@(() => Change("Panel collapsed"))>
-            <HeaderTemplate>
-                <span style="float:left;">
-                    <RadzenIcon Icon="account_box" /><b style="font-size:30px">ORDER</b>
-                </span>
-            </HeaderTemplate>
-            <ChildContent>
-                <RadzenDataList PageSize="1" WrapItems="true" AllowPaging="true" 
-                                Data="@orders" TItem="Order">
+    <RadzenPanel AllowCollapse="true" Style="width: 700px; margin: 40px auto;"
+                    Expand=@(() => Change("Panel expanded")) Collapse=@(() => Change("Panel collapsed")) >
+        <HeaderTemplate>
+            <h4 class="m-0 d-flex align-items-center">
+                <RadzenIcon Icon="account_box" Class="mr-1" /><b>Orders</b>
+            </h4>
+        </HeaderTemplate>
+        <ChildContent>
+            <RadzenCard Class="mt-3">
+                <RadzenDataList PageSize="4" WrapItems="true" AllowPaging="true" 
+                                Data="@orders" TItem="Order" >
                     <Template Context="order">
-                        <RadzenCard Style="width:300px;height:300px">
+                        <RadzenCard Style="width: 250px">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div>Company:</div>
-                                    <b>@order.Customer?.CompanyName</b>
-                                    <div style="margin-top:20px">Employee:</div>
-                                    <b>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</b>
-                                    <br />
-                                    <RadzenImage Path="@order.Employee?.Photo" Style="width:100px;" />
-                                </div>
-                                <div class="col-md-6">
-                                    <div>Freight:</div>
-                                    <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)</b>
-                                    <div style="margin-top:20px">Ship country:</div>
-                                    <b>@(order.ShipCountry)</b>
-                                    <div style="margin-top:20px">Ship city:</div>
-                                    <b>@(order.ShipCity)</b>
-                                    <div style="margin-top:20px">Ship name:</div>
+                                <div class="col-md-8 text-truncate">
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") Class="mr-1" />
                                     <b>@(order.ShipName)</b>
                                 </div>
+                                <div class="col-md-4 text-right">
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
+                                </div>
                             </div>
-
+                            <hr style="border: none; background-color: rgba(0,0,0,.08); height: 1px; margin: 1rem 0;" />
+                            <div class="d-flex flex-row align-items-center">
+                                <RadzenImage Path="@order.Employee?.Photo" Class="rounded-circle float-left mr-3" Style="width: 80px; height: 80px;" />
+                                <div>
+                                    <h4 class="mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</h4>
+                                    <div>@order.ShipAddress</div>
+                                    <div style="font-size: .8em">@(order.ShipCity), @(order.ShipCountry)</div>
+                                </div>
+                            </div>
                         </RadzenCard>
                     </Template>
                 </RadzenDataList>
-            </ChildContent>
-            <SummaryTemplate>
-                <RadzenCard>
-                    @orders.Count() Orders
-                </RadzenCard>
-            </SummaryTemplate>
-        </RadzenPanel>
-    </div>
-    <div class="col-xl-6">
-        <EventConsole @ref=@console />
-    </div>
-</div>
+            </RadzenCard>
+        </ChildContent>
+        <SummaryTemplate>
+            <RadzenCard class="mt-3">
+                <b>@orders.Count() Orders</b>
+            </RadzenCard>
+        </SummaryTemplate>
+    </RadzenPanel>
 </RadzenExample>
+
+<RadzenCard class="mt-4">
+    <EventConsole @ref=@console />
+</RadzenCard>
 
 @code {
     EventConsole console;
