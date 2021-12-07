@@ -6,7 +6,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12 my-5">
-                <label>Smooth <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox></label>
+                <RadzenLabel Text="Smooth" For="smooth" /><RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
                 <RadzenChart>
                     <RadzenAreaSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">
                     </RadzenAreaSeries>
