@@ -10,9 +10,9 @@
         <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
         <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
     </RadzenTree>
-    <EventConsole @ref=@console />
 </RadzenExample>
 
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     IEnumerable<Category> categories;

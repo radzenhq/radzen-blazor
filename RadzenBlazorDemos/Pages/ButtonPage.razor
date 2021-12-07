@@ -72,11 +72,6 @@
             <RadzenButton style="width: 160px" Icon="save" BusyText="Saving ..." IsBusy=@busy Click=@OnBusyClick Text="Save" />
         </div>
     </div>
-    <div class="row">
-        <div class="col">
-            <EventConsole @ref=@console />
-        </div>
-    </div>
 </div>
 <style>
     .button-demo .rz-button {
@@ -84,6 +79,8 @@
     }
 </style>
 </RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     EventConsole console;
