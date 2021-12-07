@@ -1,8 +1,8 @@
 ﻿@page "/login"
 
 <RadzenExample Name="Login">
-<div class="row d-flex">
-    <div class="col-xl-4 d-flex mb-4">
+<div class="row d-flex px-3">
+    <div class="col-xl-4 d-flex p-3">
         <RadzenCard Style="width: 100%;">
             <h2 class="mb-4">Simple login</h2>
             <RadzenTemplateForm Data=@("SimpleLogin") Action="http://www.google.com">
@@ -10,7 +10,7 @@
             </RadzenTemplateForm>
         </RadzenCard>
     </div>
-    <div class="col-xl-4 mb-4">
+    <div class="col-xl-4 p-3">
         <RadzenCard>
             <h2 class="mb-4">Login with register</h2>
             <RadzenTemplateForm Data=@("LoginWithRegister")>
@@ -20,7 +20,7 @@
             </RadzenTemplateForm>
         </RadzenCard>
     </div>
-    <div class="col-xl-4 mb-4">
+    <div class="col-xl-4 p-3">
         <RadzenCard>
             <h2 class="mb-4">Register and password reset</h2>
             <RadzenTemplateForm Data=@("LoginWithRegisterAndReset")>
@@ -30,7 +30,7 @@
             </RadzenTemplateForm>
         </RadzenCard>
     </div>
-    <div class="col-xl-4 mb-4">
+    <div class="col-xl-4 p-3">
         <RadzenCard>
             <h2 class="mb-4">Default values</h2>
             <RadzenTemplateForm Data=@("LoginWithDefaultValues")>
@@ -41,7 +41,7 @@
             </RadzenTemplateForm>
         </RadzenCard>
     </div>
-    <div class="col-xl-4 mb-4">
+    <div class="col-xl-4 p-3">
         <RadzenCard>
             <h2 class="mb-4">Localization</h2>
             <RadzenTemplateForm Data=@("Localization")>
@@ -61,9 +61,7 @@
 </div>
 </RadzenExample>
 
-<RadzenCard Class="mt-4">
-    <EventConsole @ref=@console/>
-</RadzenCard>
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     string userName = "admin";

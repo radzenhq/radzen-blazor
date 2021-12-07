@@ -7,29 +7,35 @@
 <p>Populate RadzenTree from a database via Entity Framework</p>
 <RadzenExample Name="Tree" Source="TreeDataBindingPage" Heading="false">
     <div class="row">
-        <div class="col-md-4 mb-4">
-            <h3>Data-bindinig to Categories &#8250; Products</h3>
-            <h4>(data from different tables)</h4>
-            <RadzenTree Style="height: 300px" Data=@categories>
-                <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
-                <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
-            </RadzenTree>
+        <div class="col-md-4">
+            <RadzenCard>
+                <h3>Data-bindinig to Categories &#8250; Products</h3>
+                <p class="mb-3">Data from different tables.</p>
+                <RadzenTree Style="height: 300px" Data=@categories>
+                    <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
+                    <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
+                </RadzenTree>
+            </RadzenCard>
         </div>
-        <div class="col-md-4 mb-4">
-            <h3>Data-bindinig to Employees</h3>
-            <h4>(data from a single self-referencing table)</h4>
-            <RadzenTree Data=@employees Style="height: 300px">
-                <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1" 
-                    Expanded=@ShouldExpand HasChildren=@(e => (e as Employee).Employees1.Any()) 
-                />
-            </RadzenTree>
+        <div class="col-md-4">
+            <RadzenCard>
+                <h3>Data-bindinig to Employees</h3>
+                <p class="mb-3">Data from a single self-referencing table.</p>
+                <RadzenTree Data=@employees Style="height: 300px">
+                    <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1" 
+                        Expanded=@ShouldExpand HasChildren=@(e => (e as Employee).Employees1.Any()) 
+                    />
+                </RadzenTree>
+            </RadzenCard>
         </div>
-        <div class="col-md-4 mb-4">
-            <h3>Load children on demand</h3>
-            <h4>(populate children on parent expand)</h4>
-            <RadzenTree Data=@categories Expand=@OnExpand Style="height: 300px">
-                <RadzenTreeLevel TextProperty="CategoryName"/>
-            </RadzenTree>
+        <div class="col-md-4">
+            <RadzenCard>
+                <h3>Load children on demand</h3>
+                <p class="mb-3">Populate children on parent expand.</p>
+                <RadzenTree Data=@categories Expand=@OnExpand Style="height: 300px">
+                    <RadzenTreeLevel TextProperty="CategoryName"/>
+                </RadzenTree>
+            </RadzenCard>
         </div>
     </div>
 </RadzenExample>

@@ -1,10 +1,24 @@
 ﻿@page "/link"
 
 <RadzenExample Name="Link">
-<h3>Link to path in application</h3>
-<RadzenLink Path="buttons" Text="Go to Buttons page" />
-<h3 style="margin-top:20px">Link to path in application with icon</h3>
-<RadzenLink Icon="accessibility" Path="button" Text="Go to the Button component page" />
-<h3 style="margin-top:20px">Link to url</h3>
-<RadzenLink Path="https://www.radzen.com" Text="Go to url" target="_blank" />
+    <div class="row px-3">
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4 class="mb-3">Link to path in application</h4>
+                <RadzenLink Path="buttons" Text="Go to Buttons page" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4 class="mb-3">Link to path in application with icon</h4>
+                <RadzenLink Icon="accessibility" Path="button" Text="Go to the Button component page" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4 class="mb-3">Link to url</h4>
+                <RadzenLink Path="https://www.radzen.com" Text="Go to url" target="_blank" />
+            </RadzenCard>
+        </div>
+    </div>
 </RadzenExample>

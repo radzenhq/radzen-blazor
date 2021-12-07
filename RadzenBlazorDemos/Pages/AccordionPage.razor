@@ -1,10 +1,10 @@
 ﻿@page "/accordion"
 
 <RadzenExample Name="Accordion">
-<div class="row p-5" style="min-height: 300px;">
-    <div class="col-xl-6">
+<div class="row px-3" style="min-height: 200px;">
+    <div class="col-xl-6 p-3">
         <RadzenCard>
-            <h3>Accordion with single expand</h3>
+            <h4>Accordion with single expand</h4>
             <RadzenAccordion Expand=@(args => Change(args, "Accordion with single expand", "expanded"))>
                 <Items>
                     <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
@@ -20,9 +20,9 @@
             </RadzenAccordion>
         </RadzenCard>
     </div>
-    <div class="col-xl-6">
+    <div class="col-xl-6 p-3">
         <RadzenCard>
-            <h3>Accordion with multiple expand</h3>
+            <h4>Accordion with multiple expand</h4>
             <RadzenAccordion Multiple="true" Collapse=@(args => Change(args, "Accordion with multiple expand", "collapsed"))
                                 Expand=@(args => Change(args, "Accordion with multiple expand", "expanded"))>
                 <Items>
@@ -41,7 +41,9 @@
     </div>
 </div>
 </RadzenExample>
-<EventConsole @ref=@console Class="mt-3" />
+
+<EventConsole @ref=@console Class="mt-4" />
+
 @code {
     EventConsole console;
     void Change(object value, string name, string action)

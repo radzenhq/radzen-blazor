@@ -3,23 +3,32 @@
 @inject ContextMenuService ContextMenuService
 
 <RadzenExample Name="ContextMenu">
+    <p>Right click on a button to show context menu.</p>
     <div class="row">
-        <div class="col-xl-6">
-            <p>Right click on a button to show context menu.</p>
-            <h3 style="margin-top: 20px;">Defaul Radzen ContextMenu</h3>
-            <RadzenButton Text="Show context menu" ContextMenu=@(args => ShowContextMenuWithItems(args)) />
-            <h3 style="margin-top: 20px;">Context menu with custom content</h3>
-            <RadzenButton Text="Show context menu" ContextMenu=@(args => ShowContextMenuWithContent(args)) />
-            <h3 style="margin-top: 20px;">Context menu with custom content for HTML elment</h3>
-            <button @oncontextmenu=@(args => ShowContextMenuWithContent(args)) @oncontextmenu:preventDefault="true">
-                Show context menu
-            </button>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4 class="mb-3">Defaul Radzen ContextMenu</h4>
+                <RadzenButton Text="Show context menu" ContextMenu=@(args => ShowContextMenuWithItems(args)) ButtonStyle="ButtonStyle.Secondary"  />
+            </RadzenCard>
         </div>
-        <div class="col-xl-6">
-            <EventConsole @ref=@console />
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4 class="mb-3">Custom content</h4>
+                <RadzenButton Text="Show context menu" ContextMenu=@(args => ShowContextMenuWithContent(args)) ButtonStyle="ButtonStyle.Secondary" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4 class="mb-3">Custom content for HTML elment</h4>
+                <button @oncontextmenu=@(args => ShowContextMenuWithContent(args)) @oncontextmenu:preventDefault="true">
+                    Show context menu
+                </button>
+            </RadzenCard>
         </div>
     </div>
 </RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     EventConsole console;
