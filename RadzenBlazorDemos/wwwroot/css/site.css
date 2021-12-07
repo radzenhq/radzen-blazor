@@ -84,42 +84,24 @@ margin-right: 8px;
 text-decoration: none;
 }
 
-.console {
-    height: 400px;
-    margin: 16px 0;
-    border: 1px solid rgba(0,0,0,0.1);
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    padding: 0 0 16px 0;
-}
-
 .console-content {
-    flex: 1;
+    height: 230px;
     overflow: auto;
 }
 
 .console-header {
     display: flex;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    padding: 16px;
-}
-.console-title {
-    flex: 1;
-    text-align: left;
-    font-size: 18px;
-    font-weight: 600;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    padding: 0 0 16px 0;
 }
 
-.console-clear {
-    appearance: none;
-    border: none;
-    outline: none !important;
-    background: transparent;
+.console-title {
+    flex: 1;
+    margin: 0 !important;
 }
 
 .console-message {
-    margin: 8px;
+    margin: 8px 0;
     padding: 4px 0;
     display: flex;
     align-items: baseline;
