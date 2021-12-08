@@ -765,12 +765,12 @@ namespace Radzen.Blazor
         {
             if (ShowTimeOkButton)
             {
-                CurrentDate = new DateTime(CurrentDate.Year, newValue.Month,newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
+                CurrentDate = new DateTime(newValue.Year, newValue.Month,newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
                 await OkClick();
             }
             else
             {
-                var v = new DateTime(CurrentDate.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
+                var v = new DateTime(newValue.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
                 if (v != DateTimeValue)
                 {
                     DateTimeValue = v;
