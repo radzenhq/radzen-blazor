@@ -1,29 +1,54 @@
 ﻿@page "/numeric"
 
 <RadzenExample Name="Numeric">
-    <div class="row">
-        <div class="col-xl-6">
-            <h3>Numeric</h3>
-            <RadzenNumeric TValue="int" Change=@(args => OnChange(args, "Numeric")) />
-            <h3 style="margin-top: 2rem">Numeric with Min set to 1 and Max set to 10</h3>
-            <RadzenNumeric TValue="int" Min="1" Max="10" Change=@(args => OnChange(args, "Numeric with Min set to 1 and Max set to 10")) />
-            <h3 style="margin-top: 2rem">Numeric with placeholder and 0.5 step</h3>
-            <RadzenNumeric TValue="double" Placeholder="0.0" Step="0.5" Change=@(args => OnChange(args, "Numeric with placeholder and 0.5 step")) />
-            <h3 style="margin-top: 2rem">Nullable numeric</h3>
-            <RadzenNumeric TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" Change=@(args => OnChange(args, "Nullable numeric")) />
-            <h3 style="margin-top: 2rem">Disabled numeric</h3>
-            <RadzenNumeric Disabled="true" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" />
-            <h3 style="margin-top: 2rem">Without Up/Down</h3>
-            <RadzenNumeric ShowUpDown="false" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Without Up/Down"))" />
-            <h3 style="margin-top: 2rem">Formatted Value</h3>
-            <RadzenNumeric TValue="double" Format="0.0000" @bind-Value=@dblValue Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Formatted numeric"))" />
-            <RadzenNumeric TValue="double" Format="c" @bind-Value=@dblValue Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Formatted numeric"))" />
+    <div class="row px-3">
+        <div class="col-lg-3 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Default Numeric</h4>
+                <RadzenNumeric TValue="int" Change=@(args => OnChange(args, "Numeric")) Class="w-100" />
+            </RadzenCard>
         </div>
-        <div class="col-xl-6">
-            <EventConsole @ref=@console />
+        <div class="col-lg-3 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Min set to 1 and Max set to 10</h4>
+                <RadzenNumeric TValue="int" Min="1" Max="10" Change=@(args => OnChange(args, "Numeric with Min set to 1 and Max set to 10")) Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-lg-3 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Placeholder and 0.5 step</h4>
+                <RadzenNumeric TValue="double" Placeholder="0.0" Step="0.5" Change=@(args => OnChange(args, "Numeric with placeholder and 0.5 step")) Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-lg-3 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Nullable numeric</h4>
+                <RadzenNumeric TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" Change=@(args => OnChange(args, "Nullable numeric")) Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-lg-3 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Disabled numeric</h4>
+                <RadzenNumeric Disabled="true" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-lg-3 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Without Up/Down</h4>
+                <RadzenNumeric ShowUpDown="false" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Without Up/Down"))" Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-lg-6 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Formatted Value</h4>
+                <RadzenNumeric TValue="double" Format="0.0000" @bind-Value=@dblValue Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Formatted numeric"))" Class="mr-1" />
+                <RadzenNumeric TValue="double" Format="c" @bind-Value=@dblValue Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Formatted numeric"))" />
+            </RadzenCard>
         </div>
     </div>
 </RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     int? value;

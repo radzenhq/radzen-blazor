@@ -4,24 +4,24 @@
 
 <RadzenExample Name="ContextMenu">
     <p>Right click on a button to show context menu.</p>
-    <div class="row">
+    <div class="row px-3">
         <div class="col-md-4 p-3">
             <RadzenCard>
                 <h4 class="mb-3">Defaul Radzen ContextMenu</h4>
-                <RadzenButton Text="Show context menu" ContextMenu=@(args => ShowContextMenuWithItems(args)) ButtonStyle="ButtonStyle.Secondary"  />
+                <RadzenButton Text="Right click me" ContextMenu=@(args => ShowContextMenuWithItems(args)) ButtonStyle="ButtonStyle.Secondary"  />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
                 <h4 class="mb-3">Custom content</h4>
-                <RadzenButton Text="Show context menu" ContextMenu=@(args => ShowContextMenuWithContent(args)) ButtonStyle="ButtonStyle.Secondary" />
+                <RadzenButton Text="Right click me" ContextMenu=@(args => ShowContextMenuWithContent(args)) ButtonStyle="ButtonStyle.Secondary" />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
                 <h4 class="mb-3">Custom content for HTML elment</h4>
                 <button @oncontextmenu=@(args => ShowContextMenuWithContent(args)) @oncontextmenu:preventDefault="true">
-                    Show context menu
+                    Right click me
                 </button>
             </RadzenCard>
         </div>
