@@ -63,6 +63,8 @@ $splitbutton-menu-button-border: 1px solid #475359;
 $splitter-bar-background-color-active: #598087 !default;
 
 @import 'bootstrap';
+$bootstrap: true;
+
 @import 'fonts';
 @import 'typography';
 @import 'components';

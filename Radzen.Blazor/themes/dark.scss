@@ -265,6 +265,8 @@ $splitter-bar-background-color: #4A5A63 !default;
 $splitter-bar-hover-opacity: 0.8 !default;
 
 @import 'bootstrap';
+$bootstrap: true;
+
 @import 'fonts';
 @import 'typography';
 @import 'components';

@@ -60,6 +60,8 @@ $radio-checked-hover-background-color: $secondary-hover;
 $splitter-bar-background-color-active: #3BA5FC !default;
 
 @import 'bootstrap';
+$bootstrap: true;
+
 @import 'fonts';
 @import 'typography';
 @import 'components';

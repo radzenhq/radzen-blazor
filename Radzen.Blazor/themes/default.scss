@@ -35,6 +35,8 @@ $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
   'Segoe UI Emoji', 'Segoe UI Symbol' !default;
 
 @import 'bootstrap';
+$bootstrap: true;
+
 @import 'fonts';
 @import 'typography';
 @import 'components';
