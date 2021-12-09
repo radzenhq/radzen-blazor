@@ -12,7 +12,7 @@
         }
         <div class="rz-colorpicker-value" style="background-color: @Color" ></div>
         <button type="button" tabindex="-1" class="rz-colorpicker-trigger" disabled=@Disabled @onclick:preventDefault><i class="rzi" /></button>
-        <Popup @ref=@Popup class="rz-colorpicker-popup" Close=@Close Open=@Open>
+        <Popup Lazy=@Lazy @ref=@Popup class="rz-colorpicker-popup" Close=@Close Open=@Open>
             @if (ShowHSV)
             {
                 <Draggable class="rz-saturation-picker rz-colorpicker-section" style=@($"background-color: {HSV.ToRGB().ToCSS()}") Drag=@OnSaturationMove>

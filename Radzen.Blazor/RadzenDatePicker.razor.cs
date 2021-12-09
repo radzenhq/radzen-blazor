@@ -978,5 +978,15 @@ namespace Radzen.Blazor
 
             return base.OnAfterRenderAsync(firstRender);
         }
+
+        Popup popup;
+
+        [Parameter]
+        public bool Lazy { get; set; }
+
+        async Task OnToggle()
+        {
+            await popup.ToggleAsync(Element);
+        }
     }
 }

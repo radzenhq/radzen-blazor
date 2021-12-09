@@ -1,10 +1,16 @@
 @inherits RadzenComponent
 @using Microsoft.JSInterop
 <div @ref=@Element @onmousedown:preventDefault @attributes=@Attributes style=@Style id=@GetId()>
-    @ChildContent
+    @if (open || !Lazy)
+    {
+        @ChildContent
+    }
 </div>
 @code {
     bool open;
+
+    [Parameter]
+    public bool Lazy { get; set; }
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }

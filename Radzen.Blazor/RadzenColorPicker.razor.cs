@@ -321,6 +321,9 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
+        [Parameter]
+        public bool Lazy { get; set; }
+
         double SaturationHandleLeft { get; set; }
         double HueHandleLeft { get; set; }
         double AlphaHandleLeft { get; set; } = 1;
