@@ -798,6 +798,7 @@ namespace Radzen.Blazor
             Close();
         }
 
+        bool shouldRenderPopup = false;
         private string getOpenPopup()
         {
             return !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";

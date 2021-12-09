@@ -17,7 +17,7 @@
                 <input @ref="@input" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@TabIndex"
                        @onchange="@ParseDate" autocomplete="off" type="text" 
                        class="rz-inputtext @InputClass" id="@Name" placeholder="@Placeholder" />
-                <button onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
+                <button @onmousedown=@(() => shouldRenderPopup = true) onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
                     <span aria-hidden="true" class="rz-button-icon-left  rzi rzi-calendar"></span><span class="rz-button-text"></span>
                 </button>
                 @if (AllowClear && HasValue)
@@ -26,111 +26,116 @@
                 }
             </span>
         }
-        <div id="@PopupID" style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")" @onclick:preventDefault="true">
-            <div class="rz-datepicker-group">
-                @if (!TimeOnly)
-                {
-                    <div class="rz-datepicker-header">
-                        <a href="javascript:void(0)" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { CurrentDate = CurrentDate.AddMonths(-1); } })">
-                            <span class="rz-datepicker-prev-icon rzi rzi-chevron-left"></span>
-                        </a>
-                        <a href="javascript:void(0)" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { CurrentDate = CurrentDate.AddMonths(1); } })">
-                            <span class="rz-datepicker-next-icon rzi rzi-chevron-right"></span>
-                        </a>
-                        <div class="rz-datepicker-title" style="height:40px;">
-                            <RadzenDropDown @ref="monthDropDown" Style="height:auto;width:120px;margin-top:5px;text-align:left;" TabIndex="-1"
+        @if (shouldRenderPopup || Inline)
+        {
+            <div id="@PopupID" style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")" @onclick:preventDefault="true">
+                <div class="rz-datepicker-group">
+                    @if (!TimeOnly)
+                    {
+                        <div class="rz-datepicker-header">
+                            <a href="javascript:void(0)" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { CurrentDate = CurrentDate.AddMonths(-1); } })">
+                                <span class="rz-datepicker-prev-icon rzi rzi-chevron-left"></span>
+                            </a>
+                            <a href="javascript:void(0)" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { CurrentDate = CurrentDate.AddMonths(1); } })">
+                                <span class="rz-datepicker-next-icon rzi rzi-chevron-right"></span>
+                            </a>
+                            <div class="rz-datepicker-title" style="height:40px;">
+                                <RadzenDropDown @ref="monthDropDown" Style="height:auto;width:120px;margin-top:5px;text-align:left;" TabIndex="-1"
                                             TValue="int" Value="@CurrentDate.Month" Disabled="@Disabled" Data="@months" TextProperty="Name" ValueProperty="Value"
                                             Change="@((args) => { SetMonth(int.Parse(args.ToString())); })" />
-                            <RadzenDropDown @ref="yearDropDown" Style="height:auto;width:80px;margin-top:5px;text-align:left;" TabIndex="-1"
+                                <RadzenDropDown @ref="yearDropDown" Style="height:auto;width:80px;margin-top:5px;text-align:left;" TabIndex="-1"
                                             TValue="int" Value="@CurrentDate.Year" Disabled="@Disabled" Data="@years" TextProperty="Name" ValueProperty="Value"
                                             Change="@((args) => { SetYear(int.Parse(args.ToString())); })" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="rz-datepicker-calendar-container">
-                        <table class="rz-datepicker-calendar" style="@(Inline ? "" : "width:100%")">
-                            <thead>
-                                <tr>
-                                    @foreach (var day in AbbreviatedDayNames)
-                                    {
-                                        <th scope="col">
-                                            <span>@day</span>
-                                        </th>
-                                    }
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @{int dayNumber = 0;}
-                                @for (int i = 0; i < 6; i++)
-                                {
+                        <div class="rz-datepicker-calendar-container">
+                            <table class="rz-datepicker-calendar" style="@(Inline ? "" : "width:100%")">
+                                <thead>
                                     <tr>
-                                        @for (int j = 0; j < 7; j++)
+                                        @foreach (var day in AbbreviatedDayNames)
                                         {
-                                            DateTime date = StartDate.AddDays(dayNumber++);
-                                            var dateArgs = DateAttributes(date);
-
-                                            @if (CurrentDate.Month == date.Month)
-                                            {
-                                                <td @attributes="@(dateArgs.Attributes)" onmouseup=@(Inline || ShowTime ? "" : $"Radzen.closePopup('{PopupID}')")
-                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
-                                                    <span class=@($"rz-state-default{(DateTimeValue.HasValue && DateTimeValue.Value.Year == date.Year && DateTimeValue.Value.Month == date.Month && DateTimeValue.Value.Day == date.Day ? " rz-state-active" : "")}{(!dateArgs.Disabled ? "" : " rz-state-disabled")}")>@date.Day</span>
-                                                </td>
-                                            }
-                                            else
-                                            {
-                                                <td @attributes="@(dateArgs.Attributes)" class="rz-datepicker-other-month" onmouseup=@(Inline || ShowTime ? "" : $"Radzen.closePopup('{PopupID}')")
-                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
-                                                    <span class="rz-state-default rz-state-disabled">@date.Day</span>
-                                                </td>
-                                            }
+                                            <th scope="col">
+                                                <span>@day</span>
+                                            </th>
                                         }
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int dayNumber = 0;
+                                    }
+                                    @for (int i = 0; i < 6; i++)
+                                    {
+                                        <tr>
+                                            @for (int j = 0; j < 7; j++)
+                                            {
+                                                DateTime date = StartDate.AddDays(dayNumber++);
+                                                var dateArgs = DateAttributes(date);
+
+                                                @if (CurrentDate.Month == date.Month)
+                                                {
+                                                    <td @attributes="@(dateArgs.Attributes)" onmouseup=@(Inline || ShowTime ? "" : $"Radzen.closePopup('{PopupID}')")
+                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
+                                                        <span class=@($"rz-state-default{(DateTimeValue.HasValue && DateTimeValue.Value.Year == date.Year && DateTimeValue.Value.Month == date.Month && DateTimeValue.Value.Day == date.Day ? " rz-state-active" : "")}{(!dateArgs.Disabled ? "" : " rz-state-disabled")}")>@date.Day</span>
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td @attributes="@(dateArgs.Attributes)" class="rz-datepicker-other-month" onmouseup=@(Inline || ShowTime ? "" : $"Radzen.closePopup('{PopupID}')")
+                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
+                                                        <span class="rz-state-default rz-state-disabled">@date.Day</span>
+                                                    </td>
+                                                }
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+                @if (ShowTime)
+                {
+                    <div class="rz-timepicker">
+                        <RadzenNumeric TValue="int" Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)" 
+                           Min="@(HourFormat == "12" ? 1 : -1)" Max="@(HourFormat == "12" ? 12 : 24)" TValue="double" Step="@HoursStep"
+                           Change="@UpdateHour" class="rz-hour-picker" @oninput=@OnUpdateHourInput />
+                        <div class="rz-separator">
+                            <span>:</span>
+                        </div>
+                        <RadzenNumeric TValue="int" Disabled="@Disabled" Value="CurrentDate.Minute" TValue="double" Step="@MinutesStep" Min="0" Max="59"
+                           Change="@UpdateMinutes" class="rz-minute-picker" @oninput=@OnUpdateHourMinutes />
+                        @if (ShowSeconds)
+                        {
+                            <div class="rz-separator">
+                                <span>:</span>
+                            </div>
+                            <RadzenNumeric TValue="int" Disabled="@Disabled" Value="CurrentDate.Second" TValue="double" Step="@SecondsStep" Min="0" Max="59"
+                               Change="@UpdateSeconds" class="rz-second-picker" @oninput=@OnUpdateHourSeconds />
+                        }
+                        @if (HourFormat == "12")
+                        {
+                            <div class="rz-ampm-picker">
+                                <a href="javascript:void(0)" @onclick="@AmToPm">
+                                    <span class="rzi rzi-chevron-up"></span>
+                                </a>
+                                <span>@CurrentDate.ToString("tt")</span>
+                                <a href="javascript:void(0)" @onclick="@PmToAm">
+                                    <span class="rzi rzi-chevron-down"></span>
+                                </a>
+                            </div>
+                        }
+                        @if (ShowTimeOkButton)
+                        {
+                            <button type="button" class="rz-button rz-button-md btn-secondary" style="width:60px;padding:0px;margin-left:10px;"
+                        @onclick="@OkClick"
+                        onmouseup="@($"Radzen.closePopup('{PopupID}')")">
+                                <span class="rz-button-text">Ok</span>
+                            </button>
+                        }
                     </div>
                 }
             </div>
-            @if (ShowTime)
-            {
-        <div class="rz-timepicker">
-            <RadzenNumeric TValue="int" Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)" 
-                           Min="@(HourFormat == "12" ? 1 : -1)" Max="@(HourFormat == "12" ? 12 : 24)" TValue="double" Step="@HoursStep"
-                           Change="@UpdateHour" class="rz-hour-picker" @oninput=@OnUpdateHourInput />
-            <div class="rz-separator">
-                <span>:</span>
-            </div>
-            <RadzenNumeric TValue="int" Disabled="@Disabled" Value="CurrentDate.Minute" TValue="double" Step="@MinutesStep" Min="0" Max="59"
-                           Change="@UpdateMinutes" class="rz-minute-picker" @oninput=@OnUpdateHourMinutes />
-            @if (ShowSeconds)
-            {
-                <div class="rz-separator">
-                    <span>:</span>
-                </div>
-                <RadzenNumeric TValue="int" Disabled="@Disabled" Value="CurrentDate.Second" TValue="double" Step="@SecondsStep" Min="0" Max="59"
-                               Change="@UpdateSeconds" class="rz-second-picker" @oninput=@OnUpdateHourSeconds />
-            }
-            @if (HourFormat == "12")
-            {
-                <div class="rz-ampm-picker">
-                    <a href="javascript:void(0)" @onclick="@AmToPm">
-                        <span class="rzi rzi-chevron-up"></span>
-                    </a>
-                    <span>@CurrentDate.ToString("tt")</span>
-                    <a href="javascript:void(0)" @onclick="@PmToAm">
-                        <span class="rzi rzi-chevron-down"></span>
-                    </a>
-                </div>
-            }
-            @if (ShowTimeOkButton)
-            {
-                <button type="button" class="rz-button rz-button-md btn-secondary" style="width:60px;padding:0px;margin-left:10px;"
-                        @onclick="@OkClick"
-                        onmouseup="@($"Radzen.closePopup('{PopupID}')")">
-                    <span class="rz-button-text">Ok</span>
-                </button>
-            }
-        </div>
-            }
-        </div>
+        }
     </div>
 }
