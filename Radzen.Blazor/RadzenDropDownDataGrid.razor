@@ -9,7 +9,7 @@
 
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()"  @onmousedown=@(() => shouldRenderPopup = true) 
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()"
          style="@Style" tabindex="@TabIndex" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" style="width:100%" aria-haspopup="listbox" readonly="" type="text"
@@ -74,8 +74,7 @@
         <div class="rz-dropdown-trigger  rz-corner-right" onclick="@OpenPopupScript()">
             <span class="rz-dropdown-trigger-icon  rzi rzi-chevron-down"></span>
         </div>
-        @if(shouldRenderPopup)
-        {
+
         <div id="@PopupID" class="@(Multiple ? "rz-multiselect-panel" : "rz-dropdown-panel")"
              style="display:none;min-width:320px;padding:0px;">
             <div class="rz-lookup-panel">
@@ -139,7 +138,7 @@
                 }
             </div>
         </div>
-        }
+
         @if (AllowClear && (!Multiple && HasValue || Multiple && selectedItems.Count > 0))
         {
             <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear"></i>

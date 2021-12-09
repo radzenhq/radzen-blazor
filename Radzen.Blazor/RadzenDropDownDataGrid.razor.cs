@@ -137,8 +137,6 @@ namespace Radzen.Blazor
         /// </summary>
         protected ElementReference popup;
 
-        internal bool shouldRenderPopup = false;
-
         /// <summary>
         /// Called when [after render asynchronous].
         /// </summary>

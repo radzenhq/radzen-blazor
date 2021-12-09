@@ -160,8 +160,6 @@ namespace Radzen.Blazor
             }
         }
 
-        Dictionary<RadzenDataGridColumn<TItem>, bool> shouldRenderColumnPopup = new Dictionary<RadzenDataGridColumn<TItem>, bool>();
-
         /// <summary>
         /// Gets or sets a value indicating whether DataGrid is responsive.
         /// </summary>

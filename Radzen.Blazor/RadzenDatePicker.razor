@@ -17,7 +17,7 @@
                 <input @ref="@input" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@TabIndex"
                        @onchange="@ParseDate" autocomplete="off" type="text" 
                        class="rz-inputtext @InputClass" id="@Name" placeholder="@Placeholder" />
-                <button @onmousedown=@(() => shouldRenderPopup = true) onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
+                <button onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
                     <span aria-hidden="true" class="rz-button-icon-left  rzi rzi-calendar"></span><span class="rz-button-text"></span>
                 </button>
                 @if (AllowClear && HasValue)
@@ -26,8 +26,7 @@
                 }
             </span>
         }
-        @if (shouldRenderPopup || Inline)
-        {
+
             <div id="@PopupID" style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")" @onclick:preventDefault="true">
                 <div class="rz-datepicker-group">
                     @if (!TimeOnly)
@@ -136,6 +135,6 @@
                     </div>
                 }
             </div>
-        }
+        
     </div>
 }
