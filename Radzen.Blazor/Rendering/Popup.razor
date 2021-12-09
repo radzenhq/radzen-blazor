@@ -30,8 +30,25 @@
             await Open.InvokeAsync(null);
         }
 
-        await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", target, GetId(), false, Reference, nameof(OnClose));
+        this.target = target;
+        shouldToggle = true;
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            if (shouldToggle)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", target, GetId(), false, Reference, nameof(OnClose));
+            }
+
+            shouldToggle = false;
+        }
+    }
+
+    ElementReference target;
+    bool shouldToggle;
 
     [JSInvokable]
     public async Task OnClose()
