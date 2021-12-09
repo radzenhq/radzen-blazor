@@ -182,11 +182,17 @@ namespace Radzen.Blazor
             }
 
             await base.SetParametersAsync(parameters);
+        }
 
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
             if (RenderMode == TabRenderMode.Client)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
             }
+
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         bool shouldRender = true;
