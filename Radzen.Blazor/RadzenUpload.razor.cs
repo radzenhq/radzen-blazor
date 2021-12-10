@@ -123,16 +123,22 @@ namespace Radzen.Blazor
             await JSRuntime.InvokeAsync<string>("Radzen.upload", fileUpload, Url, Multiple);
         }
 
-        IDictionary<string, string> headers = new Dictionary<string, string>();
+        readonly IDictionary<string, string> headers = new Dictionary<string, string>();
 
         internal void AddHeader(string name, string value)
         {
-            headers.Add(name, value);
+            if (name != null)
+            {
+                headers.Add(name, value);
+            }
         }
 
         internal void RemoveHeader(string name)
         {
-            headers.Remove(name);
+            if (name != null)
+            {
+                headers.Remove(name);
+            }
         }
 
         private bool visibleChanged = false;
