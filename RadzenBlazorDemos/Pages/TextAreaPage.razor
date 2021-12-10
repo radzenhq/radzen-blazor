@@ -1,24 +1,41 @@
 ﻿@page "/textarea"
 
 <RadzenExample Name="TextArea">
-<div class="row">
-    <div class="col-xl-6">
-        <h3>TextArea</h3>
-        <RadzenTextArea Change=@(args => OnChange(args, "TextArea")) />
-        <h3 style="margin-top: 2rem">TextArea with placeholder</h3>
-        <RadzenTextArea Placeholder="Enter here..." Change=@(args => OnChange(args, "TextArea with placeholder")) />
-        <h3 style="margin-top: 2rem">TextArea with 5 maximum characters</h3>
-        <RadzenTextArea MaxLength="5" Change=@(args => OnChange(args, "TextArea with 5 maximum characters")) />
-        <h3 style="margin-top: 2rem">TextArea with 3 rows and 30 columns</h3>
-        <RadzenTextArea @bind-Value=@value Cols="30" Rows="3" Change=@(args => OnChange(args, "TextArea with 3 rows and 30 columns")) />
-        <h3 style="margin-top: 2rem">Disabled TextArea with 3 rows and 30 columns</h3>
-        <RadzenTextArea Disabled="true" @bind-Value=@value Cols="30" Rows="3" />
+<div class="row px-3">
+    <div class="col-md-6 col-lg-4 p-3">
+        <RadzenCard>
+            <h4 class="mb-4">TextArea</h4>
+            <RadzenTextArea Change=@(args => OnChange(args, "TextArea")) Class="w-100" />
+        </RadzenCard>
     </div>
-    <div class="col-xl-6">
-        <EventConsole @ref=@console />
+    <div class="col-md-6 col-lg-4 p-3">
+        <RadzenCard>
+            <h4 class="mb-4">TextArea with placeholder</h4>
+            <RadzenTextArea Placeholder="Enter here..." Change=@(args => OnChange(args, "TextArea with placeholder")) Class="w-100" />
+        </RadzenCard>
+    </div>
+    <div class="col-md-6 col-lg-4 p-3">
+        <RadzenCard>
+            <h4 class="mb-4">TextArea with 5 maximum characters</h4>
+            <RadzenTextArea MaxLength="5" Change=@(args => OnChange(args, "TextArea with 5 maximum characters")) Class="w-100" />
+        </RadzenCard>
+    </div>
+    <div class="col-md-6 col-lg-4 p-3">
+        <RadzenCard Style="overflow: scroll">
+            <h4 class="mb-4">TextArea with 3 rows and 30 columns</h4>
+            <RadzenTextArea @bind-Value=@value Cols="30" Rows="3" Change=@(args => OnChange(args, "TextArea with 3 rows and 30 columns")) />
+        </RadzenCard>
+    </div>
+    <div class="col-md-6 col-lg-4 p-3">
+        <RadzenCard Style="overflow: scroll">
+            <h4 class="mb-4">Disabled TextArea with 3 rows and 30 columns</h4>
+            <RadzenTextArea Disabled="true" @bind-Value=@value Cols="30" Rows="3" />
+        </RadzenCard>
     </div>
 </div>
 </RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     string value;
