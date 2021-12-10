@@ -54,7 +54,7 @@ The previous example loads all tree items instantly. Sometimes you would like to
 ```
 <RadzenTree Data="@Northwind.Categories" Expand="@OnExpand">
     <RadzenTreeLevel TextProperty="CategoryName"/>
-</RadzenTree
+</RadzenTree>
 @code {
     void OnExpand(TreeExpandEventArgs args)
     {
@@ -77,7 +77,7 @@ Here is how to have mixed types of nodes per level - files and directories in th
 ```
 <RadzenTree Data="@entries" Expand="@LoadFiles">
     <RadzenTreeLevel Text="@GetTextForNode" />
-</RadzenTree
+</RadzenTree>
 @code {
     IEnumerable<string> entries = null;
 
@@ -151,7 +151,7 @@ you should use a `RenderFragment`.
 ```
 <RadzenTree Data="@entries" Expand="@LoadFiles">
     <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
-</RadzenTree
+</RadzenTree>
 @code {
     IEnumerable<string> entries = null;
 
