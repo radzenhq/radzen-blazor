@@ -5,7 +5,7 @@
 
 <h1>Tree checkboxes</h1>
 <p>Get or set the selected items of RadzenTree</p>
-<RadzenExample Name="Tree" Source="TreeCheckBoxesPage" Heading="false">
+<RadzenExample Name="Tree" Source="TreeCheckBoxes" Heading="false">
     <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 300px" Data=@categories>
         <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
         <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
