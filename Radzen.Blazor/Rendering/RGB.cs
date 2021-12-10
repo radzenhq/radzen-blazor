@@ -193,6 +193,11 @@ namespace Radzen.Blazor.Rendering
         /// <returns>RGB.</returns>
         public static RGB Parse(string color)
         {
+            if (string.IsNullOrEmpty(color))
+            {
+                return null;
+            }
+
             var rgb = new Regex(@"rgb\((?<r>\d{1,3}),\s*(?<g>\d{1,3}),\s*(?<b>\d{1,3})\)");
 
             var match = rgb.Match(color);
