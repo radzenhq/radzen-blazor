@@ -1,41 +1,67 @@
 ﻿@page "/example-upload"
 
 <RadzenExample Name="Upload">
-<div class="row">
-    <div class="col-xl-6">
-        <h3>Single file upload</h3>
-        <RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
-                      Progress=@(args => OnProgress(args, "Single file upload"))>
-        </RadzenUpload>
-        <h3 style="margin-top: 1rem">Custom HTTP headers</h3>
-        <RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
-                      Progress=@(args => OnProgress(args, "Single file upload"))>
-            <RadzenUploadHeader Name="Authorization" Value="Bearer <token>" />
-            <RadzenUploadHeader Name="X-Uploaded-By" Value="Radzen" />
-        </RadzenUpload>
-        <h3 style="margin-top: 1rem">Multiple files upload</h3>
-        <RadzenUpload Multiple="true" Url="upload/multiple" Style="margin-bottom: 20px;"
-                      Progress=@(args => OnProgress(args, "Multiple files upload")) />
-        <h3 style="margin-top: 1rem">Upload images only</h3>
-        <RadzenUpload Multiple="true" Accept="image/*" Url="upload/multiple" Style="margin-bottom: 20px;"
-                      Progress=@(args => OnProgress(args, "Images only upload")) />
-        <h3 style="margin-top: 1rem">Upload with additional parameter</h3>
-        <RadzenUpload Multiple="true" Accept="image/*" Url=@($"upload/{customParameter}") Style="margin-bottom: 20px;"
-                      Progress=@(args => OnProgress(args, "Upload with additional parameter")) />
-        <h3 style="margin-top: 1rem">Manual Upload</h3>
-        <RadzenUpload @ref="upload" Auto="false" Multiple="true" Url="upload/multiple" Style="margin-bottom: 20px;" Change=@(args => OnChange(args, "Manual Upload"))
-                      Progress=@(args => OnProgress(args, "Manual Upload")) />
-        <RadzenButton Text="Upload" Click=@(args => upload.Upload()) Style="margin-bottom: 20px;" />
-        <h3 style="margin-top: 1rem">Upload completed</h3>
-        <RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
-                      Complete=@OnComplete />
-        <br />
+<div class="row px-3">
+    <div class="col-md-9">
+        <div class="row">
+            <div class="col-md-4 p-3">
+                <RadzenCard>
+                    <h4 class="mb-4">Single file upload</h4>
+                    <RadzenUpload Url="upload/single" Progress=@(args => OnProgress(args, "Single file upload")) Class="w-100">
+                    </RadzenUpload>
+                </RadzenCard>
+            </div>
+            <div class="col-md-4 p-3">
+                <RadzenCard>
+                    <h4 class="mb-4">Custom HTTP headers</h4>
+                    <RadzenUpload Url="upload/single" Progress=@(args => OnProgress(args, "Single file upload")) Class="w-100">
+                        <RadzenUploadHeader Name="Authorization" Value="Bearer <token>" />
+                        <RadzenUploadHeader Name="X-Uploaded-By" Value="Radzen" />
+                    </RadzenUpload>
+                </RadzenCard>
+            </div>
+            <div class="col-md-4 p-3">
+                <RadzenCard>
+                    <h4 class="mb-4">Multiple files upload</h4>
+                    <RadzenUpload Multiple="true" Url="upload/multiple" Progress=@(args => OnProgress(args, "Multiple files upload")) Class="w-100" />
+                </RadzenCard>
+            </div>
+            <div class="col-md-4 p-3">
+                <RadzenCard>
+                    <h4 class="mb-4">Upload images only</h4>
+                    <RadzenUpload Multiple="true" Accept="image/*" Url="upload/multiple" Progress=@(args => OnProgress(args, "Images only upload")) Class="w-100" />
+                </RadzenCard>
+            </div>
+            <div class="col-md-4 p-3">
+                <RadzenCard>
+                    <h4 class="mb-4">Upload with additional parameter</h4>
+                    <RadzenUpload Multiple="true" Accept="image/*" Url=@($"upload/{customParameter}") Progress=@(args => OnProgress(args, "Upload with additional parameter")) Class="w-100" />
+                </RadzenCard>
+            </div>
+            <div class="col-md-4 p-3">
+                <RadzenCard>
+                    <h4 class="mb-4">Upload completed</h4>
+                    <RadzenUpload Url="upload/single" Complete=@OnComplete Class="w-100" />
+                </RadzenCard>
+            </div>
+        </div>
     </div>
-    <div class="col-xl-6">
-        <EventConsole @ref=@console />
+    <div class="col-md-3">
+        <div class="row">
+            <div class="col p-3">
+                <RadzenCard>
+                    <h4 class="mb-4">Manual Upload</h4>
+                    <RadzenUpload @ref="upload" Auto="false" Multiple="true" Url="upload/multiple" Change=@(args => OnChange(args, "Manual Upload"))
+                            Progress=@(args => OnProgress(args, "Manual Upload")) Class="w-100" />
+                    <RadzenButton Text="Upload" Click=@(args => upload.Upload()) class="d-block mt-4" />
+                </RadzenCard>
+            </div>
+        </div>
     </div>
 </div>
 </RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     EventConsole console;
