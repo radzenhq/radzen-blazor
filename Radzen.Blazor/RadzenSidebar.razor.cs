@@ -7,12 +7,20 @@ namespace Radzen.Blazor
     /// </summary>
     public partial class RadzenSidebar : RadzenComponentWithChildren
     {
+        private const string DefaultStyle = "top:51px;bottom:57px;width:250px;";
+
         /// <summary>
         /// Gets or sets the style.
         /// </summary>
         /// <value>The style.</value>
         [Parameter]
-        public override string Style { get; set; } = "top:51px;bottom:57px;width:250px;";
+        public override string Style { get; set; } = DefaultStyle;
+
+        /// <summary>
+        /// The <see cref="RadzenLayout" /> this component is nested in.
+        /// </summary>
+        [CascadingParameter]
+        public RadzenLayout Layout { get; set; }
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
@@ -36,7 +44,14 @@ namespace Radzen.Blazor
         /// <returns>System.String.</returns>
         protected string GetStyle()
         {
-            return $"{Style}{(Expanded ? ";transform:translateX(0px);" : ";width:0px;transform:translateX(-100%);")}";
+            var style = Style;
+
+            if (Layout != null && !string.IsNullOrEmpty(style))
+            {
+                style = style.Replace(DefaultStyle, "");
+            }
+
+            return $"{style}{(Expanded ? ";transform:translateX(0px);" : ";width:0px;transform:translateX(-100%);")}";
         }
 
         /// <summary>
