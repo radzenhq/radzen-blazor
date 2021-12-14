@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System.Linq;
 using Radzen.Blazor.Rendering;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.JSInterop;
 
 namespace Radzen.Blazor
 {
@@ -92,5 +95,32 @@ namespace Radzen.Blazor
         /// <value>The expanded changed callback.</value>
         [Parameter]
         public EventCallback<bool> ExpandedChanged { get; set; }
+
+        [Inject]
+        NavigationManager NavigationManager { get; set; }
+
+        /// <inheritdoc />
+        protected override Task OnInitializedAsync()
+        {
+            NavigationManager.LocationChanged += OnLocationChanged;
+
+            return base.OnInitializedAsync();
+        }
+
+        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+        {
+            if (IsJSRuntimeAvailable && Layout != null)
+            {
+                JSRuntime.InvokeVoidAsync("eval", $"document.getElementById('{GetId()}').scrollTop = 0");
+            }
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            NavigationManager.LocationChanged -= OnLocationChanged;
+
+            base.Dispose();
+        }
     }
 }
