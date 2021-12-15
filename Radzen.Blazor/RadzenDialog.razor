@@ -42,14 +42,12 @@
     {
         Service.OnOpen -= OnOpen;
         Service.OnClose -= OnClose;
-        Service.OnRefresh -= OnRefresh;
     }
 
     protected override void OnInitialized()
     {
         Service.OnOpen += OnOpen;
         Service.OnClose += OnClose;
-        Service.OnRefresh += OnRefresh;
     }
 
     void OnOpen(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
@@ -60,10 +58,5 @@
     void OnClose(dynamic result)
     {
         Close(result).ConfigureAwait(false);
-    }
-
-    void OnRefresh()
-    {
-        InvokeAsync(StateHasChanged).ConfigureAwait(false);
     }
 }
