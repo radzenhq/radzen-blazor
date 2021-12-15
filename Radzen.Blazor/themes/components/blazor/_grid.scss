@@ -509,12 +509,6 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
         display: none;
       }
     }
-    .rz-chkbox-box {
-
-      &.rz-state-active {
-        background-color: $input-background-color;
-      }
-    }
 
     > input {
       width: 0;
