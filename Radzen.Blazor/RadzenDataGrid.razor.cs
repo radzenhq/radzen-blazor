@@ -58,19 +58,7 @@ namespace Radzen.Blazor
                 top = PageSize;
             }
 
-            if (LoadData.HasDelegate)
-            {
-                var orderBy = GetOrderBy();
-
-                Query.Skip = request.StartIndex;
-                Query.Top = top;
-                Query.OrderBy = orderBy;
-
-                var filterString = columns.ToFilterString<TItem>();
-                Query.Filter = filterString;
-
-                await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = top, OrderBy = orderBy, Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString });
-            }
+            await InvokeLoadData(request.StartIndex, top);
 
             virtualDataItems = (LoadData.HasDelegate ? Data : itemToInsert != null ? (new[] { itemToInsert }).Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top)).ToList();
 
@@ -1055,7 +1043,7 @@ namespace Radzen.Blazor
             {
                 Count = 1;
             }
-    #if NET5
+#if NET5
             if (AllowVirtualization && virtualize != null)
             {
                 if(!LoadData.HasDelegate)
@@ -1067,37 +1055,8 @@ namespace Radzen.Blazor
                     Data = null;
                 }
             }
-    #endif
-            var orderBy = GetOrderBy();
-
-            Query.Skip = skip;
-            Query.Top = PageSize;
-            Query.OrderBy = orderBy;
-
-            var filterString = columns.ToFilterString<TItem>();
-            Query.Filter = filterString;
-
-            if (LoadData.HasDelegate)
-            {
-                await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
-                {
-                    Skip = skip,
-                    Top = PageSize,
-                    OrderBy = orderBy,
-                    Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString,
-                    Filters = columns.Where(c => c.Filterable && c.Visible && (c.GetFilterValue() != null 
-                        || c.FilterOperator == FilterOperator.IsNotNull || c.FilterOperator == FilterOperator.IsNull)).Select(c => new FilterDescriptor()
-                    {
-                        Property = c.GetFilterProperty(),
-                        FilterValue = c.GetFilterValue(),
-                        FilterOperator = c.GetFilterOperator(),
-                        SecondFilterValue = c.GetSecondFilterValue(),
-                        SecondFilterOperator = c.GetSecondFilterOperator(),
-                        LogicalFilterOperator = c.GetLogicalFilterOperator()
-                    }),
-                    Sorts = sorts
-                }); ;
-            }
+#endif
+            await InvokeLoadData(skip, PageSize);
 
             CalculatePager();
 
@@ -1115,6 +1074,42 @@ namespace Radzen.Blazor
     #endif        
             } 
        }
+
+        async Task InvokeLoadData(int start, int top)
+        {
+            var orderBy = GetOrderBy();
+
+            Query.Skip = skip;
+            Query.Top = PageSize;
+            Query.OrderBy = orderBy;
+
+            var filterString = columns.ToFilterString<TItem>();
+            Query.Filter = filterString;
+
+            if (LoadData.HasDelegate)
+            {
+                var filters = columns.Where(c => c.Filterable && c.Visible && (c.GetFilterValue() != null
+                        || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull)).Select(c => new FilterDescriptor()
+                        {
+                            Property = c.GetFilterProperty(),
+                            FilterValue = c.GetFilterValue(),
+                            FilterOperator = c.GetFilterOperator(),
+                            SecondFilterValue = c.GetSecondFilterValue(),
+                            SecondFilterOperator = c.GetSecondFilterOperator(),
+                            LogicalFilterOperator = c.GetLogicalFilterOperator()
+                        });
+
+                await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
+                {
+                    Skip = start,
+                    Top = top,
+                    OrderBy = orderBy,
+                    Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString,
+                    Filters = filters,
+                    Sorts = sorts
+                });
+            }
+        }
 
         internal async Task ChangeState()
         {
