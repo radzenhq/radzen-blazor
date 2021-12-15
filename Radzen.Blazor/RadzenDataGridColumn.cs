@@ -456,10 +456,24 @@ namespace Radzen.Blazor
             if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))
             {
                 filterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
+                
                 if (FilterTemplate != null)
                 {
                     FilterValue = filterValue;
-                    await Grid.Reload();
+                    if (Grid.IsVirtualizationAllowed())
+                    {
+#if NET5
+                        if (Grid.virtualize != null)
+                        {
+                            await Grid.virtualize.RefreshDataAsync();
+                        }
+#endif
+                    }
+                    else
+                    {
+                        await Grid.Reload();
+                    }
+                    
                     return;
                 }
             }

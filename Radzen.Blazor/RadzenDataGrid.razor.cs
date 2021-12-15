@@ -1066,12 +1066,12 @@ namespace Radzen.Blazor
             }
             else
             {
-    #if NET5
+#if NET5
                 if (AllowVirtualization && virtualize != null)
                 {
                     await virtualize.RefreshDataAsync();
                 }
-    #endif        
+#endif
             } 
        }
 
