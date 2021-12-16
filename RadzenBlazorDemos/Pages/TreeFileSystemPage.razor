@@ -5,9 +5,16 @@
 <h1>File and directory browser</h1>
 <p>Populate RadzenTree from the file system</p>
 <RadzenExample Name="Tree" Source="TreeFileSystem" Heading="false">
-    <RadzenTree Data=@entries Expand=@LoadFiles Style="width: 100%; height: 300px">
-        <RadzenTreeLevel Text=@GetTextForNode Template=@FileOrFolderTemplate />
-    </RadzenTree>
+
+<div class="row my-5">
+    <div class="col-lg-6 offset-lg-3">
+        <RadzenCard>
+            <RadzenTree Data=@entries Expand=@LoadFiles Style="width: 100%; height: 300px">
+                <RadzenTreeLevel Text=@GetTextForNode Template=@FileOrFolderTemplate />
+            </RadzenTree>
+        </RadzenCard>
+    </div>
+</div>
 </RadzenExample>
 
 @code {

@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-md-4">
             <RadzenCard>
-                <h3>Data-binding to Categories &#8250; Products</h3>
+                <h4>Data-binding to Categories &#8250; Products</h4>
                 <p class="mb-3">Data from different tables.</p>
                 <RadzenTree Style="height: 300px" Data=@categories>
                     <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
@@ -19,7 +19,7 @@
         </div>
         <div class="col-md-4">
             <RadzenCard>
-                <h3>Data-binding to Employees</h3>
+                <h4>Data-binding to Employees</h4>
                 <p class="mb-3">Data from a single self-referencing table.</p>
                 <RadzenTree Data=@employees Style="height: 300px">
                     <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1" 
@@ -30,7 +30,7 @@
         </div>
         <div class="col-md-4">
             <RadzenCard>
-                <h3>Load children on demand</h3>
+                <h4>Load children on demand</h4>
                 <p class="mb-3">Populate children on parent expand.</p>
                 <RadzenTree Data=@categories Expand=@OnExpand Style="height: 300px">
                     <RadzenTreeLevel TextProperty="CategoryName"/>
