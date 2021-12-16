@@ -66,7 +66,13 @@ $tree-transition: none !default;
   margin: $tree-node-margin;
 
   .rz-treenode-label {
+    display: flex;
+    align-items: center;
     padding: $tree-node-padding;
+
+    .rzi:first-child {
+      margin-right: 0.25rem;
+    }
   }
 
   &:not(.rz-treenode-content-selected) {
