@@ -10,7 +10,7 @@
     Sample dashboard that uses data from the <a href="https://github.com/dotnet/aspnetcore/issues" target="_blank">ASP.NET GitHub repository</a>. Data is updated 24 hours.
 </p>
 <div class="container-fluid p-0" style="position: relative">
-    <RadzenCard Visible=@fetchingData style="z-index: 1; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, .5)">
+    <RadzenCard Visible=@fetchingData style="z-index: 2; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, .5)">
         <RadzenCard Visible=@(error == null) style="margin: 32px auto; width: 80%">
             <h3 style="margin: 32px 0">Fetching data from GitHub: page @currentPage of @totalPages.</h3>
             <RadzenProgressBar Value=@currentPage Max=@totalPages ShowValue="false" Style="display: inline-block; width: 180px; height: 8px; margin-top: 16px" />
