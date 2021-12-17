@@ -81,7 +81,8 @@ namespace Radzen.Blazor
             var value = $"{args.Value}";
             if (!string.IsNullOrWhiteSpace(value))
             {
-                hour = (int)Convert.ChangeType(value, typeof(int));
+                int outValue;
+                hour = int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out outValue) ? (int?)outValue : null;
             }
         }
 
@@ -93,7 +94,9 @@ namespace Radzen.Blazor
             var value = $"{args.Value}";
             if (!string.IsNullOrWhiteSpace(value))
             {
-                minutes = (int)Convert.ChangeType(value, typeof(int));
+                int outValue;
+                minutes = int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out outValue) ? (int?)outValue : null;
+
             }
         }
 
@@ -104,7 +107,8 @@ namespace Radzen.Blazor
             var value = $"{args.Value}";
             if (!string.IsNullOrWhiteSpace(value))
             {
-                seconds = (int)Convert.ChangeType(value, typeof(int));
+                int outValue;
+                seconds = int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out outValue) ? (int?)outValue : null;
             }
         }
 
