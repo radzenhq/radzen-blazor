@@ -20,15 +20,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Handles the <see cref="E:MouseUp" /> event.
+        /// Toggles this instance checked state.
         /// </summary>
-        /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        public async Task OnMouseUp(MouseEventArgs args)
-        {
-            await Toggle();
-        }
-
-        async System.Threading.Tasks.Task Toggle()
+        public async System.Threading.Tasks.Task Toggle()
         {
             if (Disabled)
             {
