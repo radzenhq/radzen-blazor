@@ -74,6 +74,12 @@ namespace Radzen.Blazor
             return base.TransformCategoryScale(scale);
         }
 
+        /// <inheritdoc />
+        protected override IList<object> GetCategories()
+        {
+            return base.GetCategories().Reverse().ToList();
+        }
+
         private IList<IChartSeries> BarSeries
         {
             get

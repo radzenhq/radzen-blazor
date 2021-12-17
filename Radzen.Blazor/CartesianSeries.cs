@@ -217,6 +217,16 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Returns the category values
+        /// </summary>
+        protected virtual IList<object> GetCategories()
+        {
+            Func<TItem, object> category = String.IsNullOrEmpty(CategoryProperty) ? (item) => string.Empty : PropertyAccess.Getter<TItem, object>(CategoryProperty);
+
+            return Items.Select(category).ToList();
+        }
+
         /// <inheritdoc />
         public virtual ScaleBase TransformCategoryScale(ScaleBase scale)
         {
@@ -243,10 +253,8 @@ namespace Radzen.Blazor
                     Output = scale.Output
                 };
             }
-
-            Func<TItem, object> category = String.IsNullOrEmpty(CategoryProperty) ? (item) => string.Empty : PropertyAccess.Getter<TItem, object>(CategoryProperty);
-
-            var data = Items.Select(category).ToList();
+            
+            var data = GetCategories();
 
             if (scale is OrdinalScale ordinal)
             {
