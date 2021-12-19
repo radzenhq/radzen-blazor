@@ -146,7 +146,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public bool ShowInLegend { get => Visible; }
+        public bool ShowInLegend { get; set; } = true;
 
         /// <summary>
         /// The name of the property of <typeparamref name="TItem" /> that provides the Y axis (a.k.a. value axis) values.
