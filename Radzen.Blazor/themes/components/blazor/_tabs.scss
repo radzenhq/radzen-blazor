@@ -18,7 +18,22 @@ $tabs-transition: none !default;
 
 .rz-tabview {
   display: flex;
-  flex-direction: column;
+
+  &.rz-tabview-top {
+    flex-direction: column;
+  }
+
+  &.rz-tabview-bottom {
+    flex-direction: column-reverse;
+  }
+
+  &.rz-tabview-left {
+    flex-direction: row;
+  }
+
+  &.rz-tabview-right {
+    flex-direction: row-reverse;
+  }
 }
 
 .rz-tabview-nav {
@@ -29,17 +44,13 @@ $tabs-transition: none !default;
 
   li {
     border: $tabs-border;
-    border-top-width: 2px;
-    border-bottom-color: $tabs-tab-background-color;
     background-color: $tabs-tab-background-color;
-    border-radius: $tabs-border-radius $tabs-border-radius 0 0;
     transition: $tabs-transition;
 
     &:hover {
       &:not(.rz-tabview-selected) {
         &:not(.rz-state-disabled) {
           background-color: $tabs-hover-background-color;
-          border-top-color: $tabs-tab-selected-top-border-color;
 
           a {
             color: $tabs-hover-color;
@@ -49,7 +60,7 @@ $tabs-transition: none !default;
     }
 
     a {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       color: $tabs-tab-color;
       padding: $tabs-tab-padding;
@@ -68,13 +79,108 @@ $tabs-transition: none !default;
 
   .rz-tabview-selected {
     background-color: $tabs-background-color;
-    border-bottom-color: $tabs-background-color;
-    margin-bottom: -1px;
     position: relative;
-    border-top-color: $tabs-tab-selected-top-border-color;
 
     a {
       color: $tabs-selected-tab-color;
+    }
+  }
+
+  .rz-tabview-top > & {
+    flex-direction: row;
+
+    li {
+      border-top-width: 2px;
+      border-bottom-color: $tabs-tab-background-color;
+      border-radius: $tabs-border-radius $tabs-border-radius 0 0;
+  
+      &:hover {
+        &:not(.rz-tabview-selected) {
+          &:not(.rz-state-disabled) {
+            border-top-color: $tabs-tab-selected-top-border-color;
+          }
+        }
+      }
+    }
+  
+    .rz-tabview-selected {
+      border-bottom-color: $tabs-background-color;
+      margin-bottom: -1px;
+      border-top-color: $tabs-tab-selected-top-border-color;
+    }
+  }
+
+  .rz-tabview-bottom > & {
+    flex-direction: row;
+
+    li {
+      border-bottom-width: 2px;
+      border-top-color: $tabs-tab-background-color;
+      border-radius: 0 0 $tabs-border-radius $tabs-border-radius;
+  
+      &:hover {
+        &:not(.rz-tabview-selected) {
+          &:not(.rz-state-disabled) {
+            border-bottom-color: $tabs-tab-selected-top-border-color;
+          }
+        }
+      }
+    }
+  
+    .rz-tabview-selected {
+      border-top-color: $tabs-background-color;
+      margin-top: -1px;
+      padding-top: 1px;
+      border-bottom-color: $tabs-tab-selected-top-border-color;
+    }
+  }
+
+  .rz-tabview-left > & {
+    flex-direction: column;
+
+    li {
+      border-left-width: 2px;
+      border-right-color: $tabs-tab-background-color;
+      border-radius: $tabs-border-radius 0 0 $tabs-border-radius;
+  
+      &:hover {
+        &:not(.rz-tabview-selected) {
+          &:not(.rz-state-disabled) {
+            border-left-color: $tabs-tab-selected-top-border-color;
+          }
+        }
+      }
+    }
+  
+    .rz-tabview-selected {
+      border-right-color: $tabs-background-color;
+      margin-right: -1px;
+      border-left-color: $tabs-tab-selected-top-border-color;
+    }
+  }
+
+  .rz-tabview-right > & {
+    flex-direction: column;
+
+    li {
+      border-right-width: 2px;
+      border-left-color: $tabs-tab-background-color;
+      border-radius: 0 $tabs-border-radius $tabs-border-radius 0;
+  
+      &:hover {
+        &:not(.rz-tabview-selected) {
+          &:not(.rz-state-disabled) {
+            border-right-color: $tabs-tab-selected-top-border-color;
+          }
+        }
+      }
+    }
+  
+    .rz-tabview-selected {
+      border-left-color: $tabs-background-color;
+      margin-left: -1px;
+      padding-left: 1px;
+      border-right-color: $tabs-tab-selected-top-border-color;
     }
   }
 }
