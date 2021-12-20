@@ -195,7 +195,7 @@ namespace Radzen.Blazor
         public EventCallback<IEnumerable<object>> CheckedValuesChanged { get; set; }
 
         void RenderTreeItem(RenderTreeBuilder builder, object data, RenderFragment<RadzenTreeItem> template, Func<object, string> text,
-            Func<object, bool> hasChildren, Func<object, bool> expanded, Func<object, bool> selected)
+            Func<object, bool> hasChildren, Func<object, bool> expanded, Func<object, bool> selected, IEnumerable children = null)
         {
             builder.OpenComponent<RadzenTreeItem>(0);
             builder.AddAttribute(1, nameof(RadzenTreeItem.Text), text(data));
@@ -233,6 +233,7 @@ namespace Radzen.Blazor
                         if (grandChildren != null && hasChildren)
                         {
                             builder.AddAttribute(7, "ChildContent", RenderChildren(grandChildren, depth + 1));
+                            builder.AddAttribute(8, nameof(RadzenTreeItem.Data), grandChildren);
                         }
                     }
 
@@ -305,6 +306,20 @@ namespace Radzen.Blazor
                     else
                     {
                         await SetCheckedValues(CheckedValues.Except(args.Children.Data.Cast<object>()));
+                    }
+                }
+            }
+            else if (item.Data != null)
+            {
+                if (AllowCheckBoxes && AllowCheckChildren && item.Data != null)
+                {
+                    if (CheckedValues != null && CheckedValues.Contains(item.Value))
+                    {
+                        await SetCheckedValues(CheckedValues.Union(item.Data.Cast<object>().Except(UncheckedValues)));
+                    }
+                    else
+                    {
+                        await SetCheckedValues(CheckedValues);
                     }
                 }
             }
