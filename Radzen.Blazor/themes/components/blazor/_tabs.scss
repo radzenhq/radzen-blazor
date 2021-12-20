@@ -188,10 +188,22 @@ $tabs-transition: none !default;
 .rz-tabview-panels {
   background-color: $tabs-background-color;
   border: $tabs-border;
-  border-radius: 0 0 $border-radius $border-radius;
   box-shadow: $tabs-shadow;
   flex: 1;
   overflow: auto;
+
+  .rz-tabview-top > & {
+    border-radius: 0 0 $border-radius $border-radius;
+  }
+  .rz-tabview-bottom > & {
+    border-radius: $border-radius $border-radius 0 0;
+  }
+  .rz-tabview-left > & {
+    border-radius: 0 $border-radius $border-radius 0;
+  }
+  .rz-tabview-right > & {
+    border-radius: $border-radius 0 0 $border-radius;
+  }
 }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
