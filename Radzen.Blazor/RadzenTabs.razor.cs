@@ -33,6 +33,13 @@ namespace Radzen.Blazor
         public TabRenderMode RenderMode { get; set; } = TabRenderMode.Server;
 
         /// <summary>
+        /// Gets or sets the tab position.
+        /// </summary>
+        /// <value>The tab position.</value>
+        [Parameter]
+        public TabPosition TabPosition { get; set; } = TabPosition.Top;
+
+        /// <summary>
         /// Gets or sets the selected index.
         /// </summary>
         /// <value>The selected index.</value>
@@ -162,7 +169,22 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-tabview";
+            var positionCSS = "rz-tabview-top";
+
+            if (TabPosition == TabPosition.Bottom)
+            {
+                positionCSS = "rz-tabview-bottom";
+            }
+            else if (TabPosition == TabPosition.Right)
+            {
+                positionCSS = "rz-tabview-right";
+            }
+            else if (TabPosition == TabPosition.Left)
+            {
+                positionCSS = "rz-tabview-left";
+            }
+
+            return $"rz-tabview {positionCSS}";
         }
 
         /// <inheritdoc />

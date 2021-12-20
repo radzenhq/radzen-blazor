@@ -413,6 +413,29 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Specifies the ways a <see cref="RadzenTabs" /> component renders its titles.
+    /// </summary>
+    public enum TabPosition
+    {
+        /// <summary>
+        /// The RadzenTabs titles are displayed at the top of the component.
+        /// </summary>
+        Top,
+        /// <summary>
+        /// The RadzenTabs titles are displayed at the bottom of the component.
+        /// </summary>
+        Bottom,
+        /// <summary>
+        /// The RadzenTabs titles are displayed at the left side of the component.
+        /// </summary>
+        Left,
+        /// <summary>
+        /// The RadzenTabs titles are displayed at the right side of the component.
+        /// </summary>
+        Right
+    }
+
+    /// <summary>
     /// Specifies the position at which a Radzen Blazor component renders its built-in <see cref="RadzenPager" />.
     /// </summary>
     public enum PagerPosition
