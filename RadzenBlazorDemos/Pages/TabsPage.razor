@@ -7,7 +7,12 @@
 @inject NorthwindContext dbContext
 
 <RadzenExample Name="Tabs">
-    <RadzenTabs Change=@OnChange style="height: 504px; width: 700px; margin: 20px auto;" RenderMode="TabRenderMode.Client">
+    <RadzenCard Class="w-75 mb-5 mx-auto" Style="display: flex; align-items: center;" >
+        <div style="white-space:nowrap; margin-right: 16px">Tabs Position:</div>
+        <RadzenDropDown @bind-Value="@tabPosition" TextProperty="Text" ValueProperty="Value" 
+            Data="@(Enum.GetValues(typeof(TabPosition)).Cast<TabPosition>().Select(t => new { Text = $"{t}", Value = t }))" />
+    </RadzenCard>
+    <RadzenTabs Change=@OnChange TabPosition="@tabPosition" style="height: 504px; width: 700px; margin: 20px auto;" RenderMode="TabRenderMode.Client" >
         <Tabs>
             <RadzenTabsItem Text="Orders">
                 <RadzenDataList PageSize="4" WrapItems="true" AllowPaging="true" Data="@orders" TItem="Order">
@@ -96,6 +101,8 @@
     IEnumerable<Order> orders;
     IEnumerable<Employee> employees;
     IEnumerable<Customer> customers;
+
+    TabPosition tabPosition = TabPosition.Top;
 
     protected override void OnInitialized()
     {
