@@ -80,6 +80,7 @@ $grid-detail-template-border-radius: 2px !default;
 $grid-detail-template-padding: 0.625rem !default;
 $grid-detail-template-background-color: $white !default;
 
+$grid-loading-indicator-color: currentColor !default;
 $grid-loading-indicator-background-color: rgba($cool-grey, 0.5) !default;
 $grid-button-icon-only-padding: 0 0.25rem !default;
 $grid-button-text-padding: 0 0.6875rem !default;
@@ -660,12 +661,14 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  color: $grid-loading-indicator-color;
   z-index: 1;
 
   .rzi-circle-o-notch {
     @extend .rzi;
 
-    animation: rotation 1s linear infinite;
+    animation: rotation .5s linear infinite;
+    font-size: 2rem;
 
     &:before {
       content: 'refresh';
