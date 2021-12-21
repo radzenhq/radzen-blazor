@@ -455,6 +455,30 @@ namespace Radzen.Blazor
             return new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes);
         }
 
+        internal IReadOnlyDictionary<string, object> HeaderCellAttributes(RadzenDataGridColumn<TItem> column)
+        {
+            var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { Column = column };
+
+            if (HeaderCellRender != null)
+            {
+                HeaderCellRender(args);
+            }
+
+            return new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes);
+        }
+
+        internal IReadOnlyDictionary<string, object> FooterCellAttributes(RadzenDataGridColumn<TItem> column)
+        {
+            var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { Column = column };
+
+            if (FooterCellRender != null)
+            {
+                FooterCellRender(args);
+            }
+
+            return new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes);
+        }
+
         internal Dictionary<int, int> rowSpans = new Dictionary<int, int>();
 
         /// <summary>
@@ -990,6 +1014,20 @@ namespace Radzen.Blazor
         /// <value>The cell render callback.</value>
         [Parameter]
         public Action<DataGridCellRenderEventArgs<TItem>> CellRender { get; set; }
+
+        /// <summary>
+        /// Gets or sets the header cell render callback. Use it to set header cell attributes.
+        /// </summary>
+        /// <value>The cell render callback.</value>
+        [Parameter]
+        public Action<DataGridCellRenderEventArgs<TItem>> HeaderCellRender { get; set; }
+
+        /// <summary>
+        /// Gets or sets the footer cell render callback. Use it to set footer cell attributes.
+        /// </summary>
+        /// <value>The cell render callback.</value>
+        [Parameter]
+        public Action<DataGridCellRenderEventArgs<TItem>> FooterCellRender { get; set; }
 
         /// <summary>
         /// Gets or sets the render callback.

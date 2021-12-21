@@ -74,11 +74,22 @@
                             <span class="rz-column-title"></span>
                         </th>
                     }
-                    @foreach (var column in visibleColumns)
+                    @for (var j = 0; j < visibleColumns.Count; j++)
                     {
+                        var column = visibleColumns[j];
+                        var cellAttr = HeaderCellAttributes(column);
+
+                        object colspan;
+                        cellAttr.TryGetValue("colspan", out colspan);
+
+                        if (colspan != null)
+                        {
+                            j = j + (int)Convert.ChangeType(colspan, TypeCode.Int32) - 1;
+                        }
+
                         var columnIndex = visibleColumns.IndexOf(column);
                         var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
-                        <th class="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}")" scope="col" style="@column.GetStyle(true, true)" @onmouseup=@(args => EndColumnReorder(args, columnIndex))>
+                        <th class="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}")" scope="col" style="@column.GetStyle(true, true)" @onmouseup=@(args => EndColumnReorder(args, columnIndex)) @attributes="@(cellAttr)">
                             <div @onclick='@((args) => OnSort(args, column))' style="width:100%">
                                 @if (AllowColumnReorder && column.Reorderable || AllowGrouping && column.Groupable)
                                 {
@@ -352,9 +363,20 @@
                                 <span class="rz-column-title"></span>
                             </td>
                         }
-                        @foreach (var column in visibleColumns)
+                        @for (var j = 0; j < visibleColumns.Count; j++)
                         {
-                            <td class="@($" {column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)}")" style="@column.GetStyle(true, true)">
+                            var column = visibleColumns[j];
+                            var cellAttr = FooterCellAttributes(column);
+
+                            object colspan;
+                            cellAttr.TryGetValue("colspan", out colspan);
+
+                            if (colspan != null)
+                            {
+                                j = j + (int)Convert.ChangeType(colspan, TypeCode.Int32) - 1;
+                            }
+
+                            <td class="@($" {column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)}")" style="@column.GetStyle(true, true)" @attributes="@(cellAttr)">
                                 <span class="rz-column-footer">
                                     @if (column.FooterTemplate != null)
                                     {
