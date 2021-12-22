@@ -33,7 +33,7 @@ namespace Radzen.Blazor
         /// <value>The size of the marker.</value>
         double MarkerSize { get; }
         /// <summary>
-        /// Renders the siries with the specified category and value scales.
+        /// Renders the series with the specified category and value scales.
         /// </summary>
         /// <param name="categoryScale">The category scale.</param>
         /// <param name="valueScale">The value scale.</param>

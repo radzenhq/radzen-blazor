@@ -11,31 +11,31 @@
 <p>This page demonstrates how to configure the Razden Blazor DataGrid for inline editing</p>
 
 <RadzenExample Name="DataGrid" Source="DataGridInLineEdit" Heading="false">
-    <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Text="Add" Click="@InsertRow" />
-    <RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" EditMode="DataGridEditMode.Single"
+    <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Text="Add New Order" Click="@InsertRow" Disabled=@(orderToInsert != null) />
+    <RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single"
                 Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow">
         <Columns>
-            <RadzenDataGridColumn Width="100px" TItem="Order" Property="OrderID" Title="Order ID" />
-            <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer">
+            <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID" Width="120px" />
+            <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" Width="280px" >
                 <EditTemplate Context="order">
-                    <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%" />
+                    <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%; display: block;" />
                 </EditTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee" Width="300px">
+            <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee" Width="220px">
                 <Template Context="order">
-                    <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                    <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 16px; margin-right: 6px;" />
                     @order.Employee?.FirstName @order.Employee?.LastName
                 </Template>
                 <EditTemplate Context="order">
-                    <RadzenDropDown @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%">
+                    <RadzenDropDown @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%; display: block;">
                         <Template>
-                            <RadzenImage Path="@context.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                            <RadzenImage Path="@context.Photo" style="width: 20px; height: 20px; border-radius: 16px; margin-right: 6px;" />
                             @context.FirstName @context.LastName
                         </Template>
                     </RadzenDropDown>
                 </EditTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
+            <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" Width="200px">
                 <Template Context="order">
                     @String.Format("{0:d}", order.OrderDate)
                 </Template>
@@ -57,25 +57,25 @@
                     <RadzenRequiredValidator Text="ShipName is required" Component="ShipName" Popup="true" />
                 </EditTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Order" Context="sampleBlazorModelsSampleOrder" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+            <RadzenDataGridColumn TItem="Order" Context="sampleBlazorModelsSampleOrder" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="120px">
                 <Template Context="order">
-                    <RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditRow(order))" @onclick:stopPropagation="true">
+                    <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Class="m-1" Click="@(args => EditRow(order))" @onclick:stopPropagation="true">
                     </RadzenButton>
                 </Template>
                 <EditTemplate Context="order">
-                    <RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => SaveRow(order))">
+                    <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Primary" Class="m-1" Click="@((args) => SaveRow(order))">
                     </RadzenButton>
-                    <RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => CancelEdit(order))">
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Class="m-1" Click="@((args) => CancelEdit(order))">
                     </RadzenButton>
                 </EditTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Order" Context="order" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+            <RadzenDataGridColumn TItem="Order" Context="order" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
                 <Template Context="order">
-                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@(args => DeleteRow(order))"  @onclick:stopPropagation="true">
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Small" Class="m-1" Click="@(args => DeleteRow(order))"  @onclick:stopPropagation="true">
                     </RadzenButton>
                 </Template>
                 <EditTemplate Context="order">
-                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="close" Size="ButtonSize.Small" Click="@(args => DeleteRow(order))">
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Small" Class="m-1" Click="@(args => DeleteRow(order))">
                     </RadzenButton>
                 </EditTemplate>
             </RadzenDataGridColumn>
@@ -103,13 +103,18 @@
         //orders = dbContext.Orders.Include("Customer").Include("Employee");
     }
 
-    void EditRow(Order order)
+    async Task EditRow(Order order)
     {
-        ordersGrid.EditRow(order);
+        await ordersGrid.EditRow(order);
     }
 
     void OnUpdateRow(Order order)
     {
+        if (order == orderToInsert)
+        {
+            orderToInsert = null;
+        }
+
         dbContext.Update(order);
 
         // For demo purposes only
@@ -120,13 +125,23 @@
         //dbContext.SaveChanges();
     }
 
-    void SaveRow(Order order)
+    async Task SaveRow(Order order)
     {
-        ordersGrid.UpdateRow(order);
+        if (order == orderToInsert)
+        {
+            orderToInsert = null;
+        }
+
+        await ordersGrid.UpdateRow(order);
     }
 
     void CancelEdit(Order order)
     {
+        if (order == orderToInsert)
+        {
+            orderToInsert = null;
+        }
+
         ordersGrid.CancelEditRow(order);
 
         // For production
@@ -138,8 +153,13 @@
         }
     }
 
-    void DeleteRow(Order order)
+    async Task DeleteRow(Order order)
     {
+        if (order == orderToInsert)
+        {
+            orderToInsert = null;
+        }
+
         if (orders.Contains(order))
         {
             dbContext.Remove<Order>(order);
@@ -150,7 +170,7 @@
             // For production
             //dbContext.SaveChanges();
 
-            ordersGrid.Reload();
+            await ordersGrid.Reload();
         }
         else
         {
@@ -158,9 +178,12 @@
         }
     }
 
-    void InsertRow()
+    Order orderToInsert;
+
+    async Task InsertRow()
     {
-        ordersGrid.InsertRow(new Order());
+        orderToInsert = new Order();
+        await ordersGrid.InsertRow(orderToInsert);
     }
 
     void OnCreateRow(Order order)

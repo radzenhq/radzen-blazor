@@ -19,7 +19,7 @@ namespace Radzen.Blazor
         public string Fill { get; set; }
 
         /// <summary>
-        /// Specifies a list of colors that will be used to set the individual bar backrounds.
+        /// Specifies a list of colors that will be used to set the individual bar backgrounds.
         /// </summary>
         /// <value>The fills.</value>
         [Parameter]
@@ -72,6 +72,12 @@ namespace Radzen.Blazor
         public override ScaleBase TransformValueScale(ScaleBase scale)
         {
             return base.TransformCategoryScale(scale);
+        }
+
+        /// <inheritdoc />
+        protected override IList<object> GetCategories()
+        {
+            return base.GetCategories().Reverse().ToList();
         }
 
         private IList<IChartSeries> BarSeries

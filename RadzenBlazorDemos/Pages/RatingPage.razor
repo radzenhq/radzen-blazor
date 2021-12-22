@@ -1,22 +1,35 @@
 ﻿@page "/rating"
 
 <RadzenExample Name="Rating">
-<div class="row">
-    <div class="col-xl-6">
-        <h3>Rating with 5 stars</h3>
-        <RadzenRating Change=@(args => OnChange(args, "Rating with 5 stars")) />
-        <h3 style="margin-top: 2rem">Rating with 10 stars</h3>
-        <RadzenRating Stars="10" Change=@(args => OnChange(args, "Rating with 10 stars")) />
-        <h3 style="margin-top: 2rem">Disabled Rating with 10 stars</h3>
-        <RadzenRating Disabled="true" Stars="10" />
-        <h3 style="margin-top: 2rem">ReadOnly Rating</h3>
-        <RadzenRating ReadOnly="true" Stars="5" Value="4" />
+    <div class="row px-3">
+        <div class="col-12 col-lg-6 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Rating with 5 stars</h4>
+                <RadzenRating Change=@(args => OnChange(args, "Rating with 5 stars")) />
+            </RadzenCard>
+        </div>
+        <div class="col-12 col-lg-6 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Rating with 10 stars</h4>
+                <RadzenRating Stars="10" Change=@(args => OnChange(args, "Rating with 10 stars")) />
+            </RadzenCard>
+        </div>
+        <div class="col-12 col-lg-6 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Disabled Rating with 10 stars</h4>
+                <RadzenRating Disabled="true" Stars="10" />
+            </RadzenCard>
+        </div>
+        <div class="col-12 col-lg-6 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">ReadOnly Rating</h4>
+                <RadzenRating ReadOnly="true" Stars="5" Value="4" />
+            </RadzenCard>
+        </div>
     </div>
-    <div class="col-xl-6">
-        <EventConsole @ref=@console />
-    </div>
-</div>
 </RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     EventConsole console;

@@ -63,7 +63,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets the current X coordiante of the center.
+        /// Gets the current X coordinate of the center.
         /// </summary>
         protected double CenterX
         {
@@ -74,7 +74,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets the current Y coordiante of the center.
+        /// Gets the current Y coordinate of the center.
         /// </summary>
         protected double CenterY
         {

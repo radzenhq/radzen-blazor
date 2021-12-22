@@ -15,6 +15,12 @@ $input-disabled-shadow: inset 0 4px 7px 0 rgba(0, 0, 0, 0.03) !default;
 $input-disabled-background-color: rgba(#fff, 0.7) !default;
 $input-disabled-border: solid 1px #eaeaea !default;
 $input-disabled-color: rgba(#3a3a3a, 0.4) !default;
+$input-disabled-placeholder-color: $input-disabled-color !default;
+$input-disabled-opacity: 1 !default;
+
+$input-transition: none !default;
+
+$input-focus-shadow: $input-shadow !default;
 
 %input-hover {
   box-shadow: $input-hover-shadow;
@@ -26,9 +32,10 @@ $input-disabled-color: rgba(#3a3a3a, 0.4) !default;
   box-shadow: $input-disabled-shadow;
   background-color: $input-disabled-background-color;
   border: $input-disabled-border;
+  opacity: $input-disabled-opacity;
 
   &::placeholder {
-    color: $input-disabled-color;
+    color: $input-disabled-placeholder-color;
   }
 
   .rz-inputtext {
@@ -63,14 +70,23 @@ input {
   line-height: $input-line-height;
   color: $input-value-color;
   font-size: $input-font-size;
+  transition: $input-transition;
+  outline: none;
 
   @extend %input-base;
 
-  &:hover {
-    &:not(:focus) {
+  &:not(:disabled):not(.rz-state-disabled) {
+    &:hover {
       @extend %input-hover;
     }
+
+    &:focus {
+      @extend %input-hover;
+      box-shadow: $input-focus-shadow;
+    }
   }
+
+
 
   &:disabled {
     @extend %input-disabled;

@@ -15,7 +15,7 @@ namespace Radzen.Blazor
         public string Text { get; set; }
 
         /// <summary>
-        /// Sets the axis whith this configuratiton applies to.
+        /// Sets the axis with this configuration applies to.
         /// </summary>
         /// <value>The axis.</value>
         [CascadingParameter]

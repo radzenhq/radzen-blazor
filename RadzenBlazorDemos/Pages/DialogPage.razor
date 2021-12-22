@@ -3,26 +3,47 @@
 @implements IDisposable
 
 <RadzenExample Name="Dialog" AdditionalSourceCodePages=@(new [] { "DialogCardPage.razor" })>
-    <div class="row">
-        <div class="col-xl-6">
-            <h3>Open page as a dialog</h3>
-            <RadzenButton Text=@($"Show OrderID: {orderID} details") Click=@OpenOrder />
-            <h3 style="margin-top: 20px;">Inline Dialog</h3>
-            <RadzenButton Text="Show dialog with inline Blazor content" Click=@ShowInlineDialog />
-            <h3 style="margin-top: 20px;">Busy Dialog with a string message</h3>
-            <RadzenButton Text="Show busy dialog" Click=@(args => ShowBusyDialog(true)) />
-            <h3 style="margin-top: 20px;">Busy Dialog with markup</h3>
-            <RadzenButton Text="Show busy dialog" Click=@(args => ShowBusyDialog(false)) />
-            <h3 style="margin-top: 20px;">Confirm Dialog</h3>
-            <RadzenButton Text="Show confirm dialog" Click=@(args => DialogService.Confirm("Are you sure?", "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })) />
-            <h3 style="margin-top: 20px;">Close Dialog by clicking outside</h3>
-            <RadzenButton Text="Show dialog with clickable overlay" Click=@ShowCloseableFromOverlayDialog />
+    <div class="row px-3">
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Open page as a dialog</h4>
+                <RadzenButton Text=@($"Order {orderID} details") ButtonStyle="ButtonStyle.Secondary" Click=@OpenOrder />
+            </RadzenCard>
         </div>
-        <div class="col-xl-6">
-            <EventConsole @ref=@console />
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Inline Dialog</h4>
+                <RadzenButton Text="Dialog with inline Blazor content" ButtonStyle="ButtonStyle.Secondary" Click=@ShowInlineDialog />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Busy Dialog with a string message</h4>
+                <RadzenButton Text="Busy dialog" Style="width: 140px;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => ShowBusyDialog(true)) />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Busy Dialog with markup</h4>
+                <RadzenButton Text="Busy dialog" Style="width: 140px;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => ShowBusyDialog(false)) />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Confirm Dialog</h4>
+                <RadzenButton Text="Confirm dialog" Style="width: 140px;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => DialogService.Confirm("Are you sure?", "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })) />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4 class="mb-4">Close Dialog by clicking outside</h4>
+                <RadzenButton Text="Dialog with clickable overlay" ButtonStyle="ButtonStyle.Secondary" Click=@ShowCloseableFromOverlayDialog />
+            </RadzenCard>
         </div>
     </div>
 </RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     EventConsole console;
@@ -55,20 +76,20 @@
     {
         await DialogService.OpenAsync<DialogCardPage>($"Order {orderID}",
                new Dictionary<string, object>() { { "OrderID", orderID } },
-               new DialogOptions() { Width = "700px", Height = "530px", Resizable = true, Draggable = true });
+               new DialogOptions() { Width = "700px", Height = "570px", Resizable = true, Draggable = true });
     }
 
     async Task ShowInlineDialog()
     {
      var result = await DialogService.OpenAsync("Simple Dialog", ds =>
         @<div>
-            <p Style="margin-bottom: 1rem">Confirm?</p>
+            <p class="mb-4">Confirm Order ID <b>@orderID</b>?</p>
             <div class="row">
-                <div class="col-md-12">
-                    <RadzenButton Text="Ok" Click="() => ds.Close(true)" Style="margin-bottom: 10px; width: 150px" />
-                    <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary"  Style="margin-bottom: 10px; width: 150px"/>
-                    <RadzenButton Text="Refresh" Click="(() => { orderID = 10249; ds.Refresh(); })" ButtonStyle="ButtonStyle.Info"  Style="margin-bottom: 10px; width: 150px"/>
-                    Order ID: @orderID
+                <div class="col">
+                    <RadzenButton Text="Ok" Click="() => ds.Close(true)" Class="mr-1" Style="width: 80px;" />
+                    <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" Class="mr-1" />
+                    <RadzenButton Text="Refresh" Click="(() => { orderID = 10249; ds.Refresh(); })" ButtonStyle="ButtonStyle.Light"  Class="mr-1 float-right" />
+                    
                 </div>
             </div>
         </div>);
@@ -111,8 +132,9 @@
         await DialogService.OpenAsync("", ds =>
             @<div>
                 <div class="row">
-                    <div class="col-md-12">
-                        Loading...
+                    <div class="col text-center p-5">
+                        <RadzenImage Path="images/community.svg" Style="display: block; width: 200px; margin-bottom: 40px;" />
+                        <b>Loading, please wait...</b>
                     </div>
                 </div>
         </div>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });

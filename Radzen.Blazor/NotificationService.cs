@@ -6,7 +6,7 @@ using System.Text;
 namespace Radzen
 {
     /// <summary>
-    /// Class NotificationService. Contains variuos methods with options to open notifications. 
+    /// Class NotificationService. Contains various methods with options to open notifications. 
     /// Should be added as scoped service in the application services and RadzenNotification should be added in application main layout.
     /// </summary>
     /// <example>

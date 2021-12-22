@@ -19,7 +19,7 @@ namespace Radzen.Blazor
         public string Fill { get; set; }
 
         /// <summary>
-        /// Specifies a list of colors that will be used to set the individual column backrounds.
+        /// Specifies a list of colors that will be used to set the individual column backgrounds.
         /// </summary>
         /// <value>The fills.</value>
         [Parameter]

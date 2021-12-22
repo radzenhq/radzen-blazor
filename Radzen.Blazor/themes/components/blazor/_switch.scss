@@ -1,10 +1,13 @@
 $switch-background-color: #ced4da !default;
 $switch-checked-background-color:#479cc8 !default;
+$switch-box-shadow: none !default;
+
 
 .rz-switch {
   position: relative;
   display: inline-block;
   width: 3rem;
+  min-width: 3rem;
   height: 1.75rem;
 }
 
@@ -18,7 +21,8 @@ $switch-checked-background-color:#479cc8 !default;
 }
 
 .rz-switch-circle.rz-disabled {
-  background: #ced4da !important;
+  opacity: 0.5;
+  cursor: initial;
 }
 
 .rz-switch .rz-switch-circle {
@@ -39,12 +43,17 @@ $switch-checked-background-color:#479cc8 !default;
   margin-top: -0.625rem;
   border-radius: 50%;
   transition-duration: 0.2s;
+  box-shadow: $switch-box-shadow;
 }
 
 .rz-switch-circle:before {
   position: absolute;
   content: "";
   top: 50%;
+}
+
+.rz-switch-circle.rz-disabled:before {
+  box-shadow: none;
 }
 
 .rz-switch.p-rz-switch-checked .rz-switch-circle:before {

@@ -27,19 +27,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                byte[] hash = new byte[0];
-
-                try
-                {
-                    hash = System.Security.Cryptography.MD5.Create()
-                        .ComputeHash(System.Text.Encoding.ASCII.GetBytes(Email != null ? Email : ""));
-                }
-                catch
-                {
-                    //
-                }
-
-                var md5Email = string.Join("", Enumerable.Range(0, hash.Length).Select(i => hash[i].ToString("x2")));
+                var md5Email = MD5.Calculate(System.Text.Encoding.ASCII.GetBytes(Email != null ? Email : ""));
 
                 var style = "retro";
                 var width = "36";

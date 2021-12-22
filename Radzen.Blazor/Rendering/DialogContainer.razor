@@ -1,5 +1,7 @@
 @using Microsoft.JSInterop
+@using System.Reflection;
 @inject IJSRuntime JSRuntime
+@implements IDisposable
 <div class="rz-dialog-wrapper">
     <div @ref="dialog" class="rz-dialog" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
@@ -103,8 +105,12 @@
                 }
             }
 
+            builder.AddComponentReferenceCapture(2, component => reference = component);
+
             builder.CloseComponent();
         });
+
+    object reference;
 
     void Close()
     {
@@ -128,4 +134,21 @@
 
     [Inject] 
     DialogService Service { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Service.OnRefresh += OnRefresh;
+    }
+
+    void OnRefresh()
+    {
+        var stateHasChanged = reference?.GetType().GetMethod("StateHasChanged", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        InvokeAsync(() => stateHasChanged?.Invoke(reference, null)).ConfigureAwait(false);
+    }
+
+    public void Dispose()
+    {
+        Service.OnRefresh -= OnRefresh;
+    }
 }

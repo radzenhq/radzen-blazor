@@ -1,9 +1,9 @@
 @using System.Text.Json
 @inject IJSRuntime JSRuntime
-<div class="console" @attributes=@Attributes>
-    <div class="console-header">
-        <div class="console-title">Console Log</div>
-        <button class="console-clear" @onclick=@OnClearClick>Clear</button>
+<RadzenCard @attributes=@Attributes >
+    <div class="console-header align-items-center">
+        <h3 class="console-title">Console log</h3>
+        <RadzenButton Click=@OnClearClick Text="Clear console" ButtonStyle="ButtonStyle.Light" />
     </div>
     <div class="console-content" @ref=@console>
     @foreach(var message in messages)
@@ -14,7 +14,7 @@
         </div>
     }
     </div>
-</div>
+</RadzenCard>
 
 @code {
     class Message

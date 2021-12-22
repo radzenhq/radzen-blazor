@@ -159,17 +159,17 @@ namespace Radzen.Blazor
         public int RenderingOrder { get; set; }
 
         /// <summary>
-        /// Creates a getter function that returns a value from the specifid data item. Uses <see cref="ValueProperty" />.
+        /// Creates a getter function that returns a value from the specified data item. Uses <see cref="ValueProperty" />.
         /// </summary>
         /// <value>The value.</value>
-        /// <exception cref="ArgumentException">ValueProperty shoud not be empty</exception>
+        /// <exception cref="ArgumentException">ValueProperty should not be empty</exception>
         protected Func<TItem, double> Value
         {
             get
             {
                 if (String.IsNullOrEmpty(ValueProperty))
                 {
-                    throw new ArgumentException("ValueProperty shoud not be empty");
+                    throw new ArgumentException("ValueProperty should not be empty");
                 }
 
                 return PropertyAccess.Getter<TItem, double>(ValueProperty);
@@ -217,6 +217,16 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Returns the category values
+        /// </summary>
+        protected virtual IList<object> GetCategories()
+        {
+            Func<TItem, object> category = String.IsNullOrEmpty(CategoryProperty) ? (item) => string.Empty : PropertyAccess.Getter<TItem, object>(CategoryProperty);
+
+            return Items.Select(category).ToList();
+        }
+
         /// <inheritdoc />
         public virtual ScaleBase TransformCategoryScale(ScaleBase scale)
         {
@@ -243,10 +253,8 @@ namespace Radzen.Blazor
                     Output = scale.Output
                 };
             }
-
-            Func<TItem, object> category = String.IsNullOrEmpty(CategoryProperty) ? (item) => string.Empty : PropertyAccess.Getter<TItem, object>(CategoryProperty);
-
-            var data = Items.Select(category).ToList();
+            
+            var data = GetCategories();
 
             if (scale is OrdinalScale ordinal)
             {

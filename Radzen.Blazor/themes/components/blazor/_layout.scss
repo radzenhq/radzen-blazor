@@ -1,0 +1,30 @@
+.rz-layout {
+    height: 100vh;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+    "rz-header rz-header"
+    "rz-sidebar rz-body"
+    "rz-footer rz-footer";
+  
+    .rz-body {
+      grid-area: rz-body;
+      overflow: auto;
+    }
+  
+    .rz-sidebar {
+      grid-area: rz-sidebar;
+      position: static;
+    }
+  
+    .rz-header {
+      grid-area: rz-header;
+      z-index: 2;
+    }
+  
+    .rz-footer {
+      grid-area: rz-footer;
+    }
+  }

@@ -4,28 +4,46 @@
 @inject NorthwindContext dbContext
 
 <RadzenExample Name="AutoComplete">
-<div class="row">
-    <div class="col-xl-6">
-        <h3>AutoComplete</h3>
-        <RadzenAutoComplete Data=@customers TextProperty="CompanyName"
-                            Style="margin-bottom: 20px" Change=@(args => OnChange(args, "AutoComplete")) />
-        <h3 style="margin-top: 1rem">AutoComplete with placeholder</h3>
-        <RadzenAutoComplete Placeholder="Select..." Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "AutoComplete with placeholder")) Style="margin-bottom: 20px" />
-        <h3 style="margin-top: 1rem">AutoComplete with custom filter operator</h3>
-        <RadzenAutoComplete Data=@customers TextProperty="CompanyName" FilterOperator="StringFilterOperator.StartsWith"
-                            Style="margin-bottom: 20px" Change=@(args => OnChange(args, "AutoComplete with custom filter operator")) />
-        <h3 style="margin-top: 1rem">AutoComplete with custom filtering</h3>
-        <RadzenAutoComplete Data=@customCustomersData TextProperty="CompanyName"
-                            LoadData=@OnLoadData
-                            Style="margin-bottom: 20px" Change=@(args => OnChange(args, "AutoComplete with custom filtering")) />
-        <h3 style="margin-top: 1rem">Disabled AutoComplete</h3>
-        <RadzenAutoComplete Disabled="true" Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "AutoComplete with placeholder")) Style="margin-bottom: 20px" />
+    <div class="row px-3">
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4>AutoComplete</h4>
+                <p class="mb-4">Start typing e.g. France</p>
+                <RadzenAutoComplete Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "AutoComplete")) Style="width: 100%;" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4>AutoComplete with placeholder</h4>
+                <p class="mb-4">Start typing e.g. France</p>
+                <RadzenAutoComplete Placeholder="Select a customer..." Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "AutoComplete with placeholder")) Style="width: 100%;" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4>Custom filter operator</h4>
+                <p class="mb-4">Show items that <b>start with</b> a specific string</p>
+                <RadzenAutoComplete Data=@customers TextProperty="CompanyName" FilterOperator="StringFilterOperator.StartsWith" Change=@(args => OnChange(args, "AutoComplete with custom filter operator")) Style="width: 100%;" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4>Custom filtering</h4>
+                <p class="mb-4">Filtering with LoadData</p>
+                <RadzenAutoComplete Data=@customCustomersData TextProperty="CompanyName" LoadData=@OnLoadData Change=@(args => OnChange(args, "AutoComplete with custom filtering")) Style="width: 100%;" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4>Disabled AutoComplete</h4>
+                <p class="mb-4">AutoComplete with Disabled="true"</p>
+                <RadzenAutoComplete Disabled="true" Placeholder="Select a customer..."  Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "Disabled AutoComplete")) Style="width: 100%;" />
+            </RadzenCard>
+        </div>
     </div>
-    <div class="col-xl-6">
-        <EventConsole @ref=@console />
-    </div>
-</div>
 </RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     EventConsole console;

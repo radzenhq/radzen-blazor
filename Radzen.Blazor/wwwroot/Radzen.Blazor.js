@@ -20,18 +20,17 @@ var resolveCallbacks = [];
 var rejectCallbacks = [];
 
 window.Radzen = {
-  mask: function (id, mask, pattern) {
+    mask: function (id, mask, pattern, characterPattern) {
       var el = document.getElementById(id);
       if (el) {
-          var format = function (value, mask, pattern) {
-              var strippedValue = value.replace(new RegExp(pattern, "g"), "");
-              var chars = strippedValue.split('');
+          var format = function (value, mask, pattern, characterPattern) {
+              var chars = !characterPattern ? value.replace(new RegExp(pattern, "g"), "").split('') : value.match(new RegExp(characterPattern, "g"));
               var count = 0;
 
               var formatted = '';
               for (var i = 0; i < mask.length; i++) {
                   const c = mask[i];
-                  if (chars[count]) {
+                  if (chars && chars[count]) {
                       if (/\*/.test(c)) {
                           formatted += chars[count];
                           count++;
@@ -42,7 +41,7 @@ window.Radzen = {
               }
               return formatted;
           }
-          el.value = format(el.value, mask, pattern);
+          el.value = format(el.value, mask, pattern, characterPattern);
       }
   },
   addContextMenu: function (id, ref) {
@@ -736,15 +735,17 @@ window.Radzen = {
             Radzen.closePopup(id, instance, callback);
             return;
         }
-        if (!e.defaultPrevented) {
-          if (parent) {
-            if (e.type == 'click' && !parent.contains(e.target) && !popup.contains(e.target)) {
-              Radzen.closePopup(id, instance, callback);
-            }
-          } else {
-            if (!popup.contains(e.target)) {
-              Radzen.closePopup(id, instance, callback);
-            }
+        var closestPopup = e.target.closest('.rz-popup');
+        if (closestPopup && closestPopup != popup) {
+          return;
+        }
+        if (parent) {
+          if (e.type == 'mousedown' && !parent.contains(e.target) && !popup.contains(e.target)) {
+            Radzen.closePopup(id, instance, callback);
+          }
+        } else {
+          if (!popup.contains(e.target)) {
+            Radzen.closePopup(id, instance, callback);
           }
         }
     };
@@ -763,8 +764,8 @@ window.Radzen = {
     Radzen.popups.push({id, instance, callback});
 
     document.body.appendChild(popup);
-    document.removeEventListener('click', Radzen[id]);
-    document.addEventListener('click', Radzen[id]);
+    document.removeEventListener('mousedown', Radzen[id]);
+    document.addEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
     window.addEventListener('resize', Radzen[id]);
 
@@ -793,7 +794,7 @@ window.Radzen = {
       }
       popup.style.display = 'none';
     }
-    document.removeEventListener('click', Radzen[id]);
+    document.removeEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
     Radzen[id] = null;
 
@@ -820,7 +821,7 @@ window.Radzen = {
     if (popup) {
       popup.parentNode.removeChild(popup);
     }
-    document.removeEventListener('click', Radzen[id]);
+    document.removeEventListener('mousedown', Radzen[id]);
   },
   scrollDataGrid: function (e) {
     var scrollLeft =

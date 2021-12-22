@@ -81,7 +81,8 @@ namespace Radzen.Blazor
             var value = $"{args.Value}";
             if (!string.IsNullOrWhiteSpace(value))
             {
-                hour = (int)Convert.ChangeType(value, typeof(int));
+                int outValue;
+                hour = int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out outValue) ? (int?)outValue : null;
             }
         }
 
@@ -93,7 +94,9 @@ namespace Radzen.Blazor
             var value = $"{args.Value}";
             if (!string.IsNullOrWhiteSpace(value))
             {
-                minutes = (int)Convert.ChangeType(value, typeof(int));
+                int outValue;
+                minutes = int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out outValue) ? (int?)outValue : null;
+
             }
         }
 
@@ -104,7 +107,8 @@ namespace Radzen.Blazor
             var value = $"{args.Value}";
             if (!string.IsNullOrWhiteSpace(value))
             {
-                seconds = (int)Convert.ChangeType(value, typeof(int));
+                int outValue;
+                seconds = int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out outValue) ? (int?)outValue : null;
             }
         }
 
@@ -288,6 +292,12 @@ namespace Radzen.Blazor
             return args;
         }
 
+        /// <summary>
+        /// Gets or sets the kind of DateTime bind to control
+        /// </summary>
+        [Parameter]
+        public DateTimeKind Kind { get; set; } = DateTimeKind.Unspecified;
+
         object _value;
 
         /// <summary>
@@ -316,7 +326,14 @@ namespace Radzen.Blazor
                     }
                     else
                     {
-                        DateTimeValue = value as DateTime?;
+                        if (value is DateTime dateTime)
+                        {
+                            DateTimeValue = DateTime.SpecifyKind(dateTime, Kind);
+                        }
+                        else
+                        {
+                            DateTimeValue = null;
+                        }
 
                         if (DateTimeValue.HasValue && DateTimeValue.Value == default(DateTime))
                         {
@@ -343,8 +360,15 @@ namespace Radzen.Blazor
             set 
             {
                 _currentDate = value;
+                CurrentDateChanged.InvokeAsync(value);
             }
         }
+
+        /// <summary>
+        /// Gets or set the current date changed callback.
+        /// </summary>
+        [Parameter]
+        public EventCallback<DateTime> CurrentDateChanged { get; set; }
 
         private DateTime StartDate
         {
@@ -745,12 +769,12 @@ namespace Radzen.Blazor
         {
             if (ShowTimeOkButton)
             {
-                CurrentDate = new DateTime(CurrentDate.Year, newValue.Month,newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
+                CurrentDate = new DateTime(newValue.Year, newValue.Month,newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
                 await OkClick();
             }
             else
             {
-                var v = new DateTime(CurrentDate.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
+                var v = new DateTime(newValue.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
                 if (v != DateTimeValue)
                 {
                     DateTimeValue = v;

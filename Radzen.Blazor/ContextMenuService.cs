@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Radzen
 {
     /// <summary>
-    /// Class ContextMenuService. Contains variuos methods with options to open and close context menus. 
+    /// Class ContextMenuService. Contains various methods with options to open and close context menus. 
     /// Should be added as scoped service in the application services and RadzenContextMenu should be added in application main layout.
     /// Implements the <see cref="IDisposable" />
     /// </summary>

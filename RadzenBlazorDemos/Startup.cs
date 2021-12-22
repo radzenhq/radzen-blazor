@@ -10,7 +10,7 @@ namespace RadzenBlazorDemos
 {
 	public class ThemeState
     {
-        public string CurrentTheme { get; set; } = "default";
+        public string CurrentTheme { get; set; } = "standard";
     }
     public class Startup
     {

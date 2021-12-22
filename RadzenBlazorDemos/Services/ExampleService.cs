@@ -36,7 +36,8 @@ namespace RadzenBlazorDemos
 
         new Example()
         {
-            Name="DataGrid",
+            Name = "DataGrid",
+            Icon = "&#xf1be",
             Children = new [] {
                 new Example
                 {
@@ -360,7 +361,8 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            Name="Data",
+            Name = "Data",
+            Icon = "&#xe1db",
             Children = new [] {
                 new Example()
                 {
@@ -386,39 +388,72 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "Tree",
-                    Path = "tree",
                     Icon = "&#xe8ef",
-                    Tags = new [] { "tree", "treeview", "nodes", "hierarchy" }
+                    Tags = new [] { "tree", "treeview", "nodes", "hierarchy" },
+                    Children = new [] {
+                        new Example
+                        {
+                            Name = "Inline definition",
+                            Path = "tree",
+                            Tags = new [] { "tree", "treeview", "nodes", "inline" },
+                        },
+                        new Example
+                        {
+                            Name = "Data-binding",
+                            Path = "tree-data-binding",
+                            Tags = new [] { "tree", "treeview", "nodes", "data", "table" },
+                        },
+                        new Example
+                        {
+                            Name = "Files and directories",
+                            Path = "tree-file-system",
+                            Tags = new [] { "tree", "treeview", "nodes", "file", "directory" },
+                        },
+                        new Example
+                        {
+                            Name = "Selection",
+                            Path = "tree-selection",
+                            Tags = new [] { "tree", "treeview", "nodes", "selection" },
+                        },
+                        new Example
+                        {
+                            Name = "Checkboxes",
+                            Path = "tree-checkboxes",
+                            Tags = new [] { "tree", "treeview", "nodes", "check" },
+                        }
+                    }
                 },
             }
         },
         new Example()
         {
-            Name="Images",
+            Name = "Images",
+            Icon = "&#xe3d3", 
             Children = new [] {
                 new Example()
                 {
                     Name = "Gravatar",
                     Path = "gravatar",
-                    Icon = "&#xe84e"
+                    Icon = "&#xe420"
                 },
                 new Example()
                 {
                     Name = "Icon",
                     Path = "icon",
-                    Icon = "&#xe84f"
+                    Icon = "&#xe148"
                 },
                 new Example()
                 {
                     Name = "Image",
                     Path = "image",
-                    Icon = "&#xe8aa"
+                    Icon = "&#xe3c4"
                 },
             }
         },
         new Example()
         {
             Name="Layout & Navigation",
+            Icon = "&#xe8f1",
             Children = new [] {
                 new Example()
                 {
@@ -514,7 +549,8 @@ namespace RadzenBlazorDemos
         },
         new Example()
         {
-            Name="Forms",
+            Name = "Forms",
+            Icon = "&#xf1c1",
             Children = new [] {
                 new Example()
                 {
@@ -707,7 +743,8 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            Name="Data Visualization",
+            Name = "Data Visualization",
+            Icon = "&#xe4fb",
             Children= new [] {
                 new Example
                 {
@@ -789,7 +826,8 @@ namespace RadzenBlazorDemos
         },
         new Example()
         {
-            Name="Feedback",
+            Name = "Feedback",
+            Icon = "&#xe0cb",
             Children = new [] {
                 new Example()
                 {
@@ -824,6 +862,7 @@ namespace RadzenBlazorDemos
         new Example()
         {
             Name = "Validators",
+            Icon = "&#xf1c2",
             Children = new [] {
                 new Example()
                 {

@@ -264,5 +264,16 @@ namespace Radzen.Blazor
                 }
             }
         }
+
+
+#if NET5
+        /// <summary>
+        /// Sets the focus on the input element.
+        /// </summary>
+        public async Task FocusAsync()
+        {
+            await input.FocusAsync();
+        }
+#endif
     }
 }

@@ -15,11 +15,13 @@
             }
             else
             {
-                @if (!string.IsNullOrEmpty(Icon))
-                {
-                    <i class="rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>
-                }
-                <span class="rz-navigation-item-text">@Text</span>
+                <div class="rz-navigation-item-link">
+                    @if (!string.IsNullOrEmpty(Icon))
+                    {
+                        <i class="rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>
+                    }
+                    <span class="rz-navigation-item-text">@Text</span>
+                </div>
             }
         </div>
     </li>

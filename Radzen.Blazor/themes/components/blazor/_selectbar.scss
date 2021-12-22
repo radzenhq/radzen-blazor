@@ -21,7 +21,7 @@ $selectbar-border-radius: $border-radius !default;
     border: $selectbar-border;
 
     &:first-child {
-      border-top-left-radius: $border-radius;
+      border-top-left-radius: $selectbar-border-radius;
       border-bottom-left-radius: $selectbar-border-radius;
     }
 

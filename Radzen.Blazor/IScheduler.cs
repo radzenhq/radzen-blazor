@@ -12,7 +12,7 @@ namespace Radzen.Blazor
     public interface IScheduler
     {
         /// <summary>
-        /// Gets the appointments in the specifed range.
+        /// Gets the appointments in the specified range.
         /// </summary>
         /// <param name="start">The start of the range.</param>
         /// <param name="end">The end of the range.</param>

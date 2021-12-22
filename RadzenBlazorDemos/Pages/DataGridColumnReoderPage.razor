@@ -13,18 +13,17 @@
 <RadzenExample Name="DataGrid" Source="DataGridColumnReoder" Heading="false">
     <RadzenButton Text="Change page state" Click="@((args) => { StateHasChanged(); })" Style="margin-bottom:20px" />
     <RadzenDataGrid AllowColumnReorder="true" ColumnReordered="@OnColumnReordered"
-        AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+        AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" Reorderable="false" Resizable="false" />
-            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
+            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" >
                 <Template Context="data">
                     <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
-            <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
+            <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" />
             <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
-            <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
             <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
             <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
             <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
@@ -39,7 +38,9 @@
     </RadzenDataGrid>
 </RadzenExample>
 
-<EventConsole @ref=@console />
+<RadzenCard Class="mt-4">
+    <EventConsole @ref=@console />
+</RadzenCard>
 
 @code {
     EventConsole console;

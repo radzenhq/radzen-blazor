@@ -8,7 +8,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>Radzen.Blazor</PackageId>
     <Product>Radzen.Blazor</Product>
-    <Version>3.12.0</Version>
+    <Version>3.13.8</Version>
     <Copyright>Radzen Ltd.</Copyright>
     <Authors>Radzen Ltd.</Authors>
     <Description>Native Blazor UI components by Radzen Ltd.</Description>
@@ -63,7 +63,7 @@
     <Exec Command="dotnet tool restore" StandardOutputImportance="high" />
   </Target>
   <Target Name="PreBuild" AfterTargets="ToolRestore">
-    <Exec Command="dotnet tool run webcompiler -r themes -o wwwroot/css -z disable -m disable -p disable" StandardOutputImportance="high" />
+    <Exec Command="dotnet webcompiler -r themes -o wwwroot/css -z disable -m disable -p disable" StandardOutputImportance="high" />
     <ItemGroup>
       <CssFiles Include="$(MSBuildProjectDirectory)\themes\*.css" />
     </ItemGroup>

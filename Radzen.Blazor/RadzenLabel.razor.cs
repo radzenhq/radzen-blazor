@@ -26,5 +26,11 @@ namespace Radzen.Blazor
         /// <value>The text.</value>
         [Parameter]
         public string Text { get; set; } = "";
+
+        /// <inheritdoc />
+        protected override string GetComponentCssClass()
+        {
+            return "rz-label";
+        }
     }
 }

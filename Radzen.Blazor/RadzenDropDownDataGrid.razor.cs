@@ -22,6 +22,13 @@ namespace Radzen.Blazor
     public partial class RadzenDropDownDataGrid<TValue> : DropDownBase<TValue>
     {
         /// <summary>
+        /// Gets or sets a value indicating whether column resizing is allowed.
+        /// </summary>
+        /// <value><c>true</c> if column resizing is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowColumnResize { get; set; }
+
+        /// <summary>
         /// Gets or sets the width of all columns.
         /// </summary>
         /// <value>The width of all columns.</value>
@@ -33,7 +40,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if responsive; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool Responsive { get; set; } = true;
+        public bool Responsive { get; set; } = false;
 
         /// <summary>
         /// Gets or sets a value indicating whether search button is shown.

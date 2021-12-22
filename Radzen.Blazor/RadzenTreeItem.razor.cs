@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -75,6 +76,12 @@ namespace Radzen.Blazor
         /// </summary>
         [CascadingParameter]
         public RadzenTreeItem ParentItem { get; set; }
+
+        /// <summary>
+        /// The children data.
+        /// </summary>
+        [Parameter]
+        public IEnumerable Data { get; set; }
 
         internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
 

@@ -11,7 +11,7 @@
             <i class="rzi">@Icon</i>
         }
         <div class="rz-colorpicker-value" style="background-color: @Color" ></div>
-        <button type="button" class="rz-colorpicker-trigger" disabled=@Disabled @onclick:preventDefault><i class="rzi" /></button>
+        <button type="button" tabindex="-1" class="rz-colorpicker-trigger" disabled=@Disabled @onclick:preventDefault><i class="rzi" /></button>
         <Popup @ref=@Popup class="rz-colorpicker-popup" Close=@Close Open=@Open>
             @if (ShowHSV)
             {
@@ -110,7 +110,7 @@
             @if(ShowButton)
             {
                 <div class="rz-colorpicker-button rz-colorpicker-section">
-                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Click=@OnClick Text=@ButtonText @onclick:preventDefault />
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" Click=@OnClick Text=@ButtonText @onclick:preventDefault />
                 </div>
             }
         </Popup>

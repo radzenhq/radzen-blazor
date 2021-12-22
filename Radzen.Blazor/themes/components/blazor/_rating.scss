@@ -1,18 +1,26 @@
 $rating-color: $default-link !default;
+$rating-opacity: 0.2 !default;
+$rating-font-size: 1.5rem !default;
 $rating-selected-color: $pinkish-orange !default;
 $rating-disabled-color: $cool-grey !default;
+$rating-disabled-opacity: 0.3 !default;
+$rating-ban-icon: "not_interested" !default;
 
 .rz-rating {
-  display: inline-block;
+  display: inline-flex;
+  font-size: $rating-font-size;
+  height: 1em;
 
   &.rz-state-disabled {
     .rzi {
-      opacity: 0.3;
+      opacity: $rating-disabled-opacity;
       color: $rating-disabled-color;
     }
   }
 
   a {
+    width: 1em;
+    height: 1em;
     text-decoration: none;
     cursor: default;
     outline: none;
@@ -20,16 +28,17 @@ $rating-disabled-color: $cool-grey !default;
 
   .rzi {
     color: $rating-color;
+    font-size: 1em;
   }
 
   .rzi-ban {
     &:before {
-      content: "not_interested";
+      content: $rating-ban-icon;
     }
   }
 
   .rzi-star-o {
-    opacity: 0.2;
+    opacity: $rating-opacity;
 
     &:before {
       content: "star_border";
@@ -48,12 +57,21 @@ $rating-disabled-color: $cool-grey !default;
 .rz-rating:not(.rz-state-disabled):not(.rz-state-readonly) {
   .rzi-star-o {
     cursor: pointer;
+
     &:hover {
       color: $rating-selected-color;
 
       &:before {
         content: "star";
       }
+    }
+  }
+
+  .rzi-ban {
+    cursor: pointer;
+
+    &:hover {
+      color: $rating-selected-color;
     }
   }
 }

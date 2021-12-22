@@ -1,0 +1,1429 @@
+@import 'colors';
+@import 'variables';
+$standard: true;
+
+// Color tokens
+
+$rz-white: #ffffff !default;
+
+$rz-base-100: #f4f5f9 !default;
+$rz-base-200: #e9eaed !default;
+$rz-base-300: #e0e1e4 !default;
+$rz-base-400: #c9cacd !default;
+$rz-base-500: #afafb2 !default;
+$rz-base-600: #8d8e90 !default;
+$rz-base-700: #707072 !default;
+$rz-base-800: #4f4f50 !default;
+$rz-base-900: #262526 !default;
+
+$rz-primary: #1151F3 !default;
+$rz-primary-light: #376df5 !default; /*lighten($rz-primary, 8%);*/
+$rz-primary-dark: #0e44cc !default; /*darken($rz-primary, 10%);*/
+$rz-primary-lighter: rgba($rz-primary, .16) !default;
+
+$rz-secondary: $rz-primary !default;
+$rz-secondary-light: $rz-primary-light !default;
+$rz-secondary-dark: $rz-primary-dark !default;
+$rz-secondary-lighter: rgba($rz-secondary, .16) !default;
+
+$rz-info: #12a4f5 !default;
+$rz-info-light: #38b3f7 !default;
+$rz-info-dark: #0f8ace !default;
+$rz-info-secondary: rgba($rz-info, .16) !default;
+
+$rz-success: #009B51 !default;
+$rz-success-light: #29AB6D !default;
+$rz-success-dark: #008244 !default;
+$rz-success-secondary: rgba($rz-success, .16) !default;
+
+$rz-warning: #FFAE11 !default;
+$rz-warning-light: #FFBE41 !default;
+$rz-warning-dark: #EBA010 !default;
+$rz-warning-secondary: rgba($rz-warning, .16) !default;
+
+$rz-danger: #F31155 !default;
+$rz-danger-light: #F53770 !default;
+$rz-danger-dark: #CC0E47 !default;
+$rz-danger-secondary: rgba($rz-danger, .16) !default;
+
+$rz-series-1: #376DF5 !default;
+$rz-series-2: #64DFDF !default;
+$rz-series-3: #F68769 !default;
+$rz-series-4: #C161E2 !default;
+$rz-series-5: #FDD07A !default;
+$rz-series-6: #F8629B !default;
+$rz-series-7: #74D062 !default;
+$rz-series-8: #84A7FF !default;
+
+
+$rz-transition: 0.1s linear !default;
+$rz-transition-all: all $rz-transition !default;
+
+
+// Shadows
+
+$rz-shadow-level-1: 0 2px 2px 0 rgba(0, 0, 0, 0.08), 0 0 2px 0 rgba(0, 0, 0, 0.08) !default;
+$rz-shadow-level-2: 0 4px 12px 0 rgba(0, 0, 0, 0.04) !default;
+
+$rz-shadow-inset-level-1: inset 0px 0px 2px rgba(0, 0, 0, 0.2) !default;
+
+// Theme colors
+
+$primary-color: $rz-primary !default;
+$secondary: $rz-secondary !default;
+$tertiary: $rz-base-200 !default;
+$additional-1: $rz-success !default;
+$additional-2: $rz-success !default;
+$additional-3: $rz-danger !default;
+$contrast: $rz-base-900 !default;
+
+$default-background-color: $rz-white !default;
+$button-hover-background-color: $rz-primary-light !default;
+$button-active-background-color: $rz-primary-dark !default;
+
+// Bootstrap overrides
+
+$primary: $primary-color !default;
+$danger: $rz-danger !default;
+$info: $rz-info !default;
+$success: $rz-success !default;
+$warning: $rz-warning !default;
+$default-link: $primary-color !default;
+
+$light: $rz-base-200 !default;
+$body-color: $rz-base-800 !default;
+$link-color: $rz-primary !default;
+$link-hover-color: $rz-primary-dark !default;
+
+$state-success-bg: $success !default;
+$state-warning-bg: $warning !default;
+$state-danger-bg: $danger !default;
+$state-info-bg: $info !default;
+
+$body-bg: $rz-base-100 !default;
+$font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
+  'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
+  'Segoe UI Emoji', 'Segoe UI Symbol' !default;
+
+$rz-border-radius: 0.25rem !default;
+
+$icon-base-font-size: 1.25rem !default;
+
+// Button
+
+$button-base-background-color: $rz-base-200 !default;
+$button-base-color: $rz-base-800 !default;
+$button-hover-shadow: none !default;
+$button-hover-gradient: linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%), linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0) 100%) !default;
+$button-active-shadow: none !default;
+$button-active-gradient: $button-hover-gradient !default;
+$button-border-radius: $rz-border-radius !default;
+$button-shadow: none !default;
+$button-transition: $rz-transition-all !default;
+$button-disabled-opacity: 0.5 !default;
+$button-line-height: 1.25rem !default;
+$button-vertical-align: top !default;
+$button-background-size: 100% 0%, 100% 0% !default;
+$button-hover-background-size: 100% 200%, 100% 0%  !default;
+$button-active-background-size: 100% 0%, 100% 200%  !default;
+
+$button-sizes: (
+  md: (
+    font-size: 0.875rem,
+    padding: 0.5rem 1rem,
+    line-height: 1.25rem,
+    height: auto,
+    font-weight: 600,
+    icon: (
+      font-size: 1.25rem,
+      line-height: 1.25rem,
+      width: 1.25rem,
+      height: 1.25rem
+    ),
+    text-with-icon-padding: 0.5rem 1rem 0.5rem 0.5rem,
+    icon-only-padding: 0.5rem
+  ),
+  sm: (
+    font-size: 0.875rem,
+    padding: 0.25rem 0.75rem,
+    line-height: 1.25rem,
+    height: auto,
+    icon: (
+      font-size: 1.25rem,
+      line-height: 1.25rem,
+      width: 1.25rem,
+      height: 1.25rem
+    ),
+    text-with-icon-padding: 0.25rem 0.75rem 0.25rem 0.25rem,
+    icon-only-padding: 0.25rem
+  )
+) !default;
+
+$button-styles: () !default;
+$button-styles: map-merge(
+  (
+    primary: (
+      background-color: $rz-primary,
+      color: $rz-white
+    ),
+    light: (
+      background-color: $rz-base-200,
+      color: $rz-base-800
+    ),
+    secondary: (
+      background-color: $rz-secondary-lighter,
+      color: $rz-secondary
+    ),
+    info: (
+      background-color: $rz-info,
+      color: $rz-white
+    ),
+    warning: (
+      background-color: $rz-warning,
+      color: $rz-white
+    ),
+    error: (
+      background-color: $rz-danger,
+      color: $rz-white
+    ),
+    danger: (
+      background-color: $rz-danger,
+      color: $rz-white
+    ),
+    success: (
+      background-color: $rz-success,
+      color: $rz-white
+    )
+  ),
+  $button-styles
+);
+
+$button-hover-styles: () !default;
+$button-hover-styles: map-merge(
+  (
+    primary: (
+      background-color: $rz-primary-light,
+      color: $rz-white
+    ),
+    light: (
+      background-color: $rz-base-300,
+      color: $rz-base-900
+    ),
+    secondary: (
+      background-color: $rz-secondary-light,
+      color: $rz-white
+    ),
+    info: (
+      background-color: $rz-info-light,
+      color: $rz-white
+    ),
+    warning: (
+      background-color: $rz-warning-light,
+      color: $rz-white
+    ),
+    error: (
+      background-color: $rz-danger-light,
+      color: $rz-white
+    ),
+    danger: (
+      background-color: $rz-danger-light,
+      color: $rz-white
+    ),
+    success: (
+      background-color: $rz-success-light,
+      color: $rz-white
+    )
+  ),
+  $button-hover-styles
+);
+
+$button-active-styles: () !default;
+$button-active-styles: map-merge(
+  (
+    primary: (
+      background-color: $rz-primary-dark,
+      color: $rz-white
+    ),
+    light: (
+      background-color: $rz-base-400,
+      color: $rz-base-900
+    ),
+    secondary: (
+      background-color: $rz-secondary-dark,
+      color: $rz-white
+    ),
+    info: (
+      background-color: $rz-info-dark,
+      color: $rz-white
+    ),
+    warning: (
+      background-color: $rz-warning-dark,
+      color: $rz-white
+    ),
+    error: (
+      background-color: $rz-danger-dark,
+      color: $rz-white
+    ),
+    danger: (
+      background-color: $rz-danger-dark,
+      color: $rz-white
+    ),
+    success: (
+      background-color: $rz-success-dark,
+      color: $rz-white
+    )
+  ),
+  $button-active-styles
+);
+
+$rz-primary-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-primary, 0.2) !default;
+$rz-secondary-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-secondary, 0.2) !default;
+$rz-info-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-info, 0.3) !default;
+$rz-warning-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-warning, 0.4) !default;
+$rz-danger-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-danger, 0.3) !default;
+$rz-success-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-success, 0.3) !default;
+
+
+$button-focus-styles: () !default;
+$button-focus-styles: map-merge(
+  (
+    primary: (box-shadow: $rz-primary-focus),
+    light: (box-shadow: $rz-primary-focus),
+    secondary: (box-shadow: $rz-secondary-focus),
+    info: (box-shadow: $rz-info-focus),
+    warning: (box-shadow: $rz-warning-focus),
+    error:  (box-shadow: $rz-danger-focus),
+    danger:  (box-shadow: $rz-danger-focus),
+    success:  (box-shadow: $rz-success-focus)
+  ),
+  $button-focus-styles
+);
+
+.rz-button {
+
+  &:not(.rz-state-disabled) {
+
+    &:hover {
+      &:not(:active) {
+        background-color: $rz-base-300;
+        color: $rz-base-900;
+      }
+    }
+  
+    &:active {
+      background-color: $rz-base-400;
+      color: $rz-base-900;
+    }
+    
+    @each $style, $shadow in $button-focus-styles {
+      &.btn-#{$style} {
+        &:focus {
+          @each $name, $value in $shadow {
+            #{$name}: #{$value};
+          }
+
+          &:hover {
+            @each $name, $value in $shadow {
+              #{$name}: #{$value};
+            }
+
+            &:not(:active) {
+              @each $name, $value in $shadow {
+                #{$name}: #{$value};
+              }
+            }
+          }
+        }
+      }
+    }
+
+    @each $style, $button in $button-hover-styles {
+      &.btn-#{$style} {
+        &:hover {
+          &:not(:active) {
+            @each $name, $value in $button {
+              #{$name}: #{$value};
+            }
+          }
+        }
+      }
+    }
+
+    @each $style, $button in $button-active-styles {
+      &.btn-#{$style} {
+        &:active {
+          @each $name, $value in $button {
+            #{$name}: #{$value};
+          }
+        }
+      }
+    }
+  }
+
+  &:not(.rz-button-icon-only) .rz-button-icon-left {
+    margin-right: 0.25rem;
+  }
+
+  &:not(.rz-button-icon-only) .rz-button-icon-left {
+    margin-right: 0.25rem;
+  }
+
+}
+
+// SelectButton
+
+$selectbar-background-color: transparent !default;
+$selectbar-color: $rz-base-800 !default;
+$selectbar-border: solid 1px $rz-base-200 !default;
+
+$selectbar-selected-background-color: lighten($rz-primary-lighter, 20%) !default;
+$selectbar-selected-color: $rz-primary !default;
+$selectbar-selected-border: $selectbar-border !default;
+$selectbar-border-radius: $rz-border-radius !default;
+
+
+// SplitButton
+
+$splitbutton-menu-button-width: 1.875rem !default;
+$splitbutton-menu-button-padding: 0 0 0.375rem 0 !default;
+$splitbutton-menu-button-font-size: 1.0625rem !default; // Not Used
+$splitbutton-menu-button-border: 1px solid $rz-white !default;
+$splitbutton-menu-shadow: none !default;
+$splitbutton-menu-min-width: 10rem !default;
+
+$splitbutton-padding: 0.5rem !default;
+$splitbutton-background-color: $rz-primary !default;
+$splitbutton-border-radius: $rz-border-radius !default;
+
+// Badge
+
+$badge-border-radius: $rz-border-radius !default;
+$badge-pill-border-radius: $rz-border-radius * 4 !default;
+$badge-padding: 0.125rem 0.25rem !default;
+$badge-pill-padding: 0.125rem 0.5rem !default;
+$badge-font-size: 0.75rem !default;
+$badge-font-weight: 600 !default;
+$badge-line-height: 1rem !default;
+$badge-text-transform: uppercase !default;
+$badge-letter-spacing: 0.02rem !default;
+
+$badge-styles: () !default;
+
+$badge-styles: map-merge(
+  (
+    primary: (
+      background-color: $rz-primary
+    ),
+    light: (
+      background-color: $rz-base-200,
+      color: $rz-base-800
+    ),
+    secondary: (
+      background-color: $rz-secondary-lighter,
+      color: $rz-secondary
+    ),
+    info: (
+      background-color: $rz-info
+    ),
+    warning: (
+      background-color: $rz-warning
+    ),
+    error: (
+      background-color: $rz-danger
+    ),
+    danger: (
+      background-color: $rz-danger
+    ),
+    success: (
+      background-color: $rz-success
+    )
+  ),
+  $badge-styles
+);
+
+.rz-badge {
+  .rz-button & {
+    vertical-align: top;
+    margin: 0 0.25rem;
+  }
+}
+
+
+// PanelMenu
+
+$panel-menu-color: $rz-white !default;
+$panel-menu-background-color: $rz-base-900 !default;
+$panel-menu-hover-background-color: lighten($rz-base-900, 8%) !default;
+$panel-menu-hover-color: inherit !default;
+
+$panel-menu-item-line-height: 1.25rem !default;
+$panel-menu-item-padding: 0.75rem 1rem !default;
+$panel-menu-item-border: 1px solid lighten($rz-base-900, 8%) !default;
+$panel-menu-item-active-background-color: $rz-base-900 !default;
+$panel-menu-item-active-color: inherit !default;
+$panel-menu-item-active-indicator: $rz-primary !default;
+$panel-menu-item-offset: 0.75rem !default;
+$panel-menu-item-transition: $rz-transition-all !default;
+
+$panel-menu-item-2nd-level-padding: 0.5rem 1rem !default;
+$panel-menu-item-2nd-level-offset: 2.75rem !default;
+$panel-menu-item-2nd-level-font-size: 0.875rem !default;
+$panel-menu-item-2nd-level-color: inherit !default;
+
+$panel-menu-item-2nd-level-hover-background-color: lighten($rz-base-900, 8%) !default;
+$panel-menu-item-2nd-level-hover-color: inherit !default;
+
+$panel-menu-item-2nd-level-active-background-color: lighten($rz-base-900, 6%)  !default;
+$panel-menu-item-2nd-level-active-color: inherit !default;
+
+$panel-menu-item-3rd-level-hover-background-color: lighten($rz-base-900, 10%) !default;
+$panel-menu-item-3rd-level-hover-color: inherit !default;
+
+$panel-menu-item-3rd-level-active-background-color: lighten($rz-base-900, 12%) !default;
+$panel-menu-item-3rd-level-active-color: inherit !default;
+
+$panel-menu-icon-width: 1.25rem !default;
+$panel-menu-icon-font-size: 1.25rem !default;
+$panel-menu-icon-color: $panel-menu-color !default;
+$panel-menu-icon-height: $panel-menu-icon-width !default;
+$panel-menu-icon-margin: 0 0.5rem 0 0 !default;
+$panel-menu-icon-2nd-level-margin: 0 0.5rem 0 -1.75rem !default;
+
+$panel-menu-font-size: 0.875rem !default;
+$panel-menu-toggle-icon-font-size: 1.25rem !default;
+$panel-menu-toggle-icon-opacity: 0.4 !default;
+
+// Card
+
+$card-padding: 1.25rem !default;
+$card-background-color: $default-background-color !default;
+$card-shadow: $rz-shadow-level-1, $rz-shadow-level-2 !default;
+$card-border-radius: $rz-border-radius !default;
+$card-heading-margin-bottom: 0.5rem !default;
+
+// Steps
+
+$steps-color: $body-color !default;
+
+$steps-number-width: 2rem !default;
+$steps-number-height: $steps-number-width !default;
+$steps-number-background-color: $rz-base-300 !default;
+$steps-number-border-radius: 50% !default;
+$steps-number-color: $body-color !default;
+$steps-number-padding: 0.5rem 0 !default;
+$steps-number-selected-background: $rz-primary !default;
+$steps-number-selected-color: $rz-white !default;
+
+$steps-title-selected-color: $rz-primary !default;
+$steps-title-margin: 0 1rem 0 0.5rem !default;
+$steps-button-color: $rz-primary !default;
+
+// ProgressBar
+
+$progressbar-value-background-color: $rz-primary-lighter !default;
+$progressbar-background-color: $rz-base-200 !default;
+$progressbar-font-size: 0.875rem !default;
+$progressbar-height: 1.25rem !default;
+$progressbar-border-radius: $rz-border-radius !default;
+
+// Accordion
+
+$accordion-item-padding: 0.25rem 0 !default;
+$accordion-item-margin: 0 !default;
+$accordion-item-background-color: $rz-white !default;
+$accordion-item-color: $body-color !default;
+$accordion-item-line-height: 1.25rem !default;
+$accordion-item-font-size: 0.875rem !default;
+$accordion-item-font-weight: normal !default;
+$accordion-icon-width: 1.25rem !default;
+$accordion-icon-height: $accordion-icon-width !default;
+$accordion-icon-font-size: 1.25rem !default;
+$accordion-icon-margin: 0 0.25rem 0 0 !default;
+$accordion-selected-color: $rz-base-900 !default;
+$accordion-hover-color: $rz-primary !default;
+$accordion-content-padding: 0.5rem 0.5rem 0.5rem 1.5rem !default;
+$accordion-content-font-size: $accordion-item-font-size;
+$accordion-border-radius: $rz-border-radius !default;
+$accordion-item-border: none !default;
+$accordion-shadow: none !default;
+
+// Tabs
+
+$tabs-tab-background-color: $rz-base-200 !default;
+$tabs-shadow: none !default;
+$tabs-border: 1px solid $rz-base-200 !default;
+$tabs-tab-color: $rz-base-800 !default;
+$tabs-selected-tab-color: $rz-base-900 !default;
+$tabs-tab-font-size: 0.875rem !default;
+$tabs-tab-font-weight: normal !default;
+$tabs-background-color: $rz-white !default;
+$tabs-tab-padding: 0.5rem 1rem !default;
+$tabs-padding: 1.25rem !default;
+$tabs-tab-selected-top-border-color: $rz-primary !default;
+$tabs-hover-color: $rz-primary !default;
+$tabs-hover-background-color: $tabs-background-color !default;
+$tabs-border-radius: $rz-border-radius !default;
+$tabs-icon-font-size: 1.25rem !default;
+$tabs-icon-margin: 0 0.25rem 0 -0.25rem !default;
+$tabs-transition: $rz-transition-all !default;
+
+
+// Grid
+
+$grid-border-radius: 0;
+
+$grid-data-border-shadow: 0 1px 0 0 $rz-base-200, 0 -1px 0 0 $rz-base-200;
+
+$grid-cell-border: 1px solid $rz-base-200 !default;
+$grid-right-cell-border: $grid-cell-border !default;
+$grid-bottom-cell-border: $grid-cell-border !default;
+$grid-cell-padding: 0.5rem !default;
+$grid-cell-color: $rz-base-800 !default;
+$grid-cell-font-size: 0.875rem !default;
+
+$grid-hover-background-color: $rz-primary-lighter !default;
+$grid-hover-color: $rz-primary !default;
+
+$grid-selected-background-color: lighten($rz-primary-lighter, 20%) !default;
+$grid-selected-color: $rz-primary !default;
+
+$grid-stripe-background-color: lighten($rz-base-100, 1%) !default;
+
+$grid-toolbar-background-color: $rz-white !default;
+$grid-header-cell-border: $grid-cell-border  !default;
+$grid-header-cell-border-bottom: $grid-header-cell-border !default;
+$grid-header-background-color: $rz-base-100 !default;
+$grid-header-font-size: $grid-cell-font-size !default;
+$grid-header-line-height: 1.25rem !default;
+$grid-header-font-weight: 600 !default;
+$grid-header-text-transform: none !default;
+$grid-header-color: $rz-base-900 !default;
+$grid-header-cell-padding: 0.5rem 0 !default;
+$grid-header-title-padding: 0 0.125rem 0 0.5rem !default;
+$grid-header-title-vertical-align: middle !default;
+$grid-header-sorted-background-color: $rz-base-100 !default;
+
+$grid-header-padding: 1rem !default;
+
+$grid-foot-cell-color: $rz-base-900 !default;
+$grid-foot-background-color: $rz-base-200 !default;
+
+$grid-filter-background-color: $rz-base-100 !default;
+$grid-filter-padding: 0 0.5rem !default;
+$grid-filter-margin: -0.5rem 0 !default;
+$grid-filter-border: none !default;
+$grid-filter-font-size: 0.875rem !default;
+$grid-filter-icon-width: 1.25rem !default;
+$grid-filter-icon-height: 1.25rem !default;
+$grid-filter-icon-margin: 0 0.25rem 0 0 !default;
+$grid-filter-icon-font-size: 1.25rem !default;
+$grid-filter-color: $rz-base-400 !default;
+$grid-filter-focus-color: $rz-base-900 !default;
+$grid-filter-operator-margin: 1rem !default;
+$grid-filter-buttons-padding: 1rem !default;
+$grid-filter-buttons-border: 1px solid $rz-base-200 !default;
+$grid-filter-buttons-background-color: $rz-white !default;
+
+$grid-clear-filter-button-background-color: $rz-base-200 !default;
+$grid-clear-filter-button-color: $rz-base-800 !default;
+$grid-apply-filter-button-background-color: $rz-primary !default;
+
+$grid-header-filter-icon-margin: 0.25rem 0.5rem 0 0 !default;
+$grid-header-filter-icon-hover-color: $rz-base-900 !default;
+
+$grid-border: none !default;
+
+$grid-sort-icon-width: 1rem !default;
+$grid-sort-icon-height: $grid-sort-icon-width !default;
+$grid-sort-icon-color: $rz-base-400 !default;
+
+$grid-shadow: none !default;
+$grid-background-color: $rz-white !default;
+
+$grid-column-resizer-width: 0.5rem !default;
+$grid-column-resizer-helper-width: 0.25rem !default;
+$grid-column-resizer-helper-background-color: $rz-primary !default;
+
+$grid-column-icon-width: 2rem !default;
+$grid-column-icon-padding: 0 !default;
+
+$grid-detail-template-border: none !default;
+$grid-detail-template-border-radius: 0 !default;
+$grid-detail-template-padding: 0 !default;
+$grid-detail-template-background-color: $rz-base-100 !default;
+
+$grid-loading-indicator-background-color: $rz-primary-lighter !default;
+$grid-button-icon-only-padding: 0 0.25rem !default;
+$grid-button-text-padding: 0 0.6875rem !default;
+$grid-button-font-size: 0.75rem !default;
+$grid-button-icon-width: 0.75rem !default;
+$grid-button-icon-height: $grid-button-icon-width !default;
+$grid-button-height: 1.25rem !default;
+$grid-button-line-height: $grid-button-height !default;
+
+$grid-frozen-cell-border: $grid-cell-border !default;
+$grid-frozen-cell-background-color: $grid-header-background-color !default;
+
+$grid-state-transition: $rz-transition-all !default;
+
+$grid-group-header-padding: 0.5rem !default;
+$grid-group-header-item-padding: 0.5rem !default;
+$grid-group-header-item-margin: 0 0.5rem 0 0 !default;
+
+$column-drag-handle-color: $rz-base-400 !default;
+
+$column-drag-handle-hover-color: $rz-base-900 !default;
+
+.rz-selectable {
+  .rz-datatable-even,
+  .rz-datatable-odd {
+    td,
+    .rz-cell-data {
+      transition: background-color $rz-transition, color $rz-transition;
+    }
+
+    &:hover {
+      > td:not(.rz-frozen-cell) {
+        background-color: $grid-hover-background-color;
+        
+      }
+
+      .rz-cell-data {
+        color: $grid-hover-color;
+      }
+    }
+  }
+}
+
+// DataList
+
+$datalist-background-color: transparent !default;
+$datalist-shadow: none !default;
+$datalist-padding: 0.5rem !default;
+$datalist-border: 1px solid $rz-base-200 !default;
+
+$datalist-item-shadow: none !default;
+$datalist-item-border: 1px solid $rz-base-200 !default;
+$datalist-item-vertical-margin: 0.5rem 0 !default;
+$datalist-item-horizontal-margin: 0.5rem !default;
+$datalist-item-padding: 1rem !default;
+$datalist-item-background-color: $rz-white !default;
+$datalist-border-radius: $rz-border-radius !default;
+
+// Scheduler
+
+$scheduler-border: solid 1px $rz-base-200 !default;
+$scheduler-shadow: none !default;
+$scheduler-padding: 0.5rem !default;
+$scheduler-background-color: $rz-white !default;
+
+$scheduler-toolbar-padding: 0.5rem !default;
+$scheduler-toolbar-background-color: $rz-base-100 !default;
+$scheduler-toolbar-font-size: 0.875rem !default;
+$scheduler-toolbar-color: $body-color !default;
+$scheduler-toolbar-button-background-color: $rz-base-200 !default;
+$scheduler-toolbar-button-font-size: 0.875rem !default;
+$scheduler-toolbar-button-width: 1.25rem !default;
+$scheduler-toolbar-button-height: 1.25rem !default;
+$scheduler-toolbar-text-transform: uppercase !default;
+
+$scheduler-toolbar-title-font-size: 1rem !default;
+$scheduler-toolbar-title-font-weight: 700 !default;
+
+$scheduler-button-padding: 0.4375rem 1rem !default;
+$scheduler-button-font-size: 0.75rem !default;
+$scheduler-prev-next-button-padding: 0.5rem !default;
+$scheduler-prev-next-button-font-size: 1.25rem !default;
+$scheduler-button-line-height: 1.25rem !default;
+$scheduler-today-button-margin-left: 0.5rem !default;
+
+$scheduler-view-button-border: solid 1px $rz-base-200 !default;
+$scheduler-view-button-color: $rz-base-800 !default;
+$scheduler-view-button-background-color: transparent !default;
+$scheduler-view-selected-background-color: lighten($rz-primary-lighter, 20%) !default;
+$scheduler-view-selected-border-color: transparent !default;
+$scheduler-view-selected-color: $rz-primary !default;
+
+$scheduler-header-background-color: $rz-base-100 !default;
+$scheduler-header-font-size: 0.75rem !default;
+$scheduler-header-color: $rz-base-600 !default; // Not used
+$scheduler-header-border: 1px solid $rz-base-200 !default;
+$scheduler-header-padding: 0.5rem 0 !default;
+
+$scheduler-border-color: $rz-base-200 !default;
+$scheduler-minor-border-color: $rz-base-100 !default;
+$scheduler-color: $body-color !default;
+
+$scheduler-slot-title-padding: 0 0.25rem !default;
+
+$scheduler-event-color: $body-color !default;
+$scheduler-event-background-color: $rz-series-2 !default;
+$scheduler-event-font-size: 0.75rem !default;
+$scheduler-event-line-height: 1rem !default;
+$scheduler-event-padding: 0 1px 1px 1px !default;
+$scheduler-event-content-padding: 0.125rem 0.25rem !default;
+
+$scheduler-day-number-padding: 0 0.5rem !default;
+$scheduler-border-radius: $rz-border-radius !default;
+
+// Overlay Panel
+
+$overlay-shadow: $rz-shadow-level-2 !default;
+$overlay-border: solid 1px $rz-base-200 !default;
+$overlay-background-color: $body-bg !default;
+
+// Pager
+
+$paginator-background-color: transparent !default;
+$paginator-padding: 0.5rem !default;
+
+$paginator-numeric-button-background-color: $rz-base-200 !default;
+$paginator-numeric-button-color: $rz-base-800 !default;
+$paginator-numeric-button-margin: 0 0.125rem !default;
+$paginator-numeric-button-padding: 0.5rem 1rem !default;
+$paginator-numeric-button-selected-background-color: $rz-primary-lighter !default;
+$paginator-numeric-button-selected-color: $rz-primary !default;
+$paginator-numeric-button-selected-border: none !default;
+$paginator-numeric-button-selected-padding: $paginator-numeric-button-padding !default;
+
+$paginator-back-button-background-color: $rz-base-200 !default;
+$paginator-back-button-color: $rz-base-800 !default;
+
+$paginator-first-button-margin: 0 0.5rem 0 0 !default;
+$paginator-last-button-margin: 0 0 0 0.5rem !default;
+
+$paginator-next-button-background-color: $rz-base-200 !default;
+$paginator-next-button-color: $rz-base-800 !default;
+
+$paginator-dropdown-width: 80px !default;
+$paginator-dropdown-margin: $paginator-last-button-margin !default;
+
+$paginator-summary-padding: 0 1.25rem 0 0 !default;
+$paginator-summary-font-size: 0.875rem !default;
+$paginator-summary-color: $rz-base-600 !default;
+
+$paginator-button-size: ".rz-button-md" !default;
+
+// Tree
+
+$tree-node-padding: 0.25rem !default;
+$tree-node-selected-background-color: $rz-primary !default;
+$tree-node-selected-color: $rz-white !default;
+$tree-node-selected-border-radius: $rz-border-radius !default;
+$tree-node-margin: 1px 0 !default;
+$tree-node-hover-background-color: $rz-primary-lighter !default;
+$tree-node-hover-color: $rz-primary !default;
+$tree-node-toggle-color: $rz-base-600 !default;
+$tree-node-toggle-hover-color: $rz-base-900 !default;
+$tree-icon-right: 'arrow_right' !default;
+$tree-icon-down: 'arrow_drop_down' !default;
+$tree-transition: $rz-transition-all !default; 
+
+
+// Switch
+
+$switch-background-color: $rz-base-200 !default;
+$switch-checked-background-color: $rz-primary !default;
+$switch-box-shadow: $rz-shadow-level-1, $rz-shadow-level-2 !default;
+
+// Header
+
+$header-background-color: $rz-white !default;
+$header-min-height: 3.125rem !default;
+$header-z: 2 !default;
+$header-border: 1px solid $rz-white !default;
+$header-color: $body-color !default;
+$header-shadow: $rz-shadow-level-2 !default;
+
+// Footer
+
+$footer-padding: 1rem !default;
+$footer-background-color: $rz-white !default;
+$footer-border: none !default;
+$footer-color: $body-color !default;
+$footer-z: 2 !default;
+
+// Sidebar
+
+$sidebar-border-right: 1px solid $rz-base-800 !default;
+$sidebar-background-color: $rz-base-900 !default;
+
+// SidebarToggle
+
+$sidebar-toggle-border: 1px solid $rz-base-200 !default;
+$sidebar-toggle-hover-color: $rz-base-900 !default;
+$sidebar-toggle-background-color: $rz-white !default;
+$sidebar-toggle-color: $rz-base-800 !default;
+$sidebar-toggle-hover-background-color: $rz-white !default;
+$sidebar-toggle-hover-border-radius: 0 !default;
+
+// Menu
+
+$menu-background-color: $default-background-color !default;
+$menu-border: none !default;
+$menu-border-radius: 0 !default;
+
+$menu-item-padding: 0.5rem !default;
+$menu-item-color: $body-color !default;
+$menu-item-selected-color: $rz-primary !default;
+$menu-item-icon-margin: 0 0.5rem 0 0 !default;
+$menu-item-hover-background-color: $rz-primary-lighter !default;
+$menu-item-hover-color: $rz-primary !default;
+$menu-item-offset: 1rem;
+$menu-item-transition: $rz-transition-all !default;
+
+$menu-top-item-padding: 0.5rem !default;
+$menu-top-item-hover-color: $rz-primary !default;
+$menu-top-item-hover-background-color: $rz-primary-lighter !default;
+$menu-top-item-background-color: $menu-background-color !default;
+$menu-top-item-color: $menu-item-color !default;
+
+$context-menu-box-shadow: $rz-shadow-level-2 !default;
+
+// ProfileMenu
+
+$profile-menu-background-color: $default-background-color !default;
+$profile-menu-top-item-background-color: $profile-menu-background-color !default;
+$profile-menu-border: 1px solid $rz-base-200 !default;
+$profile-menu-padding: 0.625rem 1rem !default;
+$profile-menu-border-radius: $rz-border-radius !default;
+$profile-menu-toggle-button-color: $body-color !default;
+
+$profile-menu-item-hover-background-color: $rz-primary-lighter !default;
+$profile-menu-item-icon-width: 1.25rem !default;
+$profile-menu-item-icon-height: $profile-menu-item-icon-width !default;
+$profile-menu-item-icon-font-size: $profile-menu-item-icon-height !default;
+$profile-menu-item-icon-margin: 0 0.5rem 0 0 !default;
+
+// Gravatar
+
+$gravatar-width: 2rem !default;
+$gravatar-height: $gravatar-width !default;
+$gravatar-border-radius: 50% !default;
+$gravatar-box-shadow: $rz-shadow-inset-level-1 !default;
+
+// Panel
+
+$panel-background-color: $default-background-color !default;
+$panel-padding: 0.5rem !default;
+$panel-title-line-height: 1.25rem !default;
+$panel-title-font-weight: 600 !default;
+$panel-content-margin: 0 !default;
+$panel-toggle-icon-width: 1.5rem !default;
+$panel-toggle-icon-height: $panel-toggle-icon-width !default;
+$panel-toggle-icon-border-radius: $rz-border-radius !default;
+$panel-toggle-icon-background-color: $rz-base-200 !default;
+$panel-hover-color: $rz-primary !default;
+$panel-border-radius: $rz-border-radius !default;
+$panel-shadow: none !default;
+
+// Input components
+
+$input-font-size: 0.875rem !default;
+$input-height: 2.25rem;
+$input-line-height: 1.429 !default;
+$input-padding: 0.4375rem !default;
+$input-value-color: $rz-base-800 !default;
+$input-placeholder-color: $rz-base-600 !default;
+$input-background-color: $rz-white !default;
+$input-border: 1px solid $rz-base-300 !default;
+$input-border-radius: $border-radius !default;
+$input-shadow: none !default;
+
+$input-hover-shadow: none !default;
+$input-value-hover-color: $rz-base-800 !default;
+$input-hover-border: 1px solid $rz-primary-light !default;
+
+$input-focus-border: 1px solid $rz-primary-light !default;
+$input-focus-shadow: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-primary, 0.2) !default;
+
+$input-disabled-border: 1px solid $rz-base-300 !default;
+$input-disabled-background-color: $rz-base-100 !default;
+$input-disabled-shadow: none !default;
+$input-disabled-color: $rz-base-800 !default;
+$input-disabled-placeholder-color: $rz-base-600 !default;
+$input-disabled-opacity: .5 !default;
+
+$input-transition: $rz-transition-all !default; 
+
+// Numeric
+
+$numeric-line-height: 1.25rem !default;
+$numeric-input-padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+$numeric-button-width: 1rem !default;
+$numeric-button-height: $numeric-button-width !default;
+$numeric-button-offset: 1px !default;
+$numeric-button-border-radius: $rz-border-radius / 2 !default;
+$numeric-button-background-color: $rz-white !default;
+$numeric-button-disabled-background-color: $rz-base-100 !default;
+$numeric-button-disabled-color: $rz-base-500 !default;
+$numeric-button-color: $rz-base-600 !default;
+
+// DatePicker
+
+$datepicker-trigger-icon-width: 1.25rem !default;
+$datepicker-trigger-icon-height: $datepicker-trigger-icon-width !default;
+$datepicker-line-height: 1.25rem !default;
+$datepicker-trigger-icon-color: $rz-base-800 !default;
+$datepicker-trigger-icon-hover-color: $rz-base-900 !default;
+
+$datepicker-panel-border: $overlay-border !default;
+$datepicker-panel-background-color: $rz-white !default;
+$datepicker-panel-shadow: $rz-shadow-level-2 !default;
+$datepicker-panel-margin: 0 !default;
+$datepicker-header-background-color: $rz-white !default;
+$datepicker-header-color: $rz-base-800 !default;
+$datepicker-header-padding: 0 1rem !default;
+$datepicker-header-line-height: 2.8125rem !default;
+$datepicker-header-border: none !default;
+
+$datepicker-calendar-padding: 0.5rem 0.875rem !default;
+$datepicker-calendar-header-font-size: 0.625rem !default;
+$datepicker-calendar-header-text-transform: uppercase !default;
+$datepicker-calendar-header-color: $rz-base-500 !default;
+$datepicker-calendar-font-size: 0.875rem !default;
+$datepicker-calendar-color: $body-color !default;
+$datepicker-calendar-hover-color: $rz-primary !default;
+$datepicker-calendar-hover-background-color: $rz-primary-lighter !default;
+$datepicker-calendar-selected-color: $rz-white !default;
+$datepicker-calendar-selected-background-color: $rz-primary !default;
+$datepicker-calendar-selected-hover-color: $rz-white !default;
+$datepicker-calendar-selected-hover-background-color: $rz-primary-light !default;
+$datepicker-calendar-border: none !default;
+$datepicker-calendar-border-radius: $rz-border-radius !default;
+$datepicker-calendar-transition: $rz-transition-all !default;
+
+$datepicker-title-height: 45px !important;
+
+$timepicker-background-color: $datepicker-header-background-color !default;
+$timepicker-color: $body-color !default;
+$timepicker-separator-color: $rz-base-500 !default;
+$timepicker-padding: 0.5rem !default;
+$timepicker-hour-padding: 0.5rem !default;
+$timepicker-button-background-color: $rz-primary !default;
+$timepicker-button-color: $rz-white !default;
+$timepicker-button-width: 0.875rem !default;
+$timepicker-button-height: $timepicker-button-width !default;
+$timepicker-button-border-radius: $rz-border-radius !default;
+$timepicker-button-padding: 0.5rem 1rem !important;
+$timepicker-separator-margin: 0 0.5rem !default;
+$timepicker-border: none !default;
+
+// Forms
+
+$form-error-color: $rz-danger !default;
+$form-error-font-size: 0.75rem !default;
+$form-group-margin-bottom: 1.5rem !default; // Bootstrap override
+$validator-background-color: $danger !default;
+$validator-color: $white !default;
+$validator-shadow: 0 6px 14px 0 rgba($rz-danger, 0.3) !default;
+$validator-text-padding: 0.25rem 0 0 0 !default;
+$validator-padding: 0.5rem !default;
+$validator-pointer-size: 0.25rem !default;
+$validator-transform: translateY(12px) !default;
+
+// Fieldset
+
+$fieldset-border: 1px solid $rz-base-300 !default;
+$fieldset-border-radius: $rz-border-radius !default;
+$fieldset-padding: 1.25rem !default;
+$fieldset-legend-color: $rz-base-800 !default;
+$fieldset-legend-font-size: 0.875rem !default;
+$fieldset-legend-padding: 0 1rem !default;
+
+$fieldset-toggle-width: 1.125rem !default;
+$fieldset-toggle-margin: 0 0.5rem 0 0 !default;
+$fieldset-toggle-height: $fieldset-toggle-width !default;
+$fieldset-toggle-background-color: $rz-base-200 !default;
+$fieldset-toggle-color: $rz-base-800 !default;
+$fieldset-toggle-font-size: 1rem !default;
+$fieldset-toggle-border: none !default;
+
+// Slider
+
+$slider-border: 1px solid $rz-base-300 !default;
+$slider-background-color: $rz-white !default;
+
+$slider-horizontal-height: 0.5rem !default;
+$slider-horizontal-width: 10rem !default;
+
+$slider-range-background-color: $rz-primary-lighter !default;
+$slider-range-border: 1px solid $rz-primary-lighter !default;
+
+$slider-handle-background-color: $rz-white !default;
+$slider-handle-width: 1.25rem !default;
+$slider-handle-height: 1.25rem !default;
+$slider-handle-border: 0.25rem solid $rz-primary;
+$slider-handle-border-radius: $rz-border-radius * 4 !default;
+$slider-handle-hover-border: $slider-handle-border !default;
+$slider-handle-hover-background-color: $rz-primary !default;
+$slider-handle-hover-shadow: none !default;
+$slider-handle-color: $rz-white !default;
+$slider-handle-icon-display: none !default;
+$slider-handle-transition: background-color 0.1s $rz-transition, color $rz-transition, border $rz-transition !default;
+
+$slider-disabled-range-background-color: $rz-base-200 !default;
+$slider-disabled-range-border: 1px solid $rz-base-300 !default;
+$slider-disabled-background-color: $rz-white !default;
+$slider-disabled-border: solid 1px $rz-base-200 !default;
+$slider-disabled-handle-background-color: $rz-white !default;
+$slider-disabled-handle-border: 0.25rem solid $rz-base-400;
+$slider-border-radius: $rz-border-radius * 2 !default;
+
+// Checkbox
+
+$checkbox-width: 1.25rem !default;
+$checkbox-height: $checkbox-width !default;
+$checkbox-border-radius: $rz-border-radius;
+$checkbox-label-margin: 0 1rem 0 0.5rem;
+$checkbox-margin: 1rem 0;
+
+$checkbox-checked-background-color: $rz-white !default;
+$checkbox-checked-hover-background-color: $rz-white !default;
+$checkbox-checked-color: $rz-primary !default;
+$checkbox-checked-shadow: none !default;
+$checkbox-checked-border: 1px solid $rz-base-300 !default;
+$checkbox-checked-icon-background-color: $rz-primary !default;
+$checkbox-checked-icon-border-radius: $rz-border-radius / 2 !default;
+
+$checkbox-icon-width: 0.625rem !default;
+$checkbox-icon-height: $checkbox-icon-width !default;
+$checkbox-icon-font-size: 0 !default;
+
+$checkbox-tri-icon-width: $checkbox-icon-width !default;
+$checkbox-tri-icon-height: 0.125rem !default;
+$checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
+
+.rz-checkbox-list-vertical,
+.rz-checkbox-list-horizontal {
+
+  &.rz-state-disabled > div > .rz-chkbox-label {
+    opacity: 0.5;
+  }
+
+  &:not(.rz-state-disabled) > div > .rz-chkbox-label:hover {
+    color: $rz-primary-light;
+    cursor: pointer;
+  }
+}
+
+// Radio Button
+
+$radio-width: 1.25rem !default;
+$radio-height: $radio-width !default;
+$radio-border-radius: 50%;
+$radio-label-margin: 0 1rem 0 0.5rem;
+$radio-margin: 1rem 0;
+
+$radio-active-background-color: $rz-white !default;
+$radio-active-shadow: none !default;
+
+$radio-checked-background-color: $rz-white !default;
+$radio-checked-hover-background-color: $rz-white !default;
+$radio-checked-hover-shadow: none !default;
+
+$radio-checked-color: $rz-white !default;
+
+$radio-circle-background-color: $rz-primary !default;
+$radio-circle-shadow: none;
+$radio-circle-hover-background-color: $rz-primary-light !default;
+
+$radio-icon-width: 0.625rem !default;
+$radio-icon-height: $radio-icon-width !default;
+$radio-checked-border: 1px solid $rz-base-300 !default;
+
+.rz-radio-button-list-vertical,
+.rz-radio-button-list-horizontal {
+
+  &.rz-state-disabled > div > .rz-radiobutton-label {
+    opacity: 0.5;
+  }
+
+  &:not(.rz-state-disabled) > div > .rz-radiobutton-label:hover {
+    color: $rz-primary-light;
+    cursor: pointer;
+  }
+}
+
+// DropDown
+
+$dropdown-trigger-icon-width: 1.25rem !default;
+$dropdown-trigger-icon-height: $dropdown-trigger-icon-width !default;
+$dropdown-trigger-icon-margin: 0 0.5rem 0 0 !default;
+
+$dropdown-horizontal-padding: 0.5rem !default;
+$dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
+$dropdown-items-margin: 0 (-$dropdown-horizontal-padding) !default;
+
+$dropdown-item-padding: $dropdown-horizontal-padding !default;
+$dropdown-item-font-size: $input-font-size !default;
+$dropdown-item-hover-background-color: $rz-primary-lighter !default;
+$dropdown-item-selected-background-color: lighten($rz-primary-lighter, 20%) !default;
+$dropdown-item-selected-shadow: none !default;
+$dropdown-item-hover-color: $rz-primary !default;
+$dropdown-item-selected-color: $rz-primary !default;
+$dropdown-item-selected-hover-background-color: $rz-primary-lighter !default;
+$dropdown-item-selected-hover-color: $dropdown-item-selected-color !default;
+$dropdown-item-transition: $rz-transition-all !default;
+
+$multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
+$dropdown-label-padding: 0 $dropdown-trigger-icon-width 0 0 !default;
+$dropdown-filter-border: 1px solid $rz-base-200 !default;
+$dropdown-filter-padding: 0.5rem 0 !default;
+
+$dropdown-open-background-color: $input-background-color !default;
+$dropdown-open-border: $input-border !default;
+$dropdown-panel-border: $dropdown-open-border !default;
+
+// ListBox
+
+$listbox-background-color: $input-background-color !default;
+$listbox-border-radius: $input-border-radius !default;
+$listbox-border: $input-border !default;
+$listbox-filter-border: $input-border !default;
+$listbox-padding: 0 !default;
+
+$listbox-item-padding: $dropdown-item-padding !default;
+$listbox-item-margin: 0 !default;
+
+$listbox-checkbox-margin: 0 0.5rem 0 0 !default;
+
+$listbox-header-padding: 0.5rem !default;
+$listbox-header-icon-width: 1.25rem !default;
+$listbox-header-icon-height: $listbox-header-icon-width !default;
+$listbox-header-icon-margin: 0 !default;
+
+// ColorPicker
+
+$colorpicker-panel-border: $overlay-border !default;
+$colorpicker-panel-background-color: $rz-white !default;
+$colorpicker-panel-shadow: $rz-shadow-level-2 !default;
+$colorpicker-panel-padding: 0.5rem !default;
+$colorpicker-panel-max-width: 20rem !default;
+$colorpicker-saturation-height: 200px !default;
+
+$colorpicker-value-border-radius: 50% !default;
+
+$colorpicker-item-size: 1.25rem !default;
+$colorpicker-item-border-radius: 50% !default;
+$colorpicker-item-margin: 0.25rem !default;
+$colorpicker-item-shadow: $rz-shadow-inset-level-1 !default;
+
+$colorpicker-handle-size: 12px !default;
+$colorpicker-handle-border: 2px solid $rz-white !default;
+$colorpicker-handle-shadow: $rz-shadow-inset-level-1, $rz-shadow-level-1, 0 0 0 1px rgba(0,0,0,.08);
+
+$colorpicker-hex-input-padding: 0.25rem 0.5rem !default;
+$colorpicker-hex-input-height: 2rem !default;
+$colorpicker-rgba-input-padding: 0.25rem 0.5rem !default;
+$colorpicker-rgba-input-height: 2rem !default;
+$colorpicker-input-labels-color: $rz-base-500 !default;
+
+// Rating
+
+$rating-color: $rz-base-500 !default;
+$rating-opacity: 1 !default;
+$rating-font-size: 1.25rem !default;
+$rating-selected-color: $rz-primary !default;
+$rating-disabled-color: $rating-color !default;
+$rating-disabled-opacity: 0.5 !default;
+$rating-ban-icon: "highlight_off" !default;
+
+// Upload
+
+$upload-button-bar-background-color: $rz-base-100 !default;
+$upload-button-bar-padding: 0.5rem !default;
+
+$upload-files-background-color: $rz-white !default;
+$upload-files-padding: 0.5rem 0 !default;
+$upload-files-remove-background-color: $rz-base-300 !default;
+$upload-files-remove-color: $rz-base-800 !default;
+
+$upload-files-margin: 0 0.5rem !default;
+
+$upload-choose-background-color: $rz-primary !default;
+$upload-cancel-background-color: $rz-base-300 !default;
+$upload-cancel-color: $rz-base-800 !default;
+$upload-button-background-color: $rz-primary !default;
+
+// Dialog
+
+$dialog-background-color: $rz-white !default;
+$dialog-shadow: 0 22px 64px 0 rgba(0, 0, 0, 0.22) !default;
+$dialog-title-background-color: $dialog-background-color !default;
+$dialog-title-border: none !default;
+$dialog-title-padding: 1.25rem 1.25rem 0.5rem !default;
+$dialog-title-font-size: 1.5rem !default;
+$dialog-title-line-height: 1.25em !default;
+$dialog-title-font-weight: 700 !default;
+$dialog-title-letter-spacing: -0.03em !default;
+$dialog-title-color: $rz-base-900 !default;
+$dialog-close-font-size: 1.25rem !default;
+$dialog-close-color: $rz-base-500 !default;
+$dialog-close-hover-color: $rz-base-900!default;
+$dialog-close-vertical-align: top !default;
+$dialog-content-padding: 1.25rem !default;
+$dialog-mask-background-color: $rz-base-600 !default;
+$dialog-border-radius: $rz-border-radius * 2 !default;
+
+// Scrollbar
+
+$scrollbar-background-color: transparent !default;
+$scrollbar-color: rgba($rz-base-600, 0.5) !default;
+
+// Editor
+
+$editor-border: 1px solid $rz-base-200 !default;
+$editor-border-radius: $rz-border-radius !default;
+$editor-toolbar-background-color: $rz-base-100 !default;
+$editor-toolbar-item-margin: 0.25rem 0.125rem !default;
+$editor-button-padding: 0.5rem !default;
+$editor-button-background-color: $rz-base-100 !default;
+$editor-button-color: $body-color !default;
+$editor-button-disabled-color: $rz-base-400 !default;
+$editor-button-selected-background-color: $rz-primary !default;
+$editor-button-selected-color: $rz-white !default;
+$editor-separator-background-color: $rz-base-200 !default;
+$editor-content-background-color: $input-background-color !default;
+
+// Splitter
+
+$splitter-bar-color: $rz-base-600 !default;
+$splitter-bar-color-active: $rz-primary !default;
+$splitter-bar-background-color: $rz-base-200 !default;
+$splitter-bar-background-color-active: $rz-primary-lighter !default;
+$splitter-bar-hover-opacity: 1 !default;
+
+// Tooltip
+
+$tooltip-background-color: $rz-base-900 !default;
+$tooltip-color: $rz-white !default;
+$tooltip-shadow: $rz-shadow-level-2 !default;
+$tooltip-padding: 0.25rem 0.5rem !default;
+$tooltip-border-radius: $input-border-radius !default;
+$tooltip-font-size: 0.875rem !default;
+
+// Gauge
+
+$gauge-scale-color: $rz-base-300 !default;
+$gauge-scale-label-color: $rz-base-600 !default;
+$gauge-scale-font-size: 0.875rem !default;
+$gauge-pointer-color: $rz-primary !default;
+$gauge-arc-scale-color: $rz-base-300 !default;
+$gauge-arc-scale-label-color: $rz-base-600 !default;
+$gauge-arc-value-color: $rz-primary !default;
+
+// Charts
+
+$chart-axis-color: $rz-base-300 !default;
+$chart-axis-label-color: $rz-base-600 !default;
+$chart-axis-font-size: 0.75rem !default;
+$chart-tooltip-background: $rz-white !default;
+$chart-tooltip-color: $rz-base-900 !default;
+
+$color-schemes: (
+  palette: (
+    #240093,
+    #5a0a8e,
+    #8f1389,
+    #c41d84,
+    #f9267f,
+    #fc695a,
+    #fe8e50,
+    #ffa14b,
+    #ffb346    
+  ),
+  pastel: (
+    #376DF5,
+    #64DFDF,
+    #F68769,
+    #C161E2,
+    #FDD07A,
+    #F8629B,
+    #74D062,
+    #84A7FF
+  ),
+  monochrome: (
+    #04247b,
+    #0734a6,
+    #0d45d4,
+    #2659fa,
+    #5a74fb,
+    #7d8efc,
+    #9ca8fd,
+    #b9c0fd
+  ),
+  divergent: (
+    #5d07d7,
+    #8436ca,
+    #ac67bb,
+    #d397ad,
+    #fdca9f,
+    #ffab83,
+    #ff8564,
+    #ff5e44,
+    #ff3725,
+  )
+) !default;
+
+
+@import 'fonts';
+@import 'typography';
+@import 'components';
+
+// Paragraph
+
+$paragraph-line-height: 1.429;
+
+::selection {
+  background-color: $rz-primary-lighter;
+}
+
+// Body
+$rz-body-background: no-repeat 180% 0 / 60% fixed url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwNCIgaGVpZ2h0PSIxNDU4IiB2aWV3Qm94PSIwIDAgMTIwNCAxNDU4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBvcGFjaXR5PSIwLjUiIGZpbHRlcj0idXJsKCNmaWx0ZXIwX2ZfNDkzXzEwMTM0KSI+CjxjaXJjbGUgY3g9IjcyMi4xMjgiIGN5PSI4MzkuMDIiIHI9IjQ4MS40MTkiIGZpbGw9InVybCgjcGFpbnQwX3JhZGlhbF80OTNfMTAxMzQpIi8+CjwvZz4KPGcgb3BhY2l0eT0iMC41IiBmaWx0ZXI9InVybCgjZmlsdGVyMV9mXzQ5M18xMDEzNCkiPgo8Y2lyY2xlIGN4PSI0NzAuMzMzIiBjeT0iNTcwLjMzMyIgcj0iNDcwLjMzMyIgZmlsbD0idXJsKCNwYWludDFfcmFkaWFsXzQ5M18xMDEzNCkiLz4KPC9nPgo8ZyBvcGFjaXR5PSIwLjUiIGZpbHRlcj0idXJsKCNmaWx0ZXIyX2ZfNDkzXzEwMTM0KSI+CjxjaXJjbGUgY3g9IjY5MS41MTEiIGN5PSI1MjIuMjk3IiByPSIzMzEuNTAzIiBmaWxsPSJ1cmwoI3BhaW50Ml9yYWRpYWxfNDkzXzEwMTM0KSIvPgo8L2c+CjxnIG9wYWNpdHk9IjAuNSIgZmlsdGVyPSJ1cmwoI2ZpbHRlcjNfZl80OTNfMTAxMzQpIj4KPGNpcmNsZSBjeD0iNjA4LjI0NCIgY3k9IjEwNzkuOTciIHI9IjMzMS41MDMiIHRyYW5zZm9ybT0icm90YXRlKC04MS4yMjQ0IDYwOC4yNDQgMTA3OS45NykiIGZpbGw9InVybCgjcGFpbnQzX3JhZGlhbF80OTNfMTAxMzQpIi8+CjwvZz4KPGRlZnM+CjxmaWx0ZXIgaWQ9ImZpbHRlcjBfZl80OTNfMTAxMzQiIHg9IjE0MC43MDkiIHk9IjI1Ny42MDEiIHdpZHRoPSIxMTYyLjg0IiBoZWlnaHQ9IjExNjIuODQiIGZpbHRlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJzUkdCIj4KPGZlRmxvb2QgZmxvb2Qtb3BhY2l0eT0iMCIgcmVzdWx0PSJCYWNrZ3JvdW5kSW1hZ2VGaXgiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJCYWNrZ3JvdW5kSW1hZ2VGaXgiIHJlc3VsdD0ic2hhcGUiLz4KPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNTAiIHJlc3VsdD0iZWZmZWN0MV9mb3JlZ3JvdW5kQmx1cl80OTNfMTAxMzQiLz4KPC9maWx0ZXI+CjxmaWx0ZXIgaWQ9ImZpbHRlcjFfZl80OTNfMTAxMzQiIHg9Ii0xMDAiIHk9IjAiIHdpZHRoPSIxMTQwLjY3IiBoZWlnaHQ9IjExNDAuNjciIGZpbHRlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJzUkdCIj4KPGZlRmxvb2QgZmxvb2Qtb3BhY2l0eT0iMCIgcmVzdWx0PSJCYWNrZ3JvdW5kSW1hZ2VGaXgiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJCYWNrZ3JvdW5kSW1hZ2VGaXgiIHJlc3VsdD0ic2hhcGUiLz4KPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNTAiIHJlc3VsdD0iZWZmZWN0MV9mb3JlZ3JvdW5kQmx1cl80OTNfMTAxMzQiLz4KPC9maWx0ZXI+CjxmaWx0ZXIgaWQ9ImZpbHRlcjJfZl80OTNfMTAxMzQiIHg9IjI2MC4wMDgiIHk9IjkwLjc5MzkiIHdpZHRoPSI4NjMuMDA2IiBoZWlnaHQ9Ijg2My4wMDYiIGZpbHRlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJzUkdCIj4KPGZlRmxvb2QgZmxvb2Qtb3BhY2l0eT0iMCIgcmVzdWx0PSJCYWNrZ3JvdW5kSW1hZ2VGaXgiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJCYWNrZ3JvdW5kSW1hZ2VGaXgiIHJlc3VsdD0ic2hhcGUiLz4KPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNTAiIHJlc3VsdD0iZWZmZWN0MV9mb3JlZ3JvdW5kQmx1cl80OTNfMTAxMzQiLz4KPC9maWx0ZXI+CjxmaWx0ZXIgaWQ9ImZpbHRlcjNfZl80OTNfMTAxMzQiIHg9IjE3Ni42OTQiIHk9IjY0OC40MjMiIHdpZHRoPSI4NjMuMSIgaGVpZ2h0PSI4NjMuMSIgZmlsdGVyVW5pdHM9InVzZXJTcGFjZU9uVXNlIiBjb2xvci1pbnRlcnBvbGF0aW9uLWZpbHRlcnM9InNSR0IiPgo8ZmVGbG9vZCBmbG9vZC1vcGFjaXR5PSIwIiByZXN1bHQ9IkJhY2tncm91bmRJbWFnZUZpeCIvPgo8ZmVCbGVuZCBtb2RlPSJub3JtYWwiIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9IkJhY2tncm91bmRJbWFnZUZpeCIgcmVzdWx0PSJzaGFwZSIvPgo8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI1MCIgcmVzdWx0PSJlZmZlY3QxX2ZvcmVncm91bmRCbHVyXzQ5M18xMDEzNCIvPgo8L2ZpbHRlcj4KPHJhZGlhbEdyYWRpZW50IGlkPSJwYWludDBfcmFkaWFsXzQ5M18xMDEzNCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSg3MjIuMTI4IDgzOS4wMikgcm90YXRlKDkwKSBzY2FsZSg0ODEuNDE5KSI+CjxzdG9wIHN0b3AtY29sb3I9IiNGRjFBNkMiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkYxQTZDIiBzdG9wLW9wYWNpdHk9IjAiLz4KPC9yYWRpYWxHcmFkaWVudD4KPHJhZGlhbEdyYWRpZW50IGlkPSJwYWludDFfcmFkaWFsXzQ5M18xMDEzNCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSg0NzAuMzMzIDU3MC4zMzMpIHJvdGF0ZSg5MCkgc2NhbGUoNDcwLjMzMykiPgo8c3RvcCBzdG9wLWNvbG9yPSIjM0FBQ0ZGIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzNBOTVGRiIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0icGFpbnQyX3JhZGlhbF80OTNfMTAxMzQiIGN4PSIwIiBjeT0iMCIgcj0iMSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIGdyYWRpZW50VHJhbnNmb3JtPSJ0cmFuc2xhdGUoNjkxLjUxMSA1MjIuMjk3KSByb3RhdGUoOTApIHNjYWxlKDMzMS41MDMpIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzQ4M0FGRiIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0ODNBRkYiIHN0b3Atb3BhY2l0eT0iMCIvPgo8L3JhZGlhbEdyYWRpZW50Pgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50M19yYWRpYWxfNDkzXzEwMTM0IiBjeD0iMCIgY3k9IjAiIHI9IjEiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKDYwOC4yNDQgMTA3OS45Nykgcm90YXRlKDkwKSBzY2FsZSgzMzEuNTAzKSI+CjxzdG9wIHN0b3AtY29sb3I9IiNGRkM4M0EiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkZDODNBIiBzdG9wLW9wYWNpdHk9IjAiLz4KPC9yYWRpYWxHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K") !default;
+
+body {
+  font-size: 0.875rem;
+  line-height: $paragraph-line-height;
+  background: $rz-base-100 $rz-body-background;
+}
+
+// Headings
+
+$heading-color: $rz-base-900;
+
+$headings: (
+  h1: (font-size: 2rem, line-height: 1.1875em, font-weight: 700, letter-spacing: -0.04em, color: $heading-color, margin-bottom: 1rem),
+  h2: (font-size: 1.5rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.03em, color: $heading-color, margin-bottom: 1rem),
+  h3: (font-size: 1.125rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.75rem),
+  h4: (font-size: 1rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem),
+  h5: (font-size: 0.875rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem),
+  h6: (font-size: 0.75rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem)
+);
+
+@each $name, $heading in $headings {
+  #{$name},
+  .#{$name} {
+    @each $name, $value in $heading {
+      #{$name}: #{$value};
+    }
+  }
+}
+
+$headings-thin: (
+  h1: (font-size: 3rem, font-weight: 300),
+  h2: (font-size: 2rem, font-weight: 300),
+  h3: (font-size: 1.25rem, font-weight: 300),
+  h4: (font-size: 1rem, font-weight: 300),
+  h5: (font-size: 0.875rem, font-weight: 300),
+  h6: (font-size: 0.75rem, font-weight: 300)
+);
+
+@each $name, $heading in $headings-thin {
+  #{$name}.text-thin,
+  .#{$name}.text-thin  {
+    @each $name, $value in $heading {
+      #{$name}: #{$value};
+    }
+  }
+}

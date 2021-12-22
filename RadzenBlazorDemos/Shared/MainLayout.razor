@@ -8,7 +8,7 @@
 @inject IJSRuntime JSRuntime
 @inject IHttpContextAccessor httpContextAccessor
 
-@if (Theme != "default.css")
+@if (Theme != "standard.css")
 {
     <link href="_content/Radzen.Blazor/css/@(Theme)" rel="stylesheet" />
 }
@@ -17,6 +17,7 @@
 <RadzenTooltip />
 <RadzenContextMenu />
 
+<RadzenLayout>
 <RadzenHeader>
     <ChildContent>
         <div class="row justify-content-start align-items-center">
@@ -42,41 +43,39 @@
         </div>
     </ChildContent>
 </RadzenHeader>
-<div style="width:100%">
-    <RadzenBody @ref="@body0" @bind-Expanded="@bodyExpanded">
-        <ChildContent>
-            <RadzenContentContainer Name="main">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12 pt-4 pb-5 px-3 px-lg-5">
-                            @Body
-                            <RadzenCard class="mt-5 content-footer">
-                                <div class="row align-items-center">
-                                    <div class="col-12 col-lg-7 px-5 py-3 text-center text-lg-left">
-                                        <h2 class="mb-3">Boost your Blazor development with Radzen</h2>
-                                        <p class="mb-2">Radzen is a desktop tool that gives you the power to create line of business applications. Build and launch Blazor apps visually, while we generate clean code for you.</p>
-                                    </div>
-                                    <div class="col-12 col-lg-5 px-5 text-center text-lg-right">
-                                        <NavLink class="cta-button primary ml-0 my-2" href="https://www.radzen.com/download/" target="_blank">Download Radzen</NavLink>
-                                        <NavLink class="cta-button my-2" href="https://www.radzen.com/features/" target="_blank">Learn More</NavLink>
-                                    </div>
+<RadzenBody @ref="@body0" @bind-Expanded="@bodyExpanded">
+    <ChildContent>
+        <RadzenContentContainer Name="main">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 pt-4 pb-5 px-3 px-lg-5">
+                        @Body
+                        <RadzenCard class="mt-5 content-footer">
+                            <div class="row align-items-center">
+                                <div class="col-12 col-lg-7 px-5 py-3 text-center text-lg-left">
+                                    <h2 class="mb-3">Boost your Blazor development with Radzen</h2>
+                                    <p class="mb-2">Radzen is a desktop tool that gives you the power to create line of business applications. Build and launch Blazor apps visually, while we generate clean code for you.</p>
                                 </div>
-                            </RadzenCard>
-                            <p class="mt-5 md-3 text-center">
-                                <RadzenLabel Text="Radzen Blazor Components, &copy; 2021 Radzen."></RadzenLabel>
-                                <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under
-                                <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a>
-                            </p>
-                            <p class="text-center">
-                                <Social />
-                            </p>
-                        </div>
+                                <div class="col-12 col-lg-5 px-5 text-center text-lg-right">
+                                    <NavLink class="cta-button ml-0 my-2" href="https://www.radzen.com/features/" target="_blank">Learn More</NavLink>
+                                    <NavLink class="cta-button primary my-2" href="https://www.radzen.com/download/" target="_blank">Download Radzen</NavLink>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                        <p class="mt-5 md-3 text-center">
+                            <RadzenLabel Text="Radzen Blazor Components, &copy; 2021 Radzen."></RadzenLabel>
+                            <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under
+                            <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a>
+                        </p>
+                        <p class="text-center">
+                            <Social />
+                        </p>
                     </div>
                 </div>
-            </RadzenContentContainer>
-        </ChildContent>
-    </RadzenBody>
-</div>
+            </div>
+        </RadzenContentContainer>
+    </ChildContent>
+</RadzenBody>
 <RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded">
     <ChildContent>
         <div style="padding: 1rem">
@@ -111,6 +110,7 @@
         </RadzenPanelMenu>
     </ChildContent>
 </RadzenSidebar>
+</RadzenLayout>
 @code {
     RadzenSidebar sidebar0;
     RadzenBody body0;
@@ -122,7 +122,8 @@
         new { Text = "Default Theme", Value = "default"},
         new { Text = "Dark Theme", Value="dark" },
         new { Text = "Software Theme", Value = "software"},
-        new { Text = "Humanistic Theme", Value = "humanistic" }
+        new { Text = "Humanistic Theme", Value = "humanistic" },
+        new { Text = "Standard Theme", Value = "standard" }
     };
 
     IEnumerable<Example> examples;

@@ -22,16 +22,8 @@ $upload-button-background-color: $primary !default;
 
     -webkit-appearance: none !important;
 
-    &:not(.rz-fileupload-choose) {
-      background-color: $upload-button-background-color;
-    }
-
     &[disabled] {
       opacity: 0.5;
-    }
-
-    .rzi {
-      display: none;
     }
   }
 }
@@ -43,10 +35,6 @@ $upload-button-background-color: $primary !default;
   vertical-align: middle;
   background-color: $upload-choose-background-color;
   @extend .rz-button-md;
-
-  .rzi {
-    display: none;
-  }
 
   input[type='file'] {
     position: absolute;
@@ -72,8 +60,6 @@ $upload-button-background-color: $primary !default;
   }
 
   .rz-button {
-    background-color: $upload-files-remove-background-color;
-    color: $upload-files-remove-color;
 
     .rzi-close,
     .rzi-times,
@@ -90,9 +76,9 @@ $upload-button-background-color: $primary !default;
 
 .rz-fileupload-buttonbar {
   position: relative;
-
   background-color: $upload-button-bar-background-color;
   padding: $upload-button-bar-padding;
+  border-radius: $input-border-radius;
 
   .rz-button {
     &:nth-child(3) {

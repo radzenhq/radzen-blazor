@@ -3,47 +3,46 @@
 @using System.Text.Json
 
 <RadzenExample Name="RequiredValidator">
-<div class="row">
-    <div class="col-xl-6">
-        <div class="row">
-            <div class="col">
-                <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
-                    <RadzenFieldset Text="Personal information">
-                        <div class="row" style="margin-bottom: 48px">
-                            <div class="col-md-4 align-right">
-                                <RadzenLabel Text="First Name" />
-                            </div>
-                            <div class="col">
-                                <RadzenTextBox style="display: block" Name="FirstName" @bind-Value=@model.FirstName />
-                                <RadzenRequiredValidator Component="FirstName" Text="First name is required" Popup=@popup Style="position: absolute"/>
-                            </div>
-                        </div>
-                        <div class="row" style="margin-bottom: 48px">
-                            <div class="col-md-4">
-                                <RadzenLabel Text="Last Name" />
-                            </div>
-                            <div class="col">
-                                <RadzenTextBox style="display: block" Name="LastName" @bind-Value=@model.LastName />
-                                <RadzenRequiredValidator Component="LastName" Text="Last name is required" Popup=@popup Style="position: absolute"/>
-                            </div>
-                        </div>
-                        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
-                    </RadzenFieldset>
-                </RadzenTemplateForm>
-            </div>
-            <div class="col">
-                <label>
-                    Display validators as popup
-                    <RadzenCheckBox @bind-Value=@popup></RadzenCheckBox>
-                </label>
-            </div>
+<div class="container my-4">
+    <div class="row">
+        <div class="col">
+            <RadzenCard Class="w-100 mb-4" >
+            <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
+                <RadzenLabel Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
+            </RadzenCard>
         </div>
     </div>
-    <div class="col-xl-6">
-        <EventConsole @ref=@console />
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+                <RadzenFieldset Text="Personal information">
+                    <div class="row mb-5">
+                        <div class="col-md-4">
+                            <RadzenLabel Text="First Name" />
+                        </div>
+                        <div class="col">
+                            <RadzenTextBox style="display: block" Name="FirstName" @bind-Value=@model.FirstName Class="w-100" />
+                            <RadzenRequiredValidator Component="FirstName" Text="First name is required" Popup=@popup Style="position: absolute"/>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-md-4">
+                            <RadzenLabel Text="Last Name" />
+                        </div>
+                        <div class="col">
+                            <RadzenTextBox style="display: block" Name="LastName" @bind-Value=@model.LastName  Class="w-100" />
+                            <RadzenRequiredValidator Component="LastName" Text="Last name is required" Popup=@popup Style="position: absolute"/>
+                        </div>
+                    </div>
+                    <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
+                </RadzenFieldset>
+            </RadzenTemplateForm>
+        </div>
     </div>
 </div>
 </RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     class Model

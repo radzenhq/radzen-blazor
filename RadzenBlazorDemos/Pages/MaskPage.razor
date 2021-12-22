@@ -2,28 +2,25 @@
 @using System.Text.Json;
 
 <RadzenExample Name="Mask">
-<div class="row">
-    <div class="col-xl-6">
-        <RadzenTemplateForm TItem="MyObject" Data=@obj Submit=@OnSubmit>
-            <h3>Telephone</h3>
-            <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" Name="Phone" @bind-Value=@obj.Phone Change=@(args => OnChange(args, "Telephone")) />
-            <h3 style="margin-top: 2rem">Credit Card</h3>
-            <RadzenMask Mask="**** **** **** ****" Pattern="[^0-9]" Placeholder="0000 0000 0000 0000" Name="CardNr" @bind-Value=@obj.CardNr Change=@(args => OnChange(args, "Credit Card")) />
-            <h3 style="margin-top: 2rem">SSN</h3>
-            <RadzenMask Mask="***-**-****" Pattern="[^0-9]" Placeholder="000-00-0000" Name="SSN" @bind-Value=@obj.SSN Change=@(args => OnChange(args, "SSN")) />
-            <div class="row justify-content-center">
-                <div class="col-md-12 d-flex align-items-end justify-content-center" style="margin-top: 2rem">
-                    <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save" />
-                    <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="margin-left: 10px;" Text="Cancel" />
-                </div>
+    <RadzenTemplateForm TItem="MyObject" Data=@obj Submit=@OnSubmit>
+        <RadzenCard Class="my-5 mx-auto" Style="max-width: 400px;">
+        <h4>Telephone</h4>
+        <RadzenMask Mask="(***) ***-****" CharacterPattern="[0-9]" Placeholder="(000) 000-0000" Name="Phone" @bind-Value=@obj.Phone Change=@(args => OnChange(args, "Telephone")) Style="width: 100%;" />
+        <h4 class="mt-4">Credit Card</h4>
+        <RadzenMask Mask="**** **** **** ****" CharacterPattern="[0-9]" Placeholder="0000 0000 0000 0000" Name="CardNr" @bind-Value=@obj.CardNr Change=@(args => OnChange(args, "Credit Card")) Style="width: 100%;" />
+        <h4 class="mt-4">SSN</h4>
+        <RadzenMask Mask="***-**-****" CharacterPattern="[0-9]" Placeholder="000-00-0000" Name="SSN" @bind-Value=@obj.SSN Change=@(args => OnChange(args, "SSN")) Style="width: 100%;" />
+        <div class="row">
+            <div class="col-md-12 d-flex align-items-end justify-content-left mt-4">
+                <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save" />
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="margin-left: 10px;" Text="Cancel" />
             </div>
-        </RadzenTemplateForm>
-    </div>
-    <div class="col-xl-6">
-        <EventConsole @ref=@console />
-    </div>
-</div>
+        </div>
+        </RadzenCard>
+    </RadzenTemplateForm>
 </RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
 
 @code { 
     public class MyObject

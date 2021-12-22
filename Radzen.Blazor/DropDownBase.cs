@@ -35,7 +35,12 @@ namespace Radzen
             var data = Data != null ? Data.Cast<object>() : Enumerable.Empty<object>();
             var view = (LoadData.HasDelegate ? data : View).Cast<object>().AsQueryable();
             var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
-            var top = Math.Min(request.Count, totalItemsCount - request.StartIndex);
+            var top = request.Count;
+
+            if(top <= 0)
+            {
+                top = PageSize;
+            }
 
             if (LoadData.HasDelegate)
             {
@@ -729,7 +734,7 @@ namespace Radzen
                         }
                         else
                         {
-                            _view = (typeof(IQueryable).IsAssignableFrom(Data.GetType())) ? Query.Cast<object>().ToList().AsQueryable() : Query;
+                            _view = (typeof(IQueryable).IsAssignableFrom(Data.GetType())) ? (Query as IEnumerable).Cast<object>().ToList().AsQueryable() : Query;
                         }
                     }
                 }
