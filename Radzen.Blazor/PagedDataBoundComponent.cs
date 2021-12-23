@@ -28,12 +28,23 @@ namespace Radzen
         [Parameter]
         public bool AllowPaging { get; set; }
 
+        int _PageSize = 10;
         /// <summary>
         /// Gets or sets the size of the page.
         /// </summary>
         /// <value>The size of the page.</value>
         [Parameter]
-        public int PageSize { get; set; } = 10;
+        public int PageSize 
+        {
+            get
+            {
+                return pageSize ?? _PageSize;
+            }
+            set
+            {
+                _PageSize = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the page numbers count.
@@ -185,7 +196,8 @@ namespace Radzen
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            bool pageSizeChanged = parameters.DidParameterChange(nameof(PageSize), PageSize);
+            bool pageSizeChanged = parameters.DidParameterChange(nameof(PageSize), PageSize) &&
+                PageSize != pageSize;
 
             await base.SetParametersAsync(parameters);
 
@@ -259,13 +271,15 @@ namespace Radzen
             await InvokeAsync(Reload);
         }
 
+        int? pageSize;
+
         /// <summary>
         /// Called when [page size changed].
         /// </summary>
         /// <param name="value">The value.</param>
         protected async Task OnPageSizeChanged(int value)
         {
-            PageSize = value;
+            pageSize = value;
             await InvokeAsync(Reload);
         }
 
