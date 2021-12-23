@@ -418,6 +418,12 @@ namespace Radzen.Blazor
             column.SetFilterOperator(null);
             column.SetSecondFilterOperator(null);
 
+            column.FilterValue = null;
+            column.SecondFilterValue = null;
+            column.FilterOperator = default(FilterOperator);
+            column.SecondFilterOperator = default(FilterOperator);
+            column.LogicalFilterOperator = default(LogicalFilterOperator);
+
             skip = 0;
             CurrentPage = 0;
 
