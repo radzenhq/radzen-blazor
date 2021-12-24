@@ -14,7 +14,7 @@
         else if (menu.Options.Items != null && menu.Options.Items.Any())
         {
             <div class="rz-context-menu">
-                <RadzenMenu Click="@(args => { if (menu.Options.Click != null) { menu.Options.Click(args); } })">
+                <RadzenMenu Click="@(args => { if (menu.Options.Click != null) { menu.Options.Click(args); } })" Responsive="false">
                     @foreach (var item in menu.Options.Items)
                     {
                         <RadzenMenuItem Text="@item.Text" Value="@item.Value"></RadzenMenuItem>
