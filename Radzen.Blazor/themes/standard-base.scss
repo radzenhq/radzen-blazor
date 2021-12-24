@@ -1017,7 +1017,7 @@ $form-group-margin-bottom: 1.5rem !default; // Bootstrap override
 $validator-background-color: $danger !default;
 $validator-color: $white !default;
 $validator-shadow: 0 6px 14px 0 rgba($rz-danger, 0.3) !default;
-$validator-text-padding: 0.25rem 0 0 0 !default;
+$validator-text-padding: 0 !default;
 $validator-padding: 0.5rem !default;
 $validator-pointer-size: 0.25rem !default;
 $validator-transform: translateY(12px) !default;
