@@ -8,10 +8,6 @@ using RadzenBlazorDemos.Services;
 
 namespace RadzenBlazorDemos
 {
-	public class ThemeState
-    {
-        public string CurrentTheme { get; set; } = "standard";
-    }
     public class Startup
     {
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -25,7 +21,7 @@ namespace RadzenBlazorDemos
             {
                 o.MaximumReceiveMessageSize = 10 * 1024 * 1024;
             });
-            services.AddScoped<ThemeState>();
+            services.AddScoped<ThemeService>();
             services.AddScoped<ExampleService>();
 
             services.AddScoped<NorthwindContext>();

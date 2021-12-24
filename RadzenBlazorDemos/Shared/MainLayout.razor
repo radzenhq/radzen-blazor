@@ -2,16 +2,12 @@
 @using Microsoft.AspNetCore.Http
 @using Radzen.Blazor
 @inherits LayoutComponentBase
-@inject ThemeState ThemeState
+@inject ThemeService ThemeService
 @inject ExampleService ExampleService
 @inject NavigationManager UriHelper
 @inject IJSRuntime JSRuntime
 @inject IHttpContextAccessor httpContextAccessor
 
-@if (Theme != "standard.css")
-{
-    <link href="_content/Radzen.Blazor/css/@(Theme)" rel="stylesheet" />
-}
 <RadzenDialog />
 <RadzenNotification />
 <RadzenTooltip />
@@ -32,7 +28,7 @@
                     <a href="/docs/" title="Radzen Blazor Components Documentation" class="mx-2 mx-lg-3" target="_blank">Documentation</a>
                     <a href="https://www.radzen.com/" title="Create .NET Core web applications fast & easy" class="text-nowrap mx-2 mx-lg-3" target="_blank">About Radzen</a>
                 </div>
-                <RadzenDropDown class="mx-0 mx-lg-3" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@themes" Value="@ThemeState.CurrentTheme" Change="@ChangeTheme" />
+                <RadzenDropDown class="mx-0 mx-lg-3" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@ThemeService.Themes" Value="@ThemeService.CurrentTheme" Change="@ChangeTheme" />
                 <a href="https://github.com/radzenhq/radzen-blazor" title="GitHub" target="_blank" class="mx-3">
                     <svg width="24" height="24" viewBox="0 0 512 499.36" xmlns="http://www.w3.org/2000/svg">
                     <title>GitHub</title>
@@ -117,25 +113,7 @@
     bool sidebarExpanded = true;
     bool bodyExpanded = false;
 
-    dynamic themes = new[]
-    {
-        new { Text = "Default Theme", Value = "default"},
-        new { Text = "Dark Theme", Value="dark" },
-        new { Text = "Software Theme", Value = "software"},
-        new { Text = "Humanistic Theme", Value = "humanistic" },
-        new { Text = "Standard Theme", Value = "standard" }
-    };
-
     IEnumerable<Example> examples;
-
-    string Theme
-    {
-        get
-        {
-            return $"{ThemeState.CurrentTheme}.css";
-        }
-    }
-
     protected override void OnInitialized()
     {
         if (httpContextAccessor != null && httpContextAccessor.HttpContext != null &&
@@ -151,6 +129,8 @@
                 }
             }
         }
+
+        ThemeService.Initialize(UriHelper);
 
         examples = ExampleService.Examples;
 
@@ -176,7 +156,9 @@
 
     void ChangeTheme(object value)
     {
-        ThemeState.CurrentTheme = value.ToString();
-        UriHelper.NavigateTo(UriHelper.ToAbsoluteUri(UriHelper.Uri).ToString());
+        
+        var url = UriHelper.GetUriWithQueryParameter("theme", $"{value}");
+
+        UriHelper.NavigateTo(url, true);
     }
 }
