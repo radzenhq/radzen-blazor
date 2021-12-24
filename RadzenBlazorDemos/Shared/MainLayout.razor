@@ -77,7 +77,7 @@
         <div style="padding: 1rem">
             <RadzenTextBox Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" />
         </div>
-        <RadzenPanelMenu>
+        <RadzenPanelMenu Match="NavLinkMatch.Prefix">
             @foreach (var category in examples)
             {
                 <RadzenPanelMenuItem @bind-Expanded="@category.Expanded" Text="@category.Name" Path="@category.Path" Icon="@category.Icon">

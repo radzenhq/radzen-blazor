@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using System;
 using System.Collections.Generic;
 
@@ -25,6 +26,12 @@ namespace Radzen.Blazor
         /// <value>The click callback.</value>
         [Parameter]
         public EventCallback<MenuItemEventArgs> Click { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value representing the URL matching behavior.
+        /// </summary>
+        [Parameter]
+        public NavLinkMatch Match { get; set; }
 
         List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
 
@@ -73,7 +80,55 @@ namespace Radzen.Blazor
             var currentAbsoluteUrl = UriHelper.ToAbsoluteUri(UriHelper.Uri).AbsoluteUri;
             var absoluteUrl = UriHelper.ToAbsoluteUri(url).AbsoluteUri;
 
-            return string.Equals(currentAbsoluteUrl, absoluteUrl, StringComparison.OrdinalIgnoreCase);
+            if (EqualsHrefExactlyOrIfTrailingSlashAdded(absoluteUrl, currentAbsoluteUrl))
+            {
+                return true;
+            }
+
+            if (Match == NavLinkMatch.Prefix
+                && IsStrictlyPrefixWithSeparator(currentAbsoluteUrl, absoluteUrl))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool EqualsHrefExactlyOrIfTrailingSlashAdded(string absoluteUrl, string currentAbsoluteUrl)
+        {
+            if (string.Equals(currentAbsoluteUrl, absoluteUrl, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (currentAbsoluteUrl.Length == absoluteUrl.Length - 1)
+            {
+                if (absoluteUrl[absoluteUrl.Length - 1] == '/'
+                    && absoluteUrl.StartsWith(currentAbsoluteUrl, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsStrictlyPrefixWithSeparator(string value, string prefix)
+        {
+            var prefixLength = prefix.Length;
+            if (value.Length > prefixLength)
+            {
+                return value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+                    && (
+                        prefixLength == 0
+                        || !char.IsLetterOrDigit(prefix[prefixLength - 1])
+                        || !char.IsLetterOrDigit(value[prefixLength])
+                    );
+            }
+            else
+            {
+                return false;
+            }
         }
 
         void SelectItem(RadzenPanelMenuItem item)
