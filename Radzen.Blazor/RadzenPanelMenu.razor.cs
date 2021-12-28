@@ -113,6 +113,11 @@ namespace Radzen.Blazor
             return false;
         }
 
+        private static bool IsSeparator(char c)
+        {
+            return c == '?' || c == '/';
+        }
+
         private static bool IsStrictlyPrefixWithSeparator(string value, string prefix)
         {
             var prefixLength = prefix.Length;
@@ -121,8 +126,8 @@ namespace Radzen.Blazor
                 return value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
                     && (
                         prefixLength == 0
-                        || !char.IsLetterOrDigit(prefix[prefixLength - 1])
-                        || !char.IsLetterOrDigit(value[prefixLength])
+                        || IsSeparator(prefix[prefixLength - 1])
+                        || IsSeparator(value[prefixLength])
                     );
             }
             else
