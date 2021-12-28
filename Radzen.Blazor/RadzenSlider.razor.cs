@@ -118,7 +118,7 @@ namespace Radzen.Blazor
         {
             var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : decimal.Parse(Step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
 
-            var newValue = Math.Round(value / step) * step;
+            var newValue = Math.Round((value - MinValue()) / step) * step + MinValue();
 
             if (Range)
             {
