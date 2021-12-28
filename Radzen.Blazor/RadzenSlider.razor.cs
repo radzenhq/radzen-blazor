@@ -30,6 +30,7 @@ namespace Radzen.Blazor
         bool minChanged = false;
         bool rangeChanged = false;
         bool stepChanged = false;
+        bool stepBaseChanged = false;
         bool firstRender = true;
 
         decimal Left => ((MinValue() - Min) * 100) / (Max - Min);
@@ -44,6 +45,7 @@ namespace Radzen.Blazor
             minChanged = parameters.DidParameterChange(nameof(Min), Min);
             rangeChanged = parameters.DidParameterChange(nameof(Range), Range);
             stepChanged = parameters.DidParameterChange(nameof(Step), Step);
+            stepBaseChanged = parameters.DidParameterChange(nameof(StepBase), StepBase);
 
             await base.SetParametersAsync(parameters);
 
@@ -88,6 +90,11 @@ namespace Radzen.Blazor
                     stepChanged = false;
                 }
 
+                if (stepBaseChanged)
+                {
+                    stepBaseChanged = false;
+                }
+
                 if (Visible && !Disabled)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.createSlider", UniqueID, Reference, Element, Range, Range ? minHandle : handle, maxHandle, Min, Max, Value, Step);
@@ -117,8 +124,9 @@ namespace Radzen.Blazor
         public async System.Threading.Tasks.Task OnValueChange(decimal value, bool isMin)
         {
             var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : decimal.Parse(Step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+            var stepBase = CalculateStepBase();
 
-            var newValue = Math.Round(value / step) * step;
+            var newValue = ((Math.Round((value - stepBase) / step) * step) + stepBase);
 
             if (Range)
             {
@@ -188,6 +196,28 @@ namespace Radzen.Blazor
                     StateHasChanged();
                 }
             }
+        }
+
+        /// <summary>Calculates the step base value from the StepBase property.</summary>
+        /// <returns>System.Decimal.
+        /// The calculated step base value.</returns>
+        private decimal CalculateStepBase()
+        {
+            decimal stepBase = 0;
+            if (string.IsNullOrWhiteSpace(StepBase))
+            {
+                stepBase = 0;
+            }
+            else if (string.Equals(StepBase, "min", StringComparison.CurrentCultureIgnoreCase))
+            {
+                stepBase = MinValue();
+            }
+            else
+            {
+                stepBase = decimal.Parse(StepBase.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            return stepBase;
         }
 
         /// <inheritdoc />
@@ -288,6 +318,14 @@ namespace Radzen.Blazor
         /// <value>The step.</value>
         [Parameter]
         public string Step { get; set; } = "1";
+
+        /// <summary>
+        /// Gets or sets the step base, a value indicating the base value, the <see cref="P:Step"/> value shall be based to.
+        /// If <c>string.Empty</c>, or any value convertible to a decimal value of 0.0, step is based to 0 (the default behaviour of the control before this property was added). If "min", the step value is based on the Min property value. In any other case, the step value is based on the value converted to a decimal value.
+        /// </summary>
+        /// <value>The step base. Defaults to "0".</value>
+        [Parameter]
+        public string StepBase { get; set; } = "0";
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenSlider{TValue}"/> is range.
