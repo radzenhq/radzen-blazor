@@ -16,12 +16,12 @@ $scheduler-toolbar-text-transform: uppercase;
 $scheduler-toolbar-title-font-size: inherit !default;
 $scheduler-toolbar-title-font-weight: inherit !default;
 
-$scheduler-button-padding: 0 0.875rem !default;
+$scheduler-button-padding: 0.25rem 0.5rem !default;
 $scheduler-button-font-size: 0.6875rem !default;
 $scheduler-prev-next-button-padding: $scheduler-button-padding !default;
 $scheduler-prev-next-button-font-size: $scheduler-button-font-size !default;
-$scheduler-button-line-height: 1.75rem !default;
-$scheduler-today-button-margin-left: 16px !default;
+$scheduler-button-line-height: 1.25rem !default;
+$scheduler-today-button-margin-left: 0.5rem !default;
 
 $scheduler-view-button-border: solid 1px #dadfe2 !default;
 $scheduler-view-button-color: $cool-grey !default;
@@ -137,6 +137,7 @@ $scheduler-border-radius: $border-radius !default;
 
 .rz-scheduler-nav {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   padding: $scheduler-toolbar-padding;
   background: $scheduler-toolbar-background-color;
@@ -243,6 +244,10 @@ $scheduler-border-radius: $border-radius !default;
     border: $scheduler-view-button-border;
     border-radius: 0;
 
+    span {
+      margin-left: 0.25rem;
+    }
+
     &:first-child {
       border-top-left-radius: $scheduler-border-radius;
       border-bottom-left-radius: $scheduler-border-radius;
@@ -296,5 +301,45 @@ $scheduler-border-radius: $border-radius !default;
 .rz-event-list {
   .rz-event {
     position: static;
+  }
+}
+
+@media (max-width: 576px) {
+  .rz-scheduler-nav {
+    .rz-scheduler-nav-prev-next {
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      margin-right: 0.5rem;
+      order: 1;
+    }
+
+    .rz-scheduler-nav-title {
+      justify-content: center;
+      width: 100%;
+      order: 3;
+    }
+
+    .rz-scheduler-nav-views {
+      margin-bottom: 0.5rem;
+      justify-content: center;
+      flex-grow: 1;
+      order: 2;
+
+      .rz-button {
+        flex-grow: 1;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+
+        span {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .rz-slot-hours {
+    .rz-slot-header {
+      width: auto;
+    }
   }
 }
