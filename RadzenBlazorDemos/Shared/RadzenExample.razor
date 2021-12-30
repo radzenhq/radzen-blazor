@@ -8,7 +8,7 @@
 }
 @if (Documentation)
 {
-    <a class="documentation-link" target="blank" href="@DocumentationHref"><RadzenIcon Icon="help_outline" style="font-size: 1rem; margin-right: 4px;" /> Documentation</a>
+    <a class="documentation-link" target="blank" href="@DocumentationHref" title=@($"Open {Name} documentation in new tab") ><RadzenIcon Icon="help_outline" style="font-size: 1rem; margin-right: 4px;" /> @Name Docs</a>
 }
 <RadzenTabs>
     <Tabs>
