@@ -485,6 +485,15 @@ img.illustration {
 
 /* Responsive */
 
+@media (max-width: 1024px) {
+    .documentation-link {
+        padding: 0; 
+        float: none; 
+        margin-left: 0;
+        margin-bottom: 1rem;
+    }
+}
+
 @media (max-width: 767px) {
     .nav-links a {
         margin-left: 1rem;
