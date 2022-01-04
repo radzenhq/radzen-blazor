@@ -169,7 +169,9 @@ namespace Radzen.Blazor
             {
                 if(_groupedPagedView == null)
                 {
-                    _groupedPagedView = PagedView.GroupByMany(groups.Select(g => $"np({g.Property})").ToArray()).ToList();
+                    var query = View.OrderBy(string.Join(',', groups.Select(g => $"np({g.Property})")));
+                    var v = (AllowPaging && !LoadData.HasDelegate ? query.Skip(skip).Take(PageSize) : query).ToList().AsQueryable();
+                    _groupedPagedView = v.GroupByMany(groups.Select(g => $"np({g.Property})").ToArray()).ToList();
                 }
                 return _groupedPagedView;
             }
