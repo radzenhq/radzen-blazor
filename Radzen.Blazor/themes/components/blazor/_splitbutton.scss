@@ -20,6 +20,10 @@ $splitbutton-border-radius: $input-border-radius !default;
     border-bottom-right-radius: 0;
     padding: $splitbutton-padding;
   }
+
+  .rz-button-text-icon-left {
+    flex: 1;
+  }
 }
 
 .rz-splitbutton-menu {
