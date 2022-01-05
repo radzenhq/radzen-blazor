@@ -1,11 +1,15 @@
 @typeparam TItem
 @using System.Linq.Dynamic.Core
 <tr>
-    @for(var i = 0; i < GetLevel(); i++)
+    @if (Group.GroupDescriptor != null)
     {
-        <td class="rz-col-icon">
-            <span class="rz-column-title"></span>
-        </td>
+        @for (var i = 0; i < GetLevel(); i++)
+        {
+            <td class="rz-col-icon">
+                <span class="rz-column-title"></span>
+            </td>
+        }
+
     }
     <td class="rz-col-icon">
         <span class="rz-column-title"></span>
@@ -19,7 +23,7 @@
             {
                 @Grid.GroupHeaderTemplate(Group)
             }
-            else
+            else if(Group.GroupDescriptor != null)
             {
                 @(Group.GroupDescriptor.GetTitle() + ": " + (Group.Data.Key ?? ""))
             }
@@ -59,7 +63,7 @@
                     Group = new Group()
                     {
                         Level = level,
-                        GroupDescriptor = Grid.groups[level],
+                        GroupDescriptor = Grid.groups?.ElementAtOrDefault(level),
                         Data = _groupResult
                     };
                 }

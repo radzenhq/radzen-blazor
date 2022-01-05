@@ -33,6 +33,7 @@ namespace Radzen.Blazor
         }
 
         internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> virtualize;
+        internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<GroupResult> groupVirtualize;
 
         /// <summary>
         /// Gets Virtualize component reference.
@@ -64,39 +65,83 @@ namespace Radzen.Blazor
 
             return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(virtualDataItems, totalItemsCount);
         }
+
+        private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<GroupResult>> LoadGroups(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
+        {
+            var top = request.Count;
+
+            if(top <= 0)
+            {
+                top = PageSize;
+            }
+
+            var view = AllowPaging ? PagedView : View;
+            var query = view.AsQueryable().OrderBy(string.Join(',', groups.Select(g => $"np({g.Property})")));
+            _groupedPagedView = query.GroupByMany(groups.Select(g => $"np({g.Property})").ToArray()).ToList();
+
+            var totalItemsCount = _groupedPagedView.Count();
+
+            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<GroupResult>(_groupedPagedView.Skip(request.StartIndex).Take(top), totalItemsCount);
+        }
 #endif
         RenderFragment DrawRows(IList<RadzenDataGridColumn<TItem>> visibleColumns)
         {
             return new RenderFragment(builder =>
             {
-    #if NET5
+#if NET5
                 if (AllowVirtualization)
                 {
-                    builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>));
-                    builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<TItem>(LoadItems));
-                    builder.AddAttribute(2, "ChildContent", (RenderFragment<TItem>)((context) =>
+                    if(AllowGrouping && groups.Any() && !LoadData.HasDelegate)
                     {
-                        return (RenderFragment)((b) =>
+                        builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<GroupResult>));
+                        builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<GroupResult>(LoadGroups));
+
+                        builder.AddAttribute(2, "ChildContent", (RenderFragment<GroupResult>)((context) =>
                         {
-                            b.OpenComponent<RadzenDataGridRow<TItem>>(3);
-                            b.AddAttribute(4, "Columns", visibleColumns);
-                            b.AddAttribute(5, "Grid", this);
-                            b.AddAttribute(6, "TItem", typeof(TItem));
-                            b.AddAttribute(7, "Item", context);
-                            b.AddAttribute(8, "InEditMode", IsRowInEditMode(context));
-                            b.AddAttribute(9, "Index", virtualDataItems.IndexOf(context));
-
-                            if (editContexts.ContainsKey(context))
+                            return (RenderFragment)((b) =>
                             {
-                                b.AddAttribute(10, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[context]);
-                            }
+                                b.OpenComponent(3, typeof(RadzenDataGridGroupRow<TItem>));
+                                b.AddAttribute(4, "Columns", visibleColumns);
+                                b.AddAttribute(5, "Grid", this);
+                                b.AddAttribute(6, "GroupResult", context);
+                                b.AddAttribute(7, "Builder", b);
+                                b.SetKey(context);
+                                b.CloseComponent();
+                            });
+                        }));
 
-                            b.SetKey(context);
-                            b.CloseComponent();
-                        });
-                    }));
+                        builder.AddComponentReferenceCapture(8, c => { groupVirtualize = (Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<GroupResult>)c; });
+                    }
+                    else
+                    {
+                        builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>));
+                        builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<TItem>(LoadItems));
+                    
+                        builder.AddAttribute(2, "ChildContent", (RenderFragment<TItem>)((context) =>
+                        {
+                            return (RenderFragment)((b) =>
+                            {
+                                b.OpenComponent<RadzenDataGridRow<TItem>>(3);
+                                b.AddAttribute(4, "Columns", visibleColumns);
+                                b.AddAttribute(5, "Grid", this);
+                                b.AddAttribute(6, "TItem", typeof(TItem));
+                                b.AddAttribute(7, "Item", context);
+                                b.AddAttribute(8, "InEditMode", IsRowInEditMode(context));
+                                b.AddAttribute(9, "Index", virtualDataItems.IndexOf(context));
 
-                    builder.AddComponentReferenceCapture(8, c => { virtualize = (Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>)c; });
+                                if (editContexts.ContainsKey(context))
+                                {
+                                    b.AddAttribute(10, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[context]);
+                                }
+
+                                b.SetKey(context);
+                                b.CloseComponent();
+                            });
+                        }));
+
+                        builder.AddComponentReferenceCapture(8, c => { virtualize = (Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>)c; });
+
+                    }
 
                     builder.CloseComponent();
                 }
@@ -104,7 +149,7 @@ namespace Radzen.Blazor
                 {
                     DrawGroupOrDataRows(builder, visibleColumns);
                 }
-    #else
+#else
                 DrawGroupOrDataRows(builder, visibleColumns);
     #endif
             });
@@ -1090,11 +1135,19 @@ namespace Radzen.Blazor
                 Count = 1;
             }
 #if NET5
-            if (AllowVirtualization && virtualize != null)
+            if (AllowVirtualization)
             {
                 if(!LoadData.HasDelegate)
                 {
-                    await virtualize.RefreshDataAsync();
+                    if(virtualize != null)
+                    {
+                        await virtualize.RefreshDataAsync();
+                    }
+
+                    if(groupVirtualize != null)
+                    {
+                        await groupVirtualize.RefreshDataAsync();
+                    }
                 }
                 else
                 {
@@ -1113,13 +1166,21 @@ namespace Radzen.Blazor
             else
             {
 #if NET5
-                if (AllowVirtualization && virtualize != null)
+                if (AllowVirtualization)
                 {
-                    await virtualize.RefreshDataAsync();
+                    if(virtualize != null)
+                    {
+                        await virtualize.RefreshDataAsync();
+                    }
+
+                    if(groupVirtualize != null)
+                    {
+                        await groupVirtualize.RefreshDataAsync();
+                    }
                 }
 #endif
-            } 
-       }
+            }
+        }
 
         async Task InvokeLoadData(int start, int top)
         {
@@ -1537,13 +1598,18 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-        #if NET5
+#if NET5
                     itemToInsert = default(TItem);
-                    if (virtualize != null)
+                    if(virtualize != null)
                     {
                         virtualize.RefreshDataAsync();
                     }
-        #endif
+
+                    if(groupVirtualize != null)
+                    {
+                        groupVirtualize.RefreshDataAsync();
+                    }
+#endif
                 }
             }
             else
@@ -1588,15 +1654,20 @@ namespace Radzen.Blazor
             }
             else
             {
-    #if NET5
-                if (virtualize != null)
+#if NET5
+                if(virtualize != null)
                 {
                     await virtualize.RefreshDataAsync();
                 }
-    #endif
+
+                if(groupVirtualize != null)
+                {
+                    await groupVirtualize.RefreshDataAsync();
+                }
+#endif
             }
-            
-           await EditRowInternal(item);
+
+            await EditRowInternal(item);
         }
 
 
@@ -1675,7 +1746,7 @@ namespace Radzen.Blazor
 
         internal List<GroupDescriptor> groups = new List<GroupDescriptor>();
 
-        internal void EndColumnDropToGroup()
+        internal async Task EndColumnDropToGroup()
         {
             if(indexOfColumnToReoder != null)
             {
@@ -1689,6 +1760,11 @@ namespace Radzen.Blazor
                         descriptor = new GroupDescriptor() { Property = column.GetGroupProperty(), Title = column.Title };
                         groups.Add(descriptor);
                         _groupedPagedView = null;
+
+                        if (IsVirtualizationAllowed())
+                        {
+                            await Reload();
+                        }
                     }
                 }
 
