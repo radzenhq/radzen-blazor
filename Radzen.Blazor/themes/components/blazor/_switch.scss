@@ -4,8 +4,8 @@ $switch-box-shadow: none !default;
 $switch-width: 3rem !default;
 
 $switch-height: round($switch-width*600)/1000;
-$switch-circlesize: round($switch-width*420)/1000;
-$switch-circlemargin: round(($switch-height - $switch-circlesize)*500)/1000;
+$switch-circle-size: round($switch-width*420)/1000;
+$switch-circle-margin: round(($switch-height - $switch-circle-size)*500)/1000;
 
 .rz-switch {
     position: relative;
@@ -41,10 +41,10 @@ $switch-circlemargin: round(($switch-height - $switch-circlesize)*500)/1000;
 
 .rz-switch .rz-switch-circle:before {
     background: #ffffff;
-    width: $switch-circlesize;
-    height: $switch-circlesize;
-    left: $switch-circlemargin;
-    margin-top: round($switch-circlesize*-500)/1000;
+    width: $switch-circle-size;
+    height: $switch-circle-size;
+    left: $switch-circle-margin;
+    margin-top: round($switch-circle-size*-500)/1000;
     border-radius: 50%;
     transition-duration: 0.2s;
     box-shadow: $switch-box-shadow;
@@ -65,5 +65,5 @@ $switch-circlemargin: round(($switch-height - $switch-circlesize)*500)/1000;
 }
 
 .rz-switch.rz-switch-checked .rz-switch-circle:before {
-    transform: translateX($switch-width - ($switch-circlesize+$switch-circlemargin*2));
+    transform: translateX($switch-width - ($switch-circle-size+$switch-circle-margin*2));
 }
