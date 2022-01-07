@@ -193,7 +193,14 @@ namespace Radzen.Blazor
         private async System.Threading.Tasks.Task InternalValueChanged(object value)
         {
             TValue newValue;
-            BindConverter.TryConvertTo<TValue>(RemoveNonNumericCharacters(value), Culture, out newValue);
+            try
+            {
+                BindConverter.TryConvertTo<TValue>(RemoveNonNumericCharacters(value), Culture, out newValue);
+            }
+            catch
+            {
+                newValue = default(TValue);
+            }
 
             decimal? newValueAsDecimal = newValue == null ? default(decimal?) : (decimal)ConvertType.ChangeType(newValue, typeof(decimal));
 
