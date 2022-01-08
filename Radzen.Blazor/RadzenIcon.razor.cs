@@ -19,10 +19,16 @@ namespace Radzen.Blazor
         [Parameter]
         public string Icon { get; set; }
 
+        /// <summary>
+        /// Specifies the display style of the icon.
+        /// </summary>
+        [Parameter]
+        public IconStyle? IconStyle { get; set; }
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rzi d-inline-flex justify-content-center align-items-center";
+            return $"rzi {(IconStyle.HasValue ? $"rzi-{IconStyle.Value.ToString().ToLower()} " : "")}d-inline-flex justify-content-center align-items-center";
         }
     }
 }

@@ -1,5 +1,36 @@
 $icon-base-font-size: 1.5em !default; /* Preferred icon size */
 
+$icon-styles: () !default;
+$icon-styles: map-merge(
+  (
+    primary: (
+      color: $primary
+    ),
+    light: (
+      color: $light,
+    ),
+    secondary: (
+      color: $secondary
+    ),
+    info: (
+      color: $info
+    ),
+    warning: (
+      color: $warning
+    ),
+    error: (
+      color: $danger
+    ),
+    danger: (
+      color: $danger
+    ),
+    success: (
+      color: $success
+    )
+  ),
+  $icon-styles
+);
+
 .rzi {
   font-family: 'Material Icons';
   font-weight: normal;
@@ -25,4 +56,12 @@ $icon-base-font-size: 1.5em !default; /* Preferred icon size */
 
   /* Support for IE. */
   font-feature-settings: 'liga';
+}
+
+@each $style, $icon in $icon-styles {
+    .rzi-#{$style} {
+        @each $name, $value in $icon {
+            #{$name}: #{$value};
+        }
+    }
 }
