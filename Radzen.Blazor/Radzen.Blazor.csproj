@@ -53,6 +53,5 @@
   </ItemGroup>
   <Target Name="MoveCss" AfterTargets="AfterCompile">
     <Move SourceFiles="@(CssFiles)" DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/css/" />
-    <Message Importance="high" Text="Copying the minified build styles to WWWROOT" />
   </Target>
 </Project>
