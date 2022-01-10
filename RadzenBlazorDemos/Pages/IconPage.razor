@@ -114,6 +114,20 @@
 <RadzenIcon Icon="open_with" />
 <RadzenIcon Icon="pageview" />
 </div>
+
+<h4>Syled icons</h4>
+<RadzenDataList TItem="IconStyle" Data="@(Enum.GetValues<IconStyle>())" WrapItems="true">
+    <Template Context="style">
+        <div>
+            <h5>@style.ToString()</h5>
+            <RadzenIcon Icon="dashboard" IconStyle="@style" />
+            <RadzenIcon Icon="open_with" IconStyle="@style" />
+
+        </div>
+    </Template>
+
+</RadzenDataList>
+
 <style>
     .icons-preview .rzi {
         margin: 1rem;

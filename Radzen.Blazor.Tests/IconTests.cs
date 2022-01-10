@@ -45,5 +45,29 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
+
+        [Fact]
+        public void Icon_Renders_IconStyleClass()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenIcon>();
+
+            component.SetParametersAndRender(parameters => parameters.Add(icon => icon.IconStyle, IconStyle.Primary));
+
+            Assert.Contains(@$"rzi-primary", component.Markup);
+        }
+
+        [Fact]
+        public void Icon_NotRenders_IconStyleClass_WhenNull()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenIcon>();
+
+            component.SetParametersAndRender(parameters => parameters.Add(icon => icon.IconStyle, null));
+
+            Assert.DoesNotContain(@$"rzi-primary", component.Markup);
+        }
     }
 }
