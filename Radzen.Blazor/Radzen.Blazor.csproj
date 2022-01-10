@@ -43,15 +43,21 @@
       <LogicalName>$(MSBuildProjectName).xml</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
+
   <PropertyGroup>
     <LibSassOutputStyle>expanded</LibSassOutputStyle>
     <EnableDefaultSassItems>false</EnableDefaultSassItems>  
   </PropertyGroup>
+
   <ItemGroup>
-    <SassFile Include="$(MSBuildProjectDirectory)/themes/*.scss" Exclude="$(MSBuildProjectDirectory)/themes/_*.scss" />
-    <CssFiles Include="$(MSBuildProjectDirectory)/themes/*.css" />
+    <SassFile Include="$(MSBuildProjectDirectory)/themes/*.scss" Exclude="$(MSBuildProjectDirectory)/themes/_*.scss" Condition="'$(TargetFramework)' == 'net5.0'" />
   </ItemGroup>
-  <Target Name="MoveCss" AfterTargets="AfterCompile">
-    <Move SourceFiles="@(CssFiles)" DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/css/" />
+
+  <Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net5.0'" >
+    <ItemGroup>
+        <CssFile Include="$(MSBuildProjectDirectory)/themes/*.css" />
+    </ItemGroup>
+    <Move SourceFiles="@(CssFile)" DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/css/" />
   </Target>
+
 </Project>
