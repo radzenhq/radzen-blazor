@@ -925,18 +925,18 @@ namespace RadzenBlazorDemos
             if (string.IsNullOrEmpty(term))
                 return allExamples;
 
-            bool contains(string value) => value.Contains(term, StringComparison.OrdinalIgnoreCase);
+            bool contains(string value) => value != null && value.Contains(term, StringComparison.OrdinalIgnoreCase);
 
             bool filter(Example example) => contains(example.Name) || (example.Tags != null && example.Tags.Any(contains));
 
             bool deepFilter(Example example) => filter(example) || example.Children?.Any(filter) == true;
 
-            return Examples.Where(category => category.Children?.Any(deepFilter) == true)
+            return Examples.Where(category => category.Children?.Any(deepFilter) == true || filter(category))
                            .Select(category => new Example
                            {
                                Name = category.Name,
                                Expanded = true,
-                               Children = category.Children.Where(deepFilter).Select(example => new Example
+                               Children = category.Children?.Where(deepFilter).Select(example => new Example
                                {
                                    Name = example.Name,
                                    Path = example.Path,
