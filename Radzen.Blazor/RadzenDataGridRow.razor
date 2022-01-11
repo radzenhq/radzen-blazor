@@ -95,6 +95,70 @@
     </CascadingValue>
     </CascadingValue>
 </tr>
+
+@if (Grid.deepestChildColumnLevel > 0)
+{
+    for (var i = 0; i < Grid.deepestChildColumnLevel; i++)
+    {
+        <tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
+        @foreach(var g in Grid.groups)
+        {
+            <td class="rz-col-icon">
+                <span class="rz-column-title"></span>
+            </td>
+        }
+        @if (Grid.Template != null && Grid.ShowExpandColumn)
+        {
+            <td class="rz-col-icon">
+                <span class="rz-column-title"></span>
+                @if (rowArgs.Item1.Expandable)
+                {
+                    <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandItem(Item))">
+                        <span class="@(Grid.ExpandedItemStyle(Item))"></span>
+                    </a>
+                }
+            </td>
+        }
+        @foreach (var column in Grid.childColumns)
+        {
+            <RadzenDataGridCell Grid="@Grid" Column="@column" Item="@Item"
+            Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + Grid.getFrozenColumnClass(column, Columns))" Attributes="@(Grid.CellAttributes(Item, column))">
+                @if (Grid.Responsive)
+                {
+                    <span class="rz-column-title">
+                        @if (column.HeaderTemplate != null)
+                        {
+                            @column.HeaderTemplate
+                        }
+                        else
+                        {
+                            @column.Title
+                        }
+                    </span>
+                }
+                <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
+                    @if (Item != null)
+                    {
+                        @if (Grid.IsRowInEditMode(Item) && column.EditTemplate != null)
+                        {
+                            @column.EditTemplate(Item)
+                        }
+                        else if (column.Template != null)
+                        {
+                            @column.Template(Item)
+                        }
+                        else
+                        {
+                            @column.GetValue(Item)
+                        }
+                    }
+                </span>
+            </RadzenDataGridCell>
+        }
+        </tr>
+    }
+}
+
 @if (Grid.Template != null && Grid.expandedItems.Keys.Contains(Item))
 {
     <tr class="rz-expanded-row-content">

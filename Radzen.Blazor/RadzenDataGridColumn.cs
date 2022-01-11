@@ -23,6 +23,45 @@ namespace Radzen.Blazor
         public RadzenDataGrid<TItem> Grid { get; set; }
 
         /// <summary>
+        /// Gets or sets the columns.
+        /// </summary>
+        /// <value>The columns.</value>
+        [Parameter]
+        public RenderFragment Columns { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parent column.
+        /// </summary>
+        /// <value>The parent column.</value>
+        [CascadingParameter]
+        public RadzenDataGridColumn<TItem> Parent { get; set; }
+
+        internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
+        {
+            if (Grid.childColumns.Contains(column))
+            {
+                Grid.childColumns.Remove(column);
+                if (!Grid.disposed)
+                {
+                    try { InvokeAsync(StateHasChanged); } catch { }
+                }
+            }
+        }
+
+        internal int GetLevel()
+        {
+            int i = 0;
+            var p = Parent;
+            while (p != null)
+            {
+                p = p.Parent;
+                i++;
+            }
+
+            return i;
+        }
+
+        /// <summary>
         /// Called when initialized.
         /// </summary>
         protected override void OnInitialized()
