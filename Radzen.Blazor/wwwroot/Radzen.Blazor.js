@@ -1109,8 +1109,9 @@ window.Radzen = {
           });
       } else if (paste) {
         e.preventDefault();
+        var data = e.clipboardData.getData('text/html') || e.clipboardData.getData('text/plain');
 
-        instance.invokeMethodAsync('OnPaste', e.clipboardData.getData('text/html'))
+        instance.invokeMethodAsync('OnPaste', data)
           .then(function (html) {
             document.execCommand("insertHTML", false, html);
           });
