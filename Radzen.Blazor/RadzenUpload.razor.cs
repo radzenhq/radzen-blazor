@@ -98,7 +98,7 @@ namespace Radzen.Blazor
         /// Gets the choose class list.
         /// </summary>
         /// <value>The choose class list.</value>
-        ClassList ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button btn-secondary")
+        ClassList ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button")
                                               .AddDisabled(Disabled);
 
         /// <summary>

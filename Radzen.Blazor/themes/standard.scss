@@ -1242,10 +1242,37 @@ $upload-files-remove-color: $rz-base-800 !default;
 
 $upload-files-margin: 0 0.5rem !default;
 
-$upload-choose-background-color: $rz-primary !default;
+$upload-choose-background-color: $rz-secondary-lighter !default;
+$upload-choose-color: $rz-secondary !default;
+$upload-choose-hover-background-color: $rz-secondary-light !default;
+$upload-choose-hover-color: $rz-white !default;
+$upload-choose-active-background-color: $rz-secondary-dark !default;
+$upload-choose-active-color: $rz-white !default;
 $upload-cancel-background-color: $rz-base-300 !default;
 $upload-cancel-color: $rz-base-800 !default;
 $upload-button-background-color: $rz-primary !default;
+
+.rz-fileupload-choose {
+  &:not(.rz-state-disabled) {
+    background-color: $upload-choose-background-color;
+    color: $upload-choose-color;
+
+    &:hover {
+      background-color: $upload-choose-hover-background-color;
+      color: $upload-choose-hover-color;
+
+      &:not(:active) {
+        background-color: $upload-choose-hover-background-color;
+        color: $upload-choose-hover-color;
+      }
+    }
+
+    &:active {
+      background-color: $upload-choose-active-background-color;
+      color: $upload-choose-active-color;
+    }
+  }
+}
 
 // Dialog
 
