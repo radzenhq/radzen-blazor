@@ -24,6 +24,7 @@
     <DefineConstants>NET5</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="LibSassBuilder" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'netstandard2.1'" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'netstandard2.1'" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net5.0'" Version="5.0.0" />
@@ -33,46 +34,30 @@
   </ItemGroup>
 
   <ItemGroup>
-      <None Include="LICENSE.txt" Pack="true" PackagePath="" />
-      <None Include="icon.png" Pack="true" PackagePath="" />
+    <None Include="LICENSE.txt" Pack="true" PackagePath="" />
+    <None Include="icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>
-      <EmbeddedResource Include="LinkerConfig.xml">
-        <LogicalName>$(MSBuildProjectName).xml</LogicalName>
-      </EmbeddedResource>
+    <EmbeddedResource Include="LinkerConfig.xml">
+      <LogicalName>$(MSBuildProjectName).xml</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
-  
-  <UsingTask TaskName="RemoveSourceMap" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
-    <Task>
-      <Using Namespace="System" />
-      <Using Namespace="System.IO" />
-      <Using Namespace="System.Text" />
-      <Code Type="Fragment" Language="cs">
-        <![CDATA[
-          foreach (var file in Directory.EnumerateFiles("./wwwroot/css", "*.css"))
-          {
-              File.WriteAllText(file, File.ReadAllText(file).Replace("/*# sourceMappingURL=themes" + Path.DirectorySeparatorChar + Path.GetFileName(file) + ".map */", ""), Encoding.UTF8);
-          }
-        ]]>
-      </Code>
-    </Task>
-  </UsingTask>
-  
-  <Target Name="ToolRestore" BeforeTargets="PreBuildEvent">
-    <Exec Command="dotnet tool restore" StandardOutputImportance="high" />
-  </Target>
-  <Target Name="PreBuild" AfterTargets="ToolRestore">
-    <Exec Command="dotnet webcompiler -r themes -o wwwroot/css -z disable -m disable -p disable" StandardOutputImportance="high" />
+
+  <PropertyGroup>
+    <LibSassOutputStyle>expanded</LibSassOutputStyle>
+    <EnableDefaultSassItems>false</EnableDefaultSassItems>  
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SassFile Include="$(MSBuildProjectDirectory)/themes/*.scss" Exclude="$(MSBuildProjectDirectory)/themes/_*.scss" Condition="'$(TargetFramework)' == 'net5.0'" />
+  </ItemGroup>
+
+  <Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net5.0'" >
     <ItemGroup>
-      <CssFiles Include="$(MSBuildProjectDirectory)\themes\*.css" />
+        <CssFile Include="$(MSBuildProjectDirectory)/themes/*.css" />
     </ItemGroup>
-    <ItemGroup>
-      <BootstrapFiles Include="$(MSBuildProjectDirectory)\wwwroot\css\bootstrap\**\*.*" />
-    </ItemGroup>
-    <Delete Files="@(CssFiles)" />
-    <Delete Files="@(BootstrapFiles)" />
-    <RemoveDir Directories="$(MSBuildProjectDirectory)\wwwroot\css\bootstrap" />
-    <RemoveSourceMap />
+    <Move SourceFiles="@(CssFile)" DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/css/" />
   </Target>
+
 </Project>
