@@ -102,7 +102,10 @@ namespace Radzen.Blazor
             if (items.Contains(item))
             {
                 items.Remove(item);
-                try { InvokeAsync(StateHasChanged); } catch { }
+                if (!disposed)
+                {
+                    try { InvokeAsync(StateHasChanged); } catch { }
+                }
             }
         }
 

@@ -286,11 +286,15 @@ namespace Radzen
             }
         }
 
+        internal bool disposed = false;
+
         /// <summary>
         /// Detaches event handlers and disposes <see cref="Reference" />.
         /// </summary>
         public virtual void Dispose()
         {
+            disposed = true;
+
             reference?.Dispose();
             reference = null;
 

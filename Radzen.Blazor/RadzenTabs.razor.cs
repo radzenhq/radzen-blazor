@@ -123,13 +123,9 @@ namespace Radzen.Blazor
             {
                 tabs.Remove(item);
 
-                try
+                if (!disposed)
                 {
-                    InvokeAsync(StateHasChanged);
-                }
-                catch
-                {
-
+                    try { InvokeAsync(StateHasChanged); } catch { }
                 }
             }
         }

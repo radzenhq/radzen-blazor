@@ -1851,14 +1851,10 @@ namespace Radzen.Blazor
             }
         }
 
-        internal bool disposed = false;
-
         /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();
-
-            disposed = true;
 
             if (IsJSRuntimeAvailable)
             {

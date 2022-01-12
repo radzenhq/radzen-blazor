@@ -245,7 +245,10 @@ namespace Radzen.Blazor
             {
                 steps.Remove(item);
 
-                StateHasChanged();
+                if (!disposed)
+                {
+                    try { InvokeAsync(StateHasChanged); } catch { }
+                }
             }
         }
 

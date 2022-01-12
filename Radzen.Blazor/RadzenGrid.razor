@@ -1369,13 +1369,9 @@
         }
     }
 
-    private bool disposed = false;
-
     public override void Dispose()
     {
         base.Dispose();
-
-        disposed = true;
 
         foreach (var column in columns.Where(c => c.Visible))
         {
