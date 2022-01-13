@@ -33,6 +33,18 @@ $paginator-button-size: ".rz-button-sm" !default;
   align-items: center;
   justify-content: space-between;
 
+  &.rz-align-right {
+    justify-content: flex-end;
+  }
+
+  &.rz-align-left {
+    justify-content: flex-start;
+  }
+
+  &.rz-align-center {
+    justify-content: center;
+  }
+
   background-color: $paginator-background-color;
   padding: $paginator-padding;
 
@@ -85,24 +97,48 @@ $paginator-button-size: ".rz-button-sm" !default;
   border-bottom-left-radius: $border-radius;
 }
 
+.rz-paginator-pages {
+  margin: 0 0.5rem;
+}
+
 .rz-paginator-element {
   @extend .rz-button, #{$paginator-button-size}, .rz-button-icon-only;
 }
 
 .rz-paginator-first {
   margin: $paginator-first-button-margin;
+
+  .rz-align-center & {
+    margin-left: auto;
+  }
 }
 
 .rz-paginator-prev {
   margin-right: auto;
+
+  .rz-align-left &,
+  .rz-align-right &,
+  .rz-align-center & {
+    margin: $paginator-first-button-margin;
+  }
 }
 
 .rz-paginator-next {
   margin-left: auto;
+
+  .rz-align-left &,
+  .rz-align-right &,
+  .rz-align-center & {
+    margin: $paginator-last-button-margin;
+  }
 }
 
 .rz-paginator-last {
   margin: $paginator-last-button-margin;
+
+  .rz-align-center & {
+    margin-right: auto;
+  }
 }
 
 .rz-paginator-first,
@@ -148,6 +184,15 @@ $paginator-button-size: ".rz-button-sm" !default;
     padding: $paginator-summary-padding;
     font-size: $paginator-summary-font-size;
     color: $paginator-summary-color;
+
+    .rz-align-right & {
+      margin-right: auto;
+    }
+
+    .rz-align-left & {
+      margin-left: auto;
+      order: 2;
+    }
 }
 
 @media (max-width: 768px) {
