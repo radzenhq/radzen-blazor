@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
@@ -36,6 +37,46 @@ namespace Radzen
         [Parameter]
         public FilterCaseSensitivity FilterCaseSensitivity { get; set; } = FilterCaseSensitivity.Default;
 
+        /// <summary>
+        /// Gets or sets the diacritics sensitivity.
+        /// </summary>
+        /// <value>The filter diacritics sensitivity.</value>
+        [Parameter]
+        public FilterDiacriticsSensitivity FilterDiacriticsSensitivity { get; set; } = FilterDiacriticsSensitivity.Default;
+
+        /// <summary>
+        /// Gets or sets the symbols sensitivity.
+        /// </summary>
+        /// <value>The filter symbols sensitivity.</value>
+        [Parameter]
+        public FilterSymbolsSensitivity FilterSymbolsSensitivity { get; set; } = FilterSymbolsSensitivity.Default;
+
+        /// <summary>
+        /// Returns the compareOptions to be used in filtering oprations according the values of FilterCaseSensitivity,FilterDiacriticsSensitivity,FilterSymbolsSensitivity
+        /// </summary>
+        protected CompareOptions CompareOptions
+        {
+            get {
+                CompareOptions options = CompareOptions.None;
+                if (FilterCaseSensitivity==FilterCaseSensitivity.CaseInsensitive)
+                {
+                    options |= CompareOptions.IgnoreCase;
+                }
+                if (FilterDiacriticsSensitivity == FilterDiacriticsSensitivity.DiacriticsInsensitive)
+                {
+                    options |= CompareOptions.IgnoreNonSpace;
+                }
+                if (FilterSymbolsSensitivity == FilterSymbolsSensitivity.SymbolInsensitive)
+                {
+                    options |= CompareOptions.IgnoreSymbols;
+                }
+                return options;
+            }
+        }
+        protected string GetFilterExpression(string property)
+        {
+            return $"{property}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0,@1)";
+        }
         /// <summary>
         /// Gets or sets the filter operator.
         /// </summary>

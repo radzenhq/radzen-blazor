@@ -693,7 +693,34 @@ namespace Radzen
         /// </summary>
         CaseInsensitive
     }
-
+    /// <summary>
+    /// Specifies the filter Diacritics sensitivity of a component.
+    /// </summary>
+    public enum FilterDiacriticsSensitivity
+    {
+        /// <summary>
+        /// Relies on the underlying provider (LINQ to Objects, Entity Framework etc.) to handle diacritics sensitivity. LINQ to Objects is diacritics sensitive. Entity Framework relies on the database collection settings.
+        /// </summary>
+        Default,
+        /// <summary>
+        /// Filters are Diacritics insensitive regardless of the underlying provider.
+        /// </summary>
+        DiacriticsInsensitive
+    }
+    /// <summary>
+    /// Specifies the filter symbol sensitivity of a component. Valid symbols are members of the following categories in UnicodeCategory: MathSymbol, CurrencySymbol, ModifierSymbol, and OtherSymbol.
+    /// </summary>
+    public enum FilterSymbolsSensitivity
+    {
+        /// <summary>
+        /// It is used only on LINQ to Objects provider where the default behaviour is symbol sensitive.   
+        /// </summary>
+        Default,
+        /// <summary>
+        /// Filters are Diacritics insensitive regardless of the underlying provider.
+        /// </summary>
+        SymbolInsensitive
+    }
     /// <summary>
     /// Specifies the logical operator between filters.
     /// </summary>

@@ -146,10 +146,8 @@ namespace Radzen.Blazor
             {
                 if (Query != null)
                 {
-                    string filterCaseSensitivityOperator = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
-
-                    return Query.Where($"{TextProperty}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)",
-                        FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                   
+                    return Query.Where($"{GetFilterExpression(TextProperty)}", searchText, CompareOptions);
                 }
 
                 return null;

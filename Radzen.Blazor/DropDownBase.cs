@@ -703,8 +703,7 @@ namespace Radzen
                 {
                     if (!string.IsNullOrEmpty(searchText))
                     {
-                        var ignoreCase = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive;
-
+                     
                         var query = new List<string>();
 
                         if (!string.IsNullOrEmpty(TextProperty))
@@ -717,14 +716,8 @@ namespace Radzen
                             query.Add("ToString()");
                         }
 
-                        if (ignoreCase)
-                        {
-                            query.Add("ToLower()");
-                        }
+                        _view = Query.Where($"{GetFilterExpression(String.Join(".", query))}", searchText, CompareOptions);
 
-                        query.Add($"{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)");
-
-                        _view = Query.Where(String.Join(".", query), ignoreCase ? searchText.ToLower() : searchText);
                     }
                     else
                     {
