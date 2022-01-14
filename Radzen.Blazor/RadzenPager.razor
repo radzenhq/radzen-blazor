@@ -30,6 +30,7 @@
         @if(PageSizeOptions != null && PageSizeOptions.Any())
         {
             <RadzenDropDown TValue="int" Data="@PageSizeOptions" Value="@PageSize" Change="@OnPageSizeChanged" />
+            <span class="rz-pagesize-text">@PageSizeText</span>
         }
     </div>
 }
