@@ -105,6 +105,13 @@ namespace Radzen
         /// <value>The page size options.</value>
         [Parameter]
         public IEnumerable<int> PageSizeOptions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the page size description text.
+        /// </summary>
+        /// <value>The page size description text.</value>
+        [Parameter]
+        public string PageSizeText { get; set; } = "items per page";
         
         /// <summary>
         /// Gets or sets the pager summary visibility.

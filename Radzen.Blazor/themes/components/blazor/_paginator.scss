@@ -73,9 +73,17 @@ $paginator-button-size: ".rz-button-sm" !default;
   }
 
   .rz-dropdown {
+    order: 2;
     width: $paginator-dropdown-width;
-    margin: $paginator-last-button-margin;
+    margin-left: 1rem;
     overflow: visible;
+  }
+
+  .rz-pagesize-text {
+    order: 2;
+    margin: $paginator-last-button-margin;
+    font-size: $paginator-summary-font-size;
+    color: $paginator-summary-color;
   }
 
   .rz-dropdown-items-wrapper {
@@ -190,8 +198,9 @@ $paginator-button-size: ".rz-button-sm" !default;
     }
 
     .rz-align-left & {
-      margin-left: auto;
       order: 2;
+      margin-left: auto;
+      padding: 0;
     }
 }
 
