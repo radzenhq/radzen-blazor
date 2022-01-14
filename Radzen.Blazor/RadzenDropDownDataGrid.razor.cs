@@ -239,6 +239,7 @@ namespace Radzen.Blazor
                     }
                     else
                     {
+                        
                         query = query.Where($"{GetPropertyFilterExpression(TextProperty)}", searchText,CompareOptions);
                     }
                 }

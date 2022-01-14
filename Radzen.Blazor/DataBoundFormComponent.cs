@@ -75,7 +75,7 @@ namespace Radzen
         }
         protected string GetFilterExpression(string property)
         {
-            return $"{property}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0,@1)";
+            return $"StringExtensions.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}({property},@0,@1)";
         }
         /// <summary>
         /// Gets or sets the filter operator.
