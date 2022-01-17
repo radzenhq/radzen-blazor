@@ -39,6 +39,12 @@ namespace Radzen.Blazor
         [Parameter]
         public TimeSpan EndTime { get; set; } = TimeSpan.FromHours(24);
 
+        /// <summary>
+        /// Gets or sets slot size in minutes. Set to <c>30</c> by default.
+        /// </summary>
+        /// <value>The slot size in minutes.</value>
+        [Parameter]
+        public int MinutesPerSlot { get; set; } = 30;
         /// <inheritdoc />
         public override DateTime StartDate
         {

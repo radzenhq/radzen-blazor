@@ -5,10 +5,10 @@
     var eventGroups = AppointmentGroups(); 
     var lefts = new Dictionary<AppointmentData, double>();
 }
-@for (var date = StartDate; date < EndDate; date = date.AddMinutes(30))
+@for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
 {
     var start = date;
-    var end = start.AddMinutes(30);
+    var end = start.AddMinutes(MinutesPerSlot);
 
     var appointments = AppointmentsInSlot(start, end);
     var existingLefts = ExistingLefts(lefts, appointments);
@@ -26,7 +26,7 @@
 
         var eventStart = item.Start < StartDate ? StartDate : item.Start;
         var eventEnd = item.End > EndDate ? EndDate : item.End;
-        var length = eventStart.Subtract(StartDate).TotalMinutes / 30;
+        var length = eventStart.Subtract(StartDate).TotalMinutes / MinutesPerSlot;
         var top = 1.5 * length;
         var height = Math.Max(1.5, 1.5 * eventEnd.Subtract(eventStart).TotalHours * 2);
 
@@ -51,6 +51,9 @@
 
     [Parameter]
     public DateTime EndDate { get; set; }
+
+    [Parameter]
+    public int MinutesPerSlot { get; set; }
 
     [Parameter]
     public IList<AppointmentData> Appointments { get; set; }
@@ -105,10 +108,10 @@
             groups[index] = 0;
         }
 
-        for (var date = StartDate; date < EndDate; date = date.AddMinutes(30))
+        for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
         {
             var start = date;
-            var end = start.AddMinutes(30);
+            var end = start.AddMinutes(MinutesPerSlot);
 
             var appointments = AppointmentsInSlot(start, end);
 

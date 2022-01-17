@@ -1,6 +1,6 @@
 <div class="rz-slot-hours">
 @{var minor = false; }
-@for (var date = DateTime.Today.Add(Start); date < DateTime.Today.Add(End); date = date.AddMinutes(30))
+@for (var date = DateTime.Today.Add(Start); date < DateTime.Today.Add(End); date = date.AddMinutes(MinutesPerSlot))
 {
     @if (minor)
     {
@@ -23,4 +23,7 @@
 
     [Parameter]
     public string TimeFormat { get; set; } = "h tt";
+
+    [Parameter]
+    public int MinutesPerSlot { get; set; }
 }

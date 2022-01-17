@@ -11,15 +11,15 @@
     }
     </div>
     <div class="rz-view-content">
-        <Hours Start=@StartTime End=@EndTime TimeFormat="@TimeFormat" />
+        <Hours Start=@StartTime End=@EndTime TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot />
         <div class="rz-week-view-content">
         @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
         {
             var start = day.Add(StartTime);
             var end = day.Add(EndTime);
             <div class="rz-slots">
-                <DaySlotEvents StartDate=@start EndDate=@end Appointments=@Appointments />
-                @for (var date = start; date < end; date = date.AddMinutes(30))
+                <DaySlotEvents MinutesPerSlot=@MinutesPerSlot StartDate=@start EndDate=@end Appointments=@Appointments />
+                @for (var date = start; date < end; date = date.AddMinutes(MinutesPerSlot))
                 {
                     var slotDate = date;
                     <div @onclick=@(args => OnSlotClick(slotDate)) @attributes=@Attributes(date)></div>
@@ -46,6 +46,9 @@
     public string TimeFormat { get; set; }
 
     [Parameter]
+    public int MinutesPerSlot { get; set; }
+
+    [Parameter]
     public IList<AppointmentData> Appointments { get; set; }
 
     [CascadingParameter]
@@ -53,13 +56,13 @@
 
     async Task OnSlotClick(DateTime date)
     {
-        await Scheduler.SelectSlot(date, date.AddMinutes(30));
+        await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot));
     }
 
     IDictionary<string, object> Attributes(DateTime date)
     {
-        var attributes = Scheduler.GetSlotAttributes(date, date.AddMinutes(30));
-        attributes["class"] = ClassList.Create("rz-slot").Add("rz-slot-minor", date.Minute == 30).Add(attributes).ToString();
+        var attributes = Scheduler.GetSlotAttributes(date, date.AddMinutes(MinutesPerSlot));
+        attributes["class"] = ClassList.Create("rz-slot").Add("rz-slot-minor", (date.Minute / MinutesPerSlot) % 2 == 1).Add(attributes).ToString();
         return attributes;
     }
 }
