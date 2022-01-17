@@ -89,8 +89,15 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         protected bool GetVisible()
         {
-            return Visible && (Count > PageSize || (PageSizeOptions != null && PageSizeOptions.Any()));
+            return Visible && (AlwaysVisible || Count > PageSize || (PageSizeOptions != null && PageSizeOptions.Any()));
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether pager is visible even when not enough data for paging.
+        /// </summary>
+        /// <value><c>true</c> if pager is visible even when not enough data for paging otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AlwaysVisible { get; set; }
 
         /// <summary>
         /// Gets or sets the page changed callback.
