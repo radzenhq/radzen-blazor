@@ -1,7 +1,8 @@
 @typeparam TItem
-@if(Column != null && (Column.Columns == null || HeaderRowIndex < Grid.deepestChildColumnLevel))
+@if(!RenderedColumns.Contains(Column))
 {
-<th rowspan="@(Column.Columns == null && Column.Parent == null ? Grid.deepestChildColumnLevel + 1 : 1)"
+    RenderedColumns.Add(Column);
+    <th rowspan="@(Column.Columns == null && Column.Parent == null ? Grid.deepestChildColumnLevel + 1 : 1)"
     colspan="@(Column.Columns == null ? 1 : Grid.childColumns.Where(c => c.Visible && c.Parent == Column).Count())"
     @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex)) >
     <div @onclick='@((args) => Grid.OnSort(args, Column))' style="width:100%">
@@ -118,7 +119,7 @@ else
 {
     @foreach(var column in Grid.childColumns.Where(c => c.Visible && c.Parent == Column))
     {
-        <RadzenDataGridHeaderCell HeaderRowIndex="@HeaderRowIndex" Grid="@Grid" Column="@column" ColumnIndex="@ColumnIndex" 
+        <RadzenDataGridHeaderCell RenderedColumns="@RenderedColumns" Grid="@Grid" Column="@column" ColumnIndex="@ColumnIndex" 
             CssClass="@($"rz-unselectable-text {(Grid.AllowSorting && column.Sortable ? "rz-sortable-column" : "")} {column.HeaderCssClass} {Grid.getFrozenColumnClass(column, Grid.ColumnsCollection.Where(c => c.Visible).ToList())}".Trim())" />
     }
 }
@@ -133,7 +134,7 @@ else
     public int ColumnIndex { get; set; }
 
     [Parameter]
-    public int HeaderRowIndex { get; set; }
+    public IList<RadzenDataGridColumn<TItem>> RenderedColumns { get; set; }
 
     [Parameter]
     public RadzenDataGrid<TItem> Grid { get; set; }

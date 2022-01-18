@@ -61,6 +61,7 @@
                 }
             </colgroup>
             <thead>
+                @{var renderedColumns = new List<RadzenDataGridColumn<TItem>>();}
                 @for(var i = 0; i < deepestChildColumnLevel + 1; i++)
                 {
                 <tr>
@@ -93,7 +94,7 @@
                         var columnIndex = visibleColumns.IndexOf(column);
                         var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
 
-                        <RadzenDataGridHeaderCell HeaderRowIndex="@i" Grid="@this" Column="@(i > 0 && !childColumns.Where(c => c.Visible && c.Parent == column).Any() ? null : column)" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}".Trim())" Attributes="@(cellAttr)" />
+                        <RadzenDataGridHeaderCell RenderedColumns="@renderedColumns" Grid="@this" Column="@column" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)}".Trim())" Attributes="@(cellAttr)" />
                     }
                 </tr>
                 }
