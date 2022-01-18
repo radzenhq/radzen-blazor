@@ -16,11 +16,26 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenPager : RadzenComponent
     {
+        static readonly IDictionary<HorizontalAlign, string> HorizontalAlignCssClasses = new Dictionary<HorizontalAlign, string>
+        {
+            {HorizontalAlign.Center, "rz-align-center"},
+            {HorizontalAlign.Left, "rz-align-left"},
+            {HorizontalAlign.Right, "rz-align-right"},
+            {HorizontalAlign.Justify, "rz-align-justify"}
+        };
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-paginator rz-unselectable-text rz-helper-clearfix";
+            return $"rz-paginator rz-unselectable-text rz-helper-clearfix {HorizontalAlignCssClasses[HorizontalAlign]}";
         }
+
+        /// <summary>
+        /// Gets or sets the horizontal align.
+        /// </summary>
+        /// <value>The horizontal align.</value>
+        [Parameter]
+        public HorizontalAlign HorizontalAlign { get; set; } = HorizontalAlign.Justify;
 
         /// <summary>
         /// Gets or sets the page size.
