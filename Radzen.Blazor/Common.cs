@@ -960,6 +960,13 @@ namespace Radzen
         /// </summary>
         /// <value>The property.</value>
         public string Property { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sort order.
+        /// </summary>
+        /// <value>The sort order.</value>
+        public SortOrder? SortOrder { get; set; }
+
         /// <summary>
         /// Gets or sets the title displayed in the group.
         /// </summary>

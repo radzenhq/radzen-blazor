@@ -48,7 +48,7 @@
     {
         if(args.FirstRender)
         {
-            args.Grid.Groups.Add(new GroupDescriptor(){ Property = "Title" });
+            args.Grid.Groups.Add(new GroupDescriptor(){ Property = "Title", SortOrder = SortOrder.Descending });
             StateHasChanged();
         }
     }
