@@ -1,5 +1,12 @@
 @using System.IO
 @using Radzen.Blazor
+@inject ExampleService ExampleService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@ExampleService.TitleFor(example)</PageTitle>
+<HeadContent>
+    <meta name="description" content="@ExampleService.DescriptionFor(example)">
+</HeadContent>
 
 @if (Heading)
 {
@@ -47,4 +54,11 @@
 
     [Parameter]
     public IEnumerable<string> AdditionalSourceCodePages { get; set; } = Enumerable.Empty<string>();
+
+    Example example;
+
+    protected override void OnInitialized()
+    {
+        example = ExampleService.FindCurrent(NavigationManager.ToAbsoluteUri(NavigationManager.Uri));
+    }
 }

@@ -137,16 +137,6 @@
         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-        {
-            var example = ExampleService.FindCurrent(UriHelper.ToAbsoluteUri(UriHelper.Uri));
-
-            await JSRuntime.InvokeVoidAsync("setTitle", ExampleService.TitleFor(example));
-        }
-    }
-
     void FilterPanelMenu(ChangeEventArgs args)
     {
         var term = args.Value.ToString();
