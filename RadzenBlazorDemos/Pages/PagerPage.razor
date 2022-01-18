@@ -30,7 +30,7 @@
             </RadzenCard>
         </Template>
     </RadzenDataList>
-    <RadzenPager ShowPagingSummary="true" PagingSummaryFormat="@pagingSummaryFormat" Count="count" PageSize="@pageSize" PageNumbersCount="10" PageChanged="@PageChanged" />
+    <RadzenPager ShowPagingSummary="true" PagingSummaryFormat="@pagingSummaryFormat" HorizontalAlign="HorizontalAlign.Right" Count="count" PageSize="@pageSize" PageNumbersCount="5" PageChanged="@PageChanged" />
 </RadzenExample>
 @code {
     string pagingSummaryFormat = "Displaying page {0} of {1} (total {2} records)";
