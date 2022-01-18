@@ -821,13 +821,6 @@ namespace Radzen.Blazor
         public bool GroupFootersAlwaysVisible { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether pager is visible even when not enough data for paging.
-        /// </summary>
-        /// <value><c>true</c> if pager is visible even when not enough data for paging otherwise, <c>false</c>.</value>
-        [Parameter]
-        public bool PagerAlwaysVisible { get; set; }
-
-        /// <summary>
         /// Gets or sets the group header template.
         /// </summary>
         /// <value>The group header template.</value>
