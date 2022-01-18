@@ -7,7 +7,7 @@
 
 <RadzenExample Name="DataGrid" Source="DataGridDynamicData" Heading="false">
     <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced"
-            AllowPaging="true" PageSize="5" AllowSorting="true" Data="@data" TItem="IDictionary<string, object>"
+            AllowPaging="true" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Center" AllowSorting="true" Data="@data" TItem="IDictionary<string, object>"
             IsLoading="@isLoading"
             Count="@count" LoadData="@LoadData">
         <Columns>

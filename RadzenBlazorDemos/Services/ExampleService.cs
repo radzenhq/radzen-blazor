@@ -267,6 +267,7 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "Paging",
+                    Updated = true,
                     Icon = "&#xe5dd",
                     Children = new []
                     {
@@ -275,6 +276,14 @@ namespace RadzenBlazorDemos
                             Name = "Pager Position",
                             Path = "datagrid-pager-position",
                             Title = "Blazor DataGrid pager position",
+                            Tags = new [] { "pager", "paging", "datagrid", "table", "dataview" }
+                        },
+                        new Example
+                        {
+                            Name = "Pager Horizontal Align",
+                            New = true,
+                            Path = "datagrid-pager-horizontal-align",
+                            Title = "Blazor DataGrid pager horizontal align",
                             Tags = new [] { "pager", "paging", "datagrid", "table", "dataview" }
                         },
                         new Example
@@ -370,11 +379,13 @@ namespace RadzenBlazorDemos
         new Example
         {
             Name = "Data",
+            Updated = true,
             Icon = "&#xe1db",
             Children = new [] {
                 new Example()
                 {
                     Name = "DataList",
+                    Updated = true,
                     Path = "datalist",
                     Icon = "&#xe896",
                     Tags = new [] { "dataview", "grid", "table" }
@@ -382,6 +393,7 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "Pager",
+                    Updated = true,
                     Path = "pager",
                     Icon = "&#xe8be",
                     Tags = new [] { "pager", "paging" }
