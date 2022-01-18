@@ -90,14 +90,13 @@
                                 <RadzenPanelMenuItem Text="@example.Name" @bind-Expanded="@example.Expanded" Icon="@example.Icon">
                                 @foreach (var child in example.Children)
                                 {
-                                    <RadzenPanelMenuItem Text="@child.Name" Path="@child.Path" />
+                                    <NavigationItem Example=@child />
                                 }
                                 </RadzenPanelMenuItem>
-
                             }
                             else
                             {
-                                <RadzenPanelMenuItem Text="@example.Name" Path="@example.Path" Icon="@example.Icon" />
+                                <NavigationItem Example=@example />
                             }
                         }
                     }

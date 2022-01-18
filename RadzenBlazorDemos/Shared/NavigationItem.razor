@@ -1,0 +1,18 @@
+@if (!Example.New && !Example.Updated)
+{
+    <RadzenPanelMenuItem Text="@Example.Name" Path="@Example.Path" Icon="@Example.Icon"/>
+}
+else
+{
+    <RadzenPanelMenuItem Text="@Example.Name" Path="@Example.Path" Icon="@Example.Icon">
+        <Template>
+            @Example.Name
+            <RadzenBadge Text="Updated" Visible=@Example.Updated />
+            <RadzenBadge Text="New" Visible=@Example.New />
+        </Template>
+    </RadzenPanelMenuItem>
+}
+@code {
+    [Parameter]
+    public Example Example { get; set; }
+}
