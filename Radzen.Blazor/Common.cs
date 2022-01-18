@@ -775,6 +775,29 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Specifies horizontal alignment.
+    /// </summary>
+    public enum HorizontalAlign
+    {
+        /// <summary>
+        /// Left horizontal alignment.
+        /// </summary>
+        Left,
+        /// <summary>
+        /// Right horizontal alignment.
+        /// </summary>
+        Right,
+        /// <summary>
+        /// Center horizontal alignment.
+        /// </summary>
+        Center,
+        /// <summary>
+        /// Justify horizontal alignment.
+        /// </summary>
+        Justify
+    }
+
+    /// <summary>
     /// Specifies the display style of a <see cref="RadzenBadge" />. Affects the visual styling of RadzenBadge (background and text color).
     /// </summary>
     public enum BadgeStyle
