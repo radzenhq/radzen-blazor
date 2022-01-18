@@ -380,6 +380,12 @@ video {
     margin: 0;
 }
 
+.all-components li {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.25rem 0;
+}
+
 .all-components h4 {
     font-size: 1rem;
     font-weight: 600;
@@ -388,7 +394,7 @@ video {
 }
 
 .all-components a {
-    line-height: 200%;
+    line-height: 1rem;
     color: #1151f3;
     transition: all 0.2s;
     border-bottom: 1px solid transparent;
@@ -397,6 +403,13 @@ video {
 .all-components a:hover {
     color: #0E44CC;
     border-bottom-color: #0E44CC; 
+}
+
+.all-components .rz-badge {
+    margin-left: 0.5rem;
+    margin-top: 0.0625rem;
+    font-size: 0.5rem;
+    line-height: 0.625rem;
 }
 
 /* Footer */
@@ -481,6 +494,18 @@ img.illustration {
     box-shadow: none;
     max-width: 300px;
     min-height: 220px;
+}
+
+/* Demos Sidebar */
+
+.demos-sidebar .rz-panel-menu .rz-navigation-item-icon-children {
+    margin-left: auto;
+}
+
+.demos-sidebar .rz-panel-menu .rz-badge {
+    margin-left: 0.5rem;
+    font-size: 0.5rem;
+    line-height: 0.625rem;
 }
 
 /* Responsive */
