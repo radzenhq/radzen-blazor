@@ -1,18 +1,30 @@
 @if (!Example.New && !Example.Updated)
 {
-    <RadzenPanelMenuItem Text="@Example.Name" Path="@Example.Path" Icon="@Example.Icon"/>
+    <RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Example.Name" Path="@Example.Path" Icon="@Example.Icon">
+        @ChildContent
+    </RadzenPanelMenuItem>
 }
 else
 {
-    <RadzenPanelMenuItem Text="@Example.Name" Path="@Example.Path" Icon="@Example.Icon">
+    <RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Example.Name" Path="@Example.Path" Icon="@Example.Icon">
         <Template>
             @Example.Name
             <RadzenBadge Text="Updated" Visible=@Example.Updated />
             <RadzenBadge Text="New" Visible=@Example.New />
         </Template>
+        <ChildContent>@ChildContent</ChildContent>
     </RadzenPanelMenuItem>
 }
 @code {
     [Parameter]
     public Example Example { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool Expanded { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ExpandedChanged { get; set; }
 }

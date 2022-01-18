@@ -37,6 +37,7 @@ namespace RadzenBlazorDemos
         new Example()
         {
             Name = "DataGrid",
+            Updated = true,
             Icon = "&#xf1be",
             Children = new [] {
                 new Example
@@ -62,7 +63,6 @@ namespace RadzenBlazorDemos
                             Name = "OData service",
                             Path = "datagrid-odata",
                             Title = "Blazor DataGrid OData data-binding",
-                            Icon = "&#xe871",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "odata", "service", "rest" }
                         },
                         new Example
@@ -70,7 +70,6 @@ namespace RadzenBlazorDemos
                             Name = "Dynamic data",
                             Path = "datagrid-dynamic",
                             Title = "Blazor DataGrid binding dynamic data",
-                            Icon = "&#xe871",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "dynamic" }
                         },
                     }
@@ -950,7 +949,7 @@ namespace RadzenBlazorDemos
 
         public Example FindCurrent(Uri uri)
         {
-            static IEnumerable<Example> Flatten(IEnumerable<Example> e)
+            IEnumerable<Example> Flatten(IEnumerable<Example> e)
             {
                 return e.SelectMany(c => c.Children != null ? Flatten(c.Children) : new[] { c });
             }
