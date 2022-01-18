@@ -1,5 +1,11 @@
 ﻿@layout HomeLayout
 @page "/"
+@inject ExampleService ExampleService
+
+<PageTitle>@ExampleService.TitleFor(null)</PageTitle>
+<HeadContent>
+    <meta name="description" content="@ExampleService.DescriptionFor(null)">
+</HeadContent>
 
 <div class="next">
   <div class="container-fluid stage light">

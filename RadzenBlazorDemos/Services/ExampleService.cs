@@ -950,8 +950,13 @@ namespace RadzenBlazorDemos
 
         public Example FindCurrent(Uri uri)
         {
-            return Examples.SelectMany(example => example.Children ?? new[] { example })
-                           .FirstOrDefault(example => example.Path == uri.AbsolutePath || $"/{example.Path}" == uri.AbsolutePath);
+            static IEnumerable<Example> Flatten(IEnumerable<Example> e)
+            {
+                return e.SelectMany(c => c.Children != null ? Flatten(c.Children) : new[] { c });
+            }
+
+            return Flatten(Examples)
+                        .FirstOrDefault(example => example.Path == uri.AbsolutePath || $"/{example.Path}" == uri.AbsolutePath);
         }
 
         public string TitleFor(Example example)
