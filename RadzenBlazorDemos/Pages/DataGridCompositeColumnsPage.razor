@@ -11,7 +11,7 @@
 <p>Use DataGrid column <code>Columns</code> property to define child columns.</p>
 
 <RadzenExample Name="DataGrid" Heading="false">
-    <RadzenDataGrid @ref="employeesGrid" AllowSorting="true" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
+    <RadzenDataGrid AllowSorting="true" AllowFiltering="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
         Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
@@ -24,44 +24,18 @@
                 <Columns>
                     <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="FirstName" Width="140px">
                          <Columns>
-                            <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Job Title" Width="200px">
-                                <FooterTemplate>
-                                    Job Title footer
-                                </FooterTemplate>
-                            </RadzenDataGridColumn>
-                            <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="140px">
-                                 <FooterTemplate>
-                                    Birth Date footer
-                                </FooterTemplate>
-                            </RadzenDataGridColumn>
-                            <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="140px">
-                                <FooterTemplate>
-                                    Hire Date footer
-                                </FooterTemplate>
-                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Job Title" Width="200px" />
+                            <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="140px" />
+                            <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="140px" />
                          </Columns>
-                         <FooterTemplate>
-                            FirstName footer
-                        </FooterTemplate>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="LastName" Width="140px">
                         <Columns>
-                            <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" Width="200px">
-                                <FooterTemplate>
-                                    Address footer
-                                </FooterTemplate>
-                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" Width="200px" />
                         </Columns>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" Width="140px">
-                         <FooterTemplate>
-                            City footer
-                        </FooterTemplate>
-                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" Width="140px" />
                 </Columns>
-                 <FooterTemplate>
-                    Employees: <b>@(employeesGrid.View.Count() < employeesGrid.PageSize ? employeesGrid.View.Count() : employeesGrid.PageSize )</b> of <b>@employees.Count()</b>
-                </FooterTemplate>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" Width="140px" />
             <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" Width="140px" />
@@ -73,7 +47,6 @@
     </RadzenDataGrid>
 </RadzenExample>
 @code {
-    RadzenDataGrid<Employee> employeesGrid;
     IEnumerable<Employee> employees;
 
     protected override void OnInitialized()
