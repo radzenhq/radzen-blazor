@@ -61,6 +61,27 @@ namespace Radzen.Blazor
             return i;
         }
 
+        internal int GetColSpan()
+        {
+            if (Parent == null)
+            {
+                return Columns == null ? 1 : Grid.childColumns.Where(c => c.Visible).Count() - Grid.childColumns.Where(c => c.Visible && c.Parent == this).Count() + 1;
+            }
+
+            return Columns == null ? 1 : Grid.childColumns.Where(c => c.Visible && c.Parent == this).Count();
+        }
+
+        internal int GetRowSpan()
+        {
+            if (Columns == null && Parent != null)
+            {
+                var level = this.GetLevel();
+                return level == Grid.deepestChildColumnLevel ? 1 : level + 1;
+            }
+
+            return Columns == null && Parent == null ? Grid.deepestChildColumnLevel + 1 : 1;
+        }
+
         /// <summary>
         /// Called when initialized.
         /// </summary>

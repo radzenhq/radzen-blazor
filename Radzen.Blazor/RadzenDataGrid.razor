@@ -114,8 +114,8 @@
                         }
                         @foreach (var column in visibleColumns)
                         {
-                            <th class="@($" rz-unselectable-text")" tabindex="1" scope="col" style="@column.GetStyle(true, true)">
-                                @if (AllowFiltering && column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
+                            <th colspan="@column.GetColSpan()" class="@($" rz-unselectable-text")" tabindex="1" scope="col" style="@column.GetStyle(true, true)">
+                                @if (AllowFiltering && column.Filterable && column.Columns == null && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
                                 {
                                     <div class="rz-cell-filter">
                                         <div class="rz-cell-filter-content">
@@ -245,6 +245,8 @@
             @if (visibleColumns.Where(c => c.FooterTemplate != null).Any())
             {
                 <tfoot class="rz-datatable-tfoot">
+                    @for(var i = 0; i < deepestChildColumnLevel + 1; i++)
+                    {
                     <tr class="">
                         @foreach(var g in groups)
                         {
@@ -271,16 +273,12 @@
                                 j = j + (int)Convert.ChangeType(colspan, TypeCode.Int32) - 1;
                             }
 
-                            <td class="@($" {column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)}")" style="@column.GetStyle(true, true)" @attributes="@(cellAttr)">
-                                <span class="rz-column-footer">
-                                    @if (column.FooterTemplate != null)
-                                    {
-                                        @column.FooterTemplate
-                                    }
-                                </span>
-                            </td>
+                            <RadzenDataGridFooterCell RowIndex="@i" Grid="@this" Column="@column" 
+                                CssClass="@($"{column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)}")" 
+                                Attributes="@(cellAttr)" />
                         }
                     </tr>
+                    }
                 </tfoot>
             }
         </table>

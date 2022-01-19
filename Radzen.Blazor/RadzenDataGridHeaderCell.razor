@@ -1,9 +1,7 @@
 @typeparam TItem
 @if (RowIndex == Column.GetLevel())
 {
-    <th rowspan="@(Column.Columns == null && Column.Parent == null ? Grid.deepestChildColumnLevel + 1 : 1)"
-    colspan="@(Column.Columns == null ? 1 : Grid.childColumns.Where(c => c.Visible && c.Parent == Column).Count())"
-    @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex)) >
+<th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex)) >
     <div @onclick='@((args) => Grid.OnSort(args, Column))' style="width:100%">
         @if (Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable)
         {

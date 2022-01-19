@@ -4,13 +4,11 @@
     <CascadingValue Value=Row>
 @if (RowIndex == Column.GetLevel())
 {
-    <td rowspan="@(Column.Columns == null && Column.Parent == null ? Grid.deepestChildColumnLevel + 1 : 1)"
-    colspan="@(Column.Columns == null ? 1 : Grid.childColumns.Where(c => c.Visible && c.Parent == Column).Count())"
-    @attributes="@Attributes" style="@GetStyle()" class="@GetCssClass()" @onclick="@OnClick" @ondblclick="@OnDblClick" @oncontextmenu="@OnContextMenu" @oncontextmenu:preventDefault="@Grid.CellContextMenu.HasDelegate">
-        <CascadingValue Value=this>
-            @ChildContent
-        </CascadingValue>
-    </td>
+<td rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" style="@GetStyle()" class="@GetCssClass()" @onclick="@OnClick" @ondblclick="@OnDblClick" @oncontextmenu="@OnContextMenu" @oncontextmenu:preventDefault="@Grid.CellContextMenu.HasDelegate">
+    <CascadingValue Value=this>
+        @ChildContent
+    </CascadingValue>
+</td>
 }
 else
 {
