@@ -63,12 +63,15 @@ namespace Radzen.Blazor
 
         internal int GetColSpan()
         {
+            var visibleChildColumns = Grid.childColumns.Where(c => c.Visible);
+            var directChildColumns = visibleChildColumns.Where(c => c.Parent == this);
+
             if (Parent == null)
             {
-                return Columns == null ? 1 : Grid.childColumns.Where(c => c.Visible).Count() - Grid.childColumns.Where(c => c.Visible && c.Parent == this).Count() + 1;
+                return Columns == null ? 1 : visibleChildColumns.Count() - directChildColumns.Count() + 1;
             }
 
-            return Columns == null ? 1 : Grid.childColumns.Where(c => c.Visible && c.Parent == this).Count();
+            return Columns == null ? 1 : directChildColumns.Count();
         }
 
         internal int GetRowSpan()
