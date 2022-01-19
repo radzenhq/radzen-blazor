@@ -1307,7 +1307,7 @@ namespace Radzen.Blazor
         }
 
         private bool visibleChanged = false;
-        private bool firstRender = true;
+        internal bool firstRender = true;
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)

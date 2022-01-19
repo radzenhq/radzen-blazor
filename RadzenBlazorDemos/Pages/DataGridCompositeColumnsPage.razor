@@ -11,7 +11,7 @@
 <p>Use DataGrid column <code>Columns</code> property to define child columns.</p>
 
 <RadzenExample Name="DataGrid" Heading="false">
-    <RadzenDataGrid AllowFiltering="false" AllowColumnResize="false" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="false" 
+    <RadzenDataGrid AllowSorting="false" AllowFiltering="false" AllowColumnResize="false" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
         Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
         <Columns>
             @*<RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />

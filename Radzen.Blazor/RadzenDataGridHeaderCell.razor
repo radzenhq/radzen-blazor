@@ -1,7 +1,6 @@
 @typeparam TItem
-@if(!RenderedColumns.Contains(Column))
+@if (RowIndex == Column.GetLevel())
 {
-    RenderedColumns.Add(Column);
     <th rowspan="@(Column.Columns == null && Column.Parent == null ? Grid.deepestChildColumnLevel + 1 : 1)"
     colspan="@(Column.Columns == null ? 1 : Grid.childColumns.Where(c => c.Visible && c.Parent == Column).Count())"
     @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex)) >
@@ -119,7 +118,7 @@ else
 {
     @foreach(var column in Grid.childColumns.Where(c => c.Visible && c.Parent == Column))
     {
-        <RadzenDataGridHeaderCell RenderedColumns="@RenderedColumns" Grid="@Grid" Column="@column" ColumnIndex="@ColumnIndex" 
+        <RadzenDataGridHeaderCell RowIndex="@RowIndex" Grid="@Grid" Column="@column" ColumnIndex="@ColumnIndex" 
             CssClass="@($"rz-unselectable-text {(Grid.AllowSorting && column.Sortable ? "rz-sortable-column" : "")} {column.HeaderCssClass} {Grid.getFrozenColumnClass(column, Grid.ColumnsCollection.Where(c => c.Visible).ToList())}".Trim())" />
     }
 }
@@ -134,7 +133,7 @@ else
     public int ColumnIndex { get; set; }
 
     [Parameter]
-    public IList<RadzenDataGridColumn<TItem>> RenderedColumns { get; set; }
+    public int RowIndex { get; set; }
 
     [Parameter]
     public RadzenDataGrid<TItem> Grid { get; set; }
