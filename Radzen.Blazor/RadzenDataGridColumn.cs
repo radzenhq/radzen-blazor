@@ -23,6 +23,69 @@ namespace Radzen.Blazor
         public RadzenDataGrid<TItem> Grid { get; set; }
 
         /// <summary>
+        /// Gets or sets the columns.
+        /// </summary>
+        /// <value>The columns.</value>
+        [Parameter]
+        public RenderFragment Columns { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parent column.
+        /// </summary>
+        /// <value>The parent column.</value>
+        [CascadingParameter]
+        public RadzenDataGridColumn<TItem> Parent { get; set; }
+
+        internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
+        {
+            if (Grid.childColumns.Contains(column))
+            {
+                Grid.childColumns.Remove(column);
+                if (!Grid.disposed)
+                {
+                    try { InvokeAsync(StateHasChanged); } catch { }
+                }
+            }
+        }
+
+        internal int GetLevel()
+        {
+            int i = 0;
+            var p = Parent;
+            while (p != null)
+            {
+                p = p.Parent;
+                i++;
+            }
+
+            return i;
+        }
+
+        internal int GetColSpan()
+        {
+            var visibleChildColumns = Grid.childColumns.Where(c => c.Visible);
+            var directChildColumns = visibleChildColumns.Where(c => c.Parent == this);
+
+            if (Parent == null)
+            {
+                return Columns == null ? 1 : visibleChildColumns.Count() - directChildColumns.Count() + 1;
+            }
+
+            return Columns == null ? 1 : directChildColumns.Count();
+        }
+
+        internal int GetRowSpan()
+        {
+            if (Columns == null && Parent != null)
+            {
+                var level = this.GetLevel();
+                return level == Grid.deepestChildColumnLevel ? 1 : level + 1;
+            }
+
+            return Columns == null && Parent == null ? Grid.deepestChildColumnLevel + 1 : 1;
+        }
+
+        /// <summary>
         /// Called when initialized.
         /// </summary>
         protected override void OnInitialized()

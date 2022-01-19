@@ -143,6 +143,13 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-frozen-columns",
                             Title = "Blazor DataGrid frozen columns",
                             Tags = new [] { "datagrid", "column", "frozen", "locked" }
+                        },
+                        new Example
+                        {
+                            Name = "Composite Columns",
+                            Path = "datagrid-composite-columns",
+                            Title = "Blazor DataGrid composite columns",
+                            Tags = new [] { "datagrid", "column", "composite", "merged", "complex" }
                         }
                     }
                 },

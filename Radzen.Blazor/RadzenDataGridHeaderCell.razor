@@ -1,0 +1,149 @@
+@typeparam TItem
+@if (RowIndex == Column.GetLevel())
+{
+<th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex)) >
+    <div @onclick='@((args) => Grid.OnSort(args, Column))' style="width:100%">
+        @if (Column.Parent == null && Column.Columns == null && (Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
+        {
+            <span id="@Grid.getColumnResizerId(ColumnIndex)" class="rz-column-drag" 
+                    @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                    @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex))>&nbsp;</span>
+        }
+        <span class="rz-column-title">
+            @if (Column.HeaderTemplate != null)
+            {
+                @Column.HeaderTemplate
+            }
+            else
+            {
+                @Column.Title
+            }
+        </span>
+        @if (Grid.AllowSorting && Column.Sortable)
+        {
+            @if (Column.GetSortOrder() == SortOrder.Ascending)
+            {
+                <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
+            }
+            else if (Column.GetSortOrder() == SortOrder.Descending)
+            {
+                <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
+            }
+            else
+            {
+                <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
+            }
+        }
+        @if (Grid.AllowColumnResize && Column.Resizable && Column.Parent == null)
+        {
+            <div id="@Grid.getColumnResizerId(ColumnIndex)" style="cursor:col-resize;float:right;"
+                    @onclick:preventDefault="true" @onclick:stopPropagation="true" class="rz-column-resizer" 
+                    @onmousedown=@(args => Grid.StartColumnResize(args, ColumnIndex))>&nbsp;</div>
+        }
+        @if (Grid.AllowFiltering && Column.Filterable && Grid.FilterMode == FilterMode.Advanced)
+        {
+            <i @onclick:stopPropagation="true" onclick="@($"Radzen.togglePopup(this, '{Grid.PopupID}{Column.GetFilterProperty()}')")"
+                class="@getFilterIconCss(Column)" />
+
+                    <div id="@($"{Grid.PopupID}{Column.GetFilterProperty()}")" class="rz-overlaypanel"
+                    style="display:none;min-width:250px;" tabindex="0">
+                        <div class="rz-grid-filter rz-overlaypanel-content">
+                            @if (Column.FilterTemplate != null)
+                            {
+                                @Column.FilterTemplate(Column)
+                            }
+                            else
+                            {
+                                <RadzenLabel Text="@Grid.FilterText" class="rz-grid-filter-label" />
+                                <RadzenDropDown @onclick:preventDefault="true" Data="@(Column.GetFilterOperators().Select(t => new { Value = Column.GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@Column.GetFilterOperator()" Change="@(args => Column.SetFilterOperator((FilterOperator)args))" />
+                                @if (PropertyAccess.IsNumeric(Column.FilterPropertyType))
+                                {
+                                    @(Grid.DrawNumericFilter(Column, false))
+                                }
+                                else if (PropertyAccess.IsDate(Column.FilterPropertyType))
+                                {
+                                    <RadzenDatePicker TValue="@object" ShowTime="true" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
+                                                Value="@Column.GetFilterValue()" Change="@(args => Column.SetFilterValue(args.Value))" />
+
+                                }
+                                else if (Column.FilterPropertyType == typeof(bool) || Column.FilterPropertyType == typeof(bool?))
+                                {
+                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@Column.GetFilterValue()" Change="@(args => Column.SetFilterValue(args))" />
+                                }
+                                else
+                                {
+                                    <RadzenTextBox Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
+                                }
+
+                                <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 80px"
+                                        Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? Grid.AndOperatorText : Grid.OrOperatorText, Value = t }))" TValue="LogicalFilterOperator" Value="@Column.LogicalFilterOperator" Change="@(args => Column.SetLogicalFilterOperator((LogicalFilterOperator)args))" />
+
+                                <RadzenDropDown @onclick:preventDefault="true" Data="@(Column.GetFilterOperators().Select(t => new { Value = Column.GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@Column.GetSecondFilterOperator()" Change="@(args => Column.SetSecondFilterOperator((FilterOperator)args))" />
+                                @if (PropertyAccess.IsNumeric(Column.FilterPropertyType))
+                                {
+                                    @(Grid.DrawNumericFilter(Column, false, false))
+                                }
+                                else if (PropertyAccess.IsDate(Column.FilterPropertyType))
+                                {
+                                    <RadzenDatePicker TValue="@object"
+                                                ShowTime="true" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
+                                                Value="@Column.GetSecondFilterValue()" Change="@(args => Column.SetFilterValue(args.Value, false))" />
+
+                                }
+                                else if (Column.FilterPropertyType == typeof(bool) || Column.FilterPropertyType == typeof(bool?))
+                                {
+                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@Column.GetSecondFilterValue()" Change="@(args => Column.SetFilterValue(args, false))"/>
+                                }
+                                else
+                                {
+                                    <RadzenTextBox Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
+                                }
+                            }
+                        </div>
+                        @if (Column.FilterTemplate == null)
+                        {
+                            <div class="rz-grid-filter-buttons">
+                                <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text=@Grid.ClearFilterText Click="@((args) => Grid.ClearFilter(Column, true))" />
+                                <RadzenButton ButtonStyle="ButtonStyle.Primary" Text=@Grid.ApplyFilterText Click="@((args) => Grid.ApplyFilter(Column, true))" />
+                            </div>
+                        }
+                    </div>
+        }
+    </div>
+</th>
+}
+else
+{
+    @foreach(var column in Grid.childColumns.Where(c => c.Visible && c.Parent == Column))
+    {
+        <RadzenDataGridHeaderCell RowIndex="@RowIndex" Grid="@Grid" Column="@column" ColumnIndex="@ColumnIndex" 
+            CssClass="@($"rz-unselectable-text {(Grid.AllowSorting && column.Sortable ? "rz-sortable-column" : "")} {column.HeaderCssClass} {Grid.getFrozenColumnClass(column, Grid.ColumnsCollection.Where(c => c.Visible).ToList())}".Trim())" />
+    }
+}
+@code {
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object> Attributes { get; set; }
+
+    [Parameter]
+    public RadzenDataGridColumn<TItem> Column { get; set; }
+
+    [Parameter]
+    public int ColumnIndex { get; set; }
+
+    [Parameter]
+    public int RowIndex { get; set; }
+
+    [Parameter]
+    public RadzenDataGrid<TItem> Grid { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
+    
+    private string getFilterIconCss(RadzenDataGridColumn<TItem> column)
+    {
+        var additionalStyle = column.GetFilterValue() != null || column.GetSecondFilterValue() != null || 
+            column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull 
+                ? "rz-grid-filter-active" : "";
+        return $"rzi rz-grid-filter-icon {additionalStyle}";
+    }
+}

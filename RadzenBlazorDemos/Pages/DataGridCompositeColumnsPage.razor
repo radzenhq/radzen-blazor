@@ -1,0 +1,56 @@
+﻿@page "/datagrid-composite-columns"
+
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject NorthwindContext dbContext
+
+<h1>DataGrid <strong>Composite Columns</strong></h1>
+
+<p>Use DataGrid column <code>Columns</code> property to define child columns.</p>
+
+<RadzenExample Name="DataGrid" Heading="false">
+    <RadzenDataGrid AllowSorting="true" AllowFiltering="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
+        Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+        <Columns>
+            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="Employee" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="60px" >
+                <Template Context="data">
+                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Title="Title" Property="TitleOfCourtesy">
+                <Columns>
+                    <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="FirstName" Width="140px">
+                         <Columns>
+                            <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Job Title" Width="200px" />
+                            <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="140px" />
+                            <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="140px" />
+                         </Columns>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="LastName" Width="140px">
+                        <Columns>
+                            <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" Width="200px" />
+                        </Columns>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" Width="140px" />
+                </Columns>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" Width="140px" />
+            <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" Width="140px" />
+            <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" Width="140px" />
+            <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" Width="140px" />
+            <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" Width="140px" />
+            <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" Width="300px" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenExample>
+@code {
+    IEnumerable<Employee> employees;
+
+    protected override void OnInitialized()
+    {
+        employees = dbContext.Employees;
+    }
+}

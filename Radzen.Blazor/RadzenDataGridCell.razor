@@ -1,12 +1,68 @@
 @typeparam TItem
-<td @attributes="@Attributes" style="@GetStyle()" class="@GetCssClass()" @onclick="@OnClick" @ondblclick="@OnDblClick" @oncontextmenu="@OnContextMenu" @oncontextmenu:preventDefault="@Grid.CellContextMenu.HasDelegate">
+@using Microsoft.AspNetCore.Components.Forms
+ <CascadingValue Value=@EditContext>
+    <CascadingValue Value=Row>
+@if (RowIndex == Column.GetLevel())
+{
+<td rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" style="@GetStyle()" class="@GetCssClass()" @onclick="@OnClick" @ondblclick="@OnDblClick" @oncontextmenu="@OnContextMenu" @oncontextmenu:preventDefault="@Grid.CellContextMenu.HasDelegate">
     <CascadingValue Value=this>
         @ChildContent
     </CascadingValue>
 </td>
+}
+else
+{
+    @foreach(var column in Grid.childColumns.Where(c => c.Visible && c.Parent == Column))
+    {
+        <RadzenDataGridCell Row=@Row EditContext=EditContext RowIndex="@RowIndex" Grid="@Grid" Column="@column" Item="@Item"
+            Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + Grid.getFrozenColumnClass(column, Grid.ColumnsCollection))" Attributes="@(Grid.CellAttributes(Item, column))">
+                @if (Grid.Responsive)
+                {
+                    <span class="rz-column-title">
+                        @if (column.HeaderTemplate != null)
+                        {
+                            @column.HeaderTemplate
+                        }
+                        else
+                        {
+                            @column.Title
+                        }
+                    </span>
+                }
+                <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
+                    @if (Item != null)
+                    {
+                        @if (Grid.IsRowInEditMode(Item) && column.EditTemplate != null)
+                        {
+                            @column.EditTemplate(Item)
+                        }
+                        else if (column.Template != null)
+                        {
+                            @column.Template(Item)
+                        }
+                        else
+                        {
+                            @column.GetValue(Item)
+                        }
+                    }
+                </span>
+            </RadzenDataGridCell>
+    }
+}
+ </CascadingValue>
+</CascadingValue>
 @code {
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object> Attributes { get; set; }
+
+    [Parameter]
+    public int RowIndex { get; set; }
+
+    [Parameter]
+    public RadzenDataGridRow<TItem> Row { get; set; }
+
+    [Parameter]
+    public EditContext EditContext { get; set; }
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }

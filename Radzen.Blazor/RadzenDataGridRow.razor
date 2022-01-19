@@ -2,16 +2,18 @@
 @typeparam TItem
 @implements IRadzenForm
 @{var rowArgs = Grid?.RowAttributes(Item); }
+@for(var i = 0; i < Grid.deepestChildColumnLevel + 1; i++)
+{
 <tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
     @foreach(var g in Grid.groups)
     {
-        <td class="rz-col-icon">
+        <td class="rz-col-icon" rowspan=@(Grid.deepestChildColumnLevel + 1)>
             <span class="rz-column-title"></span>
         </td>
     }
-    @if (Grid.Template != null && Grid.ShowExpandColumn)
+    @if (Grid.Template != null && Grid.ShowExpandColumn && i == 0)
     {
-        <td class="rz-col-icon">
+        <td class="rz-col-icon" rowspan=@(Grid.deepestChildColumnLevel + 1)>
             <span class="rz-column-title"></span>
             @if (rowArgs.Item1.Expandable)
             {
@@ -21,8 +23,7 @@
             }
         </td>
     }
-    <CascadingValue Value=@EditContext>
-    <CascadingValue Value=this>
+
         @for (var j = 0; j < Columns.Count; j++)
         {
             if (Grid.rowSpans.ContainsKey(j))
@@ -58,7 +59,7 @@
                 Grid.rowSpans.Add(j, (int)Convert.ChangeType(rowspan, TypeCode.Int32));
             }
 
-            <RadzenDataGridCell Grid="@this.Grid" Item="@Item" Column="@column"
+            <RadzenDataGridCell Row=@this EditContext=EditContext RowIndex="@i" Grid="@this.Grid" Item="@Item" Column="@column"
                                 Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + Grid.getFrozenColumnClass(column, Columns))" Attributes="@(cellAttr)">
                 @if (Grid.Responsive)
                 {
@@ -92,9 +93,10 @@
                 </span>
             </RadzenDataGridCell>
         }
-    </CascadingValue>
-    </CascadingValue>
+   
 </tr>
+}
+
 @if (Grid.Template != null && Grid.expandedItems.Keys.Contains(Item))
 {
     <tr class="rz-expanded-row-content">
