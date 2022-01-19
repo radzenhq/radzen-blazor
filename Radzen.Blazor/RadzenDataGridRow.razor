@@ -7,13 +7,13 @@
 <tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
     @foreach(var g in Grid.groups)
     {
-        <td class="rz-col-icon">
+        <td class="rz-col-icon" rowspan=@(Grid.deepestChildColumnLevel + 1)>
             <span class="rz-column-title"></span>
         </td>
     }
-    @if (Grid.Template != null && Grid.ShowExpandColumn)
+    @if (Grid.Template != null && Grid.ShowExpandColumn && i == 0)
     {
-        <td class="rz-col-icon">
+        <td class="rz-col-icon" rowspan=@(Grid.deepestChildColumnLevel + 1)>
             <span class="rz-column-title"></span>
             @if (rowArgs.Item1.Expandable)
             {

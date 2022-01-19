@@ -250,13 +250,13 @@
                     <tr class="">
                         @foreach(var g in groups)
                         {
-                            <td class="rz-col-icon rz-unselectable-text" scope="col">
+                            <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                 <span class="rz-column-title"></span>
                             </td>
                         }
                         @if (Template != null && ShowExpandColumn)
                         {
-                            <td class="rz-col-icon rz-unselectable-text" scope="col">
+                            <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                 <span class="rz-column-title"></span>
                             </td>
                         }
