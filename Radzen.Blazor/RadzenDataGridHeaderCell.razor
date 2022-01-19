@@ -3,7 +3,7 @@
 {
 <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex)) >
     <div @onclick='@((args) => Grid.OnSort(args, Column))' style="width:100%">
-        @if (Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable)
+        @if (Column.Parent == null && Column.Columns == null && (Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
         {
             <span id="@Grid.getColumnResizerId(ColumnIndex)" class="rz-column-drag" 
                     @onclick:preventDefault="true" @onclick:stopPropagation="true"
@@ -34,7 +34,7 @@
                 <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
             }
         }
-        @if (Grid.AllowColumnResize && Column.Resizable)
+        @if (Grid.AllowColumnResize && Column.Resizable && Column.Parent == null)
         {
             <div id="@Grid.getColumnResizerId(ColumnIndex)" style="cursor:col-resize;float:right;"
                     @onclick:preventDefault="true" @onclick:stopPropagation="true" class="rz-column-resizer" 
