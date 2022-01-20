@@ -1427,10 +1427,17 @@ namespace Radzen.Blazor
             await CellContextMenu.InvokeAsync(args);
         }
 
-        internal async Task OnRowClick(DataGridRowMouseEventArgs<TItem> args)
+        internal async Task OnRowClick(DataGridRowMouseEventArgs<TItem> args, RadzenDataGridColumn<TItem> column)
         {
-            await RowClick.InvokeAsync(args);
-            await OnRowSelect(args.Data);
+            if(column.IsSelectColumn)
+            {
+                await OnRowSelect(args.Data);
+            }
+            else
+            {
+                await RowClick.InvokeAsync(args);
+                await OnRowSelect(args.Data);
+            }
         }
 
         internal async System.Threading.Tasks.Task OnRowSelect(object item, bool raiseChange = true)

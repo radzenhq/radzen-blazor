@@ -1,4 +1,4 @@
-﻿@page "/datagrid-multiple-selection"
+@page "/datagrid-multiple-selection"
 @using Radzen
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
@@ -9,10 +9,10 @@
 
 <RadzenExample Name="DataGrid" Source="DataGridMultipleSelection" Heading="false">
     <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
-                AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
+                AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px" RowClick="OnRowClicked"
                 SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedEmployees>
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Width="40px" Sortable="false" Filterable="false">
+            <RadzenDataGridColumn TItem="Employee" Width="40px" Sortable="false" Filterable="false" IsSelectColumn="true">
                 <HeaderTemplate>
                     <RadzenCheckBox TriState="false" TValue="bool" Value="@(employees.Any(i => selectedEmployees != null && selectedEmployees.Contains(i)))"
                                     Change="@(args => selectedEmployees = args ? employees.ToList() : null)" />
@@ -35,12 +35,22 @@
         </Columns>
     </RadzenDataGrid>
 </RadzenExample>
+
+<RadzenCard class="mt-4">
+    <EventConsole @ref="console"></EventConsole>
+</RadzenCard>
 @code {
     IEnumerable<Employee> employees;
     IList<Employee> selectedEmployees;
+    private EventConsole console;
 
     protected override void OnInitialized()
     {
         employees = dbContext.Employees;
+    }
+
+    private void OnRowClicked(DataGridRowMouseEventArgs<Employee> args)
+    {
+        console.Log($"Clicked on non-selectable-cell with data: {args.Data.EmployeeID}"); 
     }
 }

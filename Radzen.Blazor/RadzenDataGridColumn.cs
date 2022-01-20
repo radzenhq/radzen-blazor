@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -238,6 +238,12 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Filterable { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenDataGridColumn{TItem}"/> is a (multi-)select column. Which does not trigger a RowClick.
+        /// </summary>
+        /// <value><c>true</c> if selectcolumn; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool IsSelectColumn { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenDataGridColumn{TItem}"/> is sortable.
         /// </summary>

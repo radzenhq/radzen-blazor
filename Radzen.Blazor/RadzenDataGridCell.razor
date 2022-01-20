@@ -151,7 +151,7 @@ else
                 ScreenY = args.ScreenY,
                 ShiftKey = args.ShiftKey,
                 Type = args.Type
-            });
+            }, Column);
 #else
             await Grid.OnRowClick(new DataGridRowMouseEventArgs<TItem>
             {
@@ -168,7 +168,7 @@ else
                 ScreenY = args.ScreenY,
                 ShiftKey = args.ShiftKey,
                 Type = args.Type
-            });
+            },Column);
 #endif
         }
     }
