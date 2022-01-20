@@ -11,9 +11,9 @@
 <RadzenExample Name="DataGrid" Source="DataGridPagerHorizontalAlign" Heading="false">
     <div style="display: flex; align-items: center; margin-bottom: 16px">
     <div style="white-space:nowrap; margin-right: 16px">Pager Horizontal Align:</div>
-    <RadzenDropDown @bind-Value="@pagerHorizontalAlign" Data="@(Enum.GetValues(typeof(HorizontalAlign)))" Change=@(args => grid.Reload())  />
+    <RadzenDropDown @bind-Value="@pagerHorizontalAlign" Data="@(Enum.GetValues(typeof(HorizontalAlign)))" />
     </div>
-   <RadzenDataGrid @ref="grid" Data="@orderDetails" TItem="OrderDetail" PagerHorizontalAlign="@pagerHorizontalAlign" AllowPaging="true" AllowSorting="true">
+   <RadzenDataGrid Data="@orderDetails" TItem="OrderDetail" PagerHorizontalAlign="@pagerHorizontalAlign" AllowPaging="true" AllowSorting="true">
         <Columns>
             <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
             <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
@@ -34,7 +34,6 @@
 
 @code {
     HorizontalAlign pagerHorizontalAlign = HorizontalAlign.Justify;
-    RadzenDataGrid<OrderDetail> grid;
     IEnumerable<OrderDetail> orderDetails;
 
     protected override void OnInitialized()
