@@ -227,7 +227,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     @if $material == false and $fluent == false {
       border-bottom: $grid-header-cell-border-bottom;
       
-      &:not(:last-child) {
+      &:not(:last-child), &.rz-composite-cell {
         border-right: $grid-header-cell-border;
         
       }
@@ -257,7 +257,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     text-overflow: ellipsis;
 
     @if $material == false and $fluent == false {
-      &:not(:last-child) {
+      &:not(:last-child), &.rz-composite-cell {
         border-right: $grid-right-cell-border;
       }
     }
@@ -372,7 +372,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     border-bottom: $grid-bottom-cell-border;
 
     @if $material == false and $fluent == false {
-      &:not(:last-child) {
+      &:not(:last-child), &.rz-composite-cell {
         border-right: $grid-right-cell-border;
       }
     }
@@ -391,7 +391,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
       &:first-child {
         border-left: none;
       }
-      &:last-child {
+      &:last-child:not(.rz-composite-cell) {
         border-right: none;
       }
     }

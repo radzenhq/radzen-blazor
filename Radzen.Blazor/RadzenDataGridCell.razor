@@ -15,7 +15,7 @@ else
     @foreach(var column in Grid.childColumns.Where(c => c.Visible && c.Parent == Column))
     {
         <RadzenDataGridCell Row=@Row EditContext=EditContext RowIndex="@RowIndex" Grid="@Grid" Column="@column" Item="@Item"
-            Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + Grid.getFrozenColumnClass(column, Grid.ColumnsCollection))" Attributes="@(Grid.CellAttributes(Item, column))">
+            Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + Grid.getFrozenColumnClass(column, Grid.ColumnsCollection) + " " + (column.Columns != null || column.Parent != null ? "rz-composite-cell" : ""))" Attributes="@(Grid.CellAttributes(Item, column))">
                 @if (Grid.Responsive)
                 {
                     <span class="rz-column-title">
