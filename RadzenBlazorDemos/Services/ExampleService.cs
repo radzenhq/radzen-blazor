@@ -100,6 +100,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Columns",
                     Icon = "&#xe336",
+                    Updated = true,
                     Children = new []
                     {
                         new Example
@@ -147,6 +148,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "Composite Columns",
+                            New = true,
                             Path = "datagrid-composite-columns",
                             Title = "Blazor DataGrid composite columns",
                             Tags = new [] { "datagrid", "column", "composite", "merged", "complex" }
