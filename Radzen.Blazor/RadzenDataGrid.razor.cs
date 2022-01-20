@@ -1409,9 +1409,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the selection mode.
+        /// Gets or sets a value indicating whether DataGrid row can be selected on row click.
         /// </summary>
-        /// <value>The selection mode.</value>
+        /// <value><c>true</c> if DataGrid row can be selected on row click; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowRowSelectOnRowClick { get; set; } = true;
 
