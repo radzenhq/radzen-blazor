@@ -85,6 +85,11 @@ namespace Radzen.Blazor
                 return true;
             }
 
+            if (url == "/")
+            {
+                return false;
+            }
+
             if (Match == NavLinkMatch.Prefix
                 && IsStrictlyPrefixWithSeparator(currentAbsoluteUrl, absoluteUrl))
             {

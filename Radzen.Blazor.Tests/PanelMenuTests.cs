@@ -21,29 +21,35 @@ namespace Radzen.Blazor.Tests
             }
         }
 
-        [Fact]
-        public void RadzenPanelMenu_SetsOneActiveMenuItem()
+        private static string CreatePanelMenu(string currentAbsoluteUrl, NavLinkMatch match, params string[] urls)
         {
             using var ctx = new TestContext();
 
             ctx.Services.RemoveAll<NavigationManager>();
-            ctx.Services.TryAddSingleton<NavigationManager>(new TestNavigationManager("http://www.example.com/datagrid-dynamic"));
+            ctx.Services.TryAddSingleton<NavigationManager>(new TestNavigationManager(currentAbsoluteUrl));
 
             var component = ctx.RenderComponent<RadzenPanelMenu>();
 
-            component.SetParametersAndRender(parameters => parameters.AddChildContent(builder => 
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Match, match).AddChildContent(builder => 
             {
-                builder.OpenComponent<RadzenPanelMenuItem>(0);
-                builder.AddAttribute(1, nameof(RadzenPanelMenuItem.Path), "/datagrid");
-                builder.CloseComponent();
-
-                builder.OpenComponent<RadzenPanelMenuItem>(2);
-                builder.AddAttribute(3, nameof(RadzenPanelMenuItem.Path), "/datagrid-dynamic");
-                builder.CloseComponent();
+                foreach (var url in urls)
+                {
+                    builder.OpenComponent<RadzenPanelMenuItem>(0);
+                    builder.AddAttribute(1, nameof(RadzenPanelMenuItem.Path), url);
+                    builder.CloseComponent();
+                }
             }));
 
-            var firstIndex = component.Markup.IndexOf("rz-navigation-item-wrapper-active");
-            var lastIndex = component.Markup.LastIndexOf("rz-navigation-item-wrapper-active");
+            return component.Markup;
+        }
+
+        [Fact]
+        public void RadzenPanelMenu_SetsOneActiveMenuItem()
+        {
+            var component = CreatePanelMenu("http://www.example.com/datagrid-dynamic", NavLinkMatch.All, "/datagrid", "/datagrid-dynamic");
+
+            var firstIndex = component.IndexOf("rz-navigation-item-wrapper-active");
+            var lastIndex = component.LastIndexOf("rz-navigation-item-wrapper-active");
 
             Assert.NotEqual(-1, firstIndex);
             Assert.Equal(firstIndex, lastIndex);
@@ -52,41 +58,41 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void RadzenPanelMenu_MatchesQueryStringParameters()
         {
-            using var ctx = new TestContext();
+            var component = CreatePanelMenu("http://www.example.com/foo?bar", NavLinkMatch.Prefix, "/foo");
 
-            ctx.Services.RemoveAll<NavigationManager>();
-            ctx.Services.TryAddSingleton<NavigationManager>(new TestNavigationManager("http://www.example.com/foo?bar"));
-
-            var component = ctx.RenderComponent<RadzenPanelMenu>();
-
-            component.SetParametersAndRender(parameters => parameters.AddChildContent(builder => 
-            {
-                builder.OpenComponent<RadzenPanelMenuItem>(0);
-                builder.AddAttribute(1, nameof(RadzenPanelMenuItem.Path), "/foo");
-                builder.CloseComponent();
-            }));
-
-            Assert.Contains("rz-navigation-item-wrapper-active", component.Markup);
+            Assert.Contains("rz-navigation-item-wrapper-active", component);
         }
 
         [Fact]
-        public void RadzenPanelMenu_DoesNotMatcheQueryStringParametersWhenExactMatchIsSpecified()
+        public void RadzenPanelMenu_DoesNotMatchQueryStringParametersWhenExactMatchIsSpecified()
         {
-            using var ctx = new TestContext();
+            var component = CreatePanelMenu("http://www.example.com/foo?bar", NavLinkMatch.All, "/foo");
 
-            ctx.Services.RemoveAll<NavigationManager>();
-            ctx.Services.TryAddSingleton<NavigationManager>(new TestNavigationManager("http://www.example.com/foo?bar"));
+            Assert.DoesNotContain("rz-navigation-item-wrapper-active", component);
+        }
 
-            var component = ctx.RenderComponent<RadzenPanelMenu>();
+        [Fact]
+        public void RadzenPanelMenu_DoesNotMatchRootWithEverything()
+        {
+            var component = CreatePanelMenu("http://www.example.com/foo", NavLinkMatch.Prefix, "/");
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Match, NavLinkMatch.All).AddChildContent(builder => 
-            {
-                builder.OpenComponent<RadzenPanelMenuItem>(0);
-                builder.AddAttribute(1, nameof(RadzenPanelMenuItem.Path), "/foo");
-                builder.CloseComponent();
-            }));
+            Assert.DoesNotContain("rz-navigation-item-wrapper-active", component);
+        }
 
-            Assert.DoesNotContain("rz-navigation-item-wrapper-active", component.Markup);
+        [Fact]
+        public void RadzenPanelMenu_MatchesRoot()
+        {
+            var component = CreatePanelMenu("http://www.example.com/", NavLinkMatch.Prefix, "/");
+
+            Assert.Contains("rz-navigation-item-wrapper-active", component);
+        }
+
+        [Fact]
+        public void RadzenPanelMenu_MatchesRootWithoutTrailingSlash()
+        {
+            var component = CreatePanelMenu("http://www.example.com", NavLinkMatch.Prefix, "/");
+
+            Assert.Contains("rz-navigation-item-wrapper-active", component);
         }
     }
 }
