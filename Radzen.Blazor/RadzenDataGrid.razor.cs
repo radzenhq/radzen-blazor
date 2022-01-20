@@ -1413,6 +1413,13 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The selection mode.</value>
         [Parameter]
+        public bool AllowRowSelectOnRowClick { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the selection mode.
+        /// </summary>
+        /// <value>The selection mode.</value>
+        [Parameter]
         public DataGridSelectionMode SelectionMode { get; set; } = DataGridSelectionMode.Single;
 
         internal async Task OnCellContextMenu(DataGridCellMouseEventArgs<TItem> args)
@@ -1423,7 +1430,10 @@ namespace Radzen.Blazor
         internal async Task OnRowClick(DataGridRowMouseEventArgs<TItem> args)
         {
             await RowClick.InvokeAsync(args);
-            await OnRowSelect(args.Data);
+            if (AllowRowSelectOnRowClick)
+            {
+                await OnRowSelect(args.Data);
+            }
         }
 
         internal async System.Threading.Tasks.Task OnRowSelect(object item, bool raiseChange = true)
