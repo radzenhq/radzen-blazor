@@ -61,8 +61,11 @@ namespace Radzen.Blazor
             return i;
         }
 
-        internal int GetColSpan()
+        internal int GetColSpan(bool isDataCell = false)
         {
+            if (!Grid.AllowCompositeDataCells && isDataCell) 
+                return 1;
+
             var visibleChildColumns = Grid.childColumns.Where(c => c.Visible);
             var directChildColumns = visibleChildColumns.Where(c => c.Parent == this);
 
@@ -74,8 +77,11 @@ namespace Radzen.Blazor
             return Columns == null ? 1 : directChildColumns.Count();
         }
 
-        internal int GetRowSpan()
+        internal int GetRowSpan(bool isDataCell = false)
         {
+            if (!Grid.AllowCompositeDataCells && isDataCell) 
+                return 1;
+
             if (Columns == null && Parent != null)
             {
                 var level = this.GetLevel();

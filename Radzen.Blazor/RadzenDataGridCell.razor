@@ -2,9 +2,9 @@
 @using Microsoft.AspNetCore.Components.Forms
  <CascadingValue Value=@EditContext>
     <CascadingValue Value=Row>
-@if (RowIndex == Column.GetLevel())
+@if (Grid.AllowCompositeDataCells ? RowIndex == Column.GetLevel() : (Column.Parent != null && RowIndex == Column.GetLevel() ||  Column.Columns == null))
 {
-<td rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" style="@GetStyle()" class="@GetCssClass()" @onclick="@OnClick" @ondblclick="@OnDblClick" @oncontextmenu="@OnContextMenu" @oncontextmenu:preventDefault="@Grid.CellContextMenu.HasDelegate">
+<td rowspan="@(Column.GetRowSpan(true))" colspan="@(Column.GetColSpan(true))" @attributes="@Attributes" style="@GetStyle()" class="@GetCssClass()" @onclick="@OnClick" @ondblclick="@OnDblClick" @oncontextmenu="@OnContextMenu" @oncontextmenu:preventDefault="@Grid.CellContextMenu.HasDelegate">
     <CascadingValue Value=this>
         @ChildContent
     </CascadingValue>

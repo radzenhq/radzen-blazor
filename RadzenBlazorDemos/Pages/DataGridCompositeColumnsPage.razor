@@ -11,8 +11,10 @@
 <p>Use DataGrid column <code>Columns</code> property to define child columns.</p>
 
 <RadzenExample Name="DataGrid" Source="DataGridCompositeColumns" Heading="false">
-    <RadzenDataGrid AllowSorting="true" AllowFiltering="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
-        Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+    <RadzenCheckBox @bind-Value=@allowCompositeDataCells Name="CheckBox1" />
+    <RadzenLabel Text="Allow composite data cells" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 10px;" />
+    <RadzenDataGrid AllowCompositeDataCells="@allowCompositeDataCells" AllowSorting="true" AllowFiltering="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
+        Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:400px">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="60px" >
@@ -20,16 +22,16 @@
                     <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Title="Title" Property="TitleOfCourtesy">
+            <RadzenDataGridColumn TItem="Employee" Title="Title" Property="TitleOfCourtesy" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
                 <Columns>
-                    <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="FirstName" Width="140px">
+                    <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="FirstName" Width="140px" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
                          <Columns>
                             <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Job Title" Width="200px" />
                             <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="140px" />
                             <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="140px" />
                          </Columns>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="LastName" Width="140px">
+                    <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="LastName" Width="140px" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
                         <Columns>
                             <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" Width="200px" />
                         </Columns>
@@ -47,6 +49,8 @@
     </RadzenDataGrid>
 </RadzenExample>
 @code {
+    bool allowCompositeDataCells = false;
+
     IEnumerable<Employee> employees;
 
     protected override void OnInitialized()
