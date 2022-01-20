@@ -12,7 +12,7 @@
 
 <RadzenExample Name="DataGrid" Source="DataGridConditionalTemplate" Heading="false">
     <h3>Order Details</h3>
-    <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+    <RadzenDataGrid AllowFiltering="false" AllowPaging="true" AllowSorting="false" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 Data="@orderDetails" TItem="OrderDetail" ColumnWidth="200px" 
                 RowRender="@RowRender" CellRender="@CellRender" HeaderCellRender="@HeaderFooterCellRender" FooterCellRender="@HeaderFooterCellRender">
         <Columns>
