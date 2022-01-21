@@ -1071,6 +1071,10 @@ window.Radzen = {
       redo: document.queryCommandEnabled('redo')
     };
   },
+  matchMedia: function(query) {
+      var result = matchMedia(query);
+      return result.matches;
+  },
   createEditor: function (ref, uploadUrl, paste, instance) {
     ref.inputListener = function () {
       instance.invokeMethodAsync('OnChange', ref.innerHTML);
