@@ -1409,6 +1409,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether DataGrid row can be selected on row click.
+        /// </summary>
+        /// <value><c>true</c> if DataGrid row can be selected on row click; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowRowSelectOnRowClick { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the selection mode.
         /// </summary>
         /// <value>The selection mode.</value>
@@ -1423,7 +1430,10 @@ namespace Radzen.Blazor
         internal async Task OnRowClick(DataGridRowMouseEventArgs<TItem> args)
         {
             await RowClick.InvokeAsync(args);
-            await OnRowSelect(args.Data);
+            if (AllowRowSelectOnRowClick)
+            {
+                await OnRowSelect(args.Data);
+            }
         }
 
         internal async System.Threading.Tasks.Task OnRowSelect(object item, bool raiseChange = true)
