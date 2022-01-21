@@ -5,6 +5,19 @@
 @typeparam TItem
 @inherits PagedDataBoundComponent<TItem>
 
+@if(Visible && AllowColumnPicking)
+{
+    <div class="d-flex flex-row-reverse mb-1">
+    <RadzenDropDown SelectAllText="All"
+                    MaxSelectedLabels="2" 
+                    SelectedItemsText="columns showing" 
+                    @bind-Value="@VisibleColumns" 
+                    Multiple="true" 
+                    Placeholder="Columns" 
+                    Data="columns" 
+                    TextProperty="Title" ValueProperty="Title" />
+    </div>
+}
 @if (Columns != null)
 {
     <CascadingValue Value=this>
@@ -14,7 +27,7 @@
 
 @if (Visible)
 {
-    var visibleColumns = columns.Where(c => c.Visible).ToList();
+    var visibleColumns = columns.Where(c => c.IsVisible).ToList();
 
     <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()">
         @if(AllowGrouping)

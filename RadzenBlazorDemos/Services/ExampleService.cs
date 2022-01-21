@@ -152,6 +152,14 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-composite-columns",
                             Title = "Blazor DataGrid composite columns",
                             Tags = new [] { "datagrid", "column", "composite", "merged", "complex" }
+                        },
+                                                new Example
+                        {
+                            Name = "Column Picker",
+                            New = true,
+                            Path = "datagrid-column-picker",
+                            Title = "Blazor DataGrid column picker",
+                            Tags = new [] { "datagrid", "column", "picker", "chooser" }
                         }
                     }
                 },

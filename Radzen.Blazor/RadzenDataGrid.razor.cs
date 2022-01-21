@@ -279,6 +279,8 @@ namespace Radzen.Blazor
         private readonly List<RadzenDataGridColumn<TItem>> columns = new List<RadzenDataGridColumn<TItem>>();
         internal readonly List<RadzenDataGridColumn<TItem>> childColumns = new List<RadzenDataGridColumn<TItem>>();
 
+        public IEnumerable<string> VisibleColumns { get; set; } = new List<string>();
+
         /// <summary>
         /// Gets or sets the columns.
         /// </summary>
@@ -290,13 +292,13 @@ namespace Radzen.Blazor
         {
             if (!columns.Contains(column) && column.Parent == null)
             {
+                VisibleColumns = VisibleColumns.Append(column.Title);
                 columns.Add(column);
             }
 
             if (!childColumns.Contains(column) && column.Parent != null)
             {
                 childColumns.Add(column);
-
                 var level = column.GetLevel();
                 if (level > deepestChildColumnLevel)
                 {
@@ -817,6 +819,13 @@ namespace Radzen.Blazor
         public bool AllowColumnReorder { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether column picking is allowed.
+        /// </summary>
+        /// <value><c>true</c> if column picking is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowColumnPicking { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether grouping is allowed.
         /// </summary>
         /// <value><c>true</c> if grouping is allowed; otherwise, <c>false</c>.</value>
@@ -866,7 +875,7 @@ namespace Radzen.Blazor
         {
             if (indexOfColumnToReoder != null)
             {
-                var visibleColumns = columns.Where(c => c.Visible).ToList();
+                var visibleColumns = columns.Where(c => c.IsVisible).ToList();
                 var columnToReorder = visibleColumns.ElementAtOrDefault(indexOfColumnToReoder.Value);
                 var columnToReorderTo = visibleColumns.ElementAtOrDefault(columnIndex);
 
@@ -897,7 +906,7 @@ namespace Radzen.Blazor
         [JSInvokable("RadzenGrid.OnColumnResized")]
         public async Task OnColumnResized(int columnIndex, double value)
         {
-            var column = columns.Where(c => c.Visible).ToList()[columnIndex];
+            var column = columns.Where(c => c.IsVisible).ToList()[columnIndex];
             column.SetWidth($"{Math.Round(value)}px");
             await ColumnResized.InvokeAsync(new DataGridColumnResizedEventArgs<TItem>
             {
@@ -1237,7 +1246,7 @@ namespace Radzen.Blazor
 
             if (LoadData.HasDelegate)
             {
-                var filters = allColumns.ToList().Where(c => c.Filterable && c.Visible && (c.GetFilterValue() != null
+                var filters = allColumns.ToList().Where(c => c.Filterable && c.IsVisible && (c.GetFilterValue() != null
                         || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull)).Select(c => new FilterDescriptor()
                         {
                             Property = c.GetFilterProperty(),
@@ -1819,7 +1828,7 @@ namespace Radzen.Blazor
         {
             if(indexOfColumnToReoder != null)
             {
-                var column = columns.Where(c => c.Visible).ElementAtOrDefault(indexOfColumnToReoder.Value);
+                var column = columns.Where(c => c.IsVisible).ElementAtOrDefault(indexOfColumnToReoder.Value);
 
                 if(column != null && column.Groupable && !string.IsNullOrEmpty(column.GetGroupProperty()))
                 {
@@ -1928,7 +1937,7 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
-                foreach (var column in allColumns.ToList().Where(c => c.Visible))
+                foreach (var column in allColumns.ToList().Where(c => c.IsVisible))
                 {
                     JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", $"{PopupID}{column.GetFilterProperty()}");
                 }
