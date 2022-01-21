@@ -8,7 +8,9 @@
 <h1>DataGrid <strong>Multiple Selection</strong></h1>
 
 <RadzenExample Name="DataGrid" Source="DataGridMultipleSelection" Heading="false">
-    <RadzenDataGrid @ref="grid" AllowRowSelectOnRowClick="false" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+    <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" />
+    <RadzenLabel Text="Allow row select on row click" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 10px;" />
+    <RadzenDataGrid @ref="grid" AllowRowSelectOnRowClick="@allowRowSelectOnRowClick" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                 AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
                 SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedEmployees>
         <Columns>
@@ -19,7 +21,7 @@
                 </HeaderTemplate>
                 <Template Context="data">
                     <RadzenCheckBox TriState="false" Value="@(selectedEmployees != null && selectedEmployees.Contains(data))" 
-                        TValue="bool" Change=@(args => grid.SelectRow(data)) />
+                        TValue="bool" Change=@(args => { if(!allowRowSelectOnRowClick) { grid.SelectRow(data); }}) />
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
@@ -37,6 +39,7 @@
     </RadzenDataGrid>
 </RadzenExample>
 @code {
+    bool allowRowSelectOnRowClick = true;
     IEnumerable<Employee> employees;
     IList<Employee> selectedEmployees;
     RadzenDataGrid<Employee> grid;
