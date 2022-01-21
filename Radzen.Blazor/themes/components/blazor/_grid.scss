@@ -781,7 +781,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 .rz-grid-table thead {
     position: sticky;
     top: 0;
-    z-index: 2;
+    z-index: 1;
 
     th {
         position: sticky;
