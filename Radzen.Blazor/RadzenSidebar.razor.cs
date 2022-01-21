@@ -25,7 +25,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return Expanded ? "rz-sidebar rz-sidebar-expanded" : "rz-sidebar";
+            return Expanded ? "rz-sidebar rz-sidebar-expanded" : "rz-sidebar rz-sidebar-collapsed";
         }
 
         /// <summary>
@@ -49,6 +49,11 @@ namespace Radzen.Blazor
             if (Layout != null && !string.IsNullOrEmpty(style))
             {
                 style = style.Replace(DefaultStyle, "");
+            }
+
+            if (Layout != null)
+            {
+                return style;
             }
 
             return $"{style}{(Expanded ? ";transform:translateX(0px);" : ";width:0px;transform:translateX(-100%);")}";
