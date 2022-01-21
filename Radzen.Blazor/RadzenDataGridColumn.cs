@@ -66,7 +66,7 @@ namespace Radzen.Blazor
             if (!Grid.AllowCompositeDataCells && isDataCell) 
                 return 1;
 
-            var visibleChildColumns = Grid.childColumns.Where(c => c.Visible);
+            var visibleChildColumns = Grid.childColumns.Where(c => c.IsVisible);
             var directChildColumns = visibleChildColumns.Where(c => c.Parent == this);
 
             if (Parent == null)
@@ -138,8 +138,8 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool Visible { get; set; } = true;
-
+        public bool? Visible { get; set; }
+        public bool IsVisible => Visible.HasValue ? Visible.Value : Grid.VisibleColumns.Contains(Title);
         /// <summary>
         /// Gets or sets the title.
         /// </summary>
@@ -409,7 +409,7 @@ namespace Radzen.Blazor
                 style.Add($"left:{left}px");
             }
 
-            if ((isHeaderOrFooterCell && Frozen || isHeaderOrFooterCell && !Frozen || !isHeaderOrFooterCell && Frozen) && Grid.ColumnsCollection.Where(c => c.Visible && c.Frozen).Any())
+            if ((isHeaderOrFooterCell && Frozen || isHeaderOrFooterCell && !Frozen || !isHeaderOrFooterCell && Frozen) && Grid.ColumnsCollection.Where(c => c.IsVisible && c.Frozen).Any())
             {
                 style.Add($"z-index:{(isHeaderOrFooterCell && Frozen ? 1 : 0)}");
             }
