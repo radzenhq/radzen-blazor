@@ -92,27 +92,10 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        /// <inheritdoc />
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        async Task OnChange(bool matches)
         {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (IsJSRuntimeAvailable && expanded == null)
-            {
-                try
-                {
-                    var mobile = await JSRuntime.InvokeAsync<bool>("Radzen.matchMedia", new object[] { "(max-width: 768px)" });
-
-                    if (mobile)
-                    {
-                        await ExpandedChanged.InvokeAsync(false);
-                    }
-                }
-                catch (Exception)
-                {
-
-                }
-            }
+            expanded = !matches;
+            await ExpandedChanged.InvokeAsync(!matches);
         }
     }
 }
