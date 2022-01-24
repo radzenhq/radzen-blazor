@@ -1073,6 +1073,13 @@ namespace Radzen.Blazor
         public Action<RowRenderEventArgs<TItem>> RowRender { get; set; }
 
         /// <summary>
+        /// Gets or sets the group row render callback. Use it to set group row attributes.
+        /// </summary>
+        /// <value>The group row render callback.</value>
+        [Parameter]
+        public Action<GroupRowRenderEventArgs> GroupRowRender { get; set; }
+
+        /// <summary>
         /// Gets or sets the cell render callback. Use it to set cell attributes.
         /// </summary>
         /// <value>The cell render callback.</value>
@@ -1254,18 +1261,21 @@ namespace Radzen.Blazor
 
         internal Dictionary<RadzenDataGridGroupRow<TItem>, bool> collapsedGroupItems = new Dictionary<RadzenDataGridGroupRow<TItem>, bool>();
 
-        internal string ExpandedGroupItemStyle(RadzenDataGridGroupRow<TItem> item)
+        internal string ExpandedGroupItemStyle(RadzenDataGridGroupRow<TItem> item, bool? expandedOnLoad)
         {
-            return collapsedGroupItems.Keys.Contains(item) ? "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-right" : "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-down";
+            return collapsedGroupItems.Keys.Contains(item) || expandedOnLoad == false ? "rz-row-toggler rzi-grid-sort rzi-chevron-circle-right" : "rz-row-toggler rzi-grid-sort rzi-chevron-circle-down";
         }
 
         internal bool IsGroupItemExpanded(RadzenDataGridGroupRow<TItem> item)
         {
-            return !collapsedGroupItems.Keys.Contains(item) ;
+            return !collapsedGroupItems.Keys.Contains(item);
         }
 
-        internal async System.Threading.Tasks.Task ExpandGroupItem(RadzenDataGridGroupRow<TItem> item)
+        internal async System.Threading.Tasks.Task ExpandGroupItem(RadzenDataGridGroupRow<TItem> item, bool? expandedOnLoad)
         {
+            if (expandedOnLoad != null)
+                return;
+
             if (!collapsedGroupItems.Keys.Contains(item))
             {
                 collapsedGroupItems.Add(item, true);
@@ -1305,6 +1315,18 @@ namespace Radzen.Blazor
             }
 
             return new Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>>(args, new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes));
+        }
+
+        internal Tuple<GroupRowRenderEventArgs, IReadOnlyDictionary<string, object>> GroupRowAttributes(RadzenDataGridGroupRow<TItem> item)
+        {
+            var args = new Radzen.GroupRowRenderEventArgs() { Group = item.Group, FirstRender = firstRender };
+
+            if (GroupRowRender != null)
+            {
+                GroupRowRender(args);
+            }
+
+            return new Tuple<GroupRowRenderEventArgs, IReadOnlyDictionary<string, object>>(args, new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes));
         }
 
         private bool visibleChanged = false;
