@@ -1079,9 +1079,9 @@ window.Radzen = {
       };
       var query = matchMedia(query);
       this.mediaQueries[instance._id] = function() {
-          query.removeEventListener('change', callback);
+          query.removeListener(callback);
       }
-      query.addEventListener('change', callback);
+      query.addListener(callback);
       return query.matches;
     } else {
         instance = query;
