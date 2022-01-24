@@ -228,6 +228,7 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Updated = true,
                             Name = "Multiple selection",
                             Path = "datagrid-multiple-selection",
                             Title = "Blazor DataGrid Multiple selection",
@@ -303,6 +304,7 @@ namespace RadzenBlazorDemos
                     {
                         new Example
                         {
+                            Updated = true,
                             Name = "Grouping API",
                             Path = "datagrid-grouping-api",
                             Title = "Blazor DataGrid pager position",
@@ -310,6 +312,7 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Updated = true,
                             Name = "Group Header Template",
                             Path = "datagrid-group-header-template",
                             Title = "Blazor DataGrid group header template",
