@@ -215,6 +215,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Updated = true,
                     Name = "Selection",
                     Icon = "&#xf0c5",
                     Children = new []
@@ -298,6 +299,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Updated = true,
                     Name = "Grouping",
                     Icon = "&#xf1be",
                     Children = new []
