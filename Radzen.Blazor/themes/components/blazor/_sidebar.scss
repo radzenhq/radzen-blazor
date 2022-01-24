@@ -30,6 +30,6 @@ $sidebar-background-color: $charcoal-grey !default;
 }
 
 .rz-sidebar-collapsed {
-  width: 0;
+  width: 0 !important;
   opacity: 0;
 }
