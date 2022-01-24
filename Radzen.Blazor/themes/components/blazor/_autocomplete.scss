@@ -4,15 +4,13 @@
   border-radius: $input-border-radius;
   overflow: hidden;
 
-  &:hover {
+  &:hover:not(.rz-state-disabled) {
     @extend %input-hover;
   }
 }
 
-.rz-state-disabled {
-  .rz-autocomplete {
+.rz-state-disabled.rz-autocomplete {
     @extend %input-disabled;
-  }
 }
 
 .rz-autocomplete-input {
