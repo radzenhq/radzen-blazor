@@ -171,6 +171,7 @@ namespace Radzen
                 Width = options != null && !string.IsNullOrEmpty(options.Width) ? options.Width : "600px",
                 Left = options != null && !string.IsNullOrEmpty(options.Left) ? options.Left : "",
                 Top = options != null && !string.IsNullOrEmpty(options.Top) ? options.Top : "",
+                Bottom = options != null && !string.IsNullOrEmpty(options.Bottom) ? options.Bottom : "",
                 Height = options != null && !string.IsNullOrEmpty(options.Height) ? options.Height : "",
                 ShowTitle = options != null ? options.ShowTitle : true,
                 ShowClose = options != null ? options.ShowClose : true,
