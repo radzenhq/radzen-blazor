@@ -392,10 +392,10 @@ namespace Radzen.Blazor
                 style.Add($"text-align:{Enum.GetName(typeof(TextAlign), TextAlign).ToLower()};");
             }
 
-            if (forCell && Frozen)
+            if (forCell && IsFrozen())
             {
                 var left = Grid.ColumnsCollection
-                    .TakeWhile((c, i) => Grid.ColumnsCollection.IndexOf(this) > i && c.Frozen)
+                    .TakeWhile((c, i) => Grid.ColumnsCollection.IndexOf(this) > i && c.IsFrozen())
                     .Sum(c => {
                         var w = !string.IsNullOrEmpty(c.GetWidth()) ? c.GetWidth() : Grid.ColumnWidth;
                         var cw = 200;
@@ -409,12 +409,17 @@ namespace Radzen.Blazor
                 style.Add($"left:{left}px");
             }
 
-            if ((isHeaderOrFooterCell && Frozen || isHeaderOrFooterCell && !Frozen || !isHeaderOrFooterCell && Frozen) && Grid.ColumnsCollection.Where(c => c.Visible && c.Frozen).Any())
+            if ((isHeaderOrFooterCell && IsFrozen() || isHeaderOrFooterCell && !IsFrozen() || !isHeaderOrFooterCell && IsFrozen()) && Grid.ColumnsCollection.Where(c => c.Visible && c.IsFrozen()).Any())
             {
-                style.Add($"z-index:{(isHeaderOrFooterCell && Frozen ? 1 : 0)}");
+                style.Add($"z-index:{(isHeaderOrFooterCell && IsFrozen() ? 1 : 0)}");
             }
 
             return string.Join(";", style);
+        }
+
+        internal bool IsFrozen()
+        {
+            return Frozen && Parent == null && Columns == null;
         }
 
         /// <summary>

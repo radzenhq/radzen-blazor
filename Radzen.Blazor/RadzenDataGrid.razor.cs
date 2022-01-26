@@ -232,7 +232,7 @@ namespace Radzen.Blazor
 
         internal string getFrozenColumnClass(RadzenDataGridColumn<TItem> column, IList<RadzenDataGridColumn<TItem>> visibleColumns)
         {
-            return column.Frozen ? "rz-frozen-cell" : "";
+            return column.IsFrozen() ? "rz-frozen-cell" : "";
         }
 
         /// <summary>
