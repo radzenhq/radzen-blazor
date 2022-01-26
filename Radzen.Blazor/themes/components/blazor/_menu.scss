@@ -80,6 +80,7 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
 
   .rz-navigation-item {
     position: relative;
+    z-index: 2;
   }
 
   .rz-navigation-menu {
