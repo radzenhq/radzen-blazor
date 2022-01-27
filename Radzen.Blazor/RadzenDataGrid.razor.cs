@@ -221,8 +221,7 @@ namespace Radzen.Blazor
             {
                 if (_groupedPagedView == null)
                 {
-
-                    var query = View.OrderBy(string.Join(',', groups.Select(g => $"np({g.Property}) {(g.SortOrder == null ? "" : g.SortOrder == SortOrder.Ascending ? " asc" : " desc")}")));
+                    var query = groups.Count(g => g.SortOrder == null) == Groups.Count ? View : View.OrderBy(string.Join(',', groups.Select(g => $"np({g.Property}) {(g.SortOrder == null ? "" : g.SortOrder == SortOrder.Ascending ? " asc" : " desc")}")));
                     var v = (AllowPaging && !LoadData.HasDelegate ? query.Skip(skip).Take(PageSize) : query).ToList().AsQueryable();
                     _groupedPagedView = v.GroupByMany(groups.Select(g => $"np({g.Property})").ToArray()).ToList();
                 }
