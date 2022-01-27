@@ -1071,6 +1071,26 @@ window.Radzen = {
       redo: document.queryCommandEnabled('redo')
     };
   },
+  mediaQueries: {},
+  mediaQuery: function(query, instance) {
+    if (instance) {
+      function callback(event) {
+          instance.invokeMethodAsync('OnChange', event.matches)
+      };
+      var query = matchMedia(query);
+      this.mediaQueries[instance._id] = function() {
+          query.removeListener(callback);
+      }
+      query.addListener(callback);
+      return query.matches;
+    } else {
+        instance = query;
+        if (this.mediaQueries[instance._id]) {
+            this.mediaQueries[instance._id]();
+            delete this.mediaQueries[instance._id];
+        }
+    }
+  },
   createEditor: function (ref, uploadUrl, paste, instance) {
     ref.inputListener = function () {
       instance.invokeMethodAsync('OnChange', ref.innerHTML);
