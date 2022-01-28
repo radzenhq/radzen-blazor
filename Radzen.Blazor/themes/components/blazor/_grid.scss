@@ -694,6 +694,10 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     .rz-datatable-scrollable-table-wrapper {
       > table {
         table-layout: auto;
+        display: block;
+      }
+      > tbody {
+        display: block;
       }
     }
 
@@ -705,6 +709,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
     .rz-datatable-odd,
     .rz-datatable-even {
+      display: block;
       > td {
         display: block;
         width: 100% !important;
