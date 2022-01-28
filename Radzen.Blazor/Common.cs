@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor;
 using System;
 using System.Collections;
@@ -100,7 +101,7 @@ namespace Radzen
     /// <summary>
     /// Supplies information about a <see cref="RadzenMenu.Click" /> event that is being raised.
     /// </summary>
-    public class MenuItemEventArgs
+    public class MenuItemEventArgs : MouseEventArgs
     {
         /// <summary>
         /// Gets text of the clicked item.
