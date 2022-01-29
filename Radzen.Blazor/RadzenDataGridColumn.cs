@@ -71,7 +71,8 @@ namespace Radzen.Blazor
 
             if (Parent == null)
             {
-                return Columns == null ? 1 : visibleChildColumns.Count() - directChildColumns.Count() + directChildColumns.Where(c => c.Columns == null).Count();
+                return Columns == null ? 1 : Grid.deepestChildColumnLevel == 1 ? directChildColumns.Count() :
+                    visibleChildColumns.Count() - directChildColumns.Count() + directChildColumns.Where(c => c.Columns == null).Count();
             }
 
             return Columns == null ? 1 : directChildColumns.Count();
