@@ -66,13 +66,11 @@ namespace Radzen.Blazor
             if (!Grid.AllowCompositeDataCells && isDataCell) 
                 return 1;
 
-            var visibleChildColumns = Grid.childColumns.Where(c => c.Visible);
-            var directChildColumns = visibleChildColumns.Where(c => c.Parent == this);
+            var directChildColumns = Grid.childColumns.Where(c => c.Visible && c.Parent == this);
 
             if (Parent == null)
             {
-                return Columns == null ? 1 : Grid.deepestChildColumnLevel == 1 ? directChildColumns.Count() :
-                    visibleChildColumns.Count() - directChildColumns.Count() + directChildColumns.Where(c => c.Columns == null).Count();
+                return Columns == null ? 1 : directChildColumns.Sum(c => c.GetColSpan());
             }
 
             return Columns == null ? 1 : directChildColumns.Count();
