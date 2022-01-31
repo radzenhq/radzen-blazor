@@ -519,6 +519,17 @@ namespace Radzen.Blazor
                 HeaderCellRender(args);
             }
 
+            var sortOrder = column.GetSortOrder();
+            switch (sortOrder)
+            {
+                case SortOrder.Ascending:
+                    args.Attributes.Add("aria-sort", "ascending");
+                    break;
+                case SortOrder.Descending:
+                    args.Attributes.Add("aria-sort", "descending");
+                    break;
+            }
+
             return new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes);
         }
 
