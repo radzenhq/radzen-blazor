@@ -2,7 +2,7 @@
 @if (RowIndex == Column.GetLevel())
 {
 <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex)) >
-    <div @onclick='@((args) => Grid.OnSort(args, Column))' style="width:100%" tabindex="@SortingTabIndex" @onkeydown="OnSortKeyPressed">
+    <div @onclick='@((args) => Grid.OnSort(args, Column))' style="width:100%;outline:none;" tabindex="@SortingTabIndex" @onkeydown="OnSortKeyPressed">
         @if (Column.Parent == null && Column.Columns == null && (Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
         {
             <span id="@Grid.getColumnResizerId(ColumnIndex)" class="rz-column-drag" 
