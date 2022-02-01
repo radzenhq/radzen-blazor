@@ -130,9 +130,10 @@
                                                     {
                                                         <i onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")"
                                                            class="rzi">date_range</i>
-                                                        @if (column.GetFilterValue() != null)
+                                                        var filterValue = column.GetFilterValue();
+                                                        @if (filterValue != null)
                                                         {
-                                                            <span class="rz-current-filter">@column.GetFilterValue()</span>
+                                                            <span class="rz-current-filter">@string.Format("{0:" + getFilterDateFormat(column) + "}", filterValue)</span>
                                                             <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear">close</i>
                                                         }
                                                         <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel"
