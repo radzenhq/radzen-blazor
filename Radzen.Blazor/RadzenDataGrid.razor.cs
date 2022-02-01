@@ -1069,11 +1069,25 @@ namespace Radzen.Blazor
         public EventCallback<TItem> RowExpand { get; set; }
 
         /// <summary>
+        /// Gets or sets the group row expand callback.
+        /// </summary>
+        /// <value>The group row expand callback.</value>
+        [Parameter]
+        public EventCallback<Group> GroupRowExpand { get; set; }
+
+        /// <summary>
         /// Gets or sets the row collapse callback.
         /// </summary>
         /// <value>The row collapse callback.</value>
         [Parameter]
         public EventCallback<TItem> RowCollapse { get; set; }
+
+        /// <summary>
+        /// Gets or sets the group row collapse callback.
+        /// </summary>
+        /// <value>The group row collapse callback.</value>
+        [Parameter]
+        public EventCallback<Group> GroupRowCollapse { get; set; }
 
         /// <summary>
         /// Gets or sets the row render callback. Use it to set row attributes.
@@ -1288,10 +1302,12 @@ namespace Radzen.Blazor
 
             if (!collapsedGroupItems.Keys.Contains(item))
             {
+                await GroupRowCollapse.InvokeAsync(item.Group);
                 collapsedGroupItems.Add(item, true);
             }
             else
             {
+                await GroupRowExpand.InvokeAsync(item.Group);
                 collapsedGroupItems.Remove(item);
             }
 
