@@ -98,6 +98,7 @@ $grid-state-transition: none !default;
 $grid-group-header-padding: 15px !default;
 $grid-group-header-item-padding: 10px !default;
 $grid-group-header-item-margin: 5px !default;
+$grid-group-header-items-margin: 0 !default;
 
 $column-drag-handle-color: $grid-header-color !default;
 $column-drag-handle-hover-color: $column-drag-handle-color !default;
@@ -872,6 +873,13 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     background-color: $grid-header-background-color;
     padding: $grid-group-header-padding;
     border-bottom: $grid-bottom-cell-border;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rz-group-header-items {
+  margin: $grid-group-header-items-margin;
 }
 
 .rz-group-header-item {
@@ -879,9 +887,17 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     padding: $grid-group-header-item-padding;
     margin: $grid-group-header-item-margin;
     width: fit-content;
-    float:left;
+    float: left;
 }
 
 .rz-group-header-item-title {
     margin-right: 5px;
+}
+
+.rz-group-header-drop {
+  height: fit-content;
+}
+
+.rz-column-picker {
+  display: flex;
 }

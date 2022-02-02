@@ -5,19 +5,6 @@
 @typeparam TItem
 @inherits PagedDataBoundComponent<TItem>
 
-@if(Visible && AllowColumnPicking)
-{
-    <div class="d-flex flex-row-reverse mb-1">
-    <RadzenDropDown SelectAllText="All"
-                    MaxSelectedLabels="2" 
-                    SelectedItemsText="columns showing" 
-                    @bind-Value="@VisibleColumns" 
-                    Multiple="true" 
-                    Placeholder="Columns" 
-                    Data="columns" 
-                    TextProperty="Title" ValueProperty="Title" />
-    </div>
-}
 @if (Columns != null)
 {
     <CascadingValue Value=this>
@@ -30,25 +17,44 @@
     var visibleColumns = columns.Where(c => c.IsVisible).ToList();
 
     <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()">
-        @if(AllowGrouping)
+        @if(AllowGrouping || AllowColumnPicking)
         {
             <div class="rz-group-header" @onmouseup=@(args => EndColumnDropToGroup())>
-            @if(groups.Any())
-            {
-                @foreach(var gd in groups)
+                @if(AllowGrouping)
                 {
-                    <div class="rz-group-header-item">
-                        <span class="rz-group-header-item-title">@gd.GetTitle()</span>
-                        <a href="javascript:void(0)" @onclick=@(args => { groups.Remove(gd); _groupedPagedView = null; }) role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
-                            <span class="rzi rzi-times"></span>
-                        </a>
+                    @if(groups.Any())
+                    {
+                        <div class="rz-group-header-items">
+                        @foreach(var gd in groups)
+                        {
+                            <div class="rz-group-header-item">
+                                <span class="rz-group-header-item-title">@gd.GetTitle()</span>
+                                <a href="javascript:void(0)" @onclick=@(args => { groups.Remove(gd); _groupedPagedView = null; }) role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                                    <span class="rzi rzi-times"></span>
+                                </a>
+                            </div>
+                        }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="rz-group-header-drop">@GroupPanelText</div>
+                    }
+                }
+
+                @if(AllowColumnPicking)
+                {
+                    <div class="rz-column-picker">
+                        <RadzenDropDown SelectAllText="All"
+                                        MaxSelectedLabels="2" 
+                                        SelectedItemsText="columns showing" 
+                                        @bind-Value="@VisibleColumns" 
+                                        Multiple="true" 
+                                        Placeholder="Columns" 
+                                        Data="columns" 
+                                        TextProperty="Title" ValueProperty="Title" />
                     </div>
                 }
-            }
-            else
-            {
-                <div class="rz-group-header-drop">@GroupPanelText</div>
-            }
             </div>
         }
 
