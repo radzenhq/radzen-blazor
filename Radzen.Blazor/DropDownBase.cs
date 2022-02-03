@@ -206,17 +206,17 @@ namespace Radzen
             if (!string.IsNullOrEmpty(ValueProperty))
             {
                 System.Reflection.PropertyInfo pi = PropertyAccess.GetElementType(Data.GetType()).GetProperty(ValueProperty);
-                Value = selectedItems.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty)).AsQueryable().Cast(pi.PropertyType);
+                internalValue = selectedItems.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty)).AsQueryable().Cast(pi.PropertyType);
             }
             else
             {
                 var type = typeof(T).IsGenericType ? typeof(T).GetGenericArguments()[0] : typeof(T);
-                Value = selectedItems.AsQueryable().Cast(type);
+                internalValue = selectedItems.AsQueryable().Cast(type);
             }
 
-            await ValueChanged.InvokeAsync((T)Value);
+            await ValueChanged.InvokeAsync((T)internalValue);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
-            await Change.InvokeAsync(Value);
+            await Change.InvokeAsync(internalValue);
 
             StateHasChanged();
         }
@@ -241,16 +241,16 @@ namespace Radzen
             searchText = null;
             await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, "");
 
-            Value = default(T);
+            internalValue = default(T);
             selectedItem = null;
 
             selectedItems.Clear();
 
             selectedIndex = -1;
 
-            await ValueChanged.InvokeAsync((T)Value);
+            await ValueChanged.InvokeAsync((T)internalValue);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
-            await Change.InvokeAsync(Value);
+            await Change.InvokeAsync(internalValue);
 
             await OnFilter(new ChangeEventArgs());
 
@@ -286,7 +286,7 @@ namespace Radzen
                         selectedItems.Clear();
                     }
 
-                    SelectItemFromValue(Value);
+                    SelectItemFromValue(internalValue);
 
                     OnDataChanged();
 
@@ -576,6 +576,14 @@ namespace Radzen
             return base.OnAfterRenderAsync(firstRender);
         }
 
+        /// <inheritdoc />
+        protected override void OnInitialized()
+        {
+            internalValue = Value;
+
+            base.OnInitialized();
+        }
+
         /// <summary>
         /// Set parameters as an asynchronous operation.
         /// </summary>
@@ -604,6 +612,11 @@ namespace Radzen
                 shouldClose = !visible;
             }
 
+            if (parameters.DidParameterChange(nameof(Value), Value))
+            {
+                internalValue = parameters.GetValueOrDefault<object>(nameof(Value));
+            }
+
             await base.SetParametersAsync(parameters);
 
             if (shouldClose && !firstRender)
@@ -618,7 +631,7 @@ namespace Radzen
         /// <returns>Task.</returns>
         protected override Task OnParametersSetAsync()
         {
-            var valueAsEnumerable = Value as IEnumerable;
+            var valueAsEnumerable = internalValue as IEnumerable;
 
             if (valueAsEnumerable != null)
             {
@@ -628,7 +641,7 @@ namespace Radzen
                 }
             }
 
-            SelectItemFromValue(Value);
+            SelectItemFromValue(internalValue);
 
             return base.OnParametersSetAsync();
         }
@@ -639,7 +652,7 @@ namespace Radzen
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected void OnChange(ChangeEventArgs args)
         {
-            Value = args.Value;
+            internalValue = args.Value;
         }
 
         /// <summary>
@@ -775,6 +788,8 @@ namespace Radzen
             await SelectItem(item, raiseChange);
         }
 
+        internal object internalValue;
+
         /// <summary>
         /// Selects the item.
         /// </summary>
@@ -790,11 +805,11 @@ namespace Radzen
                 selectedItem = item;
                 if (!string.IsNullOrEmpty(ValueProperty))
                 {
-                    Value = PropertyAccess.GetItemOrValueFromProperty(item, ValueProperty);
+                    internalValue = PropertyAccess.GetItemOrValueFromProperty(item, ValueProperty);
                 }
                 else
                 {
-                    Value = item;
+                    internalValue = item;
                 }
 
                 SetSelectedIndexFromSelectedItem();
@@ -815,7 +830,7 @@ namespace Radzen
                 if (!string.IsNullOrEmpty(ValueProperty))
                 {
                     System.Reflection.PropertyInfo pi = PropertyAccess.GetElementType(Data.GetType()).GetProperty(ValueProperty);
-                    Value = selectedItems.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty)).AsQueryable().Cast(pi.PropertyType);
+                    internalValue = selectedItems.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty)).AsQueryable().Cast(pi.PropertyType);
                 }
                 else
                 {
@@ -823,19 +838,19 @@ namespace Radzen
                     var elementType = firstElement != null ? firstElement.GetType() : null;
                     if (elementType != null)
                     {
-                        Value = selectedItems.AsQueryable().Cast(elementType);
+                        internalValue = selectedItems.AsQueryable().Cast(elementType);
                     }
                     else
                     {
-                        Value = selectedItems;
+                        internalValue = selectedItems;
                     }
                 }
             }
             if (raiseChange)
             {
-                await ValueChanged.InvokeAsync(object.Equals(Value, null) ? default(T) : (T)Value);
+                await ValueChanged.InvokeAsync(object.Equals(internalValue, null) ? default(T) : (T)internalValue);
                 if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
-                await Change.InvokeAsync(Value);
+                await Change.InvokeAsync(internalValue);
             }
             StateHasChanged();
         }
@@ -863,7 +878,7 @@ namespace Radzen
                     }
                     else
                     {
-                        selectedItem = Value;
+                        selectedItem = internalValue;
                     }
 
                     SetSelectedIndexFromSelectedItem();

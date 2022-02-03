@@ -304,7 +304,7 @@ namespace Radzen.Blazor
                     }
                     else
                     {
-                        selectedItem = Value;
+                        selectedItem = internalValue;
                     }
                     SelectedItemChanged?.Invoke(selectedItem);
                 }
@@ -344,14 +344,14 @@ namespace Radzen.Blazor
                 return;
 
             searchText = null;
-            Value = default(TValue);
+            internalValue = default(TValue);
             selectedItem = null;
 
             selectedItems.Clear();
 
-            await ValueChanged.InvokeAsync((TValue)Value);
+            await ValueChanged.InvokeAsync((TValue)internalValue);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
-            await Change.InvokeAsync(Value);
+            await Change.InvokeAsync(internalValue);
 
             await grid.Reload();
 
