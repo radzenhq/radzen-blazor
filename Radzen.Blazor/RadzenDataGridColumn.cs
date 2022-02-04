@@ -410,7 +410,7 @@ namespace Radzen.Blazor
 
             if ((isHeaderOrFooterCell && IsFrozen() || isHeaderOrFooterCell && !IsFrozen() || !isHeaderOrFooterCell && IsFrozen()) && Grid.ColumnsCollection.Where(c => c.Visible && c.IsFrozen()).Any())
             {
-                style.Add($"z-index:{(isHeaderOrFooterCell && IsFrozen() ? 1 : 0)}");
+                style.Add($"z-index:{(isHeaderOrFooterCell && IsFrozen() ? 2 : 1)}");
             }
 
             return string.Join(";", style);
