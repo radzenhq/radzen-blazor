@@ -4,11 +4,12 @@ $paginator-padding: 0.625rem !default;
 $paginator-numeric-button-background-color: #e6ecef !default;
 $paginator-numeric-button-color: $battleship-grey !default;
 $paginator-numeric-button-margin: 0 0.3125rem !default;
-$paginator-numeric-button-padding: 0.3125rem 0.6875rem !default;
+$paginator-numeric-button-padding: 0.3125rem !default;
 $paginator-numeric-button-selected-background-color: $white !default;
 $paginator-numeric-button-selected-color: $primary-color !default;
 $paginator-numeric-button-selected-border: 1px solid #e6ecef !default;
-$paginator-numeric-button-selected-padding: 0.25rem 0.625rem !default;
+$paginator-numeric-button-selected-padding: 0.25rem !default;
+$paginator-numeric-button-min-width: 1.75rem !default;
 
 $paginator-back-button-background-color: #e6ecef !default;
 $paginator-back-button-color: $battleship-grey !default;
@@ -173,7 +174,8 @@ $paginator-button-size: ".rz-button-sm" !default;
 
 .rz-paginator-page {
   display: inline-block;
-
+  min-width: $paginator-numeric-button-min-width;
+  text-align: center;
   margin: $paginator-numeric-button-margin;
   background-color: $paginator-numeric-button-background-color;
   border-radius: $border-radius;

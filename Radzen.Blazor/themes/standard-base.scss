@@ -780,11 +780,12 @@ $paginator-padding: 0.5rem !default;
 $paginator-numeric-button-background-color: $rz-base-200 !default;
 $paginator-numeric-button-color: $rz-base-800 !default;
 $paginator-numeric-button-margin: 0 0.125rem !default;
-$paginator-numeric-button-padding: 0.5rem 1rem !default;
+$paginator-numeric-button-padding: 0.5rem !default;
 $paginator-numeric-button-selected-background-color: $rz-primary-lighter !default;
 $paginator-numeric-button-selected-color: $rz-primary !default;
 $paginator-numeric-button-selected-border: none !default;
 $paginator-numeric-button-selected-padding: $paginator-numeric-button-padding !default;
+$paginator-numeric-button-min-width: 2.25rem !default;
 
 $paginator-back-button-background-color: $rz-base-200 !default;
 $paginator-back-button-color: $rz-base-800 !default;
