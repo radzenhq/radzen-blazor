@@ -37,7 +37,7 @@ $grid-foot-cell-color: $grid-cell-color !default;
 $grid-foot-background-color: $grid-header-background-color !default;
 
 $grid-filter-background-color: #f6f8f9 !default;
-$grid-filter-padding: 0.25rem 0.625rem !default;
+$grid-filter-padding: 0.5rem 0.625rem !default;
 $grid-filter-margin: 0 !default;
 $grid-filter-border: $grid-cell-border !default;
 $grid-filter-font-size: 0.8125rem !default;
@@ -55,6 +55,7 @@ $grid-filter-buttons-background-color: $white !default;
 $grid-clear-filter-button-background-color: #e6ecef !default;
 $grid-clear-filter-button-color: $cool-grey !default;
 $grid-apply-filter-button-background-color: $default-link !default;
+$grid-apply-filter-button-color: inherit !default;
 
 $grid-header-filter-icon-margin: 5px 5px 0 0 !default;
 $grid-header-filter-icon-hover-color: inherit !default;
@@ -489,7 +490,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
         }
       }
 
-    .rz-spinner {
+     /* .rz-spinner {
       border: none;
       padding: 0;
       height: auto;
@@ -509,9 +510,9 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
       button {
         display: none;
       }
-    }
+    } */
 
-    > input {
+    /* > input {
       width: 0;
       flex: auto;
       border: none;
@@ -526,6 +527,10 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
         outline: none;
         color: $grid-filter-focus-color;
       }
+    } */
+
+    .rz-current-filter {
+      margin-left: 0.5rem;
     }
   }
 }
@@ -644,6 +649,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
 .rz-apply-filter {
   background-color: $grid-apply-filter-button-background-color;
+  color: $grid-apply-filter-button-color;
 }
 
 .rz-datatable-loading {
