@@ -102,6 +102,9 @@
                                 </Template>
                             </RadzenDataGridColumn>
                         </Columns>
+                        <EmptyTemplate>
+                            @EmptyTemplate
+                        </EmptyTemplate>
                     </RadzenDataGrid>
                 }
                 else
@@ -120,6 +123,9 @@
                                     <RadzenDataGridColumn TItem="object" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)" />
                                 }
                             </Columns>
+                            <EmptyTemplate>
+                                @EmptyTemplate
+                            </EmptyTemplate>
                         </RadzenDataGrid>
                     }
                     else
@@ -133,6 +139,9 @@
                                     </Template>
                                 </RadzenDataGridColumn>
                             </Columns>
+                            <EmptyTemplate>
+                                @EmptyTemplate
+                            </EmptyTemplate>
                         </RadzenDataGrid>
                     }
                 }
