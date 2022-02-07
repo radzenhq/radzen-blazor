@@ -2,5 +2,7 @@ $body-padding: 1rem !default;
 
 .body {
   padding: $body-padding;
-  transform: translateZ(0);
+  .rz-layout & {
+    transform: translateZ(0);
+  }
 }
