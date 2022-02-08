@@ -493,11 +493,11 @@ namespace Radzen.Blazor
 
         async Task OnRowSelect(object item)
         {
-            await SelectItem(item);
             if (!Disabled && !Multiple)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
+            await SelectItem(item);
         }
 
         /// <inheritdoc />
