@@ -48,6 +48,7 @@ namespace Radzen
         /// Initializes a new instance of the <see cref="DialogService"/> class.
         /// </summary>
         /// <param name="uriHelper">The URI helper.</param>
+        /// <param name="jsRuntime">IJSRuntime instance.</param>
         public DialogService(NavigationManager uriHelper, IJSRuntime jsRuntime)
         {
             UriHelper = uriHelper;
