@@ -25,7 +25,7 @@ To set a component property assign the corresponding attribute to the desired va
 ## Handle events
 To handle an event create a method and assign the corresponding attribute to the method name. 
 ```
-<RadzenButton Text="Hello World!" Click=@OnButtonClick>
+<RadzenButton Text="Hello World!" Click=@OnButtonClick />
 @code {
     void OnButtonClick()
     {
@@ -47,7 +47,7 @@ The `Visible` property is used to toggle a component. If it is set to `false` th
 <RadzenButton Text="Toggle" Click=@ToggleVisible />
 @code {
    bool visible = true;
-   void Toggle()
+   void ToggleVisible()
    {
        visible = !visible;
    }
@@ -75,7 +75,7 @@ Some Radzen Blazor components display a collection of items. All of them have a 
     class DataItem
     {
         public string Name { get; set; }
-        public int Value { get; sett; }
+        public int Value { get; set; }
     }
 
     IEnumerable<DataItem> items = new List<DataItem>()
