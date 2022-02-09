@@ -490,45 +490,6 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
         }
       }
 
-     /* .rz-spinner {
-      border: none;
-      padding: 0;
-      height: auto;
-      background-color: transparent;
-      box-shadow: none;
-      line-height: 1;
-      flex: auto;
-
-      input {
-        line-height: 1;
-        &:focus {
-          outline: none;
-          color: $grid-filter-focus-color;
-        }
-      }
-
-      button {
-        display: none;
-      }
-    } */
-
-    /* > input {
-      width: 0;
-      flex: auto;
-      border: none;
-      box-shadow: none;
-      padding: 0;
-      background-color: transparent;
-      color: $grid-filter-color;
-      font-size: $grid-filter-font-size;
-      line-height: 1;
-
-      &:focus {
-        outline: none;
-        color: $grid-filter-focus-color;
-      }
-    } */
-
     .rz-current-filter {
       margin-left: 0.5rem;
     }
