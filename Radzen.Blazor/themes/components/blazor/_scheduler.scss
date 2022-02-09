@@ -77,16 +77,16 @@ $scheduler-border-radius: $border-radius !default;
   display: flex;
   height: 1.5em;
   border-top: 1px solid $scheduler-border-color;
-  border-left: 1px solid $scheduler-border-color;
+  border-inline-start: 1px solid $scheduler-border-color;
 }
 
 .rz-slot-hours {
   .rz-slot-header {
     height: 1.5em;
-    text-align: right;
+    text-align: end;
     padding: 0 4px;
     width: 80px;
-    border-right: 1px solid $scheduler-border-color;
+    border-inline-end: 1px solid $scheduler-border-color;
     white-space: nowrap;
   }
 }
@@ -98,7 +98,7 @@ $scheduler-border-radius: $border-radius !default;
 .rz-day-view,
 .rz-slots:first-child {
   .rz-slot {
-    border-left: none;
+    border-inline-start: none;
   }
 }
 
@@ -131,7 +131,7 @@ $scheduler-border-radius: $border-radius !default;
 }
 
 .rz-slot-title {
-  text-align: right;
+  text-align: end;
   padding: $scheduler-slot-title-padding;
 }
 
@@ -212,7 +212,7 @@ $scheduler-border-radius: $border-radius !default;
     height: 100%;
 
     &:first-child {
-      border-left: none;
+      border-inline-start: none;
     }
   }
 }
@@ -227,7 +227,7 @@ $scheduler-border-radius: $border-radius !default;
 .rz-week-view,
 .rz-day-view {
   .rz-view-header {
-    padding-right: 15px;
+    padding-inline-end: 15px;
   }
 }
 
@@ -245,13 +245,13 @@ $scheduler-border-radius: $border-radius !default;
     border-radius: 0;
 
     span {
-      margin-left: 0.25rem;
+      margin-inline-start: 0.25rem;
     }
 
     &:first-child {
       border-top-left-radius: $scheduler-border-radius;
       border-bottom-left-radius: $scheduler-border-radius;
-      border-right: none;
+      border-inline-end: none;
     }
 
     &:last-child {
@@ -272,7 +272,7 @@ $scheduler-border-radius: $border-radius !default;
   display: flex;
 
   .rz-today {
-    margin-left: $scheduler-today-button-margin-left;
+    margin-inline-start: $scheduler-today-button-margin-left;
   }
 
   .rz-button {
@@ -309,7 +309,7 @@ $scheduler-border-radius: $border-radius !default;
     .rz-scheduler-nav-prev-next {
       justify-content: space-between;
       margin-bottom: 0.5rem;
-      margin-right: 0.5rem;
+      margin-inline-end: 0.5rem;
       order: 1;
     }
 
@@ -327,8 +327,8 @@ $scheduler-border-radius: $border-radius !default;
 
       .rz-button {
         flex-grow: 1;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
+        padding-inline-start: 0.5rem;
+        padding-inline-end: 0.5rem;
 
         span {
           display: none;
@@ -342,4 +342,44 @@ $scheduler-border-radius: $border-radius !default;
       width: auto;
     }
   }
+}
+/* RTL */
+.rtl {
+    .rz-scheduler-nav-views {
+        .rz-button {
+            &:first-child {
+                border-top-left-radius: unset;
+                border-bottom-left-radius: unset;
+                border-top-right-radius: $scheduler-border-radius;
+                border-bottom-right-radius: $scheduler-border-radius;
+            }
+
+            &:last-child {
+                border-top-right-radius: unset;
+                border-bottom-right-radius: unset;
+                border-top-left-radius: $scheduler-border-radius;
+                border-bottom-left-radius: $scheduler-border-radius;
+            }
+        }
+    }
+
+    .rz-scheduler-nav-prev-next {
+        .rz-prev {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+
+            > i {
+                content: 'chevron_right';
+            }
+        }
+
+        .rz-next {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    }
 }

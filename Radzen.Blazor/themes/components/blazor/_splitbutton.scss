@@ -69,7 +69,7 @@ $splitbutton-border-radius: $input-border-radius !default;
 .rz-splitbutton-menubutton {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  border-left: $splitbutton-menu-button-border;
+  border-inline-start: $splitbutton-menu-button-border;
 
   @extend .rz-button-md;
 
@@ -82,4 +82,36 @@ $splitbutton-border-radius: $input-border-radius !default;
       content: 'arrow_drop_down';
     }
   }
+}
+
+/* RTL */
+.rtl {
+    .rz-splitbutton {
+        .rz-button-text-icon-left,
+        .rz-button-text-only {
+            border-top-right-radius: $splitbutton-border-radius;
+            border-bottom-right-radius: $splitbutton-border-radius;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+
+    .rz-splitbutton-menu {
+        border-top-left-radius: $splitbutton-border-radius;
+    }
+
+    .rz-menuitem {
+        &:hover {
+            &:first-child {
+                border-top-left-radius: $splitbutton-border-radius;
+            }
+        }
+    }
+
+    .rz-splitbutton-menubutton {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-top-left-radius: $splitbutton-border-radius;
+        border-bottom-left-radius: $splitbutton-border-radius;
+    }
 }

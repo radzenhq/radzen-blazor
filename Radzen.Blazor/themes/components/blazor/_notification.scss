@@ -93,3 +93,10 @@ $notification-icon-margin: 0 0.625rem 0 0 !default;
     margin-bottom: 0;
   }
 }
+
+/* RTL */
+.rtl {
+    .rz-growl-image {
+        float: right;
+    }
+}

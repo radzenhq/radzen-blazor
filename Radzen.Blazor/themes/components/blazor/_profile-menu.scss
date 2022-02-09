@@ -9,7 +9,7 @@ $profile-menu-item-hover-background-color: $default-link !default;
 $profile-menu-item-icon-width: 1.125rem !default;
 $profile-menu-item-icon-height: $profile-menu-item-icon-width !default;
 $profile-menu-item-icon-font-size: $profile-menu-item-icon-height !default;
-$profile-menu-item-icon-margin: 0 0.625rem 0 0 !default;
+$profile-menu-item-icon-margin-inline: 0 0.625rem !default;
 
 ul.rz-profile-menu {
   list-style: none;
@@ -68,7 +68,7 @@ ul.rz-profile-menu {
       width: $profile-menu-item-icon-width;
       height: $profile-menu-item-icon-height;
       font-size: $profile-menu-item-icon-font-size;
-      margin: $profile-menu-item-icon-margin;
+      margin-inline: $profile-menu-item-icon-margin-inline;
     }
   }
 }

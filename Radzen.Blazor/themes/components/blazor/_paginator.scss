@@ -14,16 +14,16 @@ $paginator-numeric-button-min-width: 1.75rem !default;
 $paginator-back-button-background-color: #e6ecef !default;
 $paginator-back-button-color: $battleship-grey !default;
 
-$paginator-first-button-margin: 0 0.625rem 0 0 !default;
-$paginator-last-button-margin: 0 0 0 0.625rem !default;
+$paginator-first-button-margin-inline: 0 0.625rem !default;
+$paginator-last-button-margin-inline: 0.625rem 0 !default;
 
 $paginator-next-button-background-color: $default-link !default;
 $paginator-next-button-color: $white !default;
 
 $paginator-dropdown-width: 80px !default;
-$paginator-dropdown-margin: $paginator-last-button-margin !default;
+$paginator-dropdown-margin: $paginator-last-button-margin-inline !default;
 
-$paginator-summary-padding: 0 1.25rem 0 0.625rem !default;
+$paginator-summary-padding-inline: 0.625rem 1.25rem !default;
 $paginator-summary-font-size: 0.875rem !default;
 $paginator-summary-color: $battleship-grey !default;
 
@@ -76,13 +76,13 @@ $paginator-button-size: ".rz-button-sm" !default;
   .rz-dropdown {
     order: 2;
     width: $paginator-dropdown-width;
-    margin-left: 1rem;
+    margin-inline-start: 1rem;
     overflow: visible;
   }
 
   .rz-pagesize-text {
     order: 2;
-    margin: $paginator-last-button-margin;
+    margin-inline: $paginator-last-button-margin-inline;
     font-size: $paginator-summary-font-size;
     color: $paginator-summary-color;
   }
@@ -115,38 +115,38 @@ $paginator-button-size: ".rz-button-sm" !default;
 }
 
 .rz-paginator-first {
-  margin: $paginator-first-button-margin;
+  margin-inline: $paginator-first-button-margin-inline;
 
   .rz-align-center & {
-    margin-left: auto;
+    margin-inline-start: auto;
   }
 }
 
 .rz-paginator-prev {
-  margin-right: auto;
+  margin-inline-end: auto;
 
   .rz-align-left &,
   .rz-align-right &,
   .rz-align-center & {
-    margin: $paginator-first-button-margin;
+    margin-inline: $paginator-first-button-margin-inline;
   }
 }
 
 .rz-paginator-next {
-  margin-left: auto;
+  margin-inline-start: auto;
 
   .rz-align-left &,
   .rz-align-right &,
   .rz-align-center & {
-    margin: $paginator-last-button-margin;
+    margin-inline: $paginator-last-button-margin-inline;
   }
 }
 
 .rz-paginator-last {
-  margin: $paginator-last-button-margin;
+  margin-inline: $paginator-last-button-margin-inline;
 
   .rz-align-center & {
-    margin-right: auto;
+    margin-inline-end: auto;
   }
 }
 
@@ -191,17 +191,17 @@ $paginator-button-size: ".rz-button-sm" !default;
 }
 
 .rz-paginator-summary {
-    padding: $paginator-summary-padding;
+    padding-inline: $paginator-summary-padding-inline;
     font-size: $paginator-summary-font-size;
     color: $paginator-summary-color;
 
     .rz-align-right & {
-      margin-right: auto;
+      margin-inline-end: auto;
     }
 
     .rz-align-left & {
       order: 2;
-      margin-left: auto;
+      margin-inline-start: auto;
       padding: 0;
     }
 }
@@ -212,4 +212,31 @@ $paginator-button-size: ".rz-button-sm" !default;
       display: none;
     }
   }
+}
+
+/* RTL */
+.rtl {
+    .rzi-step-backward {
+        &:before {
+            content: 'last_page';
+        }
+    }
+
+    .rzi-caret-left {
+        &:before {
+            content: 'navigate_next';
+        }
+    }
+
+    .rzi-caret-right {
+        &:before {
+            content: 'navigate_before';
+        }
+    }
+
+    .rzi-step-forward {
+        &:before {
+            content: 'first_page';
+        }
+    }
 }

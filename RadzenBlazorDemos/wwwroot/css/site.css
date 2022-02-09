@@ -1,3 +1,7 @@
+.rtl{
+    direction: rtl;
+    text-align: start !important;
+}
 a.ui-button:hover {
     color: #fff;
     text-decoration: none;
@@ -76,7 +80,7 @@ display: flex;
 align-items: center; 
 position: relative; 
 float: right; 
-margin-left: -100%;
+margin-inline-start: -100%;
 }
 
 .social-link {
@@ -406,7 +410,7 @@ video {
 }
 
 .all-components .rz-badge {
-    margin-left: 0.5rem;
+    margin-inline-start: 0.5rem;
     margin-top: 0.0625rem;
     font-size: 0.5rem;
     line-height: 0.625rem;
@@ -499,11 +503,11 @@ img.illustration {
 /* Demos Sidebar */
 
 .demos-sidebar .rz-panel-menu .rz-navigation-item-icon-children {
-    margin-left: auto;
+    margin-inline-start: auto;
 }
 
 .demos-sidebar .rz-panel-menu .rz-badge {
-    margin-left: 0.5rem;
+    margin-inline-start: 0.5rem;
     font-size: 0.5rem;
     line-height: 0.625rem;
 }
@@ -514,14 +518,14 @@ img.illustration {
     .documentation-link {
         padding: 0; 
         float: none; 
-        margin-left: 0;
+        margin-inline-start: 0;
         margin-bottom: 1rem;
     }
 }
 
 @media (max-width: 767px) {
     .nav-links a {
-        margin-left: 1rem;
+        margin-inline-start: 1rem;
     }
 }
 

@@ -43,7 +43,21 @@ window.Radzen = {
           }
           el.value = format(el.value, mask, pattern, characterPattern);
       }
-  },
+    },
+    addClass: function (selector, className) {
+        if (selector) {
+            document.querySelectorAll(selector).forEach(el => {
+                if (!el.classList.contains(className)) el.classList.add(className);
+            });
+        }
+    },
+    removeClass: function (selector, className) {
+        if (selector) {
+            document.querySelectorAll(selector).forEach(el => {
+                if (el.classList.contains(className)) el.classList.remove(className);
+            });
+        }
+    },
   addContextMenu: function (id, ref) {
      var el = document.getElementById(id);
      if (el) {

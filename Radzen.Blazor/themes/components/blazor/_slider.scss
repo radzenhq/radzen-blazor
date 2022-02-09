@@ -71,7 +71,7 @@ $slider-border-radius: $input-border-radius !default;
   position: absolute;
   transform: translateY(-50%);
   top: 50%;
-  margin-left: -$slider-handle-width/2;
+  margin-inline-start: -$slider-handle-width/2;
   background-color: $slider-handle-background-color;
   border: $slider-handle-border;
   border-radius: $slider-handle-border-radius;
@@ -100,4 +100,16 @@ $slider-border-radius: $input-border-radius !default;
       cursor: pointer;
     }
   }
+}
+
+/* RTL */
+.rtl {
+    .rz-slider-range {
+        left: unset;
+        right: -1px;
+        border-top-left-radius: unset;
+        border-bottom-left-radius: unset;
+        border-top-right-radius: $slider-border-radius;
+        border-bottom-right-radius: $slider-border-radius;
+    }
 }

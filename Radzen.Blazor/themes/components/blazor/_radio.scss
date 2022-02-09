@@ -1,7 +1,7 @@
 $radio-width: 1.25rem !default;
 $radio-height: $radio-width !default;
 $radio-border-radius: 50% !default;
-$radio-label-margin: 0 1rem 0 0.5rem !default;
+$radio-label-margin-inline: 0.5rem 1rem !default;
 $radio-margin: 1rem 0 !default;
 
 $radio-active-background-color: #3f8cb3 !default;
@@ -46,7 +46,7 @@ $radio-checked-border: $input-border !default;
 }
 
 .rz-radiobutton-label {
-  margin: $radio-label-margin;
+  margin-inline: $radio-label-margin-inline;
 }
 
 .rz-radiobutton {

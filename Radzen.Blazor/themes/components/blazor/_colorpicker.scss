@@ -153,7 +153,7 @@ button.rz-colorpicker-trigger {
 
 .rz-hue-and-alpha {
   flex: 1;
-  padding-right: 8px;
+  padding-inline-end: 8px;
 }
 
 .rz-alpha-picker,
@@ -199,12 +199,12 @@ button.rz-colorpicker-trigger {
   text-transform: uppercase;
 
   &:not(:last-child) {
-    margin-right: 4px;
+    margin-inline-end: 4px;
   }
 
   .rz-textbox {
     width: 80px;
-    margin-right: 4px;
+    margin-inline-end: 4px;
     padding: $colorpicker-hex-input-padding;
     height: $colorpicker-hex-input-height;
   }
@@ -241,8 +241,8 @@ button.rz-colorpicker-trigger {
 .rz-colorpicker-colors {
   display: flex;
   flex-wrap: wrap;
-  margin-left: -4px;
-  margin-right: -4px;
+  margin-inline-start: -4px;
+  margin-inline-end: -4px;
 }
 
 .rz-colorpicker-item {

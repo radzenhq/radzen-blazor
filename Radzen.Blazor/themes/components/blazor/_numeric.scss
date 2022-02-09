@@ -1,5 +1,6 @@
 $numeric-line-height: 1.5rem !default;
-$numeric-input-padding: 1px 12px 1px 0.5rem;
+$numeric-input-padding-vertical: 1px 0;
+$numeric-input-padding-inline: 0.5rem 1px;
 $numeric-button-width: 0.875rem !default;
 $numeric-button-height: $numeric-button-width !default;
 $numeric-button-offset: 2px !default;
@@ -26,7 +27,8 @@ $numeric-button-color: $white !default;
     background-color: transparent;
     line-height: $numeric-line-height;
     text-align: inherit;
-    padding: $numeric-input-padding;
+    padding: $numeric-input-padding-vertical;
+    padding-inline: $numeric-input-padding-inline;
     outline: none;
 
     &::-webkit-inner-spin-button,
@@ -94,4 +96,12 @@ $numeric-button-color: $white !default;
 
 .rz-spinner-down {
   bottom: $numeric-button-offset;
+}
+
+/* RTL */
+.rtl{
+    .rz-spinner-button {
+        right: unset;
+        left: $numeric-button-offset;
+    }
 }

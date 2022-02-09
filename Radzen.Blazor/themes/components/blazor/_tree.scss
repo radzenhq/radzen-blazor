@@ -13,6 +13,7 @@ $tree-node-hover-color: $white !default;
 $tree-node-toggle-color: inherit !default;
 $tree-node-toggle-hover-color: inherit !default;
 $tree-icon-right: 'arrow_right' !default;
+$tree-icon-left: 'arrow_left' !default;
 $tree-icon-down: 'arrow_drop_down' !default;
 $tree-transition: none !default;
 
@@ -26,12 +27,12 @@ $tree-transition: none !default;
  }
 
  .rz-treenode {
-   padding-left: 1rem;
+   padding-inline-start: 1rem;
  }
 
 .rz-tree-toggler {
   cursor: pointer;
-  margin-left: -1rem;
+  margin-inline-start: -1rem;
   width: 1rem;
   height: 1.5rem;
   font-size: 1.25rem;
@@ -43,14 +44,14 @@ $tree-transition: none !default;
   &.rzi-caret-right {
     &:before {
       content: $tree-icon-right;
-      margin-left: -0.125rem;
+      margin-inline-start: -0.125rem;
     }
   }
 
   &.rzi-caret-down {
     &:before {
       content: $tree-icon-down;
-      margin-left: -0.125rem;
+      margin-inline-start: -0.125rem;
     }
   }
 
@@ -71,7 +72,7 @@ $tree-transition: none !default;
     padding: $tree-node-padding;
 
     .rzi:first-child {
-      margin-right: 0.25rem;
+      margin-inline-end: 0.25rem;
     }
   }
 
@@ -99,4 +100,14 @@ $tree-transition: none !default;
     color: $tree-node-selected-color;
     background-color: $tree-node-selected-background-color;
   }
+}
+/* RTL */
+.rtl {
+    .rz-tree-toggler {
+        &.rzi-caret-right {
+            &:before {
+                content: $tree-icon-left;
+            }
+        }
+    }
 }

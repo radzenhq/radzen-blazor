@@ -7,14 +7,14 @@ $sidebar-toggle-hover-background-color: $header-background-color !default;
 $sidebar-toggle-hover-border-radius: 0 !default;
 $sidebar-toggle-background-color: $header-background-color !default;
 $sidebar-toggle-color: #000 !default;
-$sidebar-toggle-margin: 0 1rem 0 0 !default;
+$sidebar-toggle-margin-inline: 0 1rem !default;
 
 .sidebar-toggle {
   -webkit-appearance: none;
   border: none;
   padding: $sidebar-toggle-padding;
-  margin: $sidebar-toggle-margin;
-  border-right: $sidebar-toggle-border;
+  margin-inline: $sidebar-toggle-margin-inline;
+  border-inline-end: $sidebar-toggle-border;
   background-color: $sidebar-toggle-background-color;
   color: $sidebar-toggle-color;
 

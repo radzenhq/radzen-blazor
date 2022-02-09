@@ -1,7 +1,7 @@
 $checkbox-width: 1.25rem !default;
 $checkbox-height: $checkbox-width !default;
 $checkbox-border-radius: 2px !default;
-$checkbox-label-margin: 0 1rem 0 0.5rem !default;
+$checkbox-label-margin-inline: 0.5rem 1rem !default;
 $checkbox-margin: 1rem 0 !default;
 
 $checkbox-checked-background-color: #3f8cb3 !default;
@@ -41,7 +41,7 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
 }
 
 .rz-chkbox-label {
-  margin: $checkbox-label-margin;
+  margin-inline: $checkbox-label-margin-inline;
 }
 
 .rz-chkbox {

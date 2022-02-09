@@ -67,3 +67,15 @@ $switch-circle-margin: round(($switch-height - $switch-circle-size)*500)/1000;
 .rz-switch.rz-switch-checked .rz-switch-circle:before {
     transform: translateX($switch-width - ($switch-circle-size+$switch-circle-margin*2));
 }
+
+/* RTL */
+.rtl {
+    .rz-switch .rz-switch-circle:before {
+        left: unset;
+        right: $switch-circle-margin;
+    }
+
+    .rz-switch.rz-switch-checked .rz-switch-circle:before {
+        transform: translateX(($switch-width - ($switch-circle-size+$switch-circle-margin*2)) * -1);
+    }
+}

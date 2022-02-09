@@ -5,7 +5,7 @@ $sidebar-background-color: $charcoal-grey !default;
 
 .rz-sidebar {
   background-color: $sidebar-background-color;
-  border-right: $sidebar-border-right;
+  border-inline-end: $sidebar-border-right;
   position: fixed;
   overflow: auto;
   left: 0;
@@ -32,4 +32,12 @@ $sidebar-background-color: $charcoal-grey !default;
 .rz-sidebar-collapsed {
   width: 0 !important;
   opacity: 0;
+}
+
+/* RTL */
+.rtl {
+    .rz-sidebar {
+        left: unset;
+        right: 0;
+    }
 }

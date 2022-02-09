@@ -44,7 +44,7 @@ $validator-transform: translateY(16px) !default;
     content: '';
     border: $validator-pointer-size solid transparent;
     border-bottom-color: $validator-background-color;
-    border-left-color: $validator-background-color;
+    border-inline-start-color: $validator-background-color;
     position: absolute;
     top: 0;
     left: 0;
@@ -56,4 +56,14 @@ $validator-transform: translateY(16px) !default;
   .row {
     margin: 0;
   }
+}
+
+/* RTL */
+.rtl {
+    .rz-message-popup {
+         &:before {
+            left: unset;
+            right: 0;
+        }
+    }
 }

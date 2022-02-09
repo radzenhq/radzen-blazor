@@ -97,3 +97,21 @@ $upload-button-background-color: $primary !default;
   background-color: $upload-files-background-color;
   padding: $upload-files-padding;
 }
+
+/* RTL */
+.rtl {
+    .rz-fileupload-choose {
+        input[type='file'] {
+            right: unset;
+            left: 0;
+        }
+    }
+
+    .rz-fileupload-buttonbar {
+        .rz-button {
+            &:nth-child(3) {
+                float: left;
+            }
+        }
+    }
+}

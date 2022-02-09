@@ -13,210 +13,238 @@ $tabs-hover-color: $default-link !default;
 $tabs-hover-background-color: $tabs-background-color !default;
 $tabs-border-radius: $border-radius !default;
 $tabs-icon-font-size: 1.0625rem !default;
-$tabs-icon-margin: 0 !default;
+$tabs-icon-margin-inline: 0 !default;
 $tabs-transition: none !default;
 
 .rz-tabview {
-  display: flex;
+    display: flex;
 
-  &.rz-tabview-top {
-    flex-direction: column;
-  }
+    &.rz-tabview-top {
+        flex-direction: column;
+    }
 
-  &.rz-tabview-bottom {
-    flex-direction: column-reverse;
-  }
+    &.rz-tabview-bottom {
+        flex-direction: column-reverse;
+    }
 
-  &.rz-tabview-left {
-    flex-direction: row;
-  }
+    &.rz-tabview-left {
+        flex-direction: row;
+    }
 
-  &.rz-tabview-right {
-    flex-direction: row-reverse;
-  }
+    &.rz-tabview-right {
+        flex-direction: row-reverse;
+    }
 }
 
 .rz-tabview-nav {
-  list-style: none;
-  display: flex;
-  padding: 0;
-  margin: 0;
-
-  li {
-    border: $tabs-border;
-    background-color: $tabs-tab-background-color;
-    transition: $tabs-transition;
-
-    &:hover {
-      &:not(.rz-tabview-selected) {
-        &:not(.rz-state-disabled) {
-          background-color: $tabs-hover-background-color;
-
-          a {
-            color: $tabs-hover-color;
-          }
-        }
-      }
-    }
-
-    a {
-      display: flex;
-      align-items: center;
-      color: $tabs-tab-color;
-      padding: $tabs-tab-padding;
-      font-size: $tabs-tab-font-size;
-      font-weight: $tabs-tab-font-weight;
-
-      &:hover {
-        text-decoration: none;
-      }
-    }
-
-    &.rz-state-disabled {
-      opacity: 0.5;
-    }
-  }
-
-  .rz-tabview-selected {
-    background-color: $tabs-background-color;
-    position: relative;
-
-    a {
-      color: $tabs-selected-tab-color;
-    }
-  }
-
-  .rz-tabview-top > & {
-    flex-direction: row;
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
 
     li {
-      border-top-width: 2px;
-      border-bottom-color: $tabs-tab-background-color;
-      border-radius: $tabs-border-radius $tabs-border-radius 0 0;
-  
-      &:hover {
-        &:not(.rz-tabview-selected) {
-          &:not(.rz-state-disabled) {
+        border: $tabs-border;
+        background-color: $tabs-tab-background-color;
+        transition: $tabs-transition;
+
+        &:hover {
+            &:not(.rz-tabview-selected) {
+                &:not(.rz-state-disabled) {
+                    background-color: $tabs-hover-background-color;
+
+                    a {
+                        color: $tabs-hover-color;
+                    }
+                }
+            }
+        }
+
+        a {
+            display: flex;
+            align-items: center;
+            color: $tabs-tab-color;
+            padding: $tabs-tab-padding;
+            font-size: $tabs-tab-font-size;
+            font-weight: $tabs-tab-font-weight;
+
+            &:hover {
+                text-decoration: none;
+            }
+        }
+
+        &.rz-state-disabled {
+            opacity: 0.5;
+        }
+    }
+
+    .rz-tabview-selected {
+        background-color: $tabs-background-color;
+        position: relative;
+
+        a {
+            color: $tabs-selected-tab-color;
+        }
+    }
+
+    .rz-tabview-top > & {
+        flex-direction: row;
+
+        li {
+            border-top-width: 2px;
+            border-bottom-color: $tabs-tab-background-color;
+            border-radius: $tabs-border-radius $tabs-border-radius 0 0;
+
+            &:hover {
+                &:not(.rz-tabview-selected) {
+                    &:not(.rz-state-disabled) {
+                        border-top-color: $tabs-tab-selected-top-border-color;
+                    }
+                }
+            }
+        }
+
+        .rz-tabview-selected {
+            border-bottom-color: $tabs-background-color;
+            margin-bottom: -1px;
             border-top-color: $tabs-tab-selected-top-border-color;
-          }
         }
-      }
     }
-  
-    .rz-tabview-selected {
-      border-bottom-color: $tabs-background-color;
-      margin-bottom: -1px;
-      border-top-color: $tabs-tab-selected-top-border-color;
-    }
-  }
 
-  .rz-tabview-bottom > & {
-    flex-direction: row;
+    .rz-tabview-bottom > & {
+        flex-direction: row;
 
-    li {
-      border-bottom-width: 2px;
-      border-top-color: $tabs-tab-background-color;
-      border-radius: 0 0 $tabs-border-radius $tabs-border-radius;
-  
-      &:hover {
-        &:not(.rz-tabview-selected) {
-          &:not(.rz-state-disabled) {
+        li {
+            border-bottom-width: 2px;
+            border-top-color: $tabs-tab-background-color;
+            border-radius: 0 0 $tabs-border-radius $tabs-border-radius;
+
+            &:hover {
+                &:not(.rz-tabview-selected) {
+                    &:not(.rz-state-disabled) {
+                        border-bottom-color: $tabs-tab-selected-top-border-color;
+                    }
+                }
+            }
+        }
+
+        .rz-tabview-selected {
+            border-top-color: $tabs-background-color;
+            margin-top: -1px;
+            padding-top: 1px;
             border-bottom-color: $tabs-tab-selected-top-border-color;
-          }
         }
-      }
     }
-  
-    .rz-tabview-selected {
-      border-top-color: $tabs-background-color;
-      margin-top: -1px;
-      padding-top: 1px;
-      border-bottom-color: $tabs-tab-selected-top-border-color;
-    }
-  }
 
-  .rz-tabview-left > & {
-    flex-direction: column;
+    .rz-tabview-left > & {
+        flex-direction: column;
 
-    li {
-      border-left-width: 2px;
-      border-right-color: $tabs-tab-background-color;
-      border-radius: $tabs-border-radius 0 0 $tabs-border-radius;
-  
-      &:hover {
-        &:not(.rz-tabview-selected) {
-          &:not(.rz-state-disabled) {
-            border-left-color: $tabs-tab-selected-top-border-color;
-          }
+        li {
+            border-inline-start-width: 2px;
+            border-inline-end-color: $tabs-tab-background-color;
+            border-radius: $tabs-border-radius 0 0 $tabs-border-radius;
+
+            &:hover {
+                &:not(.rz-tabview-selected) {
+                    &:not(.rz-state-disabled) {
+                        border-inline-start-color: $tabs-tab-selected-top-border-color;
+                    }
+                }
+            }
         }
-      }
-    }
-  
-    .rz-tabview-selected {
-      border-right-color: $tabs-background-color;
-      margin-right: -1px;
-      border-left-color: $tabs-tab-selected-top-border-color;
-    }
-  }
 
-  .rz-tabview-right > & {
-    flex-direction: column;
-
-    li {
-      border-right-width: 2px;
-      border-left-color: $tabs-tab-background-color;
-      border-radius: 0 $tabs-border-radius $tabs-border-radius 0;
-  
-      &:hover {
-        &:not(.rz-tabview-selected) {
-          &:not(.rz-state-disabled) {
-            border-right-color: $tabs-tab-selected-top-border-color;
-          }
+        .rz-tabview-selected {
+            border-inline-end-color: $tabs-background-color;
+            margin-inline-end: -1px;
+            border-inline-start-color: $tabs-tab-selected-top-border-color;
         }
-      }
     }
-  
-    .rz-tabview-selected {
-      border-left-color: $tabs-background-color;
-      margin-left: -1px;
-      padding-left: 1px;
-      border-right-color: $tabs-tab-selected-top-border-color;
+
+    .rz-tabview-right > & {
+        flex-direction: column;
+
+        li {
+            border-inline-end-width: 2px;
+            border-inline-start-color: $tabs-tab-background-color;
+            border-radius: 0 $tabs-border-radius $tabs-border-radius 0;
+
+            &:hover {
+                &:not(.rz-tabview-selected) {
+                    &:not(.rz-state-disabled) {
+                        border-inline-end-color: $tabs-tab-selected-top-border-color;
+                    }
+                }
+            }
+        }
+
+        .rz-tabview-selected {
+            border-inline-start-color: $tabs-background-color;
+            margin-inline-start: -1px;
+            padding-inline-start: 1px;
+            border-inline-end-color: $tabs-tab-selected-top-border-color;
+        }
     }
-  }
 }
 
 .rz-tabview-panels {
-  background-color: $tabs-background-color;
-  border: $tabs-border;
-  box-shadow: $tabs-shadow;
-  flex: 1;
-  overflow: auto;
+    background-color: $tabs-background-color;
+    border: $tabs-border;
+    box-shadow: $tabs-shadow;
+    flex: 1;
+    overflow: auto;
 
-  .rz-tabview-top > & {
-    border-radius: 0 0 $border-radius $border-radius;
-  }
-  .rz-tabview-bottom > & {
-    border-radius: $border-radius $border-radius 0 0;
-  }
-  .rz-tabview-left > & {
-    border-radius: 0 $border-radius $border-radius 0;
-  }
-  .rz-tabview-right > & {
-    border-radius: $border-radius 0 0 $border-radius;
-  }
+    .rz-tabview-top > & {
+        border-radius: 0 0 $border-radius $border-radius;
+    }
+
+    .rz-tabview-bottom > & {
+        border-radius: $border-radius $border-radius 0 0;
+    }
+
+    .rz-tabview-left > & {
+        border-radius: 0 $border-radius $border-radius 0;
+    }
+
+    .rz-tabview-right > & {
+        border-radius: $border-radius 0 0 $border-radius;
+    }
 }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-  .rz-tabview-panels {
-    flex: auto;
-  }
+    .rz-tabview-panels {
+        flex: auto;
+    }
 }
 
 .rz-tabview-panel {
-  padding: $tabs-padding;
+    padding: $tabs-padding;
 }
 
 .rz-tabview-left-icon {
-  font-size: $tabs-icon-font-size;
-  margin: $tabs-icon-margin;
+    font-size: $tabs-icon-font-size;
+    margin-inline: $tabs-icon-margin-inline;
+}
+
+/* RTL */
+.rtl {
+    .rz-tabview-left {
+        > .rz-tabview-nav {
+            > li {
+                border-radius: 0 $tabs-border-radius $tabs-border-radius 0;
+            }
+        }
+        .rz-tabview-panels {
+            border-radius: $border-radius 0 0 $border-radius;
+        }
+    }
+
+    .rz-tabview-right {
+        > .rz-tabview-nav {
+            > li {
+                border-radius: $tabs-border-radius 0 0 $tabs-border-radius;
+            }
+        }
+        .rz-tabview-panels {
+            border-radius: 0 $border-radius $border-radius 0;
+        }
+    }
 }

@@ -13,7 +13,7 @@ $selectbar-border-radius: $border-radius !default;
   .rz-button {
     @extend .rz-button-md;
 
-    margin-left: -1px;
+    margin-inline-start: -1px;
     display: inline-block;
     border-radius: 0;
     background-color: $selectbar-background-color;
@@ -36,4 +36,26 @@ $selectbar-border-radius: $border-radius !default;
       border: $selectbar-selected-border;
     }
   }
+}
+
+/* RTL */
+.rtl {
+    .rz-selectbutton {
+
+        .rz-button {
+            &:first-child {
+                border-top-left-radius: unset;
+                border-bottom-left-radius: unset;
+                border-top-right-radius: $selectbar-border-radius;
+                border-bottom-right-radius: $selectbar-border-radius;
+            }
+
+            &:last-child {
+                border-top-right-radius: unset;
+                border-bottom-right-radius: unset;
+                border-top-left-radius: $selectbar-border-radius;
+                border-bottom-left-radius: $selectbar-border-radius;
+            }
+        }
+    }
 }

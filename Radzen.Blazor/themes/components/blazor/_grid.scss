@@ -43,7 +43,7 @@ $grid-filter-border: $grid-cell-border !default;
 $grid-filter-font-size: 0.8125rem !default;
 $grid-filter-icon-width: 0.875rem !default;
 $grid-filter-icon-height: 0.875rem !default;
-$grid-filter-icon-margin: 0 0.3125rem 0 0 !default;
+$grid-filter-icon-margin-inline: 0 0.3125rem !default;
 $grid-filter-icon-font-size: $grid-filter-font-size !default;
 $grid-filter-color: $cool-grey !default;
 $grid-filter-focus-color: $default-link !default;
@@ -56,7 +56,8 @@ $grid-clear-filter-button-background-color: #e6ecef !default;
 $grid-clear-filter-button-color: $cool-grey !default;
 $grid-apply-filter-button-background-color: $default-link !default;
 
-$grid-header-filter-icon-margin: 5px 5px 0 0 !default;
+$grid-header-filter-icon-margin-top: 5px !default;
+$grid-header-filter-icon-margin-inline: 0 5px !default;
 $grid-header-filter-icon-hover-color: inherit !default;
 
 $grid-border: 1px solid #e6ecef !default;
@@ -228,7 +229,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
       border-bottom: $grid-header-cell-border-bottom;
       
       &:not(:last-child), &.rz-composite-cell {
-        border-right: $grid-header-cell-border;
+        border-inline-end: $grid-header-cell-border;
         
       }
     }
@@ -258,7 +259,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
     @if $material == false and $fluent == false {
       &:not(:last-child), &.rz-composite-cell {
-        border-right: $grid-right-cell-border;
+        border-inline-end: $grid-right-cell-border;
       }
     }
   }
@@ -373,7 +374,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
     @if $material == false and $fluent == false {
       &:not(:last-child), &.rz-composite-cell {
-        border-right: $grid-right-cell-border;
+        border-inline-end: $grid-right-cell-border;
       }
     }
     .rz-cell-data {
@@ -389,10 +390,10 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
   tr {
     td {
       &:first-child {
-        border-left: none;
+        border-inline-start: none;
       }
       &:last-child:not(.rz-composite-cell) {
-        border-right: none;
+        border-inline-end: none;
       }
     }
 
@@ -481,11 +482,11 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
         width: $grid-filter-icon-width;
         height: $grid-filter-icon-height;
         font-size: $grid-filter-icon-font-size;
-        margin: $grid-filter-icon-margin;
+        margin-inline: $grid-filter-icon-margin-inline;
         color: $grid-filter-color;
 
         &.rz-cell-filter-clear {
-          margin-left: auto;
+          margin-inline-start: auto;
         }
       }
 
@@ -582,7 +583,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
   }
 
   .rz-datepicker {
-    border-left: $grid-border;
+    border-inline-start: $grid-border;
   }
 }
 
@@ -713,7 +714,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
       > td {
         display: block;
         width: 100% !important;
-        text-align: left !important;
+        text-align: start !important;
         border: none;
 
         .rz-column-title {
@@ -750,7 +751,8 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
 .rz-grid-filter-icon {
   color: $grid-filter-color;
-  margin: $grid-header-filter-icon-margin;
+  margin-top: $grid-header-filter-icon-margin-top;
+  margin-inline: $grid-header-filter-icon-margin-inline;
   float: right;
   font-size: 1rem;
   transition: $grid-state-transition;
@@ -808,7 +810,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
         position: -webkit-sticky;
         position: sticky;
         background: $grid-frozen-cell-background-color;
-        border-right: $grid-frozen-cell-border !important;
+        border-inline-end: $grid-frozen-cell-border !important;
         z-index: 1;
     }
 }
@@ -883,5 +885,27 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 }
 
 .rz-group-header-item-title {
-    margin-right: 5px;
+    margin-inline-end: 5px;
+}
+
+/* RTL */
+.rtl {
+    .rzi-chevron-circle-right {
+        &:before {
+            content: 'arrow_left';
+        }
+    }
+
+    .rz-column-resizer {
+        right: unset;
+        left: 0;
+    }
+
+    .rz-grid-filter-icon {
+        float: left;
+    }
+
+    .rz-group-header-item {
+        float: right;
+    }
 }

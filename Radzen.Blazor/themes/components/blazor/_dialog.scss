@@ -79,12 +79,12 @@ $dialog-border-radius: $border-radius !default;
 }
 
 .rz-dialog-footer {
-  text-align: right;
+  text-align: end;
   border: 0 none;
   padding: 1em;
 
   .rz-button {
-    text-align: left !important;
+    text-align: start !important;
     padding: 6px;
   }
 
@@ -112,13 +112,13 @@ $dialog-border-radius: $border-radius !default;
   }
 
   .no-scroll {
-    padding-right: 0;
+    padding-inline-end: 0;
   }
 }
 
 .no-scroll {
   overflow: hidden;
-  padding-right: 15px;
+  padding-inline-end: 15px;
 }
 
 .rz-dialog-wrapper {
@@ -143,4 +143,11 @@ $dialog-border-radius: $border-radius !default;
     flex: 0 1 auto;
     overflow: auto;
   }
+}
+
+/* RTL */
+.rtl{
+    .rz-dialog-titlebar-close {
+        float: left;
+    }
 }

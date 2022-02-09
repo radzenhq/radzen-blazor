@@ -8,10 +8,11 @@ $accordion-item-font-weight: 600 !default;
 $accordion-icon-width: 1.5rem !default;
 $accordion-icon-height: $accordion-icon-width !default;
 $accordion-icon-font-size: 1.5rem !default;
-$accordion-icon-margin: 0 0.375rem 0 0 !default;
+$accordion-icon-margin-inline: 0 0.375rem !default;
 $accordion-selected-color: $default-link !default;
 $accordion-hover-color: $accordion-selected-color !default;
-$accordion-content-padding: 0.5rem 0.5rem 0.5rem 2rem !default;
+$accordion-content-padding-vertical: 0.5rem 0 !default;
+$accordion-content-padding-inline: 2rem 0.5rem !default;
 $accordion-content-font-size: $accordion-item-font-size !default;
 $accordion-border-radius: $border-radius !default;
 $accordion-item-border: none !default;
@@ -42,7 +43,7 @@ $accordion-shadow: none !default;
 
   .rzi {
     font-size: $accordion-icon-font-size;
-    margin: $accordion-icon-margin;
+    margin-inline: $accordion-icon-margin-inline;
   }
 }
 
@@ -50,7 +51,7 @@ $accordion-shadow: none !default;
   width: $accordion-icon-width;
   height: $accordion-icon-height;
   font-size: $accordion-icon-font-size;
-  margin: $accordion-icon-margin;
+  margin-inline: $accordion-icon-margin-inline;
 
   &.rzi-chevron-right {
     &:before {
@@ -78,5 +79,17 @@ $accordion-shadow: none !default;
 .rz-accordion-content {
   font-size: $accordion-content-font-size;
   background-color: $accordion-item-background-color;
-  padding: $accordion-content-padding;
+  padding: $accordion-content-padding-vertical;
+  padding-inline: $accordion-content-padding-inline;
+}
+/* RTL */
+.rtl {
+    .rz-accordion-toggle-icon {
+
+        &.rzi-chevron-right {
+            &:before {
+                content: 'arrow_left';
+            }
+        }
+    }
 }

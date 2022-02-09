@@ -1,6 +1,6 @@
 $dropdown-trigger-icon-width: 1.1875rem !default;
 $dropdown-trigger-icon-height: $dropdown-trigger-icon-width !default;
-$dropdown-trigger-icon-margin: 0 0.5rem 0 0 !default;
+$dropdown-trigger-icon-margin-inline: 0 0.5rem !default;
 
 $dropdown-horizontal-padding: 0.625rem !default;
 $dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
@@ -17,7 +17,7 @@ $dropdown-item-selected-hover-background-color: $dropdown-item-selected-backgrou
 $dropdown-item-selected-hover-color: $dropdown-item-selected-color !default;
 $dropdown-item-transition: none !default;
 
-$multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
+$multiselect-checkbox-margin-inline: 0 0.5rem !default;
 $dropdown-label-padding: 0 $dropdown-trigger-icon-width 0 0 !default;
 $dropdown-filter-border: 1px solid rgba(#979797, 0.1) !default;
 $dropdown-filter-padding: 0.5rem 0 !default;
@@ -78,7 +78,7 @@ $dropdown-panel-border: $dropdown-open-border !default;
     width: $dropdown-trigger-icon-width;
     height: $dropdown-trigger-icon-height;
     font-size: $dropdown-trigger-icon-height;
-    margin: $dropdown-trigger-icon-margin;
+    margin-inline: $dropdown-trigger-icon-margin-inline;
   }
 
   .rzi-chevron-down {
@@ -137,7 +137,7 @@ $dropdown-panel-border: $dropdown-open-border !default;
   padding: $dropdown-panel-padding;
 
   .rz-chkbox {
-    margin: $multiselect-checkbox-margin;
+    margin-inline: $multiselect-checkbox-margin-inline;
   }
 }
 
@@ -249,12 +249,25 @@ $dropdown-panel-border: $dropdown-open-border !default;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  padding-right: $dropdown-trigger-icon-width;
+  padding-inline-end: $dropdown-trigger-icon-width;
 }
 
 .rz-clear {
   .rz-multiselect-label-container,
   .rz-dropdown-label {
-    padding-right: 2 * $dropdown-trigger-icon-width;
+    padding-inline-end: 2 * $dropdown-trigger-icon-width;
   }
+}
+
+/* RTL */
+.rtl {
+    .rz-dropdown-trigger {
+        right: unset;
+        left: 0;
+    }
+
+    .rz-dropdown-clear-icon {
+        right: unset;
+        left: $dropdown-trigger-icon-width + 0.5rem;
+    }
 }

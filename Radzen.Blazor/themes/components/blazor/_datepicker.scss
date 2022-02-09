@@ -47,237 +47,268 @@ $timepicker-separator-margin: 0 0.5rem !default;
 $timepicker-border: none !default;
 
 .rz-calendar {
-  display: inline-block;
-  position: relative;
+    display: inline-block;
+    position: relative;
 
-  .rz-inputtext {
-    @extend %input;
-    width: 100%;
-    line-height: $datepicker-line-height;
-    padding-right: $datepicker-trigger-icon-width;
-  }
-
-  &:not(.rz-state-disabled) {
-    &:hover {
-      .rz-datepicker-trigger {
-        box-shadow: none;
-        color: $datepicker-trigger-icon-hover-color;
-      }
-    }
-  }
-
-  &.rz-state-disabled {
     .rz-inputtext {
-      @extend %input-disabled;
+        @extend %input;
+        width: 100%;
+        line-height: $datepicker-line-height;
+        padding-inline-end: $datepicker-trigger-icon-width;
     }
-  }
+
+    &:not(.rz-state-disabled) {
+        &:hover {
+            .rz-datepicker-trigger {
+                box-shadow: none;
+                color: $datepicker-trigger-icon-hover-color;
+            }
+        }
+    }
+
+    &.rz-state-disabled {
+        .rz-inputtext {
+            @extend %input-disabled;
+        }
+    }
 }
 
 .rz-calendar-inline {
-  border: $input-border;
+    border: $input-border;
 }
 
 .rz-datepicker-trigger {
-  box-shadow: none;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  right: 0.625rem;
-  background-color: transparent;
-  padding: 0;
-  vertical-align: text-top;
-
-  &.rz-state-disabled {
-    border: none;
     box-shadow: none;
-    cursor: initial;
-  }
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0.625rem;
+    background-color: transparent;
+    padding: 0;
+    vertical-align: text-top;
 
-  color: $datepicker-trigger-icon-color;
-  width: $datepicker-trigger-icon-width;
-  height: $datepicker-trigger-icon-height;
-  font-size: $datepicker-trigger-icon-height;
-
-  &:not(.rz-state-disabled) {
-    &:hover {
-      &:not(:active),
-      &:active {
-      background-color: transparent;
-      }
+    &.rz-state-disabled {
+        border: none;
+        box-shadow: none;
+        cursor: initial;
     }
 
-    &:active {
-      box-shadow: none !important;
-      background-image: none !important;
-    }
-  }
+    color: $datepicker-trigger-icon-color;
+    width: $datepicker-trigger-icon-width;
+    height: $datepicker-trigger-icon-height;
+    font-size: $datepicker-trigger-icon-height;
 
-  .rzi-calendar {
-    font-size: inherit;
-    vertical-align: top;
-    &:before {
-      content: 'calendar_today';
-    }
-  }
+    &:not(.rz-state-disabled) {
+        &:hover {
+            &:not(:active),
+            &:active {
+                background-color: transparent;
+            }
+        }
 
-  .rz-button-text {
-    display: none;
-  }
+        &:active {
+            box-shadow: none !important;
+            background-image: none !important;
+        }
+    }
+
+    .rzi-calendar {
+        font-size: inherit;
+        vertical-align: top;
+
+        &:before {
+            content: 'calendar_today';
+        }
+    }
+
+    .rz-button-text {
+        display: none;
+    }
 }
 
 .rz-datepicker {
-  &:not(.rz-datepicker-inline) {
-    box-sizing: content-box;
-    margin: $datepicker-panel-margin;
-    position: absolute;
-    border: $datepicker-panel-border;
-    box-shadow: $datepicker-panel-shadow;
-    border-radius: $border-radius;
-  }
+    &:not(.rz-datepicker-inline) {
+        box-sizing: content-box;
+        margin: $datepicker-panel-margin;
+        position: absolute;
+        border: $datepicker-panel-border;
+        box-shadow: $datepicker-panel-shadow;
+        border-radius: $border-radius;
+    }
 
-  background-color: $datepicker-panel-background-color;
+    background-color: $datepicker-panel-background-color;
 }
 
 .rz-calendar {
-  display: inline-block;
+    display: inline-block;
 }
 
 .rz-datepicker-inline {
-  position: static;
+    position: static;
 
-  .rz-datepicker-group {
-    display: inline-block;
-  }
+    .rz-datepicker-group {
+        display: inline-block;
+    }
 }
 
 .rz-datepicker-header {
-  position: relative;
-  line-height: $datepicker-header-line-height;
-
-  background-color: $datepicker-header-background-color;
-  border-bottom: $datepicker-header-border;
-  color: $datepicker-header-color;
-  padding: $datepicker-header-padding;
+    position: relative;
+    line-height: $datepicker-header-line-height;
+    background-color: $datepicker-header-background-color;
+    border-bottom: $datepicker-header-border;
+    color: $datepicker-header-color;
+    padding: $datepicker-header-padding;
 }
 
 .rz-datepicker-prev {
-  float: left;
-  height: $datepicker-header-line-height;
+    float: left;
+    height: $datepicker-header-line-height;
 
-  .rzi-chevron-left {
-    vertical-align: text-top;
-    color: $datepicker-header-color;
-    &:before {
-      content: 'chevron_left';
+    .rzi-chevron-left {
+        vertical-align: text-top;
+        color: $datepicker-header-color;
+
+        &:before {
+            content: 'chevron_left';
+        }
     }
-  }
 }
 
 .rz-datepicker-next {
-  float: right;
-  height: $datepicker-header-line-height;
+    float: right;
+    height: $datepicker-header-line-height;
 
-  .rzi-chevron-right {
-    vertical-align: text-top;
-    color: $datepicker-header-color;
-    &:before {
-      content: 'chevron_right';
+    .rzi-chevron-right {
+        vertical-align: text-top;
+        color: $datepicker-header-color;
+
+        &:before {
+            content: 'chevron_right';
+        }
     }
-  }
 }
 
 .rz-datepicker-title {
-  height: $datepicker-title-height;
-  text-align: center;
+    height: $datepicker-title-height;
+    text-align: center;
 }
 
 .rz-datepicker-calendar {
-  table-layout: fixed;
-  border-collapse: collapse;
+    table-layout: fixed;
+    border-collapse: collapse;
 
-  th {
-    font-weight: normal;
-    font-size: $datepicker-calendar-header-font-size;
-    text-transform: $datepicker-calendar-header-text-transform;
-    color: $datepicker-calendar-header-color;
-    padding: $datepicker-calendar-padding;
-    text-align: center;
-  }
-
-  td {
-    text-align: center;
-    border-top: $datepicker-calendar-border;
-    padding: 0;
-
-    .rz-state-default {
-      display: block;
-      padding: $datepicker-calendar-padding;
-      color: $datepicker-calendar-color;
-      font-size: $datepicker-calendar-font-size;
-      border-radius: $datepicker-calendar-border-radius;
-      transition: $datepicker-calendar-transition;
-
-      &:hover {
-        text-decoration: none;
-        color: $datepicker-calendar-hover-color;
-        background-color: $datepicker-calendar-hover-background-color;
-        cursor: pointer;
-      }
+    th {
+        font-weight: normal;
+        font-size: $datepicker-calendar-header-font-size;
+        text-transform: $datepicker-calendar-header-text-transform;
+        color: $datepicker-calendar-header-color;
+        padding: $datepicker-calendar-padding;
+        text-align: center;
     }
 
-    .rz-state-active {
-      color: $datepicker-calendar-selected-color;
-      background-color: $datepicker-calendar-selected-background-color;
-      padding: $datepicker-calendar-padding;
+    td {
+        text-align: center;
+        border-top: $datepicker-calendar-border;
+        padding: 0;
 
-      &:hover {
-        color: $datepicker-calendar-selected-hover-color;
-        background-color: $datepicker-calendar-selected-hover-background-color;
-      }
+        .rz-state-default {
+            display: block;
+            padding: $datepicker-calendar-padding;
+            color: $datepicker-calendar-color;
+            font-size: $datepicker-calendar-font-size;
+            border-radius: $datepicker-calendar-border-radius;
+            transition: $datepicker-calendar-transition;
+
+            &:hover {
+                text-decoration: none;
+                color: $datepicker-calendar-hover-color;
+                background-color: $datepicker-calendar-hover-background-color;
+                cursor: pointer;
+            }
+        }
+
+        .rz-state-active {
+            color: $datepicker-calendar-selected-color;
+            background-color: $datepicker-calendar-selected-background-color;
+            padding: $datepicker-calendar-padding;
+
+            &:hover {
+                color: $datepicker-calendar-selected-hover-color;
+                background-color: $datepicker-calendar-selected-hover-background-color;
+            }
+        }
     }
-  }
 
-  .rz-state-disabled {
-    opacity: 0.5;
-  }
+    .rz-state-disabled {
+        opacity: 0.5;
+    }
 }
 
 .rz-timepicker {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-top: $datepicker-calendar-border;
-  padding: $timepicker-padding;
-  color: $timepicker-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: $datepicker-calendar-border;
+    padding: $timepicker-padding;
+    color: $timepicker-color;
 
-  .rzi-chevron-up {
-    &:before {
-      content: 'expand_less';
+    .rzi-chevron-up {
+        &:before {
+            content: 'expand_less';
+        }
     }
-  }
 
-  .rzi-chevron-down {
-    &:before {
-      content: 'expand_more';
+    .rzi-chevron-down {
+        &:before {
+            content: 'expand_more';
+        }
     }
-  }
 
-  .rz-separator {
-    color: $timepicker-separator-color;
-    margin: $timepicker-separator-margin;
-    a {
-      display: none;
+    .rz-separator {
+        color: $timepicker-separator-color;
+        margin: $timepicker-separator-margin;
+
+        a {
+            display: none;
+        }
     }
-  }
 
-  .rz-button-md {
-    padding: $timepicker-button-padding;
-  }
+    .rz-button-md {
+        padding: $timepicker-button-padding;
+    }
 }
 
 .rz-hour-picker,
 .rz-minute-picker,
 .rz-second-picker {
-  background-color: $timepicker-background-color;
-  width: 4rem;
+    background-color: $timepicker-background-color;
+    width: 4rem;
+}
+
+/* RTL */
+.rtl {
+    .rz-datepicker-trigger {
+        right: unset;
+        left: 0.625rem;
+    }
+
+    .rz-datepicker-prev {
+        float: right;
+
+        .rzi-chevron-left {
+            &:before {
+                content: 'chevron_right';
+            }
+        }
+    }
+
+    .rz-datepicker-next {
+        float: left;
+
+        .rzi-chevron-right {
+            &:before {
+                content: 'chevron_left';
+            }
+        }
+    }
 }

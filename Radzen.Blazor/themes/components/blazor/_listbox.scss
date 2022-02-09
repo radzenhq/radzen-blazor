@@ -7,7 +7,7 @@ $listbox-padding: 0.5rem !default;
 $listbox-item-padding: $dropdown-item-padding !default;
 $listbox-item-margin: 1px 0 !default;
 
-$listbox-checkbox-margin: 0 0.5rem 0 0 !default;
+$listbox-checkbox-margin-inline: 0 0.5rem !default;
 
 $listbox-header-padding: 0.5625rem 1.25rem 0.625rem 1.125rem !default;
 $listbox-header-icon-width: 1.25rem !default;
@@ -23,7 +23,7 @@ $listbox-header-icon-margin: 0 !default;
   border-radius: $listbox-border-radius;
 
   .rz-chkbox {
-    margin: $listbox-checkbox-margin;
+    margin-inline: $listbox-checkbox-margin-inline;
   }
 
   &.rz-state-disabled {

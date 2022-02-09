@@ -361,11 +361,11 @@ $button-focus-styles: map-merge(
   }
 
   &:not(.rz-button-icon-only) .rz-button-icon-left {
-    margin-right: 0.25rem;
+    margin-inline-end: 0.25rem;
   }
 
   &:not(.rz-button-icon-only) .rz-button-icon-left {
-    margin-right: 0.25rem;
+    margin-inline-end: 0.25rem;
   }
 
 }
@@ -486,8 +486,8 @@ $panel-menu-icon-width: 1.25rem !default;
 $panel-menu-icon-font-size: 1.25rem !default;
 $panel-menu-icon-color: $panel-menu-color !default;
 $panel-menu-icon-height: $panel-menu-icon-width !default;
-$panel-menu-icon-margin: 0 0.5rem 0 0 !default;
-$panel-menu-icon-2nd-level-margin: 0 0.5rem 0 -1.75rem !default;
+$panel-menu-icon-margin-inline: 0 0.5rem !default;
+$panel-menu-icon-2nd-level-margin-inline: -1.75rem 0.5rem !default;
 
 $panel-menu-font-size: 0.875rem !default;
 $panel-menu-toggle-icon-font-size: 1.25rem !default;
@@ -538,10 +538,11 @@ $accordion-item-font-weight: normal !default;
 $accordion-icon-width: 1.25rem !default;
 $accordion-icon-height: $accordion-icon-width !default;
 $accordion-icon-font-size: 1.25rem !default;
-$accordion-icon-margin: 0 0.25rem 0 0 !default;
+$accordion-icon-margin-inline: 0 0.25rem !default;
 $accordion-selected-color: $rz-base-900 !default;
 $accordion-hover-color: $rz-primary !default;
-$accordion-content-padding: 0.5rem 0.5rem 0.5rem 1.5rem !default;
+$accordion-content-padding-vertical: 0.5rem 0 !default;
+$accordion-content-padding-inline: 1.5rem 0.5rem !default;
 $accordion-content-font-size: $accordion-item-font-size;
 $accordion-border-radius: $rz-border-radius !default;
 $accordion-item-border: none !default;
@@ -564,7 +565,7 @@ $tabs-hover-color: $rz-primary !default;
 $tabs-hover-background-color: $tabs-background-color !default;
 $tabs-border-radius: $rz-border-radius !default;
 $tabs-icon-font-size: 1.25rem !default;
-$tabs-icon-margin: 0 0.25rem 0 -0.25rem !default;
+$tabs-icon-margin-inline: -0.25rem 0.25rem !default;
 $tabs-transition: $rz-transition-all !default;
 
 
@@ -615,7 +616,7 @@ $grid-filter-border: none !default;
 $grid-filter-font-size: 0.875rem !default;
 $grid-filter-icon-width: 1.25rem !default;
 $grid-filter-icon-height: 1.25rem !default;
-$grid-filter-icon-margin: 0 0.25rem 0 0 !default;
+$grid-filter-icon-margin-inline: 0 0.25rem !default;
 $grid-filter-icon-font-size: 1.25rem !default;
 $grid-filter-color: $rz-base-400 !default;
 $grid-filter-focus-color: $rz-base-900 !default;
@@ -628,7 +629,8 @@ $grid-clear-filter-button-background-color: $rz-base-200 !default;
 $grid-clear-filter-button-color: $rz-base-800 !default;
 $grid-apply-filter-button-background-color: $rz-primary !default;
 
-$grid-header-filter-icon-margin: 0.25rem 0.5rem 0 0 !default;
+$grid-header-filter-icon-margin-top: 0.25rem !default;
+$grid-header-filter-icon-margin-inline: 0 0.5rem !default;
 $grid-header-filter-icon-hover-color: $rz-base-900 !default;
 
 $grid-border: none !default;
@@ -669,7 +671,7 @@ $grid-state-transition: $rz-transition-all !default;
 
 $grid-group-header-padding: 0.5rem !default;
 $grid-group-header-item-padding: 0.5rem !default;
-$grid-group-header-item-margin: 0 0.5rem 0 0 !default;
+$grid-group-header-item-margin-inline: 0 0.5rem !default;
 
 $column-drag-handle-color: $rz-base-400 !default;
 
@@ -791,16 +793,16 @@ $paginator-numeric-button-min-width: 2.25rem !default;
 $paginator-back-button-background-color: $rz-base-200 !default;
 $paginator-back-button-color: $rz-base-800 !default;
 
-$paginator-first-button-margin: 0 0.5rem 0 0 !default;
-$paginator-last-button-margin: 0 0 0 0.5rem !default;
+$paginator-first-button-margin-inline: 0 0.5rem !default;
+$paginator-last-button-margin-inline: 0.5rem 0 !default;
 
 $paginator-next-button-background-color: $rz-base-200 !default;
 $paginator-next-button-color: $rz-base-800 !default;
 
 $paginator-dropdown-width: 80px !default;
-$paginator-dropdown-margin: $paginator-last-button-margin !default;
+$paginator-dropdown-margin: $paginator-last-button-margin-inline !default;
 
-$paginator-summary-padding: 0 1.25rem 0 0 !default;
+$paginator-summary-padding-inline: 0 1.25rem !default;
 $paginator-summary-font-size: 0.875rem !default;
 $paginator-summary-color: $rz-base-600 !default;
 
@@ -868,7 +870,7 @@ $menu-border-radius: 0 !default;
 $menu-item-padding: 0.5rem !default;
 $menu-item-color: $body-color !default;
 $menu-item-selected-color: $rz-primary !default;
-$menu-item-icon-margin: 0 0.5rem 0 0 !default;
+$menu-item-icon-margin-inline: 0 0.5rem !default;
 $menu-item-hover-background-color: $rz-primary-lighter !default;
 $menu-item-hover-color: $rz-primary !default;
 $menu-item-offset: 1rem;
@@ -895,7 +897,7 @@ $profile-menu-item-hover-background-color: $rz-primary-lighter !default;
 $profile-menu-item-icon-width: 1.25rem !default;
 $profile-menu-item-icon-height: $profile-menu-item-icon-width !default;
 $profile-menu-item-icon-font-size: $profile-menu-item-icon-height !default;
-$profile-menu-item-icon-margin: 0 0.5rem 0 0 !default;
+$profile-menu-item-icon-margin-inline: 0 0.5rem !default;
 
 // Gravatar
 
@@ -951,7 +953,8 @@ $input-transition: $rz-transition-all !default;
 // Numeric
 
 $numeric-line-height: 1.25rem !default;
-$numeric-input-padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+$numeric-input-padding-vertical: 0.5rem 0;
+$numeric-input-padding-inline: 0.5rem 0.75rem;
 $numeric-button-width: 1rem !default;
 $numeric-button-height: $numeric-button-width !default;
 $numeric-button-offset: 1px !default;
@@ -1034,7 +1037,7 @@ $fieldset-legend-font-size: 0.875rem !default;
 $fieldset-legend-padding: 0 1rem !default;
 
 $fieldset-toggle-width: 1.125rem !default;
-$fieldset-toggle-margin: 0 0.5rem 0 0 !default;
+$fieldset-toggle-margin-inline: 0 0.5rem !default;
 $fieldset-toggle-height: $fieldset-toggle-width !default;
 $fieldset-toggle-background-color: $rz-base-200 !default;
 $fieldset-toggle-color: $rz-base-800 !default;
@@ -1077,7 +1080,7 @@ $slider-border-radius: $rz-border-radius * 2 !default;
 $checkbox-width: 1.25rem !default;
 $checkbox-height: $checkbox-width !default;
 $checkbox-border-radius: $rz-border-radius;
-$checkbox-label-margin: 0 1rem 0 0.5rem;
+$checkbox-label-margin-inline: 0.5rem 1rem;
 $checkbox-margin: 1rem 0;
 
 $checkbox-checked-background-color: $rz-white !default;
@@ -1114,7 +1117,7 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
 $radio-width: 1.25rem !default;
 $radio-height: $radio-width !default;
 $radio-border-radius: 50%;
-$radio-label-margin: 0 1rem 0 0.5rem;
+$radio-label-margin-inline: 0.5rem 1rem;
 $radio-margin: 1rem 0;
 
 $radio-active-background-color: $rz-white !default;
@@ -1151,7 +1154,7 @@ $radio-checked-border: 1px solid $rz-base-300 !default;
 
 $dropdown-trigger-icon-width: 1.25rem !default;
 $dropdown-trigger-icon-height: $dropdown-trigger-icon-width !default;
-$dropdown-trigger-icon-margin: 0 0.5rem 0 0 !default;
+$dropdown-trigger-icon-margin-inline: 0 0.5rem !default;
 
 $dropdown-horizontal-padding: 0.5rem !default;
 $dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
@@ -1188,7 +1191,7 @@ $listbox-padding: 0 !default;
 $listbox-item-padding: $dropdown-item-padding !default;
 $listbox-item-margin: 0 !default;
 
-$listbox-checkbox-margin: 0 0.5rem 0 0 !default;
+$listbox-checkbox-margin-inline: 0 0.5rem !default;
 
 $listbox-header-padding: 0.5rem !default;
 $listbox-header-icon-width: 1.25rem !default;
@@ -1449,4 +1452,15 @@ body {
   font-size: 0.875rem;
   line-height: $paragraph-line-height;
   background: $rz-base-100 $rz-body-background;
+}
+
+/* RTL */
+.rtl {
+    .float-left {
+        float: right !important;
+    }
+
+    .float-right {
+        float: left !important;
+    }
 }
