@@ -145,7 +145,12 @@
     {
         var stateHasChanged = reference?.GetType().GetMethod("StateHasChanged", BindingFlags.NonPublic | BindingFlags.Instance);
 
-        InvokeAsync(() => stateHasChanged?.Invoke(reference, null)).ConfigureAwait(false);
+        InvokeAsync(() => 
+        {
+            StateHasChanged();
+            stateHasChanged?.Invoke(reference, null);
+        })
+        .ConfigureAwait(false);
     }
 
     public void Dispose()
