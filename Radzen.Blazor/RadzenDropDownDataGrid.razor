@@ -23,7 +23,7 @@
                 @Template(selectedItem)
             </label>
         }
-        else if (selectedItem != null)
+        else if (selectedItem != null && !Multiple)
         {
             <label class="rz-dropdown-label rz-inputtext " onclick="@OpenPopupScript()" style="width:100%;">
                 @PropertyAccess.GetItemOrValueFromProperty(selectedItem, TextProperty)
