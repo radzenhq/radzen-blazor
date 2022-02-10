@@ -119,6 +119,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Column Picker",
+                            New = true,
+                            Path = "datagrid-column-picker",
+                            Title = "Blazor DataGrid column picker",
+                            Tags = new [] { "datagrid", "column", "picker", "chooser" }
+                        },
+                        new Example
+                        {
                             Name = "Reorder",
                             Path = "datagrid-column-reorder",
                             Title = "Blazor DataGrid column reorder",

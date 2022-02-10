@@ -670,7 +670,8 @@ $grid-state-transition: $rz-transition-all !default;
 
 $grid-group-header-padding: 0.5rem !default;
 $grid-group-header-item-padding: 0.5rem !default;
-$grid-group-header-item-margin: 0 0.5rem 0 0 !default;
+$grid-group-header-item-margin: 0 0.5rem 0.5rem 0 !default;
+$grid-group-header-items-margin: 0 0 -0.5rem 0 !default;
 
 $column-drag-handle-color: $rz-base-400 !default;
 

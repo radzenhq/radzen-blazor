@@ -132,12 +132,31 @@ namespace Radzen.Blazor
         [Parameter]
         public SortOrder? SortOrder { get; set; }
 
+        bool _visible = true;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenDataGridColumn{TItem}"/> is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool Visible { get; set; } = true;
+        public bool Visible
+        {
+            get
+            {
+                if (Grid != null && Grid.selectedColumns != null)
+                {
+                    return ((IEnumerable<object>)Grid.selectedColumns).Cast<RadzenDataGridColumn<TItem>>().Contains(this);
+                }
+
+                return _visible;
+            }
+            set
+            {
+                if (_visible != value)
+                {
+                    _visible = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the title.
