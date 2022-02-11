@@ -215,6 +215,13 @@ namespace Radzen.Blazor
         public string Width { get; set; }
 
         /// <summary>
+        /// Gets or sets the min-width.
+        /// </summary>
+        /// <value>The min-width.</value>
+        [Parameter]
+        public string MinWidth { get; set; }
+
+        /// <summary>
         /// Gets or sets the format string.
         /// </summary>
         /// <value>The format string.</value>
@@ -430,6 +437,11 @@ namespace Radzen.Blazor
             if ((isHeaderOrFooterCell && IsFrozen() || isHeaderOrFooterCell && !IsFrozen() || !isHeaderOrFooterCell && IsFrozen()) && Grid.ColumnsCollection.Where(c => c.Visible && c.IsFrozen()).Any())
             {
                 style.Add($"z-index:{(isHeaderOrFooterCell && IsFrozen() ? 2 : 1)}");
+            }
+
+            if (!string.IsNullOrEmpty(MinWidth))
+            {
+                style.Add($"min-width:{MinWidth}");
             }
 
             return string.Join(";", style);
