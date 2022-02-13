@@ -414,5 +414,47 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.Equal(kind, ((DateTime)newValue).Kind);
         }
+
+        [Fact]
+        public void DatePicker_TodayButtonClick_SetsDatepickerToToday()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime?>>();
+
+            DateTime? newValue = null;
+
+            component.SetParametersAndRender(parameters => {
+                parameters.Add(p => p.ValueChanged, args => { newValue = args; })
+                          .Add(p => p.Value, DateTime.Now.AddDays(-7))
+                          .Add(p => p.ShowTodayButton, true);
+            });
+
+            component.Find("button[data-action='today']").Click();
+
+            Assert.Equal(newValue.Value.ToShortDateString(), DateTime.Now.ToShortDateString());
+        }
+
+        [Fact]
+        public void DatePicker_ClearButtonClick_ClearsDatepicker()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime?>>();
+
+            DateTime? newValue = null;
+
+            component.SetParametersAndRender(parameters => {
+                parameters.Add(p => p.ValueChanged, args => { newValue = args; })
+                          .Add(p => p.Value, DateTime.Now.AddDays(-7))
+                          .Add(p => p.ShowClearButton, true);
+            });
+
+            component.Find("button[data-action='clear']").Click();
+
+            Assert.Null(newValue);
+        }
     }
 }
