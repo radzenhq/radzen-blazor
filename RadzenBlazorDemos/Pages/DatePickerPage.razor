@@ -54,6 +54,12 @@
                     <RadzenDatePicker Disabled="true" @bind-Value=@value Class="w-100" />
                 </RadzenCard>
             </div>
+            <div class="col-lg-6 col-xl-4 p-3">
+                <RadzenCard>
+                    <h4 class="mb-4">DatePicker with buttons</h4>
+                    <RadzenDatePicker TValue="DateTime?" DateFormat="d" Change=@(args => OnChange(args, "DatePicker with buttons", "MM/dd/yyyy")) Class="w-100" ShowTodayButton="true" ShowClearButton="true" />
+                </RadzenCard>
+            </div>
         </div>
     </div>
     <div class="col-lg-12 col-xl-4 p-3">
