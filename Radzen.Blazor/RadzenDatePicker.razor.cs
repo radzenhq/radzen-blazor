@@ -857,6 +857,50 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether a today button is shown
+        /// </summary>
+        /// <value><c>true</c> if button will be shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowTodayButton { get; set; }
+
+        /// <summary>
+        /// Gets or sets the text that is used on the Today Button. Defaults to Today
+        /// </summary>
+        [Parameter]
+        public string TodayButtonText { get; set; } = "Today";
+
+        async Task TodayClick()
+        {
+            if (!Disabled)
+            {
+                CurrentDate = DateTime.Now;
+
+                await OkClick();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a clear date button is shown
+        /// </summary>
+        /// <value><c>true</c> if button will be shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowClearButton { get; set; }
+
+        /// <summary>
+        /// Gets or sets the text that is used on the Clear Button. Defaults to Clear
+        /// </summary>
+        [Parameter]
+        public string ClearButtonText { get; set; } = "Clear";
+
+        async Task ClearClick()
+        {
+            if (!Disabled)
+            {
+                await Clear();
+            }
+        }
+
         /// <inheritdoc />
         public override void Dispose()
         {

@@ -281,3 +281,11 @@ $timepicker-border: none !default;
   background-color: $timepicker-background-color;
   width: 4rem;
 }
+
+.rz-datepicker-actions {
+    padding: 0.5rem;
+	
+	.rz-button {
+		margin-right: 5px;
+	}
+}

@@ -134,6 +134,26 @@
                         }
                     </div>
                 }
+                <div class="rz-datepicker-actions">
+                    @if (ShowTodayButton)
+                    {
+                        <button type="button" class="rz-button rz-button-md btn-secondary"
+                            @onclick="@TodayClick"
+                            data-action="today"
+                            onmouseup="@($"Radzen.closePopup('{PopupID}')")">
+                            <span class="rz-button-text">@TodayButtonText</span>
+                        </button>
+                    }
+                    @if (ShowClearButton)
+                    {
+                        <button type="button" class="rz-button rz-button-md btn-secondary"
+                            @onclick="@ClearClick"
+                            data-action="clear"
+                            onmouseup="@($"Radzen.closePopup('{PopupID}')")">
+                            <span class="rz-button-text">@ClearButtonText</span>
+                        </button>
+                    }
+                </div>
             </div>
         
     </div>
