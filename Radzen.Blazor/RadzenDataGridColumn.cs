@@ -426,8 +426,9 @@ namespace Radzen.Blazor
 
             if (forCell && IsFrozen())
             {
-                var left = Grid.ColumnsCollection
-                    .TakeWhile((c, i) => Grid.ColumnsCollection.IndexOf(this) > i && c.IsFrozen())
+                var visibleColumns = Grid.ColumnsCollection.Where(c => c.Visible).ToList();
+                var left = visibleColumns
+                    .TakeWhile((c, i) => visibleColumns.IndexOf(this) > i && c.IsFrozen())
                     .Sum(c => {
                         var w = !string.IsNullOrEmpty(c.GetWidth()) ? c.GetWidth() : Grid.ColumnWidth;
                         var cw = 200;
