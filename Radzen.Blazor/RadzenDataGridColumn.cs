@@ -142,7 +142,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                if (Grid != null && Grid.selectedColumns != null)
+                if (Grid != null && Grid.selectedColumns != null && Pickable)
                 {
                     return ((IEnumerable<object>)Grid.selectedColumns).Cast<RadzenDataGridColumn<TItem>>().Contains(this);
                 }
@@ -297,6 +297,13 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if groupable; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Groupable { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenDataGridColumn{TItem}"/> is pickable - listed when DataGrid AllowColumnPicking is set to true.
+        /// </summary>
+        /// <value><c>true</c> if pickable; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Pickable { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the text align.

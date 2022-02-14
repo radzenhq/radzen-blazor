@@ -279,6 +279,7 @@ namespace Radzen.Blazor
         private readonly List<RadzenDataGridColumn<TItem>> columns = new List<RadzenDataGridColumn<TItem>>();
         internal readonly List<RadzenDataGridColumn<TItem>> childColumns = new List<RadzenDataGridColumn<TItem>>();
         private readonly List<RadzenDataGridColumn<TItem>> allColumns = new List<RadzenDataGridColumn<TItem>>();
+        private List<RadzenDataGridColumn<TItem>> allPickableColumns = new List<RadzenDataGridColumn<TItem>>();
         internal object selectedColumns;
 
         /// <summary>
@@ -321,6 +322,7 @@ namespace Radzen.Blazor
             if (AllowColumnPicking)
             {
                 selectedColumns = allColumns;
+                allPickableColumns = allColumns.Where(c => c.Pickable).ToList();
             }
 
             StateHasChanged();
