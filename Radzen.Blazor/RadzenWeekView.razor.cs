@@ -15,6 +15,9 @@ namespace Radzen.Blazor
     public partial class RadzenWeekView : SchedulerViewBase
     {
         /// <inheritdoc />
+        public override string Icon => "calendar_view_week";
+
+        /// <inheritdoc />
         [Parameter]
         public override string Text { get; set; } = "Week";
 
@@ -71,6 +74,7 @@ namespace Radzen.Blazor
                 return $"{StartDate.ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)} - {StartDate.EndOfWeek().ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)}";
             }
         }
+
 
         /// <inheritdoc />
         public override DateTime Next()

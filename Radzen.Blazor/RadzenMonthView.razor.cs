@@ -17,6 +17,9 @@ namespace Radzen.Blazor
     public partial class RadzenMonthView : SchedulerViewBase
     {
         /// <inheritdoc />
+        public override string Icon => "calendar_view_month";
+
+        /// <inheritdoc />
         public override string Title
         {
             get => Scheduler.CurrentDate.ToString("MMMM yyyy", Scheduler.Culture);

@@ -16,6 +16,9 @@ namespace Radzen.Blazor
     public partial class RadzenDayView : SchedulerViewBase
     {
         /// <inheritdoc />
+        public override string Icon => "calendar_view_day";
+
+        /// <inheritdoc />
         [Parameter]
         public override string Text { get; set; } = "Day";
 
