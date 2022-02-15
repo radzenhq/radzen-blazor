@@ -37,6 +37,25 @@ namespace Radzen
     /// </example>
     public class DialogService : IDisposable
     {
+        private DotNetObjectReference<DialogService> reference;
+
+        /// <summary>
+        /// Gets the reference for the current component.
+        /// </summary>
+        /// <value>The reference.</value>
+        internal DotNetObjectReference<DialogService> Reference
+        {
+            get
+            {
+                if (reference == null)
+                {
+                    reference = DotNetObjectReference.Create(this);
+                }
+
+                return reference;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the URI helper.
         /// </summary>
@@ -192,6 +211,7 @@ namespace Radzen
         /// Closes the last opened dialog with optional result.
         /// </summary>
         /// <param name="result">The result.</param>
+        [JSInvokable("DialogService.Close")]
         public void Close(dynamic result = null)
         {
             var dialog = dialogs.LastOrDefault();
@@ -242,7 +262,7 @@ namespace Radzen
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
             };
 
-            await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions);
+            await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Reference);
 
             return await OpenAsync(title, ds =>
             {
