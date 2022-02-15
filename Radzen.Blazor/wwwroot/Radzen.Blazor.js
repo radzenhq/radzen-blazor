@@ -867,8 +867,10 @@ window.Radzen = {
             }
         }, 500);
     }
-    document.removeEventListener('keydown', Radzen.closePopupOrDialog);
-    document.addEventListener('keydown', Radzen.closePopupOrDialog);
+    if (options.closeDialogOnEsc) {
+        document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+        document.addEventListener('keydown', Radzen.closePopupOrDialog);
+    }
   },
   closeDialog: function () {
     document.body.classList.remove('no-scroll');

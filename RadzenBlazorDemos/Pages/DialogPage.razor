@@ -137,7 +137,7 @@
                         <b>Loading, please wait...</b>
                     </div>
                 </div>
-        </div>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });
+        </div>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
     }
 
     // Busy dialog from string
@@ -159,6 +159,6 @@
                 b.CloseElement();
             };
             return content;
-        }, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });
+        }, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
     }
 }

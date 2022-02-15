@@ -204,6 +204,7 @@ namespace Radzen
                 Style = options != null ? options.Style : "",
                 AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true,
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
+                CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
             });
         }
 
@@ -260,6 +261,7 @@ namespace Radzen
                 Style = options != null ? options.Style : "",
                 AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true,
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
+                CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
             };
 
             await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Reference);
@@ -374,6 +376,12 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
         public bool CloseDialogOnOverlayClick { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the dialog should be closed on ESC key press.
+        /// </summary>
+        /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
+        public bool CloseDialogOnEsc { get; set; } = true;
     }
 
     /// <summary>
