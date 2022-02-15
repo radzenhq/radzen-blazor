@@ -286,8 +286,6 @@ namespace Radzen
                         selectedItems.Clear();
                     }
 
-                    SelectItemFromValue(internalValue);
-
                     OnDataChanged();
 
                     StateHasChanged();
