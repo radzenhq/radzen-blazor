@@ -18,7 +18,7 @@ $sidebar-background-color: $charcoal-grey !default;
 }
 
 @media (max-width: 768px) { 
-  .rz-sidebar {
+  .rz-sidebar-responsive {
     width: 0;
     opacity: 0;
   }
