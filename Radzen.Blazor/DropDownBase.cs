@@ -286,8 +286,6 @@ namespace Radzen
                         selectedItems.Clear();
                     }
 
-                    OnDataChanged();
-
                     StateHasChanged();
                 }
             }
@@ -596,6 +594,12 @@ namespace Radzen
                 PageSize = pageSize;
             }
 #endif
+            var dataChanged = parameters.DidParameterChange(nameof(Data), Data);
+            if (dataChanged)
+            {
+               await OnDataChanged();
+            }
+
             var selectedItemChanged = parameters.DidParameterChange(nameof(SelectedItem), SelectedItem);
             if (selectedItemChanged)
             {

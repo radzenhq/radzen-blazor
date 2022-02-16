@@ -486,16 +486,8 @@ namespace Radzen.Blazor
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
             }
-            column.SetFilterValue(null);
-            column.SetFilterValue(null, false);
-            column.SetFilterOperator(null);
-            column.SetSecondFilterOperator(null);
 
-            column.FilterValue = null;
-            column.SecondFilterValue = null;
-            column.FilterOperator = default(FilterOperator);
-            column.SecondFilterOperator = default(FilterOperator);
-            column.LogicalFilterOperator = default(LogicalFilterOperator);
+            column.ClearFilters();
 
             skip = 0;
             CurrentPage = 0;

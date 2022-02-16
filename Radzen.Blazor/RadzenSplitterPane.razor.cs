@@ -166,6 +166,11 @@ namespace Radzen.Blazor
             }
         }
 
+        internal void SetCollapsed(bool value)
+        {
+            Collapsed = value;
+        }
+
 
         /// <inheritdoc />
         public override void Dispose()

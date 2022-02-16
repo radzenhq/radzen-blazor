@@ -63,7 +63,7 @@ namespace Radzen.Blazor
 
         internal int GetColSpan(bool isDataCell = false)
         {
-            if (!Grid.AllowCompositeDataCells && isDataCell) 
+            if (!Grid.AllowCompositeDataCells && isDataCell)
                 return 1;
 
             var directChildColumns = Grid.childColumns.Where(c => c.Visible && c.Parent == this);
@@ -78,7 +78,7 @@ namespace Radzen.Blazor
 
         internal int GetRowSpan(bool isDataCell = false)
         {
-            if (!Grid.AllowCompositeDataCells && isDataCell) 
+            if (!Grid.AllowCompositeDataCells && isDataCell)
                 return 1;
 
             if (Columns == null && Parent != null)
@@ -108,7 +108,7 @@ namespace Radzen.Blazor
                         _filterPropertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
                     }
                 }
-            
+
                 if (_filterPropertyType == null)
                 {
                     _filterPropertyType = Type;
@@ -568,7 +568,7 @@ namespace Radzen.Blazor
             if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))
             {
                 filterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
-                
+
                 if (FilterTemplate != null)
                 {
                     FilterValue = filterValue;
@@ -585,7 +585,7 @@ namespace Radzen.Blazor
                     {
                         await Grid.Reload();
                     }
-                    
+
                     return;
                 }
             }
@@ -659,6 +659,20 @@ namespace Radzen.Blazor
             {
                 secondFilterValue = value;
             }
+        }
+
+        internal void ClearFilters()
+        {
+            SetFilterValue(null);
+            SetFilterValue(null, false);
+            SetFilterOperator(null);
+            SetSecondFilterOperator(null);
+
+            FilterValue = null;
+            SecondFilterValue = null;
+            FilterOperator = default(FilterOperator);
+            SecondFilterOperator = default(FilterOperator);
+            LogicalFilterOperator = default(LogicalFilterOperator);
         }
 
         /// <summary>
