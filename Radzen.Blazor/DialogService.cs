@@ -38,11 +38,6 @@ namespace Radzen
     public class DialogService : IDisposable
     {
         private DotNetObjectReference<DialogService> reference;
-
-        /// <summary>
-        /// Gets the reference for the current component.
-        /// </summary>
-        /// <value>The reference.</value>
         internal DotNetObjectReference<DialogService> Reference
         {
             get
