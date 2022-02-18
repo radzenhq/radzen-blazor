@@ -17,7 +17,13 @@
 
         </div>
 
-        @if (Template != null && selectedItem != null)
+        @if (ValueTemplate != null && selectedItem != null)
+        {
+            <label class="rz-dropdown-label rz-inputtext " onclick="@OpenPopupScript()" style="width:100%;">
+                @ValueTemplate(selectedItem)
+            </label>
+        }
+        else if (Template != null && selectedItem != null)
         {
             <label class="rz-dropdown-label rz-inputtext " onclick="@OpenPopupScript()" style="width:100%;">
                 @Template(selectedItem)

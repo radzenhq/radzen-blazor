@@ -22,6 +22,13 @@ namespace Radzen.Blazor
     public partial class RadzenDropDownDataGrid<TValue> : DropDownBase<TValue>
     {
         /// <summary>
+        /// Gets or sets the value template.
+        /// </summary>
+        /// <value>The value template.</value>
+        [Parameter]
+        public RenderFragment<dynamic> ValueTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets the empty template shown when Data is empty collection.
         /// </summary>
         /// <value>The empty template.</value>
