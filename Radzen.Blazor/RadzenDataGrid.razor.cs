@@ -908,6 +908,8 @@ namespace Radzen.Blazor
                         OldIndex = actualColumnIndexFrom,
                         NewIndex = actualColumnIndexTo
                     });
+
+                    StateHasChanged();
                 }
 
                 indexOfColumnToReoder = null;
