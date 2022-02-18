@@ -276,9 +276,9 @@ namespace Radzen.Blazor
             column.SetFilterOperator(filterOperator);
         }
 
-        private readonly List<RadzenDataGridColumn<TItem>> columns = new List<RadzenDataGridColumn<TItem>>();
+        private List<RadzenDataGridColumn<TItem>> columns = new List<RadzenDataGridColumn<TItem>>();
         internal readonly List<RadzenDataGridColumn<TItem>> childColumns = new List<RadzenDataGridColumn<TItem>>();
-        private readonly List<RadzenDataGridColumn<TItem>> allColumns = new List<RadzenDataGridColumn<TItem>>();
+        private List<RadzenDataGridColumn<TItem>> allColumns = new List<RadzenDataGridColumn<TItem>>();
         private List<RadzenDataGridColumn<TItem>> allPickableColumns = new List<RadzenDataGridColumn<TItem>>();
         internal object selectedColumns;
 
@@ -288,6 +288,29 @@ namespace Radzen.Blazor
         /// <value>The columns.</value>
         [Parameter]
         public RenderFragment Columns { get; set; }
+
+        internal void UpdateColumnsOrder()
+        {
+            if (allColumns.Any(c => c.OrderIndex.HasValue))
+            {
+                var columnsWithoutOrderIndex = columns.Where(c => !c.OrderIndex.HasValue).ToList();
+                for (var i = 0; i < columnsWithoutOrderIndex.Count; i++)
+                {
+                    columnsWithoutOrderIndex[i].SetOrderIndex(columns.IndexOf(columnsWithoutOrderIndex[i]));
+                }
+
+                columns = columns
+                    .Where(c => c.OrderIndex.HasValue).OrderBy(c => c.OrderIndex)
+                        .Concat(columns.Where(c => !c.OrderIndex.HasValue)).ToList();
+
+                if (AllowColumnPicking)
+                {
+                    allPickableColumns = allColumns.Where(c => c.Pickable)
+                        .Where(c => c.OrderIndex.HasValue).OrderBy(c => c.OrderIndex)
+                        .Concat(allColumns.Where(c => c.Pickable).Where(c => !c.OrderIndex.HasValue)).ToList();
+                }
+            }
+        }
 
         internal void AddColumn(RadzenDataGridColumn<TItem> column)
         {
@@ -325,6 +348,8 @@ namespace Radzen.Blazor
                 allPickableColumns = allColumns.Where(c => c.Pickable).ToList();
             }
 
+            UpdateColumnsOrder();
+
             StateHasChanged();
         }
 
@@ -344,6 +369,8 @@ namespace Radzen.Blazor
             {
                 allColumns.Remove(column);
             }
+
+            UpdateColumnsOrder();
 
             if (!disposed)
             {
@@ -901,6 +928,8 @@ namespace Radzen.Blazor
                     var actualColumnIndexTo = columns.IndexOf(columnToReorderTo);
                     columns.Remove(columnToReorder);
                     columns.Insert(actualColumnIndexTo, columnToReorder);
+
+                    UpdateColumnsOrder();
 
                     await ColumnReordered.InvokeAsync(new DataGridColumnReorderedEventArgs<TItem>
                     {
