@@ -125,6 +125,8 @@ namespace Radzen.Blazor
             }
         }
 
+        int? orderIndex;
+
         /// <summary>
         /// Gets or sets the order index.
         /// </summary>
@@ -132,9 +134,14 @@ namespace Radzen.Blazor
         [Parameter]
         public int? OrderIndex { get; set; }
 
+        internal int? GetOrderIndex()
+        {
+            return orderIndex ?? OrderIndex;
+        }
+
         internal void SetOrderIndex(int? value)
         {
-            OrderIndex = value;
+            orderIndex = value;
         }
 
         /// <summary>

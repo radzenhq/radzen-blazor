@@ -291,23 +291,19 @@ namespace Radzen.Blazor
 
         internal void UpdateColumnsOrder()
         {
-            if (allColumns.Any(c => c.OrderIndex.HasValue))
+            if (allColumns.Any(c => c.GetOrderIndex().HasValue))
             {
-                var columnsWithoutOrderIndex = columns.Where(c => !c.OrderIndex.HasValue).ToList();
+                var columnsWithoutOrderIndex = columns.Where(c => !c.GetOrderIndex().HasValue).ToList();
                 for (var i = 0; i < columnsWithoutOrderIndex.Count; i++)
                 {
                     columnsWithoutOrderIndex[i].SetOrderIndex(columns.IndexOf(columnsWithoutOrderIndex[i]));
                 }
 
-                columns = columns
-                    .Where(c => c.OrderIndex.HasValue).OrderBy(c => c.OrderIndex)
-                        .Concat(columns.Where(c => !c.OrderIndex.HasValue)).ToList();
+                columns = columns.OrderBy(c => c.GetOrderIndex()).ToList();
 
                 if (AllowColumnPicking)
                 {
-                    allPickableColumns = allColumns.Where(c => c.Pickable)
-                        .Where(c => c.OrderIndex.HasValue).OrderBy(c => c.OrderIndex)
-                        .Concat(allColumns.Where(c => c.Pickable).Where(c => !c.OrderIndex.HasValue)).ToList();
+                    allPickableColumns = allColumns.Where(c => c.Pickable).OrderBy(c => c.GetOrderIndex()).ToList();
                 }
             }
         }
@@ -928,6 +924,9 @@ namespace Radzen.Blazor
                     var actualColumnIndexTo = columns.IndexOf(columnToReorderTo);
                     columns.Remove(columnToReorder);
                     columns.Insert(actualColumnIndexTo, columnToReorder);
+
+                    columnToReorder.SetOrderIndex(columns.IndexOf(columnToReorder));
+                    columnToReorderTo.SetOrderIndex(columns.IndexOf(columnToReorderTo));
 
                     UpdateColumnsOrder();
 
