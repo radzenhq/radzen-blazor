@@ -231,10 +231,39 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Clear selected file(s) from the upload selection
+        /// </summary>
+        public async System.Threading.Tasks.Task ClearFiles()
+        {
+            while(files.Count > 0)
+            {
+                await OnRemove(files[0], false);
+            }
+
+            await Change.InvokeAsync(new UploadChangeEventArgs() { Files = files.Select(f => new FileInfo() { Name = f.Name, Size = f.Size }).ToList() });
+        }
+
+        /// <summary>
+        /// Called on file remove.
+        /// </summary>
+        /// <param name="fileName">The name of the file to remove.</param>
+        /// <param name="ignoreCase">Specify true is file name casing should be ignored (default: false)</param>
+        public async System.Threading.Tasks.Task RemoveFile(string fileName, bool ignoreCase = false)
+        {
+            var comparisonMethod = ignoreCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+            var fileInfo = files.FirstOrDefault(f => string.Equals(f.Name, fileName, comparisonMethod));
+            if (fileInfo != null)
+            {
+                await OnRemove(fileInfo);
+            }
+        }
+
+        /// <summary>
         /// Called on file remove.
         /// </summary>
         /// <param name="file">The file.</param>
-        protected async System.Threading.Tasks.Task OnRemove(PreviewFileInfo file)
+        /// <param name="fireChangeEvent">If the linked <see cref="Change" /> event should be fired as a result of this removal (default: true)</param>
+        protected async System.Threading.Tasks.Task OnRemove(PreviewFileInfo file, bool fireChangeEvent = true)
         {
             files.Remove(file);
             await JSRuntime.InvokeVoidAsync("Radzen.removeFileFromUpload", fileUpload, file.Name);
