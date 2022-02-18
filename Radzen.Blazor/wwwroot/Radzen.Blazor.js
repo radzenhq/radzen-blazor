@@ -471,6 +471,16 @@ window.Radzen = {
     var uploadComponent =
       Radzen.uploadComponents && Radzen.uploadComponents[fileInput.id];
     if (uploadComponent) {
+      if (uploadComponent.localFiles) {
+        // Clear any previously created preview URL(s)
+        for (var i = 0; i < uploadComponent.localFiles.length; i++) {
+          var file = uploadComponent.localFiles[i];
+          if (file.Url) {
+            URL.revokeObjectURL(file.Url);
+          }
+        }
+      }
+
       uploadComponent.files = Array.from(fileInput.files);
       uploadComponent.localFiles = files;
       uploadComponent.invokeMethodAsync('RadzenUpload.OnChange', files);
