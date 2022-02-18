@@ -127,6 +127,7 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Updated = true,
                             Name = "Reorder",
                             Path = "datagrid-column-reorder",
                             Title = "Blazor DataGrid column reorder",

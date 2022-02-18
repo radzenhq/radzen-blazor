@@ -8,7 +8,7 @@
 
 <h1>DataGrid</h1>
 
-<p>Enable column reorder by setting the AllowColumnReorder property to true.</p>
+<p>Enable column reorder by setting the AllowColumnReorder property to true. Define column initial order using column OrderIndex property.</p>
 
 <RadzenExample Name="DataGrid" Source="DataGridColumnReoder" Heading="false">
     <RadzenButton Text="Change page state" Click="@((args) => { StateHasChanged(); })" Style="margin-bottom:20px" />
@@ -21,8 +21,8 @@
                     <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
-            <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" />
+            <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" OrderIndex="2" />
+            <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" OrderIndex="1" />
             <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
             <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
             <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
