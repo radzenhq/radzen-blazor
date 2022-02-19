@@ -159,8 +159,11 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroyMap", UniqueID);
+                SafeInvokeJSRuntime(disposeAsync);
             }
+
+            async Task disposeAsync() =>
+                await JSRuntime.InvokeVoidAsync("Radzen.destroyMap", UniqueID);
         }
     }
 }

@@ -504,8 +504,11 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroyScheduler", Element);
+                SafeInvokeJSRuntime(disposeAsync);
             }
+
+            async Task disposeAsync() =>
+                await JSRuntime.InvokeVoidAsync("Radzen.destroyScheduler", Element);
         }
 
         private bool heightIsSet = false;

@@ -104,8 +104,11 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroySlider", UniqueID, Element);
+                SafeInvokeJSRuntime(disposeAsync);
             }
+
+            async Task disposeAsync() =>
+                await JSRuntime.InvokeVoidAsync("Radzen.destroySlider", UniqueID, Element);
         }
 
         /// <summary>

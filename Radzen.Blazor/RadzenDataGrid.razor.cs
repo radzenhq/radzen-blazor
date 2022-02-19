@@ -26,7 +26,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem>
     {
-#if NET5
+#if NET5_0_OR_GREATER
         internal void SetAllowVirtualization(bool allowVirtualization)
         {
             AllowVirtualization = allowVirtualization;
@@ -54,7 +54,7 @@ namespace Radzen.Blazor
             var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
             var top = request.Count;
 
-            if(top <= 0)
+            if (top <= 0)
             {
                 top = PageSize;
             }
@@ -70,7 +70,7 @@ namespace Radzen.Blazor
         {
             var top = request.Count;
 
-            if(top <= 0)
+            if (top <= 0)
             {
                 top = PageSize;
             }
@@ -88,10 +88,10 @@ namespace Radzen.Blazor
         {
             return new RenderFragment(builder =>
             {
-#if NET5
+#if NET5_0_OR_GREATER
                 if (AllowVirtualization)
                 {
-                    if(AllowGrouping && groups.Any() && !LoadData.HasDelegate)
+                    if (AllowGrouping && groups.Any() && !LoadData.HasDelegate)
                     {
                         builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<GroupResult>));
                         builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<GroupResult>(LoadGroups));
@@ -116,7 +116,7 @@ namespace Radzen.Blazor
                     {
                         builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>));
                         builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<TItem>(LoadItems));
-                    
+
                         builder.AddAttribute(2, "ChildContent", (RenderFragment<TItem>)((context) =>
                         {
                             return (RenderFragment)((b) =>
@@ -429,7 +429,8 @@ namespace Radzen.Blazor
 
                 if (FilterMode == FilterMode.Advanced)
                 {
-                    builder.AddAttribute(4, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, args => {
+                    builder.AddAttribute(4, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, args =>
+                    {
                         var value = $"{args.Value}";
                         column.SetFilterValue(!string.IsNullOrWhiteSpace(value) ? Convert.ChangeType(value, Nullable.GetUnderlyingType(type)) : null, isFirst);
                     }));
@@ -800,7 +801,7 @@ namespace Radzen.Blazor
         /// <value>The empty template.</value>
         [Parameter]
         public RenderFragment EmptyTemplate { get; set; }
-#if NET5
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Gets or sets a value indicating whether this instance is virtualized.
         /// </summary>
@@ -988,7 +989,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                if(LoadData.HasDelegate)
+                if (LoadData.HasDelegate)
                 {
                     return base.View;
                 }
@@ -1040,14 +1041,14 @@ namespace Radzen.Blazor
 
         internal bool IsVirtualizationAllowed()
         {
-    #if NET5
+#if NET5_0_OR_GREATER
             return AllowVirtualization;
-    #else
+#else
             return false;
-    #endif
+#endif
         }
 
-        IList<TItem> _value;
+        private IList<TItem> _value;
 
         /// <summary>
         /// Gets or sets the selected item.
@@ -1208,7 +1209,7 @@ namespace Radzen.Blazor
                 allColumns.ToList().ForEach(c => { c.SetFilterValue(null); c.SetFilterValue(null, false); c.SetSecondFilterOperator(FilterOperator.Equals); });
                 allColumns.ToList().ForEach(c => { c.ResetSortOrder(); });
                 sorts.Clear();
-           }
+            }
         }
 
         /// <summary>
@@ -1223,17 +1224,17 @@ namespace Radzen.Blazor
             {
                 Count = 1;
             }
-#if NET5
+#if NET5_0_OR_GREATER
             if (AllowVirtualization)
             {
-                if(!LoadData.HasDelegate)
+                if (!LoadData.HasDelegate)
                 {
-                    if(virtualize != null)
+                    if (virtualize != null)
                     {
                         await virtualize.RefreshDataAsync();
                     }
 
-                    if(groupVirtualize != null)
+                    if (groupVirtualize != null)
                     {
                         await groupVirtualize.RefreshDataAsync();
                     }
@@ -1254,15 +1255,15 @@ namespace Radzen.Blazor
             }
             else
             {
-#if NET5
+#if NET5_0_OR_GREATER
                 if (AllowVirtualization)
                 {
-                    if(virtualize != null)
+                    if (virtualize != null)
                     {
                         await virtualize.RefreshDataAsync();
                     }
 
-                    if(groupVirtualize != null)
+                    if (groupVirtualize != null)
                     {
                         await groupVirtualize.RefreshDataAsync();
                     }
@@ -1632,7 +1633,7 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public async System.Threading.Tasks.Task EditRow(TItem item)
         {
-            if(itemToInsert != null)
+            if (itemToInsert != null)
             {
                 CancelEditRow(itemToInsert);
             }
@@ -1703,7 +1704,7 @@ namespace Radzen.Blazor
         {
             if (object.Equals(itemToInsert, item))
             {
-                if(!IsVirtualizationAllowed())
+                if (!IsVirtualizationAllowed())
                 {
                     var list = this.PagedView.ToList();
                     list.Remove(item);
@@ -1714,14 +1715,14 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-#if NET5
+#if NET5_0_OR_GREATER
                     itemToInsert = default(TItem);
-                    if(virtualize != null)
+                    if (virtualize != null)
                     {
                         virtualize.RefreshDataAsync();
                     }
 
-                    if(groupVirtualize != null)
+                    if (groupVirtualize != null)
                     {
                         groupVirtualize.RefreshDataAsync();
                     }
@@ -1761,7 +1762,7 @@ namespace Radzen.Blazor
         public async System.Threading.Tasks.Task InsertRow(TItem item)
         {
             itemToInsert = item;
-            if(!IsVirtualizationAllowed())
+            if (!IsVirtualizationAllowed())
             {
                 var list = this.PagedView.ToList();
                 list.Insert(0, item);
@@ -1770,13 +1771,13 @@ namespace Radzen.Blazor
             }
             else
             {
-#if NET5
-                if(virtualize != null)
+#if NET5_0_OR_GREATER
+                if (virtualize != null)
                 {
                     await virtualize.RefreshDataAsync();
                 }
 
-                if(groupVirtualize != null)
+                if (groupVirtualize != null)
                 {
                     await groupVirtualize.RefreshDataAsync();
                 }
@@ -1791,7 +1792,7 @@ namespace Radzen.Blazor
 
         internal bool IsOData()
         {
-            if(isOData == null && Data != null)
+            if (isOData == null && Data != null)
             {
                 isOData = typeof(ODataEnumerable<TItem>).IsAssignableFrom(Data.GetType());
             }
@@ -1848,8 +1849,8 @@ namespace Radzen.Blazor
         /// Gets or sets the group descriptors.
         /// </summary>
         /// <value>The groups.</value>
-        public List<GroupDescriptor> Groups 
-        { 
+        public List<GroupDescriptor> Groups
+        {
             get
             {
                 return groups;
@@ -1864,16 +1865,16 @@ namespace Radzen.Blazor
 
         internal async Task EndColumnDropToGroup()
         {
-            if(indexOfColumnToReoder != null)
+            if (indexOfColumnToReoder != null)
             {
                 var column = columns.Where(c => c.Visible).ElementAtOrDefault(indexOfColumnToReoder.Value);
 
-                if(column != null && column.Groupable && !string.IsNullOrEmpty(column.GetGroupProperty()))
+                if (column != null && column.Groupable && !string.IsNullOrEmpty(column.GetGroupProperty()))
                 {
                     var descriptor = groups.Where(d => d.Property == column.GetGroupProperty()).FirstOrDefault();
                     if (descriptor == null)
                     {
-                        descriptor = new GroupDescriptor() { Property = column.GetGroupProperty(), Title = column.Title, SortOrder = column.GetSortOrder()  };
+                        descriptor = new GroupDescriptor() { Property = column.GetGroupProperty(), Title = column.Title, SortOrder = column.GetSortOrder() };
                         groups.Add(descriptor);
                         _groupedPagedView = null;
 
@@ -1885,7 +1886,7 @@ namespace Radzen.Blazor
                 }
 
                 indexOfColumnToReoder = null;
-            }  
+            }
         }
 
         /// <summary>
@@ -1975,10 +1976,26 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
+                SafeInvokeJSRuntime(disposeAsync);
+            }
+
+            GC.SuppressFinalize(this);
+
+            Task disposeAsync()
+            {
+                // Fire and forget each column's popup
                 foreach (var column in allColumns.ToList().Where(c => c.Visible))
                 {
-                    JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", $"{PopupID}{column.GetFilterProperty()}");
+                    var valueTask = JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", $"{PopupID}{column.GetFilterProperty()}");
+
+                    // If the JSRuntime is being disposed it will synchronously fault so stop firing
+                    if (valueTask.IsFaulted)
+                    {
+                        return valueTask.AsTask();
+                    }
                 }
+
+                return Task.CompletedTask;
             }
         }
 

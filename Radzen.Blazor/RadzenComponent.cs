@@ -300,21 +300,71 @@ namespace Radzen
 
             if (IsJSRuntimeAvailable)
             {
+                SafeInvokeJSRuntime(disposeAsync);
+            }
+
+            Task disposeAsync()
+            {
                 if (ContextMenu.HasDelegate)
                 {
-                    JSRuntime.InvokeVoidAsync("Radzen.removeContextMenu", UniqueID);
+                    var valueTask = JSRuntime.InvokeVoidAsync("Radzen.removeContextMenu", UniqueID);
+                    if (valueTask.IsFaulted)
+                    {
+                        return valueTask.AsTask();
+                    }
                 }
 
                 if (MouseEnter.HasDelegate)
                 {
-                    JSRuntime.InvokeVoidAsync("Radzen.removeMouseEnter", UniqueID);
+                    var valueTask = JSRuntime.InvokeVoidAsync("Radzen.removeMouseEnter", UniqueID);
+                    if (valueTask.IsFaulted)
+                    {
+                        return valueTask.AsTask();
+                    }
                 }
 
                 if (MouseLeave.HasDelegate)
                 {
-                    JSRuntime.InvokeVoidAsync("Radzen.removeMouseLeave", UniqueID);
+                    var valueTask = JSRuntime.InvokeVoidAsync("Radzen.removeMouseLeave", UniqueID);
+                    if (valueTask.IsFaulted)
+                    {
+                        return valueTask.AsTask();
+                    }
+                }
+
+                return Task.CompletedTask;
+            }
+        }
+
+        /// <summary>
+        /// Invoke the JSRuntime and safely handle if it is no longer available.
+        /// </summary>
+        /// <param name="f">A function containing invocations to JSRuntime.</param>
+        private protected void SafeInvokeJSRuntime(Func<Task> f)
+        {
+            // There are situations (e.g. Refresh) where the JSRuntime is being disposed. Some
+            // functions (e.g. Dispose) which may be called after the runtime is unavailable
+            // will cause Blazor to throw an exception (only in .Net 6.0 or higher) and
+            // the Task will return synchronously.
+            // Otherwise it is fire and forget, waiting will cause deadlock.
+#if NET6_0_OR_GREATER
+            var runtimeTask = f();
+
+            Exception ex = runtimeTask?.Exception;
+            if (ex != null)
+            {
+                if (ex is AggregateException)
+                {
+                    ex = ex?.InnerException;
+                }
+                if (ex is JSDisconnectedException)
+                {
+                    IsJSRuntimeAvailable = false;
                 }
             }
+#else
+            _ = f();
+#endif
         }
 
         /// <summary>

@@ -27,7 +27,7 @@ namespace Radzen.Blazor
             var classList = ClassList.Create("rz-body")
                                      .Add("body")
                                      .Add("body-expanded", Expanded);
-                                     
+
             return classList.ToString();
         }
 
@@ -111,8 +111,11 @@ namespace Radzen.Blazor
         {
             if (IsJSRuntimeAvailable && Layout != null)
             {
-                JSRuntime.InvokeVoidAsync("eval", $"document.getElementById('{GetId()}').scrollTop = 0");
+                SafeInvokeJSRuntime(onLocationChangedInternal);
             }
+
+            async Task onLocationChangedInternal() =>
+                await JSRuntime.InvokeVoidAsync("eval", $"document.getElementById('{GetId()}').scrollTop = 0");
         }
 
         /// <inheritdoc />

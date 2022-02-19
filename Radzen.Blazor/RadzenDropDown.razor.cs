@@ -135,11 +135,14 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+                SafeInvokeJSRuntime(disposeAsync);
             }
+
+            async Task disposeAsync() =>
+                await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
         }
 
-        internal async System.Threading.Tasks.Task ClosePopup()
+        internal async Task ClosePopup()
         {
             await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
         }
