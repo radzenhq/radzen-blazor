@@ -37,7 +37,7 @@ $grid-foot-cell-color: $grid-cell-color !default;
 $grid-foot-background-color: $grid-header-background-color !default;
 
 $grid-filter-background-color: #f6f8f9 !default;
-$grid-filter-padding: 0.25rem 0.625rem !default;
+$grid-filter-padding: 0.5rem 0.625rem !default;
 $grid-filter-margin: 0 !default;
 $grid-filter-border: $grid-cell-border !default;
 $grid-filter-font-size: 0.8125rem !default;
@@ -55,6 +55,7 @@ $grid-filter-buttons-background-color: $white !default;
 $grid-clear-filter-button-background-color: #e6ecef !default;
 $grid-clear-filter-button-color: $cool-grey !default;
 $grid-apply-filter-button-background-color: $default-link !default;
+$grid-apply-filter-button-color: inherit !default;
 
 $grid-header-filter-icon-margin: 5px 5px 0 0 !default;
 $grid-header-filter-icon-hover-color: inherit !default;
@@ -98,6 +99,7 @@ $grid-state-transition: none !default;
 $grid-group-header-padding: 15px !default;
 $grid-group-header-item-padding: 10px !default;
 $grid-group-header-item-margin: 5px !default;
+$grid-group-header-items-margin: 0 !default;
 
 $column-drag-handle-color: $grid-header-color !default;
 $column-drag-handle-hover-color: $column-drag-handle-color !default;
@@ -489,43 +491,8 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
         }
       }
 
-    .rz-spinner {
-      border: none;
-      padding: 0;
-      height: auto;
-      background-color: transparent;
-      box-shadow: none;
-      line-height: 1;
-      flex: auto;
-
-      input {
-        line-height: 1;
-        &:focus {
-          outline: none;
-          color: $grid-filter-focus-color;
-        }
-      }
-
-      button {
-        display: none;
-      }
-    }
-
-    > input {
-      width: 0;
-      flex: auto;
-      border: none;
-      box-shadow: none;
-      padding: 0;
-      background-color: transparent;
-      color: $grid-filter-color;
-      font-size: $grid-filter-font-size;
-      line-height: 1;
-
-      &:focus {
-        outline: none;
-        color: $grid-filter-focus-color;
-      }
+    .rz-current-filter {
+      margin-left: 0.5rem;
     }
   }
 }
@@ -644,6 +611,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
 .rz-apply-filter {
   background-color: $grid-apply-filter-button-background-color;
+  color: $grid-apply-filter-button-color;
 }
 
 .rz-datatable-loading {
@@ -694,6 +662,10 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     .rz-datatable-scrollable-table-wrapper {
       > table {
         table-layout: auto;
+        display: block;
+      }
+      > tbody {
+        display: block;
       }
     }
 
@@ -705,6 +677,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
     .rz-datatable-odd,
     .rz-datatable-even {
+      display: block;
       > td {
         display: block;
         width: 100% !important;
@@ -867,6 +840,13 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     background-color: $grid-header-background-color;
     padding: $grid-group-header-padding;
     border-bottom: $grid-bottom-cell-border;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rz-group-header-items {
+    margin: $grid-group-header-items-margin;
 }
 
 .rz-group-header-item {
@@ -874,9 +854,17 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     padding: $grid-group-header-item-padding;
     margin: $grid-group-header-item-margin;
     width: fit-content;
-    float:left;
+    float: left;
 }
 
 .rz-group-header-item-title {
     margin-right: 5px;
+}
+
+.rz-group-header-drop {
+    height: fit-content;
+}
+
+.rz-column-picker {
+    display: flex;
 }

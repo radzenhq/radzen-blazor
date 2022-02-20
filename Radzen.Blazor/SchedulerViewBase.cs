@@ -15,6 +15,12 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The title.</value>
         public abstract string Title { get; }
+
+        /// <summary>
+        /// Gets the icon of the view. It is displayed in the view switching UI.
+        /// </summary>
+        public abstract string Icon { get; }
+
         /// <summary>
         /// Gets the text of the view. It is displayed in the view switching UI.
         /// </summary>

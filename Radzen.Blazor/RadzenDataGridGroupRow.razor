@@ -1,6 +1,9 @@
 @typeparam TItem
 @using System.Linq.Dynamic.Core
-<tr>
+@{
+    var rowArgs = Grid?.GroupRowAttributes(this);
+}
+<tr @attributes="@rowArgs.Item2">
     @if (Group.GroupDescriptor != null)
     {
         @for (var i = 0; i < GetLevel(); i++)
@@ -13,8 +16,8 @@
     }
     <td class="rz-col-icon">
         <span class="rz-column-title"></span>
-        <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandGroupItem(this))">
-            <span class="@(Grid.ExpandedGroupItemStyle(this))"></span>
+        <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandGroupItem(this, rowArgs.Item1.Expanded))">
+            <span class="@(Grid.ExpandedGroupItemStyle(this, rowArgs.Item1.Expanded))"></span>
         </a>
     </td>
     <td colspan="@(Columns.Count + Grid.groups.Count - 1 - Group.Level)">
@@ -32,7 +35,7 @@
 </tr>
 @if(Grid != null)
 {
-    if (Grid.IsGroupItemExpanded(this))
+    if (Grid.IsGroupItemExpanded(this) && rowArgs.Item1.Expanded != false)
     {
         @DrawDataRows()
     }

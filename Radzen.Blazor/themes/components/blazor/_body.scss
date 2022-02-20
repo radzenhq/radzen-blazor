@@ -3,3 +3,11 @@ $body-padding: 1rem !default;
 .body {
   padding: $body-padding;
 }
+
+.rz-body {
+  padding: $body-padding;
+  
+  .rz-layout & {
+    transform: translateZ(0);
+  }
+}

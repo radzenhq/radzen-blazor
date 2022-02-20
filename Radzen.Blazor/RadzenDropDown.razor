@@ -13,8 +13,8 @@
          @onkeydown="@((args) => OnKeyPress(args))" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" style="width:100%" aria-haspopup="listbox" readonly="" type="text" tabindex="-1"
-                   name="@Name" value="@(Value != null ? Value : "")"
-                   aria-label="@(!Multiple && Value != null ? PropertyAccess.GetItemOrValueFromProperty(Value, TextProperty) : "")" />
+                   name="@Name" value="@(internalValue != null ? internalValue : "")"
+                   aria-label="@(!Multiple && internalValue != null ? PropertyAccess.GetItemOrValueFromProperty(internalValue, TextProperty) : "")" />
         </div>
 
         @if (Template != null && selectedItem != null)
@@ -23,7 +23,7 @@
                 @Template(selectedItem)
             </label>
         }
-        else if (selectedItem != null)
+        else if (selectedItem != null && !Multiple)
         {
             <label class="rz-dropdown-label rz-inputtext ">
                 @PropertyAccess.GetItemOrValueFromProperty(selectedItem, TextProperty)

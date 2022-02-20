@@ -13,4 +13,23 @@ $sidebar-background-color: $charcoal-grey !default;
   bottom: 0;
   z-index: $sidebar-z;
   width: $sidebar-width;
+  opacity: 1;
+  transition: all .1s linear;
+}
+
+@media (max-width: 768px) { 
+  .rz-sidebar-responsive {
+    width: 0;
+    opacity: 0;
+  }
+}
+
+.rz-sidebar-expanded {
+  width: $sidebar-width;
+  opacity: 1;
+}
+
+.rz-sidebar-collapsed {
+  width: 0 !important;
+  opacity: 0;
 }

@@ -9,6 +9,10 @@ namespace Radzen.Blazor
     public interface ISchedulerView
     {
         /// <summary>
+        /// Gets the icon of the view. It is displayed in the view switching UI.
+        /// </summary>
+        string Icon { get; }
+        /// <summary>
         /// Gets the title of the view. It is displayed in the RadzenScheduler title area.
         /// </summary>
         /// <value>The title.</value>

@@ -63,15 +63,14 @@ namespace Radzen.Blazor
 
         internal int GetColSpan(bool isDataCell = false)
         {
-            if (!Grid.AllowCompositeDataCells && isDataCell) 
+            if (!Grid.AllowCompositeDataCells && isDataCell)
                 return 1;
 
-            var visibleChildColumns = Grid.childColumns.Where(c => c.Visible);
-            var directChildColumns = visibleChildColumns.Where(c => c.Parent == this);
+            var directChildColumns = Grid.childColumns.Where(c => c.Visible && c.Parent == this);
 
             if (Parent == null)
             {
-                return Columns == null ? 1 : visibleChildColumns.Count() - directChildColumns.Count() + 1;
+                return Columns == null ? 1 : directChildColumns.Sum(c => c.GetColSpan());
             }
 
             return Columns == null ? 1 : directChildColumns.Count();
@@ -79,7 +78,7 @@ namespace Radzen.Blazor
 
         internal int GetRowSpan(bool isDataCell = false)
         {
-            if (!Grid.AllowCompositeDataCells && isDataCell) 
+            if (!Grid.AllowCompositeDataCells && isDataCell)
                 return 1;
 
             if (Columns == null && Parent != null)
@@ -109,7 +108,7 @@ namespace Radzen.Blazor
                         _filterPropertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
                     }
                 }
-            
+
                 if (_filterPropertyType == null)
                 {
                     _filterPropertyType = Type;
@@ -126,6 +125,25 @@ namespace Radzen.Blazor
             }
         }
 
+        int? orderIndex;
+
+        /// <summary>
+        /// Gets or sets the order index.
+        /// </summary>
+        /// <value>The order index.</value>
+        [Parameter]
+        public int? OrderIndex { get; set; }
+
+        internal int? GetOrderIndex()
+        {
+            return orderIndex ?? OrderIndex;
+        }
+
+        internal void SetOrderIndex(int? value)
+        {
+            orderIndex = value;
+        }
+
         /// <summary>
         /// Gets or sets the sort order.
         /// </summary>
@@ -133,12 +151,31 @@ namespace Radzen.Blazor
         [Parameter]
         public SortOrder? SortOrder { get; set; }
 
+        bool _visible = true;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenDataGridColumn{TItem}"/> is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool Visible { get; set; } = true;
+        public bool Visible
+        {
+            get
+            {
+                if (Grid != null && Grid.selectedColumns != null && Pickable)
+                {
+                    return ((IEnumerable<object>)Grid.selectedColumns).Cast<RadzenDataGridColumn<TItem>>().Contains(this);
+                }
+
+                return _visible;
+            }
+            set
+            {
+                if (_visible != value)
+                {
+                    _visible = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the title.
@@ -195,6 +232,13 @@ namespace Radzen.Blazor
         /// <value>The width.</value>
         [Parameter]
         public string Width { get; set; }
+
+        /// <summary>
+        /// Gets or sets the min-width.
+        /// </summary>
+        /// <value>The min-width.</value>
+        [Parameter]
+        public string MinWidth { get; set; }
 
         /// <summary>
         /// Gets or sets the format string.
@@ -272,6 +316,13 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if groupable; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Groupable { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenDataGridColumn{TItem}"/> is pickable - listed when DataGrid AllowColumnPicking is set to true.
+        /// </summary>
+        /// <value><c>true</c> if pickable; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Pickable { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the text align.
@@ -392,10 +443,11 @@ namespace Radzen.Blazor
                 style.Add($"text-align:{Enum.GetName(typeof(TextAlign), TextAlign).ToLower()};");
             }
 
-            if (forCell && Frozen)
+            if (forCell && IsFrozen())
             {
-                var left = Grid.ColumnsCollection
-                    .TakeWhile((c, i) => Grid.ColumnsCollection.IndexOf(this) > i && c.Frozen)
+                var visibleColumns = Grid.ColumnsCollection.Where(c => c.Visible).ToList();
+                var left = visibleColumns
+                    .TakeWhile((c, i) => visibleColumns.IndexOf(this) > i && c.IsFrozen())
                     .Sum(c => {
                         var w = !string.IsNullOrEmpty(c.GetWidth()) ? c.GetWidth() : Grid.ColumnWidth;
                         var cw = 200;
@@ -409,12 +461,22 @@ namespace Radzen.Blazor
                 style.Add($"left:{left}px");
             }
 
-            if ((isHeaderOrFooterCell && Frozen || isHeaderOrFooterCell && !Frozen || !isHeaderOrFooterCell && Frozen) && Grid.ColumnsCollection.Where(c => c.Visible && c.Frozen).Any())
+            if ((isHeaderOrFooterCell && IsFrozen() || isHeaderOrFooterCell && !IsFrozen() || !isHeaderOrFooterCell && IsFrozen()) && Grid.ColumnsCollection.Where(c => c.Visible && c.IsFrozen()).Any())
             {
-                style.Add($"z-index:{(isHeaderOrFooterCell && Frozen ? 2 : 1)}");
+                style.Add($"z-index:{(isHeaderOrFooterCell && IsFrozen() ? 2 : 1)}");
+            }
+
+            if (!string.IsNullOrEmpty(MinWidth))
+            {
+                style.Add($"min-width:{MinWidth}");
             }
 
             return string.Join(";", style);
+        }
+
+        internal bool IsFrozen()
+        {
+            return Frozen && Parent == null && Columns == null;
         }
 
         /// <summary>
@@ -525,7 +587,7 @@ namespace Radzen.Blazor
             if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))
             {
                 filterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
-                
+
                 if (FilterTemplate != null)
                 {
                     FilterValue = filterValue;
@@ -542,7 +604,7 @@ namespace Radzen.Blazor
                     {
                         await Grid.Reload();
                     }
-                    
+
                     return;
                 }
             }
@@ -616,6 +678,20 @@ namespace Radzen.Blazor
             {
                 secondFilterValue = value;
             }
+        }
+
+        internal void ClearFilters()
+        {
+            SetFilterValue(null);
+            SetFilterValue(null, false);
+            SetFilterOperator(null);
+            SetSecondFilterOperator(null);
+
+            FilterValue = null;
+            SecondFilterValue = null;
+            FilterOperator = default(FilterOperator);
+            SecondFilterOperator = default(FilterOperator);
+            LogicalFilterOperator = default(LogicalFilterOperator);
         }
 
         /// <summary>

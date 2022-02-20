@@ -11,8 +11,10 @@
 <p>Use GroupHeaderTemplate to customize DataGrid group header rows.</p>
 
 <RadzenExample Name="DataGrid" Source="DataGridGroupHeaderTemplate" Heading="false">
+    <RadzenCheckBox @bind-Value=@groupsExpanded Name="CheckBox1" TValue="bool?" TriState="true" />
+    <RadzenLabel Text="All groups expanded" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 10px;" />
     <RadzenDataGrid @ref="ordersGrid"  AllowGrouping="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
-            Data="@orders" TItem="Order">
+            Data="@orders" TItem="Order" Render="@OnRender" GroupRowRender="OnGroupRowRender">
         <GroupHeaderTemplate>
             @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Group items count: @context.Data.Count, Last order date: @(context.Data.Items.Cast<Order>().OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)
         </GroupHeaderTemplate>
@@ -51,11 +53,26 @@
     </RadzenDataGrid>
 </RadzenExample>
 @code {
+    bool? groupsExpanded;
     IList<Order> orders;
     RadzenDataGrid<Order> ordersGrid;
 
     protected override void OnInitialized()
     {
         orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+
+    void OnRender(DataGridRenderEventArgs<Order> args)
+    {
+        if(args.FirstRender)
+        {
+            args.Grid.Groups.Add(new GroupDescriptor(){ Title = "Customer", Property = "Customer.CompanyName", SortOrder = SortOrder.Descending });
+            StateHasChanged();
+        }
+    }
+
+    void OnGroupRowRender(GroupRowRenderEventArgs args)
+    {
+       args.Expanded = groupsExpanded;
     }
 }

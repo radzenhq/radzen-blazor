@@ -119,6 +119,15 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Column Picker",
+                            New = true,
+                            Path = "datagrid-column-picker",
+                            Title = "Blazor DataGrid column picker",
+                            Tags = new [] { "datagrid", "column", "picker", "chooser" }
+                        },
+                        new Example
+                        {
+                            Updated = true,
                             Name = "Reorder",
                             Path = "datagrid-column-reorder",
                             Title = "Blazor DataGrid column reorder",
@@ -215,6 +224,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Updated = true,
                     Name = "Selection",
                     Icon = "&#xf0c5",
                     Children = new []
@@ -228,6 +238,7 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Updated = true,
                             Name = "Multiple selection",
                             Path = "datagrid-multiple-selection",
                             Title = "Blazor DataGrid Multiple selection",
@@ -297,12 +308,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Updated = true,
                     Name = "Grouping",
                     Icon = "&#xf1be",
                     Children = new []
                     {
                         new Example
                         {
+                            Updated = true,
                             Name = "Grouping API",
                             Path = "datagrid-grouping-api",
                             Title = "Blazor DataGrid pager position",
@@ -310,6 +323,7 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Updated = true,
                             Name = "Group Header Template",
                             Path = "datagrid-group-header-template",
                             Title = "Blazor DataGrid group header template",

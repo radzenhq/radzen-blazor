@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -17,6 +21,16 @@ namespace Radzen.Blazor
         public override string Style { get; set; } = DefaultStyle;
 
         /// <summary>
+        /// Toggles the responsive mode of the component. If set to <c>true</c> (the default) the component will be 
+        /// expanded on larger displays and collapsed on touch devices. Set to <c>false</c> if you want to disable this behavior.
+        /// Responsive mode is only available when RadzenSidebar is inside <see cref="RadzenLayout" />.
+        /// </summary>
+        [Parameter]
+        public bool Responsive { get; set; } = true;
+
+        private bool IsResponsive => Responsive && Layout != null;
+
+        /// <summary>
         /// The <see cref="RadzenLayout" /> this component is nested in.
         /// </summary>
         [CascadingParameter]
@@ -25,7 +39,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return Expanded ? "rz-sidebar rz-sidebar-expanded" : "rz-sidebar";
+            return ClassList.Create("rz-sidebar").Add("rz-sidebar-expanded", expanded == true)
+                                                 .Add("rz-sidebar-collapsed", expanded == false)
+                                                 .Add("rz-sidebar-responsive", IsResponsive)
+                                                 .ToString();
         }
 
         /// <summary>
@@ -33,7 +50,7 @@ namespace Radzen.Blazor
         /// </summary>
         public void Toggle()
         {
-            Expanded = !Expanded;
+            expanded = Expanded = !Expanded;
 
             StateHasChanged();
         }
@@ -49,6 +66,11 @@ namespace Radzen.Blazor
             if (Layout != null && !string.IsNullOrEmpty(style))
             {
                 style = style.Replace(DefaultStyle, "");
+            }
+
+            if (Layout != null)
+            {
+                return style;
             }
 
             return $"{style}{(Expanded ? ";transform:translateX(0px);" : ";width:0px;transform:translateX(-100%);")}";
@@ -67,5 +89,35 @@ namespace Radzen.Blazor
         /// <value>The expanded changed callback.</value>
         [Parameter]
         public EventCallback<bool> ExpandedChanged { get; set; }
+
+        bool? expanded;
+
+        /// <inheritdoc />
+        protected override void OnInitialized()
+        {
+            if (!Responsive)
+            {
+                expanded = Expanded;
+            }
+
+            base.OnInitialized();
+        }
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            if (parameters.DidParameterChange(nameof(Expanded), Expanded))
+            {
+                expanded = parameters.GetValueOrDefault<bool>(nameof(Expanded));
+            }
+
+            await base.SetParametersAsync(parameters);
+        }
+
+        async Task OnChange(bool matches)
+        {
+            expanded = !matches;
+            await ExpandedChanged.InvokeAsync(!matches);
+        }
     }
 }

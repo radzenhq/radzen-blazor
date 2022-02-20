@@ -2,7 +2,7 @@
 @if (RowIndex == Column.GetLevel())
 {
 <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex)) >
-    <div @onclick='@((args) => Grid.OnSort(args, Column))' style="width:100%">
+    <div @onclick='@((args) => Grid.OnSort(args, Column))' style="width:100%;outline:none;" tabindex="@SortingTabIndex" @onkeydown="OnSortKeyPressed">
         @if (Column.Parent == null && Column.Columns == null && (Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
         {
             <span id="@Grid.getColumnResizerId(ColumnIndex)" class="rz-column-drag" 
@@ -139,6 +139,8 @@ else
     [Parameter]
     public string CssClass { get; set; }
     
+	private int SortingTabIndex => Grid.AllowSorting && Column.Sortable ? 0 : -1;
+
     private string getFilterIconCss(RadzenDataGridColumn<TItem> column)
     {
         var additionalStyle = column.GetFilterValue() != null || column.GetSecondFilterValue() != null || 
@@ -146,4 +148,13 @@ else
                 ? "rz-grid-filter-active" : "";
         return $"rzi rz-grid-filter-icon {additionalStyle}";
     }
+
+	private void OnSortKeyPressed(KeyboardEventArgs args)
+	{
+		var key = args.Code ?? args.Key;
+		if (key == "Enter")
+		{
+			Grid.OnSort(args, Column);
+		}
+	}
 }

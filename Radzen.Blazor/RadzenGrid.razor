@@ -182,8 +182,9 @@
                                                             <label class="rz-cell-filter-label" style="height:35px">
                                                                 @if (column.Type == "string" && column.Format == "date-time")
                                                                 {
-                                                                    <i onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")"
-                                                                       class="rzi">date_range</i>
+                                                                    <button class="rz-button rz-button-md rz-button-icon-only btn-light" onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")">
+                                                                        <i class="rzi">date_range</i>
+                                                                    </button>
                                                                     @if (column.FilterValue != null)
                                                                     {
                                                                         <span class="rz-current-filter">@column.FilterValue</span>
@@ -239,7 +240,6 @@
                                                                 }
                                                                 else if (column.Type == "number")
                                                                 {
-                                                                    <i class="rzi">search</i>
                                                                     @(DrawNumericFilter(column))
                                                                 }
                                                                 else if (column.Type == "boolean")
@@ -248,8 +248,7 @@
                                                                 }
                                                                 else
                                                                 {
-                                                                    <i class="rzi">search</i>
-                                                                    <input id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.FilterValue" type="text" />
+                                                                    <input id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.FilterValue" type="text" class="rz-textbox" style="width: 100%;" />
                                                                 }
                                                             </label>
                                                         }

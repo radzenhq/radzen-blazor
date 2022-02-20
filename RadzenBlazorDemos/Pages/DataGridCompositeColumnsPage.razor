@@ -11,7 +11,7 @@
 <p>Use DataGrid column <code>Columns</code> property to define child columns.</p>
 
 <RadzenExample Name="DataGrid" Source="DataGridCompositeColumns" Heading="false">
-    <RadzenCheckBox @bind-Value=@allowCompositeDataCells Name="CheckBox1" TValue="bool" Change=@(args => OnChange()) />
+    <RadzenCheckBox @bind-Value=@allowCompositeDataCells Name="CheckBox1" TValue="bool" Change=@(args => grid.Reload()) />
     <RadzenLabel Text="Allow composite data cells" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 10px;" />
     <RadzenDataGrid @ref="grid" AllowCompositeDataCells="@allowCompositeDataCells" AllowSorting="true" AllowFiltering="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
         Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:400px">
@@ -56,10 +56,5 @@
     protected override void OnInitialized()
     {
         employees = dbContext.Employees;
-    }
-
-    void OnChange()
-    {
-        grid.Reload();
     }
 }

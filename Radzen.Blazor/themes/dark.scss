@@ -4,7 +4,7 @@
 $primary-color: $pinkish-orange !default;
 $secondary: $default-link !default;
 $tertiary: $cool-grey !default;
-$light: #e6ecef;
+$light: $cool-grey !default;
 $additional-1: $soft-green !default;
 $additional-2: $tip !default;
 $additional-3: $dev !default;
@@ -40,6 +40,46 @@ $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
 $default-background-color: $slate-grey !default;
 $navigation-border: 1px solid #435863 !default;
 // Components
+
+// Button
+$button-styles: () !default;
+$button-styles: map-merge(
+  (
+    primary: (
+      background-color: $primary,
+      color: $white
+    ),
+    light: (
+      background-color: $light,
+      color: $white
+    ),
+    secondary: (
+      background-color: $secondary,
+      color: $white
+    ),
+    info: (
+      background-color: $info,
+      color: $white
+    ),
+    warning: (
+      background-color: $warning,
+      color: $white
+    ),
+    error: (
+      background-color: $danger,
+      color: $white
+    ),
+    danger: (
+      background-color: $danger,
+      color: $white
+    ),
+    success: (
+      background-color: $success,
+      color: $white
+    )
+  ),
+  $button-styles
+);
 
 // Header
 $header-background-color: $default-background-color !default;
@@ -77,7 +117,7 @@ $panel-menu-item-2nd-level-hover-background-color: #e9eaec !default;
 $panel-menu-item-3rd-level-hover-background-color: #dddfe1 !default;
 $panel-menu-item-2nd-level-hover-color: $charcoal-grey !default;
 $panel-menu-item-3rd-level-hover-color: $charcoal-grey !default;
-$panel-menu-item-2nd-level-color: #000 !default
+$panel-menu-item-2nd-level-color: #000 !default;
 
 // Card
 $card-background-color: $default-background-color !default;
@@ -177,8 +217,8 @@ $grid-detail-template-border: none !default;
 $paginator-background-color: $default-background-color !default;
 $paginator-back-button-background-color: $cool-grey !default;
 $paginator-numeric-button-background-color: $cool-grey !default;
-$paginator-back-button-color: #515f65 !default;
-$paginator-numeric-button-color: #515f65 !default;
+$paginator-back-button-color: $body-color !default;
+$paginator-numeric-button-color: $body-color !default;
 $paginator-numeric-button-selected-background-color: $charcoal-grey !default;
 $paginator-numeric-button-selected-color: $body-color !default;
 $paginator-numeric-button-selected-border: 1px solid $charcoal-grey !default;

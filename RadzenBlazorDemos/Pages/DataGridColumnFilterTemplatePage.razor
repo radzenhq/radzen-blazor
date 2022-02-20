@@ -19,14 +19,14 @@
                 <RadzenDataGridColumn TItem="Employee" Title="Customer" Property="CompanyName" Type="typeof(IEnumerable<string>)" 
                         FilterValue="@selectedCompanyNames" FilterOperator="FilterOperator.Contains" LogicalFilterOperator="LogicalFilterOperator.Or">
                     <FilterTemplate>
-                        <RadzenDropDown @bind-Value=@selectedCompanyNames Style="width:100%; margin: 8px 4px;"
+                        <RadzenDropDown @bind-Value=@selectedCompanyNames Style="width:100%;"
                             Change=@OnSelectedCompanyNamesChange Data="@(companyNames)" AllowClear="true" Multiple="true" />
                     </FilterTemplate>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" 
                     FilterValue="@currentTOC">
                     <FilterTemplate>
-                        <RadzenDropDown @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%; margin: 8px 4px;"
+                        <RadzenDropDown @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%;"
                                         Change=@OnSelectedTOCChange
                                         Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy?>().Select(t => new { Text = $"{t}", Value = t == TitleOfCourtesy.All ? null : t }))" />
                     </FilterTemplate>

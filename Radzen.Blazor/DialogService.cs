@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,19 +37,36 @@ namespace Radzen
     /// </example>
     public class DialogService : IDisposable
     {
+        private DotNetObjectReference<DialogService> reference;
+        internal DotNetObjectReference<DialogService> Reference
+        {
+            get
+            {
+                if (reference == null)
+                {
+                    reference = DotNetObjectReference.Create(this);
+                }
+
+                return reference;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the URI helper.
         /// </summary>
         /// <value>The URI helper.</value>
         NavigationManager UriHelper { get; set; }
+        IJSRuntime JSRuntime { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DialogService"/> class.
         /// </summary>
         /// <param name="uriHelper">The URI helper.</param>
-        public DialogService(NavigationManager uriHelper)
+        /// <param name="jsRuntime">IJSRuntime instance.</param>
+        public DialogService(NavigationManager uriHelper, IJSRuntime jsRuntime)
         {
             UriHelper = uriHelper;
+            JSRuntime = jsRuntime;
 
             if (UriHelper != null)
             {
@@ -171,6 +189,7 @@ namespace Radzen
                 Width = options != null && !string.IsNullOrEmpty(options.Width) ? options.Width : "600px",
                 Left = options != null && !string.IsNullOrEmpty(options.Left) ? options.Left : "",
                 Top = options != null && !string.IsNullOrEmpty(options.Top) ? options.Top : "",
+                Bottom = options != null && !string.IsNullOrEmpty(options.Bottom) ? options.Bottom : "",
                 Height = options != null && !string.IsNullOrEmpty(options.Height) ? options.Height : "",
                 ShowTitle = options != null ? options.ShowTitle : true,
                 ShowClose = options != null ? options.ShowClose : true,
@@ -180,6 +199,7 @@ namespace Radzen
                 Style = options != null ? options.Style : "",
                 AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true,
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
+                CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
             });
         }
 
@@ -187,6 +207,7 @@ namespace Radzen
         /// Closes the last opened dialog with optional result.
         /// </summary>
         /// <param name="result">The result.</param>
+        [JSInvokable("DialogService.Close")]
         public void Close(dynamic result = null)
         {
             var dialog = dialogs.LastOrDefault();
@@ -218,53 +239,64 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="options">The options.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions options = null) => await OpenAsync(title, ds => {
-            RenderFragment content = b =>
-            {
-                var i = 0;
-                b.OpenElement(i++, "div");
-                b.OpenElement(i++, "p");
-                b.AddAttribute(i++, "style", "margin-bottom: 20px;");
-                b.AddContent(i++, message);
-                b.CloseElement();
-
-                b.OpenElement(i++, "div");
-                b.AddAttribute(i++, "class", "row");
-                b.OpenElement(i++, "div");
-                b.AddAttribute(i++, "class", "col-md-12");
-
-                b.OpenComponent<Blazor.RadzenButton>(i++);
-                b.AddAttribute(i++, "Text", options != null ? options.OkButtonText : "Ok");
-                b.AddAttribute(i++, "Style", "margin-bottom: 10px; width: 150px");
-                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(true)));
-                b.CloseComponent();
-
-                b.OpenComponent<Blazor.RadzenButton>(i++);
-                b.AddAttribute(i++, "Text", options != null ? options.CancelButtonText : "Cancel");
-                b.AddAttribute(i++, "ButtonStyle", ButtonStyle.Secondary);
-                b.AddAttribute(i++, "Style", "margin-bottom: 10px; margin-left: 10px; width: 150px");
-                b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(false)));
-                b.CloseComponent();
-                
-                b.CloseElement();
-                b.CloseElement();
-                b.CloseElement();
-            };
-            return content;
-        }, new DialogOptions() 
+        public async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions options = null)
         {
-            Width = options != null ? !string.IsNullOrEmpty(options.Width) ? options.Width : "355px" : "355px",
-            Height = options != null ? options.Height : null,
-            Left = options != null ? options.Left : null,
-            Top = options != null ? options.Top : null,
-            Bottom = options != null ? options.Bottom : null,
-            ChildContent = options != null ? options.ChildContent : null,
-            ShowTitle = options != null ? options.ShowTitle : true,
-            ShowClose = options != null ? options.ShowClose : true,
-            Resizable = options != null ? options.Resizable : false,
-            Draggable = options != null ? options.Draggable : false,
-            Style = options != null ? options.Style : "",
-        });
+            var dialogOptions = new DialogOptions()
+            {
+                Width = options != null ? !string.IsNullOrEmpty(options.Width) ? options.Width : "355px" : "355px",
+                Height = options != null ? options.Height : null,
+                Left = options != null ? options.Left : null,
+                Top = options != null ? options.Top : null,
+                Bottom = options != null ? options.Bottom : null,
+                ChildContent = options != null ? options.ChildContent : null,
+                ShowTitle = options != null ? options.ShowTitle : true,
+                ShowClose = options != null ? options.ShowClose : true,
+                Resizable = options != null ? options.Resizable : false,
+                Draggable = options != null ? options.Draggable : false,
+                Style = options != null ? options.Style : "",
+                AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true,
+                CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
+                CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
+            };
+
+            await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Reference);
+
+            return await OpenAsync(title, ds =>
+            {
+                RenderFragment content = b =>
+                {
+                    var i = 0;
+                    b.OpenElement(i++, "div");
+                    b.OpenElement(i++, "p");
+                    b.AddAttribute(i++, "style", "margin-bottom: 20px;");
+                    b.AddContent(i++, message);
+                    b.CloseElement();
+
+                    b.OpenElement(i++, "div");
+                    b.AddAttribute(i++, "class", "row");
+                    b.OpenElement(i++, "div");
+                    b.AddAttribute(i++, "class", "col-md-12");
+
+                    b.OpenComponent<Blazor.RadzenButton>(i++);
+                    b.AddAttribute(i++, "Text", options != null ? options.OkButtonText : "Ok");
+                    b.AddAttribute(i++, "Style", "margin-bottom: 10px; width: 150px");
+                    b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(true)));
+                    b.CloseComponent();
+
+                    b.OpenComponent<Blazor.RadzenButton>(i++);
+                    b.AddAttribute(i++, "Text", options != null ? options.CancelButtonText : "Cancel");
+                    b.AddAttribute(i++, "ButtonStyle", ButtonStyle.Secondary);
+                    b.AddAttribute(i++, "Style", "margin-bottom: 10px; margin-left: 10px; width: 150px");
+                    b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(false)));
+                    b.CloseComponent();
+
+                    b.CloseElement();
+                    b.CloseElement();
+                    b.CloseElement();
+                };
+                return content;
+            }, dialogOptions);
+        }
     }
 
     /// <summary>
@@ -339,6 +371,12 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
         public bool CloseDialogOnOverlayClick { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the dialog should be closed on ESC key press.
+        /// </summary>
+        /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
+        public bool CloseDialogOnEsc { get; set; } = true;
     }
 
     /// <summary>

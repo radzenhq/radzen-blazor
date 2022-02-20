@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
@@ -115,6 +116,37 @@ namespace Radzen.Blazor
         /// <value>The error callback.</value>
         [Parameter]
         public EventCallback<UploadErrorEventArgs> Error { get; set; }
+
+        /// <summary>
+        /// Gets or sets the image click callback.
+        /// </summary>
+        /// <value>The image click callback.</value>
+        [Parameter]
+        public EventCallback<MouseEventArgs> ImageClick { get; set; }
+
+        bool clicking;
+        /// <summary>
+        /// Handles the <see cref="E:ImageClick" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
+        public async Task OnImageClick(MouseEventArgs args)
+        {
+            if (clicking)
+            {
+                return;
+            }
+
+            try
+            {
+                clicking = true;
+
+                await ImageClick.InvokeAsync(args);
+            }
+            finally
+            {
+                clicking = false;
+            }
+        }
 
         async System.Threading.Tasks.Task Remove(EventArgs args)
         {

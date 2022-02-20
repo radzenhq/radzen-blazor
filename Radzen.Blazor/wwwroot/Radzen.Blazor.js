@@ -843,7 +843,8 @@ window.Radzen = {
         }
     }
   },
-  openDialog: function (options) {
+  openDialog: function (options, dialogService) {
+    Radzen.dialogService = dialogService;
     if (
       document.documentElement.scrollHeight >
       document.documentElement.clientHeight
@@ -866,9 +867,32 @@ window.Radzen = {
             }
         }, 500);
     }
+    if (options.closeDialogOnEsc) {
+        document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+        document.addEventListener('keydown', Radzen.closePopupOrDialog);
+    }
   },
   closeDialog: function () {
     document.body.classList.remove('no-scroll');
+  },
+  closePopupOrDialog: function (e) {
+      e = e || window.event;
+      var isEscape = false;
+      if ("key" in e) {
+          isEscape = (e.key === "Escape" || e.key === "Esc");
+      } else {
+          isEscape = (e.keyCode === 27);
+      }
+      if (isEscape && Radzen.dialogService) {
+          var popups = document.querySelectorAll('.rz-popup,.rz-overlaypanel');
+          for (var i = 0; i < popups.length; i++) {
+              if (popups[i].style.display != 'none') {
+                  return;
+              }
+          }
+
+          Radzen.dialogService.invokeMethodAsync('DialogService.Close', null);
+      }
   },
   getInputValue: function (arg) {
     var input =
@@ -1070,6 +1094,26 @@ window.Radzen = {
       undo: document.queryCommandEnabled('undo'),
       redo: document.queryCommandEnabled('redo')
     };
+  },
+  mediaQueries: {},
+  mediaQuery: function(query, instance) {
+    if (instance) {
+      function callback(event) {
+          instance.invokeMethodAsync('OnChange', event.matches)
+      };
+      var query = matchMedia(query);
+      this.mediaQueries[instance._id] = function() {
+          query.removeListener(callback);
+      }
+      query.addListener(callback);
+      return query.matches;
+    } else {
+        instance = query;
+        if (this.mediaQueries[instance._id]) {
+            this.mediaQueries[instance._id]();
+            delete this.mediaQueries[instance._id];
+        }
+    }
   },
   createEditor: function (ref, uploadUrl, paste, instance) {
     ref.inputListener = function () {

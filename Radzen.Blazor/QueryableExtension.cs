@@ -395,11 +395,11 @@ namespace Radzen
                 }
                 else if (columnFilterOperator == FilterOperator.IsNull)
                 {
-                    return $@"({property} == null ? """" : {property}) == null";
+                    return $@"np({property}) == null";
                 }
                 else if (columnFilterOperator == FilterOperator.IsNotNull)
                 {
-                    return $@"({property} == null ? """" : {property}) != null";
+                    return $@"np({property}) != null";
                 }
             }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))

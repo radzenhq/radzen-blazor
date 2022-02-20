@@ -609,7 +609,7 @@ $grid-foot-cell-color: $rz-base-900 !default;
 $grid-foot-background-color: $rz-base-200 !default;
 
 $grid-filter-background-color: $rz-base-100 !default;
-$grid-filter-padding: 0 0.5rem !default;
+$grid-filter-padding: 0.5rem !default;
 $grid-filter-margin: -0.5rem 0 !default;
 $grid-filter-border: none !default;
 $grid-filter-font-size: 0.875rem !default;
@@ -627,6 +627,7 @@ $grid-filter-buttons-background-color: $rz-white !default;
 $grid-clear-filter-button-background-color: $rz-base-200 !default;
 $grid-clear-filter-button-color: $rz-base-800 !default;
 $grid-apply-filter-button-background-color: $rz-primary !default;
+$grid-apply-filter-button-color: $rz-white !default;
 
 $grid-header-filter-icon-margin: 0.25rem 0.5rem 0 0 !default;
 $grid-header-filter-icon-hover-color: $rz-base-900 !default;
@@ -669,7 +670,8 @@ $grid-state-transition: $rz-transition-all !default;
 
 $grid-group-header-padding: 0.5rem !default;
 $grid-group-header-item-padding: 0.5rem !default;
-$grid-group-header-item-margin: 0 0.5rem 0 0 !default;
+$grid-group-header-item-margin: 0 0.5rem 0.5rem 0 !default;
+$grid-group-header-items-margin: 0 0 -0.5rem 0 !default;
 
 $column-drag-handle-color: $rz-base-400 !default;
 
@@ -781,11 +783,12 @@ $paginator-padding: 0.5rem !default;
 $paginator-numeric-button-background-color: $rz-base-200 !default;
 $paginator-numeric-button-color: $rz-base-800 !default;
 $paginator-numeric-button-margin: 0 0.125rem !default;
-$paginator-numeric-button-padding: 0.5rem 1rem !default;
+$paginator-numeric-button-padding: 0.5rem !default;
 $paginator-numeric-button-selected-background-color: $rz-primary-lighter !default;
 $paginator-numeric-button-selected-color: $rz-primary !default;
 $paginator-numeric-button-selected-border: none !default;
 $paginator-numeric-button-selected-padding: $paginator-numeric-button-padding !default;
+$paginator-numeric-button-min-width: 2.25rem !default;
 
 $paginator-back-button-background-color: $rz-base-200 !default;
 $paginator-back-button-color: $rz-base-800 !default;

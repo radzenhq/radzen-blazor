@@ -17,25 +17,44 @@
     var visibleColumns = columns.Where(c => c.Visible).ToList();
 
     <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()">
-        @if(AllowGrouping)
+        @if(AllowGrouping || AllowColumnPicking)
         {
             <div class="rz-group-header" @onmouseup=@(args => EndColumnDropToGroup())>
-            @if(groups.Any())
-            {
-                @foreach(var gd in groups)
+                @if(AllowGrouping)
                 {
-                    <div class="rz-group-header-item">
-                        <span class="rz-group-header-item-title">@gd.GetTitle()</span>
-                        <a href="javascript:void(0)" @onclick=@(args => { groups.Remove(gd); _groupedPagedView = null; }) role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
-                            <span class="rzi rzi-times"></span>
-                        </a>
+                    @if(groups.Any())
+                    {
+                        <div class="rz-group-header-items">
+                        @foreach(var gd in groups)
+                        {
+                            <div class="rz-group-header-item">
+                                <span class="rz-group-header-item-title">@gd.GetTitle()</span>
+                                <a href="javascript:void(0)" @onclick=@(args => { groups.Remove(gd); _groupedPagedView = null; }) role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                                    <span class="rzi rzi-times"></span>
+                                </a>
+                            </div>
+                        }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="rz-group-header-drop">@GroupPanelText</div>
+                    }
+                }
+
+                @if(AllowColumnPicking)
+                {
+                    <div class="rz-column-picker">
+                        <RadzenDropDown SelectAllText="All"
+                                        MaxSelectedLabels="2" 
+                                        SelectedItemsText="@ColumnsShowingText" Change=@(args => StateHasChanged())
+                                        @bind-Value="@selectedColumns" 
+                                        Multiple="true" 
+                                        Placeholder="Columns" 
+                                        Data="allPickableColumns" 
+                                        TextProperty="Title" />
                     </div>
                 }
-            }
-            else
-            {
-                <div class="rz-group-header-drop">@GroupPanelText</div>
-            }
             </div>
         }
 
@@ -128,11 +147,13 @@
                                                 <label class="rz-cell-filter-label" style="height:35px" onclick="event.preventDefault()">
                                                     @if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?) || column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
                                                     {
-                                                        <i onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")"
-                                                           class="rzi">date_range</i>
-                                                        @if (column.GetFilterValue() != null)
+                                                        <button class="rz-button rz-button-md rz-button-icon-only btn-light" onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")">
+                                                            <i class="rzi">date_range</i>
+                                                        </button>
+                                                        var filterValue = column.GetFilterValue();
+                                                        @if (filterValue != null)
                                                         {
-                                                            <span class="rz-current-filter">@column.GetFilterValue()</span>
+                                                            <span class="rz-current-filter">@string.Format("{0:" + getFilterDateFormat(column) + "}", filterValue)</span>
                                                             <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear">close</i>
                                                         }
                                                         <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel"
@@ -191,7 +212,6 @@
                                                     }
                                                     else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
                                                     {
-                                                        <i class="rzi">search</i>
                                                         @(DrawNumericFilter(column))
                                                     }
                                                     else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
@@ -202,8 +222,7 @@
                                                     }
                                                     else
                                                     {
-                                                        <i class="rzi">search</i>
-                                                        <input id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" />
+                                                        <input id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" class="rz-textbox" style="width: 100%;" />
                                                     }
                                                 </label>
                                             }
