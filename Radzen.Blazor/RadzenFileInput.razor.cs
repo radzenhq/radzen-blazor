@@ -87,7 +87,7 @@ namespace Radzen.Blazor
 
             try
             {
-                uploadValue = await JSRuntime.InvokeAsync<string>("Radzen.readFileAsBase64", fileUpload, MaxFileSize);
+                uploadValue = await JSRuntime.InvokeAsync<string>("Radzen.readFileAsBase64", fileUpload, MaxFileSize, MaxWidth, MaxHeight);
 
                 if (typeof(TValue) == typeof(byte[]))
                 {
@@ -172,6 +172,20 @@ namespace Radzen.Blazor
         /// <value>The maximum size of the file.</value>
         [Parameter]
         public int MaxFileSize { get; set; } = 5 * 1024 * 1024;
+
+        /// <summary>
+        /// Gets or sets the maximum width of the file, keeping aspect ratio.
+        /// </summary>
+        /// <value>The maximum width of the file.</value>
+        [Parameter]
+        public int MaxWidth { get; set; } = 0;
+
+        /// <summary>
+        /// Gets or sets the maximum height of the file, keeping aspect ratio.
+        /// </summary>
+        /// <value>The maximum height of the file.</value>
+        [Parameter]
+        public int MaxHeight { get; set; } = 0;
 
         /// <summary>
         /// Gets or sets the image style.
