@@ -285,6 +285,7 @@ namespace Radzen.Blazor
             var innerStartY = innerStart.Y.ToInvariantString();
             var innerEndX = innerEnd.X.ToInvariantString();
             var innerEndY = innerEnd.Y.ToInvariantString();
+            var innerR = innerRadius.ToInvariantString();
 
             if (Math.Abs(end.X - start.X) < 0.01 && Math.Abs(end.Y - start.Y) < 0.01)
             {
@@ -294,7 +295,7 @@ namespace Radzen.Blazor
                 innerEndX = (innerEnd.X - 0.01).ToInvariantString();
             }
 
-            return $"M {startX} {startY} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {innerEndX} {innerEndY} A {innerRadius} {innerRadius} 0 {largeArcFlag} 0 {innerStartX} {innerStartY}";
+            return $"M {startX} {startY} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {innerEndX} {innerEndY} A {innerR} {innerR} 0 {largeArcFlag} 0 {innerStartX} {innerStartY}";
         }
     }
 }

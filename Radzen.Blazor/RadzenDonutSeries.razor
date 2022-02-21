@@ -23,7 +23,7 @@
         var width = innerRadius * 2;
         var height = innerRadius * 2;
 
-      return @<div style="position: absolute;left: @(left)px;top: @(top)px;width: @(width)px; height: @(height)px;">
+      return @<div style="position: absolute;left: @(left)px;top: @(top)px;width: @(width.ToInvariantString())px; height: @(height.ToInvariantString())px;">
                 @TitleTemplate
             </div>;
       }
