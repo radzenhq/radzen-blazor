@@ -13,7 +13,7 @@
 <RadzenExample Name="DataGrid" Source="DataGridColumnResizing" Heading="false">
     <RadzenDataGrid Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnPicking="true">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" Frozen="true" />
+            <RadzenDataGridColumn Visible="false" TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" Frozen="true" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Width="200px" Pickable="false">
                 <Template Context="data">
                     <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />

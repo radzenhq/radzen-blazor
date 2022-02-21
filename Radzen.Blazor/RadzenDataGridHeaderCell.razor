@@ -114,10 +114,10 @@
 }
 else
 {
-    @foreach(var column in Grid.childColumns.Where(c => c.Visible && c.Parent == Column))
+    @foreach(var column in Grid.childColumns.Where(c => c.GetVisible() && c.Parent == Column))
     {
         <RadzenDataGridHeaderCell RowIndex="@RowIndex" Grid="@Grid" Column="@column" ColumnIndex="@ColumnIndex" 
-            CssClass="@($"rz-unselectable-text {(Grid.AllowSorting && column.Sortable ? "rz-sortable-column" : "")} {column.HeaderCssClass} {Grid.getFrozenColumnClass(column, Grid.ColumnsCollection.Where(c => c.Visible).ToList())} {(column.Columns != null || column.Parent != null ? "rz-composite-cell" : "")}".Trim())" />
+            CssClass="@($"rz-unselectable-text {(Grid.AllowSorting && column.Sortable ? "rz-sortable-column" : "")} {column.HeaderCssClass} {Grid.getFrozenColumnClass(column, Grid.ColumnsCollection.Where(c => c.GetVisible()).ToList())} {(column.Columns != null || column.Parent != null ? "rz-composite-cell" : "")}".Trim())" />
     }
 }
 @code {

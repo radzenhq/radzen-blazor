@@ -14,7 +14,7 @@
 
 @if (Visible)
 {
-    var visibleColumns = columns.Where(c => c.Visible).ToList();
+    var visibleColumns = columns.Where(c => c.GetVisible()).ToList();
 
     <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()">
         @if(AllowGrouping || AllowColumnPicking)
@@ -47,7 +47,7 @@
                     <div class="rz-column-picker">
                         <RadzenDropDown SelectAllText="All"
                                         MaxSelectedLabels="2" 
-                                        SelectedItemsText="@ColumnsShowingText" Change=@(args => StateHasChanged())
+                                        SelectedItemsText="@ColumnsShowingText" Change=@ToggleColumns
                                         @bind-Value="@selectedColumns" 
                                         Multiple="true" 
                                         Placeholder="Columns" 

@@ -12,10 +12,10 @@
 }
 else
 {
-    @foreach(var column in Grid.childColumns.Where(c => c.Visible && c.Parent == Column))
+    @foreach(var column in Grid.childColumns.Where(c => c.GetVisible() && c.Parent == Column))
     {
         <RadzenDataGridFooterCell RowIndex="@RowIndex" Grid="@Grid" Column="@column" 
-                                CssClass="@($"{Column.FooterCssClass} {Grid.getFrozenColumnClass(column, Grid.ColumnsCollection.Where(c => c.Visible).ToList())} {(column.Columns != null || column.Parent != null ? "rz-composite-cell" : "")}")" 
+                                CssClass="@($"{Column.FooterCssClass} {Grid.getFrozenColumnClass(column, Grid.ColumnsCollection.Where(c => c.GetVisible()).ToList())} {(column.Columns != null || column.Parent != null ? "rz-composite-cell" : "")}")" 
                                 Attributes="@(Attributes)" />
     }
 }
