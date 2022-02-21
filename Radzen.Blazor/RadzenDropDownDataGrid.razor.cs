@@ -498,13 +498,25 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AllowFilteringByAllStringColumns { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether DataGrid row can be selected on row click.
+        /// </summary>
+        /// <value><c>true</c> if DataGrid row can be selected on row click; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowRowSelectOnRowClick { get; set; } = true;
+
         async Task OnRowSelect(object item)
         {
             if (!Disabled && !Multiple)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
-            await SelectItem(item);
+
+            if (AllowRowSelectOnRowClick)
+            {
+                await SelectItem(item);
+            }
+            
         }
 
         /// <inheritdoc />
