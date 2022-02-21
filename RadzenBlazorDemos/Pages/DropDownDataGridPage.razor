@@ -6,8 +6,6 @@
 @inject NorthwindContext dbContext
 
 <RadzenExample Name="DropDownDataGrid">
-    <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" />
-    <RadzenLabel Text="Allow row select on row click" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 10px;" />
     <div class="row px-3">
         <div class="col-md-6 col-lg-4 col-xl-3 p-3">
             <RadzenCard>
@@ -51,7 +49,9 @@
         </div>
         <div class="col-md-6 col-lg-4 col-xl-3 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Multiple selection</h4>
+                <h4 class="mb-4" style="float:left;">Multiple selection</h4>
+                <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" Style="margin-left:20px" />
+                <RadzenLabel Text="Row select on row click" Component="CheckBox1" />
                 <RadzenDropDownDataGrid @ref="grid" AllowRowSelectOnRowClick="@allowRowSelectOnRowClick" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value=@multipleValues
                                         Multiple="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
                                         Change=@(args => OnChange(args, "DropDownDataGrid with multiple selection")) Class="w-100">
