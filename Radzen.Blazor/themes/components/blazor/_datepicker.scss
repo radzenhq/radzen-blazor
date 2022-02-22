@@ -50,6 +50,10 @@ $timepicker-border: none !default;
   display: inline-block;
   position: relative;
 
+  .rz-readonly {
+      cursor: pointer;
+  }
+
   .rz-inputtext {
     @extend %input;
     width: 100%;
