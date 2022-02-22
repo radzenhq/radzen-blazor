@@ -16,7 +16,7 @@
             <span class="@($"rz-calendar rz-calendar-w-btn{(Disabled ? " rz-state-disabled" : "")}")" style="width:100%">
                 <input @ref="@input" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@TabIndex"
                        @onchange="@ParseDate" autocomplete="off" type="text" name="@Name"
-                       class="rz-inputtext @InputClass" id="@Name" placeholder="@Placeholder" onclick="@getOpenPopupForInput()"/>
+                       class="rz-inputtext @InputClass @(IsReadonly ? "rz-readonly" : "")" id="@Name" placeholder="@Placeholder" onclick="@getOpenPopupForInput()"/>
                 <button onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
                     <span aria-hidden="true" class="rz-button-icon-left  rzi rzi-calendar"></span><span class="rz-button-text"></span>
                 </button>
