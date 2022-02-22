@@ -3,7 +3,15 @@
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
  <button title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) class="rz-filter-button rz-button rz-button-md rz-button-icon-only btn-light" onclick="@($"Radzen.togglePopup(this.parentNode, '{Grid.PopupID}{Column.GetFilterProperty()}')")">
-     <i class="rzi">filter_alt</i>@Column.GetFilterOperatorSymbol(Column.GetFilterOperator())
+     <i class="rzi">filter_alt</i>
+    @if (Column.GetFilterOperator() == FilterOperator.DoesNotContain)
+    {
+        <s>@Column.GetFilterOperatorSymbol(Column.GetFilterOperator())</s>
+    }
+    else
+    {
+        @Column.GetFilterOperatorSymbol(Column.GetFilterOperator())
+    }
 </button>
 <div id="@($"{Grid.PopupID}{Column.GetFilterProperty()}")" class="rz-overlaypanel"
         style="display:none;" tabindex="0">
