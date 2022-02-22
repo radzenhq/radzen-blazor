@@ -870,6 +870,11 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 }
 
 .rz-filter-menu-symbol {
-    width: 30px;
+    width: 1.75rem;
     display: inline-block;
+}
+
+.rz-filter-button {
+    margin-right: 10px;
+    width: 3.5rem;
 }

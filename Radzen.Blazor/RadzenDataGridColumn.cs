@@ -772,28 +772,29 @@ namespace Radzen.Blazor
 
         internal string GetFilterOperatorSymbol(FilterOperator filterOperator)
         {
+            var symbol = Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? "a" : "A";
             switch (filterOperator)
             {
                 case FilterOperator.Contains:
-                    return "...";
+                    return $"*{symbol}*";
                 case FilterOperator.DoesNotContain:
-                    return "<>";
+                    return $"*{symbol}*";
                 case FilterOperator.StartsWith:
-                    return "_..";
+                    return $"{symbol}**";
                 case FilterOperator.EndsWith:
-                    return ".._";
+                    return $"**{symbol}";
                 case FilterOperator.Equals:
-                    return "==";
+                    return "=";
                 case FilterOperator.GreaterThan:
                     return ">";
                 case FilterOperator.GreaterThanOrEquals:
-                    return ">=";
+                    return "≥";
                 case FilterOperator.LessThan:
                     return "<";
                 case FilterOperator.LessThanOrEquals:
-                    return "<=";
+                    return "≤";
                 case FilterOperator.NotEquals:
-                    return "!=";
+                    return "≠";
                 case FilterOperator.IsNull:
                     return "∅";
                 case FilterOperator.IsNotNull:

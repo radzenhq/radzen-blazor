@@ -2,8 +2,8 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
- <button title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) style="margin-right:10px;width:40px;" class="rz-button rz-button-md rz-button-icon-only btn-light" onclick="@($"Radzen.togglePopup(this.parentNode, '{Grid.PopupID}{Column.GetFilterProperty()}')")">
-    @Column.GetFilterOperatorSymbol(Column.GetFilterOperator())
+ <button title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) class="rz-filter-button rz-button rz-button-md rz-button-icon-only btn-light" onclick="@($"Radzen.togglePopup(this.parentNode, '{Grid.PopupID}{Column.GetFilterProperty()}')")">
+     <i class="rzi">filter_alt</i>@Column.GetFilterOperatorSymbol(Column.GetFilterOperator())
 </button>
 <div id="@($"{Grid.PopupID}{Column.GetFilterProperty()}")" class="rz-overlaypanel"
         style="display:none;" tabindex="0">
@@ -15,7 +15,7 @@
                 <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.Contains)</span><span>@Grid.ContainsText</span>
             </li>
             <li class="@(FilterOperatorStyle(Column, FilterOperator.DoesNotContain))" @onclick="@(args => ApplyFilter(FilterOperator.DoesNotContain))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.DoesNotContain)</span><span>@Grid.DoesNotContainText</span>
+                <span class="rz-filter-menu-symbol"><s>@Column.GetFilterOperatorSymbol(FilterOperator.DoesNotContain)</s></span><span>@Grid.DoesNotContainText</span>
             </li>
             <li class="@(FilterOperatorStyle(Column, FilterOperator.StartsWith))" @onclick="@(args => ApplyFilter(FilterOperator.StartsWith))" style="display: block;">
                 <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.StartsWith)</span><span>@Grid.StartsWithText</span>
@@ -61,8 +61,8 @@
     protected string FilterOperatorStyle(RadzenDataGridColumn<TItem> column, FilterOperator value)
     {
         return column.GetFilterOperator() == value ?
-            "rz-listbox-item  rz-state-highlight" :
-            "rz-listbox-item ";
+            "rz-multiselect-item rz-state-highlight" :
+            "rz-multiselect-item";
     }
 
     protected async Task ApplyFilter(FilterOperator value)
