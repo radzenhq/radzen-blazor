@@ -1,0 +1,74 @@
+@typeparam TItem
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+ <button title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) style="margin-right:10px;width:40px;" class="rz-button rz-button-md rz-button-icon-only btn-light" onclick="@($"Radzen.togglePopup(this.parentNode, '{Grid.PopupID}{Column.GetFilterProperty()}')")">
+    @Column.GetFilterOperatorSymbol(Column.GetFilterOperator())
+</button>
+<div id="@($"{Grid.PopupID}{Column.GetFilterProperty()}")" class="rz-overlaypanel"
+        style="display:none;" tabindex="0">
+    <div class="rz-overlaypanel-content">
+        <ul class="rz-listbox-list" style="margin:5px">
+            @if (Column.FilterPropertyType == typeof(string))
+            {
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.Contains))" @onclick="@(args => ApplyFilter(FilterOperator.Contains))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.Contains)</span><span>@Grid.ContainsText</span>
+            </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.DoesNotContain))" @onclick="@(args => ApplyFilter(FilterOperator.DoesNotContain))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.DoesNotContain)</span><span>@Grid.DoesNotContainText</span>
+            </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.StartsWith))" @onclick="@(args => ApplyFilter(FilterOperator.StartsWith))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.StartsWith)</span><span>@Grid.StartsWithText</span>
+            </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.EndsWith))" @onclick="@(args => ApplyFilter(FilterOperator.EndsWith))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.EndsWith)</span><span>@Grid.EndsWithText</span>
+            </li>
+            }
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.Equals))" @onclick="@(args => ApplyFilter(FilterOperator.Equals))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.Equals)</span><span>@Grid.EqualsText</span>
+            </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.NotEquals))" @onclick="@(args => ApplyFilter(FilterOperator.NotEquals))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.NotEquals)</span><span>@Grid.NotEqualsText</span>
+            </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.LessThan))" @onclick="@(args => ApplyFilter(FilterOperator.LessThan))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.LessThan)</span><span>@Grid.LessThanText</span>
+            </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.LessThanOrEquals))" @onclick="@(args => ApplyFilter(FilterOperator.LessThanOrEquals))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.LessThanOrEquals)</span><span>@Grid.LessThanOrEqualsText</span>
+            </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.GreaterThan))" @onclick="@(args => ApplyFilter(FilterOperator.GreaterThan))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.GreaterThan)</span><span>@Grid.GreaterThanText</span>
+            </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.GreaterThanOrEquals))" @onclick="@(args => ApplyFilter(FilterOperator.GreaterThanOrEquals))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.GreaterThanOrEquals)</span><span>@Grid.GreaterThanOrEqualsText</span>
+            </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNull))" @onclick="@(args => ApplyFilter(FilterOperator.IsNull))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNull)</span><span>@Grid.IsNullText</span>
+            </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNotNull))" @onclick="@(args => ApplyFilter(FilterOperator.IsNotNull))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotNull)</span><span>@Grid.IsNotNullText</span>
+            </li>
+        </ul>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public RadzenDataGridColumn<TItem> Column { get; set; }
+
+    [Parameter]
+    public RadzenDataGrid<TItem> Grid { get; set; }
+
+    protected string FilterOperatorStyle(RadzenDataGridColumn<TItem> column, FilterOperator value)
+    {
+        return column.GetFilterOperator() == value ?
+            "rz-listbox-item  rz-state-highlight" :
+            "rz-listbox-item ";
+    }
+
+    protected async Task ApplyFilter(FilterOperator value)
+    {
+        Column.SetFilterOperator(value);
+        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{Column.GetFilterProperty()}");
+        await Grid.Reload();
+    }
+}
