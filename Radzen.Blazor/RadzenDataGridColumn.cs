@@ -770,6 +770,40 @@ namespace Radzen.Blazor
             }
         }
 
+        internal string GetFilterOperatorSymbol(FilterOperator filterOperator)
+        {
+            var symbol = Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? "a" : "A";
+            switch (filterOperator)
+            {
+                case FilterOperator.Contains:
+                    return $"*{symbol}*";
+                case FilterOperator.DoesNotContain:
+                    return $"*{symbol}*";
+                case FilterOperator.StartsWith:
+                    return $"{symbol}**";
+                case FilterOperator.EndsWith:
+                    return $"**{symbol}";
+                case FilterOperator.Equals:
+                    return "=";
+                case FilterOperator.GreaterThan:
+                    return ">";
+                case FilterOperator.GreaterThanOrEquals:
+                    return "≥";
+                case FilterOperator.LessThan:
+                    return "<";
+                case FilterOperator.LessThanOrEquals:
+                    return "≤";
+                case FilterOperator.NotEquals:
+                    return "≠";
+                case FilterOperator.IsNull:
+                    return "∅";
+                case FilterOperator.IsNotNull:
+                    return "!∅";
+                default:
+                    return $"{filterOperator}";
+            }
+        }
+
         /// <summary>
         /// Disposes this instance.
         /// </summary>

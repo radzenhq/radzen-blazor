@@ -807,6 +807,11 @@ namespace Radzen.Blazor
             return !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
         }
 
+        private string getOpenPopupForInput()
+        {
+            return !Disabled && !ReadOnly && !Inline && !AllowInput ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
+        }
+
         /// <summary>
         /// Gets or sets the edit context.
         /// </summary>

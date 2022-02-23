@@ -437,7 +437,8 @@ namespace Radzen.Blazor
 
                 if (FilterMode == FilterMode.Advanced)
                 {
-                    builder.AddAttribute(4, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, args => {
+                    builder.AddAttribute(4, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, args =>
+                    {
                         var value = $"{args.Value}";
                         column.SetFilterValue(!string.IsNullOrWhiteSpace(value) ? Convert.ChangeType(value, Nullable.GetUnderlyingType(type)) : null, isFirst);
                     }));

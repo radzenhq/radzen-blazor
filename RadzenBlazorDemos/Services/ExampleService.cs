@@ -179,6 +179,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            New = true,
+                            Name = "Simple with menu",
+                            Path = "datagrid-simple-filter-menu",
+                            Title = "Blazor DataGrid Simple filter mode with menu",
+                            Tags = new [] { "filter", "simple", "grid", "datagrid", "table", "menu" }
+                        },
+                        new Example
+                        {
                             Name = "Advanced Mode",
                             Path = "datagrid-advanced-filter",
                             Title = "Blazor DataGrid Simple filter mode",
