@@ -166,6 +166,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Updated = true,
                     Name = "Filtering",
                     Icon = "&#xef4f",
                     Children = new []
