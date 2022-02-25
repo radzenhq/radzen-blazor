@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
- <button title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) class="rz-filter-button rz-button rz-button-md rz-button-icon-only btn-light" onclick="@($"Radzen.togglePopup(this.parentNode, '{Grid.PopupID}{Column.GetFilterProperty()}')")">
+ <button title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) class="@FilterIconStyle()" onclick="@($"Radzen.togglePopup(this.parentNode, '{Grid.PopupID}{Column.GetFilterProperty()}')")">
      <i class="rzi">filter_alt</i>
     @if (Column.GetFilterOperator() == FilterOperator.DoesNotContain)
     {
@@ -71,6 +71,14 @@
         return column.GetFilterOperator() == value ?
             "rz-multiselect-item rz-state-highlight" :
             "rz-multiselect-item";
+    }
+
+    protected string FilterIconStyle()
+    {
+        var additionalStyle = Column.GetFilterValue() != null || Column.GetSecondFilterValue() != null || 
+            Column.GetFilterOperator() == FilterOperator.IsNotNull || Column.GetFilterOperator() == FilterOperator.IsNull 
+                ? "rz-grid-filter-active" : "";
+        return $"rz-filter-button rz-button rz-button-md rz-button-icon-only btn-light {additionalStyle}";
     }
 
     protected async Task ApplyFilter(FilterOperator value)
