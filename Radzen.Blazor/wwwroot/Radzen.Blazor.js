@@ -928,25 +928,23 @@ window.Radzen = {
     }
   },
   readFileAsBase64: function (fileInput, maxFileSize, maxWidth, maxHeight) {
-      var calculateWidthAndHeight = function (img, maxWidthImg, maxHeightImg) {
-        var width = img.width;
-        var height = img.height;
-
-        // Change the resizing logic
-        if (width > height) {
-            if (width > maxWidthImg) {
-                height = height * (maxWidthImg / width);
-                width = maxWidthImg;
-            }
-        } else {
-            if (height > maxHeightImg) {
-                width = width * (maxHeightImg / height);
-                height = maxHeightImg;
-            }
-          }
-          return { width, height };
+    var calculateWidthAndHeight = function (img) {
+      var width = img.width;
+      var height = img.height;
+      // Change the resizing logic
+      if (width > height) {
+        if (width > maxWidth) {
+          height = height * (maxWidth / width);
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width = width * (maxHeight / height);
+          height = maxHeight;
+        }
+      }
+      return { width, height };
     };
-
     var readAsDataURL = function (fileInput) {
       return new Promise(function (resolve, reject) {
         var reader = new FileReader();
@@ -957,21 +955,22 @@ window.Radzen = {
         reader.addEventListener(
           'load',
           function () {
-              if (maxWidth > 0 && maxHeight > 0) {
-                  var img = document.createElement("img");
-                  img.onload = function (event) {
-                      // Dynamically create a canvas element
-                      var canvas = document.createElement("canvas");
-                      var ctx = canvas.getContext("2d");
-                      var res = calculateWidthAndHeight(img, maxWidth, maxHeight);
-                      ctx.drawImage(img, 0, 0, res.width, res.height);
-                      resolve(canvas.toDataURL(fileInput.type));
-                  }
-                  img.src = reader.result;
-                 
-              } else {
-                  resolve(reader.result);
+            if (maxWidth > 0 && maxHeight > 0) {
+              var img = document.createElement("img");
+              img.onload = function (event) {
+                // Dynamically create a canvas element
+                var canvas = document.createElement("canvas");
+                var res = calculateWidthAndHeight(img);
+                canvas.width = res.width;
+                canvas.height = res.height;
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, res.width, res.height);
+                resolve(canvas.toDataURL(fileInput.type));
               }
+              img.src = reader.result;
+            } else {
+              resolve(reader.result);
+            }
           },
           false
           );
