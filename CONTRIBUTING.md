@@ -5,21 +5,19 @@
 This is a set of guidelines for contributing to Radzen.Blazor.
 
 ## Asking questions
-
 Please don't open an issue to ask a question about using Radzen.Blazor components. You can check the following resources instead:
 
-- [Online demos](https://blazor.radzen.com)
-
+### [Online demos](https://blazor.radzen.com)
 A showcase application that demonstrates all Radzen.Blazor components. You will find various use cases that demonstrate the component features and API. The source 
 of the demos is available [here](https://github.com/radzenhq/radzen-blazor/tree/master/RadzenBlazorDemos).
-- [Documentation](https://www.radzen.com/documentation/blazor/accordion/)
 
+### [Documentation](https://blazor.radzen.com/docs/)
 Technical documentation and API reference.
-- [Online forum](https://forum.radzen.com)
 
+### [Community forum](https://forum.radzen.com)
 You can ask your question here. Please use the [Radzen.Blazor Components](https://forum.radzen.com/c/blazor-components/10) category.
 
-- Dedicated technical support
+### Dedicated technical support
 
 Radzen staff provides technical support with guaranteed response time to Radzen Professional and Enterprise subscribers. The pricing options are available [here](https://www.radzen.com/pricing/).
 
@@ -67,7 +65,8 @@ Explain the enhancement and include additional details:
 If you want to contribute a new feature of fix a bug you can open a pull request. 
 
 Make sure you follow this procedure:
-
+* **Important!!!** if you itent to make a lot of changes in a pull request open an issue to discuss this with us first. The Radzen Blazor Components have a lot of
+moving parts and making big changes should be done with extra precautions. 
 * **Be sure that none of the existing tests** breaks after your changes. The test project is available [here](https://github.com/radzenhq/radzen-blazor/tree/master/Radzen.Blazor.Tests).
 * **If possible add new tests that verify your fix or new feature**. 
 * **Follow the existing coding style** (to be described in detail later).
