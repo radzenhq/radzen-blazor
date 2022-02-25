@@ -9,10 +9,29 @@
 <h1>DataGrid <strong>Simple Filter Mode</strong></h1>
 
 <RadzenExample Name="DataGrid" Source="DataGridSimpleFilterWithMenu" Heading="false">
+    <div class="row">
+        <div class="col-xl-2 mb-4">
+            <h3>Filter case sensitivity</h3>
+            <RadzenDropDown @bind-Value="filterCaseSensitivity" Data="@(Enum.GetValues(typeof(FilterCaseSensitivity)))">
+                <Template>
+                    @Enum.GetName(context)
+                </Template>
+            </RadzenDropDown>
+        </div>
+        <div class="col-xl-6 mb-4">
+            <h3>Filter logical operator</h3>
+            <RadzenDropDown @bind-Value="logicalFilterOperator" Data="@(Enum.GetValues(typeof(LogicalFilterOperator)))">
+                <Template>
+                    @Enum.GetName(context)
+                </Template>
+            </RadzenDropDown>
+        </div>
+    </div>
+    <h3>Orders</h3>
     <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" 
         FilterMode="FilterMode.SimpleWithMenu" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders" TItem="Order" ColumnWidth="300px" 
-        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-        LogicalFilterOperator="LogicalFilterOperator.Or">
+        FilterCaseSensitivity="@filterCaseSensitivity"
+        LogicalFilterOperator="@logicalFilterOperator">
         <Columns>
             <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID" />
             <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" />
@@ -32,6 +51,9 @@
 </RadzenExample>
 @code {
     IEnumerable<Order> orders;
+
+    FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.CaseInsensitive;
+    LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.Or;
 
     protected override void OnInitialized()
     {
