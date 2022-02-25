@@ -5,14 +5,7 @@
     <div class=@ContentClassList @onclick="@Select">
         @if (ChildContent != null || HasChildren)
         {
-            if (Tree.AllowToggleChildrenOnClient && expanded)
-            {
-                <span class=@IconClassList onclick="Radzen.toggleTreeItem(this)"></span>
-            }
-            else
-            {
-                <span class=@IconClassList @onclick="@Toggle" @onclick:stopPropagation></span>
-            }
+            <span class=@IconClassList @onclick="@Toggle" @onclick:stopPropagation></span>
         }
         @if(Tree != null && Tree.AllowCheckBoxes)
         {
@@ -29,7 +22,7 @@
     @if (ChildContent != null && expanded)
     {
     <CascadingValue Value=this>
-    <ul class="rz-treenode-children">
+    <ul class="rz-treenode-children" style=@(clientExpanded ? "" : "display:none;")>
         @ChildContent
     </ul>
     </CascadingValue>

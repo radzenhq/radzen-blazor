@@ -140,12 +140,6 @@ namespace Radzen.Blazor
         public bool AllowCheckChildren { get; set; } = true;
 
         /// <summary>
-        /// Specifies if child items should be toggled client side once expanded. If set to <c>true</c> child items will be toggled client side once expanded.
-        /// </summary>
-        [Parameter]
-        public bool AllowToggleChildrenOnClient { get; set; } = false;
-
-        /// <summary>
         /// Specifies what happens with a parent item when one of its children is checked. If set to <c>true</c> checking a child item will affect the checked state of its parents.
         /// </summary>
         [Parameter]
