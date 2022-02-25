@@ -132,6 +132,18 @@ window.Radzen = {
        el.addEventListener('keydown', preventDefault, false);
     }
   },
+  toggleTreeItem(el) {
+      var parent = el.parentNode.parentNode;
+      var content = parent.children[1];
+      if (content.style.display == 'none') {
+          el.className = 'rz-tree-toggler rzi rzi-caret-down';
+          content.style.display = 'block';
+      }
+      else {
+          el.className = 'rz-tree-toggler rzi rzi-caret-right';
+          content.style.display = 'none';
+      }
+  },
   selectTab: function (id, index) {
     var el = document.getElementById(id);
     if (el && el.parentNode && el.parentNode.previousElementSibling) {

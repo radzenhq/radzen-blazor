@@ -5,7 +5,14 @@
     <div class=@ContentClassList @onclick="@Select">
         @if (ChildContent != null || HasChildren)
         {
-            <span class=@IconClassList @onclick="@Toggle" @onclick:stopPropagation></span>
+            if (Tree.AllowToggleChildrenOnClient && expanded)
+            {
+                <span class=@IconClassList onclick="Radzen.toggleTreeItem(this)"></span>
+            }
+            else
+            {
+                <span class=@IconClassList @onclick="@Toggle" @onclick:stopPropagation></span>
+            }
         }
         @if(Tree != null && Tree.AllowCheckBoxes)
         {

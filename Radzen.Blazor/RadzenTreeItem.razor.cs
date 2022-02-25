@@ -116,6 +116,11 @@ namespace Radzen.Blazor
 
         internal async Task Toggle()
         {
+            if (expanded && Tree.AllowToggleChildrenOnClient)
+            {
+                return;
+            }
+
             expanded = !expanded;
 
             if (expanded)
