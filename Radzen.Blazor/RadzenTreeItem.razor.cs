@@ -16,8 +16,8 @@ namespace Radzen.Blazor
         ClassList ContentClassList => ClassList.Create("rz-treenode-content")
                                                .Add("rz-treenode-content-selected", selected);
         ClassList IconClassList => ClassList.Create("rz-tree-toggler rzi")
-                                               .Add("rzi-caret-down", expanded)
-                                               .Add("rzi-caret-right", !expanded);
+                                               .Add("rzi-caret-down", clientExpanded)
+                                               .Add("rzi-caret-right", !clientExpanded);
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
@@ -114,9 +114,17 @@ namespace Radzen.Blazor
             }
         }
 
+        bool clientExpanded;
         internal async Task Toggle()
         {
+            if (expanded)
+            {
+                clientExpanded = !clientExpanded;
+                return;
+            }
+
             expanded = !expanded;
+            clientExpanded = !clientExpanded;
 
             if (expanded)
             {
@@ -161,6 +169,7 @@ namespace Radzen.Blazor
         override protected void OnInitialized()
         {
             expanded = Expanded;
+            clientExpanded = expanded;
 
             if (expanded)
             {
@@ -194,6 +203,7 @@ namespace Radzen.Blazor
             {
                 // The Expanded property has changed - update the expanded state
                 expanded = parameters.GetValueOrDefault<bool>(nameof(Expanded));
+                clientExpanded = expanded;
                 shouldExpand = true;
             }
 

@@ -22,7 +22,7 @@
     @if (ChildContent != null && expanded)
     {
     <CascadingValue Value=this>
-    <ul class="rz-treenode-children">
+    <ul class="rz-treenode-children" style=@(clientExpanded ? "" : "display:none;")>
         @ChildContent
     </ul>
     </CascadingValue>
