@@ -6,22 +6,33 @@
 <h1>Tree checkboxes</h1>
 <p>Get or set the selected items of RadzenTree</p>
 <RadzenExample Name="Tree" Source="TreeCheckBoxes" Heading="false">
-<div class="row my-5">
-    <div class="col-lg-6 offset-lg-3">
-        <RadzenCard>
-            <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 300px" Data=@categories>
-                <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
-                <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
-            </RadzenTree>
-        </RadzenCard>
+    <div class="row my-5">
+        <div class="col-lg-6 offset-lg-3">
+            <RadzenCard>
+                <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 300px" Data=@categories>
+                    <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products"/>
+                    <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false)/>
+                </RadzenTree>
+            </RadzenCard>
+            <br>
+            <br>
+            <RadzenCard>
+                <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 300px" Data=@exampleData ChildrenPropertiesChain="Children.GrandChildren.GrandGrandChildren">
+                    <RadzenTreeLevel TextProperty="Name" ChildrenProperty="Children"/>
+                    <RadzenTreeLevel TextProperty="Name" ChildrenProperty="GrandChildren"/>
+                    <RadzenTreeLevel TextProperty="Name" ChildrenProperty="GrandGrandChildren"/>
+                    <RadzenTreeLevel TextProperty="Name" HasChildren=@(kid => false)/>
+                </RadzenTree>
+            </RadzenCard>
+        </div>
     </div>
-</div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console Class="mt-4"/>
 
 @code {
     IEnumerable<Category> categories;
+    IEnumerable<Parent> exampleData;
     IEnumerable<object> checkedValues;
 
     IEnumerable<object> CheckedValues
@@ -49,10 +60,133 @@
         return string.Empty;
     }
 
+    
     EventConsole console;
 
     protected override void OnInitialized()
     {
         categories = Northwind.Categories.Include(c => c.Products);
+        exampleData = CreateSampleData;
     }
+
+    class Parent
+    {
+        public string Name { get; set; }
+        public IEnumerable<Child> Children { get; set; }
+    }
+    class Child
+    {
+        public string Name { get; set; }
+        public IEnumerable<GrandChild> GrandChildren { get; set; }
+    }
+    class GrandChild    
+    {
+        public string Name { get; set; }
+        public IEnumerable<GrandGrandChild> GrandGrandChildren { get; set; }
+    }
+    class GrandGrandChild    
+    {
+        public string Name { get; set; }
+    }
+    
+    private static Parent[] CreateSampleData => new []
+    {
+        new Parent()
+        {
+            Name = "Parent A",
+            Children = new []
+            {
+                new Child
+                {
+                    Name = "Child A",
+                    GrandChildren = new GrandChild[]
+                    {
+                        new GrandChild
+                        {
+                            Name = "Grand Child A",
+                            GrandGrandChildren = new GrandGrandChild[]
+                            {
+                                new GrandGrandChild
+                                {
+                                    Name = "Grand Grand Child A",
+                                },
+                                new GrandGrandChild
+                                {
+                                    Name = "Grand Grand Child B",
+                                },
+                                new GrandGrandChild
+                                {
+                                    Name = "Grand Grand Child C",
+                                }
+                            }
+                        },
+                        new GrandChild
+                        {
+                            Name = "Grand Child B",
+                            GrandGrandChildren = new GrandGrandChild[]
+                            {
+                                new GrandGrandChild
+                                {
+                                    Name = "Grand Grand Child E",
+                                },
+                                new GrandGrandChild
+                                {
+                                    Name = "Grand Grand Child F",
+                                },
+                                new GrandGrandChild
+                                {
+                                    Name = "Grand Grand Child G",
+                                }
+                            }
+                        }
+                    }
+                },
+                new Child
+                {
+                    Name = "Child B",
+                    GrandChildren = new GrandChild[]
+                    {
+                        new GrandChild
+                        {
+                            Name = "Grand Child C",
+                            GrandGrandChildren = new GrandGrandChild[]
+                            {
+                                new GrandGrandChild
+                                {
+                                    Name = "Grand Grand Child H",
+                                },
+                                new GrandGrandChild
+                                {
+                                    Name = "Grand Grand Child I",
+                                },
+                                new GrandGrandChild
+                                {
+                                    Name = "Grand Grand Child J",
+                                }
+                            }
+                        },
+                        new GrandChild
+                        {
+                            Name = "Grand Child D",
+                            GrandGrandChildren = new GrandGrandChild[]
+                            {
+                                new GrandGrandChild
+                                {
+                                    Name = "Grand Grand Child K",
+                                },
+                                new GrandGrandChild
+                                {
+                                    Name = "Grand Grand Child L",
+                                },
+                                new GrandGrandChild
+                                {
+                                    Name = "Grand Grand Child m",
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
 }

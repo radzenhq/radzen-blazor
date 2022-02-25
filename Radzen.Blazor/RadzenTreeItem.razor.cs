@@ -160,6 +160,16 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         override protected void OnInitialized()
         {
+            if (!string.IsNullOrEmpty(Tree.ChildrenPropertiesChain) && Tree.LowestLevelChildrentDict is null)
+            {
+                Tree.LowestLevelChildrentDict = Tree.CreateDictionary();
+            }
+
+            if (Tree.LowestLevelChildrentDict != null && !Tree.LowestLevelChildrentDict.Keys.Contains(Value))
+            {
+                Tree.LowestLevelChildrentDict = Tree.CreateDictionary();
+            }
+            
             expanded = Expanded;
 
             if (expanded)
@@ -222,10 +232,42 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
+        private void UpdateBottomLayerCheckValues(bool? value)
+        {
+            if (HasChildren)
+            {
+                IEnumerable<object> bottomLayerVales = (IEnumerable<object>) Tree.LowestLevelChildrentDict[Value];
+                if (value == true)
+                {
+                    Tree.SetBottomLayerCheckedValues(Tree.CheckedBottomLayerValues.Concat(bottomLayerVales));
+                }
+                else if (value == false)
+                {
+                    Tree.SetBottomLayerCheckedValues(Tree.CheckedBottomLayerValues.Where(x => !bottomLayerVales.Contains(x)));
+                }
+            }
+            else
+            {
+                if (value == true)
+                {
+                    Tree.SetBottomLayerCheckedValues(Tree.CheckedBottomLayerValues.Append(Value));
+                }
+                else if (value == false)
+                {
+                    Tree.SetBottomLayerCheckedValues(Tree.CheckedBottomLayerValues.Where(x => x != Value));
+                }
+            }
+        }
+        
         async Task CheckedChange(bool? value)
         {
             if (Tree != null)
             {
+                if (!string.IsNullOrEmpty(Tree.ChildrenPropertiesChain))
+                {
+                    UpdateBottomLayerCheckValues(value);
+                }
+                
                 var checkedValues = GetCheckedValues();
 
                 if (Tree.AllowCheckChildren)
@@ -247,13 +289,13 @@ namespace Radzen.Blazor
                 {
                     if (value == true)
                     {
-                        var valueWithoutChildren = new[] { Value };
+                        var valueWithoutChildren = new[] {Value};
                         checkedValues = checkedValues.Union(valueWithoutChildren);
                         Tree.SetUncheckedValues(Tree.UncheckedValues.Except(valueWithoutChildren));
                     }
                     else
                     {
-                        var valueWithoutChildren = new[] { Value };
+                        var valueWithoutChildren = new[] {Value};
                         checkedValues = checkedValues.Except(valueWithoutChildren);
                         Tree.SetUncheckedValues(valueWithoutChildren.Union(Tree.UncheckedValues));
                     }
@@ -270,14 +312,61 @@ namespace Radzen.Blazor
 
         bool? IsChecked()
         {
-            var checkedValues = GetCheckedValues();
-
-            if (HasChildren && IsOneChildUnchecked() && IsOneChildChecked())
+            IEnumerable<object> checkedVals;
+            if (string.IsNullOrEmpty(Tree.ChildrenPropertiesChain))
             {
-                return null;
+                checkedVals = GetCheckedValues();
+                if (HasChildren && IsOneChildUnchecked() && IsOneChildChecked())
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                checkedVals = Tree.CheckedBottomLayerValues;
+                if (HasChildren)
+                {
+                    return EvaluateBottomLayer();
+                }
             }
 
-            return checkedValues.Contains(Value);
+            bool isInCheckedValues = checkedVals.Contains(Value);
+            return isInCheckedValues;
+        }
+
+        private bool? EvaluateBottomLayer()
+        {
+            if (Tree.LowestLevelChildrentDict != null && Tree.LowestLevelChildrentDict.Count != 0)
+            {
+                IEnumerable bottomLayer = Tree.LowestLevelChildrentDict[Value];
+                HashSet<object> checkedValues = Tree.CheckedBottomLayerValues.ToHashSet();
+
+                int isChecked = 0;
+                int isNotChecked = 0;
+                foreach (object data in bottomLayer)
+                {
+                    if (checkedValues.Contains(data))
+                    {
+                        isChecked++;
+                    }
+                    else
+                    {
+                        isNotChecked++;
+                    }
+                }
+
+                if (isChecked > 0 && isNotChecked > 0)
+                {
+                    return null;
+                }
+                
+                if(isChecked > 0 && isNotChecked == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         IEnumerable<object> GetCheckedValues()

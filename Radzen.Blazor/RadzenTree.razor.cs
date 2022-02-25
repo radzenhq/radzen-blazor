@@ -156,6 +156,22 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public IEnumerable<object> CheckedValues { get; set; } = Enumerable.Empty<object>();
+        
+        /// <summary>
+        /// Gets or sets the checked values. Use with <c>@bind-CheckedBottomLayerValues</c> to sync it with a property.
+        /// </summary>
+        [Parameter]
+        public IEnumerable<object> CheckedBottomLayerValues { get; set; } = Enumerable.Empty<object>();
+        
+        [Parameter] public string ChildrenPropertiesChain { get; set; } = string.Empty;
+        
+        internal Dictionary<object, IEnumerable> LowestLevelChildrentDict { get; set; } 
+        private string[] ChildrenPropertyNames => ChildrenPropertiesChain.Split('.');
+        
+        internal void SetBottomLayerCheckedValues(IEnumerable<object> values)
+        {
+            CheckedBottomLayerValues = values.ToList();
+        }
 
         internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
 
@@ -319,6 +335,10 @@ namespace Radzen.Blazor
                     }
                     else
                     {
+                        if (CheckedValues == null)
+                        {
+                            CheckedValues = Enumerable.Empty<object>();
+                        }
                         await SetCheckedValues(CheckedValues);
                     }
                 }
@@ -357,6 +377,59 @@ namespace Radzen.Blazor
             {
                 Levels.Add(level);
                 StateHasChanged();
+            }
+        }
+        
+        private IEnumerable GetLowestLevelChildren(string[] propNames, object data, int layer)
+        {
+            var nextLayerData = PropertyAccess.GetValue(data, propNames[layer]) as IEnumerable;
+            if (layer == propNames.Length - 1)
+            {
+                foreach (var child in nextLayerData)
+                {
+                    yield return child;
+                }
+            }
+            else
+            {
+                foreach (var nextLayerSingleObject in nextLayerData)
+                {
+                    var results = GetLowestLevelChildren(propNames, nextLayerSingleObject, layer + 1);
+                    foreach (var result in results)
+                    {
+                        yield return result;
+                    }
+                }
+            }
+        }
+        
+        internal Dictionary<object, IEnumerable> CreateDictionary()
+        {
+            Dictionary<object, IEnumerable> result = new Dictionary<object, IEnumerable>();
+            string[] propNames = ChildrenPropertyNames;
+            var pairs = GetObjectToBottomLayerItems(Data, 0, propNames);
+            foreach (var pair in pairs)
+            {
+                result.Add(pair.Item1, pair.Item2);
+            }
+        
+            return result;
+        }
+        
+        private IEnumerable<(object, IEnumerable)> GetObjectToBottomLayerItems(IEnumerable layerData, int layer, string[] propNames)
+        {
+            foreach (object data in layerData)
+            {
+                yield return (data, GetLowestLevelChildren(propNames, data, layer));
+                if (layer <= propNames.Length - 2) // 2nd to last layer
+                {
+                    var nextLayerData = PropertyAccess.GetValue(data, propNames[layer]) as IEnumerable;
+                    var results =  GetObjectToBottomLayerItems(nextLayerData, layer + 1, propNames);
+                    foreach (var result in results)
+                    {
+                        yield return result;
+                    }
+                }
             }
         }
     }
