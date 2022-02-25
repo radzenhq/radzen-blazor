@@ -443,6 +443,10 @@ namespace Radzen.Blazor
                         column.SetFilterValue(!string.IsNullOrWhiteSpace(value) ? Convert.ChangeType(value, Nullable.GetUnderlyingType(type)) : null, isFirst);
                     }));
                 }
+                else if (FilterMode == FilterMode.SimpleWithMenu)
+                {
+                    builder.AddAttribute(4, "Disabled", column.CanSetFilterValue());
+                }
 
                 builder.CloseComponent();
             });

@@ -75,7 +75,14 @@
 
     protected async Task ApplyFilter(FilterOperator value)
     {
+        if (value == FilterOperator.IsNull || value == FilterOperator.IsNotNull)
+        {
+            Column.SetFilterValue(null);
+            Column.SetFilterValue(null, false);
+        }
+
         Column.SetFilterOperator(value);
+
         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{Column.GetFilterProperty()}");
         await Grid.Reload();
     }

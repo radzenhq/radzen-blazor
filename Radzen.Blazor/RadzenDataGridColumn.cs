@@ -672,6 +672,11 @@ namespace Radzen.Blazor
             }
         }
 
+        internal bool CanSetFilterValue()
+        { 
+            return GetFilterOperator() == FilterOperator.IsNull || GetFilterOperator() == FilterOperator.IsNotNull;
+        }
+
         internal void ClearFilters()
         {
             SetFilterValue(null);
