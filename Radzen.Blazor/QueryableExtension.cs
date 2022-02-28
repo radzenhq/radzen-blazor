@@ -404,7 +404,14 @@ namespace Radzen
             }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
             {
-                return $"{property} {linqOperator} {value}";
+                if (column.GetFilterOperator() == FilterOperator.IsNull || column.GetFilterOperator() == FilterOperator.IsNotNull)
+                {
+                    return $"{property} {linqOperator} null";
+                }
+                else
+                {
+                    return $"{property} {linqOperator} {value}";
+                }
             }
             else if (column.FilterPropertyType == typeof(DateTime) || 
                     column.FilterPropertyType == typeof(DateTime?) ||
