@@ -314,7 +314,7 @@ namespace Radzen
         {
             get
             {
-                return $"popup{UniqueID}";
+                return $"popup-{GetId()}";
             }
         }
 
@@ -326,7 +326,7 @@ namespace Radzen
         {
             get
             {
-                return $"search{UniqueID}";
+                return $"search-{GetId()}";
             }
         }
 
