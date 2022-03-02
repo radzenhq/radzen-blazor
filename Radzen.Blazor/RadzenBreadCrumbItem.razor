@@ -1,0 +1,20 @@
+﻿@inherits RadzenComponent
+@typeparam TItem
+
+@if (Visible)
+{
+    <div class="rz-breadcrumb @GetComponentCssClass()" id="@GetId()" style="@Style">
+        @if (BreadCrumb.Template != null)
+        {
+            @BreadCrumb.Template(Item)
+        }
+        else if (BreadCrumb.LinkProperty != null)
+        {
+            <RadzenLink Path="@GetLink()" Text="@GetText()" />
+        }
+        else
+        {
+            <RadzenLabel Text="@GetText()" />
+        }
+    </div>
+}
