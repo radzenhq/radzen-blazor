@@ -471,7 +471,7 @@ namespace RadzenBlazorDemos
         new Example()
         {
             Name = "Images",
-            Icon = "&#xe3d3", 
+            Icon = "&#xe3d3",
             Children = new [] {
                 new Example()
                 {
@@ -566,7 +566,7 @@ namespace RadzenBlazorDemos
                     Icon = "&#xe851",
                     Tags = new [] { "navigation", "dropdown", "menu" }
                 },
-				new Example()
+                new Example()
                 {
                     Name = "Splitter",
                     Path = "splitter",
@@ -587,7 +587,13 @@ namespace RadzenBlazorDemos
                     Icon = "&#xe8d8",
                     Tags = new [] { "tabstrip", "tabview", "container" }
                 },
-                
+                new Example()
+                {
+                    Name = "Bread Crumb",
+                    Path = "breadcrumb",
+                    Icon = "&#xeac9",
+                    Tags = new [] { "breadcrumb", "navigation", "menu" }
+                }
             }
         },
         new Example()
@@ -949,7 +955,7 @@ namespace RadzenBlazorDemos
                     Icon = "&#xe5ca",
                     Tags = new [] { "validator", "validation", "required"}
                 },
-                
+
             }
         },
 
