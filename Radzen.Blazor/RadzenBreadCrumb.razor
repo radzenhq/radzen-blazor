@@ -1,0 +1,23 @@
+﻿@inherits RadzenComponent
+@typeparam TItem
+
+<CascadingValue Value="this">
+    @if (Data != null)
+    {
+        @foreach (var item in Data.Select((item, idx) => new { Item = item, Index = idx}))
+        {
+            <RadzenBreadCrumbItem TItem="TItem" Item="@item.Item" />
+            @if (item.Index < (_count - 1))
+            {
+                @if (SeparatorTemplate != null)
+                {
+                    @SeparatorTemplate
+                }
+                else
+                {
+                    @Separator
+                }
+            }
+        }
+    }
+</CascadingValue>
