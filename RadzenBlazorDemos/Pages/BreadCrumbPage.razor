@@ -1,0 +1,51 @@
+﻿@page "/breadcrumb"
+
+<RadzenExample Name="Bread Crumb" Source="BreadCrumb" Documentation="false">
+    <RadzenCard>
+        <RadzenHeading Size="H4" Text="With Template" />
+        <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data">
+            <Template Context="item">
+                @item.Title
+            </Template>
+        </RadzenBreadCrumb>
+    </RadzenCard>
+    
+    <RadzenCard>
+        <RadzenHeading Size="H4" Text="With Standard Template" />
+        <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title" LinkProperty="Link" />
+    </RadzenCard>
+
+    <RadzenCard>
+        <RadzenHeading Size="H4" Text="With Standard Template without Link" />
+        <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title" />
+    </RadzenCard>
+
+    <RadzenCard>
+        <RadzenHeading Size="H4" Text="With Standard Template and Custom Separator" />
+        <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title" Separator=">>" />
+    </RadzenCard>
+
+    <RadzenCard>
+        <RadzenHeading Size="H4" Text="With Standard Template and Custom Separator Template" />
+        <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title">
+            <SeparatorTemplate>
+                <RadzenIcon Icon="chevron_right" />
+            </SeparatorTemplate>
+        </RadzenBreadCrumb>
+    </RadzenCard>
+</RadzenExample>
+
+@code {
+  List<BreadCrumbItem> data = new List<BreadCrumbItem>()
+  {
+      new BreadCrumbItem { Title = "Dashboard", Link = "/" },
+      new BreadCrumbItem { Title="Badges", Link = "/badge" },
+  };
+
+
+  class BreadCrumbItem
+  {
+    public string Title { get; set; }
+    public string Link { get; set; }
+  }
+}
