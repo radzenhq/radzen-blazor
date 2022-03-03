@@ -1,23 +1,52 @@
 ﻿@inherits RadzenComponent
 @typeparam TItem
 
-<CascadingValue Value="this">
-    @if (Data != null)
-    {
-        @foreach (var item in Data.Select((item, idx) => new { Item = item, Index = idx}))
+@if (Items != null)
+{
+  <div class="rz-breadcrumb @GetComponentCssClass()" style="@Style" @attributes="@Attributes">
+    @Items
+  </div>
+}
+else if (Visible)
+{
+    <div class="rz-breadcrumb @GetComponentCssClass()" style="@Style" @attributes="@Attributes">
+        @if (Data != null)
         {
-            <RadzenBreadCrumbItem TItem="TItem" Item="@item.Item" />
-            @if (item.Index < (_count - 1))
+            @foreach (var item in Data.Select((item, idx) => new { Item = item, Index = idx }))
             {
-                @if (SeparatorTemplate != null)
+                @if (Template != null)
                 {
-                    @SeparatorTemplate
+                    @Template(item.Item)
                 }
-                else
+                else if (TextProperty != null)
                 {
-                    @Separator
+                    if (LinkProperty != null)
+                    {
+                        <RadzenBreadCrumbItem 
+                            Text="@GetText(item.Item)" 
+                            Link="@GetLink(item.Item)" />
+                    }
+                    else
+                    {
+                        <RadzenBreadCrumbItem 
+                            Text="@GetText(item.Item)" />
+                    }
+                }
+
+                @if (item.Index < (_count - 1))
+                {
+                    <div class="rz-breadcrumb-separator">
+                        @if (SeparatorTemplate != null)
+                        {
+                            @SeparatorTemplate
+                        }
+                        else
+                        {
+                            @Separator
+                        }
+                    </div>
                 }
             }
         }
-    }
-</CascadingValue>
+    </div>
+}

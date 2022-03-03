@@ -143,6 +143,27 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("<span>SEP</span>", component.Markup);
         }
+
+        [Fact]
+        public void BreadCrumb_Renders_Items()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenBreadCrumb<object>>();
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(c => c.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenBreadCrumbItem>(0);
+                    builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Test");
+                    builder.CloseComponent();
+                });
+            });
+            //@"<RadzenBreadCrumbItem Text=""Test"" />"
+            Assert.Contains(@"class=""rz-breadcrumb-item", component.Markup);
+            Assert.Contains(">Test</", component.Markup);
+        }
     }
 
     public class TestItem

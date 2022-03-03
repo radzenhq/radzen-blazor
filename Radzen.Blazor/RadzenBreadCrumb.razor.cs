@@ -20,6 +20,12 @@ namespace Radzen.Blazor
         public RenderFragment<TItem> Template { get; set; }
 
         /// <summary>
+        /// Items to be Displayed
+        /// </summary>
+        [Parameter]
+        public RenderFragment Items { get; set; }
+
+        /// <summary>
         /// An optional RenderFragment that is rendered between Items
         /// </summary>
         [Parameter]
@@ -57,5 +63,13 @@ namespace Radzen.Blazor
             // temporary store the item count on each set
             _count = Data?.Count() ?? 0;
         }
+
+        private string GetLink(TItem item)
+            => item.GetType().GetProperty(LinkProperty).GetValue(item, null).ToString();
+
+
+        private string GetText(TItem item)
+            => item.GetType().GetProperty(TextProperty).GetValue(item, null).ToString();
     }
+
 }
