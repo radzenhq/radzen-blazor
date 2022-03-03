@@ -1,38 +1,55 @@
 ﻿@page "/breadcrumb"
 
 <RadzenExample Name="Bread Crumb" Source="BreadCrumb" Documentation="false">
-    <RadzenCard>
-        <RadzenHeading Size="H4" Text="With Template" />
-        <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data">
-            <Template Context="item">
-                @item.Title
-            </Template>
-        </RadzenBreadCrumb>
-    </RadzenCard>
-    
-    <RadzenCard>
-        <RadzenHeading Size="H4" Text="With Standard Template" />
-        <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title" LinkProperty="Link" />
-    </RadzenCard>
-
+    <div class="col">
+        <RadzenCard>
+            <RadzenHeading Size="H4" Text="With Template" />
+            <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data">
+                <Template Context="item">
+                    @item.Title
+                </Template>
+            </RadzenBreadCrumb>
+        </RadzenCard>
+    </div>
+    <div class="col">
+        <RadzenCard>
+            <RadzenHeading Size="H4" Text="With Standard Template" />
+            <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title" LinkProperty="Link" />
+        </RadzenCard>
+    </div>
+    <div class="col">   
     <RadzenCard>
         <RadzenHeading Size="H4" Text="With Standard Template without Link" />
         <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title" />
     </RadzenCard>
-
-    <RadzenCard>
-        <RadzenHeading Size="H4" Text="With Standard Template and Custom Separator" />
-        <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title" Separator=">>" />
-    </RadzenCard>
-
-    <RadzenCard>
-        <RadzenHeading Size="H4" Text="With Standard Template and Custom Separator Template" />
-        <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title">
-            <SeparatorTemplate>
-                <RadzenIcon Icon="chevron_right" />
-            </SeparatorTemplate>
-        </RadzenBreadCrumb>
-    </RadzenCard>
+    </div>
+    <div class="col">
+        <RadzenCard>
+            <RadzenHeading Size="H4" Text="With Standard Template and Custom Separator" />
+            <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title" Separator=">>" />
+        </RadzenCard>
+    </div>
+    <div class="col">
+        <RadzenCard>
+            <RadzenHeading Size="H4" Text="With Standard Template and Custom Separator Template" />
+            <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title">
+                <SeparatorTemplate>
+                    <RadzenIcon Icon="chevron_right" />
+                </SeparatorTemplate>
+            </RadzenBreadCrumb>
+        </RadzenCard>
+    </div>
+    <div class="col">
+        <RadzenCard>
+            <RadzenHeading Size="H4" Text="With Inline Items" />
+            <RadzenBreadCrumb TItem="object">
+                <Items>
+                    <RadzenBreadCrumbItem Link="/badge" Text="Badges" />
+                    <RadzenBreadCrumbItem Icon="add" Text="Add" />
+                </Items>
+            </RadzenBreadCrumb>
+        </RadzenCard>
+    </div>
 </RadzenExample>
 
 @code {
