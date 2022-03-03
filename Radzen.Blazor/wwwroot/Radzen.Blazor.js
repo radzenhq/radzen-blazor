@@ -582,7 +582,7 @@ window.Radzen = {
     if (e.clipboardData) {
       var value = e.clipboardData.getData('text');
 
-      if (value && /^-?\d*\.?\d*$/.test(value)) {
+      if (value && !isNaN(+value)) {
         return;
       }
 
