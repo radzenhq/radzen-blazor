@@ -1452,6 +1452,18 @@ namespace Radzen.Blazor
             }
         }
 
+        internal override async Task ReloadOnFirstRender()
+        {
+            if (firstRender && Visible && (LoadData.HasDelegate && Data == null) && IsVirtualizationAllowed())
+            {
+                await InvokeLoadData(skip, PageSize);
+            }
+            else
+            {
+                await base.ReloadOnFirstRender();
+            }
+        }
+
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {

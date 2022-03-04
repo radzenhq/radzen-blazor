@@ -255,16 +255,22 @@ namespace Radzen
         /// </summary>
         /// <param name="firstRender">if set to <c>true</c> [first render].</param>
         /// <returns>Task.</returns>
-        protected override Task OnAfterRenderAsync(bool firstRender)
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             this.firstRender = firstRender;
+
+            await ReloadOnFirstRender();
+
+            await base.OnAfterRenderAsync(firstRender);
+        }
+
+        internal virtual async Task ReloadOnFirstRender()
+        {
             if (firstRender && Visible && (LoadData.HasDelegate && Data == null))
             {
-                InvokeAsync(Reload);
+                await InvokeAsync(Reload);
                 StateHasChanged();
             }
-
-            return base.OnAfterRenderAsync(firstRender);
         }
 
         /// <summary>

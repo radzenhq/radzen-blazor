@@ -32,12 +32,18 @@
         </Columns>
     </RadzenDataGrid>
 </RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
 @code {
+    EventConsole console;
+
     int count;
     IEnumerable<OrderDetail> orderDetails;
 
     void LoadData(LoadDataArgs args)
     {
+        console.Log($"Skip: {args.Skip}, Top: {args.Top}");
+
         var query = dbContext.OrderDetails.AsQueryable();
 
         if (!string.IsNullOrEmpty(args.Filter))
