@@ -30,7 +30,10 @@
         set
         {
             checkedValues = value;
-            console.Log($"CheckedValues Changed {string.Join(Environment.NewLine, value.Select(GetText))}");
+            if (checkedValues != null)
+            {
+                console.Log($"CheckedValues Changed {string.Join(Environment.NewLine, value.Select(GetText))}");
+            }
         }
     }
 
