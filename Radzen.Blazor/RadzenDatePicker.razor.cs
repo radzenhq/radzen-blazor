@@ -334,12 +334,6 @@ namespace Radzen.Blazor
                         {
                             DateTimeValue = null;
                         }
-
-                        if (DateTimeValue.HasValue && DateTimeValue.Value == default(DateTime))
-                        {
-                            _value = null;
-                            _dateTimeValue = null;
-                        }
                     }
                 }
             }
@@ -353,7 +347,7 @@ namespace Radzen.Blazor
             {
                 if (_currentDate == default(DateTime))
                 {
-                    _currentDate = HasValue && DateTimeValue.Value != default(DateTime) ? DateTimeValue.Value : DateTime.Today;
+                    _currentDate = HasValue ? DateTimeValue.Value : DateTime.Today;
                 }
                 return _currentDate;
             }

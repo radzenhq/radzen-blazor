@@ -1,7 +1,5 @@
 using Bunit;
-using Radzen.Blazor.Rendering;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -380,6 +378,44 @@ namespace Radzen.Blazor.Tests
             Assert.Null(newValue);
         }
         
+        [Fact]
+        public void DatePicker_Respects_DateTimeMaxValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+            
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.Value, DateTime.MaxValue);
+            });
+
+            Assert.Contains(DateTime.MaxValue.ToString(component.Instance.DateFormat), component.Markup);
+
+            var exception = Record.Exception(() => component.Find(".rz-datepicker-next-icon")
+                                                            .Click());
+            Assert.Null(exception);
+        }
+
+        [Fact]
+        public void DatePicker_Respects_DateTimeMinValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.Value, DateTime.MinValue);
+            });
+
+            Assert.Contains(DateTime.MinValue.ToString(component.Instance.DateFormat), component.Markup);
+
+            var exception = Record.Exception(() => component.Find(".rz-datepicker-prev-icon")
+                                                            .Click());
+            Assert.Null(exception);
+        }
+
         [Theory]
         [InlineData(DateTimeKind.Local)]
         [InlineData(DateTimeKind.Unspecified)]
