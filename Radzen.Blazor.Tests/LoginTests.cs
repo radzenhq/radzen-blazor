@@ -216,7 +216,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Login_NotRaises_ResetPasswordEvent_WhenEmptyUsername()
+        public void Login_Raises_ResetPasswordEvent_WhenEmptyUsername()
         {
             using var ctx = new TestContext();
 
@@ -231,7 +231,7 @@ namespace Radzen.Blazor.Tests
 
             component.Find("a").Click();
 
-            Assert.True(!clicked);
+            Assert.True(clicked);
         }
     }
 }

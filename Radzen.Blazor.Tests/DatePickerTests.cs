@@ -231,7 +231,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void DatePicker_Raises_ChangeEventOnNextMonth()
+        public void DatePicker_NotRaises_ChangeEventOnNextMonth()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -248,12 +248,11 @@ namespace Radzen.Blazor.Tests
 
             component.Find(".rz-datepicker-next-icon").Click();
 
-            Assert.True(raised);
-            Assert.True(((DateTime)newValue) > DateTime.Now);
+            Assert.False(raised);
         }
 
         [Fact]
-        public void DatePicker_Raises_ValueChangedEventOnNextMonth()
+        public void DatePicker_NotRaises_ValueChangedEventOnNextMonth()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -270,12 +269,11 @@ namespace Radzen.Blazor.Tests
 
             component.Find(".rz-datepicker-next-icon").Click();
 
-            Assert.True(raised);
-            Assert.True(((DateTime)newValue) > DateTime.Now);
+            Assert.False(raised);
         }
 
         [Fact]
-        public void DatePicker_Raises_ChangeEventOnPrevMonth()
+        public void DatePicker_NotRaises_ChangeEventOnPrevMonth()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -292,12 +290,11 @@ namespace Radzen.Blazor.Tests
 
             component.Find(".rz-datepicker-prev-icon").Click();
 
-            Assert.True(raised);
-            Assert.True(((DateTime)newValue) < DateTime.Now);
+            Assert.False(raised);
         }
 
         [Fact]
-        public void DatePicker_Raises_ValueChangedEventOnPrevMonth()
+        public void DatePicker_NotRaises_ValueChangedEventOnPrevMonth()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -314,8 +311,7 @@ namespace Radzen.Blazor.Tests
 
             component.Find(".rz-datepicker-prev-icon").Click();
 
-            Assert.True(raised);
-            Assert.True(((DateTime)newValue) < DateTime.Now);
+            Assert.False(raised);
         }
 
         [Fact]

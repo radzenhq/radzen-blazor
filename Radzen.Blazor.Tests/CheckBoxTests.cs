@@ -110,7 +110,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; }));
 
-            component.Find("div").MouseUp();
+            component.Find("div.rz-chkbox-box").Click();
 
             Assert.True(raised);
         }
@@ -126,7 +126,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.ValueChanged, args => { raised = true; }));
 
-            component.Find("div").MouseUp();
+            component.Find("div.rz-chkbox-box").Click();
 
             Assert.True(raised);
         }
@@ -141,21 +141,21 @@ namespace Radzen.Blazor.Tests
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.TriState, true));
 
 
-            component.Find("div").MouseUp();
+            component.Find("div.rz-chkbox-box").Click();
 
             component.Render();
 
             Assert.Contains(@$"rz-state-active", component.Markup);
             Assert.Contains(@$"rzi-check", component.Markup);
 
-            component.Find("div").MouseUp();
+            component.Find("div.rz-chkbox-box").Click();
 
             component.Render();
 
             Assert.DoesNotContain(@$"rz-state-active", component.Markup);
             Assert.DoesNotContain(@$"rzi-check", component.Markup);
 
-            component.Find("div").MouseUp();
+            component.Find("div.rz-chkbox-box").Click();
 
             Assert.Contains(@$"rz-state-active", component.Markup);
             Assert.Contains(@$"rzi-times", component.Markup);
