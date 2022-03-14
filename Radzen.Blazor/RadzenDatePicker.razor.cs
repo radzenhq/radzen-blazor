@@ -368,6 +368,10 @@ namespace Radzen.Blazor
         {
             get
             {
+                if (CurrentDate == DateTime.MinValue) {
+                    return DateTime.MinValue;
+                }
+
                 var firstDayOfTheMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
 
                 int diff = (7 + (firstDayOfTheMonth.DayOfWeek - Culture.DateTimeFormat.FirstDayOfWeek)) % 7;
