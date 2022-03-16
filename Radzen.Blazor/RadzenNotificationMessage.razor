@@ -10,8 +10,8 @@
                 <div class="rz-growl-icon-close rzi rzi-times" @onclick="@Close" style="cursor:pointer"></div>
                 <span class="rz-growl-image rzi @classes.Item2"></span>
                 <div class="rz-growl-message">
-                    <span class="rz-growl-title">@Message.Summary</span>
-                    <p>@Message.Detail</p>
+                    <span class="rz-growl-title">@((MarkupString)Message.Summary)</span>
+                    <p>@((MarkupString)Message.Detail)</p>
                 </div>
                 <div style="clear: both;"></div>
             </div>
