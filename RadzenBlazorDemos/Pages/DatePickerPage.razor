@@ -54,6 +54,16 @@
                     <RadzenDatePicker Disabled="true" @bind-Value=@value Class="w-100" />
                 </RadzenCard>
             </div>
+            <div class="col-lg-6 col-xl-4 p-3">
+                <RadzenCard>
+                    <h4 class="mb-4">DatePicker with footer template</h4>
+                    <RadzenDatePicker @bind-Value=@value DateFormat="d" Class="w-100">
+                        <FooterTemplate>
+                            <RadzenButton Click=@OnTodayClick Text="Today" />
+                        </FooterTemplate>
+                    </RadzenDatePicker>
+                </RadzenCard>
+            </div>
         </div>
     </div>
     <div class="col-lg-12 col-xl-4 p-3">
@@ -90,5 +100,10 @@
     void DateRender(DateRenderEventArgs args)
     {
         args.Disabled = dates.Contains(args.Date);
+    }
+
+    void OnTodayClick()
+    {
+        value = DateTime.Now;
     }
 }
