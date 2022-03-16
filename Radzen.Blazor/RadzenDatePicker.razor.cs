@@ -703,6 +703,13 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<TValue> ValueChanged { get; set; }
 
+        /// <summary>
+        /// Gets or sets the footer template.
+        /// </summary>
+        /// <value>The footer template.</value>
+        [Parameter]
+        public RenderFragment FooterTemplate { get; set; }
+
         string contentStyle = "display:none;";
 
         private string getStyle()
