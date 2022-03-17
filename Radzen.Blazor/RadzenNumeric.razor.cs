@@ -273,7 +273,7 @@ namespace Radzen.Blazor
         }
 
 
-#if NET5_0_OR_GREATER
+#if NET5
         /// <summary>
         /// Sets the focus on the input element.
         /// </summary>
