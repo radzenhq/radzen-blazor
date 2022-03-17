@@ -124,7 +124,7 @@
 
         count = query.Count();
 
-        customCustomersDataVirtualization = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+        customCustomersDataVirtualization = query.Skip(args.Skip.HasValue ? args.Skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : 10).ToList();
 
         InvokeAsync(StateHasChanged);
     }
