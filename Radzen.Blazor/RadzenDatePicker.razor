@@ -96,6 +96,12 @@
                                 </tbody>
                             </table>
                         </div>
+                        @if (FooterTemplate != null)
+                        {
+                            <div class="rz-datepicker-footer">
+                                 @FooterTemplate
+                            </div>
+                        }
                     }
                 </div>
                 @if (ShowTime)

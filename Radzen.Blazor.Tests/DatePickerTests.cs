@@ -446,5 +446,23 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.Equal(kind, ((DateTime)newValue).Kind);
         }
+
+        [Fact]
+        public void DatePicker_Renders_FooterTemplate()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            string actionsTemplate = "<input type=\"button\" value=\"Test\" />";
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.Value, DateTime.MinValue);
+                parameters.Add(p => p.FooterTemplate, actionsTemplate);
+            });
+
+            Assert.Contains(actionsTemplate, component.Markup);
+        }
     }
 }
