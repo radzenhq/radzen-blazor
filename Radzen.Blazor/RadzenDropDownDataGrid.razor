@@ -10,7 +10,7 @@
 @if (Visible)
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()"
-         style="@Style" tabindex="@TabIndex" id="@GetId()">
+         style="@Style" tabindex="@TabIndex" id="@GetId()" onclick="@OpenPopupScriptFromParent()">
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" style="width:100%" aria-haspopup="listbox" readonly="" type="text"
                    name="@Name" aria-label="@(!Multiple && internalValue != null ? PropertyAccess.GetItemOrValueFromProperty(internalValue, TextProperty) : "")" />
@@ -19,25 +19,25 @@
 
         @if (ValueTemplate != null && selectedItem != null)
         {
-            <label class="rz-dropdown-label rz-inputtext " onclick="@OpenPopupScript()" style="width:100%;">
+            <label class="rz-dropdown-label rz-inputtext " style="width:100%;">
                 @ValueTemplate(selectedItem)
             </label>
         }
         else if (Template != null && selectedItem != null)
         {
-            <label class="rz-dropdown-label rz-inputtext " onclick="@OpenPopupScript()" style="width:100%;">
+            <label class="rz-dropdown-label rz-inputtext " style="width:100%;">
                 @Template(selectedItem)
             </label>
         }
         else if (selectedItem != null && !Multiple)
         {
-            <label class="rz-dropdown-label rz-inputtext " onclick="@OpenPopupScript()" style="width:100%;">
+            <label class="rz-dropdown-label rz-inputtext " style="width:100%;">
                 @PropertyAccess.GetItemOrValueFromProperty(selectedItem, TextProperty)
             </label>
         }
         else if (selectedItems.Count > 0)
         {
-            <label class="rz-dropdown-label rz-inputtext " onclick="@OpenPopupScript()" style="width:100%;">
+            <label class="rz-dropdown-label rz-inputtext " style="width:100%;">
                 @if (selectedItems.Count < MaxSelectedLabels)
                 {
                     @if (Template == null)
@@ -60,24 +60,24 @@
         }
         else if (SelectedValue != null)
         {
-            <label class="rz-dropdown-label rz-inputtext rz-corner-all" onclick="@OpenPopupScript()" style="width:100%;">
+            <label class="rz-dropdown-label rz-inputtext rz-corner-all" style="width:100%;">
                 @PropertyAccess.GetItemOrValueFromProperty(SelectedValue, TextProperty)
             </label>
         }
         else if (!string.IsNullOrEmpty(Placeholder))
         {
-            <label class="rz-dropdown-label rz-inputtext  rz-placeholder" onclick="@OpenPopupScript()" style="width:100%;">
+            <label class="rz-dropdown-label rz-inputtext  rz-placeholder" style="width:100%;">
                 @Placeholder
             </label>
         }
         else
         {
-            <label class="rz-dropdown-label rz-inputtext " onclick="@OpenPopupScript()" style="width:100%">
+            <label class="rz-dropdown-label rz-inputtext " style="width:100%">
                 &nbsp;
             </label>
         }
 
-        <div class="rz-dropdown-trigger  rz-corner-right" onclick="@OpenPopupScript()">
+        <div class="rz-dropdown-trigger  rz-corner-right">
             <span class="rz-dropdown-trigger-icon  rzi rzi-chevron-down"></span>
         </div>
 
