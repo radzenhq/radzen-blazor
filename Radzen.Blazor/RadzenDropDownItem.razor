@@ -7,7 +7,9 @@
 @if (DropDown.Multiple)
 {
     <li class="@(DropDown.isSelected(Item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")"
-        aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)" style="display: block;white-space: nowrap;" @onclick:preventDefault @onclick="@(() => DropDown.OnSelectItemInternal(Item))">
+        aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)" style="display: block;white-space: nowrap;" 
+        @onmousedown:preventDefault @onmousedown="@(() => { if(DropDown.LoadData.HasDelegate && !string.IsNullOrEmpty(DropDown.searchText)) { DropDown.OnSelectItemInternal(Item); } })"
+        @onclick:preventDefault @onclick="@(() => { if(!(DropDown.LoadData.HasDelegate && !string.IsNullOrEmpty(DropDown.searchText))) { DropDown.OnSelectItemInternal(Item); } })">
         <div class="rz-chkbox ">
             <div class="@(DropDown.isSelected(Item) ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
                 <span class="@(DropDown.isSelected(Item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
@@ -27,7 +29,9 @@
 }
 else
 {
-    <li role="option" class="@(DropDown.isSelected(Item) ? "rz-dropdown-item  rz-state-highlight" : "rz-dropdown-item ")" aria-label=">@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)" @onclick:preventDefault @onclick="@(() => DropDown.OnSelectItemInternal(Item))">
+    <li role="option" class="@(DropDown.isSelected(Item) ? "rz-dropdown-item  rz-state-highlight" : "rz-dropdown-item ")" aria-label=">@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)" 
+        @onmousedown:preventDefault @onmousedown="@(() => { if(DropDown.LoadData.HasDelegate && !string.IsNullOrEmpty(DropDown.searchText)) { DropDown.OnSelectItemInternal(Item); } })"
+        @onclick:preventDefault @onclick="@(() => { if(!(DropDown.LoadData.HasDelegate && !string.IsNullOrEmpty(DropDown.searchText))) { DropDown.OnSelectItemInternal(Item); } })">
         <span>
             @if (DropDown.Template != null)
             {

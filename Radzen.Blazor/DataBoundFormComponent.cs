@@ -219,7 +219,7 @@ namespace Radzen
         /// <summary>
         /// The search text
         /// </summary>
-        protected string searchText;
+        internal string searchText;
 
         /// <summary>
         /// The view
