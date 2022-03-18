@@ -878,6 +878,20 @@ namespace Radzen.Blazor
         public string ColumnsShowingText { get; set; } = "columns showing";
 
         /// <summary>
+        /// Gets or sets the column picker all columns text.
+        /// </summary>
+        /// <value>The column picker all columns text.</value>
+        [Parameter]
+        public string AllColumnsText { get; set; } = "All";
+
+        /// <summary>
+        /// Gets or sets the column picker columns text.
+        /// </summary>
+        /// <value>The column picker columns text.</value>
+        [Parameter]
+        public string ColumnsText { get; set; } = "Columns";
+
+        /// <summary>
         /// Gets or sets a value indicating whether grouping is allowed.
         /// </summary>
         /// <value><c>true</c> if grouping is allowed; otherwise, <c>false</c>.</value>
