@@ -276,6 +276,11 @@ namespace Radzen.Blazor
             column.SetFilterOperator(filterOperator);
         }
 
+        internal IJSRuntime GetJSRuntime()
+        {
+            return JSRuntime;
+        }
+
         private List<RadzenDataGridColumn<TItem>> columns = new List<RadzenDataGridColumn<TItem>>();
         internal readonly List<RadzenDataGridColumn<TItem>> childColumns = new List<RadzenDataGridColumn<TItem>>();
         private List<RadzenDataGridColumn<TItem>> allColumns = new List<RadzenDataGridColumn<TItem>>();

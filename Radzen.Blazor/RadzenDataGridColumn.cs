@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -718,6 +719,15 @@ namespace Radzen.Blazor
         internal void SetLogicalFilterOperator(LogicalFilterOperator value)
         {
             LogicalFilterOperator = value;
+        }
+
+
+        /// <summary>
+        /// Closes this column filter popup.
+        /// </summary>
+        public async Task CloseFilter()
+        {
+            await Grid.GetJSRuntime().InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{GetFilterProperty()}");
         }
 
         string runtimeWidth;
