@@ -11,7 +11,8 @@
 <p>Set the initial sort order of your RadzenDataGrid via the <code>SortOrder</code> column property.</p>
 
 <RadzenExample Name="DataGrid" Source="DataGridSortApi" Heading="false">
-    <RadzenDataGrid AllowColumnResize="true" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="400px">
+    <RadzenDataGrid AllowColumnResize="true" PageSize="5" AllowPaging="true" 
+        AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="400px" Sort="@OnSort">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" SortOrder="SortOrder.Descending" Width="150px" />
             <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px" />
@@ -27,5 +28,10 @@
     protected override void OnInitialized()
     {
         employees = dbContext.Employees;
+    }
+
+    void OnSort(DataGridColumnSortEventArgs<Employee> args)
+    {
+        //
     }
 }

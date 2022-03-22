@@ -475,6 +475,16 @@ namespace Radzen.Blazor
                     skip = 0;
                     CurrentPage = 0;
 
+                    Filter.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
+                    {
+                        Column = column,
+                        FilterValue = column.GetFilterValue(),
+                        SecondFilterValue = column.GetSecondFilterValue(),
+                        FilterOperator = column.GetFilterOperator(),
+                        SecondFilterOperator = column.GetSecondFilterOperator(),
+                        LogicalFilterOperator = column.GetLogicalFilterOperator()
+                    });
+
                     if (LoadData.HasDelegate && IsVirtualizationAllowed())
                     {
                         Data = null;
@@ -498,6 +508,13 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets or sets the column sort callback.
+        /// </summary>
+        /// <value>The column sort callback.</value>
+        [Parameter]
+        public EventCallback<DataGridColumnSortEventArgs<TItem>> Sort { get; set; }
+
         internal void OnSort(EventArgs args, RadzenDataGridColumn<TItem> column)
         {
             if (AllowSorting && column.Sortable)
@@ -511,6 +528,8 @@ namespace Radzen.Blazor
                 {
                     SetColumnSortOrder(column);
 
+                    Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
+
                     if (LoadData.HasDelegate && IsVirtualizationAllowed())
                     {
                         Data = null;
@@ -520,6 +539,13 @@ namespace Radzen.Blazor
                 }
             }
         }
+
+        /// <summary>
+        /// Gets or sets the column filter callback.
+        /// </summary>
+        /// <value>The column filter callback.</value>
+        [Parameter]
+        public EventCallback<DataGridColumnFilterEventArgs<TItem>> Filter { get; set; }
 
         internal async Task ClearFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
         {
@@ -532,6 +558,16 @@ namespace Radzen.Blazor
 
             skip = 0;
             CurrentPage = 0;
+
+            await Filter.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>() 
+            { 
+                Column = column, 
+                FilterValue = column.GetFilterValue(),
+                SecondFilterValue = column.GetSecondFilterValue(),
+                FilterOperator = column.GetFilterOperator(),
+                SecondFilterOperator = column.GetSecondFilterOperator(),
+                LogicalFilterOperator = column.GetLogicalFilterOperator()
+            });
 
             if (LoadData.HasDelegate && IsVirtualizationAllowed())
             {
@@ -1945,6 +1981,7 @@ namespace Radzen.Blazor
             if (column != null)
             {
                 SetColumnSortOrder(column);
+                Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
             }
 
             if (LoadData.HasDelegate && IsVirtualizationAllowed())

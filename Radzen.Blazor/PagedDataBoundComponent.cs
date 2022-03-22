@@ -288,6 +288,13 @@ namespace Radzen
         protected RadzenPager bottomPager;
 
         /// <summary>
+        /// Gets or sets the page callback.
+        /// </summary>
+        /// <value>The page callback.</value>
+        [Parameter]
+        public EventCallback<PagerEventArgs> Page { get; set; }
+
+        /// <summary>
         /// Handles the <see cref="E:PageChanged" /> event.
         /// </summary>
         /// <param name="args">The <see cref="PagerEventArgs"/> instance containing the event data.</param>
@@ -295,6 +302,9 @@ namespace Radzen
         {
             skip = args.Skip;
             CurrentPage = args.PageIndex;
+
+            await Page.InvokeAsync(args);
+
             await InvokeAsync(Reload);
         }
 

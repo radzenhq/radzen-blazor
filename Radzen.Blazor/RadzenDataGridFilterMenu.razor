@@ -91,6 +91,16 @@
 
         Column.SetFilterOperator(value);
 
+        await Grid.Filter.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
+        {
+            Column = Column,
+            FilterValue = Column.GetFilterValue(),
+            SecondFilterValue = Column.GetSecondFilterValue(),
+            FilterOperator = Column.GetFilterOperator(),
+            SecondFilterOperator = Column.GetSecondFilterOperator(),
+            LogicalFilterOperator = Column.GetLogicalFilterOperator()
+        });
+
         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{Column.GetFilterProperty()}");
         await Grid.Reload();
     }
