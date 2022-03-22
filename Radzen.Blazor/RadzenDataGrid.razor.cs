@@ -908,6 +908,13 @@ namespace Radzen.Blazor
         public bool AllowMultiColumnSorting { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether multi column sorting index is shown.
+        /// </summary>
+        /// <value><c>true</c> if multi column sorting index is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowMultiColumnSortingIndex { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether filtering is allowed.
         /// </summary>
         /// <value><c>true</c> if filtering is allowed; otherwise, <c>false</c>.</value>

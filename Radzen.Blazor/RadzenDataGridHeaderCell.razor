@@ -24,10 +24,18 @@
             @if (Column.GetSortOrder() == SortOrder.Ascending)
             {
                 <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
+                @if(Grid.ShowMultiColumnSortingIndex)
+                {
+                    <span class="rz-column-title" style="padding-left:0px">@getSortIndex()</span>
+                }
             }
             else if (Column.GetSortOrder() == SortOrder.Descending)
             {
                 <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
+                @if(Grid.ShowMultiColumnSortingIndex)
+                {
+                    <span class="rz-column-title" style="padding-left:0px">@getSortIndex()</span>
+                }
             }
             else
             {
@@ -138,8 +146,8 @@ else
 
     [Parameter]
     public string CssClass { get; set; }
-    
-	private int SortingTabIndex => Grid.AllowSorting && Column.Sortable ? 0 : -1;
+
+    private int SortingTabIndex => Grid.AllowSorting && Column.Sortable ? 0 : -1;
 
     private string getFilterIconCss(RadzenDataGridColumn<TItem> column)
     {
@@ -149,12 +157,18 @@ else
         return $"rzi rz-grid-filter-icon {additionalStyle}";
     }
 
-	private void OnSortKeyPressed(KeyboardEventArgs args)
-	{
-		var key = args.Code ?? args.Key;
-		if (key == "Enter")
-		{
-			Grid.OnSort(args, Column);
-		}
-	}
+    private void OnSortKeyPressed(KeyboardEventArgs args)
+    {
+        var key = args.Code ?? args.Key;
+        if (key == "Enter")
+        {
+            Grid.OnSort(args, Column);
+        }
+    }
+
+    string getSortIndex()
+    {
+        var descriptor = Grid.sorts.Where(s => s.Property == Column.GetSortProperty()).FirstOrDefault();
+        return descriptor != null ? $"({Grid.sorts.IndexOf(descriptor) + 1})" : "";
+    }
 }
