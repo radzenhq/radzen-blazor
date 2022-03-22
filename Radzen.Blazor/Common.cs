@@ -918,6 +918,23 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Supplies information about a <see cref="RadzenDataGrid{TItem}.Group" /> event that is being raised.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class DataGridColumnGroupEventArgs<T>
+    {
+        /// <summary>
+        /// Gets the sorted RadzenDataGridColumn.
+        /// </summary>
+        public RadzenDataGridColumn<T> Column { get; internal set; }
+
+        /// <summary>
+        /// Gets the new sort order of the sorted column.
+        /// </summary>
+        public GroupDescriptor GroupDescriptor { get; internal set; }
+    }
+
+    /// <summary>
     /// Supplies information about a <see cref="RadzenDataGrid{TItem}.Filter" /> event that is being raised.
     /// </summary>
     /// <typeparam name="T"></typeparam>

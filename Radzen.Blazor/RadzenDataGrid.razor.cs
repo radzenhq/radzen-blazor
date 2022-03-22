@@ -229,6 +229,30 @@ namespace Radzen.Blazor
             }
         }
 
+        internal void RemoveGroup(GroupDescriptor gd)
+        {
+            groups.Remove(gd); 
+            _groupedPagedView = null;
+
+            var column = columns.Where(c => c.GetGroupProperty() == gd.Property).FirstOrDefault();
+            if (column != null)
+            {
+                if (HideGroupedColumn)
+                {
+                    column.SetVisible(true);
+                }
+
+                Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = null });
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the column group callback.
+        /// </summary>
+        /// <value>The column group callback.</value>
+        [Parameter]
+        public EventCallback<DataGridColumnGroupEventArgs<TItem>> Group { get; set; }
+
         internal string getFrozenColumnClass(RadzenDataGridColumn<TItem> column, IList<RadzenDataGridColumn<TItem>> visibleColumns)
         {
             return column.IsFrozen() ? "rz-frozen-cell" : "";
@@ -938,6 +962,13 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if grouping is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowGrouping { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether grouped column should be hidden.
+        /// </summary>
+        /// <value><c>true</c> if grouped columns should be hidden; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool HideGroupedColumn { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether group footers are visible even when the group is collapsed.
@@ -1956,6 +1987,13 @@ namespace Radzen.Blazor
                         descriptor = new GroupDescriptor() { Property = column.GetGroupProperty(), Title = column.Title, SortOrder = column.GetSortOrder()  };
                         groups.Add(descriptor);
                         _groupedPagedView = null;
+
+                        if (HideGroupedColumn) 
+                        {
+                            column.SetVisible(false);
+                        }
+
+                        await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = descriptor });
 
                         if (IsVirtualizationAllowed())
                         {

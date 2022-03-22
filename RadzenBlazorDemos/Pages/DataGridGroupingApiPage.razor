@@ -13,7 +13,7 @@
 <RadzenExample Name="DataGrid" Source="DataGridGroupingApi" Heading="false">
     <RadzenDataGrid AllowGrouping="true" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" 
         Data="@employees" TItem="Employee" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or" Render="@OnRender" 
-            GroupRowRender="OnGroupRowRender" GroupRowExpand="OnGroupRowExpand" GroupRowCollapse="OnGroupRowCollapse">
+            HideGroupedColumn="true" GroupRowRender="OnGroupRowRender" GroupRowExpand="OnGroupRowExpand" GroupRowCollapse="OnGroupRowCollapse" Group="@OnGroup">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Frozen="true" Groupable="false" Width="60px" >
@@ -74,5 +74,10 @@
     void OnGroupRowCollapse(Group group)
     {
         console.Log($"Group row with key: {group.Data.Key} collapsed");
+    }
+
+    void OnGroup(DataGridColumnGroupEventArgs<Employee> args)
+    {
+        console.Log($"DataGrid {(args.GroupDescriptor != null ? "grouped" : "ungrouped")} by {args.Column.GetGroupProperty()}");
     }
 }
