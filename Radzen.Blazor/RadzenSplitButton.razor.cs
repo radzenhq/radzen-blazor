@@ -112,5 +112,12 @@ namespace Radzen.Blazor
         {
             return Disabled ? "rz-splitbutton rz-buttonset rz-state-disabled" : "rz-splitbutton rz-buttonset";
         }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            Close();
+            base.Dispose();
+        }
     }
 }
