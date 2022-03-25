@@ -22,10 +22,10 @@
             <div class="rz-group-header" @onmouseup=@(args => EndColumnDropToGroup())>
                 @if(AllowGrouping)
                 {
-                    @if(groups.Any())
+                    @if(Groups.Any())
                     {
                         <div class="rz-group-header-items">
-                        @foreach(var gd in groups)
+                        @foreach(var gd in Groups)
                         {
                             <div class="rz-group-header-item">
                                 <span class="rz-group-header-item-title">@gd.GetTitle()</span>
@@ -66,7 +66,7 @@
     <div class="rz-data-grid-data">
         <table class="rz-grid-table rz-grid-table-fixed">
             <colgroup>
-                @foreach(var g in groups)
+                @foreach(var g in Groups)
                 {
                     <col>
                 }
@@ -83,7 +83,7 @@
                 @for(var i = 0; i < deepestChildColumnLevel + 1; i++)
                 {
                 <tr>
-                    @foreach(var g in groups)
+                    @foreach(var g in Groups)
                     {
                         <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                             <span class="rz-column-title"></span>
@@ -119,7 +119,7 @@
                 @if (AllowFiltering && (FilterMode == FilterMode.Simple || FilterMode == FilterMode.SimpleWithMenu) && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())
                 {
                     <tr>
-                        @foreach(var g in groups)
+                        @foreach(var g in Groups)
                         {
                             <th class="rz-col-icon  rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                 <span class="rz-column-title"></span>
@@ -285,7 +285,7 @@
                     @for(var i = 0; i < deepestChildColumnLevel + 1; i++)
                     {
                     <tr class="">
-                        @foreach(var g in groups)
+                        @foreach(var g in Groups)
                         {
                             <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                 <span class="rz-column-title"></span>

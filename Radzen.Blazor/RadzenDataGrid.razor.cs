@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -76,8 +78,8 @@ namespace Radzen.Blazor
             }
 
             var view = AllowPaging ? PagedView : View;
-            var query = view.AsQueryable().OrderBy(string.Join(',', groups.Select(g => $"np({g.Property})")));
-            _groupedPagedView = query.GroupByMany(groups.Select(g => $"np({g.Property})").ToArray()).ToList();
+            var query = view.AsQueryable().OrderBy(string.Join(',', Groups.Select(g => $"np({g.Property})")));
+            _groupedPagedView = query.GroupByMany(Groups.Select(g => $"np({g.Property})").ToArray()).ToList();
 
             var totalItemsCount = _groupedPagedView.Count();
 
@@ -91,7 +93,7 @@ namespace Radzen.Blazor
 #if NET5
                 if (AllowVirtualization)
                 {
-                    if(AllowGrouping && groups.Any() && !LoadData.HasDelegate)
+                    if(AllowGrouping && Groups.Any() && !LoadData.HasDelegate)
                     {
                         builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<GroupResult>));
                         builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<GroupResult>(LoadGroups));
@@ -157,7 +159,7 @@ namespace Radzen.Blazor
 
         internal void DrawGroupOrDataRows(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, IList<RadzenDataGridColumn<TItem>> visibleColumns)
         {
-            if (groups.Any())
+            if (Groups.Any())
             {
                 foreach (var group in GroupedPagedView)
                 {
@@ -221,9 +223,9 @@ namespace Radzen.Blazor
             {
                 if (_groupedPagedView == null)
                 {
-                    var query = groups.Count(g => g.SortOrder == null) == Groups.Count ? View : View.OrderBy(string.Join(',', groups.Select(g => $"np({g.Property}) {(g.SortOrder == null ? "" : g.SortOrder == SortOrder.Ascending ? " asc" : " desc")}")));
+                    var query = Groups.Count(g => g.SortOrder == null) == Groups.Count ? View : View.OrderBy(string.Join(',', Groups.Select(g => $"np({g.Property}) {(g.SortOrder == null ? "" : g.SortOrder == SortOrder.Ascending ? " asc" : " desc")}")));
                     var v = (AllowPaging && !LoadData.HasDelegate ? query.Skip(skip).Take(PageSize) : query).ToList().AsQueryable();
-                    _groupedPagedView = v.GroupByMany(groups.Select(g => $"np({g.Property})").ToArray()).ToList();
+                    _groupedPagedView = v.GroupByMany(Groups.Select(g => $"np({g.Property})").ToArray()).ToList();
                 }
                 return _groupedPagedView;
             }
@@ -231,17 +233,12 @@ namespace Radzen.Blazor
 
         internal void RemoveGroup(GroupDescriptor gd)
         {
-            groups.Remove(gd); 
+            Groups.Remove(gd); 
             _groupedPagedView = null;
 
             var column = columns.Where(c => c.GetGroupProperty() == gd.Property).FirstOrDefault();
             if (column != null)
             {
-                if (HideGroupedColumn)
-                {
-                    column.SetVisible(true);
-                }
-
                 Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = null });
             }
         }
@@ -1966,10 +1963,36 @@ namespace Radzen.Blazor
         /// Gets or sets the group descriptors.
         /// </summary>
         /// <value>The groups.</value>
-        public List<GroupDescriptor> Groups 
+        public ObservableCollection<GroupDescriptor> Groups 
         { 
             get
             {
+                if (groups == null)
+                {
+                    groups = new ObservableCollection<GroupDescriptor>();
+                    groups.CollectionChanged += (object sender, NotifyCollectionChangedEventArgs args) => 
+                    {
+                        if (args.Action == NotifyCollectionChangedAction.Add)
+                        {
+                            var column = columns.Where(c => c.GetGroupProperty() == ((GroupDescriptor)args.NewItems[0]).Property).FirstOrDefault();
+                            
+                            if (HideGroupedColumn)
+                            {
+                                column.SetVisible(false);
+                            }
+                        }
+                        else if (args.Action == NotifyCollectionChangedAction.Remove)
+                        {
+                            var column = columns.Where(c => c.GetGroupProperty() == ((GroupDescriptor)args.OldItems[0]).Property).FirstOrDefault();
+
+                            if (HideGroupedColumn)
+                            {
+                                column.SetVisible(true);
+                            }
+                        }
+                    };
+                }
+
                 return groups;
             }
             set
@@ -1978,7 +2001,7 @@ namespace Radzen.Blazor
             }
         }
 
-        internal List<GroupDescriptor> groups = new List<GroupDescriptor>();
+        ObservableCollection<GroupDescriptor> groups;
 
         internal async Task EndColumnDropToGroup()
         {
@@ -1988,17 +2011,12 @@ namespace Radzen.Blazor
 
                 if(column != null && column.Groupable && !string.IsNullOrEmpty(column.GetGroupProperty()))
                 {
-                    var descriptor = groups.Where(d => d.Property == column.GetGroupProperty()).FirstOrDefault();
+                    var descriptor = Groups.Where(d => d.Property == column.GetGroupProperty()).FirstOrDefault();
                     if (descriptor == null)
                     {
                         descriptor = new GroupDescriptor() { Property = column.GetGroupProperty(), Title = column.Title, SortOrder = column.GetSortOrder()  };
-                        groups.Add(descriptor);
+                        Groups.Add(descriptor);
                         _groupedPagedView = null;
-
-                        if (HideGroupedColumn) 
-                        {
-                            column.SetVisible(false);
-                        }
 
                         await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = descriptor });
 
