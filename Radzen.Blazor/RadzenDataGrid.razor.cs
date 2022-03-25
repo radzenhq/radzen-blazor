@@ -2061,11 +2061,23 @@ namespace Radzen.Blazor
         /// <param name="property">The property name.</param>
         public void OrderByDescending(string property)
         {
-            var column = allColumns.ToList().Where(c => c.GetSortProperty() == property).FirstOrDefault();
+            var p = IsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
+
+            var column = allColumns.ToList().Where(c => c.GetSortProperty() == p).FirstOrDefault();
+
             if (column != null)
             {
-                column.SetSortOrder(SortOrder.Descending);
+                column.SetSortOrder(SortOrder.Ascending);
+                SetColumnSortOrder(column);
+
+                Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
             }
+
+            if (LoadData.HasDelegate && IsVirtualizationAllowed())
+            {
+                Data = null;
+            }
+
             InvokeAsync(Reload);
         }
 
