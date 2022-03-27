@@ -10,7 +10,7 @@
         <input type="checkbox" @onchange=@Toggle value=@CheckBoxValue name=@Name id=@Name checked=@CheckBoxChecked
             tabindex="-1">
     </div>
-    <div class=@BoxClassList @onclick=@Toggle>
+    <div class=@BoxClassList @onclick=@Toggle @onclick:preventDefault>
         <span class=@IconClassList></span>
     </div>
 </div>
