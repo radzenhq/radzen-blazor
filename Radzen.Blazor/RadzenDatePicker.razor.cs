@@ -43,10 +43,7 @@ namespace Radzen.Blazor
 
                 var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, newHour, CurrentDate.Minute, CurrentDate.Second);
 
-                if (!object.Equals(newValue, Value))
-                {
-                    await UpdateValueFromTime(newValue);
-                }
+                await UpdateValueFromTime(newValue);
             }
         }
 
@@ -67,10 +64,7 @@ namespace Radzen.Blazor
 
                 var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, newHour, CurrentDate.Minute, CurrentDate.Second);
 
-                if (!object.Equals(newValue, Value))
-                {
-                    await UpdateValueFromTime(newValue);
-                }
+                await UpdateValueFromTime(newValue);
             }
         }
 
