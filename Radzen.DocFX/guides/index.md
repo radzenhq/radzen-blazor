@@ -31,4 +31,4 @@ A Radzen subscription provides:
 You can get support from the Radzen community in the [forum](https://forum.radzen.com).
 
 > [!Warning]
-> The Radzen team monitors the forum threads but does not guarantee a response to every question. Consider [dedicated support](#dedicated-support) of you require guaranteed replies.
+> The Radzen team monitors the forum threads but does not guarantee a response to every question. Consider [dedicated support](#dedicated-support) if you require guaranteed replies.
