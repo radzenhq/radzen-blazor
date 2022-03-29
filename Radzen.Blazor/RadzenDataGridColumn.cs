@@ -160,7 +160,12 @@ namespace Radzen.Blazor
         public bool Visible { get; set; } = true;
 
         bool? _visible;
-        internal bool GetVisible()
+
+        /// <summary>
+        /// Gets if the column is visible or not.
+        /// </summary>
+        /// <returns>System.Boolean.</returns>
+        public bool GetVisible()
         {
             return _visible ?? Visible;
         }
