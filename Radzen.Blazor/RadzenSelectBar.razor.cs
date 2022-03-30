@@ -148,8 +148,6 @@ namespace Radzen.Blazor
             {
                 return object.Equals(Value, item.Value);
             }
-
-            return false;
         }
 
         /// <summary>
