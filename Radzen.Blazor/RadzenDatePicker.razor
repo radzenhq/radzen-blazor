@@ -76,7 +76,7 @@
                                                 DateTime date = StartDate.AddDays(dayNumber++);
                                                 var dateArgs = DateAttributes(date);
 
-                                                @if (CurrentDate.Month == date.Month)
+                                                @if (CurrentDate.Month == date.Month || SameStyleForAllDays)
                                                 {
                                                     <td @attributes="@(dateArgs.Attributes)" onmouseup=@(Inline || ShowTime || dateArgs.Disabled ? "" : $"Radzen.closePopup('{PopupID}')")
                                                     @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
