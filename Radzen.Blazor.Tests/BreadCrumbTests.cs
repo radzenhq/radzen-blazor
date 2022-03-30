@@ -3,172 +3,73 @@ using Xunit;
 
 namespace Radzen.Blazor.Tests
 {
-    public class BreadCrumbTests
+  public class BreadCrumbTests
+  {
+    [Fact]
+    public void BreadCrumb_Renders_Items()
     {
-        [Fact]
-        public void BreadCrumb_Renders_TextProperty()
+      using var ctx = new TestContext();
+
+      var component = ctx.RenderComponent<RadzenBreadCrumb>();
+
+      component.SetParametersAndRender(parameters =>
+      {
+        parameters.Add(c => c.Items, builder =>
         {
-            using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenBreadCrumb<TestItem>>();
-
-            var items = new[]
-            {
-                new TestItem { Text = "Test" }
-            };
-
-            component.SetParametersAndRender(parameters =>
-            {
-                parameters.Add(component => component.TextProperty, nameof(TestItem.Text));
-                parameters.Add(component => component.Data, items);
-            });
-
-            Assert.Contains("Test", component.Markup);
-        }
-
-        [Fact]
-        public void BreadCrumb_DoestNotRender_SeparatorWithOneItem()
-        {
-            using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenBreadCrumb<TestItem>>();
-
-            var items = new[]
-            {
-                new TestItem { Text = "Test" }
-            };
-
-            component.SetParametersAndRender(parameters =>
-            {
-                parameters.Add(component => component.TextProperty, nameof(TestItem.Text));
-                parameters.Add(component => component.Data, items);
-            });
-
-            Assert.Contains("Test", component.Markup);
-            Assert.DoesNotContain(component.Instance.Separator, component.Markup);
-        }
-
-        [Fact]
-        public void BreadCrumb_Renders_LinkProperty()
-        {
-            using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenBreadCrumb<TestItem>>();
-
-            var items = new[]
-            {
-                new TestItem { Text = "Test", Link = "/test-link" }
-            };
-
-            component.SetParametersAndRender(parameters =>
-            {
-                parameters.Add(component => component.TextProperty, nameof(TestItem.Text));
-                parameters.Add(component => component.LinkProperty, nameof(TestItem.Link));
-                parameters.Add(component => component.Data, items);
-            });
-
-            Assert.Contains("/test-link", component.Markup);
-        }
-
-        [Fact]
-        public void BreadCrumb_Renders_Separator()
-        {
-            using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenBreadCrumb<TestItem>>();
-
-            var items = new[]
-            {
-                new TestItem { Text = "Test", Link = "/test-link" },
-                new TestItem { Text = "Test", Link = "/test-link" }
-            };
-
-            component.SetParametersAndRender(parameters =>
-            {
-                parameters.Add(component => component.TextProperty, nameof(TestItem.Text));
-                parameters.Add(component => component.LinkProperty, nameof(TestItem.Link));
-                parameters.Add(component => component.Separator, "SEPARATOR");
-                parameters.Add(component => component.Data, items);
-            });
-
-            Assert.Contains("SEPARATOR", component.Markup);
-        }
-
-        [Fact]
-        public void BreadCrumb_Renders_Template()
-        {
-            using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenBreadCrumb<TestItem>>();
-
-            var items = new[]
-            {
-                new TestItem { Text = "Test1", Link = "/test-link" },
-                new TestItem { Text = "Test2", Link = "/test-link" }
-            };
-
-            component.SetParametersAndRender(parameters =>
-            {
-                parameters.Add(component => component.TextProperty, nameof(TestItem.Text));
-                parameters.Add(component => component.LinkProperty, nameof(TestItem.Link));
-                parameters.Add(component => component.Template, item => item.Text);
-                parameters.Add(component => component.Data, items);
-            });
-
-            Assert.Contains("Test1", component.Markup);
-            Assert.Contains("Test2", component.Markup);
-        }
-
-        [Fact]
-        public void BreadCrumb_Renders_SeparatorTemplate()
-        {
-            using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenBreadCrumb<TestItem>>();
-
-            var items = new[]
-            {
-                new TestItem { Text = "Test", Link = "/test-link" },
-                new TestItem { Text = "Test", Link = "/test-link" },
-                new TestItem { Text = "Test", Link = "/test-link" }
-            };
-
-            component.SetParametersAndRender(parameters =>
-            {
-                parameters.Add(component => component.TextProperty, nameof(TestItem.Text));
-                parameters.Add(component => component.LinkProperty, nameof(TestItem.Link));
-                parameters.Add(component => component.SeparatorTemplate, "<span>SEP</span>");
-                parameters.Add(component => component.Data, items);
-            });
-
-            Assert.Contains("<span>SEP</span>", component.Markup);
-        }
-
-        [Fact]
-        public void BreadCrumb_Renders_Items()
-        {
-            using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenBreadCrumb<object>>();
-
-            component.SetParametersAndRender(parameters =>
-            {
-                parameters.Add(c => c.Items, builder =>
-                {
-                    builder.OpenComponent<RadzenBreadCrumbItem>(0);
-                    builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Test");
-                    builder.CloseComponent();
-                });
-            });
-            //@"<RadzenBreadCrumbItem Text=""Test"" />"
-            Assert.Contains(@"class=""rz-breadcrumb-item", component.Markup);
-            Assert.Contains(">Test</", component.Markup);
-        }
+          builder.OpenComponent<RadzenBreadCrumbItem>(0);
+          builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Test");
+          builder.CloseComponent();
+        });
+      });
+      //@"<RadzenBreadCrumbItem Text=""Test"" />"
+      Assert.Contains(@"class=""rz-breadcrumb-item", component.Markup);
+      Assert.Contains(">Test</", component.Markup);
     }
 
-    public class TestItem
+    [Fact]
+    public void BreadCrumb_Renders_Icon()
     {
-        public string Text { get; set; }
-        public string Link { get; set; }
+      using var ctx = new TestContext();
+
+      var component = ctx.RenderComponent<RadzenBreadCrumb>();
+
+      component.SetParametersAndRender(parameters =>
+      {
+        parameters.Add(c => c.Items, builder =>
+        {
+          builder.OpenComponent<RadzenBreadCrumbItem>(0);
+          builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Test");
+          builder.AddAttribute(2, nameof(RadzenBreadCrumbItem.Icon), "add");
+          builder.CloseComponent();
+        });
+      });
+      //@"<RadzenBreadCrumbItem Text=""Test"" />"
+      Assert.Contains("<i", component.Markup);
+      Assert.Contains(">add</i>", component.Markup);
     }
+
+    [Fact]
+    public void BreadCrumb_Renders_Link()
+    {
+      using var ctx = new TestContext();
+
+      var component = ctx.RenderComponent<RadzenBreadCrumb>();
+
+      component.SetParametersAndRender(parameters =>
+      {
+        parameters.Add(c => c.Items, builder =>
+              {
+                builder.OpenComponent<RadzenBreadCrumbItem>(0);
+                builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Test");
+                builder.AddAttribute(2, nameof(RadzenBreadCrumbItem.Icon), "add");
+                builder.AddAttribute(3, nameof(RadzenBreadCrumbItem.Link), "/badge");
+                builder.CloseComponent();
+              });
+      });
+      //@"<RadzenBreadCrumbItem Text=""Test"" />"
+      Assert.Contains("<i", component.Markup);
+      Assert.Contains(">add</i>", component.Markup);
+      Assert.Contains("<a href=\"/badge", component.Markup);
+    }
+  }
 }

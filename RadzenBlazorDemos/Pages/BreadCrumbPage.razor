@@ -4,45 +4,21 @@
     <div class="col">
         <RadzenCard>
             <RadzenHeading Size="H4" Text="With Template" />
-            <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data">
+            <RadzenBreadCrumb>
                 <Template Context="item">
-                    @item.Title
+                    <RadzenBadge Text="@item.Text" IsPill="true" />
                 </Template>
+                <Items>
+                    <RadzenBreadCrumbItem Link="/badge" Text="Badges" />
+                    <RadzenBreadCrumbItem Icon="add" Text="Add" />
+                </Items>
             </RadzenBreadCrumb>
         </RadzenCard>
     </div>
     <div class="col">
         <RadzenCard>
             <RadzenHeading Size="H4" Text="With Standard Template" />
-            <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title" LinkProperty="Link" />
-        </RadzenCard>
-    </div>
-    <div class="col">   
-    <RadzenCard>
-        <RadzenHeading Size="H4" Text="With Standard Template without Link" />
-        <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title" />
-    </RadzenCard>
-    </div>
-    <div class="col">
-        <RadzenCard>
-            <RadzenHeading Size="H4" Text="With Standard Template and Custom Separator" />
-            <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title" Separator=">>" />
-        </RadzenCard>
-    </div>
-    <div class="col">
-        <RadzenCard>
-            <RadzenHeading Size="H4" Text="With Standard Template and Custom Separator Template" />
-            <RadzenBreadCrumb TItem="BreadCrumbItem" Data="@data" TextProperty="Title">
-                <SeparatorTemplate>
-                    <RadzenIcon Icon="chevron_right" />
-                </SeparatorTemplate>
-            </RadzenBreadCrumb>
-        </RadzenCard>
-    </div>
-    <div class="col">
-        <RadzenCard>
-            <RadzenHeading Size="H4" Text="With Inline Items" />
-            <RadzenBreadCrumb TItem="object">
+            <RadzenBreadCrumb>
                 <Items>
                     <RadzenBreadCrumbItem Link="/badge" Text="Badges" />
                     <RadzenBreadCrumbItem Icon="add" Text="Add" />
@@ -52,17 +28,3 @@
     </div>
 </RadzenExample>
 
-@code {
-  List<BreadCrumbItem> data = new List<BreadCrumbItem>()
-  {
-      new BreadCrumbItem { Title = "Dashboard", Link = "/" },
-      new BreadCrumbItem { Title="Badges", Link = "/badge" },
-  };
-
-
-  class BreadCrumbItem
-  {
-    public string Title { get; set; }
-    public string Link { get; set; }
-  }
-}
