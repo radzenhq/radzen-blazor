@@ -43,6 +43,7 @@ namespace Radzen.Blazor.Tests
           builder.CloseComponent();
         });
       });
+
       //@"<RadzenBreadCrumbItem Text=""Test"" />"
       Assert.Contains("<i", component.Markup);
       Assert.Contains(">add</i>", component.Markup);
@@ -58,14 +59,15 @@ namespace Radzen.Blazor.Tests
       component.SetParametersAndRender(parameters =>
       {
         parameters.Add(c => c.Items, builder =>
-              {
-                builder.OpenComponent<RadzenBreadCrumbItem>(0);
-                builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Test");
-                builder.AddAttribute(2, nameof(RadzenBreadCrumbItem.Icon), "add");
-                builder.AddAttribute(3, nameof(RadzenBreadCrumbItem.Link), "/badge");
-                builder.CloseComponent();
-              });
+        {
+          builder.OpenComponent<RadzenBreadCrumbItem>(0);
+          builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Test");
+          builder.AddAttribute(2, nameof(RadzenBreadCrumbItem.Icon), "add");
+          builder.AddAttribute(3, nameof(RadzenBreadCrumbItem.Link), "/badge");
+          builder.CloseComponent();
+        });
       });
+
       //@"<RadzenBreadCrumbItem Text=""Test"" />"
       Assert.Contains("<i", component.Markup);
       Assert.Contains(">add</i>", component.Markup);
