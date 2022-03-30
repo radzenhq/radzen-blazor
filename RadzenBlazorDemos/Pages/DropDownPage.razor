@@ -12,7 +12,7 @@
     <div class="col-md-6 col-lg-4 col-xl-3 p-3">
         <RadzenCard>
             <h4 class="mb-4">Binding to simple collection</h4>
-            <RadzenDropDown AllowClear="true" TValue="string" Class="w-100" 
+            <RadzenDropDown OpenOnFocus="true" AllowClear="true" TValue="string" Class="w-100" 
                             Data=@(customers.Select(c => c.CompanyName).Distinct())
                             Change=@(args => OnChange(args, "DropDown")) />
         </RadzenCard>

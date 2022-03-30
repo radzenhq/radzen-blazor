@@ -16,6 +16,21 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenDropDown<TValue> : DropDownBase<TValue>
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether popup should open on focus. Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if popup should open on focus; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool OpenOnFocus { get; set; }
+
+        private async Task OnFocus(Microsoft.AspNetCore.Components.Web.FocusEventArgs args)
+        {
+            if (OpenOnFocus)
+            {
+                await OpenPopup("Enter", false);
+            }
+        }
+
         internal override void RenderItem(RenderTreeBuilder builder, object item)
         {
             builder.OpenComponent(0, typeof(RadzenDropDownItem<TValue>));

@@ -22,6 +22,21 @@ namespace Radzen.Blazor
     public partial class RadzenDropDownDataGrid<TValue> : DropDownBase<TValue>
     {
         /// <summary>
+        /// Gets or sets a value indicating whether popup should open on focus. Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if popup should open on focus; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool OpenOnFocus { get; set; }
+
+        private async Task OnFocus(Microsoft.AspNetCore.Components.Web.FocusEventArgs args)
+        {
+            if (OpenOnFocus)
+            {
+                await OpenPopup("Enter", false);
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the value template.
         /// </summary>
         /// <value>The value template.</value>
