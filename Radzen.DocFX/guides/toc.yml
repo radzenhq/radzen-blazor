@@ -22,6 +22,10 @@
       href: components/arcgauge.md
     - name: Autocomplete
       href: components/autocomplete.md
+    - name: Badge
+      href: components/badge.md
+    - name: BreadCrumb
+      href: components/breadcrumb.md
     - name: Button
       href: components/button.md
     - name: SplitButton
