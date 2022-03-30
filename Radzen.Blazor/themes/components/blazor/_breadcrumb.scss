@@ -10,15 +10,12 @@
     padding-right: 1rem;
 }
 
-
-.rz-breadcrumb-separator {
-    display: inline-block;
-    padding-left: 1rem;
-    padding-right: 1rem;
-}
-
 .rz-breadcrumb-item {
-    margin-right: 1rem;
+    margin-right: 0.5rem;
     margin-left: 1rem;
     display: inline-block;
+}
+
+.rz-breadcrumb-item .rzi {
+    font-size: smaller;
 }

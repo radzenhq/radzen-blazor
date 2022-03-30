@@ -1,52 +1,13 @@
 ﻿@inherits RadzenComponent
-@typeparam TItem
 
-@if (Items != null)
+<CascadingValue Value="@Template">
+@if (Visible)
 {
   <div class="rz-breadcrumb @GetComponentCssClass()" style="@Style" @attributes="@Attributes">
-    @Items
+    @if (Items != null)
+    {
+        @Items
+    }
   </div>
 }
-else if (Visible)
-{
-    <div class="rz-breadcrumb @GetComponentCssClass()" style="@Style" @attributes="@Attributes">
-        @if (Data != null)
-        {
-            @foreach (var item in Data.Select((item, idx) => new { Item = item, Index = idx }))
-            {
-                @if (Template != null)
-                {
-                    @Template(item.Item)
-                }
-                else if (TextProperty != null)
-                {
-                    if (LinkProperty != null)
-                    {
-                        <RadzenBreadCrumbItem 
-                            Text="@GetText(item.Item)" 
-                            Link="@GetLink(item.Item)" />
-                    }
-                    else
-                    {
-                        <RadzenBreadCrumbItem 
-                            Text="@GetText(item.Item)" />
-                    }
-                }
-
-                @if (item.Index < (_count - 1))
-                {
-                    <div class="rz-breadcrumb-separator">
-                        @if (SeparatorTemplate != null)
-                        {
-                            @SeparatorTemplate
-                        }
-                        else
-                        {
-                            @Separator
-                        }
-                    </div>
-                }
-            }
-        }
-    </div>
-}
+</CascadingValue>

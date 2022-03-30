@@ -3,17 +3,24 @@
 @if (Visible)
 {
     <div class="rz-breadcrumb-item @GetComponentCssClass()" id="@GetId()" style="@Style" @attributes="@Attributes">
-        @if (!string.IsNullOrWhiteSpace(Link))
+        @if (Template != null)
         {
-            <RadzenLink Icon="@Icon" Path="@Link" Text="@Text" />
+            @Template(this)
         }
         else
         {
-            @if (!string.IsNullOrWhiteSpace(Icon))
+            @if (!string.IsNullOrWhiteSpace(Link))
             {
-                <RadzenIcon Icon="@Icon" />
+                <RadzenLink Icon="@Icon" Path="@Link" Text="@Text" />
             }
-            <RadzenLabel Text="@Text" />
+            else
+            {
+                @if (!string.IsNullOrWhiteSpace(Icon))
+                {
+                    <RadzenIcon Icon="@Icon" />
+                }
+                <RadzenLabel Text="@Text" />
+            }
         }
     </div>
 }
