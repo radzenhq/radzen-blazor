@@ -38,7 +38,7 @@
                             <a href="javascript:void(0)" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { try {CurrentDate = CurrentDate.AddMonths(1);} catch (ArgumentOutOfRangeException) {} } })">
                                 <span class="rz-datepicker-next-icon rzi rzi-chevron-right"></span>
                             </a>
-                            <div class="rz-datepicker-title" style="height:40px;">
+                            <div class="rz-datepicker-title">
                                 <RadzenDropDown @ref="monthDropDown" Style="height:auto;width:120px;margin-top:5px;text-align:left;" TabIndex="-1"
                                             TValue="int" Value="@CurrentDate.Month" Disabled="@Disabled" Data="@months" TextProperty="Name" ValueProperty="Value"
                                             Change="@((args) => { SetMonth(int.Parse(args.ToString())); })" />
