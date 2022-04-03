@@ -63,7 +63,7 @@ namespace Radzen.Blazor.Tests
                     builder.OpenComponent<RadzenBreadCrumbItem>(0);
                     builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Test");
                     builder.AddAttribute(2, nameof(RadzenBreadCrumbItem.Icon), "add");
-                    builder.AddAttribute(3, nameof(RadzenBreadCrumbItem.Link), "/badge");
+                    builder.AddAttribute(3, nameof(RadzenBreadCrumbItem.Path), "/badge");
                     builder.CloseComponent();
                 });
             });
