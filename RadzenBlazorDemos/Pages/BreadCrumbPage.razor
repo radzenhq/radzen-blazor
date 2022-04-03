@@ -8,10 +8,10 @@
                 <Template Context="item">
                     <RadzenBadge Text="@item.Text" IsPill="true" />
                 </Template>
-                <Items>
+                <ChildContent>
                     <RadzenBreadCrumbItem Link="/badge" Text="Badges" />
                     <RadzenBreadCrumbItem Icon="add" Text="Add" />
-                </Items>
+                </ChildContent>
             </RadzenBreadCrumb>
         </RadzenCard>
     </div>
@@ -19,10 +19,8 @@
         <RadzenCard>
             <RadzenHeading Size="H4" Text="With Standard Template" />
             <RadzenBreadCrumb>
-                <Items>
-                    <RadzenBreadCrumbItem Link="/badge" Text="Badges" />
-                    <RadzenBreadCrumbItem Icon="add" Text="Add" />
-                </Items>
+                <RadzenBreadCrumbItem Link="/badge" Text="Badges" />
+                <RadzenBreadCrumbItem Icon="add" Text="Add" />
             </RadzenBreadCrumb>
         </RadzenCard>
     </div>
