@@ -2,16 +2,16 @@
 
 @if (Visible)
 {
-    <div class="rz-breadcrumb-item @GetComponentCssClass()" id="@GetId()" style="@Style" @attributes="@Attributes">
+    <div class="@GetCssClass()" id="@GetId()" style="@Style" @attributes="@Attributes">
         @if (Template != null)
         {
             @Template(this)
         }
         else
         {
-            @if (!string.IsNullOrWhiteSpace(Link))
+            @if (!string.IsNullOrWhiteSpace(Path))
             {
-                <RadzenLink Icon="@Icon" Path="@Link" Text="@Text" />
+                <RadzenLink Icon="@Icon" Path="@Path" Text="@Text" />
             }
             else
             {

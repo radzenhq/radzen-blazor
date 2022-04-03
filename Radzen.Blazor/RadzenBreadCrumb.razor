@@ -3,7 +3,7 @@
 <CascadingValue Value="@Template">
 @if (Visible)
 {
-  <div class="rz-breadcrumb @GetComponentCssClass()" style="@Style" @attributes="@Attributes" id="@GetId()">
+  <div class="@GetCssClass()" style="@Style" @attributes="@Attributes" id="@GetId()">
     @if (ChildContent != null)
     {
         @ChildContent
