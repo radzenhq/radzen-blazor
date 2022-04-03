@@ -1,12 +1,12 @@
-﻿@inherits RadzenComponent
+﻿@inherits RadzenComponentWithChildren
 
 <CascadingValue Value="@Template">
 @if (Visible)
 {
   <div class="rz-breadcrumb @GetComponentCssClass()" style="@Style" @attributes="@Attributes">
-    @if (Items != null)
+    @if (ChildContent != null)
     {
-        @Items
+        @ChildContent
     }
   </div>
 }
