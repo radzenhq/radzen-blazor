@@ -6,12 +6,12 @@
 @typeparam TValue
 @inherits FormComponent<IEnumerable<TValue>>
 
-<CascadingValue Value=this>
-    @if (Items != null)
-    {
-            @Items
-    }
-</CascadingValue>
+@if (Items != null)
+{
+    <CascadingValue Value=this>
+        @Items
+    </CascadingValue>
+}
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
