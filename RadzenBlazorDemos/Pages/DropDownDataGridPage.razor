@@ -10,7 +10,7 @@
         <div class="col-md-6 col-lg-4 col-xl-3 p-3">
             <RadzenCard>
                 <h4 class="mb-4">Binding to simple collection</h4>
-                <RadzenDropDownDataGrid OpenOnFocus="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true"
+                <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true"
                                         Data=@(customers.Select(c => c.CompanyName).Distinct().AsQueryable())
                                         Change=@(args => OnChange(args, "DropDownDataGrid")) Style="width: 100%"/>
             </RadzenCard>
