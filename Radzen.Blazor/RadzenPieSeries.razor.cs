@@ -174,11 +174,16 @@ namespace Radzen.Blazor
         {
             var style = base.TooltipStyle(item);
 
-            var color = PickColor(Items.IndexOf(item), Fills);
+            var index = Items.IndexOf(item);
 
-            if (color != null)
+            if (index >= 0)
             {
-                style = $"{style}; border-color: {color};";
+                var color = PickColor(index, Fills);
+
+                if (color != null)
+                {
+                    style = $"{style}; border-color: {color};";
+                }
             }
 
             return style;
