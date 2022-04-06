@@ -6,16 +6,13 @@
 .rz-breadcrumb-item + .rz-breadcrumb-item::before {
     content: '»';
     display: inline-block;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.25rem;
 }
 
 .rz-breadcrumb-item {
-    margin-right: 0.5rem;
-    margin-left: 1rem;
-    display: inline-block;
-}
-
-.rz-breadcrumb-item .rzi {
-    font-size: smaller;
+    display: inline-flex;
+    align-items: center;
 }

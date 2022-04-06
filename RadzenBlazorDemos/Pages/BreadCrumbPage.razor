@@ -1,28 +1,32 @@
 ﻿@page "/breadcrumb"
 
-<RadzenExample Name="Bread Crumb" Source="BreadCrumb" Documentation="false">
-    <div class="col">
-        <RadzenCard>
-            <RadzenHeading Size="H4" Text="With Template" />
-            <RadzenBreadCrumb>
-                <Template Context="item">
-                    <RadzenBadge Text="@item.Text" IsPill="true" />
-                </Template>
-                <ChildContent>
-                    <RadzenBreadCrumbItem Path="/badge" Text="Badges" />
+<RadzenExample Name="BreadCrumb" Source="BreadCrumb" Documentation="false">
+    <div class="row px-3">
+        <div class="col-md-6 p-3">
+            <RadzenCard class="pb-4">
+                <RadzenHeading Size="H4" Text="Default Radzen BreadCrumb" Class="mb-4" />
+                <RadzenBreadCrumb>
+                    <RadzenBreadCrumbItem Path="/" Text="Components" />
+                    <RadzenBreadCrumbItem Path="/badge" Text="Badge" />
                     <RadzenBreadCrumbItem Icon="add" Text="Add" />
-                </ChildContent>
-            </RadzenBreadCrumb>
-        </RadzenCard>
-    </div>
-    <div class="col">
-        <RadzenCard>
-            <RadzenHeading Size="H4" Text="With Standard Template" />
-            <RadzenBreadCrumb>
-                <RadzenBreadCrumbItem Path="/badge" Text="Badges" />
-                <RadzenBreadCrumbItem Icon="add" Text="Add" />
-            </RadzenBreadCrumb>
-        </RadzenCard>
+                </RadzenBreadCrumb>
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard class="pb-4">
+                <RadzenHeading Size="H4" Text="With Template" Class="mb-4" />
+                <RadzenBreadCrumb>
+                    <Template Context="item">
+                        <RadzenBadge Text="@item.Text" IsPill="true" />
+                    </Template>
+                    <ChildContent>
+                        <RadzenBreadCrumbItem Path="/" Text="Components" />
+                        <RadzenBreadCrumbItem Path="/badge" Text="Badge" />
+                        <RadzenBreadCrumbItem Icon="add" Text="Add" />
+                    </ChildContent>
+                </RadzenBreadCrumb>
+            </RadzenCard>
+        </div>
     </div>
 </RadzenExample>
 

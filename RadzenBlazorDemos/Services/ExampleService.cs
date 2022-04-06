@@ -507,6 +507,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "BreadCrumb",
+                    New = true,
+                    Path = "breadcrumb",
+                    Icon = "&#xeac9",
+                    Tags = new [] { "breadcrumb", "navigation", "menu" }
+                },
+                new Example()
+                {
                     Name = "Card",
                     Path = "card",
                     Icon = "&#xe919",
@@ -586,13 +594,6 @@ namespace RadzenBlazorDemos
                     Path = "tabs",
                     Icon = "&#xe8d8",
                     Tags = new [] { "tabstrip", "tabview", "container" }
-                },
-                new Example()
-                {
-                    Name = "Bread Crumb",
-                    Path = "breadcrumb",
-                    Icon = "&#xeac9",
-                    Tags = new [] { "breadcrumb", "navigation", "menu" }
                 }
             }
         },
