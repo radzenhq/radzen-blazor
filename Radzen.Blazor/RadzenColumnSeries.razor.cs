@@ -91,6 +91,26 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <inheritdoc />
+        protected override string TooltipStyle(TItem item)
+        {
+            var style = base.TooltipStyle(item);
+
+            var index = Items.IndexOf(item);
+
+            if (index >= 0)
+            {
+                var color = PickColor(index, Fills, Fill);
+
+                if (color != null)
+                {
+                    style = $"{style}; border-color: {color};";
+                }
+            }
+
+            return style;
+        }
+
         private double BandWidth
         {
             get

@@ -9,7 +9,7 @@ namespace Radzen.Blazor
     /// Renders bar series in <see cref="RadzenChart" />.
     /// </summary>
     /// <typeparam name="TItem">The type of the series data item.</typeparam>
-    public partial class RadzenBarSeries<TItem> : Radzen.Blazor.CartesianSeries<TItem>, IChartBarSeries
+    public partial class RadzenBarSeries<TItem> : CartesianSeries<TItem>, IChartBarSeries
     {
         /// <summary>
         /// Specifies the fill (background color) of the bar series.
@@ -94,6 +94,26 @@ namespace Radzen.Blazor
             {
                 return BarSeries.Where(series => series.Visible).ToList();
             }
+        }
+
+        /// <inheritdoc />
+        protected override string TooltipStyle(TItem item)
+        {
+            var style = base.TooltipStyle(item);
+
+            var index = Items.IndexOf(item);
+
+            if (index >= 0)
+            {
+                var color = PickColor(index, Fills, Fill);
+
+                if (color != null)
+                {
+                    style = $"{style}; border-color: {color};";
+                }
+            }
+
+            return style;
         }
 
         private double BandHeight
