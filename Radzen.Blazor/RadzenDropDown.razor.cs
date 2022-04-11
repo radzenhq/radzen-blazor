@@ -56,7 +56,7 @@ namespace Radzen.Blazor
             builder.OpenComponent(0, typeof(RadzenDropDownItem<TValue>));
             builder.AddAttribute(1, "DropDown", this);
             builder.AddAttribute(2, "Item", item);
-            builder.SetKey(item);
+            builder.SetKey(PropertyAccess.GetItemOrValueFromProperty(item, ValueProperty));
             builder.CloseComponent();
         }
 
