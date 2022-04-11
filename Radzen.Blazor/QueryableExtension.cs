@@ -877,7 +877,7 @@ namespace Radzen
                         property = $"({property})";
                     }
 
-                    if (column.FilterPropertyType == typeof(string))
+                    if (column.FilterPropertyType == typeof(string) && !(column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull))
                     {
                         property = $@"({property} == null ? """" : {property})";
                     }
