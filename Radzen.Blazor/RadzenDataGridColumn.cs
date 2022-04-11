@@ -577,6 +577,21 @@ namespace Radzen.Blazor
                 }
             }
 
+            if (parameters.DidParameterChange(nameof(OrderIndex), OrderIndex))
+            {
+                var newOrderIndex = parameters.GetValueOrDefault<int?>(nameof(OrderIndex));
+                if (newOrderIndex != orderIndex)
+                {
+                    SetOrderIndex(newOrderIndex);
+
+                    if (Grid != null)
+                    {
+                        Grid.UpdateColumnsOrder();
+                        await Grid.ChangeState();
+                    }
+                }
+            }
+
             if (parameters.DidParameterChange(nameof(SortOrder), SortOrder))
             {
                 sortOrder = new SortOrder?[] { parameters.GetValueOrDefault<SortOrder?>(nameof(SortOrder)) };
