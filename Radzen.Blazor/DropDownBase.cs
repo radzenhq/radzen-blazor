@@ -145,6 +145,23 @@ namespace Radzen
             //
         }
 
+        System.Collections.Generic.HashSet<object> keys = new System.Collections.Generic.HashSet<object>();
+
+        internal object GetKey(object item)
+        {
+            var value = PropertyAccess.GetItemOrValueFromProperty(item, ValueProperty);
+
+            if (!keys.Contains(value))
+            {
+                keys.Add(value);
+                return value;
+            }
+            else
+            {
+                return item;
+            }
+        }
+
         /// <summary>
         /// Gets or sets a value indicating whether filtering is allowed. Set to <c>false</c> by default.
         /// </summary>
@@ -937,6 +954,14 @@ namespace Radzen
             {
                 selectedItem = null;
             }
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            keys.Clear();
         }
     }
 }
