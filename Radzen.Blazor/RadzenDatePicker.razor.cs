@@ -209,13 +209,19 @@ namespace Radzen.Blazor
         IList<NameValue> months;
         IList<NameValue> years;
 
+        int YearFrom { get; set; }
+        int YearTo { get; set; }
+
         /// <inheritdoc />
         protected override void OnInitialized()
         {
             base.OnInitialized();
 
+            YearFrom = int.Parse(YearRange.Split(':').First());
+            YearTo = int.Parse(YearRange.Split(':').Last());
+
             months = Enumerable.Range(1, 12).Select(i => new NameValue() { Name = Culture.DateTimeFormat.GetMonthName(i), Value = i }).ToList();
-            years = Enumerable.Range(int.Parse(YearRange.Split(':').First()), int.Parse(YearRange.Split(':').Last()) - int.Parse(YearRange.Split(':').First()) + 1)
+            years = Enumerable.Range(YearFrom, YearTo - YearFrom + 1)
                 .Select(i => new NameValue() { Name = $"{i}", Value = i }).ToList();
         }
 
@@ -345,7 +351,7 @@ namespace Radzen.Blazor
                 }
                 return _currentDate;
             }
-            set 
+            set
             {
                 _currentDate = value;
                 CurrentDateChanged.InvokeAsync(value);
@@ -362,7 +368,8 @@ namespace Radzen.Blazor
         {
             get
             {
-                if (CurrentDate == DateTime.MinValue) {
+                if (CurrentDate == DateTime.MinValue)
+                {
                     return DateTime.MinValue;
                 }
 
@@ -672,7 +679,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The year range.</value>
         [Parameter]
-        public string YearRange { get; set; } = "1950:2050";
+        public string YearRange { get; set; } = $"1950:{DateTime.Now.AddYears(30).Year}";
 
         /// <summary>
         /// Gets or sets the hour format.
@@ -773,7 +780,7 @@ namespace Radzen.Blazor
         {
             if (ShowTimeOkButton)
             {
-                CurrentDate = new DateTime(newValue.Year, newValue.Month,newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
+                CurrentDate = new DateTime(newValue.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
                 await OkClick();
             }
             else
