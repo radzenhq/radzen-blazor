@@ -1,6 +1,9 @@
+![Radzen Blazor Components](RadzenBlazorDemos/wwwroot/images/radzen-blazor-components.png)
+
 <h1 align="center">
     Radzen Blazor Components
 </h1>
+
 <p align="center">
     A set of <strong>60+ free and open source</strong> native Blazor UI controls.
 </p>
