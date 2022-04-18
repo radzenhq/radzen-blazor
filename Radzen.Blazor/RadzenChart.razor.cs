@@ -296,7 +296,9 @@ namespace Radzen.Blazor
         {
             if (Tooltip.Visible)
             {
-                foreach (var series in Series)
+                var orderedSeries = Series.OrderBy(s => s.RenderingOrder).Reverse();
+
+                foreach (var series in orderedSeries)
                 {
                     if (series.Visible && series.Contains(mouseX - MarginLeft, mouseY - MarginTop, 25))
                     {

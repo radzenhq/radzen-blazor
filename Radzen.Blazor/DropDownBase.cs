@@ -145,6 +145,23 @@ namespace Radzen
             //
         }
 
+        System.Collections.Generic.HashSet<object> keys = new System.Collections.Generic.HashSet<object>();
+
+        internal object GetKey(object item)
+        {
+            var value = PropertyAccess.GetItemOrValueFromProperty(item, ValueProperty);
+
+            if (!keys.Contains(value))
+            {
+                keys.Add(value);
+                return value;
+            }
+            else
+            {
+                return item;
+            }
+        }
+
         /// <summary>
         /// Gets or sets a value indicating whether filtering is allowed. Set to <c>false</c> by default.
         /// </summary>
@@ -372,7 +389,7 @@ namespace Radzen
         /// <summary>
         /// The list
         /// </summary>
-        protected ElementReference list;
+        protected ElementReference? list;
         /// <summary>
         /// The selected index
         /// </summary>
@@ -392,7 +409,10 @@ namespace Radzen
             await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, true);
             await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
 
-            await JSRuntime.InvokeVoidAsync("Radzen.selectListItem", search, list, selectedIndex);
+            if (list != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.selectListItem", search, list, selectedIndex);
+            }
         }
 
         /// <summary>
@@ -934,6 +954,14 @@ namespace Radzen
             {
                 selectedItem = null;
             }
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            keys.Clear();
         }
     }
 }

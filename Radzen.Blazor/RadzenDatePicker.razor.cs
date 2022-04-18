@@ -209,16 +209,20 @@ namespace Radzen.Blazor
         IList<NameValue> months;
         IList<NameValue> years;
 
+        int YearFrom { get; set; }
+        int YearTo { get; set; }
+
         /// <inheritdoc />
         protected override void OnInitialized()
         {
             base.OnInitialized();
 
+            YearFrom = Min.HasValue ? Min.Value.Year : int.Parse(YearRange.Split(':').First());
+            YearTo = Max.HasValue ? Max.Value.Year : int.Parse(YearRange.Split(':').Last());
             months = Enumerable.Range(1, 12).Select(i => new NameValue() { Name = Culture.DateTimeFormat.GetMonthName(i), Value = i }).ToList();
-            var firstYear = Min.HasValue ? Min.Value.Year : int.Parse(YearRange.Split(':').First());
-            var lastYear = Max.HasValue ? Max.Value.Year : int.Parse(YearRange.Split(':').Last());
-            years = Enumerable.Range(firstYear, lastYear - firstYear + 1)
+            years = Enumerable.Range(YearFrom, YearTo - YearFrom + 1)
                 .Select(i => new NameValue() { Name = $"{i}", Value = i }).ToList();
+
         }
 
         /// <summary>
@@ -368,7 +372,7 @@ namespace Radzen.Blazor
                 }
                 return _currentDate;
             }
-            set 
+            set
             {
                 _currentDate = value;
                 CurrentDateChanged.InvokeAsync(value);
@@ -385,7 +389,8 @@ namespace Radzen.Blazor
         {
             get
             {
-                if (CurrentDate == DateTime.MinValue) {
+                if (CurrentDate == DateTime.MinValue)
+                {
                     return DateTime.MinValue;
                 }
 
@@ -695,7 +700,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The year range.</value>
         [Parameter]
-        public string YearRange { get; set; } = "1950:2050";
+        public string YearRange { get; set; } = $"1950:{DateTime.Now.AddYears(30).Year}";
 
         /// <summary>
         /// Gets or sets the hour format.
@@ -796,7 +801,7 @@ namespace Radzen.Blazor
         {
             if (ShowTimeOkButton)
             {
-                CurrentDate = new DateTime(newValue.Year, newValue.Month,newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
+                CurrentDate = new DateTime(newValue.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
                 await OkClick();
             }
             else

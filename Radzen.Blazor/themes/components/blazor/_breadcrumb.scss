@@ -1,0 +1,18 @@
+﻿.rz-breadcrumb {
+    display: flex;
+    align-items: center;
+}
+
+.rz-breadcrumb-item + .rz-breadcrumb-item::before {
+    content: '»';
+    display: inline-block;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.25rem;
+}
+
+.rz-breadcrumb-item {
+    display: inline-flex;
+    align-items: center;
+}

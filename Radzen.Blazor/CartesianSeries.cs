@@ -130,10 +130,21 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="CartesianSeries{TItem}"/> is visible.
+        /// Invisible series do not appear in the legend and cannot be shown by the user.
+        /// Use the <c>Visible</c> property to programatically show or hide a series.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Visible { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="CartesianSeries{TItem}"/> is hidden.
+        /// Hidden series are initially invisible and the user can show them by clicking on their label in the legend.
+        /// Use the <c>Hidden</c> property to hide certain series from your users but still allow them to see them.
+        /// </summary>
+        /// <value><c>true</c> if hidden; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Hidden { get; set; }
 
         bool IsVisible { get; set; } = true;
 
@@ -308,8 +319,15 @@ namespace Radzen.Blazor
         {
             var shouldRefresh = parameters.DidParameterChange(nameof(Data), Data);
             var visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+            var hiddenChanged = parameters.DidParameterChange(nameof(Hidden), Hidden);
 
             await base.SetParametersAsync(parameters);
+
+            if (hiddenChanged)
+            {
+                IsVisible = !Hidden;
+                shouldRefresh = true;
+            }
 
             if (visibleChanged)
             {

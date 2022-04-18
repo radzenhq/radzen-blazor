@@ -16,12 +16,47 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenDropDown<TValue> : DropDownBase<TValue>
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether popup should open on focus. Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if popup should open on focus; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool OpenOnFocus { get; set; }
+
+        private async Task OnFocus(Microsoft.AspNetCore.Components.Web.FocusEventArgs args)
+        {
+            if (OpenOnFocus)
+            {
+                await OpenPopup("Enter", false);
+            }
+        }
+
+        /// <summary>
+        /// Opens the popup.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
+        /// <param name="isFromClick">if set to <c>true</c> [is from click].</param>
+        protected override async System.Threading.Tasks.Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
+        {
+            if (Disabled)
+                return;
+
+            await JSRuntime.InvokeVoidAsync(OpenOnFocus ? "Radzen.openPopup" : "Radzen.togglePopup", Element, PopupID, true);
+            await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
+
+            if (list != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.selectListItem", search, list, selectedIndex);
+            }
+        }
+
         internal override void RenderItem(RenderTreeBuilder builder, object item)
         {
             builder.OpenComponent(0, typeof(RadzenDropDownItem<TValue>));
             builder.AddAttribute(1, "DropDown", this);
             builder.AddAttribute(2, "Item", item);
-            builder.SetKey(item);
+            builder.SetKey(GetKey(item));
             builder.CloseComponent();
         }
 

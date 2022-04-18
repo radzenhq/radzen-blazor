@@ -7,16 +7,21 @@
 <HeadContent>
     <meta name="description" content="@ExampleService.DescriptionFor(example)">
 </HeadContent>
-
 @if (Heading)
 {
     <h1>@Name</h1>
     <p>Demonstration and configuration of the Radzen Blazor <strong>@Name</strong> component.</p>
 }
+<div class="documentation-links">
 @if (Documentation)
 {
-    <a class="documentation-link" target="blank" href="@DocumentationHref" title=@($"Open {Name} documentation in new tab") ><RadzenIcon Icon="help_outline" style="font-size: 1rem; margin-right: 4px;" /> @Name Docs</a>
+    <a target="blank" href="@DocumentationHref" title=@($"Open {Name} documentation in new tab") ><RadzenIcon Icon="help_outline" style="font-size: 1rem; margin-right: 4px;" /> @Name Docs</a>
 }
+@if (Heading)
+{
+    <a target="blank" href="@ComponentSourceHref" title=@($"View {Name} source code in new tab") ><RadzenIcon Icon="launch" style="font-size: 1rem; margin-right: 4px;" /> @Name Source</a>
+}
+</div>
 <RadzenTabs>
     <Tabs>
         <RadzenTabsItem Text="Example" Icon="apps">
@@ -51,6 +56,8 @@
     public bool Documentation { get; set; } = true;
 
     string DocumentationHref => $"/docs/guides/components/{Name.ToLower()}.html";
+
+    string ComponentSourceHref => $"https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/Radzen{Name}.razor.cs";
 
     [Parameter]
     public IEnumerable<string> AdditionalSourceCodePages { get; set; } = Enumerable.Empty<string>();

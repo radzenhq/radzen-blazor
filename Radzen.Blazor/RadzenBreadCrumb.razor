@@ -1,0 +1,13 @@
+﻿@inherits RadzenComponentWithChildren
+
+<CascadingValue Value="@Template">
+@if (Visible)
+{
+  <div class="@GetCssClass()" style="@Style" @attributes="@Attributes" id="@GetId()">
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+  </div>
+}
+</CascadingValue>

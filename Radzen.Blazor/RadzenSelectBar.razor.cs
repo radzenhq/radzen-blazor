@@ -140,19 +140,14 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if the specified item is selected; otherwise, <c>false</c>.</returns>
         protected bool IsSelected(RadzenSelectBarItem item)
         {
-            if (Value != null)
+            if (Multiple)
             {
-                if (Multiple)
-                {
-                    return ((IEnumerable)Value).Cast<object>().Contains(item.Value);
-                }
-                else
-                {
-                    return object.Equals(Value, item.Value);
-                }
+                return Value != null && ((IEnumerable)Value).Cast<object>().Contains(item.Value);
             }
-
-            return false;
+            else
+            {
+                return object.Equals(Value, item.Value);
+            }
         }
 
         /// <summary>

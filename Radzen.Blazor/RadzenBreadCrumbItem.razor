@@ -1,0 +1,26 @@
+﻿@inherits RadzenComponent
+
+@if (Visible)
+{
+    <div class="@GetCssClass()" id="@GetId()" style="@Style" @attributes="@Attributes">
+        @if (Template != null)
+        {
+            @Template(this)
+        }
+        else
+        {
+            @if (!string.IsNullOrWhiteSpace(Path))
+            {
+                <RadzenLink Icon="@Icon" Path="@Path" Text="@Text" />
+            }
+            else
+            {
+                @if (!string.IsNullOrWhiteSpace(Icon))
+                {
+                    <RadzenIcon Icon="@Icon" />
+                }
+                <RadzenLabel Text="@Text" />
+            }
+        }
+    </div>
+}

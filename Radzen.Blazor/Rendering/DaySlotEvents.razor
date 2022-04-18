@@ -28,7 +28,7 @@
         var eventEnd = item.End > EndDate ? EndDate : item.End;
         var length = eventStart.Subtract(StartDate).TotalMinutes / MinutesPerSlot;
         var top = 1.5 * length;
-        var height = Math.Max(1.5, 1.5 * eventEnd.Subtract(eventStart).TotalHours * 2);
+        var height = Math.Max(1.5, 1.5 * eventEnd.Subtract(eventStart).TotalHours * (60 / MinutesPerSlot));
 
         @if (item.Start >= start && item.Start <= end)
         {

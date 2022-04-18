@@ -21,7 +21,7 @@ namespace Radzen.Blazor
             builder.OpenComponent(0, typeof(RadzenListBoxItem<TValue>));
             builder.AddAttribute(1, "ListBox", this);
             builder.AddAttribute(2, "Item", item);
-            builder.SetKey(item);
+            builder.SetKey(GetKey(item));
             builder.CloseComponent();
         }
 
