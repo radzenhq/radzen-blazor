@@ -76,7 +76,7 @@
                                                 DateTime date = StartDate.AddDays(dayNumber++);
                                                 var dateArgs = DateAttributes(date);
 
-                                                @if (CurrentDate.Month == date.Month || SameStyleForAllDays)
+                                                @if (CurrentDate.Month == date.Month)
                                                 {
                                                     <td @attributes="@(dateArgs.Attributes)" onmouseup=@(Inline || ShowTime || dateArgs.Disabled ? "" : $"Radzen.closePopup('{PopupID}')")
                                                     @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
@@ -87,7 +87,7 @@
                                                 {
                                                     <td @attributes="@(dateArgs.Attributes)" class="rz-datepicker-other-month" onmouseup=@(Inline || ShowTime || dateArgs.Disabled ? "" : $"Radzen.closePopup('{PopupID}')")
                                                     @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
-                                                        <span class="rz-state-default rz-state-disabled">@date.Day</span>
+                                                        <span class=@($"rz-state-default{(!dateArgs.Disabled ? "" : " rz-state-disabled")} rz-datepicker-other-month")>@date.Day</span>
                                                     </td>
                                                 }
                                             }

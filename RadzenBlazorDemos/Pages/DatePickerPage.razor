@@ -66,20 +66,20 @@
             </div>
             <div class="col-lg-6 col-xl-4 p-3">
                 <RadzenCard>
-                    <h4 class="mb-4">DatePicker with custom initial month/year (June, 2040)</h4>
-                    <RadzenDatePicker InitialMonth="new DateTime(2040,06,01)" TValue="DateTime?" Change=@(args => OnChange(args, "DatePicker with custom initial month/year (June, 2040)", "MM/dd/yyyy")) Class="w-100" />
+                    <h4 class="mb-4">DatePicker with custom initial view date (June 1, 2040)</h4>
+                    <RadzenDatePicker InitialViewDate="new DateTime(2040,06,01)" TValue="DateTime?" Change=@(args => OnChange(args, "DatePicker with custom initial view date (June 1, 2040)", "MM/dd/yyyy")) Class="w-100" />
                 </RadzenCard>
             </div>
             <div class="col-lg-6 col-xl-4 p-3">
                 <RadzenCard>
-                    <h4 class="mb-4">DatePicker with minimum and maximum dates and disabled weekends</h4>
-                    <RadzenDatePicker MinimumDate="DateTime.Today.AddDays(-7)" MaximumDate="DateTime.Today.AddDays(7)" DateRender=@DateRenderNoWeekends TValue="DateTime?" Change=@(args => OnChange(args, "DatePicker with minimum and maximum dates and disabled weekends", "MM/dd/yyyy")) Class="w-100" />
+                    <h4 class="mb-4">DatePicker with minimum and maximum dates</h4>
+                    <RadzenDatePicker Min="DateTime.Today.AddDays(-7)" Max="DateTime.Today.AddDays(7)" TValue="DateTime?" Change=@(args => OnChange(args, "DatePicker with minimum and maximum dates", "MM/dd/yyyy")) Class="w-100" />
                 </RadzenCard>
             </div>
             <div class="col-lg-6 col-xl-4 p-3">
                 <RadzenCard>
-                    <h4 class="mb-4">DatePicker same styling for days of other months</h4>
-                    <RadzenDatePicker SameStyleForAllDays=true TValue="DateTime?" Change=@(args => OnChange(args, "DatePicker same styling for days of other months", "MM/dd/yyyy")) Class="w-100" />
+                    <h4 class="mb-4">DatePicker with disabled weekends</h4>
+                    <RadzenDatePicker DateRender=@DateRenderNoWeekends TValue="DateTime?" Change=@(args => OnChange(args, "DatePicker with disabled weekends", "MM/dd/yyyy")) Class="w-100" />
                 </RadzenCard>
             </div>
         </div>
