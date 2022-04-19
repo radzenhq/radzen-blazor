@@ -41,6 +41,11 @@
     }
     else if(Grid.GroupFootersAlwaysVisible)
     {
+        if (!Grid.collapsedGroupItems.Keys.Contains(this))
+        {
+            Grid.collapsedGroupItems.Add(this, true);
+        }
+
         @DrawDataRows(true)
     }
     else
