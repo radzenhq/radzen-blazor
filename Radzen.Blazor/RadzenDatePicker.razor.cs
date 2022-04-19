@@ -217,12 +217,12 @@ namespace Radzen.Blazor
         {
             base.OnInitialized();
 
-            YearFrom = int.Parse(YearRange.Split(':').First());
-            YearTo = int.Parse(YearRange.Split(':').Last());
-
+            YearFrom = Min.HasValue ? Min.Value.Year : int.Parse(YearRange.Split(':').First());
+            YearTo = Max.HasValue ? Max.Value.Year : int.Parse(YearRange.Split(':').Last());
             months = Enumerable.Range(1, 12).Select(i => new NameValue() { Name = Culture.DateTimeFormat.GetMonthName(i), Value = i }).ToList();
             years = Enumerable.Range(YearFrom, YearTo - YearFrom + 1)
                 .Select(i => new NameValue() { Name = $"{i}", Value = i }).ToList();
+
         }
 
         /// <summary>
@@ -255,6 +255,27 @@ namespace Radzen.Blazor
         [Parameter]
         public string InputClass { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Minimum Selectable Date.
+        /// </summary>
+        /// <value>The Minimum Selectable Date.</value>
+        [Parameter]
+        public DateTime? Min { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Maximum Selectable Date.
+        /// </summary>
+        /// <value>The Maximum Selectable Date.</value>
+        [Parameter]
+        public DateTime? Max { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Initial Date/Month View.
+        /// </summary>
+        /// <value>The Initial Date/Month View.</value>
+        [Parameter]
+        public DateTime? InitialViewDate { get; set; }
+
         DateTime? _dateTimeValue;
 
         DateTime? DateTimeValue
@@ -282,7 +303,7 @@ namespace Radzen.Blazor
 
         DateRenderEventArgs DateAttributes(DateTime value)
         {
-            var args = new Radzen.DateRenderEventArgs() { Date = value, Disabled = false };
+            var args = new Radzen.DateRenderEventArgs() { Date = value, Disabled = (Min.HasValue && value < Min.Value) || (Max.HasValue && value > Max.Value) };
 
             if (DateRender != null)
             {
@@ -347,7 +368,7 @@ namespace Radzen.Blazor
             {
                 if (_currentDate == default(DateTime))
                 {
-                    _currentDate = HasValue ? DateTimeValue.Value : DateTime.Today;
+                    _currentDate = HasValue ? DateTimeValue.Value : InitialViewDate ?? DateTime.Today;
                 }
                 return _currentDate;
             }
