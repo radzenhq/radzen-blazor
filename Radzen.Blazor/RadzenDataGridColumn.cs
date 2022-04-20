@@ -573,6 +573,7 @@ namespace Radzen.Blazor
             {
                 if (Grid != null)
                 {
+                    Grid.UpdatePickableColumn(this, parameters.GetValueOrDefault<bool>(nameof(Visible)));
                     await Grid.ChangeState();
                 }
             }

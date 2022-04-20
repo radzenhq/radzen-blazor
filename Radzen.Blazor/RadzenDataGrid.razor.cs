@@ -375,6 +375,27 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        internal void UpdatePickableColumn(RadzenDataGridColumn<TItem> column, bool visible)
+        {
+            var columnsList = (IList<RadzenDataGridColumn<TItem>>)selectedColumns;
+            if (visible)
+            {
+                if (!columnsList.Contains(column))
+                {
+                    columnsList.Add(column);
+                }
+            }
+            else 
+            {
+                if (columnsList.Contains(column))
+                {
+                    columnsList.Remove(column);
+                }
+            }
+
+            selectedColumns = columnsList;
+        }
+
         internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
         {
             if (columns.Contains(column))
