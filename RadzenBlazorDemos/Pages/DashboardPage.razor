@@ -109,7 +109,7 @@
             <h3>Issue List</h3>
             <RadzenDataGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true" AllowSorting="true">
                 <Columns>
-                    <RadzenDataGridColumn TItem="Issue" Title="User" Width="200px" Property="User.Login">
+                    <RadzenDataGridColumn TItem="Issue" Title="User" Width="200px" Property="User.Login" FilterValue="@selectedUser?.Login">
                         <FilterTemplate>
                             <RadzenDropDown AllowClear="true" AllowFiltering="true" Data=@users TextProperty="Login" @bind-Value="selectedUser" Change=@FilterIssues>
                                 <Template Context="user">
