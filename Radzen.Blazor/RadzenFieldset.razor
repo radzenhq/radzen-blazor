@@ -3,6 +3,8 @@
 @if (Visible)
 {
     <fieldset @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+        @if(AllowCollapse || !string.IsNullOrEmpty(Text) || !string.IsNullOrEmpty(Icon) || HeaderTemplate != null)
+        {
         <legend class="rz-fieldset-legend" style="white-space:nowrap">
 
             @if (AllowCollapse)
@@ -41,6 +43,7 @@
                 @HeaderTemplate
             }
         </legend>
+        }
         <div class="rz-fieldset-content-wrapper" role="region" id="rz-fieldset-0-content" aria-hidden="false" style="@contentStyle">
             <div class="rz-fieldset-content">
                 @ChildContent
