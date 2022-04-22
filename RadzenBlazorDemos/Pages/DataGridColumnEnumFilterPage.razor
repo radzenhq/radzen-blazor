@@ -1,0 +1,77 @@
+﻿@page "/datagrid-enum-filter"
+@using System.Linq.Dynamic.Core
+
+<h1>DataGrid Enum Column FilterTemplate</h1>
+
+<p>This page demonstrates how to use enums in the DataGrid column filter.</p>
+
+<RadzenExample Name="DataGrid" Source="DataGridColumnEnumFilter" Heading="false">
+        <h3>Custom filtering template with IQueryable binding</h3>
+        <RadzenDataGrid LoadData="LoadData" IsLoading=@isLoading Count="count" Data=@employees FilterMode="FilterMode.Advanced" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
+            <Columns>
+                <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />
+                <RadzenDataGridColumn TItem="Employee" Property="Gender" Title="Gender" />
+                <RadzenDataGridColumn TItem="Employee" Property="Status" Title="Nullable Status" />
+            </Columns>
+        </RadzenDataGrid>
+</RadzenExample>
+
+@code {
+    int count;
+    IEnumerable<Employee> initialEmployees;
+    IEnumerable<Employee> employees;
+    bool isLoading = false;
+
+    public class Employee
+    {
+        public int ID { get; set; }
+        public GenderType Gender { get; set; }
+        public StatusType? Status { get; set; }
+    }
+
+    public enum GenderType
+    {
+        Ms,
+        Mr,
+        Unknown,
+    }
+
+    public enum StatusType
+    {
+        Inactive,
+        Active,
+    }
+
+    protected override void OnInitialized()
+    {
+        initialEmployees = Enumerable.Range(0, 10).Select(i =>
+            new Employee
+            {
+                ID = i,
+                Gender = i < 3 ? GenderType.Mr : i < 6 ? GenderType.Ms : GenderType.Unknown,
+                Status = i < 3 ? StatusType.Active: i < 6 ? StatusType.Inactive : null
+            });
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+        var query = initialEmployees.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        count = query.Count();
+
+        employees = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+        isLoading = false;
+
+    }
+}

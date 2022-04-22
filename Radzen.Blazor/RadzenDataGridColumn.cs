@@ -765,6 +765,12 @@ namespace Radzen.Blazor
 
         internal IEnumerable<FilterOperator> GetFilterOperators()
         {
+            if (PropertyAccess.IsEnum(FilterPropertyType))
+                return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals };
+            
+            if (PropertyAccess.IsNullableEnum(FilterPropertyType))
+                return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.IsNull, FilterOperator.IsNotNull };
+
             return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
                 var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
                 return FilterPropertyType == typeof(string) ? isStringOperator 

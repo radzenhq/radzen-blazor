@@ -1,4 +1,4 @@
-@typeparam TItem
+﻿@typeparam TItem
 @if (RowIndex == Column.GetLevel())
 {
 <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex)) >
@@ -64,7 +64,13 @@
                             {
                                 <RadzenLabel Text="@Grid.FilterText" class="rz-grid-filter-label" />
                                 <RadzenDropDown @onclick:preventDefault="true" Data="@(Column.GetFilterOperators().Select(t => new { Value = Column.GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@Column.GetFilterOperator()" Change="@(args => Column.SetFilterOperator((FilterOperator)args))" />
-                                @if (PropertyAccess.IsNumeric(Column.FilterPropertyType))
+                                @if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
+                                {
+                                    <RadzenDropDown AllowClear="false" AllowFiltering="false" TValue="@object"
+                                                    Value=@Column.GetFilterValue() Multiple="false" Placeholder="Select..." Data=@Enum.GetValues(Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType)
+                                                    Change="@(args => Column.SetFilterValue(args))" />
+                                }
+                                else if (PropertyAccess.IsNumeric(Column.FilterPropertyType))
                                 {
                                     @(Grid.DrawNumericFilter(Column, false))
                                 }
@@ -87,7 +93,13 @@
                                         Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? Grid.AndOperatorText : Grid.OrOperatorText, Value = t }))" TValue="LogicalFilterOperator" Value="@Column.LogicalFilterOperator" Change="@(args => Column.SetLogicalFilterOperator((LogicalFilterOperator)args))" />
 
                                 <RadzenDropDown @onclick:preventDefault="true" Data="@(Column.GetFilterOperators().Select(t => new { Value = Column.GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@Column.GetSecondFilterOperator()" Change="@(args => Column.SetSecondFilterOperator((FilterOperator)args))" />
-                                @if (PropertyAccess.IsNumeric(Column.FilterPropertyType))
+                                @if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
+                                {
+                                    <RadzenDropDown AllowClear="false" AllowFiltering="false" TValue="@object"
+                                                    Value=@Column.GetSecondFilterValue() Multiple="false" Placeholder="Select..." Data=@Enum.GetValues(Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType)
+                                                    Change="@(args => Column.SetFilterValue(args,false))" />
+                                }
+                                else if (PropertyAccess.IsNumeric(Column.FilterPropertyType))
                                 {
                                     @(Grid.DrawNumericFilter(Column, false, false))
                                 }
