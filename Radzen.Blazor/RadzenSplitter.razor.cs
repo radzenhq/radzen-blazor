@@ -229,7 +229,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-splitter rz-splitter-{Enum.GetName(typeof(Orientation), Orientation).ToLower()}";
+            return $"rz-splitter rz-splitter-{Enum.GetName(typeof(Orientation), Orientation).ToLowerInvariant()}";
         }
 
         /// <summary>

@@ -28,7 +28,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rzi {(IconStyle.HasValue ? $"rzi-{IconStyle.Value.ToString().ToLower()} " : "")}d-inline-flex justify-content-center align-items-center";
+            return $"rzi {(IconStyle.HasValue ? $"rzi-{IconStyle.Value.ToString().ToLowerInvariant()} " : "")}d-inline-flex justify-content-center align-items-center";
         }
     }
 }

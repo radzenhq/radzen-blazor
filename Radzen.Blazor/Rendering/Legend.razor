@@ -24,7 +24,7 @@
             var classList = new List<string>();
 
             classList.Add("rz-legend");
-            classList.Add($"rz-legend-{Chart.Legend.Position}".ToLower());
+            classList.Add($"rz-legend-{Chart.Legend.Position}".ToLowerInvariant());
 
             return String.Join(" ", classList);
         }

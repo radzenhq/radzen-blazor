@@ -19,7 +19,7 @@ namespace Radzen.Blazor
             var classList = new List<string>();
 
             classList.Add("rz-badge");
-            classList.Add($"rz-badge-{BadgeStyle.ToString().ToLower()}");
+            classList.Add($"rz-badge-{BadgeStyle.ToString().ToLowerInvariant()}");
 
             if (IsPill)
             {

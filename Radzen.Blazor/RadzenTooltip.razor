@@ -23,7 +23,7 @@
 @code {
     string getCssClass(Tooltip tooltip)
     {
-        return $"rz-{Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLower()}-tooltip-content";
+        return $"rz-{Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant()}-tooltip-content";
     }
 
     public string UniqueID { get; set; }
@@ -54,7 +54,7 @@
                 tooltip.Element,
                 UniqueID,
                 tooltip.Options.Duration,
-                Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLower());
+                Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant());
         }
     }
 

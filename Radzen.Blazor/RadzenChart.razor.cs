@@ -468,7 +468,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-chart rz-scheme-{ColorScheme.ToString().ToLower()}";
+            return $"rz-chart rz-scheme-{ColorScheme.ToString().ToLowerInvariant()}";
         }
     }
 }
