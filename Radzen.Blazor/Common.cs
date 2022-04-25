@@ -1479,6 +1479,11 @@ namespace Radzen
                 return Guid.Parse((string)value);
             }
 
+            if (Nullable.GetUnderlyingType(type).IsEnum)
+            {
+                return Enum.Parse(Nullable.GetUnderlyingType(type), value.ToString());
+            }
+            
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
                 Type itemType = type.GetGenericArguments()[0];
@@ -1698,6 +1703,30 @@ namespace Radzen
                 default:
                     return false;
             }
+        }
+
+        /// <summary>
+        /// Determines whether the specified type is an enum.
+        /// </summary>
+        /// <param name="source">The type.</param>
+        /// <returns><c>true</c> if the specified source is an enum; otherwise, <c>false</c>.</returns>
+        public static bool IsEnum(Type source)
+        {
+            if (source == null)
+                return false;
+
+            return source.IsEnum;
+        }
+
+        /// <summary> 
+        /// Determines whether the specified type is a Nullable enum. 
+        /// </summary> 
+        /// <param name="source">The type.</param> 
+        /// <returns><c>true</c> if the specified source is an enum; otherwise, <c>false</c>.</returns> 
+        public static bool IsNullableEnum(Type source)
+        {
+            Type u = Nullable.GetUnderlyingType(source);
+            return (u != null) && u.IsEnum;
         }
 
         /// <summary>
