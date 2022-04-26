@@ -204,9 +204,9 @@ namespace Radzen.Blazor
 
             decimal? newValueAsDecimal = newValue == null ? default(decimal?) : (decimal)ConvertType.ChangeType(newValue, typeof(decimal));
 
-            if (object.Equals(Value, newValue) && !ValueChanged.HasDelegate)
+            if (object.Equals(Value, newValue) && (!ValueChanged.HasDelegate || !string.IsNullOrEmpty(Format)))
             {
-                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, Value);
+                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
                 return;
             }
 
@@ -223,7 +223,7 @@ namespace Radzen.Blazor
             Value = (TValue)ConvertType.ChangeType(newValueAsDecimal, typeof(TValue));
             if (!ValueChanged.HasDelegate)
             {
-                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, Value);
+                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
             }
 
             await ValueChanged.InvokeAsync(Value);

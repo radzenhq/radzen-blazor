@@ -1479,7 +1479,7 @@ namespace Radzen
                 return Guid.Parse((string)value);
             }
 
-            if (Nullable.GetUnderlyingType(type).IsEnum)
+            if (Nullable.GetUnderlyingType(type)?.IsEnum == true)
             {
                 return Enum.Parse(Nullable.GetUnderlyingType(type), value.ToString());
             }
