@@ -24,7 +24,14 @@
                 <li class='@($"rz-steps-item {(IsSelected(i, step) ? "rz-state-highlight rz-steps-current" : step.Disabled ? "rz-state-disabled" : "")}")' @attributes="step.Attributes" style="@step.Style">
                     <a @onclick="@(async (args) => { if (!step.Disabled) { await SelectStep(step, true); } })" href="javascript:void(0)" class="rz-menuitem-link">
                         <span class="rz-steps-number">@(steps.Where(s => s.Visible).ToList().IndexOf(step) + 1)</span>
-                        <span class="rz-steps-title">@step.Text</span>
+                        @if (step.Template != null)
+                        {
+                            @step.Template(step)
+                        }
+                        else
+                        {
+                            <span class="rz-steps-title">@step.Text</span>
+                        }
                     </a>
                 </li>
             }

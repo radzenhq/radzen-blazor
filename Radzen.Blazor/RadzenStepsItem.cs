@@ -34,6 +34,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets the template.
+        /// </summary>
+        /// <value>The template.</value>
+        [Parameter]
+        public RenderFragment<RadzenStepsItem> Template { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenStepsItem"/> is selected.
         /// </summary>
         /// <value><c>true</c> if selected; otherwise, <c>false</c>.</value>
