@@ -22,6 +22,10 @@ namespace RadzenBlazorDemos
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.ConfigureKestrel((context, options) =>
+                    {
+                        options.Limits.MaxRequestBodySize = long.MaxValue;
+                    });
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseSetting(WebHostDefaults.DetailedErrorsKey, "true");
                 });

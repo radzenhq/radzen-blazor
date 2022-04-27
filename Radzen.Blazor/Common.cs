@@ -285,11 +285,11 @@ namespace Radzen
         /// <summary>
         /// Gets or sets the number of bytes that have been uploaded.
         /// </summary>
-        public int Loaded { get; set; }
+        public long Loaded { get; set; }
         /// <summary>
         /// Gets the total number of bytes that need to be uploaded.
         /// </summary>
-        public int Total { get; set; }
+        public long Total { get; set; }
         /// <summary>
         /// Gets the progress as a percentage value (from <c>0</c> to <c>100</c>).
         /// </summary>
@@ -325,10 +325,11 @@ namespace Radzen
         /// Gets the name of the selected file.
         /// </summary>
         public string Name { get; set; }
+
         /// <summary>
         /// Gets the size (in bytes) of the selected file.
         /// </summary>
-        public int Size { get; set; }
+        public long Size { get; set; }
     }
 
     /// <summary>

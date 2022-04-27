@@ -292,7 +292,7 @@ namespace Radzen.Blazor
         /// <param name="total">The total.</param>
         /// <param name="files">The files.</param>
         [JSInvokable("RadzenUpload.OnProgress")]
-        public async System.Threading.Tasks.Task OnProgress(int progress, int loaded, int total, IEnumerable<FileInfo> files)
+        public async System.Threading.Tasks.Task OnProgress(int progress, long loaded, long total, IEnumerable<FileInfo> files)
         {
             await Progress.InvokeAsync(new UploadProgressArgs() { Progress = progress, Loaded = loaded, Total = total, Files = files });
         }
