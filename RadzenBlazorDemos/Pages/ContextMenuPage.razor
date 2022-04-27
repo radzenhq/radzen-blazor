@@ -58,5 +58,6 @@
     void OnMenuItemClick(MenuItemEventArgs args)
     {
         console.Log($"Menu item with Value={args.Value} clicked");
+        ContextMenuService.Close();
     }
 }
