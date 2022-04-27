@@ -38,13 +38,6 @@
         tooltips.Add(new Tooltip() { Type = type, Options = options, Element = element });
 
         await InvokeAsync(() => { StateHasChanged(); });
-    }
-
-    bool IsJSRuntimeAvailable { get; set; }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        IsJSRuntimeAvailable = true;
 
         var tooltip = tooltips.LastOrDefault();
 
@@ -56,6 +49,13 @@
                 tooltip.Options.Duration,
                 Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant());
         }
+    }
+
+    bool IsJSRuntimeAvailable { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        IsJSRuntimeAvailable = true;
     }
 
     public async Task Close()
