@@ -748,7 +748,7 @@ window.Radzen = {
     }
 
     Radzen[id] = function (e) {
-        if(e.type == 'contextmenu') return;
+        if(e.type == 'contextmenu' || !e.target) return;
         if (!/Android/i.test(navigator.userAgent) && e.type == 'resize') {
             Radzen.closePopup(id, instance, callback);
             return;
