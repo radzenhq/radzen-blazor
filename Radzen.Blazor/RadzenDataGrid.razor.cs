@@ -377,6 +377,9 @@ namespace Radzen.Blazor
 
         internal void UpdatePickableColumn(RadzenDataGridColumn<TItem> column, bool visible)
         {
+            if (selectedColumns == null)
+                return;
+
             var columnsList = (IList<RadzenDataGridColumn<TItem>>)selectedColumns;
             if (visible)
             {
