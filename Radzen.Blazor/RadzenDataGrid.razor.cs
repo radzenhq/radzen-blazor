@@ -1983,6 +1983,7 @@ namespace Radzen.Blazor
             }
         }
 
+        List<RadzenDataGridColumn<TItem>> groupedColumns = new List<RadzenDataGridColumn<TItem>>();
         /// <summary>
         /// Gets or sets the group descriptors.
         /// </summary>
@@ -1999,10 +2000,14 @@ namespace Radzen.Blazor
                         if (args.Action == NotifyCollectionChangedAction.Add)
                         {
                             var column = columns.Where(c => c.GetGroupProperty() == ((GroupDescriptor)args.NewItems[0]).Property).FirstOrDefault();
-                            
+
                             if (HideGroupedColumn)
                             {
                                 column.SetVisible(false);
+                                if (!groupedColumns.Contains(column))
+                                {
+                                    groupedColumns.Add(column);
+                                }
                             }
                         }
                         else if (args.Action == NotifyCollectionChangedAction.Remove)
@@ -2012,6 +2017,20 @@ namespace Radzen.Blazor
                             if (HideGroupedColumn)
                             {
                                 column.SetVisible(true);
+                                if (groupedColumns.Contains(column))
+                                {
+                                    groupedColumns.Remove(column);
+                                }
+                            }
+                        }
+                        else if (args.Action == NotifyCollectionChangedAction.Reset)
+                        {
+                            foreach (var column in groupedColumns)
+                            {
+                                if (HideGroupedColumn)
+                                {
+                                    column.SetVisible(true);
+                                }
                             }
                         }
                     };
