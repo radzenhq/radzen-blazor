@@ -1726,6 +1726,7 @@ namespace Radzen
         /// <returns><c>true</c> if the specified source is an enum; otherwise, <c>false</c>.</returns> 
         public static bool IsNullableEnum(Type source)
         {
+            if (source == null) return false;
             Type u = Nullable.GetUnderlyingType(source);
             return (u != null) && u.IsEnum;
         }
