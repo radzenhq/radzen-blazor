@@ -1,4 +1,5 @@
 using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -512,14 +513,6 @@ namespace RadzenBlazorDemos
                     Path = "accordion",
                     Icon = "&#xe8ee",
                     Tags = new [] { "panel", "container" }
-                },
-                new Example()
-                {
-                    New = true,
-                    Name = "Drag",
-                    Path = "drag",
-                    Icon = "&#xe945",
-                    Tags = new [] { "drag", "drop", "container" }
                 },
                 new Example()
                 {
