@@ -515,6 +515,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    New = true,
+                    Name = "Drag",
+                    Path = "drag",
+                    Icon = "&#xe945",
+                    Tags = new [] { "drag", "drop", "container" }
+                },
+                new Example()
+                {
                     Name = "BreadCrumb",
                     New = true,
                     Path = "breadcrumb",
