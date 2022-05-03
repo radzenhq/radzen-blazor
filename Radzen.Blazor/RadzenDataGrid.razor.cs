@@ -723,6 +723,13 @@ namespace Radzen.Blazor
         public string FilterText { get; set; } = "Filter";
 
         /// <summary>
+        /// Gets or sets the enum filter select text.
+        /// </summary>
+        /// <value>The enum filter select text.</value>
+        [Parameter]
+        public string EnumFilterSelectText { get; set; } = "Select...";
+
+        /// <summary>
         /// Gets or sets the and operator text.
         /// </summary>
         /// <value>The and operator text.</value>
