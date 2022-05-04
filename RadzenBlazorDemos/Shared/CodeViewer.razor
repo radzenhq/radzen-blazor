@@ -67,9 +67,13 @@
     {
         if (!String.IsNullOrEmpty(source) && !editorCreated)
         {
-            await JSRuntime.InvokeVoidAsync("eval", "if(!window.editor) window.editor = monaco.editor.create(document.getElementById('container'), { language: 'razor', theme: 'vs' });");
+            await JSRuntime.InvokeVoidAsync("eval", "if(!window.editor) window.editor = monaco.editor.create(document.getElementById('container'), { language: 'razor', theme: 'vs', automaticLayout: true });");
 
-            await JSRuntime.InvokeVoidAsync("window.editor.setValue", source);
+            var newSource = await JSRuntime.InvokeAsync<string>("window.editor.getValue");
+            if (newSource != source)
+            {
+                await JSRuntime.InvokeVoidAsync("window.editor.setValue", source);
+            }
 
             editorCreated = true;
         }

@@ -22,7 +22,7 @@
     <a target="blank" href="@ComponentSourceHref" title=@($"View {Name} source code in new tab") ><RadzenIcon Icon="launch" style="font-size: 1rem; margin-right: 4px;" /> @Name Source</a>
 }
 </div>
-<RadzenTabs>
+<RadzenTabs RenderMode="TabRenderMode.Client">
     <Tabs>
         <RadzenTabsItem Text="Example" Icon="apps">
             @ChildContent
