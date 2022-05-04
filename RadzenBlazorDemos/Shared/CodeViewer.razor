@@ -61,11 +61,13 @@
         }
     }
 
+    bool editorCreated;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!editorCreated && !string.IsNullOrEmpty(source))
         {
             await JSRuntime.InvokeVoidAsync("createEditorAndSetValue", source);
+            editorCreated = true;
         }
     }
 }
