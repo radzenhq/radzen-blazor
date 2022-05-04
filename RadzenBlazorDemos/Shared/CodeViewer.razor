@@ -4,7 +4,7 @@
 
 <RadzenButton Text="Run" Click="@Run" IsBusy=@busy Style="margin-bottom:10px;" />
 
-<div id="container" style="height:500px;border:1px solid black;overflow:hidden;"></div>
+<div id="editorContainer" style="height:500px;border:1px solid black;overflow:hidden;"></div>
 
 @code {
     private ElementReference pre;
@@ -65,9 +65,7 @@
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("eval", "if(!window.editor) window.editor = monaco.editor.create(document.getElementById('container'), { language: 'razor', theme: 'vs', automaticLayout: true });");
-
-            await JSRuntime.InvokeVoidAsync("window.editor.setValue", source);
+            await JSRuntime.InvokeVoidAsync("createEditorAndSetValue", source);
         }
     }
 }

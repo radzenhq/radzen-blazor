@@ -30,5 +30,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.nls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.js"></script>
+    <script>
+        function createEditorAndSetValue(value)
+        {
+             monaco.editor.create(document.getElementById('editorContainer'), 
+                    { language: 'razor', theme: 'vs', automaticLayout: true, value: value });
+        }
+    </script>
 </body>
 </html>
