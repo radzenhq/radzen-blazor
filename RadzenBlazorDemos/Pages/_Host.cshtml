@@ -33,8 +33,12 @@
     <script>
         function createEditorAndSetValue(value)
         {
-             window.editor = monaco.editor.create(document.getElementById('editorContainer'), 
+             if(!window.editor) {
+                window.editor = monaco.editor.create(document.getElementById('editorContainer'), 
                     { language: 'razor', theme: 'vs', automaticLayout: true, value: value });
+             } else {
+                window.editor.setValue(value);
+             }
         }
     </script>
 </body>
