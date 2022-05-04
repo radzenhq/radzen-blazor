@@ -61,21 +61,13 @@
         }
     }
 
-    bool editorCreated;
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!String.IsNullOrEmpty(source) && !editorCreated)
+        if (firstRender)
         {
             await JSRuntime.InvokeVoidAsync("eval", "if(!window.editor) window.editor = monaco.editor.create(document.getElementById('container'), { language: 'razor', theme: 'vs', automaticLayout: true });");
 
-            var newSource = await JSRuntime.InvokeAsync<string>("window.editor.getValue");
-            if (newSource != source)
-            {
-                await JSRuntime.InvokeVoidAsync("window.editor.setValue", source);
-            }
-
-            editorCreated = true;
+            await JSRuntime.InvokeVoidAsync("window.editor.setValue", source);
         }
     }
 }
