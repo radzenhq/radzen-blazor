@@ -1,14 +1,10 @@
 @using System.Text.RegularExpressions;
 @inject IJSRuntime JSRuntime
+@inject DialogService DialogService
 
-<RadzenButton Text="Run" Click="@Run" />
+<RadzenButton Text="Run" Click="@Run" IsBusy=@busy Style="margin-bottom:10px;" />
 
-<div id="container" style="height:500px;border:1px solid black;"></div>
-
-@if (childContent != null)
-{
-    @childContent
-}
+<div id="container" style="height:500px;border:1px solid black;overflow:hidden;"></div>
 
 @code {
     private ElementReference pre;
@@ -26,8 +22,10 @@
         source = Regex.Replace(source, "</?RadzenExample[^>]*>\n", "");
     }
 
+    bool busy;
     async Task Run()
     {
+        busy = true;
         var newSource = await JSRuntime.InvokeAsync<string>("window.editor.getValue");
         if (!String.IsNullOrEmpty(newSource))
         {
@@ -40,7 +38,7 @@
             }
             catch
             {
-                
+
             }
 
             if (compiledType != null)
@@ -51,6 +49,14 @@
 
                     builder.CloseComponent();
                 });
+
+                if (childContent != null)
+                {
+                    busy = false;
+
+                    await DialogService.OpenAsync("Run", ds => childContent, 
+                        new DialogOptions() { Width = "800px", Height = "600px", Resizable = true, Draggable = true });
+                }
             }
         }
     }
