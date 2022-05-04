@@ -91,13 +91,8 @@ namespace RadzenBlazorDemos
         }
         public const string Imports = @"
 @using System.Net.Http
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.AspNetCore.Components.Routing
-@using Microsoft.AspNetCore.Components.Web
-@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.JSInterop
 @using Microsoft.EntityFrameworkCore
-@using System.Linq.Dynamic.Core
 @using RadzenBlazorDemos
 @using RadzenBlazorDemos.Shared
 @using RadzenBlazorDemos.Data
