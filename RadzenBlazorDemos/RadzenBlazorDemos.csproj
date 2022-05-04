@@ -15,4 +15,20 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+	<PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.4" />
+	<PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.1.0" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.1.0" />
+	<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.1.0" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.1.0" />
+	<PackageReference Include="Microsoft.CodeAnalysis.Razor" Version="6.0.3" />
+	<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" Version="6.0.0" />
+	<PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+	<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	<PackageReference Include="ResXResourceReader.NetStandard" Version="1.0.1" />
+	<PackageReference Include="System.Reactive" Version="5.0.0" />
+  </ItemGroup>	
 </Project>

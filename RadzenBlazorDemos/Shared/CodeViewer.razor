@@ -1,11 +1,19 @@
 @using System.Text.RegularExpressions;
 @inject IJSRuntime JSRuntime
 
-<pre style="min-height: 500px; overflow: auto; font-size: 12px" @ref="pre">@source</pre>
+<RadzenButton Text="Run" Click="@Run" />
+
+<div id="container" style="height:500px;border:1px solid black;"></div>
+
+@if (childContent != null)
+{
+    @childContent
+}
 
 @code {
     private ElementReference pre;
     private string source;
+    private RenderFragment childContent;
 
     [Parameter]
     public string PageName { get; set; }
@@ -18,11 +26,46 @@
         source = Regex.Replace(source, "</?RadzenExample[^>]*>\n", "");
     }
 
+    async Task Run()
+    {
+        var newSource = await JSRuntime.InvokeAsync<string>("window.editor.getValue");
+        if (!String.IsNullOrEmpty(newSource))
+        {
+            var compiler = new Compiler();
+            Type compiledType = null;
+
+            try
+            {
+                compiledType = compiler.Compile(newSource);
+            }
+            catch
+            {
+                
+            }
+
+            if (compiledType != null)
+            {
+                childContent = new RenderFragment(builder =>
+                {
+                    builder.OpenComponent(0, compiledType);
+
+                    builder.CloseComponent();
+                });
+            }
+        }
+    }
+
+    bool editorCreated;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!String.IsNullOrEmpty(source))
+        if (!String.IsNullOrEmpty(source) && !editorCreated)
         {
-            await JSRuntime.InvokeAsync<object>("hljs.highlightBlock", pre);
+            await JSRuntime.InvokeVoidAsync("eval", "window.editor = monaco.editor.create(document.getElementById('container'), { language: 'razor', theme: 'vs' });");
+
+            await JSRuntime.InvokeVoidAsync("window.editor.setValue", source);
+
+            editorCreated = true;
         }
     }
 }
