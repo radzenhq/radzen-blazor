@@ -513,7 +513,7 @@ namespace Radzen.Blazor
 
             if (valid && !DateAttributes(value).Disabled)
             {
-                newValue = value;
+                newValue = TimeOnly && CurrentDate != null ? new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, value.Hour, value.Minute, value.Second) : value;
             }
             else
             {
