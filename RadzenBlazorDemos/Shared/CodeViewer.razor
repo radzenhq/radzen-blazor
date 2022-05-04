@@ -67,7 +67,7 @@
     {
         if (!String.IsNullOrEmpty(source) && !editorCreated)
         {
-            await JSRuntime.InvokeVoidAsync("eval", "window.editor = monaco.editor.create(document.getElementById('container'), { language: 'razor', theme: 'vs' });");
+            await JSRuntime.InvokeVoidAsync("eval", "if(!window.editor) window.editor = monaco.editor.create(document.getElementById('container'), { language: 'razor', theme: 'vs' });");
 
             await JSRuntime.InvokeVoidAsync("window.editor.setValue", source);
 
