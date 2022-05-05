@@ -1,12 +1,12 @@
-$dropdown-trigger-icon-width: 1.1875rem !default;
+$dropdown-trigger-icon-width: 1.25rem !default;
 $dropdown-trigger-icon-height: $dropdown-trigger-icon-width !default;
 $dropdown-trigger-icon-margin: 0 0.5rem 0 0 !default;
 
-$dropdown-horizontal-padding: 0.625rem !default;
+$dropdown-horizontal-padding: 0.5rem !default;
 $dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
 $dropdown-items-margin: 0 (-$dropdown-horizontal-padding) !default;
 
-$dropdown-item-padding: 0.25rem $dropdown-horizontal-padding !default;
+$dropdown-item-padding: $dropdown-horizontal-padding !default;
 $dropdown-item-font-size: $input-font-size !default;
 $dropdown-item-hover-background-color: #59a6cd !default;
 $dropdown-item-selected-background-color: $default-link !default;

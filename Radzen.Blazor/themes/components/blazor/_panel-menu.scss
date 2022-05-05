@@ -3,8 +3,8 @@ $panel-menu-background-color: $sidebar-background-color !default;
 $panel-menu-hover-background-color: #28363c !default;
 $panel-menu-hover-color: $panel-menu-color !default;
 
-$panel-menu-item-line-height: 1.575 !default;
-$panel-menu-item-padding: 0.625rem 1.25rem !default;
+$panel-menu-item-line-height: 1.25rem !default;
+$panel-menu-item-padding: 0.75rem 1rem !default;
 $panel-menu-item-border: solid 1px #363d40 !default;
 $panel-menu-item-active-background-color: #28363c !default;
 $panel-menu-item-active-color: $panel-menu-color !default;
@@ -12,8 +12,8 @@ $panel-menu-item-active-indicator: $default-link !default;
 $panel-menu-item-offset: 0.75rem !default;
 $panel-menu-item-transition: none !default;
 
-$panel-menu-item-2nd-level-padding: 0.25rem 1.25rem !default;
-$panel-menu-item-2nd-level-offset: 3.625rem !default;
+$panel-menu-item-2nd-level-padding: 0.5rem 1rem !default;
+$panel-menu-item-2nd-level-offset: 2.75rem !default;
 $panel-menu-item-2nd-level-font-size: 0.875rem !default;
 $panel-menu-item-2nd-level-color: inherit !default;
 $panel-menu-item-2nd-level-hover-background-color: #1f2b31 !default;
@@ -25,15 +25,15 @@ $panel-menu-item-3rd-level-hover-color: inherit !default;
 $panel-menu-item-3rd-level-active-background-color: $panel-menu-item-3rd-level-hover-background-color !default;
 $panel-menu-item-3rd-level-active-color: $panel-menu-item-3rd-level-hover-color !default;
 
-$panel-menu-icon-width: 1.5rem !default;
-$panel-menu-icon-font-size: 1.5em !default;
+$panel-menu-icon-width: 1.25rem !default;
+$panel-menu-icon-font-size: 1.25rem !default;
 $panel-menu-icon-color: $cool-grey !default;
 $panel-menu-icon-height: $panel-menu-icon-width !default;
-$panel-menu-icon-margin: 0 0.9375rem 0 0 !default;
-$panel-menu-icon-2nd-level-margin: 0 0.75rem 0 -2.25rem !default;
+$panel-menu-icon-margin: 0 0.5rem 0 0 !default;
+$panel-menu-icon-2nd-level-margin: 0 0.5rem 0 -1.75rem !default;
 
-$panel-menu-font-size: inherit !default;
-$panel-menu-toggle-icon-font-size: 1.5rem !default;
+$panel-menu-font-size: 0.875rem !default;
+$panel-menu-toggle-icon-font-size: 1.25rem !default;
 $panel-menu-toggle-icon-opacity: 1 !default;
 
 .rz-panel-menu {

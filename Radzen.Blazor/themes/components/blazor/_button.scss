@@ -9,8 +9,8 @@ $button-border-radius: $border-radius !default;
 $button-shadow: none !default;
 $button-transition: none !default;
 $button-disabled-opacity: 0.2 !default;
-$button-line-height: initial !default;
-$button-vertical-align: middle !default;
+$button-line-height: 1.25rem !default;
+$button-vertical-align: top !default;
 $button-background-size: auto !default;
 $button-hover-background-size: $button-background-size !default;
 $button-active-background-size: $button-background-size !default;
@@ -20,33 +20,33 @@ $button-sizes: () !default;
 $button-sizes: map-merge(
   (
     md: (
-      font-size: 1.0625rem,
-      padding: 0 2rem,
-      line-height: 2.1875rem,
-      height: 2.1875rem,
-      font-weight: normal,
+      font-size: 0.875rem,
+      padding: 0.5rem 1rem,
+      line-height: 1.25rem,
+      height: auto,
+      font-weight: 600,
       icon: (
-        font-size: 1.0625rem,
-        height: auto,
-        line-height: 2.1875rem,
-        width: 1.25rem
+        font-size: 1.25rem,
+        line-height: 1.25rem,
+        width: 1.25rem,
+        height: 1.25rem
       ),
-      text-with-icon-padding: 0 1.375rem,
-      icon-only-padding: 0 0.5rem
+      text-with-icon-padding: 0.5rem 1rem 0.5rem 0.5rem,
+      icon-only-padding: 0.5rem
     ),
     sm: (
       font-size: 0.875rem,
-      padding: 0 2.875rem,
-      line-height: 1.75rem,
-      height: 1.75rem,
+      padding: 0.25rem 0.75rem,
+      line-height: 1.25rem,
+      height: auto,
       icon: (
-        font-size: 0.9375rem,
-        height: auto,
-        line-height: 1.75rem,
-        width: 1.125rem
+        font-size: 1.25rem,
+        line-height: 1.25rem,
+        width: 1.25rem,
+        height: 1.25rem
       ),
-      text-with-icon-padding: 0 1.375rem,
-      icon-only-padding: 0 0.3125rem
+      text-with-icon-padding: 0.25rem 0.75rem 0.25rem 0.25rem,
+      icon-only-padding: 0.25rem
     )
   ),
   $button-sizes
@@ -181,6 +181,15 @@ $button-styles: map-merge(
       }
     }
   }
+
+  &:not(.rz-button-icon-only) .rz-button-icon-left {
+    margin-right: 0.25rem;
+  }
+
+  &:not(.rz-button-icon-only) .rz-button-icon-left {
+    margin-right: 0.25rem;
+  }
+
 }
 
 @keyframes button-icon-spin {
