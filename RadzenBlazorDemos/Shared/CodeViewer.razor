@@ -7,7 +7,7 @@
             <RadzenButton Text="Run" Click="@Run" IsBusy=@busy Style="margin-bottom:10px;" />
             <div id="editorContainer" style="height:100%;border:1px solid black;overflow:hidden;"></div>
         </RadzenSplitterPane>
-        <RadzenSplitterPane Style="padding-left:10px" Collapsed=@(childContent == null)>
+        <RadzenSplitterPane Style="padding-left:10px;overflow:auto;" Collapsed=@(childContent == null)>
             @childContent
         </RadzenSplitterPane>
 </RadzenSplitter>
