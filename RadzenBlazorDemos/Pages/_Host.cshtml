@@ -27,18 +27,18 @@
     <script async src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
     <script defer data-domain="blazor.radzen.com" src="https://analytics.radzen.com/js/plausible.js"></script>
     <script>var require = { paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs' } }</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.nls.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.nls.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.js"></script>
     <script>
         function createEditorAndSetValue(value)
         {
-             if(!window.editor) {
-                window.editor = monaco.editor.create(document.getElementById('editorContainer'), 
+            window.editor = monaco.editor.create(document.getElementById('editorContainer'), 
                     { language: 'razor', theme: 'vs', automaticLayout: true, value: value });
-             } else {
-                window.editor.setValue(value);
-             }
+        }
+        function getEditorValue()
+        {
+            return window.editor ? window.editor.getModel().getValue() : '';
         }
     </script>
 </body>
