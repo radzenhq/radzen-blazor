@@ -2,14 +2,14 @@ $listbox-background-color: $input-background-color !default;
 $listbox-border-radius: $input-border-radius !default;
 $listbox-border: $input-border !default;
 $listbox-filter-border: $input-border !default;
-$listbox-padding: 0.5rem !default;
+$listbox-padding: 0 !default;
 
 $listbox-item-padding: $dropdown-item-padding !default;
-$listbox-item-margin: 1px 0 !default;
+$listbox-item-margin: 0 !default;
 
 $listbox-checkbox-margin: 0 0.5rem 0 0 !default;
 
-$listbox-header-padding: 0.5625rem 1.25rem 0.625rem 1.125rem !default;
+$listbox-header-padding: 0.5rem !default;
 $listbox-header-icon-width: 1.25rem !default;
 $listbox-header-icon-height: $listbox-header-icon-width !default;
 $listbox-header-icon-margin: 0 !default;
