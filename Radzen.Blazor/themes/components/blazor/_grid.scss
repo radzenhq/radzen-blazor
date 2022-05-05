@@ -5,7 +5,7 @@ $grid-data-border-shadow: none;
 $grid-cell-border: solid 1px #dfe7eb !default;
 $grid-right-cell-border: $grid-cell-border !default;
 $grid-bottom-cell-border: $grid-cell-border !default;
-$grid-cell-padding: 0.5rem 0.625rem 0.5rem 0.625rem !default;
+$grid-cell-padding: 0.5rem !default;
 $grid-cell-color: #48606c !default;
 $grid-cell-font-size: 0.875rem !default;
 
@@ -21,34 +21,34 @@ $grid-toolbar-background-color: $white !default;
 $grid-header-cell-border: $grid-cell-border !default;
 $grid-header-cell-border-bottom: none !default;
 $grid-header-background-color: #e6ecef !default;
-$grid-header-font-size: 0.75rem !default;
-$grid-header-line-height: inherit !default;
-$grid-header-font-weight: normal !default;
-$grid-header-text-transform: uppercase !default;
+$grid-header-font-size: $grid-cell-font-size !default;
+$grid-header-line-height: 1.25rem !default;
+$grid-header-font-weight: 600 !default;
+$grid-header-text-transform: none !default;
 $grid-header-color: $charcoal-grey !default;
-$grid-header-cell-padding: 0.5rem 0 0 0 !default;
-$grid-header-title-padding: 0 0 0.625rem 0.625rem !default;
-$grid-header-title-vertical-align: unset !default;
+$grid-header-cell-padding: 0.5rem 0 !default;
+$grid-header-title-padding: 0 0.125rem 0 0.5rem !default;
+$grid-header-title-vertical-align: middle !default;
 $grid-header-sorted-background-color: #e2e9ee !default;
 
-$grid-header-padding: 0.625rem !default;
+$grid-header-padding: 1rem !default;
 
 $grid-foot-cell-color: $grid-cell-color !default;
 $grid-foot-background-color: $grid-header-background-color !default;
 
 $grid-filter-background-color: #f6f8f9 !default;
-$grid-filter-padding: 0.5rem 0.625rem !default;
-$grid-filter-margin: 0 !default;
+$grid-filter-padding: 0.5rem !default;
+$grid-filter-margin: -0.5rem 0 !default;
 $grid-filter-border: $grid-cell-border !default;
-$grid-filter-font-size: 0.8125rem !default;
-$grid-filter-icon-width: 0.875rem !default;
-$grid-filter-icon-height: 0.875rem !default;
-$grid-filter-icon-margin: 0 0.3125rem 0 0 !default;
-$grid-filter-icon-font-size: $grid-filter-font-size !default;
+$grid-filter-font-size: 0.875rem !default;
+$grid-filter-icon-width: 1.25rem !default;
+$grid-filter-icon-height: 1.25rem !default;
+$grid-filter-icon-margin: 0 0.25rem 0 0 !default;
+$grid-filter-icon-font-size: 1.25rem !default;
 $grid-filter-color: $cool-grey !default;
 $grid-filter-focus-color: $default-link !default;
-$grid-filter-operator-margin: 1.25rem !default;
-$grid-filter-buttons-padding: 0.325rem 1.25rem !default;
+$grid-filter-operator-margin: 1rem !default;
+$grid-filter-buttons-padding: 1rem !default;
 $grid-filter-buttons-border: 1px solid rgba(#979797, 0.2) !default;
 $grid-filter-buttons-background-color: $white !default;
 
@@ -57,7 +57,7 @@ $grid-clear-filter-button-color: $cool-grey !default;
 $grid-apply-filter-button-background-color: $default-link !default;
 $grid-apply-filter-button-color: inherit !default;
 
-$grid-header-filter-icon-margin: 5px 5px 0 0 !default;
+$grid-header-filter-icon-margin: 0.25rem 0.5rem 0 0 !default;
 $grid-header-filter-icon-hover-color: inherit !default;
 
 $grid-border: 1px solid #e6ecef !default;
@@ -96,10 +96,10 @@ $grid-frozen-cell-background-color: $grid-header-background-color !default;
 
 $grid-state-transition: none !default;
 
-$grid-group-header-padding: 15px !default;
-$grid-group-header-item-padding: 10px !default;
-$grid-group-header-item-margin: 5px !default;
-$grid-group-header-items-margin: 0 !default;
+$grid-group-header-padding: 0.5rem !default;
+$grid-group-header-item-padding: 0.5rem !default;
+$grid-group-header-item-margin: 0 0.5rem 0.5rem 0 !default;
+$grid-group-header-items-margin: 0 0 -0.5rem 0 !default;
 
 $column-drag-handle-color: $grid-header-color !default;
 $column-drag-handle-hover-color: $column-drag-handle-color !default;

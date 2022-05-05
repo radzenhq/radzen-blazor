@@ -1,25 +1,25 @@
 $colorpicker-panel-border: $dropdown-panel-border !default;
 $colorpicker-panel-background-color: $dropdown-open-background-color !default;
 $colorpicker-panel-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06) !default;
-$colorpicker-panel-padding: 0.625rem !default;
-$colorpicker-panel-max-width: 280px !default;
-$colorpicker-saturation-height: 150px !default;
+$colorpicker-panel-padding: 0.5rem !default;
+$colorpicker-panel-max-width: 20rem !default;
+$colorpicker-saturation-height: 200px !default;
 
 $colorpicker-value-border-radius: $input-border-radius !default;
 
-$colorpicker-item-size: 16px !default;
+$colorpicker-item-size: 1.25rem !default;
 $colorpicker-item-border-radius: $input-border-radius !default;
-$colorpicker-item-margin: 4px !default;
+$colorpicker-item-margin: 0.25rem !default;
 $colorpicker-item-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.25) 0px 0px 4px inset !default;
 
 $colorpicker-handle-size: 12px !default;
-$colorpicker-handle-border: 1px solid #fff !default;
+$colorpicker-handle-border: 2px solid #fff !default;
 $colorpicker-handle-shadow: rgb(255, 255, 255) 0px 0px 0px 1px, rgba(0, 0, 0, 0.3) 0px 0px 1px 1px inset, rgba(0, 0, 0, 0.4) 0px 0px 1px 2px !default;
 
-$colorpicker-hex-input-padding: 0 3px !default;
-$colorpicker-hex-input-height: 30px !default;
-$colorpicker-rgba-input-padding: 1px 3px !default;
-$colorpicker-rgba-input-height: 30px !default;
+$colorpicker-hex-input-padding: 0.25rem 0.5rem !default;
+$colorpicker-hex-input-height: 2rem !default;
+$colorpicker-rgba-input-padding: 0.25rem 0.5rem !default;
+$colorpicker-rgba-input-height: 2rem !default;
 $colorpicker-input-labels-color: $input-disabled-color !default;
 
 

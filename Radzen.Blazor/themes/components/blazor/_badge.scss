@@ -1,12 +1,12 @@
 ﻿$badge-border-radius: 0 !default;
 $badge-pill-border-radius: $border-radius !default;
-$badge-padding: 0.25em 0.4em !default;
-$badge-pill-padding: $badge-padding !default;
-$badge-font-size: 75% !default;
-$badge-font-weight: 700 !default;
-$badge-line-height: 1 !default;
-$badge-text-transform: none !default;
-$badge-letter-spacing: 0 !default;
+$badge-padding: 0.125rem 0.25rem !default;
+$badge-pill-padding: 0.125rem 0.5rem !default;
+$badge-font-size: 0.75rem !default;
+$badge-font-weight: 600 !default;
+$badge-line-height: 1rem !default;
+$badge-text-transform: uppercase !default;
+$badge-letter-spacing: 0.02rem !default;
 
 $badge-styles: () !default;
 
