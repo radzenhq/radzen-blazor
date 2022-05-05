@@ -2,6 +2,7 @@
 @using Radzen.Blazor
 @inject ExampleService ExampleService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <PageTitle>@ExampleService.TitleFor(example)</PageTitle>
 <HeadContent>
@@ -22,13 +23,24 @@
     <a target="blank" href="@ComponentSourceHref" title=@($"View {Name} source code in new tab") ><RadzenIcon Icon="launch" style="font-size: 1rem; margin-right: 4px;" /> @Name Source</a>
 }
 </div>
-<RadzenTabs>
+<RadzenTabs RenderMode="TabRenderMode.Server" Change=@OnChange>
     <Tabs>
         <RadzenTabsItem Text="Example" Icon="apps">
-            @ChildContent
+            @if (!string.IsNullOrEmpty(error))
+            {
+                @((MarkupString)error)
+            }
+            else if(RuntimeChildContent != null)
+            {
+                @RuntimeChildContent
+            }
+            else
+            {
+                @ChildContent
+            }
         </RadzenTabsItem>
         <RadzenTabsItem Text="Source" Icon="code">
-            <CodeViewer PageName="@($"{Source ?? Name}Page.razor")" />
+            <CodeViewer @ref="codeViewer" PageName="@($"{Source ?? Name}Page.razor")" />
         </RadzenTabsItem>
         @foreach (var p in AdditionalSourceCodePages)
         {
@@ -67,5 +79,41 @@
     protected override void OnInitialized()
     {
         example = ExampleService.FindCurrent(NavigationManager.ToAbsoluteUri(NavigationManager.Uri));
+    }
+
+    CodeViewer codeViewer;
+    RenderFragment RuntimeChildContent;
+    string error;
+    async Task OnChange(int index)
+    {
+        if (index == 0)
+        {
+            var originalSource = codeViewer.GetOriginalSource();
+            var newSource = await JSRuntime.InvokeAsync<string>("getEditorValue");
+            if (!String.IsNullOrEmpty(newSource) && newSource != originalSource)
+            {
+                var compiler = new Compiler();
+                Type compiledType = null;
+
+                try
+                {
+                    compiledType = compiler.Compile(newSource);
+                }
+                catch(Exception ex)
+                {
+                    error = ex.Message;
+                }
+
+                if (compiledType != null)
+                {
+                    RuntimeChildContent = new RenderFragment(builder =>
+                    {
+                        builder.OpenComponent(0, compiledType);
+
+                        builder.CloseComponent();
+                    });
+                }
+            }
+        }
     }
 }

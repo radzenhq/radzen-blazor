@@ -1,16 +1,9 @@
 @using System.Text.RegularExpressions;
 @inject IJSRuntime JSRuntime
-@inject DialogService DialogService
 
-<RadzenSplitter Orientation="Orientation.Horizontal" style="height: 500px;">
-        <RadzenSplitterPane Style="padding-right:10px;padding-bottom:50px">
-            <RadzenButton Text="Run" Click="@Run" IsBusy=@busy Style="margin-bottom:10px;" />
-            <div id="editorContainer" style="height:100%;border:1px solid black;overflow:hidden;"></div>
-        </RadzenSplitterPane>
-        <RadzenSplitterPane Style="padding-left:10px;overflow:auto;" Collapsed=@(childContent == null)>
-            @childContent
-        </RadzenSplitterPane>
-</RadzenSplitter>
+To preview the source changes switch to Example tab
+
+<div id="editorContainer" style="height:500px;border:1px solid black;overflow:hidden;"></div>
 
 @code {
     private ElementReference pre;
@@ -20,45 +13,17 @@
     [Parameter]
     public string PageName { get; set; }
 
+    public string GetOriginalSource()
+    {
+        return source;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         var http = new HttpClient();
 
         source = await http.GetStringAsync($"https://raw.githubusercontent.com/radzenhq/radzen-blazor/master/RadzenBlazorDemos/Pages/{PageName}");
         source = Regex.Replace(source, "</?RadzenExample[^>]*>\n", "");
-    }
-
-    bool busy;
-    async Task Run()
-    {
-        busy = true;
-        var newSource = await JSRuntime.InvokeAsync<string>("getEditorValue");
-        if (!String.IsNullOrEmpty(newSource))
-        {
-            var compiler = new Compiler();
-            Type compiledType = null;
-
-            try
-            {
-                compiledType = compiler.Compile(newSource);
-            }
-            catch(Exception ex)
-            {
-
-            }
-
-            busy = false;
-
-            if (compiledType != null)
-            {
-                childContent = new RenderFragment(builder =>
-                {
-                    builder.OpenComponent(0, compiledType);
-
-                    builder.CloseComponent();
-                });
-            }
-        }
     }
 
     bool editorCreated;
