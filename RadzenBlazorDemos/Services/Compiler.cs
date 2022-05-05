@@ -90,12 +90,17 @@ namespace RadzenBlazorDemos
             });
         }
         public const string Imports = @"
+@using System
+@using System.Linq
+@using System.Net
 @using System.Net.Http
+@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.JSInterop
 @using Microsoft.EntityFrameworkCore
 @using RadzenBlazorDemos
 @using RadzenBlazorDemos.Shared
 @using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Pages
 @using RadzenBlazorDemos.Models.Northwind
 @using Radzen
 @using Radzen.Blazor
@@ -117,7 +122,10 @@ namespace RadzenBlazorDemos
 
             if (errors)
             {
-                throw new CompilationFailedException(compilation);
+                throw new Exception(String.Join(Environment.NewLine, compilation.GetDiagnostics()
+                                                 .Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
+                                                 .Select(diagnostic => diagnostic.GetMessage())
+                                                 .Distinct()));
             }
 
             using (var stream = new MemoryStream())
@@ -130,34 +138,6 @@ namespace RadzenBlazorDemos
             }
         }
 
-        private class CompilationFailedException : Exception
-        {
-            public CompilationFailedException(Compilation compilation)
-            {
-                Compilation = compilation;
-            }
-
-            public Compilation Compilation { get; }
-
-            public override string Message
-            {
-                get
-                {
-                    var builder = new StringBuilder();
-                    var diagnostics = Compilation.GetDiagnostics()
-                                                 .Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
-                                                 .Select(diagnostic => diagnostic.GetMessage())
-                                                 .Distinct();
-
-                    foreach (var diagnostic in diagnostics)
-                    {
-                        builder.AppendLine(diagnostic);
-                    }
-
-                    return builder.ToString();
-                }
-            }
-        }
         private class SuppressChecksum : IConfigureRazorCodeGenerationOptionsFeature
         {
             public int Order => 0;
