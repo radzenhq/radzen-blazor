@@ -1,21 +1,21 @@
 $paginator-background-color: $white !default;
-$paginator-padding: 0.625rem !default;
+$paginator-padding: 0.5rem !default;
 
 $paginator-numeric-button-background-color: #e6ecef !default;
 $paginator-numeric-button-color: $battleship-grey !default;
-$paginator-numeric-button-margin: 0 0.3125rem !default;
-$paginator-numeric-button-padding: 0.3125rem !default;
+$paginator-numeric-button-margin: 0 0.125rem !default;
+$paginator-numeric-button-padding: 0.5rem !default;
 $paginator-numeric-button-selected-background-color: $white !default;
 $paginator-numeric-button-selected-color: $primary-color !default;
 $paginator-numeric-button-selected-border: 1px solid #e6ecef !default;
-$paginator-numeric-button-selected-padding: 0.25rem !default;
-$paginator-numeric-button-min-width: 1.75rem !default;
+$paginator-numeric-button-selected-padding: $paginator-numeric-button-padding !default;
+$paginator-numeric-button-min-width: 2.25rem !default;
 
 $paginator-back-button-background-color: #e6ecef !default;
 $paginator-back-button-color: $battleship-grey !default;
 
-$paginator-first-button-margin: 0 0.625rem 0 0 !default;
-$paginator-last-button-margin: 0 0 0 0.625rem !default;
+$paginator-first-button-margin: 0 0.5rem 0 0 !default;
+$paginator-last-button-margin: 0 0 0 0.5rem !default;
 
 $paginator-next-button-background-color: $default-link !default;
 $paginator-next-button-color: $white !default;
@@ -23,11 +23,11 @@ $paginator-next-button-color: $white !default;
 $paginator-dropdown-width: 80px !default;
 $paginator-dropdown-margin: $paginator-last-button-margin !default;
 
-$paginator-summary-padding: 0 1.25rem 0 0.625rem !default;
+$paginator-summary-padding: 0 1.25rem 0 0 !default;
 $paginator-summary-font-size: 0.875rem !default;
 $paginator-summary-color: $battleship-grey !default;
 
-$paginator-button-size: ".rz-button-sm" !default;
+$paginator-button-size: ".rz-button-md" !default;
 
 .rz-paginator {
   display: flex;

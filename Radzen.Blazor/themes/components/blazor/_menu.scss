@@ -2,16 +2,16 @@ $menu-background-color: $default-background-color !default;
 $menu-border: $input-border !default;
 $menu-border-radius: 2px !default;
 
-$menu-item-padding: 0.375rem 1.25rem !default;
+$menu-item-padding: 0.5rem !default;
 $menu-item-color: $charcoal-grey !default;
 $menu-item-selected-color: $charcoal-grey !default;
-$menu-item-icon-margin: 0 0.625rem 0 0 !default;
+$menu-item-icon-margin: 0 0.5rem 0 0 !default;
 $menu-item-hover-background-color: $default-link !default;
 $menu-item-hover-color: $white !default;
-$menu-item-offset: 0.75rem;
+$menu-item-offset: 1rem;
 $menu-item-transition: none !default;
 
-$menu-top-item-padding: 0.8125rem 0.625rem !default;
+$menu-top-item-padding: 0.5rem !default;
 $menu-top-item-hover-color: $default-link !default;
 $menu-top-item-hover-background-color: transparent !default;
 $menu-top-item-background-color: $menu-background-color !default;
