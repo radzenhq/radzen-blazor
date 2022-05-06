@@ -1,25 +1,25 @@
 $scheduler-border: solid 1px #cecece !default;
 $scheduler-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
-$scheduler-padding: 0.625rem !default;
+$scheduler-padding: 0.5rem !default;
 $scheduler-background-color: $white !default;
 
-$scheduler-toolbar-padding: 0.625rem !default;
+$scheduler-toolbar-padding: 0.5rem !default;
 $scheduler-toolbar-background-color: #e6ecef !default;
 $scheduler-toolbar-font-size: 0.875rem !default;
 $scheduler-toolbar-color: $white !default;
 $scheduler-toolbar-button-background-color: $default-link !default;
-$scheduler-toolbar-button-font-size: 1.25rem !default;
-$scheduler-toolbar-button-width: 1.125rem !default;
-$scheduler-toolbar-button-height: 1.125rem !default;
-$scheduler-toolbar-text-transform: uppercase;
+$scheduler-toolbar-button-font-size: 0.875rem !default;
+$scheduler-toolbar-button-width: 1.25rem !default;
+$scheduler-toolbar-button-height: 1.25rem !default;
+$scheduler-toolbar-text-transform: uppercase !default;
 
-$scheduler-toolbar-title-font-size: inherit !default;
-$scheduler-toolbar-title-font-weight: inherit !default;
+$scheduler-toolbar-title-font-size: 1rem !default;
+$scheduler-toolbar-title-font-weight: 700 !default;
 
-$scheduler-button-padding: 0.25rem 0.5rem !default;
-$scheduler-button-font-size: 0.6875rem !default;
-$scheduler-prev-next-button-padding: $scheduler-button-padding !default;
-$scheduler-prev-next-button-font-size: $scheduler-button-font-size !default;
+$scheduler-button-padding: 0.4375rem 1rem !default;
+$scheduler-button-font-size: 0.75rem !default;
+$scheduler-prev-next-button-padding: 0.5rem !default;
+$scheduler-prev-next-button-font-size: 1.25rem !default;
 $scheduler-button-line-height: 1.25rem !default;
 $scheduler-today-button-margin-left: 0.5rem !default;
 
@@ -31,7 +31,7 @@ $scheduler-view-selected-border-color: $scheduler-view-selected-background-color
 $scheduler-view-selected-color: $white !default;
 
 $scheduler-header-background-color: rgba(#e6ecef, 0.4) !default;
-$scheduler-header-font-size: 0.6875rem !default;
+$scheduler-header-font-size: 0.75rem !default;
 $scheduler-header-color: inherit !default;
 $scheduler-header-border: solid 1px #dfe7ec !default;
 $scheduler-header-padding: 0.5rem 0 !default;
@@ -40,16 +40,16 @@ $scheduler-border-color: #dfe7eb !default;
 $scheduler-minor-border-color: rgba(#dfe7eb, 0.2) !default;
 $scheduler-color: #6a6a6a !default;
 
-$scheduler-slot-title-padding: 0 11px !default;
+$scheduler-slot-title-padding: 0 0.25rem !default;
 
 $scheduler-event-color: $white !default;
 $scheduler-event-background-color: $tip !default;
-$scheduler-event-font-size: 0.6875rem !default;
-$scheduler-event-line-height: 12px !default;
-$scheduler-event-padding: 2px 1px !default;
-$scheduler-event-content-padding: 4px !default;
+$scheduler-event-font-size: 0.75rem !default;
+$scheduler-event-line-height: 1rem !default;
+$scheduler-event-padding: 0 1px 1px 1px !default;
+$scheduler-event-content-padding: 0.125rem 0.25rem !default;
 
-$scheduler-day-number-padding: 0 0.6875rem !default;
+$scheduler-day-number-padding: 0 0.5rem !default;
 $scheduler-border-radius: $border-radius !default;
 
 .rz-scheduler {

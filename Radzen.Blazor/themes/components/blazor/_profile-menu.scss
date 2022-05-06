@@ -1,15 +1,15 @@
 $profile-menu-background-color: $white !default;
 $profile-menu-top-item-background-color: $profile-menu-background-color !default;
 $profile-menu-border: 1px solid #eaeef0 !default;
-$profile-menu-padding: 0.5625rem 1.25rem !default;
+$profile-menu-padding: 0.625rem 1rem !default;
 $profile-menu-border-radius: 2px !default;
 $profile-menu-toggle-button-color: $default-link !default;
 
 $profile-menu-item-hover-background-color: $default-link !default;
-$profile-menu-item-icon-width: 1.125rem !default;
+$profile-menu-item-icon-width: 1.25rem !default;
 $profile-menu-item-icon-height: $profile-menu-item-icon-width !default;
 $profile-menu-item-icon-font-size: $profile-menu-item-icon-height !default;
-$profile-menu-item-icon-margin: 0 0.625rem 0 0 !default;
+$profile-menu-item-icon-margin: 0 0.5rem 0 0 !default;
 
 ul.rz-profile-menu {
   list-style: none;
