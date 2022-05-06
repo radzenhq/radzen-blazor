@@ -1,9 +1,9 @@
 $tooltip-background-color: #84d2c8 !default;
 $tooltip-color: #fff !default;
 $tooltip-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15) !default;
-$tooltip-padding: 0.25rem 1rem !default;
+$tooltip-padding: 0.25rem 0.5rem !default;
 $tooltip-border-radius: $input-border-radius !default;
-$tooltip-font-size: initial !default;
+$tooltip-font-size: 0.875rem !default;
 
 .rz-tooltip {
   position: absolute;

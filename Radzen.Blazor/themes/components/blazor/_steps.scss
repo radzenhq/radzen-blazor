@@ -5,12 +5,12 @@ $steps-number-height: $steps-number-width !default;
 $steps-number-background-color: #e6ecef !default;
 $steps-number-border-radius: 50% !default;
 $steps-number-color: $body-color !default;
-$steps-number-padding: 0.4375rem 0 !default;
+$steps-number-padding: 0.5rem 0 !default;
 $steps-number-selected-background: $default-link !default;
 $steps-number-selected-color: $white !default;
 
 $steps-title-selected-color: $default-link !default;
-$steps-title-margin: 0 0.8125rem !default;
+$steps-title-margin: 0 1rem 0 0.5rem !default;
 $steps-button-color: $battleship-grey !default;
 
 .rz-steps {

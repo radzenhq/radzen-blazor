@@ -1,10 +1,10 @@
 $rating-color: $default-link !default;
-$rating-opacity: 0.2 !default;
-$rating-font-size: 1.5rem !default;
+$rating-opacity: 0.5 !default;
+$rating-font-size: 1.25rem !default;
 $rating-selected-color: $pinkish-orange !default;
 $rating-disabled-color: $cool-grey !default;
 $rating-disabled-opacity: 0.3 !default;
-$rating-ban-icon: "not_interested" !default;
+$rating-ban-icon: "highlight_off" !default;
 
 .rz-rating {
   display: inline-flex;
