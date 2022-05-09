@@ -392,7 +392,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns>System.Object.</returns>
-        public object GetValue(TItem item)
+        public virtual object GetValue(TItem item)
         {
             var value = propertyValueGetter != null && !string.IsNullOrEmpty(Property) && !Property.Contains('.') ? propertyValueGetter(item) : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
 
