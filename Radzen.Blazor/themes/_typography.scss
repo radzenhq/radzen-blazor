@@ -2,13 +2,15 @@ $bootstrap: false !default;
 
 // Headings
 
+$heading-color: inherit !default;
+
 $headings: (
-  h1: (font-size: 2.25rem, font-weight: bold),
-  h2: (font-size: 1.5rem, font-weight: 600),
-  h3: (font-size: 1.25rem, font-weight: normal),
-  h4: (font-size: 1.125rem, font-weight: 600),
-  h5: (font-size: 1rem, font-weight: 600),
-  h6: (font-size: 0.875rem, font-weight: 600)
+  h1: (font-size: 2rem, line-height: 1.1875em, font-weight: 700, letter-spacing: -0.04em, margin-bottom: 1rem),
+  h2: (font-size: 1.5rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.03em, margin-bottom: 1rem),
+  h3: (font-size: 1.125rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, margin-bottom: 0.75rem),
+  h4: (font-size: 1rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, margin-bottom: 0.5rem),
+  h5: (font-size: 0.875rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, margin-bottom: 0.5rem),
+  h6: (font-size: 0.75rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, margin-bottom: 0.5rem)
 ) !default;
 
 @each $name, $heading in $headings {
@@ -30,8 +32,27 @@ $headings: (
   }
 }
 
+$headings-thin: (
+  h1: (font-size: 3rem, font-weight: 300),
+  h2: (font-size: 2rem, font-weight: 300),
+  h3: (font-size: 1.25rem, font-weight: 300),
+  h4: (font-size: 1rem, font-weight: 300),
+  h5: (font-size: 0.875rem, font-weight: 300),
+  h6: (font-size: 0.75rem, font-weight: 300)
+) !default;
+
+@each $name, $heading in $headings-thin {
+  #{$name}.text-thin,
+  .#{$name}.text-thin  {
+    @each $name, $value in $heading {
+      #{$name}: #{$value};
+    }
+  }
+}
+
 // Paragraph
-$paragraph-line-height: 1.38 !default;
+
+$paragraph-line-height: 1.429 !default;
 
 @if $bootstrap {
   p {
