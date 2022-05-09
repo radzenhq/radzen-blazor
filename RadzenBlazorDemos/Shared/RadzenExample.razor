@@ -8,6 +8,7 @@
 <HeadContent>
     <meta name="description" content="@ExampleService.DescriptionFor(example)">
 </HeadContent>
+
 @if (Heading)
 {
     <h1>@Name</h1>
@@ -26,18 +27,27 @@
 <RadzenTabs RenderMode="TabRenderMode.Server" Change=@OnChange>
     <Tabs>
         <RadzenTabsItem Text="Example" Icon="apps">
-            @if (!string.IsNullOrEmpty(error))
-            {
-                @((MarkupString)error)
-            }
-            else if(RuntimeChildContent != null)
-            {
-                @RuntimeChildContent
-            }
-            else
-            {
-                @ChildContent
-            }
+        @if (isBusy)
+        {
+            <div>
+                <div class="rz-datatable-loading"></div>
+                <div class="rz-datatable-loading-content">
+                    <i class="rzi-circle-o-notch"></i>
+                </div>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(error))
+        {
+            @((MarkupString)error)
+        }
+        else if(RuntimeChildContent != null)
+        {
+            @RuntimeChildContent
+        }
+        else
+        {
+            @ChildContent
+        }
         </RadzenTabsItem>
         <RadzenTabsItem Text="Source" Icon="code">
             <CodeViewer @ref="codeViewer" PageName="@($"{Source ?? Name}Page.razor")" />
@@ -84,25 +94,34 @@
     CodeViewer codeViewer;
     RenderFragment RuntimeChildContent;
     string error;
+    bool isBusy;
+
     async Task OnChange(int index)
     {
         if (index == 0)
         {
-            var originalSource = codeViewer.GetOriginalSource();
-            var newSource = await JSRuntime.InvokeAsync<string>("getEditorValue");
-            if (!String.IsNullOrEmpty(newSource) && newSource != originalSource)
+            var editedSource = await JSRuntime.InvokeAsync<string>("getEditorValue");
+            if (!String.IsNullOrEmpty(editedSource) && editedSource != codeViewer.Source)
             {
+                codeViewer.Source = editedSource;
+
                 var compiler = new Compiler();
                 Type compiledType = null;
 
+                isBusy = true;
+
+                StateHasChanged();
+
                 try
                 {
-                    compiledType = compiler.Compile(newSource);
+                    compiledType = compiler.Compile(editedSource);
                 }
                 catch(Exception ex)
                 {
                     error = ex.Message;
                 }
+
+                isBusy = false;
 
                 if (compiledType != null)
                 {
@@ -112,6 +131,8 @@
 
                         builder.CloseComponent();
                     });
+
+                    StateHasChanged();
                 }
             }
         }

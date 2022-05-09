@@ -7,31 +7,30 @@ To preview the source changes switch to Example tab
 
 @code {
     private ElementReference pre;
-    private string source;
     private RenderFragment childContent;
 
     [Parameter]
     public string PageName { get; set; }
 
-    public string GetOriginalSource()
-    {
-        return source;
-    }
+    public string Source { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var http = new HttpClient();
+        if (string.IsNullOrEmpty(Source))
+        {
+            var http = new HttpClient();
 
-        source = await http.GetStringAsync($"https://raw.githubusercontent.com/radzenhq/radzen-blazor/master/RadzenBlazorDemos/Pages/{PageName}");
-        source = Regex.Replace(source, "</?RadzenExample[^>]*>\n", "");
+            Source = await http.GetStringAsync($"https://raw.githubusercontent.com/radzenhq/radzen-blazor/master/RadzenBlazorDemos/Pages/{PageName}");
+            Source = Regex.Replace(Source, "</?RadzenExample[^>]*>\n", "");
+        }
     }
 
     bool editorCreated;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!editorCreated && !string.IsNullOrEmpty(source))
+        if (!editorCreated && !string.IsNullOrEmpty(Source))
         {
-            await JSRuntime.InvokeVoidAsync("createEditorAndSetValue", source);
+            await JSRuntime.InvokeVoidAsync("createEditorAndSetValue", Source);
             editorCreated = true;
         }
     }
