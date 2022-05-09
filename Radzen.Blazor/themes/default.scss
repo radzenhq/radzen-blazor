@@ -40,3 +40,8 @@ $bootstrap: true;
 @import 'fonts';
 @import 'typography';
 @import 'components';
+
+body {
+  font-size: 0.875rem;
+  line-height: $paragraph-line-height;
+}
