@@ -74,3 +74,14 @@ $paragraph-line-height: 1.429 !default;
 
 // Link
 $link-color: $default-link !default;
+
+::selection {
+  background-color: $rz-primary-lighter;
+}
+
+// Body
+
+body {
+  font-size: 0.875rem;
+  line-height: $paragraph-line-height;
+}
