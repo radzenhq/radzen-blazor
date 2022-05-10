@@ -923,6 +923,11 @@ namespace Radzen
                     {
                         if (!string.IsNullOrEmpty(ValueProperty))
                         {
+                            if (typeof(EnumerableQuery).IsAssignableFrom(View.GetType()) && Enumerable.Count(values) == 1)
+                            {
+                                selectedItems.Clear();
+                            }
+
                             foreach (object v in values)
                             {
                                 dynamic item;
