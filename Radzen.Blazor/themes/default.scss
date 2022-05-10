@@ -1,33 +1,127 @@
 @import 'colors';
 @import 'variables';
-// Theme colors
-$primary-color: $pinkish-orange !default;
-$secondary: $default-link !default;
-$tertiary: $cool-grey !default;
-$additional-1: $soft-green !default;
-$additional-2: $tip !default;
-$additional-3: $dev !default;
-$contrast: $charcoal-grey !default;
 
-$default-background-color: $white !default;
-$button-hover-background-color: #ff7b54 !default;
-$button-active-background-color: #e5613a !default;
-$sidebar-background-color: $charcoal-grey !default;
+// Global variables
 
-// Bootstrap overrides
+$rz-white: #ffffff !default;
+$rz-black: #000000 !default;
+
+$rz-base-50: #ffffff !default;
+$rz-base-100: #f6f7fa !default;
+$rz-base-200: #eaeef1 !default;
+$rz-base-300: #e2e7ea !default;
+$rz-base-400: #cdd4d8 !default;
+$rz-base-500: #b4bec3 !default;
+$rz-base-600: #95a4a8 !default;
+$rz-base-700: #77858b !default;
+$rz-base-800: #545e61 !default;
+$rz-base-900: #292c2e !default;
+
+$rz-primary: #ff6d41 !default;
+$rz-primary-light: #ff7b54 !default; /*lighten($rz-primary, 8%);*/
+$rz-primary-lighter: rgba($rz-primary, .16) !default;
+$rz-primary-dark: #e5613a !default; /*darken($rz-primary, 10%);*/
+
+$rz-secondary: #35a0d7 !default;
+$rz-secondary-light: #4dabdc !default;
+$rz-secondary-lighter: rgba($rz-secondary, .20) !default;
+$rz-secondary-dark: #3193c6 !default;
+
+$rz-info: #2cc8c8 !default;
+$rz-info-light: #4ed1d1 !default;
+$rz-info-lighter: rgba($rz-info, .20) !default;
+$rz-info-dark: #25a8a8 !default;
+
+$rz-success: #5dbf74 !default;
+$rz-success-light: #5dbf74 !default;
+$rz-success-lighter: rgba($rz-success, .16) !default;
+$rz-success-dark: #5dbf74 !default;
+
+$rz-warning: #fac152 !default;
+$rz-warning-light: #fbcd75 !default;
+$rz-warning-lighter: rgba($rz-warning, .20) !default;
+$rz-warning-dark: #e6b24b !default;
+
+$rz-danger: #f9777f !default;
+$rz-danger-light: #fa8d93 !default;
+$rz-danger-lighter: rgba($rz-danger, .20) !default;
+$rz-danger-dark: #db6970 !default;
+
+$rz-series-1: #376df5 !default;
+$rz-series-2: #64dfdf !default;
+$rz-series-3: #f68769 !default;
+$rz-series-4: #c161e2 !default;
+$rz-series-5: #fdd07a !default;
+$rz-series-6: #f8629b !default;
+$rz-series-7: #74d062 !default;
+$rz-series-8: #84a7ff !default;
+
+$rz-transition: 0.1s linear !default;
+
+// Global CSS variables
+
+@import 'css-variables';
+
+// Component Aliases
+
+$rz-text-title-color: var(--rz-base-900) !default;
+$rz-text-color: var(--rz-base-800) !default;
+$rz-text-secondary-color: var(--rz-base-700) !default;
+$rz-text-tertiary-color: var(--rz-base-600) !default;
+$rz-text-disabled-color: var(--rz-base-500) !default;
+
+$rz-border-radius: 4px !default;
+$rz-border-radius-2: $rz-border-radius * 2 !default;
+$rz-border-radius-3: $rz-border-radius * 3 !default;
+$rz-border-radius-4: $rz-border-radius * 4 !default;
+$rz-border-radius-5: $rz-border-radius * 5 !default;
+
+$rz-transition-all: all var(--rz-transition) !default;
+
+:root {
+  --rz-text-title-color: #{$rz-text-title-color};
+  --rz-text-color: #{$rz-text-color};
+  --rz-text-secondary-color: #{$rz-text-secondary-color};
+  --rz-text-tertiary-color: #{$rz-text-tertiary-color};
+  --rz-text-disabled-color: #{$rz-text-disabled-color};
+
+  --rz-border-radius: #{$rz-border-radius};
+  --rz-border-radius-2: #{$rz-border-radius-2};
+  --rz-border-radius-3: #{$rz-border-radius-3};
+  --rz-border-radius-4: #{$rz-border-radius-4};
+  --rz-border-radius-5: #{$rz-border-radius-5};
+
+  --rz-transition-all: #{$rz-transition-all};
+}
+
+// Theme colors SHOULD NOT BE USED!
+$primary-color: $rz-primary !default;
+$secondary: $rz-secondary !default;
+$tertiary: $rz-base-600 !default;
+$additional-1: $rz-success !default;
+$additional-2: $rz-info !default;
+$additional-3: $rz-danger !default;
+$contrast: $rz-base-900 !default;
+
+$default-background-color: $rz-white !default;
+$button-hover-background-color: $rz-primary-light !default;
+$button-active-background-color: $rz-primary-dark !default;
+$sidebar-background-color: $rz-base-900 !default;
+
+// Bootstrap overrides SHOULD NOT BE USED!
 $primary: $primary-color !default;
-$danger: #f9777f !default;
-$info: $tip !default;
-$success: $additional-1 !default;
-$warning: $dull-yellow !default;
-$light: #e6ecef !default;
-$body-color: #212529 !default;
-$link-color: $default-link;
-$link-hover-color: $default-link;
-$state-success-bg: $success;
-$state-warning-bg: $warning;
-$state-danger-bg: $danger;
-$state-info-bg: $info;
+$danger: $rz-danger !default;
+$info: $rz-info !default;
+$success: $rz-success !default;
+$warning: $rz-warning !default;
+$light: $rz-base-200 !default; //#e6ecef
+$body-color: $rz-base-800 !default; //#212529
+$link-color: $rz-secondary;
+$link-hover-color: $rz-secondary;
+$state-success-bg: $rz-success;
+$state-warning-bg: $rz-warning;
+$state-danger-bg: $rz-danger;
+$state-info-bg: $rz-info;
 
 $body-bg: #f3f5f7 !default;
 $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
@@ -40,8 +134,3 @@ $bootstrap: true;
 @import 'fonts';
 @import 'typography';
 @import 'components';
-
-body {
-  font-size: 0.875rem;
-  line-height: $paragraph-line-height;
-}
