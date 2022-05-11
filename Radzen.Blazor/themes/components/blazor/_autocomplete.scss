@@ -1,7 +1,7 @@
 .rz-autocomplete {
   display: inline-block;
-  border: $input-border;
-  border-radius: $input-border-radius;
+  border: var(--rz-input-border);
+  border-radius: var(--rz-input-border-radius);
   overflow: hidden;
 
   &:hover:not(.rz-state-disabled) {
@@ -14,12 +14,12 @@
 }
 
 .rz-autocomplete-input {
-  padding: $input-padding;
-  background-color: $input-background-color;
-  box-shadow: $input-shadow;
+  padding: var(--rz-input-padding);
+  background-color: var(--rz-input-background-color);
+  box-shadow: var(--rz-input-shadow);
   border: none;
-  height: $input-height;
-  line-height: $input-line-height;
+  height: var(--rz-input-height);
+  line-height: var(--rz-input-line-height);
   width: 100%;
 
   &:focus {
@@ -36,7 +36,7 @@
   @extend %dropdown-panel;
   overflow: auto;
   box-sizing: content-box;
-  transform: translate(-1px, -$input-border-radius);
+  transform: translate(-1px, calc(-1 * var(--rz-input-border-radius)));
 }
 
 .rz-autocomplete-items {

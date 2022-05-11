@@ -56,7 +56,7 @@ $badge-styles: map-merge(
 );
 
 .rz-badge {
-    color: var(--rz-white);
+    color: var(--rz-text-contrast-color);
     display: inline-block;
     padding: var(--rz-badge-padding);
     font-size: var(--rz-badge-font-size);
