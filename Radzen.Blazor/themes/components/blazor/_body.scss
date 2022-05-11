@@ -1,11 +1,17 @@
 $body-padding: 1rem !default;
 
+// Body CSS variables
+
+:root {
+  --rz-body-padding: #{$body-padding};
+}
+
 .body {
-  padding: $body-padding;
+  padding: var(--rz-body-padding);
 }
 
 .rz-body {
-  padding: $body-padding;
+  padding: var(--rz-body-padding);
   
   .rz-layout & {
     transform: translateZ(0);

@@ -1,8 +1,8 @@
-$chart-axis-color: rgba($greyish-brown, 0.2) !default;
-$chart-axis-label-color: rgba($greyish-brown, 0.5) !default;
-$chart-axis-font-size: 0.75rem !default;
-$chart-tooltip-background: rgba(#fff, 0.95) !default;
-$chart-tooltip-color: $body-color !default;
+$chart-axis-color: var(--rz-base-300) !default;
+$chart-axis-label-color: var(--rz-base-600) !default;
+$chart-axis-font-size: 0.875rem !default;
+$chart-tooltip-background: var(--rz-base-background-color) !default;
+$chart-tooltip-color: var(--rz-text-color) !default;
 
 $color-schemes: (
   palette: (
@@ -48,6 +48,16 @@ $color-schemes: (
   )
 ) !default;
 
+// Chart CSS variables
+
+:root {
+  --rz-chart-axis-color: #{$chart-axis-color};
+  --rz-chart-axis-label-color: #{$chart-axis-label-color};
+  --rz-chart-axis-font-size: #{$chart-axis-font-size};
+  --rz-chart-tooltip-background: #{$chart-tooltip-background};
+  --rz-chart-tooltip-color: #{$chart-tooltip-color};
+}
+
 .chart,
 .pie {
   height: 200px;
@@ -56,7 +66,7 @@ $color-schemes: (
     overflow: visible !important;
 
     .gridline-path {
-      stroke: $chart-axis-color;
+      stroke: var(--rz-chart-axis-color);
     }
   }
 
@@ -72,8 +82,8 @@ $color-schemes: (
 
   .tick {
     text {
-      fill: $chart-axis-label-color;
-      font-size: $chart-axis-font-size !important;
+      fill: var(--rz-chart-axis-label-color);
+      font-size: var(--rz-chart-axis-font-size) !important;
     }
   }
 }
@@ -123,17 +133,17 @@ $color-schemes: (
 }
 
 .rz-axis {
-  stroke: $chart-axis-color;
-  font-size: 0.875em;
+  stroke: var(--rz-chart-axis-color);
+  font-size: var(--rz-chart-axis-font-size);
 }
 
 .rz-axis .rz-grid-line {
-  stroke: $chart-axis-color;
+  stroke: var(--rz-chart-axis-color);
 }
 
 .rz-tick-text {
   stroke: none;
-  fill: $chart-axis-label-color;
+  fill: var(--rz-chart-axis-label-color);
 }
 
 .rz-value-axis .rz-tick-text {
@@ -225,8 +235,8 @@ $color-schemes: (
 }
 
 .rz-chart-tooltip-content {
-  background: $chart-tooltip-background;
-  color: $chart-tooltip-color;
+  background: var(--rz-chart-tooltip-background);
+  color: var(--rz-chart-tooltip-color);
   box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15);
   padding: 0.25rem 1rem;
   border-radius: 4px;
