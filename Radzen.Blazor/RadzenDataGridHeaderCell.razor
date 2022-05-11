@@ -67,7 +67,7 @@
                                 @if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
                                 {
                                     <RadzenDropDown AllowClear="false" AllowFiltering="false" TValue="@object"
-                                                    Value=@Column.GetFilterValue() Multiple="false" Placeholder="Select..." Data=@Enum.GetValues(Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType)
+                                                    Value=@Column.GetFilterValue() Multiple="false" Placeholder="@Grid.EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data=@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType)
                                                     Change="@(args => Column.SetFilterValue(args))" />
                                 }
                                 else if (PropertyAccess.IsNumeric(Column.FilterPropertyType))
@@ -96,7 +96,7 @@
                                 @if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
                                 {
                                     <RadzenDropDown AllowClear="false" AllowFiltering="false" TValue="@object"
-                                                    Value=@Column.GetSecondFilterValue() Multiple="false" Placeholder="@Grid.EnumFilterSelectText" Data=@Enum.GetValues(Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType)
+                                                    Value=@Column.GetSecondFilterValue() Multiple="false" Placeholder="@Grid.EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data=@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType)
                                                     Change="@(args => Column.SetFilterValue(args,false))" />
                                 }
                                 else if (PropertyAccess.IsNumeric(Column.FilterPropertyType))

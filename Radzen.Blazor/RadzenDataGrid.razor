@@ -224,7 +224,7 @@
                                                     {
                                                         <RadzenDropDown Style="width:100%" AllowClear="true" AllowFiltering="false" TValue="@object"
                                                                         Value=@column.GetFilterValue() Multiple="false" Placeholder="@EnumFilterSelectText" 
-                                                                        Data=@Enum.GetValues(Nullable.GetUnderlyingType(column.FilterPropertyType) ?? column.FilterPropertyType)
+                                                                        Data=@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(column.FilterPropertyType) ?? column.FilterPropertyType)
                                                                         Change="@(args => {column.SetFilterValue(args);ApplyFilter(column, true);})" />
                                                     }
                                                     else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
