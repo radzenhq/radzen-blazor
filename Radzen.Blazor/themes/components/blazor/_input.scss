@@ -4,7 +4,7 @@ $input-line-height: 1.429 !default;
 $input-padding: 0.4375rem !default;
 $input-value-color: var(--rz-text-color) !default;
 $input-placeholder-color: var(--rz-text-tertiary-color) !default;
-$input-background-color: var(--rz-white) !default;
+$input-background-color: var(--rz-base-background-color) !default;
 $input-border: 1px solid var(--rz-base-300) !default;
 $input-border-radius: var(--rz-border-radius) !default;
 $input-shadow: inset 0 4px 3px 0 rgba(0, 0, 0, 0.03) !default;
@@ -15,7 +15,7 @@ $input-hover-border: 1px solid var(--rz-base-400) !default;
 $input-focus-shadow: $input-shadow !default;
 $input-focus-border: 1px solid var(--rz-base-400) !default;
 
-$input-disabled-border: solid 1px var(--rz-base-200) !default;
+$input-disabled-border: 1px solid var(--rz-base-200) !default;
 $input-disabled-shadow: $input-shadow !default;
 $input-disabled-background-color: var(--rz-base-100) !default;
 $input-disabled-color: var(--rz-text-color) !default;

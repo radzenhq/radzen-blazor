@@ -9,8 +9,8 @@ $rz-black: #000000 !default;
 $rz-base-50: #ffffff !default;
 $rz-base-100: #f6f7fa !default;
 $rz-base-200: #eaeef1 !default;
-$rz-base-300: #e2e7ea !default;
-$rz-base-400: #cdd4d8 !default;
+$rz-base-300: #dadfe2 !default;
+$rz-base-400: #cecece !default;
 $rz-base-500: #b4bec3 !default;
 $rz-base-600: #95a4a8 !default;
 $rz-base-700: #77858b !default;
@@ -69,6 +69,9 @@ $rz-text-color: var(--rz-base-800) !default;
 $rz-text-secondary-color: var(--rz-base-700) !default;
 $rz-text-tertiary-color: var(--rz-base-600) !default;
 $rz-text-disabled-color: var(--rz-base-500) !default;
+$rz-text-contrast-color: var(--rz-white) !default;
+
+$rz-base-background-color: var(--rz-white) !default;
 
 $rz-border-radius: 4px !default;
 $rz-border-radius-2: $rz-border-radius * 2 !default;
@@ -84,6 +87,9 @@ $rz-transition-all: all var(--rz-transition) !default;
   --rz-text-secondary-color: #{$rz-text-secondary-color};
   --rz-text-tertiary-color: #{$rz-text-tertiary-color};
   --rz-text-disabled-color: #{$rz-text-disabled-color};
+  --rz-text-contrast-color: #{$rz-text-contrast-color};
+
+  --rz-base-background-color: #{$rz-base-background-color};
 
   --rz-border-radius: #{$rz-border-radius};
   --rz-border-radius-2: #{$rz-border-radius-2};
@@ -122,6 +128,17 @@ $state-success-bg: $rz-success;
 $state-warning-bg: $rz-warning;
 $state-danger-bg: $rz-danger;
 $state-info-bg: $rz-info;
+
+// Bootstrap component overrides
+
+$input-height: 2.25rem;
+$input-line-height: 1.429;
+$input-border-radius: var(--rz-border-radius);
+$input-placeholder-color: var(--rz-text-tertiary-color);
+
+$tooltip-color: var(--rz-text-contrast-color);
+$tooltip-border-radius: var(--rz-border-radius);
+$tooltip-font-size: 0.875rem;
 
 $body-bg: #f3f5f7 !default;
 $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,

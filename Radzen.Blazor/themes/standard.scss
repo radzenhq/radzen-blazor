@@ -975,7 +975,7 @@ $editor-button-disabled-color: $rz-base-400 !default;
 $editor-button-selected-background-color: $rz-primary !default;
 $editor-button-selected-color: $rz-white !default;
 $editor-separator-background-color: $rz-base-200 !default;
-$editor-content-background-color: var(--rz-white) !default;
+$editor-content-background-color: var(--rz-base-background-color) !default;
 
 // Splitter
 
@@ -987,8 +987,8 @@ $splitter-bar-hover-opacity: 1 !default;
 
 // Tooltip
 
-$tooltip-background-color: $rz-base-900 !default;
-$tooltip-color: $rz-white !default;
+$tooltip-background-color: var(--rz-base-900) !default;
+$tooltip-color: var(--rz-text-contrast-color) !default;
 $tooltip-shadow: $rz-shadow-level-2 !default;
 
 // Gauge
