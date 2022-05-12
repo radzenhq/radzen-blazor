@@ -1,19 +1,20 @@
 ﻿@page "/datagrid-enum-filter"
 @using System.Linq.Dynamic.Core
-
+@using System.ComponentModel.DataAnnotations
 <h1>DataGrid Enum Column Filter</h1>
 
 <p>This page demonstrates how to use enums in the DataGrid column filter.</p>
 
 <RadzenExample Name="DataGrid" Source="DataGridColumnEnumFilter" Heading="false">
-        <h3>Advanced Filter Mode of enums</h3>
-        <RadzenDataGrid LoadData="LoadData" IsLoading=@isLoading Count="count" Data=@employees FilterMode="FilterMode.Advanced" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
-            <Columns>
-                <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />
-                <RadzenDataGridColumn TItem="Employee" Property="Gender" Title="Gender" />
-                <RadzenDataGridColumn TItem="Employee" Property="Status" Title="Nullable Status" />
-            </Columns>
-        </RadzenDataGrid>
+    <h3>Advanced Filter Mode of enums</h3>
+    <RadzenDataGrid LoadData="LoadData" IsLoading=@isLoading Count="count" Data=@employees FilterMode="FilterMode.Advanced" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
+        <Columns>
+            <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />
+            <RadzenDataGridColumn TItem="Employee" Property="Gender" Title="Gender" />
+            <RadzenDataGridColumn TItem="Employee" Property="Status" Title="Nullable Status" />
+            <RadzenDataGridColumn TItem="Employee" Property="Color" Title="Favorite Color (Display Attribute in Filter)" />
+        </Columns>
+    </RadzenDataGrid>
 </RadzenExample>
 
 @code {
@@ -27,6 +28,7 @@
         public int ID { get; set; }
         public GenderType Gender { get; set; }
         public StatusType? Status { get; set; }
+        public ColorType Color { get; set; }
     }
 
     public enum GenderType
@@ -34,6 +36,23 @@
         Ms,
         Mr,
         Unknown,
+    }
+
+    public enum ColorType
+    {
+        Red,
+        Green,
+        Blue,
+        [Display(Description = "Almond Green")]
+        AlmondGreen,
+        [Display(Description = "Amber Gray")]
+        AmberGray,
+        [Display(Description = "Apple Blue... ")]
+        AppleBlueSeaGreen,
+        //[Display(Description = "Miss", ResourceType = typeof(ResourceFile)] localization example
+        [Display(Description = "Azure")]
+        AzureBlue,
+
     }
 
     public enum StatusType
@@ -49,7 +68,8 @@
             {
                 ID = i,
                 Gender = i < 3 ? GenderType.Mr : i < 6 ? GenderType.Ms : GenderType.Unknown,
-                Status = i < 3 ? StatusType.Active: i < 6 ? StatusType.Inactive : null
+                Status = i < 3 ? StatusType.Active : i < 6 ? StatusType.Inactive : null,
+                Color = i < 2 ? ColorType.Red: i < 4 ? ColorType.AlmondGreen : i < 6 ? ColorType.AppleBlueSeaGreen : ColorType.AzureBlue,
             });
     }
 
