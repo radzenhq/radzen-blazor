@@ -29,7 +29,7 @@ namespace Radzen.Blazor
 
             foreach (Enum val in values)
             {
-                items.Add(new { Value = val, Text = val.GetDisplayDescription() });
+                items.Add(new { Value = Convert.ToInt32(val), Text = val.GetDisplayDescription() });
             }
 
             return items;
