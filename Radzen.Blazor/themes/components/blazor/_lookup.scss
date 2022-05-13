@@ -1,9 +1,16 @@
-$lookup-panel-background-color: $white !default;
+$lookup-panel-background-color: var(--rz-base-background-color) !default;
 $lookup-panel-padding: 1rem !default;
 
+// Lookup CSS variables
+
+:root {
+  --rz-lookup-panel-background-color: #{$lookup-panel-background-color};
+  --rz-lookup-panel-padding: #{$lookup-panel-padding};
+}
+
 .rz-lookup-panel {
-  background-color: $lookup-panel-background-color;
-  padding: $lookup-panel-padding;
+  background-color: var(--rz-lookup-panel-background-color);
+  padding: var(--rz-lookup-panel-padding);
 }
 
 .rz-lookup-search {
