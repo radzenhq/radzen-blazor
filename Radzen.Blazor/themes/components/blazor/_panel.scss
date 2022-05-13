@@ -1,4 +1,4 @@
-$panel-background-color: $default-background-color !default;
+$panel-background-color: var(--rz-base-background-color) !default;
 $panel-padding: 0.5rem !default;
 $panel-title-line-height: 1.25rem !default;
 $panel-title-font-weight: 600 !default;
@@ -6,16 +6,33 @@ $panel-content-margin: 0 !default;
 $panel-toggle-icon-width: 1.5rem !default;
 $panel-toggle-icon-height: $panel-toggle-icon-width !default;
 $panel-toggle-icon-border-radius: 2px !default;
-$panel-toggle-icon-background-color: #e6ecef !default;
-$panel-hover-color: $default-link !default;
-$panel-border-radius: $border-radius !default;
+$panel-toggle-icon-background-color: var(--rz-base-200) !default;
+$panel-hover-color: var(--rz-secondary) !default;
+$panel-border-radius: var(--rz-border-radius) !default;
 $panel-shadow: none !default;
 
+// Panel CSS variables
+
+:root {
+  --rz-panel-background-color: #{$panel-background-color};
+  --rz-panel-padding: #{$panel-padding};
+  --rz-panel-title-line-height: #{$panel-title-line-height};
+  --rz-panel-title-font-weight: #{$panel-title-font-weight};
+  --rz-panel-content-margin: #{$panel-content-margin};
+  --rz-panel-toggle-icon-width: #{$panel-toggle-icon-width};
+  --rz-panel-toggle-icon-height: #{$panel-toggle-icon-height};
+  --rz-panel-toggle-icon-border-radius: #{$panel-toggle-icon-border-radius};
+  --rz-panel-toggle-icon-background-color: #{$panel-toggle-icon-background-color};
+  --rz-panel-hover-color: #{$panel-hover-color};
+  --rz-panel-border-radius: #{$panel-border-radius};
+  --rz-panel-shadow: #{$panel-shadow};
+}
+
 .rz-panel {
-  background: $panel-background-color;
-  border-radius: $panel-border-radius;
-  padding: $panel-padding;
-  box-shadow: $panel-shadow;
+  background: var(--rz-panel-background-color);
+  border-radius: var(--rz-panel-border-radius);
+  padding: var(--rz-panel-padding);
+  box-shadow: var(--rz-panel-shadow);
   display: flex;
   flex-direction: column;
 }
@@ -26,7 +43,7 @@ $panel-shadow: none !default;
 }
 
 .rz-panel-content {
-  margin: $panel-content-margin;
+  margin: var(--rz-panel-content-margin);
 }
 
 .rz-panel-content-wrapper {
@@ -36,15 +53,15 @@ $panel-shadow: none !default;
 }
 
 .rz-panel-title {
-  line-height: $panel-title-line-height;
-  font-weight: $panel-title-font-weight;
+  line-height: var(--rz-panel-title-line-height);
+  font-weight: var(--rz-panel-title-font-weight);
 }
 
 .rz-panel-titlebar-toggler {
-  width: $panel-toggle-icon-width;
-  height: $panel-toggle-icon-height;
-  border-radius: $panel-toggle-icon-border-radius;
-  background-color: $panel-toggle-icon-background-color;
+  width: var(--rz-panel-toggle-icon-width);
+  height: var(--rz-panel-toggle-icon-height);
+  border-radius: var(--rz-panel-toggle-icon-border-radius);
+  background-color: var(--rz-panel-toggle-icon-background-color);
   color: inherit;
   display: flex;
   align-items: center;
@@ -52,7 +69,7 @@ $panel-shadow: none !default;
 
   &:hover {
     text-decoration: none;
-    color: $panel-hover-color;
+    color: var(--rz-panel-hover-color);
   }
 
   .rzi-minus {
