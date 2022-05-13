@@ -1,6 +1,13 @@
 $notification-padding: 1rem 1.25rem !default;
 $notification-icon-margin: 0 0.625rem 0 0 !default;
 
+// Notification CSS variables
+
+:root {
+  --rz-notification-padding: #{$notification-padding};
+  --rz-notification-icon-margin: #{$notification-icon-margin};
+}
+
 .rz-growl {
   position: fixed;
   top: 100px;
@@ -9,37 +16,37 @@ $notification-icon-margin: 0 0.625rem 0 0 !default;
 }
 
 .rz-growl-item {
-  border-radius: $border-radius;
-  padding: $notification-padding;
+  border-radius: var(--rz-border-radius);
+  padding: var(--rz-notification-padding);
 }
 
 .rz-growl-message-success {
   .rz-growl-item {
-    background-color: $success;
+    background-color: var(--rz-success);
   }
 }
 
 .rz-growl-message-warn {
   .rz-growl-item {
-    background-color: $warning;
+    background-color: var(--rz-warning);
   }
 }
 
 .rz-growl-message-error {
   .rz-growl-item {
-    background-color: $danger;
+    background-color: var(--rz-danger);
   }
 }
 
 .rz-growl-message-info {
   .rz-growl-item {
-    background-color: $info;
+    background-color: var(--rz-info);
   }
 }
 
 .rz-growl-item {
   margin: 1rem 0;
-  color: $white;
+  color: var(--rz-text-contrast-color);
 
   p {
     color: inherit;
@@ -56,7 +63,7 @@ $notification-icon-margin: 0 0.625rem 0 0 !default;
 
 .rz-growl-image {
   float: left;
-  margin: $notification-icon-margin;
+  margin: var(--rz-notification-icon-margin);
 
   &.rzi-check {
     &:before {
