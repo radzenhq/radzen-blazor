@@ -4,27 +4,54 @@ $radio-border-radius: 50% !default;
 $radio-label-margin: 0 1rem 0 0.5rem !default;
 $radio-margin: 1rem 0 !default;
 
-$radio-active-background-color: #3f8cb3 !default;
+$radio-active-background-color: var(--rz-secondary) !default;
 $radio-active-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.1) !default;
 
-$radio-checked-background-color: #3f8cb3 !default;
-$radio-checked-hover-background-color: #59a6cd !default;
+$radio-checked-background-color: var(--rz-secondary) !default;
+$radio-checked-hover-background-color: var(--rz-secondary-light) !default;
 $radio-checked-hover-shadow: inset 0 -3px 0 0 rgba(#fff, 0.2) !default;
 
-$radio-checked-color: $white !default;
+$radio-checked-color: var(--rz-text-contrast-color) !default;
 
-$radio-circle-background-color: $white !default;
+$radio-circle-background-color: var(--rz-base-background-color) !default;
 $radio-circle-shadow: inset 0 4px 7px 0 rgba(0, 0, 0, 0.03);
-$radio-circle-hover-background-color: #fafafa !default;
+$radio-circle-hover-background-color: var(--rz-base-100) !default;
 
-$radio-icon-width: 0.625rem !default;
+$radio-icon-width: 0.5rem !default;
 $radio-icon-height: $radio-icon-width !default;
 $radio-checked-border: $input-border !default;
+
+// Radio CSS variables
+
+:root {
+  --rz-radio-width: #{$radio-width};
+  --rz-radio-height: #{$radio-height};
+  --rz-radio-border-radius: #{$radio-border-radius};
+  --rz-radio-label-margin: #{$radio-label-margin};
+  --rz-radio-margin: #{$radio-margin};
+
+  --rz-radio-active-background-color: #{$radio-active-background-color};
+  --rz-radio-active-shadow: #{$radio-active-shadow};
+
+  --rz-radio-checked-background-color: #{$radio-checked-background-color};
+  --rz-radio-checked-hover-background-color: #{$radio-checked-hover-background-color};
+  --rz-radio-checked-hover-shadow: #{$radio-checked-hover-shadow};
+
+  --rz-radio-checked-color: #{$radio-checked-color};
+
+  --rz-radio-circle-background-color: #{$radio-circle-background-color};
+  --rz-radio-circle-shadow: #{$radio-circle-shadow};
+  --rz-radio-circle-hover-background-color: #{$radio-circle-hover-background-color};
+
+  --rz-radio-icon-width: #{$radio-icon-width};
+  --rz-radio-icon-height: #{$radio-icon-height};
+  --rz-radio-checked-border: #{$radio-checked-border};
+}
 
 .rz-radio-button-list-vertical {
   .rz-radio-btn {
     display: flex;
-    margin: $radio-margin;
+    margin: var(--rz-radio-margin);
   }
 }
 
@@ -46,7 +73,7 @@ $radio-checked-border: $input-border !default;
 }
 
 .rz-radiobutton-label {
-  margin: $radio-label-margin;
+  margin: var(--rz-radio-label-margin);
 }
 
 .rz-radiobutton {
@@ -54,8 +81,8 @@ $radio-checked-border: $input-border !default;
   position: relative;
   vertical-align: middle;
 
-  width: $radio-width;
-  height: $radio-height;
+  width: var(--rz-radio-width);
+  height: var(--rz-radio-height);
 
   .rz-helper-hidden-accessible {
     opacity: 0;
@@ -75,18 +102,18 @@ $radio-checked-border: $input-border !default;
   justify-content: center;
   width: inherit;
 
-  border: $input-border;
-  border-radius: $radio-border-radius;
-  box-shadow: $input-shadow;
-  background-color: $input-background-color;
+  border: var(--rz-input-border);
+  border-radius: var(--rz-radio-border-radius);
+  box-shadow: var(--rz-input-shadow);
+  background-color: var(--rz-input-background-color);
 
   &:hover:not(.rz-state-disabled) {
     @extend %input-hover;
   }
 
   &:active:not(.rz-state-disabled) {
-    background-color: $radio-active-background-color;
-    box-shadow: $radio-active-shadow;
+    background-color: var(--rz-radio-active-background-color);
+    box-shadow: var(--rz-radio-active-shadow);
   }
 
   &.rz-state-disabled {
@@ -94,29 +121,29 @@ $radio-checked-border: $input-border !default;
   }
 
   .rzi {
-    width: $radio-icon-width;
-    height: $radio-icon-height;
-    color: $radio-checked-color;
+    width: var(--rz-radio-icon-width);
+    height: var(--rz-radio-icon-height);
+    color: var(--rz-radio-checked-color);
   }
 
   .rzi-circle-on {
-    border-radius: $radio-border-radius;
+    border-radius: var(--rz-radio-border-radius);
     vertical-align: middle;
-    background-color: $radio-circle-background-color;
-    box-shadow: $radio-circle-shadow;
+    background-color: var(--rz-radio-circle-background-color);
+    box-shadow: var(--rz-radio-circle-shadow);
 
     &:hover {
-      background-color: $radio-circle-hover-background-color;
+      background-color: var(--rz-radio-circle-hover-background-color);
     }
   }
 
   &.rz-state-active {
-    background-color: $radio-checked-background-color;
-    border: $radio-checked-border;
+    background-color: var(--rz-radio-checked-background-color);
+    border: var(--rz-radio-checked-border);
 
     &:hover {
-      background-color: $radio-checked-hover-background-color;
-      box-shadow: $radio-checked-hover-shadow;
+      background-color: var(--rz-radio-checked-hover-background-color);
+      box-shadow: var(--rz-radio-checked-hover-shadow);
     }
   }
 
@@ -125,18 +152,18 @@ $radio-checked-border: $input-border !default;
     .rzi-circle-on {
     
       &:hover {
-        background-color: $radio-circle-background-color;
+        background-color: var(--rz-radio-circle-background-color);
       }
     }
 
     &.rz-state-active {
-      background-color: $radio-checked-background-color;
-      border: $radio-checked-border;
+      background-color: var(--rz-radio-checked-background-color);
+      border: var(--rz-radio-checked-border);
       opacity: 0.5;
 
       &:hover {
-        background-color: $radio-checked-background-color;
-        border: $radio-checked-border; 
+        background-color: var(--rz-radio-checked-background-color);
+        border: var(--rz-radio-checked-border); 
       }
     }
   }

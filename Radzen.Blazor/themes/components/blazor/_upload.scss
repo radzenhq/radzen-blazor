@@ -1,18 +1,38 @@
-$upload-button-bar-background-color: rgba(#e6ecef, 0.5) !default;
+$upload-button-bar-background-color: var(--rz-base-200) !default;
 $upload-button-bar-padding: 0.5rem !default;
 
-$upload-files-background-color: $white !default;
+$upload-files-background-color: var(--rz-base-background-color) !default;
 $upload-files-padding: 0.5rem 0 !default;
-$upload-files-remove-background-color: #dadfe2 !default;
-$upload-files-remove-color: $white !default;
+$upload-files-remove-background-color: var(--rz-base-300) !default;
+$upload-files-remove-color: var(--rz-text-contrast-color) !default;
 
 $upload-files-margin: 0 0.5rem !default;
 
-$upload-choose-background-color: $secondary !default;
-$upload-choose-color: $white !default;
-$upload-cancel-background-color: #dadfe2 !default;
-$upload-cancel-color: $charcoal-grey !default;
-$upload-button-background-color: $primary !default;
+$upload-choose-background-color: var(--rz-secondary) !default;
+$upload-choose-color: var(--rz-text-contrast-color) !default;
+$upload-cancel-background-color: var(--rz-base-200) !default;
+$upload-cancel-color: var(--rz-text-color) !default;
+$upload-button-background-color: var(--rz-primary) !default;
+
+// Upload CSS variables
+
+:root {
+  --rz-upload-button-bar-background-color: #{$upload-button-bar-background-color};
+  --rz-upload-button-bar-padding: #{$upload-button-bar-padding};
+  
+  --rz-upload-files-background-color: #{$upload-files-background-color};
+  --rz-upload-files-padding: #{$upload-files-padding};
+  --rz-upload-files-remove-background-color: #{$upload-files-remove-background-color};
+  --rz-upload-files-remove-color: #{$upload-files-remove-color};
+  
+  --rz-upload-files-margin: #{$upload-files-margin};
+  
+  --rz-upload-choose-background-color: #{$upload-choose-background-color};
+  --rz-upload-choose-color: #{$upload-choose-color};
+  --rz-upload-cancel-background-color: #{$upload-cancel-background-color};
+  --rz-upload-cancel-color: #{$upload-cancel-color};
+  --rz-upload-button-background-color: #{$upload-button-background-color};
+}
 
 .rz-fileupload {
   display: inline-block;
@@ -35,8 +55,8 @@ $upload-button-background-color: $primary !default;
   overflow: hidden;
   vertical-align: middle;
   @extend .rz-button-md;
-  background-color: $upload-choose-background-color;
-  color: $upload-choose-color;
+  background-color: var(--rz-upload-choose-background-color);
+  color: var(--rz-upload-choose-color);
 
   input[type='file'] {
     position: absolute;
@@ -55,7 +75,7 @@ $upload-button-background-color: $primary !default;
   justify-content: space-between;
 
   > div {
-    margin: $upload-files-margin;
+    margin: var(--rz-upload-files-margin);
   }
 
   .rz-button-text {
@@ -79,21 +99,21 @@ $upload-button-background-color: $primary !default;
 
 .rz-fileupload-buttonbar {
   position: relative;
-  background-color: $upload-button-bar-background-color;
-  padding: $upload-button-bar-padding;
-  border-radius: $input-border-radius;
+  background-color: var(--rz-upload-button-bar-background-color);
+  padding: var(--rz-upload-button-bar-padding);
+  border-radius: var(--rz-border-radius);
 
   .rz-button {
     &:nth-child(3) {
       float: right;
 
-      background-color: $upload-cancel-background-color;
-      color: $upload-cancel-color;
+      background-color: var(--rz-upload-cancel-background-color);
+      color: var(--rz-upload-cancel-color);
     }
   }
 }
 
 .rz-fileupload-files {
-  background-color: $upload-files-background-color;
-  padding: $upload-files-padding;
+  background-color: var(--rz-upload-files-background-color);
+  padding: var(--rz-upload-files-padding);
 }

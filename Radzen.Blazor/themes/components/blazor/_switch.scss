@@ -1,5 +1,5 @@
-$switch-background-color: #ced4da !default;
-$switch-checked-background-color:#479cc8 !default;
+$switch-background-color: var(--rz-base-400) !default;
+$switch-checked-background-color:var(--rz-secondary) !default;
 $switch-box-shadow: none !default;
 $switch-width: 3rem !default;
 
@@ -7,63 +7,71 @@ $switch-height: round($switch-width*600)/1000;
 $switch-circle-size: round($switch-width*420)/1000;
 $switch-circle-margin: round(($switch-height - $switch-circle-size)*500)/1000;
 
+// Switch CSS variables
+
+:root {
+  --rz-switch-background-color: #{$switch-background-color};
+  --rz-switch-checked-background-color: #{$switch-checked-background-color};
+  --rz-switch-box-shadow: #{$switch-box-shadow};
+}
+
 .rz-switch {
-    position: relative;
-    display: inline-block;
-    width: $switch-width;
-    min-width: $switch-width;
-    height: $switch-height;
+  position: relative;
+  display: inline-block;
+  width: $switch-width;
+  min-width: $switch-width;
+  height: $switch-height;
 }
 
 .rz-switch-circle {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
 }
 
 .rz-switch-circle.rz-disabled {
-  opacity: 0.5;
-  cursor: initial;
+opacity: 0.5;
+cursor: initial;
 }
 
 .rz-switch .rz-switch-circle {
-    background: $switch-background-color;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
-    border-radius: $switch-height;
+  background: var(--rz-switch-background-color);
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  border-radius: var(--rz-border-radius-5);
 }
 
 .rz-switch.rz-switch-checked .rz-switch-circle {
-  background: $switch-checked-background-color;
+background: var(--rz-switch-checked-background-color);
 }
 
 .rz-switch .rz-switch-circle:before {
-    background: #ffffff;
-    width: $switch-circle-size;
-    height: $switch-circle-size;
-    left: $switch-circle-margin;
-    margin-top: round($switch-circle-size*-500)/1000;
-    border-radius: 50%;
-    transition-duration: 0.2s;
-    box-shadow: $switch-box-shadow;
+  background: var(--rz-text-contrast-color);
+  width: $switch-circle-size;
+  height: $switch-circle-size;
+  left: $switch-circle-margin;
+  margin-top: round($switch-circle-size*-500)/1000;
+  border-radius: 50%;
+  transition-duration: 0.2s;
+  box-shadow: var(--rz-switch-box-shadow);
 }
 
 .rz-switch-circle:before {
-  position: absolute;
-  content: "";
-  top: 50%;
+position: absolute;
+content: "";
+top: 50%;
 }
 
 .rz-switch-circle.rz-disabled:before {
-  box-shadow: none;
+box-shadow: none;
 }
 
 .rz-switch.p-rz-switch-checked .rz-switch-circle:before {
-  background: #ffffff;
+background: var(--rz-text-contrast-color);
 }
 
 .rz-switch.rz-switch-checked .rz-switch-circle:before {
-    transform: translateX($switch-width - ($switch-circle-size+$switch-circle-margin*2));
+  transform: translateX($switch-width - ($switch-circle-size + $switch-circle-margin*2));
 }
