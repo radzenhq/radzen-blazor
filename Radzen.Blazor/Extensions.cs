@@ -17,7 +17,7 @@ namespace Radzen.Blazor
 
             var attribute = val?.GetCustomAttribute<DisplayAttribute>();
             if (attribute != null)
-                return attribute?.Description;
+                return attribute?.GetDescription();
 
             return enumValue.ToString();
         }
