@@ -1,11 +1,11 @@
-$button-base-background-color: $primary !default;
-$button-base-color: $white !default;
+$button-base-background-color: var(--rz-primary) !default;
+$button-base-color: var(--rz-text-contrast-color) !default;
 $button-hover-shadow: inset 0 -3px 0 0 rgba(255, 255, 255, 0.2) !default;
 $button-hover-gradient: linear-gradient(rgba(#fff, 0.1), rgba(#fff, 0.1)) !default;
 $button-active-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.1) !default;
 $button-active-gradient: linear-gradient(rgba(#000, 0.1), rgba(#000, 0.1)) !default;
 $button-focus-outline: none !default;
-$button-border-radius: $border-radius !default;
+$button-border-radius: var(--rz-border-radius) !default;
 $button-shadow: none !default;
 $button-transition: none !default;
 $button-disabled-opacity: 0.2 !default;
@@ -62,57 +62,78 @@ $button-styles: () !default;
 $button-styles: map-merge(
   (
     primary: (
-      background-color: $primary,
-      color: $white
+      background-color: var(--rz-primary),
+      color: var(--rz-text-contrast-color)
     ),
     light: (
-      background-color: $light,
-      color: $charcoal-grey
+      background-color: var(--rz-base-200),
+      color: var(--rz-text-color)
     ),
     secondary: (
-      background-color: $secondary,
-      color: $white
+      background-color: var(--rz-secondary),
+      color: var(--rz-text-contrast-color)
     ),
     info: (
-      background-color: $info,
-      color: $white
+      background-color: var(--rz-info),
+      color: var(--rz-text-contrast-color)
     ),
     warning: (
-      background-color: $warning,
-      color: $white
+      background-color: var(--rz-warning),
+      color: var(--rz-text-contrast-color)
     ),
     error: (
-      background-color: $danger,
-      color: $white
+      background-color: var(--rz-danger),
+      color: var(--rz-text-contrast-color)
     ),
     danger: (
-      background-color: $danger,
-      color: $white
+      background-color: var(--rz-danger),
+      color: var(--rz-text-contrast-color)
     ),
     success: (
-      background-color: $success,
-      color: $white
+      background-color: var(--rz-success),
+      color: var(--rz-text-contrast-color)
     )
   ),
   $button-styles
 );
 
+// Button CSS variables
+
+:root {
+  --rz-button-base-background-color: #{$button-base-background-color};
+  --rz-button-base-color: #{$button-base-color};
+  --rz-button-hover-shadow: #{$button-hover-shadow};
+  --rz-button-hover-gradient: #{$button-hover-gradient};
+  --rz-button-active-shadow: #{$button-active-shadow};
+  --rz-button-active-gradient: #{$button-active-gradient};
+  --rz-button-focus-outline: #{$button-focus-outline};
+  --rz-button-border-radius: #{$button-border-radius};
+  --rz-button-shadow: #{$button-shadow};
+  --rz-button-transition: #{$button-transition};
+  --rz-button-disabled-opacity: #{$button-disabled-opacity};
+  --rz-button-line-height: #{$button-line-height};
+  --rz-button-vertical-align: #{$button-vertical-align};
+  --rz-button-background-size: #{$button-background-size};
+  --rz-button-hover-background-size: #{$button-hover-background-size};
+  --rz-button-active-background-size: #{$button-active-background-size};
+}
+
 .rz-button {
   -webkit-appearance: none;
-  border-radius: $button-border-radius;
-  background-color: $button-base-background-color;
-  color: $button-base-color;
+  border-radius: var(--rz-button-border-radius);
+  background-color: var(--rz-button-base-background-color);
+  color: var(--rz-button-base-color);
   border: none;
   outline: none;
-  line-height: $button-line-height;
+  line-height: var(--rz-button-line-height);
   font-size: 1.0625rem;
-  box-shadow: $button-shadow;
-  transition: $button-transition;
-  background-size: $button-background-size;
+  box-shadow: var(--rz-button-shadow);
+  transition: var(--rz-button-transition);
+  background-size: var(--rz-button-background-size);
   background-repeat: no-repeat;
 
   &:focus {
-    outline: $button-focus-outline;
+    outline: var(--rz-button-focus-outline);
   }
 
   &:not(.rz-state-disabled) {
@@ -120,31 +141,31 @@ $button-styles: map-merge(
 
     &:hover {
       &:not(:active) {
-        background-image: $button-hover-gradient;
-        background-size: $button-hover-background-size;
-        box-shadow: $button-hover-shadow;
+        background-image: var(--rz-button-hover-gradient);
+        background-size: var(--rz-button-hover-background-size);
+        box-shadow: var(--rz-button-hover-shadow);
       }
     }
 
     &:active {
-      background-image: $button-active-gradient;
-      background-size: $button-active-background-size;
-      box-shadow: $button-active-shadow;
+      background-image: var(--rz-button-active-gradient);
+      background-size: var(--rz-button-active-background-size);
+      box-shadow: var(--rz-button-active-shadow);
     }
   }
 
   &.rz-state-disabled {
-    opacity: $button-disabled-opacity;
+    opacity: var(--rz-button-disabled-opacity);
     cursor: initial;
   }
 
   .rz-button-text {
-    vertical-align: $button-vertical-align;
+    vertical-align: var(--rz-button-vertical-align);
     line-height: 1.5rem;
   }
 
   .rzi {
-    vertical-align: $button-vertical-align;
+    vertical-align: var(--rz-button-vertical-align);
   }
 
   @each $style, $button in $button-styles {
