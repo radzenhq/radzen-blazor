@@ -1,18 +1,27 @@
 $sidebar-z: 2 !default;
 $sidebar-width: 250px !default;
-$sidebar-border-right: 1px solid #eaeef0 !default;
-$sidebar-background-color: $charcoal-grey !default;
+$sidebar-border-right: 1px solid var(--rz-base-300) !default;
+$sidebar-background-color: var(--rz-base-800) !default;
+
+// Sidebar CSS variables
+
+:root {
+  --rz-sidebar-z: #{$sidebar-z};
+  --rz-sidebar-width: #{$sidebar-width};
+  --rz-sidebar-border-right: #{$sidebar-border-right};
+  --rz-sidebar-background-color: #{$sidebar-background-color};
+}
 
 .rz-sidebar {
-  background-color: $sidebar-background-color;
-  border-right: $sidebar-border-right;
+  background-color: var(--rz-sidebar-background-color);
+  border-right: var(--rz-sidebar-border-right);
   position: fixed;
   overflow: auto;
   left: 0;
   top: 0;
   bottom: 0;
-  z-index: $sidebar-z;
-  width: $sidebar-width;
+  z-index: var(--rz-sidebar-z);
+  width: var(--rz-sidebar-width);
   opacity: 1;
   transition: all .1s linear;
 }
@@ -25,7 +34,7 @@ $sidebar-background-color: $charcoal-grey !default;
 }
 
 .rz-sidebar-expanded {
-  width: $sidebar-width;
+  width: var(--rz-sidebar-width);
   opacity: 1;
 }
 

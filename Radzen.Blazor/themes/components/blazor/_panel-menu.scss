@@ -1,6 +1,6 @@
 $panel-menu-color: var(--rz-text-contrast-color) !default;
 $panel-menu-background-color: var(--rz-base-800) !default;
-$panel-menu-hover-background-color: var(--rz-base-900) !default;
+$panel-menu-hover-background-color: rgba($rz-black, .3) !default;
 $panel-menu-hover-color: $panel-menu-color !default;
 
 $panel-menu-item-line-height: 1.25rem !default;
@@ -20,7 +20,7 @@ $panel-menu-item-2nd-level-hover-background-color: rgba($rz-black, .4) !default;
 $panel-menu-item-2nd-level-hover-color: inherit !default;
 $panel-menu-item-2nd-level-active-background-color: $panel-menu-item-2nd-level-hover-background-color !default;
 $panel-menu-item-2nd-level-active-color: inherit !default;
-$panel-menu-item-3rd-level-hover-background-color: rgba($rz-black, .8) !default;
+$panel-menu-item-3rd-level-hover-background-color: rgba($rz-black, .6) !default;
 $panel-menu-item-3rd-level-hover-color: inherit !default;
 $panel-menu-item-3rd-level-active-background-color: $panel-menu-item-3rd-level-hover-background-color !default;
 $panel-menu-item-3rd-level-active-color: inherit !default;
