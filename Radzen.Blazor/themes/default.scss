@@ -1,26 +1,25 @@
-@import 'colors';
 @import 'variables';
 
-// Global variables
+//---- Global Color Variables
 
 $rz-white: #ffffff !default;
 $rz-black: #000000 !default;
 
 $rz-base-50: #ffffff !default;
 $rz-base-100: #f6f7fa !default;
-$rz-base-200: #eaeef1 !default;
+$rz-base-200: #e9edf0 !default; //#e6ecef  eef1f4
 $rz-base-300: #dadfe2 !default;
 $rz-base-400: #cecece !default;
-$rz-base-500: #b4bec3 !default;
-$rz-base-600: #95a4a8 !default;
-$rz-base-700: #77858b !default;
-$rz-base-800: #545e61 !default;
-$rz-base-900: #292c2e !default;
+$rz-base-500: #95a4a8 !default; //b4bec3
+$rz-base-600: #77858b !default;
+$rz-base-700: #545e61 !default;
+$rz-base-800: #3a474d !default; //$charcoal-grey
+$rz-base-900: #28363c !default; //292c2e #28363c panelmenu
 
 $rz-primary: #ff6d41 !default;
-$rz-primary-light: #ff7b54 !default; /*lighten($rz-primary, 8%);*/
+$rz-primary-light: #ff7b54 !default;
 $rz-primary-lighter: rgba($rz-primary, .16) !default;
-$rz-primary-dark: #e5613a !default; /*darken($rz-primary, 10%);*/
+$rz-primary-dark: #e5613a !default;
 
 $rz-secondary: #35a0d7 !default;
 $rz-secondary-light: #4dabdc !default;
@@ -58,20 +57,32 @@ $rz-series-8: #84a7ff !default;
 
 $rz-transition: 0.1s linear !default;
 
-// Global CSS variables
+// Global Color CSS Variables
 
 @import 'css-variables';
 
-// Component Aliases
+//---- Component Aliases
+
+// Text Color
 
 $rz-text-title-color: var(--rz-base-900) !default;
 $rz-text-color: var(--rz-base-800) !default;
 $rz-text-secondary-color: var(--rz-base-700) !default;
-$rz-text-tertiary-color: var(--rz-base-600) !default;
+$rz-text-tertiary-color: var(--rz-base-600) !default; //cool-grey
 $rz-text-disabled-color: var(--rz-base-500) !default;
 $rz-text-contrast-color: var(--rz-white) !default;
 
+// Link Color
+
+$rz-link-color: var(--rz-secondary) !default;
+$rz-link-hover-color: var(--rz-secondary-dark) !default;
+$rz-link-hover-decoration: underline !default;
+
+// Background Color
+
 $rz-base-background-color: var(--rz-white) !default;
+
+// Border Radius
 
 $rz-border-radius: 4px !default;
 $rz-border-radius-2: $rz-border-radius * 2 !default;
@@ -79,7 +90,27 @@ $rz-border-radius-3: $rz-border-radius * 3 !default;
 $rz-border-radius-4: $rz-border-radius * 4 !default;
 $rz-border-radius-5: $rz-border-radius * 5 !default;
 
+// Shadow
+
+$rz-shadow-0: none !default;
+$rz-shadow-1: none !default;
+$rz-shadow-2: none !default;
+$rz-shadow-3: none !default;
+$rz-shadow-4: none !default;
+$rz-shadow-inner-1: none !default;
+$rz-shadow-inner-2: none !default;
+$rz-shadow-inner-3: none !default;
+$rz-shadow-inner-4: none !default;
+
+// Transition
+
 $rz-transition-all: all var(--rz-transition) !default;
+
+// Icon Size
+
+$rz-icon-base-font-size: 1.25rem !default;
+
+// Component Aliases CSS variables
 
 :root {
   --rz-text-title-color: #{$rz-text-title-color};
@@ -89,6 +120,10 @@ $rz-transition-all: all var(--rz-transition) !default;
   --rz-text-disabled-color: #{$rz-text-disabled-color};
   --rz-text-contrast-color: #{$rz-text-contrast-color};
 
+  --rz-link-color: #{$rz-link-color};
+  --rz-link-hover-color: #{$rz-link-hover-color};
+  --rz-link-hover-decoration: #{$rz-link-hover-decoration};
+
   --rz-base-background-color: #{$rz-base-background-color};
 
   --rz-border-radius: #{$rz-border-radius};
@@ -97,50 +132,53 @@ $rz-transition-all: all var(--rz-transition) !default;
   --rz-border-radius-4: #{$rz-border-radius-4};
   --rz-border-radius-5: #{$rz-border-radius-5};
 
+  --rz-shadow-0: #{$rz-shadow-0};
+  --rz-shadow-1: #{$rz-shadow-1};
+  --rz-shadow-2: #{$rz-shadow-2};
+  --rz-shadow-3: #{$rz-shadow-3};
+  --rz-shadow-4: #{$rz-shadow-4};
+  --rz-shadow-inner-1: #{$rz-shadow-inner-1};
+  --rz-shadow-inner-2: #{$rz-shadow-inner-2};
+  --rz-shadow-inner-3: #{$rz-shadow-inner-3};
+  --rz-shadow-inner-4: #{$rz-shadow-inner-4};
+
   --rz-transition-all: #{$rz-transition-all};
+  
+  --rz-icon-base-font-size: #{$rz-icon-base-font-size};
 }
 
-// Theme colors SHOULD NOT BE USED!
-$primary-color: $rz-primary !default;
+//---- Bootstrap variable overrides. DO NOT USE IN COMPONENTS!
+
+$font-size: 0.875rem !default;
+$font-size-base: $font-size !default;
+$border-radius: 4px !default;
+$primary: $rz-primary !default;
 $secondary: $rz-secondary !default;
-$tertiary: $rz-base-600 !default;
-$additional-1: $rz-success !default;
-$additional-2: $rz-info !default;
-$additional-3: $rz-danger !default;
-$contrast: $rz-base-900 !default;
-
-$default-background-color: $rz-white !default;
-$button-hover-background-color: $rz-primary-light !default;
-$button-active-background-color: $rz-primary-dark !default;
-$sidebar-background-color: $rz-base-900 !default;
-
-// Bootstrap overrides SHOULD NOT BE USED!
-$primary: $primary-color !default;
 $danger: $rz-danger !default;
 $info: $rz-info !default;
 $success: $rz-success !default;
 $warning: $rz-warning !default;
-$light: $rz-base-200 !default; //#e6ecef
-$body-color: $rz-base-800 !default; //#212529
-$link-color: $rz-secondary;
-$link-hover-color: $rz-secondary;
-$state-success-bg: $rz-success;
-$state-warning-bg: $rz-warning;
-$state-danger-bg: $rz-danger;
-$state-info-bg: $rz-info;
+$light: $rz-base-200 !default;
+$body-color: $rz-base-800 !default;
+$link-color: $rz-secondary !default;
+$link-hover-color: $rz-secondary !default;
+$link-hover-decoration: underline !default;
+$state-success-bg: $rz-success !default;
+$state-warning-bg: $rz-warning !default;
+$state-danger-bg: $rz-danger !default;
+$state-info-bg: $rz-info !default;
 
-// Bootstrap component overrides
+// Bootstrap component overrides. We need these because bootstrap is overriding them in components.
 
+$card-border-radius: var(--rz-border-radius);
 $input-height: 2.25rem;
 $input-line-height: 1.429;
 $input-border-radius: var(--rz-border-radius);
 $input-placeholder-color: var(--rz-text-tertiary-color);
-
 $tooltip-color: var(--rz-text-contrast-color);
 $tooltip-border-radius: var(--rz-border-radius);
 $tooltip-font-size: 0.875rem;
-
-$body-bg: #f3f5f7 !default;
+$body-bg: var(--rz-base-100) !default;
 $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
   'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
   'Segoe UI Emoji', 'Segoe UI Symbol' !default;
