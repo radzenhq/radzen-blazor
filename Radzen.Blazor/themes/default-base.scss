@@ -1,39 +1,136 @@
-@import 'colors';
 @import 'variables';
-// Theme colors
-$primary-color: $pinkish-orange !default;
-$secondary: $default-link !default;
-$tertiary: $cool-grey !default;
-$additional-1: $soft-green !default;
-$additional-2: $tip !default;
-$additional-3: $dev !default;
-$contrast: $charcoal-grey !default;
 
-$default-background-color: $white !default;
-$button-hover-background-color: #ff7b54 !default;
-$button-active-background-color: #e5613a !default;
-$sidebar-background-color: $charcoal-grey !default;
+//---- Global Theme Colors
 
-// Bootstrap overrides
-$primary: $primary-color !default;
-$danger: #f9777f !default;
-$info: $tip !default;
-$success: $additional-1 !default;
-$warning: $dull-yellow !default;
-$light: #e6ecef !default;
-$body-color: #212529 !default;
-$link-color: $default-link;
-$link-hover-color: $default-link;
-$state-success-bg: $success;
-$state-warning-bg: $warning;
-$state-danger-bg: $danger;
-$state-info-bg: $info;
+$rz-white: #ffffff !default;
+$rz-black: #000000 !default;
 
-$body-bg: #f3f5f7 !default;
-$font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-  'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
-  'Segoe UI Emoji', 'Segoe UI Symbol' !default;
+$rz-base-50: #ffffff !default;
+$rz-base-100: #f6f7fa !default;
+$rz-base-200: #e9edf0 !default; //#e6ecef  eef1f4
+$rz-base-300: #dadfe2 !default;
+$rz-base-400: #cecece !default;
+$rz-base-500: #95a4a8 !default; //b4bec3
+$rz-base-600: #77858b !default;
+$rz-base-700: #545e61 !default;
+$rz-base-800: #3a474d !default; //$charcoal-grey
+$rz-base-900: #28363c !default; //292c2e #28363c panelmenu
+
+$rz-primary: #ff6d41 !default;
+$rz-primary-light: #ff7b54 !default;
+$rz-primary-lighter: rgba($rz-primary, .16) !default;
+$rz-primary-dark: #e5613a !default;
+
+$rz-secondary: #35a0d7 !default;
+$rz-secondary-light: #4dabdc !default;
+$rz-secondary-lighter: rgba($rz-secondary, .20) !default;
+$rz-secondary-dark: #3193c6 !default;
+
+$rz-info: #2cc8c8 !default;
+$rz-info-light: #4ed1d1 !default;
+$rz-info-lighter: rgba($rz-info, .20) !default;
+$rz-info-dark: #25a8a8 !default;
+
+$rz-success: #5dbf74 !default;
+$rz-success-light: #5dbf74 !default;
+$rz-success-lighter: rgba($rz-success, .16) !default;
+$rz-success-dark: #5dbf74 !default;
+
+$rz-warning: #fac152 !default;
+$rz-warning-light: #fbcd75 !default;
+$rz-warning-lighter: rgba($rz-warning, .20) !default;
+$rz-warning-dark: #e6b24b !default;
+
+$rz-danger: #f9777f !default;
+$rz-danger-light: #fa8d93 !default;
+$rz-danger-lighter: rgba($rz-danger, .20) !default;
+$rz-danger-dark: #db6970 !default;
+
+$rz-series-1: #376df5 !default;
+$rz-series-2: #64dfdf !default;
+$rz-series-3: #f68769 !default;
+$rz-series-4: #c161e2 !default;
+$rz-series-5: #fdd07a !default;
+$rz-series-6: #f8629b !default;
+$rz-series-7: #74d062 !default;
+$rz-series-8: #84a7ff !default;
+
+$rz-theme-colors: () !default;
+$rz-theme-colors: map-merge(
+  (
+    "rz-white": $rz-white,
+    "rz-black": $rz-black,
+    
+    "rz-base-50": $rz-base-50,
+    "rz-base-100": $rz-base-100,
+    "rz-base-200": $rz-base-200,
+    "rz-base-300": $rz-base-300,
+    "rz-base-400": $rz-base-400,
+    "rz-base-500": $rz-base-500,
+    "rz-base-600": $rz-base-600,
+    "rz-base-700": $rz-base-700,
+    "rz-base-800": $rz-base-800,
+    "rz-base-900": $rz-base-900,
+    
+    "rz-primary": $rz-primary,
+    "rz-primary-light": $rz-primary-light,
+    "rz-primary-lighter": $rz-primary-lighter,
+    "rz-primary-dark": $rz-primary-dark,
+    
+    "rz-secondary": $rz-secondary,
+    "rz-secondary-light": $rz-secondary-light,
+    "rz-secondary-lighter": $rz-secondary-lighter,
+    "rz-secondary-dark": $rz-secondary-dark,
+    
+    "rz-info": $rz-info,
+    "rz-info-light": $rz-info-light,
+    "rz-info-lighter": $rz-info-lighter,
+    "rz-info-dark": $rz-info-dark,
+    
+    "rz-success": $rz-success,
+    "rz-success-light": $rz-success-light,
+    "rz-success-lighter": $rz-success-lighter,
+    "rz-success-dark": $rz-success-dark,
+    
+    "rz-warning": $rz-warning,
+    "rz-warning-light": $rz-warning-light,
+    "rz-warning-lighter": $rz-warning-lighter,
+    "rz-warning-dark": $rz-warning-dark,
+    
+    "rz-danger": $rz-danger,
+    "rz-danger-light": $rz-danger-light,
+    "rz-danger-lighter": $rz-danger-lighter,
+    "rz-danger-dark": $rz-danger-dark,
+    
+    "rz-series-1": $rz-series-1,
+    "rz-series-2": $rz-series-2,
+    "rz-series-3": $rz-series-3,
+    "rz-series-4": $rz-series-4,
+    "rz-series-5": $rz-series-5,
+    "rz-series-6": $rz-series-6,
+    "rz-series-7": $rz-series-7,
+    "rz-series-8": $rz-series-8,
+  ),
+  $rz-theme-colors
+);
+
+//---- Global Theme Constants
+
+$rz-border-width: 1px !default;
+$rz-border-radius: 4px !default;
+
+$rz-theme-constants: () !default;
+$rz-theme-constants: map-merge(
+  (
+    "rz-border-width": $rz-border-width,
+    "rz-border-radius": $rz-border-radius,
+  ),
+  $rz-theme-constants
+);
+
+// Global CSS Variables
+
+@import 'css-variables';
 
 @import 'fonts';
-@import 'typography';
 @import 'components';
