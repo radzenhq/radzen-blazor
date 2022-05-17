@@ -1,6 +1,6 @@
 $tabs-tab-background-color: var(--rz-base-200) !default;
 $tabs-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
-$tabs-border: solid 1px var(--rz-base-200) !default;
+$tabs-border: var(--rz-border-200) !default;
 $tabs-tab-color: var(--rz-secondary) !default;
 $tabs-selected-tab-color: var(--rz-text-title-color) !default;
 $tabs-tab-font-size: 0.875rem !default;
@@ -14,7 +14,7 @@ $tabs-hover-background-color: $tabs-background-color !default;
 $tabs-border-radius: var(--rz-border-radius) !default;
 $tabs-icon-font-size: 1.25rem !default;
 $tabs-icon-margin: 0 0.25rem 0 -0.25rem !default;
-$tabs-transition: none !default;
+$tabs-transition: var(--rz-transition-all) !default;
 
 // Tabs CSS variables
 

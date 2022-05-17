@@ -30,7 +30,7 @@ $datepicker-calendar-selected-hover-color: var(--rz-text-contrast-color) !defaul
 $datepicker-calendar-selected-hover-background-color: var(--rz-secondary) !default;
 $datepicker-calendar-border: var(--rz-border-100) !default;
 $datepicker-calendar-border-radius: 0 !default;
-$datepicker-calendar-transition: none !default;
+$datepicker-calendar-transition: var(--rz-transition-all) !default;
 
 $datepicker-title-height: 47px !default;
 
