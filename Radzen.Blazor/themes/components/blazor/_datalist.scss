@@ -1,15 +1,15 @@
 $datalist-background-color: var(--rz-base-background-color) !default;
 $datalist-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $datalist-padding: 0.5rem !default;
-$datalist-border: 1px solid var(--rz-base-200) !default;
+$datalist-border: var(--rz-border-200) !default;
 
 $datalist-item-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
-$datalist-item-border: solid 1px var(--rz-base-200) !default;
+$datalist-item-border: var(--rz-border-200) !default;
 $datalist-item-vertical-margin: 0.5rem 0 !default;
 $datalist-item-horizontal-margin: 0.5rem !default;
 $datalist-item-padding: 1rem !default;
 $datalist-item-background-color: var(--rz-base-background-color) !default;
-$datalist-border-radius: $border-radius !default;
+$datalist-border-radius: var(--rz-border-radius) !default;
 
 // DataList CSS variables
 

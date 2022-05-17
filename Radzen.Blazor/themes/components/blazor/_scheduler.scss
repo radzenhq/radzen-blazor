@@ -1,4 +1,7 @@
-$scheduler-border: 1px solid var(--rz-base-300) !default;
+$scheduler-border: var(--rz-border-normal) !default;
+$scheduler-border-color: var(--rz-base-300) !default;
+$scheduler-minor-border-color: var(--rz-base-200) !default;
+$scheduler-border-radius: var(--rz-border-radius) !default;
 $scheduler-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $scheduler-padding: 0.5rem !default;
 $scheduler-background-color: var(--rz-base-background-color) !default;
@@ -24,7 +27,7 @@ $scheduler-prev-next-button-font-size: 1.25rem !default;
 $scheduler-button-line-height: 1.25rem !default;
 $scheduler-today-button-margin-left: 0.5rem !default;
 
-$scheduler-view-button-border: 1px solid var(--rz-base-300) !default;
+$scheduler-view-button-border: var(--rz-border-normal) !default;
 $scheduler-view-button-color: var(--rz-text-secondary-color) !default;
 $scheduler-view-button-background-color: var(--rz-base-background-color) !default;
 $scheduler-view-selected-background-color: var(--rz-secondary) !default;
@@ -34,11 +37,9 @@ $scheduler-view-selected-color: var(--rz-text-contrast-color) !default;
 $scheduler-header-background-color: var(--rz-base-200) !default;
 $scheduler-header-font-size: 0.75rem !default;
 $scheduler-header-color: inherit !default;
-$scheduler-header-border: 1px solid var(--rz-base-300) !default;
+$scheduler-header-border: var(--rz-border-normal) !default;
 $scheduler-header-padding: 0.5rem 0 !default;
 
-$scheduler-border-color: var(--rz-base-300) !default;
-$scheduler-minor-border-color: var(--rz-base-200) !default;
 $scheduler-color: var(--rz-text-tertiary-color) !default;
 
 $scheduler-slot-title-padding: 0 0.25rem !default;
@@ -51,7 +52,6 @@ $scheduler-event-padding: 0 1px 1px 1px !default;
 $scheduler-event-content-padding: 0.125rem 0.25rem !default;
 
 $scheduler-day-number-padding: 0 0.5rem !default;
-$scheduler-border-radius: var(--rz-border-radius) !default;
 
 // Scheduler CSS variables
 
@@ -121,6 +121,8 @@ $scheduler-border-radius: var(--rz-border-radius) !default;
   box-shadow: var(--rz-scheduler-shadow);
   color: var(--rz-scheduler-color);
   background: var(--rz-scheduler-background-color);
+  overflow: hidden;
+  background-clip: border-box;
 
   .rz-event-list-btn {
     position: absolute;

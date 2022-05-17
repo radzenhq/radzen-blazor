@@ -1,0 +1,196 @@
+//---- Component Aliases
+
+// Text Color
+
+$rz-text-title-color: var(--rz-base-900) !default;
+$rz-text-color: var(--rz-base-800) !default;
+$rz-text-secondary-color: var(--rz-base-700) !default;
+$rz-text-tertiary-color: var(--rz-base-600) !default; //cool-grey
+$rz-text-disabled-color: var(--rz-base-500) !default;
+$rz-text-contrast-color: var(--rz-white) !default;
+
+// Link Color
+
+$rz-link-color: var(--rz-secondary) !default;
+$rz-link-hover-color: var(--rz-secondary-dark) !default;
+$rz-link-hover-decoration: underline !default;
+
+// Background Color
+
+$rz-base-background-color: var(--rz-white) !default;
+
+// Border
+
+$rz-border-50: var(--rz-border-width) solid var(--rz-base-50) !default;
+$rz-border-100: var(--rz-border-width) solid var(--rz-base-100) !default;
+$rz-border-200: var(--rz-border-width) solid var(--rz-base-200) !default;
+$rz-border-300: var(--rz-border-width) solid var(--rz-base-300) !default;
+$rz-border-400: var(--rz-border-width) solid var(--rz-base-400) !default;
+$rz-border-500: var(--rz-border-width) solid var(--rz-base-500) !default;
+$rz-border-600: var(--rz-border-width) solid var(--rz-base-600) !default;
+$rz-border-700: var(--rz-border-width) solid var(--rz-base-700) !default;
+$rz-border-800: var(--rz-border-width) solid var(--rz-base-800) !default;
+$rz-border-900: var(--rz-border-width) solid var(--rz-base-900) !default;
+
+$rz-border-white: var(--rz-border-width) solid var(--rz-white) !default;
+$rz-border-black: var(--rz-border-width) solid var(--rz-black) !default;
+
+$rz-border-primary: var(--rz-border-width) solid var(--rz-primary) !default;
+$rz-border-primary-light: var(--rz-border-width) solid var(--rz-primary-light) !default;
+$rz-border-primary-lighter: var(--rz-border-width) solid var(--rz-primary-lighter) !default;
+$rz-border-primary-dark: var(--rz-border-width) solid var(--rz-primary-dark) !default;
+
+$rz-border-secondary: var(--rz-border-width) solid var(--rz-secondary) !default;
+$rz-border-secondary-light: var(--rz-border-width) solid var(--rz-secondary-light) !default;
+$rz-border-secondary-lighter: var(--rz-border-width) solid var(--rz-secondary-lighter) !default;
+$rz-border-secondary-dark: var(--rz-border-width) solid var(--rz-secondary-dark) !default;
+
+$rz-border-info: var(--rz-border-width) solid var(--rz-info) !default;
+$rz-border-info-light: var(--rz-border-width) solid var(--rz-info-light) !default;
+$rz-border-info-lighter: var(--rz-border-width) solid var(--rz-info-lighter) !default;
+$rz-border-info-dark: var(--rz-border-width) solid var(--rz-info-dark) !default;
+
+$rz-border-success: var(--rz-border-width) solid var(--rz-success) !default;
+$rz-border-success-light: var(--rz-border-width) solid var(--rz-success-light) !default;
+$rz-border-success-lighter: var(--rz-border-width) solid var(--rz-success-lighter) !default;
+$rz-border-success-dark: var(--rz-border-width) solid var(--rz-success-dark) !default;
+
+$rz-border-warning: var(--rz-border-width) solid var(--rz-warning) !default;
+$rz-border-warning-light: var(--rz-border-width) solid var(--rz-warning-light) !default;
+$rz-border-warning-lighter: var(--rz-border-width) solid var(--rz-warning-lighter) !default;
+$rz-border-warning-dark: var(--rz-border-width) solid var(--rz-warning-dark) !default;
+
+$rz-border-danger: var(--rz-border-width) solid var(--rz-danger) !default;
+$rz-border-danger-light: var(--rz-border-width) solid var(--rz-danger-light) !default;
+$rz-border-danger-lighter: var(--rz-border-width) solid var(--rz-danger-lighter) !default;
+$rz-border-danger-dark: var(--rz-border-width) solid var(--rz-danger-dark) !default;
+
+$rz-border-series-1: var(--rz-border-width) solid var(--rz-series-1) !default;
+$rz-border-series-2: var(--rz-border-width) solid var(--rz-series-2) !default;
+$rz-border-series-3: var(--rz-border-width) solid var(--rz-series-3) !default;
+$rz-border-series-4: var(--rz-border-width) solid var(--rz-series-4) !default;
+$rz-border-series-5: var(--rz-border-width) solid var(--rz-series-5) !default;
+$rz-border-series-6: var(--rz-border-width) solid var(--rz-series-6) !default;
+$rz-border-series-7: var(--rz-border-width) solid var(--rz-series-7) !default;
+$rz-border-series-8: var(--rz-border-width) solid var(--rz-series-8) !default;
+
+$rz-border-normal: var(--rz-border-width) solid var(--rz-base-300) !default;
+$rz-border-hover: var(--rz-border-width) solid var(--rz-base-400) !default;
+$rz-border-focus: var(--rz-border-width) solid var(--rz-base-400) !default;
+$rz-border-disabled: var(--rz-border-width) solid var(--rz-base-200) !default;
+
+// Border Radius
+
+$rz-border-radius-2: $rz-border-radius * 2 !default;
+$rz-border-radius-3: $rz-border-radius * 3 !default;
+$rz-border-radius-4: $rz-border-radius * 4 !default;
+$rz-border-radius-5: $rz-border-radius * 5 !default;
+
+// Shadow
+
+$rz-shadow-0: none !default;
+$rz-shadow-1: none !default;
+$rz-shadow-2: none !default;
+$rz-shadow-3: none !default;
+$rz-shadow-4: none !default;
+
+// Transition
+
+
+$rz-transition: 0.1s linear !default;
+$rz-transition-all: all 0.1s linear !default;
+
+// Icon Size
+
+$rz-icon-base-font-size: 1.25rem !default;
+
+// Component Aliases CSS variables
+
+:root {
+  --rz-text-title-color: #{$rz-text-title-color};
+  --rz-text-color: #{$rz-text-color};
+  --rz-text-secondary-color: #{$rz-text-secondary-color};
+  --rz-text-tertiary-color: #{$rz-text-tertiary-color};
+  --rz-text-disabled-color: #{$rz-text-disabled-color};
+  --rz-text-contrast-color: #{$rz-text-contrast-color};
+
+  --rz-link-color: #{$rz-link-color};
+  --rz-link-hover-color: #{$rz-link-hover-color};
+  --rz-link-hover-decoration: #{$rz-link-hover-decoration};
+
+  --rz-base-background-color: #{$rz-base-background-color};
+
+  --rz-border-50: #{$rz-border-50};
+  --rz-border-100: #{$rz-border-100};
+  --rz-border-200: #{$rz-border-200};
+  --rz-border-300: #{$rz-border-300};
+  --rz-border-400: #{$rz-border-400};
+  --rz-border-500: #{$rz-border-500};
+  --rz-border-600: #{$rz-border-600};
+  --rz-border-700: #{$rz-border-700};
+  --rz-border-800: #{$rz-border-800};
+  --rz-border-900: #{$rz-border-900};
+
+  --rz-border-white: #{$rz-border-white};
+  --rz-border-black: #{$rz-border-black};
+
+  --rz-border-primary: #{$rz-border-primary};
+  --rz-border-primary-light: #{$rz-border-primary-light};
+  --rz-border-primary-lighter: #{$rz-border-primary-lighter};
+  --rz-border-primary-dark: #{$rz-border-primary-dark};
+
+  --rz-border-secondary: #{$rz-border-secondary};
+  --rz-border-secondary-light: #{$rz-border-secondary-light};
+  --rz-border-secondary-lighter: #{$rz-border-secondary-lighter};
+  --rz-border-secondary-dark: #{$rz-border-secondary-dark};
+
+  --rz-border-info: #{$rz-border-info};
+  --rz-border-info-light: #{$rz-border-info-light};
+  --rz-border-info-lighter: #{$rz-border-info-lighter};
+  --rz-border-info-dark: #{$rz-border-info-dark};
+
+  --rz-border-success: #{$rz-border-success};
+  --rz-border-success-light: #{$rz-border-success-light};
+  --rz-border-success-lighter: #{$rz-border-success-lighter};
+  --rz-border-success-dark: #{$rz-border-success-dark};
+
+  --rz-border-warning: #{$rz-border-warning};
+  --rz-border-warning-light: #{$rz-border-warning-light};
+  --rz-border-warning-lighter: #{$rz-border-warning-lighter};
+  --rz-border-warning-dark: #{$rz-border-warning-dark};
+
+  --rz-border-danger: #{$rz-border-danger};
+  --rz-border-danger-light: #{$rz-border-danger-light};
+  --rz-border-danger-lighter: #{$rz-border-danger-lighter};
+  --rz-border-danger-dark: #{$rz-border-danger-dark};
+
+  --rz-border-series-1: #{$rz-border-series-1};
+  --rz-border-series-2: #{$rz-border-series-2};
+  --rz-border-series-3: #{$rz-border-series-3};
+  --rz-border-series-4: #{$rz-border-series-4};
+  --rz-border-series-5: #{$rz-border-series-5};
+  --rz-border-series-6: #{$rz-border-series-6};
+  --rz-border-series-7: #{$rz-border-series-7};
+  --rz-border-series-8: #{$rz-border-series-8};
+
+  --rz-border-normal: #{$rz-border-normal};
+  --rz-border-hover: #{$rz-border-hover};
+  --rz-border-focus: #{$rz-border-focus};
+  --rz-border-disabled: #{$rz-border-disabled};
+
+  --rz-border-radius-2: #{$rz-border-radius-2};
+  --rz-border-radius-3: #{$rz-border-radius-3};
+  --rz-border-radius-4: #{$rz-border-radius-4};
+  --rz-border-radius-5: #{$rz-border-radius-5};
+
+  --rz-shadow-0: #{$rz-shadow-0};
+  --rz-shadow-1: #{$rz-shadow-1};
+  --rz-shadow-2: #{$rz-shadow-2};
+  --rz-shadow-3: #{$rz-shadow-3};
+  --rz-shadow-4: #{$rz-shadow-4};
+
+  --rz-transition: #{$rz-transition};
+  --rz-transition-all: #{$rz-transition-all};
+  
+  --rz-icon-base-font-size: #{$rz-icon-base-font-size};
+}

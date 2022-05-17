@@ -49,7 +49,7 @@ $grid-filter-color: var(--rz-text-disabled-color) !default;
 $grid-filter-focus-color: var(--rz-secondary) !default;
 $grid-filter-operator-margin: 1rem !default;
 $grid-filter-buttons-padding: 1rem !default;
-$grid-filter-buttons-border: 1px solid var(--rz-base-300) !default;
+$grid-filter-buttons-border: var(--rz-border-normal) !default;
 $grid-filter-buttons-background-color: var(--rz-base-200) !default;
 
 $grid-clear-filter-button-background-color: var(--rz-secondary) !default;
@@ -60,7 +60,7 @@ $grid-apply-filter-button-color: var(--rz-text-contrast-color) !default;
 $grid-header-filter-icon-margin: 0.25rem 0.5rem 0 0 !default;
 $grid-header-filter-icon-hover-color: var(--rz-text-color) !default;
 
-$grid-border: 1px solid var(rz-base-300) !default;
+$grid-border: var(--rz-border-normal) !default;
 
 $grid-sort-icon-width: 1rem !default;
 $grid-sort-icon-height: $grid-sort-icon-width !default;
