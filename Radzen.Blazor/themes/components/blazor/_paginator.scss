@@ -7,7 +7,7 @@ $paginator-numeric-button-margin: 0 0.125rem !default;
 $paginator-numeric-button-padding: 0.5rem !default;
 $paginator-numeric-button-selected-background-color: var(--rz-base-background-color) !default;
 $paginator-numeric-button-selected-color: var(--rz-primary) !default;
-$paginator-numeric-button-selected-border: 1px solid var(--rz-base-200) !default;
+$paginator-numeric-button-selected-border: var(--rz-border-200) !default;
 $paginator-numeric-button-selected-padding: $paginator-numeric-button-padding !default;
 $paginator-numeric-button-min-width: 2.25rem !default;
 

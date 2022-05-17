@@ -1,6 +1,6 @@
 @import 'variables';
 
-//---- Global Color Variables
+//---- Global Theme Colors
 
 $rz-white: #ffffff !default;
 $rz-black: #000000 !default;
@@ -55,97 +55,82 @@ $rz-series-6: #f8629b !default;
 $rz-series-7: #74d062 !default;
 $rz-series-8: #84a7ff !default;
 
-$rz-transition: 0.1s linear !default;
+$rz-theme-colors: () !default;
+$rz-theme-colors: map-merge(
+  (
+    "rz-white": $rz-white,
+    "rz-black": $rz-black,
+    
+    "rz-base-50": $rz-base-50,
+    "rz-base-100": $rz-base-100,
+    "rz-base-200": $rz-base-200,
+    "rz-base-300": $rz-base-300,
+    "rz-base-400": $rz-base-400,
+    "rz-base-500": $rz-base-500,
+    "rz-base-600": $rz-base-600,
+    "rz-base-700": $rz-base-700,
+    "rz-base-800": $rz-base-800,
+    "rz-base-900": $rz-base-900,
+    
+    "rz-primary": $rz-primary,
+    "rz-primary-light": $rz-primary-light,
+    "rz-primary-lighter": $rz-primary-lighter,
+    "rz-primary-dark": $rz-primary-dark,
+    
+    "rz-secondary": $rz-secondary,
+    "rz-secondary-light": $rz-secondary-light,
+    "rz-secondary-lighter": $rz-secondary-lighter,
+    "rz-secondary-dark": $rz-secondary-dark,
+    
+    "rz-info": $rz-info,
+    "rz-info-light": $rz-info-light,
+    "rz-info-lighter": $rz-info-lighter,
+    "rz-info-dark": $rz-info-dark,
+    
+    "rz-success": $rz-success,
+    "rz-success-light": $rz-success-light,
+    "rz-success-lighter": $rz-success-lighter,
+    "rz-success-dark": $rz-success-dark,
+    
+    "rz-warning": $rz-warning,
+    "rz-warning-light": $rz-warning-light,
+    "rz-warning-lighter": $rz-warning-lighter,
+    "rz-warning-dark": $rz-warning-dark,
+    
+    "rz-danger": $rz-danger,
+    "rz-danger-light": $rz-danger-light,
+    "rz-danger-lighter": $rz-danger-lighter,
+    "rz-danger-dark": $rz-danger-dark,
+    
+    "rz-series-1": $rz-series-1,
+    "rz-series-2": $rz-series-2,
+    "rz-series-3": $rz-series-3,
+    "rz-series-4": $rz-series-4,
+    "rz-series-5": $rz-series-5,
+    "rz-series-6": $rz-series-6,
+    "rz-series-7": $rz-series-7,
+    "rz-series-8": $rz-series-8,
+  ),
+  $rz-theme-colors
+);
 
-// Global Color CSS Variables
+//---- Global Theme Constants
+
+$rz-border-width: 1px !default;
+$rz-border-radius: 4px !default;
+
+$rz-theme-constants: () !default;
+$rz-theme-constants: map-merge(
+  (
+    "rz-border-width": $rz-border-width,
+    "rz-border-radius": $rz-border-radius,
+  ),
+  $rz-theme-constants
+);
+
+// Global CSS Variables
 
 @import 'css-variables';
-
-//---- Component Aliases
-
-// Text Color
-
-$rz-text-title-color: var(--rz-base-900) !default;
-$rz-text-color: var(--rz-base-800) !default;
-$rz-text-secondary-color: var(--rz-base-700) !default;
-$rz-text-tertiary-color: var(--rz-base-600) !default; //cool-grey
-$rz-text-disabled-color: var(--rz-base-500) !default;
-$rz-text-contrast-color: var(--rz-white) !default;
-
-// Link Color
-
-$rz-link-color: var(--rz-secondary) !default;
-$rz-link-hover-color: var(--rz-secondary-dark) !default;
-$rz-link-hover-decoration: underline !default;
-
-// Background Color
-
-$rz-base-background-color: var(--rz-white) !default;
-
-// Border Radius
-
-$rz-border-radius: 4px !default;
-$rz-border-radius-2: $rz-border-radius * 2 !default;
-$rz-border-radius-3: $rz-border-radius * 3 !default;
-$rz-border-radius-4: $rz-border-radius * 4 !default;
-$rz-border-radius-5: $rz-border-radius * 5 !default;
-
-// Shadow
-
-$rz-shadow-0: none !default;
-$rz-shadow-1: none !default;
-$rz-shadow-2: none !default;
-$rz-shadow-3: none !default;
-$rz-shadow-4: none !default;
-$rz-shadow-inner-1: none !default;
-$rz-shadow-inner-2: none !default;
-$rz-shadow-inner-3: none !default;
-$rz-shadow-inner-4: none !default;
-
-// Transition
-
-$rz-transition-all: all var(--rz-transition) !default;
-
-// Icon Size
-
-$rz-icon-base-font-size: 1.25rem !default;
-
-// Component Aliases CSS variables
-
-:root {
-  --rz-text-title-color: #{$rz-text-title-color};
-  --rz-text-color: #{$rz-text-color};
-  --rz-text-secondary-color: #{$rz-text-secondary-color};
-  --rz-text-tertiary-color: #{$rz-text-tertiary-color};
-  --rz-text-disabled-color: #{$rz-text-disabled-color};
-  --rz-text-contrast-color: #{$rz-text-contrast-color};
-
-  --rz-link-color: #{$rz-link-color};
-  --rz-link-hover-color: #{$rz-link-hover-color};
-  --rz-link-hover-decoration: #{$rz-link-hover-decoration};
-
-  --rz-base-background-color: #{$rz-base-background-color};
-
-  --rz-border-radius: #{$rz-border-radius};
-  --rz-border-radius-2: #{$rz-border-radius-2};
-  --rz-border-radius-3: #{$rz-border-radius-3};
-  --rz-border-radius-4: #{$rz-border-radius-4};
-  --rz-border-radius-5: #{$rz-border-radius-5};
-
-  --rz-shadow-0: #{$rz-shadow-0};
-  --rz-shadow-1: #{$rz-shadow-1};
-  --rz-shadow-2: #{$rz-shadow-2};
-  --rz-shadow-3: #{$rz-shadow-3};
-  --rz-shadow-4: #{$rz-shadow-4};
-  --rz-shadow-inner-1: #{$rz-shadow-inner-1};
-  --rz-shadow-inner-2: #{$rz-shadow-inner-2};
-  --rz-shadow-inner-3: #{$rz-shadow-inner-3};
-  --rz-shadow-inner-4: #{$rz-shadow-inner-4};
-
-  --rz-transition-all: #{$rz-transition-all};
-  
-  --rz-icon-base-font-size: #{$rz-icon-base-font-size};
-}
 
 //---- Bootstrap variable overrides. DO NOT USE IN COMPONENTS!
 
@@ -187,5 +172,4 @@ $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
 $bootstrap: true;
 
 @import 'fonts';
-@import 'typography';
 @import 'components';

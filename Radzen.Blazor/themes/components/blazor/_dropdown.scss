@@ -20,7 +20,7 @@ $dropdown-item-disabled-opacity: 0.2 !default;
 
 $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 $dropdown-label-padding: 0 $dropdown-trigger-icon-width 0 0 !default;
-$dropdown-filter-border: 1px solid var(--rz-base-100) !default;
+$dropdown-filter-border: var(--rz-border-100) !default;
 $dropdown-filter-padding: 0.5rem 0 !default;
 
 $dropdown-open-background-color: var(--rz-base-background-color) !default;

@@ -1,56 +1,10 @@
+
 :root {
-    --rz-white: #{$rz-white};
-    --rz-black: #{$rz-black};
-  
-    --rz-base-50: #{$rz-base-50};
-    --rz-base-100: #{$rz-base-100};
-    --rz-base-200: #{$rz-base-200};
-    --rz-base-300: #{$rz-base-300};
-    --rz-base-400: #{$rz-base-400};
-    --rz-base-500: #{$rz-base-500};
-    --rz-base-600: #{$rz-base-600};
-    --rz-base-700: #{$rz-base-700};
-    --rz-base-800: #{$rz-base-800};
-    --rz-base-900: #{$rz-base-900};
-  
-    --rz-primary: #{$rz-primary};
-    --rz-primary-light: #{$rz-primary-light};
-    --rz-primary-lighter: #{$rz-primary-lighter};
-    --rz-primary-dark: #{$rz-primary-dark};
-  
-    --rz-secondary: #{$rz-secondary};
-    --rz-secondary-light: #{$rz-secondary-light};
-    --rz-secondary-lighter: #{$rz-secondary-lighter};
-    --rz-secondary-dark: #{$rz-secondary-dark};
-  
-    --rz-info: #{$rz-info};
-    --rz-info-light: #{$rz-info-light};
-    --rz-info-lighter: #{$rz-info-lighter};
-    --rz-info-dark: #{$rz-info-dark};
-  
-    --rz-success: #{$rz-success};
-    --rz-success-light: #{$rz-success-light};
-    --rz-success-lighter: #{$rz-success-lighter};
-    --rz-success-dark: #{$rz-success-dark};
-  
-    --rz-warning: #{$rz-warning};
-    --rz-warning-light: #{$rz-warning-light};
-    --rz-warning-lighter: #{$rz-warning-lighter};
-    --rz-warning-dark: #{$rz-warning-dark};
-  
-    --rz-danger: #{$rz-danger};
-    --rz-danger-light: #{$rz-danger-light};
-    --rz-danger-lighter: #{$rz-danger-lighter};
-    --rz-danger-dark: #{$rz-danger-dark};
-  
-    --rz-series-1: #{$rz-series-1};
-    --rz-series-2: #{$rz-series-2};
-    --rz-series-3: #{$rz-series-3};
-    --rz-series-4: #{$rz-series-4};
-    --rz-series-5: #{$rz-series-5};
-    --rz-series-6: #{$rz-series-6};
-    --rz-series-7: #{$rz-series-7};
-    --rz-series-8: #{$rz-series-8};
-  
-    --rz-transition: #{$rz-transition};
+  @each $color, $value in $rz-theme-colors {
+    --#{$color}: #{$value};
   }
+
+  @each $constant, $value in $rz-theme-constants {
+    --#{$constant}: #{$value};
+  }
+}

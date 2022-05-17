@@ -1,6 +1,6 @@
 $profile-menu-background-color: var(--rz-base-background-color) !default;
 $profile-menu-top-item-background-color: $profile-menu-background-color !default;
-$profile-menu-border: 1px solid var(--rz-base-200) !default;
+$profile-menu-border: var(--rz-border-200) !default;
 $profile-menu-padding: 0.625rem 1rem !default;
 $profile-menu-border-radius: var(--rz-border-radius) !default;
 $profile-menu-toggle-button-color: var(--rz-secondary) !default;

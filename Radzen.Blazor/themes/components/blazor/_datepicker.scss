@@ -4,7 +4,7 @@ $datepicker-line-height: 1.25rem !default;
 $datepicker-trigger-icon-color: var(--rz-text-secondary-color) !default;
 $datepicker-trigger-icon-hover-color: var(--rz-secondary) !default;
 
-$datepicker-panel-border: 1px solid var(--rz-base-300) !default;
+$datepicker-panel-border: var(--rz-border-normal) !default;
 $datepicker-panel-background-color: var(--rz-base-background-color) !default;
 $datepicker-panel-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06) !default;
 $datepicker-panel-margin: 0 !default;
@@ -28,7 +28,7 @@ $datepicker-calendar-selected-color: var(--rz-text-contrast-color) !default;
 $datepicker-calendar-selected-background-color: var(--rz-secondary-dark) !default;
 $datepicker-calendar-selected-hover-color: var(--rz-text-contrast-color) !default;
 $datepicker-calendar-selected-hover-background-color: var(--rz-secondary) !default;
-$datepicker-calendar-border: 1px solid var(--rz-base-100) !default;
+$datepicker-calendar-border: var(--rz-border-100) !default;
 $datepicker-calendar-border-radius: 0 !default;
 $datepicker-calendar-transition: none !default;
 
