@@ -2,7 +2,7 @@ $grid-border-radius: $border-radius !default;
 
 $grid-data-border-shadow: none;
 
-$grid-cell-border: solid 1px var(--rz-base-300) !default; //#dfe7eb
+$grid-cell-border: var(--rz-border-normal) !default; //#dfe7eb
 $grid-right-cell-border: $grid-cell-border !default;
 $grid-bottom-cell-border: $grid-cell-border !default;
 $grid-cell-padding: 0.5rem !default;
@@ -94,7 +94,7 @@ $grid-button-line-height: $grid-button-height !default;
 $grid-frozen-cell-border: $grid-cell-border !default;
 $grid-frozen-cell-background-color: $grid-header-background-color !default;
 
-$grid-state-transition: none !default;
+$grid-state-transition: var(--rz-transition-all) !default;
 
 $grid-group-header-padding: 0.5rem !default;
 $grid-group-header-item-padding: 0.5rem !default;
@@ -610,6 +610,11 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 .rz-selectable {
   .rz-datatable-even,
   .rz-datatable-odd {
+    td,
+    .rz-cell-data {
+      transition: background-color var(--rz-transition), color var(--rz-transition);
+    }
+
     &.rz-state-highlight {
       > td {
         background-color: var(--rz-grid-selected-background-color);

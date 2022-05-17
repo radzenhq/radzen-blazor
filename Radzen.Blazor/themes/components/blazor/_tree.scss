@@ -14,7 +14,7 @@ $tree-node-toggle-color: var(--rz-text-tertiary-color) !default;
 $tree-node-toggle-hover-color: var(--rz-text-color) !default;
 $tree-icon-right: 'arrow_right' !default;
 $tree-icon-down: 'arrow_drop_down' !default;
-$tree-transition: none !default;
+$tree-transition: var(--rz-transition-all) !default;
 
 // Tree CSS variables
 

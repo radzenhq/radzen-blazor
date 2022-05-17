@@ -22,7 +22,7 @@ $input-disabled-color: var(--rz-text-color) !default;
 $input-disabled-placeholder-color: var(--rz-text-disabled-color) !default;
 $input-disabled-opacity: 1 !default;
 
-$input-transition: none !default;
+$input-transition: var(--rz-transition-all) !default;
 
 // Input CSS variables
 

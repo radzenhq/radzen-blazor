@@ -23,7 +23,7 @@ $sidebar-background-color: var(--rz-base-800) !default;
   z-index: var(--rz-sidebar-z);
   width: var(--rz-sidebar-width);
   opacity: 1;
-  transition: all .1s linear;
+  transition: var(--rz-transition-all);
 }
 
 @media (max-width: 768px) { 

@@ -7,7 +7,7 @@ $button-active-gradient: linear-gradient(rgba(#000, 0.1), rgba(#000, 0.1)) !defa
 $button-focus-outline: none !default;
 $button-border-radius: var(--rz-border-radius) !default;
 $button-shadow: none !default;
-$button-transition: none !default;
+$button-transition: var(--rz-transition-all) !default;
 $button-disabled-opacity: 0.2 !default;
 $button-line-height: 1.25rem !default;
 $button-vertical-align: top !default;

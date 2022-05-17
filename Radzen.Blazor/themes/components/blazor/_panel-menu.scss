@@ -5,12 +5,12 @@ $panel-menu-hover-color: $panel-menu-color !default;
 
 $panel-menu-item-line-height: 1.25rem !default;
 $panel-menu-item-padding: 0.75rem 1rem !default;
-$panel-menu-item-border: solid 1px var(--rz-base-900) !default;
+$panel-menu-item-border: var(--rz-border-900) !default;
 $panel-menu-item-active-background-color: var(--rz-base-900) !default;
 $panel-menu-item-active-color: $panel-menu-color !default;
 $panel-menu-item-active-indicator: var(--rz-secondary) !default;
 $panel-menu-item-offset: 0.75rem !default;
-$panel-menu-item-transition: none !default;
+$panel-menu-item-transition: var(--rz-transition-all) !default;
 
 $panel-menu-item-2nd-level-padding: 0.5rem 1rem !default;
 $panel-menu-item-2nd-level-offset: 2.75rem !default;

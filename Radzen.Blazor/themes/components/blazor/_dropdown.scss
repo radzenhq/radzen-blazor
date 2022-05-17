@@ -15,7 +15,7 @@ $dropdown-item-selected-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $dropdown-item-selected-color: var(--rz-text-contrast-color) !default;
 $dropdown-item-selected-hover-background-color: var(--rz-secondary) !default;
 $dropdown-item-selected-hover-color: var(--rz-text-contrast-color) !default;
-$dropdown-item-transition: none !default;
+$dropdown-item-transition: var(--rz-transition-all) !default;
 $dropdown-item-disabled-opacity: 0.2 !default;
 
 $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
