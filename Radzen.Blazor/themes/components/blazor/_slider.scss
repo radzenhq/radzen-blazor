@@ -1,4 +1,4 @@
-$slider-border: 1px solid var(--rz-base-300) !default;
+$slider-border: var(--rz-border-normal) !default;
 $slider-background-color: var(--rz-base-background-color) !default;
 $slider-border-radius: var(--rz-border-radius) !default;
 
@@ -6,7 +6,7 @@ $slider-horizontal-height: 0.5rem !default;
 $slider-horizontal-width: 10rem !default;
 
 $slider-range-background-color: var(--rz-secondary-lighter) !default;
-$slider-range-border: 1px solid var(--rz-secondary-light) !default;
+$slider-range-border: var(--rz-border-secondary-light) !default;
 
 $slider-handle-background-color: var(--rz-secondary) !default;
 $slider-handle-width: 0.75rem !default;
@@ -21,9 +21,9 @@ $slider-handle-transition: none !default;
 
 $slider-disabled-background-color: var(--rz-base-background-color) !default;
 $slider-disabled-range-background-color: var(--rz-base-100) !default;
-$slider-disabled-range-border: solid 1px var(--rz-base-300) !default;
+$slider-disabled-range-border: var(--rz-border-normal) !default;
 $slider-disabled-handle-border: none !default;
-$slider-disabled-border: solid 1px var(--rz-base-200) !default;
+$slider-disabled-border: var(--rz-border-disabled) !default;
 $slider-disabled-handle-background-color: var(--rz-base-300) !default;
 
 
