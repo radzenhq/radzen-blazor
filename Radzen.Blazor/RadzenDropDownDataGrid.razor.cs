@@ -353,9 +353,11 @@ namespace Radzen.Blazor
                     }
                     else
                     {
-                        selectedItem = internalValue;
+                        SelectedItem = internalValue;
                     }
-                    SelectedItemChanged?.Invoke(selectedItem);
+                    SelectedItemChanged?.Invoke(SelectedItem);
+                    selectedItems.Clear();
+                    selectedItems.Add(SelectedItem);
                 }
                 else
                 {
@@ -375,7 +377,7 @@ namespace Radzen.Blazor
                         }
                         else
                         {
-                            selectedItems.AddRange(values);
+                            ((List<object>)selectedItems).AddRange(values);
                         }
 
                     }

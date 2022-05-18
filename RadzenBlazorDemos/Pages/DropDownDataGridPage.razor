@@ -10,7 +10,7 @@
         <div class="col-md-6 col-lg-4 col-xl-3 p-3">
             <RadzenCard>
                 <h4 class="mb-4">Binding to simple collection</h4>
-                <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true"
+                <RadzenDropDownDataGrid @bind-Value="@simpleValue" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true"
                                         Data=@(customers.Select(c => c.CompanyName).Distinct().AsQueryable())
                                         Change=@(args => OnChange(args, "DropDownDataGrid")) Style="width: 100%"/>
             </RadzenCard>
@@ -117,8 +117,9 @@
     RadzenDropDownDataGrid<IEnumerable<string>> grid;
     IEnumerable<Customer> customers;
 
-    IEnumerable<string> multipleValues;
+    IEnumerable<string> multipleValues = new string[] { "ALFKI", "AROUT" };
     string value;
+    string simpleValue = "Around the Horn";
 
     int count;
     IEnumerable<Customer> customCustomersData;

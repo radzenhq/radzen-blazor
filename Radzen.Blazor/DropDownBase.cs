@@ -207,7 +207,7 @@ namespace Radzen
         /// <summary>
         /// The selected items
         /// </summary>
-        protected List<object> selectedItems = new List<object>();
+        protected IList<object> selectedItems = new List<object>();
         /// <summary>
         /// The selected item
         /// </summary>
