@@ -84,4 +84,6 @@ $link-color: $default-link !default;
 body {
   font-size: 0.875rem;
   line-height: $paragraph-line-height;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
