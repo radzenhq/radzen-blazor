@@ -127,7 +127,7 @@
     {
         var term = args.Value.ToString();
 
-        examples = ExampleService.Filter(term);
+        examples = string.IsNullOrEmpty(term) ? ExampleService.Examples : ExampleService.Filter(term);
     }
 
     void ChangeTheme(object value)
