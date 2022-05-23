@@ -52,7 +52,7 @@ $accordion-shadow: none !default;
     color: var(--rz-accordion-item-color);
     line-height: var(--rz-accordion-item-line-height);
     text-decoration: none;
-    color: inherit;
+    color: var(--rz-accordion-item-color);
     display: flex;
     align-items: center;
     font-size: var(--rz-accordion-item-font-size);
