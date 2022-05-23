@@ -1,44 +1,202 @@
-@import 'colors';
 @import 'variables';
-// Theme colors
-$primary-color: $pinkish-orange !default;
-$secondary: $default-link !default;
-$tertiary: $cool-grey !default;
-$light: $cool-grey !default;
-$additional-1: $soft-green !default;
-$additional-2: $tip !default;
-$additional-3: $dev !default;
-$contrast: $charcoal-grey !default;
 
-$button-hover-background-color: #ff7b54 !default;
-$button-active-background-color: #e5613a !default;
-$button-active-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.1);
+//---- Global Theme Colors
 
-// Bootstrap overrides
-$primary: $primary-color !default;
-$danger: #f9777f !default;
-$info: $tip !default;
-$success: $additional-1 !default;
-$warning: $dull-yellow !default;
+$rz-white: #ffffff !default;
+$rz-black: #000000 !default;
 
-$state-success-bg: $success;
-$state-warning-bg: $warning;
-$state-danger-bg: $danger;
-$state-info-bg: $info;
+$rz-base-50: #ffffff !default;
+$rz-base-100: #f6f7fa !default;
+$rz-base-200: #e9edf0 !default; //#e6ecef  eef1f4
+$rz-base-300: #dadfe2 !default;
+$rz-base-400: #A8B4B8 !default;
+$rz-base-500: #7B8A8E !default; //b4bec3
+$rz-base-600: #63737A !default;
+$rz-base-700: #45565E !default; //5d717b
+$rz-base-800: #38474E !default; //$charcoal-grey #3b484e // 2f3d43
+$rz-base-900: #28363c !default; //292c2e #28363c panelmenu
 
-$link-color: $dark-link !default;
-$link-hover-color: $dark-link !default;
-$body-bg: $charcoal-grey !default;
-$body-color: $white !default;
+$rz-primary: #ff6d41 !default;
+$rz-primary-light: #ff7b54 !default;
+$rz-primary-lighter: rgba($rz-primary, .16) !default;
+$rz-primary-dark: #e5613a !default;
 
+$rz-secondary: #3b9fd5 !default;
+$rz-secondary-light: #1d86be !default;
+$rz-secondary-lighter: rgba($rz-secondary, .20) !default;
+$rz-secondary-dark: #2092cf !default;
+
+$rz-info: #2cc8c8 !default;
+$rz-info-light: #4ed1d1 !default;
+$rz-info-lighter: rgba($rz-info, .20) !default;
+$rz-info-dark: #25a8a8 !default;
+
+$rz-success: #5dbf74 !default;
+$rz-success-light: #5dbf74 !default;
+$rz-success-lighter: rgba($rz-success, .16) !default;
+$rz-success-dark: #5dbf74 !default;
+
+$rz-warning: #fac152 !default;
+$rz-warning-light: #fbcd75 !default;
+$rz-warning-lighter: rgba($rz-warning, .20) !default;
+$rz-warning-dark: #e6b24b !default;
+
+$rz-danger: #f9777f !default;
+$rz-danger-light: #fa8d93 !default;
+$rz-danger-lighter: rgba($rz-danger, .20) !default;
+$rz-danger-dark: #db6970 !default;
+
+$rz-series-1: #376df5 !default;
+$rz-series-2: #64dfdf !default;
+$rz-series-3: #f68769 !default;
+$rz-series-4: #c161e2 !default;
+$rz-series-5: #fdd07a !default;
+$rz-series-6: #f8629b !default;
+$rz-series-7: #74d062 !default;
+$rz-series-8: #84a7ff !default;
+
+$rz-theme-colors: () !default;
+$rz-theme-colors: map-merge(
+  (
+    "rz-white": $rz-white,
+    "rz-black": $rz-black,
+    
+    "rz-base-50": $rz-base-50,
+    "rz-base-100": $rz-base-100,
+    "rz-base-200": $rz-base-200,
+    "rz-base-300": $rz-base-300,
+    "rz-base-400": $rz-base-400,
+    "rz-base-500": $rz-base-500,
+    "rz-base-600": $rz-base-600,
+    "rz-base-700": $rz-base-700,
+    "rz-base-800": $rz-base-800,
+    "rz-base-900": $rz-base-900,
+    
+    "rz-primary": $rz-primary,
+    "rz-primary-light": $rz-primary-light,
+    "rz-primary-lighter": $rz-primary-lighter,
+    "rz-primary-dark": $rz-primary-dark,
+    
+    "rz-secondary": $rz-secondary,
+    "rz-secondary-light": $rz-secondary-light,
+    "rz-secondary-lighter": $rz-secondary-lighter,
+    "rz-secondary-dark": $rz-secondary-dark,
+    
+    "rz-info": $rz-info,
+    "rz-info-light": $rz-info-light,
+    "rz-info-lighter": $rz-info-lighter,
+    "rz-info-dark": $rz-info-dark,
+    
+    "rz-success": $rz-success,
+    "rz-success-light": $rz-success-light,
+    "rz-success-lighter": $rz-success-lighter,
+    "rz-success-dark": $rz-success-dark,
+    
+    "rz-warning": $rz-warning,
+    "rz-warning-light": $rz-warning-light,
+    "rz-warning-lighter": $rz-warning-lighter,
+    "rz-warning-dark": $rz-warning-dark,
+    
+    "rz-danger": $rz-danger,
+    "rz-danger-light": $rz-danger-light,
+    "rz-danger-lighter": $rz-danger-lighter,
+    "rz-danger-dark": $rz-danger-dark,
+    
+    "rz-series-1": $rz-series-1,
+    "rz-series-2": $rz-series-2,
+    "rz-series-3": $rz-series-3,
+    "rz-series-4": $rz-series-4,
+    "rz-series-5": $rz-series-5,
+    "rz-series-6": $rz-series-6,
+    "rz-series-7": $rz-series-7,
+    "rz-series-8": $rz-series-8,
+  ),
+  $rz-theme-colors
+);
+
+//---- Global Theme Constants
+
+$rz-border-width: 1px !default;
+$rz-border-radius: 4px !default;
+
+$rz-theme-constants: () !default;
+$rz-theme-constants: map-merge(
+  (
+    "rz-border-width": $rz-border-width,
+    "rz-border-radius": $rz-border-radius,
+  ),
+  $rz-theme-constants
+);
+
+// Global CSS Variables
+
+@import 'css-variables';
+
+//---- Bootstrap variable overrides. DO NOT USE IN COMPONENTS!
+
+$font-size: 0.875rem !default;
+$font-size-base: $font-size !default;
+$border-radius: 4px !default;
+$primary: $rz-primary !default;
+$secondary: $rz-secondary !default;
+$danger: $rz-danger !default;
+$info: $rz-info !default;
+$success: $rz-success !default;
+$warning: $rz-warning !default;
+$light: $rz-base-200 !default;
+$body-color: $rz-base-50 !default;
+$link-color: $rz-secondary !default;
+$link-hover-color: $rz-secondary !default;
+$link-hover-decoration: underline !default;
+$state-success-bg: $rz-success !default;
+$state-warning-bg: $rz-warning !default;
+$state-danger-bg: $rz-danger !default;
+$state-info-bg: $rz-info !default;
+
+// Bootstrap component overrides. We need these because bootstrap is overriding them in components.
+
+$card-border-radius: var(--rz-border-radius);
+$input-height: 2.25rem;
+$input-line-height: 1.429;
+$input-border-radius: var(--rz-border-radius);
+$input-placeholder-color: var(--rz-text-tertiary-color);
+$tooltip-color: var(--rz-text-contrast-color);
+$tooltip-border-radius: var(--rz-border-radius);
+$tooltip-font-size: 0.875rem;
+$body-bg: var(--rz-base-900) !default;
 $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
   'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
-  'Segoe UI Emoji', 'Segoe UI Symbol';
+  'Segoe UI Emoji', 'Segoe UI Symbol' !default;
 
-// Theme variables
 
-$default-background-color: $slate-grey !default;
-$navigation-border: 1px solid #435863 !default;
+// Utilities
+
+// Text Color
+
+$rz-text-title-color: var(--rz-base-50) !default;
+$rz-text-color: var(--rz-base-100) !default;
+$rz-text-secondary-color: var(--rz-base-300) !default;
+$rz-text-tertiary-color: var(--rz-base-400) !default; //cool-grey
+$rz-text-disabled-color: var(--rz-base-600) !default;
+$rz-text-contrast-color: var(--rz-white) !default;
+
+// Link Color
+
+$rz-link-color: var(--rz-secondary) !default;
+$rz-link-hover-color: var(--rz-secondary-dark) !default;
+$rz-link-hover-decoration: underline !default;
+
+// Background Color
+
+$rz-base-background-color: var(--rz-base-800) !default;
+
+// Borders
+
+$rz-border-normal: var(--rz-border-width) solid var(--rz-base-700) !default;
+$rz-border-hover: var(--rz-border-width) solid var(--rz-base-600) !default;
+$rz-border-focus: var(--rz-border-width) solid var(--rz-base-600) !default;
+$rz-border-disabled: var(--rz-border-width) solid var(--rz-base-700) !default;
+
 // Components
 
 // Button
@@ -46,267 +204,157 @@ $button-styles: () !default;
 $button-styles: map-merge(
   (
     primary: (
-      background-color: $primary,
-      color: $white
+      background-color: var(--rz-primary),
+      color: var(--rz-text-contrast-color)
     ),
     light: (
-      background-color: $light,
-      color: $white
+      background-color: var(--rz-base-700),
+      color: var(--rz-text-contrast-color)
     ),
     secondary: (
-      background-color: $secondary,
-      color: $white
+      background-color: var(--rz-secondary),
+      color: var(--rz-text-contrast-color)
     ),
     info: (
-      background-color: $info,
-      color: $white
+      background-color: var(--rz-info),
+      color: var(--rz-text-contrast-color)
     ),
     warning: (
-      background-color: $warning,
-      color: $white
+      background-color: var(--rz-warning),
+      color: var(--rz-text-contrast-color)
     ),
     error: (
-      background-color: $danger,
-      color: $white
+      background-color: var(--rz-danger),
+      color: var(--rz-text-contrast-color)
     ),
     danger: (
-      background-color: $danger,
-      color: $white
+      background-color: var(--rz-danger),
+      color: var(--rz-text-contrast-color)
     ),
     success: (
-      background-color: $success,
-      color: $white
+      background-color: var(--rz-success),
+      color: var(--rz-text-contrast-color)
     )
   ),
   $button-styles
 );
 
 // Header
-$header-background-color: $default-background-color !default;
-$header-border: $navigation-border !default;
+$header-border: var(--rz-border-700) !default;
 
 // Sidebar
-$sidebar-border: $navigation-border !default;
-$sidebar-background-color: $slate-grey !default;
+$sidebar-border-right: var(--rz-border-800) !default;
+$sidebar-background-color: var(--rz-base-background-color) !default;
 
 // SidebarToggle
-$sidebar-toggle-border: $navigation-border !default;
-$sidebar-toggle-hover-color: $default-link !default;
-$sidebar-toggle-background-color: $default-background-color !default;
-$sidebar-toggle-color: $white !default;
-
-// Menu
-$menu-background-color: $default-background-color !default;
-$menu-item-color: rgba(#fff, 0.5) !default;
-$menu-item-selected-color: $white !default;
-$menu-top-item-hover-color: $dark-link !default;
+$sidebar-toggle-border: var(--rz-border-700) !default;
+$sidebar-toggle-hover-color: var(--rz-secondary) !default;
+$sidebar-toggle-background-color: var(--rz-base-background-color) !default;
+$sidebar-toggle-color: var(--rz-text-color) !default;
 
 // ProfileMenu
-$profile-menu-top-item-background-color: $default-background-color !default;
-$profile-menu-background-color: $default-background-color !default;
-$profile-menu-border: $navigation-border !default;
-$profile-menu-toggle-button-color: $white !default;
-
-// PanelMenu
-$panel-menu-background-color: $default-background-color !default;
-$panel-menu-hover-background-color: #435863 !default;
-$panel-menu-item-active-background-color: $panel-menu-hover-background-color !default;
-$panel-menu-item-border: solid 1px rgba(#363d40, 0.1) !default;
-$panel-menu-icon-color: rgba($charcoal-grey, 0.6) !default;
-$panel-menu-item-2nd-level-hover-background-color: #e9eaec !default;
-$panel-menu-item-3rd-level-hover-background-color: #dddfe1 !default;
-$panel-menu-item-2nd-level-hover-color: $charcoal-grey !default;
-$panel-menu-item-3rd-level-hover-color: $charcoal-grey !default;
-$panel-menu-item-2nd-level-color: #000 !default;
-
-// Card
-$card-background-color: $default-background-color !default;
+$profile-menu-border: var(--rz-border-900) !default;
+$profile-menu-toggle-button-color: var(--rz-text-color) !default;
 
 // Steps
-$steps-number-color: $greyish-brown !default;
-
-// Accordion
-$accordion-item-background-color: $default-background-color !default;
-$accordion-selected-color: $dark-link !default;
+$steps-number-background-color: var(--rz-base-700) !default;
 
 // Panel
-$panel-background-color: $default-background-color !default;
-$panel-toggle-icon-background-color: $charcoal-grey !default;
-$panel-hover-color: $dark-link !default;
+$panel-toggle-icon-background-color: var(--rz-base-700) !default;
 
 // Input components
-$input-background-color: #323f45 !default;
-$input-border: 1px solid #2f3a40 !default;
-$input-hover-border: 1px solid #2f3a40 !default;
-$input-focus-border: 1px solid rgba(71, 156, 200, 0.6) !default;
-$input-disabled-border: solid 1px rgba(47, 58, 64, 0.53) !default;
-$input-disabled-background-color: rgba(136, 152, 155, 0.06) !default;
-$input-disabled-shadow: inset 0 4px 3px 0 rgba(0, 0, 0, 0.03) !default;
-$input-disabled-color: #868e96 !default;
+$input-background-color: var(--rz-base-900) !default;
+$input-disabled-background-color: var(--rz-base-800) !default;
 
 // Fieldset
-$fieldset-border: 1px solid #242c30 !default;
-$fieldset-toggle-background-color: #323f45 !default;
+$fieldset-border: var(--rz-border-700) !default;
+$fieldset-toggle-background-color: var(--rz-base-700) !default;
 
 // Dropdown
-$dropdown-open-background-color: $default-background-color !default;
-$dropdown-open-border: 1px solid #45565d !default;
-$dropdown-filter-border: 1px solid rgba($charcoal-grey, 0.2) !default;
-
-// ListBox
-$listbox-background-color: $default-background-color !default;
-$listbox-filter-border: $dropdown-filter-border !default;
-$listbox-border: none !default;
-
-// PickList
-$picklist-background-color: rgba(#28363c, 0.5) !default;
-$picklist-list-background-color: $default-background-color !default;
-$picklist-header-color: $dark-link !default;
-$picklist-item-border: none !default;
-$picklist-item-background-color: #435863 !default;
-$picklist-header-border: 1px solid rgba($charcoal-grey, 0.2) !default;
-$picklist-list-border: none !default;
-$picklist-droppoint-background-color: $dark-link !default;
+$dropdown-filter-border: var(--rz-border-700) !default;
 
 // Slider
-
-$slider-border: 1px solid #2f3a40 !default;
-$slider-background-color: #323f45 !default;
-$slider-range-background-color: $default-background-color !default;
-$slider-range-border: 1px solid $default-background-color !default;
-$slider-disabled-border: solid 1px rgba(47, 58, 64, 0.53) !default;
-$slider-disabled-background-color: #6d787d !default;
-$slider-disabled-handle-background-color: $slider-disabled-background-color !default;
+$slider-background-color: var(--rz-base-900) !default;
+$slider-range-background-color: var(--rz-secondary-dark) !default;
+$slider-disabled-range-background-color: var(--rz-base-700) !default;
+$slider-disabled-range-border: var(--rz-base-700) !default;
+$slider-disabled-handle-background-color: var(--rz-base-700) !default;
 
 // Numeric
-$numeric-button-disabled-background-color: rgba($cool-grey, 0.2) !default;
+$numeric-button-disabled-background-color: var(--rz-base-700) !default;
 
 // DatePicker
-$datepicker-panel-background-color: $default-background-color !default;
-$datepicker-header-background-color: $default-background-color !default;
-$datepicker-calendar-border: 1px solid rgba($charcoal-grey, 0.2) !default;
-$datepicker-header-border: $datepicker-calendar-border !default;
-$datepicker-header-color: $charcoal-grey !default;
-$datepicker-panel-border: $input-border !default;
-$timepicker-border: 1px solid rgba(47, 58, 64, 0.53) !default;
-
-// Rating
-$rating-color: $cool-grey !default;
+$datepicker-header-background-color: var(--rz-base-800) !default;
+$datepicker-calendar-border: var(--rz-border-700) !default;
 
 // Upload
-$upload-button-bar-background-color: #2f3d43 !default;
-$upload-files-background-color: $default-background-color !default;
+$upload-button-bar-background-color: var(--rz-base-700) !default;
 
 // Grid
-$grid-header-background-color: #2f3d43 !default;
-$grid-header-color: $cool-grey !default;
-$grid-cell-border: 1px solid #45565d !default;
-$grid-background-color: $default-background-color !default;
-$grid-stripe-background-color: #586c75 !default;
-$grid-cell-color: $body-color !default;
-$grid-hover-background-color: rgba(#45565d, 0.5) !default;
-$grid-header-sorted-background-color: rgba(4, 4, 4, 0.1) !default;
-$grid-filter-background-color: #4a5a63 !default;
-$grid-filter-buttons-background-color: $default-background-color !default;
-$grid-border: $grid-cell-border !default;
-$grid-toolbar-background-color: $default-background-color !default;
-$grid-detail-template-background-color: $default-background-color !default;
-$grid-detail-template-border: none !default;
+$grid-header-background-color: var(--rz-base-900) !default;
+$grid-header-color: var(--rz-text-secondary-color) !default;
+$grid-stripe-background-color: var(--rz-base-700) !default;
+$grid-header-sorted-background-color: var(--rz-base-800) !default;
+$grid-filter-background-color: var(--rz-base-800) !default;
+$grid-detail-template-background-color: var(--rz-base-900) !default;
+
 
 // Paginator
-$paginator-background-color: $default-background-color !default;
-$paginator-back-button-background-color: $cool-grey !default;
-$paginator-numeric-button-background-color: $cool-grey !default;
-$paginator-back-button-color: $body-color !default;
-$paginator-numeric-button-color: $body-color !default;
-$paginator-numeric-button-selected-background-color: $charcoal-grey !default;
-$paginator-numeric-button-selected-color: $body-color !default;
-$paginator-numeric-button-selected-border: 1px solid $charcoal-grey !default;
-$paginator-summary-color: #e8eced !default;
-
-// Tree
-$tree-background-color: $default-background-color !default;
-$tree-border: 1px solid $default-background-color !default;
+$paginator-back-button-background-color: var(--rz-base-700) !default;
+$paginator-next-button-background-color: var(--rz-base-700) !default;
+$paginator-numeric-button-background-color: var(--rz-base-700) !default;
+$paginator-numeric-button-selected-color: var(--rz-text-contrast-color) !default;
+$paginator-numeric-button-selected-background-color: var(--rz-base-900) !default;
+$paginator-numeric-button-selected-border: var(--rz-border-700) !default;
 
 // DataList
-$datalist-background-color: $default-background-color !default;
-$datalist-item-background-color: $charcoal-grey !default;
 $datalist-item-border: none !default;
-$datalist-border: $grid-border !default;
+$datalist-border: var(--rz-border-700) !default;
 $datalist-item-shadow: 0 22px 64px 0 rgba(0, 0, 0, 0.22);
 
 // Scheduler
-$scheduler-background-color: $default-background-color !default;
-$scheduler-color: $cool-grey !default;
-$scheduler-toolbar-background-color: #2f3d43 !default;
-$scheduler-header-background-color: #4a5a63 !default;
-$scheduler-header-color: $cool-grey !default;
+$scheduler-toolbar-background-color: var(--rz-base-900) !default;
+$scheduler-header-background-color: var(--rz-base-700) !default;
 $scheduler-header-border: none !default;
-$scheduler-border-color: $cool-grey !default;
-$scheduler-border: $grid-border !default;
+$scheduler-border-color: var(--rz-base-700) !default;
+$scheduler-minor-border-color: var(--rz-base-700) !default;
+
+.rz-slot-minor {
+  border-top: 1px dotted var(--rz-scheduler-minor-border-color) !important;
+}
 
 // Tabs
-$tabs-background-color: $default-background-color !default;
-$tabs-tab-background-color: #2f3d43 !default;
-$tabs-hover-background-color: $tabs-tab-background-color;
-$tabs-selected-tab-color: $body-color;
-$tabs-tab-color: rgba($body-color, 0.5) !default;
+$tabs-tab-background-color: var(--rz-base-700) !default;
+$tabs-hover-background-color: var(--rz-base-800);
+$tabs-tab-color: var(--rz-text-secondary-color) !default;
+$tabs-hover-color: var(--rz-text-color) !default;
 $tabs-border: none !default;
 
 // Dialog
-$dialog-background-color: $charcoal-grey !default;
-$dialog-title-background-color: #28363c !default;
+$dialog-title-background-color: var(--rz-base-background-color) !default;
 
 // Footer
-$footer-background-color: $default-background-color !default;
-$footer-border: $navigation-border !default;
+$footer-border: var(--rz-border-700) !default;
 
 // Scrollbar
-$scrollbar-background-color: $default-background-color !default;
-$scrollbar-color: $charcoal-grey !default;
-
-// Login
-$login-register-background-color: $default-background-color !default;
-
-// Lookup
-$lookup-panel-background-color: $default-background-color !default;
-
-// Overlay
-$overlay-border: $input-border !default;
-
-// Steps
-$steps-button-color: $cool-grey !default;
+$scrollbar-color: var(--rz-base-600) !default;
 
 // ProgressBar
-$progressbar-background-color: $default-background-color !default;
+$progressbar-background-color: var(--rz-base-700) !default;
 
 // Chart
-$chart-axis-color: rgba(#fff, 0.2);
-$chart-axis-label-color: rgba(#fff, 0.5);
-$chart-tooltip-background: rgba($default-background-color, 0.95) !default;
-
-// Gauge
-$gauge-scale-color: #fff !default;
-$gauge-scale-label-color: #fff !default;
-$gauge-pointer-color: #fff !default;
-$gauge-arc-scale-color: #fff !default;
-$gauge-arc-scale-label-color: #fff !default;
-$gauge-arc-value-color: $default-link !default;
+$chart-axis-color: var(--rz-base-600) !default ;
+$chart-axis-label-color: var(--rz-text-secondary-color) !default;
 
 // Editor
-$editor-toolbar-background-color: $default-background-color !default;
-$editor-button-background-color: $default-background-color !default;
-$editor-button-selected-color: $white !default;
-$editor-separator-background-color: $body-color !default;
+$editor-separator-background-color: var(--rz-base-700) !default;
 
 // Splitter
-$splitter-bar-color: #fff !default;
-$splitter-bar-background-color: #4A5A63 !default;
+$splitter-bar-background-color: var(--rz-base-700) !default;
 $splitter-bar-hover-opacity: 0.8 !default;
 
 @import 'bootstrap';
 $bootstrap: true;
 
 @import 'fonts';
-@import 'typography';
 @import 'components';
