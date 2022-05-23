@@ -53,7 +53,7 @@ background: var(--rz-switch-checked-background-color);
   height: $switch-circle-size;
   left: $switch-circle-margin;
   margin-top: round($switch-circle-size*-500)/1000;
-  border-radius: 50%;
+  border-radius: calc(var(--rz-border-radius-5) - 3px);
   transition-duration: 0.2s;
   box-shadow: var(--rz-switch-box-shadow);
 }
