@@ -484,7 +484,7 @@ namespace Radzen.Blazor
 
         async Task RefreshAfterFilter()
         {
-    #if NET5
+#if NET5
             if (grid?.virtualize != null)
             {
                 if(string.IsNullOrEmpty(searchText))
@@ -492,6 +492,7 @@ namespace Radzen.Blazor
                     if(LoadData.HasDelegate)
                     {
                         Data = null;
+                        await grid.Reload();
                     }
                     else
                     {
@@ -501,7 +502,7 @@ namespace Radzen.Blazor
                 }
                 await grid.virtualize.RefreshDataAsync();
             }
-    #endif 
+#endif
             StateHasChanged();
             await grid.FirstPage(true);
 
