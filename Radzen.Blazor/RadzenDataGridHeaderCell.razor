@@ -82,7 +82,7 @@
                                 }
                                 else if (Column.FilterPropertyType == typeof(bool) || Column.FilterPropertyType == typeof(bool?))
                                 {
-                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@Column.GetFilterValue()" Change="@(args => Column.SetFilterValue(args))" />
+                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@Column.GetFilterValue()" Change="@(args => { Column.FilterValue = null; Column.SetFilterValue(args); Grid.Reload(); })" />
                                 }
                                 else
                                 {
