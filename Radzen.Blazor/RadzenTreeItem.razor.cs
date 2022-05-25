@@ -282,7 +282,7 @@ namespace Radzen.Blazor
         {
             var checkedValues = GetCheckedValues();
 
-            if (HasChildren && IsOneChildUnchecked() && IsOneChildChecked())
+            if (Tree?.AllowCheckParents == true && HasChildren && IsOneChildUnchecked() && IsOneChildChecked())
             {
                 return null;
             }
