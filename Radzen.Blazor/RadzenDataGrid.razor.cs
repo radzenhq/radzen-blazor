@@ -1395,6 +1395,7 @@ namespace Radzen.Blazor
                     if(virtualize != null)
                     {
                         await virtualize.RefreshDataAsync();
+                        await virtualize.RefreshDataAsync();
                     }
 
                     if(groupVirtualize != null)
