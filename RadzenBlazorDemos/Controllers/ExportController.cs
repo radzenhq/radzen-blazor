@@ -12,6 +12,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
+using System.Globalization;
 
 namespace RadzenBlazorDemos
 {
@@ -21,23 +22,24 @@ namespace RadzenBlazorDemos
         {
             if (query != null)
             {
-                if (query.ContainsKey("$filter"))
+                if (query.ContainsKey("$expand"))
                 {
-                    items = items.Where(query["$filter"].ToString());
+                    var propertiesToExpand = query["$expand"].ToString().Split(',');
+                    foreach (var p in propertiesToExpand)
+                    {
+                        items = items.Include(p);
+                    }
+                }
+
+                var filter = query.ContainsKey("$filter") ? query["$filter"].ToString() : null;
+                if (!string.IsNullOrEmpty(filter))
+                {
+                    items = items.Where(filter);
                 }
 
                 if (query.ContainsKey("$orderBy"))
                 {
                     items = items.OrderBy(query["$orderBy"].ToString());
-                }
-
-                if (query.ContainsKey("$expand"))
-                {
-                    var propertiesToExpand = query["$orderBy"].ToString().Split(',');
-                    foreach (var p in propertiesToExpand)
-                    {
-                        items = items.Include(p);
-                    }
                 }
 
                 if (query.ContainsKey("$skip"))
@@ -49,12 +51,17 @@ namespace RadzenBlazorDemos
                 {
                     items = items.Take(int.Parse(query["$top"].ToString()));
                 }
+
+                if (query.ContainsKey("$select"))
+                {
+                    return items.Select($"new ({query["$select"].ToString()})");
+                }
             }
 
             return items;
         }
 
-        public FileStreamResult ToCSV(IQueryable query)
+        public FileStreamResult ToCSV(IQueryable query, string fileName = null)
         {
             var columns = GetProperties(query.ElementType);
 
@@ -66,9 +73,7 @@ namespace RadzenBlazorDemos
 
                 foreach (var column in columns)
                 {
-                    var value = GetValue(item, column.Key);
-
-                    row.Add(value != null ? value.ToString() : "");
+                    row.Add($"{GetValue(item, column.Key)}".Trim());
                 }
 
                 sb.AppendLine(string.Join(",", row.ToArray()));
@@ -76,12 +81,12 @@ namespace RadzenBlazorDemos
 
 
             var result = new FileStreamResult(new MemoryStream(UTF8Encoding.Default.GetBytes($"{string.Join(",", columns.Select(c => c.Key))}{System.Environment.NewLine}{sb.ToString()}")), "text/csv");
-            result.FileDownloadName = $"{query.ElementType}.csv";
+            result.FileDownloadName = (!string.IsNullOrEmpty(fileName) ? fileName : "Export") + ".csv";
 
             return result;
         }
 
-        public FileStreamResult ToExcel(IQueryable query)
+        public FileStreamResult ToExcel(IQueryable query, string fileName = null)
         {
             var columns = GetProperties(query.ElementType);
             var stream = new MemoryStream();
@@ -125,7 +130,7 @@ namespace RadzenBlazorDemos
                     foreach (var column in columns)
                     {
                         var value = GetValue(item, column.Key);
-                        var stringValue = $"{value}";
+                        var stringValue = $"{value}".Trim();
 
                         var cell = new Cell();
 
@@ -137,9 +142,10 @@ namespace RadzenBlazorDemos
 
                         if (typeCode == TypeCode.DateTime)
                         {
-                            if (stringValue != string.Empty)
+                            if (!string.IsNullOrWhiteSpace(stringValue))
                             {
-                                cell.CellValue = new CellValue() { Text = DateTime.Parse(stringValue).ToOADate().ToString() };
+                                cell.CellValue = new CellValue() { Text = ((DateTime)value).ToOADate().ToString(System.Globalization.CultureInfo.InvariantCulture) };
+                                cell.DataType = new EnumValue<CellValues>(CellValues.Number);
                                 cell.StyleIndex = (UInt32Value)1U;
                             }
                         }
@@ -150,6 +156,10 @@ namespace RadzenBlazorDemos
                         }
                         else if (IsNumeric(typeCode))
                         {
+                            if (value != null)
+                            {
+                                stringValue = Convert.ToString(value, CultureInfo.InvariantCulture);
+                            }
                             cell.CellValue = new CellValue(stringValue);
                             cell.DataType = new EnumValue<CellValues>(CellValues.Number);
                         }
@@ -175,7 +185,7 @@ namespace RadzenBlazorDemos
             }
 
             var result = new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            result.FileDownloadName = $"{query.ElementType}.xls";
+            result.FileDownloadName = (!string.IsNullOrEmpty(fileName) ? fileName : "Export") + ".xlsx";
 
             return result;
         }
@@ -197,6 +207,9 @@ namespace RadzenBlazorDemos
             var underlyingType = type.IsGenericType &&
                 type.GetGenericTypeDefinition() == typeof(Nullable<>) ?
                 Nullable.GetUnderlyingType(type) : type;
+
+            if (underlyingType == typeof(System.Guid))
+                return true;
 
             var typeCode = Type.GetTypeCode(underlyingType);
 
