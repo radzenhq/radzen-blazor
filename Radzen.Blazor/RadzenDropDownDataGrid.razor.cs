@@ -349,9 +349,10 @@ namespace Radzen.Blazor
                 {
                     if (!string.IsNullOrEmpty(ValueProperty))
                     {
-                        if (!LoadData.HasDelegate)
+                        var item = Query.Where($@"{ValueProperty} == @0", value).FirstOrDefault();
+                        if (item != null)
                         {
-                            SelectedItem = Query.Where($@"{ValueProperty} == @0", value).FirstOrDefault();
+                            SelectedItem = item;
                         }
                     }
                     else
