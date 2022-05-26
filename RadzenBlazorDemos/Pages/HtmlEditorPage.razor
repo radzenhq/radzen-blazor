@@ -47,7 +47,8 @@
     </p>
     <h2>3. Include a theme</h2>
     <p>
-        Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side WebAssembly Blazor) and include a theme CSS file by adding this snippet 
+        Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6+), <code>Pages\_Host.cshtml</code> (Blazor Server before .NET 6) or <code>wwwroot/index.html</code> (Blazor WebAssembly)
+         and include a theme CSS file by adding this snippet 
         <code>&lt;link rel=""stylesheet"" href=""_content/Radzen.Blazor/css/default-base.css""&gt;</code>
         This version requires only the Radzen Blazor CSS. Optionally you can include Bootstrap.
     </p>

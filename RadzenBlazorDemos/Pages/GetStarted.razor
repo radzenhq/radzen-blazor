@@ -42,7 +42,7 @@
         <div class="col-xl-8">
             <h2 class="mt-5 mb-3">3. Include a theme</h2>
             <p>
-                Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side WebAssembly Blazor) and include a theme CSS file by adding this snippet:
+               Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6+), <code>Pages\_Host.cshtml</code> (Blazor Server before .NET 6) or <code>wwwroot/index.html</code> (Blazor WebAssembly) and include a theme CSS file by adding this snippet:
             </p>
 <pre>
 <code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css"&gt;</code>
@@ -66,7 +66,7 @@
         <div class="col-xl-8">
             <h2 class="mt-5 mb-3">4. Include Radzen.Blazor.js</h2>
             <p>
-                Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side WebAssembly Blazor) and include this snippet
+                Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6+), <code>Pages\_Host.cshtml</code> (Blazor Server before .NET 6) or <code>wwwroot/index.html</code> (Blazor WebAssembly) and include this snippet
             </p>
 <pre>
 <code>&lt;script src="_content/Radzen.Blazor/Radzen.Blazor.js"&gt;&lt;/script&gt;</code>
@@ -115,7 +115,7 @@
         <div class="col-xl-8">
             <h2 class="mt-5 mb-3">6. Use Dialog, Notification, ContextMenu and Tooltip components</h2>
             <p>
-                Open the <code>Shared/MainLayout.razor</code> file and include:
+                Open the <code>Shared\MainLayout.razor</code> file and include:
             </p>
             <ul>
                 <li><code>&lt;RadzenDialog/&gt;</code></li>
@@ -124,7 +124,7 @@
                 <li><code>&lt;RadzenTooltip/&gt;</code></li>
             </ul>
             <p>
-                Open the <code>Startup.cs</code> file (server-side Blazor) or <code>Program.cs</code> (client-side WebAssembly Blazor) and add:
+                Open <code>Startup.cs</code> file (Blazor Server before .NET 6) or <code>Program.cs</code> (Blazor WebAssembly or Blazor Server after .NET 6) and add:
             </p>
             <ul>
                 <li>DialogService</li>
@@ -132,7 +132,7 @@
                 <li>ContextMenuService</li>
                 <li>TooltipService</li>
             </ul>
-            <h4 class="my-2">Startup.cs (server-side Blazor)</h4>
+            <h4 class="my-2">Startup.cs (Blazor Server before .NET 6)</h4>
 <pre>
     <code>
     using Radzen;
@@ -148,7 +148,7 @@
     }
     </code>
 </pre>
-<h4 class="my-2">Program.cs (client-side WebAssembly Blazor / .NET 6 Blazor)</h4>
+<h4 class="my-2">Program.cs (Blazor WebAssembly Blazor and Blazor Server after .NET 6)</h4>
 <pre>
     <code>
     using Radzen;

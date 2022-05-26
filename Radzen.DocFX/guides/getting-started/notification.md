@@ -7,7 +7,7 @@ This article shows the additional setup steps required to use the RadzenNotifica
 ## Service registration
 The RadzenNotification is used via the [NotificationService](xref:Radzen.NotificationService) class which must be registered as a service.
 
-# [Server-side Blazor](#tab/server-side)
+# [Blazor Server before .NET 6](#tab/server-side)
 1. Open `Startup.cs`
 1. Import the Radzen namespace
    ```
@@ -22,7 +22,7 @@ The RadzenNotification is used via the [NotificationService](xref:Radzen.Notific
        // Other registrations
    }
    ```
-# [Client-side Blazor](#tab/client-side)
+# [Blazor WebAssembly or Blazor Server after .NET 6](#tab/client-side)
 1. Open `Program.cs`
 1. Import the Radzen namespace
    ```

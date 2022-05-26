@@ -24,7 +24,7 @@ Open the `_Imports.razor` file of your Blazor application and add these two line
 ## Include the CSS and JS
 
 ### Include CSS
-Open `_Host.cshtml` (server-side Blazor) or `wwwroot/index.html` (client-side Blazor) and include a theme CSS file by adding this snippet:
+Open `Pages\_Layout.cshtml` (Blazor Server .NET 6+), `Pages\_Host.cshtml` (Blazor Server before .NET 6) or `wwwroot/index.html` (Blazor WebAssembly) and include a theme CSS file by adding this snippet:
 ```
 <link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css">
 ```
@@ -34,7 +34,7 @@ Radzen also ships CSS files that include some vital parts of Bootstrap (mostly l
 ```
 
 ### Include the JS
-Open `_Host.cshtml` (server-side Blazor) or `wwwroot/index.html` (client-side Blazor) and include a theme CSS file by adding this snippet:
+Open `Pages\_Layout.cshtml` (Blazor Server .NET 6+), `Pages\_Host.cshtml` (Blazor Server before .NET 6) or `wwwroot/index.html` (Blazor WebAssembly) and include a theme CSS file by adding this snippet:
 ```
 <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
 ```

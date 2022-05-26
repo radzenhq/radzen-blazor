@@ -7,7 +7,7 @@ This article shows the additional setup steps required to use the RadzenDialog c
 ## Service registration
 The RadzenDialog is used via the [DialogService](xref:Radzen.DialogService) class which must be registered as a service.
 
-# [Server-side Blazor](#tab/server-side)
+# [Blazor Server before .NET 6](#tab/server-side)
 1. Open `Startup.cs`
 1. Import the Radzen namespace
    ```
@@ -22,7 +22,7 @@ The RadzenDialog is used via the [DialogService](xref:Radzen.DialogService) clas
        // Other registrations
    }
    ```
-# [Client-side Blazor](#tab/client-side)
+# [Blazor WebAssembly or Blazor Server after .NET 6](#tab/client-side)
 1. Open `Program.cs`
 1. Import the Radzen namespace
    ```
