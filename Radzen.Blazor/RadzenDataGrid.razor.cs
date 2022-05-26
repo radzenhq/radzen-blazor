@@ -1480,7 +1480,7 @@ namespace Radzen.Blazor
 
         internal async System.Threading.Tasks.Task ExpandGroupItem(RadzenDataGridGroupRow<TItem> item, bool? expandedOnLoad)
         {
-            if (expandedOnLoad != null)
+            if (expandedOnLoad == true)
                 return;
 
             if (!collapsedGroupItems.Keys.Contains(item))
