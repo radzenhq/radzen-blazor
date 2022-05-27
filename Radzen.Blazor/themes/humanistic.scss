@@ -156,6 +156,7 @@ $state-info-bg: $rz-info !default;
 // Bootstrap component overrides. We need these because bootstrap is overriding them in components.
 
 $card-border-radius: var(--rz-border-radius);
+$badge-border-radius: var(--rz-border-radius);
 $input-height: 2.25rem;
 $input-line-height: 1.429;
 $input-border-radius: var(--rz-border-radius);

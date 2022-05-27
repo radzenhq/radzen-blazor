@@ -7,14 +7,14 @@ $rz-black: #000000 !default;
 
 $rz-base-50: #ffffff !default;
 $rz-base-100: #f6f7fa !default;
-$rz-base-200: #e9edf0 !default; //#e6ecef  eef1f4
+$rz-base-200: #e9edf0 !default; 
 $rz-base-300: #dadfe2 !default;
 $rz-base-400: #A8B4B8 !default;
-$rz-base-500: #7B8A8E !default; //b4bec3
+$rz-base-500: #7B8A8E !default; 
 $rz-base-600: #63737A !default;
-$rz-base-700: #45565E !default; //5d717b
-$rz-base-800: #38474E !default; //$charcoal-grey #3b484e // 2f3d43
-$rz-base-900: #28363c !default; //292c2e #28363c panelmenu
+$rz-base-700: #45565E !default; 
+$rz-base-800: #38474E !default; 
+$rz-base-900: #28363c !default; 
 
 $rz-primary: #ff6d41 !default;
 $rz-primary-light: #ff7b54 !default;
@@ -172,7 +172,6 @@ $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
 // Utilities
 
 // Text Color
-
 $rz-text-title-color: var(--rz-base-50) !default;
 $rz-text-color: var(--rz-base-100) !default;
 $rz-text-secondary-color: var(--rz-base-300) !default;
@@ -181,17 +180,14 @@ $rz-text-disabled-color: var(--rz-base-600) !default;
 $rz-text-contrast-color: var(--rz-white) !default;
 
 // Link Color
-
 $rz-link-color: var(--rz-secondary) !default;
 $rz-link-hover-color: var(--rz-secondary-dark) !default;
 $rz-link-hover-decoration: underline !default;
 
 // Background Color
-
 $rz-base-background-color: var(--rz-base-800) !default;
 
 // Borders
-
 $rz-border-normal: var(--rz-border-width) solid var(--rz-base-700) !default;
 $rz-border-hover: var(--rz-border-width) solid var(--rz-base-600) !default;
 $rz-border-focus: var(--rz-border-width) solid var(--rz-base-600) !default;
