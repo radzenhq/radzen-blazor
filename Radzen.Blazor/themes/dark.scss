@@ -172,7 +172,6 @@ $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
 // Utilities
 
 // Text Color
-
 $rz-text-title-color: var(--rz-base-50) !default;
 $rz-text-color: var(--rz-base-100) !default;
 $rz-text-secondary-color: var(--rz-base-300) !default;
@@ -181,17 +180,14 @@ $rz-text-disabled-color: var(--rz-base-600) !default;
 $rz-text-contrast-color: var(--rz-white) !default;
 
 // Link Color
-
 $rz-link-color: var(--rz-secondary) !default;
 $rz-link-hover-color: var(--rz-secondary-dark) !default;
 $rz-link-hover-decoration: underline !default;
 
 // Background Color
-
 $rz-base-background-color: var(--rz-base-800) !default;
 
 // Borders
-
 $rz-border-normal: var(--rz-border-width) solid var(--rz-base-700) !default;
 $rz-border-hover: var(--rz-border-width) solid var(--rz-base-600) !default;
 $rz-border-focus: var(--rz-border-width) solid var(--rz-base-600) !default;
