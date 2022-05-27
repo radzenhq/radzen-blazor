@@ -19,7 +19,7 @@ $radio-circle-hover-background-color: var(--rz-base-100) !default;
 
 $radio-icon-width: 0.5rem !default;
 $radio-icon-height: $radio-icon-width !default;
-$radio-checked-border: $input-border !default;
+$radio-checked-border: var(--rz-input-border) !default;
 
 // Radio CSS variables
 

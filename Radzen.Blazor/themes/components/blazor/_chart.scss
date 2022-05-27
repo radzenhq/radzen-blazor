@@ -1,5 +1,5 @@
 $chart-axis-color: var(--rz-base-300) !default;
-$chart-axis-label-color: var(--rz-base-600) !default;
+$chart-axis-label-color: var(--rz-text-tertiary-color) !default;
 $chart-axis-font-size: 0.875rem !default;
 $chart-tooltip-background: var(--rz-base-background-color) !default;
 $chart-tooltip-color: var(--rz-text-color) !default;
@@ -239,7 +239,7 @@ $color-schemes: (
   color: var(--rz-chart-tooltip-color);
   box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15);
   padding: 0.25rem 1rem;
-  border-radius: 4px;
+  border-radius: var(--rz-border-radius);
   white-space: nowrap;
 }
 

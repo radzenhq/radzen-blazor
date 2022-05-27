@@ -10,6 +10,11 @@ $upload-files-margin: 0 0.5rem !default;
 
 $upload-choose-background-color: var(--rz-secondary) !default;
 $upload-choose-color: var(--rz-text-contrast-color) !default;
+$upload-choose-hover-background-color: var(--rz-secondary) !default;
+$upload-choose-hover-color: var(--rz-text-contrast-color) !default;
+$upload-choose-active-background-color: var(--rz-secondary-dark) !default;
+$upload-choose-active-color: var(--rz-text-contrast-color) !default;
+
 $upload-cancel-background-color: var(--rz-base-200) !default;
 $upload-cancel-color: var(--rz-text-color) !default;
 $upload-button-background-color: var(--rz-primary) !default;
@@ -29,6 +34,11 @@ $upload-button-background-color: var(--rz-primary) !default;
   
   --rz-upload-choose-background-color: #{$upload-choose-background-color};
   --rz-upload-choose-color: #{$upload-choose-color};
+  --rz-upload-choose-hover-background-color: #{$upload-choose-hover-background-color};
+  --rz-upload-choose-hover-color: #{$upload-choose-hover-color};
+  --rz-upload-choose-active-background-color: #{$upload-choose-active-background-color};
+  --rz-upload-choose-active-color: #{$upload-choose-active-color};
+
   --rz-upload-cancel-background-color: #{$upload-cancel-background-color};
   --rz-upload-cancel-color: #{$upload-cancel-color};
   --rz-upload-button-background-color: #{$upload-button-background-color};
@@ -66,6 +76,26 @@ $upload-button-background-color: var(--rz-primary) !default;
     opacity: 0;
     min-height: 100%;
     cursor: pointer;
+  }
+
+  &:not(.rz-state-disabled) {
+    background-color: var(--rz-upload-choose-background-color);
+    color: var(--rz-upload-choose-color);
+
+    &:hover {
+      background-color: var(--rz-upload-choose-hover-background-color);
+      color: var(--rz-upload-choose-hover-color);
+
+      &:not(:active) {
+        background-color: var(--rz-upload-choose-hover-background-color);
+        color: var(--rz-upload-choose-hover-color);
+      }
+    }
+
+    &:active {
+      background-color: $upload-choose-active-background-color;
+      color: var(--rz-upload-choose-active-color);
+    }
   }
 }
 
