@@ -13,6 +13,13 @@
             </div>
             <div class="col-md-4 p-3">
                 <RadzenCard>
+                    <h4 class="mb-4">Upload with icon</h4>
+                    <RadzenUpload Url="upload/single" Icon="upload" ChooseText="" Progress=@(args => OnProgress(args, "Upload with icon"))>
+                    </RadzenUpload>
+                </RadzenCard>
+            </div>
+            <div class="col-md-4 p-3">
+                <RadzenCard>
                     <h4 class="mb-4">Custom HTTP headers</h4>
                     <RadzenUpload Url="upload/single" Progress=@(args => OnProgress(args, "Custom HTTP headers")) class="w-100">
                         <RadzenUploadHeader Name="Authorization" Value="Bearer <token>" />
