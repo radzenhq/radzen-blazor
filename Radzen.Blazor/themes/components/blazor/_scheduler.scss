@@ -9,7 +9,7 @@ $scheduler-background-color: var(--rz-base-background-color) !default;
 $scheduler-toolbar-padding: 0.5rem !default;
 $scheduler-toolbar-background-color: var(--rz-base-200) !default;
 $scheduler-toolbar-font-size: 0.875rem !default;
-$scheduler-toolbar-color: $white !default;
+$scheduler-toolbar-color: var(--rz-text-contrast-color) !default;
 $scheduler-toolbar-button-background-color: var(--rz-secondary) !default;
 $scheduler-toolbar-button-font-size: 0.875rem !default;
 $scheduler-toolbar-button-width: 1.25rem !default;
