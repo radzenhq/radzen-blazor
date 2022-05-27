@@ -58,6 +58,9 @@
     void OnMenuItemClick(MenuItemEventArgs args)
     {
         console.Log($"Menu item with Value={args.Value} clicked");
-        ContextMenuService.Close();
+        if(!args.Value.Equals(3) && !args.Value.Equals(4))
+        {
+            ContextMenuService.Close();
+        }
     }
 }
