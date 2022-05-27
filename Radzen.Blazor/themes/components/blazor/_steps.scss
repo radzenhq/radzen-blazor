@@ -7,7 +7,7 @@ $steps-number-border-radius: 50% !default;
 $steps-number-color: var(--rz-text-color) !default;
 $steps-number-padding: 0.5rem 0 !default;
 $steps-number-selected-background: var(--rz-secondary) !default;
-$steps-number-selected-color: $white !default;
+$steps-number-selected-color: var(--rz-text-contrast-color) !default;
 
 $steps-title-selected-color: var(--rz-secondary) !default;
 $steps-title-margin: 0 1rem 0 0.5rem !default;

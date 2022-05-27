@@ -1,12 +1,12 @@
-$grid-border-radius: $border-radius !default;
+$grid-border-radius: var(--rz-border-radius) !default;
 
 $grid-data-border-shadow: none;
 
-$grid-cell-border: var(--rz-border-normal) !default; //#dfe7eb
+$grid-cell-border: var(--rz-border-normal) !default;
 $grid-right-cell-border: $grid-cell-border !default;
 $grid-bottom-cell-border: $grid-cell-border !default;
 $grid-cell-padding: 0.5rem !default;
-$grid-cell-color: var(--rz-text-color) !default; //#48606c
+$grid-cell-color: var(--rz-text-color) !default;
 $grid-cell-font-size: 0.875rem !default;
 
 $grid-hover-background-color: var(--rz-secondary-lighter) !default;
@@ -15,12 +15,12 @@ $grid-hover-color: var(--rz-secondary-dark) !default;
 $grid-selected-background-color: var(--rz-secondary-dark) !default;
 $grid-selected-color: var(--rz-text-contrast-color) !default;
 
-$grid-stripe-background-color: var(--rz-base-100) !default; //#f7f9fa
+$grid-stripe-background-color: var(--rz-base-100) !default;
 
 $grid-toolbar-background-color: var(--rz-base-background-color) !default;
 $grid-header-cell-border: $grid-cell-border !default;
 $grid-header-cell-border-bottom: none !default;
-$grid-header-background-color: var(--rz-base-200) !default; //#e6ecef
+$grid-header-background-color: var(--rz-base-200) !default;
 $grid-header-font-size: 0.75rem !default;
 $grid-header-line-height: 1.25rem !default;
 $grid-header-font-weight: 600 !default;
@@ -29,14 +29,14 @@ $grid-header-color: var(--rz-text-color) !default;
 $grid-header-cell-padding: 0.5rem 0 !default;
 $grid-header-title-padding: 0 0.125rem 0 0.5rem !default;
 $grid-header-title-vertical-align: middle !default;
-$grid-header-sorted-background-color: var(--rz-base-300) !default; //#e2e9ee
+$grid-header-sorted-background-color: var(--rz-base-300) !default;
 
 $grid-header-padding: 1rem !default;
 
 $grid-foot-cell-color: $grid-cell-color !default;
 $grid-foot-background-color: $grid-header-background-color !default;
 
-$grid-filter-background-color: var(--rz-base-200) !default; //#f6f8f9
+$grid-filter-background-color: var(--rz-base-200) !default;
 $grid-filter-padding: 0.5rem !default;
 $grid-filter-margin: -0.5rem 0 !default;
 $grid-filter-border: $grid-cell-border !default;

@@ -1,4 +1,4 @@
-﻿$badge-border-radius: 0 !default;
+﻿$badge-border-radius: var(--rz-border-radius) !default;
 $badge-pill-border-radius: var(--rz-border-radius-4) !default;
 $badge-padding: 0.125rem 0.25rem !default;
 $badge-pill-padding: 0.125rem 0.5rem !default;

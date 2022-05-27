@@ -2,15 +2,13 @@ $bootstrap: false !default;
 
 // Headings
 
-$heading-color: inherit !default;
-
 $headings: (
-  h1: (font-size: 2rem, line-height: 1.1875em, font-weight: 700, letter-spacing: -0.04em, color: $heading-color, margin-bottom: 1rem),
-  h2: (font-size: 1.5rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.03em, color: $heading-color, margin-bottom: 1rem),
-  h3: (font-size: 1.125rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.75rem),
-  h4: (font-size: 1rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem),
-  h5: (font-size: 0.875rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem),
-  h6: (font-size: 0.75rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: $heading-color, margin-bottom: 0.5rem)
+  h1: (font-size: 2rem, line-height: 1.1875em, font-weight: 700, letter-spacing: -0.04em, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  h2: (font-size: 1.5rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.03em, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  h3: (font-size: 1.125rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.75rem),
+  h4: (font-size: 1rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h5: (font-size: 0.875rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h6: (font-size: 0.75rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem)
 ) !default;
 
 @each $name, $heading in $headings {
