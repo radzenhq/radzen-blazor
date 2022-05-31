@@ -1,6 +1,6 @@
-$input-font-size: 0.875rem !default;
+$input-font-size: var(--rz-body-font-size) !default;
 $input-height: 2.25rem !default;
-$input-line-height: 1.429 !default;
+$input-line-height: var(--rz-body-line-height) !default;
 $input-padding: 0.4375rem !default;
 $input-value-color: var(--rz-text-color) !default;
 $input-placeholder-color: var(--rz-text-tertiary-color) !default;

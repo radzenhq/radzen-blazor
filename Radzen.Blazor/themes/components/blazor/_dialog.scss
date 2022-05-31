@@ -8,7 +8,7 @@ $dialog-title-line-height: 1.875rem !default;
 $dialog-title-font-weight: 700 !default;
 $dialog-title-letter-spacing: -0.03em !default;
 $dialog-title-color: var(--rz-text-title-color) !default;
-$dialog-close-font-size: 1.25rem !default;
+$dialog-close-font-size: var(--rz-icon-size) !default;
 $dialog-close-color: var(--rz-text-tertiary-color) !default;
 $dialog-close-hover-color: var(--rz-text-color) !default;
 $dialog-close-vertical-align: middle !default;

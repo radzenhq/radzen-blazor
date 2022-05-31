@@ -1,6 +1,6 @@
 $rating-color: var(--rz-secondary) !default;
 $rating-opacity: 0.5 !default;
-$rating-font-size: 1.25rem !default;
+$rating-font-size: var(--rz-icon-size) !default;
 $rating-selected-color: var(--rz-primary) !default;
 $rating-disabled-color: var(--rz-text-disabled-color) !default;
 $rating-disabled-opacity: 0.3 !default;

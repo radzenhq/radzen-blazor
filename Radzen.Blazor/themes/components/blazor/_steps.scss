@@ -120,6 +120,6 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
   }
 
   .rzi {
-    font-size: 1.25rem;
+    font-size: var(--rz-icon-size);
   }
 }

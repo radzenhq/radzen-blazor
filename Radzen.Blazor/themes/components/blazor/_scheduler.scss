@@ -8,10 +8,10 @@ $scheduler-background-color: var(--rz-base-background-color) !default;
 
 $scheduler-toolbar-padding: 0.5rem !default;
 $scheduler-toolbar-background-color: var(--rz-base-200) !default;
-$scheduler-toolbar-font-size: 0.875rem !default;
+$scheduler-toolbar-font-size: var(--rz-body-font-size) !default;
 $scheduler-toolbar-color: var(--rz-text-contrast-color) !default;
 $scheduler-toolbar-button-background-color: var(--rz-secondary) !default;
-$scheduler-toolbar-button-font-size: 0.875rem !default;
+$scheduler-toolbar-button-font-size: var(--rz-body-font-size) !default;
 $scheduler-toolbar-button-width: 1.25rem !default;
 $scheduler-toolbar-button-height: 1.25rem !default;
 $scheduler-toolbar-text-transform: uppercase !default;
@@ -23,8 +23,8 @@ $scheduler-toolbar-title-color: var(--rz-text-title-color) !default;
 $scheduler-button-padding: 0.4375rem 1rem !default;
 $scheduler-button-font-size: 0.75rem !default;
 $scheduler-prev-next-button-padding: 0.5rem !default;
-$scheduler-prev-next-button-font-size: 1.25rem !default;
-$scheduler-button-line-height: 1.25rem !default;
+$scheduler-prev-next-button-font-size: var(--rz-icon-size) !default;
+$scheduler-button-line-height: var(--rz-icon-size) !default;
 $scheduler-today-button-margin-left: 0.5rem !default;
 
 $scheduler-view-button-border: var(--rz-border-normal) !default;

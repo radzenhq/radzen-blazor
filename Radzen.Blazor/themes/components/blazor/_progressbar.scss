@@ -1,6 +1,6 @@
 $progressbar-value-background-color: var(--rz-secondary) !default;
 $progressbar-background-color: var(--rz-base-200) !default;
-$progressbar-font-size: 0.875rem !default;
+$progressbar-font-size: var(--rz-body-font-size) !default;
 $progressbar-height: 1.25rem !default;
 $progressbar-border-radius: var(--rz-border-radius) !default;
 

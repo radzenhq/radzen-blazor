@@ -24,7 +24,7 @@ $paginator-dropdown-width: 80px !default;
 $paginator-dropdown-margin: $paginator-last-button-margin !default;
 
 $paginator-summary-padding: 0 1.25rem 0 0 !default;
-$paginator-summary-font-size: 0.875rem !default;
+$paginator-summary-font-size: var(--rz-body-font-size) !default;
 $paginator-summary-color: var(--rz-text-secondary-color) !default;
 
 $paginator-button-size: ".rz-button-md" !default;
