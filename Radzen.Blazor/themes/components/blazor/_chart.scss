@@ -1,6 +1,6 @@
 $chart-axis-color: var(--rz-base-300) !default;
 $chart-axis-label-color: var(--rz-text-tertiary-color) !default;
-$chart-axis-font-size: 0.875rem !default;
+$chart-axis-font-size: var(--rz-body-font-size) !default;
 $chart-tooltip-background: var(--rz-base-background-color) !default;
 $chart-tooltip-color: var(--rz-text-color) !default;
 

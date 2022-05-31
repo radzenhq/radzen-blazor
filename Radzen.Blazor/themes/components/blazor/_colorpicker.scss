@@ -75,6 +75,7 @@ button.rz-colorpicker-trigger {
   outline: none;
 
   .rzi {
+    font-size: var(--rz-icon-size);
     &:before {
       content: 'arrow_drop_down';
     }

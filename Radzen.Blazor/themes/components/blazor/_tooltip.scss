@@ -3,7 +3,7 @@ $tooltip-color: var(--rz-text-contrast-color) !default;
 $tooltip-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15) !default;
 $tooltip-padding: 0.25rem 0.5rem !default;
 $tooltip-border-radius: var(--rz-border-radius) !default;
-$tooltip-font-size: 0.875rem !default;
+$tooltip-font-size: var(--rz-body-font-size) !default;
 
 // Tooltip CSS variables
 

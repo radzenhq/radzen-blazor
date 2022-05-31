@@ -12,9 +12,9 @@ $checkbox-checked-border: var(--rz-input-border) !default;
 $checkbox-checked-icon-background-color: transparent !default;
 $checkbox-checked-icon-border-radius: 0 !default;
 
-$checkbox-icon-width: 0.875rem !default;
+$checkbox-icon-width: var(--rz-body-font-size) !default;
 $checkbox-icon-height: $checkbox-icon-width !default;
-$checkbox-icon-font-size: 0.875rem !default;
+$checkbox-icon-font-size: var(--rz-body-font-size) !default;
 
 $checkbox-tri-icon-width: $checkbox-icon-width !default;
 $checkbox-tri-icon-height: $checkbox-icon-width !default;

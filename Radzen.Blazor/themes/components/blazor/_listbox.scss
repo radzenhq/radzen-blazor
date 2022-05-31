@@ -10,7 +10,7 @@ $listbox-item-margin: 0 !default;
 $listbox-checkbox-margin: 0 0.5rem 0 0 !default;
 
 $listbox-header-padding: 0.5rem !default;
-$listbox-header-icon-width: 1.25rem !default;
+$listbox-header-icon-width: var(--rz-icon-size) !default;
 $listbox-header-icon-height: $listbox-header-icon-width !default;
 $listbox-header-icon-margin: 0 !default;
 

@@ -1,4 +1,4 @@
-$dropdown-trigger-icon-width: 1.25rem !default;
+$dropdown-trigger-icon-width: var(--rz-icon-size) !default;
 $dropdown-trigger-icon-height: $dropdown-trigger-icon-width !default;
 $dropdown-trigger-icon-margin: 0 0.5rem 0 0 !default;
 
@@ -218,7 +218,7 @@ $dropdown-panel-border: var(--rz-input-border) !default;
   margin: var(--rz-dropdown-items-margin);
 }
 
-@mixin dropdown-item($radius: $border-radius) {
+@mixin dropdown-item($radius: $rz-border-radius) {
   cursor: default;
   font-size: var(--rz-dropdown-item-font-size);
 
@@ -243,7 +243,7 @@ $dropdown-panel-border: var(--rz-input-border) !default;
   }
 }
 
-@mixin dropdown-item-hover($radius: $border-radius) {
+@mixin dropdown-item-hover($radius: $rz-border-radius) {
   &:hover {
     background-color: var(--rz-dropdown-item-hover-background-color);
     color: var(--rz-dropdown-item-hover-color);
