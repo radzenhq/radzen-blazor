@@ -46,5 +46,6 @@ $sidebar-toggle-margin: 0 1rem 0 0 !default;
   .rzi {
     width: var(--rz-sidebar-toggle-icon-width);
     height: var(--rz-sidebar-toggle-icon-height);
+    font-size: var(--rz-sidebar-toggle-icon-width);
   }
 }
