@@ -17,6 +17,7 @@ $menu-top-item-hover-background-color: transparent !default;
 $menu-top-item-background-color: $menu-background-color !default;
 $menu-top-item-color: $menu-item-color !default;
 
+$context-menu-padding: 0 !default;
 $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
 
 // Menu CSS variables
@@ -41,6 +42,7 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
   --rz-menu-top-item-background-color: #{$menu-top-item-background-color};
   --rz-menu-top-item-color: #{$menu-top-item-color};
 
+  --rz-context-menu-padding: #{$context-menu-padding};
   --rz-context-menu-box-shadow: #{$context-menu-box-shadow};
 }
 
@@ -52,6 +54,7 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
 box-shadow: var(--rz-context-menu-box-shadow);
 border: var(--rz-menu-border);
 border-radius: var(--rz-menu-border-radius);
+
 }
 
 .rz-menu:not(.rz-profile-menu) {
@@ -111,7 +114,7 @@ background-color: var(--rz-menu-top-item-background-color);
   list-style: none;
   overflow: hidden;
   position: absolute;
-  padding: 0;
+  padding: var(--rz-context-menu-padding);
   margin: 0;
   min-width: 100%;
   box-shadow: var(--rz-context-menu-box-shadow);
