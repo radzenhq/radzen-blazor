@@ -122,8 +122,32 @@ $source-sans-path: '../fonts';
   @font-face {
     font-family: 'Roboto';
     font-style: normal;
+    font-weight: 300;
+    src: local(''),
+        url('#{$source-sans-path}/roboto-v30-latin-300.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
     font-weight: 400;
-    src: local('Roboto'), local('Roboto-Regular'),
-      url('#{$source-sans-path}/roboto-v15-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+    src: local(''),
+        url('#{$source-sans-path}/roboto-v30-latin-regular.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 500;
+    src: local(''),
+        url('#{$source-sans-path}/roboto-v30-latin-500.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    src: local(''),
+        url('#{$source-sans-path}/roboto-v30-latin-700.woff') format('woff');
   }
 }
