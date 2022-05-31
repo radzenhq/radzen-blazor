@@ -52,7 +52,7 @@ $validator-transform: translateY(12px) !default;
   transform: var(--rz-validator-transform);
   box-shadow: var(--rz-validator-shadow);
   padding: var(--rz-validator-padding);
-  border-radius: $border-radius;
+  border-radius: var(--rz-border-radius);
   color: var(--rz-validator-color);
   pointer-events: none;
 
