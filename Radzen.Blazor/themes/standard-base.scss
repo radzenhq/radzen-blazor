@@ -119,16 +119,23 @@ $rz-theme-colors: map-merge(
 
 $rz-border-width: 1px !default;
 $rz-border-radius: 4px !default;
+$rz-root-font-size: 16px !default;
+$rz-body-font-size: 0.875rem !default;
+$rz-body-line-height: 1.429 !default;
+$rz-icon-size: 1.25rem !default;
 
 $rz-theme-constants: () !default;
 $rz-theme-constants: map-merge(
   (
     "rz-border-width": $rz-border-width,
     "rz-border-radius": $rz-border-radius,
+    "rz-root-font-size": $rz-root-font-size,
+    "rz-body-font-size": $rz-body-font-size,
+    "rz-body-line-height": $rz-body-line-height,
+    "rz-icon-size": $rz-icon-size,
   ),
   $rz-theme-constants
 );
-
 
 // Global CSS variables
 
