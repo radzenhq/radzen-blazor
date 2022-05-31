@@ -28,23 +28,22 @@
             <label>@UrlText</label>
             <RadzenTextBox @bind-Value=@attributes.Href style="width: 100%" />
         </div>
-        @if (string.IsNullOrEmpty(attributes.InnerHtml))
-            {
-                <div class="rz-html-editor-dialog-item">
-                    <label>@LinkText</label>
-                    <RadzenTextBox @bind-Value=@attributes.InnerText style="width: 100%" />
-                </div>
-            }
-            <div class="rz-html-editor-dialog-item">
-                <RadzenCheckBox @bind-Value=@blank />
-                <label>@OpenInNewWindowText</label>
-            </div>
-            <div class="rz-html-editor-dialog-buttons">
-                <RadzenButton Text=@OkText Click="()=> ds.Close(true)" />
-                <RadzenButton Text=@CancelText Click="()=> ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
-            </div>
+        @if (string.IsNullOrWhiteSpace(attributes.InnerHtml) || attributes.InnerHtml == "<br>")
+        {
+        <div class="rz-html-editor-dialog-item">
+            <label>@LinkText</label>
+            <RadzenTextBox @bind-Value=@attributes.InnerText style="width: 100%" />
         </div>
-    );
+        }
+        <div class="rz-html-editor-dialog-item">
+            <RadzenCheckBox @bind-Value=@blank />
+            <label>@OpenInNewWindowText</label>
+        </div>
+        <div class="rz-html-editor-dialog-buttons">
+            <RadzenButton Text=@OkText Click="()=> ds.Close(true)" />
+            <RadzenButton Text=@CancelText Click="()=> ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+        </div>
+    </div>);
 
         await Editor.RestoreSelectionAsync();
 
