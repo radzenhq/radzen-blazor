@@ -2,7 +2,7 @@ $fieldset-border: var(--rz-border-normal) !default;
 $fieldset-border-radius: 0 !default;
 $fieldset-padding: 1.25rem !default;
 $fieldset-legend-color: var(--rz-text-tertiary-color) !default;
-$fieldset-legend-font-size: 0.875rem !default;
+$fieldset-legend-font-size: var(--rz-body-font-size) !default;
 $fieldset-legend-padding: 0 1rem !default;
 
 $fieldset-toggle-width: 1.125rem !default;
