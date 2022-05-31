@@ -6,7 +6,7 @@ $profile-menu-border-radius: var(--rz-border-radius) !default;
 $profile-menu-toggle-button-color: var(--rz-secondary) !default;
 
 $profile-menu-item-hover-background-color: var(--rz-secondary) !default;
-$profile-menu-item-icon-width: 1.25rem !default;
+$profile-menu-item-icon-width: var(--rz-icon-size) !default;
 $profile-menu-item-icon-height: $profile-menu-item-icon-width !default;
 $profile-menu-item-icon-font-size: $profile-menu-item-icon-height !default;
 $profile-menu-item-icon-margin: 0 0.5rem 0 0 !default;
@@ -45,10 +45,10 @@ ul.rz-profile-menu {
   .rz-navigation-menu {
     border-radius: var(--rz-profile-menu-border-radius);
     background-color: var(--rz-profile-menu-background-color);
-    box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06);
+    box-shadow: var(--rz-context-menu-box-shadow);
     overflow: hidden;
     margin-bottom: 0;
-    padding: 0;
+    padding: var(--rz-context-menu-padding);
     position: absolute;
     text-align: left;
     top: calc(100% - 2px);

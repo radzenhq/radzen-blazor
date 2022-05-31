@@ -54,7 +54,7 @@ $tree-transition: var(--rz-transition-all) !default;
   margin-left: -1rem;
   width: 1rem;
   height: 1.5rem;
-  font-size: 1.25rem;
+  font-size: var(--rz-icon-size);
   line-height: 1.5rem;
   text-align: center;
   color: var(--rz-tree-node-toggle-color);

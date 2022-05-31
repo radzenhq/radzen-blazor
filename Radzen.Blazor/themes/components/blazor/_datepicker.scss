@@ -1,4 +1,4 @@
-$datepicker-trigger-icon-width: 1.25rem !default;
+$datepicker-trigger-icon-width: var(--rz-icon-size) !default;
 $datepicker-trigger-icon-height: $datepicker-trigger-icon-width !default;
 $datepicker-line-height: 1.25rem !default;
 $datepicker-trigger-icon-color: var(--rz-text-secondary-color) !default;
@@ -20,7 +20,7 @@ $datepicker-calendar-padding: 0.5rem 0.875rem !default;
 $datepicker-calendar-header-font-size: 0.625rem !default;
 $datepicker-calendar-header-text-transform: uppercase !default;
 $datepicker-calendar-header-color: var(--rz-text-tertiary-color) !default;
-$datepicker-calendar-font-size: 0.875rem !default;
+$datepicker-calendar-font-size: var(--rz-body-font-size) !default;
 $datepicker-calendar-color: var(--rz-text-color) !default;
 $datepicker-calendar-hover-color: var(--rz-text-contrast-color) !default;
 $datepicker-calendar-hover-background-color: var(--rz-secondary-light) !default;

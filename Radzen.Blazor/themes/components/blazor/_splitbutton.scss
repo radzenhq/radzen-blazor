@@ -5,7 +5,7 @@ $splitbutton-menu-button-border: var(--rz-border-primary) !default;
 $splitbutton-menu-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06) !default;
 $splitbutton-menu-min-width: 10rem !default;
 
-$splitbutton-padding:  0.5rem !default;
+$splitbutton-padding: 0.5rem !default;
 $splitbutton-background-color: var(--rz-primary) !default;
 $splitbutton-border-radius: var(--rz-border-radius) !default;
 
@@ -90,6 +90,13 @@ $splitbutton-border-radius: var(--rz-border-radius) !default;
 
   .rz-button-text {
     display: none;
+  }
+
+  .rzi {
+    font-size: var(--rz-icon-size);
+    height: var(--rz-icon-size);
+    line-height: var(--rz-icon-size);
+    width: var(--rz-icon-size);
   }
 
   .rzi-chevron-down {
