@@ -11,6 +11,7 @@ $headings: (
   h6: (font-size: 0.75rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem)
 ) !default;
 
+// Legacy Headings
 @each $name, $heading in $headings {
   #{$name}.rz-heading {
     @each $name, $value in $heading {
@@ -48,18 +49,79 @@ $headings-thin: (
   }
 }
 
+// Typography
+
+// Text
+$text: (
+  display-h1: (font-size: 2rem, line-height: 1.1875em, font-weight: 700, letter-spacing: -0.04em, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  display-h2: (font-size: 1.5rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.03em, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  display-h3: (font-size: 1.125rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.75rem),
+  display-h4: (font-size: 1rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  display-h5: (font-size: 0.875rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  display-h6: (font-size: 0.75rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h1: (font-size: 2rem, line-height: 1.1875em, font-weight: 700, letter-spacing: -0.04em, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  h2: (font-size: 1.5rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.03em, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  h3: (font-size: 1.125rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.75rem),
+  h4: (font-size: 1rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h5: (font-size: 0.875rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h6: (font-size: 0.75rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  subtitle1: (font-size: 1rem, line-height: 1.25em,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  subtitle2: (font-size: 0.875rem, line-height: 1.25em,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  body1: (font-size: 1rem, line-height: 1.25em,  font-weight: 400, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  body2: (font-size: 0.875rem, line-height: 1.25em,  font-weight: 400, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  button: (),
+  caption: (),
+  overline:  (),
+) !default;
+
+@each $element, $property in $text {
+  .rz-text-#{$element} {
+    @each $property, $value in $property {
+      #{$property}: #{$value};
+    }
+  }
+}
+
+//Text Align
+$text-align: (
+  start: (text-align: start),
+  end: (text-align: end),
+  left: (text-align: left),
+  right: (text-align: right),
+  center: (text-align: center),
+  justify: (text-align: justify),
+  justify-all: (text-align: justify-all),
+  match-parent: (text-align: match-parent),
+) !default;
+
+@each $name, $property in $text-align {
+  .rz-text-align-#{$name} {
+    @each $property, $value in $property {
+      #{$property}: #{$value};
+    }
+  }
+}
+
+// Body
+:root {
+  font-size: var(--rz-root-font-size);
+}
+
+body {
+  font-size: var(--rz-body-font-size);
+  line-height: var(--rz-body-line-height);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 // Paragraph
-
-$paragraph-line-height: 1.429 !default;
-
 @if $bootstrap {
   p {
-    line-height: $paragraph-line-height;
+    line-height: var(--rz-body-line-height);
   }
 }
 
 // Label
-
 .rz-label {
   margin-bottom: 0;
 }
@@ -71,17 +133,9 @@ $paragraph-line-height: 1.429 !default;
 }
 
 // Link
-$link-color: $default-link !default;
+$link-color: var(--rz-secondary) !default;
 
+// Text selection
 ::selection {
-  background-color: $rz-primary-lighter;
-}
-
-// Body
-
-body {
-  font-size: 0.875rem;
-  line-height: $paragraph-line-height;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--rz-primary-lighter);
 }
