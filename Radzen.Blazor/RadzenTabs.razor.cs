@@ -237,5 +237,10 @@ namespace Radzen.Blazor
                 shouldRender = true;
             }
         }
+
+        internal RadzenTabsItem FirstVisibleTab()
+        {
+            return tabs.Where(t => t.Visible).FirstOrDefault();
+        }
     }
 }

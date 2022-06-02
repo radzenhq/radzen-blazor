@@ -158,6 +158,15 @@ namespace Radzen.Blazor
             {
                 Tabs?.SelectTab(this);
             }
+
+            if (visibleChanged && Tabs?.RenderMode == TabRenderMode.Client)
+            {
+                var firstTab = Tabs?.FirstVisibleTab();
+                if (firstTab != null)
+                {
+                    await Tabs.SelectTabOnClient(firstTab);
+                }
+            }
         }
 
         /// <inheritdoc />
