@@ -259,7 +259,10 @@ namespace Radzen
         {
             this.firstRender = firstRender;
 
-            await ReloadOnFirstRender();
+            if (firstRender)
+            {
+                await ReloadOnFirstRender();
+            }
 
             await base.OnAfterRenderAsync(firstRender);
         }
