@@ -15,4 +15,8 @@
 .rz-breadcrumb-item {
     display: inline-flex;
     align-items: center;
+
+    .rz-link {
+        display: inline-flex;
+    }
 }
