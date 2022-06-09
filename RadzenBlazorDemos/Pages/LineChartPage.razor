@@ -17,7 +17,7 @@
                     <RadzenLineSeries Smooth="@smooth" Data="@revenue2020" CategoryProperty="Date" Title="2020" ValueProperty="Revenue">
                         <RadzenMarkers MarkerType="MarkerType.Circle" />
                     </RadzenLineSeries>
-                    <RadzenCategoryAxis Padding="20" FormatString="{0:MMM}" />
+                    <RadzenCategoryAxis TickDistance="80" Padding="20" FormatString="{0:MMM}" />
                     <RadzenValueAxis Formatter="@FormatAsUSD">
                         <RadzenGridLines Visible="true" />
                         <RadzenAxisTitle Text="Revenue in USD" />

@@ -67,7 +67,13 @@ namespace Radzen.Blazor
         /// <value>The ticks.</value>
         public RadzenTicks Ticks { get; set; } = new RadzenTicks();
 
-        internal int TickDistance { get; set; } = 100;
+        /// <summary>
+        /// Gets or sets the pixel distance between axis ticks. It is used to calculate the number of visible ticks depending on the available space. Set to 100 by default;
+        /// Setting <see cref="Step" /> will override this value.
+        /// </summary>
+        /// <value>The desired pixel distance between ticks.</value>
+        [Parameter]
+        public int TickDistance { get; set; } = 100;
 
         /// <summary>
         /// Specifies the minimum value of the axis.
