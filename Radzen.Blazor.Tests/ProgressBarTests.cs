@@ -118,5 +118,19 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"style=""width: {Math.Min(value / max * 100, 100).ToInvariantString()}%;""", component.Markup);
         }
+
+        [Fact]
+        public void ProgressBar_Renders_ProgressBarStyle()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenProgressBar>();
+
+            component.SetParametersAndRender(parameters=>parameters.Add(p=>p.ProgressBarStyle, ProgressBarStyle.Success));
+            Assert.Contains(@$"rz-progressbar-value-success", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Info));
+            Assert.Contains(@$"rz-progressbar-value-info", component.Markup);
+        }
     }
 }
