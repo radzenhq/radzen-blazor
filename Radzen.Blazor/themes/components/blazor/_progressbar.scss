@@ -4,6 +4,36 @@ $progressbar-font-size: 1rem !default;
 $progressbar-height: 1.25rem !default;
 $progressbar-border-radius: $border-radius !default;
 
+$progressbar-styles: () !default;
+
+$progressbar-styles: map-merge(
+  (
+    primary: (
+      background-color: $primary
+    ),
+    light: (
+      background-color: $light
+    ),
+    secondary: (
+      background-color: $secondary
+    ),
+    info: (
+      background-color: $info
+    ),
+    warning: (
+      background-color: $warning
+    ),
+    danger: (
+      background-color: $danger
+    ),
+    success: (
+      background-color: $success
+    )
+  ),
+  $progressbar-styles
+);
+
+
 .rz-progressbar {
   border-radius: $progressbar-border-radius;
   height: $progressbar-height;
@@ -22,6 +52,15 @@ $progressbar-border-radius: $border-radius !default;
   width: 100%;
 }
 
+@each $style, $progressbar in $progressbar-styles {
+    .rz-progressbar-value-#{$style} {
+        @each $name, $value in $progressbar {
+            #{$name}: #{$value};
+        }
+    }
+}
+
+
 .rz-progressbar-label {
   position: relative;
   width: 100%;
@@ -30,11 +69,11 @@ $progressbar-border-radius: $border-radius !default;
   line-height: $progressbar-font-size;
 }
 
+
 .rz-progressbar-indeterminate {
   overflow: hidden;
 
   .rz-progressbar-value {
-    background-color: transparent;
 
     &:before {
       content: '';

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
+using System.Collections.Generic;
 
 namespace Radzen.Blazor
 {
@@ -17,6 +18,21 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return Mode == ProgressBarMode.Determinate ? "rz-progressbar rz-progressbar-determinate" : "rz-progressbar rz-progressbar-indeterminate";
+        }
+
+        /// <summary>
+        ///  Gets the ProgressBarValue CSS classes.
+        /// </summary>
+        private string GetProgressBarValueClasses()
+        {
+            var progressBarValueClasses = new List<string>
+            {
+                "rz-progressbar-value",
+                $"rz-progressbar-value-{ProgressBarStyle.ToString().ToLowerInvariant()}",
+                "rz-progressbar-value-animate"
+            };
+
+            return string.Join(" ", progressBarValueClasses);
         }
 
         /// <summary>
@@ -60,5 +76,12 @@ namespace Radzen.Blazor
         /// <value>The value changed callback.</value>
         [Parameter]
         public Action<double> ValueChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the progress bar style.
+        /// </summary>
+        /// <value>The progress bar style.</value>
+        [Parameter]
+        public ProgressBarStyle ProgressBarStyle { get; set; }
     }
-}
+} 
