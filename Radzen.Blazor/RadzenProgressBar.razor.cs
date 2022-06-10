@@ -17,22 +17,24 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return Mode == ProgressBarMode.Determinate ? "rz-progressbar rz-progressbar-determinate" : "rz-progressbar rz-progressbar-indeterminate";
-        }
-
-        /// <summary>
-        ///  Gets the ProgressBarValue CSS classes.
-        /// </summary>
-        private string GetProgressBarValueClasses()
-        {
-            var progressBarValueClasses = new List<string>
+            var classList=new List<string>()
             {
-                "rz-progressbar-value",
-                $"rz-progressbar-value-{ProgressBarStyle.ToString().ToLowerInvariant()}",
-                "rz-progressbar-value-animate"
+                "rz-progressbar"
             };
 
-            return string.Join(" ", progressBarValueClasses);
+            switch (Mode)
+            {
+                case ProgressBarMode.Determinate:
+                    classList.Add("rz-progressbar-determinate");
+                    classList.Add($"rz-progressbar-determinate-{ProgressBarStyle.ToString().ToLowerInvariant()}");
+                    break;
+                case ProgressBarMode.Indeterminate:
+                    classList.Add("rz-progressbar-indeterminate");
+                    classList.Add($"rz-progressbar-indeterminate-{ProgressBarStyle.ToString().ToLowerInvariant()}");
+                    break;
+            }
+
+            return string.Join(" ", classList);
         }
 
         /// <summary>
