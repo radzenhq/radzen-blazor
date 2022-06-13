@@ -77,7 +77,7 @@
         <div style="padding: 1rem">
             <RadzenTextBox Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" />
         </div>
-        <RadzenPanelMenu Match="NavLinkMatch.Prefix">
+        <RadzenPanelMenu Match="NavLinkMatch.Prefix" Click="@PanelMenuClick">
             @foreach (var category in examples)
             {
                 <NavigationItem @bind-Expanded=@category.Expanded Example=@category>
@@ -132,9 +132,16 @@
 
     void ChangeTheme(object value)
     {
-        
         var url = UriHelper.GetUriWithQueryParameter("theme", $"{value}");
 
         UriHelper.NavigateTo(url, true);
+    }
+
+    async Task PanelMenuClick(MenuItemEventArgs args)
+    {
+        if (args.Path == "/")
+        { 
+            await JSRuntime.InvokeVoidAsync("document.location.reload");
+        }
     }
 }
