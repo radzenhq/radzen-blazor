@@ -87,16 +87,16 @@
                         {
                             if (example.Children != null)
                             {
-                                <NavigationItem Example=@example>
+                                <NavigationItem @bind-Expanded=@category.Expanded Example=@example>
                                 @foreach (var child in example.Children)
                                 {
-                                    <NavigationItem Example=@child />
+                                    <NavigationItem @bind-Expanded=@category.Expanded Example=@child />
                                 }
                                 </NavigationItem>
                             }
                             else
                             {
-                                <NavigationItem Example=@example />
+                                <NavigationItem @bind-Expanded=@category.Expanded Example=@example />
                             }
                         }
                     }
