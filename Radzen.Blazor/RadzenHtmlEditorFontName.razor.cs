@@ -36,6 +36,12 @@ namespace Radzen.Blazor
         public RenderFragment ChildContent { get; set; }
 
         /// <summary>
+        /// Specifies the placeholder displayed to the user. Set to <c>"Font"</c> by default.
+        /// </summary>
+        [Parameter]
+        public string Placeholder { get; set; } = "Font";
+
+        /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Font name"</c> by default.
         /// </summary>
         [Parameter]
