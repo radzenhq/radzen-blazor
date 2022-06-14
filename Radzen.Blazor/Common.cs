@@ -452,9 +452,17 @@ namespace Radzen
         /// </summary>
         Top,
         /// <summary>
+        /// The RadzenTabs titles are displayed at the top right side of the component.
+        /// </summary>
+        TopRight,
+        /// <summary>
         /// The RadzenTabs titles are displayed at the bottom of the component.
         /// </summary>
         Bottom,
+        /// <summary>
+        /// The RadzenTabs titles are displayed at the bottom right side of the component.
+        /// </summary>
+        BottomRight,
         /// <summary>
         /// The RadzenTabs titles are displayed at the left side of the component.
         /// </summary>
