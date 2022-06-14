@@ -192,7 +192,6 @@ namespace Radzen
                 Bottom = options != null && !string.IsNullOrEmpty(options.Bottom) ? options.Bottom : "",
                 Height = options != null && !string.IsNullOrEmpty(options.Height) ? options.Height : "",
                 ShowTitle = options != null ? options.ShowTitle : true,
-                TitleTagName = options != null && !string.IsNullOrEmpty(options.TitleTagName) ? options.TitleTagName : "span",
                 ShowClose = options != null ? options.ShowClose : true,
                 Resizable = options != null ? options.Resizable : false,
                 Draggable = options != null ? options.Draggable : false,
@@ -312,12 +311,6 @@ namespace Radzen
         public bool ShowTitle { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the name of the title tag.
-        /// </summary>
-        /// <value>The name of the title tag.</value>
-        public string TitleTagName { get; set; } = "span";
-
-        /// <summary>
         /// Gets or sets a value indicating whether to show the close button. Set to <c>true</c> by default.
         /// </summary>
         /// <value><c>true</c> if the close button is shown; otherwise, <c>false</c>.</value>
@@ -333,7 +326,6 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> if draggable; otherwise, <c>false</c>.</value>
         public bool Draggable { get; set; } = false;
-
         /// <summary>
         /// Gets or sets the X coordinate of the dialog. Maps to the <c>left</c> CSS attribute.
         /// </summary>
