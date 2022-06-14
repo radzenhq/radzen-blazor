@@ -10,7 +10,7 @@
             {
                 <Draggable Drag="@OnDrag" DragStart="@OnDragStart">
                     <div class="rz-dialog-titlebar">
-                        <span class="rz-dialog-title" id="rz-dialog-0-label">@((MarkupString)Dialog.Title)</span>
+                        <div class="rz-dialog-title" id="rz-dialog-0-label">@((MarkupString)Dialog.Title)</div>
                         @if (Dialog.Options.ShowClose)
                         {
                             <a href="javascript:void(0)" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
@@ -23,7 +23,7 @@
             else
             {
                 <div class="rz-dialog-titlebar">
-                    <span class="rz-dialog-title" id="rz-dialog-0-label">@((MarkupString)Dialog.Title)</span>
+                    <div class="rz-dialog-title" id="rz-dialog-0-label">@((MarkupString)Dialog.Title)</div>
                     @if (Dialog.Options.ShowClose)
                     {
                         <a href="javascript:void(0)" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
