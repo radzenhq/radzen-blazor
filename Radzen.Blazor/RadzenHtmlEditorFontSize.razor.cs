@@ -25,6 +25,12 @@ namespace Radzen.Blazor
         public RadzenHtmlEditor Editor { get; set; }
 
         /// <summary>
+        /// Specifies the placeholder displayed to the user. Set to <c>"Font size"</c> by default.
+        /// </summary>
+        [Parameter]
+        public string Placeholder { get; set; } = "Font size";
+
+        /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Font size"</c> by default.
         /// </summary>
         [Parameter]
