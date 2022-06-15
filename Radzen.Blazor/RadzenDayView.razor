@@ -6,9 +6,7 @@
 @code {
     public override RenderFragment Render()
     {
-        var date = Scheduler.CurrentDate.Date;
-
-        var appointments = Scheduler.GetAppointmentsInRange(date, date.AddDays(1)).ToList();
+        var appointments = Scheduler.GetAppointmentsInRange(StartDate, EndDate).ToList();
 
         return 
     @<CascadingValue Value=@Scheduler>
