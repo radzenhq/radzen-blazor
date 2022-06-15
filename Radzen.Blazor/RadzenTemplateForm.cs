@@ -228,6 +228,7 @@ namespace Radzen.Blazor
         /// Gets or sets the edit context.
         /// </summary>
         /// <value>The edit context.</value>
+        [Parameter]
         public EditContext EditContext { get; set; }
 
         /// <inheritdoc />
