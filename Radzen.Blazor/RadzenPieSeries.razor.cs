@@ -126,24 +126,18 @@ namespace Radzen.Blazor
 
       private async Task OnLegendClick(object data)
       {
-        if(Chart.SeriesClick.HasDelegate)
+        if(Chart.LegendClick.HasDelegate)
         {
           var category = Category(Chart.CategoryScale);
 
-          var args = new SeriesClickEventArgs
+          var args = new LegendClickEventArgs
           {
             Data = data,
             Title = GetTitle(),
-            Category = PropertyAccess.GetValue(data, CategoryProperty),
-            Value = PropertyAccess.GetValue(data, ValueProperty),
-            Point = new SeriesPoint
-            {
-              Category = category((TItem)data),
-              Value = Value((TItem)data)
-            }
+            IsVisible = true,
           };
 
-          await Chart.SeriesClick.InvokeAsync(args);
+          await Chart.LegendClick.InvokeAsync(args);
         }
       }
 

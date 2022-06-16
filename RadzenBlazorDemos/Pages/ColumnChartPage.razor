@@ -6,7 +6,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12 my-5">
-                <RadzenChart>
+                <RadzenChart SeriesClick=@OnSeriesClick LegendClick=@OnLegendClick>
                     <RadzenColumnSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
                     <RadzenColumnSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
                     <RadzenColumnOptions Radius="5" />
@@ -19,7 +19,23 @@
         </div>
     </div>
 </RadzenExample>
+<EventConsole @ref=@console Class="mt-4" />
+
+
 @code {
+
+    EventConsole console;
+
+    void OnSeriesClick(SeriesClickEventArgs args)
+    {
+        console.Log(args);
+    }
+
+    void OnLegendClick(LegendClickEventArgs args)
+    {
+        console.Log(args);
+    }
+
     class DataItem
     {
         public string Quarter { get; set; }

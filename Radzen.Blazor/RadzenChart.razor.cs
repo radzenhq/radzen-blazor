@@ -47,6 +47,12 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<SeriesClickEventArgs> SeriesClick { get; set; }
 
+        /// <summary>
+        /// A callback that will be invoked when the user clicks on a legend. 
+        /// </summary>
+        [Parameter]
+        public EventCallback<LegendClickEventArgs> LegendClick { get; set; }
+
         double? Width { get; set; }
 
         double? Height { get; set; }

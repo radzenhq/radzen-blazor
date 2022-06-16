@@ -10,7 +10,7 @@
                     <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
                     <RadzenLabel Text="Smooth" For="smooth" Style="margin-left: 8px; vertical-align: middle;" />
                 </RadzenCard>
-                <RadzenChart>
+                <RadzenChart SeriesClick=@OnSeriesClick LegendClick=@OnLegendClick>
                     <RadzenLineSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Title="2019" LineType="LineType.Dashed" ValueProperty="Revenue">
                         <RadzenMarkers MarkerType="MarkerType.Square" />
                     </RadzenLineSeries>
@@ -27,7 +27,23 @@
         </div>
     </div>
 </RadzenExample>
+<EventConsole @ref=@console Class="mt-4" />
+
+
 @code {
+
+    EventConsole console;
+
+    void OnSeriesClick(SeriesClickEventArgs args)
+    {
+        console.Log(args);
+    }
+
+    void OnLegendClick(LegendClickEventArgs args)
+    {
+        console.Log(args);
+    }
+
     bool smooth = false;
     class DataItem
     {

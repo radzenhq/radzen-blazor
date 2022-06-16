@@ -10,7 +10,7 @@
         </RadzenCard>
         <div class="row my-5">
             <div class="col-sm-12 col-lg-8">
-                <RadzenChart ColorScheme="@colorScheme">
+                <RadzenChart SeriesClick=@OnSeriesClick LegendClick=@OnLegendClick ColorScheme="@colorScheme">
                     @for (var year = 2013; year <= 2020; year++)
                     {
                         var currentYearRevenue = revenue.Where(r => r.Year == year).ToList();
@@ -21,7 +21,7 @@
                 </RadzenChart>
             </div>
             <div class="col-sm-12 col-lg-4">
-                <RadzenChart ColorScheme="@colorScheme">
+                <RadzenChart SeriesClick=@OnSeriesClick LegendClick=@OnLegendClick ColorScheme="@colorScheme">
                     <RadzenPieSeries Data="@revenue.Where(r => r.Year == 2020)" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
                 </RadzenChart>
             </div>
@@ -29,7 +29,7 @@
         <h3>Custom colors and styling</h3>
         <div class="row my-5">
             <div class="col-sm-12">
-                <RadzenChart>
+                <RadzenChart SeriesClick=@OnSeriesClick LegendClick=@OnLegendClick>
                     <RadzenAreaSeries Stroke="rgb(236,72,127)" StrokeWidth="2" Fill="rgba(236,72,127,.5)" Data="@revenue.Where(r => r.Year == 2020)" CategoryProperty="Quarter" ValueProperty="Revenue">
                         <ChildContent>
                             <RadzenMarkers MarkerType="MarkerType.Circle" Fill="#fff" Stroke="rgba(236,72,127)" StrokeWidth="2" Size="8" />
@@ -51,7 +51,22 @@
         </div>
     </div>
 </RadzenExample>
+<EventConsole @ref=@console Class="mt-4" />
+
+
 @code {
+
+    EventConsole console;
+
+    void OnSeriesClick(SeriesClickEventArgs args)
+    {
+        console.Log(args);
+    }
+
+    void OnLegendClick(LegendClickEventArgs args)
+    {
+        console.Log(args);
+    }
     IEnumerable<ColorScheme> colorSchemes = Enum.GetValues(typeof(ColorScheme)).Cast<ColorScheme>();
     ColorScheme colorScheme = ColorScheme.Palette;
 

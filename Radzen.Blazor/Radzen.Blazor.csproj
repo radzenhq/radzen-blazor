@@ -34,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\JewelleryCosting\DelaciRelativeComparer.razor" Link="DelaciRelativeComparer.razor" />
     <None Include="LICENSE.txt" Pack="true" PackagePath="" />
     <None Include="icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
@@ -53,16 +54,20 @@
     <Sass Include="$(MSBuildProjectDirectory)/themes/*.scss" Exclude="$(MSBuildProjectDirectory)/themes/_*.scss" Condition="'$(TargetFramework)' == 'net5.0'" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\..\JewelleryCosting\DelaciRelativeComparer.razor.cs" Link="DelaciRelativeComparer.razor.cs" />
+  </ItemGroup>
+
  <Target Name="Sass" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net5.0'">
     <PropertyGroup>
-      <_SassFileList>@(Sass->'&quot;%(FullPath)&quot;', ' ')</_SassFileList>
+      <_SassFileList>@(Sass->'"%(FullPath)"', ' ')</_SassFileList>
       <LibSassBuilderArgs>files $(_SassFileList) --outputstyle $(LibSassOutputStyle) --level $(LibSassOutputLevel)</LibSassBuilderArgs>
     </PropertyGroup>
     <Message Text="$(LibSassBuilderArgs)" Importance="$(LibSassMessageLevel)" />
     <Message Text="Converted SassFile list to argument" Importance="$(LibSassMessageLevel)" />
   </Target>
 
-  <Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net5.0'" >
+  <Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net5.0'">
     <ItemGroup>
         <CssFile Include="$(MSBuildProjectDirectory)/themes/*.css" />
     </ItemGroup>
