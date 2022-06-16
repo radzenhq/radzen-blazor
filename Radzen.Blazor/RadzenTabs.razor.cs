@@ -181,11 +181,11 @@ namespace Radzen.Blazor
             }
             else if(TabPosition == TabPosition.TopRight)
             {
-                positionCSS = "rz-tabview-top-right";
+                positionCSS = "rz-tabview-top rz-tabview-top-right";
             }
             else if (TabPosition == TabPosition.BottomRight)
             {
-                positionCSS = "rz-tabview-bottom-right";
+                positionCSS = "rz-tabview-bottom rz-tabview-bottom-right";
             }
 
             return $"rz-tabview {positionCSS}";

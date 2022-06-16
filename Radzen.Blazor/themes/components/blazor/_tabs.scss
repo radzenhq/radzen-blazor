@@ -119,28 +119,7 @@ $tabs-transition: none !default;
     }
 
     .rz-tabview-top-right > & {
-        flex-direction: row;
         justify-content: flex-end;
-
-        li {
-            border-top-width: 2px;
-            border-bottom-color: $tabs-tab-background-color;
-            border-radius: $tabs-border-radius $tabs-border-radius 0 0;
-
-            &:hover {
-                &:not(.rz-tabview-selected) {
-                    &:not(.rz-state-disabled) {
-                        border-top-color: $tabs-tab-selected-top-border-color;
-                    }
-                }
-            }
-        }
-
-        .rz-tabview-selected {
-            border-bottom-color: $tabs-background-color;
-            margin-bottom: -1px;
-            border-top-color: $tabs-tab-selected-top-border-color;
-        }
     }
 
     .rz-tabview-bottom > & {
@@ -169,29 +148,7 @@ $tabs-transition: none !default;
     }
 
     .rz-tabview-bottom-right > & {
-        flex-direction: row;
         justify-content: flex-end;
-
-        li {
-            border-bottom-width: 2px;
-            border-top-color: $tabs-tab-background-color;
-            border-radius: 0 0 $tabs-border-radius $tabs-border-radius;
-
-            &:hover {
-                &:not(.rz-tabview-selected) {
-                    &:not(.rz-state-disabled) {
-                        border-bottom-color: $tabs-tab-selected-top-border-color;
-                    }
-                }
-            }
-        }
-
-        .rz-tabview-selected {
-            border-top-color: $tabs-background-color;
-            margin-top: -1px;
-            padding-top: 1px;
-            border-bottom-color: $tabs-tab-selected-top-border-color;
-        }
     }
 
     .rz-tabview-left > & {
@@ -255,15 +212,7 @@ $tabs-transition: none !default;
         border-radius: 0 0 $border-radius $border-radius;
     }
 
-    .rz-tabview-top-right > & {
-        border-radius: 0 0 $border-radius $border-radius;
-    }
-
     .rz-tabview-bottom > & {
-        border-radius: $border-radius $border-radius 0 0;
-    }
-
-    .rz-tabview-bottom-right > & {
         border-radius: $border-radius $border-radius 0 0;
     }
 
