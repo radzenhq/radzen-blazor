@@ -1402,10 +1402,6 @@ namespace Radzen
     /// <value>The visibility.</value>
     public bool IsVisible { get; set; }
   }
-
-
-
-
   /// <summary>
   /// Supplies information about a <see cref="RadzenHtmlEditor.Execute" /> event that is being raised.
   /// </summary>
