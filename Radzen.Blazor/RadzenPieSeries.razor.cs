@@ -124,25 +124,8 @@ namespace Radzen.Blazor
             };
         }
 
-      private async Task OnLegendClick(object data)
-      {
-        if(Chart.LegendClick.HasDelegate)
-        {
-          var category = Category(Chart.CategoryScale);
-
-          var args = new LegendClickEventArgs
-          {
-            Data = data,
-            Title = GetTitle(),
-            IsVisible = true,
-          };
-
-          await Chart.LegendClick.InvokeAsync(args);
-        }
-      }
-
-      /// <inheritdoc />
-      public override bool Contains(double x, double y, double tolerance)
+        /// <inheritdoc />
+        public override bool Contains(double x, double y, double tolerance)
         {
             if (Items.Any())
             {

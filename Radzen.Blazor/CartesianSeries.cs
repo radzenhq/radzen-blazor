@@ -515,19 +515,17 @@ namespace Radzen.Blazor
 
             if (Chart.LegendClick.HasDelegate)
             {
-              var category = Category(Chart.CategoryScale);
+                var category = Category(Chart.CategoryScale);
 
-              var args = new LegendClickEventArgs
-              {
-                Data = this.Data,
-                Title = GetTitle(),
-                IsVisible=IsVisible,
-              };
+                var args = new LegendClickEventArgs
+                {
+                    Data = this.Data,
+                    Title = GetTitle(),
+                    IsVisible = IsVisible,
+                };
 
-              await Chart.LegendClick.InvokeAsync(args);
+                await Chart.LegendClick.InvokeAsync(args);
             }
-
-
         }
 
         /// <inheritdoc />
