@@ -3,6 +3,7 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -116,11 +117,28 @@ namespace Radzen.Blazor
                     builder.AddAttribute(3, nameof(LegendItem.MarkerSize), MarkerSize);
                     builder.AddAttribute(4, nameof(LegendItem.MarkerType), MarkerType);
                     builder.AddAttribute(5, nameof(LegendItem.Color), PickColor(Items.IndexOf(data), Fills));
+                    builder.AddAttribute(6, nameof(LegendItem.Click), EventCallback.Factory.Create(this, () => OnLegendClick(data)));
                     builder.CloseComponent();
                 };
             };
         }
 
+        private async Task OnLegendClick(object data)
+        {
+            if (Chart.LegendClick.HasDelegate)
+            {
+                var category = Category(Chart.CategoryScale);
+
+                var args = new LegendClickEventArgs
+                {
+                    Data = data,
+                    Title = GetTitle(),
+                    IsVisible = true,
+                };
+
+                await Chart.LegendClick.InvokeAsync(args);
+            }
+        }
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
