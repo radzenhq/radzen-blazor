@@ -22,6 +22,20 @@ namespace Radzen.Blazor
     public partial class RadzenDropDownDataGrid<TValue> : DropDownBase<TValue>
     {
         /// <summary>
+        /// Gets or sets the row render callback. Use it to set row attributes.
+        /// </summary>
+        /// <value>The row render callback.</value>
+        [Parameter]
+        public Action<RowRenderEventArgs<object>> RowRender { get; set; }
+
+        /// <summary>
+        /// Gets or sets the cell render callback. Use it to set cell attributes.
+        /// </summary>
+        /// <value>The cell render callback.</value>
+        [Parameter]
+        public Action<DataGridCellRenderEventArgs<object>> CellRender { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether popup should open on focus. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if popup should open on focus; otherwise, <c>false</c>.</value>
