@@ -681,7 +681,15 @@ window.Radzen = {
             popup.minWidth = true;
             popup.style.minWidth = parentRect.width + 'px';
         }
-    } 
+    }
+
+    if (window.chrome) {
+        var closestFrozenCell = popup.closest('.rz-frozen-cell');
+        if (closestFrozenCell) {
+            Radzen[id + 'FZL'] = { cell: closestFrozenCell, left: closestFrozenCell.style.left };
+            closestFrozenCell.style.left = '';
+        }
+    }
 
     popup.style.display = 'block';
 
@@ -810,6 +818,12 @@ window.Radzen = {
       if (popup.minWidth) {
           popup.style.minWidth = '';
       }
+
+      if (window.chrome && Radzen[id + 'FZL']) {
+        Radzen[id + 'FZL'].cell.style.left = Radzen[id + 'FZL'].left;
+        Radzen[id + 'FZL'] = null;
+      }
+
       popup.style.display = 'none';
     }
     document.removeEventListener('mousedown', Radzen[id]);
