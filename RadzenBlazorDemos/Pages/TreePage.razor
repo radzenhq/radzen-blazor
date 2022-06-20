@@ -4,11 +4,11 @@
 @using RadzenBlazorDemos.Models.Northwind
 @inject RadzenBlazorDemos.Data.NorthwindContext Northwind
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
-
+@inject ContextMenuService ContextMenuService
 <RadzenExample Name="Tree">
     <RadzenCard Class="my-5 mx-auto" style="max-width: 400px;">
         <h4>Inline definition</h4>
-        <RadzenTree Expand=@OnExpand Change=@OnChange Style="width: 100%; height: 300px">
+        <RadzenTree Expand=@OnExpand Change=@OnChange Style="width: 100%; height: 300px" ContextMenu=@(args => ShowContextMenuWithItems(args))>
             <RadzenTreeItem Text="BMW">
                 <ChildContent>
                     <RadzenTreeItem Text="M3" />
@@ -63,6 +63,25 @@
         if (args.Value is string text)
         {
             Log("Expand", $"Text: {text}");
+        }
+    }
+
+    void ShowContextMenuWithItems(MouseEventArgs args)
+    {
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Context menu item 1", Value = 1 },
+                new ContextMenuItem(){ Text = "Context menu item 2", Value = 2 },
+                new ContextMenuItem(){ Text = "Context menu item 3", Value = 3 },
+         }, OnMenuItemClick);
+    }
+
+    void OnMenuItemClick(MenuItemEventArgs args)
+    {
+        console.Log($"Menu item with Value={args.Value} clicked");
+        if(!args.Value.Equals(3) && !args.Value.Equals(4))
+        {
+            ContextMenuService.Close();
         }
     }
 }
