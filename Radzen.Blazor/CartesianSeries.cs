@@ -586,18 +586,16 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public virtual object DataAt(double x, double y)
         {
-            var first = Items.FirstOrDefault();
-            var last = Items.LastOrDefault();
+            if (Items.Any())
+            {
+                return Items.Select(item =>
+                {
+                    var distance = Math.Abs(TooltipX(item) - x);
+                    return new { Item = item, Distance = distance };
+                }).Aggregate((a, b) => a.Distance < b.Distance ? a : b).Item;
+            }
 
-            var category = Category(Chart.CategoryScale);
-
-            var startX = Chart.CategoryScale.Scale(category(first), true);
-            var endX = Chart.CategoryScale.Scale(category(last), true);
-
-            var count = Math.Max(Items.Count() - 1, 1);
-            var index = Convert.ToInt32((x - startX) / ((endX - startX) / count));
-
-            return Items.ElementAtOrDefault(index);
+            return null;
         }
 
         /// <summary>

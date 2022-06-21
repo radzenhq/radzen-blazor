@@ -20,6 +20,19 @@ var resolveCallbacks = [];
 var rejectCallbacks = [];
 
 window.Radzen = {
+    throttle: function (callback, delay) {
+        var timeout = null;
+        return function () {
+            var args = arguments;
+            var ctx = this;
+            if (!timeout) {
+                timeout = setTimeout(function () {
+                    callback.apply(ctx, args);
+                    timeout = null;
+                }, delay);
+            }
+        };
+    },
     mask: function (id, mask, pattern, characterPattern) {
       var el = document.getElementById(id);
       if (el) {
@@ -1042,15 +1055,14 @@ window.Radzen = {
     document.addEventListener('click', target.clickHandler);
   },
   destroyChart: function (ref) {
-    if (ref.mouseMoveHandler) {
-      ref.removeEventListener('mousemove', ref.mouseMoveHandler);
-      delete ref.mouseMoveHandler;
-    }
-    if (ref.clickHandler) {
-      ref.removeEventListener('click', ref.clickHandler);
-      delete ref.clickHandler;
-    }
-
+    ref.removeEventListener('mouseleave', ref.mouseLeaveHandler);
+    delete ref.mouseLeaveHandler;
+    ref.removeEventListener('mouseenter', ref.mouseEnterHandler);
+    delete ref.mouseEnterHandler;
+    ref.removeEventListener('mousemove', ref.mouseMoveHandler);
+    delete ref.mouseMoveHandler;
+    ref.removeEventListener('click', ref.clickHandler);
+    delete ref.clickHandler;
     this.destroyResizable(ref);
   },
   destroyGauge: function (ref) {
@@ -1085,11 +1097,21 @@ window.Radzen = {
     return {width: rect.width, height: rect.height};
   },
   createChart: function (ref, instance) {
-    ref.mouseMoveHandler = function (e) {
-      var rect = ref.getBoundingClientRect();
-      var x = e.clientX - rect.left;
-      var y = e.clientY - rect.top;
-      instance.invokeMethodAsync('MouseMove', x, y);
+    var inside = false;
+    ref.mouseMoveHandler = this.throttle(function (e) {
+      if (inside) {
+        var rect = ref.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+        instance.invokeMethodAsync('MouseMove', x, y);
+     }
+    }, 100);
+    ref.mouseEnterHandler = function () {
+        inside = true;
+    };
+    ref.mouseLeaveHandler = function () {
+        inside = false;
+        instance.invokeMethodAsync('MouseMove', -1, -1);
     };
     ref.clickHandler = function (e) {
       var rect = ref.getBoundingClientRect();
@@ -1098,6 +1120,8 @@ window.Radzen = {
       instance.invokeMethodAsync('Click', x, y);
     };
 
+    ref.addEventListener('mouseenter', ref.mouseEnterHandler);
+    ref.addEventListener('mouseleave', ref.mouseLeaveHandler);
     ref.addEventListener('mousemove', ref.mouseMoveHandler);
     ref.addEventListener('click', ref.clickHandler);
 
