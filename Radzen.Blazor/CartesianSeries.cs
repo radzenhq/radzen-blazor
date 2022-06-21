@@ -511,12 +511,9 @@ namespace Radzen.Blazor
         private async Task OnLegendItemClick()
         {
             IsVisible = !IsVisible;
-            await Chart.Refresh();
 
             if (Chart.LegendClick.HasDelegate)
             {
-                var category = Category(Chart.CategoryScale);
-
                 var args = new LegendClickEventArgs
                 {
                     Data = this.Data,
@@ -525,7 +522,11 @@ namespace Radzen.Blazor
                 };
 
                 await Chart.LegendClick.InvokeAsync(args);
+
+                IsVisible = args.IsVisible;
             }
+
+            await Chart.Refresh();
         }
 
         /// <inheritdoc />
