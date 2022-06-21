@@ -127,8 +127,6 @@ namespace Radzen.Blazor
         {
             if (Chart.LegendClick.HasDelegate)
             {
-                var category = Category(Chart.CategoryScale);
-
                 var args = new LegendClickEventArgs
                 {
                     Data = data,
