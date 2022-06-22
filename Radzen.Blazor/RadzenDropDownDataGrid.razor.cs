@@ -404,6 +404,7 @@ namespace Radzen.Blazor
             else
             {
                 selectedItem = null;
+                selectedItems.Clear();
             }
         }
 
