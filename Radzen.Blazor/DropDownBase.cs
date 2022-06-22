@@ -693,13 +693,20 @@ namespace Radzen
         /// <returns><c>true</c> if the specified item is selected; otherwise, <c>false</c>.</returns>
         internal bool isSelected(object item)
         {
-            if (Multiple)
+            if (LoadData.HasDelegate && !string.IsNullOrEmpty(ValueProperty))
             {
-                return selectedItems.IndexOf(item) != -1;
+                return IsItemSelectedByValue(PropertyAccess.GetValue(item, ValueProperty));
             }
             else
             {
-                return item == selectedItem;
+                if (Multiple)
+                {
+                    return selectedItems.IndexOf(item) != -1;
+                }
+                else
+                {
+                    return item == selectedItem;
+                }
             }
         }
 
@@ -936,7 +943,7 @@ namespace Radzen
                                     item = View.AsQueryable().Where($@"{ValueProperty} == @0", v).FirstOrDefault();
                                 }
 
-                                if (!object.Equals(item, null) && selectedItems.IndexOf(item) == -1)
+                                if (!object.Equals(item, null) && (LoadData.HasDelegate ? !IsItemSelectedByValue(v) : selectedItems.IndexOf(item) == -1))
                                 {
                                     selectedItems.Add(item);
                                 }
@@ -954,6 +961,12 @@ namespace Radzen
             {
                 selectedItem = null;
             }
+        }
+
+        internal bool IsItemSelectedByValue(object v)
+        {
+            return ((Multiple ? selectedItems : selectedItem != null ? new[] { selectedItem } : Enumerable.Empty<object>()) ?? Enumerable.Empty<object>())
+                .AsQueryable().Where($@"object.Equals({ValueProperty},@0)", v).Any();
         }
 
         /// <inheritdoc />
