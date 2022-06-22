@@ -918,12 +918,12 @@ namespace Radzen
                 }
                 else
                 {
-                    var values = value as dynamic;
+                    var values = value as IEnumerable;
                     if (values != null)
                     {
                         if (!string.IsNullOrEmpty(ValueProperty))
                         {
-                            foreach (object v in values)
+                            foreach (object v in values.ToDynamicList())
                             {
                                 dynamic item;
 
