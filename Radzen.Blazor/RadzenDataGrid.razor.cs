@@ -53,7 +53,6 @@ namespace Radzen.Blazor
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
             var view = AllowPaging ? PagedView : View;
-            var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
             var top = request.Count;
 
             if(top <= 0)
@@ -62,6 +61,8 @@ namespace Radzen.Blazor
             }
 
             await InvokeLoadData(request.StartIndex, top);
+            
+            var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
 
             virtualDataItems = (LoadData.HasDelegate ? Data : itemToInsert != null ? (new[] { itemToInsert }).Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top)).ToList();
 
@@ -1394,7 +1395,6 @@ namespace Radzen.Blazor
                 {
                     if(virtualize != null)
                     {
-                        await virtualize.RefreshDataAsync();
                         await virtualize.RefreshDataAsync();
                     }
 
