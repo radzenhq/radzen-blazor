@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-xl-2 mb-4">
             <h3>Filter case sensitivity</h3>
-            <RadzenDropDown @bind-Value="filterCaseSensitivity" Data="@(Enum.GetValues(typeof(FilterCaseSensitivity)))">
+            <RadzenDropDown @bind-Value="filterCaseSensitivity" Data="@(Enum.GetValues(typeof(FilterCaseSensitivity)))" Change="@(args => grid.Reload())">
                 <Template>
                     @Enum.GetName(context)
                 </Template>
@@ -20,7 +20,7 @@
         </div>
         <div class="col-xl-6 mb-4">
             <h3>Filter logical operator</h3>
-            <RadzenDropDown @bind-Value="logicalFilterOperator" Data="@(Enum.GetValues(typeof(LogicalFilterOperator)))">
+            <RadzenDropDown @bind-Value="logicalFilterOperator" Data="@(Enum.GetValues(typeof(LogicalFilterOperator)))" Change="@(args => grid.Reload())">
                 <Template>
                     @Enum.GetName(context)
                 </Template>
@@ -28,7 +28,7 @@
         </div>
     </div>
     <h3>Orders</h3>
-    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" 
+    <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 
         FilterMode="FilterMode.SimpleWithMenu" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders" TItem="Order" ColumnWidth="300px" 
         FilterCaseSensitivity="@filterCaseSensitivity"
         LogicalFilterOperator="@logicalFilterOperator">
@@ -51,6 +51,7 @@
 </RadzenExample>
 @code {
     IEnumerable<Order> orders;
+    RadzenDataGrid<Order> grid;
 
     FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.CaseInsensitive;
     LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.Or;
