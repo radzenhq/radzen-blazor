@@ -56,6 +56,9 @@
             <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNotNull))" @onclick="@(args => ApplyFilter(FilterOperator.IsNotNull))" style="display: block;">
                 <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotNull)</span><span>@Grid.IsNotNullText</span>
             </li>
+            <li class="rz-multiselect-item" @onclick="@(args => ClearFilter())" style="display:block;">
+                <span class="rz-filter-menu-symbol">x</span><span>@Grid.ClearFilterText</span>
+            </li>
         </ul>
     </div>
 </div>
@@ -100,6 +103,14 @@
             SecondFilterOperator = Column.GetSecondFilterOperator(),
             LogicalFilterOperator = Column.GetLogicalFilterOperator()
         });
+
+        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{Column.GetFilterProperty()}");
+        await Grid.Reload();
+    }
+
+    protected async Task ClearFilter()
+    {
+        Column.ClearFilters();
 
         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{Column.GetFilterProperty()}");
         await Grid.Reload();
