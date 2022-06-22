@@ -1340,7 +1340,7 @@ namespace Radzen.Blazor
 
             if (resetColumnState)
             {
-                allColumns.ToList().ForEach(c => { c.SetFilterValue(null); c.SetFilterValue(null, false); c.SetSecondFilterOperator(FilterOperator.Equals); });
+                allColumns.ToList().ForEach(c => c.ClearFilters());
                 allColumns.ToList().ForEach(c => { c.ResetSortOrder(); });
                 sorts.Clear();
            }
