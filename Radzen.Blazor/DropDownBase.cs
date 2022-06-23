@@ -482,7 +482,7 @@ namespace Radzen
                     Debounce(DebounceFilter, FilterDelay);
                 }
             }
-            else if(AllowFiltering && isFilter)
+            else if (AllowFiltering && isFilter)
             {
                 Debounce(DebounceFilter, FilterDelay);
             }
@@ -536,7 +536,7 @@ namespace Radzen
                 else
                 {
                     await LoadData.InvokeAsync(await GetLoadDataArgs());
-                }   
+                }
             }
 
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
@@ -856,13 +856,29 @@ namespace Radzen
             }
             else
             {
-                if (selectedItems.IndexOf(item) == -1)
+                if (!string.IsNullOrEmpty(ValueProperty))
                 {
-                    selectedItems.Add(item);
+                    if (LoadData.HasDelegate)
+                    {
+                        var v = PropertyAccess.GetValue(item, ValueProperty);
+                        var si = (selectedItems ?? Enumerable.Empty<object>()).AsQueryable().Where($@"object.Equals({ValueProperty},@0)", v).FirstOrDefault();
+                        if (si == null)
+                        {
+                            selectedItems.Add(item);
+                        }
+                        else
+                        {
+                            selectedItems.Remove(si);
+                        }
+                    }
+                    else
+                    {
+                        UpdateSelectedItems(item);
+                    }
                 }
                 else
                 {
-                    selectedItems.Remove(item);
+                    UpdateSelectedItems(item);
                 }
 
                 if (!string.IsNullOrEmpty(ValueProperty))
@@ -891,6 +907,18 @@ namespace Radzen
                 await Change.InvokeAsync(internalValue);
             }
             StateHasChanged();
+        }
+
+        internal void UpdateSelectedItems(object item)
+        {
+            if (selectedItems.IndexOf(item) == -1)
+            {
+                selectedItems.Add(item);
+            }
+            else
+            {
+                selectedItems.Remove(item);
+            }
         }
 
         /// <summary>
