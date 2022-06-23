@@ -36,6 +36,28 @@ namespace Radzen.Blazor
         public Action<DataGridCellRenderEventArgs<object>> CellRender { get; set; }
 
         /// <summary>
+        /// Executes CellRender callback.
+        /// </summary>
+        protected virtual void OnCellRender(DataGridCellRenderEventArgs<object> args)
+        {
+            if (CellRender != null)
+            {
+                CellRender(args);
+            }
+        }
+
+        /// <summary>
+        /// Executes RowRender callback.
+        /// </summary>
+        protected virtual void OnRowRender(RowRenderEventArgs<object> args)
+        {
+            if (RowRender != null)
+            {
+                RowRender(args);
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether popup should open on focus. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if popup should open on focus; otherwise, <c>false</c>.</value>
