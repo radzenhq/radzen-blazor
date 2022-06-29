@@ -17,6 +17,13 @@ namespace Radzen.Blazor
     public partial class RadzenDropDown<TValue> : DropDownBase<TValue>
     {
         /// <summary>
+        /// Gets or sets the value template.
+        /// </summary>
+        /// <value>The value template.</value>
+        [Parameter]
+        public RenderFragment<dynamic> ValueTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether popup should open on focus. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if popup should open on focus; otherwise, <c>false</c>.</value>
