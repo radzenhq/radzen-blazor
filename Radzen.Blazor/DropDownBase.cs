@@ -251,6 +251,16 @@ namespace Radzen
             StateHasChanged();
         }
 
+        internal bool IsAllSelected()
+        {
+            if (LoadData.HasDelegate && !string.IsNullOrEmpty(ValueProperty))
+            {
+                return View != null && View.Cast<object>().All(i => IsItemSelectedByValue(PropertyAccess.GetValue(i, ValueProperty)));
+            }
+
+            return View != null && selectedItems.Count == View.Cast<object>().Count();
+        }
+
         /// <summary>
         /// Resets this instance.
         /// </summary>
