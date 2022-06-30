@@ -929,7 +929,7 @@ namespace Radzen
                             
                             index++;
                         }
-                        else
+                        else if (!(typeof(IEnumerable).IsAssignableFrom(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)))
                         {
                             whereList.Add($@"{property}{filterCaseSensitivityOperator} {comparison} @{index}{filterCaseSensitivityOperator}", new object[] { column.GetFilterValue() });
                             index++;
@@ -970,7 +970,9 @@ namespace Radzen
                     }
                 }
 
-                return source.Where(string.Join($" {gridBooleanOperator} ", whereList.Keys), whereList.Values.SelectMany(i => i.ToArray()).ToArray());
+                return whereList.Keys.Any() ?
+                    source.Where(string.Join($" {gridBooleanOperator} ", whereList.Keys), whereList.Values.SelectMany(i => i.ToArray()).ToArray())
+                    : source;
             }
 
             return source;
