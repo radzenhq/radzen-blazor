@@ -399,13 +399,13 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     }
 
     &:first-child {
-      td {
+      > td {
         border-top: none;
       }
     }
 
     &:last-child {
-      td {
+      > td {
         border-bottom: none;
       }
     }
