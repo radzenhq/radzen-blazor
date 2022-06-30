@@ -646,37 +646,58 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        internal SortOrder? GetSortOrder()
+        /// <summary>
+        /// Get column sort order.
+        /// </summary>
+        public SortOrder? GetSortOrder()
         {
             return sortOrder.Any() ? sortOrder.FirstOrDefault() : SortOrder;
         }
 
-        internal object GetFilterValue()
+        /// <summary>
+        /// Get column filter value.
+        /// </summary>
+        public object GetFilterValue()
         {
             return filterValue ?? FilterValue;
         }
 
-        internal FilterOperator GetFilterOperator()
+        /// <summary>
+        /// Get column filter operator.
+        /// </summary>
+        public FilterOperator GetFilterOperator()
         {
             return filterOperator ?? FilterOperator;
         }
 
-        internal object GetSecondFilterValue()
+        /// <summary>
+        /// Get column second filter value.
+        /// </summary>
+        public object GetSecondFilterValue()
         {
             return secondFilterValue ?? SecondFilterValue;
         }
 
-        internal FilterOperator GetSecondFilterOperator()
+        /// <summary>
+        /// Get column second filter operator.
+        /// </summary>
+        public FilterOperator GetSecondFilterOperator()
         {
             return secondFilterOperator ?? SecondFilterOperator;
         }
 
-        internal LogicalFilterOperator GetLogicalFilterOperator()
+        /// <summary>
+        /// Get column logical filter operator.
+        /// </summary>
+        public LogicalFilterOperator GetLogicalFilterOperator()
         {
             return logicalFilterOperator ?? LogicalFilterOperator;
         }
 
-        internal void SetFilterValue(object value, bool isFirst = true)
+        /// <summary>
+        /// Set column filter value.
+        /// </summary>
+        public void SetFilterValue(object value, bool isFirst = true)
         {
             if ((FilterPropertyType == typeof(DateTimeOffset) || FilterPropertyType == typeof(DateTimeOffset?)) && value != null && value is DateTime?)
             {
@@ -699,7 +720,10 @@ namespace Radzen.Blazor
             return GetFilterOperator() == FilterOperator.IsNull || GetFilterOperator() == FilterOperator.IsNotNull;
         }
 
-        internal void ClearFilters()
+        /// <summary>
+        /// Sets to default column filter values and operators.
+        /// </summary>
+        public void ClearFilters()
         {
             SetFilterValue(null);
             SetFilterValue(null, false);
@@ -727,17 +751,26 @@ namespace Radzen.Blazor
         [Parameter]
         public FilterOperator SecondFilterOperator { get; set; }
 
-        internal void SetFilterOperator(FilterOperator? value)
+        /// <summary>
+        /// Set column filter operator.
+        /// </summary>
+        public void SetFilterOperator(FilterOperator? value)
         {
             filterOperator = value;
         }
 
-        internal void SetSecondFilterOperator(FilterOperator? value)
+        /// <summary>
+        /// Set column second filter operator.
+        /// </summary>
+        public void SetSecondFilterOperator(FilterOperator? value)
         {
             secondFilterOperator = value;
         }
 
-        internal void SetLogicalFilterOperator(LogicalFilterOperator value)
+        /// <summary>
+        /// Set column second logical operator.
+        /// </summary>
+        public void SetLogicalFilterOperator(LogicalFilterOperator value)
         {
             LogicalFilterOperator = value;
         }
@@ -753,17 +786,26 @@ namespace Radzen.Blazor
 
         string runtimeWidth;
 
-        internal void SetWidth(string value)
+        /// <summary>
+        /// Set column width.
+        /// </summary>
+        public void SetWidth(string value)
         {
             runtimeWidth = value;
         }
 
-        internal string GetWidth()
+        /// <summary>
+        /// Get column width.
+        /// </summary>
+        public string GetWidth()
         {
             return !string.IsNullOrEmpty(runtimeWidth) ? runtimeWidth : Width;
         }
 
-        internal IEnumerable<FilterOperator> GetFilterOperators()
+        /// <summary>
+        /// Get possible column filter operators.
+        /// </summary>
+        public IEnumerable<FilterOperator> GetFilterOperators()
         {
             if (PropertyAccess.IsEnum(FilterPropertyType))
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals };
