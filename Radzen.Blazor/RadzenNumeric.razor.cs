@@ -187,7 +187,7 @@ namespace Radzen.Blazor
             {
                 valueStr = value.ToString();
             }
-            return new string(valueStr.Where(c => char.IsDigit(c) || char.IsPunctuation(c)).ToArray());
+            return new string(valueStr.Where(c => char.IsDigit(c) || char.IsPunctuation(c)).ToArray()).Replace("%", "");
         }
 
         private async System.Threading.Tasks.Task InternalValueChanged(object value)
