@@ -2189,4 +2189,10 @@ namespace Radzen
             return String.Join("", BitConverter.GetBytes(x).Select(y => y.ToString("x2")));
         }
     }
+
+    public enum CoordinateSystem
+    {
+        Cartesian,
+        Polar
+    }
 }

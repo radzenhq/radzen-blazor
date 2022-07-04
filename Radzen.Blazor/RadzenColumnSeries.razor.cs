@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -128,7 +129,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override double TooltipX(TItem item)
+        internal override double TooltipX(TItem item)
         {
             var columnSeries = VisibleColumnSeries;
             var index = columnSeries.IndexOf(this);
@@ -142,7 +143,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override double TooltipY(TItem item)
+        internal override double TooltipY(TItem item)
         {
             var y = base.TooltipY(item);
             var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
@@ -180,6 +181,12 @@ namespace Radzen.Blazor
             }
 
             return null;
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
+        {
+            return base.GetDataLabels(offsetX, offsetY - 16);
         }
     }
 }
