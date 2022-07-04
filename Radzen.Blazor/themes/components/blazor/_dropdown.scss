@@ -3,8 +3,8 @@ $dropdown-trigger-icon-height: $dropdown-trigger-icon-width !default;
 $dropdown-trigger-icon-margin: 0 0.5rem 0 0 !default;
 
 $dropdown-horizontal-padding: 0.5rem !default;
-$dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
 $dropdown-items-margin: 0 (-$dropdown-horizontal-padding) !default;
+$dropdown-items-padding: 0 !default;
 
 $dropdown-item-padding: $dropdown-horizontal-padding !default;
 $dropdown-item-font-size: var(--rz-input-font-size) !default;
@@ -25,7 +25,10 @@ $dropdown-filter-padding: 0.5rem 0 !default;
 
 $dropdown-open-background-color: var(--rz-base-background-color) !default;
 $dropdown-open-border: var(--rz-input-border) !default;
+
+$dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
 $dropdown-panel-border: var(--rz-input-border) !default;
+$dropdown-panel-shadow: none !default;
 
 // DropDown CSS variables
 
@@ -37,6 +40,7 @@ $dropdown-panel-border: var(--rz-input-border) !default;
   --rz-dropdown-horizontal-padding: #{$dropdown-horizontal-padding};
   --rz-dropdown-panel-padding: #{$dropdown-panel-padding};
   --rz-dropdown-items-margin: #{$dropdown-items-margin};
+  --rz-dropdown-items-padding: #{$dropdown-items-padding};
 
   --rz-dropdown-item-padding: #{$dropdown-item-padding};
   --rz-dropdown-item-font-size: #{$dropdown-item-font-size};
@@ -58,6 +62,7 @@ $dropdown-panel-border: var(--rz-input-border) !default;
   --rz-dropdown-open-background-color: #{$dropdown-open-background-color};
   --rz-dropdown-open-border: #{$dropdown-open-border};
   --rz-dropdown-panel-border: #{$dropdown-panel-border};
+  --rz-dropdown-panel-shadow: #{$dropdown-panel-shadow};
 }
 
 %dropdown {
@@ -151,12 +156,10 @@ $dropdown-panel-border: var(--rz-input-border) !default;
 
 %dropdown-panel {
   position: absolute;
-  transform: translateY(calc(-1 * var(--rz-input-border-radius)));
   background-color: var(--rz-dropdown-open-background-color);
   border-radius: var(--rz-input-border-radius);
   border: var(--rz-dropdown-panel-border);
-  border-top-right-radius: 0;
-  border-top-left-radius: 0;
+  box-shadow: var(--rz-dropdown-panel-shadow);
 }
 
 .rz-dropdown-panel {
@@ -177,7 +180,7 @@ $dropdown-panel-border: var(--rz-input-border) !default;
 
 .rz-dropdown-items {
   list-style: none;
-  padding: 0;
+  padding: var(--rz-dropdown-items-padding);
   margin: 0;
 
   li {
@@ -194,6 +197,7 @@ $dropdown-panel-border: var(--rz-input-border) !default;
 .rz-multiselect-items-wrapper {
   overflow: auto;
   margin: var(--rz-dropdown-items-margin);
+  border-radius: var(--rz-input-border-radius);
 }
 
 .rz-multiselect-items-wrapper {
@@ -208,7 +212,7 @@ $dropdown-panel-border: var(--rz-input-border) !default;
 
 .rz-dropdown-filter {
   background-color: transparent;
-  color: var(--rz-base-background-color);
+  color: var(--rz-text-color);
 }
 
 .rz-multiselect-header {
@@ -273,6 +277,7 @@ $dropdown-panel-border: var(--rz-input-border) !default;
 
   .rz-inputtext {
     @extend .rz-dropdown-filter;
+    padding: 0;
   }
 }
 
