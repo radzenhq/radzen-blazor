@@ -40,6 +40,13 @@ namespace Radzen.Blazor
         /// <returns>RenderFragment.</returns>
         RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale);
         /// <summary>
+        /// Renders the series overlays with the specified category and value scales.
+        /// </summary>
+        /// <param name="categoryScale">The category scale.</param>
+        /// <param name="valueScale">The value scale.</param>
+        /// <returns>RenderFragment.</returns>
+        RenderFragment RenderOverlays(ScaleBase categoryScale, ScaleBase valueScale);
+        /// <summary>
         /// Renders the series tooltip.
         /// </summary>
         /// <param name="data">The data.</param>

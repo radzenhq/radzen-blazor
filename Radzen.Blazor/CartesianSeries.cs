@@ -5,6 +5,8 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using Radzen.Blazor.Rendering;
 using System.Threading.Tasks;
+using System.Collections;
+using Microsoft.AspNetCore.Components.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -123,6 +125,12 @@ namespace Radzen.Blazor
         public RenderFragment<TItem> TooltipTemplate { get; set; }
 
         /// <summary>
+        /// Gets the list of overlays.
+        /// </summary>
+        /// <value>The Overlays list.</value>
+        internal List<IRadzenSeriesOverlay> Overlays { get; } = new List<IRadzenSeriesOverlay>();
+
+        /// <summary>
         /// The name of the property of <typeparamref name="TItem" /> that provides the X axis (a.k.a. category axis) values.
         /// </summary>
         [Parameter]
@@ -174,7 +182,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The value.</value>
         /// <exception cref="ArgumentException">ValueProperty should not be empty</exception>
-        protected Func<TItem, double> Value
+        internal Func<TItem, double> Value
         {
             get
             {
@@ -264,7 +272,7 @@ namespace Radzen.Blazor
                     Output = scale.Output
                 };
             }
-            
+
             var data = GetCategories();
 
             if (scale is OrdinalScale ordinal)
@@ -310,6 +318,20 @@ namespace Radzen.Blazor
 
         /// <inheritdoc />
         public abstract RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale);
+
+        /// <inheritdoc />
+        public RenderFragment RenderOverlays(ScaleBase categoryScale, ScaleBase valueScale)
+        {
+            return new RenderFragment(builder =>
+            {
+                builder.OpenRegion(0);
+                foreach (var overlay in Overlays)
+                {
+                    builder.AddContent(1, overlay.Render(categoryScale, valueScale));
+                }
+                builder.CloseRegion();
+            });
+        }
 
         /// <inheritdoc />
         public abstract string Color { get; }
