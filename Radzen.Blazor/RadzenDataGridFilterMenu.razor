@@ -16,7 +16,7 @@
 <div id="@($"{Grid.PopupID}{Column.GetFilterProperty()}")" class="rz-overlaypanel"
         style="display:none;" tabindex="0">
     <div class="rz-overlaypanel-content">
-        <ul class="rz-listbox-list" style="margin:5px">
+        <ul class="rz-listbox-list">
             @if (Column.FilterPropertyType == typeof(string))
             {
             <li class="@(FilterOperatorStyle(Column, FilterOperator.Contains))" @onclick="@(args => ApplyFilter(FilterOperator.Contains))" style="display: block;">
