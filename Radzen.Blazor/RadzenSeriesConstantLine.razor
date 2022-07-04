@@ -1,0 +1,50 @@
+﻿@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits RadzenGridLines
+@implements IRadzenSeriesOverlay
+
+@code {
+    [Parameter]
+    public virtual double Value { get; set; }
+    [Parameter]
+    public EventCallback<double> ValueChanged { get; set; }
+
+    CartesianSeries<TItem> series;
+    [CascadingParameter]
+    protected CartesianSeries<TItem> Series 
+    { 
+        get
+        {
+            return series;
+        }
+        set
+        {
+            series = value;
+            series.Overlays.Add(this);
+        }
+    }
+
+    public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var constant = Value;
+
+        double x1, x2, y1, y2;
+        if (Chart.ShouldInvertAxes())
+        {
+            x1 = x2 = categoryScale.Scale(constant);
+            y1 = 0; y2 = Chart.ValueScale.OutputSize;
+        }
+        else
+        {
+            y1 = y2 = valueScale.Scale(constant);
+            x1 = 0; x2 = Chart.CategoryScale.OutputSize - Chart.CategoryAxis.Padding * 2;           
+        }
+       
+        var path = $"M{x1} {y1} L{x2} {y2}";
+        return
+        @<g>
+            <Path D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" />
+        </g>;
+    }
+
+}

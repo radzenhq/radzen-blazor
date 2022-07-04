@@ -26,6 +26,7 @@
                     @if (series.Visible)
                     {
                         @series.Render(CategoryScale, ValueScale);
+                        @series.RenderOverlays(CategoryScale, ValueScale)
                     }
                 }
             </g>

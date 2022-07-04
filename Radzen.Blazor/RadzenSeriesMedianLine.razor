@@ -1,0 +1,17 @@
+﻿@typeparam TItem
+@inherits RadzenSeriesConstantLine<TItem>
+
+@code {
+    public override double Value
+    {
+        get
+        {
+            var result = Series.Data.Select(e => Series.Value(e)).OrderBy(e => e).Skip(Series.Data.Count() / 2).FirstOrDefault();
+            ValueChanged.InvokeAsync(result);
+            return result;
+        }
+        set
+        {            
+        }
+    }
+}
