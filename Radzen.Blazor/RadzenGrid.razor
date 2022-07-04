@@ -119,7 +119,7 @@
                                                                 <RadzenTextBox Value="@($"{column.FilterValue}")" Change="@(args => column.SetFilterValue(args))" />
                                                             }
 
-                                                            <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 80px"
+                                                            <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px"
                                                                             Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator" Value="@column.LogicalFilterOperator" Change="@(args => column.SetLogicalFilterOperator((LogicalFilterOperator)args))" />
 
                                                             <RadzenDropDown @onclick:preventDefault="true" Data="@(column.FilterOperators)" TextProperty="Value" ValueProperty="Key" TValue="string" Value="@column.SecondFilterOperator" Change="@(args => column.SetSecondFilterOperator($"{args}"))" />
