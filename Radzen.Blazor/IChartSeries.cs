@@ -99,19 +99,19 @@ namespace Radzen.Blazor
         /// <summary>
         /// Returns series median
         /// </summary>
-        double Median { get; }
+        double GetMedian();
         /// <summary>
         /// Returns series mean
         /// </summary>
-        double Mean { get; }
+        double GetMean();
         /// <summary>
         /// Returns series mode
         /// </summary>
-        double Mode { get; }
+        double GetMode();
         /// <summary>
         /// Returns series trend
         /// </summary>
-        (double a, double b) Trend { get; }
+        (double a, double b) GetTrend();
         /// <summary>
         /// Series coordinate system
         /// </summary>

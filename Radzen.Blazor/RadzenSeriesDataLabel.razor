@@ -34,7 +34,10 @@
                 throw new ArgumentException($"Series must use Cartesian coordinate system");
             }
             series = value;
-            series.Overlays.Add(this);
+            if (!series.Overlays.Contains(this))
+            {
+                series.Overlays.Add(this);
+            }
         }
     }
 
