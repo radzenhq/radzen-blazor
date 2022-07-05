@@ -33,7 +33,7 @@ $icon-styles: map-merge(
   font-family: 'Material Icons';
   font-weight: normal;
   font-style: normal;
-  font-size: var(--rz-icon-base-font-size);
+  font-size: var(--rz-icon-size);
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -46,6 +46,7 @@ $icon-styles: map-merge(
 
   /* Support for all WebKit browsers. */
   -webkit-font-smoothing: antialiased;
+  
   /* Support for Safari and Chrome. */
   text-rendering: optimizeLegibility;
 
