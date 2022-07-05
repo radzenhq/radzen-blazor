@@ -1,17 +1,22 @@
-$tabs-tab-background-color: var(--rz-base-200) !default;
+$tabs-padding: 1.25rem !default;
 $tabs-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $tabs-border: var(--rz-border-200) !default;
-$tabs-tab-color: var(--rz-secondary) !default;
-$tabs-selected-tab-color: var(--rz-text-title-color) !default;
-$tabs-tab-font-size: var(--rz-body-font-size) !default;
-$tabs-tab-font-weight: normal !default;
-$tabs-background-color: var(--rz-base-background-color) !default;
-$tabs-tab-padding: 0.5rem 1rem !default;
-$tabs-padding: 1.25rem !default;
-$tabs-tab-selected-top-border-color: var(--rz-secondary) !default;
-$tabs-hover-color: var(--rz-secondary-light) !default;
-$tabs-hover-background-color: $tabs-background-color !default;
 $tabs-border-radius: var(--rz-border-radius) !default;
+$tabs-background-color: var(--rz-base-background-color) !default;
+
+$tabs-tab-font-size: var(--rz-body-font-size) !default;
+$tabs-tab-line-height: var(--rz-body-line-height) !default;
+$tabs-tab-font-weight: normal !default;
+$tabs-tab-text-transform: none !default;
+$tabs-tab-letter-spacing: 0 !default;
+$tabs-tab-padding: 0.5rem 1rem !default;
+$tabs-tab-background-color: var(--rz-base-200) !default;
+$tabs-tab-color: var(--rz-secondary) !default;
+$tabs-tab-selected-color: var(--rz-text-title-color) !default;
+$tabs-tab-selected-top-border-color: var(--rz-secondary) !default;
+$tabs-tab-hover-background-color: $tabs-background-color !default;
+$tabs-tab-hover-color: var(--rz-secondary-light) !default;
+
 $tabs-icon-font-size: var(--rz-icon-size) !default;
 $tabs-icon-margin: 0 0.25rem 0 -0.25rem !default;
 $tabs-transition: var(--rz-transition-all) !default;
@@ -19,20 +24,23 @@ $tabs-transition: var(--rz-transition-all) !default;
 // Tabs CSS variables
 
 :root {
-  --rz-tabs-tab-background-color: #{$tabs-tab-background-color};
+  --rz-tabs-padding: #{$tabs-padding};
   --rz-tabs-shadow: #{$tabs-shadow};
   --rz-tabs-border: #{$tabs-border};
-  --rz-tabs-tab-color: #{$tabs-tab-color};
-  --rz-tabs-selected-tab-color: #{$tabs-selected-tab-color};
-  --rz-tabs-tab-font-size: #{$tabs-tab-font-size};
-  --rz-tabs-tab-font-weight: #{$tabs-tab-font-weight};
-  --rz-tabs-background-color: #{$tabs-background-color};
-  --rz-tabs-tab-padding: #{$tabs-tab-padding};
-  --rz-tabs-padding: #{$tabs-padding};
-  --rz-tabs-tab-selected-top-border-color: #{$tabs-tab-selected-top-border-color};
-  --rz-tabs-hover-color: #{$tabs-hover-color};
-  --rz-tabs-hover-background-color: #{$tabs-hover-background-color};
   --rz-tabs-border-radius: #{$tabs-border-radius};
+  --rz-tabs-background-color: #{$tabs-background-color};
+  --rz-tabs-tab-font-size: #{$tabs-tab-font-size};
+  --rz-tabs-tab-line-height: #{$tabs-tab-line-height};
+  --rz-tabs-tab-font-weight: #{$tabs-tab-font-weight};
+  --rz-tabs-tab-text-transform: #{$tabs-tab-text-transform};
+  --rz-tabs-tab-letter-spacing: #{$tabs-tab-letter-spacing};
+  --rz-tabs-tab-padding: #{$tabs-tab-padding};
+  --rz-tabs-tab-background-color: #{$tabs-tab-background-color};
+  --rz-tabs-tab-color: #{$tabs-tab-color};
+  --rz-tabs-tab-selected-color: #{$tabs-tab-selected-color};
+  --rz-tabs-tab-selected-top-border-color: #{$tabs-tab-selected-top-border-color};
+  --rz-tabs-tab-hover-background-color: #{$tabs-tab-hover-background-color};
+  --rz-tabs-tab-hover-color: #{$tabs-tab-hover-color};
   --rz-tabs-icon-font-size: #{$tabs-icon-font-size};
   --rz-tabs-icon-margin: #{$tabs-icon-margin};
   --rz-tabs-transition: #{$tabs-transition};
@@ -80,10 +88,10 @@ $tabs-transition: var(--rz-transition-all) !default;
     &:hover {
       &:not(.rz-tabview-selected) {
         &:not(.rz-state-disabled) {
-          background-color: var(--rz-tabs-hover-background-color);
+          background-color: var(--rz-tabs-tab-hover-background-color);
 
           a {
-            color: var(--rz-tabs-hover-color);
+            color: var(--rz-tabs-tab-hover-color);
           }
         }
       }
@@ -95,7 +103,10 @@ $tabs-transition: var(--rz-transition-all) !default;
       color: var(--rz-tabs-tab-color);
       padding: var(--rz-tabs-tab-padding);
       font-size: var(--rz-tabs-tab-font-size);
+      line-height: var(--rz-tabs-tab-line-height);
       font-weight: var(--rz-tabs-tab-font-weight);
+      text-transform: var(--rz-tabs-tab-text-transform);
+      letter-spacing: var(--rz-tabs-tab-letter-spacing);
 
       &:hover {
         text-decoration: none;
@@ -112,7 +123,7 @@ $tabs-transition: var(--rz-transition-all) !default;
     position: relative;
 
     a {
-      color: var(--rz-tabs-selected-tab-color);
+      color: var(--rz-tabs-tab-selected-color);
     }
   }
 
