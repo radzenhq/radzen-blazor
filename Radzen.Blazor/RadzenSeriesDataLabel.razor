@@ -1,0 +1,68 @@
+﻿@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits RadzenChartComponentBase
+@implements IRadzenSeriesOverlay
+
+@code {
+    [Parameter]
+    public TItem Data { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public double OffsetX { get; set; }
+
+    [Parameter]
+    public double OffsetY { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    CartesianSeries<TItem> series;
+    [CascadingParameter]
+    protected CartesianSeries<TItem> Series 
+    { 
+        get
+        {
+            return series;
+        }
+        set
+        {
+            if (value.CoordinateSystem != CoordinateSystem.Cartesian)
+            {
+                throw new ArgumentException($"Series must use Cartesian coordinate system");
+            }
+            series = value;
+            series.Overlays.Add(this);
+        }
+    }
+
+    public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        double x, y;
+        if (Chart.ShouldInvertAxes())
+        {
+            x = Chart.CategoryScale.Scale(series.Value(Data));
+            y = Chart.ValueScale.Scale(series.Category(Chart.ValueScale)(Data));
+        }
+        else
+        {
+            x = Chart.CategoryScale.Scale(series.Category(Chart.CategoryScale)(Data));
+            y = Chart.ValueScale.Scale(series.Value(Data));
+        }
+
+        x += OffsetX;
+        y += OffsetY;
+
+        Point pt = new Point() { X = x, Y = y };
+        return 
+        @<g>
+            <Text Value="@Text" Position="pt" Class="@Class" />
+        </g>
+    ;
+    }
+    
+    [Parameter]
+    public bool Visible { get; set; } = true;
+}

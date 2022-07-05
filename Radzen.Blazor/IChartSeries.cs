@@ -1,3 +1,6 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
@@ -93,6 +96,34 @@ namespace Radzen.Blazor
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
         object DataAt(double x, double y);
+        /// <summary>
+        /// Returns series median
+        /// </summary>
+        double Median { get; }
+        /// <summary>
+        /// Returns series mean
+        /// </summary>
+        double Mean { get; }
+        /// <summary>
+        /// Returns series mode
+        /// </summary>
+        double Mode { get; }
+        /// <summary>
+        /// Returns series trend
+        /// </summary>
+        (double a, double b) Trend { get; }
+        /// <summary>
+        /// Series coordinate system
+        /// </summary>
+        CoordinateSystem CoordinateSystem { get; }
+        /// <summary>
+        /// Series overlays
+        /// </summary>
+        IList<IRadzenSeriesOverlay> Overlays{ get; }
+        /// <summary>
+        /// Series overlays
+        /// </summary>
+        IEnumerable<object> Data { get; }
         /// <summary>
         /// Gets or sets the title of the series. The title is displayed in tooltips and the legend.
         /// </summary>
