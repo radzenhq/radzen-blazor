@@ -20,7 +20,7 @@ namespace Radzen.Blazor
         /// Creates a getter function that returns a value from the specified category scale for the specified data item.
         /// </summary>
         /// <param name="scale">The scale.</param>
-        protected Func<TItem, double> Category(ScaleBase scale)
+        internal Func<TItem, double> Category(ScaleBase scale)
         {
             if (IsNumeric(CategoryProperty))
             {
@@ -129,6 +129,12 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The Overlays list.</value>
         internal List<IRadzenSeriesOverlay> Overlays { get; } = new List<IRadzenSeriesOverlay>();
+
+        /// <summary>
+        /// Gets the coordinate system of the series.
+        /// </summary>
+        /// <value>Coordinate system enum value.</value>
+        public virtual CoordinateSystem CoordinateSystem => CoordinateSystem.Cartesian;
 
         /// <summary>
         /// The name of the property of <typeparamref name="TItem" /> that provides the X axis (a.k.a. category axis) values.

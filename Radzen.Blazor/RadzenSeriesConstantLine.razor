@@ -19,6 +19,10 @@
         }
         set
         {
+            if (value.CoordinateSystem != CoordinateSystem.Cartesian)
+            {
+                throw new ArgumentException($"Series must use Cartesian coordinate system");
+            }
             series = value;
             series.Overlays.Add(this);
         }
@@ -46,5 +50,4 @@
             <Path D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" />
         </g>;
     }
-
 }
