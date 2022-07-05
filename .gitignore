@@ -341,4 +341,3 @@ Radzen.DocFX/_exported_templates
 Radzen.DocFX/api/*.yml
 !Radzen.DocFX/api/index.md
 Radzen.DocFX/api/.manifest
-/ChartAxisTest
