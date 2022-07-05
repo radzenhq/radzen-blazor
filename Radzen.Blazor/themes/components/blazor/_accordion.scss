@@ -1,5 +1,5 @@
 $accordion-item-padding: 0.25rem 0 !default;
-$accordion-item-margin: 0 !default;
+$accordion-item-margin: 0 !default; //not used
 $accordion-item-background-color: var(--rz-base-background-color) !default;
 $accordion-item-color: var(--rz-text-color) !default;
 $accordion-item-line-height: 1.25rem !default;
@@ -9,12 +9,16 @@ $accordion-icon-width: var(--rz-icon-size) !default;
 $accordion-icon-height: $accordion-icon-width !default;
 $accordion-icon-font-size: var(--rz-icon-size) !default;
 $accordion-icon-margin: 0 0.25rem 0 0 !default;
+$accordion-toggle-icon-margin: $accordion-icon-margin !default;
+$accordion-toggle-icon-order: 1 !default;
+$accordion-toggle-icon-collapsed: 'arrow_right' !default;
+$accordion-toggle-icon-expanded: 'arrow_drop_down' !default;
 $accordion-selected-color: var(--rz-secondary) !default;
 $accordion-hover-color: $accordion-selected-color !default;
 $accordion-content-padding: 0.5rem 0.5rem 0.5rem 1.5rem !default;
 $accordion-content-font-size: $accordion-item-font-size !default;
 $accordion-border-radius: var(--rz-border-radius)!default;
-$accordion-item-border: none !default;
+$accordion-item-border: none !default; //not used
 $accordion-shadow: none !default;
 
 // Accordion CSS variables
@@ -31,6 +35,8 @@ $accordion-shadow: none !default;
   --rz-accordion-icon-height: #{$accordion-icon-height};
   --rz-accordion-icon-font-size: #{$accordion-icon-font-size};
   --rz-accordion-icon-margin: #{$accordion-icon-margin};
+  --rz-accordion-toggle-icon-margin: #{$accordion-toggle-icon-margin};
+  --rz-accordion-toggle-icon-order: #{$accordion-toggle-icon-order};
   --rz-accordion-selected-color: #{$accordion-selected-color};
   --rz-accordion-hover-color: #{$accordion-hover-color};
   --rz-accordion-content-padding: #{$accordion-content-padding};
@@ -52,15 +58,18 @@ $accordion-shadow: none !default;
     color: var(--rz-accordion-item-color);
     line-height: var(--rz-accordion-item-line-height);
     text-decoration: none;
-    color: var(--rz-accordion-item-color);
     display: flex;
     align-items: center;
     font-size: var(--rz-accordion-item-font-size);
     font-weight: var(--rz-accordion-item-font-weight);
-  }
 
-  &:hover {
-    color: var(--rz-accordion-hover-color);
+    &:hover {
+      color: var(--rz-accordion-hover-color);
+    }
+
+    span:not(.rz-accordion-toggle-icon) {
+      flex-grow: 1;
+    }
   }
 
   .rzi {
@@ -73,17 +82,21 @@ $accordion-shadow: none !default;
   width: var(--rz-accordion-icon-width);
   height: var(--rz-accordion-icon-height);
   font-size: var(--rz-accordion-icon-font-size);
-  margin: var(--rz-accordion-icon-margin);
+  order: var(--rz-accordion-toggle-icon-order);
+
+  &.rzi {
+    margin: var(--rz-accordion-toggle-icon-margin);
+  }
 
   &.rzi-chevron-right {
     &:before {
-      content: 'arrow_right';
+      content: $accordion-toggle-icon-collapsed;
     }
   }
 
   &.rzi-chevron-down {
     &:before {
-      content: 'arrow_drop_down';
+      content: $accordion-toggle-icon-expanded;
     }
   }
 }
