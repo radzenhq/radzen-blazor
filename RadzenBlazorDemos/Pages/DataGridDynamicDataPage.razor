@@ -1,4 +1,5 @@
 ﻿@page "/datagrid-dynamic"
+@using System.Linq.Dynamic.Core
 <h1>DataGrid <strong>dynamic</strong> data support</h1>
 
 <p>
@@ -6,46 +7,70 @@
 </p>
 
 <RadzenExample Name="DataGrid" Source="DataGridDynamicData" Heading="false">
-    <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced"
-            AllowPaging="true" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Center" AllowSorting="true" Data="@data" TItem="IDictionary<string, object>"
-            IsLoading="@isLoading"
-            Count="@count" LoadData="@LoadData">
-        <Columns>
-            <RadzenDataGridColumn TItem="IDictionary<string, object>" Property="EmployeeID" Title="EmployeeID" Type="typeof(int)">
-                <Template>
-                    @context["EmployeeID"]
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="IDictionary<string, object>" Property="FirstName" Title="FirstName" Type="typeof(string)">
-                <Template>
-                    @context["FirstName"]
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="IDictionary<string, object>" Property="LastName" Title="LastName" Type="typeof(string)">
-                <Template>
-                    @context["LastName"]
-                </Template>
-            </RadzenDataGridColumn>
+    <RadzenDataGrid Data="@data" Count="@count"  LoadData="@LoadData" TItem="IDictionary<string, object>"
+                         AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" AllowPaging="true" AllowSorting="true">
+            <Columns>
+                @foreach(var column in columns)
+                {
+                    <RadzenDataGridColumn TItem="IDictionary<string, object>" Title="@column.Key" Type="column.Value"
+                            Property="@GetColumnPropertyExpression(column.Key, column.Value)" >
+                        <Template>
+                            @context[@column.Key]
+                        </Template>
+                    </RadzenDataGridColumn>
+                }
         </Columns>
-    </RadzenDataGrid>
+        </RadzenDataGrid>
 </RadzenExample>
 @code {
-    IEnumerable<IDictionary<string, object>> data;
-    int count;
-    bool isLoading;
-
-    async Task LoadData(LoadDataArgs args)
+    public static IEnumerable<IDictionary<string, object>> rows { get; set; } = Enumerable.Range(0, 100).Select(i =>
     {
-        isLoading = true;
-        var uri = new Uri("https://services.radzen.com/odata/Northwind/Employees")
-            .GetODataUri(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+        var row = new Dictionary<string, object>();
 
-        var response = await new HttpClient().SendAsync(new HttpRequestMessage(HttpMethod.Get, uri));
+        foreach (var column in columns)
+        {
+            row.Add(column.Key, column.Value == typeof(int) ? i : $"{column.Key}{i}");
+        }
 
-        var result = await response.ReadAsync<ODataServiceResult<IDictionary<string, object>>>();
+        return row;
+    });
 
-        data = result.Value.AsODataEnumerable();
-        count = result.Count;
-        isLoading = false;
+    public static IDictionary<string, Type> columns { get; set; } = new Dictionary<string, Type>() 
+    { 
+        { "EmployeeID", typeof(int) },
+        { "FirstName", typeof(string) },
+        { "LastName", typeof(string) },
+    };
+
+    public string GetColumnPropertyExpression(string name, Type type)
+    {
+        var expression = $@"it[""{name}""].ToString()";
+        return type == typeof(int) ? $"int.Parse({expression})" : expression;
+    }
+
+    public IEnumerable<IDictionary<string, object>> data { get; set; }
+    public int count { get; set; }
+
+    public async Task LoadData(LoadDataArgs args)
+    {
+        var query = rows.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            // Filter via the Where method
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            // Sort via the OrderBy method
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        // Important!!! Make sure the Count property of RadzenDataGrid is set.
+        count = query.Count();
+
+        // Perform paging via Skip and Take.
+        data = await Task.FromResult(query.Skip(args.Skip.Value).Take(args.Top.Value).ToList());
     }
 }
