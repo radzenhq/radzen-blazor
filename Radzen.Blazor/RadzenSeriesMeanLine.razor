@@ -2,12 +2,17 @@
 @inherits RadzenSeriesConstantLine<TItem>
 
 @code {
+    double? lastValue;
     public override double Value 
     {
         get
         {
             var result = Series.Data.Select(e => Series.Value(e)).Average();
-            ValueChanged.InvokeAsync(result);
+            if (lastValue != result)
+            {
+                ValueChanged.InvokeAsync(result);
+                lastValue = result;
+            }
             return result;
         }
         set
