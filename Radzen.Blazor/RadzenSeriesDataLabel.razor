@@ -61,7 +61,7 @@
         Point pt = new Point() { X = x, Y = y };
         return 
         @<g>
-            <Text Value="@Text" Position="pt" Class="@Class" />
+            <Text @key="@($"{pt}-{Text}-{Chart.Series.IndexOf(series)}")"  Value="@Text" Position="pt" Class="@Class" />
         </g>
     ;
     }
