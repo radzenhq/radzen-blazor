@@ -59,6 +59,11 @@ $input-transition: var(--rz-transition-all) !default;
   border: var(--rz-input-hover-border);
 }
 
+%input-focus {
+  box-shadow: var(--rz-input-focus-shadow);
+  border: var(--rz-input-focus-border);
+}
+
 %input-disabled {
   color: var(--rz-input-disabled-color);
   box-shadow: var(--rz-input-disabled-shadow);
@@ -113,8 +118,7 @@ input {
     }
 
     &:focus {
-      @extend %input-hover;
-      box-shadow: var(--rz-input-focus-shadow);
+      @extend %input-focus;
     }
   }
 
