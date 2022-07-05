@@ -209,12 +209,6 @@ namespace Radzen.Blazor
         public IEnumerable<TItem> Data { get; set; }
 
         /// <summary>
-        /// Gets or sets the data of the series. The data is enumerated and its items are displayed by the series.
-        /// </summary>
-        /// <value>The data.</value>
-        IEnumerable<object> IChartSeries.Data => Data.Cast<object>();
-
-        /// <summary>
         /// Stores <see cref="Data" /> as an IList of <typeparamref name="TItem"/>.
         /// </summary>
         /// <value>The items.</value>
