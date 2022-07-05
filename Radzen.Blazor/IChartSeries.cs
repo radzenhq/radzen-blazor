@@ -121,10 +121,6 @@ namespace Radzen.Blazor
         /// </summary>
         IList<IRadzenSeriesOverlay> Overlays{ get; }
         /// <summary>
-        /// Series overlays
-        /// </summary>
-        IEnumerable<object> Data { get; }
-        /// <summary>
         /// Gets or sets the title of the series. The title is displayed in tooltips and the legend.
         /// </summary>
         /// <value>The title.</value>
