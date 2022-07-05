@@ -39,11 +39,19 @@
         if (Chart.ShouldInvertAxes())
         {
             x1 = x2 = categoryScale.Scale(Value);
+            if (x1 < 0 || x1 > Chart.CategoryScale.OutputSize)
+            {
+                return null;
+            }
             y1 = 0; y2 = Chart.ValueScale.OutputSize;
         }
         else
         {
             y1 = y2 = valueScale.Scale(Value);
+            if (y1 < 0 || y1 > Chart.ValueScale.OutputSize)
+            {
+                return null;
+            }
             x1 = 0; x2 = Chart.CategoryScale.OutputSize - Chart.CategoryAxis.Padding * 2;           
         }
        
