@@ -23,13 +23,16 @@
                 throw new ArgumentException($"Series must use Cartesian coordinate system");
             }
             series = value;
-            series.Overlays.Add(this);
+            if (!series.Overlays.Contains(this))
+            {
+                series.Overlays.Add(this);
+            }
         }
     }
 
     public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
-        (double a, double b) = series.Trend;
+        (double a, double b) = series.GetTrend();
         double x1, x2, y1, y2;
 
         if (Chart.ShouldInvertAxes())

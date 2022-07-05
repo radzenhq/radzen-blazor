@@ -540,55 +540,62 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public double Median => Data.Select(e => Value(e)).OrderBy(e => e).Skip(Data.Count() / 2).FirstOrDefault();
+        public double GetMedian()
+        {
+            return Data.Select(e => Value(e)).OrderBy(e => e).Skip(Data.Count() / 2).FirstOrDefault();
+        }
 
         /// <inheritdoc />
-        public double Mean => Data.Select(e => Value(e)).Average();
+        public double GetMean()
+        {
+            return Data.Select(e => Value(e)).Average();
+        }
 
         /// <inheritdoc />
-        public double Mode => Data.GroupBy(e => Value(e)).Select(g => new { Value = g.Key, Count = g.Count() }).OrderByDescending(e => e.Count).FirstOrDefault().Value;
+        public double GetMode()
+        {
+            return Data.GroupBy(e => Value(e)).Select(g => new { Value = g.Key, Count = g.Count() }).OrderByDescending(e => e.Count).FirstOrDefault().Value;
+        }
 
         /// <summary>
         /// https://en.wikipedia.org/wiki/Simple_linear_regression#Fitting_the_regression_line
         /// </summary>
-        public (double a, double b) Trend
+        public (double a, double b) GetTrend()
         {
-            get
+            double a, b;
+
+            Func<TItem, double> X;
+            Func<TItem, double> Y;
+            if (Chart.ShouldInvertAxes())
             {
-                double a, b;
-
-                Func<TItem, double> X;
-                Func<TItem, double> Y;
-                if (Chart.ShouldInvertAxes())
-                {
-                    X = e => Chart.CategoryScale.Scale(Value(e));
-                    Y = e => Chart.ValueScale.Scale(Category(Chart.ValueScale)(e));
-                }
-                else
-                {
-                    X = e => Chart.CategoryScale.Scale(Category(Chart.CategoryScale)(e));
-                    Y = e => Chart.ValueScale.Scale(Value(e));
-                }
-
-                var avgX = Data.Select(e => X(e)).Average();
-                var avgY = Data.Select(e => Y(e)).Average();
-                var sumXY = Data.Sum(e => (X(e) - avgX) * (Y(e) - avgY));         
-                if (Chart.ShouldInvertAxes())
-                {
-                    var sumYSq = Data.Sum(e => (Y(e) - avgY) * (Y(e) - avgY));
-                    b = sumXY / sumYSq;
-                    a = avgX - b * avgY;
-                }
-                else
-                {
-                    var sumXSq = Data.Sum(e => (X(e) - avgX) * (X(e) - avgX));
-                    b = sumXY / sumXSq;
-                    a = avgY - b * avgX;
-                }
-
-                return (a, b);
+                X = e => Chart.CategoryScale.Scale(Value(e));
+                Y = e => Chart.ValueScale.Scale(Category(Chart.ValueScale)(e));
             }
+            else
+            {
+                X = e => Chart.CategoryScale.Scale(Category(Chart.CategoryScale)(e));
+                Y = e => Chart.ValueScale.Scale(Value(e));
+            }
+
+            var avgX = Data.Select(e => X(e)).Average();
+            var avgY = Data.Select(e => Y(e)).Average();
+            var sumXY = Data.Sum(e => (X(e) - avgX) * (Y(e) - avgY));         
+            if (Chart.ShouldInvertAxes())
+            {
+                var sumYSq = Data.Sum(e => (Y(e) - avgY) * (Y(e) - avgY));
+                b = sumXY / sumYSq;
+                a = avgX - b * avgY;
+            }
+            else
+            {
+                var sumXSq = Data.Sum(e => (X(e) - avgX) * (X(e) - avgX));
+                b = sumXY / sumXSq;
+                a = avgY - b * avgX;
+            }
+
+            return (a, b);
         }
+
         private async Task OnLegendItemClick()
         {
             IsVisible = !IsVisible;
