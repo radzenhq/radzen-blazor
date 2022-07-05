@@ -1,8 +1,12 @@
 $paginator-background-color: var(--rz-base-background-color) !default;
 $paginator-padding: 0.5rem !default;
 
+$paginator-button-border-radius: var(--rz-border-radius) !default;
+
 $paginator-numeric-button-background-color: var(--rz-base-200) !default;
 $paginator-numeric-button-color: var(--rz-text-color) !default;
+$paginator-numeric-button-hover-background-color: $paginator-numeric-button-background-color !default;
+$paginator-numeric-button-hover-color: $paginator-numeric-button-color !default;
 $paginator-numeric-button-margin: 0 0.125rem !default;
 $paginator-numeric-button-padding: 0.5rem !default;
 $paginator-numeric-button-selected-background-color: var(--rz-base-background-color) !default;
@@ -13,12 +17,16 @@ $paginator-numeric-button-min-width: 2.25rem !default;
 
 $paginator-back-button-background-color: var(--rz-base-200) !default;
 $paginator-back-button-color: var(--rz-text-color) !default;
+$paginator-back-button-hover-background-color: $paginator-back-button-background-color !default;
+$paginator-back-button-hover-color: $paginator-back-button-color !default;
 
 $paginator-first-button-margin: 0 0.5rem 0 0 !default;
 $paginator-last-button-margin: 0 0 0 0.5rem !default;
 
 $paginator-next-button-background-color: var(--rz-base-200) !default;
 $paginator-next-button-color: var(--rz-text-color) !default;
+$paginator-next-button-hover-background-color: $paginator-next-button-background-color !default;
+$paginator-next-button-hover-color: $paginator-next-button-color !default;
 
 $paginator-dropdown-width: 80px !default;
 $paginator-dropdown-margin: $paginator-last-button-margin !default;
@@ -35,8 +43,12 @@ $paginator-button-size: ".rz-button-md" !default;
   --rz-paginator-background-color: #{$paginator-background-color};
   --rz-paginator-padding: #{$paginator-padding};
 
+  --rz-paginator-button-border-radius: #{$paginator-button-border-radius};
+
   --rz-paginator-numeric-button-background-color: #{$paginator-numeric-button-background-color};
   --rz-paginator-numeric-button-color: #{$paginator-numeric-button-color};
+  --rz-paginator-numeric-button-hover-background-color: #{$paginator-numeric-button-hover-background-color};
+  --rz-paginator-numeric-button-hover-color: #{$paginator-numeric-button-hover-color};
   --rz-paginator-numeric-button-margin: #{$paginator-numeric-button-margin};
   --rz-paginator-numeric-button-padding: #{$paginator-numeric-button-padding};
   --rz-paginator-numeric-button-selected-background-color: #{$paginator-numeric-button-selected-background-color};
@@ -47,12 +59,16 @@ $paginator-button-size: ".rz-button-md" !default;
 
   --rz-paginator-back-button-background-color: #{$paginator-back-button-background-color};
   --rz-paginator-back-button-color: #{$paginator-back-button-color};
+  --rz-paginator-back-button-hover-background-color: #{$paginator-back-button-hover-background-color};
+  --rz-paginator-back-button-hover-color: #{$paginator-back-button-hover-color};
 
   --rz-paginator-first-button-margin: #{$paginator-first-button-margin};
   --rz-paginator-last-button-margin: #{$paginator-last-button-margin};
 
   --rz-paginator-next-button-background-color: #{$paginator-next-button-background-color};
   --rz-paginator-next-button-color: #{$paginator-next-button-color};
+  --rz-paginator-next-button-hover-background-color: #{$paginator-next-button-hover-background-color};
+  --rz-paginator-next-button-hover-color: #{$paginator-next-button-hover-color};
 
   --rz-paginator-dropdown-width: #{$paginator-dropdown-width};
   --rz-paginator-dropdown-margin: #{$paginator-dropdown-margin};
@@ -130,13 +146,13 @@ $paginator-button-size: ".rz-button-md" !default;
 .rz-paginator-element,
 .rz-paginator-page {
   &:hover {
-    color: inherit;
+    background-color: var(--rz-paginator-numeric-button-hover-background-color);
+    color: var(--rz-paginator-numeric-button-hover-color);
   }
 }
 
 .rz-paginator-bottom {
   border-top: $grid-border;
-
   border-bottom-right-radius: var(--rz-border-radius);
   border-bottom-left-radius: var(--rz-border-radius);
 }
@@ -147,6 +163,7 @@ $paginator-button-size: ".rz-button-md" !default;
 
 .rz-paginator-element {
   @extend .rz-button, #{$paginator-button-size}, .rz-button-icon-only;
+  letter-spacing: 0;
 }
 
 .rz-paginator-first {
@@ -189,6 +206,7 @@ $paginator-button-size: ".rz-button-md" !default;
 .rz-paginator-prev {
   background-color: var(--rz-paginator-back-button-background-color);
   color: var(--rz-paginator-back-button-color);
+  border-radius: var(--rz-paginator-button-border-radius);
 }
 
 .rz-paginator-element {
@@ -201,10 +219,7 @@ $paginator-button-size: ".rz-button-md" !default;
 .rz-paginator-next {
   background-color: var(--rz-paginator-next-button-background-color);
   color: var(--rz-paginator-next-button-color);
-
-  &:hover {
-    color: var(--rz-paginator-next-button-color);
-  }
+  border-radius: var(--rz-paginator-button-border-radius);
 }
 
 .rz-paginator-page {
@@ -213,7 +228,7 @@ $paginator-button-size: ".rz-button-md" !default;
   text-align: center;
   margin: var(--rz-paginator-numeric-button-margin);
   background-color: var(--rz-paginator-numeric-button-background-color);
-  border-radius: var(--rz-border-radius);
+  border-radius: var(--rz-paginator-button-border-radius);
   padding: var(--rz-paginator-numeric-button-padding);
   color: var(--rz-paginator-numeric-button-color);
 
