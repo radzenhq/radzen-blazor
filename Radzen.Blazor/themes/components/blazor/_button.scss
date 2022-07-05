@@ -182,6 +182,7 @@ $button-styles: map-merge(
       font-weight: map-get($button, font-weight);
       padding: map-get($button, padding);
       height: map-get($button, height);
+      line-height: map-get($button, line-height);
       letter-spacing: map-get($button, letter-spacing);
       text-transform: map-get($button, text-transform);
 
@@ -197,10 +198,6 @@ $button-styles: map-merge(
         @each $name, $value in map-get($button, icon) {
           #{$name}: #{$value};
         }
-      }
-
-      .rz-button-text {
-        line-height: map-get($button, line-height);
       }
     }
   }
