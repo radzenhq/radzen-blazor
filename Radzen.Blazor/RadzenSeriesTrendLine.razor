@@ -1,0 +1,79 @@
+﻿@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits RadzenGridLines
+@implements IRadzenSeriesOverlay
+
+@code {
+    CartesianSeries<TItem> series;
+    [CascadingParameter]
+    protected CartesianSeries<TItem> Series
+    {
+        get
+        {
+            return series;
+        }
+        set
+        {
+            if (value.CoordinateSystem != CoordinateSystem.Cartesian)
+            {
+                throw new ArgumentException($"Series must use Cartesian coordinate system");
+            }
+            series = value;
+            series.Overlays.Add(this);
+        }
+    }
+
+    public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        Func<TItem, double> X;
+        Func<TItem, double> Y;
+        if (Chart.ShouldInvertAxes())
+        {
+            X = e => categoryScale.Scale(series.Value(e));
+            Y = e => valueScale.Scale(series.Category(valueScale)(e));
+        }
+        else
+        {
+            X = e => categoryScale.Scale(series.Category(categoryScale)(e));
+            Y = e => valueScale.Scale(series.Value(e));
+        }
+
+        double x1, x2, y1, y2;
+
+        // https://en.wikipedia.org/wiki/Simple_linear_regression#Fitting_the_regression_line
+        var avgX = series.Data.Select(e => X(e)).Average();
+        var avgY = series.Data.Select(e => Y(e)).Average();
+        var sumXY = series.Data.Sum(e => (X(e) - avgX) * (Y(e) - avgY));
+        if (Chart.ShouldInvertAxes())
+        {
+            var sumYSq = series.Data.Sum(e => (Y(e) - avgY) * (Y(e) - avgY));
+            var b = sumXY / sumYSq;
+            var a = avgX - b * avgY;
+
+            y1 = 0; y2 = Chart.ValueScale.OutputSize;
+            x1 = a; x2 = (a + b * y2);
+
+            x1 = Math.Min(Math.Max(0, x1), Chart.CategoryScale.OutputSize); 
+            x2 = Math.Max(Math.Min(Chart.CategoryScale.OutputSize, x2), 0);
+        }
+        else
+        {
+            var sumXSq = series.Data.Sum(e => (X(e) - avgX) * (X(e) - avgX));
+            var b = sumXY / sumXSq;
+            var a = avgY - b * avgX;
+
+            x1 = 0; x2 = Chart.CategoryScale.OutputSize - Chart.CategoryAxis.Padding * 2;
+            y1 = a; y2 = (a + b * x2);
+
+            y1 = Math.Min(Math.Max(0, y1), Chart.ValueScale.OutputSize); 
+            y2 = Math.Max(Math.Min(Chart.ValueScale.OutputSize, y2), 0);
+        }
+
+        var path = $"M{x1} {y1} L{x2} {y2} ";
+
+        return
+        @<g>
+            <Path @key="@($"{path}-{Chart.Series.IndexOf(series)}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" />
+        </g>;
+    }
+}

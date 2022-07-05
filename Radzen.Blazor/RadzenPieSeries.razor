@@ -7,8 +7,10 @@
 </CascadingValue>
 
 @code {
-   public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
-   {
+    public override CoordinateSystem CoordinateSystem => CoordinateSystem.Polar;
+
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
         var className = $"rz-pie-series rz-series-{Chart.Series.IndexOf(this)}";
         var x = CenterX;
         var y = CenterY;
