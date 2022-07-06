@@ -87,15 +87,25 @@
         if (Chart.ShouldInvertAxes())
         {
             mouseX = Chart.CategoryScale.Scale(Value);
+            mouseY = Math.Max(0, Math.Min(Chart.ValueScale.OutputSize, mouseY));
         }
         else
         {
-            mouseY = Chart.ValueScale.Scale(Value);            
+            mouseY = Chart.ValueScale.Scale(Value);
+            mouseX = Math.Max(0, Math.Min(Chart.CategoryScale.OutputSize, mouseX));
         }
 
         return builder =>
         {
-            var value = Chart.ValueAxis.Format(Chart.ValueScale, Value);
+            string value;
+            if (Chart.ShouldInvertAxes())
+            {
+                value = Chart.CategoryAxis.Format(Chart.CategoryScale, Value);
+            }
+            else
+            {
+                value = Chart.ValueAxis.Format(Chart.ValueScale, Value);
+            }
 
             builder.OpenComponent<ChartTooltip>(0);
 
