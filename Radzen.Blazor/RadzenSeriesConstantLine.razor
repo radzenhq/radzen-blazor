@@ -36,6 +36,8 @@
         }
     }
 
+    protected virtual string Name => "Value";
+
     public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
         double x1, x2, y1, y2;
@@ -60,9 +62,9 @@
 
         var path = $"M{x1} {y1} L{x2} {y2}";
         return
-        @<g>
-            <Path @key="@($"{path}-{Chart.Series.IndexOf(series)}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" />
-        </g>
+    @<g>
+        <Path @key="@($"{path}-{Chart.Series.IndexOf(series)}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" />
+    </g>
     ;
     }
 
@@ -86,13 +88,13 @@
     {
         if (Chart.ShouldInvertAxes())
         {
-            mouseX = Chart.CategoryScale.Scale(Value);
-            mouseY = Math.Max(0, Math.Min(Chart.ValueScale.OutputSize, mouseY));
+            mouseX = Chart.CategoryScale.Scale(Value) + marginLeft;
+            mouseY = Math.Max(marginTop, Math.Min(Chart.ValueScale.OutputSize + marginTop, mouseY));
         }
         else
         {
-            mouseY = Chart.ValueScale.Scale(Value);
-            mouseX = Math.Max(0, Math.Min(Chart.CategoryScale.OutputSize, mouseX));
+            mouseY = Chart.ValueScale.Scale(Value) + marginTop;
+            mouseX = Math.Max(marginLeft, Math.Min(Chart.CategoryScale.OutputSize + marginLeft, mouseX));
         }
 
         return builder =>
@@ -109,12 +111,12 @@
 
             builder.OpenComponent<ChartTooltip>(0);
 
-            builder.AddAttribute(1, nameof(ChartTooltip.X), mouseX + marginLeft);
-            builder.AddAttribute(2, nameof(ChartTooltip.Y), mouseY + marginTop);
+            builder.AddAttribute(1, nameof(ChartTooltip.X), mouseX);
+            builder.AddAttribute(2, nameof(ChartTooltip.Y), mouseY);
 
             builder.AddAttribute(3, nameof(ChartTooltip.ChildContent), TooltipTemplate == null ? null : TooltipTemplate(Value));
 
-            builder.AddAttribute(4, nameof(ChartTooltip.Label), "Value");
+            builder.AddAttribute(4, nameof(ChartTooltip.Label), Name);
             builder.AddAttribute(4, nameof(ChartTooltip.Value), value);
 
             builder.AddAttribute(4, nameof(ChartTooltip.Style), "");
@@ -122,6 +124,6 @@
             builder.AddAttribute(4, nameof(ChartTooltip.Title), "");
 
             builder.CloseComponent();
-        };       
+        };
     }
 }
