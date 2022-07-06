@@ -119,7 +119,7 @@
             builder.AddAttribute(4, nameof(ChartTooltip.Label), Name);
             builder.AddAttribute(4, nameof(ChartTooltip.Value), value);
 
-            builder.AddAttribute(4, nameof(ChartTooltip.Style), "");
+            builder.AddAttribute(4, nameof(ChartTooltip.Style), $"border: 1px solid {Stroke};");
             builder.AddAttribute(4, nameof(ChartTooltip.Class), "");
             builder.AddAttribute(4, nameof(ChartTooltip.Title), "");
 
