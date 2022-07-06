@@ -117,11 +117,11 @@
             builder.AddAttribute(3, nameof(ChartTooltip.ChildContent), TooltipTemplate == null ? null : TooltipTemplate(Value));
 
             builder.AddAttribute(4, nameof(ChartTooltip.Label), Name);
-            builder.AddAttribute(4, nameof(ChartTooltip.Value), value);
+            builder.AddAttribute(5, nameof(ChartTooltip.Value), value);
 
-            builder.AddAttribute(4, nameof(ChartTooltip.Style), $"border: 1px solid {Stroke};");
-            builder.AddAttribute(4, nameof(ChartTooltip.Class), "");
-            builder.AddAttribute(4, nameof(ChartTooltip.Title), "");
+            builder.AddAttribute(6, nameof(ChartTooltip.Style), $"border: 1px solid {Stroke};");
+            builder.AddAttribute(7, nameof(ChartTooltip.Class), "");
+            builder.AddAttribute(8, nameof(ChartTooltip.Title), "");
 
             builder.CloseComponent();
         };
