@@ -100,10 +100,10 @@ namespace Radzen.Blazor
             {
                 Grid.AddColumn(this);
 
-                if (!string.IsNullOrEmpty(FilterProperty) || Type == null)
-                {
-                    var property = GetFilterProperty();
+                var property = GetFilterProperty();
 
+                if (!string.IsNullOrEmpty(property) && Type == null)
+                {
                     if (!string.IsNullOrEmpty(property))
                     {
                         _filterPropertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
