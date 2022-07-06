@@ -19,6 +19,9 @@
     [Parameter]
     public string Class { get; set; }
 
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
     CartesianSeries<TItem> series;
     [CascadingParameter]
     protected CartesianSeries<TItem> Series 
@@ -66,6 +69,13 @@
     ;
     }
     
-    [Parameter]
-    public bool Visible { get; set; } = true;
+    public bool Contains(double mouseX, double mouseY, int tolerance)
+    {
+        return false;
+    }
+
+    public RenderFragment RenderTooltip(double mouseX, double mouseY, double marginLeft, double marginTop)
+    {
+        return null;
+    }
 }

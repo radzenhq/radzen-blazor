@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -19,5 +20,15 @@ namespace Radzen.Blazor
         /// Gets overlay visibility state
         /// </summary>
         bool Visible { get; }
+
+        /// <summary>
+        /// Hit test
+        /// </summary>
+        bool Contains(double mouseX, double mouseY, int tolerance);
+
+        /// <summary>
+        /// Renders tooltip
+        /// </summary>
+        RenderFragment RenderTooltip(double mouseX, double mouseY, double marginLeft, double marginTop);
     }
 }

@@ -11,10 +11,13 @@
     [Parameter]
     public virtual double Value { get; set; }
 
+    [Parameter]
+    public RenderFragment<double> TooltipTemplate { get; set; }
+
     IChartSeries series;
     [CascadingParameter]
-    protected IChartSeries Series 
-    { 
+    protected IChartSeries Series
+    {
         get
         {
             return series;
@@ -52,13 +55,56 @@
             {
                 return null;
             }
-            x1 = 0; x2 = Chart.CategoryScale.OutputSize - Chart.CategoryAxis.Padding * 2;           
+            x1 = 0; x2 = Chart.CategoryScale.OutputSize - Chart.CategoryAxis.Padding * 2;
         }
-       
+
         var path = $"M{x1} {y1} L{x2} {y2}";
         return
         @<g>
             <Path @key="@($"{path}-{Chart.Series.IndexOf(series)}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" />
-        </g>;
+        </g>
+    ;
+    }
+
+    public bool Contains(double mouseX, double mouseY, int tolerance)
+    {
+        var x = mouseX;
+        var y = mouseY;
+        if (Chart.ShouldInvertAxes())
+        {
+            var a = Chart.CategoryScale.Scale(Value);
+            return (a >= x - tolerance && a <= x + tolerance);
+        }
+        else
+        {
+            var a = Chart.ValueScale.Scale(Value);
+            return (a >= y - tolerance && a <= y + tolerance);
+        }
+    }
+
+    public RenderFragment RenderTooltip(double mouseX, double mouseY, double marginLeft, double marginTop)
+    {
+        if (Chart.ShouldInvertAxes())
+        {
+            mouseX = Chart.CategoryScale.Scale(Value);
+        }
+        else
+        {
+            mouseY = Chart.ValueScale.Scale(Value);            
+        }
+
+        return builder =>
+        {
+            builder.OpenComponent<ChartTooltip>(0);
+            builder.AddAttribute(1, nameof(ChartTooltip.X), mouseX + marginLeft);
+            builder.AddAttribute(2, nameof(ChartTooltip.Y), mouseY + marginTop);
+            if (TooltipTemplate != null)
+            {
+                builder.AddAttribute(3, nameof(ChartTooltip.ChildContent), TooltipTemplate(Value));
+            }
+            builder.AddAttribute(4, nameof(ChartTooltip.Label), "Value");
+            builder.AddAttribute(4, nameof(ChartTooltip.Value), Value.ToInvariantString());
+            builder.CloseComponent();
+        };       
     }
 }
