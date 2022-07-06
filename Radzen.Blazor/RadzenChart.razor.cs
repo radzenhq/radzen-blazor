@@ -305,19 +305,35 @@ namespace Radzen.Blazor
 
                 foreach (var series in orderedSeries)
                 {
-                    if (series.Visible && series.Contains(mouseX - MarginLeft, mouseY - MarginTop, 25))
+                    if (series.Visible)
                     {
-                        var data = series.DataAt(mouseX - MarginLeft, mouseY - MarginTop);
-
-                        if (data != tooltipData)
+                        foreach (var overlay in series.Overlays.Reverse())
                         {
-                            tooltipData = data;
-                            tooltip = series.RenderTooltip(data, MarginLeft, MarginTop);
-                            StateHasChanged();
-                            await Task.Yield();
+                            if (overlay.Contains(mouseX - MarginLeft, mouseY - MarginTop, 25))
+                            {
+                                tooltipData = null;
+                                tooltip = overlay.RenderTooltip(mouseX, mouseY, MarginLeft, MarginTop);
+                                StateHasChanged();
+                                await Task.Yield();
+                                
+                                return;
+                            }
                         }
 
-                        return;
+                        if (series.Contains(mouseX - MarginLeft, mouseY - MarginTop, 25))
+                        {
+                            var data = series.DataAt(mouseX - MarginLeft, mouseY - MarginTop);
+
+                            if (data != tooltipData)
+                            {
+                                tooltipData = data;
+                                tooltip = series.RenderTooltip(data, MarginLeft, MarginTop);
+                                StateHasChanged();
+                                await Task.Yield();
+                            }
+
+                            return;
+                        }
                     }
                 }
 

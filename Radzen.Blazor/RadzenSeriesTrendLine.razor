@@ -57,6 +57,17 @@
         return
         @<g>
             <Path @key="@($"{path}-{Chart.Series.IndexOf(series)}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" />
-        </g>;
+        </g>
+    ;
+    }
+
+    public bool Contains(double mouseX, double mouseY, int tolerance)
+    {
+        return false;
+    }
+
+    public RenderFragment RenderTooltip(double mouseX, double mouseY, double marginLeft, double marginTop)
+    {
+        return null;
     }
 }
