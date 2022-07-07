@@ -99,15 +99,7 @@
 
         return builder =>
         {
-            string value;
-            if (Chart.ShouldInvertAxes())
-            {
-                value = Chart.CategoryAxis.Format(Chart.CategoryScale, Value);
-            }
-            else
-            {
-                value = Chart.ValueAxis.Format(Chart.ValueScale, Value);
-            }
+            string value = Chart.ValueAxis.Format(Chart.ValueScale, Value);
 
             builder.OpenComponent<ChartTooltip>(0);
 

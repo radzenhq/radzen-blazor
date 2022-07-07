@@ -97,6 +97,10 @@ namespace Radzen.Blazor
         /// <param name="y">The y.</param>
         object DataAt(double x, double y);
         /// <summary>
+        /// Returns data chart position
+        /// </summary>
+        IEnumerable<(Point Position, string Text)> GetDataLabels(double offsetX, double offsetY);
+        /// <summary>
         /// Returns series median
         /// </summary>
         double GetMedian();

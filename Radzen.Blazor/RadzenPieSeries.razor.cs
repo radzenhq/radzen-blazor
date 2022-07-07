@@ -318,5 +318,26 @@ namespace Radzen.Blazor
 
             return $"M {startX} {startY} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {innerEndX} {innerEndY} A {innerR} {innerR} 0 {largeArcFlag} 0 {innerStartX} {innerStartY}";
         }
+
+        /// <inheritdoc />
+        public override IEnumerable<(Point Position, string Text)> GetDataLabels(double offsetX, double offsetY)
+        {
+            var list = new List<(Point Position, string Text)>();
+            foreach (var d in Data)
+            {
+                var x = TooltipX(d);
+                var y = TooltipY(d);
+
+                var phi = Math.Atan2(y - CenterY, x - CenterX);
+
+                x += offsetX * Math.Cos(phi);
+                y += offsetX * Math.Sin(phi);
+
+                var position = new Point() { X = x, Y = y };
+                var text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d));
+                list.Add((position, text));
+            }
+            return list;
+        }
     }
 }

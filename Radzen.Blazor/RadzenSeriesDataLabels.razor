@@ -1,0 +1,75 @@
+﻿@using Radzen.Blazor.Rendering
+@inherits RadzenChartComponentBase
+@implements IRadzenSeriesOverlay
+
+@code {
+    [Parameter]
+    public double OffsetX { get; set; }
+
+    [Parameter]
+    public double OffsetY { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
+    IChartSeries series;
+    [CascadingParameter]
+    protected IChartSeries Series 
+    { 
+        get
+        {
+            return series;
+        }
+        set
+        {
+            if (!value.Overlays.Contains(this))
+            {
+                series = value;
+                series.Overlays.Add(this);
+            }
+        }
+    }
+
+    public override Task SetParametersAsync(ParameterView parameters)
+    {
+        foreach(var parameter in parameters)
+        {
+            if (parameters.TryGetValue(nameof(OffsetY), out double _))
+            {
+                throw new ArgumentException($"{nameof(OffsetY)} only supported in series that use Cartesian coordinate system");
+            }
+        }
+
+        return base.SetParametersAsync(parameters);
+    }
+
+    public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        return builder =>
+        {
+            builder.OpenRegion(0);
+            foreach (var label in series.GetDataLabels(OffsetX, OffsetY))
+            {
+                builder.AddContent(1,
+                    @<g>
+                        <Text @key="@($"{label.Position}-{Chart.Series.IndexOf(series)}")" Value="@label.Text" Position="label.Position" Class="@Class" />
+                    </g>
+                    );
+            }
+            builder.CloseRegion();
+        };
+    }
+    
+    public bool Contains(double mouseX, double mouseY, int tolerance)
+    {
+        return false;
+    }
+
+    public RenderFragment RenderTooltip(double mouseX, double mouseY, double marginLeft, double marginTop)
+    {
+        return null;
+    }
+}
