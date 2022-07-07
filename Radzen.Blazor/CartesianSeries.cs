@@ -683,6 +683,33 @@ namespace Radzen.Blazor
             return null;
         }
 
+        /// <inheritdoc />
+        public virtual IEnumerable<(Point Position, string Text)> GetDataLabels(double offsetX, double offsetY)
+        {
+            var list = new List<(Point, string)>();
+            
+            foreach (var d in Data)
+            {
+                double x, y;
+                if (Chart.ShouldInvertAxes())
+                {
+                    x = Chart.CategoryScale.Scale(Value(d));
+                    y = Chart.ValueScale.Scale(Category(Chart.ValueScale)(d));
+                }
+                else
+                {
+                    x = Chart.CategoryScale.Scale(Category(Chart.CategoryScale)(d));
+                    y = Chart.ValueScale.Scale(Value(d));
+                }
+
+                var pt = new Point() { X = x + offsetX, Y = y + offsetY };
+                var text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d));
+                list.Add((pt, text));
+            }
+
+            return list;
+        }
+
         /// <summary>
         /// Returns a color from the specified list of colors. Rotates colors.
         /// </summary>
