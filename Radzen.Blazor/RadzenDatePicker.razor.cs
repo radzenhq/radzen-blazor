@@ -217,12 +217,17 @@ namespace Radzen.Blazor
         {
             base.OnInitialized();
 
-            YearFrom = Min.HasValue ? Min.Value.Year : int.Parse(YearRange.Split(':').First());
-            YearTo = Max.HasValue ? Max.Value.Year : int.Parse(YearRange.Split(':').Last());
+            UpdateYearsAndMonths(Min, Max);
+
+        }
+
+        void UpdateYearsAndMonths(DateTime? min, DateTime? max)
+        {
+            YearFrom = min.HasValue ? min.Value.Year : int.Parse(YearRange.Split(':').First());
+            YearTo = max.HasValue ? max.Value.Year : int.Parse(YearRange.Split(':').Last());
             months = Enumerable.Range(1, 12).Select(i => new NameValue() { Name = Culture.DateTimeFormat.GetMonthName(i), Value = i }).ToList();
             years = Enumerable.Range(YearFrom, YearTo - YearFrom + 1)
                 .Select(i => new NameValue() { Name = $"{i}", Value = i }).ToList();
-
         }
 
         /// <summary>
@@ -867,6 +872,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            if (parameters.DidParameterChange(nameof(Min), Min) || parameters.DidParameterChange(nameof(Max), Max))
+            {
+                var min = parameters.GetValueOrDefault<DateTime?>(nameof(Min));
+                var max = parameters.GetValueOrDefault<DateTime?>(nameof(Max));
+                UpdateYearsAndMonths(min, max);
+            }
             var shouldClose = false;
 
             if (parameters.DidParameterChange(nameof(Visible), Visible))
