@@ -717,7 +717,10 @@ namespace Radzen.Blazor
 
         internal bool CanSetFilterValue()
         { 
-            return GetFilterOperator() == FilterOperator.IsNull || GetFilterOperator() == FilterOperator.IsNotNull;
+            return GetFilterOperator() == FilterOperator.IsNull 
+                    || GetFilterOperator() == FilterOperator.IsNotNull 
+                    ||  GetFilterOperator() == FilterOperator.IsEmpty 
+                    || GetFilterOperator() == FilterOperator.IsNotEmpty;
         }
 
         /// <summary>
@@ -814,10 +817,13 @@ namespace Radzen.Blazor
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.IsNull, FilterOperator.IsNotNull };
 
             return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
-                var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
+                var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain 
+                    || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
                 return FilterPropertyType == typeof(string) ? isStringOperator 
-                    || o == FilterOperator.Equals || o == FilterOperator.NotEquals || o == FilterOperator.IsNull || o == FilterOperator.IsNotNull
-                        : !isStringOperator;
+                      || o == FilterOperator.Equals || o == FilterOperator.NotEquals 
+                      || o == FilterOperator.IsNull || o == FilterOperator.IsNotNull
+                      || o == FilterOperator.IsEmpty || o == FilterOperator.IsNotEmpty
+                    : !isStringOperator;
             });
         }
 
@@ -847,8 +853,12 @@ namespace Radzen.Blazor
                     return Grid?.NotEqualsText;
                 case FilterOperator.IsNull:
                     return Grid?.IsNullText;
+                case FilterOperator.IsEmpty:
+                    return Grid?.IsEmptyText;
                 case FilterOperator.IsNotNull:
                     return Grid?.IsNotNullText;
+                case FilterOperator.IsNotEmpty:
+                    return Grid?.IsNotEmptyText;
                 default:
                     return $"{filterOperator}";
             }
@@ -880,8 +890,10 @@ namespace Radzen.Blazor
                 case FilterOperator.NotEquals:
                     return "≠";
                 case FilterOperator.IsNull:
+                case FilterOperator.IsEmpty:
                     return "∅";
                 case FilterOperator.IsNotNull:
+                case FilterOperator.IsNotEmpty:
                     return "!∅";
                 default:
                     return $"{filterOperator}";

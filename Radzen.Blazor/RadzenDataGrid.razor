@@ -188,6 +188,12 @@
                                                                                         <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNull))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNull))" style="display: block;">
                                                                                             <span>@IsNullText</span>
                                                                                         </li>
+                                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsEmpty))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsEmpty))" style="display: block;">
+                                                                                            <span>@IsEmptyText</span>
+                                                                                        </li>
+                                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNotEmpty))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNotEmpty))" style="display: block;">
+                                                                                            <span>@IsNotEmptyText</span>
+                                                                                        </li>
                                                                                         <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNotNull))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNotNull))" style="display: block;">
                                                                                             <span>@IsNotNullText</span>
                                                                                         </li>

@@ -165,6 +165,7 @@ else
     {
         var additionalStyle = column.GetFilterValue() != null || column.GetSecondFilterValue() != null || 
             column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull 
+                || column.GetFilterOperator() == FilterOperator.IsEmpty || column.GetFilterOperator() == FilterOperator.IsNotEmpty
                 ? "rz-grid-filter-active" : "";
         return $"rzi rz-grid-filter-icon {additionalStyle}";
     }
