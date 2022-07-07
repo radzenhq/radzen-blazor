@@ -849,6 +849,20 @@ namespace Radzen.Blazor
         /// <value>The null text.</value>
         [Parameter]
         public string IsNullText { get; set; } = "Is null";
+        
+        /// <summary>
+        /// Gets or sets the is empty text.
+        /// </summary>
+        /// <value>The empty text.</value>
+        [Parameter]
+        public string IsEmptyText { get; set; } = "Is empty";
+        
+        /// <summary>
+        /// Gets or sets the is not empty text.
+        /// </summary>
+        /// <value>The not empty text.</value>
+        [Parameter]
+        public string IsNotEmptyText { get; set; } = "Is not empty";
 
         internal class NumericFilterEventCallback
         {
@@ -1428,15 +1442,17 @@ namespace Radzen.Blazor
             if (LoadData.HasDelegate)
             {
                 var filters = allColumns.ToList().Where(c => c.Filterable && c.GetVisible() && (c.GetFilterValue() != null
-                        || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull)).Select(c => new FilterDescriptor()
-                        {
+                        || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
+                        || c.GetFilterOperator() == FilterOperator.IsEmpty | c.GetFilterOperator() == FilterOperator.IsNotEmpty))
+                    .Select(c => new FilterDescriptor()
+                    {
                             Property = c.GetFilterProperty(),
                             FilterValue = c.GetFilterValue(),
                             FilterOperator = c.GetFilterOperator(),
                             SecondFilterValue = c.GetSecondFilterValue(),
                             SecondFilterOperator = c.GetSecondFilterOperator(),
                             LogicalFilterOperator = c.GetLogicalFilterOperator()
-                        });
+                    });
 
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
                 {
