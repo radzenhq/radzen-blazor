@@ -759,6 +759,11 @@ namespace Radzen.Blazor
         /// </summary>
         public void SetFilterOperator(FilterOperator? value)
         {
+            if (value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty || value == FilterOperator.IsNull || value == FilterOperator.IsNotNull)
+            {
+                filterValue = value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty ? string.Empty : null;
+            }
+
             filterOperator = value;
         }
 
@@ -767,6 +772,11 @@ namespace Radzen.Blazor
         /// </summary>
         public void SetSecondFilterOperator(FilterOperator? value)
         {
+            if (value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty || value == FilterOperator.IsNull || value == FilterOperator.IsNotNull)
+            {
+                secondFilterValue = value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty ? string.Empty : null;
+            }
+
             secondFilterOperator = value;
         }
 
