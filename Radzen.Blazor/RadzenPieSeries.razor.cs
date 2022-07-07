@@ -66,7 +66,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the current X coordinate of the center.
         /// </summary>
-        protected double CenterX
+        internal double CenterX
         {
             get
             {
@@ -77,7 +77,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the current Y coordinate of the center.
         /// </summary>
-        protected double CenterY
+        internal double CenterY
         {
             get
             {
@@ -325,13 +325,19 @@ namespace Radzen.Blazor
             var list = new List<(Point Position, string Text)>();
             foreach (var d in Data)
             {
-                var x = TooltipX(d);
-                var y = TooltipY(d);
+                var x = TooltipX(d) - CenterX;
+                var y = TooltipY(d) - CenterY;
 
-                var phi = Math.Atan2(y - CenterY, x - CenterX);
+                // find angle and add offset
+                var phi = Math.Atan2(y, x);
+                phi += Polar.ToRadian(offsetY % 360);
 
-                x += offsetX * Math.Cos(phi);
-                y += offsetX * Math.Sin(phi);
+                // find radius
+                var hyp = Math.Sqrt(x * x + y * y) + offsetX;
+
+                // move along the radius and rotate
+                x = CenterX + hyp * Math.Cos(phi);
+                y = CenterY + hyp * Math.Sin(phi);
 
                 var position = new Point() { X = x, Y = y };
                 var text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d));

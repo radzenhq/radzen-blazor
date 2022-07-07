@@ -5,6 +5,9 @@
 
 @code {
     [Parameter]
+    public CoordinateSystem? CoordinateSystem { get; set; }
+
+    [Parameter]
     public TItem Data { get; set; }
 
     [Parameter]
@@ -45,8 +48,44 @@
         double x = series.TooltipX(Data);
         double y = series.TooltipY(Data);
 
-        x += OffsetX;
-        y += OffsetY;
+        var coordinateSystem = CoordinateSystem ?? series.CoordinateSystem;
+        switch (coordinateSystem)
+        {
+            case Radzen.CoordinateSystem.Cartesian:
+                x += OffsetX;
+                y += OffsetY;
+                break;
+
+            case Radzen.CoordinateSystem.Polar:
+                double orgX;
+                double orgY;
+                if (series is RadzenPieSeries<TItem>)
+                {
+                    var pieSeries = series as RadzenPieSeries<TItem>;
+                    orgX = pieSeries.CenterX;
+                    orgY = pieSeries.CenterY;
+                }
+                else
+                {
+                    orgX = x;
+                    orgY = y;
+                }
+
+                x -= orgX;
+                y -= orgY;
+
+                // find angle and add offset
+                var phi = Math.Atan2(y, x);
+                phi += Polar.ToRadian(OffsetY % 360);
+
+                // find radius
+                var hyp = Math.Sqrt(x * x + y * y) + OffsetX;
+
+                // move along the radius and rotate
+                x = orgX + hyp * Math.Cos(phi);
+                y = orgY + hyp * Math.Sin(phi);                    
+                break;
+        }
 
         Point pt = new Point() { X = x, Y = y };
         return 

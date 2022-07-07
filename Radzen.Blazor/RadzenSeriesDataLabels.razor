@@ -33,19 +33,6 @@
         }
     }
 
-    public override Task SetParametersAsync(ParameterView parameters)
-    {
-        foreach(var parameter in parameters)
-        {
-            if (parameters.TryGetValue(nameof(OffsetY), out double _))
-            {
-                throw new ArgumentException($"{nameof(OffsetY)} only supported in series that use Cartesian coordinate system");
-            }
-        }
-
-        return base.SetParametersAsync(parameters);
-    }
-
     public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
         return builder =>
