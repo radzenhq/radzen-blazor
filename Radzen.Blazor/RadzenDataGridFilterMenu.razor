@@ -31,6 +31,12 @@
             <li class="@(FilterOperatorStyle(Column, FilterOperator.EndsWith))" @onclick="@(args => ApplyFilter(FilterOperator.EndsWith))" style="display: block;">
                 <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.EndsWith)</span><span>@Grid.EndsWithText</span>
             </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.IsEmpty))" @onclick="@(args => ApplyFilter(FilterOperator.IsEmpty))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsEmpty)</span><span>@Grid.IsEmptyText</span>
+            </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNotEmpty))" @onclick="@(args => ApplyFilter(FilterOperator.IsNotEmpty))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotEmpty)</span><span>@Grid.IsNotEmptyText</span>
+            </li>
             }
             <li class="@(FilterOperatorStyle(Column, FilterOperator.Equals))" @onclick="@(args => ApplyFilter(FilterOperator.Equals))" style="display: block;">
                 <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.Equals)</span><span>@Grid.EqualsText</span>
@@ -53,14 +59,8 @@
             <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNull))" @onclick="@(args => ApplyFilter(FilterOperator.IsNull))" style="display: block;">
                 <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNull)</span><span>@Grid.IsNullText</span>
             </li>
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.IsEmpty))" @onclick="@(args => ApplyFilter(FilterOperator.IsEmpty))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsEmpty)</span><span>@Grid.IsEmptyText</span>
-            </li>
             <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNotNull))" @onclick="@(args => ApplyFilter(FilterOperator.IsNotNull))" style="display: block;">
                 <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotNull)</span><span>@Grid.IsNotNullText</span>
-            </li>s
-             <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNotEmpty))" @onclick="@(args => ApplyFilter(FilterOperator.IsNotEmpty))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotEmpty)</span><span>@Grid.IsNotEmptyText</span>
             </li>
             <li class="rz-multiselect-item" @onclick="@(args => ClearFilter())" style="display:block;">
                 <span class="rz-filter-menu-symbol">x</span><span>@Grid.ClearFilterText</span>
@@ -96,8 +96,8 @@
         if (value == FilterOperator.IsNull || value == FilterOperator.IsNotNull 
             || value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty)
         {
-            Column.SetFilterValue(null);
-            Column.SetFilterValue(null, false);
+            Column.SetFilterValue(value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty ? string.Empty : null);
+            Column.SetFilterValue(value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty ? string.Empty : null, false);
         }
 
         Column.SetFilterOperator(value);
