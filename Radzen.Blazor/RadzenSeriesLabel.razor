@@ -32,13 +32,9 @@
         }
         set
         {
-            if (value.CoordinateSystem != CoordinateSystem.Cartesian)
+            if (!value.Overlays.Contains(this))
             {
-                throw new ArgumentException($"Series must use Cartesian coordinate system");
-            }
-            series = value;
-            if (!series.Overlays.Contains(this))
-            {
+                series = value;
                 series.Overlays.Add(this);
             }
         }
@@ -46,17 +42,8 @@
 
     public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
-        double x, y;
-        if (Chart.ShouldInvertAxes())
-        {
-            x = Chart.CategoryScale.Scale(series.Value(Data));
-            y = Chart.ValueScale.Scale(series.Category(Chart.ValueScale)(Data));
-        }
-        else
-        {
-            x = Chart.CategoryScale.Scale(series.Category(Chart.CategoryScale)(Data));
-            y = Chart.ValueScale.Scale(series.Value(Data));
-        }
+        double x = series.TooltipX(Data);
+        double y = series.TooltipY(Data);
 
         x += OffsetX;
         y += OffsetY;
@@ -68,7 +55,7 @@
         </g>
     ;
     }
-    
+
     public bool Contains(double mouseX, double mouseY, int tolerance)
     {
         return false;

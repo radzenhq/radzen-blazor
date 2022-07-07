@@ -206,7 +206,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override double TooltipX(TItem item)
+        internal override double TooltipX(TItem item)
         {
             var sum = Items.Sum(Value);
             double startAngle = 0;
@@ -231,7 +231,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override double TooltipY(TItem item)
+        internal override double TooltipY(TItem item)
         {
             var sum = Items.Sum(Value);
             double startAngle = 0;

@@ -653,7 +653,7 @@ namespace Radzen.Blazor
         /// Gets the X coordinate of the tooltip of the specified item.
         /// </summary>
         /// <param name="item">The item.</param>
-        protected virtual double TooltipX(TItem item)
+        internal virtual double TooltipX(TItem item)
         {
             var category = Category(Chart.CategoryScale);
             return Chart.CategoryScale.Scale(category(item), true);
@@ -663,7 +663,7 @@ namespace Radzen.Blazor
         /// Gets the Y coordinate of the tooltip of the specified item.
         /// </summary>
         /// <param name="item">The item.</param>
-        protected virtual double TooltipY(TItem item)
+        internal virtual double TooltipY(TItem item)
         {
             return Chart.ValueScale.Scale(Value(item), true);
         }
