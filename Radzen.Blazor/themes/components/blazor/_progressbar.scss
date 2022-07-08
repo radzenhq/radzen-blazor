@@ -16,8 +16,39 @@ $progressbar-border-radius: var(--rz-border-radius) !default;
 
 $progressbar-styles: () !default;
 
-$progressbar-styles: map-merge( ( primary: ( background-color: $primary, color: $white ), light: ( background-color: $light, color: $charcoal-grey ), secondary: ( background-color: $secondary, color: $white ), info: ( background-color: $info, color: $white ), warning: ( background-color: $warning, color: $white ), danger: ( background-color: $danger, color: $white ), success: ( background-color: $success, color: $white ) ), $progressbar-styles );
-
+$progressbar-styles: map-merge(
+    (
+        primary: (
+            background-color: var(--rz-primary),
+            color: var(--rz-text-contrast-color)
+        ), 
+        light: (
+            background-color: var(--rz-base-700),
+            color: var(--rz-text-contrast-color)
+        ),
+        secondary: ( 
+            background-color: var(--rz-secondary),
+            color: var(--rz-text-contrast-color)
+        ),
+        info: (
+            background-color: var(--rz-info),
+            color: var(--rz-text-contrast-color)
+        ),
+        warning: (
+            background-color: var(--rz-warning),
+            color: var(--rz-text-contrast-color)
+        ),
+        danger: (
+            background-color: var(--rz-danger),
+            color: var(--rz-text-contrast-color)
+        ),
+        success: (
+            background-color: var(--rz-success),
+            color: var(--rz-text-contrast-color)
+        )
+    ),
+    $progressbar-styles
+);
 
 .rz-progressbar {
   border-radius: var(--rz-progressbar-border-radius);
