@@ -9,7 +9,7 @@
         }
         @if(Tree != null && Tree.AllowCheckBoxes)
         {
-            <RadzenCheckBox TValue="bool?" Value="@IsChecked()" Change="@CheckedChange" Style="@(ParentItem != null && !HasChildren ? "margin-left:25px;margin-right:5px;" : "margin-right:5px;")" />
+            <RadzenCheckBox TValue="bool?" Value="@IsChecked()" Change="@CheckedChange" />
         }
         @if (Template != null)
         {
