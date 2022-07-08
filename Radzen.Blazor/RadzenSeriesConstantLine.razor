@@ -109,12 +109,12 @@
 
             builder.AddAttribute(3, nameof(ChartTooltip.ChildContent), TooltipTemplate == null ? null : TooltipTemplate(Value));
 
+            builder.AddAttribute(8, nameof(ChartTooltip.Title), series.GetTitle());
             builder.AddAttribute(4, nameof(ChartTooltip.Label), Name);
             builder.AddAttribute(5, nameof(ChartTooltip.Value), text);
 
             builder.AddAttribute(6, nameof(ChartTooltip.Style), $"border: 1px solid {Stroke};");
             builder.AddAttribute(7, nameof(ChartTooltip.Class), "");
-            builder.AddAttribute(8, nameof(ChartTooltip.Title), "");
 
             builder.CloseComponent();
         };
