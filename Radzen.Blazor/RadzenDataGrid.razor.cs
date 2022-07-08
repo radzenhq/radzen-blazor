@@ -511,7 +511,7 @@ namespace Radzen.Blazor
         /// <param name="column">The column.</param>
         /// <param name="force">if set to <c>true</c> [force].</param>
         /// <param name="isFirst">if set to <c>true</c> [is first].</param>
-        protected void OnFilter(ChangeEventArgs args, RadzenDataGridColumn<TItem> column, bool force = false, bool isFirst = true)
+        protected async Task OnFilter(ChangeEventArgs args, RadzenDataGridColumn<TItem> column, bool force = false, bool isFirst = true)
         {
             string property = column.GetFilterProperty();
             if (AllowFiltering && column.Filterable)
@@ -522,7 +522,7 @@ namespace Radzen.Blazor
                     skip = 0;
                     CurrentPage = 0;
 
-                    Filter.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
+                    await Filter.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
                     {
                         Column = column,
                         FilterValue = column.GetFilterValue(),
@@ -537,7 +537,12 @@ namespace Radzen.Blazor
                         Data = null;
                     }
 
-                    InvokeAsync(Reload);
+                    await InvokeAsync(Reload);
+
+                    if (IsVirtualizationAllowed())
+                    {
+                        StateHasChanged();
+                    }
                 }
             }
         }
