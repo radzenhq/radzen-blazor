@@ -1,9 +1,9 @@
 .rz-busy-overlay {
     z-index: 9999;
+    position: absolute;
 }
 
 .rz-busy-screen {
-    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
@@ -11,7 +11,7 @@
 }
 
 .rz-busy-indicator {
-    position: absolute;
+    text-align: center;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
