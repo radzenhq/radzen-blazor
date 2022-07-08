@@ -28,6 +28,13 @@ namespace Radzen.Blazor
         [Parameter]
         public string Label { get; set; }
 
+        /// <summary>
+        /// Gets or sets custom source for marker icon.
+        /// </summary>
+        /// <value>The marker icon source.</value>
+        [Parameter]
+        public string IconSrc { get; set; }
+
         RadzenGoogleMap _map;
 
         /// <summary>

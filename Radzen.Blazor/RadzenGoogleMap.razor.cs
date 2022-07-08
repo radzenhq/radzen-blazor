@@ -84,6 +84,13 @@ namespace Radzen.Blazor
         List<RadzenGoogleMapMarker> markers = new List<RadzenGoogleMapMarker>();
 
         /// <summary>
+        /// Gets or sets name or url of the cursor to display when the map is being dragged
+        /// </summary>
+        /// <value>The dragging cursor</value>
+        [Parameter]
+        public string DraggingCursor { get; set; } = string.Empty;
+
+        /// <summary>
         /// Adds the marker.
         /// </summary>
         /// <param name="marker">The marker.</param>
@@ -139,16 +146,17 @@ namespace Radzen.Blazor
             await base.OnAfterRenderAsync(firstRender);
 
             var data = Data != null ? Data : markers;
+            var data_markers = data.Select(m => new { m.Title, m.Label, m.Position, Icon = m.IconSrc ?? string.Empty });
 
             if (firstRender)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center,
-                     data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }));
+                await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center, data_markers);
+                if (!string.IsNullOrWhiteSpace(DraggingCursor))
+                    await JSRuntime.InvokeVoidAsync("Radzen.customizeMap", UniqueID, DraggingCursor);
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, Zoom, Center,
-                             data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }));
+                await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, Zoom, Center, data_markers);
             }
         }
 

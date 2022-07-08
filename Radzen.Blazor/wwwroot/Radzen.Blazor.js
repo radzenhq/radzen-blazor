@@ -229,6 +229,13 @@ window.Radzen = {
       Radzen.updateMap(id, zoom, center, markers);
     });
   },
+  customizeMap: function(id, draggingCursor) {
+    if (Radzen[id] && Radzen[id].instance) {
+      Radzen[id].instance.setOptions({
+         draggableCursor: draggingCursor
+        });
+    }
+  },
   updateMap: function (id, zoom, center, markers) {
     if (Radzen[id] && Radzen[id].instance) {
       if (Radzen[id].instance.markers && Radzen[id].instance.markers.length) {
@@ -243,7 +250,8 @@ window.Radzen = {
         var marker = new this.google.maps.Marker({
           position: m.position,
           title: m.title,
-          label: m.label
+          label: m.label, 
+          icon: m.icon
         });
 
         marker.addListener('click', function (e) {
