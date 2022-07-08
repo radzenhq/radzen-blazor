@@ -912,8 +912,13 @@ namespace Radzen
             }
             if (raiseChange)
             {
-                await ValueChanged.InvokeAsync(object.Equals(internalValue, null) ? default(T) : (T)internalValue);
+                if (ValueChanged.HasDelegate)
+                {
+                    await ValueChanged.InvokeAsync(object.Equals(internalValue, null) ? default(T) : (T)internalValue);
+                }
+
                 if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+
                 await Change.InvokeAsync(internalValue);
             }
             StateHasChanged();
