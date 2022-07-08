@@ -126,11 +126,11 @@
                         @if (HourFormat == "12")
                         {
                             <div class="rz-ampm-picker">
-                                <a href="javascript:void(0)" @onclick="@AmToPm">
+                                <a href="javascript:void(0)" @onclick="@ToggleAmPm">
                                     <span class="rzi rzi-chevron-up"></span>
                                 </a>
                                 <span>@CurrentDate.ToString("tt")</span>
-                                <a href="javascript:void(0)" @onclick="@PmToAm">
+                                <a href="javascript:void(0)" @onclick="@ToggleAmPm">
                                     <span class="rzi rzi-chevron-down"></span>
                                 </a>
                             </div>

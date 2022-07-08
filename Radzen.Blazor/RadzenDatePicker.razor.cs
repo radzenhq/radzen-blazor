@@ -26,46 +26,39 @@ namespace Radzen.Blazor
         RadzenDropDown<int> monthDropDown;
         RadzenDropDown<int> yearDropDown;
 
-        async Task AmToPm()
+        async Task ToggleAmPm()
         {
-            if (amPm == "am" && !Disabled)
+            if (Disabled) return;
+
+            var currentHour = ((CurrentDate.Hour + 11) % 12) + 1;
+            int newHour = 0;
+
+            if (amPm == "pm")
+            {
+                amPm = "am";               
+
+                newHour = currentHour + 12;
+
+                if (newHour > 23)
+                {
+                    newHour = 0;
+                }              
+            }
+            else if (amPm == "am")
             {
                 amPm = "pm";
 
-                var currentHour = ((CurrentDate.Hour + 11) % 12) + 1;
-
-                var newHour = currentHour - 12;
+                newHour = currentHour - 12;
 
                 if (newHour < 1)
                 {
                     newHour = currentHour;
                 }
-
-                var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, newHour, CurrentDate.Minute, CurrentDate.Second);
-
-                await UpdateValueFromTime(newValue);
             }
-        }
 
-        async Task PmToAm()
-        {
-            if (amPm == "pm" && !Disabled)
-            {
-                amPm = "am";
+            var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, newHour, CurrentDate.Minute, CurrentDate.Second);
 
-                var currentHour = ((CurrentDate.Hour + 11) % 12) + 1;
-
-                var newHour = currentHour + 12;
-
-                if (newHour > 23)
-                {
-                    newHour = 0;
-                }
-
-                var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, newHour, CurrentDate.Minute, CurrentDate.Second);
-
-                await UpdateValueFromTime(newValue);
-            }
+            await UpdateValueFromTime(newValue);
         }
 
         int? hour;
