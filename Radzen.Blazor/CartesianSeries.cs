@@ -690,20 +690,17 @@ namespace Radzen.Blazor
             
             foreach (var d in Data)
             {
-                double x, y;
+                var pt = new Point() { X = TooltipX(d) + offsetX, Y = TooltipY(d) + offsetY };
+                string text;
                 if (Chart.ShouldInvertAxes())
                 {
-                    x = Chart.CategoryScale.Scale(Value(d));
-                    y = Chart.ValueScale.Scale(Category(Chart.ValueScale)(d));
+                    text = Chart.CategoryAxis.Format(Chart.CategoryScale, Value(d));
                 }
                 else
                 {
-                    x = Chart.CategoryScale.Scale(Category(Chart.CategoryScale)(d));
-                    y = Chart.ValueScale.Scale(Value(d));
+                    text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d));
                 }
 
-                var pt = new Point() { X = x + offsetX, Y = y + offsetY };
-                var text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d));
                 list.Add((pt, text));
             }
 
