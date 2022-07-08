@@ -1,7 +1,6 @@
 //---- Component Aliases
 
 // Text Color
-
 $rz-text-title-color: var(--rz-base-900) !default;
 $rz-text-color: var(--rz-base-800) !default;
 $rz-text-secondary-color: var(--rz-base-700) !default;
@@ -10,17 +9,14 @@ $rz-text-disabled-color: var(--rz-base-500) !default;
 $rz-text-contrast-color: var(--rz-white) !default;
 
 // Link Color
-
 $rz-link-color: var(--rz-secondary) !default;
 $rz-link-hover-color: var(--rz-secondary-dark) !default;
 $rz-link-hover-decoration: underline !default;
 
 // Background Color
-
 $rz-base-background-color: var(--rz-white) !default;
 
 // Border
-
 $rz-border-50: var(--rz-border-width) solid var(--rz-base-50) !default;
 $rz-border-100: var(--rz-border-width) solid var(--rz-base-100) !default;
 $rz-border-200: var(--rz-border-width) solid var(--rz-base-200) !default;
@@ -80,32 +76,29 @@ $rz-border-focus: var(--rz-border-width) solid var(--rz-base-400) !default;
 $rz-border-disabled: var(--rz-border-width) solid var(--rz-base-200) !default;
 
 // Border Radius
-
 $rz-border-radius-2: $rz-border-radius * 2 !default;
 $rz-border-radius-3: $rz-border-radius * 3 !default;
 $rz-border-radius-4: $rz-border-radius * 4 !default;
 $rz-border-radius-5: $rz-border-radius * 5 !default;
 
 // Shadow
-
 $rz-shadow-0: none !default;
 $rz-shadow-1: none !default;
 $rz-shadow-2: none !default;
 $rz-shadow-3: none !default;
 $rz-shadow-4: none !default;
+$rz-shadow-5: none !default;
+$rz-shadow-6: none !default;
+$rz-shadow-7: none !default;
+$rz-shadow-8: none !default;
+$rz-shadow-9: none !default;
+$rz-shadow-10: none !default;
 
 // Transition
-
-
 $rz-transition: 0.1s linear !default;
 $rz-transition-all: all 0.1s linear !default;
 
-// Icon Size
-
-$rz-icon-base-font-size: 1.25rem !default;
-
 // Component Aliases CSS variables
-
 :root {
   --rz-text-title-color: #{$rz-text-title-color};
   --rz-text-color: #{$rz-text-color};
@@ -188,9 +181,13 @@ $rz-icon-base-font-size: 1.25rem !default;
   --rz-shadow-2: #{$rz-shadow-2};
   --rz-shadow-3: #{$rz-shadow-3};
   --rz-shadow-4: #{$rz-shadow-4};
+  --rz-shadow-5: #{$rz-shadow-5};
+  --rz-shadow-6: #{$rz-shadow-6};
+  --rz-shadow-7: #{$rz-shadow-7};
+  --rz-shadow-8: #{$rz-shadow-8};
+  --rz-shadow-9: #{$rz-shadow-9};
+  --rz-shadow-10: #{$rz-shadow-10};
 
   --rz-transition: #{$rz-transition};
   --rz-transition-all: #{$rz-transition-all};
-  
-  --rz-icon-base-font-size: #{$rz-icon-base-font-size};
 }
