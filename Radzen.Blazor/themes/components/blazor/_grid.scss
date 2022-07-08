@@ -1,6 +1,4 @@
-$grid-border-radius: var(--rz-border-radius) !default;
-
-$grid-data-border-shadow: none;
+$grid-data-border-shadow: none !default;
 
 $grid-cell-border: var(--rz-border-normal) !default;
 $grid-right-cell-border: $grid-cell-border !default;
@@ -54,11 +52,14 @@ $grid-filter-buttons-background-color: var(--rz-base-200) !default;
 
 $grid-clear-filter-button-background-color: var(--rz-secondary) !default;
 $grid-clear-filter-button-color: var(--rz-text-contrast-color) !default;
+$grid-clear-filter-button-shadow: inherit !default;
 $grid-apply-filter-button-background-color: var(--rz-primary) !default;
 $grid-apply-filter-button-color: var(--rz-text-contrast-color) !default;
+$grid-apply-filter-button-shadow: inherit !default;
 
 $grid-header-filter-icon-margin: 0.25rem 0.5rem 0 0 !default;
 $grid-header-filter-icon-hover-color: var(--rz-text-color) !default;
+$grid-header-filter-icon-font-size: 1rem !default;
 
 $grid-border: var(--rz-border-normal) !default;
 
@@ -107,8 +108,6 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 // Grid CSS variables
 
 :root {
-  --rz-grid-border-radius: #{$grid-border-radius};
-
   --rz-grid-data-border-shadow: #{$grid-data-border-shadow};
 
   --rz-grid-cell-border: #{$grid-cell-border};
@@ -163,11 +162,15 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
   --rz-grid-clear-filter-button-background-color: #{$grid-clear-filter-button-background-color};
   --rz-grid-clear-filter-button-color: #{$grid-clear-filter-button-color};
+  --rz-grid-clear-filter-button-shadow: #{$grid-clear-filter-button-shadow};
   --rz-grid-apply-filter-button-background-color: #{$grid-apply-filter-button-background-color};
   --rz-grid-apply-filter-button-color: #{$grid-apply-filter-button-color};
+  --rz-grid-apply-filter-button-shadow: #{$grid-apply-filter-button-shadow};
+
 
   --rz-grid-header-filter-icon-margin: #{$grid-header-filter-icon-margin};
   --rz-grid-header-filter-icon-hover-color: #{$grid-header-filter-icon-hover-color};
+  --rz-grid-header-filter-icon-font-size: #{$grid-header-filter-icon-font-size};
 
   --rz-grid-border: #{$grid-border};
 
@@ -219,9 +222,6 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
   box-shadow: var(--rz-grid-shadow);
   border: var(--rz-grid-cell-border);
   background-color: var(--rz-grid-background-color);
-
-  border-bottom-right-radius: var(--rz-grid-border-radius);
-  border-bottom-left-radius: var(--rz-grid-border-radius);
 
   .rz-col-icon {
     text-align: center;
@@ -285,13 +285,6 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
   position: relative;
 }
 
-.rz-column-resizer-helper {
-  position: absolute;
-  display: none;
-  width: var(--rz-grid-column-resizer-helper-width);
-  background-color: var(--rz-grid-column-resizer-helper-background-color);
-}
-
 .rz-datatable-reorder-indicator-up {
   position: absolute;
   &:before {
@@ -314,6 +307,23 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
   height: 100%;
   cursor: col-resize;
   width: var(--rz-grid-column-resizer-width);
+
+  &:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: var(--rz-grid-column-resizer-helper-width);
+    background-color: transparent;
+  }
+
+  &:hover,
+  &:active {
+    &:after {
+      background-color: var(--rz-grid-column-resizer-helper-background-color);
+    }
+  }
 }
 
 .rz-rowgroup-header .fa,
@@ -336,7 +346,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     text-overflow: ellipsis;
     
 
-    @if $material == false and $fluent == false {
+    @if $fluent == false {
       border-bottom: var(--rz-grid-header-cell-border-bottom);
       
       &:not(:last-child), &.rz-composite-cell {
@@ -722,11 +732,13 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 .rz-clear-filter {
   background-color: var(--rz-grid-clear-filter-button-background-color);
   color: var(--rz-grid-clear-filter-button-color);
+  box-shadow: var(--rz-grid-clear-filter-button-shadow);
 }
 
 .rz-apply-filter {
   background-color: var(--rz-grid-apply-filter-button-background-color);
   color: var(--rz-grid-apply-filter-button-color);
+  box-shadow: var(--rz-grid-apply-filter-button-shadow);
 }
 
 .rz-datatable-loading {
@@ -836,7 +848,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
   color: var(--rz-grid-filter-color);
   margin: var(--rz-grid-header-filter-icon-margin);
   float: right;
-  font-size: 1rem;
+  font-size: var(--rz-grid-header-filter-icon-font-size);
   transition: var(--rz-grid-state-transition);
   &:hover {
     cursor: pointer;
@@ -966,6 +978,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
 .rz-group-header-item {
     border: var(--rz-grid-cell-border);
+    border-radius: var(--rz-border-radius);
     padding: var(--rz-grid-group-header-item-padding);
     margin: var(--rz-grid-group-header-item-margin);
     width: fit-content;
@@ -973,10 +986,13 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 }
 
 .rz-group-header-item-title {
-    margin-right: 5px;
+    font-size: var(--rz-grid-header-font-size);
+    font-weight: var(--rz-grid-header-font-weight);
+    margin-right: 0.25rem;
 }
 
 .rz-group-header-drop {
+    font-size: var(--rz-grid-header-font-size);
     height: fit-content;
 }
 
