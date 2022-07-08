@@ -591,16 +591,32 @@ window.Radzen = {
       : null;
     return uiCulture || 'en-US';
   },
-  numericOnPaste: function (e) {
+  numericOnPaste: function (e, min, max) {
     if (e.clipboardData) {
       var value = e.clipboardData.getData('text');
 
       if (value && !isNaN(+value)) {
-        return;
-      }
+        var numericValue = +value;
+        if (numericValue >= min && numericValue <= max) {
+            return;
+        }
+        }
 
       e.preventDefault();
     }
+  },
+  numericOnInput: function (e, min, max) {
+      var value = e.target.value;
+
+      if (value && !isNaN(+value)) {
+        var numericValue = +value;
+        if (numericValue < min) {
+            e.target.value = min;
+        }
+        if (numericValue > max) {
+            e.target.value = max;
+        }
+      }
   },
   numericKeyPress: function (e, isInteger) {
     if (
