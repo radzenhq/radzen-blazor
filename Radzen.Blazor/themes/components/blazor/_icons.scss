@@ -44,6 +44,7 @@ $icon-styles: map-merge(
   white-space: nowrap;
   direction: ltr;
 
+
   /* Support for all WebKit browsers. */
   -webkit-font-smoothing: antialiased;
   
@@ -55,6 +56,12 @@ $icon-styles: map-merge(
 
   /* Support for IE. */
   font-feature-settings: 'liga';
+}
+
+i.rzi {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @each $style, $icon in $icon-styles {
