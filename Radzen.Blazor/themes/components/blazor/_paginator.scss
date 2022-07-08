@@ -8,7 +8,7 @@ $paginator-numeric-button-background-color: var(--rz-base-200) !default;
 $paginator-numeric-button-color: var(--rz-text-color) !default;
 $paginator-numeric-button-hover-background-color: $paginator-numeric-button-background-color !default;
 $paginator-numeric-button-hover-color: $paginator-numeric-button-color !default;
-$paginator-numeric-button-margin: 0 0.125rem !default;
+$paginator-numeric-button-margin: 0 0.25rem !default;
 $paginator-numeric-button-padding: 0.5rem !default;
 $paginator-numeric-button-selected-background-color: var(--rz-base-background-color) !default;
 $paginator-numeric-button-selected-color: var(--rz-primary) !default;
@@ -158,6 +158,7 @@ $paginator-button-size: ".rz-button-md" !default;
 }
 
 .rz-paginator-pages {
+  display: inline-flex;
   margin: 0 0.5rem;
 }
 
