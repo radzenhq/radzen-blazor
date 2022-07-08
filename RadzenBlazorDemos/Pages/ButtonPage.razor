@@ -28,7 +28,6 @@
             <RadzenButton Click=@(args => OnClick("Danger icon button")) Icon="report" ButtonStyle="ButtonStyle.Danger" />
         </div>
     </div>
-
     <div class="row mb-4">
         <div class="col">
             <h4 class="text-thin">Icon and text</h4>
@@ -41,7 +40,6 @@
             <RadzenButton Click=@(args => OnClick("Danger button with text and icon")) Text="Report" Icon="report" ButtonStyle="ButtonStyle.Danger" />
         </div>
     </div>
-
     <div class="row mb-4">
         <div class="col">
             <h4 class="text-thin">Images</h4>
@@ -52,7 +50,17 @@
             </RadzenButton>
         </div>
     </div>
-
+    <div class="row mb-4">
+        <div class="col">
+            <h4 class="text-thin">Button Size</h4>
+            <RadzenButton Click=@(args => OnClick("Small Button")) Text="Small" Size="ButtonSize.Small" />
+            <RadzenButton Click=@(args => OnClick("Primary icon button")) Icon="add_circle_outline" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
+            <RadzenButton Click=@(args => OnClick("Primary button with text and icon")) Text="Small" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
+            <RadzenButton Click=@(args => OnClick("Medium Button")) Text="Medium" Size="ButtonSize.Medium" />
+            <RadzenButton Click=@(args => OnClick("Primary icon button")) Icon="add_circle_outline" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium" />
+            <RadzenButton Click=@(args => OnClick("Primary button with text and icon")) Text="Medium" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium" />
+        </div>
+    </div>
     <div class="row mb-4">
         <div class="col">
             <h4 class="text-thin">Disabled Button</h4>
