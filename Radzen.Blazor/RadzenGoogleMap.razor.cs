@@ -91,6 +91,19 @@ namespace Radzen.Blazor
         public string DraggingCursor { get; set; } = string.Empty;
 
         /// <summary>
+        /// Get or set parameter to manage map conponent refreshing.
+        /// </summary>
+        /// <value>Should render Map component.</value>
+        [Parameter]
+        public bool IsShouldRender { get; set; } = true;
+
+        /// <inheritdoc />
+        protected override bool ShouldRender()
+        {
+            return IsShouldRender;
+        }
+
+        /// <summary>
         /// Adds the marker.
         /// </summary>
         /// <param name="marker">The marker.</param>

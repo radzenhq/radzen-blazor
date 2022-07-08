@@ -247,6 +247,8 @@ window.Radzen = {
       }
 
       Radzen[id].instance.markers = [];
+      // Create an info window to share between markers.
+      const infoWindow = new google.maps.InfoWindow();
 
       markers.forEach(function (m) {
         var marker = new this.google.maps.Marker({
@@ -262,6 +264,9 @@ window.Radzen = {
             Label: marker.label,
             Position: marker.position
           });
+          infoWindow.close();
+          infoWindow.setContent('<div style="color:rgb(0,0,0)">' + marker.getTitle() + '</div>');
+          infoWindow.open(marker.getMap(), marker);
         });
 
         marker.setMap(Radzen[id].instance);
