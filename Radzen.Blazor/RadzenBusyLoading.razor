@@ -1,0 +1,75 @@
+﻿@if (IsLoaded)
+{
+    <div class="@(IsBusy ? "rz-busy-wrapper" : "")">
+        @ChildContent
+        @if (IsBusy)
+        {
+            <div class="rz-busy-overlay rz-busy-screen" style="@($"opacity:{ScreenOpacity}; background-color:{ScreenColor}")"/>
+            <div class="rz-busy-overlay rz-busy-indicator">
+                @if (BusyIndicatorTemplate != null)
+                {
+                    @BusyIndicatorTemplate
+                }
+                else
+                {
+                    // https://icons8.com/preloaders/en/search/spinner#
+                    <svg width="64px" height="64px" viewBox="0 0 128 128" xml:space="preserve">
+                        <g>
+                            <path d="M38.52 33.37L21.36 16.2A63.6 63.6 0 0 1 59.5.16v24.3a39.5 39.5 0 0 0-20.98 8.92z" fill="@Color"/>
+                            <path d="M38.52 33.37L21.36 16.2A63.6 63.6 0 0 1 59.5.16v24.3a39.5 39.5 0 0 0-20.98 8.92z" fill="@BackgroundColor" transform="rotate(45 64 64)"/>
+                            <path d="M38.52 33.37L21.36 16.2A63.6 63.6 0 0 1 59.5.16v24.3a39.5 39.5 0 0 0-20.98 8.92z" fill="@BackgroundColor" transform="rotate(90 64 64)"/>
+                            <path d="M38.52 33.37L21.36 16.2A63.6 63.6 0 0 1 59.5.16v24.3a39.5 39.5 0 0 0-20.98 8.92z" fill="@BackgroundColor" transform="rotate(135 64 64)"/>
+                            <path d="M38.52 33.37L21.36 16.2A63.6 63.6 0 0 1 59.5.16v24.3a39.5 39.5 0 0 0-20.98 8.92z" fill="@BackgroundColor" transform="rotate(180 64 64)"/>
+                            <path d="M38.52 33.37L21.36 16.2A63.6 63.6 0 0 1 59.5.16v24.3a39.5 39.5 0 0 0-20.98 8.92z" fill="@BackgroundColor" transform="rotate(225 64 64)"/>
+                            <path d="M38.52 33.37L21.36 16.2A63.6 63.6 0 0 1 59.5.16v24.3a39.5 39.5 0 0 0-20.98 8.92z" fill="@BackgroundColor" transform="rotate(270 64 64)"/>
+                            <path d="M38.52 33.37L21.36 16.2A63.6 63.6 0 0 1 59.5.16v24.3a39.5 39.5 0 0 0-20.98 8.92z" fill="@BackgroundColor" transform="rotate(315 64 64)"/>
+                            <animateTransform attributeName="transform" type="rotate" values="0 64 64;45 64 64;90 64 64;135 64 64;180 64 64;225 64 64;270 64 64;315 64 64" calcMode="discrete" dur="720ms" repeatCount="indefinite" />
+                        </g>  
+                    </svg>
+                }
+            </div>
+        }
+    </div>
+}
+else
+{
+    @if (LoadingTemplate != null)
+    {
+        @LoadingTemplate
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
+}
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    bool isLoaded;
+    [Parameter]
+    public bool IsLoaded { get { return isLoaded; } set { if (value != isLoaded) { isLoaded = value; StateHasChanged(); } } }
+
+    bool isBusy;
+    [Parameter]
+    public bool IsBusy { get { return isBusy; } set { if (value != isBusy) { isBusy = value; StateHasChanged(); } } }
+
+    [Parameter]
+    public RenderFragment BusyIndicatorTemplate { get; set; }
+    
+    [Parameter]
+    public RenderFragment LoadingTemplate { get; set; }
+    
+    [Parameter]
+    public string BackgroundColor { get; set; } = "#000000"; // TODO: use themes
+
+    [Parameter]
+    public string Color { get; set; } = "#c0c0c0"; // TODO: use themes
+
+    [Parameter]
+    public double ScreenOpacity { get; set; } = 0.5;
+
+    [Parameter]
+    public string ScreenColor { get; set; } = "white"; // TODO: use themes
+}
