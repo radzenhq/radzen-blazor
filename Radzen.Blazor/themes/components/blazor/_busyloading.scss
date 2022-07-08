@@ -1,9 +1,11 @@
+.rz-busy-wrapper {
+    pointer-events: none;
+    position: relative;
+}
+
 .rz-busy-overlay {
     z-index: 9999;
     position: absolute;
-}
-
-.rz-busy-screen {
     top: 0;
     left: 0;
     width: 100%;
@@ -11,14 +13,8 @@
 }
 
 .rz-busy-indicator {
-    text-align: center;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.rz-busy-wrapper
-{
-    pointer-events: none;
-    position: relative;
-}
