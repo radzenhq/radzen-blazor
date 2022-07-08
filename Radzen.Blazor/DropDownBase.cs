@@ -122,6 +122,30 @@ namespace Radzen
             });
         }
 
+        /// <summary>
+        /// Gets or sets the selected items.
+        /// </summary>
+        /// <value>The selected items.</value>
+        [Parameter]
+        public IList<object> SelectedItems
+        {
+            get
+            {
+                return selectedItems;
+            }
+            set
+            {
+                selectedItems = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the SelectedItems changed callback.
+        /// </summary>
+        /// <value>The SelectedItems changed callback.</value>
+        [Parameter]
+        public EventCallback<IList<object>> SelectedItemsChanged { get; set; }
+
         /// <inheritdoc />
         public override bool HasValue
         {
@@ -912,8 +936,18 @@ namespace Radzen
             }
             if (raiseChange)
             {
-                await ValueChanged.InvokeAsync(object.Equals(internalValue, null) ? default(T) : (T)internalValue);
+                if (ValueChanged.HasDelegate)
+                {
+                    await ValueChanged.InvokeAsync(object.Equals(internalValue, null) ? default(T) : (T)internalValue);
+                }
+
                 if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+
+                if (SelectedItemsChanged.HasDelegate)
+                {
+                    await SelectedItemsChanged.InvokeAsync(selectedItems);
+                }
+
                 await Change.InvokeAsync(internalValue);
             }
             StateHasChanged();
