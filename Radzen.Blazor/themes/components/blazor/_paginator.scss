@@ -1,5 +1,6 @@
 $paginator-background-color: var(--rz-base-background-color) !default;
 $paginator-padding: 0.5rem !default;
+$paginator-border: $grid-border !default;
 
 $paginator-button-border-radius: var(--rz-border-radius) !default;
 
@@ -42,6 +43,7 @@ $paginator-button-size: ".rz-button-md" !default;
 :root {
   --rz-paginator-background-color: #{$paginator-background-color};
   --rz-paginator-padding: #{$paginator-padding};
+  --rz-paginator-border: #{$paginator-border};
 
   --rz-paginator-button-border-radius: #{$paginator-button-border-radius};
 
@@ -152,9 +154,7 @@ $paginator-button-size: ".rz-button-md" !default;
 }
 
 .rz-paginator-bottom {
-  border-top: $grid-border;
-  border-bottom-right-radius: var(--rz-border-radius);
-  border-bottom-left-radius: var(--rz-border-radius);
+  border-top: var(--rz-paginator-border);
 }
 
 .rz-paginator-pages {
