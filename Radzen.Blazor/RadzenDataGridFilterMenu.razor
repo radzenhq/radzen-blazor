@@ -31,6 +31,12 @@
             <li class="@(FilterOperatorStyle(Column, FilterOperator.EndsWith))" @onclick="@(args => ApplyFilter(FilterOperator.EndsWith))" style="display: block;">
                 <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.EndsWith)</span><span>@Grid.EndsWithText</span>
             </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.IsEmpty))" @onclick="@(args => ApplyFilter(FilterOperator.IsEmpty))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsEmpty)</span><span>@Grid.IsEmptyText</span>
+            </li>
+            <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNotEmpty))" @onclick="@(args => ApplyFilter(FilterOperator.IsNotEmpty))" style="display: block;">
+                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotEmpty)</span><span>@Grid.IsNotEmptyText</span>
+            </li>
             }
             <li class="@(FilterOperatorStyle(Column, FilterOperator.Equals))" @onclick="@(args => ApplyFilter(FilterOperator.Equals))" style="display: block;">
                 <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.Equals)</span><span>@Grid.EqualsText</span>
@@ -79,17 +85,19 @@
     protected string FilterIconStyle()
     {
         var additionalStyle = Column.GetFilterValue() != null || Column.GetSecondFilterValue() != null || 
-            Column.GetFilterOperator() == FilterOperator.IsNotNull || Column.GetFilterOperator() == FilterOperator.IsNull 
-                ? "rz-grid-filter-active" : "";
+                              Column.GetFilterOperator() == FilterOperator.IsNotNull || Column.GetFilterOperator() == FilterOperator.IsNull 
+                              || Column.GetFilterOperator() == FilterOperator.IsEmpty || Column.GetFilterOperator() == FilterOperator.IsNotEmpty 
+            ? "rz-grid-filter-active" : "";
         return $"rz-filter-button rz-button rz-button-md rz-button-icon-only btn-light {additionalStyle}";
     }
 
     protected async Task ApplyFilter(FilterOperator value)
     {
-        if (value == FilterOperator.IsNull || value == FilterOperator.IsNotNull)
+        if (value == FilterOperator.IsNull || value == FilterOperator.IsNotNull 
+            || value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty)
         {
-            Column.SetFilterValue(null);
-            Column.SetFilterValue(null, false);
+            Column.SetFilterValue(value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty ? string.Empty : null);
+            Column.SetFilterValue(value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty ? string.Empty : null, false);
         }
 
         Column.SetFilterOperator(value);

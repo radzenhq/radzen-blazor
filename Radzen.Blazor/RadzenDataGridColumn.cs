@@ -100,10 +100,10 @@ namespace Radzen.Blazor
             {
                 Grid.AddColumn(this);
 
-                if (!string.IsNullOrEmpty(FilterProperty) || Type == null)
-                {
-                    var property = GetFilterProperty();
+                var property = GetFilterProperty();
 
+                if (!string.IsNullOrEmpty(property) && Type == null)
+                {
                     if (!string.IsNullOrEmpty(property))
                     {
                         _filterPropertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
@@ -717,7 +717,10 @@ namespace Radzen.Blazor
 
         internal bool CanSetFilterValue()
         { 
-            return GetFilterOperator() == FilterOperator.IsNull || GetFilterOperator() == FilterOperator.IsNotNull;
+            return GetFilterOperator() == FilterOperator.IsNull 
+                    || GetFilterOperator() == FilterOperator.IsNotNull 
+                    ||  GetFilterOperator() == FilterOperator.IsEmpty 
+                    || GetFilterOperator() == FilterOperator.IsNotEmpty;
         }
 
         /// <summary>
@@ -756,6 +759,11 @@ namespace Radzen.Blazor
         /// </summary>
         public void SetFilterOperator(FilterOperator? value)
         {
+            if (value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty || value == FilterOperator.IsNull || value == FilterOperator.IsNotNull)
+            {
+                filterValue = value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty ? string.Empty : null;
+            }
+
             filterOperator = value;
         }
 
@@ -764,6 +772,11 @@ namespace Radzen.Blazor
         /// </summary>
         public void SetSecondFilterOperator(FilterOperator? value)
         {
+            if (value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty || value == FilterOperator.IsNull || value == FilterOperator.IsNotNull)
+            {
+                secondFilterValue = value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty ? string.Empty : null;
+            }
+
             secondFilterOperator = value;
         }
 
@@ -814,10 +827,12 @@ namespace Radzen.Blazor
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.IsNull, FilterOperator.IsNotNull };
 
             return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
-                var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith;
+                var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain 
+                    || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith || o == FilterOperator.IsEmpty || o == FilterOperator.IsNotEmpty;
                 return FilterPropertyType == typeof(string) ? isStringOperator 
-                    || o == FilterOperator.Equals || o == FilterOperator.NotEquals || o == FilterOperator.IsNull || o == FilterOperator.IsNotNull
-                        : !isStringOperator;
+                      || o == FilterOperator.Equals || o == FilterOperator.NotEquals 
+                      || o == FilterOperator.IsNull || o == FilterOperator.IsNotNull
+                    : !isStringOperator;
             });
         }
 
@@ -847,8 +862,12 @@ namespace Radzen.Blazor
                     return Grid?.NotEqualsText;
                 case FilterOperator.IsNull:
                     return Grid?.IsNullText;
+                case FilterOperator.IsEmpty:
+                    return Grid?.IsEmptyText;
                 case FilterOperator.IsNotNull:
                     return Grid?.IsNotNullText;
+                case FilterOperator.IsNotEmpty:
+                    return Grid?.IsNotEmptyText;
                 default:
                     return $"{filterOperator}";
             }
@@ -883,6 +902,10 @@ namespace Radzen.Blazor
                     return "∅";
                 case FilterOperator.IsNotNull:
                     return "!∅";
+                case FilterOperator.IsEmpty:
+                    return "= ''";
+                case FilterOperator.IsNotEmpty:
+                    return "≠ ''";
                 default:
                     return $"{filterOperator}";
             }

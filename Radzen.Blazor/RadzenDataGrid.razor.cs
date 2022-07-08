@@ -511,7 +511,7 @@ namespace Radzen.Blazor
         /// <param name="column">The column.</param>
         /// <param name="force">if set to <c>true</c> [force].</param>
         /// <param name="isFirst">if set to <c>true</c> [is first].</param>
-        protected void OnFilter(ChangeEventArgs args, RadzenDataGridColumn<TItem> column, bool force = false, bool isFirst = true)
+        protected async Task OnFilter(ChangeEventArgs args, RadzenDataGridColumn<TItem> column, bool force = false, bool isFirst = true)
         {
             string property = column.GetFilterProperty();
             if (AllowFiltering && column.Filterable)
@@ -522,7 +522,7 @@ namespace Radzen.Blazor
                     skip = 0;
                     CurrentPage = 0;
 
-                    Filter.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
+                    await Filter.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
                     {
                         Column = column,
                         FilterValue = column.GetFilterValue(),
@@ -537,7 +537,12 @@ namespace Radzen.Blazor
                         Data = null;
                     }
 
-                    InvokeAsync(Reload);
+                    await InvokeAsync(Reload);
+
+                    if (IsVirtualizationAllowed())
+                    {
+                        StateHasChanged();
+                    }
                 }
             }
         }
@@ -849,6 +854,20 @@ namespace Radzen.Blazor
         /// <value>The null text.</value>
         [Parameter]
         public string IsNullText { get; set; } = "Is null";
+        
+        /// <summary>
+        /// Gets or sets the is empty text.
+        /// </summary>
+        /// <value>The empty text.</value>
+        [Parameter]
+        public string IsEmptyText { get; set; } = "Is empty";
+        
+        /// <summary>
+        /// Gets or sets the is not empty text.
+        /// </summary>
+        /// <value>The not empty text.</value>
+        [Parameter]
+        public string IsNotEmptyText { get; set; } = "Is not empty";
 
         internal class NumericFilterEventCallback
         {
@@ -1428,15 +1447,17 @@ namespace Radzen.Blazor
             if (LoadData.HasDelegate)
             {
                 var filters = allColumns.ToList().Where(c => c.Filterable && c.GetVisible() && (c.GetFilterValue() != null
-                        || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull)).Select(c => new FilterDescriptor()
-                        {
+                        || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
+                        || c.GetFilterOperator() == FilterOperator.IsEmpty | c.GetFilterOperator() == FilterOperator.IsNotEmpty))
+                    .Select(c => new FilterDescriptor()
+                    {
                             Property = c.GetFilterProperty(),
                             FilterValue = c.GetFilterValue(),
                             FilterOperator = c.GetFilterOperator(),
                             SecondFilterValue = c.GetSecondFilterValue(),
                             SecondFilterOperator = c.GetSecondFilterOperator(),
                             LogicalFilterOperator = c.GetLogicalFilterOperator()
-                        });
+                    });
 
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
                 {

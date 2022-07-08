@@ -45,7 +45,9 @@ namespace Radzen
             {FilterOperator.Contains, "Contains"},
             {FilterOperator.DoesNotContain, "DoesNotContain"},
             {FilterOperator.IsNull, "=="},
-            {FilterOperator.IsNotNull, "!="}
+            {FilterOperator.IsEmpty, "=="},
+            {FilterOperator.IsNotNull, "!="},
+            {FilterOperator.IsNotEmpty, "!="}
         };
 
         /// <summary>
@@ -64,7 +66,9 @@ namespace Radzen
             {FilterOperator.Contains, "contains"},
             {FilterOperator.DoesNotContain, "DoesNotContain"},
             {FilterOperator.IsNull, "eq"},
-            {FilterOperator.IsNotNull, "ne"}
+            {FilterOperator.IsEmpty, "eq"},
+            {FilterOperator.IsNotNull, "ne"},
+            {FilterOperator.IsNotEmpty, "ne"}
         };
 
         /// <summary>
@@ -140,8 +144,10 @@ namespace Radzen
         public static string ToFilterString<T>(this IEnumerable<RadzenDataGridColumn<T>> columns)
         {
             Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
-                (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty) || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull)
-                    && c.GetFilterProperty() != null;
+               (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty) || c.GetFilterOperator() == FilterOperator.IsNotNull 
+                   || c.GetFilterOperator() == FilterOperator.IsNull || c.GetFilterOperator() == FilterOperator.IsEmpty 
+                   || c.GetFilterOperator() == FilterOperator.IsNotEmpty)
+               && c.GetFilterProperty() != null;
 
             if (columns.Where(canFilter).Any())
             {
@@ -179,7 +185,7 @@ namespace Radzen
                             secondValue = ((int)sv).ToString();
                         }
                     }
-                    else if (typeof(IEnumerable).IsAssignableFrom(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
+                    else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
                     {
                         var enumerableValue = ((IEnumerable)(v != null ? v : Enumerable.Empty<object>())).AsQueryable();
                         var enumerableSecondValue = ((IEnumerable)(sv != null ? sv : Enumerable.Empty<object>())).AsQueryable();
@@ -232,7 +238,10 @@ namespace Radzen
                         secondValue = (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
                     }
 
-                    if (!string.IsNullOrEmpty(value) || column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull)
+                    if (!string.IsNullOrEmpty(value) || column.GetFilterOperator() == FilterOperator.IsNotNull 
+                                                    || column.GetFilterOperator() == FilterOperator.IsNull
+                                                    || column.GetFilterOperator() == FilterOperator.IsEmpty
+                                                    || column.GetFilterOperator() == FilterOperator.IsNotEmpty)
                     {
                         var linqOperator = LinqFilterOperators[column.GetFilterOperator()];
                         if (linqOperator == null)
@@ -408,6 +417,14 @@ namespace Radzen
                 {
                     return $@"np({property}) == null";
                 }
+                else if (columnFilterOperator == FilterOperator.IsEmpty)
+                {
+                    return $@"np({property}) == ''";
+                }
+                else if (columnFilterOperator == FilterOperator.IsNotEmpty)
+                {
+                    return $@"np({property}) != ''";
+                }
                 else if (columnFilterOperator == FilterOperator.IsNotNull)
                 {
                     return $@"np({property}) != null";
@@ -418,6 +435,10 @@ namespace Radzen
                 if (column.GetFilterOperator() == FilterOperator.IsNull || column.GetFilterOperator() == FilterOperator.IsNotNull)
                 {
                     return $"{property} {linqOperator} null";
+                }
+                else if (column.GetFilterOperator() == FilterOperator.IsEmpty || column.GetFilterOperator() == FilterOperator.IsNotEmpty)
+                {
+                    return $"{property} {linqOperator} ''";
                 }
                 else
                 {
@@ -432,6 +453,10 @@ namespace Radzen
                 if (column.GetFilterOperator() == FilterOperator.IsNull || column.GetFilterOperator() == FilterOperator.IsNotNull)
                 {
                     return $"{property} {linqOperator} null";
+                }
+                else if (column.GetFilterOperator() == FilterOperator.IsEmpty || column.GetFilterOperator() == FilterOperator.IsNotEmpty)
+                {
+                    return $"{property} {linqOperator} ''";
                 }
                 else
                 {
@@ -452,6 +477,10 @@ namespace Radzen
                 if (column.GetFilterOperator() == FilterOperator.IsNull || column.GetFilterOperator() == FilterOperator.IsNotNull)
                 {
                     return $"{property} {linqOperator} null";
+                }
+                else if (column.GetFilterOperator() == FilterOperator.IsEmpty || column.GetFilterOperator() == FilterOperator.IsNotEmpty)
+                {
+                    return $"{property} {linqOperator} ''";
                 }
                 else
                 {
@@ -563,7 +592,7 @@ namespace Radzen
             var columnFilterOperator = !second ? column.GetFilterOperator() : column.GetSecondFilterOperator();
             var odataFilterOperator = ODataFilterOperators[columnFilterOperator];
 
-            var value = typeof(IEnumerable).IsAssignableFrom(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) ? null :
+            var value = IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) ? null :
                     !second ? (string)Convert.ChangeType(column.GetFilterValue(), typeof(string)) :
                         (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
 
@@ -614,8 +643,12 @@ namespace Radzen
                 {
                     return $"{property} {odataFilterOperator} null";
                 }
+                else if (columnFilterOperator == FilterOperator.IsEmpty || columnFilterOperator == FilterOperator.IsNotEmpty)
+                {
+                    return $"{property} {odataFilterOperator} ''";
+                }
             }
-            else if (typeof(IEnumerable).IsAssignableFrom(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
+            else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
             {
                 var v = !second ? column.GetFilterValue() : column.GetSecondFilterValue();
 
@@ -643,6 +676,10 @@ namespace Radzen
                 {
                     return $"{property} {odataFilterOperator} null";
                 }
+                else if (columnFilterOperator == FilterOperator.IsEmpty || columnFilterOperator == FilterOperator.IsNotEmpty)
+                {
+                    return $"{property} {odataFilterOperator} ''";
+                }
                 else
                 {
                     return $"{property} eq {value.ToLower()}";
@@ -656,6 +693,10 @@ namespace Radzen
                 if (columnFilterOperator == FilterOperator.IsNull || columnFilterOperator == FilterOperator.IsNotNull)
                 {
                     return $"{property} {odataFilterOperator} null";
+                }
+                else if (columnFilterOperator == FilterOperator.IsEmpty || columnFilterOperator == FilterOperator.IsNotEmpty)
+                {
+                    return $"{property} {odataFilterOperator} ''";
                 }
                 else
                 {
@@ -733,8 +774,10 @@ namespace Radzen
         public static string ToODataFilterString<T>(this IEnumerable<RadzenDataGridColumn<T>> columns)
         {
             Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
-                (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty) || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull)
-                    && c.GetFilterProperty() != null;
+               (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty) 
+                || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
+                || c.GetFilterOperator() == FilterOperator.IsEmpty || c.GetFilterOperator() == FilterOperator.IsNotEmpty)
+               && c.GetFilterProperty() != null;
 
             if (columns.Where(canFilter).Any())
             {
@@ -749,7 +792,8 @@ namespace Radzen
                     var value = column.GetFilterValue();
                     var secondValue = column.GetSecondFilterValue();
 
-                    if (value != null || column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull)
+                    if (value != null || column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull
+                        || column.GetFilterOperator() == FilterOperator.IsEmpty || column.GetFilterOperator() == FilterOperator.IsNotEmpty)
                     {
                         var linqOperator = ODataFilterOperators[column.GetFilterOperator()];
                         if (linqOperator == null)
@@ -859,6 +903,11 @@ namespace Radzen
             return source;
         }
 
+        private static bool IsEnumerable(Type type)
+        {
+            return typeof(IEnumerable).IsAssignableFrom(type) || typeof(IEnumerable<>).IsAssignableFrom(type);
+        }
+
         /// <summary>
         /// Wheres the specified columns.
         /// </summary>
@@ -869,8 +918,10 @@ namespace Radzen
         public static IQueryable<T> Where<T>(this IQueryable<T> source, IEnumerable<RadzenDataGridColumn<T>> columns)
         {
             Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
-                (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty) || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull)
-                    && c.GetFilterProperty() != null;
+               (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty) 
+                || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
+                || c.GetFilterOperator() == FilterOperator.IsEmpty || c.GetFilterOperator() == FilterOperator.IsNotEmpty)
+               && c.GetFilterProperty() != null;
 
             if (columns.Where(canFilter).Any())
             {
@@ -888,14 +939,18 @@ namespace Radzen
                         property = $"({property})";
                     }
 
-                    if (column.FilterPropertyType == typeof(string) && !(column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull))
+                    if (column.FilterPropertyType == typeof(string) && 
+                        !(column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull
+                            || column.GetFilterOperator() == FilterOperator.IsEmpty || column.GetFilterOperator() == FilterOperator.IsNotEmpty))
                     {
                         property = $@"({property} == null ? """" : {property})";
                     }
 
                     string filterCaseSensitivityOperator = column.FilterPropertyType == typeof(string) 
-                        && column.GetFilterOperator() != FilterOperator.IsNotNull && column.GetFilterOperator() != FilterOperator.IsNull &&
-                        column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
+                           && column.GetFilterOperator() != FilterOperator.IsNotNull && column.GetFilterOperator() != FilterOperator.IsNull
+                           && column.GetFilterOperator() != FilterOperator.IsEmpty && column.GetFilterOperator() != FilterOperator.IsNotEmpty
+                           && column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
+
 
                     var comparison = LinqFilterOperators[column.GetFilterOperator()];
 
@@ -905,7 +960,7 @@ namespace Radzen
                     {
                         if (comparison == "StartsWith" || comparison == "EndsWith" || comparison == "Contains")
                         {
-                            if (typeof(IEnumerable).IsAssignableFrom(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "Contains")
+                            if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "Contains")
                             {
                                 whereList.Add($@"(@{index}).Contains({property})", new object[] { column.GetFilterValue() });
                             }
@@ -918,7 +973,7 @@ namespace Radzen
                         }
                         else if (comparison == "DoesNotContain")
                         {
-                            if (typeof(IEnumerable).IsAssignableFrom(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "DoesNotContain")
+                            if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "DoesNotContain")
                             {
                                 whereList.Add($@"!(@{index}).Contains({property})", new object[] { column.GetFilterValue() });
                             }
@@ -929,7 +984,7 @@ namespace Radzen
                             
                             index++;
                         }
-                        else if (!(typeof(IEnumerable).IsAssignableFrom(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)))
+                        else if (!(IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)))
                         {
                             whereList.Add($@"{property}{filterCaseSensitivityOperator} {comparison} @{index}{filterCaseSensitivityOperator}", new object[] { column.GetFilterValue() });
                             index++;
@@ -939,7 +994,7 @@ namespace Radzen
                     {
                         var secondComparison = LinqFilterOperators[column.GetSecondFilterOperator()];
 
-                        if (typeof(IEnumerable).IsAssignableFrom(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) &&
+                        if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) &&
                             (comparison == "Contains" || comparison == "DoesNotContain") && 
                                 (secondComparison == "Contains" || secondComparison == "DoesNotContain"))
                         {

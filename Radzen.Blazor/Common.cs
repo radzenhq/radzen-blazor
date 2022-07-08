@@ -827,9 +827,17 @@ namespace Radzen
         /// </summary>
         IsNull,
         /// <summary>
+        /// Satisfied if the current value is <see cref="string.Empty"/>.
+        /// </summary>
+        IsEmpty,
+        /// <summary>
         /// Satisfied if the current value is not null.
         /// </summary>
-        IsNotNull
+        IsNotNull,
+        /// <summary>
+        /// Satisfied if the current value is not <see cref="string.Empty"/>.
+        /// </summary>
+        IsNotEmpty
     }
 
     /// <summary>
