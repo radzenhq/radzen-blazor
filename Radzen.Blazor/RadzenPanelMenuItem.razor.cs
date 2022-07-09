@@ -87,6 +87,20 @@ namespace Radzen.Blazor
         public bool Selected { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenPanelMenuItem"/> is indented once.
+        /// </summary>
+        /// <value><c>true</c> if selected; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool IndentOnce { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenPanelMenuItem"/> is indented twice.
+        /// </summary>
+        /// <value><c>true</c> if selected; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool IndentTwice { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the child content.
         /// </summary>
         /// <value>The child content.</value>

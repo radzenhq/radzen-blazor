@@ -21,7 +21,7 @@
                     }
                     else
                     {
-                        <span class="rz-navigation-item-text" @onclick="@Toggle">@Text</span>
+                        <span class=@(IndentTwice ? "rz-navigation-item-text rz-navigation-item-text-indent-twice" : (IndentOnce ? "rz-navigation-item-text rz-navigation-item-text-indent-once" : "rz-navigation-item-text")) @onclick="@Toggle">@Text</span>
                     }
                     @if (items.Any())
                     {
@@ -46,7 +46,7 @@
                     }
                     else
                     {
-                        <span class="rz-navigation-item-text">@Text</span>
+                        <span class=@(IndentTwice ? "rz-navigation-item-text rz-navigation-item-text-indent-twice" : (IndentOnce ? "rz-navigation-item-text rz-navigation-item-text-indent-once" : "rz-navigation-item-text"))>@Text</span>
                     }
                     @if (items.Any())
                     {
