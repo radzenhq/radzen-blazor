@@ -694,7 +694,7 @@ namespace Radzen.Blazor
                 string text;
                 if (Chart.ShouldInvertAxes())
                 {
-                    text = Chart.CategoryAxis.Format(Chart.CategoryScale, Value(d));
+                    text = Chart.ValueAxis.Format(Chart.CategoryScale, Value(d));
                 }
                 else
                 {
