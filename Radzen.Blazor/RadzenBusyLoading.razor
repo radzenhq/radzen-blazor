@@ -66,18 +66,38 @@ else
         }
     }
 
-    [Parameter]
-    public RenderFragment ChildContent { get; set; }
-
     bool? isLoaded;
+    bool isLoadedParameter;
     [Parameter]
-    public bool IsLoaded { get; set; }
+    public bool IsLoaded
+    { 
+        get
+        {
+            return isLoaded ?? isLoadedParameter;
+        }
+        set
+        {
+            isLoadedParameter = value;
+        }
+    }
     [Parameter]
     public EventCallback<bool> IsLoadedChanged { get; set; }
 
-    bool? isBusy; 
+    bool? isBusy;
+    bool isBusyParameter;
     [Parameter]
-    public bool IsBusy { get; set; }
+    public bool IsBusy
+    { 
+        get
+        {
+            return isBusy ?? isBusyParameter;
+        }
+        set
+        {
+            isBusyParameter = value;
+        }
+    }
+
     [Parameter]
     public EventCallback<bool> IsBusyChanged { get; set; }
 
@@ -93,18 +113,21 @@ else
 
     public override Task SetParametersAsync(ParameterView parameters)
     {
-        if (parameters.DidParameterChange(nameof(IsLoaded), IsLoaded))
+        if (parameters.DidParameterChange(nameof(IsLoaded), isLoadedParameter))
         {
             isLoaded = null;
         }
 
-        if (parameters.DidParameterChange(nameof(IsBusy), IsBusy))
+        if (parameters.DidParameterChange(nameof(IsBusy), isBusyParameter))
         {
             isBusy = null;
         }
 
         return base.SetParametersAsync(parameters);
     }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
 
     [Parameter]
     public RenderFragment BusyIndicatorTemplate { get; set; }
