@@ -1,7 +1,9 @@
 ﻿@if (IsLoaded)
 {    
-    <div class="rz-busy-wrapper @(IsBusy ? IsFixed ? "" : "rz-busy-wrapper-relative" : "") @Class" style="@Style">
-        @ChildContent
+    <div class="rz-busy-wrapper @(IsBusy ? IsFixed ? "rz-busy-wrapper-noevents" : "rz-busy-wrapper-events-none rz-busy-wrapper-relative" : "") @Class" style="@Style">
+        <CascadingValue Value="@this">
+            @ChildContent
+        </CascadingValue>
         @if (IsBusy)
         {
             <div class="rz-busy-overlay @(IsFixed ? "rz-busy-overlay-fixed" : "")" style="opacity:@ScreenOpacity; background-color:@ScreenColor;" />
@@ -44,6 +46,16 @@ else
 }
 
 @code {
+    public void Busy(bool isBusy)
+    {
+        IsBusy = isBusy;
+    }
+
+    public void Loaded(bool isLoaded)
+    {
+        IsLoaded = isLoaded;
+    }
+
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
@@ -77,7 +89,7 @@ else
     public string ScreenColor { get; set; } = "white"; // TODO: use themes
 
     [Parameter]
-    public bool IsFixed { get; set; } = false;
+    public bool IsFixed { get; set; }
 
     [Parameter]
     public string Style { get; set; }
