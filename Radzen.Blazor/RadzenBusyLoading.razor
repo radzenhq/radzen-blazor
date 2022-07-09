@@ -1,11 +1,11 @@
 ﻿@if (IsLoaded)
-{
-    <div class="@(IsBusy ? "rz-busy-wrapper" : "")">
+{    
+    <div class="rz-busy-wrapper @(IsBusy ? IsFixed ? "" : "rz-busy-wrapper-relative" : "") @Class" style="@Style">
         @ChildContent
         @if (IsBusy)
         {
-            <div class="rz-busy-overlay" style="opacity:@ScreenOpacity; background-color:@ScreenColor;" />
-            <div class="rz-busy-overlay rz-busy-indicator">
+            <div class="rz-busy-overlay @(IsFixed ? "rz-busy-overlay-fixed" : "")" style="opacity:@ScreenOpacity; background-color:@ScreenColor;" />
+            <div class="rz-busy-overlay @(IsFixed ? "rz-busy-overlay-fixed" : "") rz-busy-indicator">
                 @if (BusyIndicatorTemplate != null)
                 {
                     @BusyIndicatorTemplate
@@ -75,4 +75,13 @@ else
 
     [Parameter]
     public string ScreenColor { get; set; } = "white"; // TODO: use themes
+
+    [Parameter]
+    public bool IsFixed { get; set; } = false;
+
+    [Parameter]
+    public string Style { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
 }

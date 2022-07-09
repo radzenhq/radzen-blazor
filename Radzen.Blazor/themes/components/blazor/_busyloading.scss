@@ -1,6 +1,6 @@
-.rz-busy-wrapper {
-    pointer-events: none;
+.rz-busy-wrapper-relative {
     position: relative;
+    pointer-events: none;
 }
 
 .rz-busy-overlay {
@@ -10,6 +10,10 @@
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+.rz-busy-overlay-fixed {
+    position: fixed;
 }
 
 .rz-busy-indicator {
