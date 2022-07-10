@@ -87,8 +87,11 @@ else
                 }
 
                 service = value;
-                service.BusyChanged += Service_BusyChanged;
-                service.LoadedChanged += Service_LoadedChanged;
+                if (service != null)
+                {
+                    service.BusyChanged += Service_BusyChanged;
+                    service.LoadedChanged += Service_LoadedChanged;
+                }
             }
         }
     }
