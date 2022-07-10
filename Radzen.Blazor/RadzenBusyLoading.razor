@@ -1,4 +1,8 @@
-﻿@if (GetIsLoaded())
+﻿@using Radzen.Blazor
+
+@implements IDisposable
+
+@if (GetIsLoaded())
 {
     <div class="rz-busy-wrapper @(GetIsBusy() && !IsFixed ? "rz-busy-wrapper-relative" : "") @Class" style="@Style">
         <CascadingValue Value="@this">
@@ -46,25 +50,66 @@ else
 }
 
 @code {
-    public async Task Busy(bool val)
+    public void Busy(bool val)
     {
         if (GetIsBusy() != val)
         {
             isBusy = val;
-            await IsBusyChanged.InvokeAsync(val);
-            await InvokeAsync(StateHasChanged);
+            IsBusyChanged.InvokeAsync(val);
+            InvokeAsync(StateHasChanged);
         }
     }
 
-    public async Task Loaded(bool val)
+    public void Loaded(bool val)
     {
         if (GetIsLoaded() != val)
         {
             isLoaded = val;
-            await IsLoadedChanged.InvokeAsync(val);
-            await InvokeAsync(StateHasChanged);
+            IsLoadedChanged.InvokeAsync(val);
+            InvokeAsync(StateHasChanged);
         }
     }
+    
+    BusyLoadingService service;
+    [Parameter]
+    public BusyLoadingService Service 
+    { 
+        get
+        {
+            return service;
+        }
+        set
+        {
+            if (value != service)
+            {
+                if (service != null)
+                {
+                    service.BusyChanged -= Service_BusyChanged;
+                    service.LoadedChanged -= Service_LoadedChanged;
+                }
+
+                service = value;
+                service.BusyChanged += Service_BusyChanged;
+                service.LoadedChanged += Service_LoadedChanged;
+            }
+        }
+    }
+
+    void Service_BusyChanged(bool val)
+    {
+        Busy(val);
+    }
+
+    void Service_LoadedChanged(bool val)
+    {
+        Loaded(val);
+    }
+
+    void IDisposable.Dispose()
+    {
+        Service = null;
+    }
+
 
     bool? isLoaded;
     bool isLoadedParameter;
