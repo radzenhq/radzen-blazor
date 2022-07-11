@@ -492,7 +492,21 @@ namespace Radzen.Blazor
                     builder.AddAttribute(4, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, args =>
                     {
                         var value = $"{args.Value}";
-                        column.SetFilterValue(!string.IsNullOrWhiteSpace(value) ? Convert.ChangeType(value, Nullable.GetUnderlyingType(type)) : null, isFirst);
+                        object filterValue = null;
+
+                        if (!string.IsNullOrWhiteSpace(value))
+                        {
+                            try
+                            {
+                                filterValue = Convert.ChangeType(value, Nullable.GetUnderlyingType(type));
+                            }
+                            catch (Exception)
+                            {
+                                filterValue = null;
+                            }
+                        }
+
+                        column.SetFilterValue(filterValue, isFirst);
                     }));
                 }
                 else if (FilterMode == FilterMode.SimpleWithMenu)
