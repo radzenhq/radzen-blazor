@@ -1,11 +1,29 @@
 $notification-padding: 1rem 1.25rem !default;
 $notification-icon-margin: 0 0.625rem 0 0 !default;
+$notification-container-background-color: transparent !default;
+$notification-success-color: var(--rz-text-contrast-color) !default;
+$notification-success-background-color: var(--rz-success) !default;
+$notification-warning-color: var(--rz-text-contrast-color) !default;
+$notification-warning-background-color: var(--rz-warning) !default;
+$notification-error-color: var(--rz-text-contrast-color) !default;
+$notification-error-background-color: var(--rz-danger) !default;
+$notification-info-color: var(--rz-text-contrast-color) !default;
+$notification-info-background-color: var(--rz-info) !default;
 
 // Notification CSS variables
 
 :root {
   --rz-notification-padding: #{$notification-padding};
   --rz-notification-icon-margin: #{$notification-icon-margin};
+  --rz-notification-container-background-color: #{$notification-container-background-color};
+  --rz-notification-success-color: #{$notification-success-color};
+  --rz-notification-success-background-color: #{$notification-success-background-color};
+  --rz-notification-warning-color: #{$notification-warning-color};
+  --rz-notification-warning-background-color: #{$notification-warning-background-color};
+  --rz-notification-error-color: #{$notification-error-color};
+  --rz-notification-error-background-color: #{$notification-error-background-color};
+  --rz-notification-info-color: #{$notification-info-color};
+  --rz-notification-info-background-color: #{$notification-info-background-color};
 }
 
 .rz-growl {
@@ -15,6 +33,10 @@ $notification-icon-margin: 0 0.625rem 0 0 !default;
   min-width: 20rem;
 }
 
+.rz-growl-item-container {
+  background-color: var(--rz-notification-container-background-color);
+}
+
 .rz-growl-item {
   border-radius: var(--rz-border-radius);
   padding: var(--rz-notification-padding);
@@ -22,31 +44,34 @@ $notification-icon-margin: 0 0.625rem 0 0 !default;
 
 .rz-growl-message-success {
   .rz-growl-item {
-    background-color: var(--rz-success);
+    color: var(--rz-notification-success-color);
+    background-color: var(--rz-notification-success-background-color);
   }
 }
 
 .rz-growl-message-warn {
   .rz-growl-item {
-    background-color: var(--rz-warning);
+    color: var(--rz-notification-warning-color);
+    background-color: var(--rz-notification-warning-background-color);
   }
 }
 
 .rz-growl-message-error {
   .rz-growl-item {
-    background-color: var(--rz-danger);
+    color: var(--rz-notification-error-color);
+    background-color: var(--rz-notification-error-background-color);
   }
 }
 
 .rz-growl-message-info {
   .rz-growl-item {
-    background-color: var(--rz-info);
+    color: var(--rz-notification-info-color);
+    background-color: var(--rz-notification-info-background-color);
   }
 }
 
 .rz-growl-item {
   margin: 1rem 0;
-  color: var(--rz-text-contrast-color);
 
   p {
     color: inherit;
