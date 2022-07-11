@@ -10,7 +10,7 @@ $accordion-icon-height: $accordion-icon-width !default;
 $accordion-icon-font-size: var(--rz-icon-size) !default;
 $accordion-icon-margin: 0 0.25rem 0 0 !default;
 $accordion-toggle-icon-margin: $accordion-icon-margin !default;
-$accordion-toggle-icon-order: 1 !default;
+$accordion-toggle-icon-order: 0 !default;
 $accordion-toggle-icon-collapsed: 'arrow_right' !default;
 $accordion-toggle-icon-expanded: 'arrow_drop_down' !default;
 $accordion-selected-color: var(--rz-secondary) !default;
