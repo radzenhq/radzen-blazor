@@ -45,6 +45,7 @@ $timepicker-button-width: 0.875rem !default;
 $timepicker-button-height: $timepicker-button-width !default;
 $timepicker-button-border-radius: 2px !default;
 $timepicker-button-padding: 0.5rem 1rem !important;
+$timepicker-gap: 0.5rem !default;
 $timepicker-separator-margin: 0 0.5rem !default;
 $timepicker-border: none !default;
 
@@ -98,6 +99,7 @@ $timepicker-border: none !default;
   --rz-timepicker-button-height: #{$timepicker-button-height};
   --rz-timepicker-button-border-radius: #{$timepicker-button-border-radius};
   --rz-timepicker-button-padding: #{$timepicker-button-padding};
+  --rz-timepicker-gap: #{$timepicker-gap};
   --rz-timepicker-separator-margin: #{$timepicker-separator-margin};
   --rz-timepicker-border: #{$timepicker-border};
 }
@@ -316,6 +318,7 @@ $timepicker-border: none !default;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--rz-timepicker-gap);
   border-top: var(--rz-datepicker-calendar-border);
   padding: var(--rz-timepicker-padding);
   color: var(--rz-timepicker-color);
@@ -334,7 +337,6 @@ $timepicker-border: none !default;
 
   .rz-separator {
     color: var(--rz-timepicker-separator-color);
-    margin: var(--rz-timepicker-separator-margin);
     a {
       display: none;
     }
@@ -342,6 +344,7 @@ $timepicker-border: none !default;
 
   .rz-button-md {
     padding: var(--rz-timepicker-button-padding);
+    text-transform: uppercase;
   }
 }
 
