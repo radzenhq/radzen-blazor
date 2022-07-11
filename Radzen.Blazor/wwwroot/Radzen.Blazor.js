@@ -230,13 +230,11 @@ window.Radzen = {
     });
   },
   customizeMap: function(id, draggingCursor) {
-      if (Radzen[id] && Radzen[id].instance) {
-          Radzen[id].instance.addListener('tilesloaded', function () {
-              Radzen[id].instance.setOptions({
-                  draggableCursor: draggingCursor
-              });
-          });
-      }
+    if (Radzen[id] && Radzen[id].instance) {
+      Radzen[id].instance.setOptions({
+         draggableCursor: draggingCursor
+        });
+    }
   },
   updateMap: function (id, zoom, center, markers) {
     if (Radzen[id] && Radzen[id].instance) {
