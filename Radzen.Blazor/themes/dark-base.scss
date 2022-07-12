@@ -7,44 +7,21 @@ $rz-black: #000000 !default;
 
 $rz-base-50: #ffffff !default;
 $rz-base-100: #f6f7fa !default;
-$rz-base-200: #e9edf0 !default; 
+$rz-base-200: #e9edf0 !default;
 $rz-base-300: #dadfe2 !default;
 $rz-base-400: #A8B4B8 !default;
-$rz-base-500: #7B8A8E !default; 
+$rz-base-500: #7B8A8E !default;
 $rz-base-600: #63737A !default;
-$rz-base-700: #45565E !default; 
-$rz-base-800: #38474E !default; 
-$rz-base-900: #28363c !default; 
+$rz-base-700: #45565E !default;
+$rz-base-800: #38474E !default;
+$rz-base-900: #28363c !default;
 
 $rz-primary: #ff6d41 !default;
-$rz-primary-light: #ff7b54 !default;
-$rz-primary-lighter: rgba($rz-primary, .16) !default;
-$rz-primary-dark: #e5613a !default;
-
 $rz-secondary: #3b9fd5 !default;
-$rz-secondary-light: #1d86be !default;
-$rz-secondary-lighter: rgba($rz-secondary, .20) !default;
-$rz-secondary-dark: #2092cf !default;
-
 $rz-info: #2cc8c8 !default;
-$rz-info-light: #4ed1d1 !default;
-$rz-info-lighter: rgba($rz-info, .20) !default;
-$rz-info-dark: #25a8a8 !default;
-
 $rz-success: #5dbf74 !default;
-$rz-success-light: #5dbf74 !default;
-$rz-success-lighter: rgba($rz-success, .16) !default;
-$rz-success-dark: #5dbf74 !default;
-
 $rz-warning: #fac152 !default;
-$rz-warning-light: #fbcd75 !default;
-$rz-warning-lighter: rgba($rz-warning, .20) !default;
-$rz-warning-dark: #e6b24b !default;
-
 $rz-danger: #f9777f !default;
-$rz-danger-light: #fa8d93 !default;
-$rz-danger-lighter: rgba($rz-danger, .20) !default;
-$rz-danger-dark: #db6970 !default;
 
 $rz-series-1: #376df5 !default;
 $rz-series-2: #64dfdf !default;
@@ -54,6 +31,30 @@ $rz-series-5: #fdd07a !default;
 $rz-series-6: #f8629b !default;
 $rz-series-7: #74d062 !default;
 $rz-series-8: #84a7ff !default;
+
+$rz-primary-light: mix($rz-white, $rz-primary, 12%)!default;
+$rz-primary-lighter: rgba($rz-primary, .16) !default;
+$rz-primary-dark: mix($rz-black, $rz-primary, 8%) !default;
+
+$rz-secondary-light: mix($rz-white, $rz-secondary, 12%) !default;
+$rz-secondary-lighter: rgba($rz-secondary, .20) !default;
+$rz-secondary-dark: mix($rz-black, $rz-secondary, 8%) !default;
+
+$rz-info-light: mix($rz-white, $rz-info, 16%) !default;
+$rz-info-lighter: rgba($rz-info, .20) !default;
+$rz-info-dark: mix($rz-black, $rz-info, 16%) !default;
+
+$rz-success-light: mix($rz-white, $rz-success, 16%) !default;
+$rz-success-lighter: rgba($rz-success, .16) !default;
+$rz-success-dark: mix($rz-black, $rz-success, 16%) !default;
+
+$rz-warning-light: mix($rz-white, $rz-warning, 16%) !default;
+$rz-warning-lighter: rgba($rz-warning, .20) !default;
+$rz-warning-dark: mix($rz-black, $rz-warning, 16%) !default;
+
+$rz-danger-light: mix($rz-white, $rz-danger, 16%) !default;
+$rz-danger-lighter: rgba($rz-danger, .20) !default;
+$rz-danger-dark: mix($rz-black, $rz-danger, 16%) !default;
 
 $rz-theme-colors: () !default;
 $rz-theme-colors: map-merge(
