@@ -4,7 +4,17 @@ $chart-axis-font-size: var(--rz-body-font-size) !default;
 $chart-tooltip-background: var(--rz-base-background-color) !default;
 $chart-tooltip-color: var(--rz-text-color) !default;
 
-$color-schemes: (
+$chart-color-schemes: (
+  pastel: (
+    var(--rz-series-1),
+    var(--rz-series-2),
+    var(--rz-series-3),
+    var(--rz-series-4),
+    var(--rz-series-5),
+    var(--rz-series-6),
+    var(--rz-series-7),
+    var(--rz-series-8)
+  ),
   palette: (
     #003f5c,
     #2f4b7c,
@@ -14,16 +24,6 @@ $color-schemes: (
     #f95d6a,
     #ff7c43,
     #ffa600
-  ),
-  pastel: (
-    #0479cc,
-    #68d5c8,
-    #ff6d41,
-    #cb6992,
-    #e6c54f,
-    #f9777f,
-    #5dbf74,
-    #4db9f2
   ),
   monochrome: (
     #004c6d,
@@ -97,7 +97,7 @@ $color-schemes: (
   fill-opacity: 0.8;
 }
 
-@each $scheme, $colors in $color-schemes {
+@each $scheme, $colors in $chart-color-schemes {
   @each $color in $colors {
     $index: index($colors, $color);
     .rz-scheme-#{$scheme} {
@@ -157,6 +157,7 @@ $color-schemes: (
 .rz-axis .rz-axis-title {
   stroke: none;
   text-anchor: middle;
+  fill: var(--rz-text-title-color)
 }
 
 .rz-donut-title {
