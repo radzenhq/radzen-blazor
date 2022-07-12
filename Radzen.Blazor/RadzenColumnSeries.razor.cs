@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -180,6 +181,12 @@ namespace Radzen.Blazor
             }
 
             return null;
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
+        {
+            return base.GetDataLabels(offsetX, offsetY - 16);
         }
     }
 }

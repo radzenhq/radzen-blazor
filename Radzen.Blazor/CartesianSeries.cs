@@ -684,24 +684,18 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public virtual IEnumerable<(Point Position, string Text)> GetDataLabels(double offsetX, double offsetY)
+        public virtual IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
-            var list = new List<(Point, string)>();
+            var list = new List<ChartDataLabel>();
             
             foreach (var d in Data)
             {
-                var pt = new Point() { X = TooltipX(d) + offsetX, Y = TooltipY(d) + offsetY };
-                string text;
-                if (Chart.ShouldInvertAxes())
-                {
-                    text = Chart.ValueAxis.Format(Chart.CategoryScale, Value(d));
-                }
-                else
-                {
-                    text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d));
-                }
-
-                list.Add((pt, text));
+                list.Add(new ChartDataLabel 
+                { 
+                    Position = new Point { X = TooltipX(d) + offsetX, Y = TooltipY(d) + offsetY },
+                    TextAnchor = "middle",
+                    Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
+                });
             }
 
             return list;

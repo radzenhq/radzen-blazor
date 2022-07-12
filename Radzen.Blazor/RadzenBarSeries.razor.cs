@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -205,6 +206,24 @@ namespace Radzen.Blazor
             var y = category(item) - bandHeight / 2 + index * height + index * padding;
 
             return y + height / 2;
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
+        {
+            var list = new List<ChartDataLabel>();
+            
+            foreach (var d in Data)
+            {
+                list.Add(new ChartDataLabel 
+                { 
+                    Position = new Point() { X = TooltipX(d) + offsetX + 8, Y = TooltipY(d) + offsetY },
+                    TextAnchor = "start",
+                    Text = Chart.ValueAxis.Format(Chart.CategoryScale, Value(d))
+                });
+            }
+
+            return list;
         }
     }
 }

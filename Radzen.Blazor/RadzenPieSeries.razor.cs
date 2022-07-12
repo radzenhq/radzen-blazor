@@ -320,9 +320,10 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public override IEnumerable<(Point Position, string Text)> GetDataLabels(double offsetX, double offsetY)
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
-            var list = new List<(Point Position, string Text)>();
+            var list = new List<ChartDataLabel>();
+
             foreach (var d in Data)
             {
                 var x = TooltipX(d) - CenterX;
@@ -330,19 +331,26 @@ namespace Radzen.Blazor
 
                 // find angle and add offset
                 var phi = Math.Atan2(y, x);
+
                 phi += Polar.ToRadian(offsetY % 360);
 
+                var textAnchor = phi >= -1.5 && phi <= 1.5 ? "start" : "end";
+
                 // find radius
-                var hyp = Math.Sqrt(x * x + y * y) + offsetX;
+                var hyp = Math.Sqrt(x * x + y * y) + offsetX + 16;
 
                 // move along the radius and rotate
                 x = CenterX + hyp * Math.Cos(phi);
                 y = CenterY + hyp * Math.Sin(phi);
 
-                var position = new Point() { X = x, Y = y };
-                var text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d));
-                list.Add((position, text));
+                list.Add(new ChartDataLabel 
+                { 
+                    TextAnchor = textAnchor, 
+                    Position = new Point { X = x, Y = y },
+                    Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
+                });
             }
+
             return list;
         }
     }

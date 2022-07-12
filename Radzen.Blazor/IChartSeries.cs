@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -99,7 +100,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Returns data chart position
         /// </summary>
-        IEnumerable<(Point Position, string Text)> GetDataLabels(double offsetX, double offsetY);
+        IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY);
         /// <summary>
         /// Returns series median
         /// </summary>

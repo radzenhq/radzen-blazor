@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Radzen.Blazor
@@ -79,11 +81,11 @@ namespace Radzen.Blazor
                     var end = points[i + 1];
 
                     var polygon = new[] {
-                    new Point { X = start.X, Y = start.Y - tolerance },
-                    new Point { X = end.X, Y = end.Y - tolerance },
-                    new Point { X = end.X, Y = end.Y + tolerance },
-                    new Point { X = start.X, Y = start.Y + tolerance },
-                };
+                        new Point { X = start.X, Y = start.Y - tolerance },
+                        new Point { X = end.X, Y = end.Y - tolerance },
+                        new Point { X = end.X, Y = end.Y + tolerance },
+                        new Point { X = start.X, Y = start.Y + tolerance },
+                    };
 
                     if (InsidePolygon(new Point { X = x, Y = y }, polygon))
                     {
@@ -93,6 +95,12 @@ namespace Radzen.Blazor
             }
 
             return false;
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
+        {
+            return base.GetDataLabels(offsetX, offsetY - 16);
         }
     }
 }

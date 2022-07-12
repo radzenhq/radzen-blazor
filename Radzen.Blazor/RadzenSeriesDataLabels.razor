@@ -10,12 +10,10 @@
     public double OffsetY { get; set; }
 
     [Parameter]
-    public string Class { get; set; }
-
-    [Parameter]
     public bool Visible { get; set; } = true;
 
     IChartSeries series;
+
     [CascadingParameter]
     protected IChartSeries Series 
     { 
@@ -42,12 +40,18 @@
             {
                 builder.AddContent(1,
                     @<g>
-                        <Text @key="@($"{label.Position}-{Chart.Series.IndexOf(series)}")" Value="@label.Text" Position="label.Position" Class="@Class" />
+                        <Text @key="@($"{label.Position}-{Chart.Series.IndexOf(series)}")" 
+                            Value="@label.Text" Position="@label.Position" TextAnchor="@label.TextAnchor" Class="rz-data-label" />
                     </g>
                     );
             }
             builder.CloseRegion();
         };
+    }
+
+    protected override bool ShouldRefreshChart(ParameterView parameters)
+    {
+        return parameters.DidParameterChange(nameof(Visible), Visible);
     }
     
     public bool Contains(double mouseX, double mouseY, int tolerance)

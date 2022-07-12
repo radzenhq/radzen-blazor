@@ -18,6 +18,16 @@ namespace Radzen.Blazor.Rendering
         }
 
         /// <summary>
+        /// Converts to degrees.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>System.Double.</returns>
+        public static double ToDegree(double value)
+        {
+            return (180 / Math.PI) * value;
+        }
+
+        /// <summary>
         /// Converts to cartesian.
         /// </summary>
         /// <param name="cx">The cx.</param>

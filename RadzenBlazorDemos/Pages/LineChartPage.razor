@@ -9,13 +9,17 @@
                 <RadzenCard Class="w-100 mb-4" >
                     <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
                     <RadzenLabel Text="Smooth" For="smooth" Style="margin-left: 8px; vertical-align: middle;" />
+                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                    <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
                 </RadzenCard>
                 <RadzenChart>
                     <RadzenLineSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Title="2019" LineType="LineType.Dashed" ValueProperty="Revenue">
                         <RadzenMarkers MarkerType="MarkerType.Square" />
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
                     </RadzenLineSeries>
                     <RadzenLineSeries Smooth="@smooth" Data="@revenue2020" CategoryProperty="Date" Title="2020" ValueProperty="Revenue">
                         <RadzenMarkers MarkerType="MarkerType.Circle" />
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
                     </RadzenLineSeries>
                     <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth" />
                     <RadzenValueAxis Formatter="@FormatAsUSD">
@@ -29,6 +33,8 @@
 </RadzenExample>
 @code {
     bool smooth = false;
+    bool showDataLabels = false;
+
     class DataItem
     {
         public string Date { get; set; }
