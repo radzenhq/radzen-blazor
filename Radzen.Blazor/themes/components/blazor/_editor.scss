@@ -69,6 +69,11 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
   .rz-colorpicker-trigger {
     color: inherit;
     background-color: var(--rz-editor-button-background-color);
+
+    .rzi {
+      font-size: 1.25rem;
+      height: 1rem;
+    }
   }
 
   .rz-colorpicker-value {
@@ -81,7 +86,7 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
     padding: 0;
     height: auto;
 
-    &:hover {
+    &:not(:disabled):not(.rz-state-disabled):hover {
       border: none;
       box-shadow: none;
     }
@@ -198,4 +203,26 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
 .rz-html-editor-separator {
   width: 1px;
   background-color: var(--rz-editor-separator-background-color);
+}
+
+
+
+
+
+.rz-html-editor-toolbar {
+  
+  .rz-html-editor-colorpicker {
+    .rz-colorpicker {
+      &:not(:disabled):not(.rz-state-disabled):hover {
+        border: none;
+      }
+    }
+  
+    .rz-colorpicker-trigger {
+      .rzi {
+        font-size: 1.25rem;
+        height: 1rem;
+      }
+    }
+  }
 }
