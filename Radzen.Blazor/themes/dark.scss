@@ -329,13 +329,16 @@ $scheduler-minor-border-color: var(--rz-base-700) !default;
 
 // Tabs
 $tabs-tab-background-color: var(--rz-base-700) !default;
-$tabs-hover-background-color: var(--rz-base-800);
+$tabs-tab-hover-background-color: var(--rz-base-800);
 $tabs-tab-color: var(--rz-text-secondary-color) !default;
-$tabs-hover-color: var(--rz-text-color) !default;
+$tabs-tab-hover-color: var(--rz-text-color) !default;
 $tabs-border: none !default;
 
 // Dialog
 $dialog-title-background-color: var(--rz-base-background-color) !default;
+
+// Overlay
+$overlay-background-color: var(--rz-base-background-color) !default;
 
 // Footer
 $footer-border: var(--rz-border-700) !default;
