@@ -914,6 +914,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Trends",
+                    Path = "chart-trends",
+                    New = true,
+                    Icon = "&#xe41d",
+                    Tags = new [] { "chart", "graph", "styling" }
+                },
+                new Example
+                {
                     Name = "Styling Chart",
                     Path = "styling-chart",
                     Title = "Blazor chart styling",

@@ -5,9 +5,6 @@
 
 @code {
     [Parameter]
-    public CoordinateSystem? CoordinateSystem { get; set; }
-
-    [Parameter]
     public TItem Data { get; set; }
 
     [Parameter]
@@ -20,12 +17,10 @@
     public double OffsetY { get; set; }
 
     [Parameter]
-    public string Class { get; set; }
-
-    [Parameter]
     public bool Visible { get; set; } = true;
 
     CartesianSeries<TItem> series;
+
     [CascadingParameter]
     protected CartesianSeries<TItem> Series 
     { 
@@ -48,7 +43,10 @@
         double x = series.TooltipX(Data);
         double y = series.TooltipY(Data);
 
-        var coordinateSystem = CoordinateSystem ?? series.CoordinateSystem;
+        var coordinateSystem = series.CoordinateSystem;
+
+        var textAnchor = "middle";
+
         switch (coordinateSystem)
         {
             case Radzen.CoordinateSystem.Cartesian:
@@ -78,8 +76,10 @@
                 var phi = Math.Atan2(y, x);
                 phi += Polar.ToRadian(OffsetY % 360);
 
+                textAnchor = phi >= -1.5 && phi <= 1.5 ? "start" : "end";
+
                 // find radius
-                var hyp = Math.Sqrt(x * x + y * y) + OffsetX;
+                var hyp = Math.Sqrt(x * x + y * y) + OffsetX + 16;
 
                 // move along the radius and rotate
                 x = orgX + hyp * Math.Cos(phi);
@@ -90,7 +90,7 @@
         Point pt = new Point() { X = x, Y = y };
         return 
         @<g>
-            <Text @key="@($"{pt}-{Text}-{Chart.Series.IndexOf(series)}")"  Value="@Text" Position="pt" Class="@Class" />
+            <Text @key="@($"{pt}-{Text}-{Chart.Series.IndexOf(series)}")" TextAnchor="@textAnchor" Value="@Text" Position="pt" />
         </g>
     ;
     }
