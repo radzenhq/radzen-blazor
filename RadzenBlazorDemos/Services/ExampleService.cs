@@ -629,6 +629,13 @@ namespace RadzenBlazorDemos
                     Path = "tabs",
                     Icon = "&#xe8d8",
                     Tags = new [] { "tabstrip", "tabview", "container" }
+                },
+                new Example()
+                {
+                    Name = "Typography",
+                    Path = "typography",
+                    Icon = "&#xe264",
+                    Tags = new [] { "typo", "typography", "text", "paragraph, header, heading, caption, overline, content" }
                 }
             }
         },
