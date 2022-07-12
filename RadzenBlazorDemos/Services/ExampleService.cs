@@ -917,8 +917,16 @@ namespace RadzenBlazorDemos
                     Name = "Trends",
                     Path = "chart-trends",
                     New = true,
-                    Icon = "&#xe41d",
-                    Tags = new [] { "chart", "graph", "styling" }
+                    Icon = "&#xe8e5",
+                    Tags = new [] { "chart", "trend", "median", "mean", "mode" }
+                },
+                new Example
+                {
+                    Name = "Annotations",
+                    Path = "chart-annotations",
+                    New = true,
+                    Icon = "&#xe06f",
+                    Tags = new [] { "chart", "annotation", "label" }
                 },
                 new Example
                 {
