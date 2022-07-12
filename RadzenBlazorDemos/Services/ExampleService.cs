@@ -523,7 +523,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Accordion",
                     Path = "accordion",
-                    Title = "Blazor Accordion component"
+                    Title = "Blazor Accordion component",
                     Icon = "&#xe8ee",
                     Tags = new [] { "panel", "container" }
                 },
