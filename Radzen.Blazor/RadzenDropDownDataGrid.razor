@@ -35,7 +35,7 @@
                 @PropertyAccess.GetItemOrValueFromProperty(selectedItem, TextProperty)
             </label>
         }
-        else if (selectedItems.Count > 0)
+        else if (selectedItems.Count > 0 && Multiple)
         {
             <label class="rz-dropdown-label rz-inputtext " style="width:100%;">
                 @if (selectedItems.Count < MaxSelectedLabels)
