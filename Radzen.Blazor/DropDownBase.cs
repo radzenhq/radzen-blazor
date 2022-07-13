@@ -479,7 +479,7 @@ namespace Radzen
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
-            else if (key == "Delete")
+            else if (key == "Delete" && AllowClear)
             {
                 if (!Multiple && selectedItem != null)
                 {
