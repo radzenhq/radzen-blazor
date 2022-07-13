@@ -46,6 +46,9 @@ $scheduler-event-line-height: 1rem !default;
 $scheduler-event-padding: 0 1px 1px 1px !default;
 $scheduler-event-content-padding: 0.125rem 0.25rem !default;
 
+$scheduler-event-list-button-color: var(--rz-secondary);
+$scheduler-event-list-button-font-size: 0.75rem;
+
 $scheduler-slot-title-font-size: 0.875rem !default;
 $scheduler-slot-title-padding: 0 0.25rem !default;
 
@@ -101,6 +104,9 @@ $scheduler-day-number-padding: 0 0.5rem !default;
   --rz-scheduler-event-line-height: #{$scheduler-event-line-height};
   --rz-scheduler-event-padding: #{$scheduler-event-padding};
   --rz-scheduler-event-content-padding: #{$scheduler-event-content-padding};
+
+  --rz-scheduler-event-list-button-color: #{$scheduler-event-list-button-color};
+  --rz-scheduler-event-list-button-font-size: #{$scheduler-event-list-button-font-size};
   
   --rz-scheduler-slot-title-font-size: #{$scheduler-slot-title-font-size};
   --rz-scheduler-slot-title-padding: #{$scheduler-slot-title-padding};
@@ -120,12 +126,15 @@ $scheduler-day-number-padding: 0 0.5rem !default;
   overflow: hidden;
   background-clip: border-box;
 
-  .rz-event-list-btn {
+  a.rz-event-list-btn {
     position: absolute;
-    color: var(--rz-text-color);
+    padding-left: 0.25rem;
+    color: var(--rz-scheduler-event-list-button-color);
+    font-size: var(--rz-scheduler-event-list-button-font-size);
 
     &:hover {
       cursor: pointer;
+      color: var(--rz-scheduler-event-list-button-color);
       text-decoration: underline;
     }
   }
