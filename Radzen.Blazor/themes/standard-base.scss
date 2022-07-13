@@ -188,8 +188,9 @@ $button-sizes: (
   lg: (
     font-size: 1rem,
     padding: 0.875rem 1.5rem,
-    line-height: 1.5,
+    line-height: 1.5rem,
     height: auto,
+    min-height: 3.25rem,
     font-weight: 600,
     border-radius: var(--rz-border-radius-2),
     icon: (
@@ -200,12 +201,13 @@ $button-sizes: (
     ),
     text-with-icon-padding: 0 1.375rem,
     icon-only-padding: 0.875rem
-  ),  
+  ),
   md: (
     font-size: 0.875rem,
     padding: 0.5rem 1rem,
     line-height: 1.25rem,
     height: auto,
+    min-height: 2.25rem,
     font-weight: 600,
     icon: (
       font-size: 1.25rem,
@@ -221,6 +223,7 @@ $button-sizes: (
     padding: 0.25rem 0.75rem,
     line-height: 1.25rem,
     height: auto,
+    min-height: 1.75rem,
     icon: (
       font-size: 1.25rem,
       line-height: 1.25rem,
