@@ -122,30 +122,6 @@ namespace Radzen
             });
         }
 
-        /// <summary>
-        /// Gets or sets the selected items.
-        /// </summary>
-        /// <value>The selected items.</value>
-        [Parameter]
-        public IList<object> SelectedItems
-        {
-            get
-            {
-                return selectedItems;
-            }
-            set
-            {
-                selectedItems = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the SelectedItems changed callback.
-        /// </summary>
-        /// <value>The SelectedItems changed callback.</value>
-        [Parameter]
-        public EventCallback<IList<object>> SelectedItemsChanged { get; set; }
-
         /// <inheritdoc />
         public override bool HasValue
         {
@@ -503,7 +479,7 @@ namespace Radzen
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
-            else if (key == "Delete")
+            else if (key == "Delete" && AllowClear)
             {
                 if (!Multiple && selectedItem != null)
                 {
@@ -942,11 +918,6 @@ namespace Radzen
                 }
 
                 if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
-
-                if (SelectedItemsChanged.HasDelegate)
-                {
-                    await SelectedItemsChanged.InvokeAsync(selectedItems);
-                }
 
                 await Change.InvokeAsync(internalValue);
             }
