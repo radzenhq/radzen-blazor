@@ -5,7 +5,7 @@
 @using RadzenBlazorDemos.Services
 @inject GitHubService GitHub
 
-<h1>Blazor GitHub Issues</h1>
+<h1 class="rz-text-display-h3 my-4">Blazor GitHub Issues</h1>
 <p>
     Sample dashboard that uses data from the <a href="https://github.com/dotnet/aspnetcore/issues" target="_blank">ASP.NET GitHub repository</a>. Data is updated 24 hours.
 </p>
@@ -128,7 +128,7 @@
                             <RadzenLink Path=@issue.Url Text=@issue.Title Target="_blank" />
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Issue" Property="State" Title="State" Width="100px">
+                    <RadzenDataGridColumn TItem="Issue" Property="State" Title="State" Width="120px">
                         <FilterTemplate>
                             <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues />
                         </FilterTemplate>
