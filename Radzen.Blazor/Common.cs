@@ -669,6 +669,10 @@ namespace Radzen
         /// </summary>
         Medium,
         /// <summary>
+        /// A button larger than the default.
+        /// </summary>
+        Large,
+        /// <summary>
         /// A button smaller than the default.
         /// </summary>
         Small

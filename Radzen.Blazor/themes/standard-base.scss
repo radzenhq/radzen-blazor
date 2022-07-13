@@ -185,6 +185,22 @@ $button-hover-background-size: 100% 200%, 100% 0%  !default;
 $button-active-background-size: 100% 0%, 100% 200%  !default;
 
 $button-sizes: (
+  lg: (
+    font-size: 1rem,
+    padding: 0.875rem 1.5rem,
+    line-height: 1.5,
+    height: auto,
+    font-weight: 600,
+    border-radius: var(--rz-border-radius-2),
+    icon: (
+      font-size: 1.5rem,
+      height: 1.5rem,
+      line-height: 1.5rem,
+      width: 1.5rem
+    ),
+    text-with-icon-padding: 0 1.375rem,
+    icon-only-padding: 0.875rem
+  ),  
   md: (
     font-size: 0.875rem,
     padding: 0.5rem 1rem,
