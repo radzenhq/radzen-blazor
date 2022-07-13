@@ -19,6 +19,22 @@ $button-sizes: () !default;
 
 $button-sizes: map-merge(
   (
+    lg: (
+      font-size: 1rem,
+      padding: 0.875rem 1.5rem,
+      line-height: 1.5,
+      height: auto,
+      font-weight: 600,
+      border-radius: var(--rz-border-radius-2),
+      icon: (
+        font-size: 1.5rem,
+        height: 1.5rem,
+        line-height: 1.5rem,
+        width: 1.5rem
+      ),
+      text-with-icon-padding: 0 1.375rem,
+      icon-only-padding: 0.875rem
+    ),
     md: (
       font-size: var(--rz-body-font-size),
       padding: 0.5rem 1rem,
@@ -169,7 +185,6 @@ $button-styles: map-merge(
 
   .rz-button-text {
     vertical-align: var(--rz-button-vertical-align);
-    line-height: var(--rz-button-line-height);
   }
 
   .rzi {
@@ -193,6 +208,11 @@ $button-styles: map-merge(
       line-height: map-get($button, line-height);
       letter-spacing: map-get($button, letter-spacing);
       text-transform: map-get($button, text-transform);
+      border-radius: map-get($button, border-radius);
+
+      & .rz-button-box {
+        line-height: map-get($button, line-height);
+      }
 
       &.rz-button-text-icon-left {
         padding: map-get($button, text-with-icon-padding);
