@@ -65,7 +65,7 @@
                         var left = slotIndex * slotWidth;
                         var top = 1.5 * (MaxAppointmentsInSlot + 1);
                         var listDate = start;
-                        <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())em; left: @(left.ToInvariantString())%" @onclick=@(args => OnListClick(listDate, appointments))>@String.Format(MoreText, excessCount)</a>
+                        <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())rem; left: @(left.ToInvariantString())%" @onclick=@(args => OnListClick(listDate, appointments))>@String.Format(MoreText, excessCount)</a>
                     }
                 }
             </div>
