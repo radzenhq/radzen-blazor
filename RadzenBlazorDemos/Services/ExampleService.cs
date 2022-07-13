@@ -633,6 +633,7 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "Typography",
+                    New = true,
                     Path = "typography",
                     Icon = "&#xe264",
                     Tags = new [] { "typo", "typography", "text", "paragraph, header, heading, caption, overline, content" }
