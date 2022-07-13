@@ -98,8 +98,11 @@ $grid-frozen-cell-background-color: $grid-header-background-color !default;
 $grid-state-transition: var(--rz-transition-all) !default;
 
 $grid-group-header-padding: 0.5rem !default;
+$grid-group-header-item-background-color: var(--rz-base-background-color) !default;
 $grid-group-header-item-padding: 0.5rem !default;
 $grid-group-header-item-margin: 0 0.5rem 0.5rem 0 !default;
+$grid-group-header-item-border: $grid-cell-border !default;
+$grid-group-header-item-border-radius: var(--rz-border-radius) !default;
 $grid-group-header-items-margin: 0 0 -0.5rem 0 !default;
 
 $column-drag-handle-color: $grid-header-color !default;
@@ -209,8 +212,11 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
   --rz-grid-state-transition: #{$grid-state-transition};
 
   --rz-grid-group-header-padding: #{$grid-group-header-padding};
+  --rz-grid-group-header-item-background-color: #{$grid-group-header-item-background-color};
   --rz-grid-group-header-item-padding: #{$grid-group-header-item-padding};
   --rz-grid-group-header-item-margin: #{$grid-group-header-item-margin};
+  --rz-grid-group-header-item-border: #{$grid-group-header-item-border};
+  --rz-grid-group-header-item-border-radius: #{$grid-group-header-item-border-radius};
   --rz-grid-group-header-items-margin: #{$grid-group-header-items-margin};
 
   --rz-column-drag-handle-color: #{$column-drag-handle-color};
@@ -905,6 +911,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
         position: sticky;
         background: var(--rz-grid-frozen-cell-background-color);
         border-right: var(--rz-grid-frozen-cell-border) !important;
+        box-shadow: 1px 0 2px 0 rgba(0,0,0,0.12);
         z-index: 1;
     }
 }
@@ -977,8 +984,9 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 }
 
 .rz-group-header-item {
-    border: var(--rz-grid-cell-border);
-    border-radius: var(--rz-border-radius);
+    background-color: var(--rz-grid-group-header-item-background-color);
+    border: var(--rz-grid-group-header-item-border);
+    border-radius: var(--rz-grid-group-header-item-border-radius);
     padding: var(--rz-grid-group-header-item-padding);
     margin: var(--rz-grid-group-header-item-margin);
     width: fit-content;
@@ -988,7 +996,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 .rz-group-header-item-title {
     font-size: var(--rz-grid-header-font-size);
     font-weight: var(--rz-grid-header-font-weight);
-    margin-right: 0.25rem;
+    margin-right: 0.5rem;
 }
 
 .rz-group-header-drop {
