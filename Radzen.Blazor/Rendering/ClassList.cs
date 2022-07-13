@@ -68,6 +68,21 @@ namespace Radzen.Blazor.Rendering
         }
 
         /// <summary>
+        /// Adds the specified attributes.
+        /// </summary>
+        /// <param name="attributes">The attributes.</param>
+        /// <returns>ClassList.</returns>
+        public ClassList Add(IReadOnlyDictionary<string, object> attributes)
+        {
+            if (attributes != null && attributes.TryGetValue("class", out var className) && className != null)
+            {
+                return Add(className.ToString());
+            }
+
+            return this;
+        }
+
+        /// <summary>
         /// Adds the specified field.
         /// </summary>
         /// <param name="field">The field.</param>
