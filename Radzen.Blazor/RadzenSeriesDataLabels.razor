@@ -3,15 +3,6 @@
 @implements IRadzenSeriesOverlay
 
 @code {
-    [Parameter]
-    public double OffsetX { get; set; }
-
-    [Parameter]
-    public double OffsetY { get; set; }
-
-    [Parameter]
-    public bool Visible { get; set; } = true;
-
     IChartSeries series;
 
     [CascadingParameter]
