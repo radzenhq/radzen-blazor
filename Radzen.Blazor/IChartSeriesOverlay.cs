@@ -5,7 +5,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// Interface for chart overlays
     /// </summary>
-    public interface IRadzenSeriesOverlay
+    public interface IChartSeriesOverlay
     {
         /// <summary>
         /// Render overlay

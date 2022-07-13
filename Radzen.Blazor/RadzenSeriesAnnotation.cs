@@ -30,7 +30,7 @@ namespace Radzen.Blazor
     ///   }
     /// </code>
     /// </example>
-    public partial class RadzenSeriesAnnotation<TItem> : RadzenChartComponentBase, IRadzenSeriesOverlay
+    public partial class RadzenSeriesAnnotation<TItem> : RadzenChartComponentBase, IChartSeriesOverlay
     {
         /// <summary>
         /// The data item from the series this annotation applies to. 

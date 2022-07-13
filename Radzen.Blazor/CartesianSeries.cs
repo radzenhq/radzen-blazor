@@ -128,7 +128,7 @@ namespace Radzen.Blazor
         /// Gets the list of overlays.
         /// </summary>
         /// <value>The Overlays list.</value>
-        public IList<IRadzenSeriesOverlay> Overlays { get; } = new List<IRadzenSeriesOverlay>();
+        public IList<IChartSeriesOverlay> Overlays { get; } = new List<IChartSeriesOverlay>();
 
         /// <summary>
         /// Gets the coordinate system of the series.
