@@ -69,10 +69,16 @@ font-style: italic;
 font-weight: bold;
 }
 
+.documentation-links {
+position: relative;
+float: right;
+margin-left: -100%;
+}
+
 .documentation-links a {
 text-decoration: none !important; 
 padding: 6px 0;
-margin-right: 24px;
+margin-left: 24px;
 display: inline-flex; 
 align-items: center;
 }
