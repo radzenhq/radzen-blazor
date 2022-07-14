@@ -28,7 +28,7 @@ namespace Radzen.Blazor
     ///   }
     /// </code>
     /// </example>
-    public partial class RadzenSeriesMedianLine : RadzenSeriesConstantLine
+    public partial class RadzenSeriesMedianLine : RadzenSeriesValueLine
     {
         /// <ihnheritdoc />
         public override double Value
