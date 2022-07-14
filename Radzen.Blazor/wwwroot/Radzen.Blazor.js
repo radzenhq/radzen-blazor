@@ -613,10 +613,10 @@ window.Radzen = {
 
       if (value && !isNaN(+value)) {
         var numericValue = +value;
-        if (numericValue < min) {
+        if (!isNaN(+min) && numericValue < min) {
             e.target.value = min;
         }
-        if (numericValue > max) {
+        if (!isNaN(+max) && numericValue > max) {
             e.target.value = max;
         }
       }
