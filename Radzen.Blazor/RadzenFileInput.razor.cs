@@ -203,6 +203,8 @@ namespace Radzen.Blazor
         {
             Value = default(TValue);
 
+            await JSRuntime.InvokeVoidAsync("Radzen.removeFileFromFileInput", fileUpload);
+
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);

@@ -521,6 +521,9 @@ window.Radzen = {
     }
     fileInput.value = '';
   },
+  removeFileFromFileInput: function (fileInput) {
+    fileInput.value = '';
+  },
   upload: function (fileInput, url, multiple, clear) {
     var uploadComponent = Radzen.uploadComponents && Radzen.uploadComponents[fileInput.id];
     if (!uploadComponent) { return; }
