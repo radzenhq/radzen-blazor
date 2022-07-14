@@ -309,7 +309,7 @@ namespace Radzen.Blazor
                     {
                         foreach (var overlay in series.Overlays.Reverse())
                         {
-                            if (overlay.Contains(mouseX - MarginLeft, mouseY - MarginTop, 25))
+                            if (overlay.Visible && overlay.Contains(mouseX - MarginLeft, mouseY - MarginTop, 25))
                             {
                                 tooltipData = null;
                                 tooltip = overlay.RenderTooltip(mouseX, mouseY, MarginLeft, MarginTop);

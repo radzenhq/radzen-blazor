@@ -44,6 +44,6 @@ namespace Radzen.Blazor
         }
 
         /// <ihnheritdoc />
-        protected override string Name => "Median";
+        protected override string Name => "Mean";
     }
 }
