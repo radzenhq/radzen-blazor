@@ -27,6 +27,23 @@ namespace Radzen.Blazor
         Overline
     }
 
+    public enum TagName
+    {
+        Div,
+        Span,
+        P,
+        H1, 
+        H2, 
+        H3, 
+        H4, 
+        H5, 
+        H6,
+        A,
+        Button,
+        Pre,
+        Auto
+    }
+
     public class RadzenText : RadzenComponent
     {
         [Parameter]
@@ -40,6 +57,9 @@ namespace Radzen.Blazor
 
         [Parameter]
         public TextAlign TextAlign { get; set;} = TextAlign.Left;
+
+        [Parameter]
+        public TagName TagName { get; set; } = TagName.Auto;
 
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
@@ -149,6 +169,46 @@ namespace Radzen.Blazor
                     break;
                 case TextAlign.JustifyAll:
                     alignClassName = "rz-text-align-justify-all";
+                    break;
+            }
+
+            switch (TagName)
+            {
+                case TagName.Div:
+                    tagName = "div";
+                    break;
+                case TagName.Span:
+                    tagName = "span";
+                    break;
+                case TagName.P:
+                    tagName = "p";
+                    break;
+                case TagName.H1:
+                    tagName = "h1";
+                    break;
+                case TagName.H2:
+                    tagName = "h2";
+                    break;
+                case TagName.H3:
+                    tagName = "h3";
+                    break;
+                case TagName.H4:
+                    tagName = "h4";
+                    break;
+                case TagName.H5:
+                    tagName = "h5";
+                    break;
+                case TagName.H6:
+                    tagName = "h6";
+                    break;
+                case TagName.A:
+                    tagName = "a";
+                    break;
+                case TagName.Button:
+                    tagName = "button";
+                    break;
+                case TagName.Pre:
+                    tagName = "pre";
                     break;
             }
 
