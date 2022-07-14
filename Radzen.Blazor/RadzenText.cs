@@ -43,24 +43,49 @@ namespace Radzen.Blazor
         Pre,
         Auto
     }
-
+    /// <summary>
+    /// A component which displays text or makup with predefined styling.
+    /// </summary>
+    /// <example>
+    ///   <code>
+    /// &lt;RadzenText TextStyle="TextStyle.H1"&gt;
+    ///  Hello World
+    /// &lt;/RadzenText&gt;
+    ///   </code>
+    /// </example>
     public class RadzenText : RadzenComponent
     {
+        /// <summary>
+        /// The text that will be displayed.
+        /// </summary>
         [Parameter]
         public string Text { get; set; }
 
+        /// <summary>
+        /// The child content (markup) that will be displayed. Setting the <see cref="Text"/> property will override it.
+        /// </summary>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
+        /// <summary>
+        /// The style of the text. Set to <see cref="TextStyle.Body1"/> by default.
+        /// </summary>
         [Parameter]
-        public TextStyle TextStyle { get; set; }
+        public TextStyle TextStyle { get; set; } = TextStyle.Body1;
 
+        /// <summary>
+        /// The horozontal alignment of the text.
+        /// </summary>
         [Parameter]
         public TextAlign TextAlign { get; set;} = TextAlign.Left;
 
+        /// <summary>
+        /// The tag name of the element that will be rendered. Set to <see cref="TagName.Auto"/> which uses a default tag name depending on the current <see cref="TextStyle" />.
+        /// </summary>
         [Parameter]
         public TagName TagName { get; set; } = TagName.Auto;
 
+        /// <inheritdoc />
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
             var tagName = "span";
