@@ -6,10 +6,11 @@ $paginator-button-border-radius: var(--rz-border-radius) !default;
 
 $paginator-numeric-button-background-color: var(--rz-base-200) !default;
 $paginator-numeric-button-color: var(--rz-text-color) !default;
+$paginator-numeric-button-border: 1px solid transparent !default;
 $paginator-numeric-button-hover-background-color: $paginator-numeric-button-background-color !default;
 $paginator-numeric-button-hover-color: $paginator-numeric-button-color !default;
 $paginator-numeric-button-margin: 0 0.25rem !default;
-$paginator-numeric-button-padding: 0.5rem !default;
+$paginator-numeric-button-padding: 0.4375rem !default;
 $paginator-numeric-button-selected-background-color: var(--rz-base-background-color) !default;
 $paginator-numeric-button-selected-color: var(--rz-primary) !default;
 $paginator-numeric-button-selected-border: var(--rz-border-200) !default;
@@ -49,6 +50,7 @@ $paginator-button-size: ".rz-button-md" !default;
 
   --rz-paginator-numeric-button-background-color: #{$paginator-numeric-button-background-color};
   --rz-paginator-numeric-button-color: #{$paginator-numeric-button-color};
+  --rz-paginator-numeric-button-border: #{$paginator-numeric-button-border};
   --rz-paginator-numeric-button-hover-background-color: #{$paginator-numeric-button-hover-background-color};
   --rz-paginator-numeric-button-hover-color: #{$paginator-numeric-button-hover-color};
   --rz-paginator-numeric-button-margin: #{$paginator-numeric-button-margin};
@@ -229,6 +231,7 @@ $paginator-button-size: ".rz-button-md" !default;
   text-align: center;
   margin: var(--rz-paginator-numeric-button-margin);
   background-color: var(--rz-paginator-numeric-button-background-color);
+  border: var(--rz-paginator-numeric-button-border);
   border-radius: var(--rz-paginator-button-border-radius);
   padding: var(--rz-paginator-numeric-button-padding);
   color: var(--rz-paginator-numeric-button-color);
