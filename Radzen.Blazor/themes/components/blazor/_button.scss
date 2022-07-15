@@ -1,19 +1,23 @@
 $button-base-background-color: var(--rz-primary) !default;
 $button-base-color: var(--rz-text-contrast-color) !default;
-$button-hover-shadow: inset 0 -3px 0 0 rgba(255, 255, 255, 0.2) !default;
-$button-hover-gradient: linear-gradient(rgba(#fff, 0.1), rgba(#fff, 0.1)) !default;
-$button-active-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.1) !default;
-$button-active-gradient: linear-gradient(rgba(#000, 0.1), rgba(#000, 0.1)) !default;
-$button-focus-outline: none !default;
+$button-background-size: auto !default;
 $button-border-radius: var(--rz-border-radius) !default;
 $button-shadow: none !default;
 $button-transition: var(--rz-transition-all) !default;
-$button-disabled-opacity: 0.2 !default;
 $button-line-height: 1.25rem !default;
 $button-vertical-align: top !default;
-$button-background-size: auto !default;
+
+$button-hover-shadow: inset 0 -3px 0 0 rgba(255, 255, 255, 0.2) !default;
+$button-hover-gradient: linear-gradient(rgba(#fff, 0.1), rgba(#fff, 0.1)) !default;
 $button-hover-background-size: $button-background-size !default;
+
+$button-active-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.1) !default;
+$button-active-gradient: linear-gradient(rgba(#000, 0.1), rgba(#000, 0.1)) !default;
 $button-active-background-size: $button-background-size !default;
+
+$button-focus-outline: none !default;
+
+$button-disabled-opacity: 0.2 !default;
 
 $button-sizes: () !default;
 
@@ -27,6 +31,8 @@ $button-sizes: map-merge(
       min-height: 3.25rem,
       font-weight: 600,
       border-radius: var(--rz-border-radius-2),
+      text-transform: uppercase,
+      letter-spacing: 0.5px,
       icon: (
         font-size: 1.5rem,
         height: 1.5rem,
@@ -139,6 +145,7 @@ $button-styles: map-merge(
 
 .rz-button {
   -webkit-appearance: none;
+  display: inline-block;
   border-radius: var(--rz-button-border-radius);
   background-color: var(--rz-button-base-background-color);
   color: var(--rz-button-base-color);
@@ -146,6 +153,7 @@ $button-styles: map-merge(
   outline: none;
   line-height: var(--rz-button-line-height);
   font-size: 1.0625rem;
+  text-decoration: none;
   box-shadow: var(--rz-button-shadow);
   transition: var(--rz-button-transition);
   background-size: var(--rz-button-background-size);
@@ -160,6 +168,7 @@ $button-styles: map-merge(
 
     &:hover {
       &:not(:active) {
+        text-decoration: none;
         background-image: var(--rz-button-hover-gradient);
         background-size: var(--rz-button-hover-background-size);
         box-shadow: var(--rz-button-hover-shadow);
@@ -167,6 +176,7 @@ $button-styles: map-merge(
     }
 
     &:active {
+      text-decoration: none;
       background-image: var(--rz-button-active-gradient);
       background-size: var(--rz-button-active-background-size);
       box-shadow: var(--rz-button-active-shadow);
@@ -195,7 +205,7 @@ $button-styles: map-merge(
   }
 
   @each $style, $button in $button-styles {
-    &.btn-#{$style} {
+    &.rz-#{$style} {
       @each $name, $value in $button {
         #{$name}: #{$value};
       }

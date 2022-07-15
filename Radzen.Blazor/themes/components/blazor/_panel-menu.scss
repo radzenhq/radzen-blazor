@@ -1,5 +1,5 @@
 $panel-menu-font-size: var(--rz-body-font-size) !default;
-$panel-menu-font-weight: inherit !default;
+$panel-menu-font-weight: 600 !default;
 $panel-menu-color: var(--rz-text-contrast-color) !default;
 $panel-menu-background-color: var(--rz-base-800) !default;
 $panel-menu-hover-background-color: rgba($rz-black, .3) !default;
@@ -18,7 +18,7 @@ $panel-menu-item-transition: var(--rz-transition-all) !default;
 $panel-menu-item-2nd-level-padding: 0.5rem 1rem !default;
 $panel-menu-item-2nd-level-offset: 2.75rem !default;
 $panel-menu-item-2nd-level-font-size: var(--rz-body-font-size) !default;
-$panel-menu-item-2nd-level-font-weight: inherit !default;
+$panel-menu-item-2nd-level-font-weight: 400 !default;
 $panel-menu-item-2nd-level-color: inherit !default;
 $panel-menu-item-2nd-level-hover-background-color: rgba($rz-black, .4) !default;
 $panel-menu-item-2nd-level-background-color: $panel-menu-item-2nd-level-hover-background-color !default;
@@ -36,7 +36,8 @@ $panel-menu-icon-font-size: var(--rz-icon-size) !default;
 $panel-menu-icon-color: inherit !default;
 $panel-menu-icon-height: $panel-menu-icon-width !default;
 $panel-menu-icon-margin: 0 0.5rem 0 0 !default;
-$panel-menu-icon-2nd-level-margin: 0 0.5rem 0 -1.75rem !default;
+$panel-menu-icon-2nd-level-margin: 0 0.625rem 0 -1.625rem !default;
+$panel-menu-icon-2nd-level-icon-size: calc(var(--rz-icon-size)*0.8) !default;
 
 $panel-menu-toggle-icon-font-size: var(--rz-icon-size) !default;
 $panel-menu-toggle-icon-opacity: 1 !default;
@@ -83,6 +84,7 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   --rz-panel-menu-icon-height: #{$panel-menu-icon-height};
   --rz-panel-menu-icon-margin: #{$panel-menu-icon-margin};
   --rz-panel-menu-icon-2nd-level-margin: #{$panel-menu-icon-2nd-level-margin};
+  --rz-panel-menu-icon-2nd-level-icon-size: #{$panel-menu-icon-2nd-level-icon-size};
 
   --rz-panel-menu-toggle-icon-font-size: #{$panel-menu-toggle-icon-font-size};
   --rz-panel-menu-toggle-icon-opacity: #{$panel-menu-toggle-icon-opacity};
@@ -156,7 +158,7 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   }
 
   .rz-navigation-item-icon {
-    height: var(--rz-panel-menu-item-line-height);
+    height: var(--rz-panel-menu-icon-height);
     width: var(--rz-panel-menu-icon-width);
     color: var(--rz-panel-menu-icon-color);
     margin: var(--rz-panel-menu-icon-margin);
@@ -195,6 +197,9 @@ $panel-menu-toggle-icon-opacity: 1 !default;
     }
 
     .rz-navigation-item-icon {
+      height: var(--rz-panel-menu-icon-2nd-level-icon-size);
+      width: var(--rz-panel-menu-icon-2nd-level-icon-size);
+      font-size: var(--rz-panel-menu-icon-2nd-level-icon-size);
       margin: var(--rz-panel-menu-icon-2nd-level-margin);
     }
 
