@@ -9,8 +9,12 @@
 </HeadContent>
 @if (Heading)
 {
-    <h1 class="rz-text-display-h3 my-4">@Name</h1>
-    <p>Demonstration and configuration of the Radzen Blazor <strong>@Name</strong> component.</p>
+    <RadzenText TextStyle="TextStyle.H3" TagName="h1" Class="my-4">
+        @Name
+    </RadzenText>
+    <RadzenText TextStyle="TextStyle.Body1">
+        Demonstration and configuration of the Radzen Blazor <strong>@Name</strong> component.
+    </RadzenText>
 }
 <div class="documentation-links">
 @if (Documentation)
