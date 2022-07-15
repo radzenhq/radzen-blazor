@@ -460,18 +460,6 @@ pre {
     border-right: 0 !important;
 }
 
-.content-footer {
-    background-image: url("../images/background.svg");
-    background-repeat: no-repeat;
-    background-position: right -450px top -200px;
-}
-
-.content-footer h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 100%;
-}
-
 .docu h2 {
     font-weight: 700;
     font-size: 2rem;
@@ -500,6 +488,9 @@ img.illustration {
     min-height: 220px;
 }
 
+.example-container {
+    max-width: 1440px;
+}
 /* Demos Sidebar */
 
 .demos-sidebar .rz-panel-menu .rz-navigation-item-icon-children {
