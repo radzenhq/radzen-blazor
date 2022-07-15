@@ -28,7 +28,7 @@ namespace Radzen.Blazor
     ///   }
     /// </code>
     /// </example>
-    public partial class RadzenSeriesMeanLine : RadzenSeriesConstantLine
+    public partial class RadzenSeriesMeanLine : RadzenSeriesValueLine
     {
         /// <ihnheritdoc />
         public override double Value
@@ -44,6 +44,6 @@ namespace Radzen.Blazor
         }
 
         /// <ihnheritdoc />
-        protected override string Name => "Median";
+        protected override string Name => "Mean";
     }
 }

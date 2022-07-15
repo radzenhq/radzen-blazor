@@ -3,7 +3,7 @@
 @implements IChartSeriesOverlay
 
 @code {
-    public RadzenSeriesConstantLine()
+    public RadzenSeriesValueLine()
     {
         Visible = true;
     }
@@ -57,30 +57,28 @@
             {
                 return null;
             }
-            x1 = 0; x2 = Chart.CategoryScale.OutputSize - Chart.CategoryAxis.Padding * 2;
+            x1 = 0; x2 = Chart.CategoryScale.OutputSize;
         }
 
         var path = $"M{x1} {y1} L{x2} {y2}";
         return
     @<g>
         <Path @key="@($"{path}-{Chart.Series.IndexOf(series)}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" />
-        </g>
+    </g>
     ;
     }
 
     public bool Contains(double mouseX, double mouseY, int tolerance)
     {
-        var x = mouseX;
-        var y = mouseY;
         if (Chart.ShouldInvertAxes())
         {
             var a = Chart.CategoryScale.Scale(Value);
-            return (a >= x - tolerance && a <= x + tolerance);
+            return (mouseY >= -tolerance && mouseY <= Chart.ValueScale.OutputSize + tolerance) && (a >= mouseX - tolerance && a <= mouseX + tolerance);
         }
         else
         {
             var a = Chart.ValueScale.Scale(Value);
-            return (a >= y - tolerance && a <= y + tolerance);
+            return (mouseX >= -tolerance && mouseX <= Chart.CategoryScale.OutputSize + tolerance) && (a >= mouseY - tolerance && a <= mouseY + tolerance);
         }
     }
 
