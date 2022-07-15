@@ -1,5 +1,23 @@
 //---- Component Aliases
 
+// Special Color
+$color: (
+  primary: (color: var(--rz-primary)),
+  secondary: (color: var(--rz-secondary)),
+  info: (color: var(--rz-info)),
+  success: (color: var(--rz-success)),
+  warning: (color: var(--rz-warning)),
+  error: (color: var(--rz-error)),
+) !default;
+
+@each $name, $property in $color {
+  .rz-color-#{$name} {
+    @each $property, $value in $property {
+      #{$property}: #{$value};
+    }
+  }
+}
+
 // Text Color
 $rz-text-title-color: var(--rz-base-900) !default;
 $rz-text-color: var(--rz-base-800) !default;
