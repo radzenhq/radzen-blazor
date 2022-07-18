@@ -31,15 +31,15 @@
                             {
                                 <span>@Title</span>
                             }
-                            else if (!string.IsNullOrEmpty(name))
+                            else if (!string.IsNullOrEmpty(FileName))
                             {
-                                <span>@name</span>
+                                <span>@FileName</span>
                             }
                         </div>
                         <div>
-                            @if (size != null)
+                            @if (FileSize != null)
                             {
-                                <span>@size</span>
+                                <span>@FileSize</span>
                             }
                         </div>
                         <div tabindex="@TabIndex">
