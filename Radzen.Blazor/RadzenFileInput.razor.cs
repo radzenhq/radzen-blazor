@@ -203,18 +203,18 @@ namespace Radzen.Blazor
         async System.Threading.Tasks.Task Remove(EventArgs args)
         {
             Value = default(TValue);
+            FileSize = null;
+            FileName = null;
 
             await JSRuntime.InvokeVoidAsync("Radzen.removeFileFromFileInput", fileUpload);
-
-            FileSize = null;
-            await FileSizeChanged.InvokeAsync(FileSize);
-
-            FileName = null;
-            await FileNameChanged.InvokeAsync(FileName);
 
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);
+
+            await FileSizeChanged.InvokeAsync(FileSize);
+
+            await FileNameChanged.InvokeAsync(FileName);
 
             StateHasChanged();
         }
