@@ -166,21 +166,21 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        override protected void OnInitialized()
+        override protected async Task OnInitializedAsync()
         {
             expanded = Expanded;
             clientExpanded = expanded;
 
             if (expanded)
             {
-                Tree?.ExpandItem(this);
+                await Tree?.ExpandItem(this);
             }
 
             selected = Selected;
 
             if (selected)
             {
-                Tree?.SelectItem(this);
+                await Tree?.SelectItem(this);
             }
 
             if (Tree != null && ParentItem == null)
