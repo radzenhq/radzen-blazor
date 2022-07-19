@@ -600,10 +600,10 @@ window.Radzen = {
 
       if (value && !isNaN(+value)) {
         var numericValue = +value;
-        if (min && numericValue >= min) {
+        if (min != null && numericValue >= min) {
             return;
         }
-        if (max && numericValue <= max) {
+        if (max != null && numericValue <= max) {
             return;
         }
       }
@@ -616,10 +616,10 @@ window.Radzen = {
 
       if (value && !isNaN(+value)) {
         var numericValue = +value;
-        if (min && !isNaN(+min) && numericValue < min) {
+        if (min != null && !isNaN(+min) && numericValue < min) {
             e.target.value = min;
         }
-        if (max && !isNaN(+max) && numericValue > max) {
+        if (max != null && !isNaN(+max) && numericValue > max) {
             e.target.value = max;
         }
       }
