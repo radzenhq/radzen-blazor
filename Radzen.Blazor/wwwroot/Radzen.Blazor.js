@@ -600,10 +600,13 @@ window.Radzen = {
 
       if (value && !isNaN(+value)) {
         var numericValue = +value;
-        if (numericValue >= min && numericValue <= max) {
+        if (min && numericValue >= min) {
             return;
         }
+        if (max && numericValue <= max) {
+            return;
         }
+      }
 
       e.preventDefault();
     }
@@ -613,10 +616,10 @@ window.Radzen = {
 
       if (value && !isNaN(+value)) {
         var numericValue = +value;
-        if (!isNaN(+min) && numericValue < min) {
+        if (min && !isNaN(+min) && numericValue < min) {
             e.target.value = min;
         }
-        if (!isNaN(+max) && numericValue > max) {
+        if (max && !isNaN(+max) && numericValue > max) {
             e.target.value = max;
         }
       }
