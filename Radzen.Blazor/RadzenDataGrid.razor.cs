@@ -1447,6 +1447,8 @@ namespace Radzen.Blazor
             }
         }
 
+        IEnumerable<FilterDescriptor> filters = Enumerable.Empty<FilterDescriptor>();
+
         async Task InvokeLoadData(int start, int top)
         {
             var orderBy = GetOrderBy();
@@ -1458,21 +1460,21 @@ namespace Radzen.Blazor
             var filterString = allColumns.ToList().ToFilterString<TItem>();
             Query.Filter = filterString;
 
+            filters = allColumns.ToList().Where(c => c.Filterable && c.GetVisible() && (c.GetFilterValue() != null
+                    || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
+                    || c.GetFilterOperator() == FilterOperator.IsEmpty | c.GetFilterOperator() == FilterOperator.IsNotEmpty))
+                .Select(c => new FilterDescriptor()
+                {
+                    Property = c.GetFilterProperty(),
+                    FilterValue = c.GetFilterValue(),
+                    FilterOperator = c.GetFilterOperator(),
+                    SecondFilterValue = c.GetSecondFilterValue(),
+                    SecondFilterOperator = c.GetSecondFilterOperator(),
+                    LogicalFilterOperator = c.GetLogicalFilterOperator()
+                }).ToList();
+
             if (LoadData.HasDelegate)
             {
-                var filters = allColumns.ToList().Where(c => c.Filterable && c.GetVisible() && (c.GetFilterValue() != null
-                        || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
-                        || c.GetFilterOperator() == FilterOperator.IsEmpty | c.GetFilterOperator() == FilterOperator.IsNotEmpty))
-                    .Select(c => new FilterDescriptor()
-                    {
-                            Property = c.GetFilterProperty(),
-                            FilterValue = c.GetFilterValue(),
-                            FilterOperator = c.GetFilterOperator(),
-                            SecondFilterValue = c.GetSecondFilterValue(),
-                            SecondFilterOperator = c.GetSecondFilterOperator(),
-                            LogicalFilterOperator = c.GetLogicalFilterOperator()
-                    });
-
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
                 {
                     Skip = start,

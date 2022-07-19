@@ -145,7 +145,7 @@
                                             else
                                             {
                                                 <label class="rz-cell-filter-label" style="height:35px" onclick="event.preventDefault()">
-                                                    @if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?) || column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
+                                                    @if (PropertyAccess.IsDate(column.FilterPropertyType))
                                                     {
                                                             if (FilterMode == FilterMode.Simple)
                                                             {
@@ -153,7 +153,7 @@
                                                                     <i class="rzi">date_range</i>
                                                                 </button>
                                                                 var filterValue = column.GetFilterValue();
-                                                                @if (filterValue != null)
+                                                                @if (filterValue != null && filters.Any(d => d.Property == column.GetFilterProperty()))
                                                                 {
                                                                     <span class="rz-current-filter">@string.Format("{0:" + getFilterDateFormat(column) + "}", filterValue)</span>
                                                                     <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear">close</i>
