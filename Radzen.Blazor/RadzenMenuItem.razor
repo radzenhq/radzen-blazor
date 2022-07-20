@@ -6,7 +6,7 @@
         <div class="rz-navigation-item-wrapper" onclick="Radzen.toggleMenuItem(this)">
             @if (!string.IsNullOrEmpty(Path))
             {
-                <NavLink target="@Target" class="rz-navigation-item-link" href="@Path">
+                <NavLink target="@Target" class="rz-navigation-item-link" href="@Path" Match=@PathMatch>
                     @if (!string.IsNullOrEmpty(Icon))
                     {
                         <i class="rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
 using System.Threading.Tasks;
 
@@ -42,6 +43,12 @@ namespace Radzen.Blazor
         /// <value>The path.</value>
         [Parameter]
         public string Path { get; set; }
+        /// <summary>
+        /// Gets or sets a value representing the URL matching behavior in relation to applying CSS class "active".
+        /// </summary>
+        /// <value>The matching behavior.</value>
+        [Parameter]
+        public NavLinkMatch PathMatch { get; set; }
 
         /// <summary>
         /// Gets or sets the icon.
@@ -93,8 +100,8 @@ namespace Radzen.Blazor
         {
             if (Parent != null)
             {
-                var eventArgs = new MenuItemEventArgs 
-                { 
+                var eventArgs = new MenuItemEventArgs
+                {
                     Text = Text,
                     Path = Path,
                     Value = Value,
