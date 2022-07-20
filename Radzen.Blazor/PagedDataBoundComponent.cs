@@ -41,8 +41,6 @@ namespace Radzen
         /// <value><c>true</c> if paging is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowPaging { get; set; }
-        [Parameter]
-        public bool DisableEmptyText { get; set; }
 
         int _PageSize = 10;
         /// <summary>
