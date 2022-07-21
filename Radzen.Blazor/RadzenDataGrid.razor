@@ -268,7 +268,7 @@
             <tbody>
                 @if (Data != null)
                 {
-                    @if (Count > 0 || !AllowPaging && LoadData.HasDelegate && Count == 0)
+                    @if (!ShowEmptyMessage || Count > 0 || !AllowPaging && LoadData.HasDelegate && Count == 0)
                     {
                         if (columns.Count > 0)
                         {
