@@ -3,7 +3,11 @@
 @if (Visible)
 {
     <div class="@GetCssClass()" id="@GetId()" style="@Style" @attributes="@Attributes">
-        @if (Template != null)
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else if (Template != null)
         {
             @Template(this)
         }
