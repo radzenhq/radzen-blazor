@@ -51,11 +51,13 @@ else
     [Parameter]
     public object Item { get; set; }
 
-    async Task SelectItem()
+    async Task SelectItem(MouseEventArgs args)
     {
-        if (!(DropDown.LoadData.HasDelegate && !string.IsNullOrEmpty(DropDown.searchText))) 
-        { 
-            await DropDown.OnSelectItemInternal(Item); 
+        var condition = DropDown.LoadData.HasDelegate && !string.IsNullOrEmpty(DropDown.searchText);
+
+        if (args.Type == "click" ? !condition : condition)
+        {
+            await DropDown.OnSelectItemInternal(Item);
         }
     }
 }
