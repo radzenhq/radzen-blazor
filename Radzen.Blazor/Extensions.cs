@@ -24,12 +24,14 @@ namespace Radzen.Blazor
 
         public static IEnumerable<object> EnumAsKeyValuePair(Type enumType)
         {
-            var values = Enum.GetValues(enumType);
-            var items = new List<object>(values.Length);
+            var values = Enum.GetValues(enumType).Cast<Enum>().ToList();
 
-            foreach (Enum val in values)
+            var items = new List<object>(values.Count);
+            foreach (var val in values.GroupBy(v => Convert.ToInt32(v)))
             {
-                items.Add(new { Value = Convert.ToInt32(val), Text = val.GetDisplayDescription() });
+                var description = string.Join('/', val.Select(v => v.GetDisplayDescription()));
+
+                items.Add(new { Value = val.Key, Text = description });
             }
 
             return items;
