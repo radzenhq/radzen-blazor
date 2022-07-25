@@ -303,12 +303,15 @@ namespace Radzen
         /// <param name="args">The <see cref="PagerEventArgs"/> instance containing the event data.</param>
         protected async Task OnPageChanged(PagerEventArgs args)
         {
-            skip = args.Skip;
-            CurrentPage = args.PageIndex;
+            if (skip != args.Skip || CurrentPage != args.PageIndex)
+            {
+                skip = args.Skip;
+                CurrentPage = args.PageIndex;
 
-            await Page.InvokeAsync(args);
+                await Page.InvokeAsync(args);
 
-            await InvokeAsync(Reload);
+                await InvokeAsync(Reload);
+            }
         }
 
         int? pageSize;
