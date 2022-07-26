@@ -638,6 +638,27 @@ namespace Radzen.Blazor
         [Parameter]
         public string SecondsStep { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the hour picker is padded with a leading zero.
+        /// </summary>
+        /// <value><c>true</c> if hour component is padded; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool PadHours { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the minute picker is padded with a leading zero.
+        /// </summary>
+        /// <value><c>true</c> if hour component is padded; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool PadMinutes { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the second picker is padded with a leading zero.
+        /// </summary>
+        /// <value><c>true</c> if hour component is padded; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool PadSeconds { get; set; }
+
         enum StepType
         {
             /// <summary>
