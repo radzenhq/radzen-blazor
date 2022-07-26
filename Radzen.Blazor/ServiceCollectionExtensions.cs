@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Radzen.Blazor
+namespace Radzen
 {
     /// <summary>
     /// Class that provides Extension Methods for <see cref="IServiceCollection"/>
