@@ -35,7 +35,7 @@ namespace Radzen
     /// }
     /// </code>
     /// </example>
-    public class DialogService : IDisposable
+    public class DialogService : IDisposable, IDialogService
     {
         private DotNetObjectReference<DialogService> reference;
         internal DotNetObjectReference<DialogService> Reference
@@ -140,13 +140,7 @@ namespace Radzen
             return task.Task;
         }
 
-        /// <summary>
-        /// Opens a dialog with the specified content.
-        /// </summary>
-        /// <param name="title">The text displayed in the title bar of the dialog.</param>
-        /// <param name="childContent">The content displayed in the dialog.</param>
-        /// <param name="options">The dialog options.</param>
-        /// <returns>The value passed as argument to <see cref="Close" />.</returns>
+
         public Task<dynamic> OpenAsync(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
         {
             var task = new TaskCompletionSource<dynamic>();

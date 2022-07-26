@@ -15,7 +15,7 @@ namespace Radzen
     /// &lt;RadzenButton Text="Show info notification" Click=@(args => NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Summary", Detail = "Info Detail", Duration = 4000 })) / &gt;
     /// </code>
     /// </example>
-    public class NotificationService
+    public class NotificationService : INotificationService
     {
         /// <summary>
         /// Gets the messages.

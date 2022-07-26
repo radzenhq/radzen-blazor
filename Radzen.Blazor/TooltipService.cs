@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Radzen
 {
@@ -25,7 +22,7 @@ namespace Radzen
     /// }
     /// </code>
     /// </example>
-    public class TooltipService : IDisposable
+    public class TooltipService : IDisposable, ITooltipService
     {
         /// <summary>
         /// Gets or sets the navigation manager.

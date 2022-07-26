@@ -37,7 +37,7 @@ namespace Radzen
     /// }
     /// </code>
     /// </example>
-    public class ContextMenuService : IDisposable
+    public class ContextMenuService : IDisposable, IContextMenuService
     {
         /// <summary>
         /// Gets or sets the navigation manager.
