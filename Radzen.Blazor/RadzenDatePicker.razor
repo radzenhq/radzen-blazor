@@ -109,19 +109,19 @@
                     <div class="rz-timepicker">
                         <RadzenNumeric TValue="int" Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)" 
                            Min="@(HourFormat == "12" ? 1 : -1)" Max="@(HourFormat == "12" ? 12 : 24)" TValue="double" Step="@HoursStep"
-                           Change="@UpdateHour" class="rz-hour-picker" @oninput=@OnUpdateHourInput />
+                           Change="@UpdateHour" class="rz-hour-picker" @oninput=@OnUpdateHourInput Format="@(PadHours ? "00" : "")" />
                         <div class="rz-separator">
                             <span>:</span>
                         </div>
                         <RadzenNumeric TValue="int" Disabled="@Disabled" Value="CurrentDate.Minute" TValue="double" Step="@MinutesStep" Min="0" Max="59"
-                           Change="@UpdateMinutes" class="rz-minute-picker" @oninput=@OnUpdateHourMinutes />
+                           Change="@UpdateMinutes" class="rz-minute-picker" @oninput=@OnUpdateHourMinutes Format="@(PadMinutes ? "00" : "")" />
                         @if (ShowSeconds)
                         {
                             <div class="rz-separator">
                                 <span>:</span>
                             </div>
                             <RadzenNumeric TValue="int" Disabled="@Disabled" Value="CurrentDate.Second" TValue="double" Step="@SecondsStep" Min="0" Max="59"
-                               Change="@UpdateSeconds" class="rz-second-picker" @oninput=@OnUpdateHourSeconds />
+                               Change="@UpdateSeconds" class="rz-second-picker" @oninput=@OnUpdateHourSeconds Format="@(PadSeconds ? "00" : "")"/>
                         }
                         @if (HourFormat == "12")
                         {
