@@ -303,15 +303,12 @@ namespace Radzen
         /// <param name="args">The <see cref="PagerEventArgs"/> instance containing the event data.</param>
         protected async Task OnPageChanged(PagerEventArgs args)
         {
-            if (skip != args.Skip || CurrentPage != args.PageIndex)
-            {
-                skip = args.Skip;
-                CurrentPage = args.PageIndex;
+            skip = args.Skip;
+            CurrentPage = args.PageIndex;
 
-                await Page.InvokeAsync(args);
+            await Page.InvokeAsync(args);
 
-                await InvokeAsync(Reload);
-            }
+            await InvokeAsync(Reload);
         }
 
         int? pageSize;
@@ -367,14 +364,21 @@ namespace Radzen
         /// <param name="forceReload">if set to <c>true</c> [force reload].</param>
         public async Task FirstPage(bool forceReload = false)
         {
+            var shouldReload = forceReload && CurrentPage == 0;
+
             if (topPager != null)
             {
-                await topPager.FirstPage(forceReload);
+                await topPager.FirstPage();
             }
 
             if (bottomPager != null)
             {
-                await bottomPager.FirstPage(forceReload);
+                await bottomPager.FirstPage();
+            }
+
+            if (shouldReload)
+            {
+                await InvokeAsync(Reload);
             }
         }
 
