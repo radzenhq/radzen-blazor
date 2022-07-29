@@ -16,6 +16,7 @@ $dropdown-item-selected-color: $dropdown-item-hover-color !default;
 $dropdown-item-selected-hover-background-color: $dropdown-item-selected-background-color !default;
 $dropdown-item-selected-hover-color: $dropdown-item-selected-color !default;
 $dropdown-item-transition: none !default;
+$dropdown-item-disabled-opacity: 0.2 !default;
 
 $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 $dropdown-label-padding: 0 $dropdown-trigger-icon-width 0 0 !default;
@@ -185,23 +186,28 @@ $dropdown-panel-border: $dropdown-open-border !default;
 }
 
 @mixin dropdown-item($radius: $border-radius) {
-  cursor: default;
-  font-size: $dropdown-item-font-size;
+    cursor: default;
+    font-size: $dropdown-item-font-size;
 
-  &.rz-state-highlight {
-    background-color: $dropdown-item-selected-background-color;
-    color: $dropdown-item-selected-color;
-    box-shadow: $dropdown-item-selected-shadow;
+    &.rz-state-highlight {
+        background-color: $dropdown-item-selected-background-color;
+        color: $dropdown-item-selected-color;
+        box-shadow: $dropdown-item-selected-shadow;
 
-    @if $radius {
-      border-radius: $radius;
+        @if $radius {
+            border-radius: $radius;
+        }
+
+        &:hover {
+            background-color: $dropdown-item-selected-hover-background-color;
+            color: $dropdown-item-selected-hover-color;
+        }
     }
 
-    &:hover {
-      background-color: $dropdown-item-selected-hover-background-color;
-      color: $dropdown-item-selected-hover-color;
+    &.rz-state-disabled {
+        opacity: $dropdown-item-disabled-opacity;
+        cursor: initial;
     }
-  }
 }
 
 @mixin dropdown-item-hover($radius: $border-radius) {
@@ -215,12 +221,13 @@ $dropdown-panel-border: $dropdown-open-border !default;
 }
 
 .rz-dropdown-item {
-  padding: $dropdown-item-padding;
-  transition: $dropdown-item-transition;
+    padding: $dropdown-item-padding;
+    transition: $dropdown-item-transition;
 
-  @include dropdown-item(0);
-  @include dropdown-item-hover(0);
+    @include dropdown-item(0);
+    @include dropdown-item-hover(0);
 }
+
 
 .rz-multiselect-close {
   display: none;
@@ -237,10 +244,9 @@ $dropdown-panel-border: $dropdown-open-border !default;
 }
 
 .rz-multiselect-item {
-  @extend .rz-dropdown-item;
-
-  display: flex;
-  align-items: center;
+    @extend .rz-dropdown-item;
+    display: flex;
+    align-items: center;
 }
 
 .rz-multiselect-label-container,

@@ -6,12 +6,12 @@
 
 @if (DropDown.Multiple)
 {
-    <li class="@(DropDown.isSelected(Item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")"
+    <li class="@GetComponentCssClass("rz-multiselect")"
         aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)" style="display: block;white-space: nowrap;"
     @onmousedown:preventDefault @onmousedown="@SelectItem"
         @onclick:preventDefault @onclick="@SelectItem">
         <div class="rz-chkbox ">
-            <div class="@(DropDown.isSelected(Item) ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
+            <div class="@(DropDown.isSelected(Item) ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ") @(Disabled ? " rz-state-disabled  " : "")">
                 <span class="@(DropDown.isSelected(Item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
             </div>
         </div>
@@ -29,7 +29,7 @@
 }
 else
 {
-    <li role="option" class="@(DropDown.isSelected(Item) ? "rz-dropdown-item  rz-state-highlight" : "rz-dropdown-item ")" aria-label=">@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
+    <li role="option" class="@GetComponentCssClass("rz-dropdown")" aria-label=">@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
     @onmousedown:preventDefault @onmousedown="@SelectItem"
     @onclick:preventDefault @onclick="@SelectItem">
         <span>
@@ -41,12 +41,15 @@ else
             {
                 @PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
             }
-        </span>
+       </span>
     </li>
 }
 @code {
     [Parameter]
     public RadzenDropDown<TValue> DropDown { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
 
     [Parameter]
     public object Item { get; set; }
@@ -55,9 +58,20 @@ else
     {
         var condition = DropDown.LoadData.HasDelegate && !string.IsNullOrEmpty(DropDown.searchText);
 
-        if (args.Type == "click" ? !condition : condition)
+        if (!Disabled && args.Type == "click" ? !condition : condition)
         {
             await DropDown.OnSelectItemInternal(Item);
         }
+    }
+
+    protected string GetComponentCssClass(string prefix)
+    {
+        string result = $"{prefix}-item ";
+        if (Disabled)
+            result += "rz-state-disabled ";
+        else if (DropDown.isSelected(Item))
+            result += "rz-state-highlight ";
+
+        return result;
     }
 }

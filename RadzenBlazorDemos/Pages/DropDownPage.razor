@@ -95,6 +95,20 @@
                             TextProperty="ProductName" ValueProperty="ProductID" Change=@(args => ChangeBound(args, "DropDown with bound Value")) Class="w-100" />
         </RadzenCard>
     </div>
+    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
+        <RadzenCard>
+            <h4 class="mb-4">With Disabled item</h4>
+            <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@myModelDisabled.MyValue
+                            TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => ChangeBound(args, "DropDown with bound Value")) Class="w-100" />
+        </RadzenCard>
+    </div>
+    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
+        <RadzenCard>
+            <h4 class="mb-4">Multiple with Disabled item</h4>
+            <RadzenDropDown AllowClear="true" AllowFiltering="true" Multiple="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@multipleValuesdisabled
+                            TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
+        </RadzenCard>
+    </div>
 </div>
 </RadzenExample>
 
@@ -106,12 +120,15 @@
     IEnumerable<Customer> customCustomersData;
     IEnumerable<Product> products;
     MyObject myModel = new MyObject();
+    MyObject myModelDisabled = new MyObject();
 
     int count;
     IEnumerable<Customer> customCustomersDataVirtualization;
 
     IEnumerable<string> multipleValues = new string[] { "ALFKI", "ANATR" };
     string value = "ALFKI";
+
+    IEnumerable<int> multipleValuesdisabled = new int[] { 1,2 };
 
     EventConsole console;
 
@@ -124,6 +141,13 @@
     void OnChange(object value, string name)
     {
         var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
+
+        console.Log($"{name} value changed to {str}");
+    }
+
+    void OnChangeDisabled(object value, string name)
+    {
+        var str = value is IEnumerable<int> ? string.Join(", ", (IEnumerable<int>)value) : value;
 
         console.Log($"{name} value changed to {str}");
     }
