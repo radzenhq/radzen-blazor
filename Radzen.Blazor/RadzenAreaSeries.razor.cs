@@ -84,24 +84,43 @@ namespace Radzen.Blazor
             var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
             var axisY = Chart.ValueScale.Scale(Math.Max(0, valueTicks.Start));
 
-            if (points.Any())
+            if (points.Length > 0)
             {
-                for (var i = 0; i < points.Length - 1; i++)
+                if (points.Length == 1)
                 {
-                    var start = points[i];
-                    var end = points[i + 1];
+                    var point = points[0];
 
-                    var polygon = new[]
-                    {
-                        new Point { X = start.X, Y = start.Y - tolerance },
-                        new Point { X = end.X, Y = end.Y - tolerance },
-                        new Point { X = end.X, Y = axisY },
-                        new Point { X = start.X, Y = axisY },
+                    var polygon = new[] {
+                        new Point { X = point.X - tolerance, Y = point.Y - tolerance },
+                        new Point { X = point.X - tolerance, Y = point.Y + tolerance },
+                        new Point { X = point.X + tolerance, Y = point.Y + tolerance },
+                        new Point { X = point.X + tolerance, Y = point.Y - tolerance },
                     };
 
                     if (InsidePolygon(new Point { X = x, Y = y }, polygon))
                     {
                         return true;
+                    }
+                }
+                else
+                {
+                    for (var i = 0; i < points.Length - 1; i++)
+                    {
+                        var start = points[i];
+                        var end = points[i + 1];
+
+                        var polygon = new[]
+                        {
+                            new Point { X = start.X, Y = start.Y - tolerance },
+                            new Point { X = end.X, Y = end.Y - tolerance },
+                            new Point { X = end.X, Y = axisY },
+                            new Point { X = start.X, Y = axisY },
+                        };
+
+                        if (InsidePolygon(new Point { X = x, Y = y }, polygon))
+                        {
+                            return true;
+                        }
                     }
                 }
             }
