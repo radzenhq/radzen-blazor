@@ -63,6 +63,9 @@ namespace Radzen.Blazor
             builder.OpenComponent(0, typeof(RadzenDropDownItem<TValue>));
             builder.AddAttribute(1, "DropDown", this);
             builder.AddAttribute(2, "Item", item);
+            if (DisabledProperty!=null)
+                builder.AddAttribute(3, "Disabled", PropertyAccess.GetItemOrValueFromProperty(item, DisabledProperty));
+
             builder.SetKey(GetKey(item));
             builder.CloseComponent();
         }

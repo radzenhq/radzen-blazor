@@ -198,6 +198,13 @@ namespace Radzen
         public string ValueProperty { get; set; }
 
         /// <summary>
+        /// Gets or sets the disabled property.
+        /// </summary>
+        /// <value>The disabled property.</value>
+        [Parameter]
+        public string DisabledProperty { get; set; }
+
+        /// <summary>
         /// Gets or sets the selected item changed.
         /// </summary>
         /// <value>The selected item changed.</value>
@@ -435,7 +442,7 @@ namespace Radzen
             if (Disabled)
                 return;
 
-            var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (View != null ? View : Enumerable.Empty<object>())).Cast<object>();
+            var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (View != null ? View : Enumerable.Empty<object>())).Cast<object>().ToList();
 
             var key = args.Code != null ? args.Code : args.Key;
 
@@ -443,11 +450,13 @@ namespace Radzen
             {
                 try
                 {
-                    var newSelectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown" || key == "ArrowRight", selectedIndex);
+                    var currentViewIndex = Multiple ? selectedIndex : items.IndexOf(selectedItem);
+
+                    var newSelectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown" || key == "ArrowRight", currentViewIndex);
 
                     if (!Multiple)
                     {
-                        if (newSelectedIndex != selectedIndex && newSelectedIndex >= 0 && newSelectedIndex <= items.Count() - 1)
+                        if (newSelectedIndex != currentViewIndex && newSelectedIndex >= 0 && newSelectedIndex <= items.Count() - 1)
                         {
                             selectedIndex = newSelectedIndex;
                             await OnSelectItem(items.ElementAt(selectedIndex), true);
@@ -455,7 +464,7 @@ namespace Radzen
                     }
                     else
                     {
-                        selectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown", selectedIndex);
+                        selectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown", currentViewIndex);
                     }
                 }
                 catch (Exception)
@@ -548,6 +557,9 @@ namespace Radzen
                     await LoadData.InvokeAsync(await GetLoadDataArgs());
                 }
             }
+
+            if (Multiple)
+                selectedIndex = -1;
 
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
         }

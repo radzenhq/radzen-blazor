@@ -413,7 +413,6 @@ window.Radzen = {
   },
   focusListItem: function (input, ul, isDown, startIndex) {
     if (!input || !ul) return;
-
     var childNodes = ul.getElementsByTagName('LI');
 
     if (!childNodes || childNodes.length == 0) return;
@@ -423,15 +422,18 @@ window.Radzen = {
     }
 
     ul.nextSelectedIndex = startIndex;
-
     if (isDown) {
-      if (ul.nextSelectedIndex < childNodes.length - 1) {
-        ul.nextSelectedIndex++;
-      }
+        while (ul.nextSelectedIndex < childNodes.length - 1) {
+            ul.nextSelectedIndex++;
+            if (!childNodes[ul.nextSelectedIndex].classList.contains('rz-state-disabled'))
+                break;
+        }
     } else {
-      if (ul.nextSelectedIndex > 0) {
-        ul.nextSelectedIndex--;
-      }
+        while (ul.nextSelectedIndex > 0) {
+            ul.nextSelectedIndex--;
+            if (!childNodes[ul.nextSelectedIndex].classList.contains('rz-state-disabled'))
+                break;
+        }
     }
 
     var highlighted = ul.querySelectorAll('.rz-state-highlight');
@@ -1593,5 +1595,36 @@ window.Radzen = {
         document.addEventListener('mouseup', Radzen[el].mouseUpHandler);
         document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: true });
         document.addEventListener('touchend', Radzen[el].mouseUpHandler, { passive: true });
+    },
+    openWaiting: function() {
+        if (document.documentElement.scrollHeight > document.documentElement.clientHeight) {
+            document.body.classList.add('no-scroll');
+        }
+        if (Radzen.WaitingIntervalId != null) {
+            clearInterval(Radzen.WaitingIntervalId);
+        }
+
+        setTimeout(function() {
+                var timerObj = document.getElementsByClassName('rz-waiting-timer');
+                if (timerObj.length == 0) return;
+                var timerStart = new Date().getTime();
+                Radzen.WaitingIntervalId = setInterval(function() {
+                        if (timerObj == null || timerObj[0] == null) {
+                            clearInterval(Radzen.WaitingIntervalId);
+                        } else {
+                            var time = new Date(new Date().getTime() - timerStart);
+                            timerObj[0].innerHTML = Math.floor(time / 1000) + "." + Math.floor((time % 1000) / 100);
+                        }
+                    },
+                    100);
+            },
+            100);
+    },
+    closeWaiting: function() {
+        document.body.classList.remove('no-scroll');
+        if (Radzen.WaitingIntervalId != null) {
+            clearInterval(Radzen.WaitingIntervalId);
+            Radzen.WaitingIntervalId = null;
+        }
     }
 };
