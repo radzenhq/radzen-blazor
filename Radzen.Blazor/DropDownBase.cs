@@ -30,6 +30,8 @@ namespace Radzen
             }
         }
 
+        List<object> virtualItems;
+
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
             var data = Data != null ? Data.Cast<object>() : Enumerable.Empty<object>();
@@ -47,7 +49,9 @@ namespace Radzen
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = request.Count, Filter = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) });
             }
 
-            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>(LoadData.HasDelegate ? Data.Cast<object>() : view.Skip(request.StartIndex).Take(top), LoadData.HasDelegate ? Count : totalItemsCount);
+            virtualItems = (LoadData.HasDelegate ? Data : view.Skip(request.StartIndex).Take(top)).Cast<object>().ToList();
+
+            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>(virtualItems, LoadData.HasDelegate ? Count : totalItemsCount);
         }
 
         /// <summary>
@@ -442,7 +446,28 @@ namespace Radzen
             if (Disabled)
                 return;
 
-            var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (View != null ? View : Enumerable.Empty<object>())).Cast<object>().ToList();
+            List<object> items = Enumerable.Empty<object>().ToList();
+
+            if (LoadData.HasDelegate)
+            {
+                if (Data != null)
+                {
+                    items = Data.Cast<object>().ToList();
+                }
+            }
+            else
+            {
+                if (IsVirtualizationAllowed())
+                {
+#if NET5
+                    items = virtualItems;
+#endif
+                }
+                else
+                {
+                    items = View.Cast<object>().ToList();
+                }
+            }
 
             var key = args.Code != null ? args.Code : args.Key;
 
@@ -533,7 +558,7 @@ namespace Radzen
                         await virtualize.RefreshDataAsync();
                     }
                     await InvokeAsync(() => { StateHasChanged(); });
-#endif 
+#endif
                 }
                 else
                 {
@@ -550,7 +575,7 @@ namespace Radzen
                         await InvokeAsync(virtualize.RefreshDataAsync);
                     }
                     await InvokeAsync(() => { StateHasChanged(); });
-#endif 
+#endif
                 }
                 else
                 {
