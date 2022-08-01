@@ -1,6 +1,7 @@
 using Bunit;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Xunit;
 
@@ -463,6 +464,46 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains(actionsTemplate, component.Markup);
+        }
+
+        [Fact]
+        public void DatePicker_Converts_DateTimeOffSet_FromUtc_ToLocal()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var valueUtc = DateTimeOffset.UtcNow;
+            var kind = DateTimeKind.Local;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTimeOffset>>(parameters =>
+            {
+                parameters.Add(p => p.Kind, kind);
+                parameters.Add(p => p.Value, valueUtc);
+            });
+
+            Assert.Equal(kind, (component.Instance.Value as DateTime?)?.Kind);
+            Assert.Equal(valueUtc.LocalDateTime.ToString(CultureInfo.InvariantCulture), (component.Instance.Value as DateTime?)?.ToString(CultureInfo.InvariantCulture));
+        }
+
+        [Fact]
+        public void DatePicker_Converts_DateTimeOffSet_Local_ToUtc()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var valueUtc = DateTimeOffset.Now;
+            var kind = DateTimeKind.Utc;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTimeOffset>>(parameters =>
+            {
+                parameters.Add(p => p.Kind, kind);
+                parameters.Add(p => p.Value, valueUtc);
+            });
+
+            Assert.Equal(kind, (component.Instance.Value as DateTime?)?.Kind);
+            Assert.Equal(valueUtc.UtcDateTime.ToString(CultureInfo.InvariantCulture), (component.Instance.Value as DateTime?)?.ToString(CultureInfo.InvariantCulture));
         }
     }
 }
