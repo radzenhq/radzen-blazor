@@ -16,7 +16,7 @@ namespace Radzen
     /// <typeparam name="T"></typeparam>
     public class DropDownBase<T> : DataBoundFormComponent<T>
     {
-#if NET5
+#if NET5_0_OR_GREATER
         internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<object> virtualize;
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Radzen
         /// <returns><c>true</c> if virtualization is allowed; otherwise, <c>false</c>.</returns>
         internal bool IsVirtualizationAllowed()
         {
-#if NET5
+#if NET5_0_OR_GREATER
             return AllowVirtualization;
 #else
             return false;
@@ -93,7 +93,7 @@ namespace Radzen
         {
             return new RenderFragment(builder =>
             {
-#if NET5
+#if NET5_0_OR_GREATER
                 if (AllowVirtualization)
                 {
                     builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<object>));
@@ -459,7 +459,7 @@ namespace Radzen
             {
                 if (IsVirtualizationAllowed())
                 {
-#if NET5
+#if NET5_0_OR_GREATER
                     items = virtualItems;
 #endif
                 }
@@ -552,7 +552,7 @@ namespace Radzen
                 _view = null;
                 if (IsVirtualizationAllowed())
                 {
-#if NET5
+#if NET5_0_OR_GREATER
                     if (virtualize != null)
                     {
                         await virtualize.RefreshDataAsync();
@@ -569,7 +569,7 @@ namespace Radzen
             {
                 if (IsVirtualizationAllowed())
                 {
-#if NET5
+#if NET5_0_OR_GREATER
                     if (virtualize != null)
                     {
                         await InvokeAsync(virtualize.RefreshDataAsync);
@@ -623,7 +623,7 @@ namespace Radzen
         /// <returns>LoadDataArgs.</returns>
         internal virtual async System.Threading.Tasks.Task<LoadDataArgs> GetLoadDataArgs()
         {
-#if NET5
+#if NET5_0_OR_GREATER
             if (AllowVirtualization)
             {
                 return new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, Filter = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) };
@@ -669,7 +669,7 @@ namespace Radzen
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-#if NET5
+#if NET5_0_OR_GREATER
             var pageSize = parameters.GetValueOrDefault<int>(nameof(PageSize));
             if(pageSize != default(int))
             {
