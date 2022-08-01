@@ -9,7 +9,7 @@
 <p>Use the <code>LoadData</code> event to get data from a REST service.</p>
 
 <RadzenExample Name="DataGrid" Source="DataGridOData" Heading="false" AdditionalSourceCodePages="@(new [] {"../Services/NorthwindODataService.cs"})">
-<RadzenDataGrid IsLoading="@isLoading" Count="@count" Data="@employees" LoadData="@LoadData" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" PagerHorizontalAlign="HorizontalAlign.Center" TItem="Employee" ColumnWidth="200px">
+    <RadzenDataGrid @ref="grid" IsLoading="@isLoading" Count="@count" Data="@employees" LoadData="@LoadData" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" PagerHorizontalAlign="HorizontalAlign.Center" TItem="Employee" ColumnWidth="200px">
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
@@ -68,16 +68,19 @@ async Task LoadData(LoadDataArgs args)
     bool isLoading;
     int count;
     IEnumerable<Employee> employees;
+    RadzenDataGrid<Employee> grid;
 
     List<string> titles = new List<string> {"Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
     IEnumerable<string> selectedTitles;
 
-    void OnSelectedTitlesChange(object value)
+    async Task OnSelectedTitlesChange(object value)
     {
         if (selectedTitles != null && !selectedTitles.Any())
         {
             selectedTitles = null;  
         }
+
+        await grid.FirstPage();
     }
 
     async Task LoadData(LoadDataArgs args)
