@@ -432,11 +432,22 @@ namespace Radzen.Blazor
 
         void ToggleColumns()
         {
+            var selected = ((IEnumerable<object>)selectedColumns).Cast<RadzenDataGridColumn<TItem>>();
+
             foreach (var c in allPickableColumns)
             {
-                c.SetVisible(((IEnumerable<object>)selectedColumns).Cast<RadzenDataGridColumn<TItem>>().Contains(c));
+                c.SetVisible(selected.Contains(c));
             }
+
+            PickedColumnsChanged.InvokeAsync(new DataGridPickedColumnsChangedEventArgs<TItem>() { Columns = selected });
         }
+
+        /// <summary>
+        /// Gets or sets the picked columns changed callback.
+        /// </summary>
+        /// <value>The picked columns changed callback.</value>
+        [Parameter]
+        public EventCallback<DataGridPickedColumnsChangedEventArgs<TItem>> PickedColumnsChanged { get; set; }
 
         string getFilterInputId(RadzenDataGridColumn<TItem> column)
         {

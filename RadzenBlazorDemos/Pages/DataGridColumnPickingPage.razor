@@ -12,7 +12,7 @@
 
 <RadzenExample Name="DataGrid" Source="DataGridColumnPicking" Heading="false">
     <RadzenButton Text="Toggle EmployeeID column visibility" Click=@(() => EmployeeIDVisible = !EmployeeIDVisible) Style="margin-bottom:20px;"/>
-    <RadzenDataGrid Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnPicking="true">
+    <RadzenDataGrid Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnPicking="true" PickedColumnsChanged="@PickedColumnsChanged">
         <Columns>
             <RadzenDataGridColumn Visible="@EmployeeIDVisible" TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" Frozen="true" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Width="200px" Pickable="false">
@@ -50,5 +50,10 @@
     protected override void OnInitialized()
     {
         employees = dbContext.Employees;
+    }
+
+    void PickedColumnsChanged(DataGridPickedColumnsChangedEventArgs<Employee> args)
+    {
+        console.Log($"Picked columns: {string.Join(", ", args.Columns.Select(c => c.Title))}");
     }
 }
