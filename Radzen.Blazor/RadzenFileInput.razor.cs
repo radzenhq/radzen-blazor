@@ -142,14 +142,11 @@ namespace Radzen.Blazor
         }
 
         private bool visibleChanged = false;
-        private bool firstRender = true;
 
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-
-            this.firstRender = firstRender;
 
             if (firstRender || visibleChanged)
             {
@@ -160,6 +157,14 @@ namespace Radzen.Blazor
                     await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Id);
                 }
             }
+        }
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+
+            await base.SetParametersAsync(parameters);
         }
 
         /// <summary>
