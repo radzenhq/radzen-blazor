@@ -1,27 +1,27 @@
 $sidebar-toggle-icon-width: 1.5rem !default;
 $sidebar-toggle-icon-height: 1.5rem !default;
+$sidebar-toggle-margin: 0 1rem 0 0 !default;
 $sidebar-toggle-padding: 0.8125rem !default;
 $sidebar-toggle-border: var(--rz-border-200) !default;
+$sidebar-toggle-color: var(--rz-base-900) !default;
+$sidebar-toggle-background-color: var(--rz-header-background-color) !default;
 $sidebar-toggle-hover-color: var(--rz-secondary) !default;
 $sidebar-toggle-hover-background-color: var(--rz-header-background-color) !default;
 $sidebar-toggle-hover-border-radius: 0 !default;
-$sidebar-toggle-background-color: var(--rz-header-background-color) !default;
-$sidebar-toggle-color: var(--rz-base-900) !default;
-$sidebar-toggle-margin: 0 1rem 0 0 !default;
 
 // SidebarToggle CSS variables
 
 :root {
   --rz-sidebar-toggle-icon-width: #{$sidebar-toggle-icon-width};
   --rz-sidebar-toggle-icon-height: #{$sidebar-toggle-icon-height};
+  --rz-sidebar-toggle-margin: #{$sidebar-toggle-margin};
   --rz-sidebar-toggle-padding: #{$sidebar-toggle-padding};
   --rz-sidebar-toggle-border: #{$sidebar-toggle-border};
+  --rz-sidebar-toggle-color: #{$sidebar-toggle-color};
+  --rz-sidebar-toggle-background-color: #{$sidebar-toggle-background-color};
   --rz-sidebar-toggle-hover-color: #{$sidebar-toggle-hover-color};
   --rz-sidebar-toggle-hover-background-color: #{$sidebar-toggle-hover-background-color};
   --rz-sidebar-toggle-hover-border-radius: #{$sidebar-toggle-hover-border-radius};
-  --rz-sidebar-toggle-background-color: #{$sidebar-toggle-background-color};
-  --rz-sidebar-toggle-color: #{$sidebar-toggle-color};
-  --rz-sidebar-toggle-margin: #{$sidebar-toggle-margin};
 }
 
 .sidebar-toggle {
