@@ -1,5 +1,6 @@
 $accordion-item-padding: 0.25rem 0 !default;
-$accordion-item-margin: 0 !default; //not used
+$accordion-item-margin: 0 !default;
+$accordion-item-border: none !default;
 $accordion-item-background-color: var(--rz-base-background-color) !default;
 $accordion-item-color: var(--rz-text-color) !default;
 $accordion-item-line-height: 1.25rem !default;
@@ -18,7 +19,6 @@ $accordion-hover-color: $accordion-selected-color !default;
 $accordion-content-padding: 0.5rem 0.5rem 0.5rem 1.5rem !default;
 $accordion-content-font-size: $accordion-item-font-size !default;
 $accordion-border-radius: var(--rz-border-radius)!default;
-$accordion-item-border: none !default; //not used
 $accordion-shadow: none !default;
 
 // Accordion CSS variables
@@ -26,6 +26,7 @@ $accordion-shadow: none !default;
 :root {
   --rz-accordion-item-padding: #{$accordion-item-padding};
   --rz-accordion-item-margin: #{$accordion-item-margin};
+  --rz-accordion-item-border: #{$accordion-item-border};
   --rz-accordion-item-background-color: #{$accordion-item-background-color};
   --rz-accordion-item-color: #{$accordion-item-color};
   --rz-accordion-item-line-height: #{$accordion-item-line-height};
@@ -42,7 +43,6 @@ $accordion-shadow: none !default;
   --rz-accordion-content-padding: #{$accordion-content-padding};
   --rz-accordion-content-font-size: #{$accordion-content-font-size};
   --rz-accordion-border-radius: #{$accordion-border-radius};
-  --rz-accordion-item-border: #{$accordion-item-border};
   --rz-accordion-shadow: #{$accordion-shadow};
 }
 
@@ -52,6 +52,11 @@ $accordion-shadow: none !default;
 
 .rz-accordion-header {
   background-color: var(--rz-accordion-item-background-color);
+  margin: var(--rz-accordion-item-margin);
+
+  &:not(:first-child) {
+    border-top: var(--rz-accordion-item-border)
+  }
 
   a[role='tab'] {
     padding: var(--rz-accordion-item-padding);
