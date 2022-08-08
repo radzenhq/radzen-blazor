@@ -13,7 +13,7 @@
 
         if (XAxis.Ticks.Template != null)
         {
-            var context = new TickTemplateContext { Value = value, X = x, Y = y1 } ;
+            var context = new TickTemplateContext { Text = text, Value = value, X = x, Y = y1 } ;
 
             <CategoryAxisTick X="@x" Y="@y1" Text="@text" Stroke="@(XAxis.Ticks.Stroke ?? XAxis.Stroke)" StrokeWidth="@XAxis.Ticks.StrokeWidth" LineType="@XAxis.Ticks.LineType">
                 @XAxis.Ticks.Template(context)
