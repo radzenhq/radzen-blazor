@@ -3,6 +3,7 @@ $menu-border: var(--rz-input-border) !default;
 $menu-border-radius: 2px !default;
 
 $menu-item-padding: 0.5rem 1rem 0.5rem 0.5rem !default;
+$menu-item-border-radius: 0 !default;
 $menu-item-color: var(--rz-text-color) !default;
 $menu-item-selected-color: var(--rz-text-color) !default;
 $menu-item-icon-margin: 0 0.5rem 0 0 !default;
@@ -28,6 +29,7 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
   --rz-menu-border-radius: #{$menu-border-radius};
 
   --rz-menu-item-padding: #{$menu-item-padding};
+  --rz-menu-item-border-radius: #{$menu-item-border-radius};
   --rz-menu-item-color: #{$menu-item-color};
   --rz-menu-item-selected-color: #{$menu-item-selected-color};
   --rz-menu-item-icon-margin: #{$menu-item-icon-margin};
@@ -123,6 +125,7 @@ background-color: var(--rz-menu-top-item-background-color);
   background-color: var(--rz-menu-background-color);
 
   .rz-navigation-item-wrapper {
+    border-radius: var(--rz-menu-item-border-radius);
 
     .rz-navigation-item-link {
       padding: var(--rz-menu-item-padding);
