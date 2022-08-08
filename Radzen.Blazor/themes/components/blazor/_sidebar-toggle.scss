@@ -24,7 +24,7 @@ $sidebar-toggle-hover-border-radius: 0 !default;
   --rz-sidebar-toggle-hover-border-radius: #{$sidebar-toggle-hover-border-radius};
 }
 
-.sidebar-toggle {
+.rz-sidebar-toggle {
   -webkit-appearance: none;
   border: none;
   padding: var(--rz-sidebar-toggle-padding);
