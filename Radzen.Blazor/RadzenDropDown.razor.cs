@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Radzen.Blazor
 {
@@ -86,6 +87,13 @@ namespace Radzen.Blazor
         public int MaxSelectedLabels { get; set; } = 4;
 
         /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="DropDownBase{T}"/> is multiple with badge view .
+        /// </summary>
+        /// <value><c>true</c> if multiple with badges; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool BadgesView { get; set; }
+
+        /// <summary>
         /// Gets or sets the selected items text.
         /// </summary>
         /// <value>The selected items text.</value>
@@ -155,6 +163,14 @@ namespace Radzen.Blazor
             }
         }
 
+        protected override Task OnInitializedAsync()
+        {
+            if (BadgesView)
+                Multiple=true;
+
+            return base.OnInitializedAsync();
+        }
+
         /// <summary>
         /// Called when item is selected.
         /// </summary>
@@ -173,6 +189,14 @@ namespace Radzen.Blazor
             }
         }
 
+        protected async System.Threading.Tasks.Task BadgeRemove(MouseEventArgs args, object item)
+        {
+            if (Disabled)
+                return;
+
+            await OnSelectItemInternal(item);
+        }
+
         internal async System.Threading.Tasks.Task OnSelectItemInternal(object item, bool isFromKey = false)
         {
             await OnSelectItem(item, isFromKey);
@@ -181,7 +205,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList("rz-dropdown").Add("rz-clear", AllowClear).ToString();
+            return GetClassList("rz-dropdown").Add("rz-clear", AllowClear).Add("rz-dropdown-badges", BadgesView && selectedItems.Count>0).ToString();
         }
 
         /// <inheritdoc />
@@ -198,6 +222,6 @@ namespace Radzen.Blazor
         internal async System.Threading.Tasks.Task ClosePopup()
         {
             await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
-        }
+        }       
     }
 }

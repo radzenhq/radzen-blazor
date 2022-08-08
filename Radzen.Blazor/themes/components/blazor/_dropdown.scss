@@ -258,9 +258,40 @@ $dropdown-panel-border: $dropdown-open-border !default;
   padding-right: $dropdown-trigger-icon-width;
 }
 
+.rz-dropdown-badges {
+    height: inherit;
+
+    &-items {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: -$dropdown-horizontal-padding / 2;
+    }
+
+    &-item {
+        border: $dropdown-open-border;
+        margin-top: $dropdown-horizontal-padding / 2;
+        border-radius: $button-border-radius;
+        padding-left: $dropdown-horizontal-padding / 2;
+
+        &-label {
+            vertical-align: middle;
+            display: contents;
+        }
+
+        &:not(:last-child) {
+            margin-right: $dropdown-horizontal-padding;
+        }
+
+        .rz-button {
+            margin-left: $dropdown-horizontal-padding / 2;
+        }
+    }
+}
+
 .rz-clear {
   .rz-multiselect-label-container,
-  .rz-dropdown-label {
+  .rz-dropdown-label,
+  .rz-dropdown-badges-items{
     padding-right: 2 * $dropdown-trigger-icon-width;
   }
 }
