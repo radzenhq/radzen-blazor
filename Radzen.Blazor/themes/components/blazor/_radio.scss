@@ -110,6 +110,7 @@ $radio-checked-border: var(--rz-input-border) !default;
   border-radius: var(--rz-radio-border-radius);
   box-shadow: var(--rz-input-shadow);
   background-color: var(--rz-input-background-color);
+  transition: var(--rz-transition-all);
 
   &:hover:not(.rz-state-disabled) {
     @extend %input-hover;
@@ -151,7 +152,9 @@ $radio-checked-border: var(--rz-input-border) !default;
 
     &:hover {
       background-color: var(--rz-radio-checked-hover-background-color);
+      border: var(--rz-radio-checked-border);
       box-shadow: var(--rz-radio-checked-hover-shadow);
+      border-width: var(--rz-radio-border-width);
     }
   }
 
