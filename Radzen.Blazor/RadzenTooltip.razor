@@ -74,7 +74,12 @@
     {
         if (IsJSRuntimeAvailable)
         {
-            JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+            try
+            {
+               JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+            }
+            catch
+            {}
         }
 
         Service.OnOpen -= OnOpen;
