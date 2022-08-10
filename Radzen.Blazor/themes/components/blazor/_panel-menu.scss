@@ -15,7 +15,7 @@ $panel-menu-item-active-indicator: var(--rz-secondary) !default;
 $panel-menu-item-offset: 0.75rem !default;
 $panel-menu-item-transition: var(--rz-transition-all) !default;
 
-$panel-menu-2nd-level-margin: 0 !default;
+$panel-menu-2nd-level-vertical-offset: 0 !default;
 $panel-menu-item-2nd-level-padding: 0.5rem 1rem !default;
 $panel-menu-item-2nd-level-margin: 0 !default;
 $panel-menu-item-2nd-level-border-radius: 0 !default;
@@ -65,7 +65,7 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   --rz-panel-menu-item-offset: #{$panel-menu-item-offset};
   --rz-panel-menu-item-transition: #{$panel-menu-item-transition};
   
-  --rz-panel-menu-2nd-level-margin: #{$panel-menu-2nd-level-margin};
+  --rz-panel-menu-2nd-level-vertical-offset: #{$panel-menu-2nd-level-vertical-offset};
   --rz-panel-menu-item-2nd-level-padding: #{$panel-menu-item-2nd-level-padding};
   --rz-panel-menu-item-2nd-level-margin: #{$panel-menu-item-2nd-level-margin};
   --rz-panel-menu-item-2nd-level-border-radius: #{$panel-menu-item-2nd-level-border-radius};
@@ -100,7 +100,7 @@ $panel-menu-toggle-icon-opacity: 1 !default;
 .rz-panel-menu {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin-bottom: 0;
   overflow: auto;
   font-size: var(--rz-panel-menu-font-size);
   font-weight: var(--rz-panel-menu-font-weight);
@@ -175,8 +175,10 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   .rz-navigation-menu {
     list-style: none;
     padding: 0;
-    margin: var(--rz-panel-menu-2nd-level-margin);
+    margin-bottom: 0;
     overflow: hidden;
+
+
 
     .rz-navigation-item-wrapper {
       margin: var(--rz-panel-menu-item-2nd-level-margin);
@@ -241,6 +243,14 @@ $panel-menu-toggle-icon-opacity: 1 !default;
       color: var(--rz-panel-menu-item-2nd-level-color);
       font-size: var(--rz-panel-menu-item-2nd-level-font-size);
       font-weight: var(--rz-panel-menu-item-2nd-level-font-weight);
+
+      &:first-child {
+        margin-top: var(--rz-panel-menu-2nd-level-vertical-offset);
+      }
+
+      &:last-child {
+        margin-bottom: var(--rz-panel-menu-2nd-level-vertical-offset);
+      }
 
       .rz-navigation-item-link {
         padding: var(--rz-panel-menu-item-2nd-level-padding);
