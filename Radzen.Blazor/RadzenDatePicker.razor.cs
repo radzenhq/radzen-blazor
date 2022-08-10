@@ -35,14 +35,14 @@ namespace Radzen.Blazor
 
             if (amPm == "pm")
             {
-                amPm = "am";               
+                amPm = "am";
 
                 newHour = currentHour + 12;
 
                 if (newHour > 23)
                 {
                     newHour = 0;
-                }              
+                }
             }
             else if (amPm == "am")
             {
@@ -337,10 +337,21 @@ namespace Radzen.Blazor
                     _value = value;
                     _currentDate = default(DateTime);
 
-                    DateTimeOffset? offset = value as DateTimeOffset?;
-                    if (offset != null && offset.HasValue)
+                    if (value is DateTimeOffset offset)
                     {
-                        _dateTimeValue = offset.Value.DateTime;
+                        if (offset.Offset == TimeSpan.Zero && Kind == DateTimeKind.Local)
+                        {
+                            _dateTimeValue = offset.LocalDateTime;
+                        }
+                        else if (offset.Offset != TimeSpan.Zero && Kind == DateTimeKind.Utc)
+                        {
+                            _dateTimeValue = offset.UtcDateTime;
+                        }
+                        else
+                        {
+                            _dateTimeValue = DateTime.SpecifyKind(offset.DateTime, Kind);
+                        }
+
                         _value = _dateTimeValue;
                     }
                     else
@@ -533,7 +544,7 @@ namespace Radzen.Blazor
                 DateTimeValue = newValue;
                 if ((typeof(TValue) == typeof(DateTimeOffset) || typeof(TValue) == typeof(DateTimeOffset?)) && Value != null)
                 {
-                    DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)Value, DateTimeKind.Utc);
+                    DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)Value, Kind);
                     await ValueChanged.InvokeAsync((TValue)(object)offset);
                 }
                 else
@@ -794,7 +805,7 @@ namespace Radzen.Blazor
         {
             if ((typeof(TValue) == typeof(DateTimeOffset) || typeof(TValue) == typeof(DateTimeOffset?)) && Value != null)
             {
-                DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)Value, DateTimeKind.Utc);
+                DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)Value, Kind);
                 await ValueChanged.InvokeAsync((TValue)(object)offset);
             }
             else

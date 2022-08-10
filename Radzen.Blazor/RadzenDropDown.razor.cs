@@ -16,6 +16,14 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenDropDown<TValue> : DropDownBase<TValue>
     {
+
+        /// <summary>
+        /// Gets or sets a value indicating whether is read only.
+        /// </summary>
+        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ReadOnly { get; set; }
+
         /// <summary>
         /// Gets or sets the value template.
         /// </summary>
@@ -63,6 +71,9 @@ namespace Radzen.Blazor
             builder.OpenComponent(0, typeof(RadzenDropDownItem<TValue>));
             builder.AddAttribute(1, "DropDown", this);
             builder.AddAttribute(2, "Item", item);
+            if (DisabledProperty!=null)
+                builder.AddAttribute(3, "Disabled", PropertyAccess.GetItemOrValueFromProperty(item, DisabledProperty));
+
             builder.SetKey(GetKey(item));
             builder.CloseComponent();
         }
@@ -151,12 +162,15 @@ namespace Radzen.Blazor
         /// <param name="isFromKey">if set to <c>true</c> [is from key].</param>
         protected override async System.Threading.Tasks.Task OnSelectItem(object item, bool isFromKey = false)
         {
-            if (!Multiple && !isFromKey)
+            if (!ReadOnly)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
-            }
+                if (!Multiple && !isFromKey)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                }
 
-            await SelectItem(item);
+                await SelectItem(item);
+            }
         }
 
         internal async System.Threading.Tasks.Task OnSelectItemInternal(object item, bool isFromKey = false)

@@ -89,12 +89,14 @@ void LoadData(LoadDataArgs args)
     List<string> titles = new List<string> {"Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
     IEnumerable<string> selectedTitles;
 
-    void OnSelectedTitlesChange(object value)
+    async Task OnSelectedTitlesChange(object value)
     {
         if (selectedTitles != null && !selectedTitles.Any())
         {
             selectedTitles = null;  
         }
+        
+        await grid.FirstPage();
     }
 
     async Task Reset()

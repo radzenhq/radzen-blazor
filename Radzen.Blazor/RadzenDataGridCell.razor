@@ -86,7 +86,7 @@ else
     {
         if (Grid != null)
         {
-#if NET5
+#if NET5_0_OR_GREATER
             await Grid.OnCellContextMenu(new DataGridCellMouseEventArgs<TItem>
             {
                 Data = Item,
@@ -133,7 +133,7 @@ else
     {
         if (Grid != null)
         {
-#if NET5
+#if NET5_0_OR_GREATER
             await Grid.OnRowClick(new DataGridRowMouseEventArgs<TItem>
             {
                 Data = Item,
@@ -177,7 +177,7 @@ else
     {
         if (Grid != null)
         {
-#if NET5
+#if NET5_0_OR_GREATER
             await Grid.OnRowDblClick(new DataGridRowMouseEventArgs<TItem>
             {
                 Data = Item,

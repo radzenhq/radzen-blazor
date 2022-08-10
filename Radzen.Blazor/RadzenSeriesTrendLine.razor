@@ -52,7 +52,7 @@
             y2 = Math.Max(Math.Min(Chart.ValueScale.OutputSize, y2), 0);
         }
 
-        var path = $"M{x1} {y1} L{x2} {y2} ";
+        var path = $"M{x1.ToInvariantString()} {y1.ToInvariantString()} L{x2.ToInvariantString()} {y2.ToInvariantString()} ";
 
         return
         @<g>

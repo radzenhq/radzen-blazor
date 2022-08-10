@@ -28,7 +28,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem>
     {
-#if NET5
+#if NET5_0_OR_GREATER
         internal void SetAllowVirtualization(bool allowVirtualization)
         {
             AllowVirtualization = allowVirtualization;
@@ -91,7 +91,7 @@ namespace Radzen.Blazor
         {
             return new RenderFragment(builder =>
             {
-#if NET5
+#if NET5_0_OR_GREATER
                 if (AllowVirtualization)
                 {
                     if(AllowGrouping && Groups.Any() && !LoadData.HasDelegate)
@@ -310,7 +310,7 @@ namespace Radzen.Blazor
 
         private List<RadzenDataGridColumn<TItem>> columns = new List<RadzenDataGridColumn<TItem>>();
         internal readonly List<RadzenDataGridColumn<TItem>> childColumns = new List<RadzenDataGridColumn<TItem>>();
-        private List<RadzenDataGridColumn<TItem>> allColumns = new List<RadzenDataGridColumn<TItem>>();
+        internal List<RadzenDataGridColumn<TItem>> allColumns = new List<RadzenDataGridColumn<TItem>>();
         private List<RadzenDataGridColumn<TItem>> allPickableColumns = new List<RadzenDataGridColumn<TItem>>();
         internal object selectedColumns;
 
@@ -432,11 +432,22 @@ namespace Radzen.Blazor
 
         void ToggleColumns()
         {
+            var selected = ((IEnumerable<object>)selectedColumns).Cast<RadzenDataGridColumn<TItem>>();
+
             foreach (var c in allPickableColumns)
             {
-                c.SetVisible(((IEnumerable<object>)selectedColumns).Cast<RadzenDataGridColumn<TItem>>().Contains(c));
+                c.SetVisible(selected.Contains(c));
             }
+
+            PickedColumnsChanged.InvokeAsync(new DataGridPickedColumnsChangedEventArgs<TItem>() { Columns = selected });
         }
+
+        /// <summary>
+        /// Gets or sets the picked columns changed callback.
+        /// </summary>
+        /// <value>The picked columns changed callback.</value>
+        [Parameter]
+        public EventCallback<DataGridPickedColumnsChangedEventArgs<TItem>> PickedColumnsChanged { get; set; }
 
         string getFilterInputId(RadzenDataGridColumn<TItem> column)
         {
@@ -952,7 +963,7 @@ namespace Radzen.Blazor
         /// <value>The empty template.</value>
         [Parameter]
         public RenderFragment EmptyTemplate { get; set; }
-#if NET5
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Gets or sets a value indicating whether this instance is virtualized.
         /// </summary>
@@ -1220,7 +1231,7 @@ namespace Radzen.Blazor
 
         internal bool IsVirtualizationAllowed()
         {
-    #if NET5
+    #if NET5_0_OR_GREATER
             return AllowVirtualization;
     #else
             return false;
@@ -1403,7 +1414,7 @@ namespace Radzen.Blazor
             {
                 Count = 1;
             }
-#if NET5
+#if NET5_0_OR_GREATER
             if (AllowVirtualization)
             {
                 if(!LoadData.HasDelegate)
@@ -1434,7 +1445,7 @@ namespace Radzen.Blazor
             }
             else
             {
-#if NET5
+#if NET5_0_OR_GREATER
                 if (AllowVirtualization)
                 {
                     if(virtualize != null)
@@ -1910,7 +1921,7 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-#if NET5
+#if NET5_0_OR_GREATER
                     itemToInsert = default(TItem);
                     if(virtualize != null)
                     {
@@ -1966,7 +1977,7 @@ namespace Radzen.Blazor
             }
             else
             {
-#if NET5
+#if NET5_0_OR_GREATER
                 if(virtualize != null)
                 {
                     await virtualize.RefreshDataAsync();

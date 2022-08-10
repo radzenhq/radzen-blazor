@@ -953,6 +953,18 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Supplies information about a <see cref="RadzenDataGrid{TItem}.PickedColumnsChanged" /> event that is being raised.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class DataGridPickedColumnsChangedEventArgs<T>
+    {
+        /// <summary>
+        /// Gets the picked columns.
+        /// </summary>
+        public IEnumerable<RadzenDataGridColumn<T>> Columns { get; internal set; }
+    }
+
+    /// <summary>
     /// Supplies information about a <see cref="RadzenDataGrid{TItem}.Sort" /> event that is being raised.
     /// </summary>
     /// <typeparam name="T"></typeparam>

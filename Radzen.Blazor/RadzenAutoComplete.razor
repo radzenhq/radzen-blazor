@@ -11,7 +11,7 @@
 {
     <div @ref="@Element" style="@($"{Style};display:inline-block;")" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         <input @ref="@search" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
-                onfocus="@OpenScript()" onkeypress="@OpenScript()" tabindex="@TabIndex"  @onchange="@OnChange"
+                onkeypress="@OpenScript()" tabindex="@TabIndex"  @onchange="@OnChange"
                 aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
                 class="@InputClassList"
                 type="text" id="@Name" aria-expanded="true" placeholder="@Placeholder" />

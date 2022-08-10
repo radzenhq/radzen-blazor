@@ -607,7 +607,7 @@ namespace Radzen.Blazor
                     FilterValue = filterValue;
                     if (Grid.IsVirtualizationAllowed())
                     {
-#if NET5
+#if NET5_0_OR_GREATER
                         if (Grid.virtualize != null)
                         {
                             await Grid.virtualize.RefreshDataAsync();
