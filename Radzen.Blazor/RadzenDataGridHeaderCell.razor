@@ -50,10 +50,10 @@
         }
         @if (Grid.AllowFiltering && Column.Filterable && Grid.FilterMode == FilterMode.Advanced)
         {
-            <i @onclick:stopPropagation="true" onclick="@($"Radzen.togglePopup(this, '{Grid.PopupID}{Column.GetFilterProperty()}')")"
+            <i @onclick:stopPropagation="true" onclick="@($"Radzen.togglePopup(this, '{getColumnPopupID()}')")"
                 class="@getFilterIconCss(Column)" />
 
-                    <div id="@($"{Grid.PopupID}{Column.GetFilterProperty()}")" class="rz-overlaypanel"
+                <div id="@($"{getColumnPopupID()}")" class="rz-overlaypanel"
                     style="display:none;min-width:250px;" tabindex="0">
                         <div class="rz-grid-filter rz-overlaypanel-content">
                             @if (Column.FilterTemplate != null)
@@ -183,5 +183,12 @@ else
     {
         var descriptor = Grid.sorts.Where(s => s.Property == Column.GetSortProperty()).FirstOrDefault();
         return descriptor != null ? $"({Grid.sorts.IndexOf(descriptor) + 1})" : "";
+    }
+
+    string getColumnPopupID()
+    {
+        var fiterProperty = Column.GetFilterProperty();
+
+        return $"{Grid.PopupID}{(string.IsNullOrEmpty(fiterProperty) ? Grid.allColumns.IndexOf(Column).ToString() : fiterProperty)}";
     }
 }
