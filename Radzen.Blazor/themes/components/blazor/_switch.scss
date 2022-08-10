@@ -1,13 +1,14 @@
+$switch-width: 3rem !default;
+$switch-height: round($switch-width*600)/1000 !default;
+$switch-circle-size: round($switch-width*420)/1000 !default;
+$switch-circle-margin: round(($switch-height - $switch-circle-size)*500)/1000 !default;
+
 $switch-background-color: var(--rz-base-400) !default;
 $switch-checked-background-color: var(--rz-secondary) !default;
 $switch-box-shadow: none !default;
-$switch-width: 3rem !default;
-
-$switch-height: round($switch-width*600)/1000 !default;
 $switch-circle-background-color: var(--rz-text-contrast-color) !default;
 $switch-checked-circle-background-color: var(--rz-text-contrast-color) !default;
-$switch-circle-size: round($switch-width*420)/1000 !default;
-$switch-circle-margin: round(($switch-height - $switch-circle-size)*500)/1000 !default;
+
 
 // Switch CSS variables
 
