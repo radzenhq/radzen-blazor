@@ -1,3 +1,4 @@
+$dropdown-trigger-icon: 'arrow_drop_down' !default;
 $dropdown-trigger-icon-width: var(--rz-icon-size) !default;
 $dropdown-trigger-icon-height: $dropdown-trigger-icon-width !default;
 $dropdown-trigger-icon-margin: 0 0.5rem 0 0 !default;
@@ -17,8 +18,8 @@ $dropdown-item-selected-hover-background-color: var(--rz-secondary) !default;
 $dropdown-item-selected-hover-color: var(--rz-text-contrast-color) !default;
 $dropdown-item-transition: none !default;
 $dropdown-item-disabled-opacity: 0.2 !default;
+$dropdown-item-border-radius: 0 !default;
 
-$multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 $dropdown-label-padding: 0 $dropdown-trigger-icon-width 0 0 !default;
 $dropdown-filter-border: var(--rz-border-100) !default;
 $dropdown-filter-padding: 0.5rem 0 !default;
@@ -29,6 +30,8 @@ $dropdown-open-border: var(--rz-input-border) !default;
 $dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
 $dropdown-panel-border: var(--rz-input-border) !default;
 $dropdown-panel-shadow: none !default;
+
+$multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 
 // DropDown CSS variables
 
@@ -54,7 +57,6 @@ $dropdown-panel-shadow: none !default;
   --rz-dropdown-item-transition: #{$dropdown-item-transition};
   --rz-dropdown-item-disabled-opacity: #{$dropdown-item-disabled-opacity};
 
-  --rz-multiselect-checkbox-margin: #{$multiselect-checkbox-margin};
   --rz-dropdown-label-padding: #{$dropdown-label-padding};
   --rz-dropdown-filter-border: #{$dropdown-filter-border};
   --rz-dropdown-filter-padding: #{$dropdown-filter-padding};
@@ -63,6 +65,8 @@ $dropdown-panel-shadow: none !default;
   --rz-dropdown-open-border: #{$dropdown-open-border};
   --rz-dropdown-panel-border: #{$dropdown-panel-border};
   --rz-dropdown-panel-shadow: #{$dropdown-panel-shadow};
+
+  --rz-multiselect-checkbox-margin: #{$multiselect-checkbox-margin};
 }
 
 %dropdown {
@@ -122,7 +126,7 @@ $dropdown-panel-shadow: none !default;
 
   .rzi-chevron-down {
     &:before {
-      content: 'arrow_drop_down';
+      content: $dropdown-trigger-icon;
     }
   }
 }
@@ -261,8 +265,8 @@ $dropdown-panel-shadow: none !default;
   padding: var(--rz-dropdown-item-padding);
   transition: var(--rz-dropdown-item-transition);
 
-    @include dropdown-item(0);
-    @include dropdown-item-hover(0);
+    @include dropdown-item($dropdown-item-border-radius);
+    @include dropdown-item-hover($dropdown-item-border-radius);
 }
 
 
