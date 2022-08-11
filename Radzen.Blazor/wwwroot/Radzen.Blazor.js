@@ -534,6 +534,7 @@ window.Radzen = {
     }
     var data = new FormData();
     var files = [];
+    var cancelled = false;
     for (var i = 0; i < uploadComponent.files.length; i++) {
       var file = uploadComponent.files[i];
       data.append(multiple ? 'files' : 'file', file, file.name);
@@ -551,8 +552,14 @@ window.Radzen = {
             progress,
             e.loaded,
             e.total,
-            files
-          );
+            files,
+            cancelled
+          ).then(function (cancel) {
+              if (cancel) {
+                  cancelled = true;
+                  xhr.abort();
+              }
+          });
         }
       }
     };
@@ -565,7 +572,8 @@ window.Radzen = {
           if (status === 0 || (status >= 200 && status < 400)) {
             uploadComponent.invokeMethodAsync(
               'RadzenUpload.OnComplete',
-              xhr.responseText
+                xhr.responseText,
+                cancelled
             );
           } else {
             uploadComponent.invokeMethodAsync(

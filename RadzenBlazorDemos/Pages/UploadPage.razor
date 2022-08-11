@@ -64,7 +64,8 @@
                     <h4 class="mb-4">Using RadzenProgressBar</h4>
                     <RadzenUpload Url="upload/single" Progress=@TrackProgress Complete=@CompleteUpload class="w-100" />
                     <RadzenProgressBar Value=@progress class="mt-4" Visible=@showProgress />
-                    <RadzenLabel Visible=@showComplete class="mt-4" Text="Upload Complete!" />
+                    <RadzenButton Text="Cancel" Click=@(args => CancelUpload()) class="d-block mt-4" Visible=@showProgress />
+                    <RadzenLabel Visible=@showComplete class="mt-4" Text=@completionMessage />
                 </RadzenCard>
             </div>
         </div>
@@ -88,9 +89,16 @@
     int progress;
     bool showProgress;
     bool showComplete;
+    string completionMessage;
+    bool cancelUpload = false;
 
-    void CompleteUpload()
+    void CompleteUpload(UploadCompleteEventArgs args)
     {
+        if (!args.Cancelled)
+            completionMessage = "Upload Complete!";
+        else
+            completionMessage = "Upload Cancelled!";
+
         showProgress = false;
         showComplete = true;
     }
@@ -100,6 +108,17 @@
         showProgress = true;
         showComplete = false;
         progress = args.Progress;
+
+        // cancel upload
+        args.Cancel = cancelUpload;
+
+        // reset cancel flag
+        cancelUpload = false;
+    }
+
+    void CancelUpload()
+    {
+        cancelUpload = true;
     }
 
     int customParameter = 1;
