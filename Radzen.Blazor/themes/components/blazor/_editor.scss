@@ -85,6 +85,7 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
     box-shadow: none;
     padding: 0;
     height: auto;
+    background-color: var(--rz-editor-button-background-color);
 
     &:not(:disabled):not(.rz-state-disabled):hover {
       border: none;
