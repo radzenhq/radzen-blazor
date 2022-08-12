@@ -155,6 +155,10 @@ button.rz-colorpicker-trigger {
   border-radius: var(--rz-border-radius);
   height: var(--rz-colorpicker-handle-size);
   box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+
+  &:active {
+    cursor: none;
+  }
 }
 
 .rz-alpha-picker {
@@ -163,6 +167,10 @@ button.rz-colorpicker-trigger {
   border-radius: var(--rz-border-radius);
   height: var(--rz-colorpicker-handle-size);
   box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+
+  &:active {
+    cursor: none;
+  }
 }
 
 .rz-hue-handle,
