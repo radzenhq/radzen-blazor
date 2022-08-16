@@ -1034,6 +1034,111 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Wheres the specified filters.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">The source.</param>
+        /// <param name="dataFilter">The DataFilter.</param>
+        /// <returns>IQueryable&lt;T&gt;.</returns>
+        public static IQueryable<T> Where<T>(this IQueryable<T> source, RadzenDataFilter<T> dataFilter)
+        {
+            Func<CompositeFilterDescriptor, bool> canFilter = (c) => dataFilter.properties.Where(col => col.Property == c.Property).FirstOrDefault()?.FilterPropertyType != null &&
+               (!(c.FilterValue == null || c.FilterValue as string == string.Empty)
+                || c.FilterOperator == FilterOperator.IsNotNull || c.FilterOperator == FilterOperator.IsNull
+                || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty)
+               && c.Property != null;
+
+            if (dataFilter.Filters.Where(canFilter).Any())
+            {
+                var gridLogicalFilterOperator = dataFilter?.LogicalFilterOperator;
+                var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
+
+                var index = 0;
+                var whereList = new Dictionary<string, IEnumerable<object>>();
+                foreach (var filter in dataFilter.Filters.Where(canFilter))
+                {
+                    AddWhereExpression(canFilter, filter, ref whereList, ref index, dataFilter);
+                }
+
+                return whereList.Keys.Any() ?
+                    source.Where(string.Join($" {gridBooleanOperator} ", whereList.Keys), whereList.Values.SelectMany(i => i.ToArray()).ToArray())
+                    : source;
+            }
+
+            return source;
+        }
+
+        private static void AddWhereExpression<T>(Func<CompositeFilterDescriptor, bool> canFilter, CompositeFilterDescriptor filter, ref Dictionary<string, IEnumerable<object>> whereList, ref int index, RadzenDataFilter<T> dataFilter)
+        {
+            if (filter.Filters != null)
+            {
+                foreach (var f in filter.Filters.Where(canFilter))
+                {
+                    AddWhereExpression(canFilter, f, ref whereList, ref index, dataFilter);
+                }
+            }
+            else
+            {
+                var property = PropertyAccess.GetProperty(filter.Property);
+
+                if (property.IndexOf(".") != -1)
+                {
+                    property = $"({property})";
+                }
+
+                var column = dataFilter.properties.Where(c => c.Property == filter.Property).FirstOrDefault();
+                if (column == null) return;
+
+                if (column.FilterPropertyType == typeof(string) &&
+                    !(filter.FilterOperator == FilterOperator.IsNotNull || filter.FilterOperator == FilterOperator.IsNull
+                        || filter.FilterOperator == FilterOperator.IsEmpty || filter.FilterOperator == FilterOperator.IsNotEmpty))
+                {
+                    property = $@"({property} == null ? """" : {property})";
+                }
+
+                string filterCaseSensitivityOperator = column.FilterPropertyType == typeof(string)
+                       && filter.FilterOperator != FilterOperator.IsNotNull && filter.FilterOperator != FilterOperator.IsNull
+                       && filter.FilterOperator != FilterOperator.IsEmpty && filter.FilterOperator != FilterOperator.IsNotEmpty
+                       && dataFilter.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
+
+
+                var comparison = LinqFilterOperators[filter.FilterOperator];
+
+                if (comparison == "StartsWith" || comparison == "EndsWith" || comparison == "Contains")
+                {
+                    if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "Contains")
+                    {
+                        whereList.Add($@"(@{index}).Contains({property})", new object[] { filter.FilterValue });
+                    }
+                    else
+                    {
+                        whereList.Add($@"{property}{filterCaseSensitivityOperator}.{comparison}(@{index}{filterCaseSensitivityOperator})", new object[] { filter.FilterValue });
+                    }
+
+                    index++;
+                }
+                else if (comparison == "DoesNotContain")
+                {
+                    if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "DoesNotContain")
+                    {
+                        whereList.Add($@"!(@{index}).Contains({property})", new object[] { filter.FilterValue });
+                    }
+                    else
+                    {
+                        whereList.Add($@"!{property}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator})", new object[] { filter.FilterValue });
+                    }
+
+                    index++;
+                }
+                else if (!(IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)))
+                {
+                    whereList.Add($@"{property}{filterCaseSensitivityOperator} {comparison} @{index}{filterCaseSensitivityOperator}", new object[] { filter.FilterValue });
+                    index++;
+                }
+            }
+        }
+
+        /// <summary>
         /// Ases the o data enumerable.
         /// </summary>
         /// <typeparam name="T"></typeparam>
