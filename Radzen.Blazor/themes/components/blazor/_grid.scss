@@ -20,13 +20,12 @@ $grid-header-cell-border: $grid-cell-border !default;
 $grid-header-cell-border-bottom: none !default;
 $grid-header-background-color: var(--rz-base-200) !default;
 $grid-header-font-size: 0.75rem !default;
-$grid-header-line-height: 1.25rem !default;
+$grid-header-line-height: 1rem !default;
 $grid-header-font-weight: 600 !default;
 $grid-header-text-transform: uppercase !default;
 $grid-header-color: var(--rz-text-color) !default;
-$grid-header-cell-padding: 0.5rem 0 !default;
-$grid-header-title-padding: 0 0.125rem 0 0.5rem !default;
-$grid-header-title-vertical-align: middle !default;
+$grid-header-cell-padding: 0.625rem 0.5rem !default;
+$grid-header-title-padding: 0 0.25rem 0 0 !default;
 $grid-header-sorted-background-color: var(--rz-base-300) !default;
 
 $grid-header-padding: 1rem !default;
@@ -57,8 +56,9 @@ $grid-apply-filter-button-background-color: var(--rz-primary) !default;
 $grid-apply-filter-button-color: var(--rz-text-contrast-color) !default;
 $grid-apply-filter-button-shadow: inherit !default;
 
-$grid-header-filter-icon-margin: 0.25rem 0.5rem 0 0 !default;
+$grid-header-filter-icon-margin: 0 0 0 0.25rem !default;
 $grid-header-filter-icon-hover-color: var(--rz-text-color) !default;
+$grid-header-filter-icon-active-color: var(--rz-text-title-color) !default;
 $grid-header-filter-icon-font-size: 1rem !default;
 
 $grid-border: var(--rz-border-normal) !default;
@@ -107,6 +107,8 @@ $grid-group-header-items-margin: 0 0 -0.5rem 0 !default;
 
 $column-drag-handle-color: $grid-header-color !default;
 $column-drag-handle-hover-color: $column-drag-handle-color !default;
+$column-drag-handle-margin: 0 0 0 -0.25rem !default;
+$column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
 // Grid CSS variables
 
@@ -139,7 +141,6 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
   --rz-grid-header-color: #{$grid-header-color};
   --rz-grid-header-cell-padding: #{$grid-header-cell-padding};
   --rz-grid-header-title-padding: #{$grid-header-title-padding};
-  --rz-grid-header-title-vertical-align: #{$grid-header-title-vertical-align};
   --rz-grid-header-sorted-background-color: #{$grid-header-sorted-background-color};
   --rz-grid-header-padding: #{$grid-header-padding};
 
@@ -173,6 +174,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
   --rz-grid-header-filter-icon-margin: #{$grid-header-filter-icon-margin};
   --rz-grid-header-filter-icon-hover-color: #{$grid-header-filter-icon-hover-color};
+  --rz-grid-header-filter-icon-active-color: #{$grid-header-filter-icon-active-color};
   --rz-grid-header-filter-icon-font-size: #{$grid-header-filter-icon-font-size};
 
   --rz-grid-border: #{$grid-border};
@@ -221,6 +223,8 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
   --rz-column-drag-handle-color: #{$column-drag-handle-color};
   --rz-column-drag-handle-hover-color: #{$column-drag-handle-hover-color};
+  --rz-column-drag-handle-margin: #{$column-drag-handle-margin};
+  --rz-column-draggable-shadow: #{$column-draggable-shadow};
 }
 
 .rz-datatable {
@@ -346,19 +350,27 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
   th {
     background-color: var(--rz-grid-header-background-color);
-    padding: var(--rz-grid-header-cell-padding);
+    padding: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    
+    border-bottom: var(--rz-grid-header-cell-border-bottom);
 
-    @if $fluent == false {
-      border-bottom: var(--rz-grid-header-cell-border-bottom);
-      
-      &:not(:last-child), &.rz-composite-cell {
-        border-right: var(--rz-grid-header-cell-border);
-        
-      }
+    &:not(:last-child) {
+      border-right: var(--rz-grid-header-cell-border);
+    }
+
+    &.rz-composite-cell {
+      border-right: var(--rz-grid-header-cell-border-bottom);
+    }
+
+    > div {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      outline: none;
+      padding: var(--rz-grid-header-cell-padding);
     }
 
     .rz-column-title {
@@ -369,7 +381,9 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
       color: var(--rz-grid-header-color);
       padding: var(--rz-grid-header-title-padding);
       font-weight: var(--rz-grid-header-font-weight);
-      vertical-align: var(--rz-grid-header-title-vertical-align);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }
@@ -384,10 +398,12 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     overflow: hidden;
     text-overflow: ellipsis;
 
-    @if $material == false and $fluent == false {
-      &:not(:last-child), &.rz-composite-cell {
-        border-right: var(--rz-grid-right-cell-border);
-      }
+    &:not(:last-child) {
+      border-right: var(--rz-grid-right-cell-border);
+    }
+
+    &.rz-composite-cell {
+      border-right: var(--rz-grid-right-cell-border-bottom);
     }
   }
 }
@@ -421,25 +437,26 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     background-color: var(--rz-grid-header-sorted-background-color);
   }
 
+  > div:hover {
+    .rzi-sort:not(.rzi-sort-asc):not(.rzi-sort-desc) {
+      color: var(--rz-grid-sort-icon-color);
+    }
+  }
+
   .rzi-grid-sort {
     @extend .rzi;
+    flex: auto;
     width: var(--rz-grid-sort-icon-width);
     height: var(--rz-grid-sort-icon-height);
     font-size: var(--rz-grid-sort-icon-height);
-    vertical-align: middle;
+    text-align: left;
   }
 
   .rzi-sort {
-    color: var(--rz-grid-sort-icon-color);
-    transition: var(--rz-grid-state-transition);
+    color: transparent;
 
     &:before {
       content: 'sort';
-    }
-
-    &:hover,
-    &:active {
-      color: var(--rz-grid-header-color);
     }
   }
 
@@ -499,11 +516,14 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
     padding: var(--rz-grid-cell-padding);
     border-bottom: var(--rz-grid-bottom-cell-border);
 
-    @if $material == false and $fluent == false {
-      &:not(:last-child), &.rz-composite-cell {
-        border-right: var(--rz-grid-right-cell-border);
-      }
+    &:not(:last-child) {
+      border-right: var(--rz-grid-right-cell-border);
     }
+
+    &.rz-composite-cell {
+      border-right: var(--rz-grid-right-cell-border);
+    }
+
     .rz-cell-data {
       color: var(--rz-grid-cell-color);
       font-size: var(--rz-grid-cell-font-size);
@@ -851,9 +871,9 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 }
 
 .rz-grid-filter-icon {
+  justify-self: flex-end;
   color: var(--rz-grid-filter-color);
   margin: var(--rz-grid-header-filter-icon-margin);
-  float: right;
   font-size: var(--rz-grid-header-filter-icon-font-size);
   transition: var(--rz-grid-state-transition);
   &:hover {
@@ -867,7 +887,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 }
 
 .rz-grid-filter-active {
-  color: var(--rz-secondary) !important;
+  color: var(--rz-grid-header-filter-icon-active-color) !important;
 }
 
 .rz-data-grid {
@@ -948,9 +968,9 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 
     cursor: grab;
     font-size: inherit;
-    vertical-align: middle;
     color: var(--rz-column-drag-handle-color);
     transition: var(--rz-grid-state-transition);
+    margin: var(--rz-column-drag-handle-margin);
 
     &:after {
         content: 'more_vert';
@@ -967,7 +987,36 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 }
 
 .rz-column-draggable {
-    background-color: var(--rz-grid-header-background-color);
+  background-color: var(--rz-grid-header-background-color);
+  border-radius: var(--rz-border-radius);
+  box-shadow: var(--rz-column-draggable-shadow);
+  padding: 0;
+
+  > div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    outline: none;
+    padding: var(--rz-grid-header-cell-padding);
+  }
+
+  .rz-column-title {
+    display: inline-block;
+    font-size: var(--rz-grid-header-font-size);
+    line-height: var(--rz-grid-header-line-height);
+    text-transform: var(--rz-grid-header-text-transform);
+    color: var(--rz-grid-header-color);
+    padding: var(--rz-grid-header-title-padding);
+    font-weight: var(--rz-grid-header-font-weight);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .rz-grid-filter-icon {
+    display: none;
+  }
 }
 
 .rz-group-header {
@@ -1000,7 +1049,8 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
 }
 
 .rz-group-header-drop {
-    font-size: var(--rz-grid-header-font-size);
+    font-size: var(--rz-body-font-size);
+    color: var(--rz-text-tertiary-color);
     height: fit-content;
 }
 
