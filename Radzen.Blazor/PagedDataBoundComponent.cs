@@ -345,16 +345,17 @@ namespace Radzen
         /// Goes to page.
         /// </summary>
         /// <param name="page">The page.</param>
-        public async Task GoToPage(int page)
+        /// <param name="forceReload">if set to <c>true</c> [force reload].</param>
+        public async Task GoToPage(int page, bool forceReload = false)
         {
             if (topPager != null)
             {
-                await topPager.GoToPage(page);
+                await topPager.GoToPage(page, forceReload);
             }
 
             if (bottomPager != null)
             {
-                await bottomPager.GoToPage(page);
+                await bottomPager.GoToPage(page, forceReload);
             }
         }
 
