@@ -2,12 +2,12 @@
 @if (RowIndex == Column.GetLevel())
 {
 <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex)) >
-    <div @onclick='@((args) => Grid.OnSort(args, Column))' style="width:100%;outline:none;" tabindex="@SortingTabIndex" @onkeydown="OnSortKeyPressed">
+    <div @onclick='@((args) => Grid.OnSort(args, Column))' tabindex="@SortingTabIndex" @onkeydown="OnSortKeyPressed">
         @if (Column.Parent == null && Column.Columns == null && (Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
         {
             <span id="@Grid.getColumnResizerId(ColumnIndex)" class="rz-column-drag" 
                     @onclick:preventDefault="true" @onclick:stopPropagation="true"
-                    @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex))>&nbsp;</span>
+                    @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex))></span>
         }
         <span class="rz-column-title">
             @if (Column.HeaderTemplate != null)
@@ -89,7 +89,7 @@
                                     <RadzenTextBox Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
                                 }
 
-                                <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 80px"
+                                <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px"
                                         Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? Grid.AndOperatorText : Grid.OrOperatorText, Value = t }))" TValue="LogicalFilterOperator" Value="@Column.LogicalFilterOperator" Change="@(args => Column.SetLogicalFilterOperator((LogicalFilterOperator)args))" />
 
                                 <RadzenDropDown @onclick:preventDefault="true" Data="@(Column.GetFilterOperators().Select(t => new { Value = Column.GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@Column.GetSecondFilterOperator()" Change="@(args => Column.SetSecondFilterOperator((FilterOperator)args))" />
