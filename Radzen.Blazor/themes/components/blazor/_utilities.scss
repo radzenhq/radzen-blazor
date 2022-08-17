@@ -101,8 +101,8 @@ $rz-border-radius-5: $rz-border-radius * 5 !default;
 
 // Shadow
 $rz-shadow-0: none !default;
-$rz-shadow-1: none !default;
-$rz-shadow-2: none !default;
+$rz-shadow-1: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
+$rz-shadow-2: 0 6px 14px 0 rgba(0, 0, 0, 0.2) !default;
 $rz-shadow-3: none !default;
 $rz-shadow-4: none !default;
 $rz-shadow-5: none !default;
