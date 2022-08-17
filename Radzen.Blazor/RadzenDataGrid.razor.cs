@@ -1221,6 +1221,8 @@ namespace Radzen.Blazor
                             CurrentPage = 0;
                         }
 
+                        CalculatePager();
+
                         StateHasChanged();
                     }
                 }
