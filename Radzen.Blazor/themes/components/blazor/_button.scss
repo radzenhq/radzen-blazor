@@ -29,6 +29,7 @@ $button-sizes: map-merge(
       line-height: 1.5rem,
       height: auto,
       min-height: 3.25rem,
+      min-width: 3.25rem,
       font-weight: 600,
       border-radius: var(--rz-border-radius-2),
       text-transform: uppercase,
@@ -48,6 +49,7 @@ $button-sizes: map-merge(
       line-height: 1.25rem,
       height: auto,
       min-height: 2.25rem,
+      min-width: 2.25rem,
       font-weight: 600,
       icon: (
         font-size: var(--rz-icon-size),
@@ -64,6 +66,7 @@ $button-sizes: map-merge(
       line-height: 1.25rem,
       height: auto,
       min-height: 1.75rem,
+      min-width: 1.75rem,
       icon: (
         font-size: var(--rz-icon-size),
         line-height: var(--rz-icon-size),
@@ -220,6 +223,7 @@ $button-styles: map-merge(
       height: map-get($button, height);
       line-height: map-get($button, line-height);
       min-height: map-get($button, min-height);
+      min-width: map-get($button, min-width);
       letter-spacing: map-get($button, letter-spacing);
       text-transform: map-get($button, text-transform);
       border-radius: map-get($button, border-radius);
