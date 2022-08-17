@@ -13,9 +13,9 @@
                 </div>
             }
             else if (tooltip.Options.ChildContent != null)
-       {
-        @tooltip.Options.ChildContent(Service)
-    }
+            {
+                @tooltip.Options.ChildContent(Service)
+            }
         </div>
     </div>
 }
@@ -56,6 +56,17 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         IsJSRuntimeAvailable = true;
+
+        var tooltip = tooltips.LastOrDefault();
+
+        if (tooltip != null)
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.openTooltip",
+                tooltip.Element,
+                UniqueID,
+                tooltip.Options.Duration,
+                Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant());
+        }
     }
 
     public async Task Close()
