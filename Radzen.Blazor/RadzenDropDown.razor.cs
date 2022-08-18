@@ -53,7 +53,7 @@ namespace Radzen.Blazor
         /// <param name="key">The key.</param>
         /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
         /// <param name="isFromClick">if set to <c>true</c> [is from click].</param>
-        protected override async System.Threading.Tasks.Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
+        protected override async Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
         {
             if (Disabled)
                 return;
@@ -72,8 +72,11 @@ namespace Radzen.Blazor
             builder.OpenComponent(0, typeof(RadzenDropDownItem<TValue>));
             builder.AddAttribute(1, "DropDown", this);
             builder.AddAttribute(2, "Item", item);
-            if (DisabledProperty!=null)
+
+            if (DisabledProperty != null)
+            {
                 builder.AddAttribute(3, "Disabled", PropertyAccess.GetItemOrValueFromProperty(item, DisabledProperty));
+            }
 
             builder.SetKey(GetKey(item));
             builder.CloseComponent();
@@ -87,11 +90,12 @@ namespace Radzen.Blazor
         public int MaxSelectedLabels { get; set; } = 4;
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="DropDownBase{T}"/> is multiple with chip view .
+        /// Gets or sets a value indicating whether the selected items will be displayed as chips. Set to <c>false</c> by default.
+        /// Requires <see cref="DropDownBase{T}.Multiple" /> to be set to <c>true</c>. 
         /// </summary>
-        /// <value><c>true</c> if multiple with chips; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> to display the selected items as chips; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool ChipsView { get; set; }
+        public bool Chips { get; set; }
 
         /// <summary>
         /// Gets or sets the selected items text.
@@ -163,20 +167,12 @@ namespace Radzen.Blazor
             }
         }
 
-        protected override Task OnInitializedAsync()
-        {
-            if (ChipsView)
-                Multiple=true;
-
-            return base.OnInitializedAsync();
-        }
-
         /// <summary>
         /// Called when item is selected.
         /// </summary>
         /// <param name="item">The item.</param>
         /// <param name="isFromKey">if set to <c>true</c> [is from key].</param>
-        protected override async System.Threading.Tasks.Task OnSelectItem(object item, bool isFromKey = false)
+        protected override async Task OnSelectItem(object item, bool isFromKey = false)
         {
             if (!ReadOnly)
             {
@@ -189,15 +185,15 @@ namespace Radzen.Blazor
             }
         }
 
-        protected async System.Threading.Tasks.Task ChipRemove(MouseEventArgs args, object item)
+        private async Task OnChipRemove(object item)
         {
-            if (Disabled)
-                return;
-
-            await OnSelectItemInternal(item);
+            if (!Disabled)
+            {
+                await OnSelectItemInternal(item);
+            }
         }
 
-        internal async System.Threading.Tasks.Task OnSelectItemInternal(object item, bool isFromKey = false)
+        internal async Task OnSelectItemInternal(object item, bool isFromKey = false)
         {
             await OnSelectItem(item, isFromKey);
         }
@@ -205,7 +201,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList("rz-dropdown").Add("rz-clear", AllowClear).Add("rz-dropdown-chips", ChipsView && selectedItems.Count>0).ToString();
+            return GetClassList("rz-dropdown")
+                        .Add("rz-clear", AllowClear)
+                        .Add("rz-dropdown-chips", Chips && selectedItems.Count > 0)
+                        .ToString();
         }
 
         /// <inheritdoc />
@@ -219,7 +218,7 @@ namespace Radzen.Blazor
             }
         }
 
-        internal async System.Threading.Tasks.Task ClosePopup()
+        internal async Task ClosePopup()
         {
             await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
         }       
