@@ -690,6 +690,7 @@ namespace RadzenBlazorDemos
                     Title = "Blazor Dropdown component with multiple selection support",
                     Path = "dropdown",
                     Icon = "&#xe875",
+                    Updated = true,
                     Tags = new [] { "select", "picker", "form" , "edit" }
                 },
                 new Example()
