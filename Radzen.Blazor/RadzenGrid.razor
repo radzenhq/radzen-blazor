@@ -182,7 +182,7 @@
                                                             <label class="rz-cell-filter-label" style="height:35px">
                                                                 @if (column.Type == "string" && column.Format == "date-time")
                                                                 {
-                                                                    <button class="rz-button rz-button-md rz-button-icon-only btn-light" onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")">
+                                                                    <button class="rz-button rz-button-md rz-button-icon-only rz-light" onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")">
                                                                         <i class="rzi">date_range</i>
                                                                     </button>
                                                                     @if (column.FilterValue != null)
