@@ -37,7 +37,7 @@ $listbox-header-icon-margin: 0 !default;
 .rz-listbox {
   display: inline-flex;
   flex-direction: column;
-
+  overflow: hidden;
   background-color: var(--rz-listbox-background-color);
   border: var(--rz-listbox-border);
   border-radius: var(--rz-listbox-border-radius);
