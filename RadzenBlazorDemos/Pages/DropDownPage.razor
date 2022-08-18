@@ -4,8 +4,6 @@
 @using RadzenBlazorDemos.Models.Northwind
 
 @inject NorthwindContext dbContext
-<style>
-</style>
 
 <RadzenExample Name="DropDown">
 <div class="row px-3">
@@ -109,6 +107,13 @@
                             TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
         </RadzenCard>
     </div>
+    <div class="col-md-6 col-lg-4 col-xl-6 p-3">
+        <RadzenCard>
+            <h4 class="mb-4">Multiple selection with chips</h4>
+            <RadzenDropDown Multiple="true" Chips="true" MaxSelectedLabels="20" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@multipleValuesChip
+                            TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
+        </RadzenCard>
+    </div>
 </div>
 </RadzenExample>
 
@@ -129,6 +134,8 @@
     string value = "ALFKI";
 
     IEnumerable<int> multipleValuesdisabled = new int[] { 1,2 };
+
+    IEnumerable<int> multipleValuesChip = new int[] { 1, 2, 3, 4, 6, 7, 8 };
 
     EventConsole console;
 

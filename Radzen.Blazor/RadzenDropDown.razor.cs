@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Radzen.Blazor
 {
@@ -52,7 +53,7 @@ namespace Radzen.Blazor
         /// <param name="key">The key.</param>
         /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
         /// <param name="isFromClick">if set to <c>true</c> [is from click].</param>
-        protected override async System.Threading.Tasks.Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
+        protected override async Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
         {
             if (Disabled)
                 return;
@@ -71,8 +72,11 @@ namespace Radzen.Blazor
             builder.OpenComponent(0, typeof(RadzenDropDownItem<TValue>));
             builder.AddAttribute(1, "DropDown", this);
             builder.AddAttribute(2, "Item", item);
-            if (DisabledProperty!=null)
+
+            if (DisabledProperty != null)
+            {
                 builder.AddAttribute(3, "Disabled", PropertyAccess.GetItemOrValueFromProperty(item, DisabledProperty));
+            }
 
             builder.SetKey(GetKey(item));
             builder.CloseComponent();
@@ -84,6 +88,14 @@ namespace Radzen.Blazor
         /// <value>The number of maximum selected labels.</value>
         [Parameter]
         public int MaxSelectedLabels { get; set; } = 4;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the selected items will be displayed as chips. Set to <c>false</c> by default.
+        /// Requires <see cref="DropDownBase{T}.Multiple" /> to be set to <c>true</c>. 
+        /// </summary>
+        /// <value><c>true</c> to display the selected items as chips; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Chips { get; set; }
 
         /// <summary>
         /// Gets or sets the selected items text.
@@ -120,6 +132,8 @@ namespace Radzen.Blazor
             }
         }
 
+        private bool shouldReposition;
+
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -153,6 +167,13 @@ namespace Radzen.Blazor
                     }
                 }
             }
+
+            if (shouldReposition)
+            {
+                shouldReposition = false;
+
+                await JSRuntime.InvokeVoidAsync("Radzen.repositionPopup", Element, PopupID);
+            }
         }
 
         /// <summary>
@@ -160,7 +181,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="item">The item.</param>
         /// <param name="isFromKey">if set to <c>true</c> [is from key].</param>
-        protected override async System.Threading.Tasks.Task OnSelectItem(object item, bool isFromKey = false)
+        protected override async Task OnSelectItem(object item, bool isFromKey = false)
         {
             if (!ReadOnly)
             {
@@ -173,15 +194,31 @@ namespace Radzen.Blazor
             }
         }
 
-        internal async System.Threading.Tasks.Task OnSelectItemInternal(object item, bool isFromKey = false)
+        private async Task OnChipRemove(object item)
+        {
+            if (!Disabled)
+            {
+                await OnSelectItemInternal(item);
+            }
+        }
+
+        internal async Task OnSelectItemInternal(object item, bool isFromKey = false)
         {
             await OnSelectItem(item, isFromKey);
+
+            if (Chips)
+            {
+                shouldReposition = true;
+            }
         }
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList("rz-dropdown").Add("rz-clear", AllowClear).ToString();
+            return GetClassList("rz-dropdown")
+                        .Add("rz-clear", AllowClear)
+                        .Add("rz-dropdown-chips", Chips && selectedItems.Count > 0)
+                        .ToString();
         }
 
         /// <inheritdoc />
@@ -195,9 +232,9 @@ namespace Radzen.Blazor
             }
         }
 
-        internal async System.Threading.Tasks.Task ClosePopup()
+        internal async Task ClosePopup()
         {
             await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
-        }
+        }       
     }
 }

@@ -258,9 +258,42 @@ $dropdown-panel-border: $dropdown-open-border !default;
   padding-right: $dropdown-trigger-icon-width;
 }
 
+.rz-dropdown-chips {
+    height: inherit;
+
+    .rz-dropdown-chips-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        margin-right: 3rem;
+    }
+
+    .rz-chip {
+        background: $light;
+        border-radius: $button-border-radius;
+        padding: 0 0 0 $dropdown-horizontal-padding;
+
+        .rz-chip-text {
+            vertical-align: middle;
+            display: contents;
+        }
+
+        .rz-button {
+          padding: 0.25rem 0.5rem;
+          line-height: 1.5rem;
+        }
+
+        .rzi {
+          vertical-align: middle;
+          font-size: 1rem;
+        }
+    }
+}
+
 .rz-clear {
   .rz-multiselect-label-container,
-  .rz-dropdown-label {
+  .rz-dropdown-label,
+  .rz-dropdown-badges-items{
     padding-right: 2 * $dropdown-trigger-icon-width;
   }
 }

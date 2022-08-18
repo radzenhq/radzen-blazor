@@ -35,6 +35,20 @@
                 @PropertyAccess.GetItemOrValueFromProperty(selectedItem, TextProperty)
             </label>
         }
+        else if (Chips && selectedItems.Count > 0 && selectedItems.Count < MaxSelectedLabels)
+        {
+            <div class="rz-dropdown-chips-wrapper">
+                @foreach (var item in selectedItems)
+                {
+                    <div class="rz-chip">
+                        <span class="rz-chip-text">
+                            @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
+                        </span>  
+                        <button class="rz-button btn-light @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
+                    </div>
+                }
+            </div>
+        }
         else if (selectedItems.Count > 0)
         {
             <label class="rz-dropdown-label rz-inputtext ">
@@ -116,7 +130,7 @@
                 </div>
             }
             <div class="@(Multiple ? "rz-multiselect-items-wrapper" : "rz-dropdown-items-wrapper")" style="max-height: 200px;overflow-x: hidden">
-                <ul @ref="list" class="@(Multiple ? "rz-multiselect-items rz-multiselect-list    " : "rz-dropdown-items rz-dropdown-list    ")" role="listbox">
+                <ul @ref="list" class="@(Multiple ? "rz-multiselect-items rz-multiselect-list" : "rz-dropdown-items rz-dropdown-list")" role="listbox">
                     @if (View != null)
                     {
                         @RenderItems()
