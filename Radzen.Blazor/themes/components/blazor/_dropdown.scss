@@ -226,7 +226,7 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
   margin: var(--rz-dropdown-items-margin);
 }
 
-@mixin dropdown-item($radius: $rz-border-radius) {
+@mixin dropdown-item($radius: $dropdown-item-border-radius) {
   cursor: default;
   font-size: var(--rz-dropdown-item-font-size);
 
@@ -251,7 +251,7 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
   }
 }
 
-@mixin dropdown-item-hover($radius: $rz-border-radius) {
+@mixin dropdown-item-hover($radius: $dropdown-item-border-radius) {
   &:hover {
     background-color: var(--rz-dropdown-item-hover-background-color);
     color: var(--rz-dropdown-item-hover-color);
@@ -265,8 +265,8 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
   padding: var(--rz-dropdown-item-padding);
   transition: var(--rz-dropdown-item-transition);
 
-    @include dropdown-item($dropdown-item-border-radius);
-    @include dropdown-item-hover($dropdown-item-border-radius);
+    @include dropdown-item();
+    @include dropdown-item-hover();
 }
 
 
