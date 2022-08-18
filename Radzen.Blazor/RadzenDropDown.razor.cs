@@ -132,6 +132,8 @@ namespace Radzen.Blazor
             }
         }
 
+        private bool shouldReposition;
+
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -165,6 +167,13 @@ namespace Radzen.Blazor
                     }
                 }
             }
+
+            if (shouldReposition)
+            {
+                shouldReposition = false;
+
+                await JSRuntime.InvokeVoidAsync("Radzen.repositionPopup", Element, PopupID);
+            }
         }
 
         /// <summary>
@@ -196,6 +205,11 @@ namespace Radzen.Blazor
         internal async Task OnSelectItemInternal(object item, bool isFromKey = false)
         {
             await OnSelectItem(item, isFromKey);
+
+            if (Chips)
+            {
+                shouldReposition = true;
+            }
         }
 
         /// <inheritdoc />
