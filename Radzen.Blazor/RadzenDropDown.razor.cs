@@ -87,11 +87,11 @@ namespace Radzen.Blazor
         public int MaxSelectedLabels { get; set; } = 4;
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="DropDownBase{T}"/> is multiple with badge view .
+        /// Gets or sets a value indicating whether this <see cref="DropDownBase{T}"/> is multiple with chip view .
         /// </summary>
-        /// <value><c>true</c> if multiple with badges; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if multiple with chips; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool BadgesView { get; set; }
+        public bool ChipsView { get; set; }
 
         /// <summary>
         /// Gets or sets the selected items text.
@@ -165,7 +165,7 @@ namespace Radzen.Blazor
 
         protected override Task OnInitializedAsync()
         {
-            if (BadgesView)
+            if (ChipsView)
                 Multiple=true;
 
             return base.OnInitializedAsync();
@@ -189,7 +189,7 @@ namespace Radzen.Blazor
             }
         }
 
-        protected async System.Threading.Tasks.Task BadgeRemove(MouseEventArgs args, object item)
+        protected async System.Threading.Tasks.Task ChipRemove(MouseEventArgs args, object item)
         {
             if (Disabled)
                 return;
@@ -205,7 +205,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList("rz-dropdown").Add("rz-clear", AllowClear).Add("rz-dropdown-badges", BadgesView && selectedItems.Count>0).ToString();
+            return GetClassList("rz-dropdown").Add("rz-clear", AllowClear).Add("rz-dropdown-chips", ChipsView && selectedItems.Count>0).ToString();
         }
 
         /// <inheritdoc />
