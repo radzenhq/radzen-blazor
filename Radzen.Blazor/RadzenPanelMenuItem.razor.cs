@@ -96,7 +96,7 @@ namespace Radzen.Blazor
         async System.Threading.Tasks.Task Toggle()
         {
             expanded = !expanded;
-            await ExpandedChanged.InvokeAsync(Expanded);
+            await ExpandedChanged.InvokeAsync(expanded);
             StateHasChanged();
         }
 
