@@ -21,6 +21,13 @@ namespace Radzen.Blazor
         [Parameter]
         public double Margin { get; set; } = 10;
 
+        /// <summary>
+        /// Gets or sets the height of all bars in pixels. By default it is automatically calculated depending on the chart height.
+        /// </summary>
+        /// <value>The pixel height of the bar. By default set to <c>null</c></value>
+        [Parameter]
+        public double? Height { get; set;}
+
         /// <inheritdoc />
         protected override void Initialize()
         {
@@ -30,7 +37,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override bool ShouldRefreshChart(ParameterView parameters)
         {
-            return DidParameterChange(parameters, nameof(Radius), Radius) || DidParameterChange(parameters, nameof(Margin), Margin);
+            return DidParameterChange(parameters, nameof(Radius), Radius) || 
+                   DidParameterChange(parameters, nameof(Height), Height) ||
+                   DidParameterChange(parameters, nameof(Margin), Margin);
         }
     }
 }
