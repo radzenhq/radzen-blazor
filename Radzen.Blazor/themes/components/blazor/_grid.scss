@@ -630,7 +630,7 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
   top: 50%;
   transform: translate(-50%, -50%);
   color: $grid-loading-indicator-color;
-  z-index: 1;
+  z-index: 2;
 
   .rzi-circle-o-notch {
     @extend .rzi;
