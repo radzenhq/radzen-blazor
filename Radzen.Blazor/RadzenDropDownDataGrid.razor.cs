@@ -542,7 +542,11 @@ namespace Radzen.Blazor
             }
 #endif
             StateHasChanged();
-            await grid.FirstPage(true);
+
+            if (!IsVirtualizationAllowed())
+            {
+                await grid.FirstPage(true);
+            }
 
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
         }
