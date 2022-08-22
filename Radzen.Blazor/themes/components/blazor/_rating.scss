@@ -5,6 +5,7 @@ $rating-selected-color: var(--rz-primary) !default;
 $rating-disabled-color: var(--rz-text-disabled-color) !default;
 $rating-disabled-opacity: 0.3 !default;
 $rating-ban-icon: "highlight_off" !default;
+$rating-ban-icon-color: $rating-color !default;
 
 // Rating CSS variables
 
@@ -16,6 +17,7 @@ $rating-ban-icon: "highlight_off" !default;
   --rz-rating-disabled-color: #{$rating-disabled-color};
   --rz-rating-disabled-opacity: #{$rating-disabled-opacity};
   --rz-rating-ban-icon: #{$rating-ban-icon};
+  --rz-rating-ban-icon-color: #{$rating-ban-icon-color};
 }
 
 .rz-rating {
@@ -44,6 +46,8 @@ $rating-ban-icon: "highlight_off" !default;
   }
 
   .rzi-ban {
+    color: var(--rz-rating-ban-icon-color);
+
     &:before {
       content: $rating-ban-icon;
     }
