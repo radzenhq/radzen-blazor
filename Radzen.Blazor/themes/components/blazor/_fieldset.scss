@@ -3,6 +3,7 @@ $fieldset-border-radius: 0 !default;
 $fieldset-padding: 1.25rem !default;
 $fieldset-legend-color: var(--rz-text-tertiary-color) !default;
 $fieldset-legend-font-size: var(--rz-body-font-size) !default;
+$fieldset-legend-margin: 0 0 0 1rem !default;
 $fieldset-legend-padding: 0 1rem !default;
 
 $fieldset-toggle-width: 1.125rem !default;
@@ -21,6 +22,7 @@ $fieldset-toggle-border: none !default;
   --rz-fieldset-padding: #{$fieldset-padding};
   --rz-fieldset-legend-color: #{$fieldset-legend-color};
   --rz-fieldset-legend-font-size: #{$fieldset-legend-font-size};
+  --rz-fieldset-legend-margin: #{$fieldset-legend-margin};
   --rz-fieldset-legend-padding: #{$fieldset-legend-padding};
 
   --rz-fieldset-toggle-width: #{$fieldset-toggle-width};
@@ -78,12 +80,11 @@ $fieldset-toggle-border: none !default;
 }
 
 .rz-fieldset-legend {
-  margin: 0 0 0 1rem;
+  margin: var(--rz-fieldset-legend-margin);
+  padding: var(--rz-fieldset-legend-padding);
   width: auto;
-
   color: var(--rz-fieldset-legend-color);
   font-size: var(--rz-fieldset-legend-font-size);
-  padding: var(--rz-fieldset-legend-padding);
 
   a {
     color: inherit;
