@@ -97,7 +97,7 @@
             || value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty)
         {
             Column.SetFilterValue(value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty ? string.Empty : null);
-            Column.SetFilterValue(value == FilterOperator.IsEmpty || value == FilterOperator.IsNotEmpty ? string.Empty : null, false);
+            Column.SetFilterValue(null, false);
         }
 
         Column.SetFilterOperator(value);
