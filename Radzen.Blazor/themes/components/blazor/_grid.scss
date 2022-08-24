@@ -663,9 +663,10 @@ $column-drag-handle-hover-color: $column-drag-handle-color !default;
       > table {
         table-layout: auto;
         display: block;
-      }
-      tbody {
-        display: block;
+
+        > tbody {
+          display: block;
+        }
       }
     }
 
