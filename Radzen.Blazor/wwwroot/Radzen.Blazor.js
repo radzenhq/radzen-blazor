@@ -658,14 +658,14 @@ window.Radzen = {
 
     Radzen.openPopup(null, id, false, null, x, y);
   },
-  openTooltip: function (target, id, duration, position) {
+  openTooltip: function (target, id, duration, position, closeTooltipOnDocumentClick) {
     Radzen.closePopup(id);
 
     if (Radzen[id + 'duration']) {
       clearTimeout(Radzen[id + 'duration']);
     }
 
-    Radzen.openPopup(target, id, false, position);
+    Radzen.openPopup(target, id, false, position, null, null, null, null, closeTooltipOnDocumentClick);
 
     if (duration) {
       Radzen[id + 'duration'] = setTimeout(Radzen.closePopup, duration, id);
@@ -701,7 +701,7 @@ window.Radzen = {
 
       popup.style.top = top + 'px';
   },
-  openPopup: function (parent, id, syncWidth, position, x, y, instance, callback) {
+  openPopup: function (parent, id, syncWidth, position, x, y, instance, callback, closeOnDocumentClick = true) {
     var popup = document.getElementById(id);
     if (!popup) return;
 
@@ -801,7 +801,7 @@ window.Radzen = {
     }
 
     Radzen[id] = function (e) {
-        if(e.type == 'contextmenu' || !e.target) return;
+        if(e.type == 'contextmenu' || !e.target || !closeOnDocumentClick) return;
         if (!/Android/i.test(navigator.userAgent) && e.type == 'resize') {
             Radzen.closePopup(id, instance, callback);
             return;

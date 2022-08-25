@@ -47,7 +47,8 @@
                 tooltip.Element,
                 UniqueID,
                 tooltip.Options.Duration,
-                Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant());
+                Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant(),
+                tooltip.Options.CloseTooltipOnDocumentClick);
         }
     }
 
@@ -65,7 +66,8 @@
                 tooltip.Element,
                 UniqueID,
                 tooltip.Options.Duration,
-                Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant());
+                Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant(),
+                tooltip.Options.CloseTooltipOnDocumentClick);
         }
     }
 
