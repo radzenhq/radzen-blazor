@@ -208,7 +208,7 @@ namespace Radzen
         /// </summary>
         /// <param name="result">The result.</param>
         [JSInvokable("DialogService.Close")]
-        public void Close(dynamic result = null)
+        public virtual void Close(dynamic result = null)
         {
             var dialog = dialogs.LastOrDefault();
 
