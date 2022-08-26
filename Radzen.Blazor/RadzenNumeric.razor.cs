@@ -225,7 +225,7 @@ namespace Radzen.Blazor
             }
             catch
             {
-                newValueAsDecimal = (decimal)ConvertType.ChangeType(default(TValue), typeof(decimal));
+                newValueAsDecimal = default(TValue) == null ? default(decimal?) : (decimal)ConvertType.ChangeType(default(TValue), typeof(decimal));
             }
 
             if (object.Equals(Value, newValue) && (!ValueChanged.HasDelegate || !string.IsNullOrEmpty(Format)))
