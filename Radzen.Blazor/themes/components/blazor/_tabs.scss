@@ -1,3 +1,9 @@
+$tabs-selected-tab-color: var(--rz-text-title-color) !default;
+$tabs-hover-color: var(--rz-secondary-light) !default;
+$tabs-hover-background-color: var(--rz-base-background-color) !default;
+
+// -----
+
 $tabs-padding: 1.25rem !default;
 $tabs-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $tabs-border: var(--rz-border-200) !default;
@@ -12,10 +18,10 @@ $tabs-tab-letter-spacing: 0 !default;
 $tabs-tab-padding: 0.5rem 1rem !default;
 $tabs-tab-background-color: var(--rz-base-200) !default;
 $tabs-tab-color: var(--rz-secondary) !default;
-$tabs-tab-selected-color: var(--rz-text-title-color) !default;
+$tabs-tab-selected-color: $tabs-selected-tab-color !default;
 $tabs-tab-selected-top-border-color: var(--rz-secondary) !default;
-$tabs-tab-hover-background-color: $tabs-background-color !default;
-$tabs-tab-hover-color: var(--rz-secondary-light) !default;
+$tabs-tab-hover-background-color: $tabs-hover-background-color !default;
+$tabs-tab-hover-color: $tabs-hover-color !default;
 
 $tabs-icon-font-size: var(--rz-icon-size) !default;
 $tabs-icon-margin: 0 0.25rem 0 -0.25rem !default;

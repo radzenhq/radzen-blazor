@@ -1,8 +1,8 @@
 $datepicker-trigger-icon-width: var(--rz-icon-size) !default;
 $datepicker-trigger-icon-height: $datepicker-trigger-icon-width !default;
-$datepicker-line-height: 1.25rem !default;
 $datepicker-trigger-icon-color: var(--rz-text-secondary-color) !default;
 $datepicker-trigger-icon-hover-color: var(--rz-secondary) !default;
+$datepicker-line-height: 1.25rem !default;
 
 $datepicker-panel-border: var(--rz-border-normal) !default;
 $datepicker-panel-background-color: var(--rz-base-background-color) !default;
@@ -36,7 +36,6 @@ $datepicker-title-height: 47px !default;
 
 $timepicker-background-color: var(--rz-base-200)!default;
 $timepicker-color: var(--rz-text-color) !default;
-$timepicker-separator-color: var(--rz-text-color) !default;
 $timepicker-padding: 0.5rem !default;
 $timepicker-hour-padding: 0.5rem !default;
 $timepicker-button-background-color: var(--rz-secondary) !default;
@@ -46,6 +45,7 @@ $timepicker-button-height: $timepicker-button-width !default;
 $timepicker-button-border-radius: 2px !default;
 $timepicker-button-padding: 0.5rem 1rem !important;
 $timepicker-gap: 0.5rem !default;
+$timepicker-separator-color: var(--rz-text-color) !default;
 $timepicker-separator-margin: 0 0.5rem !default;
 $timepicker-border: none !default;
 

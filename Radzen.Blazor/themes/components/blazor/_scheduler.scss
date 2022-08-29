@@ -1,3 +1,8 @@
+$scheduler-toolbar-color: var(--rz-text-contrast-color) !default;
+$scheduler-toolbar-button-background-color: var(--rz-secondary) !default;
+
+// -----
+
 $scheduler-border: var(--rz-border-normal) !default;
 $scheduler-border-color: var(--rz-base-300) !default;
 $scheduler-minor-border-color: var(--rz-base-200) !default;
@@ -13,8 +18,8 @@ $scheduler-toolbar-title-font-size: 1rem !default;
 $scheduler-toolbar-title-font-weight: 700 !default;
 $scheduler-toolbar-title-color: var(--rz-text-title-color) !default;
 
-$scheduler-prev-next-button-background-color: var(--rz-secondary) !default;
-$scheduler-prev-next-button-color: var(--rz-text-contrast-color) !default;
+$scheduler-prev-next-button-background-color: $scheduler-toolbar-button-background-color !default;
+$scheduler-prev-next-button-color: $scheduler-toolbar-color !default;
 $scheduler-prev-next-button-padding: 0.5rem !default;
 $scheduler-prev-next-button-font-size: var(--rz-icon-size) !default;
 $scheduler-prev-button-border-radius: var(--rz-border-radius) 0 0 var(--rz-border-radius) !default;
