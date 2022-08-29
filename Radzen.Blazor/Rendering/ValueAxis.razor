@@ -12,7 +12,7 @@
 
         if (YAxis.Ticks.Template != null)
         {
-            var context = new TickTemplateContext { Value = value, X = x1, Y = y } ;
+            var context = new TickTemplateContext { Text = text, Value = value, X = x1, Y = y } ;
 
             <ValueAxisTick X="@x1" Y="@y" Text="@text" Stroke="@(YAxis.Ticks.Stroke ?? YAxis.Stroke)" StrokeWidth="@YAxis.Ticks.StrokeWidth" LineType="@YAxis.Ticks.LineType">
                 @YAxis.Ticks.Template(context)

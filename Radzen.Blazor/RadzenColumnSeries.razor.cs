@@ -116,9 +116,18 @@ namespace Radzen.Blazor
         {
             get
             {
-                var availableWidth = Chart.CategoryScale.OutputSize - (Chart.CategoryAxis.Padding * 2);
-                var bands = VisibleColumnSeries.Cast<IChartColumnSeries>().Max(series => series.Count) + 2;
-                return availableWidth / bands;
+                var columnSeries = VisibleColumnSeries;
+
+                if (Chart.ColumnOptions.Width.HasValue)
+                {
+                    return Chart.ColumnOptions.Width.Value * columnSeries.Count + Chart.ColumnOptions.Margin * (columnSeries.Count - 1);
+                }
+                else
+                {
+                    var availableWidth = Chart.CategoryScale.OutputSize - (Chart.CategoryAxis.Padding * 2);
+                    var bands = columnSeries.Cast<IChartColumnSeries>().Max(series => series.Count) + 2;
+                    return availableWidth / bands;
+                }
             }
         }
 
@@ -164,7 +173,7 @@ namespace Radzen.Blazor
             var index = columnSeries.IndexOf(this);
             var padding = Chart.ColumnOptions.Margin;
             var bandWidth = BandWidth;
-            var width = bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();
+            var width = Chart.ColumnOptions.Width ?? bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();
 
             foreach (var data in Items)
             {

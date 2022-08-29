@@ -38,6 +38,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets the template.
+        /// </summary>
+        /// <value>The  template.</value>
+        [Parameter]
+        public RenderFragment Template { get; set; }
+
+        /// <summary>
         /// Gets or sets the mode.
         /// </summary>
         /// <value>The mode.</value>

@@ -23,7 +23,17 @@ else
     public RenderFragment ChildContent { get; set; }
 
     [Parameter]
-    public bool Expanded { get; set; }
+    public bool Expanded
+    {
+        get
+        {
+            return Example.Expanded;
+        }
+        set
+        {
+            Example.Expanded = value;
+        }
+    }
 
     [Parameter]
     public EventCallback<bool> ExpandedChanged { get; set; }

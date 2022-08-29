@@ -157,7 +157,7 @@
 
         @if (AllowClear && (!Multiple && HasValue || Multiple && (selectedItems.Count > 0 || SelectedValue is IEnumerable)))
         {
-            <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear"></i>
+            <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
         }
     </div>
 }

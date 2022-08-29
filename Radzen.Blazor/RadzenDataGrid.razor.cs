@@ -310,7 +310,7 @@ namespace Radzen.Blazor
 
         private List<RadzenDataGridColumn<TItem>> columns = new List<RadzenDataGridColumn<TItem>>();
         internal readonly List<RadzenDataGridColumn<TItem>> childColumns = new List<RadzenDataGridColumn<TItem>>();
-        private List<RadzenDataGridColumn<TItem>> allColumns = new List<RadzenDataGridColumn<TItem>>();
+        internal List<RadzenDataGridColumn<TItem>> allColumns = new List<RadzenDataGridColumn<TItem>>();
         private List<RadzenDataGridColumn<TItem>> allPickableColumns = new List<RadzenDataGridColumn<TItem>>();
         internal object selectedColumns;
 
@@ -1220,6 +1220,8 @@ namespace Radzen.Blazor
                             skip = 0;
                             CurrentPage = 0;
                         }
+
+                        CalculatePager();
 
                         StateHasChanged();
                     }

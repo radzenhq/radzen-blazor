@@ -121,9 +121,18 @@ namespace Radzen.Blazor
         {
             get
             {
-                var availableHeight = Chart.ValueScale.OutputSize; // - (Chart.ValueAxis.Padding * 2);
-                var bands = VisibleBarSeries.Cast<IChartBarSeries>().Max(series => series.Count) + 2;
-                return availableHeight / bands;
+                var barSeries = VisibleBarSeries;
+
+                if (Chart.BarOptions.Height.HasValue)
+                {
+                    return Chart.BarOptions.Height.Value * barSeries.Count;
+                }
+                else
+                {
+                    var availableHeight = Chart.ValueScale.OutputSize; // - (Chart.ValueAxis.Padding * 2);
+                    var bands = barSeries.Cast<IChartBarSeries>().Max(series => series.Count) + 2;
+                    return availableHeight / bands;
+                }
             }
         }
 
