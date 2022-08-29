@@ -72,38 +72,38 @@
         </RadzenContentContainer>
     </ChildContent>
 </RadzenBody>
-<RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded" class="demos-sidebar">
-    <ChildContent>
-        <div style="padding: 1rem">
-            <RadzenTextBox Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" />
-        </div>
-        <RadzenPanelMenu Match="NavLinkMatch.Prefix" Click="@PanelMenuClick">
-            @foreach (var category in examples)
-            {
-                <NavigationItem @bind-Expanded=@category.Expanded Example=@category>
-                    @if (category.Children != null)
+<RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded" class="demos-sidebar" style="display: flex; flex-direction: column">
+    <div style="padding: 1rem">
+        <RadzenTextBox Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" />
+    </div>
+    <div style="flex: 1; overflow: auto">
+    <RadzenPanelMenu Match="NavLinkMatch.Prefix" Click="@PanelMenuClick">
+        @foreach (var category in examples)
+        {
+            <NavigationItem @bind-Expanded=@category.Expanded Example=@category>
+                @if (category.Children != null)
+                {
+                    @foreach (var example in category.Children)
                     {
-                        @foreach (var example in category.Children)
+                        if (example.Children != null)
                         {
-                            if (example.Children != null)
+                            <NavigationItem @bind-Expanded=@example.Expanded Example=@example>
+                            @foreach (var child in example.Children)
                             {
-                                <NavigationItem @bind-Expanded=@example.Expanded Example=@example>
-                                @foreach (var child in example.Children)
-                                {
-                                    <NavigationItem @bind-Expanded=@child.Expanded Example=@child />
-                                }
-                                </NavigationItem>
+                                <NavigationItem @bind-Expanded=@child.Expanded Example=@child />
                             }
-                            else
-                            {
-                                <NavigationItem @bind-Expanded=@example.Expanded Example=@example />
-                            }
+                            </NavigationItem>
+                        }
+                        else
+                        {
+                            <NavigationItem @bind-Expanded=@example.Expanded Example=@example />
                         }
                     }
-                </NavigationItem>
-            }
-        </RadzenPanelMenu>
-    </ChildContent>
+                }
+            </NavigationItem>
+        }
+    </RadzenPanelMenu>
+    </div>
 </RadzenSidebar>
 </RadzenLayout>
 @code {
@@ -140,7 +140,7 @@
     async Task PanelMenuClick(MenuItemEventArgs args)
     {
         if (args.Path == "/")
-        { 
+        {
             await JSRuntime.InvokeVoidAsync("document.location.reload");
         }
     }
