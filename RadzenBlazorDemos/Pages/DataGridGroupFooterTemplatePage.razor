@@ -6,9 +6,12 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>Group Footer Totals</strong></h1>
-
-<p>The <strong>GroupFooterTemplate</strong> column property allows you to display aggregated data in the column footer for each group.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Group Footer Totals</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    The <strong>GroupFooterTemplate</strong> column property allows you to display aggregated data in the column footer for each group.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridGroupFooterTemplate" Heading="false">
     <RadzenDataGrid @ref="ordersGrid"  AllowGrouping="false" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 

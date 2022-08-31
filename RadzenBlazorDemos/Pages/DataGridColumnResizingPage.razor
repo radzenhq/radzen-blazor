@@ -6,9 +6,12 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>Column Resizing</strong></h1>
-
-<p>Enable column resizing by setting the AllowColumnResizing property to true.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Column Resizing</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Enable column resizing by setting the AllowColumnResizing property to true.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridColumnResizing" Heading="false">
     <RadzenDataGrid Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnResize="true" ColumnResized=@OnColumnResized>

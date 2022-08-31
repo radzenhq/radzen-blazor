@@ -6,7 +6,9 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>Sorting</strong></h1>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Sorting</strong>
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridSort" Heading="false">
     <RadzenDataGrid PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="400px" >

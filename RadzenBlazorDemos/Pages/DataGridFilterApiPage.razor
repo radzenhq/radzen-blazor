@@ -7,9 +7,12 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>Filter API</strong></h1>
-
-<p>Set the initial filter of your RadzenDataGrid via the <code>FilterValue</code> and <code>FilterOperator</code> column properties.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Filter API</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Set the initial filter of your RadzenDataGrid via the <code>FilterValue</code> and <code>FilterOperator</code> column properties.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridFilterApi" Heading="false" AdditionalSourceCodePages=@(new [] { "MyCustomDataGridColumn.razor" })>
     <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 

@@ -1,10 +1,12 @@
 ﻿@page "/datagrid-dynamic"
 @using System.Linq.Dynamic.Core
-<h1>DataGrid <strong>dynamic</strong> data support</h1>
 
-<p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>dynamic</strong> data support
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
     Sometimes your data comes from external API and you don't have a C# model for it. This demo shows how to implement such a scenario.
-</p>
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridDynamicData" Heading="false">
     <RadzenDataGrid Data="@data" TItem="IDictionary<string, object>"

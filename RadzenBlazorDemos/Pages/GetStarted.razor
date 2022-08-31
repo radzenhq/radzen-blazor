@@ -1,6 +1,9 @@
 @page "/get-started"
 
-<h1>Get started</h1>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    Get started
+</RadzenText>
+
 <RadzenCard class="docu px-lg-5">
 
     <div class="row">
@@ -8,14 +11,16 @@
             <img class="d-none d-lg-inline-block illustration" src="images/install.svg">
         </div>
         <div class="col-xl-8">
-            <h2 class="mt-4 mb-3">1. Install</h2>
-            <p>
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" Class="mt-4 mb-3">
+                1. Install
+            </RadzenText>
+            <RadzenText>
                 Radzen Blazor Components are distributed as the <a href="https://www.nuget.org/packages/Radzen.Blazor/">Radzen.Blazor</a> nuget package.
-            </p>
-            <p>
+            </RadzenText>
+            <RadzenText>
                 You can add them to your project in one of the following ways
-            </p>
-            <ul>
+            </RadzenText>
+            <ul class="rz-text-body1">
                 <li>Install the package from command line by running <code>dotnet add package Radzen.Blazor</code></li>
                 <li>Add the project from the Visual Nuget Package Manager <img class="ml-0" src="images/nuget-explorer.png"></li>
                 <li>Manually edit the .csproj file and add a project reference <code></code></li>
@@ -28,10 +33,10 @@
             <img class="d-none d-lg-inline-block illustration" src="images/import.svg">
         </div>
         <div class="col-xl-8">
-            <h2 class="mt-5 mb-3">2. Import the namespace</h2>
-            <p>
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" Class="mt-5 mb-3">2. Import the namespace</RadzenText>
+            <RadzenText>
                 Open the <code>_Imports.razor</code> file of your Blazor application and add these two lines <code>@@using Radzen</code> and <code>@@using Radzen.Blazor</code>.
-            </p>
+            </RadzenText>
         </div>
     </div>
 
@@ -40,19 +45,19 @@
             <img class="d-none d-lg-inline-block illustration" src="images/theme.svg">
         </div>
         <div class="col-xl-8">
-            <h2 class="mt-5 mb-3">3. Include a theme</h2>
-            <p>
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" Class="mt-4 mb-3">3. Include a theme</RadzenText>
+            <RadzenText>
                Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6+), <code>Pages\_Host.cshtml</code> (Blazor Server before .NET 6) or <code>wwwroot/index.html</code> (Blazor WebAssembly) and include a theme CSS file by adding this snippet:
-            </p>
+            </RadzenText>
 <pre>
 <code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css"&gt;</code>
 </pre>
-            <p>
+            <RadzenText>
                 Optionally include Bootstrap.
-            </p>
-            <p>
+            </RadzenText>
+            <RadzenText>
                 Radzen also ships with themes that include some vital parts of Bootstrap (mostly layout). To use a theme bundled with Bootstrap include the file without <code>-base</code> suffix:
-            </p>
+            </RadzenText>
 <pre>
 <code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css"&gt;</code>
 </pre>
@@ -64,10 +69,10 @@
             <img class="d-none d-lg-inline-block illustration" src="images/include-radzen.svg">
         </div>
         <div class="col-xl-8">
-            <h2 class="mt-5 mb-3">4. Include Radzen.Blazor.js</h2>
-            <p>
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" Class="mt-5 mb-3">4. Include Radzen.Blazor.js</RadzenText>
+            <RadzenText>
                 Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6+), <code>Pages\_Host.cshtml</code> (Blazor Server before .NET 6) or <code>wwwroot/index.html</code> (Blazor WebAssembly) and include this snippet
-            </p>
+            </RadzenText>
 <pre>
 <code>&lt;script src="_content/Radzen.Blazor/Radzen.Blazor.js"&gt;&lt;/script&gt;</code>
 </pre>
@@ -79,10 +84,10 @@
             <img class="d-none d-lg-inline-block illustration" src="images/use-component.svg">
         </div>
         <div class="col-xl-8">
-            <h2 class="mt-5 mb-3">5. Use a component</h2>
-            <p>
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" Class="mt-5 mb-3">5. Use a component</RadzenText>
+            <RadzenText>
                 Use any Radzen Blazor component by typing its tag name in a Blazor page e.g. <code>&lt;RadzenButton Text="Hi"&gt;&lt;/RadzenButton&gt;</code>
-            </p>
+            </RadzenText>
             <h4 class="my-2">Setting a property</h4>
 <pre>
 <code>
@@ -113,26 +118,26 @@
             <img class="d-none d-lg-inline-block illustration" src="images/premium.svg">
         </div>
         <div class="col-xl-8">
-            <h2 class="mt-5 mb-3">6. Use Dialog, Notification, ContextMenu and Tooltip components</h2>
-            <p>
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" Class="mt-5 mb-3">6. Use Dialog, Notification, ContextMenu and Tooltip components</RadzenText>
+            <RadzenText>
                 Open the <code>Shared\MainLayout.razor</code> file and include:
-            </p>
-            <ul>
+            </RadzenText>
+            <ul class="rz-text-body1">
                 <li><code>&lt;RadzenDialog/&gt;</code></li>
                 <li><code>&lt;RadzenNotification/&gt;</code></li>
                 <li><code>&lt;RadzenContextMenu/&gt;</code></li>
                 <li><code>&lt;RadzenTooltip/&gt;</code></li>
             </ul>
-            <p>
+            <RadzenText>
                 Open <code>Startup.cs</code> file (Blazor Server before .NET 6) or <code>Program.cs</code> (Blazor WebAssembly or Blazor Server after .NET 6) and add:
-            </p>
-            <ul>
+            </RadzenText>
+            <ul class="rz-text-body1">
                 <li>DialogService</li>
                 <li>NotificationService</li>
                 <li>ContextMenuService</li>
                 <li>TooltipService</li>
             </ul>
-            <h4 class="my-2">Startup.cs (Blazor Server before .NET 6)</h4>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" Class="my-4">Startup.cs (Blazor Server before .NET 6)</RadzenText>
 <pre>
     <code>
     using Radzen;
@@ -148,7 +153,7 @@
     }
     </code>
 </pre>
-<h4 class="my-2">Program.cs (Blazor WebAssembly Blazor and Blazor Server after .NET 6)</h4>
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" Class="my-4">Program.cs (Blazor WebAssembly Blazor and Blazor Server after .NET 6)</RadzenText>
 <pre>
     <code>
     using Radzen;
@@ -180,13 +185,13 @@
             <img class="d-none d-lg-inline-block illustration" src="images/success.svg">
         </div>
         <div class="col-xl-8">
-            <h2 class="mt-5 mb-3">Next: Explore Demos</h2>
-            <p>
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" Class="mt-5 mb-3">Next: Explore Demos</RadzenText>
+            <RadzenText>
                 Hooray! You have successfuly added Radzen Blazor Components to your Blazor app. Now let's take a deeper look and explore more components and demos.
-            </p>
-            <p class="text-center text-lg-left">
-                <a class="cta-button primary ml-0 mb-4" href="/datagrid">Explore Demos</a>
-            </p>
+            </RadzenText>
+            <RadzenText class="text-center text-lg-left">
+                <a class="rz-button rz-button-lg rz-primary" href="/datagrid">Explore Demos</a>
+            </RadzenText>
         </div>
     </div>
 </RadzenCard>

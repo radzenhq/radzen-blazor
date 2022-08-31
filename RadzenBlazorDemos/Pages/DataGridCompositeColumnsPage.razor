@@ -6,9 +6,12 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>Composite Columns</strong></h1>
-
-<p>Use DataGrid column <code>Columns</code> property to define child columns.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Composite Columns</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Use DataGrid column <code>Columns</code> property to define child columns.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridCompositeColumns" Heading="false">
     <RadzenCheckBox @bind-Value=@allowCompositeDataCells Name="CheckBox1" TValue="bool" Change=@(args => grid.Reload()) />
