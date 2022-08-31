@@ -457,21 +457,12 @@ pre {
 
 .rz-sidebar {
     bottom: 0 !important;
-    border-right: 0 !important;
 }
 
-.docu h2 {
-    font-weight: 700;
-    font-size: 2rem;
-    line-height: 2.5rem;
-    letter-spacing: -0.02em;
-}
 .rz-card.docu p,
 .rz-card.docu ul {
-    font-size: 18px;
     line-height: 1.6;
     margin-bottom: 1rem;
-    font-weight: 400;
 }
 
 .docu img {

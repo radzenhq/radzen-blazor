@@ -5,7 +5,10 @@
 @using Microsoft.EntityFrameworkCore
 
 @inject NorthwindContext dbContext
-<h1>DataGrid <strong>Multiple Selection</strong></h1>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Multiple Selection</strong>
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridMultipleSelection" Heading="false">
     <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" />

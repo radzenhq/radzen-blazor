@@ -6,14 +6,16 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>Virtualization</strong></h1>
-
-<p>
-Virtualization allows you to render large amounts of data on demand. The RadzenDataGrid component uses Entity Framework to query the visible data.
-</p>
-<p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Virtualization</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Virtualization allows you to render large amounts of data on demand. The RadzenDataGrid component uses Entity Framework to query the visible data.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
     Just set the <code>AllowVirtualization</code> property to <code>true</code>. Requires .NET Core 5.0+.
-</p>
+</RadzenText>
+
 <RadzenExample Name="DataGrid" Source="DataGridVirtualization" Heading="false">
     <RadzenDataGrid Data="@orderDetails" TItem="OrderDetail" AllowVirtualization="true" Style="height:400px"
                     AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" LogicalFilterOperator="LogicalFilterOperator.Or"

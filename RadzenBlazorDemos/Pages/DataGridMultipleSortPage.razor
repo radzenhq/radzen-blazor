@@ -6,7 +6,9 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>Multiple Column Sorting</strong></h1>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Multiple Column Sorting</strong>
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridMultipleSort" Heading="false">
     <RadzenDataGrid PageSize="5" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="400px">

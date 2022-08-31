@@ -6,9 +6,12 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid InLine Editing</h1>
-
-<p>This page demonstrates how to configure the Razden Blazor DataGrid for inline editing</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid InLine Editing
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    This page demonstrates how to configure the Razden Blazor DataGrid for inline editing.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridInLineEdit" Heading="false">
     <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Text="Add New Order" Click="@InsertRow" Disabled=@(orderToInsert != null) />

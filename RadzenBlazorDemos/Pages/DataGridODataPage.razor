@@ -4,9 +4,12 @@
 
 @inject NorthwindODataService service
 
-<h1>DataGrid <strong>OData</strong></h1>
-
-<p>Use the <code>LoadData</code> event to get data from a REST service.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>OData</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Use the <code>LoadData</code> event to get data from a REST service.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridOData" Heading="false" AdditionalSourceCodePages="@(new [] {"../Services/NorthwindODataService.cs"})">
     <RadzenDataGrid @ref="grid" IsLoading="@isLoading" Count="@count" Data="@employees" LoadData="@LoadData" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" PagerHorizontalAlign="HorizontalAlign.Center" TItem="Employee" ColumnWidth="200px">

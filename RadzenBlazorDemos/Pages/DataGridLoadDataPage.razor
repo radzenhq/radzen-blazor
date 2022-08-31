@@ -5,9 +5,12 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>LoadData</strong></h1>
-
-<p>The <code>LoadData</code> event allows you to perform custom paging, sorting and filtering.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>LoadData</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    The <code>LoadData</code> event allows you to perform custom paging, sorting and filtering.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridLoadData" Heading="false">
     <RadzenButton Text="Reset" Click="@Reset" Style="margin-bottom: 20px;" />

@@ -6,9 +6,12 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>DataGrid Column Reorder</strong></h1>
-
-<p>Enable column reorder by setting the AllowColumnReorder property to true. Define column initial order using column OrderIndex property.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>DataGrid Column Reorder</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Enable column reorder by setting the AllowColumnReorder property to true. Define column initial order using column OrderIndex property.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridColumnReoder" Heading="false">
     <RadzenButton Text="Change page state" Click="@((args) => { StateHasChanged(); })" Style="margin-bottom:20px" />

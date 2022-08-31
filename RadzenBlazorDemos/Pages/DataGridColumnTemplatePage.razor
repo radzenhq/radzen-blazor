@@ -6,14 +6,17 @@
 @inject NorthwindContext dbContext
 @inject DialogService DialogService
 
-<h1>DataGrid <strong>Column Template</strong></h1>
-
-<p>The <strong>Template</strong> allows you to customize the way data is displayed.</p>
-
-<p>Common uses: Record numbering, displaying an image depending on property value, 
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Column Template</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    The <strong>Template</strong> allows you to customize the way data is displayed.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body2" Class="my-4">
+    Common uses: Record numbering, displaying an image depending on property value, 
     displaying multiple properties in the same column, linking to other pages,
     data formatting and HTML embedding.
-</p>
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridColumnTemplate" Heading="false">
 <RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" 

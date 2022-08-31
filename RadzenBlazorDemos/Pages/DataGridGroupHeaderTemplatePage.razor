@@ -6,9 +6,12 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>DataGrid Group Header Template</strong></h1>
-
-<p>Use GroupHeaderTemplate to customize DataGrid group header rows.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>DataGrid Group Header Template</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Use GroupHeaderTemplate to customize DataGrid group header rows.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridGroupHeaderTemplate" Heading="false">
     <RadzenCheckBox @bind-Value=@groupsExpanded Name="CheckBox1" TValue="bool?" TriState="true" />

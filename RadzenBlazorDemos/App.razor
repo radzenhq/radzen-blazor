@@ -8,8 +8,12 @@
         </Found>
         <NotFound>
             <LayoutView Layout="typeof(MainLayout)">
-                <h1>Page not found</h1>
-                <p>Sorry, but there's nothing here!</p>
+                <RadzenText TextStyle="TextStyle.DisplayH1" TagName="TagName.H1" Class="my-5">
+                    Page not found
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.DisplayH5" Class="my-5">
+                    Sorry, but there's nothing here!
+                </RadzenText>
             </LayoutView>
         </NotFound>
     </Router>

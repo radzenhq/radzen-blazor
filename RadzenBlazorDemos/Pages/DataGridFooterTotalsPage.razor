@@ -5,9 +5,12 @@
 @using System.Linq 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>Footer Totals</strong></h1>
-
-<p>The <strong>FooterTemplate</strong> column property allows you to display aggregated data in the column footer.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Footer Totals</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    The <strong>FooterTemplate</strong> column property allows you to display aggregated data in the column footer.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridFooterTotals" Heading="false">
 <RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" 
