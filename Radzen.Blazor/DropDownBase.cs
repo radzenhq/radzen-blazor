@@ -350,7 +350,7 @@ namespace Radzen
         {
             await base.OnDataChanged();
 
-            if (AllowVirtualization && Virtualize != null)
+            if (AllowVirtualization && Virtualize != null && !LoadData.HasDelegate)
             {
                 await InvokeAsync(Virtualize.RefreshDataAsync);
             }
