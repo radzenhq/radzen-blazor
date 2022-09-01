@@ -337,12 +337,25 @@ namespace Radzen
                         selectedItems.Clear();
                     }
 
-                    OnDataChanged();
+                    InvokeAsync(OnDataChanged);
 
                     StateHasChanged();
                 }
             }
         }
+
+#if NET5_0_OR_GREATER
+        /// <inheritdoc/>
+        protected override async Task OnDataChanged()
+        {
+            await base.OnDataChanged();
+
+            if (AllowVirtualization && Virtualize != null)
+            {
+                await InvokeAsync(Virtualize.RefreshDataAsync);
+            }
+        }
+#endif
 
         /// <summary>
         /// Gets the popup identifier.
