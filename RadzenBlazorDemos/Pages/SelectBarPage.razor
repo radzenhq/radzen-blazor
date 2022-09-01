@@ -54,6 +54,28 @@
                 </RadzenSelectBar>
             </RadzenCard>
         </div>
+        <div class="col-lg-6 p-3" style="min-width: fit-content;">
+            <RadzenCard>
+                <h4 class="mb-4">SelectBar with icons</h4>
+                <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with icons"))>
+                    <Items>
+                        <RadzenSelectBarItem Icon="filter" Text="On" Value="true" />
+                        <RadzenSelectBarItem Icon="filter_none" Text="Off" Value="false" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenCard>
+        </div>
+        <div class="col-lg-6 p-3" style="min-width: fit-content;">
+            <RadzenCard>
+                <h4 class="mb-4">SelectBar with images</h4>
+                <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with icons"))>
+                    <Items>
+                        <RadzenSelectBarItem Image="images/radzen-nuget.png" ImageStyle="zoom: 30%; margin-right: 20px;" Text="On" Value="true" />
+                        <RadzenSelectBarItem Text="Off" Value="false" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenCard>
+        </div>
     </div>
 </RadzenExample>
 
