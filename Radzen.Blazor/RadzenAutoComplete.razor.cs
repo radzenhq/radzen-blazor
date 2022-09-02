@@ -23,6 +23,13 @@ namespace Radzen.Blazor
     public partial class RadzenAutoComplete : DataBoundFormComponent<string>
     {
         /// <summary>
+        /// Gets or sets the template.
+        /// </summary>
+        /// <value>The template.</value>
+        [Parameter]
+        public RenderFragment<dynamic> Template { get; set; }
+
+        /// <summary>
         /// Gets or sets the minimum length.
         /// </summary>
         /// <value>The minimum length.</value>

@@ -40,6 +40,19 @@
                 <RadzenAutoComplete Disabled="true" Placeholder="Select a customer..."  Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "Disabled AutoComplete")) Style="width: 100%;" />
             </RadzenCard>
         </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4>AutoComplete with Template</h4>
+                <p class="mb-4">Start typing e.g. `a`</p>
+                <RadzenAutoComplete Placeholder="Select a customer..." Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "AutoComplete with Template")) Style="width: 100%;">
+                    <Template>
+                        CompanyName: @context.CompanyName
+                        <br />
+                        Country: @context.Country
+                    </Template>
+                </RadzenAutoComplete>
+            </RadzenCard>
+        </div>
     </div>
 </RadzenExample>
 
