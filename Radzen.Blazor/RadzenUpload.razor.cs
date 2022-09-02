@@ -74,6 +74,13 @@ namespace Radzen.Blazor
         public string Url { get; set; }
 
         /// <summary>
+        /// Gets or sets the parameter name. If not set 'file' parameter name will be used for single file and 'files' for multiple files.
+        /// </summary>
+        /// <value>The parameter name.</value>
+        [Parameter]
+        public string ParameterName { get; set; }
+
+        /// <summary>
         /// Gets or sets the accepted MIME types.
         /// </summary>
         /// <value>The accepted MIME types.</value>
@@ -127,7 +134,7 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task Upload()
         {
-            await JSRuntime.InvokeAsync<string>("Radzen.upload", fileUpload, Url, Multiple);
+            await JSRuntime.InvokeAsync<string>("Radzen.upload", fileUpload, Url, Multiple, false, ParameterName);
         }
 
         readonly IDictionary<string, string> headers = new Dictionary<string, string>();

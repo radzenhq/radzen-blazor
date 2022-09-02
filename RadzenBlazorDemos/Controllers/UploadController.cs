@@ -104,5 +104,19 @@ namespace RadzenBlazorDemos
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPost("upload/specific")]
+        public IActionResult Specific(IFormFile myName)
+        {
+            try
+            {
+                // Put your code here
+                return Ok(new { Completed = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

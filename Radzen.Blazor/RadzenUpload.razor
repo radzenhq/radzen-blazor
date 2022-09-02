@@ -10,7 +10,7 @@
     <div class="rz-fileupload-buttonbar">
         <span class="@ChooseClassList">
             <input id="@Id" @ref="@fileUpload" type="file" multiple="@Multiple" accept="@Accept" disabled="@Disabled" 
-                   onchange="Radzen.uploadInputChange(event, '@Url', @Auto.ToString().ToLower(), @Multiple.ToString().ToLower(), true)" />
+                   onchange="Radzen.uploadInputChange(event, '@Url', @Auto.ToString().ToLower(), @Multiple.ToString().ToLower(), true, '@ParameterName')" />
             @if (!string.IsNullOrEmpty(Icon))
             {
             <i class="rzi">@((MarkupString)Icon)</i>
