@@ -1,28 +1,8 @@
-//---- Component Aliases
-
-// Special Color
-$color: (
-  primary: (color: var(--rz-primary)),
-  secondary: (color: var(--rz-secondary)),
-  info: (color: var(--rz-info)),
-  success: (color: var(--rz-success)),
-  warning: (color: var(--rz-warning)),
-  error: (color: var(--rz-error)),
-) !default;
-
-@each $name, $property in $color {
-  .rz-color-#{$name} {
-    @each $property, $value in $property {
-      #{$property}: #{$value};
-    }
-  }
-}
-
 // Text Color
 $rz-text-title-color: var(--rz-base-900) !default;
 $rz-text-color: var(--rz-base-800) !default;
 $rz-text-secondary-color: var(--rz-base-700) !default;
-$rz-text-tertiary-color: var(--rz-base-600) !default; //cool-grey
+$rz-text-tertiary-color: var(--rz-base-600) !default;
 $rz-text-disabled-color: var(--rz-base-500) !default;
 $rz-text-contrast-color: var(--rz-white) !default;
 
@@ -53,31 +33,37 @@ $rz-border-primary: var(--rz-border-width) solid var(--rz-primary) !default;
 $rz-border-primary-light: var(--rz-border-width) solid var(--rz-primary-light) !default;
 $rz-border-primary-lighter: var(--rz-border-width) solid var(--rz-primary-lighter) !default;
 $rz-border-primary-dark: var(--rz-border-width) solid var(--rz-primary-dark) !default;
+$rz-border-primary-darker: var(--rz-border-width) solid var(--rz-primary-darker) !default;
 
 $rz-border-secondary: var(--rz-border-width) solid var(--rz-secondary) !default;
 $rz-border-secondary-light: var(--rz-border-width) solid var(--rz-secondary-light) !default;
 $rz-border-secondary-lighter: var(--rz-border-width) solid var(--rz-secondary-lighter) !default;
 $rz-border-secondary-dark: var(--rz-border-width) solid var(--rz-secondary-dark) !default;
+$rz-border-secondary-darker: var(--rz-border-width) solid var(--rz-secondary-darker) !default;
 
 $rz-border-info: var(--rz-border-width) solid var(--rz-info) !default;
 $rz-border-info-light: var(--rz-border-width) solid var(--rz-info-light) !default;
 $rz-border-info-lighter: var(--rz-border-width) solid var(--rz-info-lighter) !default;
 $rz-border-info-dark: var(--rz-border-width) solid var(--rz-info-dark) !default;
+$rz-border-info-darker: var(--rz-border-width) solid var(--rz-info-darker) !default;
 
 $rz-border-success: var(--rz-border-width) solid var(--rz-success) !default;
 $rz-border-success-light: var(--rz-border-width) solid var(--rz-success-light) !default;
 $rz-border-success-lighter: var(--rz-border-width) solid var(--rz-success-lighter) !default;
 $rz-border-success-dark: var(--rz-border-width) solid var(--rz-success-dark) !default;
+$rz-border-success-darker: var(--rz-border-width) solid var(--rz-success-darker) !default;
 
 $rz-border-warning: var(--rz-border-width) solid var(--rz-warning) !default;
 $rz-border-warning-light: var(--rz-border-width) solid var(--rz-warning-light) !default;
 $rz-border-warning-lighter: var(--rz-border-width) solid var(--rz-warning-lighter) !default;
 $rz-border-warning-dark: var(--rz-border-width) solid var(--rz-warning-dark) !default;
+$rz-border-warning-darker: var(--rz-border-width) solid var(--rz-warning-darker) !default;
 
 $rz-border-danger: var(--rz-border-width) solid var(--rz-danger) !default;
 $rz-border-danger-light: var(--rz-border-width) solid var(--rz-danger-light) !default;
 $rz-border-danger-lighter: var(--rz-border-width) solid var(--rz-danger-lighter) !default;
 $rz-border-danger-dark: var(--rz-border-width) solid var(--rz-danger-dark) !default;
+$rz-border-danger-darker: var(--rz-border-width) solid var(--rz-danger-darker) !default;
 
 $rz-border-series-1: var(--rz-border-width) solid var(--rz-series-1) !default;
 $rz-border-series-2: var(--rz-border-width) solid var(--rz-series-2) !default;
@@ -116,7 +102,7 @@ $rz-shadow-10: none !default;
 $rz-transition: 0.1s linear !default;
 $rz-transition-all: all 0.1s linear !default;
 
-// Component Aliases CSS variables
+// CSS variables
 :root {
   --rz-text-title-color: #{$rz-text-title-color};
   --rz-text-color: #{$rz-text-color};
@@ -208,4 +194,33 @@ $rz-transition-all: all 0.1s linear !default;
 
   --rz-transition: #{$rz-transition};
   --rz-transition-all: #{$rz-transition-all};
+}
+
+//---- CSS classes
+
+// Color
+// Example .rz-primary-color
+
+@each $color, $value in $rz-theme-colors {
+  .#{$color}-color {
+    color: var(--#{$color}) !important;
+  }
+}
+
+// Background Color
+// Example .rz-primary-background-color
+
+@each $color, $value in $rz-theme-colors {
+  .#{$color}-background-color {
+    background-color: var(--#{$color}) !important;
+  }
+}
+
+// Border Color
+// Example .rz-primary-border-color
+
+@each $color, $value in $rz-theme-colors {
+  .#{$color}-border {
+    border-color: var(--#{$color}) !important;
+  }
 }
