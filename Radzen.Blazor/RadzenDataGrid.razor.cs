@@ -1377,6 +1377,13 @@ namespace Radzen.Blazor
         protected override void OnDataChanged()
         {
             Reset(!IsOData() && !LoadData.HasDelegate);
+
+            if (!IsOData() && !LoadData.HasDelegate)
+            {
+                skip = 0;
+                CurrentPage = 0;
+                CalculatePager();
+            }
         }
 
         /// <summary>

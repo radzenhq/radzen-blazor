@@ -458,9 +458,9 @@ window.Radzen = {
 
     return ul.nextSelectedIndex;
   },
-  uploadInputChange: function (e, url, auto, multiple) {
+  uploadInputChange: function (e, url, auto, multiple, clear, parameterName) {
       if (auto) {
-          Radzen.upload(e.target, url, multiple, true);
+          Radzen.upload(e.target, url, multiple, clear, parameterName);
           e.target.value = '';
       } else {
           Radzen.uploadChange(e.target);
@@ -526,7 +526,7 @@ window.Radzen = {
   removeFileFromFileInput: function (fileInput) {
     fileInput.value = '';
   },
-  upload: function (fileInput, url, multiple, clear) {
+  upload: function (fileInput, url, multiple, clear, parameterName) {
     var uploadComponent = Radzen.uploadComponents && Radzen.uploadComponents[fileInput.id];
     if (!uploadComponent) { return; }
     if (!uploadComponent.files || clear) {
@@ -537,7 +537,7 @@ window.Radzen = {
     var cancelled = false;
     for (var i = 0; i < uploadComponent.files.length; i++) {
       var file = uploadComponent.files[i];
-      data.append(multiple ? 'files' : 'file', file, file.name);
+      data.append(parameterName || (multiple ? 'files' : 'file'), file, file.name);
       files.push({Name: file.name, Size: file.size});
     }
     var xhr = new XMLHttpRequest();

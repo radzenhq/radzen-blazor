@@ -68,6 +68,12 @@
                     <RadzenLabel Visible=@showComplete class="mt-4" Text=@completionMessage />
                 </RadzenCard>
             </div>
+            <div class="col-md-4 p-3">
+                <RadzenCard>
+                    <h4 class="mb-4">Specify upload parameter name</h4>
+                    <RadzenUpload Url="upload/specific" ParameterName="myName" Progress=@(args => OnProgress(args, "Upload with specified parameter name")) class="w-100" />
+                </RadzenCard>
+            </div>
         </div>
     </div>
     <div class="col-md-3">

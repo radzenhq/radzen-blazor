@@ -2,6 +2,7 @@
 
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
 
 @inject NorthwindContext dbContext
 
@@ -114,6 +115,18 @@
                             TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
         </RadzenCard>
     </div>
+    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
+        <RadzenCard>
+            <h4 class="mb-4">DropDown with groups</h4>
+                <RadzenDropDown TValue="int" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID"
+                                Change=@(args => OnChange(args, "DropDown with groups")) Class="w-100">
+                   <Template>
+                        @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")
+                   </Template>
+                </RadzenDropDown>
+        </RadzenCard>
+    </div>
 </div>
 </RadzenExample>
 
@@ -121,9 +134,12 @@
 
 @code {
     bool disabled = true;
+
+    IEnumerable<Order> orders;
     IEnumerable<Customer> customers;
     IEnumerable<Customer> customCustomersData;
     IEnumerable<Product> products;
+
     MyObject myModel = new MyObject();
     MyObject myModelDisabled = new MyObject();
 
@@ -139,10 +155,30 @@
 
     EventConsole console;
 
+    IEnumerable<GroupData> groupedData;
+
     protected override void OnInitialized()
     {
         customers = dbContext.Customers.ToList();
         products = dbContext.Products.ToList();
+        orders = dbContext.Orders.Where(o => o.CustomerID != null).Include("Customer").ToList();
+
+        groupedData = orders.GroupBy(g => g.Customer.CompanyName)
+            .SelectMany(i => new GroupData[] { new GroupData() { CompanyName = i.Key } }
+                .Concat(i.Select(o => 
+                    new GroupData() 
+                    { 
+                        OrderID = o.OrderID,
+                        OrderDate = o.OrderDate
+                    }))).ToList();
+    }
+
+    class GroupData
+    { 
+        public string CompanyName { get; set; }
+        public int OrderID { get; set; }
+        public DateTime? OrderDate { get; set; }
+        public bool IsGroup { get { return CompanyName != null; } }
     }
 
     void OnChange(object value, string name)
