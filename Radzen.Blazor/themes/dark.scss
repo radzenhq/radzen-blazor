@@ -1,5 +1,29 @@
 @import 'variables';
 
+//---- Legacy Theme Tokens
+
+$primary: #ff6d41 !default;
+$secondary: #3b9fd5 !default;
+$danger: #f9777f !default;
+$info: #2cc8c8 !default;
+$success: #5dbf74 !default;
+$warning: #fac152 !default;
+$body-color: #f6f7fa !default;
+$body-bg: #28363c !default;
+$font-size: 16px !default;
+
+//---- Tokens Map
+
+$rz-base-100: $body-color !default;
+$rz-base-900: $body-bg !default;
+$rz-primary: $primary !default;
+$rz-secondary: $secondary !default;
+$rz-info: $info !default;
+$rz-success: $success !default;
+$rz-warning: $warning !default;
+$rz-danger: $danger !default;
+$rz-root-font-size: $font-size !default;
+
 //---- Global Theme Colors
 
 $rz-white: #ffffff !default;
@@ -9,11 +33,11 @@ $rz-base-50: #ffffff !default;
 $rz-base-100: #f6f7fa !default;
 $rz-base-200: #e9edf0 !default;
 $rz-base-300: #dadfe2 !default;
-$rz-base-400: #A8B4B8 !default;
-$rz-base-500: #7B8A8E !default;
-$rz-base-600: #63737A !default;
-$rz-base-700: #45565E !default;
-$rz-base-800: #38474E !default;
+$rz-base-400: #a8b4b8 !default;
+$rz-base-500: #7b8a8e !default;
+$rz-base-600: #63737a !default;
+$rz-base-700: #45565e !default;
+$rz-base-800: #38474e !default;
 $rz-base-900: #28363c !default;
 
 $rz-primary: #ff6d41 !default;
@@ -35,26 +59,32 @@ $rz-series-8: #84a7ff !default;
 $rz-primary-light: mix($rz-white, $rz-primary, 12%)!default;
 $rz-primary-lighter: rgba($rz-primary, .16) !default;
 $rz-primary-dark: mix($rz-black, $rz-primary, 8%) !default;
+$rz-primary-darker: mix($rz-black, $rz-primary, 25%) !default;
 
 $rz-secondary-light: mix($rz-white, $rz-secondary, 12%) !default;
 $rz-secondary-lighter: rgba($rz-secondary, .20) !default;
 $rz-secondary-dark: mix($rz-black, $rz-secondary, 8%) !default;
+$rz-secondary-darker: mix($rz-black, $rz-secondary, 25%) !default;
 
 $rz-info-light: mix($rz-white, $rz-info, 16%) !default;
 $rz-info-lighter: rgba($rz-info, .20) !default;
 $rz-info-dark: mix($rz-black, $rz-info, 16%) !default;
+$rz-info-darker: mix($rz-black, $rz-info, 25%) !default;
 
 $rz-success-light: mix($rz-white, $rz-success, 16%) !default;
 $rz-success-lighter: rgba($rz-success, .16) !default;
 $rz-success-dark: mix($rz-black, $rz-success, 16%) !default;
+$rz-success-darker: mix($rz-black, $rz-success, 25%) !default;
 
 $rz-warning-light: mix($rz-white, $rz-warning, 16%) !default;
 $rz-warning-lighter: rgba($rz-warning, .20) !default;
 $rz-warning-dark: mix($rz-black, $rz-warning, 16%) !default;
+$rz-warning-darker: mix($rz-black, $rz-warning, 25%) !default;
 
 $rz-danger-light: mix($rz-white, $rz-danger, 16%) !default;
 $rz-danger-lighter: rgba($rz-danger, .20) !default;
 $rz-danger-dark: mix($rz-black, $rz-danger, 16%) !default;
+$rz-danger-darker: mix($rz-black, $rz-danger, 25%) !default;
 
 $rz-theme-colors: () !default;
 $rz-theme-colors: map-merge(
@@ -77,31 +107,37 @@ $rz-theme-colors: map-merge(
     "rz-primary-light": $rz-primary-light,
     "rz-primary-lighter": $rz-primary-lighter,
     "rz-primary-dark": $rz-primary-dark,
+    "rz-primary-darker": $rz-primary-darker,
     
     "rz-secondary": $rz-secondary,
     "rz-secondary-light": $rz-secondary-light,
     "rz-secondary-lighter": $rz-secondary-lighter,
     "rz-secondary-dark": $rz-secondary-dark,
+    "rz-secondary-darker": $rz-secondary-darker,
     
     "rz-info": $rz-info,
     "rz-info-light": $rz-info-light,
     "rz-info-lighter": $rz-info-lighter,
     "rz-info-dark": $rz-info-dark,
+    "rz-info-darker": $rz-info-darker,
     
     "rz-success": $rz-success,
     "rz-success-light": $rz-success-light,
     "rz-success-lighter": $rz-success-lighter,
     "rz-success-dark": $rz-success-dark,
+    "rz-success-darker": $rz-success-darker,
     
     "rz-warning": $rz-warning,
     "rz-warning-light": $rz-warning-light,
     "rz-warning-lighter": $rz-warning-lighter,
     "rz-warning-dark": $rz-warning-dark,
+    "rz-warning-darker": $rz-warning-darker,
     
     "rz-danger": $rz-danger,
     "rz-danger-light": $rz-danger-light,
     "rz-danger-lighter": $rz-danger-lighter,
     "rz-danger-dark": $rz-danger-dark,
+    "rz-danger-darker": $rz-danger-darker,
     
     "rz-series-1": $rz-series-1,
     "rz-series-2": $rz-series-2,
@@ -143,9 +179,8 @@ $rz-theme-constants: map-merge(
 
 //---- Bootstrap variable overrides. DO NOT USE IN COMPONENTS!
 
-$font-size: 0.875rem !default;
-$font-size-base: $font-size !default;
-$border-radius: 4px !default;
+$font-size-base: $rz-body-font-size !default;
+$border-radius: $rz-border-radius !default;
 $primary: $rz-primary !default;
 $secondary: $rz-secondary !default;
 $danger: $rz-danger !default;
@@ -164,14 +199,14 @@ $state-info-bg: $rz-info !default;
 
 // Bootstrap component overrides. We need these because bootstrap is overriding them in components.
 
-$card-border-radius: var(--rz-border-radius);
-$input-height: 2.25rem;
-$input-line-height: 1.429;
-$input-border-radius: var(--rz-border-radius);
-$input-placeholder-color: var(--rz-text-tertiary-color);
-$tooltip-color: var(--rz-text-contrast-color);
-$tooltip-border-radius: var(--rz-border-radius);
-$tooltip-font-size: 0.875rem;
+$card-border-radius: var(--rz-border-radius) !default;
+$input-height: 2.25rem !default;
+$input-line-height: 1.429 !default;
+$input-border-radius: var(--rz-border-radius) !default;
+$input-placeholder-color: var(--rz-text-tertiary-color) !default;
+$tooltip-color: var(--rz-text-contrast-color) !default;
+$tooltip-border-radius: var(--rz-border-radius) !default;
+$tooltip-font-size: 0.875rem !default;
 $body-bg: var(--rz-base-900) !default;
 $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
   'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
@@ -282,7 +317,7 @@ $dropdown-filter-border: var(--rz-border-700) !default;
 $slider-background-color: var(--rz-base-900) !default;
 $slider-range-background-color: var(--rz-secondary-dark) !default;
 $slider-disabled-range-background-color: var(--rz-base-700) !default;
-$slider-disabled-range-border: var(--rz-base-700) !default;
+$slider-disabled-range-border: var(--rz-border-700) !default;
 $slider-disabled-handle-background-color: var(--rz-base-700) !default;
 
 // Numeric
