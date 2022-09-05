@@ -67,22 +67,32 @@ $text: (
   h6: (font-size: clamp(0.75rem, 1.111vw, 1rem), line-height: 1em,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
   subtitle1: (font-size: 1rem, line-height: 1.25rem,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
   subtitle2: (font-size: 0.875rem, line-height: 1.25rem,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  body1: (font-size: 1rem, line-height: 1.25rem,  font-weight: 400, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  body2: (font-size: 0.875rem, line-height: 1.25rem,  font-weight: 400, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  button: (font-size: 0.875rem, line-height: 1.25rem,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  caption: (font-size: 0.75rem, line-height: normal,  font-weight: 400, letter-spacing: 0.4px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  overline:   (font-size: 0.625rem, line-height: normal,  font-weight: 400, letter-spacing: 1.5px, text-transform: uppercase, color: var(--rz-text-title-color), margin-bottom: 0.5rem)
+  body1: (font-size: 1rem, line-height: 1.25rem,  font-weight: 400, letter-spacing: -0.02em, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  body2: (font-size: 0.875rem, line-height: 1.25rem,  font-weight: 400, letter-spacing: -0.02em, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  button: (font-size: 0.875rem, line-height: 1.25rem,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  caption: (font-size: 0.75rem, line-height: normal,  font-weight: 400, letter-spacing: 0.4px, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  overline:   (font-size: 0.625rem, line-height: normal,  font-weight: 400, letter-spacing: 1.5px, text-transform: uppercase, color: var(--rz-text-color), margin-bottom: 0.5rem)
 ) !default;
 
-@each $element, $property in $text {
-  .rz-text-#{$element} {
-    @each $property, $value in $property {
-      #{$property}: #{$value};
+// Text CSS variables
+
+:root {
+  @each $element, $property in $text {
+    @each $key, $value in $property {
+      --rz-text-#{$element}-#{$key}: #{$value};
     }
   }
 }
 
-//Text Align
+@each $element, $property in $text {
+  .rz-text-#{$element} {
+    @each $key, $value in $property {
+      #{$key}: var(--rz-text-#{$element}-#{$key});
+    }
+  }
+}
+
+// Text Align
 $text-align: (
   start: (text-align: start),
   end: (text-align: end),
