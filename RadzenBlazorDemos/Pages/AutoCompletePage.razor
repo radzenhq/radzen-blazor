@@ -60,6 +60,13 @@
                 </RadzenAutoComplete>
             </RadzenCard>
         </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <h4>AutoComplete with a List of Strings</h4>
+                <p class="mb-4">Start typing e.g. France</p>
+                <RadzenAutoComplete Data=@customersNames FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Change=@(args => OnChange(args, "AutoComplete with a List of Strings")) Style="width: 100%;" />
+            </RadzenCard>
+        </div>
     </div>
 </RadzenExample>
 
@@ -70,10 +77,12 @@
 
     IEnumerable<Customer> customers;
     IEnumerable<Customer> customCustomersData;
+    IEnumerable<string> customersNames;
 
     protected override void OnInitialized()
     {
         customers = dbContext.Customers.ToList();
+        customersNames = customers.Select(o => o.CompanyName).ToList();
     }
 
     void OnChange(object value, string name)
