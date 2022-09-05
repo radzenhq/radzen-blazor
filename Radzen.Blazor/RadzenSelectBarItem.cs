@@ -8,6 +8,13 @@ namespace Radzen.Blazor
     public class RadzenSelectBarItem : RadzenComponent
     {
         /// <summary>
+        /// Gets or sets the template.
+        /// </summary>
+        /// <value>The template.</value>
+        [Parameter]
+        public RenderFragment<RadzenSelectBarItem> Template { get; set; }
+
+        /// <summary>
         /// Gets or sets the icon.
         /// </summary>
         /// <value>The icon.</value>
