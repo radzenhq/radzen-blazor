@@ -44,7 +44,7 @@ $grid-filter-icon-margin: 0 0.25rem 0 0 !default;
 $grid-filter-icon-font-size: var(--rz-icon-size) !default;
 $grid-filter-color: var(--rz-text-disabled-color) !default;
 $grid-filter-focus-color: var(--rz-secondary) !default;
-$grid-filter-operator-margin: 1rem !default;
+$grid-filter-gap: 1rem !default;
 $grid-filter-buttons-padding: 1rem !default;
 $grid-filter-buttons-border: var(--rz-border-normal) !default;
 $grid-filter-buttons-background-color: var(--rz-base-200) !default;
@@ -159,7 +159,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
   --rz-grid-filter-color: #{$grid-filter-color};
   --rz-grid-filter-focus-color: #{$grid-filter-focus-color};
-  --rz-grid-filter-operator-margin: #{$grid-filter-operator-margin};
+  --rz-grid-filter-gap: #{$grid-filter-gap};
   --rz-grid-filter-buttons-padding: #{$grid-filter-buttons-padding};
   --rz-grid-filter-buttons-border: #{$grid-filter-buttons-border};
   --rz-grid-filter-buttons-background-color: #{$grid-filter-buttons-background-color};
@@ -692,11 +692,21 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
 .rz-date-filter {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   background-color: var(--rz-grid-filter-background-color);
+  gap: var(--rz-grid-filter-gap);
+  padding: var(--rz-grid-filter-gap);
 
   .rz-listbox {
-    margin: var(--rz-grid-filter-operator-margin);
+    min-width: 10rem;
+
+    .rz-listbox-item {
+      font-size: 0.875rem;
+    }
+  }
+
+  .rz-calendar-inline {
+    border-radius: var(--rz-border-radius);
   }
 }
 
@@ -843,6 +853,9 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 }
 
 .rz-grid-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   padding: 0 1rem;
 
   .rz-dropdown,
@@ -850,7 +863,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   .rz-textbox,
   .rz-grid-filter-label {
     display: block;
-    margin: 0.5rem 0;
     width: 100%;
   }
 
@@ -863,7 +875,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 .rz-grid-filter-buttons {
   display: flex;
   justify-content: space-between;
-  margin: 1rem;
+  padding: var(--rz-grid-filter-buttons-padding);
 }
 
 .rz-grid-filter-icon {
