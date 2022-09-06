@@ -136,6 +136,7 @@ $timepicker-border: none !default;
 }
 
 .rz-calendar-inline {
+  background-color: var(--rz-datepicker-panel-background-color);
   border: var(--rz-input-border);
 }
 
