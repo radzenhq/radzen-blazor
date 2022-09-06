@@ -8,8 +8,9 @@ $rz-text-contrast-color: var(--rz-white) !default;
 
 // Link Color
 $rz-link-color: var(--rz-secondary) !default;
+$rz-link-text-decoration: none !default;
 $rz-link-hover-color: var(--rz-secondary-dark) !default;
-$rz-link-hover-decoration: underline !default;
+$rz-link-hover-text-decoration: underline !default;
 
 // Background Color
 $rz-base-background-color: var(--rz-white) !default;
@@ -112,8 +113,9 @@ $rz-transition-all: all 0.1s linear !default;
   --rz-text-contrast-color: #{$rz-text-contrast-color};
 
   --rz-link-color: #{$rz-link-color};
+  --rz-link-text-decoration: #{$rz-link-text-decoration};
   --rz-link-hover-color: #{$rz-link-hover-color};
-  --rz-link-hover-decoration: #{$rz-link-hover-decoration};
+  --rz-link-hover-text-decoration: #{$rz-link-hover-text-decoration};
 
   --rz-base-background-color: #{$rz-base-background-color};
 
@@ -208,10 +210,10 @@ $rz-transition-all: all 0.1s linear !default;
 }
 
 // Background Color
-// Example .rz-primary-background-color
+// Example .rz-primary-bg-color
 
 @each $color, $value in $rz-theme-colors {
-  .#{$color}-background-color {
+  .#{$color}-bg-color {
     background-color: var(--#{$color}) !important;
   }
 }
@@ -220,7 +222,18 @@ $rz-transition-all: all 0.1s linear !default;
 // Example .rz-primary-border-color
 
 @each $color, $value in $rz-theme-colors {
+  .#{$color}-border-color {
+    border-color:  var(--#{$color}) !important;
+  }
+}
+
+// Border
+// Example .rz-primary-border
+
+@each $color, $value in $rz-theme-colors {
   .#{$color}-border {
-    border-color: var(--#{$color}) !important;
+    border-width: var(--rz-border-width);
+    border-style: solid;
+    border-color:  var(--#{$color}) !important;
   }
 }
