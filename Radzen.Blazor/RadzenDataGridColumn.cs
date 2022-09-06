@@ -546,7 +546,7 @@ namespace Radzen.Blazor
 
         Type _filterPropertyType;
 
-        internal Type FilterPropertyType
+        public Type FilterPropertyType
         {
             get
             {
