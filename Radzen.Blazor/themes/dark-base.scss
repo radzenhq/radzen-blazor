@@ -1,6 +1,6 @@
 @import 'variables';
 
-//---- Legacy Theme Tokens
+// Legacy Theme Tokens
 
 $primary: #ff6d41 !default;
 $secondary: #3b9fd5 !default;
@@ -12,7 +12,7 @@ $body-color: #f6f7fa !default;
 $body-bg: #28363c !default;
 $font-size: 16px !default;
 
-//---- Tokens Map
+// Legacy Tokens Map
 
 $rz-base-100: $body-color !default;
 $rz-base-900: $body-bg !default;
@@ -24,7 +24,7 @@ $rz-warning: $warning !default;
 $rz-danger: $danger !default;
 $rz-root-font-size: $font-size !default;
 
-//---- Global Theme Colors
+// Theme Colors
 
 $rz-white: #ffffff !default;
 $rz-black: #000000 !default;
@@ -86,72 +86,7 @@ $rz-danger-lighter: rgba($rz-danger, .20) !default;
 $rz-danger-dark: mix($rz-black, $rz-danger, 16%) !default;
 $rz-danger-darker: mix($rz-black, $rz-danger, 25%) !default;
 
-$rz-theme-colors: () !default;
-$rz-theme-colors: map-merge(
-  (
-    "rz-white": $rz-white,
-    "rz-black": $rz-black,
-    
-    "rz-base-50": $rz-base-50,
-    "rz-base-100": $rz-base-100,
-    "rz-base-200": $rz-base-200,
-    "rz-base-300": $rz-base-300,
-    "rz-base-400": $rz-base-400,
-    "rz-base-500": $rz-base-500,
-    "rz-base-600": $rz-base-600,
-    "rz-base-700": $rz-base-700,
-    "rz-base-800": $rz-base-800,
-    "rz-base-900": $rz-base-900,
-    
-    "rz-primary": $rz-primary,
-    "rz-primary-light": $rz-primary-light,
-    "rz-primary-lighter": $rz-primary-lighter,
-    "rz-primary-dark": $rz-primary-dark,
-    "rz-primary-darker": $rz-primary-darker,
-    
-    "rz-secondary": $rz-secondary,
-    "rz-secondary-light": $rz-secondary-light,
-    "rz-secondary-lighter": $rz-secondary-lighter,
-    "rz-secondary-dark": $rz-secondary-dark,
-    "rz-secondary-darker": $rz-secondary-darker,
-    
-    "rz-info": $rz-info,
-    "rz-info-light": $rz-info-light,
-    "rz-info-lighter": $rz-info-lighter,
-    "rz-info-dark": $rz-info-dark,
-    "rz-info-darker": $rz-info-darker,
-    
-    "rz-success": $rz-success,
-    "rz-success-light": $rz-success-light,
-    "rz-success-lighter": $rz-success-lighter,
-    "rz-success-dark": $rz-success-dark,
-    "rz-success-darker": $rz-success-darker,
-    
-    "rz-warning": $rz-warning,
-    "rz-warning-light": $rz-warning-light,
-    "rz-warning-lighter": $rz-warning-lighter,
-    "rz-warning-dark": $rz-warning-dark,
-    "rz-warning-darker": $rz-warning-darker,
-    
-    "rz-danger": $rz-danger,
-    "rz-danger-light": $rz-danger-light,
-    "rz-danger-lighter": $rz-danger-lighter,
-    "rz-danger-dark": $rz-danger-dark,
-    "rz-danger-darker": $rz-danger-darker,
-    
-    "rz-series-1": $rz-series-1,
-    "rz-series-2": $rz-series-2,
-    "rz-series-3": $rz-series-3,
-    "rz-series-4": $rz-series-4,
-    "rz-series-5": $rz-series-5,
-    "rz-series-6": $rz-series-6,
-    "rz-series-7": $rz-series-7,
-    "rz-series-8": $rz-series-8,
-  ),
-  $rz-theme-colors
-);
-
-//---- Global Theme Constants
+// Theme Constants
 
 $rz-border-width: 1px !default;
 $rz-border-radius: 4px !default;
@@ -159,23 +94,6 @@ $rz-root-font-size: 16px !default;
 $rz-body-font-size: 0.875rem !default;
 $rz-body-line-height: 1.429 !default;
 $rz-icon-size: 1.25rem !default;
-
-$rz-theme-constants: () !default;
-$rz-theme-constants: map-merge(
-  (
-    "rz-border-width": $rz-border-width,
-    "rz-border-radius": $rz-border-radius,
-    "rz-root-font-size": $rz-root-font-size,
-    "rz-body-font-size": $rz-body-font-size,
-    "rz-body-line-height": $rz-body-line-height,
-    "rz-icon-size": $rz-icon-size,
-  ),
-  $rz-theme-constants
-);
-
-// Global CSS Variables
-
-@import 'css-variables';
 
 // Utilities
 
