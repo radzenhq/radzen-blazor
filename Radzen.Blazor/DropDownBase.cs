@@ -765,7 +765,7 @@ namespace Radzen
                 }
                 else
                 {
-                    return item == selectedItem;
+                    return object.Equals(item,selectedItem);
                 }
             }
         }
