@@ -638,7 +638,7 @@ $header-shadow: $rz-shadow-2 !default;
 $footer-border: none !default;
 
 // Sidebar
-$sidebar-border-right: var(--rz-border-800) !default;
+$sidebar-border-right: var(--rz-border-base-800) !default;
 $sidebar-background-color: var(--rz-base-900) !default;
 
 // SidebarToggle
@@ -698,13 +698,13 @@ $timepicker-button-background-color: var(--rz-primary) !default;
 $timepicker-button-border-radius: var(--rz-border-radius) !default;
 
 // Fieldset
-$fieldset-border: var(--rz-border-300) !default;
+$fieldset-border: var(--rz-border-base-300) !default;
 $fieldset-border-radius: var(--rz-border-radius) !default;
 $fieldset-legend-color: var(--rz-text-color) !default;
 $fieldset-toggle-color: var(--rz-text-color) !default;
 
 // Slider
-$slider-border: var(--rz-border-300) !default;
+$slider-border: var(--rz-border-base-300) !default;
 $slider-range-background-color: var(--rz-primary-lighter) !default;
 $slider-range-border: var(--rz-border-primary-lighter) !default;
 $slider-handle-background-color: var(--rz-white) !default;
@@ -715,7 +715,7 @@ $slider-handle-border-radius: var(--rz-border-radius-4) !default;
 $slider-handle-hover-background-color: var(--rz-primary) !default;
 $slider-handle-hover-shadow: none !default;
 $slider-disabled-range-background-color: var(--rz-base-200) !default;
-$slider-disabled-range-border: var(--rz-border-300) !default;
+$slider-disabled-range-border: var(--rz-border-base-300) !default;
 $slider-disabled-handle-background-color: var(--rz-white) !default;
 $slider-disabled-handle-border: 0.25rem solid var(--rz-base-400);
 $slider-border-radius: var(--rz-border-radius-2) !default;
@@ -785,7 +785,7 @@ $dropdown-item-selected-color: var(--rz-primary) !default;
 $dropdown-item-selected-hover-background-color: var(--rz-primary-lighter) !default;
 $dropdown-item-selected-hover-color: var(--rz-primary) !default;
 $dropdown-item-transition: var(--rz-transition-all) !default;
-$dropdown-filter-border: var(--rz-border-200) !default;
+$dropdown-filter-border: var(--rz-border-base-200) !default;
 
 // ColorPicker
 $colorpicker-panel-shadow: $rz-shadow-2 !default;

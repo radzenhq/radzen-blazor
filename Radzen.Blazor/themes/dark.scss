@@ -193,20 +193,20 @@ $button-styles: map-merge(
 );
 
 // Header
-$header-border: var(--rz-border-700) !default;
+$header-border: var(--rz-border-base-700) !default;
 
 // Sidebar
-$sidebar-border-right: var(--rz-border-800) !default;
+$sidebar-border-right: var(--rz-border-base-800) !default;
 $sidebar-background-color: var(--rz-base-background-color) !default;
 
 // SidebarToggle
-$sidebar-toggle-border: var(--rz-border-700) !default;
+$sidebar-toggle-border: var(--rz-border-base-700) !default;
 $sidebar-toggle-hover-color: var(--rz-secondary) !default;
 $sidebar-toggle-background-color: var(--rz-base-background-color) !default;
 $sidebar-toggle-color: var(--rz-text-color) !default;
 
 // ProfileMenu
-$profile-menu-border: var(--rz-border-900) !default;
+$profile-menu-border: var(--rz-border-base-900) !default;
 $profile-menu-toggle-button-color: var(--rz-text-color) !default;
 
 // Steps
@@ -220,17 +220,17 @@ $input-background-color: var(--rz-base-900) !default;
 $input-disabled-background-color: var(--rz-base-800) !default;
 
 // Fieldset
-$fieldset-border: var(--rz-border-700) !default;
+$fieldset-border: var(--rz-border-base-700) !default;
 $fieldset-toggle-background-color: var(--rz-base-700) !default;
 
 // Dropdown
-$dropdown-filter-border: var(--rz-border-700) !default;
+$dropdown-filter-border: var(--rz-border-base-700) !default;
 
 // Slider
 $slider-background-color: var(--rz-base-900) !default;
 $slider-range-background-color: var(--rz-secondary-dark) !default;
 $slider-disabled-range-background-color: var(--rz-base-700) !default;
-$slider-disabled-range-border: var(--rz-border-700) !default;
+$slider-disabled-range-border: var(--rz-border-base-700) !default;
 $slider-disabled-handle-background-color: var(--rz-base-700) !default;
 
 // Numeric
@@ -238,7 +238,7 @@ $numeric-button-disabled-background-color: var(--rz-base-700) !default;
 
 // DatePicker
 $datepicker-header-background-color: var(--rz-base-800) !default;
-$datepicker-calendar-border: var(--rz-border-700) !default;
+$datepicker-calendar-border: var(--rz-border-base-700) !default;
 $timepicker-background-color: var(--rz-base-900) !default;
 
 // Upload
@@ -261,11 +261,11 @@ $paginator-next-button-background-color: var(--rz-base-700) !default;
 $paginator-numeric-button-background-color: var(--rz-base-700) !default;
 $paginator-numeric-button-selected-color: var(--rz-text-contrast-color) !default;
 $paginator-numeric-button-selected-background-color: var(--rz-base-900) !default;
-$paginator-numeric-button-selected-border: var(--rz-border-700) !default;
+$paginator-numeric-button-selected-border: var(--rz-border-base-700) !default;
 
 // DataList
 $datalist-item-border: none !default;
-$datalist-border: var(--rz-border-700) !default;
+$datalist-border: var(--rz-border-base-700) !default;
 $datalist-item-shadow: 0 22px 64px 0 rgba(0, 0, 0, 0.22);
 
 // Scheduler
@@ -293,7 +293,7 @@ $dialog-title-background-color: var(--rz-base-background-color) !default;
 $overlay-background-color: var(--rz-base-background-color) !default;
 
 // Footer
-$footer-border: var(--rz-border-700) !default;
+$footer-border: var(--rz-border-base-700) !default;
 
 // Scrollbar
 $scrollbar-color: var(--rz-base-600) !default;
