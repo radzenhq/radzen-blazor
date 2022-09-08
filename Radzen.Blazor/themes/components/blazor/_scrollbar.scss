@@ -1,6 +1,6 @@
 $scrollbar-background-color: transparent !default;
 $scrollbar-color: var(--rz-secondary) !default;
-$scrollbar-border-radius: var(--rz-border-radius-2) !default;
+$scrollbar-border-radius: calc(2 * var(--rz-border-radius)) !default;
 
 // Scrollbar CSS variables
 

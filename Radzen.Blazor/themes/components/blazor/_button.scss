@@ -31,7 +31,7 @@ $button-sizes: map-merge(
       min-height: 3.25rem,
       min-width: 3.25rem,
       font-weight: 600,
-      border-radius: var(--rz-border-radius-2),
+      border-radius: calc(2 * var(--rz-border-radius)),
       text-transform: uppercase,
       letter-spacing: 0.5px,
       icon: (

@@ -45,7 +45,7 @@ $switch-checked-circle-background-color: var(--rz-text-contrast-color) !default;
 .rz-switch .rz-switch-circle {
   background: var(--rz-switch-background-color);
   transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
-  border-radius: var(--rz-border-radius-5);
+  border-radius: calc(5 * var(--rz-border-radius));
 }
 
 .rz-switch.rz-switch-checked .rz-switch-circle {
@@ -58,7 +58,7 @@ $switch-checked-circle-background-color: var(--rz-text-contrast-color) !default;
   height: $switch-circle-size;
   left: $switch-circle-margin;
   margin-top: round($switch-circle-size*-500)/1000;
-  border-radius: calc(var(--rz-border-radius-5) - 3px);
+  border-radius: calc((5 * var(--rz-border-radius)) - 3px);
   transition: transform 0.2s linear;
   box-shadow: var(--rz-switch-box-shadow);
 }

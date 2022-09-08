@@ -415,7 +415,7 @@ $splitbutton-menu-shadow: none !default;
 
 // Badge
 $badge-border-radius: var(--rz-border-radius) !default;
-$badge-pill-border-radius: var(--rz-border-radius-4) !default;
+$badge-pill-border-radius: calc(4 * var(--rz-border-radius)) !default;
 
 $badge-styles: () !default;
 
@@ -677,7 +677,7 @@ $slider-handle-background-color: var(--rz-white) !default;
 $slider-handle-width: 1.25rem !default;
 $slider-handle-height: 1.25rem !default;
 $slider-handle-border: 0.25rem solid var(--rz-primary);
-$slider-handle-border-radius: var(--rz-border-radius-4) !default;
+$slider-handle-border-radius: calc(4 * var(--rz-border-radius)) !default;
 $slider-handle-hover-background-color: var(--rz-primary) !default;
 $slider-handle-hover-shadow: none !default;
 $slider-disabled-range-background-color: var(--rz-base-200) !default;
