@@ -1,0 +1,178 @@
+﻿@page "/borders"
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    Borders
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Border styles and utility CSS classes.
+</RadzenText>
+
+<RadzenExample Name="Borders" Heading="false">
+<div class="container-fluid mb-3">
+    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="my-4">
+        Border-radius
+    </RadzenText>
+    <div class="border-radius mb-4">
+        <RadzenButton Text=".rz-border-radius (theme's default)" Class="rz-border-radius" />
+        <RadzenButton Text=".rz-border-radius-6" Class="rz-border-radius-6" />
+    </div>
+    <RadzenText TextStyle="TextStyle.Body1" Class="mb-4">
+        Use these CSS classes to set border-radius to an element e.g. <code>class="rz-border-radius-6"</code>.
+    </RadzenText>
+    <div class="row">
+        <div class="col-12">
+        <div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
+            <div class="rz-data-grid-data">
+                <table class="rz-grid-table">
+                    <thead>
+                        <tr>
+                            <th><div>Border-radius value</div></th>
+                            <th><div>CSS class</div></th>
+                            <th><div>CSS variable</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="rz-cell-data">theme specific</span></td>
+                            <td><span class="rz-cell-data">.rz-border-radius</span></td>
+                            <td><span class="rz-cell-data">--rz-border-radius</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="rz-cell-data">0</span></td>
+                            <td><span class="rz-cell-data">.rz-border-radius-0</span></td>
+                            <td><span class="rz-cell-data">--rz-border-radius-0</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="rz-cell-data">0.25rem</span></td>
+                            <td><span class="rz-cell-data">.rz-border-radius-1</span></td>
+                            <td><span class="rz-cell-data">--rz-border-radius-1</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="rz-cell-data">0.5rem</span></td>
+                            <td><span class="rz-cell-data">.rz-border-radius-2</span></td>
+                            <td><span class="rz-cell-data">--rz-border-radius-2</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="rz-cell-data">0.75rem</span></td>
+                            <td><span class="rz-cell-data">.rz-border-radius-3</span></td>
+                            <td><span class="rz-cell-data">--rz-border-radius-3</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="rz-cell-data">1rem</span></td>
+                            <td><span class="rz-cell-data">.rz-border-radius-4</span></td>
+                            <td><span class="rz-cell-data">--rz-border-radius-4</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="rz-cell-data">1.25rem</span></td>
+                            <td><span class="rz-cell-data">.rz-border-radius-5</span></td>
+                            <td><span class="rz-cell-data">--rz-border-radius-5</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="rz-cell-data">1.5rem</span></td>
+                            <td><span class="rz-cell-data">.rz-border-radius-6</span></td>
+                            <td><span class="rz-cell-data">--rz-border-radius-6</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="rz-cell-data">1.75rem</span></td>
+                            <td><span class="rz-cell-data">.rz-border-radius-7</span></td>
+                            <td><span class="rz-cell-data">--rz-border-radius-7</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="rz-cell-data">2rem</span></td>
+                            <td><span class="rz-cell-data">.rz-border-radius-8</span></td>
+                            <td><span class="rz-cell-data">--rz-border-radius-8</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="rz-cell-data">2.25rem</span></td>
+                            <td><span class="rz-cell-data">.rz-border-radius-9</span></td>
+                            <td><span class="rz-cell-data">--rz-border-radius-9</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="rz-cell-data">2.5rem</span></td>
+                            <td><span class="rz-cell-data">.rz-border-radius-10</span></td>
+                            <td><span class="rz-cell-data">--rz-border-radius-10</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+    </div>
+    
+    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="my-4">
+        Border utility CSS classes
+    </RadzenText>
+    <RadzenText TextStyle="TextStyle.Body1" Class="mb-4">
+        The following CSS classes add <code>1px solid</code> border with its respective color. E.g. <code>class="rz-border-primary"</code>.
+    </RadzenText>
+    <div class="row">
+        <div class="col-12 borders">
+            <div class="rz-border-white"><span>.rz-border-white</span></div>
+            <div class="rz-border-base-50"><span>.rz-border-base-50</span></div>
+            <div class="rz-border-base-100"><span>.rz-border-base-100</span></div>
+            <div class="rz-border-base-200"><span>.rz-border-base-200</span></div>
+            <div class="rz-border-base-300"><span>.rz-border-base-300</span></div>
+            <div class="rz-border-base-400"><span>.rz-border-base-400</span></div>
+            <div class="rz-border-base-500"><span>.rz-border-base-500</span></div>
+            <div class="rz-border-base-600"><span>.rz-border-base-600</span></div>
+            <div class="rz-border-base-700"><span>.rz-border-base-700</span></div>
+            <div class="rz-border-base-800"><span>.rz-border-base-800</span></div>
+            <div class="rz-border-base-900"><span>.rz-border-base-900</span></div>
+            <div class="rz-border-black"><span>.rz-border-black</span></div>
+            <div class="rz-border-primary-lighter"><span>.rz-border-primary-lighter</span></div>
+            <div class="rz-border-primary-light"><span>.rz-border-primary-light</span></div>
+            <div class="rz-border-primary"><span>.rz-border-primary</span></div>
+            <div class="rz-border-primary-dark"><span>.rz-border-primary-dark</span></div>
+            <div class="rz-border-primary-darker"><span>.rz-border-primary-darker</span></div>
+            <div class="rz-border-secondary-lighter"><span>.rz-border-secondary-lighter</span></div>
+            <div class="rz-border-secondary-light"><span>.rz-border-secondary-light</span></div>
+            <div class="rz-border-secondary"><span>.rz-border-secondary</span></div>
+            <div class="rz-border-secondary-dark"><span>.rz-border-secondary-dark</span></div>
+            <div class="rz-border-secondary-darker"><span>.rz-border-secondary-darker</span></div>
+            <div class="rz-border-info-lighter"><span>.rz-border-info-lighter</span></div>
+            <div class="rz-border-info-light"><span>.rz-border-info-light</span></div>
+            <div class="rz-border-info"><span>.rz-border-info</span></div>
+            <div class="rz-border-info-dark"><span>.rz-border-info-dark</span></div>
+            <div class="rz-border-info-darker"><span>.rz-border-info-darker</span></div>
+            <div class="rz-border-success-lighter"><span>.rz-border-success-lighter</span></div>
+            <div class="rz-border-success-light"><span>.rz-border-success-light</span></div>
+            <div class="rz-border-success"><span>.rz-border-success</span></div>
+            <div class="rz-border-success-dark"><span>.rz-border-success-dark</span></div>
+            <div class="rz-border-success-darker"><span>.rz-border-success-darker</span></div>
+            <div class="rz-border-warning-lighter"><span>.rz-border-warning-lighter</span></div>
+            <div class="rz-border-warning-light"><span>.rz-border-warning-light</span></div>
+            <div class="rz-border-warning"><span>.rz-border-warning</span></div>
+            <div class="rz-border-warning-dark"><span>.rz-border-warning-dark</span></div>
+            <div class="rz-border-warning-darker"><span>.rz-border-warning-darker</span></div>
+            <div class="rz-border-danger-lighter"><span>.rz-border-danger-lighter</span></div>
+            <div class="rz-border-danger-light"><span>.rz-border-danger-light</span></div>
+            <div class="rz-border-danger"><span>.rz-border-danger</span></div>
+            <div class="rz-border-danger-dark"><span>.rz-border-danger-dark</span></div>
+            <div class="rz-border-danger-darker"><span>.rz-border-danger-darker</span></div>
+        </div>
+    </div>
+
+    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="my-4">
+        Borders with CSS variables
+    </RadzenText>
+    <RadzenText TextStyle="TextStyle.Body1" Class="mb-4">
+        Use theme color variables when defining borders. <RadzenLink Path="/colors" Text="See theme colors" Target="_blank" />
+    </RadzenText>
+    <div class="row">
+        <div class="col-12 borders">
+            <div class="p-5" style="border: 10px dotted var(--rz-success)">
+                <p><code>style="border: 10px dotted var(--rz-success)"</code></p>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .border-radius button {
+        margin-right: 1rem;
+    }
+    .borders div {
+        margin: 1rem;
+        padding: 0.5rem;
+    }
+</style>
+</RadzenExample>
