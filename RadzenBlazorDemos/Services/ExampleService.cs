@@ -37,6 +37,67 @@ namespace RadzenBlazorDemos
 
         new Example()
         {
+            Name = "UI Fundamentals",
+            New = true,
+            Icon = "&#xe749",
+            Children = new [] {
+                new Example()
+                {
+                    Name = "Colors",
+                    New = true,
+                    Path = "colors",
+                    Title = "Blazor theme colors",
+                    Icon = "&#xe891",
+                    Tags = new[] { "color", "background", "border", "utility", "css", "var"}
+                },
+                new Example()
+                {
+                    Name = "Typography",
+                    New = true,
+                    Path = "typography",
+                    Title = "Blazor Text component",
+                    Icon = "&#xe264",
+                    Tags = new [] { "typo", "typography", "text", "paragraph, header, heading, caption, overline, content" }
+                },
+                new Example()
+                {
+                    Name = "Icons",
+                    Title = "Blazor Icon component",
+                    Path = "icon",
+                    Icon = "&#xe148"
+                },
+                new Example()
+                {
+                    Name = "Borders",
+                    New = true,
+                    Path = "borders",
+                    Title = "Blazor Border styles",
+                    Icon = "&#xe3c6",
+                    Tags = new [] { "border", "utility", "css", "var"}
+                },
+                new Example()
+                {
+                    Name = "Shadows",
+                    New = true,
+                    Path = "shadows",
+                    Title = "Blazor Shadow styles",
+                    Icon = "&#xe595",
+                    Tags = new [] { "shadow", "utility", "css", "var"}
+                },
+                new Example()
+                {
+                    Name = "Ripple",
+                    New = true,
+                    Title = "Blazor Ripple effect",
+                    Path = "ripple",
+                    Icon = "&#xe39e",
+                    Tags = new [] { "ripple", "utility", "css", "var"}
+                }
+            }
+        },
+
+        new Example()
+        {
             Name = "DataGrid",
             Updated = true,
             Icon = "&#xf1be",
@@ -500,13 +561,6 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
-                    Name = "Icon",
-                    Title = "Blazor Icon component",
-                    Path = "icon",
-                    Icon = "&#xe148"
-                },
-                new Example()
-                {
                     Name = "Image",
                     Title = "Blazor Image component",
                     Path = "image",
@@ -629,14 +683,6 @@ namespace RadzenBlazorDemos
                     Path = "tabs",
                     Icon = "&#xe8d8",
                     Tags = new [] { "tabstrip", "tabview", "container" }
-                },
-                new Example()
-                {
-                    Name = "Typography",
-                    New = true,
-                    Path = "typography",
-                    Icon = "&#xe264",
-                    Tags = new [] { "typo", "typography", "text", "paragraph, header, heading, caption, overline, content" }
                 }
             }
         },
