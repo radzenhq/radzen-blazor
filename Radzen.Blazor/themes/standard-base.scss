@@ -1,4 +1,5 @@
 @import 'variables';
+@import 'mixins';
 $standard: true;
 
 // Legacy Theme Tokens
@@ -145,7 +146,7 @@ $button-sizes: (
     height: auto,
     min-height: 3.25rem,
     font-weight: 600,
-    border-radius: var(--rz-border-radius-2),
+    border-radius: calc(2 * var(--rz-border-radius)),
     text-transform: uppercase,
     letter-spacing: 0.5px,
     icon: (
@@ -683,7 +684,7 @@ $slider-disabled-range-background-color: var(--rz-base-200) !default;
 $slider-disabled-range-border: var(--rz-border-base-300) !default;
 $slider-disabled-handle-background-color: var(--rz-white) !default;
 $slider-disabled-handle-border: 0.25rem solid var(--rz-base-400);
-$slider-border-radius: var(--rz-border-radius-2) !default;
+$slider-border-radius: calc(2 * var(--rz-border-radius)) !default;
 
 // Checkbox
 $checkbox-border-radius: var(--rz-border-radius);
@@ -778,7 +779,7 @@ $dialog-title-font-size: 1.5rem !default;
 $dialog-title-line-height: 1.25em !default;
 $dialog-close-vertical-align: top !default;
 $dialog-mask-background-color: var(--rz-base-600) !default;
-$dialog-border-radius: var(--rz-border-radius-2) !default;
+$dialog-border-radius: calc(2 * var(--rz-border-radius)) !default;
 
 // Scrollbar
 $scrollbar-color: rgba($rz-base-600, 0.5) !default;

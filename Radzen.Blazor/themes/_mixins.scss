@@ -1,0 +1,55 @@
+@mixin rz-color-css($map, $attribute) {
+  @each $token,
+  $value in $map {
+    .rz-#{$attribute}-#{$token} {
+      #{$attribute}: var(--rz-#{$token}) !important;
+    }
+  }
+}
+
+@mixin rz-utility-css($map, $attribute) {
+  @each $token,
+  $value in $map {
+    .rz-#{$token} {
+      #{$attribute}: var(--rz-#{$token}) !important;
+    }
+  }
+}
+
+@mixin rz-ripple($ripple-background: rgba(0,0,0,.12), $pseudo: false) {
+  @if $pseudo == true {
+
+    position: relative;
+    overflow: hidden;
+  
+    &:not(.rz-state-disabled):after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-position: center;
+      transition: background 0.8s, opacity 0.8s;
+      opacity: 0;
+      background: radial-gradient(circle, currentColor 1%, transparent 1%) center/15000%;
+    }
+  
+    &:not(.rz-state-disabled):active {
+      &:after {
+        transition: background 0s, opacity 0s;
+        opacity: .32;
+        background-size: 100%;
+      }
+    }
+
+  } @else {
+
+    background-position: center;
+    transition: background 0.8s;
+    background: radial-gradient(circle, transparent 1%, $ripple-background 1%)  center/15000%;
+
+    &:active {
+        background-color: $ripple-background;
+        transition: background 0s;
+        background-size: 100%;
+    }
+  }
+}
