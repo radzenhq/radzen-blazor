@@ -1378,7 +1378,7 @@ namespace Radzen.Blazor
         {
             Reset(!IsOData() && !LoadData.HasDelegate);
 
-            if (!IsOData() && !LoadData.HasDelegate)
+            if (!IsOData() && !LoadData.HasDelegate && !Page.HasDelegate)
             {
                 skip = 0;
                 CurrentPage = 0;
