@@ -199,19 +199,33 @@ $rz-state-border-map: map-merge(
 
 // Border Radius
 
-$rz-border-radius-2: $rz-border-radius * 2 !default;
-$rz-border-radius-3: $rz-border-radius * 3 !default;
-$rz-border-radius-4: $rz-border-radius * 4 !default;
-$rz-border-radius-5: $rz-border-radius * 5 !default;
+$rz-border-radius-0: 0 !default;
+$rz-border-radius-1: 0.25rem !default;
+$rz-border-radius-2: 0.5rem !default;
+$rz-border-radius-3: 0.75rem !default;
+$rz-border-radius-4: 1rem !default;
+$rz-border-radius-5: 1.25rem !default;
+$rz-border-radius-6: 1.5rem !default;
+$rz-border-radius-7: 1.75rem !default;
+$rz-border-radius-8: 2rem !default;
+$rz-border-radius-9: 2.25rem !default;
+$rz-border-radius-10: 2.5rem !default;
 
 $rz-border-radius-map: () !default;
 $rz-border-radius-map: map-merge(
   (
     "border-radius": $rz-border-radius,
+    "border-radius-0": $rz-border-radius-0,
+    "border-radius-1": $rz-border-radius-1,
     "border-radius-2": $rz-border-radius-2,
     "border-radius-3": $rz-border-radius-3,
     "border-radius-4": $rz-border-radius-4,
     "border-radius-5": $rz-border-radius-5,
+    "border-radius-6": $rz-border-radius-6,
+    "border-radius-7": $rz-border-radius-7,
+    "border-radius-8": $rz-border-radius-8,
+    "border-radius-9": $rz-border-radius-9,
+    "border-radius-10": $rz-border-radius-10,
   ),
   $rz-border-radius-map
 );
@@ -224,15 +238,11 @@ $rz-border-radius-map: map-merge(
 }
 
 // Border Radius CSS classes
-@each $token, $value in $rz-border-radius-map {
-  .rz-#{$token} {
-    border-radius: #{$value} !important;
-  }
-}
+@include rz-utility-css($rz-border-radius-map, 'border-radius');
 
 // Shadow
 
-$rz-shadow-0: none !default;
+/* $rz-shadow-0: none !default;
 $rz-shadow-1: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 $rz-shadow-2: 0 6px 14px 0 rgba(0, 0, 0, 0.2) !default;
 $rz-shadow-3: none !default;
@@ -242,7 +252,19 @@ $rz-shadow-6: none !default;
 $rz-shadow-7: none !default;
 $rz-shadow-8: none !default;
 $rz-shadow-9: none !default;
-$rz-shadow-10: none !default;
+$rz-shadow-10: none !default; */
+
+$rz-shadow-0: none !default;
+$rz-shadow-1: 0 0 2px 0 rgba(0, 0, 0, 0.08), 0px 2px 2px rgba(0, 0, 0, 0.08) !default;
+$rz-shadow-2: 0 0 2px 0 rgba(0, 0, 0, 0.08), 0px 2px 2px rgba(0, 0, 0, 0.08), 0px 4px 12px 0 rgba(0, 0, 0, 0.04)  !default;
+$rz-shadow-3: 0 0 4px 0 rgba(0, 0, 0, 0.04), 0px 2px 4px rgba(0, 0, 0, 0.04), 0px 4px 16px rgba(0, 0, 0, 0.10) !default;
+$rz-shadow-4: 0 0 4px 0 rgba(0, 0, 0, 0.04), 0px 3px 5px rgba(0, 0, 0, 0.04), 0px 8px 20px rgba(0, 0, 0, 0.11) !default;
+$rz-shadow-5: 0 0 6px 0 rgba(0, 0, 0, 0.04), 0px 4px 6px rgba(0, 0, 0, 0.04), 0px 12px 24px rgba(0, 0, 0, 0.12) !default;
+$rz-shadow-6: 0 0 6px 0 rgba(0, 0, 0, 0.04), 0px 5px 8px rgba(0, 0, 0, 0.04), 0px 14px 28px rgba(0, 0, 0, 0.13) !default;
+$rz-shadow-7: 0 0 8px 0 rgba(0, 0, 0, 0.04), 0px 6px 10px rgba(0, 0, 0, 0.04), 0px 16px 32px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-8: 0 0 8px 0 rgba(0, 0, 0, 0.04), 0px 7px 12px rgba(0, 0, 0, 0.04), 0px 18px 40px rgba(0, 0, 0, 0.15) !default;
+$rz-shadow-9: 0 0 12px 0 rgba(0, 0, 0, 0.04), 0px 8px 16px rgba(0, 0, 0, 0.04), 0px 20px 48px rgba(0, 0, 0, 0.16) !default;
+$rz-shadow-10: 0 0 12px 0 rgba(0, 0, 0, 0.04), 0px 9px 20px rgba(0, 0, 0, 0.04), 0px 22px 64px rgba(0, 0, 0, 0.20) !default;
 
 $rz-shadow-map: () !default;
 $rz-shadow-map: map-merge(
@@ -270,11 +292,7 @@ $rz-shadow-map: map-merge(
 }
 
 // Shadow CSS classes
-@each $token, $value in $rz-shadow-map {
-  .rz-#{$token} {
-    box-shadow: #{$value} !important;
-  }
-}
+@include rz-utility-css($rz-shadow-map, 'box-shadow');
 
 // Transition
 
@@ -292,34 +310,27 @@ $rz-transition-all: all 0.1s linear !default;
 
 // Color
 // Example .rz-color-primary
-@each $color, $value in $rz-theme-colors-map {
-  .rz-color-#{$color} {
-    color: var(--rz-#{$color}) !important;
-  }
-}
+@include rz-color-css($rz-theme-colors-map, 'color');
 
 // Background Color
-// Example .rz-primary-bg-color
-@each $color, $value in $rz-theme-colors-map {
-  .rz-background-color-#{$color} {
-    background-color: var(--rz-#{$color}) !important;
-  }
-}
+// Example .rz-background-color-primary
+@include rz-color-css($rz-theme-colors-map, 'background-color');
 
 // Border Color
-// Example .rz-primary-border-color
-@each $color, $value in $rz-theme-colors-map {
-  .rz-border-color-#{$color} {
-    border-color:  var(--rz-#{$color}) !important;
-  }
-}
+// Example .rz-border-color-primary
+@include rz-color-css($rz-theme-colors-map, 'border-color');
 
 // Border
-// Example .rz-primary-border
+// Example .rz-border-primary
 @each $color, $value in $rz-theme-colors-map {
   .rz-border-#{$color} {
     border-width: var(--rz-border-width);
     border-style: solid;
     border-color:  var(--rz-#{$color}) !important;
   }
+}
+
+// Ripple
+.rz-ripple {
+  @include rz-ripple($pseudo: true);
 }
