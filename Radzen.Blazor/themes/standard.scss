@@ -191,6 +191,7 @@ $button-sizes: (
     line-height: 1.5rem,
     height: auto,
     min-height: 3.25rem,
+    min-width: 3.25rem,
     font-weight: 600,
     border-radius: calc(2 * var(--rz-border-radius)),
     text-transform: uppercase,
@@ -210,6 +211,7 @@ $button-sizes: (
     line-height: 1.25rem,
     height: auto,
     min-height: 2.25rem,
+    min-width: 2.25rem,
     font-weight: 600,
     icon: (
       font-size: 1.25rem,
@@ -226,6 +228,7 @@ $button-sizes: (
     line-height: 1.25rem,
     height: auto,
     min-height: 1.75rem,
+    min-width: 1.75rem,
     icon: (
       font-size: 1.25rem,
       line-height: 1.25rem,
