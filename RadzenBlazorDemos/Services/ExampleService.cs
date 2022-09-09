@@ -296,6 +296,13 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Self-reference hierarchy",
+                            Path = "datagrid-selfref-hierarchy",
+                            Title = "Blazor DataGrid self-reference hierarchy",
+                            Tags = new [] { "master", "detail", "datagrid", "table", "dataview", "hierarchy", "self-reference" }
+                        },
+                        new Example
+                        {
                             Name = "Master/Detail",
                             Path = "master-detail",
                             Title = "Master and detail Blazor DataGrid",

@@ -1393,6 +1393,30 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Supplies information about a <see cref="RadzenDataGrid{TItem}.LoadChildData" /> event that is being raised.
+    /// </summary>
+    public class DataGridLoadChildDataEventArgs<T>
+    {
+        /// <summary>
+        /// Gets or sets the data.
+        /// </summary>
+        /// <value>The data.</value>
+        public IEnumerable<T> Data { get; set; }
+
+        /// <summary>
+        /// Gets the item.
+        /// </summary>
+        /// <value>The item.</value>
+        public T Item { get; internal set; }
+    }
+
+    internal class DataGridChildData<T>
+    {
+        internal int Level { get; set; }
+        internal IEnumerable<T> Data { get; set; }
+    }
+
+    /// <summary>
     /// Supplies information about a <see cref="RadzenPager.PageChanged" /> event that is being raised.
     /// </summary>
     public class PagerEventArgs
