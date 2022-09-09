@@ -28,7 +28,29 @@
                     <a href="/docs/" title="Radzen Blazor Components Documentation" class="mx-2 mx-lg-3" target="_blank">Documentation</a>
                     <a href="https://www.radzen.com/" title="Create .NET Core web applications fast & easy" class="text-nowrap mx-2 mx-lg-3" target="_blank">About Radzen</a>
                 </div>
-                <RadzenDropDown class="mx-0 mx-lg-3" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@ThemeService.Themes" Value="@ThemeService.CurrentTheme" Change="@ChangeTheme" />
+                <RadzenDropDown class="mx-0 mx-lg-3" style="width: 220px;" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@ThemeService.Themes" Value="@ThemeService.CurrentTheme" Change="@ChangeTheme" >
+                    <ValueTemplate>
+                        @context.Text Theme
+                    </ValueTemplate>
+                    <Template>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 4px; oveflow: hidden; outline: var(--rz-input-border); min-width: 80px;">
+                                <rect width="80" height="60" fill="@context.Base"/>
+                                <rect x="0" y="4" width="16" height="56" fill="@context.Sidebar"/>
+                                <rect x="24" y="17" width="48" height="32" rx="2" fill="@context.Content"/>
+                                <rect x="43" y="41" width="12" height="4" rx="1" fill="@context.Secondary"/>
+                                <rect x="28" y="21" width="16" height="2" rx="1" fill="@context.TitleText"/>
+                                <rect x="28" y="27" width="40" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="28" y="31" width="40" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="28" y="35" width="16" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="28" y="41" width="12" height="4" rx="1" fill="@context.Primary"/>
+                                <rect width="80" height="6" fill="@context.Header"/>
+                            </svg>
+                            @context.Text
+                        </div>
+                    </Template>
+                </RadzenDropDown>
+
                 <a href="https://github.com/radzenhq/radzen-blazor" title="GitHub" target="_blank" class="mx-3">
                     <svg width="24" height="24" viewBox="0 0 512 499.36" xmlns="http://www.w3.org/2000/svg">
                     <title>GitHub</title>
