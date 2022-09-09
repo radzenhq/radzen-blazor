@@ -5,8 +5,8 @@ $validator-background-color: var(--rz-danger) !default;
 $validator-color: var(--rz-text-contrast-color) !default;
 $validator-shadow: 0 6px 14px 0 rgba($rz-danger, 0.3) !default;
 $validator-text-padding: 0 !default;
-$validator-padding: 0.5rem !default;
-$validator-pointer-size: 0.25rem !default;
+$validator-padding: 0.25rem 0.5rem !default;
+$validator-pointer-size: 0.375rem !default;
 $validator-transform: translateY(12px) !default;
 
 // Forms CSS variables
@@ -60,7 +60,6 @@ $validator-transform: translateY(12px) !default;
     content: '';
     border: var(--rz-validator-pointer-size) solid transparent;
     border-bottom-color: var(--rz-validator-background-color);
-    border-left-color: var(--rz-validator-background-color);
     position: absolute;
     top: 0;
     left: 0;
