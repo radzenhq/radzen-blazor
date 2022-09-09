@@ -1,20 +1,18 @@
 $card-padding: 1.25rem !default;
 $card-background-color: var(--rz-base-background-color) !default;
-$card-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06) !default;
+$card-shadow: var(--rz-shadow-2) !default;
 $card-border-radius: var(--rz-border-radius) !default;
 $card-heading-margin-bottom: 0.5rem !default;
 
 // Card CSS variables
 
-:root {
+.rz-card {
   --rz-card-padding: #{$card-padding};
   --rz-card-background-color: #{$card-background-color};
   --rz-card-shadow: #{$card-shadow};
   --rz-card-border-radius: #{$card-border-radius};
   --rz-card-heading-margin-bottom: #{$card-heading-margin-bottom};
-}
 
-.rz-card {
   padding: var(--rz-card-padding);
   border-radius: var(--rz-card-border-radius);
   box-shadow: var(--rz-card-shadow);
