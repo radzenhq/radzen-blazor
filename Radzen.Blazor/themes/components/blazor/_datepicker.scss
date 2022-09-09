@@ -116,7 +116,7 @@ $timepicker-border: none !default;
     @extend %input;
     width: 100%;
     line-height: var(--rz-datepicker-line-height);
-    padding-right: var(--rz-datepicker-trigger-icon-width);
+    padding-right: calc(1rem + var(--rz-datepicker-trigger-icon-width));
   }
 
   &:not(.rz-state-disabled) {
