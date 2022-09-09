@@ -7,106 +7,108 @@
 @inject NorthwindContext dbContext
 
 <RadzenExample Name="DropDown">
-<div class="row px-3">
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Binding to simple collection</h4>
-            <RadzenDropDown AllowClear="true" TValue="string" Class="w-100" 
-                            Data=@(customers.Select(c => c.CompanyName).Distinct())
-                            Change=@(args => OnChange(args, "DropDown")) />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Disabled DropDown</h4>
-            <div style="display: flex; align-items: center">
-                <RadzenDropDown Disabled=@disabled AllowClear="true" TValue="string" Class="w-100" 
-                                Data=@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())
-                                TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown")) />
-                <RadzenSwitch style="margin-left: 1rem" @bind-Value=@disabled />
-            </div>
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Virtualization using IQueryable</h4>
-            <RadzenDropDown AllowClear="true" TValue="string" AllowVirtualization="true" Class="w-100" 
-                            AllowFiltering="true" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                            Change=@(args => OnChange(args, "DropDown with virtualization")) />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Virtualization using LoadData event</h4>
-            <RadzenDropDown AllowClear="true" TValue="string" AllowVirtualization="true" Class="w-100" 
-                            LoadData=@LoadDataVirtualization AllowFiltering="true" Count="@count"
-                            Data=@customCustomersDataVirtualization TextProperty="CompanyName" ValueProperty="CustomerID"
-                            Change=@(args => OnChange(args, "DropDown with virtualization")) />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Custom filter operator</h4>
-            <RadzenDropDown AllowClear="true" TValue="string" Class="w-100" 
-                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
-                            Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown with custom filter operator")) />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Custom filtering</h4>
-            <RadzenDropDown AllowClear="true" TValue="string" Class="w-100" 
-                            LoadData=@LoadData AllowFiltering="true"
-                            Data=@customCustomersData TextProperty="CompanyName" ValueProperty="CustomerID"
-                            Change=@(args => OnChange(args, "DropDown with custom filtering")) />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">DropDown with placeholder</h4>
-            <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Class="w-100" 
-                            Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown with placeholder")) />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">DropDown with template</h4>
-            <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value=@value Placeholder="Select..."
-                            Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown with placeholder")) Class="w-100" >
-                <Template>
-                    Company: @((context as Customer).CompanyName)
-                </Template>
-            </RadzenDropDown>
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Multiple selection</h4>
-            <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                            @bind-Value=@multipleValues Multiple="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                            Change=@(args => OnChange(args, "DropDown with multiple selection")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Bind Value to model property</h4>
-            <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@myModel.MyValue
-                            TextProperty="ProductName" ValueProperty="ProductID" Change=@(args => ChangeBound(args, "DropDown with bound Value")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">With Disabled item</h4>
-            <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@myModelDisabled.MyValue
-                            TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => ChangeBound(args, "DropDown with bound Value")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Multiple with Disabled item</h4>
-            <RadzenDropDown AllowClear="true" AllowFiltering="true" Multiple="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@multipleValuesdisabled
-                            TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
-        </RadzenCard>
+<div class="container-fluid">
+    <div class="row px-3">
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Binding to simple collection</RadzenText>
+                <RadzenDropDown AllowClear="true" TValue="string" Class="w-100" 
+                                Data=@(customers.Select(c => c.CompanyName).Distinct())
+                                Change=@(args => OnChange(args, "DropDown")) />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled DropDown</RadzenText>
+                <div style="display: flex; align-items: center">
+                    <RadzenDropDown Disabled=@disabled AllowClear="true" TValue="string" Class="w-100" 
+                                    Data=@(customers.Select(c => new { CustomerID = c.CustomerID, CompanyName = c.CompanyName }).Distinct())
+                                    TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown")) />
+                    <RadzenSwitch style="margin-left: 1rem" @bind-Value=@disabled />
+                </div>
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Virtualization using IQueryable</RadzenText>
+                <RadzenDropDown AllowClear="true" TValue="string" AllowVirtualization="true" Class="w-100" 
+                                AllowFiltering="true" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
+                                Change=@(args => OnChange(args, "DropDown with virtualization")) />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Virtualization using LoadData event</RadzenText>
+                <RadzenDropDown AllowClear="true" TValue="string" AllowVirtualization="true" Class="w-100" 
+                                LoadData=@LoadDataVirtualization AllowFiltering="true" Count="@count"
+                                Data=@customCustomersDataVirtualization TextProperty="CompanyName" ValueProperty="CustomerID"
+                                Change=@(args => OnChange(args, "DropDown with virtualization")) />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom filter operator</RadzenText>
+                <RadzenDropDown AllowClear="true" TValue="string" Class="w-100" 
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                                Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown with custom filter operator")) />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom filtering</RadzenText>
+                <RadzenDropDown AllowClear="true" TValue="string" Class="w-100" 
+                                LoadData=@LoadData AllowFiltering="true"
+                                Data=@customCustomersData TextProperty="CompanyName" ValueProperty="CustomerID"
+                                Change=@(args => OnChange(args, "DropDown with custom filtering")) />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown with placeholder</RadzenText>
+                <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Class="w-100" 
+                                Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown with placeholder")) />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown with template</RadzenText>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value=@value Placeholder="Select..."
+                                Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown with placeholder")) Class="w-100" >
+                    <Template>
+                        Company: @((context as Customer).CompanyName)
+                    </Template>
+                </RadzenDropDown>
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple selection</RadzenText>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                @bind-Value=@multipleValues Multiple="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
+                                Change=@(args => OnChange(args, "DropDown with multiple selection")) Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Bind Value to model property</RadzenText>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@myModel.MyValue
+                                TextProperty="ProductName" ValueProperty="ProductID" Change=@(args => ChangeBound(args, "DropDown with bound Value")) Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">With Disabled item</RadzenText>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@myModelDisabled.MyValue
+                                TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => ChangeBound(args, "DropDown with bound Value")) Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple with Disabled item</RadzenText>
+                <RadzenDropDown AllowClear="true" AllowFiltering="true" Multiple="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@multipleValuesdisabled
+                                TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
+            </RadzenCard>
+        </div>
     </div>
     <div class="col-md-6 col-lg-4 col-xl-6 p-3">
         <RadzenCard>

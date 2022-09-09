@@ -14,14 +14,14 @@
 </RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridColumnReoder" Heading="false">
-    <RadzenButton Text="Change page state" Click="@((args) => { StateHasChanged(); })" Style="margin-bottom:20px" />
+    <RadzenButton Text="Change page state" Click="@((args) => { StateHasChanged(); })" Class="my-3" />
     <RadzenDataGrid AllowColumnReorder="true" ColumnReordered="@OnColumnReordered"
         AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" Reorderable="false" Resizable="false" />
-            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" >
+            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" Reorderable="false" Resizable="false" />
+            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
                 <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                    <RadzenImage Path="@data.Photo" class="rz-gravatar" />
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" OrderIndex="2" />
@@ -41,9 +41,7 @@
     </RadzenDataGrid>
 </RadzenExample>
 
-<RadzenCard Class="mt-4">
-    <EventConsole @ref=@console />
-</RadzenCard>
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     EventConsole console;

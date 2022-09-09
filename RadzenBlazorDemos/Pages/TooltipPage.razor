@@ -3,51 +3,53 @@
 @inject TooltipService tooltipService
 
 <RadzenExample Name="Tooltip">
-<div class="row px-3">
-    <div class="col-md-6 col-lg-4 p-3 d-flex">
-        <RadzenCard Class="w-100">
-            <h4 class="mb-4">Show tooltip on mouse over Radzen component</h4>
-            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args) )" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3 d-flex">
-        <RadzenCard Class="w-100">
-            <h4 class="mb-4">Show tooltip on mouse over Radzen component and close it after 10 sec</h4>
-            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args, new TooltipOptions(){ Duration = 10000 }))" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3 d-flex">
-        <RadzenCard Class="w-100">
-            <h4 class="mb-4">Show styled tooltip on button click and close it on page click</h4>
-            <RadzenButton @ref="radzenButton" Text="Show tooltip" Click="@(args => ShowTooltip(radzenButton.Element, new TooltipOptions(){ Style = "background-color: #ffffca; color:#000", Duration = null }))" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3 d-flex">
-        <RadzenCard Class="w-100">
-            <h4 class="mb-4">Show tooltip with HTML content</h4>
-            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltipWithHtml(args, new TooltipOptions(){ Style = "color: yellow", Duration = null }))" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3 d-flex">
-        <RadzenCard Class="w-100">
-            <h4 class="mb-4">Show tooltip on mouse over HTML elment</h4>
-            <button @ref="htmlButton" @onmouseover="@(args => ShowTooltip(htmlButton))">
-                Show tooltip
-            </button>
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3 d-flex">
-        <RadzenCard Class="w-100">
-            <h4 class="mb-4">Tooltip position</h4>
-            <RadzenButton Text="Left" MouseEnter="@(args => ShowTooltip(args,
-                                                                            new TooltipOptions(){ Position = TooltipPosition.Left }))" Class="mr-1 mb-1" />
-            <RadzenButton Text="Top" MouseEnter="@(args => ShowTooltip(args,
-                                                                            new TooltipOptions(){ Position = TooltipPosition.Top }))" Class="mr-1 mb-1" />
-            <RadzenButton Text="Bottom" MouseEnter="@(args => ShowTooltip(args,
-                                                                            new TooltipOptions(){ Position = TooltipPosition.Bottom }))" Class="mr-1 mb-1" />
-            <RadzenButton Text="Right" MouseEnter="@(args => ShowTooltip(args,
-                                                                            new TooltipOptions(){ Position = TooltipPosition.Right }))" Class="mr-1 mb-1" />
-        </RadzenCard>
+<div class="container-fluid">
+    <div class="row px-3">
+        <div class="col-md-6 col-lg-4 p-3 d-flex">
+            <RadzenCard Class="w-100">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Show tooltip on mouse over Radzen component</RadzenText>
+                <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args) )" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3 d-flex">
+            <RadzenCard Class="w-100">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Show tooltip on mouse over Radzen component and close it after 10 sec</RadzenText>
+                <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args, new TooltipOptions(){ Duration = 10000 }))" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3 d-flex">
+            <RadzenCard Class="w-100">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Show styled tooltip on button click and close it on page click</RadzenText>
+                <RadzenButton @ref="radzenButton" Text="Show tooltip" Click="@(args => ShowTooltip(radzenButton.Element, new TooltipOptions(){ Style = "background-color: #ffffca; color:#000", Duration = null }))" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3 d-flex">
+            <RadzenCard Class="w-100">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Show tooltip with HTML content</RadzenText>
+                <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltipWithHtml(args, new TooltipOptions(){ Style = "color: yellow", Duration = null }))" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3 d-flex">
+            <RadzenCard Class="w-100">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Show tooltip on mouse over HTML elment</RadzenText>
+                <button @ref="htmlButton" @onmouseover="@(args => ShowTooltip(htmlButton))">
+                    Show tooltip
+                </button>
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3 d-flex">
+            <RadzenCard Class="w-100">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Tooltip position</RadzenText>
+                <RadzenButton Text="Left" MouseEnter="@(args => ShowTooltip(args,
+                                                                                new TooltipOptions(){ Position = TooltipPosition.Left }))" Class="mr-1 mb-1" />
+                <RadzenButton Text="Top" MouseEnter="@(args => ShowTooltip(args,
+                                                                                new TooltipOptions(){ Position = TooltipPosition.Top }))" Class="mr-1 mb-1" />
+                <RadzenButton Text="Bottom" MouseEnter="@(args => ShowTooltip(args,
+                                                                                new TooltipOptions(){ Position = TooltipPosition.Bottom }))" Class="mr-1 mb-1" />
+                <RadzenButton Text="Right" MouseEnter="@(args => ShowTooltip(args,
+                                                                                new TooltipOptions(){ Position = TooltipPosition.Right }))" Class="mr-1 mb-1" />
+            </RadzenCard>
+        </div>
     </div>
 </div>
 </RadzenExample>

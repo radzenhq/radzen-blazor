@@ -14,15 +14,17 @@
 </RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridGroupHeaderTemplate" Heading="false">
-    <RadzenCheckBox @bind-Value=@groupsExpanded Name="CheckBox1" TValue="bool?" TriState="true" />
-    <RadzenLabel Text="All groups expanded" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 10px;" />
+    <RadzenCard Class="m-4" style="display: flex; align-items: center; gap: 0.5rem">
+        <RadzenCheckBox @bind-Value=@groupsExpanded Name="CheckBox1" TValue="bool?" TriState="true" />
+        <RadzenLabel Text="All groups expanded" Component="CheckBox1" />
+    </RadzenCard>
     <RadzenDataGrid @ref="ordersGrid"  AllowGrouping="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
-            Data="@orders" TItem="Order" Render="@OnRender" GroupRowRender="OnGroupRowRender">
+            Data="@orders" TItem="Order" Render="@OnRender" GroupRowRender="OnGroupRowRender" Class="m-4">
         <GroupHeaderTemplate>
             @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Group items count: @context.Data.Count, Last order date: @(context.Data.Items.Cast<Order>().OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)
         </GroupHeaderTemplate>
         <Columns>
-            <RadzenDataGridColumn Width="50px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+            <RadzenDataGridColumn Width="80px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
                 <Template>
                     @(orders.IndexOf(context) + 1)
                 </Template>
