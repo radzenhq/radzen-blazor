@@ -1,10 +1,11 @@
 ﻿@page "/badge"
 
 <RadzenExample Name="Badge" Documentation="false">
+<div class="container-fluid">
     <div class="row px-3">
         <div class="col-md-6 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Badges</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Badges</RadzenText>
                 <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Primary" />
                 <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
                 <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="Light" />
@@ -16,7 +17,7 @@
         </div>
         <div class="col-md-6 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Pills</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Pills</RadzenText>
                 <RadzenBadge BadgeStyle="BadgeStyle.Primary" IsPill="true" Text="Primary" />
                 <RadzenBadge BadgeStyle="BadgeStyle.Secondary" IsPill="true" Text="Secondary" />
                 <RadzenBadge BadgeStyle="BadgeStyle.Light" IsPill="true" Text="Light" />
@@ -28,7 +29,7 @@
         </div>
         <div class="col-md-6 p-3">
             <RadzenCard>
-                <h4 class="mb-4">In Button</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">In Button</RadzenText>
                     <RadzenButton ButtonStyle="ButtonStyle.Primary" Class="mr-1" >
                     Notifications
                     <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="15" />
@@ -42,11 +43,12 @@
         </div>
         <div class="col-md-6 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Child Content</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Child Content</RadzenText>
                 <RadzenBadge BadgeStyle="BadgeStyle.Primary">
                     Childcontent
                 </RadzenBadge>
             </RadzenCard>
         </div>
     </div>
+</div>
 </RadzenExample>

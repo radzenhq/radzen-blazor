@@ -1,42 +1,44 @@
 ﻿@page "/slider"
 @using System.Collections
 <RadzenExample Name="Slider">
-<div class="row px-3">
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Slider from 0 to 100</h4>
-            <RadzenSlider @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => OnChange(args, "Slider from 0 to 100")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Slider from -100 to 100</h4>
-            <RadzenSlider @bind-Value=@negativeValue TValue="int" Min="-100" Max="100" Change=@(args => OnChange(args, "Slider from -100 to 100")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Slider with Step 10</h4>
-            <RadzenSlider @bind-Value=@valueWithStep TValue="int" Step="10" Change=@(args => OnChange(args, "Slider with Step 10")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Range Slider</h4>
-            <RadzenSlider Range="true" @bind-Value=@values TValue="IEnumerable<int>" Change=@(args => OnChange(args, "Range Slider")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Range Slider with negative values</h4>
-            <RadzenSlider Range="true" @bind-Value=@negativeValues Min="-100" Max="100" TValue="IEnumerable<int>" Change=@(args => OnChange(args, "Range Slider with negative values")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Disabled Slider</h4>
-            <RadzenSlider Disabled="true" @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => OnChange(args, "Slider from 0 to 100")) Class="w-100" />
-        </RadzenCard>
+<div class="container-fluid">
+    <div class="row px-3">
+        <div class="col-md-6 col-lg-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Slider from 0 to 100</RadzenText>
+                <RadzenSlider @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => OnChange(args, "Slider from 0 to 100")) Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Slider from -100 to 100</RadzenText>
+                <RadzenSlider @bind-Value=@negativeValue TValue="int" Min="-100" Max="100" Change=@(args => OnChange(args, "Slider from -100 to 100")) Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Slider with Step 10</RadzenText>
+                <RadzenSlider @bind-Value=@valueWithStep TValue="int" Step="10" Change=@(args => OnChange(args, "Slider with Step 10")) Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Range Slider</RadzenText>
+                <RadzenSlider Range="true" @bind-Value=@values TValue="IEnumerable<int>" Change=@(args => OnChange(args, "Range Slider")) Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Range Slider with negative values</RadzenText>
+                <RadzenSlider Range="true" @bind-Value=@negativeValues Min="-100" Max="100" TValue="IEnumerable<int>" Change=@(args => OnChange(args, "Range Slider with negative values")) Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled Slider</RadzenText>
+                <RadzenSlider Disabled="true" @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => OnChange(args, "Slider from 0 to 100")) Class="w-100" />
+            </RadzenCard>
+        </div>
     </div>
 </div>
 </RadzenExample>

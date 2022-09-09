@@ -6,16 +6,17 @@
 </RadzenText>
 
 <RadzenExample Name="HtmlEditor" Source="HtmlEditorCustomTools" Heading="false">
+<div class="container-fluid">
     <div class="row">
         <div class="col-md-4">
-            <h3>Custom button</h3>
-            <RadzenHtmlEditor style="height: 500px; margin-bottom: 1rem;" Execute=@OnExecute>
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="my-4">Custom button</RadzenText>
+            <RadzenHtmlEditor style="height: 300px; margin-bottom: 1rem;" Execute=@OnExecute>
                 <RadzenHtmlEditorCustomTool CommandName="InsertToday" Icon="today" Title="Insert today" />
             </RadzenHtmlEditor>
         </div>
         <div class="col-md-4">
-            <h3>Custom tool with template</h3>
-            <RadzenHtmlEditor style="height: 500px; margin-bottom: 1rem;">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="my-4">Custom tool with template</RadzenText>
+            <RadzenHtmlEditor style="height: 300px; margin-bottom: 1rem;">
                 <RadzenHtmlEditorCustomTool>
                     <Template Context="editor">
                         <RadzenDatePicker Change=@(args => OnDateChange(args, editor)) TValue="DateTime" />
@@ -24,12 +25,13 @@
             </RadzenHtmlEditor>
         </div>
         <div class="col-md-4">
-            <h3>Custom dialog</h3>
-            <RadzenHtmlEditor style="height: 500px; margin-bottom: 1rem;" Execute=@OnExecute>
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="my-4">Custom dialog</RadzenText>
+            <RadzenHtmlEditor style="height: 300px; margin-bottom: 1rem;" Execute=@OnExecute>
                 <RadzenHtmlEditorCustomTool CommandName="InsertImageFromList" Icon="attach_file" />
             </RadzenHtmlEditor>
         </div>
     </div>
+</div>
 </RadzenExample>
 @code {
     async Task OnExecute(HtmlEditorExecuteEventArgs args)

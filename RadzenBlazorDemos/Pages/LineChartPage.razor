@@ -9,11 +9,11 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12 my-5">
-                <RadzenCard Class="w-100 mb-4" >
+                <RadzenCard Class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem" >
                     <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
-                    <RadzenLabel Text="Smooth" For="smooth" Style="margin-left: 8px; vertical-align: middle;" />
+                    <RadzenLabel Text="Smooth" For="smooth" Style="margin-right: 1rem;"/>
                     <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                    <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+                    <RadzenLabel Text="Show Data Labels" For="dataLabels" />
                 </RadzenCard>
                 <RadzenChart>
                     <RadzenLineSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Title="2019" LineType="LineType.Dashed" ValueProperty="Revenue">

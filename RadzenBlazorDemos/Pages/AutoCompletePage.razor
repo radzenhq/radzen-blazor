@@ -4,39 +4,40 @@
 @inject NorthwindContext dbContext
 
 <RadzenExample Name="AutoComplete">
+<div class="container-fluid">
     <div class="row px-3">
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4>AutoComplete</h4>
-                <p class="mb-4">Start typing e.g. France</p>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">AutoComplete</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Start typing e.g. France</RadzenText>
                 <RadzenAutoComplete Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "AutoComplete")) Style="width: 100%;" />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4>AutoComplete with placeholder</h4>
-                <p class="mb-4">Start typing e.g. France</p>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">AutoComplete with placeholder</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Start typing e.g. France</RadzenText>
                 <RadzenAutoComplete Placeholder="Select a customer..." Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "AutoComplete with placeholder")) Style="width: 100%;" />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4>Custom filter operator</h4>
-                <p class="mb-4">Show items that <b>start with</b> a specific string</p>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">Custom filter operator</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Show items that <b>start with</b> a specific string</RadzenText>
                 <RadzenAutoComplete Data=@customers TextProperty="CompanyName" FilterOperator="StringFilterOperator.StartsWith" Change=@(args => OnChange(args, "AutoComplete with custom filter operator")) Style="width: 100%;" />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4>Custom filtering</h4>
-                <p class="mb-4">Filtering with LoadData</p>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">Custom filtering</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Filtering with LoadData</RadzenText>
                 <RadzenAutoComplete Data=@customCustomersData TextProperty="CompanyName" LoadData=@OnLoadData Change=@(args => OnChange(args, "AutoComplete with custom filtering")) Style="width: 100%;" />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4>Disabled AutoComplete</h4>
-                <p class="mb-4">AutoComplete with Disabled="true"</p>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">Disabled AutoComplete</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">AutoComplete with Disabled="true"</RadzenText>
                 <RadzenAutoComplete Disabled="true" Placeholder="Select a customer..."  Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "Disabled AutoComplete")) Style="width: 100%;" />
             </RadzenCard>
         </div>
@@ -68,6 +69,7 @@
             </RadzenCard>
         </div>
     </div>
+</div>
 </RadzenExample>
 
 <EventConsole @ref=@console Class="mt-4" />

@@ -1,32 +1,34 @@
 ﻿@page "/rating"
 
 <RadzenExample Name="Rating">
+<div class="container-fluid">
     <div class="row px-3">
         <div class="col-12 col-lg-6 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Rating with 5 stars</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Rating with 5 stars</RadzenText>
                 <RadzenRating Change=@(args => OnChange(args, "Rating with 5 stars")) />
             </RadzenCard>
         </div>
         <div class="col-12 col-lg-6 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Rating with 10 stars</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Rating with 10 stars</RadzenText>
                 <RadzenRating Stars="10" Change=@(args => OnChange(args, "Rating with 10 stars")) />
             </RadzenCard>
         </div>
         <div class="col-12 col-lg-6 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Disabled Rating with 10 stars</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled Rating with 10 stars</RadzenText>
                 <RadzenRating Disabled="true" Stars="10" />
             </RadzenCard>
         </div>
         <div class="col-12 col-lg-6 p-3">
             <RadzenCard>
-                <h4 class="mb-4">ReadOnly Rating</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">ReadOnly Rating</RadzenText>
                 <RadzenRating ReadOnly="true" Stars="5" Value="4" />
             </RadzenCard>
         </div>
     </div>
+</div>
 </RadzenExample>
 
 <EventConsole @ref=@console Class="mt-4" />

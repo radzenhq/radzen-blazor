@@ -1,10 +1,11 @@
 ﻿@page "/selectbar"
 
 <RadzenExample Name="SelectBar">
+<div class="container-fluid">
     <div class="row px-3">
         <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
             <RadzenCard>
-                <h4 class="mb-4">Single selection</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Single selection</RadzenText>
                 <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
                     <Items>
                         <RadzenSelectBarItem Text="On" Value="true" />
@@ -15,7 +16,7 @@
         </div>
         <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
             <RadzenCard>
-                <h4 class="mb-4">Multiple selection</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple selection</RadzenText>
                 <RadzenSelectBar @bind-Value=@values TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with multiple selection"))>
                     <Items>
                         <RadzenSelectBarItem Text="Orders" Value="1" />
@@ -27,7 +28,7 @@
         </div>
         <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
             <RadzenCard>
-                <h4 class="mb-4">Disabled SelectBar with multiple selection</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled SelectBar with multiple selection</RadzenText>
                 <RadzenSelectBar Disabled="true" @bind-Value=@values TValue="IEnumerable<int>" Multiple="true">
                     <Items>
                         <RadzenSelectBarItem Text="Orders" Value="1" />
@@ -39,14 +40,14 @@
         </div>
         <div class="col-lg-6 p-3" style="min-width: fit-content;">
             <RadzenCard>
-                <h4 class="mb-4">SelectBar with items from data</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with items from data</RadzenText>
                 <RadzenSelectBar @bind-Value=@values TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with items from data"))
                             Data="@data" TextProperty="Name" ValueProperty="Id" />
             </RadzenCard>
         </div>
         <div class="col-lg-6 p-3" style="min-width: fit-content;">
             <RadzenCard>
-                <h4 class="mb-4">SelectBar with declared items and items from data</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with declared items and items from data</RadzenText>
                 <RadzenSelectBar @bind-Value=@values Data="@data" TextProperty="Name" ValueProperty="Id" TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with declared items and items from data"))>
                     <Items>
                         <RadzenSelectBarItem Text="Static item" Value="0" />
@@ -92,6 +93,7 @@
             </RadzenCard>
         </div>
     </div>
+</div>
 </RadzenExample>
 
 <EventConsole @ref=@console Class="mt-4" />
