@@ -162,6 +162,9 @@ $button-styles: map-merge(
   $button-styles
 );
 
+// Chip
+$chip-background-color: var(--rz-base-700) !default;
+
 // Header
 $header-border: var(--rz-border-base-700) !default;
 
