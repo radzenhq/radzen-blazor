@@ -118,7 +118,7 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
   }
 
   &.rz-state-disabled {
-    color: rgba(var(--rz-steps-button-color), 0.5) !important;
+    opacity: 0.5 !important;
   }
 
   .rzi {
