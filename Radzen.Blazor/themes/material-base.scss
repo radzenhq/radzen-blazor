@@ -225,6 +225,10 @@ $button-sizes: (
 // Badge
 $badge-font-weight: 500 !default;
 
+// Chip
+$chip-padding: 0.125rem 0.125rem 0.125rem 0.75rem !default;
+$chip-border-radius: calc(4 * var(--rz-border-radius)) !default;
+
 // Input
 $input-height: 2.5rem !default;
 $input-line-height: var(--rz-body-line-height) !default;
