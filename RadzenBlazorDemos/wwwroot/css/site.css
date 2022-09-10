@@ -473,7 +473,7 @@ pre {
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.06);
 }
 
-img.illustration {
+svg.illustration {
     box-shadow: none;
     max-width: 300px;
     min-height: 220px;
