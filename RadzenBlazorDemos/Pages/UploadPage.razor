@@ -60,7 +60,7 @@
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Using RadzenProgressBar
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Using RadzenProgressBar</RadzenText>
                 <RadzenUpload Url="upload/single" Progress=@TrackProgress Complete=@CompleteUpload class="w-100" />
                 <RadzenProgressBar Value=@progress class="mt-4" Visible=@showProgress />
                 <RadzenButton Text="Cancel" Click=@(args => CancelUpload()) class="d-block mt-4" Visible=@showProgress />
