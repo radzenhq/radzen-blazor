@@ -466,7 +466,8 @@ pre {
     margin-bottom: 1rem;
 }
 
-.docu img {
+.docu img,
+.docu svg {
     display: block;
     width: 100%;
     max-width: 700px;
