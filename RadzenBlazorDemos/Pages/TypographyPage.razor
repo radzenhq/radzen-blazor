@@ -71,7 +71,30 @@
                         <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Justify"><strong>TextAlign.Justify</strong><br />  Radzen Blazor Components are open source and free for commercial use. You can install them from nuget or build your own copy from source.</RadzenText>
                     </div>
                 </div>
+
+
+                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="my-4">
+                    Text Functional Colors
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+                    These are the theme's text color CSS variables. Each theme has its own text color values assigned. Change the theme to preview them. You can use CSS variables in styles e.g. <code>style="color: var(--rz-text-secondary-color);"</code>
+                </RadzenText>
+                <div class="colors rz-shadow-2 rz-border-radius-2">
+                    <div><span style="color: var(--rz-text-color)">--rz-text-color</span></div>
+                    <div><span style="color: var(--rz-text-secondary-color)">--rz-text-secondary-color</span></div>
+                    <div><span style="color: var(--rz-text-tertiary-color)">--rz-text-tertiary-color</span></div>
+                    <div><span style="color: var(--rz-text-disabled-color)">--rz-text-disabled-color</span></div>
+                    <div class="rz-background-color-black"><span style="color: var(--rz-text-contrast-color)">--rz-text-contrast-color</span></div>
+                </div>
             </div>
         </div>
     </div>
+    <style>
+        .colors {
+            overflow: hidden;
+        }
+        .colors div {
+            padding: 16px;
+        }
+    </style>
 </RadzenExample>
