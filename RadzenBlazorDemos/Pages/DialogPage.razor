@@ -3,44 +3,46 @@
 @implements IDisposable
 
 <RadzenExample Name="Dialog" AdditionalSourceCodePages=@(new [] { "DialogCardPage.razor" })>
-    <div class="row px-3">
+<div class="container-fluid">
+    <div class="row">
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Open page as a dialog</h4>
-                <RadzenButton Text=@($"Order {orderID} details") ButtonStyle="ButtonStyle.Secondary" Click=@OpenOrder />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Open page as a dialog</RadzenText>
+                <RadzenButton Text=@($"Order {orderID} details") Style="width: 100%;" ButtonStyle="ButtonStyle.Secondary" Click=@OpenOrder />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Inline Dialog</h4>
-                <RadzenButton Text="Dialog with inline Blazor content" ButtonStyle="ButtonStyle.Secondary" Click=@ShowInlineDialog />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Inline Dialog</RadzenText>
+                <RadzenButton Text="Dialog with inline Blazor content" Style="width: 100%;" ButtonStyle="ButtonStyle.Secondary" Click=@ShowInlineDialog />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Busy Dialog with a string message</h4>
-                <RadzenButton Text="Busy dialog" Style="width: 140px;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => ShowBusyDialog(true)) />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Busy Dialog with a string message</RadzenText>
+                <RadzenButton Text="Busy dialog" Style="width: 100%;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => ShowBusyDialog(true)) />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Busy Dialog with markup</h4>
-                <RadzenButton Text="Busy dialog" Style="width: 140px;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => ShowBusyDialog(false)) />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Busy Dialog with markup</RadzenText>
+                <RadzenButton Text="Busy dialog" Style="width: 100%;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => ShowBusyDialog(false)) />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Confirm Dialog</h4>
-                <RadzenButton Text="Confirm dialog" Style="width: 140px;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => DialogService.Confirm("Are you sure?", "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })) />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Confirm Dialog</RadzenText>
+                <RadzenButton Text="Confirm dialog" Style="width: 100%;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => DialogService.Confirm("Are you sure?", "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })) />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Close Dialog by clicking outside</h4>
-                <RadzenButton Text="Dialog with clickable overlay" ButtonStyle="ButtonStyle.Secondary" Click=@ShowCloseableFromOverlayDialog />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Close Dialog by clicking outside</RadzenText>
+                <RadzenButton Text="Dialog with clickable overlay" Style="width: 100%;" ButtonStyle="ButtonStyle.Secondary" Click=@ShowCloseableFromOverlayDialog />
             </RadzenCard>
         </div>
     </div>
+<div class="container-fluid">
 </RadzenExample>
 
 <EventConsole @ref=@console Class="mt-4" />

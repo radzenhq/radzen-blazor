@@ -1,10 +1,11 @@
 ﻿@page "/breadcrumb"
 
 <RadzenExample Name="BreadCrumb" Source="BreadCrumb" Documentation="false">
-    <div class="row px-3">
+<div class="container-fluid">
+    <div class="row">
         <div class="col-md-6 p-3">
             <RadzenCard class="pb-4">
-                <RadzenHeading Size="H4" Text="Default Radzen BreadCrumb" Class="mb-4" />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Default Radzen BreadCrumb</RadzenText>
                 <RadzenBreadCrumb>
                     <RadzenBreadCrumbItem Path="/" Text="Components" />
                     <RadzenBreadCrumbItem Path="/badge" Text="Badge" />
@@ -14,7 +15,7 @@
         </div>
         <div class="col-md-6 p-3">
             <RadzenCard class="pb-4">
-                <RadzenHeading Size="H4" Text="With Template" Class="mb-4" />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">With Template</RadzenText>
                 <RadzenBreadCrumb>
                     <Template Context="item">
                         <RadzenBadge Text="@item.Text" IsPill="true" />
@@ -27,12 +28,9 @@
                 </RadzenBreadCrumb>
             </RadzenCard>
         </div>
-    </div>
-
-    <div class="row px-3">
         <div class="col-md-6 p-3">
             <RadzenCard class="pb-4">
-                <RadzenHeading Size="H4" Text="With ChildContent" Class="mb-4" />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">With ChildContent</RadzenText>
                 <RadzenBreadCrumb>
                     <Template Context="item">
                         <RadzenLink Path="@item.Path" Icon="@item.Icon" Text="@item.Text" />
@@ -50,5 +48,6 @@
             </RadzenCard>
         </div>
     </div>
+</div>
 </RadzenExample>
 
