@@ -12,6 +12,7 @@ $steps-number-selected-background: var(--rz-secondary) !default;
 
 $steps-title-selected-color: var(--rz-secondary) !default;
 $steps-title-margin: 0 1rem 0 0.5rem !default;
+$steps-buttons-padding: 1rem 0 !default;
 $steps-button-color: var(--rz-text-secondary-color) !default;
 
 // Steps CSS variables
@@ -31,10 +32,19 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
   
   --rz-steps-title-selected-color: #{$steps-title-selected-color};
   --rz-steps-title-margin: #{$steps-title-margin};
+  --rz-steps-buttons-padding: #{$steps-buttons-padding};
   --rz-steps-button-color: #{$steps-button-color};
 }
 
 .rz-steps {
+  display: flex;
+  flex-direction: column;
+
+  .rz-widget-content {
+    flex: 1;
+    overflow: auto;
+  }
+
   ul {
     list-style: none;
     padding: 0;
@@ -98,6 +108,7 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
 .rz-steps-buttons {
   display: flex;
   justify-content: space-between;
+  padding: var(--rz-steps-buttons-padding);
 }
 
 .rz-steps-next,
