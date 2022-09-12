@@ -5,7 +5,7 @@
     <div class="row px-3">
         <div class="col-lg-6 p-3 d-flex">
             <RadzenCard Style="width: 100%;">
-                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Horizontal Orientation</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Horizontal Orientation</RadzenText>
                 <RadzenCheckBoxList @bind-Value=@values TValue="int" Change=@(args => OnChange(args, "CheckBoxList with horizontal orientation")) Class="mb-5">
                     <Items>
                         <RadzenCheckBoxListItem Text="Orders" Value="1" />
@@ -13,7 +13,7 @@
                         <RadzenCheckBoxListItem Text="Customers" Value="3" />
                     </Items>
                 </RadzenCheckBoxList>
-                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Vertical Orientation</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Vertical Orientation</RadzenText>
                 <RadzenCheckBoxList @bind-Value=@values TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "CheckBoxList with vertical orientation"))>
                     <Items>
                         <RadzenCheckBoxListItem Text="Orders" Value="1" />
@@ -25,14 +25,14 @@
         </div>
         <div class="col-lg-6 p-3 d-flex">
             <RadzenCard Style="width: 100%;">
-                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">CheckBoxList with items from data</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">CheckBoxList with items from data</RadzenText>
                 <RadzenCheckBoxList @bind-Value=@values TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "CheckBoxList with items from data"))
                             Data="@data" TextProperty="Name" ValueProperty="Id" />
             </RadzenCard>
         </div>
         <div class="col-lg-6 p-3 d-flex">
             <RadzenCard Style="width: 100%;">
-                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">CheckBoxList with declared items and items from data</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">CheckBoxList with declared items and items from data</RadzenText>
                 <RadzenCheckBoxList @bind-Value=@values Data="@data" TextProperty="Name" ValueProperty="Id" TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "CheckBoxList with declared items and items from data"))>
                     <Items>
                         <RadzenCheckBoxListItem Text="Static item" Value="0" />
@@ -42,7 +42,7 @@
         </div>
         <div class="col-lg-6 p-3 d-flex">
             <RadzenCard Style="width: 100%;">
-                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Disabled CheckBoxList</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled CheckBoxList</RadzenText>
                 <RadzenCheckBoxList @bind-Value=@values Disabled="true" TValue="int" Orientation="Orientation.Vertical">
                     <Items>
                         <RadzenCheckBoxListItem Text="Orders" Value="1" />
