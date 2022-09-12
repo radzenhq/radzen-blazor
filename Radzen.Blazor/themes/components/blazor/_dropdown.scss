@@ -31,6 +31,8 @@ $dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
 $dropdown-panel-border: var(--rz-input-border) !default;
 $dropdown-panel-shadow: none !default;
 
+$dropdown-chips-padding: var(--rz-input-padding) !default;
+
 $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 
 // DropDown CSS variables
@@ -65,6 +67,8 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
   --rz-dropdown-open-border: #{$dropdown-open-border};
   --rz-dropdown-panel-border: #{$dropdown-panel-border};
   --rz-dropdown-panel-shadow: #{$dropdown-panel-shadow};
+
+  --rz-dropdown-chips-padding: #{$dropdown-chips-padding};
 
   --rz-multiselect-checkbox-margin: #{$multiselect-checkbox-margin};
 }
@@ -302,6 +306,7 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 
 .rz-dropdown-chips {
     height: inherit;
+    padding: var(--rz-dropdown-chips-padding);
 
     .rz-dropdown-chips-wrapper {
         display: flex;
