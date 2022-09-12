@@ -109,25 +109,25 @@
                                 TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
             </RadzenCard>
         </div>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-6 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Multiple selection with chips</h4>
-            <RadzenDropDown Multiple="true" Chips="true" MaxSelectedLabels="20" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@multipleValuesChip
-                            TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">DropDown with groups</h4>
-                <RadzenDropDown TValue="int" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID"
-                                Change=@(args => OnChange(args, "DropDown with groups")) Class="w-100">
-                   <Template>
-                        @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")
-                   </Template>
-                </RadzenDropDown>
-        </RadzenCard>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple selection with chips</RadzenText>
+                <RadzenDropDown Multiple="true" Chips="true" MaxSelectedLabels="20" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@multipleValuesChip
+                                TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown with groups</RadzenText>
+                    <RadzenDropDown TValue="int" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID"
+                                    Change=@(args => OnChange(args, "DropDown with groups")) Class="w-100">
+                    <Template>
+                            @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")
+                    </Template>
+                    </RadzenDropDown>
+            </RadzenCard>
+        </div>
     </div>
 </div>
 </RadzenExample>
