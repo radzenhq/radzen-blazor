@@ -11,11 +11,12 @@
 </RadzenText>
 
 <RadzenExample Name="Tree" Source="TreeDataBinding" Heading="false">
-    <div class="row">
+<div class="container-fluid">
+    <div class="row my-5">
         <div class="col-md-4">
             <RadzenCard>
-                <h4>Data-binding to Categories &#8250; Products</h4>
-                <p class="mb-3">Data from different tables.</p>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">Data-binding to Categories &#8250; Products</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Data from different tables.</RadzenText>
                 <RadzenTree Style="height: 300px" Data=@categories>
                     <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
                     <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
@@ -24,8 +25,8 @@
         </div>
         <div class="col-md-4">
             <RadzenCard>
-                <h4>Data-binding to Employees</h4>
-                <p class="mb-3">Data from a single self-referencing table.</p>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">Data-binding to Employees</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Data from a single self-referencing table.</RadzenText>
                 <RadzenTree Data=@employees Style="height: 300px">
                     <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1" 
                         Expanded=@ShouldExpand HasChildren=@(e => (e as Employee).Employees1.Any()) 
@@ -35,14 +36,15 @@
         </div>
         <div class="col-md-4">
             <RadzenCard>
-                <h4>Load children on demand</h4>
-                <p class="mb-3">Populate children on parent expand.</p>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">Load children on demand</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Populate children on parent expand.</RadzenText>
                 <RadzenTree Data=@categories Expand=@OnExpand Style="height: 300px">
                     <RadzenTreeLevel TextProperty="CategoryName"/>
                 </RadzenTree>
             </RadzenCard>
         </div>
     </div>
+</div>
 </RadzenExample>
 
 @code {

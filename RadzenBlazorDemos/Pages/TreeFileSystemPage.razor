@@ -10,14 +10,15 @@
 </RadzenText>
 
 <RadzenExample Name="Tree" Source="TreeFileSystem" Heading="false">
-
-<div class="row my-5">
-    <div class="col-lg-6 offset-lg-3">
-        <RadzenCard>
-            <RadzenTree Data=@entries Expand=@LoadFiles Style="width: 100%; height: 300px">
-                <RadzenTreeLevel Text=@GetTextForNode Template=@FileOrFolderTemplate />
-            </RadzenTree>
-        </RadzenCard>
+<div class="container-fluid">
+    <div class="row my-5">
+        <div class="col-lg-6 offset-lg-3">
+            <RadzenCard>
+                <RadzenTree Data=@entries Expand=@LoadFiles Style="width: 100%; height: 300px">
+                    <RadzenTreeLevel Text=@GetTextForNode Template=@FileOrFolderTemplate />
+                </RadzenTree>
+            </RadzenCard>
+        </div>
     </div>
 </div>
 </RadzenExample>
