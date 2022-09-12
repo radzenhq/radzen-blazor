@@ -105,18 +105,19 @@ text-decoration: none;
 }
 
 .console-message {
-    margin: 8px 0;
-    padding: 4px 0;
+    margin: 4px 0;
+    padding: 2px 0;
     display: flex;
     align-items: baseline;
-    color: #000000;
-    background: rgba(210,233,255,0.8);
-    border-radius: 4px;
+    color: var(--rz-text-color);
+    background: var(--rz-info-lighter);
+    border-radius: var(--rz-border-radius);
+    font-size: 0.875rem;
 }
 
 .console-message-time {
-    font-size: 12px;
-    padding: 2px 4px;
+    padding: 2px 8px;
+    color: var(--rz-info-dark);
 }
 
 /* next-demos */
