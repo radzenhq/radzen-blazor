@@ -3,6 +3,7 @@
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
+@using RadzenBlazorDemos.Pages
 
 @inject NorthwindContext dbContext
 
@@ -10,9 +11,9 @@
 
 <p>Set the initial filter of your RadzenDataGrid via the <code>FilterValue</code> and <code>FilterOperator</code> column properties.</p>
 
-<RadzenExample Name="DataGrid" Source="DataGridFilterApi" Heading="false">
+<RadzenExample Name="DataGrid" Source="DataGridFilterApi" Heading="false" AdditionalSourceCodePages=@(new [] { "MyCustomDataGridColumn.razor" })>
     <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 
-        FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" 
+        FilterMode="FilterMode.Simple" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" 
         FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
         LogicalFilterOperator="LogicalFilterOperator.Or" Filter="@OnFilter">
         <Columns>
@@ -24,7 +25,7 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
             <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
-            <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+            <MyCustomDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
             <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
             <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
         </Columns>
@@ -58,6 +59,6 @@
 
     void OnFilter(DataGridColumnFilterEventArgs<Employee> args)
     {
-        //
+    //
     }
 }

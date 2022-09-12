@@ -167,36 +167,66 @@
                                                                             <div class="rz-listbox rz-inputtext   ">
                                                                                 <div class="rz-listbox-list-wrapper">
                                                                                     <ul class="rz-listbox-list">
-                                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.Equals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.Equals))" style="display: block;">
-                                                                                            <span>@EqualsText</span>
-                                                                                        </li>
-                                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.NotEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.NotEquals))" style="display: block;">
-                                                                                            <span>@NotEqualsText</span>
-                                                                                        </li>
-                                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.LessThan))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThan))" style="display: block;">
-                                                                                            <span>@LessThanText</span>
-                                                                                        </li>
-                                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.LessThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThanOrEquals))" style="display: block;">
-                                                                                            <span>@LessThanOrEqualsText</span>
-                                                                                        </li>
-                                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThan))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThan))" style="display: block;">
-                                                                                            <span>@GreaterThanText</span>
-                                                                                        </li>
-                                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThanOrEquals))" style="display: block;">
-                                                                                            <span>@GreaterThanOrEqualsText</span>
-                                                                                        </li>
-                                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsEmpty))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsEmpty))" style="display: block;">
-                                                                                            <span>@IsEmptyText</span>
-                                                                                        </li>
-                                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNotEmpty))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNotEmpty))" style="display: block;">
-                                                                                            <span>@IsNotEmptyText</span>
-                                                                                        </li>
-                                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNull))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNull))" style="display: block;">
-                                                                                            <span>@IsNullText</span>
-                                                                                        </li>
-                                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNotNull))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNotNull))" style="display: block;">
-                                                                                            <span>@IsNotNullText</span>
-                                                                                        </li>
+                                                                                        @if (column.GetFilterOperators().Contains(FilterOperator.Equals))
+                                                                                        {
+                                                                                            <li class="@(DateFilterOperatorStyle(column, FilterOperator.Equals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.Equals))" style="display: block;">
+                                                                                                <span>@EqualsText</span>
+                                                                                            </li>
+                                                                                        }
+                                                                                        @if (column.GetFilterOperators().Contains(FilterOperator.NotEquals))
+                                                                                        {
+                                                                                            <li class="@(DateFilterOperatorStyle(column, FilterOperator.NotEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.NotEquals))" style="display: block;">
+                                                                                                <span>@NotEqualsText</span>
+                                                                                            </li>
+                                                                                        }
+                                                                                        @if (column.GetFilterOperators().Contains(FilterOperator.LessThan))
+                                                                                        {
+                                                                                            <li class="@(DateFilterOperatorStyle(column, FilterOperator.LessThan))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThan))" style="display: block;">
+                                                                                                <span>@LessThanText</span>
+                                                                                            </li>
+                                                                                        }
+                                                                                        @if (column.GetFilterOperators().Contains(FilterOperator.LessThanOrEquals))
+                                                                                        {
+                                                                                            <li class="@(DateFilterOperatorStyle(column, FilterOperator.LessThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThanOrEquals))" style="display: block;">
+                                                                                                <span>@LessThanOrEqualsText</span>
+                                                                                            </li>
+                                                                                        }
+                                                                                        @if (column.GetFilterOperators().Contains(FilterOperator.GreaterThan))
+                                                                                        {
+                                                                                            <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThan))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThan))" style="display: block;">
+                                                                                                <span>@GreaterThanText</span>
+                                                                                            </li>
+                                                                                        }
+                                                                                        @if (column.GetFilterOperators().Contains(FilterOperator.GreaterThanOrEquals))
+                                                                                        {
+                                                                                            <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThanOrEquals))" style="display: block;">
+                                                                                                <span>@GreaterThanOrEqualsText</span>
+                                                                                            </li>
+                                                                                        }
+                                                                                        @if (column.GetFilterOperators().Contains(FilterOperator.IsEmpty))
+                                                                                        {
+                                                                                            <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsEmpty))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsEmpty))" style="display: block;">
+                                                                                                <span>@IsEmptyText</span>
+                                                                                            </li>
+                                                                                        }
+                                                                                        @if (column.GetFilterOperators().Contains(FilterOperator.IsNotEmpty))
+                                                                                        {
+                                                                                            <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNotEmpty))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNotEmpty))" style="display: block;">
+                                                                                                <span>@IsNotEmptyText</span>
+                                                                                            </li>
+                                                                                        }
+                                                                                        @if (column.GetFilterOperators().Contains(FilterOperator.IsNull))
+                                                                                        {
+                                                                                            <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNull))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNull))" style="display: block;">
+                                                                                                <span>@IsNullText</span>
+                                                                                            </li>
+                                                                                        }
+                                                                                        @if (column.GetFilterOperators().Contains(FilterOperator.IsNotNull))
+                                                                                        {
+                                                                                            <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNotNull))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNotNull))" style="display: block;">
+                                                                                                <span>@IsNotNullText</span>
+                                                                                            </li>
+                                                                                        }
                                                                                     </ul>
                                                                                 </div>
                                                                             </div>

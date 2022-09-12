@@ -818,7 +818,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Get possible column filter operators.
         /// </summary>
-        public IEnumerable<FilterOperator> GetFilterOperators()
+        public virtual IEnumerable<FilterOperator> GetFilterOperators()
         {
             if (PropertyAccess.IsEnum(FilterPropertyType))
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals };
