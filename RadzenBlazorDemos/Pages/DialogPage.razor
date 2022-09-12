@@ -42,7 +42,7 @@
             </RadzenCard>
         </div>
     </div>
-<div class="container-fluid">
+</div>
 </RadzenExample>
 
 <EventConsole @ref=@console Class="mt-4" />
@@ -89,7 +89,7 @@
             <div class="row">
                 <div class="col">
                     <RadzenButton Text="Ok" Click="() => ds.Close(true)" Class="mr-1" Style="width: 80px;" />
-                    <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" Class="mr-1" />
+                    <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" Class="mr-1" />
                     <RadzenButton Text="Refresh" Click="(() => { orderID = 10249; ds.Refresh(); })" ButtonStyle="ButtonStyle.Light"  Class="mr-1 float-right" />
                     
                 </div>
