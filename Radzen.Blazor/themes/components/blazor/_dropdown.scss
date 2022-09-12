@@ -315,8 +315,7 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 
 .rz-clear {
   .rz-multiselect-label-container,
-  .rz-dropdown-label,
-  .rz-dropdown-badges-items {
+  .rz-dropdown-label {
     padding-right: calc(2 * var(--rz-dropdown-trigger-icon-width));
   }
 }
