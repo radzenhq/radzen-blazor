@@ -2,7 +2,7 @@
 
 <RadzenExample Name="DatePicker">
 <div class="container-fluid">
-    <div class="row px-3">
+    <div class="row">
         <div class="col-lg-12 col-xl-8">
             <div class="row">
                 <div class="col-lg-6 col-xl-4 p-3">
@@ -60,7 +60,7 @@
                         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DatePicker with footer template</RadzenText>
                         <RadzenDatePicker @bind-Value=@value DateFormat="d" Class="w-100">
                             <FooterTemplate>
-                                <RadzenButton Click=@OnTodayClick Text="Today" />
+                                <RadzenButton Click=@OnTodayClick Text="Today" Class="my-3 w-100" />
                             </FooterTemplate>
                         </RadzenDatePicker>
                     </RadzenCard>

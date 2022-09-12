@@ -5,7 +5,7 @@
 
 <RadzenExample Name="AutoComplete">
 <div class="container-fluid">
-    <div class="row px-3">
+    <div class="row">
         <div class="col-md-4 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">AutoComplete</RadzenText>
@@ -43,15 +43,8 @@
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4>Multiline AutoComplete</h4>
-                <p class="mb-4">AutoComplete with Multiline="true"</p>
-                <RadzenAutoComplete Multiline="true" Placeholder="Select a customer..." Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "Multiline AutoComplete")) Style="width: 100%;" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4>AutoComplete with Template</h4>
-                <p class="mb-4">Start typing e.g. `a`</p>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">AutoComplete with Template</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Start typing e.g. `a`</RadzenText>
                 <RadzenAutoComplete Placeholder="Select a customer..." Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "AutoComplete with Template")) Style="width: 100%;">
                     <Template>
                         CompanyName: @context.CompanyName
@@ -63,9 +56,16 @@
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4>AutoComplete with a List of Strings</h4>
-                <p class="mb-4">Start typing e.g. France</p>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">AutoComplete with a List of Strings</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Start typing e.g. France</RadzenText>
                 <RadzenAutoComplete Data=@customersNames FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Change=@(args => OnChange(args, "AutoComplete with a List of Strings")) Style="width: 100%;" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">Multiline AutoComplete</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">AutoComplete with Multiline="true"</RadzenText>
+                <RadzenAutoComplete Multiline="true" Placeholder="Select a customer..." Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "Multiline AutoComplete")) Style="width: 100%;" />
             </RadzenCard>
         </div>
     </div>
