@@ -911,6 +911,15 @@ namespace Radzen.Blazor
             }
         }
 
+
+        /// <summary>
+        /// Gets value indicating if the user can specify time in DateTime column filter.
+        /// </summary>
+        public virtual bool ShowTimeForDateTimeFilter()
+        {
+            return true;
+        }
+
         /// <summary>
         /// Disposes this instance.
         /// </summary>

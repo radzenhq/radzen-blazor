@@ -232,7 +232,7 @@
                                                                             </div>
 
                                                                             <RadzenDatePicker TValue="@object"
-                                                                                      ShowTime="true" ShowTimeOkButton="false" Inline="true" DateFormat="@getFilterDateFormat(column)"
+                                                                                      ShowTime="@column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="false" Inline="true" DateFormat="@getFilterDateFormat(column)"
                                                                                       Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args.Value))" />
 
                                                                         </div>
