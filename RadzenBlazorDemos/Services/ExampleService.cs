@@ -16,6 +16,7 @@ namespace RadzenBlazorDemos
         new Example()
         {
             Name = "Dashboard",
+            Updated = true,
             Path = "/dashboard",
             Title = "Rich dasboard created with the Radzen Blazor components",
             Icon = "&#xe871"
@@ -572,6 +573,7 @@ namespace RadzenBlazorDemos
         {
             Name="Layout & Navigation",
             Icon = "&#xe8f1",
+            Updated = true,
             Children = new [] {
                 new Example()
                 {
@@ -671,6 +673,7 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "Steps",
+                    Updated = true,
                     Title = "Blazor Steps component",
                     Path = "steps",
                     Icon = "&#xe044",
@@ -689,6 +692,7 @@ namespace RadzenBlazorDemos
         new Example()
         {
             Name = "Forms",
+            Updated = true,
             Icon = "&#xf1c1",
             Children = new [] {
                 new Example()
@@ -702,6 +706,7 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "Button",
+                    Updated = true,
                     Title = "Blazor Button component",
                     Path = "button",
                     Icon = "&#xe86d"
@@ -1026,12 +1031,14 @@ namespace RadzenBlazorDemos
         new Example()
         {
             Name = "Feedback",
+            Updated = true,
             Icon = "&#xe0cb",
             Children = new [] {
                 new Example()
                 {
                     Name = "Badge",
                     Path = "badge",
+                    Updated = true,
                     Title = "Blazor badge component",
                     Icon = "&#xea67",
                     Tags = new[] { "badge", "link"}
@@ -1047,6 +1054,7 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "ProgressBar",
+                    Updated = true,
                     Title = "Blazor progress component",
                     Path = "progressbar",
                     Icon = "&#xe893",
