@@ -33,6 +33,9 @@ $badge-styles: map-merge(
       background-color: var(--rz-base-200),
       color: var(--rz-base-900)
     ),
+    dark: (
+      background-color: var(--rz-base-900)
+    ),
     secondary: (
       background-color: var(--rz-secondary)
     ),
@@ -70,16 +73,123 @@ $badge-styles: map-merge(
 
     .rz-button & {
       vertical-align: top;
-      margin: 0 0.25rem;
     }
 }
 
 @each $style, $badge in $badge-styles {
     .rz-badge-#{$style} {
         @each $name, $value in $badge {
+          @if $style == 'dark' {
             #{$name}: #{$value};
+          } @else if $style == 'light' {
+            #{$name}: #{$value};
+          } @else {
+            #{$name}: #{$value};
+            @if $name == 'background-color' {
+              &.rz-shade-lighter {
+                background-color: var(--rz-#{$style}-lighter);
+                color: var(--rz-#{$style});
+              }
+              &.rz-shade-light {
+                background-color: var(--rz-#{$style}-light);
+                @if $standard == true {
+                  color: var(--rz-text-contrast-color);
+                }
+              }
+              &.rz-shade-default {
+                background-color: var(--rz-#{$style});
+                @if $standard == true {
+                  color: var(--rz-text-contrast-color);
+                }
+              }
+              &.rz-shade-dark {
+                background-color: var(--rz-#{$style}-dark);
+                @if $standard == true {
+                  color: var(--rz-text-contrast-color);
+                }
+              }
+              &.rz-shade-darker {
+                background-color: var(--rz-#{$style}-darker);
+                @if $standard == true {
+                  color: var(--rz-text-contrast-color);
+                }
+              }
+            }
+          }
         }
     }
+}
+
+@each $style, $badge in $badge-styles {
+  .rz-variant-outlined.rz-badge-#{$style} {
+    @each $name, $value in $badge {
+      @if $name == 'background-color' {
+        @if $style == 'dark' {
+          outline-color: #{$value};
+          color: #{$value};
+        } @else if $style == 'light' {
+          outline-color: #{$value};
+          color: #{$value};
+        } @else {
+          &.rz-shade-lighter {
+            outline-color: var(--rz-#{$style}-lighter);
+            color: var(--rz-#{$style}-lighter)
+          }
+          &.rz-shade-light {
+            outline-color: var(--rz-#{$style}-light);
+            color: var(--rz-#{$style}-light)
+          }
+          &.rz-shade-default {
+            outline-color: var(--rz-#{$style});
+            color: var(--rz-#{$style})
+          }
+          &.rz-shade-dark {
+            outline-color: var(--rz-#{$style}-dark);
+            color: var(--rz-#{$style}-dark)
+          }
+          &.rz-shade-darker {
+            outline-color: var(--rz-#{$style}-darker);
+            color: var(--rz-#{$style}-darker)
+          }
+        }
+        outline-style: solid;
+        outline-width: var(--rz-border-width);
+        outline-offset: calc(var(--rz-border-width) * -1);
+        background-color: transparent;
+      }
+    }
+  }
+}
+
+@each $style, $badge in $badge-styles {
+  .rz-variant-text.rz-badge-#{$style} {
+    @each $name, $value in $badge {
+      @if $name == 'background-color' {
+        @if $style == 'dark' {
+          color: #{$value};
+        } @else if $style == 'light' {
+          color: #{$value};
+        } @else {
+          &.rz-shade-lighter {
+            color: var(--rz-#{$style}-lighter)
+          }
+          &.rz-shade-light {
+            color: var(--rz-#{$style}-light)
+          }
+          &.rz-shade-default {
+            color: var(--rz-#{$style})
+          }
+          &.rz-shade-dark {
+            color: var(--rz-#{$style}-dark)
+          }
+          &.rz-shade-darker {
+            color: var(--rz-#{$style}-darker)
+          }
+        }
+        background-color: transparent;
+      }
+    }
+  }
 }
 
 .rz-badge-pill {

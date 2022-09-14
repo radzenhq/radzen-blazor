@@ -20,6 +20,8 @@ namespace Radzen.Blazor
 
             classList.Add("rz-badge");
             classList.Add($"rz-badge-{BadgeStyle.ToString().ToLowerInvariant()}");
+            classList.Add($"rz-variant-{Variant.ToString().ToLowerInvariant()}");
+            classList.Add($"rz-shade-{Shade.ToString().ToLowerInvariant()}");
 
             if (IsPill)
             {
@@ -49,6 +51,20 @@ namespace Radzen.Blazor
         /// <value>The badge style.</value>
         [Parameter]
         public BadgeStyle BadgeStyle { get; set; }
+
+        /// <summary>
+        /// Gets or sets the badge variant.
+        /// </summary>
+        /// <value>The badge variant.</value>
+        [Parameter]
+        public Variant Variant { get; set; } = Variant.Filled;
+
+         /// <summary>
+        /// Gets or sets the badge shade color.
+        /// </summary>
+        /// <value>The badge shade color.</value>
+        [Parameter]
+        public Shade Shade { get; set; } = Shade.Default;
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is pill.

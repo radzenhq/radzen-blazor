@@ -602,6 +602,10 @@ namespace Radzen
         /// </summary>
         Light,
         /// <summary>
+        /// Dark styling. Similar to dark buttons.
+        /// </summary>
+        Dark,
+        /// <summary>
         /// Success styling.
         /// </summary>
         Success,
@@ -705,6 +709,10 @@ namespace Radzen
         /// </summary>
         Light,
         /// <summary>
+        /// A button with dark styling.
+        /// </summary>
+        Dark,
+        /// <summary>
         /// A button with success styling.
         /// </summary>
         Success,
@@ -720,6 +728,52 @@ namespace Radzen
         /// A button with informative styling.
         /// </summary>
         Info
+    }
+
+    /// <summary>
+    /// Specifies the design variant of <see cref="RadzenButton" /> and <see cref="RadzenBadge" />. Affects the visual styling of RadzenButton and RadzenBadge.
+    /// </summary>
+    public enum Variant
+    {
+        /// <summary>
+        /// A filled appearance.
+        /// </summary>
+        Filled,
+        /// <summary>
+        /// A text appearance.
+        /// </summary>
+        Text,
+        /// <summary>
+        /// An outlined appearance.
+        /// </summary>
+        Outlined
+    }
+
+    /// <summary>
+    /// Specifies the color shade of a <see cref="RadzenButton" />. Affects the visual styling of RadzenButton.
+    /// </summary>
+    public enum Shade
+    {
+        /// <summary>
+        /// A button with lighter styling.
+        /// </summary>
+        Lighter,
+        /// <summary>
+        /// A button with light styling.
+        /// </summary>
+        Light,
+        /// <summary>
+        /// A button with default styling.
+        /// </summary>
+        Default,
+        /// <summary>
+        /// A button with dark styling.
+        /// </summary>
+        Dark,
+        /// <summary>
+        /// A button with darker styling.
+        /// </summary>
+        Darker
     }
 
     /// <summary>
@@ -921,6 +975,10 @@ namespace Radzen
         /// </summary>
         Light,
         /// <summary>
+        /// Dark styling. Similar to dark buttons.
+        /// </summary>
+        Dark,
+        /// <summary>
         /// Success styling.
         /// </summary>
         Success,
@@ -955,6 +1013,10 @@ namespace Radzen
         /// Light styling. Similar to light buttons.
         /// </summary>
         Light,
+        /// <summary>
+        /// Dark styling. Similar to dark buttons.
+        /// </summary>
+        Dark,
         /// <summary>
         /// Success styling.
         /// </summary>

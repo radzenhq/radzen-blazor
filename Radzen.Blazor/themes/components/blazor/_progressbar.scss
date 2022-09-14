@@ -23,7 +23,11 @@ $progressbar-styles: map-merge(
             color: var(--rz-text-contrast-color)
         ), 
         light: (
-            background-color: var(--rz-base-700),
+            background-color: var(--rz-base-400),
+            color: var(--rz-text-title-color)
+        ),
+        dark: (
+            background-color: var(--rz-base-900),
             color: var(--rz-text-contrast-color)
         ),
         secondary: ( 
