@@ -856,7 +856,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 0 1rem;
+  padding: 1rem;
 
   .rz-dropdown,
   .rz-spinner,
@@ -867,7 +867,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   }
 
   .rz-grid-filter-label {
-    margin-top: 1rem;
     font-weight: 600;
   }
 }
