@@ -166,6 +166,7 @@ $chart-color-schemes: (
 
 .rz-donut-title {
   text-anchor: middle;
+  fill: var(--rz-text-title-color)
 }
 
 .rz-donut-content {
