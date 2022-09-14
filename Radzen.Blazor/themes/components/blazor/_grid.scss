@@ -384,6 +384,10 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+
+      &:has(.rz-chkbox) {
+        overflow: visible;
+      }
     }
   }
 }
@@ -531,6 +535,11 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+
+      &:has(.rz-chkbox),
+      &:has(.rz-button) {
+        overflow: visible;
+      }
     }
   }
 
