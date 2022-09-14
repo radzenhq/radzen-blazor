@@ -36,11 +36,11 @@
                 <Template Context="data">
                     @if (data.Quantity > 20)
                     {
-                        <span style='color:white'>@data.Quantity</span>
+                        <span style='color: var(--rz-text-contrast-color)'>@data.Quantity</span>
                     }
                     else
                     {
-                        <span style='color:black'>@data.Quantity</span>
+                        <span style='color: var(--rz-text-color)'>@data.Quantity</span>
                     }
                 </Template>
                 <FooterTemplate>
@@ -73,7 +73,7 @@
     {
         if (args.Column.Property == "Quantity")
         {
-            args.Attributes.Add("style", $"background-color: {(args.Data.Quantity > 20 ? "#ff6d41" : "white")};");
+            args.Attributes.Add("style", $"background-color: {(args.Data.Quantity > 20 ? "var(--rz-success)" : "var(--rz-base-background-color)")};");
 
             if (args.Data.Discount == 0)
             {
