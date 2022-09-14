@@ -32,7 +32,6 @@ $button-sizes: map-merge(
       min-width: 3.25rem,
       font-weight: 600,
       border-radius: calc(2 * var(--rz-border-radius)),
-      letter-spacing: 0.5px,
       icon: (
         font-size: 1.5rem,
         height: 1.5rem,
@@ -95,6 +94,14 @@ $button-styles: map-merge(
     light: (
       background-color: var(--rz-base-200),
       color: var(--rz-text-color)
+    ),
+    base: (
+      background-color: var(--rz-base-200),
+      color: var(--rz-text-color)
+    ),
+    dark: (
+      background-color: var(--rz-base-900),
+      color: var(--rz-text-contrast-color)
     ),
     secondary: (
       background-color: var(--rz-secondary),
@@ -209,7 +216,147 @@ $button-styles: map-merge(
   @each $style, $button in $button-styles {
     &.rz-#{$style} {
       @each $name, $value in $button {
-        #{$name}: #{$value};
+        @if $style == 'dark' {
+          #{$name}: #{$value};
+        } @else if $style == 'light' {
+          #{$name}: #{$value};
+        } @else {
+          #{$name}: #{$value};
+          @if $name == 'background-color' {
+            &.rz-shade-lighter {
+              background-color: var(--rz-#{$style}-lighter);
+              color: var(--rz-#{$style});
+            }
+            &.rz-shade-light {
+              background-color: var(--rz-#{$style}-light);
+            }
+            &.rz-shade-default {
+              background-color: var(--rz-#{$style});
+            }
+            &.rz-shade-dark {
+              background-color: var(--rz-#{$style}-dark);
+            }
+            &.rz-shade-darker {
+              background-color: var(--rz-#{$style}-darker);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @each $style, $button in $button-styles {
+    &.rz-variant-outlined.rz-#{$style} {
+      @each $name, $value in $button {
+        @if $name == 'background-color' {
+          @if $style == 'dark' {
+            outline-color: #{$value};
+            color: #{$value};
+          } @else if $style == 'light' {
+            @if $theme-dark == true {
+              outline-color: map-get($button, color);
+              color: map-get($button, color);
+            } @else {
+              outline-color: #{$value};
+              color: #{$value};
+            }
+          } @else {
+            &.rz-shade-lighter {
+              outline-color: var(--rz-#{$style}-lighter);
+              color: var(--rz-#{$style}-light)
+            }
+            &.rz-shade-light {
+              outline-color: var(--rz-#{$style}-light);
+              color: var(--rz-#{$style}-light)
+            }
+            &.rz-shade-default {
+              outline-color: var(--rz-#{$style});
+              color: var(--rz-#{$style})
+            }
+            &.rz-shade-dark {
+              outline-color: var(--rz-#{$style}-dark);
+              color: var(--rz-#{$style}-dark)
+            }
+            &.rz-shade-darker {
+              outline-color: var(--rz-#{$style}-darker);
+              color: var(--rz-#{$style}-darker)
+            }
+          }
+          outline-style: solid;
+          outline-width: var(--rz-border-width);
+          outline-offset: calc(var(--rz-border-width) * -1);
+          background-color: transparent;
+          box-shadow: none;
+  
+          &:not(.rz-state-disabled):hover:not(:active),
+          &:not(.rz-state-disabled):active {
+            &.rz-shade-lighter {
+              color: var(--rz-#{$style})
+            }
+            @if $style == 'light' {
+              background-color: rgba(255, 255, 255, .12);
+            } @else if $style == 'dark' {
+              background-color: rgba(0, 0, 0, .12);
+            } @else {
+              background-color: var(--rz-#{$style}-lighter);
+            }
+            background-image: none;
+            box-shadow: none;
+          }
+        }
+      }
+    }
+  }
+
+  @each $style, $button in $button-styles {
+    &.rz-variant-text.rz-#{$style} {
+      @each $name, $value in $button {
+        @if $name == 'background-color' {
+          @if $style == 'dark' {
+            color: #{$value};
+          } @else if $style == 'light' {
+            @if $theme-dark == true {
+              color: map-get($button, color);
+            } @else {
+              color: #{$value};
+            }
+          } @else {
+            &.rz-shade-lighter {
+              color: var(--rz-#{$style}-lighter)
+            }
+            &.rz-shade-light {
+              color: var(--rz-#{$style}-light)
+            }
+            &.rz-shade-default {
+              color: var(--rz-#{$style})
+            }
+            &.rz-shade-dark {
+              color: var(--rz-#{$style}-dark)
+            }
+            &.rz-shade-darker {
+              color: var(--rz-#{$style}-darker)
+            }
+          }
+          background-color: transparent;
+          box-shadow: none;
+  
+          &:not(.rz-state-disabled):hover:not(:active),
+          &:not(.rz-state-disabled):active {
+            &.rz-shade-lighter {
+              color: var(--rz-#{$style})
+            }
+            @if $style == 'light' {
+              background-color: rgba(255, 255, 255, .12);
+            } @else if $style == 'dark' {
+              background-color: rgba(0, 0, 0, .12);
+            } @else {
+              background-color: var(--rz-#{$style}-lighter);
+            }
+            background-image: none;
+            box-shadow: none;
+          }
+        }
+
       }
     }
   }

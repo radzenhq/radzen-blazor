@@ -309,7 +309,7 @@ $scheduler-day-number-padding: 0 0.5rem !default;
 .rz-scheduler-nav-views {
   display: flex;
 
-  .rz-button {
+  .rz-button.rz-primary {
     @extend .rz-button-md;
 
     background: var(--rz-scheduler-view-button-background-color);

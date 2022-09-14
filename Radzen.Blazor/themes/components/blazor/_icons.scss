@@ -7,6 +7,9 @@ $icon-styles: map-merge(
     light: (
       color: var(--rz-base-200)
     ),
+    dark: (
+      color: var(--rz-base-900)
+    ),
     secondary: (
       color: var(--rz-secondary)
     ),

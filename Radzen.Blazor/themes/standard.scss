@@ -5,7 +5,7 @@ $standard: true;
 // Legacy Theme Tokens
 
 $primary: #1151f3 !default;
-$secondary: #1151f3 !default;
+$secondary: #5D89F7 !default;
 $danger: #f31155 !default;
 $info: #12a4f5 !default;
 $success: #009b51 !default;
@@ -43,7 +43,7 @@ $rz-base-800: #4f4f50 !default;
 $rz-base-900: #262526 !default;
 
 $rz-primary: #1151f3 !default;
-$rz-secondary: $rz-primary !default;
+$rz-secondary: #5D89F7 !default;
 $rz-info: #12a4f5 !default;
 $rz-success: #009b51 !default;
 $rz-warning: #ffae11 !default;
@@ -183,217 +183,6 @@ $button-vertical-align: top !default;
 $button-background-size: 100% 0%, 100% 0% !default;
 $button-hover-background-size: 100% 200%, 100% 0%  !default;
 $button-active-background-size: 100% 0%, 100% 200%  !default;
-
-$button-styles: () !default;
-$button-styles: map-merge(
-  (
-    primary: (
-      background-color: $rz-primary,
-      color: $rz-white
-    ),
-    light: (
-      background-color: $rz-base-200,
-      color: $rz-base-800
-    ),
-    secondary: (
-      background-color: $rz-secondary-lighter,
-      color: $rz-secondary
-    ),
-    info: (
-      background-color: $rz-info,
-      color: $rz-white
-    ),
-    warning: (
-      background-color: $rz-warning,
-      color: $rz-white
-    ),
-    error: (
-      background-color: $rz-danger,
-      color: $rz-white
-    ),
-    danger: (
-      background-color: $rz-danger,
-      color: $rz-white
-    ),
-    success: (
-      background-color: $rz-success,
-      color: $rz-white
-    )
-  ),
-  $button-styles
-);
-
-$button-hover-styles: () !default;
-$button-hover-styles: map-merge(
-  (
-    primary: (
-      background-color: $rz-primary-light,
-      color: $rz-white
-    ),
-    light: (
-      background-color: $rz-base-300,
-      color: $rz-base-900
-    ),
-    secondary: (
-      background-color: $rz-secondary-light,
-      color: $rz-white
-    ),
-    info: (
-      background-color: $rz-info-light,
-      color: $rz-white
-    ),
-    warning: (
-      background-color: $rz-warning-light,
-      color: $rz-white
-    ),
-    error: (
-      background-color: $rz-danger-light,
-      color: $rz-white
-    ),
-    danger: (
-      background-color: $rz-danger-light,
-      color: $rz-white
-    ),
-    success: (
-      background-color: $rz-success-light,
-      color: $rz-white
-    )
-  ),
-  $button-hover-styles
-);
-
-$button-active-styles: () !default;
-$button-active-styles: map-merge(
-  (
-    primary: (
-      background-color: $rz-primary-dark,
-      color: $rz-white
-    ),
-    light: (
-      background-color: $rz-base-400,
-      color: $rz-base-900
-    ),
-    secondary: (
-      background-color: $rz-secondary-dark,
-      color: $rz-white
-    ),
-    info: (
-      background-color: $rz-info-dark,
-      color: $rz-white
-    ),
-    warning: (
-      background-color: $rz-warning-dark,
-      color: $rz-white
-    ),
-    error: (
-      background-color: $rz-danger-dark,
-      color: $rz-white
-    ),
-    danger: (
-      background-color: $rz-danger-dark,
-      color: $rz-white
-    ),
-    success: (
-      background-color: $rz-success-dark,
-      color: $rz-white
-    )
-  ),
-  $button-active-styles
-);
-
-$rz-primary-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-primary, 0.2) !default;
-$rz-secondary-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-secondary, 0.2) !default;
-$rz-info-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-info, 0.3) !default;
-$rz-warning-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-warning, 0.4) !default;
-$rz-danger-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-danger, 0.3) !default;
-$rz-success-focus: 0px 0px 0px 1px $rz-white, 0px 0px 0px 3px rgba($rz-success, 0.3) !default;
-
-
-$button-focus-styles: () !default;
-$button-focus-styles: map-merge(
-  (
-    primary: (box-shadow: $rz-primary-focus),
-    light: (box-shadow: $rz-primary-focus),
-    secondary: (box-shadow: $rz-secondary-focus),
-    info: (box-shadow: $rz-info-focus),
-    warning: (box-shadow: $rz-warning-focus),
-    error:  (box-shadow: $rz-danger-focus),
-    danger:  (box-shadow: $rz-danger-focus),
-    success:  (box-shadow: $rz-success-focus)
-  ),
-  $button-focus-styles
-);
-
-.rz-button {
-
-  &:not(.rz-state-disabled) {
-
-    &:hover {
-      &:not(:active) {
-        background-color: $rz-base-300;
-        color: $rz-base-900;
-      }
-    }
-  
-    &:active {
-      background-color: $rz-base-400;
-      color: $rz-base-900;
-    }
-    
-    @each $style, $shadow in $button-focus-styles {
-      &.rz-button-#{$style} {
-        &:focus {
-          @each $name, $value in $shadow {
-            #{$name}: #{$value};
-          }
-
-          &:hover {
-            @each $name, $value in $shadow {
-              #{$name}: #{$value};
-            }
-
-            &:not(:active) {
-              @each $name, $value in $shadow {
-                #{$name}: #{$value};
-              }
-            }
-          }
-        }
-      }
-    }
-
-    @each $style, $button in $button-hover-styles {
-      &.rz-#{$style} {
-        &:hover {
-          &:not(:active) {
-            @each $name, $value in $button {
-              #{$name}: #{$value};
-            }
-          }
-        }
-      }
-    }
-
-    @each $style, $button in $button-active-styles {
-      &.rz-#{$style} {
-        &:active {
-          @each $name, $value in $button {
-            #{$name}: #{$value};
-          }
-        }
-      }
-    }
-  }
-
-  &:not(.rz-button-icon-only) .rz-button-icon-left {
-    margin-right: 0.25rem;
-  }
-
-  &:not(.rz-button-icon-only) .rz-button-icon-left {
-    margin-right: 0.25rem;
-  }
-
-}
 
 // SelectButton
 $selectbar-background-color: transparent !default;
@@ -573,7 +362,7 @@ $overlay-shadow: $rz-shadow-3 !default;
 // Pager
 $paginator-background-color: transparent !default;
 $paginator-numeric-button-selected-background-color: var(--rz-primary-lighter) !default;
-$paginator-numeric-button-selected-border: none !default;
+$paginator-numeric-button-selected-border: 1px solid transparent !default;
 $paginator-summary-color: var(--rz-text-tertiary-color) !default;
 
 // Tree

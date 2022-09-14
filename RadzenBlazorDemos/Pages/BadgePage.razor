@@ -3,52 +3,247 @@
 <RadzenExample Name="Badge" Documentation="false">
 <div class="container-fluid">
     <div class="row px-3">
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Badges</RadzenText>
-                <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Primary" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="Light" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Success" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Danger" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="Warning" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="Info" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Pills</RadzenText>
-                <RadzenBadge BadgeStyle="BadgeStyle.Primary" IsPill="true" Text="Primary" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Secondary" IsPill="true" Text="Secondary" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Light" IsPill="true" Text="Light" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Success" IsPill="true" Text="Success" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Danger" IsPill="true" Text="Danger" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Warning" IsPill="true" Text="Warning" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill="true" Text="Info" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">In Button</RadzenText>
-                    <RadzenButton ButtonStyle="ButtonStyle.Primary" Class="mr-1" >
+        <div class="col-md-6 p-3 button-badge-demo">
+            <RadzenCard Class="pb-3">
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Badge in Button</RadzenText>
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary">
                     Notifications
-                    <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="15" />
+                    <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Light" Text="15" Class="ml-2"/>
                 </RadzenButton>
 
-                <RadzenButton ButtonStyle="ButtonStyle.Secondary">
+                <RadzenButton ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Lighter" class="rz-shadow-0">
                     Messages
-                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" IsPill="@true" Text="15" />
+                    <RadzenBadge BadgeStyle="BadgeStyle.Secondary" IsPill="@true" Text="15" Class="ml-2" />
+                </RadzenButton>
+
+                <RadzenButton ButtonStyle="ButtonStyle.Dark" class="rz-border-radius-6 rz-shadow-6">
+                    Events
+                    <RadzenBadge BadgeStyle="BadgeStyle.Warning" Shade="Shade.Lighter" IsPill="@true" Text="15" Class="ml-2" />
                 </RadzenButton>
             </RadzenCard>
         </div>
         <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Child Content</RadzenText>
+            <RadzenCard Class="pb-3">
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Child Content</RadzenText>
                 <RadzenBadge BadgeStyle="BadgeStyle.Primary">
                     Childcontent
                 </RadzenBadge>
             </RadzenCard>
         </div>
+        <div class="col-md-6 p-3 badge-demo">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Filled</RadzenText>
+                <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="Light" />
+                <RadzenBadge BadgeStyle="BadgeStyle.Dark" Text="Dark" />
+
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H4" Class="my-3">Filled Shades</RadzenText>
+                <RadzenBadge Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge Shade="Shade.Light" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Shade="Shade.Light" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Shade="Shade.Light" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Shade="Shade.Light" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Shade="Shade.Light" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Shade="Shade.Light" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge Shade="Shade.Dark" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Shade="Shade.Dark" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Shade="Shade.Dark" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Shade="Shade.Dark" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Shade="Shade.Dark" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Shade="Shade.Dark" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge Shade="Shade.Darker" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Shade="Shade.Darker" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Shade="Shade.Darker" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Shade="Shade.Darker" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Shade="Shade.Darker" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Shade="Shade.Darker" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="mt-4">Outlined</RadzenText>
+                <RadzenBadge Variant="Variant.Outlined" Text="Primary" />
+                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Light" Text="Light" />
+                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Dark" Text="Dark" />
+
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H4" Class="my-3">Outlined Shades</RadzenText>
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Light" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Light" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Light" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Light" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Light" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Light" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Variant="Variant.Outlined" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="mt-4">Text</RadzenText>
+                <RadzenBadge Variant="Variant.Text" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Variant="Variant.Text" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Variant="Variant.Text" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Variant="Variant.Text" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Variant="Variant.Text" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Variant="Variant.Text" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <RadzenBadge Variant="Variant.Text" BadgeStyle="BadgeStyle.Light" Text="Light" />
+                <RadzenBadge Variant="Variant.Text" BadgeStyle="BadgeStyle.Dark" Text="Dark" />
+
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H4" Class="my-3">Text Shades</RadzenText>
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Light" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Light" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Light" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Light" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Light" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Light" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge Variant="Variant.Text" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3 badge-demo">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Pill Filled</RadzenText>
+                <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Light" Text="Light" />
+                <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Dark" Text="Dark" />
+
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H4" Class="my-3">Filled Shades</RadzenText>
+                <RadzenBadge IsPill="true" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge IsPill="true" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge IsPill="true" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge IsPill="true" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge IsPill="true" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge IsPill="true" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge IsPill="true" Shade="Shade.Light" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge IsPill="true" Shade="Shade.Light" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge IsPill="true" Shade="Shade.Light" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge IsPill="true" Shade="Shade.Light" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge IsPill="true" Shade="Shade.Light" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge IsPill="true" Shade="Shade.Light" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge IsPill="true" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge IsPill="true" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge IsPill="true" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge IsPill="true" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge IsPill="true" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge IsPill="true" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge IsPill="true" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge IsPill="true" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge IsPill="true" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge IsPill="true" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge IsPill="true" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge IsPill="true" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="mt-4">Pill Outlined</RadzenText>
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Text="Primary" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Light" Text="Light" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Dark" Text="Dark" />
+
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H4" Class="my-3">Outlined Shades</RadzenText>
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Light" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Light" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Light" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Light" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Light" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Light" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Dark" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+                <br />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Info" Text="Info" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Success" Text="Success" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+                <RadzenBadge IsPill="true" Variant="Variant.Outlined" Shade="Shade.Darker" BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="mt-4">Pill Text</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2">Pill text variant is the same as the default text badge.</RadzenText>
+            </RadzenCard>
+        </div>
+        
     </div>
 </div>
+<style>
+    .button-badge-demo .rz-button {
+        margin: 0 1rem 0 0;
+    }
+    .badge-demo .rz-badge {
+        margin: 0 0.25rem 0.5rem 0;
+    }
+</style>
 </RadzenExample>

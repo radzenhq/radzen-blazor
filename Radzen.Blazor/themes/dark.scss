@@ -1,5 +1,6 @@
 @import 'variables';
 @import 'mixins';
+$theme-dark: true;
 
 // Legacy Theme Tokens
 
@@ -165,6 +166,10 @@ $button-styles: map-merge(
       background-color: var(--rz-base-700),
       color: var(--rz-text-contrast-color)
     ),
+    dark: (
+      background-color: var(--rz-base-900),
+      color: var(--rz-text-contrast-color)
+    ),
     secondary: (
       background-color: var(--rz-secondary),
       color: var(--rz-text-contrast-color)
@@ -265,7 +270,7 @@ $paginator-next-button-background-color: var(--rz-base-700) !default;
 $paginator-numeric-button-background-color: var(--rz-base-700) !default;
 $paginator-numeric-button-selected-color: var(--rz-text-contrast-color) !default;
 $paginator-numeric-button-selected-background-color: var(--rz-base-900) !default;
-$paginator-numeric-button-selected-border: var(--rz-border-base-700) !default;
+$paginator-numeric-button-selected-border: var(--rz-border-base-900) !default;
 
 // DataList
 $datalist-item-border: none !default;
