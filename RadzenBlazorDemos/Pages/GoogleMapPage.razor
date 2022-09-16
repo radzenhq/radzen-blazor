@@ -40,19 +40,7 @@
     RadzenGoogleMap map;
     bool showMadridMarker;
     bool showCustomMarker;
-    bool needReload;
-    bool _enableDraggingCursor;
-    bool enableDraggingCursor
-    {
-        get => _enableDraggingCursor; set
-        {
-            if (value != _enableDraggingCursor)
-            {
-                _enableDraggingCursor = value;
-                needReload = true;
-            }
-        }
-    }
+    bool enableDraggingCursor;
     EventConsole console;
 
     string DraggingCursor => enableDraggingCursor ? "url(\"../images/find-location.png\"), default" : null;
@@ -67,16 +55,4 @@
     {
         console.Log($"Map {marker.Title} marker clicked. Marker position -> Lat: {marker.Position.Lat}, Lng: {marker.Position.Lng}");
     }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        bool first = needReload ? true : firstRender;
-        await base.OnAfterRenderAsync(first);
-        if (needReload)
-        {
-            needReload = false;
-            StateHasChanged();
-        }
-    }
-
 }

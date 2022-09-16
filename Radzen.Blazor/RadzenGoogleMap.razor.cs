@@ -90,7 +90,21 @@ namespace Radzen.Blazor
         /// <value>The dragging cursor</value>
         [Parameter]
         [CustomJsOption("draggableCursor")]
-        public string DraggingCursor { get; set; } = string.Empty;
+        public string DraggingCursor
+        {
+            get => draggingCursor;
+            set
+            {
+                if (value != draggingCursor)
+                {
+                    draggingCursor = value;
+                    mapOptionsChanged = true;
+                    InvokeAsync(StateHasChanged);
+                }
+            }
+        }
+        private string draggingCursor = string.Empty;
+        private bool mapOptionsChanged;
 
         /// <summary>
         /// Get or set parameter to manage map conponent refreshing. 
@@ -166,22 +180,25 @@ namespace Radzen.Blazor
 
             if (firstRender)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center, dataMarkers);
-                var options = GetType().GetProperties()
-                    .Where(p => Attribute.IsDefined(p, typeof(CustomJsOptionAttribute)))
-                    .Select(p => new
-                    {
-                        Name = (Attribute.GetCustomAttribute(p, typeof(CustomJsOptionAttribute)) as CustomJsOptionAttribute).PropertyName,
-                        Value = p.GetValue(this)
-                    })
-                    .Where(r => !string.IsNullOrWhiteSpace(r.Value?.ToString()))
-                    .ToDictionary(k => k.Name, v => v.Value);
-                if (options.Count > 0)
-                    await JSRuntime.InvokeVoidAsync("Radzen.customizeMap", UniqueID, options);
+                await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center, dataMarkers);           
             }
             else
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, Zoom, Center, dataMarkers);
+            }
+            if (firstRender || mapOptionsChanged)
+            {
+                var options = GetType().GetProperties()
+                   .Where(p => Attribute.IsDefined(p, typeof(CustomJsOptionAttribute)))
+                   .Select(p => new
+                   {
+                       Name = (Attribute.GetCustomAttribute(p, typeof(CustomJsOptionAttribute)) as CustomJsOptionAttribute).PropertyName,
+                       Value = p.GetValue(this)
+                   })
+                   .ToDictionary(k => k.Name, v => v.Value);
+                if (options.Count > 0)
+                    await JSRuntime.InvokeVoidAsync("Radzen.customizeMap", UniqueID, options);
+                mapOptionsChanged = false;
             }
         }
 
