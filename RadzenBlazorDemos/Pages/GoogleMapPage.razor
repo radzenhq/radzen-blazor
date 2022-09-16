@@ -5,25 +5,23 @@
     <div class="row p-3">
         <div class="col">
             <RadzenCard Class="mb-4">
-                <RadzenCheckBox @bind-Value=@ShowMadridMarker Name="showMarker" />
+                <RadzenCheckBox @bind-Value=@showMadridMarker Name="showMarker" />
                 <RadzenLabel Text="Show marker for Madrid" Component="showMarker" Style=@captionStyle />
-                <RadzenCheckBox @bind-Value=@ShowCustomMarker Name="showCustomMarker" Style="margin-left: 6px"/>
+                <RadzenCheckBox @bind-Value=@showCustomMarker Name="showCustomMarker" Style="margin-left: 6px"/>
                 <RadzenLabel Text="Show custom marker for Berlin" Component="showCustomMarker" Style=@captionStyle />
-                <RadzenCheckBox @bind-Value=@EnableDraggingCursor Name="enableCustomCursor" Style="margin-left: 6px"/>
+                <RadzenCheckBox @bind-Value=@enableDraggingCursor Name="enableCustomCursor" Style="margin-left: 6px"/>
                 <RadzenLabel Text="Enable custom cursor" Component="enableCustomCursor" Style=@captionStyle />
             </RadzenCard>
             <RadzenGoogleMap style="height: 400px" Zoom=@zoom Center=@(new GoogleMapPosition() { Lat = 42.6977, Lng = 23.3219 }) 
-                        MapClick=@OnMapClick MarkerClick=@OnMarkerClick 
-                        DraggingCursor=@DraggingCursor 
-                        IsShouldRender=@mapShouldRender>
+                        MapClick=@OnMapClick MarkerClick=@OnMarkerClick DraggingCursor=@DraggingCursor>
                 <Markers>
                     <RadzenGoogleMapMarker Title="London" Label="London" Position=@(new GoogleMapPosition() { Lat = 51.5074, Lng = 0.1278 }) />
                     <RadzenGoogleMapMarker Title="Paris " Label="Paris" Position=@(new GoogleMapPosition() { Lat = 48.8566, Lng = 2.3522 }) />
-                    @if (ShowMadridMarker)
+                    @if (showMadridMarker)
                     { 
                         <RadzenGoogleMapMarker Title="Madrid " Label="Madrid" Position=@(new GoogleMapPosition() { Lat = 40.4168, Lng = -3.7038 }) />
                     }
-                    @if (ShowCustomMarker)
+                    @if (showCustomMarker)
                     {
                         <RadzenGoogleMapMarker Title="Berlin " Label="Berlin" Position=@(new GoogleMapPosition() { Lat = 52.5347, Lng = 13.3760 })
                                                IconSrc="../images/map-icon-blue.png"/>
@@ -40,20 +38,12 @@
 @code {
     int zoom = 3;
     RadzenGoogleMap map;
-    bool mapShouldRender = true;
-    bool ShowMadridMarker { get => CheckBoxes[0]; set => ChangeCheckBox(0, value); }
-    bool ShowCustomMarker { get => CheckBoxes[1]; set => ChangeCheckBox(1, value); }
-    bool EnableDraggingCursor { get => CheckBoxes[2]; set => ChangeCheckBox(2, value); }
-    void ChangeCheckBox(int index, bool value)
-    {
-        CheckBoxes[index] = value;
-        mapShouldRender = true;
-    }
-
-    bool[] CheckBoxes = new bool[] { false, false, false };
+    bool showMadridMarker;
+    bool showCustomMarker;
+    bool enableDraggingCursor;
     EventConsole console;
 
-    string DraggingCursor => EnableDraggingCursor ? "url(\"../images/find-location.png\"), default" : null;
+    string DraggingCursor => enableDraggingCursor ? "url(\"../images/find-location.png\"), default" : null;
     const string captionStyle = "margin-left: 8px; vertical-align: middle;";
 
     void OnMapClick(GoogleMapClickEventArgs args)
@@ -64,11 +54,5 @@
     void OnMarkerClick(RadzenGoogleMapMarker marker)
     {
         console.Log($"Map {marker.Title} marker clicked. Marker position -> Lat: {marker.Position.Lat}, Lng: {marker.Position.Lng}");
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        mapShouldRender = false;
     }
 }
