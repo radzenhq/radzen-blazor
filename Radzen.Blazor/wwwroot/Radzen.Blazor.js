@@ -198,7 +198,7 @@ window.Radzen = {
 
     document.body.appendChild(script);
   },
-  createMap: function (wrapper, ref, id, apiKey, zoom, center, markers) {
+  createMap: function (wrapper, ref, id, apiKey, zoom, center, markers, options) {
     var api = function () {
       var defaultView = document.defaultView;
 
@@ -226,42 +226,52 @@ window.Radzen = {
         });
       });
 
-      Radzen.updateMap(id, zoom, center, markers);
+      Radzen.updateMap(id, zoom, center, markers, options);
     });
   },
-  updateMap: function (id, zoom, center, markers) {
+  updateMap: function (id, zoom, center, markers, options) {
     if (Radzen[id] && Radzen[id].instance) {
-      if (Radzen[id].instance.markers && Radzen[id].instance.markers.length) {
-        for (var i = 0; i < Radzen[id].instance.markers.length; i++) {
-          Radzen[id].instance.markers[i].setMap(null);
+        if (Radzen[id].instance.markers && Radzen[id].instance.markers.length) {
+            for (var i = 0; i < Radzen[id].instance.markers.length; i++) {
+                Radzen[id].instance.markers[i].setMap(null);
+            }
         }
-      }
 
-      Radzen[id].instance.markers = [];
+        if (markers) {
+            Radzen[id].instance.markers = [];
 
-      markers.forEach(function (m) {
-        var marker = new this.google.maps.Marker({
-          position: m.position,
-          title: m.title,
-          label: m.label
-        });
+            markers.forEach(function (m) {
+                var marker = new this.google.maps.Marker({
+                    position: m.position,
+                    title: m.title,
+                    label: m.label
+                });
 
-        marker.addListener('click', function (e) {
-          Radzen[id].invokeMethodAsync('RadzenGoogleMap.OnMarkerClick', {
-            Title: marker.title,
-            Label: marker.label,
-            Position: marker.position
-          });
-        });
+                marker.addListener('click', function (e) {
+                    Radzen[id].invokeMethodAsync('RadzenGoogleMap.OnMarkerClick', {
+                        Title: marker.title,
+                        Label: marker.label,
+                        Position: marker.position
+                    });
+                });
 
-        marker.setMap(Radzen[id].instance);
+                marker.setMap(Radzen[id].instance);
 
-        Radzen[id].instance.markers.push(marker);
-      });
+                Radzen[id].instance.markers.push(marker);
+            });
+        }
 
-      Radzen[id].instance.setZoom(zoom);
+        if (zoom) {
+            Radzen[id].instance.setZoom(zoom);
+            }
 
-      Radzen[id].instance.setCenter(center);
+        if (center) {
+            Radzen[id].instance.setCenter(center);
+        }
+
+        if (options) {
+            Radzen[id].instance.setOptions(options);
+        }
     }
   },
   destroyMap: function (id) {
