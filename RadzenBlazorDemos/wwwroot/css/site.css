@@ -492,8 +492,8 @@ svg.illustration {
 
 .demos-sidebar .rz-panel-menu .rz-badge {
     margin-left: 0.5rem;
-    font-size: 0.5rem;
-    line-height: 0.625rem;
+    font-size: 9px;
+    line-height: 12px;
 }
 
 /* Responsive */
