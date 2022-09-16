@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -88,10 +89,12 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The dragging cursor</value>
         [Parameter]
+        [CustomJsOption("draggableCursor")]
         public string DraggingCursor { get; set; } = string.Empty;
 
         /// <summary>
-        /// Get or set parameter to manage map conponent refreshing.
+        /// Get or set parameter to manage map conponent refreshing. 
+        /// Set to false if you need to block map updates, such as when the parent component is rerendering and the map settings have not changed.
         /// </summary>
         /// <value>Should render Map component.</value>
         [Parameter]
@@ -164,8 +167,17 @@ namespace Radzen.Blazor
             if (firstRender)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center, dataMarkers);
-                if (!string.IsNullOrWhiteSpace(DraggingCursor))
-                    await JSRuntime.InvokeVoidAsync("Radzen.customizeMap", UniqueID, DraggingCursor);
+                var options = GetType().GetProperties()
+                    .Where(p => Attribute.IsDefined(p, typeof(CustomJsOptionAttribute)))
+                    .Select(p => new
+                    {
+                        Name = (Attribute.GetCustomAttribute(p, typeof(CustomJsOptionAttribute)) as CustomJsOptionAttribute).PropertyName,
+                        Value = p.GetValue(this)
+                    })
+                    .Where(r => !string.IsNullOrWhiteSpace(r.Value?.ToString()))
+                    .ToDictionary(k => k.Name, v => v.Value);
+                if (options.Count > 0)
+                    await JSRuntime.InvokeVoidAsync("Radzen.customizeMap", UniqueID, options);
             }
             else
             {

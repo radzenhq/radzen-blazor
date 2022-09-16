@@ -229,11 +229,9 @@ window.Radzen = {
       Radzen.updateMap(id, zoom, center, markers);
     });
   },
-  customizeMap: function(id, draggingCursor) {
+  customizeMap: function(id, options) {
     if (Radzen[id] && Radzen[id].instance) {
-      Radzen[id].instance.setOptions({
-         draggableCursor: draggingCursor
-        });
+       Radzen[id].instance.setOptions(options);     
     }
   },
   updateMap: function (id, zoom, center, markers) {
