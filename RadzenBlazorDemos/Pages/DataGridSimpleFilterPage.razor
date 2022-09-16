@@ -6,7 +6,9 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>Simple Filter Mode</strong></h1>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Simple Filter Mode</strong>
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridSimpleFilter" Heading="false">
     <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" 
@@ -14,10 +16,10 @@
         FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
         LogicalFilterOperator="LogicalFilterOperator.Or">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
                 <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                    <RadzenImage Path="@data.Photo" class="rz-gravatar" />
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />

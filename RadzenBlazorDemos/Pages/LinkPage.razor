@@ -1,24 +1,26 @@
 ﻿@page "/link"
 
 <RadzenExample Name="Link">
-    <div class="row px-3">
+<div class="container-fluid">
+    <div class="row">
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4 class="mb-3">Link to path in application</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Link to path in application</RadzenText>
                 <RadzenLink Path="buttons" Text="Go to Buttons page" />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4 class="mb-3">Link to path in application with icon</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Link to path in application with icon</RadzenText>
                 <RadzenLink Icon="accessibility" Path="button" Text="Go to the Button component page" />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4 class="mb-3">Link to url</h4>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Link to url</RadzenText>
                 <RadzenLink Path="https://www.radzen.com" Text="Go to url" target="_blank" />
             </RadzenCard>
         </div>
     </div>
+</div>
 </RadzenExample>

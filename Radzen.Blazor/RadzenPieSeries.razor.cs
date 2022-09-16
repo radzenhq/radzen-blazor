@@ -66,7 +66,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the current X coordinate of the center.
         /// </summary>
-        protected double CenterX
+        internal double CenterX
         {
             get
             {
@@ -77,7 +77,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the current Y coordinate of the center.
         /// </summary>
-        protected double CenterY
+        internal double CenterY
         {
             get
             {
@@ -206,7 +206,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override double TooltipX(TItem item)
+        internal override double TooltipX(TItem item)
         {
             var sum = Items.Sum(Value);
             double startAngle = 0;
@@ -231,7 +231,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override double TooltipY(TItem item)
+        internal override double TooltipY(TItem item)
         {
             var sum = Items.Sum(Value);
             double startAngle = 0;
@@ -317,6 +317,41 @@ namespace Radzen.Blazor
             }
 
             return $"M {startX} {startY} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {innerEndX} {innerEndY} A {innerR} {innerR} 0 {largeArcFlag} 0 {innerStartX} {innerStartY}";
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
+        {
+            var list = new List<ChartDataLabel>();
+
+            foreach (var d in Data)
+            {
+                var x = TooltipX(d) - CenterX;
+                var y = TooltipY(d) - CenterY;
+
+                // find angle and add offset
+                var phi = Math.Atan2(y, x);
+
+                phi += Polar.ToRadian(offsetY % 360);
+
+                var textAnchor = phi >= -1.5 && phi <= 1.5 ? "start" : "end";
+
+                // find radius
+                var hyp = Math.Sqrt(x * x + y * y) + offsetX + 16;
+
+                // move along the radius and rotate
+                x = CenterX + hyp * Math.Cos(phi);
+                y = CenterY + hyp * Math.Sin(phi);
+
+                list.Add(new ChartDataLabel 
+                { 
+                    TextAnchor = textAnchor, 
+                    Position = new Point { X = x, Y = y },
+                    Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
+                });
+            }
+
+            return list;
         }
     }
 }

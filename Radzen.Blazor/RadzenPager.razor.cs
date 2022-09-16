@@ -233,7 +233,7 @@ namespace Radzen.Blazor
         /// <returns>System.Int32.</returns>
         protected int GetPage()
         {
-            return (int)Math.Floor((decimal)(skip / (PageSize > 0 ? PageSize : 10)));
+            return skip / (PageSize > 0 ? PageSize : 10);
         }
 
         /// <summary>

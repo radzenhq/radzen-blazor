@@ -44,14 +44,19 @@
             }
         </div>
     </div>
-    @if (Dialog.Options.CloseDialogOnOverlayClick)
+
+    @if (ShowMask)
     {
-        <div @onclick="@Close" class="rz-dialog-mask" style="z-index: 1000;"></div>
+        @if (Dialog.Options.CloseDialogOnOverlayClick)
+        {
+            <div @onclick="@Close" class="rz-dialog-mask" style="z-index: 1000;"></div>
+        }
+        else
+        {
+            <div class="rz-dialog-mask" style="z-index: 1000;"></div>
+        }
     }
-    else
-    {
-        <div class="rz-dialog-mask" style="z-index: 1000;"></div>
-    }
+
 </div>
 
 @code {
@@ -92,6 +97,9 @@
 
     [Parameter]
     public Dialog Dialog { get; set; }
+
+    [Parameter]
+    public bool ShowMask { get; set; } = true;
 
     RenderFragment ChildContent => new RenderFragment(builder =>
         {

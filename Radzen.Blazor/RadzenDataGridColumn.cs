@@ -445,7 +445,7 @@ namespace Radzen.Blazor
             {
                 var visibleColumns = Grid.ColumnsCollection.Where(c => c.GetVisible()).ToList();
                 var left = visibleColumns
-                    .TakeWhile((c, i) => visibleColumns.IndexOf(this) > i && c.IsFrozen())
+                    .Where((c, i) => visibleColumns.IndexOf(this) > i && c.IsFrozen())
                     .Sum(c => {
                         var w = !string.IsNullOrEmpty(c.GetWidth()) ? c.GetWidth() : Grid.ColumnWidth;
                         var cw = 200;
@@ -546,7 +546,7 @@ namespace Radzen.Blazor
 
         Type _filterPropertyType;
 
-        internal Type FilterPropertyType
+        public Type FilterPropertyType
         {
             get
             {
@@ -607,7 +607,7 @@ namespace Radzen.Blazor
                     FilterValue = filterValue;
                     if (Grid.IsVirtualizationAllowed())
                     {
-#if NET5
+#if NET5_0_OR_GREATER
                         if (Grid.virtualize != null)
                         {
                             await Grid.virtualize.RefreshDataAsync();
@@ -818,7 +818,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Get possible column filter operators.
         /// </summary>
-        public IEnumerable<FilterOperator> GetFilterOperators()
+        public virtual IEnumerable<FilterOperator> GetFilterOperators()
         {
             if (PropertyAccess.IsEnum(FilterPropertyType))
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals };
@@ -909,6 +909,15 @@ namespace Radzen.Blazor
                 default:
                     return $"{filterOperator}";
             }
+        }
+
+
+        /// <summary>
+        /// Gets value indicating if the user can specify time in DateTime column filter.
+        /// </summary>
+        public virtual bool ShowTimeForDateTimeFilter()
+        {
+            return true;
         }
 
         /// <summary>

@@ -298,6 +298,10 @@ namespace Radzen
         /// Gets a collection of files that are being uploaded.
         /// </summary>
         public IEnumerable<FileInfo> Files { get; set; }
+        /// <summary>
+        /// Gets or sets a flag indicating whether the underlying XMLHttpRequest should be aborted.
+        /// </summary>
+        public bool Cancel { get; set; }
     }
 
     /// <summary>
@@ -314,6 +318,11 @@ namespace Radzen
         /// Gets the raw server response.
         /// </summary>
         public string RawResponse { get; set; }
+
+        /// <summary>
+        /// Gets a boolean value indicating if the upload was cancelled by the user.
+        /// </summary>
+        public bool Cancelled { get; set; }
     }
 
     /// <summary>
@@ -593,6 +602,10 @@ namespace Radzen
         /// </summary>
         Light,
         /// <summary>
+        /// Dark styling. Similar to dark buttons.
+        /// </summary>
+        Dark,
+        /// <summary>
         /// Success styling.
         /// </summary>
         Success,
@@ -669,6 +682,10 @@ namespace Radzen
         /// </summary>
         Medium,
         /// <summary>
+        /// A button larger than the default.
+        /// </summary>
+        Large,
+        /// <summary>
         /// A button smaller than the default.
         /// </summary>
         Small
@@ -692,6 +709,10 @@ namespace Radzen
         /// </summary>
         Light,
         /// <summary>
+        /// A button with dark styling.
+        /// </summary>
+        Dark,
+        /// <summary>
         /// A button with success styling.
         /// </summary>
         Success,
@@ -707,6 +728,52 @@ namespace Radzen
         /// A button with informative styling.
         /// </summary>
         Info
+    }
+
+    /// <summary>
+    /// Specifies the design variant of <see cref="RadzenButton" /> and <see cref="RadzenBadge" />. Affects the visual styling of RadzenButton and RadzenBadge.
+    /// </summary>
+    public enum Variant
+    {
+        /// <summary>
+        /// A filled appearance.
+        /// </summary>
+        Filled,
+        /// <summary>
+        /// A text appearance.
+        /// </summary>
+        Text,
+        /// <summary>
+        /// An outlined appearance.
+        /// </summary>
+        Outlined
+    }
+
+    /// <summary>
+    /// Specifies the color shade of a <see cref="RadzenButton" />. Affects the visual styling of RadzenButton.
+    /// </summary>
+    public enum Shade
+    {
+        /// <summary>
+        /// A button with lighter styling.
+        /// </summary>
+        Lighter,
+        /// <summary>
+        /// A button with light styling.
+        /// </summary>
+        Light,
+        /// <summary>
+        /// A button with default styling.
+        /// </summary>
+        Default,
+        /// <summary>
+        /// A button with dark styling.
+        /// </summary>
+        Dark,
+        /// <summary>
+        /// A button with darker styling.
+        /// </summary>
+        Darker
     }
 
     /// <summary>
@@ -856,7 +923,15 @@ namespace Radzen
         /// <summary>
         /// The text is centered in its container.
         /// </summary>
-        Center
+        Center,
+        /// <summary>The text is justified.</summary>
+        Justify,
+        /// <summary>Same as justify, but also forces the last line to be justified.</summary>
+        JustifyAll,
+        /// <summary>The same as left if direction is left-to-right and right if direction is right-to-left..</summary>
+        Start,
+        /// <summary>The same as right if direction is left-to-right and left if direction is right-to-left..</summary>
+        End
     }
 
     /// <summary>
@@ -900,6 +975,10 @@ namespace Radzen
         /// </summary>
         Light,
         /// <summary>
+        /// Dark styling. Similar to dark buttons.
+        /// </summary>
+        Dark,
+        /// <summary>
         /// Success styling.
         /// </summary>
         Success,
@@ -935,6 +1014,10 @@ namespace Radzen
         /// </summary>
         Light,
         /// <summary>
+        /// Dark styling. Similar to dark buttons.
+        /// </summary>
+        Dark,
+        /// <summary>
         /// Success styling.
         /// </summary>
         Success,
@@ -950,6 +1033,18 @@ namespace Radzen
         /// Informative styling.
         /// </summary>
         Info
+    }
+
+    /// <summary>
+    /// Supplies information about a <see cref="RadzenDataGrid{TItem}.PickedColumnsChanged" /> event that is being raised.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class DataGridPickedColumnsChangedEventArgs<T>
+    {
+        /// <summary>
+        /// Gets the picked columns.
+        /// </summary>
+        public IEnumerable<RadzenDataGridColumn<T>> Columns { get; internal set; }
     }
 
     /// <summary>
@@ -2188,5 +2283,11 @@ namespace Radzen
         {
             return String.Join("", BitConverter.GetBytes(x).Select(y => y.ToString("x2")));
         }
+    }
+
+    public enum CoordinateSystem
+    {
+        Cartesian,
+        Polar
     }
 }

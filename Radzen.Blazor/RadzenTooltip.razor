@@ -13,9 +13,9 @@
                 </div>
             }
             else if (tooltip.Options.ChildContent != null)
-       {
-        @tooltip.Options.ChildContent(Service)
-    }
+            {
+                @tooltip.Options.ChildContent(Service)
+            }
         </div>
     </div>
 }
@@ -47,7 +47,8 @@
                 tooltip.Element,
                 UniqueID,
                 tooltip.Options.Duration,
-                Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant());
+                Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant(),
+                tooltip.Options.CloseTooltipOnDocumentClick);
         }
     }
 
@@ -56,6 +57,18 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         IsJSRuntimeAvailable = true;
+
+        var tooltip = tooltips.LastOrDefault();
+
+        if (tooltip != null)
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.openTooltip",
+                tooltip.Element,
+                UniqueID,
+                tooltip.Options.Duration,
+                Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant(),
+                tooltip.Options.CloseTooltipOnDocumentClick);
+        }
     }
 
     public async Task Close()
@@ -74,7 +87,12 @@
     {
         if (IsJSRuntimeAvailable)
         {
-            JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+            try
+            {
+               JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+            }
+            catch
+            {}
         }
 
         Service.OnOpen -= OnOpen;

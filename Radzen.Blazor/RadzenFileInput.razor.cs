@@ -39,13 +39,13 @@ namespace Radzen.Blazor
         /// Gets the choose class list.
         /// </summary>
         /// <value>The choose class list.</value>
-        ClassList ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button btn-secondary")
+        ClassList ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button rz-secondary")
                                               .AddDisabled(Disabled);
         /// <summary>
         /// Gets the button class list.
         /// </summary>
         /// <value>The button class list.</value>
-        ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only btn-light")
+        ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only rz-light")
                                               .AddDisabled(Disabled);
 
         /// <inheritdoc />
@@ -53,9 +53,6 @@ namespace Radzen.Blazor
         {
             return GetClassList("rz-fileupload").ToString();
         }
-
-        string name = "";
-        string size = "";
 
         /// <summary>
         /// Gets file input reference.
@@ -120,8 +117,12 @@ namespace Radzen.Blazor
         public async System.Threading.Tasks.Task OnChange(IEnumerable<PreviewFileInfo> files)
         {
             var file = files.FirstOrDefault();
-            size = $"{file.Size}";
-            name = file.Name;
+
+            FileSize = file.Size;
+            await FileSizeChanged.InvokeAsync(FileSize);
+
+            FileName = file.Name;
+            await FileNameChanged.InvokeAsync(FileName);
 
             await OnChange();
         }
@@ -141,14 +142,11 @@ namespace Radzen.Blazor
         }
 
         private bool visibleChanged = false;
-        private bool firstRender = true;
 
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-
-            this.firstRender = firstRender;
 
             if (firstRender || visibleChanged)
             {
@@ -159,6 +157,14 @@ namespace Radzen.Blazor
                     await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Id);
                 }
             }
+        }
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+
+            await base.SetParametersAsync(parameters);
         }
 
         /// <summary>
@@ -202,10 +208,18 @@ namespace Radzen.Blazor
         async System.Threading.Tasks.Task Remove(EventArgs args)
         {
             Value = default(TValue);
+            FileSize = null;
+            FileName = null;
 
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);
+
+            await FileSizeChanged.InvokeAsync(FileSize);
+
+            await FileNameChanged.InvokeAsync(FileName);
+
+            await JSRuntime.InvokeVoidAsync("Radzen.removeFileFromFileInput", fileUpload);
 
             StateHasChanged();
         }
@@ -244,5 +258,33 @@ namespace Radzen.Blazor
         /// <value>The image style.</value>
         [Parameter]
         public string ImageStyle { get; set; } = "width:100px;";
+
+        /// <summary>
+        /// Gets or sets the image file name.
+        /// </summary>
+        /// <value>The image file name.</value>
+        [Parameter]
+        public string FileName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the FileName changed.
+        /// </summary>
+        /// <value>The FileName changed.</value>
+        [Parameter]
+        public EventCallback<string> FileNameChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the image file size.
+        /// </summary>
+        /// <value>The image file size.</value>
+        [Parameter]
+        public long? FileSize { get; set; }
+
+        /// <summary>
+        /// Gets or sets the FileSize changed.
+        /// </summary>
+        /// <value>The FileSize changed.</value>
+        [Parameter]
+        public EventCallback<long?> FileSizeChanged { get; set; }
     }
 }

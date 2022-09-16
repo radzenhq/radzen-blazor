@@ -9,7 +9,7 @@
 
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" onmousedown="Radzen.activeElement = null" @onclick="@(args => OpenPopup("ArrowDown", false, true))" style="@Style" tabindex="@TabIndex"
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" onmousedown="Radzen.activeElement = null" @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation style="@Style" tabindex="@TabIndex"
          @onkeydown="@((args) => OnKeyPress(args))" id="@GetId()"  @onfocus="@((args) => OnFocus(args))">
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" style="width:100%" aria-haspopup="listbox" readonly="" type="text" tabindex="-1"
@@ -34,6 +34,20 @@
             <label class="rz-dropdown-label rz-inputtext ">
                 @PropertyAccess.GetItemOrValueFromProperty(selectedItem, TextProperty)
             </label>
+        }
+        else if (Chips && selectedItems.Count > 0 && selectedItems.Count < MaxSelectedLabels)
+        {
+            <div class="rz-dropdown-chips-wrapper">
+                @foreach (var item in selectedItems)
+                {
+                    <div class="rz-chip">
+                        <span class="rz-chip-text">
+                            @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
+                        </span>  
+                        <button class="rz-button rz-button-sm rz-button-icon-only rz-light @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
+                    </div>
+                }
+            </div>
         }
         else if (selectedItems.Count > 0)
         {
@@ -116,7 +130,7 @@
                 </div>
             }
             <div class="@(Multiple ? "rz-multiselect-items-wrapper" : "rz-dropdown-items-wrapper")" style="max-height: 200px;overflow-x: hidden">
-                <ul @ref="list" class="@(Multiple ? "rz-multiselect-items rz-multiselect-list    " : "rz-dropdown-items rz-dropdown-list    ")" role="listbox">
+                <ul @ref="list" class="@(Multiple ? "rz-multiselect-items rz-multiselect-list" : "rz-dropdown-items rz-dropdown-list")" role="listbox">
                     @if (View != null)
                     {
                         @RenderItems()

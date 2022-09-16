@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -120,9 +121,18 @@ namespace Radzen.Blazor
         {
             get
             {
-                var availableHeight = Chart.ValueScale.OutputSize; // - (Chart.ValueAxis.Padding * 2);
-                var bands = VisibleBarSeries.Cast<IChartBarSeries>().Max(series => series.Count) + 2;
-                return availableHeight / bands;
+                var barSeries = VisibleBarSeries;
+
+                if (Chart.BarOptions.Height.HasValue)
+                {
+                    return Chart.BarOptions.Height.Value * barSeries.Count;
+                }
+                else
+                {
+                    var availableHeight = Chart.ValueScale.OutputSize; // - (Chart.ValueAxis.Padding * 2);
+                    var bands = barSeries.Cast<IChartBarSeries>().Max(series => series.Count) + 2;
+                    return availableHeight / bands;
+                }
             }
         }
 
@@ -141,7 +151,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override double TooltipX(TItem item)
+        internal override double TooltipX(TItem item)
         {
             var value = Chart.CategoryScale.Compose(Value);
             var x = value(item);
@@ -194,7 +204,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override double TooltipY(TItem item)
+        internal override double TooltipY(TItem item)
         {
             var category = ComposeCategory(Chart.ValueScale);
             var barSeries = VisibleBarSeries;
@@ -205,6 +215,24 @@ namespace Radzen.Blazor
             var y = category(item) - bandHeight / 2 + index * height + index * padding;
 
             return y + height / 2;
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
+        {
+            var list = new List<ChartDataLabel>();
+            
+            foreach (var d in Data)
+            {
+                list.Add(new ChartDataLabel 
+                { 
+                    Position = new Point() { X = TooltipX(d) + offsetX + 8, Y = TooltipY(d) + offsetY },
+                    TextAnchor = "start",
+                    Text = Chart.ValueAxis.Format(Chart.CategoryScale, Value(d))
+                });
+            }
+
+            return list;
         }
     }
 }

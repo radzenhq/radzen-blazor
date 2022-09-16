@@ -1,35 +1,51 @@
 $sidebar-toggle-icon-width: 1.5rem !default;
 $sidebar-toggle-icon-height: 1.5rem !default;
-$sidebar-toggle-padding: 0.8125rem !default;
-$sidebar-toggle-border: 1px solid #eaeef0 !default;
-$sidebar-toggle-hover-color: $default-link !default;
-$sidebar-toggle-hover-background-color: $header-background-color !default;
-$sidebar-toggle-hover-border-radius: 0 !default;
-$sidebar-toggle-background-color: $header-background-color !default;
-$sidebar-toggle-color: #000 !default;
 $sidebar-toggle-margin: 0 1rem 0 0 !default;
+$sidebar-toggle-padding: 0.8125rem !default;
+$sidebar-toggle-border: var(--rz-border-base-200) !default;
+$sidebar-toggle-color: var(--rz-base-900) !default;
+$sidebar-toggle-background-color: var(--rz-header-background-color) !default;
+$sidebar-toggle-hover-color: var(--rz-secondary) !default;
+$sidebar-toggle-hover-background-color: var(--rz-header-background-color) !default;
+$sidebar-toggle-hover-border-radius: 0 !default;
 
-.sidebar-toggle {
+// SidebarToggle CSS variables
+
+:root {
+  --rz-sidebar-toggle-icon-width: #{$sidebar-toggle-icon-width};
+  --rz-sidebar-toggle-icon-height: #{$sidebar-toggle-icon-height};
+  --rz-sidebar-toggle-margin: #{$sidebar-toggle-margin};
+  --rz-sidebar-toggle-padding: #{$sidebar-toggle-padding};
+  --rz-sidebar-toggle-border: #{$sidebar-toggle-border};
+  --rz-sidebar-toggle-color: #{$sidebar-toggle-color};
+  --rz-sidebar-toggle-background-color: #{$sidebar-toggle-background-color};
+  --rz-sidebar-toggle-hover-color: #{$sidebar-toggle-hover-color};
+  --rz-sidebar-toggle-hover-background-color: #{$sidebar-toggle-hover-background-color};
+  --rz-sidebar-toggle-hover-border-radius: #{$sidebar-toggle-hover-border-radius};
+}
+
+.rz-sidebar-toggle {
   -webkit-appearance: none;
   border: none;
-  padding: $sidebar-toggle-padding;
-  margin: $sidebar-toggle-margin;
-  border-right: $sidebar-toggle-border;
-  background-color: $sidebar-toggle-background-color;
-  color: $sidebar-toggle-color;
+  padding: var(--rz-sidebar-toggle-padding);
+  margin: var(--rz-sidebar-toggle-margin);
+  border-right: var(--rz-sidebar-toggle-border);
+  background-color: var(--rz-sidebar-toggle-background-color);
+  color: var(--rz-sidebar-toggle-color);
 
   &:focus {
     outline: none;
   }
 
   &:hover {
-    color: $sidebar-toggle-hover-color;
-    background: $sidebar-toggle-hover-background-color;
-    border-radius: $sidebar-toggle-hover-border-radius;
+    color: var(--rz-sidebar-toggle-hover-color);
+    background: var(--rz-sidebar-toggle-hover-background-color);
+    border-radius: var(--rz-sidebar-toggle-hover-border-radius);
   }
 
   .rzi {
-    width: $sidebar-toggle-icon-width;
-    height: $sidebar-toggle-icon-height;
+    width: var(--rz-sidebar-toggle-icon-width);
+    height: var(--rz-sidebar-toggle-icon-height);
+    font-size: var(--rz-sidebar-toggle-icon-width);
   }
 }

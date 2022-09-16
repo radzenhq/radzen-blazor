@@ -1,19 +1,51 @@
 @page "/bar-chart"
 @using System.Globalization
 
-<h1>Radzen Blazor Chart bar series</h1>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    Radzen Blazor Chart bar series
+</RadzenText>
+
 <RadzenExample Heading="false" Name="Chart" Source="BarChart">
     <div class="container">
         <div class="row">
             <div class="col-sm-12 my-5">
-                <RadzenChart SeriesClick=@OnSeriesClick>
-                    <RadzenBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
-                    <RadzenBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
+                <RadzenCard Class="w-100 mb-4" >
+                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                    <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+                </RadzenCard>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <h4>Auto-size bar series</h4>
+                <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
+                    <RadzenBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </RadzenBarSeries>
+                    <RadzenBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </RadzenBarSeries>
                     <RadzenValueAxis Formatter="@FormatAsUSD">
                         <RadzenGridLines Visible="true" />
                         <RadzenAxisTitle Text="Revenue in USD" />
                     </RadzenValueAxis>
                     <RadzenBarOptions Radius="5" />
+                </RadzenChart>
+            </div>
+            <div class="col-sm-6">
+                <h4>Custom size bar series</h4>
+                <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
+                    <RadzenBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </RadzenBarSeries>
+                    <RadzenBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </RadzenBarSeries>
+                    <RadzenValueAxis Formatter="@FormatAsUSD">
+                        <RadzenGridLines Visible="true" />
+                        <RadzenAxisTitle Text="Revenue in USD" />
+                    </RadzenValueAxis>
+                    <RadzenBarOptions Radius="5" Height="20" />
                 </RadzenChart>
             </div>
         </div>
@@ -24,6 +56,7 @@
 
 @code {
     EventConsole console;
+    bool showDataLabels = false;
 
     void OnSeriesClick(SeriesClickEventArgs args)
     {

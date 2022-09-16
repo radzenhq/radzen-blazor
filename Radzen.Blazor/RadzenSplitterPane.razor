@@ -4,7 +4,7 @@
 
 @if (Visible)
 {
-    <div id="@GetId()" class="@GetComponentCssClass()" style="flex-basis: @Size; @Style" data-index="@Index">
+    <div id="@GetId()" @attributes="Attributes" class="@GetComponentCssClass()" style="flex-basis: @Size; @Style" data-index="@Index">
         @ChildContent
     </div>
 

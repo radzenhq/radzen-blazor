@@ -6,20 +6,25 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>Composite Columns</strong></h1>
-
-<p>Use DataGrid column <code>Columns</code> property to define child columns.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Composite Columns</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Use DataGrid column <code>Columns</code> property to define child columns.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridCompositeColumns" Heading="false">
-    <RadzenCheckBox @bind-Value=@allowCompositeDataCells Name="CheckBox1" TValue="bool" Change=@(args => grid.Reload()) />
-    <RadzenLabel Text="Allow composite data cells" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 10px;" />
+    <RadzenCard Class="m-4" style="display: flex; align-items: center; gap: 0.5rem">
+        <RadzenCheckBox @bind-Value=@allowCompositeDataCells Name="CheckBox1" TValue="bool" Change=@(args => grid.Reload())/>
+        <RadzenLabel Text="Allow composite data cells" Component="CheckBox1" />
+    </RadzenCard>
     <RadzenDataGrid @ref="grid" AllowCompositeDataCells="@allowCompositeDataCells" AllowSorting="true" AllowFiltering="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
-        Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:400px">
+        Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:420px" Class="m-4">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="Employee" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="60px" >
+            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="Employee" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >
                 <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                    <RadzenImage Path="@data.Photo" class="rz-gravatar" />
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Title="Title" Property="TitleOfCourtesy" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>

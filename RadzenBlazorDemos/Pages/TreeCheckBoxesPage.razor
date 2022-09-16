@@ -3,17 +3,24 @@
 @using RadzenBlazorDemos.Models.Northwind
 @inject RadzenBlazorDemos.Data.NorthwindContext Northwind
 
-<h1>Tree checkboxes</h1>
-<p>Get or set the selected items of RadzenTree</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    Tree checkboxes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Get or set the selected items of RadzenTree.
+</RadzenText>
+
 <RadzenExample Name="Tree" Source="TreeCheckBoxes" Heading="false">
-<div class="row my-5">
-    <div class="col-lg-6 offset-lg-3">
-        <RadzenCard>
-            <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 300px" Data=@categories>
-                <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
-                <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
-            </RadzenTree>
-        </RadzenCard>
+<div class="container-fluid">
+    <div class="row my-5">
+        <div class="col-lg-6 offset-lg-3">
+            <RadzenCard>
+                <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 300px" Data=@categories>
+                    <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
+                    <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
+                </RadzenTree>
+            </RadzenCard>
+        </div>
     </div>
 </div>
 </RadzenExample>

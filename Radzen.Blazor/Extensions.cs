@@ -6,33 +6,28 @@ using System.Reflection;
 
 namespace Radzen.Blazor
 {
+    /// <summary>
+    /// Class EnumExtensions.
+    /// </summary>
     public static class EnumExtensions
     {
+        /// <summary>
+        /// Gets enum description.
+        /// </summary>
         public static string GetDisplayDescription(this Enum enumValue)
         {
-            var val = enumValue.GetType().GetMember(enumValue.ToString()).FirstOrDefault();
+            var enumValueAsString = enumValue.ToString();
+            var val = enumValue.GetType().GetMember(enumValueAsString).FirstOrDefault();
 
-            if (val is null)
-                return enumValue.ToString();
-
-            var attribute = val?.GetCustomAttribute<DisplayAttribute>();
-            if (attribute != null)
-                return attribute?.GetDescription();
-
-            return enumValue.ToString();
+            return val?.GetCustomAttribute<DisplayAttribute>()?.GetDescription() ?? enumValueAsString;
         }
 
+        /// <summary>
+        /// Converts Enum to IEnumerable of Value/Text.
+        /// </summary>
         public static IEnumerable<object> EnumAsKeyValuePair(Type enumType)
         {
-            var values = Enum.GetValues(enumType);
-            var items = new List<object>(values.Length);
-
-            foreach (Enum val in values)
-            {
-                items.Add(new { Value = Convert.ToInt32(val), Text = val.GetDisplayDescription() });
-            }
-
-            return items;
+            return Enum.GetValues(enumType).Cast<Enum>().Distinct().Select(val => new { Value = Convert.ToInt32(val), Text = val.GetDisplayDescription() });
         }
 
     }

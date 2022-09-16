@@ -10,6 +10,6 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-        <iframe frameborder="0" src="@ReportUrl"></iframe>
+        <iframe frameborder="0" src="@ReportUrl" @onload=OnLoad></iframe>
     </div>
 }

@@ -208,7 +208,7 @@ namespace Radzen.Blazor
         [Parameter]
         public int MaxSelectedLabels { get; set; } = 4;
 
-#if !NET5
+#if !NET5_0_OR_GREATER
         /// <summary>
         /// Gets or sets the page size.
         /// </summary>
@@ -245,7 +245,7 @@ namespace Radzen.Blazor
         {
             if (firstRender)
             {
-    #if NET5
+    #if NET5_0_OR_GREATER
                 if (grid != null)
                 {
                     grid.SetAllowVirtualization(AllowVirtualization);
@@ -522,7 +522,7 @@ namespace Radzen.Blazor
 
         async Task RefreshAfterFilter()
         {
-#if NET5
+#if NET5_0_OR_GREATER
             if (grid?.virtualize != null)
             {
                 if(string.IsNullOrEmpty(searchText))
@@ -542,7 +542,11 @@ namespace Radzen.Blazor
             }
 #endif
             StateHasChanged();
-            await grid.FirstPage(true);
+
+            if (!IsVirtualizationAllowed())
+            {
+                await grid.FirstPage(true);
+            }
 
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
         }

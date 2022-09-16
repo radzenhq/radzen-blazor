@@ -18,7 +18,7 @@
                             <div class="container">
                                 <div class="row">
                                     <div class="col-lg-3 p-3 product-title">
-                                            @(product.ProductName)
+                                            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" Class="rz-color-secondary">@(product.ProductName)</RadzenText>
                                     </div>
                                     <div class="col-lg-7 p-3">
                                         <div class="row d-flex">
@@ -56,12 +56,7 @@
 <style>
 .product-title {
     min-height: 72px;
-    color: #da0074;
-    background-color: rgba(255, 41, 155, .1);
-    font-size: 20px;
-    font-weight: bold;
-    line-height: 20px;
-    letter-spacing: -0.02em;
+    background-color: var(--rz-secondary-lighter);
 }
 .price-badge {
     font-size: 16px;

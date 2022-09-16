@@ -29,6 +29,22 @@ namespace Radzen.Blazor
             return GetClassList("rz-spinner").ToString();
         }
 
+        private string getOnInput()
+        {
+            object minArg = Min;
+            object maxArg = Max;
+
+            return Min != null || Max != null ? $@"Radzen.numericOnInput(event, {minArg ?? "null"}, {maxArg ?? "null"})" : "";
+        }
+
+        private string getOnPaste()
+        {
+            object minArg = Min;
+            object maxArg = Max;
+
+            return Min != null || Max != null ? $@"Radzen.numericOnPaste(event, {minArg ?? "null"}, {maxArg ?? "null"})" : "";
+        }
+
         async System.Threading.Tasks.Task UpdateValueWithStep(bool stepUp)
         {
             if (Disabled || ReadOnly)
@@ -162,7 +178,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if input automatic complete is enabled; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool AutoComplete { get; set; } = true;
+        public bool AutoComplete { get; set; } = false;
 
         /// <summary>
         /// Gets or sets a value indicating whether up down buttons are shown.
@@ -202,7 +218,15 @@ namespace Radzen.Blazor
                 newValue = default(TValue);
             }
 
-            decimal? newValueAsDecimal = newValue == null ? default(decimal?) : (decimal)ConvertType.ChangeType(newValue, typeof(decimal));
+            decimal? newValueAsDecimal;
+            try
+            {
+                newValueAsDecimal = newValue == null ? default(decimal?) : (decimal)ConvertType.ChangeType(newValue, typeof(decimal));
+            }
+            catch
+            {
+                newValueAsDecimal = default(TValue) == null ? default(decimal?) : (decimal)ConvertType.ChangeType(default(TValue), typeof(decimal));
+            }
 
             if (object.Equals(Value, newValue) && (!ValueChanged.HasDelegate || !string.IsNullOrEmpty(Format)))
             {
@@ -273,7 +297,7 @@ namespace Radzen.Blazor
         }
 
 
-#if NET5
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Sets the focus on the input element.
         /// </summary>

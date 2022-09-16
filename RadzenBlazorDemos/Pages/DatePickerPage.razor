@@ -1,94 +1,96 @@
 ﻿@page "/datepicker"
 
 <RadzenExample Name="DatePicker">
-<div class="row px-3">
-    <div class="col-lg-12 col-xl-8">
-        <div class="row">
-            <div class="col-lg-6 col-xl-4 p-3">
-                <RadzenCard>
-                    <h4 class="mb-4">DatePicker</h4>
-                    <RadzenDatePicker @bind-Value=@value DateFormat="d" Change=@(args => OnChange(args, "DatePicker", "MM/dd/yyyy")) Class="w-100" />
-                </RadzenCard>
-            </div>
-            <div class="col-lg-6 col-xl-4 p-3">
-                <RadzenCard>
-                    <h4 class="mb-4">DatePicker with time</h4>
-                    <RadzenDatePicker TValue="DateTime?" ShowTime="true" ShowSeconds="true" HoursStep="1.5" MinutesStep="5" SecondsStep="10" Change=@(args => OnChange(args, "DatePicker with time", "MM/dd/yyyy HH:mm")) DateFormat="MM/dd/yyyy HH:mm" Class="w-100" />
-                </RadzenCard>
-            </div>
-            <div class="col-lg-6 col-xl-4 p-3">
-                <RadzenCard>
-                    <h4 class="mb-4">12 hour time format</h4>
-                    <RadzenDatePicker TValue="DateTime?" ShowTime="true" Change=@(args => OnChange(args, "DatePicker with 12 hour time format", "MM/dd/yyyy h:mm tt")) HourFormat="12" DateFormat="MM/dd/yyyy h:mm tt" Class="w-100" />
-                </RadzenCard>
-            </div>
-            <div class="col-lg-6 col-xl-4 p-3">
-                <RadzenCard>
-                    <h4 class="mb-4">Time-only DatePicker</h4>
-                    <RadzenDatePicker TValue="DateTime?" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Change=@(args => OnChange(args, "Time-only DatePicker", "HH:mm")) Class="w-100" />
-                </RadzenCard>
-            </div>
-            <div class="col-lg-6 col-xl-4 p-3">
-                <RadzenCard>
-                    <h4 class="mb-4">DatePicker with steps for time</h4>
-                    <RadzenDatePicker TValue="DateTime?" ShowTime="true" TimeOnly="true"
-                                        ShowSeconds="true" HoursStep="1.5" MinutesStep="5" DateFormat="HH:mm:ss"
-                                        SecondsStep="10" Change=@(args => OnChange(args, "DatePicker with steps for time", "HH:mm:ss")) Class="w-100" />
-                </RadzenCard>
-            </div>
-            <div class="col-lg-6 col-xl-4 p-3">
-                <RadzenCard>
-                    <h4 class="mb-4">DatePicker with special dates</h4>
-                    <RadzenDatePicker TValue="DateTime?" DateRender=@DateRenderSpecial Change=@(args => OnChange(args, "DatePicker with special dates", "MM/dd/yyyy")) Class="w-100" />
-                </RadzenCard>
-            </div>
-            <div class="col-lg-6 col-xl-4 p-3">
-                <RadzenCard>
-                    <h4 class="mb-4">DatePicker with disabled dates</h4>
-                    <RadzenDatePicker TValue="DateTime?" DateRender=@DateRender Change=@(args => OnChange(args, "DatePicker with disabled dates", "MM/dd/yyyy")) Class="w-100" />
-                </RadzenCard>
-            </div>
-            <div class="col-lg-6 col-xl-4 p-3">
-                <RadzenCard>
-                    <h4 class="mb-4">Disabled DatePicker</h4>
-                    <RadzenDatePicker Disabled="true" @bind-Value=@value Class="w-100" />
-                </RadzenCard>
-            </div>
-            <div class="col-lg-6 col-xl-4 p-3">
-                <RadzenCard>
-                    <h4 class="mb-4">DatePicker with footer template</h4>
-                    <RadzenDatePicker @bind-Value=@value DateFormat="d" Class="w-100">
-                        <FooterTemplate>
-                            <RadzenButton Click=@OnTodayClick Text="Today" />
-                        </FooterTemplate>
-                    </RadzenDatePicker>
-                </RadzenCard>
-            </div>
-            <div class="col-lg-6 col-xl-4 p-3">
-                <RadzenCard>
-                    <h4 class="mb-4">DatePicker with custom initial view date (June 1, 2040)</h4>
-                    <RadzenDatePicker InitialViewDate="new DateTime(2040,06,01)" TValue="DateTime?" Change=@(args => OnChange(args, "DatePicker with custom initial view date (June 1, 2040)", "MM/dd/yyyy")) Class="w-100" />
-                </RadzenCard>
-            </div>
-            <div class="col-lg-6 col-xl-4 p-3">
-                <RadzenCard>
-                    <h4 class="mb-4">DatePicker with minimum and maximum dates</h4>
-                    <RadzenDatePicker Min="DateTime.Today.AddDays(-7)" Max="DateTime.Today.AddDays(7)" TValue="DateTime?" Change=@(args => OnChange(args, "DatePicker with minimum and maximum dates", "MM/dd/yyyy")) Class="w-100" />
-                </RadzenCard>
-            </div>
-            <div class="col-lg-6 col-xl-4 p-3">
-                <RadzenCard>
-                    <h4 class="mb-4">DatePicker with disabled weekends</h4>
-                    <RadzenDatePicker DateRender=@DateRenderNoWeekends TValue="DateTime?" Change=@(args => OnChange(args, "DatePicker with disabled weekends", "MM/dd/yyyy")) Class="w-100" />
-                </RadzenCard>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-xl-8">
+            <div class="row">
+                <div class="col-lg-6 col-xl-4 p-3">
+                    <RadzenCard>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DatePicker</RadzenText>
+                        <RadzenDatePicker @bind-Value=@value DateFormat="d" Change=@(args => OnChange(args, "DatePicker", "MM/dd/yyyy")) Class="w-100" />
+                    </RadzenCard>
+                </div>
+                <div class="col-lg-6 col-xl-4 p-3">
+                    <RadzenCard>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DatePicker with time</RadzenText>
+                        <RadzenDatePicker TValue="DateTime?" ShowTime="true" ShowSeconds="true" HoursStep="1.5" MinutesStep="5" SecondsStep="10" Change=@(args => OnChange(args, "DatePicker with time", "MM/dd/yyyy HH:mm")) DateFormat="MM/dd/yyyy HH:mm" Class="w-100" />
+                    </RadzenCard>
+                </div>
+                <div class="col-lg-6 col-xl-4 p-3">
+                    <RadzenCard>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">12 hour time format</RadzenText>
+                        <RadzenDatePicker TValue="DateTime?" ShowTime="true" Change=@(args => OnChange(args, "DatePicker with 12 hour time format", "MM/dd/yyyy h:mm tt")) HourFormat="12" DateFormat="MM/dd/yyyy h:mm tt" Class="w-100" />
+                    </RadzenCard>
+                </div>
+                <div class="col-lg-6 col-xl-4 p-3">
+                    <RadzenCard>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Time-only DatePicker</RadzenText>
+                        <RadzenDatePicker TValue="DateTime?" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Change=@(args => OnChange(args, "Time-only DatePicker", "HH:mm")) Class="w-100" />
+                    </RadzenCard>
+                </div>
+                <div class="col-lg-6 col-xl-4 p-3">
+                    <RadzenCard>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DatePicker with steps for time</RadzenText>
+                        <RadzenDatePicker TValue="DateTime?" ShowTime="true" TimeOnly="true"
+                                            ShowSeconds="true" HoursStep="1.5" MinutesStep="5" DateFormat="HH:mm:ss"
+                                            SecondsStep="10" Change=@(args => OnChange(args, "DatePicker with steps for time", "HH:mm:ss")) Class="w-100" />
+                    </RadzenCard>
+                </div>
+                <div class="col-lg-6 col-xl-4 p-3">
+                    <RadzenCard>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DatePicker with special dates</RadzenText>
+                        <RadzenDatePicker TValue="DateTime?" DateRender=@DateRenderSpecial Change=@(args => OnChange(args, "DatePicker with special dates", "MM/dd/yyyy")) Class="w-100" />
+                    </RadzenCard>
+                </div>
+                <div class="col-lg-6 col-xl-4 p-3">
+                    <RadzenCard>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DatePicker with disabled dates</RadzenText>
+                        <RadzenDatePicker TValue="DateTime?" DateRender=@DateRender Change=@(args => OnChange(args, "DatePicker with disabled dates", "MM/dd/yyyy")) Class="w-100" />
+                    </RadzenCard>
+                </div>
+                <div class="col-lg-6 col-xl-4 p-3">
+                    <RadzenCard>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled DatePicker</RadzenText>
+                        <RadzenDatePicker Disabled="true" @bind-Value=@value Class="w-100" />
+                    </RadzenCard>
+                </div>
+                <div class="col-lg-6 col-xl-4 p-3">
+                    <RadzenCard>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DatePicker with footer template</RadzenText>
+                        <RadzenDatePicker @bind-Value=@value DateFormat="d" Class="w-100">
+                            <FooterTemplate>
+                                <RadzenButton Click=@OnTodayClick Text="Today" Class="my-3 w-100" />
+                            </FooterTemplate>
+                        </RadzenDatePicker>
+                    </RadzenCard>
+                </div>
+                <div class="col-lg-6 col-xl-4 p-3">
+                    <RadzenCard>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DatePicker with custom initial view date (June 1, 2040)</RadzenText>
+                        <RadzenDatePicker InitialViewDate="new DateTime(2040,06,01)" TValue="DateTime?" Change=@(args => OnChange(args, "DatePicker with custom initial view date (June 1, 2040)", "MM/dd/yyyy")) Class="w-100" />
+                    </RadzenCard>
+                </div>
+                <div class="col-lg-6 col-xl-4 p-3">
+                    <RadzenCard>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DatePicker with minimum and maximum dates</RadzenText>
+                        <RadzenDatePicker Min="DateTime.Today.AddDays(-7)" Max="DateTime.Today.AddDays(7)" TValue="DateTime?" Change=@(args => OnChange(args, "DatePicker with minimum and maximum dates", "MM/dd/yyyy")) Class="w-100" />
+                    </RadzenCard>
+                </div>
+                <div class="col-lg-6 col-xl-4 p-3">
+                    <RadzenCard>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DatePicker with disabled weekends</RadzenText>
+                        <RadzenDatePicker DateRender=@DateRenderNoWeekends TValue="DateTime?" Change=@(args => OnChange(args, "DatePicker with disabled weekends", "MM/dd/yyyy")) Class="w-100" />
+                    </RadzenCard>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-lg-12 col-xl-4 p-3">
-        <RadzenCard style="overflow: scroll;">
-            <h4 class="mb-4">Calendar</h4>
-            <RadzenDatePicker TValue="DateTime?" Inline="true" Change="@(args => OnChange(args, "Calendar", "MM/dd/yyyy"))" />
-        </RadzenCard>
+        <div class="col-lg-12 col-xl-4 p-3">
+            <RadzenCard style="overflow: scroll;">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Calendar</RadzenText>
+                <RadzenDatePicker TValue="DateTime?" Inline="true" Change="@(args => OnChange(args, "Calendar", "MM/dd/yyyy"))" />
+            </RadzenCard>
+        </div>
     </div>
 </div>
 </RadzenExample>

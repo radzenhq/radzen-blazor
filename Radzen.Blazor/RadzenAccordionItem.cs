@@ -54,7 +54,10 @@ namespace Radzen.Blazor
                 if (_visible != value)
                 {
                     _visible = value;
-                    Accordion.Refresh();
+                    if (Accordion != null)
+                    {
+                        Accordion.Refresh();
+                    }
                 }
             }
         }

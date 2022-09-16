@@ -17,7 +17,7 @@ namespace Radzen.Blazor.Tests
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, icon));
 
             Assert.Contains(@$">{icon}</i>", component.Markup);
-            Assert.Contains(@$"<i class=""rzi d-inline-flex justify-content-center align-items-center""", component.Markup);
+            Assert.Contains(@$"<i class=""rzi""", component.Markup);
         }
 
         [Fact]

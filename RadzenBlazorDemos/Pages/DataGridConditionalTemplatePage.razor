@@ -6,12 +6,15 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid conditional styles and templates</h1>
-
-<p>This page demonstrates <b>DataGrid</b> with conditional rows and cells template/styles.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid conditional styles and templates
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    This page demonstrates <b>DataGrid</b> with conditional rows and cells template/styles.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridConditionalTemplate" Heading="false">
-    <h3>Order Details</h3>
+    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3">Order Details</RadzenText>
     <RadzenDataGrid AllowFiltering="false" AllowPaging="true" AllowSorting="false" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 Data="@orderDetails" TItem="OrderDetail" ColumnWidth="200px" 
                 RowRender="@RowRender" CellRender="@CellRender" HeaderCellRender="@HeaderFooterCellRender" FooterCellRender="@HeaderFooterCellRender">
@@ -33,11 +36,11 @@
                 <Template Context="data">
                     @if (data.Quantity > 20)
                     {
-                        <span style='color:white'>@data.Quantity</span>
+                        <span style='color: var(--rz-text-contrast-color)'>@data.Quantity</span>
                     }
                     else
                     {
-                        <span style='color:black'>@data.Quantity</span>
+                        <span style='color: var(--rz-text-color)'>@data.Quantity</span>
                     }
                 </Template>
                 <FooterTemplate>
@@ -70,7 +73,7 @@
     {
         if (args.Column.Property == "Quantity")
         {
-            args.Attributes.Add("style", $"background-color: {(args.Data.Quantity > 20 ? "#ff6d41" : "white")};");
+            args.Attributes.Add("style", $"background-color: {(args.Data.Quantity > 20 ? "var(--rz-success)" : "var(--rz-base-background-color)")};");
 
             if (args.Data.Discount == 0)
             {

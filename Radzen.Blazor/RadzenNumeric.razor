@@ -10,8 +10,8 @@
         <input @ref="@input" type="text" inputmode="decimal" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
                class="rz-spinner-input rz-inputtext" tabindex="@TabIndex"
                placeholder="@Placeholder" autocomplete="@(AutoComplete ? "on" : "off")" value="@FormattedValue" @onchange="@OnChange"
-               onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower())" onpaste="Radzen.numericOnPaste(event, @Min, @Max)"
-               oninput="Radzen.numericOnInput(event, @Min, @Max)"/>
+               onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower())"
+           onblur="@getOnInput()" onpaste="@getOnPaste()" />
         @if (ShowUpDown)
         {
             <button type="button" class="rz-spinner-button rz-spinner-up rz-button" tabindex="-1"

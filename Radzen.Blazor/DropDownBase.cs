@@ -16,7 +16,7 @@ namespace Radzen
     /// <typeparam name="T"></typeparam>
     public class DropDownBase<T> : DataBoundFormComponent<T>
     {
-#if NET5
+#if NET5_0_OR_GREATER
         internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<object> virtualize;
 
         /// <summary>
@@ -29,6 +29,8 @@ namespace Radzen
                 return virtualize;
             }
         }
+
+        List<object> virtualItems;
 
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
@@ -47,7 +49,9 @@ namespace Radzen
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = request.Count, Filter = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) });
             }
 
-            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>(LoadData.HasDelegate ? Data.Cast<object>() : view.Skip(request.StartIndex).Take(top), LoadData.HasDelegate ? Count : totalItemsCount);
+            virtualItems = (LoadData.HasDelegate ? Data : view.Skip(request.StartIndex).Take(top)).Cast<object>().ToList();
+
+            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>(virtualItems, LoadData.HasDelegate ? Count : totalItemsCount);
         }
 
         /// <summary>
@@ -74,7 +78,7 @@ namespace Radzen
         /// <returns><c>true</c> if virtualization is allowed; otherwise, <c>false</c>.</returns>
         internal bool IsVirtualizationAllowed()
         {
-#if NET5
+#if NET5_0_OR_GREATER
             return AllowVirtualization;
 #else
             return false;
@@ -89,7 +93,7 @@ namespace Radzen
         {
             return new RenderFragment(builder =>
             {
-#if NET5
+#if NET5_0_OR_GREATER
                 if (AllowVirtualization)
                 {
                     builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<object>));
@@ -196,6 +200,13 @@ namespace Radzen
         /// <value>The value property.</value>
         [Parameter]
         public string ValueProperty { get; set; }
+
+        /// <summary>
+        /// Gets or sets the disabled property.
+        /// </summary>
+        /// <value>The disabled property.</value>
+        [Parameter]
+        public string DisabledProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the selected item changed.
@@ -326,12 +337,25 @@ namespace Radzen
                         selectedItems.Clear();
                     }
 
-                    OnDataChanged();
+                    InvokeAsync(OnDataChanged);
 
                     StateHasChanged();
                 }
             }
         }
+
+#if NET5_0_OR_GREATER
+        /// <inheritdoc/>
+        protected override async Task OnDataChanged()
+        {
+            await base.OnDataChanged();
+
+            if (AllowVirtualization && Virtualize != null && !LoadData.HasDelegate)
+            {
+                await InvokeAsync(Virtualize.RefreshDataAsync);
+            }
+        }
+#endif
 
         /// <summary>
         /// Gets the popup identifier.
@@ -435,7 +459,28 @@ namespace Radzen
             if (Disabled)
                 return;
 
-            var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (View != null ? View : Enumerable.Empty<object>())).Cast<object>();
+            List<object> items = Enumerable.Empty<object>().ToList();
+
+            if (LoadData.HasDelegate)
+            {
+                if (Data != null)
+                {
+                    items = Data.Cast<object>().ToList();
+                }
+            }
+            else
+            {
+                if (IsVirtualizationAllowed())
+                {
+#if NET5_0_OR_GREATER
+                    items = virtualItems;
+#endif
+                }
+                else
+                {
+                    items = View.Cast<object>().ToList();
+                }
+            }
 
             var key = args.Code != null ? args.Code : args.Key;
 
@@ -443,11 +488,13 @@ namespace Radzen
             {
                 try
                 {
-                    var newSelectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown" || key == "ArrowRight", selectedIndex);
+                    var currentViewIndex = Multiple ? selectedIndex : items.IndexOf(selectedItem);
+
+                    var newSelectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown" || key == "ArrowRight", currentViewIndex);
 
                     if (!Multiple)
                     {
-                        if (newSelectedIndex != selectedIndex && newSelectedIndex >= 0 && newSelectedIndex <= items.Count() - 1)
+                        if (newSelectedIndex != currentViewIndex && newSelectedIndex >= 0 && newSelectedIndex <= items.Count() - 1)
                         {
                             selectedIndex = newSelectedIndex;
                             await OnSelectItem(items.ElementAt(selectedIndex), true);
@@ -455,7 +502,7 @@ namespace Radzen
                     }
                     else
                     {
-                        selectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown", selectedIndex);
+                        selectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown", currentViewIndex);
                     }
                 }
                 catch (Exception)
@@ -479,7 +526,7 @@ namespace Radzen
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
-            else if (key == "Delete")
+            else if (key == "Delete" && AllowClear)
             {
                 if (!Multiple && selectedItem != null)
                 {
@@ -518,13 +565,13 @@ namespace Radzen
                 _view = null;
                 if (IsVirtualizationAllowed())
                 {
-#if NET5
+#if NET5_0_OR_GREATER
                     if (virtualize != null)
                     {
                         await virtualize.RefreshDataAsync();
                     }
                     await InvokeAsync(() => { StateHasChanged(); });
-#endif 
+#endif
                 }
                 else
                 {
@@ -535,19 +582,22 @@ namespace Radzen
             {
                 if (IsVirtualizationAllowed())
                 {
-#if NET5
+#if NET5_0_OR_GREATER
                     if (virtualize != null)
                     {
                         await InvokeAsync(virtualize.RefreshDataAsync);
                     }
                     await InvokeAsync(() => { StateHasChanged(); });
-#endif 
+#endif
                 }
                 else
                 {
                     await LoadData.InvokeAsync(await GetLoadDataArgs());
                 }
             }
+
+            if (Multiple)
+                selectedIndex = -1;
 
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
         }
@@ -586,7 +636,7 @@ namespace Radzen
         /// <returns>LoadDataArgs.</returns>
         internal virtual async System.Threading.Tasks.Task<LoadDataArgs> GetLoadDataArgs()
         {
-#if NET5
+#if NET5_0_OR_GREATER
             if (AllowVirtualization)
             {
                 return new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, Filter = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) };
@@ -632,7 +682,7 @@ namespace Radzen
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-#if NET5
+#if NET5_0_OR_GREATER
             var pageSize = parameters.GetValueOrDefault<int>(nameof(PageSize));
             if(pageSize != default(int))
             {
@@ -715,7 +765,7 @@ namespace Radzen
                 }
                 else
                 {
-                    return item == selectedItem;
+                    return object.Equals(item,selectedItem);
                 }
             }
         }
@@ -912,8 +962,32 @@ namespace Radzen
             }
             if (raiseChange)
             {
-                await ValueChanged.InvokeAsync(object.Equals(internalValue, null) ? default(T) : (T)internalValue);
+                if (ValueChanged.HasDelegate)
+                {
+                    if (typeof(IList).IsAssignableFrom(typeof(T)))
+                    {
+                        if (object.Equals(internalValue, null))
+                        {
+                            await ValueChanged.InvokeAsync(default(T));
+                        }
+                        else
+                        {
+                            var list = (IList)Activator.CreateInstance(typeof(T));
+                            foreach (var i in (IEnumerable)internalValue)
+                            {
+                                list.Add(i);
+                            }
+                            await ValueChanged.InvokeAsync((T)(object)list);
+                        }
+                    }
+                    else
+                    {
+                        await ValueChanged.InvokeAsync(object.Equals(internalValue, null) ? default(T) : (T)internalValue);
+                    }
+                }
+
                 if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+
                 await Change.InvokeAsync(internalValue);
             }
             StateHasChanged();

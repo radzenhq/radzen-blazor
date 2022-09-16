@@ -1,35 +1,34 @@
 ﻿@page "/googlemap"
 
 <RadzenExample Name="GoogleMap">
-<div class="row p-3">
-    <div class="col">
-        <RadzenCard Class="mb-4">
-            <RadzenCheckBox @bind-Value=@showMadridMarker Name="showMarker" />
-            <RadzenLabel Text="Show marker for Madrid" Component="showMarker" Style=@captionStyle />
-            <RadzenCheckBox @bind-Value=@showCustomMarker Name="showCustomMarker" Style="margin-left: 6px"/>
-            <RadzenLabel Text="Show custom marker for Berlin" Component="showCustomMarker" Style=@captionStyle />
-            <RadzenCheckBox @bind-Value=@enableDraggingCursor Name="enableCustomCursor" Style="margin-left: 6px"/>
-            <RadzenLabel Text="Enable custom cursor" Component="enableCustomCursor" Style=@captionStyle />
-        </RadzenCard>
-        @if(!needReload)       
-        {
-        <RadzenGoogleMap @ref=@map style="height: 400px" Zoom=@zoom Center=@(new GoogleMapPosition() { Lat = 42.6977, Lng = 23.3219 })
-                         MapClick=@OnMapClick MarkerClick=@OnMarkerClick DraggingCursor="@DraggingCursor">
-            <Markers>
-                <RadzenGoogleMapMarker Title="London" Label="London" Position=@(new GoogleMapPosition() { Lat = 51.5074, Lng = 0.1278 }) />
-                <RadzenGoogleMapMarker Title="Paris " Label="Paris" Position=@(new GoogleMapPosition() { Lat = 48.8566, Lng = 2.3522 }) />
-                @if (showMadridMarker)
-                { 
-                    <RadzenGoogleMapMarker Title="Madrid " Label="Madrid" Position=@(new GoogleMapPosition() { Lat = 40.4168, Lng = -3.7038 }) />
-                }     
-                @if (showCustomMarker)
-                {
-                    <RadzenGoogleMapMarker Title="Berlin " Label="Berlin" Position=@(new GoogleMapPosition() { Lat = 52.5347, Lng = 13.3760 })
-                                           IconSrc="../images/map-icon-blue.png"/>
-                }
-            </Markers>
-        </RadzenGoogleMap>
-        }
+<div class="container-fluid">
+    <div class="row p-3">
+        <div class="col">
+            <RadzenCard Class="mb-4">
+                <RadzenCheckBox @bind-Value=@showMadridMarker Name="showMarker" />
+                <RadzenLabel Text="Show marker for Madrid" Component="showMarker" Style=@captionStyle />
+                <RadzenCheckBox @bind-Value=@showCustomMarker Name="showCustomMarker" Style="margin-left: 6px"/>
+                <RadzenLabel Text="Show custom marker for Berlin" Component="showCustomMarker" Style=@captionStyle />
+                <RadzenCheckBox @bind-Value=@enableDraggingCursor Name="enableCustomCursor" Style="margin-left: 6px"/>
+                <RadzenLabel Text="Enable custom cursor" Component="enableCustomCursor" Style=@captionStyle />
+            </RadzenCard>
+            <RadzenGoogleMap style="height: 400px" Zoom=@zoom Center=@(new GoogleMapPosition() { Lat = 42.6977, Lng = 23.3219 }) 
+                        MapClick=@OnMapClick MarkerClick=@OnMarkerClick DraggingCursor=@DraggingCursor>
+                <Markers>
+                    <RadzenGoogleMapMarker Title="London" Label="London" Position=@(new GoogleMapPosition() { Lat = 51.5074, Lng = 0.1278 }) />
+                    <RadzenGoogleMapMarker Title="Paris " Label="Paris" Position=@(new GoogleMapPosition() { Lat = 48.8566, Lng = 2.3522 }) />
+                    @if (showMadridMarker)
+                    { 
+                        <RadzenGoogleMapMarker Title="Madrid " Label="Madrid" Position=@(new GoogleMapPosition() { Lat = 40.4168, Lng = -3.7038 }) />
+                    }
+                    @if (showCustomMarker)
+                    {
+                        <RadzenGoogleMapMarker Title="Berlin " Label="Berlin" Position=@(new GoogleMapPosition() { Lat = 52.5347, Lng = 13.3760 })
+                                               IconSrc="../images/map-icon-blue.png"/>
+                    }
+                </Markers>
+            </RadzenGoogleMap>
+        </div>
     </div>
 </div>
 </RadzenExample>

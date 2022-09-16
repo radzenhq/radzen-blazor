@@ -1,5 +1,38 @@
 $notification-padding: 1rem 1.25rem !default;
 $notification-icon-margin: 0 0.625rem 0 0 !default;
+$notification-container-background-color: transparent !default;
+$notification-success-color: var(--rz-text-contrast-color) !default;
+$notification-success-background-color: var(--rz-success) !default;
+$notification-success-icon-color: $notification-success-color !default;
+$notification-warning-color: var(--rz-text-contrast-color) !default;
+$notification-warning-background-color: var(--rz-warning) !default;
+$notification-warning-icon-color: $notification-warning-color !default;
+$notification-error-color: var(--rz-text-contrast-color) !default;
+$notification-error-background-color: var(--rz-danger) !default;
+$notification-error-icon-color: $notification-error-color !default;
+$notification-info-color: var(--rz-text-contrast-color) !default;
+$notification-info-background-color: var(--rz-info) !default;
+$notification-info-icon-color: $notification-info-color !default;
+
+// Notification CSS variables
+
+:root {
+  --rz-notification-padding: #{$notification-padding};
+  --rz-notification-icon-margin: #{$notification-icon-margin};
+  --rz-notification-container-background-color: #{$notification-container-background-color};
+  --rz-notification-success-color: #{$notification-success-color};
+  --rz-notification-success-background-color: #{$notification-success-background-color};
+  --rz-notification-success-icon-color: #{$notification-success-icon-color};
+  --rz-notification-warning-color: #{$notification-warning-color};
+  --rz-notification-warning-background-color: #{$notification-warning-background-color};
+  --rz-notification-warning-icon-color: #{$notification-warning-icon-color};
+  --rz-notification-error-color: #{$notification-error-color};
+  --rz-notification-error-background-color: #{$notification-error-background-color};
+  --rz-notification-error-icon-color: #{$notification-error-icon-color};
+  --rz-notification-info-color: #{$notification-info-color};
+  --rz-notification-info-background-color: #{$notification-info-background-color};
+  --rz-notification-info-icon-color: #{$notification-info-icon-color};
+}
 
 .rz-growl {
   position: fixed;
@@ -8,38 +41,45 @@ $notification-icon-margin: 0 0.625rem 0 0 !default;
   min-width: 20rem;
 }
 
+.rz-growl-item-container {
+  background-color: var(--rz-notification-container-background-color);
+}
+
 .rz-growl-item {
-  border-radius: $border-radius;
-  padding: $notification-padding;
+  border-radius: var(--rz-border-radius);
+  padding: var(--rz-notification-padding);
 }
 
 .rz-growl-message-success {
   .rz-growl-item {
-    background-color: $success;
+    color: var(--rz-notification-success-color);
+    background-color: var(--rz-notification-success-background-color);
   }
 }
 
 .rz-growl-message-warn {
   .rz-growl-item {
-    background-color: $warning;
+    color: var(--rz-notification-warning-color);
+    background-color: var(--rz-notification-warning-background-color);
   }
 }
 
 .rz-growl-message-error {
   .rz-growl-item {
-    background-color: $danger;
+    color: var(--rz-notification-error-color);
+    background-color: var(--rz-notification-error-background-color);
   }
 }
 
 .rz-growl-message-info {
   .rz-growl-item {
-    background-color: $info;
+    color: var(--rz-notification-info-color);
+    background-color: var(--rz-notification-info-background-color);
   }
 }
 
 .rz-growl-item {
   margin: 1rem 0;
-  color: $white;
 
   p {
     color: inherit;
@@ -56,27 +96,35 @@ $notification-icon-margin: 0 0.625rem 0 0 !default;
 
 .rz-growl-image {
   float: left;
-  margin: $notification-icon-margin;
+  margin: var(--rz-notification-icon-margin);
 
   &.rzi-check {
+    color: var(--rz-notification-success-icon-color);
+
     &:before {
       content: "check";
     }
   }
 
   &.rzi-exclamation-triangle {
+    color: var(--rz-notification-warning-icon-color);
+
     &:before {
       content: "warning";
     }
   }
 
   &.rzi-info-circle {
+    color: var(--rz-notification-info-icon-color);
+
     &:before {
       content: "info";
     }
   }
 
   &.rzi-times {
+    color: var(--rz-notification-error-icon-color);
+
     &:before {
       content: "error";
     }

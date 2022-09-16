@@ -125,6 +125,12 @@
                             builder.AddAttribute(4, "TItem", typeof(TItem));
                             builder.AddAttribute(5, "Item", item);
                             builder.AddAttribute(6, "InEditMode", Grid.IsRowInEditMode((TItem)item));
+
+                            if (Grid.editContexts.ContainsKey((TItem)item))
+                            {
+                                builder.AddAttribute(7, nameof(RadzenDataGridRow<TItem>.EditContext), Grid.editContexts[(TItem)item]);
+                            }
+
                             builder.CloseComponent();
                             i++;
                         }

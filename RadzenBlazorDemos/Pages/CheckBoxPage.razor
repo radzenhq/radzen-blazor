@@ -1,29 +1,28 @@
 ﻿@page "/checkbox"
 
 <RadzenExample Name="CheckBox">
+<div class="container-fluid">
     <div class="row px-3">
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4 class="mb-4">CheckBox</h4>
                 <RadzenCheckBox @bind-Value=@checkBox1Value  Name="CheckBox1" TValue="bool" Change=@(args => OnChange(args, "CheckBox1 CheckBox")) />
-                <RadzenLabel Text="CheckBox1" Component="CheckBox1" Style="margin-left: 8px; vertical-align: middle;" />
+                <RadzenLabel Text="CheckBox" Component="CheckBox1" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Tri State</h4>
                 <RadzenCheckBox @bind-Value=@checkBox2Value Name="CheckBox2" TriState="true" TValue="bool?" Change=@(args => OnChange(args, "TriState CheckBox")) />
-                <RadzenLabel Text="TriState" Component="CheckBox2" Style="margin-left: 8px; vertical-align: middle;" />
+                <RadzenLabel Text="TriState CheckBox" Component="CheckBox2" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
-                <h4 class="mb-4">Disabled CheckBox</h4>
                 <RadzenCheckBox @bind-Value=@checkBox3Value Disabled="true" TriState="true" TValue="bool?" />
-                <RadzenLabel Text="Disabled" Component="CheckBox3" Style="margin-left: 8px; vertical-align: middle;" />
+                <RadzenLabel Text="Disabled CheckBox" Component="CheckBox3" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
         </div>
     </div>
+</div>
 </RadzenExample>
 
 <EventConsole @ref=@console Class="mt-4" />

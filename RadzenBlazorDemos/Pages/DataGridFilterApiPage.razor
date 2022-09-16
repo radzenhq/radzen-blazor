@@ -3,20 +3,24 @@
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
+@using RadzenBlazorDemos.Pages
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>Filter API</strong></h1>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Filter API</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Set the initial filter of your RadzenDataGrid via the <code>FilterValue</code> and <code>FilterOperator</code> column properties.
+</RadzenText>
 
-<p>Set the initial filter of your RadzenDataGrid via the <code>FilterValue</code> and <code>FilterOperator</code> column properties.</p>
-
-<RadzenExample Name="DataGrid" Source="DataGridFilterApi" Heading="false">
+<RadzenExample Name="DataGrid" Source="DataGridFilterApi" Heading="false" AdditionalSourceCodePages=@(new [] { "MyCustomDataGridColumn.razor" })>
     <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 
-        FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" 
+        FilterMode="FilterMode.Simple" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" 
         FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
         LogicalFilterOperator="LogicalFilterOperator.Or" Filter="@OnFilter">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
                 <Template Context="data">
                     <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
@@ -24,7 +28,7 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
             <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
-            <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+            <MyCustomDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
             <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
             <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
         </Columns>
@@ -58,6 +62,6 @@
 
     void OnFilter(DataGridColumnFilterEventArgs<Employee> args)
     {
-        //
+    //
     }
 }

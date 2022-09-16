@@ -6,18 +6,21 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>Column Picker</strong></h1>
-
-<p>Enable column picker by setting the AllowColumnPicking property to true.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Column Picker</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Enable column picker by setting the AllowColumnPicking property to true.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridColumnPicking" Heading="false">
-    <RadzenButton Text="Toggle EmployeeID column visibility" Click=@(() => EmployeeIDVisible = !EmployeeIDVisible) Style="margin-bottom:20px;"/>
-    <RadzenDataGrid Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnPicking="true">
+    <RadzenButton Text="Toggle EmployeeID column visibility" Click=@(() => EmployeeIDVisible = !EmployeeIDVisible) Class="my-3"/>
+    <RadzenDataGrid Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnPicking="true" PickedColumnsChanged="@PickedColumnsChanged">
         <Columns>
-            <RadzenDataGridColumn Visible="@EmployeeIDVisible" TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" Frozen="true" />
+            <RadzenDataGridColumn Visible="@EmployeeIDVisible" TItem="Employee" Property="EmployeeID" Title="ID" Width="80px" TextAlign="TextAlign.Center" Frozen="true" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Width="200px" Pickable="false">
                 <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                    <RadzenImage Path="@data.Photo" class="rz-gravatar" />
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
@@ -38,9 +41,7 @@
     </RadzenDataGrid>
 </RadzenExample>
 
-<RadzenCard Class="mt-4">
-    <EventConsole @ref=@console />
-</RadzenCard>
+<EventConsole @ref=@console Class="mt-4" />
 
 @code {
     bool EmployeeIDVisible = false;
@@ -50,5 +51,10 @@
     protected override void OnInitialized()
     {
         employees = dbContext.Employees;
+    }
+
+    void PickedColumnsChanged(DataGridPickedColumnsChangedEventArgs<Employee> args)
+    {
+        console.Log($"Picked columns: {string.Join(", ", args.Columns.Select(c => c.Title))}");
     }
 }

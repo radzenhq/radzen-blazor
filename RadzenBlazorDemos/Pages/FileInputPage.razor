@@ -6,13 +6,15 @@
 @inject NorthwindContext dbContext
 
 <RadzenExample Name="FileInput">
-<div class="row px-3">
-    <div class="col-lg-6 offset-lg-3 p-3">
-        <RadzenCard>
-        <h4 class="mb-4">Employee: <b>@(firstEmployee.FirstName + " " + firstEmployee.LastName)</b></h4>
-        <RadzenFileInput @bind-Value=@firstEmployee.Photo TValue="string" Class="w-100" 
-            Change=@(args => OnChange(args, "FileInput")) Error=@(args => OnError(args, "FileInput")) />
-        </RadzenCard>
+<div class="container-fluid">
+    <div class="row px-3">
+        <div class="col-lg-6 offset-lg-3 p-3">
+            <RadzenCard>
+            <h4 class="mb-4">Employee: <b>@(firstEmployee.FirstName + " " + firstEmployee.LastName)</b></h4>
+            <RadzenFileInput @bind-Value=@firstEmployee.Photo @bind-FileName=@fileName @bind-FileSize=@fileSize TValue="string" Class="w-100" 
+                Change=@(args => OnChange(args, "FileInput")) Error=@(args => OnError(args, "FileInput")) />
+            </RadzenCard>
+        </div>
     </div>
 </div>
 </RadzenExample>
@@ -22,6 +24,9 @@
 @code {
     Employee firstEmployee;
     EventConsole console;
+
+    string fileName;
+    long? fileSize;
 
     protected override async Task OnInitializedAsync()
     {

@@ -4,7 +4,7 @@
 @using Microsoft.JSInterop
 @typeparam TValue
 
-<li class="@(ListBox.isSelected(Item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")" aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, ListBox.TextProperty)" style="display: block;" @onclick="@(async () => { if (!ListBox.Disabled) { await ListBox.SelectItemInternal(Item); } })">
+<li class="@(ListBox.isSelected(Item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")" aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, ListBox.TextProperty)" @onclick="@(async () => { if (!ListBox.Disabled) { await ListBox.SelectItemInternal(Item); } })">
     @if (ListBox.Multiple)
     {
         <div class="rz-chkbox ">

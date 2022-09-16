@@ -1,12 +1,21 @@
 @page "/pie-chart"
 
-<h1>Radzen Blazor Chart pie series</h1>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    Radzen Blazor Chart pie series
+</RadzenText>
+
 <RadzenExample Name="Chart" Source="PieChart" Heading="false">
     <div class="container">
             <div class="row">
                 <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
+                <RadzenCard Class="w-100 mb-4" >
+                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                    <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+                </RadzenCard>
                 <RadzenChart SeriesClick=@OnSeriesClick>
-                    <RadzenPieSeries Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
+                    <RadzenPieSeries Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue">
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </RadzenPieSeries>
                 </RadzenChart>
             </div>
         </div>
@@ -17,6 +26,7 @@
 
 @code {
     EventConsole console;
+    bool showDataLabels = false;
 
     void OnSeriesClick(SeriesClickEventArgs args)
     {

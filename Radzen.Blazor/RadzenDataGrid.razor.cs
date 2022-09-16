@@ -28,7 +28,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem>
     {
-#if NET5
+#if NET5_0_OR_GREATER
         internal void SetAllowVirtualization(bool allowVirtualization)
         {
             AllowVirtualization = allowVirtualization;
@@ -91,7 +91,7 @@ namespace Radzen.Blazor
         {
             return new RenderFragment(builder =>
             {
-#if NET5
+#if NET5_0_OR_GREATER
                 if (AllowVirtualization)
                 {
                     if(AllowGrouping && Groups.Any() && !LoadData.HasDelegate)
@@ -202,7 +202,11 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if DataGrid data cells will follow the header cells structure in composite columns; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowCompositeDataCells { get; set; } = false;
-
+        /// <summary>
+        /// Gets or sets a value indicating whether DataGrid data body show empty message.
+        /// </summary>
+        [Parameter]
+        public bool ShowEmptyMessage { get; set; } = true;
         /// <summary>
         /// Gets or sets a value indicating whether DataGrid is responsive.
         /// </summary>
@@ -257,6 +261,11 @@ namespace Radzen.Blazor
             return column.IsFrozen() ? "rz-frozen-cell" : "";
         }
 
+        internal string getColumnAlignClass(RadzenDataGridColumn<TItem> column)
+        {
+            return $"rz-text-align-{column.TextAlign.ToString().ToLower()}";
+        }
+
         /// <summary>
         /// The filter operator style for dates.
         /// </summary>
@@ -306,7 +315,7 @@ namespace Radzen.Blazor
 
         private List<RadzenDataGridColumn<TItem>> columns = new List<RadzenDataGridColumn<TItem>>();
         internal readonly List<RadzenDataGridColumn<TItem>> childColumns = new List<RadzenDataGridColumn<TItem>>();
-        private List<RadzenDataGridColumn<TItem>> allColumns = new List<RadzenDataGridColumn<TItem>>();
+        internal List<RadzenDataGridColumn<TItem>> allColumns = new List<RadzenDataGridColumn<TItem>>();
         private List<RadzenDataGridColumn<TItem>> allPickableColumns = new List<RadzenDataGridColumn<TItem>>();
         internal object selectedColumns;
 
@@ -428,11 +437,22 @@ namespace Radzen.Blazor
 
         void ToggleColumns()
         {
+            var selected = ((IEnumerable<object>)selectedColumns).Cast<RadzenDataGridColumn<TItem>>();
+
             foreach (var c in allPickableColumns)
             {
-                c.SetVisible(((IEnumerable<object>)selectedColumns).Cast<RadzenDataGridColumn<TItem>>().Contains(c));
+                c.SetVisible(selected.Contains(c));
             }
+
+            PickedColumnsChanged.InvokeAsync(new DataGridPickedColumnsChangedEventArgs<TItem>() { Columns = selected });
         }
+
+        /// <summary>
+        /// Gets or sets the picked columns changed callback.
+        /// </summary>
+        /// <value>The picked columns changed callback.</value>
+        [Parameter]
+        public EventCallback<DataGridPickedColumnsChangedEventArgs<TItem>> PickedColumnsChanged { get; set; }
 
         string getFilterInputId(RadzenDataGridColumn<TItem> column)
         {
@@ -492,7 +512,21 @@ namespace Radzen.Blazor
                     builder.AddAttribute(4, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, args =>
                     {
                         var value = $"{args.Value}";
-                        column.SetFilterValue(!string.IsNullOrWhiteSpace(value) ? Convert.ChangeType(value, Nullable.GetUnderlyingType(type)) : null, isFirst);
+                        object filterValue = null;
+
+                        if (!string.IsNullOrWhiteSpace(value))
+                        {
+                            try
+                            {
+                                filterValue = Convert.ChangeType(value, Nullable.GetUnderlyingType(type));
+                            }
+                            catch (Exception)
+                            {
+                                filterValue = null;
+                            }
+                        }
+
+                        column.SetFilterValue(filterValue, isFirst);
                     }));
                 }
                 else if (FilterMode == FilterMode.SimpleWithMenu)
@@ -511,7 +545,7 @@ namespace Radzen.Blazor
         /// <param name="column">The column.</param>
         /// <param name="force">if set to <c>true</c> [force].</param>
         /// <param name="isFirst">if set to <c>true</c> [is first].</param>
-        protected void OnFilter(ChangeEventArgs args, RadzenDataGridColumn<TItem> column, bool force = false, bool isFirst = true)
+        protected async Task OnFilter(ChangeEventArgs args, RadzenDataGridColumn<TItem> column, bool force = false, bool isFirst = true)
         {
             string property = column.GetFilterProperty();
             if (AllowFiltering && column.Filterable)
@@ -522,7 +556,7 @@ namespace Radzen.Blazor
                     skip = 0;
                     CurrentPage = 0;
 
-                    Filter.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
+                    await Filter.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
                     {
                         Column = column,
                         FilterValue = column.GetFilterValue(),
@@ -537,7 +571,12 @@ namespace Radzen.Blazor
                         Data = null;
                     }
 
-                    InvokeAsync(Reload);
+                    await InvokeAsync(Reload);
+
+                    if (IsVirtualizationAllowed())
+                    {
+                        StateHasChanged();
+                    }
                 }
             }
         }
@@ -929,7 +968,7 @@ namespace Radzen.Blazor
         /// <value>The empty template.</value>
         [Parameter]
         public RenderFragment EmptyTemplate { get; set; }
-#if NET5
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Gets or sets a value indicating whether this instance is virtualized.
         /// </summary>
@@ -1187,6 +1226,8 @@ namespace Radzen.Blazor
                             CurrentPage = 0;
                         }
 
+                        CalculatePager();
+
                         StateHasChanged();
                     }
                 }
@@ -1197,7 +1238,7 @@ namespace Radzen.Blazor
 
         internal bool IsVirtualizationAllowed()
         {
-    #if NET5
+    #if NET5_0_OR_GREATER
             return AllowVirtualization;
     #else
             return false;
@@ -1341,6 +1382,13 @@ namespace Radzen.Blazor
         protected override void OnDataChanged()
         {
             Reset(!IsOData() && !LoadData.HasDelegate);
+
+            if (!IsOData() && !LoadData.HasDelegate && !Page.HasDelegate)
+            {
+                skip = 0;
+                CurrentPage = 0;
+                CalculatePager();
+            }
         }
 
         /// <summary>
@@ -1380,7 +1428,7 @@ namespace Radzen.Blazor
             {
                 Count = 1;
             }
-#if NET5
+#if NET5_0_OR_GREATER
             if (AllowVirtualization)
             {
                 if(!LoadData.HasDelegate)
@@ -1411,7 +1459,7 @@ namespace Radzen.Blazor
             }
             else
             {
-#if NET5
+#if NET5_0_OR_GREATER
                 if (AllowVirtualization)
                 {
                     if(virtualize != null)
@@ -1428,6 +1476,8 @@ namespace Radzen.Blazor
             }
         }
 
+        IEnumerable<FilterDescriptor> filters = Enumerable.Empty<FilterDescriptor>();
+
         async Task InvokeLoadData(int start, int top)
         {
             var orderBy = GetOrderBy();
@@ -1439,21 +1489,21 @@ namespace Radzen.Blazor
             var filterString = allColumns.ToList().ToFilterString<TItem>();
             Query.Filter = filterString;
 
+            filters = allColumns.ToList().Where(c => c.Filterable && c.GetVisible() && (c.GetFilterValue() != null
+                    || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
+                    || c.GetFilterOperator() == FilterOperator.IsEmpty | c.GetFilterOperator() == FilterOperator.IsNotEmpty))
+                .Select(c => new FilterDescriptor()
+                {
+                    Property = c.GetFilterProperty(),
+                    FilterValue = c.GetFilterValue(),
+                    FilterOperator = c.GetFilterOperator(),
+                    SecondFilterValue = c.GetSecondFilterValue(),
+                    SecondFilterOperator = c.GetSecondFilterOperator(),
+                    LogicalFilterOperator = c.GetLogicalFilterOperator()
+                }).ToList();
+
             if (LoadData.HasDelegate)
             {
-                var filters = allColumns.ToList().Where(c => c.Filterable && c.GetVisible() && (c.GetFilterValue() != null
-                        || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
-                        || c.GetFilterOperator() == FilterOperator.IsEmpty | c.GetFilterOperator() == FilterOperator.IsNotEmpty))
-                    .Select(c => new FilterDescriptor()
-                    {
-                            Property = c.GetFilterProperty(),
-                            FilterValue = c.GetFilterValue(),
-                            FilterOperator = c.GetFilterOperator(),
-                            SecondFilterValue = c.GetSecondFilterValue(),
-                            SecondFilterOperator = c.GetSecondFilterOperator(),
-                            LogicalFilterOperator = c.GetLogicalFilterOperator()
-                    });
-
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
                 {
                     Skip = start,
@@ -1885,7 +1935,7 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-#if NET5
+#if NET5_0_OR_GREATER
                     itemToInsert = default(TItem);
                     if(virtualize != null)
                     {
@@ -1941,7 +1991,7 @@ namespace Radzen.Blazor
             }
             else
             {
-#if NET5
+#if NET5_0_OR_GREATER
                 if(virtualize != null)
                 {
                     await virtualize.RefreshDataAsync();

@@ -1,5 +1,9 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -39,6 +43,13 @@ namespace Radzen.Blazor
         /// <param name="valueScale">The value scale.</param>
         /// <returns>RenderFragment.</returns>
         RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale);
+        /// <summary>
+        /// Renders the series overlays with the specified category and value scales.
+        /// </summary>
+        /// <param name="categoryScale">The category scale.</param>
+        /// <param name="valueScale">The value scale.</param>
+        /// <returns>RenderFragment.</returns>
+        RenderFragment RenderOverlays(ScaleBase categoryScale, ScaleBase valueScale);
         /// <summary>
         /// Renders the series tooltip.
         /// </summary>
@@ -86,6 +97,34 @@ namespace Radzen.Blazor
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
         object DataAt(double x, double y);
+        /// <summary>
+        /// Returns data chart position
+        /// </summary>
+        IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY);
+        /// <summary>
+        /// Returns series median
+        /// </summary>
+        double GetMedian();
+        /// <summary>
+        /// Returns series mean
+        /// </summary>
+        double GetMean();
+        /// <summary>
+        /// Returns series mode
+        /// </summary>
+        double GetMode();
+        /// <summary>
+        /// Returns series trend
+        /// </summary>
+        (double a, double b) GetTrend();
+        /// <summary>
+        /// Series coordinate system
+        /// </summary>
+        CoordinateSystem CoordinateSystem { get; }
+        /// <summary>
+        /// Series overlays
+        /// </summary>
+        IList<IChartSeriesOverlay> Overlays{ get; }
         /// <summary>
         /// Gets or sets the title of the series. The title is displayed in tooltips and the legend.
         /// </summary>

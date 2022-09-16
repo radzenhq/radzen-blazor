@@ -9,8 +9,8 @@ else
     <RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Example.Name" Path="@Example.Path" Icon="@Example.Icon">
         <Template>
             @Example.Name
-            <RadzenBadge Text="Updated" Visible=@Example.Updated />
-            <RadzenBadge Text="New" Visible=@Example.New BadgeStyle="BadgeStyle.Success" />
+            <RadzenBadge Text="Updated" Visible=@Example.Updated BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter"/>
+            <RadzenBadge Text="New" Visible=@Example.New BadgeStyle="BadgeStyle.Success"/>
         </Template>
         <ChildContent>@ChildContent</ChildContent>
     </RadzenPanelMenuItem>
@@ -23,7 +23,17 @@ else
     public RenderFragment ChildContent { get; set; }
 
     [Parameter]
-    public bool Expanded { get; set; }
+    public bool Expanded
+    {
+        get
+        {
+            return Example.Expanded;
+        }
+        set
+        {
+            Example.Expanded = value;
+        }
+    }
 
     [Parameter]
     public EventCallback<bool> ExpandedChanged { get; set; }

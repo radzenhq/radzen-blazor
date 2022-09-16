@@ -419,11 +419,11 @@ namespace Radzen
                 }
                 else if (columnFilterOperator == FilterOperator.IsEmpty)
                 {
-                    return $@"np({property}) == ''";
+                    return $@"np({property}) == """"";
                 }
                 else if (columnFilterOperator == FilterOperator.IsNotEmpty)
                 {
-                    return $@"np({property}) != ''";
+                    return $@"np({property}) != """"";
                 }
                 else if (columnFilterOperator == FilterOperator.IsNotNull)
                 {
@@ -438,7 +438,7 @@ namespace Radzen
                 }
                 else if (column.GetFilterOperator() == FilterOperator.IsEmpty || column.GetFilterOperator() == FilterOperator.IsNotEmpty)
                 {
-                    return $"{property} {linqOperator} ''";
+                    return $@"{property} {linqOperator} """"";
                 }
                 else
                 {
@@ -456,7 +456,7 @@ namespace Radzen
                 }
                 else if (column.GetFilterOperator() == FilterOperator.IsEmpty || column.GetFilterOperator() == FilterOperator.IsNotEmpty)
                 {
-                    return $"{property} {linqOperator} ''";
+                    return $@"{property} {linqOperator} """"";
                 }
                 else
                 {
@@ -480,7 +480,7 @@ namespace Radzen
                 }
                 else if (column.GetFilterOperator() == FilterOperator.IsEmpty || column.GetFilterOperator() == FilterOperator.IsNotEmpty)
                 {
-                    return $"{property} {linqOperator} ''";
+                    return $@"{property} {linqOperator} """"";
                 }
                 else
                 {

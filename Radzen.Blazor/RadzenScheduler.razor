@@ -23,7 +23,7 @@
         <div class="rz-scheduler-nav-views">
         @foreach (var view in Views)
         {
-            <button class="@($"rz-button{(IsSelected(view)? " rz-state-active" : "")}")" @onclick=@(args => OnChangeView(view))><RadzenIcon Icon=@view.Icon /><span>@view.Text</span></button>
+            <RadzenButton Click=@(args => OnChangeView(view)) Icon=@view.Icon Text=@view.Text class="@($"{(IsSelected(view)? " rz-state-active" : "")}")" />
         }
         </div>
     </div>

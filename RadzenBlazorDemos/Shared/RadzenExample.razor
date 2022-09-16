@@ -9,13 +9,17 @@
 </HeadContent>
 @if (Heading)
 {
-    <h1>@Name</h1>
-    <p>Demonstration and configuration of the Radzen Blazor <strong>@Name</strong> component.</p>
+    <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+        @Name
+    </RadzenText>
+    <RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+        Demonstration and configuration of the Radzen Blazor <strong>@Name</strong> component.
+    </RadzenText>
 }
 <div class="documentation-links">
 @if (Documentation)
 {
-    <a target="blank" href="@DocumentationHref" title=@($"Open {Name} documentation in new tab") ><RadzenIcon Icon="help_outline" style="font-size: 1rem; margin-right: 4px;" /> @Name Docs</a>
+    <a target="blank" href="@DocumentationHref" title=@($"Open {Name} documentation in new tab") ><RadzenIcon Icon="launch" style="font-size: 1rem; margin-right: 4px;" /> @Name Docs</a>
 }
 @if (Heading)
 {

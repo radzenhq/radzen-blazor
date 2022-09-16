@@ -17,7 +17,7 @@ namespace Radzen.Blazor
     {
         private string getButtonSize()
         {
-            return Size == ButtonSize.Medium ? "md" : "sm";
+            return Size == ButtonSize.Medium ? "md" : Size == ButtonSize.Large ? "lg" : "sm";
         }
 
         /// <summary>
@@ -61,6 +61,20 @@ namespace Radzen.Blazor
         /// <value>The type of the button.</value>
         [Parameter]
         public ButtonType ButtonType { get; set; } = ButtonType.Button;
+
+        /// <summary>
+        /// Gets or sets the design variant of the button.
+        /// </summary>
+        /// <value>The variant of the button.</value>
+        [Parameter]
+        public Variant Variant { get; set; } = Variant.Filled;
+
+        /// <summary>
+        /// Gets or sets the color shade of the button.
+        /// </summary>
+        /// <value>The color shade of the button.</value>
+        [Parameter]
+        public Shade Shade { get; set; } = Shade.Default;
 
         /// <summary>
         /// Gets or sets the size.
@@ -131,7 +145,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-button rz-button-{getButtonSize()} btn-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLowerInvariant()}{(IsDisabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}";
+            return $"rz-button rz-button-{getButtonSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()}{(IsDisabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}";
         }
     }
 }

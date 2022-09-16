@@ -1,37 +1,54 @@
-$profile-menu-background-color: $white !default;
+$profile-menu-background-color: var(--rz-base-background-color) !default;
 $profile-menu-top-item-background-color: $profile-menu-background-color !default;
-$profile-menu-border: 1px solid #eaeef0 !default;
-$profile-menu-padding: 0.5625rem 1.25rem !default;
-$profile-menu-border-radius: 2px !default;
-$profile-menu-toggle-button-color: $default-link !default;
+$profile-menu-border: var(--rz-border-base-200) !default;
+$profile-menu-padding: 0.625rem 1rem !default;
+$profile-menu-border-radius: var(--rz-border-radius) !default;
+$profile-menu-toggle-button-color: var(--rz-secondary) !default;
 
-$profile-menu-item-hover-background-color: $default-link !default;
-$profile-menu-item-icon-width: 1.125rem !default;
+$profile-menu-item-hover-background-color: var(--rz-secondary) !default;
+$profile-menu-item-icon-width: var(--rz-icon-size) !default;
 $profile-menu-item-icon-height: $profile-menu-item-icon-width !default;
 $profile-menu-item-icon-font-size: $profile-menu-item-icon-height !default;
-$profile-menu-item-icon-margin: 0 0.625rem 0 0 !default;
+$profile-menu-item-icon-margin: 0 0.5rem 0 0 !default;
+
+// ProfileMenu CSS variables
+
+:root {
+  --rz-profile-menu-background-color: #{$profile-menu-background-color};
+  --rz-profile-menu-top-item-background-color: #{$profile-menu-top-item-background-color};
+  --rz-profile-menu-border: #{$profile-menu-border};
+  --rz-profile-menu-padding: #{$profile-menu-padding};
+  --rz-profile-menu-border-radius: #{$profile-menu-border-radius};
+  --rz-profile-menu-toggle-button-color: #{$profile-menu-toggle-button-color};
+  
+  --rz-profile-menu-item-hover-background-color: #{$profile-menu-item-hover-background-color};
+  --rz-profile-menu-item-icon-width: #{$profile-menu-item-icon-width};
+  --rz-profile-menu-item-icon-height: #{$profile-menu-item-icon-height};
+  --rz-profile-menu-item-icon-font-size: #{$profile-menu-item-icon-font-size};
+  --rz-profile-menu-item-icon-margin: #{$profile-menu-item-icon-margin};
+}
 
 ul.rz-profile-menu {
   list-style: none;
   margin-bottom: 0;
-  padding: $profile-menu-padding;
+  padding: var(--rz-profile-menu-padding);
   display: inline-block;
-  background-color: $profile-menu-top-item-background-color;
-  border-left: $profile-menu-border;
+  background-color: var(--rz-profile-menu-top-item-background-color);
+  border-left: var(--rz-profile-menu-border);
   position: relative;
   z-index: 3;
 
   .rz-navigation-item-icon-children {
-    color: $profile-menu-toggle-button-color;
+    color: var(--rz-profile-menu-toggle-button-color);
   }
 
   .rz-navigation-menu {
-    border-radius: $profile-menu-border-radius;
-    background-color: $profile-menu-background-color;
-    box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06);
+    border-radius: var(--rz-profile-menu-border-radius);
+    background-color: var(--rz-profile-menu-background-color);
+    box-shadow: var(--rz-context-menu-box-shadow);
     overflow: hidden;
     margin-bottom: 0;
-    padding: 0;
+    padding: var(--rz-context-menu-padding);
     position: absolute;
     text-align: left;
     top: calc(100% - 2px);
@@ -42,33 +59,33 @@ ul.rz-profile-menu {
     .rz-navigation-item-wrapper {
 
       .rz-navigation-item-link {
-        padding: $menu-item-padding;
+        padding: var(--rz-menu-item-padding);
       }
 
       &:hover {
-        background-color: $profile-menu-item-hover-background-color;
-        color: $menu-item-hover-color;
+        background-color: var(--rz-profile-menu-item-hover-background-color);
+        color: var(--rz-menu-item-hover-color);
 
         .rz-navigation-item-link {
-          color: $menu-item-hover-color;
+          color: var(--rz-menu-item-hover-color);
         }
 
         .rz-navigation-item-text {
-          color: $menu-item-hover-color;
+          color: var(--rz-menu-item-hover-color);
         }
       }
     }
 
     .rz-navigation-item-link,
     .rz-navigation-item-text {
-      color: $menu-item-color;
+      color: var(--rz-menu-item-color);
     }
 
     .rzi {
-      width: $profile-menu-item-icon-width;
-      height: $profile-menu-item-icon-height;
-      font-size: $profile-menu-item-icon-font-size;
-      margin: $profile-menu-item-icon-margin;
+      width: var(--rz-profile-menu-item-icon-width);
+      height: var(--rz-profile-menu-item-icon-height);
+      font-size: var(--rz-profile-menu-item-icon-font-size);
+      margin: var(--rz-profile-menu-item-icon-margin);
     }
   }
 }

@@ -74,6 +74,13 @@ namespace Radzen.Blazor
         public string Url { get; set; }
 
         /// <summary>
+        /// Gets or sets the parameter name. If not set 'file' parameter name will be used for single file and 'files' for multiple files.
+        /// </summary>
+        /// <value>The parameter name.</value>
+        [Parameter]
+        public string ParameterName { get; set; }
+
+        /// <summary>
         /// Gets or sets the accepted MIME types.
         /// </summary>
         /// <value>The accepted MIME types.</value>
@@ -112,7 +119,7 @@ namespace Radzen.Blazor
         /// Gets the button class list.
         /// </summary>
         /// <value>The button class list.</value>
-        ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only btn-light")
+        ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only rz-light")
                                               .AddDisabled(Disabled);
 
         /// <summary>
@@ -127,7 +134,7 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task Upload()
         {
-            await JSRuntime.InvokeAsync<string>("Radzen.upload", fileUpload, Url, Multiple);
+            await JSRuntime.InvokeAsync<string>("Radzen.upload", fileUpload, Url, Multiple, false, ParameterName);
         }
 
         readonly IDictionary<string, string> headers = new Dictionary<string, string>();
@@ -298,18 +305,23 @@ namespace Radzen.Blazor
         /// <param name="loaded">The loaded.</param>
         /// <param name="total">The total.</param>
         /// <param name="files">The files.</param>
+        /// <param name="cancel">The cancelled state.</param>
         [JSInvokable("RadzenUpload.OnProgress")]
-        public async System.Threading.Tasks.Task OnProgress(int progress, long loaded, long total, IEnumerable<FileInfo> files)
+        public async System.Threading.Tasks.Task<bool> OnProgress(int progress, long loaded, long total, IEnumerable<FileInfo> files, bool cancel)
         {
-            await Progress.InvokeAsync(new UploadProgressArgs() { Progress = progress, Loaded = loaded, Total = total, Files = files });
+            var args = new UploadProgressArgs() { Progress = progress, Loaded = loaded, Total = total, Files = files, Cancel = cancel };
+            await Progress.InvokeAsync(args); ;
+
+            return args.Cancel;
         }
 
         /// <summary>
         /// Called when upload is complete.
         /// </summary>
         /// <param name="response">The response.</param>
+        /// <param name="cancelled">Flag indicating if the upload was cancelled</param>
         [JSInvokable("RadzenUpload.OnComplete")]
-        public async System.Threading.Tasks.Task OnComplete(string response)
+        public async System.Threading.Tasks.Task OnComplete(string response, bool cancelled)
         {
             System.Text.Json.JsonDocument doc = null;
 
@@ -325,7 +337,7 @@ namespace Radzen.Blazor
                 }
             }
 
-            await Complete.InvokeAsync(new UploadCompleteEventArgs() { RawResponse = response, JsonResponse = doc });
+            await Complete.InvokeAsync(new UploadCompleteEventArgs() { RawResponse = response, JsonResponse = doc, Cancelled = cancelled });
         }
 
         /// <summary>

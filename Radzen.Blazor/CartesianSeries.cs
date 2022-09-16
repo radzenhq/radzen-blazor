@@ -5,6 +5,8 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using Radzen.Blazor.Rendering;
 using System.Threading.Tasks;
+using System.Collections;
+using Microsoft.AspNetCore.Components.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -18,7 +20,7 @@ namespace Radzen.Blazor
         /// Creates a getter function that returns a value from the specified category scale for the specified data item.
         /// </summary>
         /// <param name="scale">The scale.</param>
-        protected Func<TItem, double> Category(ScaleBase scale)
+        internal Func<TItem, double> Category(ScaleBase scale)
         {
             if (IsNumeric(CategoryProperty))
             {
@@ -123,6 +125,18 @@ namespace Radzen.Blazor
         public RenderFragment<TItem> TooltipTemplate { get; set; }
 
         /// <summary>
+        /// Gets the list of overlays.
+        /// </summary>
+        /// <value>The Overlays list.</value>
+        public IList<IChartSeriesOverlay> Overlays { get; } = new List<IChartSeriesOverlay>();
+
+        /// <summary>
+        /// Gets the coordinate system of the series.
+        /// </summary>
+        /// <value>Coordinate system enum value.</value>
+        public virtual CoordinateSystem CoordinateSystem => CoordinateSystem.Cartesian;
+
+        /// <summary>
         /// The name of the property of <typeparamref name="TItem" /> that provides the X axis (a.k.a. category axis) values.
         /// </summary>
         [Parameter]
@@ -174,7 +188,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The value.</value>
         /// <exception cref="ArgumentException">ValueProperty should not be empty</exception>
-        protected Func<TItem, double> Value
+        internal Func<TItem, double> Value
         {
             get
             {
@@ -264,7 +278,7 @@ namespace Radzen.Blazor
                     Output = scale.Output
                 };
             }
-            
+
             var data = GetCategories();
 
             if (scale is OrdinalScale ordinal)
@@ -310,6 +324,23 @@ namespace Radzen.Blazor
 
         /// <inheritdoc />
         public abstract RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale);
+
+        /// <inheritdoc />
+        public RenderFragment RenderOverlays(ScaleBase categoryScale, ScaleBase valueScale)
+        {
+            return new RenderFragment(builder =>
+            {
+                builder.OpenRegion(0);
+                foreach (var overlay in Overlays)
+                {
+                    if (overlay.Visible)
+                    {
+                        builder.AddContent(1, overlay.Render(categoryScale, valueScale));
+                    }
+                }
+                builder.CloseRegion();
+            });
+        }
 
         /// <inheritdoc />
         public abstract string Color { get; }
@@ -436,10 +467,7 @@ namespace Radzen.Blazor
                 builder.AddAttribute(1, nameof(ChartTooltip.X), x + marginLeft);
                 builder.AddAttribute(2, nameof(ChartTooltip.Y), y + marginTop);
 
-                if (TooltipTemplate != null)
-                {
-                    builder.AddAttribute(3, nameof(ChartTooltip.ChildContent), TooltipTemplate(item));
-                }
+                builder.AddAttribute(3, nameof(ChartTooltip.ChildContent), TooltipTemplate == null ? null : TooltipTemplate(item));
 
                 builder.AddAttribute(4, nameof(ChartTooltip.Title), TooltipTitle(item));
                 builder.AddAttribute(5, nameof(ChartTooltip.Label), TooltipLabel(item));
@@ -508,6 +536,63 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <inheritdoc />
+        public double GetMedian()
+        {
+            return Data.Select(e => Value(e)).OrderBy(e => e).Skip(Data.Count() / 2).FirstOrDefault();
+        }
+
+        /// <inheritdoc />
+        public double GetMean()
+        {
+            return Data.Select(e => Value(e)).Average();
+        }
+
+        /// <inheritdoc />
+        public double GetMode()
+        {
+            return Data.GroupBy(e => Value(e)).Select(g => new { Value = g.Key, Count = g.Count() }).OrderByDescending(e => e.Count).FirstOrDefault().Value;
+        }
+
+        /// <summary>
+        /// https://en.wikipedia.org/wiki/Simple_linear_regression#Fitting_the_regression_line
+        /// </summary>
+        public (double a, double b) GetTrend()
+        {
+            double a, b;
+
+            Func<TItem, double> X;
+            Func<TItem, double> Y;
+            if (Chart.ShouldInvertAxes())
+            {
+                X = e => Chart.CategoryScale.Scale(Value(e));
+                Y = e => Chart.ValueScale.Scale(Category(Chart.ValueScale)(e));
+            }
+            else
+            {
+                X = e => Chart.CategoryScale.Scale(Category(Chart.CategoryScale)(e));
+                Y = e => Chart.ValueScale.Scale(Value(e));
+            }
+
+            var avgX = Data.Select(e => X(e)).Average();
+            var avgY = Data.Select(e => Y(e)).Average();
+            var sumXY = Data.Sum(e => (X(e) - avgX) * (Y(e) - avgY));         
+            if (Chart.ShouldInvertAxes())
+            {
+                var sumYSq = Data.Sum(e => (Y(e) - avgY) * (Y(e) - avgY));
+                b = sumXY / sumYSq;
+                a = avgX - b * avgY;
+            }
+            else
+            {
+                var sumXSq = Data.Sum(e => (X(e) - avgX) * (X(e) - avgX));
+                b = sumXY / sumXSq;
+                a = avgY - b * avgX;
+            }
+
+            return (a, b);
+        }
+
         private async Task OnLegendItemClick()
         {
             IsVisible = !IsVisible;
@@ -568,7 +653,7 @@ namespace Radzen.Blazor
         /// Gets the X coordinate of the tooltip of the specified item.
         /// </summary>
         /// <param name="item">The item.</param>
-        protected virtual double TooltipX(TItem item)
+        internal virtual double TooltipX(TItem item)
         {
             var category = Category(Chart.CategoryScale);
             return Chart.CategoryScale.Scale(category(item), true);
@@ -578,7 +663,7 @@ namespace Radzen.Blazor
         /// Gets the Y coordinate of the tooltip of the specified item.
         /// </summary>
         /// <param name="item">The item.</param>
-        protected virtual double TooltipY(TItem item)
+        internal virtual double TooltipY(TItem item)
         {
             return Chart.ValueScale.Scale(Value(item), true);
         }
@@ -596,6 +681,24 @@ namespace Radzen.Blazor
             }
 
             return null;
+        }
+
+        /// <inheritdoc />
+        public virtual IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
+        {
+            var list = new List<ChartDataLabel>();
+            
+            foreach (var d in Data)
+            {
+                list.Add(new ChartDataLabel 
+                { 
+                    Position = new Point { X = TooltipX(d) + offsetX, Y = TooltipY(d) + offsetY },
+                    TextAnchor = "middle",
+                    Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
+                });
+            }
+
+            return list;
         }
 
         /// <summary>

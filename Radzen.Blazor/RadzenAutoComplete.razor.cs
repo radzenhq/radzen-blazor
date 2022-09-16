@@ -23,6 +23,20 @@ namespace Radzen.Blazor
     public partial class RadzenAutoComplete : DataBoundFormComponent<string>
     {
         /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenAutoComplete"/> is multiline.
+        /// </summary>
+        /// <value><c>true</c> if multiline; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Multiline { get; set; }
+
+        /// <summary>
+        /// Gets or sets the template.
+        /// </summary>
+        /// <value>The template.</value>
+        [Parameter]
+        public RenderFragment<dynamic> Template { get; set; }
+
+        /// <summary>
         /// Gets or sets the minimum length.
         /// </summary>
         /// <value>The minimum length.</value>
@@ -148,7 +162,9 @@ namespace Radzen.Blazor
                 {
                     string filterCaseSensitivityOperator = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
 
-                    return Query.Where($"{TextProperty}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)",
+                    string textProperty = string.IsNullOrEmpty(TextProperty) ? string.Empty : $".{TextProperty}";
+
+                    return Query.Where($"o=>o{textProperty}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)",
                         FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
                 }
 

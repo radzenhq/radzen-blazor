@@ -1,31 +1,32 @@
-$icon-base-font-size: 1.5em !default; /* Preferred icon size */
-
 $icon-styles: () !default;
 $icon-styles: map-merge(
   (
     primary: (
-      color: $primary
+      color: var(--rz-primary)
     ),
     light: (
-      color: $light,
+      color: var(--rz-base-200)
+    ),
+    dark: (
+      color: var(--rz-base-900)
     ),
     secondary: (
-      color: $secondary
+      color: var(--rz-secondary)
     ),
     info: (
-      color: $info
+      color: var(--rz-info)
     ),
     warning: (
-      color: $warning
+      color: var(--rz-warning)
     ),
     error: (
-      color: $danger
+      color: var(--rz-danger)
     ),
     danger: (
-      color: $danger
+      color: var(--rz-danger)
     ),
     success: (
-      color: $success
+      color: var(--rz-success)
     )
   ),
   $icon-styles
@@ -35,7 +36,7 @@ $icon-styles: map-merge(
   font-family: 'Material Icons';
   font-weight: normal;
   font-style: normal;
-  font-size: $icon-base-font-size;
+  font-size: var(--rz-icon-size);
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -46,8 +47,10 @@ $icon-styles: map-merge(
   white-space: nowrap;
   direction: ltr;
 
+
   /* Support for all WebKit browsers. */
   -webkit-font-smoothing: antialiased;
+  
   /* Support for Safari and Chrome. */
   text-rendering: optimizeLegibility;
 
@@ -56,6 +59,12 @@ $icon-styles: map-merge(
 
   /* Support for IE. */
   font-feature-settings: 'liga';
+}
+
+i.rzi {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @each $style, $icon in $icon-styles {

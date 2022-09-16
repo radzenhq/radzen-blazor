@@ -6,19 +6,22 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid <strong>DataGrid Grouping API</strong></h1>
-
-<p>Set AllowGrouping="true" to enable group by column and GroupPanelText to localize the group panel text. Set Groupable="false" for column to disable grouping by that column.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>DataGrid Grouping API</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Set AllowGrouping="true" to enable group by column and GroupPanelText to localize the group panel text. Set Groupable="false" for column to disable grouping by that column.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridGroupingApi" Heading="false">
     <RadzenDataGrid AllowGrouping="true" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" 
         Data="@employees" TItem="Employee" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or" Render="@OnRender" 
             HideGroupedColumn="true" GroupRowRender="OnGroupRowRender" GroupRowExpand="OnGroupRowExpand" GroupRowCollapse="OnGroupRowCollapse" Group="@OnGroup">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Frozen="true" Groupable="false" Width="60px" >
+            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Frozen="true" Groupable="false" Width="80px" TextAlign="TextAlign.Center" >
                 <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                    <RadzenImage Path="@data.Photo" class="rz-gravatar" />
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />

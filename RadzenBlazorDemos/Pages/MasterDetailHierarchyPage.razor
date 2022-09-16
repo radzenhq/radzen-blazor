@@ -6,9 +6,12 @@
 
 @inject NorthwindContext dbContext
 
-<h1>DataGrid Master Detail Hierarchy</h1>
-
-<p>This page demonstrates how to use templates to create a Radzen Blazor DataGrid hierarchy.</p>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid Master Detail Hierarchy
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    This page demonstrates how to use templates to create a Radzen Blazor DataGrid hierarchy.
+</RadzenText>
 
 <RadzenExample Name="DataGrid" Source="MasterDetailHierarchy" Heading="false">
     <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" RowRender="@RowRender" ExpandMode="DataGridExpandMode.Single"

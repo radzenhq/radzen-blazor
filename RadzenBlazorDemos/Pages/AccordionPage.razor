@@ -1,10 +1,10 @@
 ﻿@page "/accordion"
 
 <RadzenExample Name="Accordion">
-<div class="row px-3" style="min-height: 200px;">
-    <div class="col-xl-6 p-3">
-        <RadzenCard>
-            <h4>Accordion with single expand</h4>
+<div class="container-fluid">
+    <div class="row" style="min-height: 200px;">
+        <div class="col-xl-6 p-3">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="mb-4">Accordion with single expand</RadzenText>
             <RadzenAccordion Expand=@(args => Change(args, "Accordion with single expand", "expanded"))>
                 <Items>
                     <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
@@ -18,11 +18,9 @@
                     </RadzenAccordionItem>
                 </Items>
             </RadzenAccordion>
-        </RadzenCard>
-    </div>
-    <div class="col-xl-6 p-3">
-        <RadzenCard>
-            <h4>Accordion with multiple expand</h4>
+        </div>
+        <div class="col-xl-6 p-3">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="mb-4">Accordion with multiple expand</RadzenText>
             <RadzenAccordion Multiple="true" Collapse=@(args => Change(args, "Accordion with multiple expand", "collapsed"))
                                 Expand=@(args => Change(args, "Accordion with multiple expand", "expanded"))>
                 <Items>
@@ -37,7 +35,7 @@
                     </RadzenAccordionItem>
                 </Items>
             </RadzenAccordion>
-        </RadzenCard>
+        </div>
     </div>
 </div>
 </RadzenExample>

@@ -1,0 +1,57 @@
+﻿@using Radzen.Blazor.Rendering
+@inherits RadzenChartComponentBase
+@implements IChartSeriesOverlay
+
+@code {
+    IChartSeries series;
+
+    [CascadingParameter]
+    protected IChartSeries Series 
+    { 
+        get
+        {
+            return series;
+        }
+        set
+        {
+            if (!value.Overlays.Contains(this))
+            {
+                series = value;
+                series.Overlays.Add(this);
+            }
+        }
+    }
+
+    public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        return builder =>
+        {
+            builder.OpenRegion(0);
+            foreach (var label in series.GetDataLabels(OffsetX, OffsetY))
+            {
+                builder.AddContent(1,
+                    @<g>
+                        <Text @key="@($"{label.Position}-{Chart.Series.IndexOf(series)}")" 
+                            Value="@label.Text" Position="@label.Position" TextAnchor="@label.TextAnchor" Class="rz-series-data-label" />
+                    </g>
+                    );
+            }
+            builder.CloseRegion();
+        };
+    }
+
+    protected override bool ShouldRefreshChart(ParameterView parameters)
+    {
+        return parameters.DidParameterChange(nameof(Visible), Visible);
+    }
+    
+    public bool Contains(double mouseX, double mouseY, int tolerance)
+    {
+        return false;
+    }
+
+    public RenderFragment RenderTooltip(double mouseX, double mouseY, double marginLeft, double marginTop)
+    {
+        return null;
+    }
+}

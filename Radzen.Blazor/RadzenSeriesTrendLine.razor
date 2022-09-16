@@ -1,0 +1,73 @@
+﻿@using Radzen.Blazor.Rendering
+@inherits RadzenGridLines
+@implements IChartSeriesOverlay
+
+@code {
+    public RadzenSeriesTrendLine()
+    {
+        Visible = true;
+    }
+
+    IChartSeries series;
+    [CascadingParameter]
+    protected IChartSeries Series
+    {
+        get
+        {
+            return series;
+        }
+        set
+        {
+            if (value.CoordinateSystem != CoordinateSystem.Cartesian)
+            {
+                throw new ArgumentException($"Series must use Cartesian coordinate system");
+            }
+            series = value;
+            if (!series.Overlays.Contains(this))
+            {
+                series.Overlays.Add(this);
+            }
+        }
+    }
+
+    public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        (double a, double b) = series.GetTrend();
+        double x1, x2, y1, y2;
+
+        if (Chart.ShouldInvertAxes())
+        {
+            y1 = 0; y2 = Chart.ValueScale.OutputSize;
+            x1 = a; x2 = (a + b * y2);
+
+            x1 = Math.Min(Math.Max(0, x1), Chart.CategoryScale.OutputSize); 
+            x2 = Math.Max(Math.Min(Chart.CategoryScale.OutputSize, x2), 0);
+        }
+        else
+        {
+            x1 = 0; x2 = Chart.CategoryScale.OutputSize;
+            y1 = a; y2 = (a + b * x2);
+
+            y1 = Math.Min(Math.Max(0, y1), Chart.ValueScale.OutputSize); 
+            y2 = Math.Max(Math.Min(Chart.ValueScale.OutputSize, y2), 0);
+        }
+
+        var path = $"M{x1.ToInvariantString()} {y1.ToInvariantString()} L{x2.ToInvariantString()} {y2.ToInvariantString()} ";
+
+        return
+        @<g>
+            <Path @key="@($"{path}-{Chart.Series.IndexOf(series)}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" />
+        </g>
+    ;
+    }
+
+    public bool Contains(double mouseX, double mouseY, int tolerance)
+    {
+        return false;
+    }
+
+    public RenderFragment RenderTooltip(double mouseX, double mouseY, double marginLeft, double marginTop)
+    {
+        return null;
+    }
+}

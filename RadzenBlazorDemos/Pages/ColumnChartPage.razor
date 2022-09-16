@@ -1,15 +1,42 @@
 @page "/column-chart"
 @using System.Globalization
 
-<h1>Radzen Blazor Chart column series</h1>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    Radzen Blazor Chart column series
+</RadzenText>
+
 <RadzenExample Heading="false" Name="Chart" Source="ColumnChart">
     <div class="container">
         <div class="row">
             <div class="col-sm-12 my-5">
+                <RadzenCard Class="w-100 mb-4" >
+                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                    <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+                </RadzenCard>
+                <h4>Auto-size column series</h4>
                 <RadzenChart>
-                    <RadzenColumnSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
-                    <RadzenColumnSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
+                    <RadzenColumnSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </RadzenColumnSeries>
+                    <RadzenColumnSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </RadzenColumnSeries>
                     <RadzenColumnOptions Radius="5" />
+                    <RadzenValueAxis Formatter="@FormatAsUSD">
+                        <RadzenGridLines Visible="true" />
+                        <RadzenAxisTitle Text="Revenue in USD" />
+                    </RadzenValueAxis>
+                </RadzenChart>
+                <h4>Custom size column series</h4>
+                <RadzenChart>
+                    <RadzenColumnSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </RadzenColumnSeries>
+                    <RadzenColumnSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </RadzenColumnSeries>
+                    <RadzenColumnOptions Radius="5" Width="20" />
+                    <RadzenCategoryAxis Padding="20" />
                     <RadzenValueAxis Formatter="@FormatAsUSD">
                         <RadzenGridLines Visible="true" />
                         <RadzenAxisTitle Text="Revenue in USD" />
@@ -20,6 +47,8 @@
     </div>
 </RadzenExample>
 @code {
+    bool showDataLabels = false;
+
     class DataItem
     {
         public string Quarter { get; set; }
