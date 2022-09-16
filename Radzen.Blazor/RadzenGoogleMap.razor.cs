@@ -158,18 +158,18 @@ namespace Radzen.Blazor
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            var data = Data != null ? Data : markers;
-            var data_markers = data.Select(m => new { m.Title, m.Label, m.Position, Icon = m.IconSrc ?? string.Empty });
+            var data = Data ?? markers;
+            var dataMarkers = data.Select(m => new { m.Title, m.Label, m.Position, Icon = m.IconSrc ?? string.Empty });
 
             if (firstRender)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center, data_markers);
+                await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center, dataMarkers);
                 if (!string.IsNullOrWhiteSpace(DraggingCursor))
                     await JSRuntime.InvokeVoidAsync("Radzen.customizeMap", UniqueID, DraggingCursor);
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, Zoom, Center, data_markers);
+                await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, Zoom, Center, dataMarkers);
             }
         }
 

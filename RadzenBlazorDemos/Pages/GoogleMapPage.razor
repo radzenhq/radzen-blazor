@@ -11,7 +11,7 @@
             <RadzenCheckBox @bind-Value=@enableDraggingCursor Name="enableCustomCursor" Style="margin-left: 6px"/>
             <RadzenLabel Text="Enable custom cursor" Component="enableCustomCursor" Style=@captionStyle />
         </RadzenCard>
-        @if(!need_reload)       
+        @if(!needReload)       
         {
         <RadzenGoogleMap @ref=@map style="height: 400px" Zoom=@zoom Center=@(new GoogleMapPosition() { Lat = 42.6977, Lng = 23.3219 })
                          MapClick=@OnMapClick MarkerClick=@OnMarkerClick DraggingCursor="@DraggingCursor">
@@ -41,7 +41,7 @@
     RadzenGoogleMap map;
     bool showMadridMarker;
     bool showCustomMarker;
-    bool need_reload;
+    bool needReload;
     bool _enableDraggingCursor;
     bool enableDraggingCursor
     {
@@ -50,7 +50,7 @@
             if (value != _enableDraggingCursor)
             {
                 _enableDraggingCursor = value;
-                need_reload = true;
+                needReload = true;
             }
         }
     }
@@ -71,11 +71,11 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        bool first = need_reload ? true : firstRender;
+        bool first = needReload ? true : firstRender;
         await base.OnAfterRenderAsync(first);
-        if (need_reload)
+        if (needReload)
         {
-            need_reload = false;
+            needReload = false;
             StateHasChanged();
         }
     }
