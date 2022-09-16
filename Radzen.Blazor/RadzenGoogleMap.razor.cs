@@ -82,7 +82,7 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Markers { get; set; }
 
-        List<RadzenGoogleMapMarker> markers = new List<RadzenGoogleMapMarker>();
+        readonly List<RadzenGoogleMapMarker> markers = new List<RadzenGoogleMapMarker>();
 
         /// <summary>
         /// Gets or sets name or url of the cursor to display when the map is being dragged
@@ -104,21 +104,9 @@ namespace Radzen.Blazor
             }
         }
         private string draggingCursor = string.Empty;
+
         private bool mapOptionsChanged;
-
-        /// <summary>
-        /// Get or set parameter to manage map conponent refreshing. 
-        /// Set to false if you need to block map updates, such as when the parent component is rerendering and the map settings have not changed.
-        /// </summary>
-        /// <value>Should render Map component.</value>
-        [Parameter]
-        public bool IsShouldRender { get; set; } = true;
-
-        /// <inheritdoc />
-        protected override bool ShouldRender()
-        {
-            return IsShouldRender;
-        }
+        private bool markersCountChanged;
 
         /// <summary>
         /// Adds the marker.
@@ -129,6 +117,7 @@ namespace Radzen.Blazor
             if (markers.IndexOf(marker) == -1)
             {
                 markers.Add(marker);
+                markersCountChanged = true;
             }
         }
 
@@ -141,6 +130,7 @@ namespace Radzen.Blazor
             if (markers.IndexOf(marker) != -1)
             {
                 markers.Remove(marker);
+                markersCountChanged = true;
             }
         }
 
@@ -176,16 +166,18 @@ namespace Radzen.Blazor
             await base.OnAfterRenderAsync(firstRender);
 
             var data = Data ?? markers;
+            var markersForUpdate = data.Where(m => m.ParamsChanged).ToList();
             var dataMarkers = data.Select(m => new { m.Title, m.Label, m.Position, Icon = m.IconSrc ?? string.Empty });
-
             if (firstRender)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center, dataMarkers);           
+                await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center, dataMarkers);
             }
-            else
+            else if (markersForUpdate.Any() || markersCountChanged)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, Zoom, Center, dataMarkers);
             }
+            markersForUpdate.ForEach(m => m.ParamsChanged = false);
+            markersCountChanged = false;
             if (firstRender || mapOptionsChanged)
             {
                 var options = GetType().GetProperties()

@@ -79,12 +79,38 @@ namespace Radzen
         /// Gets or sets the latitude.
         /// </summary>
         /// <value>The latitude.</value>
-        public double Lat { get; set; }
+        public double Lat
+        {
+            get => _lat; set
+            {
+                if (value != _lat)
+                {
+                    _lat = value;
+                    PositionChanged?.Invoke();
+                }
+            }
+        }
+        private double _lat;
         /// <summary>
         /// Gets or sets the longitude.
         /// </summary>
         /// <value>The longitude.</value>
-        public double Lng { get; set; }
+        public double Lng
+        {
+            get => _lng; set
+            {
+                if (value != _lng)
+                {
+                    _lng = value;
+                    PositionChanged?.Invoke();
+                }
+            }
+        }
+        private double _lng;
+        /// <summary>
+        /// Called when parameters are changed
+        /// </summary>
+        internal Action PositionChanged;
     }
 
     /// <summary>
