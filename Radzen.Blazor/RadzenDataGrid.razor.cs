@@ -261,6 +261,11 @@ namespace Radzen.Blazor
             return column.IsFrozen() ? "rz-frozen-cell" : "";
         }
 
+        internal string getColumnAlignClass(RadzenDataGridColumn<TItem> column)
+        {
+            return $"rz-text-align-{column.TextAlign.ToString().ToLower()}";
+        }
+
         /// <summary>
         /// The filter operator style for dates.
         /// </summary>
