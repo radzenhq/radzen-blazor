@@ -125,36 +125,37 @@ $badge-styles: map-merge(
     @each $name, $value in $badge {
       @if $name == 'background-color' {
         @if $style == 'dark' {
-          outline-color: #{$value};
-          color: #{$value};
+          &.rz-shade-default {
+            box-shadow: inset 0 0 0 var(--rz-border-width) #{$value};
+            color: #{$value};
+          }
         } @else if $style == 'light' {
-          outline-color: #{$value};
-          color: #{$value};
+          &.rz-shade-default {
+            box-shadow: inset 0 0 0 var(--rz-border-width) #{$value};
+            color: #{$value};
+          }
         } @else {
           &.rz-shade-lighter {
-            outline-color: var(--rz-#{$style}-lighter);
+            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-lighter);
             color: var(--rz-#{$style}-lighter)
           }
           &.rz-shade-light {
-            outline-color: var(--rz-#{$style}-light);
+            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-light);
             color: var(--rz-#{$style}-light)
           }
           &.rz-shade-default {
-            outline-color: var(--rz-#{$style});
+            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style});
             color: var(--rz-#{$style})
           }
           &.rz-shade-dark {
-            outline-color: var(--rz-#{$style}-dark);
+            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-dark);
             color: var(--rz-#{$style}-dark)
           }
           &.rz-shade-darker {
-            outline-color: var(--rz-#{$style}-darker);
+            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-darker);
             color: var(--rz-#{$style}-darker)
           }
         }
-        outline-style: solid;
-        outline-width: var(--rz-border-width);
-        outline-offset: calc(var(--rz-border-width) * -1);
         background-color: transparent;
       }
     }
