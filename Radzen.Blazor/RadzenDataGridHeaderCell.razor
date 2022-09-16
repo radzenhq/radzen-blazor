@@ -9,16 +9,16 @@
                     @onclick:preventDefault="true" @onclick:stopPropagation="true"
                     @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex))></span>
         }
-        <span class="rz-column-title">
+        <span class="rz-column-title" title="@Column.Title">
             @if (Column.HeaderTemplate != null)
             {
-                @Column.HeaderTemplate
+                <span class="rz-column-title-content">@Column.HeaderTemplate</span>
             }
             else
             {
-                @Column.Title
+                <span class="rz-column-title-content">@Column.Title</span>
             }
-        </span>
+        
         @if (Grid.AllowSorting && Column.Sortable)
         {
             @if (Column.GetSortOrder() == SortOrder.Ascending)
@@ -26,7 +26,7 @@
                 <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
                 @if(Grid.ShowMultiColumnSortingIndex)
                 {
-                    <span class="rz-column-title" style="padding-left:0px">@getSortIndex()</span>
+                    <span class="rz-sort-index">@getSortIndex()</span>
                 }
             }
             else if (Column.GetSortOrder() == SortOrder.Descending)
@@ -34,7 +34,7 @@
                 <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
                 @if(Grid.ShowMultiColumnSortingIndex)
                 {
-                    <span class="rz-column-title" style="padding-left:0px">@getSortIndex()</span>
+                    <span class="rz-sort-index">@getSortIndex()</span>
                 }
             }
             else
@@ -42,6 +42,7 @@
                 <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
             }
         }
+        </span>
         @if (Grid.AllowColumnResize && Column.Resizable && Column.Parent == null)
         {
             <div id="@Grid.getColumnResizerId(ColumnIndex)" style="cursor:col-resize;float:right;"

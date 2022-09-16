@@ -24,8 +24,8 @@ $grid-header-line-height: 1rem !default;
 $grid-header-font-weight: 600 !default;
 $grid-header-text-transform: uppercase !default;
 $grid-header-color: var(--rz-text-color) !default;
-$grid-header-cell-padding: 0.625rem 0.5rem !default;
-$grid-header-title-padding: 0 0.25rem 0 0 !default;
+$grid-header-cell-padding: 0.625rem 0 !default;
+$grid-header-title-padding: 0 0 0 0.5rem !default;
 $grid-header-sorted-background-color: var(--rz-base-300) !default;
 
 $grid-header-padding: 1rem !default;
@@ -56,7 +56,7 @@ $grid-apply-filter-button-background-color: var(--rz-primary) !default;
 $grid-apply-filter-button-color: var(--rz-text-contrast-color) !default;
 $grid-apply-filter-button-shadow: inherit !default;
 
-$grid-header-filter-icon-margin: 0 0 0 0.25rem !default;
+$grid-header-filter-icon-margin: 0 0.5rem 0 auto !default;
 $grid-header-filter-icon-hover-color: var(--rz-text-color) !default;
 $grid-header-filter-icon-active-color: var(--rz-primary) !default;
 $grid-header-filter-icon-font-size: 1rem !default;
@@ -107,7 +107,7 @@ $grid-group-header-items-margin: 0 0 -0.5rem 0 !default;
 
 $column-drag-handle-color: $grid-header-color !default;
 $column-drag-handle-hover-color: $column-drag-handle-color !default;
-$column-drag-handle-margin: 0 0 0 -0.25rem !default;
+$column-drag-handle-margin: 0 auto 0 0 !default;
 $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
 // Grid CSS variables
@@ -374,7 +374,10 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     }
 
     .rz-column-title {
-      display: inline-block;
+      display: inline-flex;
+      flex: auto;
+      width: 100%;
+      align-items: center;
       font-size: var(--rz-grid-header-font-size);
       line-height: var(--rz-grid-header-line-height);
       text-transform: var(--rz-grid-header-text-transform);
@@ -384,9 +387,45 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .rz-column-title-content {
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       &:has(.rz-chkbox) {
         overflow: visible;
+      }
+    }
+
+    &.rz-text-align-center {
+      .rz-column-title {
+        justify-content: center;
+        padding-left: 0;
+      }
+      &.rz-sortable-column {
+        .rz-column-title {
+          padding-left: var(--rz-grid-sort-icon-width);
+        }
+      }
+    }
+
+    &.rz-text-align-right {
+      .rz-column-title {
+        justify-content: right;
+      }
+      &.rz-sortable-column {
+        .rz-column-title {
+          padding-left: var(--rz-grid-sort-icon-width);
+        }
+      }
+    }
+
+    .rz-column-drag {
+        + .rz-column-title {
+        padding-left: 0;
       }
     }
   }
@@ -449,7 +488,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
   .rzi-grid-sort {
     @extend .rzi;
-    flex: auto;
     width: var(--rz-grid-sort-icon-width);
     height: var(--rz-grid-sort-icon-height);
     font-size: var(--rz-grid-sort-icon-height);

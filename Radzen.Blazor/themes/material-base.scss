@@ -826,8 +826,8 @@ $grid-header-line-height: 1.5rem !default;
 $grid-header-font-weight: 500 !default;
 $grid-header-text-transform: none !default;
 $grid-header-color: var(--rz-text-title-color) !default;
-$grid-header-cell-padding: 0.75rem 1rem !default;
-$grid-header-title-padding: 0 0.25rem 0 0 !default;
+$grid-header-cell-padding: 0.75rem 0 !default;
+$grid-header-title-padding: 0 0 0 1rem !default;
 $grid-header-sorted-background-color: var(--rz-base-200) !default;
 $grid-foot-background-color: var(--rz-base-100) !default;
 $grid-filter-background-color: var(--rz-base-background-color) !default;
@@ -842,6 +842,7 @@ $grid-clear-filter-button-shadow: none !default;
 $grid-apply-filter-button-background-color: var(--rz-base-background-color) !default;
 $grid-apply-filter-button-color: var(--rz-primary) !default;
 $grid-apply-filter-button-shadow: none !default;
+$grid-header-filter-icon-margin: 0 1rem 0 auto !default;
 $grid-header-filter-icon-hover-color: var(--rz-text-title-color) !default;
 $grid-header-filter-icon-font-size: 1.25rem !default;
 $grid-border: var(--rz-border-base-300) !default;
@@ -859,7 +860,7 @@ $grid-group-header-item-border: var(--rz-border-base-200) !default;
 $grid-group-header-item-border-radius: calc(4 * var(--rz-border-radius)) !default;
 $column-drag-handle-color: var(--rz-text-disabled-color) !default;
 $column-drag-handle-hover-color: var(--rz-text-title-color) !default;
-$column-drag-handle-margin: 0 0 0 -1rem !default;
+$column-drag-handle-margin: 0 !default;
 $column-draggable-shadow: var(--rz-shadow-4) !default;
 
 .rz-datatable {
