@@ -118,6 +118,8 @@ $state-info-bg: $rz-info !default;
 
 // Bootstrap component overrides.
 
+$badge-font-size: 0.75rem !default;
+$badge-border-radius: var(--rz-border-radius) !default;
 $card-border-radius: var(--rz-border-radius) !default;
 $input-height: 2.25rem !default;
 $input-line-height: 1.429 !default;
