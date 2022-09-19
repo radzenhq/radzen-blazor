@@ -3,7 +3,7 @@
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
     DataGrid <strong>LoadData</strong>

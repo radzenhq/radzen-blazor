@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenExample Name="Pager">
     <RadzenDataList WrapItems="true" AllowPaging="false" Data="@orders" TItem="Order">
@@ -40,6 +40,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         count = dbContext.Orders.Count();
         orders = GetOrders(0, pageSize);
     }

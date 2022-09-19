@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
     DataGrid conditional styles and templates
@@ -61,6 +61,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         orderDetails = dbContext.OrderDetails.Include("Product").ToList();
     }
 

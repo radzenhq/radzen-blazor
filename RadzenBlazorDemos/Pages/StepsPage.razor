@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenExample Name="Steps">
     <RadzenSteps Change=@OnChange>
@@ -99,6 +99,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         customers = dbContext.Customers.ToList();
         orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
         orderDetails = dbContext.OrderDetails.Include("Product").ToList();

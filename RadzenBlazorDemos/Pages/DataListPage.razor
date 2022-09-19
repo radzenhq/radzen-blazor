@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenExample Name="DataList">
 <div class="container">
@@ -72,6 +72,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         products = dbContext.Products.Include("Category").Include("Supplier").ToList();
     }
 }

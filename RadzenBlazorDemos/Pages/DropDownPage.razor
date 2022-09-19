@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenExample Name="DropDown">
 <div class="container-fluid">
@@ -161,6 +161,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         customers = dbContext.Customers.ToList();
         products = dbContext.Products.ToList();
         orders = dbContext.Orders.Where(o => o.CustomerID != null).Include("Customer").ToList();

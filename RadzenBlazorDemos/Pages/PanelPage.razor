@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenExample Name="Panel">
     <RadzenPanel AllowCollapse="true" Style="width: 700px; margin: 40px auto;"
@@ -60,6 +60,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
     }
 

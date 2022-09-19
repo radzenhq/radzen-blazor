@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
     DataGrid <strong>Pager API</strong>
@@ -47,7 +47,7 @@
     bool showPagerSummary = true;
 
     async Task FirstPage()
-{
+    {
         await dataGrid.FirstPage();
     }
     async Task TenthPage()
@@ -61,6 +61,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+ 
         orderDetails = dbContext.OrderDetails;
     }
 

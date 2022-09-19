@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 @inject Radzen.DialogService dialogService
 
 
@@ -70,6 +70,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         order = dbContext.Orders.Where(o => o.OrderID == OrderID)
                           .Include("Customer")
                           .Include("Employee").FirstOrDefault();

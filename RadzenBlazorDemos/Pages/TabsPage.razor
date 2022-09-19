@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenExample Name="Tabs">
     <RadzenCard Class="w-75 mb-5 mx-auto" Style="display: flex; align-items: center;" >
@@ -106,6 +106,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         employees = dbContext.Employees.ToList();
 
         customers = dbContext.Customers.ToList();

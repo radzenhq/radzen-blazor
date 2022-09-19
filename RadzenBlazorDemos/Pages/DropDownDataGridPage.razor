@@ -3,7 +3,7 @@
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenExample Name="DropDownDataGrid">
     <div class="container-fluid">
@@ -130,6 +130,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         customers = dbContext.Customers.ToList();
     }
 

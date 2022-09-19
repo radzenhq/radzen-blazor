@@ -1,7 +1,8 @@
 ﻿@page "/autocomplete"
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
-@inject NorthwindContext dbContext
+
+@inherits DbContextPage
 
 <RadzenExample Name="AutoComplete">
 <div class="container-fluid">
@@ -83,6 +84,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         customers = dbContext.Customers.ToList();
         customersNames = customers.Select(o => o.CompanyName).ToList();
     }

@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenExample Name="ListBox">
 <div class="container-fluid">
@@ -80,6 +80,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         customers = dbContext.Customers.ToList();
     }
 

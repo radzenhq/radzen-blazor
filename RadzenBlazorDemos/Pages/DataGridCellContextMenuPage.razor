@@ -4,7 +4,8 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 @inject ContextMenuService ContextMenuService
-@inject NorthwindContext dbContext
+
+@inherits DbContextPage
 
 <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
     DataGrid <strong>Cell context menu</strong>
@@ -45,6 +46,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         employees = dbContext.Employees;
         selectedEmployees = employees.Take(1).ToList();
     }

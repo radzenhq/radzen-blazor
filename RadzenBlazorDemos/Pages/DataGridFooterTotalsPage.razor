@@ -3,7 +3,8 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 @using System.Linq 
-@inject NorthwindContext dbContext
+
+@inherits DbContextPage
 
 <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
     DataGrid <strong>Footer Totals</strong>
@@ -56,6 +57,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
     }
 }
