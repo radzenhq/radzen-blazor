@@ -1,5 +1,6 @@
 @using System.IO
 @using Radzen.Blazor
+@implements IDisposable
 @inject ExampleService ExampleService
 @inject NavigationManager NavigationManager
 
@@ -71,5 +72,10 @@
     protected override void OnInitialized()
     {
         example = ExampleService.FindCurrent(NavigationManager.ToAbsoluteUri(NavigationManager.Uri));
+    }
+
+    public void Dispose()
+    {
+        GC.Collect();
     }
 }
