@@ -2065,6 +2065,46 @@ namespace Radzen.Blazor
             }
         }
 
+        void GroupsCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                var column = columns.Where(c => c.GetGroupProperty() == ((GroupDescriptor)args.NewItems[0]).Property).FirstOrDefault();
+
+                if (HideGroupedColumn)
+                {
+                    column.SetVisible(false);
+                    if (!groupedColumns.Contains(column))
+                    {
+                        groupedColumns.Add(column);
+                    }
+                }
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                var column = columns.Where(c => c.GetGroupProperty() == ((GroupDescriptor)args.OldItems[0]).Property).FirstOrDefault();
+
+                if (HideGroupedColumn)
+                {
+                    column.SetVisible(true);
+                    if (groupedColumns.Contains(column))
+                    {
+                        groupedColumns.Remove(column);
+                    }
+                }
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Reset)
+            {
+                foreach (var column in groupedColumns)
+                {
+                    if (HideGroupedColumn)
+                    {
+                        column.SetVisible(true);
+                    }
+                }
+            }
+        }
+
         List<RadzenDataGridColumn<TItem>> groupedColumns = new List<RadzenDataGridColumn<TItem>>();
         /// <summary>
         /// Gets or sets the group descriptors.
@@ -2077,45 +2117,8 @@ namespace Radzen.Blazor
                 if (groups == null)
                 {
                     groups = new ObservableCollection<GroupDescriptor>();
-                    groups.CollectionChanged += (object sender, NotifyCollectionChangedEventArgs args) => 
-                    {
-                        if (args.Action == NotifyCollectionChangedAction.Add)
-                        {
-                            var column = columns.Where(c => c.GetGroupProperty() == ((GroupDescriptor)args.NewItems[0]).Property).FirstOrDefault();
-
-                            if (HideGroupedColumn)
-                            {
-                                column.SetVisible(false);
-                                if (!groupedColumns.Contains(column))
-                                {
-                                    groupedColumns.Add(column);
-                                }
-                            }
-                        }
-                        else if (args.Action == NotifyCollectionChangedAction.Remove)
-                        {
-                            var column = columns.Where(c => c.GetGroupProperty() == ((GroupDescriptor)args.OldItems[0]).Property).FirstOrDefault();
-
-                            if (HideGroupedColumn)
-                            {
-                                column.SetVisible(true);
-                                if (groupedColumns.Contains(column))
-                                {
-                                    groupedColumns.Remove(column);
-                                }
-                            }
-                        }
-                        else if (args.Action == NotifyCollectionChangedAction.Reset)
-                        {
-                            foreach (var column in groupedColumns)
-                            {
-                                if (HideGroupedColumn)
-                                {
-                                    column.SetVisible(true);
-                                }
-                            }
-                        }
-                    };
+                    groups.CollectionChanged -= GroupsCollectionChanged;
+                    groups.CollectionChanged += GroupsCollectionChanged;
                 }
 
                 return groups;
@@ -2253,6 +2256,11 @@ namespace Radzen.Blazor
         public override void Dispose()
         {
             base.Dispose();
+
+            if (groups != null)
+            {
+                groups.CollectionChanged -= GroupsCollectionChanged;
+            }
 
             if (IsJSRuntimeAvailable)
             {
