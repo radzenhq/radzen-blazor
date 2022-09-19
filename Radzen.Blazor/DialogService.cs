@@ -229,6 +229,9 @@ namespace Radzen
         /// <inheritdoc />
         public void Dispose()
         {
+            reference?.Dispose();
+            reference = null;
+
             UriHelper.LocationChanged -= UriHelper_OnLocationChanged;
         }
 
