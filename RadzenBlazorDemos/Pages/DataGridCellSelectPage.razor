@@ -12,6 +12,11 @@
 
 <RadzenExample Name="DataGrid" Source="DataGridCellSelect" Heading="false">
     <p>Click on a table cell to select or deselect.</p>
+    <RadzenCard class="mb-3" style="display: flex; align-items: center; gap: 0.5rem">
+        <RadzenCheckBox @bind-Value="@multiple" Name="multiple" Change="@((bool args) => selectedCellData.Clear())" />
+        <RadzenLabel Text="Multiple selection" Component="multiple" Style="margin-left: 8px; margin-right: 32px; vertical-align: middle;" />
+        <RadzenButton Text="Clear selected cells" Click="@(args => selectedCellData.Clear())" />
+    </RadzenCard>
     <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                 AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
                 CellClick="@OnCellClick" CellRender="OnCellRender">
@@ -34,6 +39,7 @@
 <EventConsole @ref=@console Class="mt-4" />
 
 @code {
+    bool multiple = true;
     IEnumerable<Employee> employees;
     IList<Tuple<Employee, RadzenDataGridColumn<Employee>>> selectedCellData = new List<Tuple<Employee, RadzenDataGridColumn<Employee>>>();
     EventConsole console;
@@ -47,6 +53,11 @@
 
     void OnCellClick(DataGridCellMouseEventArgs<Employee> args)
     {
+        if (!multiple)
+        {
+            selectedCellData.Clear();
+        }
+
         var cellData = selectedCellData.FirstOrDefault(i => i.Item1 == args.Data && i.Item2 == args.Column);
         if (cellData != null)
         {
