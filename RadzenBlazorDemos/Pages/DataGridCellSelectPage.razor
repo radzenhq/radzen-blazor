@@ -12,14 +12,16 @@
 
 <RadzenExample Name="DataGrid" Source="DataGridCellSelect" Heading="false">
     <p>Click on a table cell to select or deselect.</p>
-    <RadzenCard class="mb-3" style="display: flex; align-items: center; gap: 0.5rem">
+    <div style="display: flex; align-items: center; margin-bottom: 16px">
         <RadzenCheckBox @bind-Value="@multiple" Name="multiple" Change="@((bool args) => selectedCellData.Clear())" />
-        <RadzenLabel Text="Multiple selection" Component="multiple" Style="margin-left: 8px; margin-right: 32px; vertical-align: middle;" />
+        <RadzenLabel Text="Enable multiple cells selection" Component="multiple" Style="margin-left: 8px; margin-right: 32px; vertical-align: middle;" />
+        <RadzenLabel Text="Event type:" style="white-space:nowrap; margin-right: 16px" Component="type" />
+        <RadzenDropDown @bind-Value="@type" Data="@(new string[]{ "Click", "DoubleClick" })" Name="type" style="margin-right: 16px"  />
         <RadzenButton Text="Clear selected cells" Click="@(args => selectedCellData.Clear())" />
-    </RadzenCard>
+    </div>
     <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                 AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
-                CellClick="@OnCellClick" CellRender="OnCellRender">
+                CellClick="@OnCellClick" CellDoubleClick="OnCellDoubleClick" CellRender="OnCellRender">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
                 <Template Context="data">
@@ -39,6 +41,7 @@
 <EventConsole @ref=@console Class="mt-4" />
 
 @code {
+    string type = "Click";
     bool multiple = true;
     IEnumerable<Employee> employees;
     IList<Tuple<Employee, RadzenDataGridColumn<Employee>>> selectedCellData = new List<Tuple<Employee, RadzenDataGridColumn<Employee>>>();
@@ -51,7 +54,7 @@
         employees = dbContext.Employees;
     }
 
-    void OnCellClick(DataGridCellMouseEventArgs<Employee> args)
+    void Select(DataGridCellMouseEventArgs<Employee> args)
     {
         if (!multiple)
         {
@@ -66,6 +69,22 @@
         else
         {
             selectedCellData.Add(new Tuple<Employee, RadzenDataGridColumn<Employee>>(args.Data, args.Column));
+        }
+    }
+
+    void OnCellClick(DataGridCellMouseEventArgs<Employee> args)
+    {
+        if (type == "Click")
+        {
+            Select(args);
+        }
+    }
+
+    void OnCellDoubleClick(DataGridCellMouseEventArgs<Employee> args)
+    {
+        if (type != "Click")
+        {
+            Select(args);
         }
     }
 
