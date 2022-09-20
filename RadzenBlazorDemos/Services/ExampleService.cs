@@ -325,6 +325,14 @@ namespace RadzenBlazorDemos
                             Title = "Blazor DataGrid multiple selection",
                             Tags = new [] { "multiple", "selection", "datagrid", "table", "dataview" }
                         },
+                        new Example
+                        {
+                            New = true,
+                            Name = "Cell selection",
+                            Path = "datagrid-cell-selection",
+                            Title = "Blazor DataGrid cell selection",
+                            Tags = new [] { "cell", "selection", "datagrid", "table", "dataview" }
+                        },
                     }
                 },
                 new Example

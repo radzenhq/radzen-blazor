@@ -1300,6 +1300,20 @@ namespace Radzen.Blazor
         public EventCallback<DataGridRowMouseEventArgs<TItem>> RowDoubleClick { get; set; }
 
         /// <summary>
+        /// Gets or sets the cell click callback.
+        /// </summary>
+        /// <value>The cell click callback.</value>
+        [Parameter]
+        public EventCallback<DataGridCellMouseEventArgs<TItem>> CellClick { get; set; }
+
+        /// <summary>
+        /// Gets or sets the cell double click callback.
+        /// </summary>
+        /// <value>The cell double click callback.</value>
+        [Parameter]
+        public EventCallback<DataGridCellMouseEventArgs<TItem>> CellDoubleClick { get; set; }
+
+        /// <summary>
         /// Gets or sets the row click callback.
         /// </summary>
         /// <value>The row click callback.</value>
@@ -1741,6 +1755,16 @@ namespace Radzen.Blazor
         internal async Task OnCellContextMenu(DataGridCellMouseEventArgs<TItem> args)
         {
             await CellContextMenu.InvokeAsync(args);
+        }
+
+        internal async Task OnCellClick(DataGridCellMouseEventArgs<TItem> args)
+        {
+            await CellClick.InvokeAsync(args);
+        }
+
+        internal async Task OnCellDblClick(DataGridCellMouseEventArgs<TItem> args)
+        {
+            await CellDoubleClick.InvokeAsync(args);
         }
 
         internal async Task OnRowClick(DataGridRowMouseEventArgs<TItem> args)

@@ -1,0 +1,68 @@
+﻿@page "/datagrid-cell-selection"
+@using Radzen
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>Cell selection</strong>
+</RadzenText>
+
+<RadzenExample Name="DataGrid" Source="DataGridCellSelect" Heading="false">
+    <p>Click on a table cell to select or deselect.</p>
+    <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
+                CellClick="@OnCellClick" CellRender="OnCellRender">
+        <Columns>
+            <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
+                <Template Context="data">
+                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px;" />
+                    @data.FirstName @data.LastName
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
+            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
+            <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+            <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
+            <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
+
+@code {
+    IEnumerable<Employee> employees;
+    IList<Tuple<Employee, RadzenDataGridColumn<Employee>>> selectedCellData = new List<Tuple<Employee, RadzenDataGridColumn<Employee>>>();
+    EventConsole console;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        employees = dbContext.Employees;
+    }
+
+    void OnCellClick(DataGridCellMouseEventArgs<Employee> args)
+    {
+        var cellData = selectedCellData.FirstOrDefault(i => i.Item1 == args.Data && i.Item2 == args.Column);
+        if (cellData != null)
+        {
+            selectedCellData.Remove(cellData);
+        }
+        else
+        {
+            selectedCellData.Add(new Tuple<Employee, RadzenDataGridColumn<Employee>>(args.Data, args.Column));
+        }
+    }
+
+    void OnCellRender(DataGridCellRenderEventArgs<Employee> args)
+    {
+        if (selectedCellData.Any(i => i.Item1 == args.Data && i.Item2 == args.Column))
+        {
+            args.Attributes.Add("style", $"background-color: var(--rz-success);");
+        }
+    }
+}
