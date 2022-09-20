@@ -13,7 +13,7 @@
     <ul class="rz-datafilter-group">
     @foreach(var filter in Filter.Filters)
     {
-        <li class="rz-datafilter-item rz-datafilter-group-item">
+        <li class="rz-datafilter-item @(filter.Filters != null ? "rz-datafilter-group-item" : "")">
             <RadzenDataFilterItem DataFilter="@this.DataFilter" Filter="@filter" Parent=@this />
         </li>
     }
