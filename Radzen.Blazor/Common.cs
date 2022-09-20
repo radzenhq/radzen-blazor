@@ -763,6 +763,10 @@ namespace Radzen
         /// </summary>
         Filled,
         /// <summary>
+        /// A flat appearance without any drop shadows.
+        /// </summary>
+        Flat,
+        /// <summary>
         /// A text appearance.
         /// </summary>
         Text,
