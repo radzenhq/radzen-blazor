@@ -27,7 +27,20 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenSelectBar<TValue> : FormComponent<TValue>, IRadzenSelectBar
     {
-        ClassList ButtonClassList(RadzenSelectBarItem item) => ClassList.Create("rz-button rz-button-text-only")
+        private string getButtonSize()
+        {
+            return Size == ButtonSize.Medium ? "md" : Size == ButtonSize.Large ? "lg" : "sm";
+        }
+        
+        /// <summary>
+        /// Gets or sets the size.
+        /// </summary>
+        /// <value>The size.</value>
+        [Parameter]
+        public ButtonSize Size { get; set; } = ButtonSize.Medium;
+        
+        
+        ClassList ButtonClassList(RadzenSelectBarItem item) => ClassList.Create($"rz-button rz-button-{getButtonSize()} rz-button-text-only")
                             .Add("rz-state-active", IsSelected(item))
                             .AddDisabled(Disabled);
 
