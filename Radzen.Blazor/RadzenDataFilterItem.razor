@@ -1,14 +1,14 @@
 @typeparam TItem
 @if (Filter.Filters != null)
 {
-    <RadzenSelectBar @bind-Value=Filter.LogicalFilterOperator Change="@((LogicalFilterOperator args) => { InvokeAsync(ChangeState); InvokeAsync(ApplyFilter); })">
+    <RadzenSelectBar @bind-Value=Filter.LogicalFilterOperator Change="@((LogicalFilterOperator args) => { InvokeAsync(ChangeState); InvokeAsync(ApplyFilter); })" Size="ButtonSize.Small">
         <Items>
             <RadzenSelectBarItem Text="@DataFilter.AndOperatorText" Value="LogicalFilterOperator.And" title="@DataFilter.AndOperatorText" />
             <RadzenSelectBarItem Text="@DataFilter.OrOperatorText" Value="LogicalFilterOperator.Or" title="@DataFilter.OrOperatorText" />
         </Items>
     </RadzenSelectBar>
 
-    <RadzenButton title="@DataFilter.RemoveFilterText" class="rz-datafilter-item-clear" Icon="clear" Click="@RemoveFilter" ButtonStyle="ButtonStyle.Light" />
+    <RadzenButton title="@DataFilter.RemoveFilterText" class="rz-datafilter-item-clear" Icon="clear" Click="@RemoveFilter" Variant="Variant.Text" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark"/>
 
     <ul class="rz-datafilter-group">
     @foreach(var filter in Filter.Filters)
@@ -18,7 +18,7 @@
         </li>
     }
         <li class="rz-datafilter-item rz-datafilter-bar">
-            <RadzenSplitButton Icon="add" Click="@(args => DataFilter.AddFilter(args?.Value == "group", Filter))">
+            <RadzenSplitButton Icon="add" Click="@(args => DataFilter.AddFilter(args?.Value == "group", Filter))" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter">
                 <RadzenSplitButtonItem Icon="add" Text="@DataFilter.AddFilterText" />
                 <RadzenSplitButtonItem Icon="playlist_add" Value="group" Text="@DataFilter.AddFilterGroupText" />
             </RadzenSplitButton>
@@ -64,7 +64,7 @@ else
             <RadzenTextBox class="rz-datafilter-editor" Value="@($"{Filter.FilterValue}")" Change=@(args => { Filter.FilterValue = args; InvokeAsync(ApplyFilter); }) />
         }
 
-        <RadzenButton title="@DataFilter.RemoveFilterText" class="rz-datafilter-item-clear" Icon="clear" Click="@RemoveFilter" ButtonStyle="ButtonStyle.Light" />
+        <RadzenButton title="@DataFilter.RemoveFilterText" class="rz-datafilter-item-clear" Icon="clear" Click="@RemoveFilter" Variant="Variant.Text" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark"/>
     }
 }
 @code {
