@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using System;
 
 namespace Radzen.Blazor
 {
@@ -20,6 +21,11 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenSplitButton : RadzenComponentWithChildren
     {
+        private string getButtonSize()
+        {
+            return Size == ButtonSize.Medium ? "md" : Size == ButtonSize.Large ? "lg" : "sm";
+        }
+        
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
@@ -40,6 +46,34 @@ namespace Radzen.Blazor
         /// <value>The image.</value>
         [Parameter]
         public string Image { get; set; }
+
+        /// <summary>
+        /// Gets or sets the button style.
+        /// </summary>
+        /// <value>The button style.</value>
+        [Parameter]
+        public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Primary;
+
+        /// <summary>
+        /// Gets or sets the design variant of the button.
+        /// </summary>
+        /// <value>The variant of the button.</value>
+        [Parameter]
+        public Variant Variant { get; set; } = Variant.Filled;
+
+        /// <summary>
+        /// Gets or sets the color shade of the button.
+        /// </summary>
+        /// <value>The color shade of the button.</value>
+        [Parameter]
+        public Shade Shade { get; set; } = Shade.Default;
+
+        /// <summary>
+        /// Gets or sets the size.
+        /// </summary>
+        /// <value>The size.</value>
+        [Parameter]
+        public ButtonSize Size { get; set; } = ButtonSize.Medium;
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenSplitButton"/> is disabled.
@@ -89,12 +123,12 @@ namespace Radzen.Blazor
 
         private string getButtonCss()
         {
-            return $"rz-button  rz-button-text-icon-left{(Disabled ? " rz-state-disabled" : "")}";
+            return $"rz-button rz-button-{getButtonSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()} {(Disabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}";
         }
 
         private string getPopupButtonCss()
         {
-            return $"rz-splitbutton-menubutton rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}";
+            return $"rz-splitbutton-menubutton rz-button rz-button-icon-only rz-button-{getButtonSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()}{(Disabled ? " rz-state-disabled" : "")}";
         }
 
         private string OpenPopupScript()

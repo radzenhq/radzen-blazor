@@ -32,6 +32,7 @@ $button-sizes: map-merge(
       min-width: 3.25rem,
       font-weight: 600,
       border-radius: calc(2 * var(--rz-border-radius)),
+      gap: 0.25rem,
       icon: (
         font-size: 1.5rem,
         height: 1.5rem,
@@ -49,6 +50,7 @@ $button-sizes: map-merge(
       min-height: 2.25rem,
       min-width: 2.25rem,
       font-weight: 600,
+      gap: 0.25rem,
       icon: (
         font-size: var(--rz-icon-size),
         line-height: var(--rz-icon-size),
@@ -65,6 +67,7 @@ $button-sizes: map-merge(
       height: auto,
       min-height: 1.75rem,
       min-width: 1.75rem,
+      gap: 0.25rem,
       icon: (
         font-size: var(--rz-icon-size),
         line-height: var(--rz-icon-size),
@@ -242,6 +245,9 @@ $button-styles: map-merge(
           }
         }
       }
+      &.rz-variant-flat {
+        box-shadow: none !important;
+      }
     }
   }
 
@@ -377,6 +383,7 @@ $button-styles: map-merge(
 
       & .rz-button-box {
         line-height: map-get($button, line-height);
+        gap: map-get($button, gap);
       }
 
       &.rz-button-text-icon-left {
@@ -393,14 +400,6 @@ $button-styles: map-merge(
         }
       }
     }
-  }
-
-  &:not(.rz-button-icon-only) .rz-button-icon-left {
-    margin-right: 0.25rem;
-  }
-
-  &:not(.rz-button-icon-only) .rz-button-icon-left {
-    margin-right: 0.25rem;
   }
 
 }

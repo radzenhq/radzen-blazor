@@ -496,6 +496,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "DataFilter",
+                    Title = "Blazor data filter component",
+                    New = true,
+                    Path = "datafilter",
+                    Icon = "&#xef4f",
+                    Tags = new [] { "dataview", "grid", "table", "filter" }
+                },
+                new Example()
+                {
                     Name = "Pager",
                     Title = "Blazor paging component",
                     Updated = true,
