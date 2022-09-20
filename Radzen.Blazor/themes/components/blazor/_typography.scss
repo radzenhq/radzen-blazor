@@ -136,6 +136,20 @@ body {
   margin-bottom: 0;
 }
 
+.rz-form {
+  .row {
+    .rz-label {
+      min-height: var(--rz-input-height);
+      line-height: var(--rz-input-line-height);
+      padding: var(--rz-input-padding);
+      padding-left: 0;
+      border-top: var(--rz-input-border);
+      border-bottom: var(--rz-input-border);
+      border-color: transparent;
+    }
+  }
+}
+
 @if $bootstrap {
   label {
     margin-bottom: 0;
