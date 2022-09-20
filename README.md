@@ -55,7 +55,7 @@ We add new components and features on a regular basis.
 
 Short development cycle. We release as soon as new stuff is available. No more quarterly releases.
 
-## Support exceeding your expectations 
+## Support exceeding your expectations
 
 ### :speech_balloon: Community Support
 Everybody is welcome to visit the [Radzen Community forum](https://forum.radzen.com/). Join the growing community and participate in the discussions!
@@ -64,7 +64,7 @@ Everybody is welcome to visit the [Radzen Community forum](https://forum.radzen.
 
 The Radzen team monitors the forum threads, but does not guarantee a response to every question. For guaranteed responses you may consider the dedicated support option.
 
-Dedicated support for the Radzen Blazor Components is available as part of the [Radzen Professional subscription](https://www.radzen.com/pricing/). 
+Dedicated support for the Radzen Blazor Components is available as part of the [Radzen Professional subscription](https://www.radzen.com/pricing/).
 
 Our flagship product [Radzen Studio](https://www.radzen.com/features/) provides tons of productivity features for Blazor developers:
 - The first in the industry WYSIWYG Blazor design time canvas
@@ -80,7 +80,7 @@ Our flagship product [Radzen Studio](https://www.radzen.com/features/) provides 
 
 Radzen Blazor Components are distributed as a [Radzen.Blazor nuget package](https://www.nuget.org/packages/Radzen.Blazor). You can add them to your project in one of the following ways
 - Install the package from command line by running `dotnet add package Radzen.Blazor`
-- Add the project from the Visual Nuget Package Manager 
+- Add the project from the Visual Nuget Package Manager
 - Manually edit the .csproj file and add a project reference
 
 ### 2. Import the namespace
@@ -89,13 +89,26 @@ Open the `_Imports.razor` file of your Blazor application and add this line `@us
 
 ### 3. Include a theme
 
-Open `Pages\_Layout.cshtml` (Blazor Server .NET 6+), `Pages\_Host.cshtml` (Blazor Server before .NET 6) or `wwwroot/index.html` (Blazor WebAssembly) and include a theme CSS file by adding this snippet 
-```html
-<link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css">
+Radzen Blazor components come with five free themes: Material, Standard, Default, Dark, Software and Humanistic.
+
+To use a theme
+1. Pick a theme. The [online demos](https://blazor.radzen.com/colors) allow you to preview the available options via the theme dropdown located in the header. The Material theme is currently selected by default.
+1. Include the theme CSS file in your Blazor application. Open `Pages\_Layout.cshtml` (Blazor Server .NET 6+), `Pages\_Host.cshtml` (Blazor Server before .NET 6) or `wwwroot/index.html` (Blazor WebAssembly) and include the CSS file of  a theme CSS file by adding this snippet
+   ```html
+   <link rel="stylesheet" href="_content/Radzen.Blazor/css/material.css">
+   ```
+   If you either include the Bootstrap CSS manually or don't use it at all, include this instead:
+   ```html
+   <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
+   ```
+
+To include a different theme (i.e. Standard) just change the name of the CSS file:
 ```
-If you either add Bootstrap manually or don't use it at all, include this instead:
-```html
-<link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css">
+<link rel="stylesheet" href="_content/Radzen.Blazor/css/standard.css">
+```
+or
+```
+<link rel="stylesheet" href="_content/Radzen.Blazor/css/standard-base.css">
 ```
 
 
@@ -108,7 +121,7 @@ Open `Pages\_Layout.cshtml` (Blazor Server .NET 6+), `Pages\_Host.cshtml` (Blazo
 ```
 
 ### 5. Use a component
-Use any Radzen Blazor component by typing its tag name in a Blazor page e.g. 
+Use any Radzen Blazor component by typing its tag name in a Blazor page e.g.
 ```html
 <RadzenButton Text="Hi"></RadzenButton>
 ```

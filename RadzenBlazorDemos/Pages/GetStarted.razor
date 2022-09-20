@@ -56,7 +56,7 @@
                Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6+), <code>Pages\_Host.cshtml</code> (Blazor Server before .NET 6) or <code>wwwroot/index.html</code> (Blazor WebAssembly) and include a theme CSS file by adding this snippet:
             </RadzenText>
 <pre>
-<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css"&gt;</code>
+<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css"&gt;</code>
 </pre>
             <RadzenText>
                 Optionally include Bootstrap.
@@ -65,7 +65,17 @@
                 Radzen also ships with themes that include some vital parts of Bootstrap (mostly layout). To use a theme bundled with Bootstrap include the file without <code>-base</code> suffix:
             </RadzenText>
 <pre>
-<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css"&gt;</code>
+<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/material.css"&gt;</code>
+</pre>
+            <RadzenText>
+                To include a different theme (i.e. Standard) just change the name of the CSS file:
+            </RadzenText>
+<pre>
+<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/standard.css"&gt;</code>
+</pre>
+or
+<pre>
+<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/standard-base.css"&gt;</code>
 </pre>
         </div>
     </div>

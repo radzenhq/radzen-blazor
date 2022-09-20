@@ -24,13 +24,27 @@ Open the `_Imports.razor` file of your Blazor application and add these two line
 ## Include the CSS and JS
 
 ### Include CSS
-Open `Pages\_Layout.cshtml` (Blazor Server .NET 6+), `Pages\_Host.cshtml` (Blazor Server before .NET 6) or `wwwroot/index.html` (Blazor WebAssembly) and include a theme CSS file by adding this snippet:
+
+Radzen Blazor components come with five free themes: Material, Standard, Default, Dark, Software and Humanistic.
+
+To use a theme
+1. Pick a theme. The [online demos](https://blazor.radzen.com/colors) allow you to preview the available options via the theme dropdown located in the header. The Material theme is currently selected by default.
+1. Include the theme CSS file in your Blazor application. Open `Pages\_Layout.cshtml` (Blazor Server .NET 6+), `Pages\_Host.cshtml` (Blazor Server before .NET 6) or `wwwroot/index.html` (Blazor WebAssembly) and include the CSS file of  a theme CSS file by adding this snippet
+   ```html
+   <link rel="stylesheet" href="_content/Radzen.Blazor/css/material.css">
+   ```
+   If you either include the Bootstrap CSS manually or don't use it at all, include this instead:
+   ```html
+   <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
+   ```
+
+To include a different theme (i.e. Standard) just change the name of the CSS file:
 ```
-<link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css">
+<link rel="stylesheet" href="_content/Radzen.Blazor/css/standard.css">
 ```
-Radzen also ships CSS files that include some vital parts of Bootstrap (mostly layout). To use a theme bundled with Bootstrap include the file without `-base` suffix:
+or
 ```
-<link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css">
+<link rel="stylesheet" href="_content/Radzen.Blazor/css/standard-base.css">
 ```
 
 ### Include the JS
