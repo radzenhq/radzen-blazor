@@ -312,13 +312,11 @@ namespace Radzen.Blazor
         [Parameter]
         public string FilterDateFormat { get; set; }
 
-        internal async Task AddFilter(bool isGroup, CompositeFilterDescriptor filter = null)
+        internal async Task AddFilter(bool isGroup)
         {
-            var filters = filter?.Filters ?? Filters;
-
             if (isGroup)
             {
-                filters = filters.Concat(new CompositeFilterDescriptor[]
+                Filters = Filters.Concat(new CompositeFilterDescriptor[]
                     {
                         new CompositeFilterDescriptor()
                         {
@@ -329,21 +327,7 @@ namespace Radzen.Blazor
             }
             else
             {
-                if (filter != null && filter.Property == null && properties.Any())
-                {
-                    filter.Property = properties[0].Property;
-                }
-
-                filters = filters.Concat(new CompositeFilterDescriptor[] { filter ?? new CompositeFilterDescriptor() });
-            }
-
-            if (filter != null)
-            {
-                filter.Filters = filters;
-            }
-            else
-            {
-                Filters = filters;
+                Filters = Filters.Concat(new CompositeFilterDescriptor[] { new CompositeFilterDescriptor() });
             }
 
             if (Auto)
