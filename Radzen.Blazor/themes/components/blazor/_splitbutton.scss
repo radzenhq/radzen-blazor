@@ -1,13 +1,13 @@
 $splitbutton-menu-button-width: 1.875rem !default;
 $splitbutton-menu-button-padding: 0 0 0.375rem 0 !default;
 $splitbutton-menu-button-font-size: 1.0625rem !default; // Not Used
-$splitbutton-menu-button-border: var(--rz-border-primary) !default;
 $splitbutton-menu-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06) !default;
 $splitbutton-menu-min-width: 10rem !default;
 
-$splitbutton-padding: 0.5rem !default;
 $splitbutton-background-color: var(--rz-primary) !default;
 $splitbutton-border-radius: var(--rz-border-radius) !default;
+
+$splitbutton-sizes: sm, md, lg;
 
 // SplitButton CSS variables
 
@@ -15,11 +15,9 @@ $splitbutton-border-radius: var(--rz-border-radius) !default;
   --rz-splitbutton-menu-button-width: #{$splitbutton-menu-button-width};
   --rz-splitbutton-menu-button-padding: #{$splitbutton-menu-button-padding};
   --rz-splitbutton-menu-button-font-size: #{$splitbutton-menu-button-font-size};
-  --rz-splitbutton-menu-button-border: #{$splitbutton-menu-button-border};
   --rz-splitbutton-menu-shadow: #{$splitbutton-menu-shadow};
   --rz-splitbutton-menu-min-width: #{$splitbutton-menu-min-width};
   
-  --rz-splitbutton-padding: #{$splitbutton-padding};
   --rz-splitbutton-background-color: #{$splitbutton-background-color};
   --rz-splitbutton-border-radius: #{$splitbutton-border-radius};
 }
@@ -27,17 +25,26 @@ $splitbutton-border-radius: var(--rz-border-radius) !default;
 .rz-splitbutton {
   display: inline-flex;
 
-  .rz-button-text-icon-left,
-  .rz-button-text-only {
-    @extend .rz-button-md;
-
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    padding: var(--rz-splitbutton-padding);
+  @each $size in $splitbutton-sizes {
+    .rz-button-#{$size} {
+      @extend .rz-button-#{$size};
+    }
   }
 
-  .rz-button-text-icon-left {
-    flex: 1;
+  .rz-button-icon-only {
+    .rz-button-text {
+      display: none;
+    }
+  }
+
+  .rz-button.rz-splitbutton-menubutton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .rz-button:not(.rz-splitbutton-menubutton) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
 }
 
@@ -82,21 +89,15 @@ $splitbutton-border-radius: var(--rz-border-radius) !default;
 }
 
 .rz-splitbutton-menubutton {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left: var(--rz-splitbutton-menu-button-border);
+  margin-left: 1px;
 
-  @extend .rz-button-md;
+  &.rz-variant-outlined {
+    border-left: 0;
+    margin-left: calc(-1 * var(--rz-border-width));
+  }
 
   .rz-button-text {
     display: none;
-  }
-
-  .rzi {
-    font-size: var(--rz-icon-size);
-    height: var(--rz-icon-size);
-    line-height: var(--rz-icon-size);
-    width: var(--rz-icon-size);
   }
 
   .rzi-chevron-down {
