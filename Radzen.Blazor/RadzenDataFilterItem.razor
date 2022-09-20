@@ -18,7 +18,7 @@
         </li>
     }
         <li class="rz-datafilter-item rz-datafilter-bar">
-            <RadzenSplitButton Icon="add" Click="@(args => DataFilter.AddFilter(args?.Value == "group", Filter))" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter">
+            <RadzenSplitButton Icon="add" Click="@(args => AddFilter(args?.Value == "group"))" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter">
                 <RadzenSplitButtonItem Icon="add" Text="@DataFilter.AddFilterText" />
                 <RadzenSplitButtonItem Icon="playlist_add" Value="group" Text="@DataFilter.AddFilterGroupText" />
             </RadzenSplitButton>
@@ -117,6 +117,30 @@ else
         Filter.FilterOperator = property.FilterPropertyType == typeof(string) ? FilterOperator.Contains : FilterOperator.Equals;
 
         await ApplyFilter();
+    }
+
+    async Task AddFilter(bool isGroup)
+    {
+        if (isGroup)
+        {
+            Filter.Filters = Filter.Filters.Concat(new CompositeFilterDescriptor[]
+                {
+                    new CompositeFilterDescriptor()
+                    {
+                        Filters = Enumerable.Empty<CompositeFilterDescriptor>()
+                    }
+                }
+            );
+        }
+        else
+        {
+            Filter.Filters = Filter.Filters.Concat(new CompositeFilterDescriptor[] { new CompositeFilterDescriptor() });
+        }
+
+        if (DataFilter.Auto)
+        {
+            await DataFilter.Filter();
+        }
     }
 
     async Task RemoveFilter()

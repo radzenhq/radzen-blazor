@@ -329,6 +329,11 @@ namespace Radzen.Blazor
             }
             else
             {
+                if (filter != null && filter.Property == null && properties.Any())
+                {
+                    filter.Property = properties[0].Property;
+                }
+
                 filters = filters.Concat(new CompositeFilterDescriptor[] { filter ?? new CompositeFilterDescriptor() });
             }
 
