@@ -109,9 +109,12 @@ else
         }
     }
 
-    async Task OnPropertyChange(object property)
+    async Task OnPropertyChange(object p)
     {
-        property = DataFilter.properties.Where(c => object.Equals(c.Property, property)).FirstOrDefault();
+        property = DataFilter.properties.Where(c => object.Equals(c.Property, p)).FirstOrDefault();
+
+        Filter.FilterValue = null;
+        Filter.FilterOperator = property.FilterPropertyType == typeof(string) ? FilterOperator.Contains : FilterOperator.Equals;
 
         await ApplyFilter();
     }
