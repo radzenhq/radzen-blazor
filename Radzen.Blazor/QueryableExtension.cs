@@ -1050,31 +1050,37 @@ namespace Radzen
 
             if (dataFilter.Filters.Where(canFilter).Any())
             {
-                var gridLogicalFilterOperator = dataFilter?.LogicalFilterOperator;
-                var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
-
                 var index = 0;
-                var whereList = new Dictionary<string, IEnumerable<object>>();
-                foreach (var filter in dataFilter.Filters.Where(canFilter))
+                var filterExpressions = new List<string>();
+                var filterValues = new List<object[]>();
+
+                foreach (var filter in dataFilter.Filters)
                 {
-                    AddWhereExpression(canFilter, filter, ref whereList, ref index, dataFilter);
+                    AddWhereExpression(canFilter, filter, ref filterExpressions, ref filterValues, ref index, dataFilter);
                 }
 
-                return whereList.Keys.Any() ?
-                    source.Where(string.Join($" {gridBooleanOperator} ", whereList.Keys), whereList.Values.SelectMany(i => i.ToArray()).ToArray())
+                return filterExpressions.Any() ?
+                    source.Where(string.Join($" {dataFilter.LogicalFilterOperator.ToString().ToLower()} ", filterExpressions), filterValues.SelectMany(i => i.ToArray()).ToArray())
                     : source;
             }
 
             return source;
         }
 
-        private static void AddWhereExpression<T>(Func<CompositeFilterDescriptor, bool> canFilter, CompositeFilterDescriptor filter, ref Dictionary<string, IEnumerable<object>> whereList, ref int index, RadzenDataFilter<T> dataFilter)
+        private static void AddWhereExpression<T>(Func<CompositeFilterDescriptor, bool> canFilter, CompositeFilterDescriptor filter, ref List<string> filterExpressions, ref List<object[]> filterValues, ref int index, RadzenDataFilter<T> dataFilter)
         {
             if (filter.Filters != null)
             {
-                foreach (var f in filter.Filters.Where(canFilter))
+                var innerFilterExpressions = new List<string>();
+
+                foreach (var f in filter.Filters)
                 {
-                    AddWhereExpression(canFilter, f, ref whereList, ref index, dataFilter);
+                    AddWhereExpression(canFilter, f, ref innerFilterExpressions, ref filterValues, ref index, dataFilter);
+                }
+
+                if (innerFilterExpressions.Any())
+                {
+                    filterExpressions.Add("(" + string.Join($" {filter.LogicalFilterOperator.ToString().ToLower()} ", innerFilterExpressions) + ")");
                 }
             }
             else
@@ -1108,11 +1114,13 @@ namespace Radzen
                 {
                     if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "Contains")
                     {
-                        whereList.Add($@"(@{index}).Contains({property})", new object[] { filter.FilterValue });
+                        filterExpressions.Add($@"(@{index}).Contains({property})");
+                        filterValues.Add(new object[] { filter.FilterValue  });
                     }
                     else
                     {
-                        whereList.Add($@"{property}{filterCaseSensitivityOperator}.{comparison}(@{index}{filterCaseSensitivityOperator})", new object[] { filter.FilterValue });
+                        filterExpressions.Add($@"{property}{filterCaseSensitivityOperator}.{comparison}(@{index}{filterCaseSensitivityOperator})");
+                        filterValues.Add(new object[] { filter.FilterValue });
                     }
 
                     index++;
@@ -1121,18 +1129,21 @@ namespace Radzen
                 {
                     if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "DoesNotContain")
                     {
-                        whereList.Add($@"!(@{index}).Contains({property})", new object[] { filter.FilterValue });
+                        filterExpressions.Add($@"!(@{index}).Contains({property})");
+                        filterValues.Add(new object[] { filter.FilterValue });
                     }
                     else
                     {
-                        whereList.Add($@"!{property}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator})", new object[] { filter.FilterValue });
+                        filterExpressions.Add($@"!{property}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator})");
+                        filterValues.Add(new object[] { filter.FilterValue });
                     }
 
                     index++;
                 }
                 else if (!(IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)))
                 {
-                    whereList.Add($@"{property}{filterCaseSensitivityOperator} {comparison} @{index}{filterCaseSensitivityOperator}", new object[] { filter.FilterValue });
+                    filterExpressions.Add($@"{property}{filterCaseSensitivityOperator} {comparison} @{index}{filterCaseSensitivityOperator}");
+                    filterValues.Add(new object[] { filter.FilterValue });
                     index++;
                 }
             }
