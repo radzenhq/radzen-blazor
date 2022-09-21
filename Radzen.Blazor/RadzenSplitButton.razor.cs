@@ -97,6 +97,7 @@ namespace Radzen.Blazor
         {
             if (!Disabled)
             {
+                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
                 await Click.InvokeAsync(null);
             }
         }
