@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <h1>DataGrid Self-Reference Hierarchy</h1>
 
@@ -43,6 +43,8 @@
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
+
         employees = dbContext.Employees.Where(e => e.ReportsTo == null);
     }
 
