@@ -277,6 +277,7 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "Hierarchy",
+                    Updated = true,
                     Icon = "&#xe23e",
                     Children  = new []
                     {
@@ -297,6 +298,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "Self-reference hierarchy",
+                            New = true,
                             Path = "datagrid-selfref-hierarchy",
                             Title = "Blazor DataGrid self-reference hierarchy",
                             Tags = new [] { "master", "detail", "datagrid", "table", "dataview", "hierarchy", "self-reference" }
