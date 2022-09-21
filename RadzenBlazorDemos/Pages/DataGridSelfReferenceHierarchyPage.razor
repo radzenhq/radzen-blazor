@@ -14,26 +14,18 @@
     <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowSorting="true" AllowColumnResize="true" ExpandMode="DataGridExpandMode.Single"
                     Data="@employees" TItem="Employee" RowRender="@RowRender" LoadChildData="@LoadChildData">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="120px" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="Employee" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px">
+            <!-- <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="120px" /> -->
+            <RadzenDataGridColumn TItem="Employee" Title="Employee" Frozen="true" Sortable="false" Filterable="false" Width="300px">
                 <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                    <RadzenImage Path="@data.Photo" class="rz-gravatar mr-1" />
+                    <strong>@data.TitleOfCourtesy @data.FirstName @data.LastName</strong>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" Frozen="true" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Job Title" Width="200px" />
-            <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title" Width="100px" />
-            <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" Width="200px" />
-            <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" Width="300px" />
+            <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Job Title" Width="240px" />
+            <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="160px" />
+            <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" Width="200px" />
+            <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" Width="200px" />
+            <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" />
         </Columns>
     </RadzenDataGrid>
 </RadzenExample>
