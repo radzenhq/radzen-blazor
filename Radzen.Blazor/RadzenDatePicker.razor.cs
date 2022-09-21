@@ -981,12 +981,19 @@ namespace Radzen.Blazor
 
         Popup popup;
 
+        /// <summary>
+        /// Gets or sets the render mode.
+        /// </summary>
+        /// <value>The render mode.</value>
         [Parameter]
-        public bool Lazy { get; set; }
+        public RenderMode PopupRenderMode { get; set; } = RenderMode.Initial;
 
         async Task OnToggle()
         {
-            await popup.ToggleAsync(Element);
+            if (!Disabled && !ReadOnly && !Inline)
+            {
+                await popup.ToggleAsync(Element);
+            }
         }
     }
 }
