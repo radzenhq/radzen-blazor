@@ -64,7 +64,7 @@
         }
 
     <div class="rz-data-grid-data">
-        <table class="rz-grid-table rz-grid-table-fixed">
+        <table class="rz-grid-table rz-grid-table-fixed @(AllowAlternatingRows ? "rz-grid-table-striped" : "")">
             <colgroup>
                 @foreach(var g in Groups)
                 {

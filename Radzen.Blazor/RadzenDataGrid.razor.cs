@@ -1630,10 +1630,9 @@ namespace Radzen.Blazor
 
         internal string RowStyle(TItem item, int index)
         {
-            var evenOrOdd = index % 2 == 0 ? "rz-datatable-even" : "rz-datatable-odd";
             var isInEditMode = IsRowInEditMode(item) ? "rz-datatable-edit" : "";
 
-            return (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item) ? $"rz-state-highlight {evenOrOdd} {isInEditMode} " : $"{evenOrOdd} {isInEditMode} ";
+            return (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item) ? $"rz-state-highlight {isInEditMode} " : $"{isInEditMode} ";
         }
 
         internal Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item)
@@ -1796,6 +1795,13 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if DataGrid row can be selected on row click; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowRowSelectOnRowClick { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether DataGrid should use alternating row styles.
+        /// </summary>
+        /// <value><c>true</c> if DataGrid is using alternating row styles; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowAlternatingRows { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the selection mode.
