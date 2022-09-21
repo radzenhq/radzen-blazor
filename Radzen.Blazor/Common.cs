@@ -460,6 +460,21 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Specifies the ways a component renders its parts.
+    /// </summary>
+    public enum RenderMode
+    {
+        /// <summary>
+        /// The component renders its parts on-demand.
+        /// </summary>
+        OnDemand,
+        /// <summary>
+        /// The component renders its parts initially.
+        /// </summary>
+        Initial
+    }
+
+    /// <summary>
     /// Specifies the ways a <see cref="RadzenTabs" /> component renders its items.
     /// </summary>
     public enum TabRenderMode

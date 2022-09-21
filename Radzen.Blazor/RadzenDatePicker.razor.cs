@@ -866,12 +866,12 @@ namespace Radzen.Blazor
 
         private string getOpenPopup()
         {
-            return !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
+            return PopupRenderMode == RenderMode.Initial && !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
         }
 
         private string getOpenPopupForInput()
         {
-            return !Disabled && !ReadOnly && !Inline && !AllowInput ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
+            return PopupRenderMode == RenderMode.Initial && !Disabled && !ReadOnly && !Inline && !AllowInput ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
         }
 
         /// <summary>
@@ -977,6 +977,23 @@ namespace Radzen.Blazor
             this.firstRender = firstRender;
 
             return base.OnAfterRenderAsync(firstRender);
+        }
+
+        Popup popup;
+
+        /// <summary>
+        /// Gets or sets the render mode.
+        /// </summary>
+        /// <value>The render mode.</value>
+        [Parameter]
+        public RenderMode PopupRenderMode { get; set; } = RenderMode.Initial;
+
+        async Task OnToggle()
+        {
+            if (PopupRenderMode == RenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
+            {
+                await popup.ToggleAsync(Element);
+            }
         }
     }
 }

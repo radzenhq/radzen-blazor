@@ -1,10 +1,16 @@
 @inherits RadzenComponent
 @using Microsoft.JSInterop
 <div @ref=@Element @onmousedown:preventDefault @attributes=@Attributes style=@Style id=@GetId()>
-    @ChildContent
+    @if (open || !Lazy)
+    {
+        @ChildContent
+    }
 </div>
 @code {
     bool open;
+
+    [Parameter]
+    public bool Lazy { get; set; }
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }
@@ -24,8 +30,25 @@
             await Open.InvokeAsync(null);
         }
 
-        await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", target, GetId(), false, Reference, nameof(OnClose));
+        this.target = target;
+        shouldToggle = true;
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            if (shouldToggle)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", target, GetId(), false, Reference, nameof(OnClose));
+            }
+
+            shouldToggle = false;
+        }
+    }
+
+    ElementReference target;
+    bool shouldToggle;
 
     [JSInvokable]
     public async Task OnClose()
