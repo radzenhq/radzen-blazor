@@ -75,6 +75,33 @@
                         }
                     </span>
                 }
+                @if (Grid.LoadChildData.HasDelegate && Grid.ShowExpandColumn && Grid.allColumns.IndexOf(column) == 0)
+                {
+                    <span class="rz-cell-toggle">
+                        <a style="@(getExpandIconStyle(rowArgs.Item1.Expandable))" href="javascript:void(0)" @onclick="@(_ => Grid.ExpandItem(Item))">
+                            <span class="@(Grid.ExpandedItemStyle(Item))"></span>
+                        </a>
+                        <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
+                            @if (Item != null)
+                            {
+                                @if (Grid.IsRowInEditMode(Item) && column.EditTemplate != null)
+                                {
+                                    @column.EditTemplate(Item)
+                                }
+                                else if (column.Template != null)
+                                {
+                                    @column.Template(Item)
+                                }
+                                else
+                                {
+                                    @column.GetValue(Item)
+                                }
+                            }
+                        </span>
+                    </span>
+                }
+                else
+                {
                 <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
                     @if (Item != null)
                     {
@@ -92,6 +119,7 @@
                         }
                     }
                 </span>
+                }
             </RadzenDataGridCell>
         }
    
@@ -166,5 +194,26 @@
     public IRadzenFormComponent FindComponent(string name)
     {
         return components.Where(component => component.Name == name).FirstOrDefault();
+    }
+
+    internal string getExpandIconStyle(bool expandable)
+    {
+        var rules = new List<string>();
+
+        if (!expandable)
+        {
+            rules.Add("visibility:hidden");
+        }
+
+        var child = Grid.childData.Any() ? Grid.childData.Where(c => c.Value?.Data?.Contains(Item) == true).FirstOrDefault() : 
+            default(KeyValuePair<TItem, DataGridChildData<TItem>>);
+
+        var level = !object.Equals(child, default(KeyValuePair<TItem, DataGridChildData<TItem>>)) ? child.Value.Level : 0;
+        if (level > 0)
+        {
+            rules.Add($"margin-left: {level}rem");
+        }
+
+        return string.Join(';', rules);
     }
 }

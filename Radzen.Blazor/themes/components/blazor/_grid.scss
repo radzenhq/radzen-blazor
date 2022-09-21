@@ -579,6 +579,12 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
         overflow: visible;
       }
     }
+
+    .rz-cell-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
   }
 
   tr {

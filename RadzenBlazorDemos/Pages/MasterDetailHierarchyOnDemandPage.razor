@@ -76,14 +76,13 @@
         }
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        base.OnAfterRender(firstRender);
+
         if (firstRender)
         {
-            grid.ExpandRow(orders.FirstOrDefault());
-            StateHasChanged();
+            await grid.ExpandRow(orders.FirstOrDefault());
         }
-
-        base.OnAfterRender(firstRender);
     }
 }

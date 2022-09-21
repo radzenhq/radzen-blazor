@@ -197,6 +197,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets the load child data callback.
+        /// </summary>
+        /// <value>The load child data callback.</value>
+        [Parameter]
+        public EventCallback<Radzen.DataGridLoadChildDataEventArgs<TItem>> LoadChildData { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether DataGrid data cells will follow the header cells structure in composite columns.
         /// </summary>
         /// <value><c>true</c> if DataGrid data cells will follow the header cells structure in composite columns; otherwise, <c>false</c>.</value>
@@ -1208,6 +1215,34 @@ namespace Radzen.Blazor
                     }
                 }
 
+                if (childData.Any())
+                {
+                    var viewList = view.ToList();
+                    var countWithChildren = viewList.Count + childData.SelectMany(d => d.Value.Data).Count();
+                    var level = 0;
+
+                    for (int i = 0; i < countWithChildren; i++)
+                    {
+                        var item = viewList.ElementAtOrDefault(i);
+
+                        if (item != null && childData.ContainsKey(item))
+                        {
+                            level++;
+                            childData[item].Level = level;
+
+                            var cd = childData[item].Data.AsQueryable().Where<TItem>(allColumns);
+                            if (!string.IsNullOrEmpty(orderBy))
+                            {
+                                cd = cd.OrderBy(orderBy);
+                            }
+
+                            viewList.InsertRange(viewList.IndexOf(item) + 1, cd);
+                        }
+                    }
+
+                    view = viewList.AsQueryable();
+                }
+
                 if (!IsVirtualizationAllowed() || AllowPaging)
                 {
                     var count = view.Count();
@@ -1588,7 +1623,7 @@ namespace Radzen.Blazor
 
         internal string ExpandedItemStyle(TItem item)
         {
-            return expandedItems.Keys.Contains(item) ? "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-down" : "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-right";
+            return expandedItems.Keys.Contains(item) ? "rz-row-toggler rzi-chevron-circle-down" : "rz-row-toggler rzi-chevron-circle-right";
         }
 
         internal Dictionary<TItem, bool> selectedItems = new Dictionary<TItem, bool>();
@@ -1603,7 +1638,7 @@ namespace Radzen.Blazor
 
         internal Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item)
         {
-            var args = new Radzen.RowRenderEventArgs<TItem>() { Data = item, Expandable = Template != null };
+            var args = new Radzen.RowRenderEventArgs<TItem>() { Data = item, Expandable = Template != null || LoadChildData.HasDelegate };
 
             if (RowRender != null)
             {
@@ -1708,7 +1743,7 @@ namespace Radzen.Blazor
 
         internal async System.Threading.Tasks.Task ExpandItem(TItem item)
         {
-            if (ExpandMode == DataGridExpandMode.Single && expandedItems.Keys.Any())
+            if (ExpandMode == DataGridExpandMode.Single && expandedItems.Keys.Any() && !LoadChildData.HasDelegate)
             {
                 var itemToCollapse = expandedItems.Keys.FirstOrDefault();
                 if (itemToCollapse != null)
@@ -1728,15 +1763,32 @@ namespace Radzen.Blazor
             {
                 expandedItems.Add(item, true);
                 await RowExpand.InvokeAsync(item);
+
+                var args = new DataGridLoadChildDataEventArgs<TItem>() { Item = item };
+                await LoadChildData.InvokeAsync(args);
+
+                if (args.Data != null && !childData.ContainsKey(item))
+                {
+                    childData.Add(item, new DataGridChildData<TItem>() { Data = args.Data });
+                    _view = null;
+                }
             }
             else
             {
                 expandedItems.Remove(item);
                 await RowCollapse.InvokeAsync(item);
+
+                if (childData.ContainsKey(item))
+                {
+                    childData.Remove(item);
+                    _view = null;
+                }
             }
 
             await InvokeAsync(StateHasChanged);
         }
+
+        internal Dictionary<TItem, DataGridChildData<TItem>> childData = new Dictionary<TItem, DataGridChildData<TItem>>();
 
         /// <summary>
         /// Gets or sets a value indicating whether DataGrid row can be selected on row click.
