@@ -77,10 +77,31 @@
                 }
                 @if (Grid.LoadChildData.HasDelegate && Grid.ShowExpandColumn && Grid.allColumns.IndexOf(column) == 0)
                 {
-                    <a style="@(getExpandIconStyle(rowArgs.Item1.Expandable))" href="javascript:void(0)" @onclick="@(_ => Grid.ExpandItem(Item))">
-                        <span class="@(Grid.ExpandedItemStyle(Item))"></span>
-                    </a>
+                    <span class="rz-cell-toggle">
+                        <a style="@(getExpandIconStyle(rowArgs.Item1.Expandable))" href="javascript:void(0)" @onclick="@(_ => Grid.ExpandItem(Item))">
+                            <span class="@(Grid.ExpandedItemStyle(Item))"></span>
+                        </a>
+                        <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
+                            @if (Item != null)
+                            {
+                                @if (Grid.IsRowInEditMode(Item) && column.EditTemplate != null)
+                                {
+                                    @column.EditTemplate(Item)
+                                }
+                                else if (column.Template != null)
+                                {
+                                    @column.Template(Item)
+                                }
+                                else
+                                {
+                                    @column.GetValue(Item)
+                                }
+                            }
+                        </span>
+                    </span>
                 }
+                else
+                {
                 <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
                     @if (Item != null)
                     {
@@ -98,6 +119,7 @@
                         }
                     }
                 </span>
+                }
             </RadzenDataGridCell>
         }
    
