@@ -10,35 +10,39 @@
     <div class="container-fluid">
         <div class="row my-5">
             <div class="col-lg-6 col-xl-4 offset-lg-3 offset-xl-4">
-                <RadzenCard class="m-3">
-                    <h3 class="h5">Contact</h3>
-                    <div class="d-flex flex-row">
+                <RadzenCard Class="m-3">
+                    <div class="d-flex flex-row p-3">
                         <RadzenImage Path="@order.Employee?.Photo" Class="rounded-circle float-left mr-3" Style="width: 100px; height: 100px;" />
                         <div>
-                            <div>Employee</div>
-                            <b>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</b>
-                            <div class="mt-3">Company</div>
-                            <b>@order.Customer?.CompanyName</b>
+                            <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-1 mb-0">Employee</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1"><b>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</b></RadzenText>
+                            <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-3 mb-0">Company</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1"><b>@order.Customer?.CompanyName</b></RadzenText>
                         </div>
                     </div>
-                </RadzenCard>
-                <RadzenCard class="m-3">
-                    <h3 class="h5">Delivery Information</h3>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div>Country</div>
-                            <b>@(order.ShipCountry)</b>
-                            <div class="mt-3">City</div>
-                            <b>@(order.ShipCity)</b>
+                    <RadzenCard Class="my-3 rz-background-color-primary-lighter rz-shadow-0 rz-border-radius-0" style="margin: 0 calc(-1 * var(--rz-card-padding)); padding: 2rem;">
+                        <RadzenText TextStyle="TextStyle.H6" Class="rz-color-primary-light"><strong>Delivery Information</strong></RadzenText>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <RadzenText TextStyle="TextStyle.Overline" Class="rz-color-primary-light d-flex mt-3 mb-0">Country</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@(order.ShipCountry)</b></RadzenText>
+                                <RadzenText TextStyle="TextStyle.Overline" Class="rz-color-primary-light d-flex mt-3 mb-0">City</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@(order.ShipCity)</b></RadzenText>
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenText TextStyle="TextStyle.Overline" Class="rz-color-primary-light d-flex mt-3 mb-0">Ship name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@(order.ShipName)</b></RadzenText>
+                                <RadzenText TextStyle="TextStyle.Overline" Class="rz-color-primary-light d-flex mt-3 mb-0">Freight</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)</b></RadzenText>
+                            </div>
                         </div>
-                        <div class="col-md-8">
-                            <div>Ship name</div>
-                            <b>@(order.ShipName)</b>
-                            <div class="mt-3">Freight</div>
-                            <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)</b>
-                        </div>
+                    </RadzenCard>
+                    <div class="text-right">
+                        <RadzenButton Variant="Variant.Text" Class="rz-text-secondary-color" Text="Cancel" />
+                        <RadzenButton Variant="Variant.Text" Text="Send" />
                     </div>
                 </RadzenCard>
+                
             </div>
         </div>
     </div>
