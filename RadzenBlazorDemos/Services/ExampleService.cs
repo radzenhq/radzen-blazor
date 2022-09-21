@@ -496,7 +496,6 @@ namespace RadzenBlazorDemos
                 {
                     Name = "DataList",
                     Title = "Blazor data list component",
-                    Updated = true,
                     Path = "datalist",
                     Icon = "&#xe896",
                     Tags = new [] { "dataview", "grid", "table" }
@@ -514,7 +513,6 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Pager",
                     Title = "Blazor paging component",
-                    Updated = true,
                     Path = "pager",
                     Icon = "&#xe8be",
                     Tags = new [] { "pager", "paging" }
@@ -597,7 +595,6 @@ namespace RadzenBlazorDemos
         {
             Name="Layout & Navigation",
             Icon = "&#xe8f1",
-            Updated = true,
             Children = new [] {
                 new Example()
                 {
@@ -610,7 +607,6 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "BreadCrumb",
-                    New = true,
                     Title = "Blazor BreadCrumb component",
                     Path = "breadcrumb",
                     Icon = "&#xeac9",
@@ -620,6 +616,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Card",
                     Title = "Blazor Card component",
+                    Updated = true,
                     Path = "card",
                     Icon = "&#xe919",
                     Tags = new [] { "container" }
@@ -716,7 +713,6 @@ namespace RadzenBlazorDemos
         new Example()
         {
             Name = "Forms",
-            Updated = true,
             Icon = "&#xf1c1",
             Children = new [] {
                 new Example()
@@ -875,6 +871,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "SelectBar",
                     Path = "selectbar",
+                    Updated = true,
                     Title = "Blazor selectbar component",
                     Icon = "&#xe86d",
                     Tags = new [] { "form", "edit" }
@@ -890,6 +887,7 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "SplitButton",
+                    Updated = true,
                     Title = "Blazor split button component",
                     Path = "splitbutton",
                     Icon = "&#xe05f"
@@ -940,21 +938,18 @@ namespace RadzenBlazorDemos
         {
             Name = "Data Visualization",
             Icon = "&#xe4fb",
-            Updated = true,
             Children= new [] {
                 new Example
                 {
                     Name = "Area Chart",
                     Path = "area-chart",
                     Title = "Blazor area chart component",
-                    Updated = true,
                     Icon = "&#xe251",
                     Tags = new [] { "chart", "graph", "area" }
                 },
                 new Example
                 {
                     Name = "Bar Chart",
-                    Updated = true,
                     Path = "bar-chart",
                     Title = "Blazor bar chart component",
                     Icon = "&#xe164",
@@ -963,7 +958,6 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "Column Chart",
-                    Updated = true,
                     Path = "column-chart",
                     Title = "Blazor column chart component",
                     Icon = "&#xe24b",
@@ -974,14 +968,12 @@ namespace RadzenBlazorDemos
                     Name = "Donut Chart",
                     Path = "donut-chart",
                     Title = "Blazor donut chart component",
-                    Updated = true,
                     Icon = "&#xe917",
                     Tags = new [] { "chart", "graph", "donut" }
                 },
                 new Example
                 {
                     Name = "Line Chart",
-                    Updated = true,
                     Path = "line-chart",
                     Title = "Blazor line chart component",
                     Icon = "&#xe922",
@@ -991,7 +983,6 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Pie Chart",
                     Title = "Blazor pie chart component",
-                    Updated = true,
                     Path = "pie-chart",
                     Icon = "&#xe6c4",
                     Tags = new [] { "chart", "graph", "pie" }
@@ -1000,7 +991,6 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Trends",
                     Path = "chart-trends",
-                    New = true,
                     Icon = "&#xe8e5",
                     Tags = new [] { "chart", "trend", "median", "mean", "mode" }
                 },
@@ -1008,7 +998,6 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Annotations",
                     Path = "chart-annotations",
-                    New = true,
                     Icon = "&#xe06f",
                     Tags = new [] { "chart", "annotation", "label" }
                 },
@@ -1055,7 +1044,6 @@ namespace RadzenBlazorDemos
         new Example()
         {
             Name = "Feedback",
-            Updated = true,
             Icon = "&#xe0cb",
             Children = new [] {
                 new Example()
