@@ -255,7 +255,19 @@ namespace Radzen
                 internalValue = selectedItems.AsQueryable().Cast(type);
             }
 
-            await ValueChanged.InvokeAsync((T)internalValue);
+            if (typeof(IList).IsAssignableFrom(typeof(T)))
+            {
+                var list = (IList)Activator.CreateInstance(typeof(T));
+                foreach (var i in (IEnumerable)internalValue)
+                {
+                    list.Add(i);
+                }
+                await ValueChanged.InvokeAsync((T)(object)list);
+            }
+            else
+            {
+                await ValueChanged.InvokeAsync((T)internalValue);
+            }
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(internalValue);
 
