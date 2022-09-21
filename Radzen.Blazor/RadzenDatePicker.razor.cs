@@ -866,12 +866,12 @@ namespace Radzen.Blazor
 
         private string getOpenPopup()
         {
-            return !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
+            return PopupRenderMode == RenderMode.Initial && !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
         }
 
         private string getOpenPopupForInput()
         {
-            return !Disabled && !ReadOnly && !Inline && !AllowInput ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
+            return PopupRenderMode == RenderMode.Initial && !Disabled && !ReadOnly && !Inline && !AllowInput ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
         }
 
         /// <summary>
@@ -990,7 +990,7 @@ namespace Radzen.Blazor
 
         async Task OnToggle()
         {
-            if (!Disabled && !ReadOnly && !Inline)
+            if (PopupRenderMode == RenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
             {
                 await popup.ToggleAsync(Element);
             }
