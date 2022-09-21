@@ -7,33 +7,33 @@
 @inherits DbContextPage
 
 <RadzenExample Name="Tabs">
-    <RadzenCard Class="w-75 mb-5 mx-auto" Style="display: flex; align-items: center;">
+    <RadzenCard Class="w-75 my-3 mx-auto" Style="display: flex; align-items: center;" >
         <div style="white-space:nowrap; margin-right: 16px">Tabs Position:</div>
         <RadzenDropDown @bind-Value="@tabPosition" TextProperty="Text" ValueProperty="Value"
                         Data="@(Enum.GetValues(typeof(TabPosition)).Cast<TabPosition>().Select(t => new { Text = $"{t}", Value = t }))" />
     </RadzenCard>
-    <RadzenTabs Change=@OnChange TabPosition="@tabPosition" style="height: 504px; width: 700px; margin: 20px auto;" RenderMode="TabRenderMode.Client">
+    <RadzenTabs Change=@OnChange TabPosition="@tabPosition" Class="w-75 my-5 mx-auto" RenderMode="TabRenderMode.Client" >
         <Tabs>
             <RadzenTabsItem Text="Orders">
-                <RadzenDataList PageSize="4" WrapItems="true" AllowPaging="true" Data="@orders" TItem="Order">
+                <RadzenDataList PageSize="6" WrapItems="true" AllowPaging="true" Data="@orders" TItem="Order">
                     <Template Context="order">
-                        <RadzenCard Style="width: 250px;">
+                        <RadzenCard Style="width: 250px;" Class="rz-border-radius-3">
                             <div class="row">
                                 <div class="col-md-8 text-truncate">
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") Class="mr-1" />
-                                    <b>@(order.ShipName)</b>
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") Class="mr-1" IsPill="true" />
+                                    <RadzenText TextStyle="TextStyle.Caption" class="mb-0">@(order.ShipName)</RadzenText>
                                 </div>
                                 <div class="col-md-4 text-right">
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Shade="Shade.Lighter" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") IsPill="true" />
                                 </div>
                             </div>
                             <hr style="border: none; background-color: rgba(0,0,0,.08); height: 1px; margin: 1rem 0;" />
                             <div class="d-flex flex-row align-items-center">
-                                <RadzenImage Path="@order.Employee?.Photo" Class="rounded-circle float-left mr-3" Style="width: 80px; height: 80px;" />
+                                <RadzenImage Path="@order.Employee?.Photo" Class="rz-border-radius-10 float-left mr-3" Style="width: 80px; height: 80px;" />
                                 <div>
-                                    <h4 class="mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</h4>
-                                    <div>@order.ShipAddress</div>
-                                    <div style="font-size: .8em">@(order.ShipCity), @(order.ShipCountry)</div>
+                                    <RadzenText TextStyle="TextStyle.Subtitle1" class="mb-0"><strong>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</strong></RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Body2" class="mb-0">@order.ShipAddress</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Caption" class="mb-0">@(order.ShipCity), @(order.ShipCountry)</RadzenText>
                                 </div>
                             </div>
                         </RadzenCard>
@@ -43,7 +43,7 @@
             <RadzenTabsItem Text="Employee">
                 <RadzenDataGrid ColumnWidth="150px" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" Data="@employees" TItem="Employee">
                     <Columns>
-                        <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false" Width="60px">
+                        <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false" Width="80px">
                             <Template Context="data">
                                 <RadzenImage Path="@data?.Photo" Style="width: 40px; height: 40px; border-radius: 8px;" />
                             </Template>
