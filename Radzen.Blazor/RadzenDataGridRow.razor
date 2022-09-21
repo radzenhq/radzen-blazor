@@ -200,8 +200,6 @@
     {
         var rules = new List<string>();
 
-        rules.Add("float:left");
-
         if (!expandable)
         {
             rules.Add("visibility:hidden");
@@ -213,7 +211,7 @@
         var level = !object.Equals(child, default(KeyValuePair<TItem, DataGridChildData<TItem>>)) ? child.Value.Level : 0;
         if (level > 0)
         {
-            rules.Add($"margin-left: {level}em");
+            rules.Add($"margin-left: {level}rem");
         }
 
         return string.Join(';', rules);
