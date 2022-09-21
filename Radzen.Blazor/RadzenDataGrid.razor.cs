@@ -1623,7 +1623,7 @@ namespace Radzen.Blazor
 
         internal string ExpandedItemStyle(TItem item)
         {
-            return expandedItems.Keys.Contains(item) ? "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-down" : "rz-row-toggler rzi-grid-sort  rzi-chevron-circle-right";
+            return expandedItems.Keys.Contains(item) ? "rz-row-toggler rzi-chevron-circle-down" : "rz-row-toggler rzi-chevron-circle-right";
         }
 
         internal Dictionary<TItem, bool> selectedItems = new Dictionary<TItem, bool>();
