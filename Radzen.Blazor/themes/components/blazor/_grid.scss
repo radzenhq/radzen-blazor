@@ -519,15 +519,17 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   }
 }
 
-.rz-datatable-odd {
-  > td {
-    background-color: var(--rz-grid-stripe-background-color);
+.rz-grid-table-striped {
+  tr:nth-child(odd)  {
+    > td {
+      background-color: var(--rz-grid-stripe-background-color);
+    }
   }
-}
 
-.rz-datatable-even {
-  > td {
-    background-color: var(--rz-grid-background-color);
+  tr:nth-child(even) {
+    > td {
+      background-color: var(--rz-grid-background-color);
+    }
   }
 }
 
@@ -697,8 +699,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 }
 
 .rz-selectable {
-  .rz-datatable-even,
-  .rz-datatable-odd {
+  tr:nth-child(even),
+  tr:nth-child(odd) {
     td,
     .rz-cell-data {
       transition: background-color var(--rz-transition), color var(--rz-transition);
