@@ -326,7 +326,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The render mode.</value>
         [Parameter]
-        public RenderMode PopupRenderMode { get; set; } = RenderMode.Initial;
+        public PopupRenderMode PopupRenderMode { get; set; } = PopupRenderMode.Initial;
 
         double SaturationHandleLeft { get; set; }
         double HueHandleLeft { get; set; }

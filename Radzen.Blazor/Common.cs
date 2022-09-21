@@ -460,16 +460,16 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Specifies the ways a component renders its parts.
+    /// Specifies the ways a component renders its popup.
     /// </summary>
-    public enum RenderMode
+    public enum PopupRenderMode
     {
         /// <summary>
-        /// The component renders its parts on-demand.
+        /// The component renders its popup on-demand.
         /// </summary>
         OnDemand,
         /// <summary>
-        /// The component renders its parts initially.
+        /// The component renders its popup initially.
         /// </summary>
         Initial
     }

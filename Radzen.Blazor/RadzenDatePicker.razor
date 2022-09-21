@@ -27,7 +27,7 @@
             </span>
         }
 
-        <Popup id="@PopupID" Lazy=@(PopupRenderMode == RenderMode.OnDemand) @ref=@popup style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")">
+        <Popup id="@PopupID" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@popup style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")">
                 <div class="rz-datepicker-group">
                     @if (!TimeOnly)
                     {

@@ -866,12 +866,12 @@ namespace Radzen.Blazor
 
         private string getOpenPopup()
         {
-            return PopupRenderMode == RenderMode.Initial && !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
+            return PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
         }
 
         private string getOpenPopupForInput()
         {
-            return PopupRenderMode == RenderMode.Initial && !Disabled && !ReadOnly && !Inline && !AllowInput ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
+            return PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline && !AllowInput ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
         }
 
         /// <summary>
@@ -986,11 +986,11 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The render mode.</value>
         [Parameter]
-        public RenderMode PopupRenderMode { get; set; } = RenderMode.Initial;
+        public PopupRenderMode PopupRenderMode { get; set; } = PopupRenderMode.Initial;
 
         async Task OnToggle()
         {
-            if (PopupRenderMode == RenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
+            if (PopupRenderMode == PopupRenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
             {
                 await popup.ToggleAsync(Element);
             }
