@@ -61,18 +61,10 @@ To use a theme
 1. Pick a theme. The [online demos](https://blazor.radzen.com/colors) allow you to preview the available options via the theme dropdown located in the header. The Material theme is currently selected by default.
 1. Include the theme CSS file in your Blazor application. Open `Pages\_Layout.cshtml` (Blazor Server .NET 6+), `Pages\_Host.cshtml` (Blazor Server before .NET 6) or `wwwroot/index.html` (Blazor WebAssembly) and include the CSS file of  a theme CSS file by adding this snippet
    ```html
-   <link rel="stylesheet" href="_content/Radzen.Blazor/css/material.css">
-   ```
-   If you either include the Bootstrap CSS manually or don't use it at all, include this instead:
-   ```html
    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
    ```
 
 To include a different theme (i.e. Standard) just change the name of the CSS file:
-```
-<link rel="stylesheet" href="_content/Radzen.Blazor/css/standard.css">
-```
-or
 ```
 <link rel="stylesheet" href="_content/Radzen.Blazor/css/standard-base.css">
 ```
