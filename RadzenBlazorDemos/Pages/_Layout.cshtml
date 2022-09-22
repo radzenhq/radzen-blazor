@@ -14,6 +14,29 @@
     <!-- Include the base version if you are using Bootstrap already
     <link href="_content/Radzen.Blazor/css/default-base.css" rel="stylesheet">
     -->
+
+    <style>
+    // Body
+        :root {
+            font-size: var(--rz-root-font-size);
+        }
+        body {
+            font-family: var(--rz-text-font-family);
+            color: var(--rz-text-color);
+            font-size: var(--rz-body-font-size);
+            line-height: var(--rz-body-line-height);
+            background-color: var(--rz-body-background-color);
+        }
+
+        a {
+            color: var(--rz-link-color);
+        }
+
+        a:hover,
+        a:focus {
+            color: var(--rz-link-hover-color);
+        }
+    </style>
 </head>
 <body>
     @RenderBody()

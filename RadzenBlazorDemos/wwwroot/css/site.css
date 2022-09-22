@@ -148,19 +148,22 @@ body {
 
 .next a {
     color: #FF504D;
+    text-decoration: none;
 }
 
 .next a:hover {
-    text-decoration: none;
     color: #FF7371;
+    text-decoration: none;
 }
 
 .dark a {
     color: #FF9C9A;
+    text-decoration: none;
 }
 
 .dark a:hover {
     color: #FF504D;
+    text-decoration: none;
 }
 
 .next h1,
@@ -229,10 +232,12 @@ body {
     color: #050A23;
     margin: .5rem 0 0 2.5rem;
     transition: all 0.3s;
+    text-decoration: none;
 }
 
 .nav-links a:hover {
     color: #FF504D;
+    text-decoration: none;
 }
 
 /* CTA Buttons */
@@ -294,7 +299,7 @@ body {
 
 /* Customer Logos */
 
-.customers {
+.row.customers {
     margin-top: 5rem;
     margin-bottom: 1rem;
     border-radius: .75rem;
@@ -302,7 +307,7 @@ body {
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.06);
 }
 
-.customers h3 {
+.row.customers h3 {
     font-size: 1rem;
     font-weight: 300;
     letter-spacing: 0.1em;
@@ -311,7 +316,7 @@ body {
     margin: 2rem 0;
 }
 
-.logos {
+.row .logos {
     margin: 2rem 0 0;
     display: flex;
     flex-wrap: wrap;
@@ -319,12 +324,12 @@ body {
     justify-content: center;
 }
 
-.logos img {
+.row .logos img {
     height: 24px;
     margin: 0 12px 32px;
 }
 
-.logos .square {
+.row .logos .square {
     height: 48px;
 }
 
@@ -362,6 +367,7 @@ video {
     color: #1151f3;
     transition: all 0.2s;
     border-bottom: 1px solid transparent;
+    text-decoration: none;
 }
 
 .popular-components a:hover {
@@ -403,11 +409,13 @@ video {
     color: #1151f3;
     transition: all 0.2s;
     border-bottom: 1px solid transparent;
+    text-decoration: none;
 }
 
 .all-components a:hover {
     color: #0E44CC;
-    border-bottom-color: #0E44CC; 
+    border-bottom-color: #0E44CC;
+    text-decoration: none;
 }
 
 .all-components .rz-badge {
@@ -419,18 +427,18 @@ video {
 
 /* Footer */
 
-.copyright {
+.row.copyright {
     margin-top: 6rem;
     opacity: .2;
     transition: all 0.4s ease-in-out;
 }
-.copyright p {
+.row.copyright p {
     font-size: 1rem;
     font-weight: 300;
     color: #ACAFB9;
 }
 
-.copyright:hover {
+.row.copyright:hover {
     opacity: 1;
 }
 

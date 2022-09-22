@@ -15,7 +15,7 @@
 </RadzenText>
 
 <RadzenExample Name="DataGrid" Source="ExportToExcelCsv" Heading="false">
-    <RadzenButton Text="Export XLS" Icon="grid_on" Click="@(args => Export("excel"))" Class="mb-4 mr-2" /><RadzenButton Text="Export CSV" Icon="wrap_text" Click="@(args => Export("csv"))" Class="mb-4" />
+    <RadzenButton Text="Export XLS" Icon="grid_on" Click="@(args => Export("excel"))" Class="mb-4 me-2" /><RadzenButton Text="Export CSV" Icon="wrap_text" Click="@(args => Export("csv"))" Class="mb-4" />
     <RadzenDataGrid @ref="grid" AllowColumnPicking="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@orderDetails" TItem="OrderDetail">
         <Columns>
             <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />

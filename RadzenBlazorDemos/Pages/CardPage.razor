@@ -12,7 +12,7 @@
             <div class="col-lg-6 col-xl-4 offset-lg-3 offset-xl-4">
                 <RadzenCard Class="m-3">
                     <div class="d-flex flex-row p-3">
-                        <RadzenImage Path="@order.Employee?.Photo" Class="rounded-circle float-left mr-3" Style="width: 100px; height: 100px;" />
+                        <RadzenImage Path="@order.Employee?.Photo" Class="rounded-circle float-start me-3" Style="width: 100px; height: 100px;" />
                         <div>
                             <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-1 mb-0">Employee</RadzenText>
                             <RadzenText TextStyle="TextStyle.Body1"><b>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</b></RadzenText>
@@ -37,7 +37,7 @@
                             </div>
                         </div>
                     </RadzenCard>
-                    <div class="text-right">
+                    <div class="text-end">
                         <RadzenButton Variant="Variant.Text" Class="rz-text-secondary-color" Text="Cancel" />
                         <RadzenButton Variant="Variant.Text" Text="Send" />
                     </div>

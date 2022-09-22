@@ -42,7 +42,7 @@
         <div class="col-lg-6 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Formatted Value</RadzenText>
-                <RadzenNumeric TValue="double" Format="0.0000" @bind-Value=@dblValue Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Formatted numeric"))" Class="mr-1" />
+                <RadzenNumeric TValue="double" Format="0.0000" @bind-Value=@dblValue Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Formatted numeric"))" Class="me-1" />
                 <RadzenNumeric TValue="double" Format="c" @bind-Value=@dblValue Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Formatted numeric"))" />
             </RadzenCard>
         </div>

@@ -11,7 +11,7 @@
                     Expand=@(() => Change("Panel expanded")) Collapse=@(() => Change("Panel collapsed")) >
         <HeaderTemplate>
             <h4 class="m-0 d-flex align-items-center">
-                <RadzenIcon Icon="account_box" Class="mr-1" /><b>Orders</b>
+                <RadzenIcon Icon="account_box" Class="me-1" /><b>Orders</b>
             </h4>
         </HeaderTemplate>
         <ChildContent>
@@ -22,16 +22,16 @@
                         <RadzenCard Style="width: 250px">
                             <div class="row">
                                 <div class="col-md-8 text-truncate">
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") Class="mr-1" />
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") Class="me-1" />
                                     <b>@(order.ShipName)</b>
                                 </div>
-                                <div class="col-md-4 text-right">
+                                <div class="col-md-4 text-end">
                                     <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
                                 </div>
                             </div>
                             <hr style="border: none; background-color: rgba(0,0,0,.08); height: 1px; margin: 1rem 0;" />
                             <div class="d-flex flex-row align-items-center">
-                                <RadzenImage Path="@order.Employee?.Photo" Class="rounded-circle float-left mr-3" Style="width: 80px; height: 80px;" />
+                                <RadzenImage Path="@order.Employee?.Photo" Class="rounded-circle float-start me-3" Style="width: 80px; height: 80px;" />
                                 <div>
                                     <h4 class="mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</h4>
                                     <div>@order.ShipAddress</div>

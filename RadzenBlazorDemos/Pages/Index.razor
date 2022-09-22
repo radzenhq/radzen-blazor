@@ -11,7 +11,7 @@
   <div class="container-fluid stage light">
     <div class="container">
       <div class="row">
-        <div class="col-xs-12 col-sm-4 text-center text-sm-left">
+        <div class="col-xs-12 col-sm-4 text-center text-sm-start">
           <a href="/" title="Radzen" class="logo">
             <svg width="159" height="48" viewBox="0 0 159 48" xmlns="http://www.w3.org/2000/svg">
               <title>Radzen</title>
@@ -20,7 +20,7 @@
             </svg>
           </a>
         </div>
-        <div class="col-sm-8 d-none d-sm-block text-right nav-links align-items-center">
+        <div class="col-sm-8 d-none d-sm-block text-end nav-links align-items-center">
           <a href="/docs/" title="Radzen Blazor Components Documentation" target="_blank">Documentation</a>
           <a href="https://www.radzen.com/" title="Create .NET Core web applications fast & easy" target="_blank">About Radzen</a>
           <a href="https://github.com/radzenhq/radzen-blazor" title="GitHub" target="_blank">
@@ -97,42 +97,52 @@
 
           <h2 class="subtitle">Most Popular Components</h2>
 
-          <div class="row popular-components">
-            <a href="/datagrid">
-              <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M16 0H0V16H16V0ZM15 1H11V5H15V1ZM15 6H11V10H15V6ZM15 11H11V15H15V11ZM10 11V15H6V11H10ZM10 6V10H6V6H10ZM10 1V5H6V1H10ZM5 1H1V5H5V1ZM5 6H1V10H5V6ZM5 11H1V15H5V11Z" fill="currentColor"/>
-              </svg>
-              DataGrid
-            </a>
-            <a href="/scheduler">
-              <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M3 0H4V2H12V0H13V2H16V16H0V2H3V0ZM12 3V4H13V3H15V15H1V3H3V4H4V3H12ZM3 13V6H7V13H3ZM4 12V7H6V12H4ZM9 6H13V10H9V6ZM10 9V7H12V9H10Z" fill="currentColor"/>
-              </svg>
-              Scheduler
-            </a>
-            <a href="/dropdown">
-              <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H13V1H0V0ZM14 0H16V1H14V0ZM0 3H16V16H0V3ZM1 4H15V15H1V4ZM14 5H13V10H14V5ZM11 6H3V7H11V6ZM11 9H3V10H11V9ZM3 12H11V13H3V12Z" fill="currentColor"/>
-              </svg>
-              DropDown
-            </a>
-            <a href="/dialog">
-              <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0V16H16V0H0ZM15 1H1V15H15V1ZM8 3H3V4H8V3ZM13 7V6H3V7H13ZM13 12H10V13H13V12ZM3 8H13V9H3V8ZM12 3H13V4H12V3ZM9 12H6V13H9V12Z" fill="currentColor"/>
-              </svg>
-              Dialog
-            </a>
-            <a href="/datepicker">
-              <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M0 13V3H16V13H0ZM1 4H15V12H1V4ZM6.89778 10H8.05248L10.3619 6H9.20718L6.89778 10ZM6 9H3V10H6V9ZM10 9H13V10H10V9Z" fill="currentColor"/>
-              </svg>
-              DatePicker
-            </a>
+          <div class="row">
+            <div class="col popular-components">
+              <a href="/datagrid">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M16 0H0V16H16V0ZM15 1H11V5H15V1ZM15 6H11V10H15V6ZM15 11H11V15H15V11ZM10 11V15H6V11H10ZM10 6V10H6V6H10ZM10 1V5H6V1H10ZM5 1H1V5H5V1ZM5 6H1V10H5V6ZM5 11H1V15H5V11Z" fill="currentColor"/>
+                </svg>
+                DataGrid
+              </a>
+            </div>
+            <div class="col popular-components">
+              <a href="/scheduler">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M3 0H4V2H12V0H13V2H16V16H0V2H3V0ZM12 3V4H13V3H15V15H1V3H3V4H4V3H12ZM3 13V6H7V13H3ZM4 12V7H6V12H4ZM9 6H13V10H9V6ZM10 9V7H12V9H10Z" fill="currentColor"/>
+                </svg>
+                Scheduler
+              </a>
+            </div>
+            <div class="col popular-components">
+              <a href="/dropdown">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H13V1H0V0ZM14 0H16V1H14V0ZM0 3H16V16H0V3ZM1 4H15V15H1V4ZM14 5H13V10H14V5ZM11 6H3V7H11V6ZM11 9H3V10H11V9ZM3 12H11V13H3V12Z" fill="currentColor"/>
+                </svg>
+                DropDown
+              </a>
+            </div>
+            <div class="col popular-components">
+              <a href="/dialog">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0V16H16V0H0ZM15 1H1V15H15V1ZM8 3H3V4H8V3ZM13 7V6H3V7H13ZM13 12H10V13H13V12ZM3 8H13V9H3V8ZM12 3H13V4H12V3ZM9 12H6V13H9V12Z" fill="currentColor"/>
+                </svg>
+                Dialog
+              </a>
+            </div>
+            <div class="col popular-components">
+              <a href="/datepicker">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M0 13V3H16V13H0ZM1 4H15V12H1V4ZM6.89778 10H8.05248L10.3619 6H9.20718L6.89778 10ZM6 9H3V10H6V9ZM10 9H13V10H10V9Z" fill="currentColor"/>
+                </svg>
+                DatePicker
+              </a>
+            </div>
           </div>
 
           <h2 class="subtitle mb-4">All Components</h2>
 
-          <div class="row all-components text-left">
+          <div class="row all-components text-start">
 
             <div class="col-sm-12 col-md-4">
               <div class="row">
