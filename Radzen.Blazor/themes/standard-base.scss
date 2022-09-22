@@ -95,7 +95,11 @@ $rz-border-radius: 4px !default;
 $rz-root-font-size: 16px !default;
 $rz-body-font-size: 0.875rem !default;
 $rz-body-line-height: 1.429 !default;
+$rz-body-background-color: var(--rz-base-100) !default;
 $rz-icon-size: 1.25rem !default;
+$rz-text-font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
+'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
+'Segoe UI Emoji', 'Segoe UI Symbol' !default;
 
 // Utilities
 

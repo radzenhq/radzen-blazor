@@ -94,7 +94,11 @@ $rz-border-radius: 0 !default;
 $rz-root-font-size: 16px !default;
 $rz-body-font-size: 0.875rem !default;
 $rz-body-line-height: 1.429 !default;
+$rz-body-background-color: var(--rz-base-100) !default;
 $rz-icon-size: 1.25rem !default;
+$rz-text-font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
+'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
+'Segoe UI Emoji', 'Segoe UI Symbol' !default;
 
 // Bootstrap variable overrides. DO NOT USE IN COMPONENTS!
 
@@ -110,6 +114,7 @@ $light: $rz-base-200 !default;
 $body-color: $rz-base-800 !default;
 $link-color: $rz-secondary !default;
 $link-hover-color: $rz-secondary !default;
+$link-decoration: none !default;
 $link-hover-decoration: underline !default;
 $state-success-bg: $rz-success !default;
 $state-warning-bg: $rz-warning !default;
