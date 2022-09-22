@@ -1196,27 +1196,29 @@ namespace Radzen.Blazor
                     return base.View;
                 }
 
-                var view = base.View.Where<TItem>(allColumns);
+                IQueryable<TItem> view;
                 var orderBy = GetOrderBy();
-
-                if (!string.IsNullOrEmpty(orderBy))
-                {
-                    if (typeof(TItem) == typeof(object))
-                    {
-                        var firstItem = view.FirstOrDefault();
-                        if (firstItem != null)
-                        {
-                            view = view.Cast(firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
-                        }
-                    }
-                    else
-                    {
-                        view = view.OrderBy(orderBy);
-                    }
-                }
 
                 if (childData.Any())
                 {
+                    view = base.View;//.Where<TItem>(allColumns);
+
+                    if (!string.IsNullOrEmpty(orderBy))
+                    {
+                        if (typeof(TItem) == typeof(object))
+                        {
+                            var firstItem = view.FirstOrDefault();
+                            if (firstItem != null)
+                            {
+                                view = view.Cast(firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
+                            }
+                        }
+                        else
+                        {
+                            view = view.OrderBy(orderBy);
+                        }
+                    }
+
                     var viewList = view.ToList();
                     var countWithChildren = viewList.Count + childData.SelectMany(d => d.Value.Data).Count();
                     var level = 0;
@@ -1240,7 +1242,29 @@ namespace Radzen.Blazor
                         }
                     }
 
-                    view = viewList.AsQueryable();
+                    view = viewList.AsQueryable()
+                        .Where(i => childData.ContainsKey(i) ? childData[i].Data.AsQueryable().Where<TItem>(allColumns).Any() 
+                            : viewList.AsQueryable().Where<TItem>(allColumns).Contains(i));
+                }
+                else
+                {
+                    view = base.View.Where<TItem>(allColumns);
+
+                    if (!string.IsNullOrEmpty(orderBy))
+                    {
+                        if (typeof(TItem) == typeof(object))
+                        {
+                            var firstItem = view.FirstOrDefault();
+                            if (firstItem != null)
+                            {
+                                view = view.Cast(firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
+                            }
+                        }
+                        else
+                        {
+                            view = view.OrderBy(orderBy);
+                        }
+                    }
                 }
 
                 if (!IsVirtualizationAllowed() || AllowPaging)
