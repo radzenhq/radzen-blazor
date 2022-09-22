@@ -10,36 +10,71 @@ $scrollbar-border-radius: calc(2 * var(--rz-border-radius)) !default;
   --rz-scrollbar-border-radius: #{$scrollbar-border-radius};
 }
 
-body {
-  &:not(.rz-default-scrollbars) {
-    &::-webkit-scrollbar {
-      background-color: var(--rz-scrollbar-background-color);
-    }
+@if $base == false {
+  body {
+    &:not(.rz-default-scrollbars) {
+      &::-webkit-scrollbar {
+        background-color: var(--rz-scrollbar-background-color);
+      }
 
-    &::-webkit-scrollbar-thumb {
-      background: var(--rz-scrollbar-color);
-      border: 4px solid rgba(0, 0, 0, 0);
-      background-clip: padding-box;
-      border-radius: var(--rz-scrollbar-border-radius);
-    }
+      &::-webkit-scrollbar-thumb {
+        background: var(--rz-scrollbar-color);
+        border: 4px solid rgba(0, 0, 0, 0);
+        background-clip: padding-box;
+        border-radius: var(--rz-scrollbar-border-radius);
+      }
 
-    &::-webkit-scrollbar-corner {
-      background-color: var(--rz-scrollbar-background-color);
-    }
+      &::-webkit-scrollbar-corner {
+        background-color: var(--rz-scrollbar-background-color);
+      }
 
-    ::-webkit-scrollbar {
-      background-color: var(--rz-scrollbar-background-color);
-    }
+      ::-webkit-scrollbar {
+        background-color: var(--rz-scrollbar-background-color);
+      }
 
-    ::-webkit-scrollbar-thumb {
-      background: var(--rz-scrollbar-color);
-      border: 4px solid rgba(0, 0, 0, 0);
-      background-clip: padding-box;
-      border-radius: var(--rz-scrollbar-border-radius);
-    }
+      ::-webkit-scrollbar-thumb {
+        background: var(--rz-scrollbar-color);
+        border: 4px solid rgba(0, 0, 0, 0);
+        background-clip: padding-box;
+        border-radius: var(--rz-scrollbar-border-radius);
+      }
 
-    ::-webkit-scrollbar-corner {
-      background-color: var(--rz-scrollbar-background-color);
+      ::-webkit-scrollbar-corner {
+        background-color: var(--rz-scrollbar-background-color);
+      }
     }
+  }
+}
+
+
+.rz-layout {
+  &::-webkit-scrollbar {
+    background-color: var(--rz-scrollbar-background-color);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--rz-scrollbar-color);
+    border: 4px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: var(--rz-scrollbar-border-radius);
+  }
+
+  &::-webkit-scrollbar-corner {
+    background-color: var(--rz-scrollbar-background-color);
+  }
+
+  ::-webkit-scrollbar {
+    background-color: var(--rz-scrollbar-background-color);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--rz-scrollbar-color);
+    border: 4px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: var(--rz-scrollbar-border-radius);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background-color: var(--rz-scrollbar-background-color);
   }
 }

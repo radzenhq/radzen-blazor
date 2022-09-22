@@ -20,7 +20,7 @@ $headings: (
   }
 }
 
-@if $bootstrap {
+@if $base == false {
   @each $name, $heading in $headings {
     #{$name},
     .#{$name} {
@@ -40,11 +40,13 @@ $headings-thin: (
   h6: (font-size: 0.75rem, font-weight: 300)
 ) !default;
 
-@each $name, $heading in $headings-thin {
-  #{$name}.text-thin,
-  .#{$name}.text-thin  {
-    @each $name, $value in $heading {
-      #{$name}: #{$value};
+@if $base == false {
+  @each $name, $heading in $headings-thin {
+    #{$name}.text-thin,
+    .#{$name}.text-thin  {
+      @each $name, $value in $heading {
+        #{$name}: #{$value};
+      }
     }
   }
 }
@@ -114,19 +116,23 @@ $text-align: (
 }
 
 // Body
-:root {
-  font-size: var(--rz-root-font-size);
+@if $base == false {
+  :root {
+    font-size: var(--rz-root-font-size);
+  }
 }
 
-body {
-  font-size: var(--rz-body-font-size);
-  line-height: var(--rz-body-line-height);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@if $base == false {
+  body {
+    font-size: var(--rz-body-font-size);
+    line-height: var(--rz-body-line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
 // Paragraph
-@if $bootstrap {
+@if $base == false {
   p {
     line-height: var(--rz-body-line-height);
   }
@@ -151,7 +157,7 @@ body {
   }
 }
 
-@if $bootstrap {
+@if $base == false {
   label {
     margin-bottom: 0;
   }
@@ -161,6 +167,14 @@ body {
 $link-color: var(--rz-secondary) !default;
 
 // Text selection
-::selection {
-  background-color: var(--rz-primary-lighter);
+@if $base == false {
+  ::selection {
+    background-color: var(--rz-primary-lighter);
+  }
+}
+
+.rz-layout {
+    ::selection {
+    background-color: var(--rz-primary-lighter);
+  }
 }
