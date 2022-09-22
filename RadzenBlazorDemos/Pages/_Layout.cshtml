@@ -8,10 +8,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="favicon.ico">
     <link href="css/site.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     @(await Html.RenderComponentAsync<Theme>(RenderMode.Static))
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
     <!-- Include the base version if you are using Bootstrap already
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="_content/Radzen.Blazor/css/default-base.css" rel="stylesheet">
     -->
 </head>
