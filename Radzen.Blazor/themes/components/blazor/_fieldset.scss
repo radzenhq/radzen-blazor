@@ -80,6 +80,7 @@ $fieldset-toggle-border: none !default;
 }
 
 .rz-fieldset-legend {
+  float: none;
   margin: var(--rz-fieldset-legend-margin);
   padding: var(--rz-fieldset-legend-padding);
   width: auto;
