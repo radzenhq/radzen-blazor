@@ -30,4 +30,8 @@ $header-shadow: none !default;
     right: 0;
     z-index: var(--rz-header-z);
   }
+
+  a {
+    text-decoration: none;
+  }
 }

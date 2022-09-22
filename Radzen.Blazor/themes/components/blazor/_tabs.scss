@@ -113,6 +113,7 @@ $tabs-transition: var(--rz-transition-all) !default;
       font-weight: var(--rz-tabs-tab-font-weight);
       text-transform: var(--rz-tabs-tab-text-transform);
       letter-spacing: var(--rz-tabs-tab-letter-spacing);
+      text-decoration: none;
 
       &:hover {
         text-decoration: none;
