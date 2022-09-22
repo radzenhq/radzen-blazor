@@ -86,6 +86,7 @@ $text: (
 
 @each $element, $property in $text {
   .rz-text-#{$element} {
+    font-family: var(--rz-text-font-family);
     @each $key, $value in $property {
       #{$key}: var(--rz-text-#{$element}-#{$key});
     }
