@@ -1166,6 +1166,8 @@ namespace RadzenBlazorDemos
                            .Select(category => new Example
                            {
                                Name = category.Name,
+                               Path = category.Path,
+                               Icon = category.Icon,
                                Expanded = true,
                                Children = category.Children?.Where(deepFilter).Select(example => new Example
                                {
