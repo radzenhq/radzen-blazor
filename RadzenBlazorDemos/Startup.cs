@@ -34,6 +34,7 @@ namespace RadzenBlazorDemos
             services.AddScoped<NorthwindService>();
             services.AddScoped<NorthwindODataService>();
             services.AddScoped<GitHubService>();
+            services.AddScoped<DataGridSettingsService>();
 
             services.AddDistributedMemoryCache();
 

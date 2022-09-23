@@ -1,0 +1,52 @@
+﻿@page "/datagrid-save-settings"
+@using Radzen
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using RadzenBlazorDemos.Services
+
+@inject DataGridSettingsService settingsService
+
+@inherits DbContextPage
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    DataGrid <strong>save settings</strong>
+</RadzenText>
+
+<RadzenExample Name="DataGrid" Source="DataGridSaveSettings" Heading="false">
+    <p>This example shows how to save/load DataGrid state using Settings property.</p>
+    <p>The state format is JSON and includes current page index, groups and columns filter, sort, order, width and visibility.</p>
+    <RadzenButton Click="@(args => settingsService.Settings = null)" Text="Clear saved settings" Style="margin-bottom: 16px" />
+    <RadzenDataGrid @bind-Settings="@settingsService.Settings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
+                    AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" 
+                    AllowColumnResize="true" ColumnWidth="200px"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@employees" TItem="Employee">
+        <Columns>
+            <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
+                <Template Context="data">
+                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px;" />
+                    @data.FirstName @data.LastName
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
+            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
+            <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+            <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
+            <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
+
+@code {
+    IEnumerable<Employee> employees;
+    EventConsole console;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        employees = dbContext.Employees;
+    }
+}
