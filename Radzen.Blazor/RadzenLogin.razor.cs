@@ -45,7 +45,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "login";
+            return "rz-login";
         }
 
         string _username;
@@ -151,7 +151,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The reset password text.</value>
         [Parameter]
-        public string ResetPasswordText { get; set; } = "Forgot password";
+        public string ResetPasswordText { get; set; } = "Forgot password?";
 
         /// <summary>
         /// Gets or sets the user text.

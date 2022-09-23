@@ -649,6 +649,7 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "Login",
+                    Updated = true,
                     Title = "Blazor Login component",
                     Path = "login",
                     Icon = "&#xe8e8"

@@ -1,24 +1,57 @@
-$login-register-background-color: var(--rz-base-background-color) !default;
+$login-register-background-color: var(--rz-base-100) !default;
 $login-register-padding: 1rem !default;
-$login-register-button-margin: 0 1rem !default;
+$login-register-margin: 2rem 0 0 !default;
+$login-register-button-margin: 0 !default;
 
 // Login CSS variables
 
 :root {
   --rz-login-register-background-color: #{$login-register-background-color};
   --rz-login-register-padding: #{$login-register-padding};
+  --rz-login-register-margin: #{$login-register-margin};
   --rz-login-register-button-margin: #{$login-register-button-margin};
 }
 
-.login {
+.rz-login {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
+  .rz-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .rz-form-row {
+      display: flex;
+      flex-flow: row wrap;
+      align-items: center;
+      gap: 0.5rem;
+
+      .rz-label {
+        flex: 1 8rem;
+      }
+
+      .rz-form-input-wrapper {
+        flex: 3 14rem;
+      }
+
+      .rz-messages-error  {
+        position: initial; // Clear .rz-form .rz-messages-error position
+      }
+    }
+  }
+
   .register {
-    text-align: center;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
     background-color: var(--rz-login-register-background-color);
+    margin: var(--rz-login-register-margin);
     padding: var(--rz-login-register-padding);
+    border-radius: var(--rz-border-radius);
 
     .rz-button {
       margin: var(--rz-login-register-button-margin);
@@ -26,18 +59,10 @@ $login-register-button-margin: 0 1rem !default;
   }
 
   .login-buttons {
-    display: flex;
+    display: inline-flex;
+    flex-flow: row wrap;
     justify-content: space-between;
     align-items: center;
-
-    a {
-      color: var(--rz-link-color);
-      cursor: pointer;
-
-      &:hover {
-        color: var(--rz-link-hover-color);
-        text-decoration: var(--rz-link-hover-decoration);
-      }
-    }
+    gap: 0.5rem;
   }
 }
