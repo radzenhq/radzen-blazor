@@ -21,9 +21,9 @@
     </RadzenCard>
 <div class="row no-gutters mx-n2">
     <div class="col-xl-3 col-lg-6 p-2">
-        <RadzenCard>
+        <RadzenCard style="position: relative;">
             <RadzenText TextStyle="TextStyle.H6">Open Issues</RadzenText>
-            <RadzenText TextStyle="TextStyle.H2" Class="rz-color-success" Style="position: absolute; right: 2rem; top: 1.25rem;">@openIssues?.Count()</RadzenText>
+            <RadzenText TextStyle="TextStyle.H2" Class="rz-color-success" Style="position: absolute; right: 1.5rem; top: 1rem;">@openIssues?.Count()</RadzenText>
             <RadzenChart style="width: 100%; height: 120px; margin-bottom: -30px;">
                 <RadzenColumnSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-success)" />
                 <RadzenValueAxis Visible="false" />
@@ -34,9 +34,9 @@
         </RadzenCard>
     </div>
     <div class="col-xl-3 col-lg-6 p-2">
-        <RadzenCard>
+        <RadzenCard style="position: relative;">
             <RadzenText TextStyle="TextStyle.H6">Closed Issues</RadzenText>
-            <RadzenText TextStyle="TextStyle.H2" Class="rz-color-danger" Style="position: absolute; right: 2rem; top: 1.25rem;">@closedIssues?.Count()</RadzenText>
+            <RadzenText TextStyle="TextStyle.H2" Class="rz-color-danger" Style="position: absolute; right: 1.5rem; top: 1rem;">@closedIssues?.Count()</RadzenText>
             <RadzenChart style="width: 100%; height: 120px; margin-bottom: -30px;">
                 <RadzenColumnSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-danger)" />
                 <RadzenValueAxis Visible="false" />
@@ -47,9 +47,9 @@
         </RadzenCard>
     </div>
     <div class="col-xl-3 col-lg-6 p-2">
-        <RadzenCard>
+        <RadzenCard style="position: relative;">
             <RadzenText TextStyle="TextStyle.H6">All Issues</RadzenText>
-            <RadzenText TextStyle="TextStyle.H2" Style="position: absolute; right: 2rem; top: 1.25rem;">@issues?.Count()</RadzenText>
+            <RadzenText TextStyle="TextStyle.H2" Style="position: absolute; right: 1.5rem; top: 1rem;">@issues?.Count()</RadzenText>
             <RadzenChart style="width: 100%; height: 120px; margin-bottom: -30px;">
                 <RadzenLineSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" Stroke="var(--rz-success)" />
                 <RadzenLineSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" Stroke="var(--rz-danger)" />
