@@ -124,6 +124,8 @@ text-decoration: none;
 
 body {
     background-color: #F4F5F9;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .stage {
