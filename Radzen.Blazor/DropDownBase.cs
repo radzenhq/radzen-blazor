@@ -135,7 +135,14 @@ namespace Radzen
                 {
                     return !string.IsNullOrEmpty($"{internalValue}");
                 }
-                return internalValue != null;
+                else if (typeof(IEnumerable).IsAssignableFrom(typeof(T)))
+                {
+                    return internalValue != null && ((IEnumerable)internalValue).Cast<object>().Any();
+                }
+                else
+                {
+                    return internalValue != null;
+                }
             }
         }
 
