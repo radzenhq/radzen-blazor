@@ -55,6 +55,7 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
     align-items: center;
     color: var(--rz-steps-color);
     cursor: pointer;
+    text-decoration: none;
 
     &:hover {
       text-decoration: none;
@@ -116,6 +117,7 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
   display: inline-flex;
   align-items: center;
   color: var(--rz-steps-button-color) !important;
+  text-decoration: none;
 
   &:not(.rz-state-disabled) {
     &:hover {

@@ -76,6 +76,7 @@ $splitbutton-sizes: sm, md, lg;
   .rz-menuitem-link {
     color: inherit;
     display: block;
+    text-decoration: none;
 
     &:hover {
       text-decoration: none;
