@@ -42,7 +42,7 @@ $login-register-button-margin: 0 !default;
     }
   }
 
-  .register {
+  .rz-register {
     display: flex;
     flex-flow: row wrap;
     align-items: center;
@@ -58,7 +58,7 @@ $login-register-button-margin: 0 !default;
     }
   }
 
-  .login-buttons {
+  .rz-login-buttons {
     display: inline-flex;
     flex-flow: row wrap;
     justify-content: space-between;
