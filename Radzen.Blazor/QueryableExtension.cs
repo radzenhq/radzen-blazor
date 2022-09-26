@@ -1112,6 +1112,11 @@ namespace Radzen
 
                 if (comparison == "StartsWith" || comparison == "EndsWith" || comparison == "Contains")
                 {
+                    if (column.FilterPropertyType == typeof(string) && filter.FilterValue == null)
+                    {
+                        filter.FilterValue = "";
+                    }
+
                     if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "Contains")
                     {
                         filterExpressions.Add($@"(@{index}).Contains({property})");
@@ -1127,6 +1132,11 @@ namespace Radzen
                 }
                 else if (comparison == "DoesNotContain")
                 {
+                    if (column.FilterPropertyType == typeof(string) && filter.FilterValue == null)
+                    {
+                        filter.FilterValue = "";
+                    }
+
                     if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "DoesNotContain")
                     {
                         filterExpressions.Add($@"!(@{index}).Contains({property})");
