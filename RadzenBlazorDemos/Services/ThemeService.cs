@@ -36,6 +36,30 @@ namespace RadzenBlazorDemos
                 ContentText = "#bdbdbd"
             },
             new Theme {
+                Text = "Material Dark",
+                Value = "material-dark",
+                Primary = "#bb86fc",
+                Secondary = "#01a299",
+                Base = "#121212",
+                Header = "#333333",
+                Sidebar = "#252525",
+                Content = "#252525",
+                TitleText = "#ffffff",
+                ContentText = "#a0a0a0"
+            },
+            new Theme {
+                Text = "Fluent",
+                Value = "fluent",
+                Primary = "#0078d4",
+                Secondary = "#2b88d8",
+                Base = "#f5f5f5",
+                Header = "white",
+                Sidebar = "gray",
+                Content = "white",
+                TitleText = "black",
+                ContentText = "black"
+            },
+            new Theme {
                 Text = "Standard",
                 Value = "standard",
                 Primary = "#1151f3",
@@ -86,32 +110,6 @@ namespace RadzenBlazorDemos
             new Theme {
                 Text = "Software",
                 Value = "software",
-                Primary = "#598087",
-                Secondary = "#80a4ab",
-                Base = "#f6f7fa",
-                Header = "#ffffff",
-                Sidebar = "#3a474d",
-                Content = "#ffffff",
-                TitleText = "#28363c",
-                ContentText = "#95a4a8"
-            },
-            new Theme {
-                Text = "Fluent",
-                Premium = true,
-                Value = "fluent",
-                Primary = "#598087",
-                Secondary = "#80a4ab",
-                Base = "#f6f7fa",
-                Header = "#ffffff",
-                Sidebar = "#3a474d",
-                Content = "#ffffff",
-                TitleText = "#28363c",
-                ContentText = "#95a4a8"
-            },
-            new Theme {
-                Text = "Material Dark",
-                Premium = true,
-                Value = "material-dark",
                 Primary = "#598087",
                 Secondary = "#80a4ab",
                 Base = "#f6f7fa",
