@@ -38,6 +38,7 @@ namespace RadzenBlazorDemos
             new Theme {
                 Text = "Material Dark",
                 Value = "material-dark",
+                Premium = true,
                 Primary = "#bb86fc",
                 Secondary = "#01a299",
                 Base = "#121212",
@@ -50,6 +51,7 @@ namespace RadzenBlazorDemos
             new Theme {
                 Text = "Fluent",
                 Value = "fluent",
+                Premium = true,
                 Primary = "#0078d4",
                 Secondary = "#2b88d8",
                 Base = "#f5f5f5",
