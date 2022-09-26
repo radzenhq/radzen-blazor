@@ -19,8 +19,9 @@ namespace RadzenBlazorDemos
             public string Content { get; set; }
             public string TitleText { get; set; }
             public string ContentText { get; set; }
+            public bool Premium { get; set; }
         }
-        public static readonly Theme[] Themes = new [] 
+        public static readonly Theme[] Themes = new []
         {
             new Theme {
                 Text = "Material",
@@ -58,7 +59,7 @@ namespace RadzenBlazorDemos
                 TitleText = "#28363c",
                 ContentText = "#95a4a8"
             },
-            new Theme { 
+            new Theme {
                 Text = "Dark",
                 Value="dark",
                 Primary = "#ff6d41",
@@ -82,9 +83,35 @@ namespace RadzenBlazorDemos
                 TitleText = "#2b3a50",
                 ContentText = "#7293b6"
             },
-            new Theme { 
+            new Theme {
                 Text = "Software",
                 Value = "software",
+                Primary = "#598087",
+                Secondary = "#80a4ab",
+                Base = "#f6f7fa",
+                Header = "#ffffff",
+                Sidebar = "#3a474d",
+                Content = "#ffffff",
+                TitleText = "#28363c",
+                ContentText = "#95a4a8"
+            },
+            new Theme {
+                Text = "Fluent",
+                Premium = true,
+                Value = "fluent",
+                Primary = "#598087",
+                Secondary = "#80a4ab",
+                Base = "#f6f7fa",
+                Header = "#ffffff",
+                Sidebar = "#3a474d",
+                Content = "#ffffff",
+                TitleText = "#28363c",
+                ContentText = "#95a4a8"
+            },
+            new Theme {
+                Text = "Material Dark",
+                Premium = true,
+                Value = "material-dark",
                 Primary = "#598087",
                 Secondary = "#80a4ab",
                 Base = "#f6f7fa",

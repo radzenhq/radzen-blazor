@@ -47,6 +47,10 @@
                                 <rect width="80" height="6" fill="@context.Header"/>
                             </svg>
                             @context.Text
+                            @if (context.Premium)
+                            {
+                                <RadzenBadge>pro</RadzenBadge>
+                            }
                         </div>
                     </Template>
                 </RadzenDropDown>
