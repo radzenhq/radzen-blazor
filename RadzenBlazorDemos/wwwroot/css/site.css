@@ -319,20 +319,21 @@ body {
 }
 
 .row .logos {
-    margin: 2rem 0 0;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
+    column-gap: 80px;
+    row-gap: 48px;
+    padding: 3rem 5rem;
 }
 
 .row .logos img {
-    height: 24px;
-    margin: 0 12px 32px;
+    height: 32px;
 }
 
 .row .logos .square {
-    height: 48px;
+    height: 64px;
 }
 
 /* Radzen Features */
