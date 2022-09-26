@@ -1755,7 +1755,7 @@ namespace Radzen.Blazor
             {
                 if (settings != null)
                 {
-                    LoadSettings(settings);
+                    await LoadSettings(settings);
                 }
 
                 var args = new Radzen.DataGridRenderEventArgs<TItem>() { Grid = this, FirstRender = firstRender };
@@ -2434,7 +2434,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Load DataGrid settings saved from GetSettings() method.
         /// </summary>
-        internal void LoadSettings(DataGridSettings settings)
+        internal async Task LoadSettings(DataGridSettings settings)
         {
             if (SettingsChanged.HasDelegate)
             {
@@ -2520,7 +2520,7 @@ namespace Radzen.Blazor
                 {
                     CalculatePager();
                     UpdateColumnsOrder();
-                    Reload();
+                    await Reload();
                 }
             }
         }
