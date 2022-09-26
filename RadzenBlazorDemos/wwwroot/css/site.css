@@ -242,6 +242,15 @@ body {
     text-decoration: none;
 }
 
+#popup-themes {
+    width: 300px !important;
+    height: 400px;
+}
+
+#popup-themes .rz-dropdown-items-wrapper {
+    max-height: 400px !important;
+}
+
 /* CTA Buttons */
 
 .cta-strip {

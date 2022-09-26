@@ -19,8 +19,9 @@ namespace RadzenBlazorDemos
             public string Content { get; set; }
             public string TitleText { get; set; }
             public string ContentText { get; set; }
+            public bool Premium { get; set; }
         }
-        public static readonly Theme[] Themes = new [] 
+        public static readonly Theme[] Themes = new []
         {
             new Theme {
                 Text = "Material",
@@ -33,6 +34,32 @@ namespace RadzenBlazorDemos
                 Content = "#ffffff",
                 TitleText = "#212121",
                 ContentText = "#bdbdbd"
+            },
+            new Theme {
+                Text = "Material Dark",
+                Value = "material-dark",
+                Premium = true,
+                Primary = "#bb86fc",
+                Secondary = "#01a299",
+                Base = "#121212",
+                Header = "#333333",
+                Sidebar = "#252525",
+                Content = "#252525",
+                TitleText = "#ffffff",
+                ContentText = "#a0a0a0"
+            },
+            new Theme {
+                Text = "Fluent",
+                Value = "fluent",
+                Premium = true,
+                Primary = "#0078d4",
+                Secondary = "#2b88d8",
+                Base = "#f5f5f5",
+                Header = "white",
+                Sidebar = "gray",
+                Content = "white",
+                TitleText = "black",
+                ContentText = "black"
             },
             new Theme {
                 Text = "Standard",
@@ -58,7 +85,7 @@ namespace RadzenBlazorDemos
                 TitleText = "#28363c",
                 ContentText = "#95a4a8"
             },
-            new Theme { 
+            new Theme {
                 Text = "Dark",
                 Value="dark",
                 Primary = "#ff6d41",
@@ -82,7 +109,7 @@ namespace RadzenBlazorDemos
                 TitleText = "#2b3a50",
                 ContentText = "#7293b6"
             },
-            new Theme { 
+            new Theme {
                 Text = "Software",
                 Value = "software",
                 Primary = "#598087",
