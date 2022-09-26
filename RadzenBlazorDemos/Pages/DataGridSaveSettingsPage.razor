@@ -4,8 +4,9 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 @using RadzenBlazorDemos.Services
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 
-@inject DataGridSettingsService settingsService
+@inject ProtectedSessionStorage ProtectedSessionStore
 
 @inherits DbContextPage
 
@@ -16,8 +17,8 @@
 <RadzenExample Name="DataGrid" Source="DataGridSaveSettings" Heading="false">
     <p>This example shows how to save/load DataGrid state using Settings property.</p>
     <p>The state includes current page index, page size, groups and columns filter, sort, order, width and visibility.</p>
-    <RadzenButton Click="@(args => settingsService.Settings = null)" Text="Clear saved settings" Style="margin-bottom: 16px" />
-    <RadzenDataGrid @bind-Settings="@settingsService.Settings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
+    <RadzenButton Click="@(args => Settings = null)" Text="Clear saved settings" Style="margin-bottom: 16px" />
+    <RadzenDataGrid @bind-Settings="@Settings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
                     AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" 
                     AllowColumnResize="true" ColumnWidth="200px"
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@employees" TItem="Employee">
@@ -48,5 +49,45 @@
         base.OnInitialized();
 
         employees = dbContext.Employees;
+    }
+
+    DataGridSettings _settings;
+    public DataGridSettings Settings 
+    { 
+        get
+        {
+            return _settings;
+        }
+        set
+        {
+            if (_settings != value)
+            {
+                _settings = value;
+                InvokeAsync(SaveStateAsync);
+            }
+        }
+    }
+
+    private async Task LoadStateAsync()
+    {
+        var result = await ProtectedSessionStore.GetAsync<DataGridSettings>("Settings");
+        if (result.Success)
+        {
+            _settings = result.Value;
+        }
+    }
+
+    private async Task SaveStateAsync()
+    {
+        await ProtectedSessionStore.SetAsync("Settings", _settings);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadStateAsync();
+            StateHasChanged();
+        }
     }
 }
