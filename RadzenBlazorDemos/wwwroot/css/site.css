@@ -323,13 +323,13 @@ body {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-around;
-    column-gap: 80px;
+    column-gap: 32px;
     row-gap: 48px;
     padding: 3rem 5rem;
 }
 
 .row .logos img {
-    height: 32px;
+    height: 28px;
 }
 
 .row .logos .square {
