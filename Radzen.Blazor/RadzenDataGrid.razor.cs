@@ -2478,7 +2478,7 @@ namespace Radzen.Blazor
                             // Filtering
                             if (gridColumn.GetFilterValue() != column.FilterValue)
                             {
-                                gridColumn.SetFilterValue(GetFilterValue(column.FilterValue));
+                                gridColumn.SetFilterValue(GetFilterValue(column.FilterValue, gridColumn.FilterPropertyType));
                                 shouldUpdateState = true;
                             }
 
@@ -2490,7 +2490,7 @@ namespace Radzen.Blazor
 
                             if (gridColumn.GetSecondFilterValue() != column.SecondFilterValue)
                             {
-                                gridColumn.SetFilterValue(GetFilterValue(column.SecondFilterValue), true);
+                                gridColumn.SetFilterValue(GetFilterValue(column.SecondFilterValue, gridColumn.FilterPropertyType), true);
                                 shouldUpdateState = true;
                             }
                         }
@@ -2520,17 +2520,48 @@ namespace Radzen.Blazor
                 {
                     CalculatePager();
                     UpdateColumnsOrder();
-                    StateHasChanged();
+                    Reload();
                 }
             }
         }
 
-        object GetFilterValue(object value)
+        object GetFilterValue(object value, Type type)
         {
             if (value != null && value is JsonElement)
             {
                 var element = (JsonElement)value;
-                return element.GetRawText().Replace("\"", "");
+                if (type == typeof(Int16) || type == typeof(Int16?))
+                {
+                    return element.GetInt16();
+                }
+                else if (type == typeof(Int32) || type == typeof(Int32?))
+                {
+                    return element.GetInt32();
+                }
+                else if (type == typeof(Int64) || type == typeof(Int64?))
+                {
+                    return element.GetInt64();
+                }
+                else if (type == typeof(double) || type == typeof(double?))
+                {
+                    return element.GetDouble();
+                }
+                else if (type == typeof(bool) || type == typeof(bool?))
+                {
+                    return element.GetBoolean();
+                }
+                else if (type == typeof(DateTime) || type == typeof(DateTime?))
+                {
+                    return element.GetDateTime();
+                }
+                else if (type == typeof(DateTime) || type == typeof(DateTime?))
+                {
+                    return element.GetDateTime();
+                }
+                else
+                {
+                    return element.GetRawText().Replace("\"", "");
+                }
             }
             else
             {

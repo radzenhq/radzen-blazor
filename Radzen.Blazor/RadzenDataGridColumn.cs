@@ -607,6 +607,9 @@ namespace Radzen.Blazor
 
         Type _filterPropertyType;
 
+        /// <summary>
+        /// Gets the filter property type.
+        /// </summary>
         public Type FilterPropertyType
         {
             get
