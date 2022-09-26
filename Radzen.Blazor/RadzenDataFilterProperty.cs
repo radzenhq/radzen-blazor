@@ -160,7 +160,10 @@ namespace Radzen.Blazor
 
         Type _filterPropertyType;
 
-        internal Type FilterPropertyType
+        /// <summary>
+        /// Gets the filter property type.
+        /// </summary>
+        public Type FilterPropertyType
         {
             get
             {
@@ -241,7 +244,8 @@ namespace Radzen.Blazor
             SetFilterOperator(null);
 
             FilterValue = null;
-            FilterOperator = typeof(System.Collections.IEnumerable).IsAssignableFrom(FilterPropertyType) ? FilterOperator.Contains : default(FilterOperator);
+            var defaultOperator = typeof(System.Collections.IEnumerable).IsAssignableFrom(FilterPropertyType) ? FilterOperator.Contains : default(FilterOperator);
+            FilterOperator = GetFilterOperators().Contains(defaultOperator) ? defaultOperator : GetFilterOperators().FirstOrDefault();
         }
 
         /// <summary>
@@ -267,7 +271,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Get possible property filter operators.
         /// </summary>
-        public IEnumerable<FilterOperator> GetFilterOperators()
+        public virtual IEnumerable<FilterOperator> GetFilterOperators()
         {
             if (PropertyAccess.IsEnum(FilterPropertyType))
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals };

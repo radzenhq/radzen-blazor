@@ -6,7 +6,7 @@
 
 @inject NorthwindContext dbContext
 
-<RadzenExample Name="DataFilter">
+<RadzenExample Name="DataFilter" AdditionalSourceCodePages=@(new List<string>() { "MyCustomDataGridProperty.razor" })>
 <div class="container-fluid">
     <div class="row">
         <div class="col">
@@ -20,7 +20,7 @@
                     <Properties>
                         <RadzenDataFilterProperty TItem="Order" Property="OrderID" Title="Order ID" />
                         <RadzenDataFilterProperty TItem="Order" Property="Employee.LastName" Title="Employee Last Name" />
-                        <RadzenDataFilterProperty TItem="Order" Property="OrderDate" Title="Order Date" />
+                        <MyCustomDataFilterProperty TItem="Order" Property="OrderDate" Title="Order Date" />
                         <RadzenDataFilterProperty TItem="Order" Property="Freight" Title="Freight" />
                     </Properties>
                 </RadzenDataFilter>

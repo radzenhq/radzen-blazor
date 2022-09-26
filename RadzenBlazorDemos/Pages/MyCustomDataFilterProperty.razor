@@ -1,0 +1,18 @@
+@typeparam TItem
+@inherits RadzenDataFilterProperty<TItem>
+
+@code {
+    public override IEnumerable<FilterOperator> GetFilterOperators()
+    {
+        var operators = base.GetFilterOperators();
+
+        if (FilterPropertyType == typeof(DateTime?))
+        {
+            operators = operators.Where(o => 
+                o != FilterOperator.IsNull && o != FilterOperator.IsNotNull && 
+                o != FilterOperator.Equals && o != FilterOperator.NotEquals);
+        }
+
+        return operators;
+    }
+}

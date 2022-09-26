@@ -114,7 +114,9 @@ else
         property = DataFilter.properties.Where(c => object.Equals(c.Property, p)).FirstOrDefault();
 
         Filter.FilterValue = null;
-        Filter.FilterOperator = property.FilterPropertyType == typeof(string) ? FilterOperator.Contains : FilterOperator.Equals;
+
+        var defaultOperator = typeof(System.Collections.IEnumerable).IsAssignableFrom(property.FilterPropertyType) ? FilterOperator.Contains : default(FilterOperator);
+        Filter.FilterOperator = property.GetFilterOperators().Contains(defaultOperator) ? defaultOperator : property.GetFilterOperators().FirstOrDefault();
 
         await ApplyFilter();
     }
