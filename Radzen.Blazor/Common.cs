@@ -38,17 +38,6 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Settings service used to Save/Load DataGrid settings.
-    /// </summary>
-    public partial class DataGridSettingsService
-    {
-        /// <summary>
-        /// DataGrid settings.
-        /// </summary>
-        public DataGridSettings Settings { get; set; }
-    }
-
-    /// <summary>
     /// DataGrid column settings class used to Save/Load settings.
     /// </summary>
     public class DataGridColumnSettings
