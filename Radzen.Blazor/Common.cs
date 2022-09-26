@@ -31,6 +31,10 @@ namespace Radzen
         /// CurrentPage.
         /// </summary>
         public int? CurrentPage { get; set; }
+        /// <summary>
+        /// PageSize.
+        /// </summary>
+        public int? PageSize { get; set; }
     }
 
     /// <summary>

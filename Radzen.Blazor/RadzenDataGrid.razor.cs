@@ -2423,6 +2423,7 @@ namespace Radzen.Blazor
                         SecondFilterOperator = c.GetSecondFilterOperator(),
                     }).ToList(),
                     CurrentPage = CurrentPage,
+                    PageSize = PageSize,
                     Groups = Groups
                 };
 
@@ -2506,6 +2507,12 @@ namespace Radzen.Blazor
                 if (settings.CurrentPage != null && settings.CurrentPage != CurrentPage)
                 {
                     CurrentPage = settings.CurrentPage.Value;
+                    shouldUpdateState = true;
+                }
+
+                if (settings.PageSize != null && settings.PageSize != PageSize)
+                {
+                    PageSize = settings.PageSize.Value;
                     shouldUpdateState = true;
                 }
 
