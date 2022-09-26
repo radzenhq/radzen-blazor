@@ -6,8 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -398,7 +400,7 @@ namespace Radzen.Blazor
             if (selectedColumns == null)
                 return;
 
-            var columnsList = (IList<RadzenDataGridColumn<TItem>>)selectedColumns;
+            var columnsList = ((IEnumerable<RadzenDataGridColumn<TItem>>)selectedColumns).ToList();
             if (visible)
             {
                 if (!columnsList.Contains(column))
@@ -452,6 +454,7 @@ namespace Radzen.Blazor
             }
 
             PickedColumnsChanged.InvokeAsync(new DataGridPickedColumnsChangedEventArgs<TItem>() { Columns = selected });
+            SaveSettings();
         }
 
         /// <summary>
@@ -573,6 +576,8 @@ namespace Radzen.Blazor
                         LogicalFilterOperator = column.GetLogicalFilterOperator()
                     });
 
+                    SaveSettings();
+
                     if (LoadData.HasDelegate && IsVirtualizationAllowed())
                     {
                         Data = null;
@@ -622,6 +627,7 @@ namespace Radzen.Blazor
                     SetColumnSortOrder(column);
 
                     Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
+                    SaveSettings();
 
                     if (LoadData.HasDelegate && IsVirtualizationAllowed())
                     {
@@ -1140,6 +1146,8 @@ namespace Radzen.Blazor
                         NewIndex = actualColumnIndexTo
                     });
 
+                    SaveSettings();
+
                     StateHasChanged();
                 }
 
@@ -1162,6 +1170,7 @@ namespace Radzen.Blazor
                 Column = column,
                 Width = value,
             });
+            SaveSettings();
         }
 
         internal string GetOrderBy()
@@ -1483,8 +1492,13 @@ namespace Radzen.Blazor
 
             if (resetColumnState)
             {
-                allColumns.ToList().ForEach(c => c.ClearFilters());
-                allColumns.ToList().ForEach(c => { c.ResetSortOrder(); });
+                allColumns.ToList().ForEach(c => 
+                { 
+                    c.ClearFilters(); 
+                    c.ResetSortOrder();
+                    c.SetOrderIndex(null);
+                    c.SetWidth(null);
+                });
                 sorts.Clear();
            }
         }
@@ -1739,6 +1753,11 @@ namespace Radzen.Blazor
 
             if (Visible)
             {
+                if (settings != null)
+                {
+                    LoadSettings(settings);
+                }
+
                 var args = new Radzen.DataGridRenderEventArgs<TItem>() { Grid = this, FirstRender = firstRender };
 
                 if (Render != null)
@@ -2134,7 +2153,7 @@ namespace Radzen.Blazor
             {
                 foreach (var c in allColumns.ToList().Where(c => c != column))
                 {
-                    c.SetSortOrder(null);
+                    c.SetSortOrderInternal(null);
                 }
                 sorts.Clear();
             }
@@ -2147,17 +2166,17 @@ namespace Radzen.Blazor
 
             if (column.GetSortOrder() == null)
             {
-                column.SetSortOrder(SortOrder.Ascending);
+                column.SetSortOrderInternal(SortOrder.Ascending);
                 descriptor.SortOrder = SortOrder.Ascending;
             }
             else if (column.GetSortOrder() == SortOrder.Ascending)
             {
-                column.SetSortOrder(SortOrder.Descending);
+                column.SetSortOrderInternal(SortOrder.Descending);
                 descriptor.SortOrder = SortOrder.Descending;
             }
             else if (column.GetSortOrder() == SortOrder.Descending)
             {
-                column.SetSortOrder(null);
+                column.SetSortOrderInternal(null);
                 if (sorts.Where(d => d.Property == column?.GetSortProperty()).Any())
                 {
                     sorts.Remove(descriptor);
@@ -2253,6 +2272,7 @@ namespace Radzen.Blazor
                         _groupedPagedView = null;
 
                         await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = descriptor });
+                        SaveSettings();
 
                         if (IsVirtualizationAllowed())
                         {
@@ -2279,6 +2299,7 @@ namespace Radzen.Blazor
             {
                 SetColumnSortOrder(column);
                 Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
+                SaveSettings();
             }
 
             if (LoadData.HasDelegate && IsVirtualizationAllowed())
@@ -2301,10 +2322,11 @@ namespace Radzen.Blazor
 
             if (column != null)
             {
-                column.SetSortOrder(SortOrder.Ascending);
+                column.SetSortOrderInternal(SortOrder.Ascending);
                 SetColumnSortOrder(column);
 
                 Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
+                SaveSettings();
             }
 
             if (LoadData.HasDelegate && IsVirtualizationAllowed())
@@ -2378,5 +2400,177 @@ namespace Radzen.Blazor
         }
 
         internal int deepestChildColumnLevel;
+
+        /// <summary>
+        /// Gets DataGrid settings as JSON string.
+        /// </summary>
+        internal void SaveSettings()
+        {
+            if (SettingsChanged.HasDelegate)
+            {
+                settings = new DataGridSettings()
+                {
+                    Columns = ColumnsCollection.ToList().Select(c => new DataGridColumnSettings()
+                    {
+                        Property = c.Property,
+                        Width = c.GetWidth(),
+                        Visible = c.GetVisible(),
+                        OrderIndex = c.GetOrderIndex(),
+                        SortOrder = c.GetSortOrder(),
+                        FilterValue = c.GetFilterValue(),
+                        FilterOperator = c.GetFilterOperator(),
+                        SecondFilterValue = c.GetSecondFilterValue(),
+                        SecondFilterOperator = c.GetSecondFilterOperator(),
+                    }).ToList(),
+                    CurrentPage = CurrentPage,
+                    Groups = Groups
+                };
+
+                SettingsChanged.InvokeAsync(settings);
+            }
+        }
+
+        /// <summary>
+        /// Load DataGrid settings saved from GetSettings() method.
+        /// </summary>
+        internal void LoadSettings(DataGridSettings settings)
+        {
+            if (SettingsChanged.HasDelegate)
+            {
+                var shouldUpdateState = false;
+
+                if (settings.Columns != null)
+                {
+                    foreach (var column in settings.Columns)
+                    {
+                        var gridColumn = ColumnsCollection.Where(c => c.Property == column.Property).FirstOrDefault();
+                        if (gridColumn != null)
+                        {
+                            // Visibility
+                            if (gridColumn.GetVisible() != column.Visible)
+                            {
+                                gridColumn.SetVisible(column.Visible);
+                                shouldUpdateState = true;
+                            }
+
+                            // Width
+                            if (gridColumn.GetWidth() != column.Width)
+                            {
+                                gridColumn.SetWidth(column.Width);
+                                shouldUpdateState = true;
+                            }
+
+                            // OrderIndex
+                            if (gridColumn.GetOrderIndex() != column.OrderIndex)
+                            {
+                                gridColumn.SetOrderIndex(column.OrderIndex);
+                                shouldUpdateState = true;
+                            }
+
+                            // Sorting
+                            if (gridColumn.GetSortOrder() != column.SortOrder)
+                            {
+                                gridColumn.SetSortOrder(column.SortOrder);
+                                shouldUpdateState = true;
+                            }
+
+                            // Filtering
+                            if (gridColumn.GetFilterValue() != column.FilterValue)
+                            {
+                                gridColumn.SetFilterValue(GetFilterValue(column.FilterValue));
+                                shouldUpdateState = true;
+                            }
+
+                            if (gridColumn.GetFilterOperator() != column.FilterOperator)
+                            {
+                                gridColumn.SetFilterOperator(column.FilterOperator);
+                                shouldUpdateState = true;
+                            }
+
+                            if (gridColumn.GetSecondFilterValue() != column.SecondFilterValue)
+                            {
+                                gridColumn.SetFilterValue(GetFilterValue(column.SecondFilterValue), true);
+                                shouldUpdateState = true;
+                            }
+                        }
+                    }
+                }
+
+                if (settings.Groups != null && !settings.Groups.SequenceEqual(Groups))
+                {
+                    Groups.Clear();
+                    settings.Groups.ToList().ForEach(Groups.Add);
+                    shouldUpdateState = true;
+                }
+
+                if (settings.CurrentPage != null && settings.CurrentPage != CurrentPage)
+                {
+                    CurrentPage = settings.CurrentPage.Value;
+                    shouldUpdateState = true;
+                }
+
+                if (shouldUpdateState)
+                {
+                    CalculatePager();
+                    UpdateColumnsOrder();
+                    StateHasChanged();
+                }
+            }
+        }
+
+        object GetFilterValue(object value)
+        {
+            if (value != null && value is JsonElement)
+            {
+                var element = (JsonElement)value;
+                return element.GetRawText().Replace("\"", "");
+            }
+            else
+            {
+                return value;
+            }
+        }
+
+        DataGridSettings settings;
+
+        /// <summary>
+        /// Gets or sets DataGrid settings.
+        /// </summary>
+        [Parameter]
+        public DataGridSettings Settings
+        {
+            get
+            {
+                return settings;
+            }
+            set
+            {
+                if (settings != value)
+                {
+                    settings = value;
+
+                    if (settings == null)
+                    {
+                        Groups.Clear();
+                        CurrentPage = 0;
+                        Reset();
+                        InvokeAsync(Reload);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the settings changed callback.
+        /// </summary>
+        /// <value>The settings callback.</value>
+        [Parameter]
+        public EventCallback<DataGridSettings> SettingsChanged { get; set; }
+
+        async Task ChangePage(PagerEventArgs args)
+        {
+            await OnPageChanged(args);
+            SaveSettings();
+        }
     }
 }

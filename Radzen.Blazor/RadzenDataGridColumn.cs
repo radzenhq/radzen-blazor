@@ -193,6 +193,11 @@ namespace Radzen.Blazor
         internal void SetVisible(bool? value)
         {
             _visible = value;
+
+            if (Grid != null)
+            {
+                Grid.UpdatePickableColumn(this, _visible == true);
+            }
         }
 
         /// <summary>
@@ -523,6 +528,42 @@ namespace Radzen.Blazor
         }
 
         internal void SetSortOrder(SortOrder? order)
+        {
+            var descriptor = Grid.sorts.Where(d => d.Property == GetSortProperty()).FirstOrDefault();
+            if (descriptor == null)
+            {
+                descriptor = new SortDescriptor() { Property = GetSortProperty() };
+            }
+
+            if (GetSortOrder() == null)
+            {
+                SetSortOrderInternal(Radzen.SortOrder.Ascending);
+                descriptor.SortOrder = Radzen.SortOrder.Ascending;
+            }
+            else if (GetSortOrder() == Radzen.SortOrder.Ascending)
+            {
+                SetSortOrderInternal(Radzen.SortOrder.Descending);
+                descriptor.SortOrder = Radzen.SortOrder.Descending;
+            }
+            else if (GetSortOrder() == Radzen.SortOrder.Descending)
+            {
+                SetSortOrderInternal(null);
+                if (Grid.sorts.Where(d => d.Property == GetSortProperty()).Any())
+                {
+                    Grid.sorts.Remove(descriptor);
+                }
+                descriptor = null;
+            }
+
+            if (descriptor != null && !Grid.sorts.Where(d => d.Property == GetSortProperty()).Any())
+            {
+                Grid.sorts.Add(descriptor);
+            }
+
+            sortOrder = new SortOrder?[] { order };
+        }
+
+        internal void SetSortOrderInternal(SortOrder? order)
         {
             sortOrder = new SortOrder?[] { order };
         }
