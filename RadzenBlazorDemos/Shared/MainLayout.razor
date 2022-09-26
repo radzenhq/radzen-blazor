@@ -28,7 +28,7 @@
                     <a href="/docs/" title="Radzen Blazor Components Documentation" class="mx-2 mx-lg-3" target="_blank">Documentation</a>
                     <a href="https://www.radzen.com/" title="Create .NET Core web applications fast & easy" class="text-nowrap mx-2 mx-lg-3" target="_blank">About Radzen</a>
                 </div>
-                <RadzenDropDown class="mx-0 mx-lg-3" style="width: 220px;" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@ThemeService.Themes" Value="@ThemeService.CurrentTheme" Change="@ChangeTheme" >
+                <RadzenDropDown class="mx-0 mx-lg-3" id="themes" style="width: 220px;" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@ThemeService.Themes" Value="@ThemeService.CurrentTheme" Change="@ChangeTheme" >
                     <ValueTemplate>
                         @context.Text Theme
                     </ValueTemplate>
