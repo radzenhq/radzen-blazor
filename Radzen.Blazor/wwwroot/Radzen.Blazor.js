@@ -807,7 +807,8 @@ window.Radzen = {
 
     Radzen[id] = function (e) {
         if(e.type == 'contextmenu' || !e.target || !closeOnDocumentClick) return;
-        if (!/Android/i.test(navigator.userAgent) && e.type == 'resize') {
+        if (!/Android/i.test(navigator.userAgent) &&
+            !['input', 'textarea'].includes(document.activeElement ? document.activeElement.tagName.toLowerCase() : '') && e.type == 'resize') {
             Radzen.closePopup(id, instance, callback);
             return;
         }
