@@ -42,7 +42,8 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
 
   .rz-widget-content {
     flex: 1;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   ul {
