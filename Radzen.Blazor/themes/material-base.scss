@@ -318,8 +318,8 @@ $menu-item-hover-background-color: var(--rz-base-100) !default;
 $menu-item-hover-color: var(--rz-base-900) !default;
 $menu-top-item-padding: 0.5rem 1rem !default;
 $menu-top-item-hover-color: var(--rz-primary) !default;
-$menu-top-item-hover-background-color: var(--rz-base-background-color) !default;
-$menu-top-item-background-color: var(--rz-base-background-color) !default;
+$menu-top-item-background-color: transparent !default;
+$menu-top-item-hover-background-color: $menu-top-item-background-color !default;
 $context-menu-padding: 0.5rem 0 !default;
 $context-menu-box-shadow: var(--rz-shadow-6) !default;
 
