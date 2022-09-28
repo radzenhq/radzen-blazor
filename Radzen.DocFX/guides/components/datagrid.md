@@ -208,7 +208,7 @@ Use `Template`, `FooterTemplate` and `HeaderTemplate` to specify custom template
         <Template Context="data">
             @(orders.IndexOf(data) + 1)
         </Template>
-            <FooterTemplate>
+        <FooterTemplate>
             Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
         </FooterTemplate>
     </RadzenDataGridColumn>
