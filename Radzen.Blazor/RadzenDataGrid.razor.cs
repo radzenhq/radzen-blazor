@@ -400,7 +400,7 @@ namespace Radzen.Blazor
             if (selectedColumns == null)
                 return;
 
-            var columnsList = ((IEnumerable<RadzenDataGridColumn<TItem>>)selectedColumns).ToList();
+            var columnsList = ((IEnumerable<object>)selectedColumns).ToList();
             if (visible)
             {
                 if (!columnsList.Contains(column))
