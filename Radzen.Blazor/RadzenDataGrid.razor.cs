@@ -2614,7 +2614,11 @@ namespace Radzen.Blazor
                     {
                         Groups.Clear();
                         CurrentPage = 0;
-                        Reset();
+                        Reset(true);
+                        allColumns.ToList().ForEach(c =>
+                        {
+                            c.SetVisible(true);
+                        });
                         InvokeAsync(Reload);
                     }
                 }
