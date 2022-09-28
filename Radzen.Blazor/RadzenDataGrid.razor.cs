@@ -1237,7 +1237,6 @@ namespace Radzen.Blazor
 
                     var viewList = view.ToList();
                     var countWithChildren = viewList.Count + childData.SelectMany(d => d.Value.Data).Count();
-                    var level = 0;
 
                     for (int i = 0; i < countWithChildren; i++)
                     {
@@ -1245,7 +1244,14 @@ namespace Radzen.Blazor
 
                         if (item != null && childData.ContainsKey(item))
                         {
-                            level++;
+                            var level = 1;
+                            var parentChildData = childData[item].ParentChildData;
+                            while (parentChildData != null)
+                            {
+                                parentChildData = parentChildData.ParentChildData;
+                                level++;
+                            }
+
                             childData[item].Level = level;
 
                             var cd = childData[item].Data.AsQueryable().Where<TItem>(allColumns);
@@ -1818,7 +1824,7 @@ namespace Radzen.Blazor
 
                 if (args.Data != null && !childData.ContainsKey(item))
                 {
-                    childData.Add(item, new DataGridChildData<TItem>() { Data = args.Data });
+                    childData.Add(item, new DataGridChildData<TItem>() { Data = args.Data, ParentChildData = childData.Where(c => c.Value.Data.Contains(item)).Select(c => c.Value).FirstOrDefault() });
                     _view = null;
                 }
             }

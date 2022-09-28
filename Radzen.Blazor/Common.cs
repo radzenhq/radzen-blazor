@@ -1478,6 +1478,7 @@ namespace Radzen
 
     internal class DataGridChildData<T>
     {
+        internal DataGridChildData<T> ParentChildData { get; set; }
         internal int Level { get; set; }
         internal IEnumerable<T> Data { get; set; }
     }
