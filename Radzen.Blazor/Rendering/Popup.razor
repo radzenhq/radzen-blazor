@@ -1,6 +1,6 @@
 @inherits RadzenComponent
 @using Microsoft.JSInterop
-<div @ref=@Element @onmousedown:preventDefault @attributes=@Attributes style=@Style id=@GetId()>
+<div @ref=@Element onmousedown="Radzen.preventPopupDefault(event)" @attributes=@Attributes style=@Style id=@GetId()>
     @if (open || !Lazy)
     {
         @ChildContent
