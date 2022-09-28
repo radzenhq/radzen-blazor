@@ -11,7 +11,7 @@
         <div class="rz-helper-hidden-accessible">
             <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" />
         </div>
-        @if (AllowFiltering || Multiple)
+        @if (AllowFiltering || (Multiple && AllowSelectAll))
         {
             <div class=" rz-listbox-header rz-helper-clearfix rz-listbox-header-w-checkbox">
                 @if (Multiple)
@@ -27,7 +27,7 @@
                         </div>
                     </div>
                     }
-                    @if (!AllowFiltering && !string.IsNullOrEmpty(Placeholder))
+                    @if (AllowSelectAll && !AllowFiltering && !string.IsNullOrEmpty(Placeholder))
                     {
                         <label for="@($"{UniqueID}sa")" class="rz-dropdown-label rz-inputtext" style="width:100%;">@Placeholder</label>
                     }

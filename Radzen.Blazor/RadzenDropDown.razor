@@ -99,7 +99,7 @@
                     <span class="rz-dropdown-filter-icon rzi rzi-search"></span>
                 </div>
             }
-            @if (Multiple)
+            @if (Multiple && (AllowSelectAll || AllowFiltering))
             {
                 <div class=" rz-multiselect-header rz-helper-clearfix" @onclick:preventDefault>
                     @if(AllowSelectAll)
@@ -113,7 +113,7 @@
                         </div>
                     </div>
                     }
-                    @if (!AllowFiltering && !string.IsNullOrEmpty(SelectAllText))
+                    @if (AllowSelectAll && !AllowFiltering && !string.IsNullOrEmpty(SelectAllText))
                     {
                         <span style="cursor:pointer" @onclick="@SelectAll">@SelectAllText</span>
                     }

@@ -1067,6 +1067,13 @@ namespace Radzen.Blazor
         public string ColumnsText { get; set; } = "Columns";
 
         /// <summary>
+        /// Gets or sets a value indicating whether user can pick all columns in column picker.
+        /// </summary>
+        /// <value><c>true</c> if pick of all columns is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowPickAllColumns { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets a value indicating whether grouping is allowed.
         /// </summary>
         /// <value><c>true</c> if grouping is allowed; otherwise, <c>false</c>.</value>
