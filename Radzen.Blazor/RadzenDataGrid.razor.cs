@@ -662,6 +662,16 @@ namespace Radzen.Blazor
 
             column.ClearFilters();
 
+            var settingColumn = Settings?.Columns.Where(c => c.Property == column.Property).FirstOrDefault();
+            if (settingColumn != null)
+            {
+                settingColumn.FilterValue = null;
+                settingColumn.FilterValue = null;
+                settingColumn.SecondFilterValue = null;
+                settingColumn.FilterOperator = typeof(System.Collections.IEnumerable).IsAssignableFrom(column.FilterPropertyType) ? FilterOperator.Contains : default(FilterOperator);
+                settingColumn.SecondFilterOperator = default(FilterOperator);
+            }
+
             skip = 0;
             CurrentPage = 0;
 
