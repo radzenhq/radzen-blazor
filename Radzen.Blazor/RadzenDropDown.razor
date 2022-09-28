@@ -102,6 +102,8 @@
             @if (Multiple)
             {
                 <div class=" rz-multiselect-header rz-helper-clearfix" @onclick:preventDefault>
+                    @if(AllowSelectAll)
+                    {
                     <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)" @onclick="@SelectAll">
                         <div class="rz-helper-hidden-accessible">
                             <input readonly="readonly" type="checkbox">
@@ -110,6 +112,7 @@
                             <span class="@(IsAllSelected() ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
                         </div>
                     </div>
+                    }
                     @if (!AllowFiltering && !string.IsNullOrEmpty(SelectAllText))
                     {
                         <span style="cursor:pointer" @onclick="@SelectAll">@SelectAllText</span>

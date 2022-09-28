@@ -195,6 +195,13 @@ namespace Radzen
         public bool Multiple { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the user can select all values in multiple selection. Set to <c>true</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if select all values is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowSelectAll { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the template.
         /// </summary>
         /// <value>The template.</value>
