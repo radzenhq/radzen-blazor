@@ -134,11 +134,6 @@ window.Radzen = {
     e.preventDefault();
     e.stopPropagation();
   },
-  preventPopupDefault: function (e) {
-    if (!['input', 'textarea'].includes(e.target.tagName.toLowerCase())) {
-        e.preventDefault();
-    }
-  },
   preventArrows: function (el) {
     var preventDefault = function (e) {
       if (e.keyCode === 38 || e.keyCode === 40) {
