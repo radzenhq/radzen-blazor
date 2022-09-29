@@ -20,9 +20,12 @@ $menu-top-item-color: $menu-item-color !default;
 $menu-top-item-background-color: $menu-background-color !default;
 $menu-top-item-hover-color: var(--rz-secondary) !default;
 $menu-top-item-hover-background-color: transparent !default;
+$menu-top-item-selected-color: var(--rz-secondary) !default;
+$menu-top-item-icon-color: $menu-item-selected-color !default;
+$menu-top-item-icon-hover-color: $menu-top-item-hover-color !default;
 
 $context-menu-padding: 0 !default;
-$context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
+$context-menu-box-shadow: $rz-shadow-3 !default;
 
 // Menu CSS variables
 
@@ -49,6 +52,9 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
   --rz-menu-top-item-background-color: #{$menu-top-item-background-color};
   --rz-menu-top-item-hover-color: #{$menu-top-item-hover-color};
   --rz-menu-top-item-hover-background-color: #{$menu-top-item-hover-background-color};
+  --rz-menu-top-item-selected-color: #{$menu-top-item-selected-color};
+  --rz-menu-top-item-icon-color: #{$menu-top-item-icon-color};
+  --rz-menu-top-item-icon-hover-color: #{$menu-top-item-icon-hover-color};
 
   --rz-context-menu-padding: #{$context-menu-padding};
   --rz-context-menu-box-shadow: #{$context-menu-box-shadow};
@@ -64,21 +70,12 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
   border-radius: var(--rz-menu-border-radius);
 }
 
-.rz-menu:not(.rz-profile-menu) {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  background-color: var(--rz-menu-top-item-background-color);
-
-  .rz-context-menu & {
-    padding: var(--rz-context-menu-padding);
-  }
+.rz-context-menu .rz-menu:not(.rz-profile-menu) {
+  align-items: stretch;
+  background-color: var(--rz-menu-background-color);
 
   .rz-navigation-item-link {
-    color: var(--rz-menu-top-item-color);
-    white-space: nowrap;
+    color: var(--rz-menu-item-color);
 
     .rzi:not(.rz-navigation-item-icon-children) {
       color: var(--rz-menu-item-icon-color);
@@ -86,18 +83,18 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
   }
 
   .rz-navigation-item-wrapper {
-    border-radius: var(--rz-menu-top-item-border-radius);;
+    border-radius: var(--rz-menu-item-border-radius);;
 
     .rz-navigation-item-link {
-      padding: var(--rz-menu-top-item-padding);
+      padding: var(--rz-menu-item-padding);
 
     }
 
     &:hover {
-      background-color: var(--rz-menu-top-item-hover-background-color);
+      background-color: var(--rz-menu-item-hover-background-color);
 
       .rz-navigation-item-link {
-        color: var(--rz-menu-top-item-hover-color);
+        color: var(--rz-menu-item-hover-color);
 
         .rzi:not(.rz-navigation-item-icon-children) {
           color: var(--rz-menu-item-icon-hover-color);
@@ -119,13 +116,74 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
   > .rz-navigation-item {
     > .rz-navigation-item-wrapper-active {
       &:before {
+       display: none;
+      }
+    }
+  }
+}
+
+.rz-menu:not(.rz-profile-menu) {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  background-color: var(--rz-menu-top-item-background-color);
+
+  .rz-context-menu & {
+    padding: var(--rz-context-menu-padding);
+  }
+
+  .rz-navigation-item-link {
+    color: var(--rz-menu-top-item-color);
+    white-space: nowrap;
+
+    .rzi:not(.rz-navigation-item-icon-children) {
+      color: var(--rz-menu-top-item-icon-color);
+    }
+  }
+
+  .rz-navigation-item-wrapper {
+    border-radius: var(--rz-menu-top-item-border-radius);;
+
+    .rz-navigation-item-link {
+      padding: var(--rz-menu-top-item-padding);
+
+    }
+
+    &:hover {
+      background-color: var(--rz-menu-top-item-hover-background-color);
+
+      .rz-navigation-item-link {
+        color: var(--rz-menu-top-item-hover-color);
+
+        .rzi:not(.rz-navigation-item-icon-children) {
+          color: var(--rz-menu-top-item-icon-hover-color);
+        }
+      }
+    }
+  }
+
+  .rz-navigation-item-wrapper-active {
+    .rz-navigation-item-link {
+      color: var(--rz-menu-top-item-selected-color);
+
+      .rzi:not(.rz-navigation-item-icon-children) {
+        color: var(--rz-menu-top-item-selected-color);
+      }
+    }
+  }
+
+  > .rz-navigation-item {
+    > .rz-navigation-item-wrapper-active {
+      &:before {
         position: absolute;
         content: '';
         bottom: -2px;
         height: 1px;
         left: 0;
         right: 0;
-        background-color: var(--rz-menu-item-selected-color);
+        background-color: var(--rz-menu-top-item-selected-color);
         margin-left: 0.5rem;
         margin-right: 0.5rem;
       }
@@ -214,7 +272,8 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
 .rz-menu-toggle-item {
   display: none;
   padding: var(--rz-menu-top-item-padding);
-  text-align: right;
+  justify-content: end;
+  align-items: center;
   width: 100%;
   height: 100%;
 }
@@ -227,10 +286,28 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
   align-items: center;
   justify-content: center;
   padding: 0;
+  color: var(--rz-menu-top-item-color);
+
+  &:hover {
+    background-color: transparent;
+    color: var(--rz-menu-top-item-hover-color);
+  }
 
   &:active {
     background-color: transparent;
-    color: inherit;
+    color: var(--rz-menu-top-item-color);
+  }
+
+  .rz-context-menu & {
+    color: var(--rz-menu-item-color);
+
+    &:hover {
+      color: var(--rz-menu-item-hover-color);
+    }
+  
+    &:active {
+      color: var(--rz-menu-item-color);
+    }
   }
 }
 
@@ -256,11 +333,12 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
       .rz-navigation-menu {
         position: static;
         box-shadow: none;
+        border-radius: 0;
       }
     }
 
     .rz-menu-toggle-item {
-      display: block;
+      display: flex;
     }
 
     .rz-navigation-item-wrapper-active:before {

@@ -362,12 +362,17 @@ $sidebar-toggle-color: var(--rz-base-800) !default;
 // Menu
 $menu-border: none !default;
 $menu-border-radius: 0 !default;
-$menu-item-selected-color: var(--rz-primary) !default;
-$menu-item-hover-background-color: var(--rz-primary-lighter) !default;
+$menu-item-color: var(--rz-text-color) !default;
 $menu-item-hover-color: var(--rz-primary) !default;
+$menu-item-hover-background-color: var(--rz-primary-lighter) !default;
+$menu-item-selected-color: var(--rz-primary) !default;
 $menu-item-transition: var(--rz-transition-all) !default;
+$menu-top-item-color: $menu-item-color !default;
 $menu-top-item-hover-color: var(--rz-primary) !default;
 $menu-top-item-hover-background-color: var(--rz-primary-lighter) !default;
+$menu-top-item-icon-color: $menu-top-item-color !default;
+$menu-top-item-icon-hover-color: $menu-top-item-hover-color !default;
+$menu-top-item-selected-color: $menu-item-selected-color !default;
 $context-menu-box-shadow: $rz-shadow-3 !default;
 
 // ProfileMenu
