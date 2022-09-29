@@ -703,34 +703,36 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 }
 
 .rz-selectable {
-  tr.rz-data-row {
-    td,
-    .rz-cell-data {
-      transition: background-color var(--rz-transition), color var(--rz-transition);
-    }
-
-    &.rz-state-highlight {
-      > td {
-        background-color: var(--rz-grid-selected-background-color);
-      }
-
+  tbody {
+    tr.rz-data-row {
+      td,
       .rz-cell-data {
-        color: var(--rz-grid-selected-color);
+        transition: background-color var(--rz-transition), color var(--rz-transition);
       }
 
-      > .rzi {
-        color: var(--rz-grid-selected-color);
-      }
-    }
-
-    &:hover {
-      &:not(.rz-state-highlight) {
-        > td:not(.rz-frozen-cell) {
-          background-color: var(--rz-grid-hover-background-color);
+      &.rz-state-highlight {
+        > td {
+          background-color: var(--rz-grid-selected-background-color);
         }
 
         .rz-cell-data {
-          color: var(--rz-grid-hover-color);
+          color: var(--rz-grid-selected-color);
+        }
+
+        > .rzi {
+          color: var(--rz-grid-selected-color);
+        }
+      }
+
+      &:hover {
+        &:not(.rz-state-highlight) {
+          > td:not(.rz-frozen-cell) {
+            background-color: var(--rz-grid-hover-background-color);
+          }
+
+          .rz-cell-data {
+            color: var(--rz-grid-hover-color);
+          }
         }
       }
     }
