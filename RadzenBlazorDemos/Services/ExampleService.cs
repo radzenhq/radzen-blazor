@@ -667,6 +667,7 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "Menu",
+                    Updated = true,
                     Title = "Blazor Menu component",
                     Path = "menu",
                     Icon = "&#xe91a",
