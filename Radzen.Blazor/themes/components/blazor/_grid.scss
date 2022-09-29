@@ -520,16 +520,18 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 }
 
 .rz-grid-table-striped {
-  tr:not(.rz-expanded-row-content)  {
-    &:nth-child(even) {
-      > td {
-        background-color: var(--rz-grid-stripe-background-color);
+  tbody {
+    tr:not(.rz-expanded-row-content)  {
+      &:nth-child(even) {
+        > td {
+          background-color: var(--rz-grid-stripe-background-color);
+        }
       }
-    }
 
-    &:nth-child(odd) {
-      > td {
-        background-color: var(--rz-grid-background-color);
+      &:nth-child(odd) {
+        > td {
+          background-color: var(--rz-grid-background-color);
+        }
       }
     }
   }
