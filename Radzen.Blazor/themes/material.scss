@@ -1175,17 +1175,6 @@ $tabs-transition: var(--rz-transition-all) !default;
   &.rz-tabview-right > .rz-tabview-panels {
     border-right: $tabs-tab-panels-border;
   }
-
-  .rz-tabview-panel {
-    padding: var(--rz-tabs-padding) 0;
-  }
-
-  &.rz-tabview-left,
-  &.rz-tabview-right {
-    .rz-tabview-panel {
-      padding: 0 var(--rz-tabs-padding);
-    }
-  }
 }
 
 // Dialog
