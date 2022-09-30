@@ -83,7 +83,7 @@
                                 }
                                 else if (Column.FilterPropertyType == typeof(bool) || Column.FilterPropertyType == typeof(bool?))
                                 {
-                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@Column.GetFilterValue()" Change="@(args => { Column.FilterValue = null; Column.SetFilterValue(args); Grid.Reload(); })" />
+                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@Column.GetFilterValue()" Change="@(args => { Column.FilterValue = null; Column.SetFilterValue(args); Grid.SaveSettings(); Grid.Reload(); })" />
                                 }
                                 else
                                 {
@@ -113,7 +113,7 @@
                                 }
                                 else if (Column.FilterPropertyType == typeof(bool) || Column.FilterPropertyType == typeof(bool?))
                                 {
-                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@Column.GetSecondFilterValue()" Change="@(args => Column.SetFilterValue(args, false))"/>
+                                <RadzenCheckBox TriState="true" TValue="@object" Value="@Column.GetSecondFilterValue()" Change="@(args => { Column.SetFilterValue(args, false); Grid.SaveSettings(); })" />
                                 }
                                 else
                                 {
