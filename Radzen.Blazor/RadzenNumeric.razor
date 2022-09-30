@@ -8,7 +8,7 @@
 {
     <span @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         <input @ref="@input" type="text" inputmode="decimal" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
-               class="rz-spinner-input rz-inputtext" tabindex="@TabIndex"
+               class="@GetCssClass()" tabindex="@TabIndex"
                placeholder="@Placeholder" autocomplete="@(AutoComplete ? "on" : "off")" value="@FormattedValue" @onchange="@OnChange"
                onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower())"
            onblur="@getOnInput()" onpaste="@getOnPaste()" />
