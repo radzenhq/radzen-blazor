@@ -658,10 +658,10 @@ window.Radzen = {
 
     e.preventDefault();
   },
-  openContextMenu: function (x,y,id) {
+  openContextMenu: function (x,y,id, instance, callback) {
     Radzen.closePopup(id);
 
-    Radzen.openPopup(null, id, false, null, x, y);
+    Radzen.openPopup(null, id, false, null, x, y, instance, callback);
   },
   openTooltip: function (target, id, duration, position, closeTooltipOnDocumentClick) {
     Radzen.closePopup(id);
