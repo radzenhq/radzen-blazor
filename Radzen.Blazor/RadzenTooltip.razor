@@ -67,8 +67,38 @@
                 UniqueID,
                 tooltip.Options.Duration,
                 Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant(),
-                tooltip.Options.CloseTooltipOnDocumentClick);
+                tooltip.Options.CloseTooltipOnDocumentClick,
+                Reference,
+                "RadzenTooltip.CloseTooltip");
         }
+    }
+
+    private DotNetObjectReference<RadzenTooltip> reference;
+
+    /// <summary>
+    /// Gets the reference for the current component.
+    /// </summary>
+    /// <value>The reference.</value>
+    protected DotNetObjectReference<RadzenTooltip> Reference
+    {
+        get
+        {
+            if (reference == null)
+            {
+                reference = DotNetObjectReference.Create(this);
+            }
+
+            return reference;
+        }
+    }
+
+    /// <summary>
+    /// Closes this instance.
+    /// </summary>
+    [JSInvokable("RadzenTooltip.CloseTooltip")]
+    public void CloseTooltip()
+    {
+        Service.Close();
     }
 
     public async Task Close()
@@ -85,6 +115,9 @@
 
     public void Dispose()
     {
+        reference?.Dispose();
+        reference = null;
+
         if (IsJSRuntimeAvailable)
         {
             try
