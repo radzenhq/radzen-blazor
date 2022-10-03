@@ -46,6 +46,18 @@
                 <RadzenNumeric TValue="double" Format="c" @bind-Value=@dblValue Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Formatted numeric"))" />
             </RadzenCard>
         </div>
+        <div class="col-lg-3 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Text-Align Right</RadzenText>
+                <RadzenNumeric ShowUpDown="false" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Without Up/Down"))" Class="w-100" TextAlign="TextAlign.Right" />
+            </RadzenCard>
+        </div>
+            <div class="col-lg-3 p-3">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Text-Align Center</RadzenText>
+                    <RadzenNumeric ShowUpDown="false" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Without Up/Down"))" Class="w-100" TextAlign="TextAlign.Center" />
+                </RadzenCard>
+            </div>
     </div>
 </div>
 </RadzenExample>

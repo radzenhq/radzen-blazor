@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList("rz-spinner").ToString();
+            return GetClassList("rz-spinner")
+                        .Add("rz-spinner-input")
+                        .Add("rz-inputtext")
+                        .Add($"rz-text-align-{Enum.GetName(typeof(TextAlign), TextAlign).ToLower()}")
+                        .ToString();
         }
 
         private string getOnInput()
@@ -188,6 +193,13 @@ namespace Radzen.Blazor
         public bool ShowUpDown { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets the text align.
+        /// </summary>
+        /// <value>The text align.</value>
+        [Parameter]
+        public TextAlign TextAlign { get; set; } = TextAlign.Left;
+
+        /// <summary>
         /// Handles the <see cref="E:Change" /> event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
@@ -295,7 +307,6 @@ namespace Radzen.Blazor
                 }
             }
         }
-
 
 #if NET5_0_OR_GREATER
         /// <summary>
