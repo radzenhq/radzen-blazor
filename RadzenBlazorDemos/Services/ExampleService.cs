@@ -438,6 +438,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "Density",
+                    New = true,
+                    Path = "datagrid-density",
+                    Title = "Blazor DataGrid density",
+                    Icon = "&#xeb9e",
+                    Tags = new [] { "density", "compact", "small", "large", "tight" }
+                },
+                new Example()
+                {
                     Name = "Cell Context Menu",
                     Path = "datagrid-cell-contextmenu",
                     Title = "Blazor DataGrid cell context menu",

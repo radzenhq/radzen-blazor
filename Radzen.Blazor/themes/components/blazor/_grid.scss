@@ -6,6 +6,7 @@ $grid-bottom-cell-border: $grid-cell-border !default;
 $grid-cell-padding: 0.5rem !default;
 $grid-cell-color: var(--rz-text-color) !default;
 $grid-cell-font-size: var(--rz-body-font-size) !default;
+$grid-cell-line-height: var(--rz-body-line-height) !default;
 
 $grid-hover-background-color: var(--rz-secondary-lighter) !default;
 $grid-hover-color: var(--rz-secondary-dark) !default;
@@ -121,6 +122,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   --rz-grid-cell-padding: #{$grid-cell-padding};
   --rz-grid-cell-color: #{$grid-cell-color};
   --rz-grid-cell-font-size: #{$grid-cell-font-size};
+  --rz-grid-cell-line-height: #{$grid-cell-line-height};
 
   --rz-grid-hover-background-color: #{$grid-hover-background-color};
   --rz-grid-hover-color: #{$grid-hover-color};
@@ -435,6 +437,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   td {
     background-color: var(--rz-grid-foot-background-color);
     font-size: var(--rz-grid-cell-font-size);
+    line-height: var(--rz-grid-cell-line-height);
     color: var(--rz-grid-foot-cell-color);
     padding: var(--rz-grid-cell-padding);
     white-space: nowrap;
@@ -575,6 +578,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     .rz-cell-data {
       color: var(--rz-grid-cell-color);
       font-size: var(--rz-grid-cell-font-size);
+      line-height: var(--rz-grid-cell-line-height);
       display: block;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -981,12 +985,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     top: 0;
     z-index: 1;
   }
-
-  tr:nth-of-type(2) {
-    th {
-      top: 35px; // height of the first header row
-    }
-  }
 }
 
 .rz-grid-table-fixed {
@@ -1132,4 +1130,18 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 .rz-filter-button {
   flex: none;
   margin-right: 0.5rem;
+}
+
+// Density
+.rz-data-grid {
+  &.rz-density-compact {
+    --rz-grid-cell-line-height: 1rem;
+    --rz-grid-cell-padding: 0.25rem 0.5rem;
+    --rz-grid-header-cell-padding: 0.25rem 0;
+    --rz-grid-header-padding: 0.25rem 1rem;
+    --rz-grid-header-title-padding: 0 0 0 0.5rem;
+    --rz-grid-filter-padding: 0.25rem 0.5rem;
+    --rz-grid-group-header-padding: 0.25 0.5rem;
+    --rz-grid-group-header-item-padding: 0.25 0.5rem;
+  }
 }
