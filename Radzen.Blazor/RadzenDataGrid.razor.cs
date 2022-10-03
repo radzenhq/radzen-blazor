@@ -224,6 +224,12 @@ namespace Radzen.Blazor
         public bool Responsive { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating DataGrid density.
+        /// </summary>
+        [Parameter]
+        public Density Density { get; set; }
+
+        /// <summary>
         /// The grouped and paged View
         /// </summary>
         IEnumerable<GroupResult> _groupedPagedView;
@@ -2370,6 +2376,11 @@ namespace Radzen.Blazor
             if (Responsive)
             {
                 additionalClasses.Add("rz-datatable-reflow");
+            }
+
+            if (Density == Density.Compact)
+            {
+                additionalClasses.Add("rz-density-compact");
             }
 
             return $"rz-has-paginator rz-datatable  rz-datatable-scrollable {String.Join(" ", additionalClasses)}";

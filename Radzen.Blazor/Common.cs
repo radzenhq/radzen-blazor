@@ -526,6 +526,21 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Specifies component density.
+    /// </summary>
+    public enum Density
+    {
+        /// <summary>
+        /// The default density.
+        /// </summary>
+        Default,
+        /// <summary>
+        /// А high density compact mode.
+        /// </summary>
+        Compact
+    }
+
+    /// <summary>
     /// Specifies the ways a component renders its popup.
     /// </summary>
     public enum PopupRenderMode
