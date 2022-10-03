@@ -15,6 +15,13 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        @if (AllowSelectAll)
+        {
+            <div class="rz-multiselect-header rz-helper-clearfix" @onclick:preventDefault>
+                <RadzenCheckBox Name="SelectAll" TValue="bool?" Value="@IsAllSelected()" Change="@SelectAll" />
+                <RadzenLabel Component="SelectAll" Text="@SelectAllText" class="rz-chkbox-label" />
+            </div>
+        }
         @foreach (var item in allItems.Where(i => i.Visible))
         {
             <div class="rz-checkbox" @onclick="@(args => SelectItem(item))" @attributes="item.Attributes" style="@item.Style">

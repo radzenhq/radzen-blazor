@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,6 +57,59 @@ namespace Radzen.Blazor
                     item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
                     return item;
                 }));
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user can select all values. Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if select all values is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowSelectAll { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the select all text.
+        /// </summary>
+        /// <value>The select all text.</value>
+        [Parameter]
+        public string SelectAllText { get; set; }
+
+        async Task SelectAll(bool? value)
+        {
+            if (Disabled)
+            {
+                return;
+            }
+
+            if (value == true)
+            {
+                Value = items.Select(i => i.Value);
+            }
+            else if (value == false)
+            {
+                Value = null;
+            }
+
+            await ValueChanged.InvokeAsync(Value);
+            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            await Change.InvokeAsync(Value);
+
+            StateHasChanged();
+        }
+
+        bool? IsAllSelected()
+        {
+            Func<RadzenCheckBoxListItem<TValue>, bool> predicate = i => Value != null && Value.Contains(i.Value);
+            var all = items.All(predicate);
+            var any = items.Any(predicate);
+
+            if (all)
+            {
+                return true;
+            }
+            else
+            {
+                return any ? null : (bool?)false;
             }
         }
 

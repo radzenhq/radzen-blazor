@@ -52,6 +52,18 @@
                 </RadzenCheckBoxList>
             </RadzenCard>
         </div>
+         <div class="col-lg-6 p-3 d-flex">
+            <RadzenCard Style="width: 100%;">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Select all items CheckBoxList</RadzenText>
+                <RadzenCheckBoxList @bind-Value=@values AllowSelectAll="true" SelectAllText="Select all items" TValue="int" Orientation="Orientation.Vertical">
+                    <Items>
+                        <RadzenCheckBoxListItem Text="Orders" Value="1" />
+                        <RadzenCheckBoxListItem Text="Employees" Value="2" />
+                        <RadzenCheckBoxListItem Text="Customers" Value="3" />
+                    </Items>
+                </RadzenCheckBoxList>
+            </RadzenCard>
+        </div>
     </div>
 </div>
 </RadzenExample>
