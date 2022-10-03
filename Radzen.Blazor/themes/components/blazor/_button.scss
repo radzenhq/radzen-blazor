@@ -76,6 +76,24 @@ $button-sizes: map-merge(
       ),
       text-with-icon-padding: 0.25rem 0.75rem 0.25rem 0.25rem,
       icon-only-padding: 0.25rem
+    ),
+    xs: (
+      font-size: 0.75rem,
+      padding: 0.125rem 0.25rem,
+      line-height: 1rem,
+      height: auto,
+      min-height: 1.25rem,
+      min-width: 1.25rem,
+      font-weight: 600,
+      gap: 0.125rem,
+      icon: (
+        font-size: calc(0.8 * var(--rz-icon-size)),
+        line-height: calc(0.8 * var(--rz-icon-size)),
+        width: calc(0.8 * var(--rz-icon-size)),
+        height: calc(0.8 * var(--rz-icon-size))
+      ),
+      text-with-icon-padding: 0.125rem 0.5rem 0.125rem 0.125rem,
+      icon-only-padding: 0.125rem
     )
   ),
   $button-sizes
@@ -386,7 +404,7 @@ $button-styles: map-merge(
         gap: map-get($button, gap);
       }
 
-      &.rz-button-text-icon-left {
+      &.rz-button-icon-left {
         padding: map-get($button, text-with-icon-padding);
       }
 

@@ -95,6 +95,12 @@
         <div class="col-lg-12 p-3" style="min-width: fit-content;">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Selectbar Size</RadzenText>
+                <RadzenSelectBar Size="ButtonSize.ExtraSmall" @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
+                    <Items>
+                        <RadzenSelectBarItem Text="On" Value="true" />
+                        <RadzenSelectBarItem Text="Off" Value="false" />
+                    </Items>
+                </RadzenSelectBar>
                 <RadzenSelectBar Size="ButtonSize.Small" @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
                     <Items>
                         <RadzenSelectBarItem Text="On" Value="true" />

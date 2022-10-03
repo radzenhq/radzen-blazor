@@ -23,7 +23,7 @@ namespace Radzen.Blazor
     {
         private string getButtonSize()
         {
-            return Size == ButtonSize.Medium ? "md" : Size == ButtonSize.Large ? "lg" : "sm";
+            return Size == ButtonSize.Medium ? "md" : Size == ButtonSize.Large ? "lg" : Size == ButtonSize.Small ? "sm" : "xs";
         }
         
         /// <summary>

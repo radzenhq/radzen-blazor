@@ -792,7 +792,11 @@ namespace Radzen
         /// <summary>
         /// A button smaller than the default.
         /// </summary>
-        Small
+        Small,
+        /// <summary>
+        /// The smallest button.
+        /// </summary>
+        ExtraSmall
     }
 
     /// <summary>
