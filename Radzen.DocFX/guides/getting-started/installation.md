@@ -6,7 +6,7 @@ This article shows you how to add Radzen Blazor components to your project.
 1. [Include the CSS and JS](#include-the-css-and-js)
 
 ## Install the Nuget package
-Radzen Blazor Components are distributed as the [Radzen.Blazor](https://www.nuget.org/packages/Radzen.Blazor)"> nuget package.
+Radzen Blazor Components are distributed as the [Radzen.Blazor](https://www.nuget.org/packages/Radzen.Blazor) nuget package.
 
 You can add them to your project in one of the following ways
 - Install the package from command line by running `dotnet add package Radzen.Blazor`.
