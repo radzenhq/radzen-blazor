@@ -817,6 +817,13 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Gets or sets the item separator for Multiple dropdown.
+        /// </summary>
+        /// <value>Item separator</value>
+        [Parameter]
+        public string Separator { get; set; } = ",";
+
+        /// <summary>
         /// Gets the items.
         /// </summary>
         /// <value>The items.</value>
