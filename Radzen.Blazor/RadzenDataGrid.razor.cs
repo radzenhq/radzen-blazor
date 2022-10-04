@@ -2427,6 +2427,16 @@ namespace Radzen.Blazor
 
         internal int deepestChildColumnLevel;
 
+        /// <inheritdoc />
+        protected override async Task OnPageSizeChanged(int value)
+        {
+            pageSize = value;
+
+            SaveSettings();
+
+            await base.OnPageSizeChanged(value);
+        }
+
         /// <summary>
         /// Gets DataGrid settings as JSON string.
         /// </summary>

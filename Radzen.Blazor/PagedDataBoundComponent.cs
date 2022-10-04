@@ -311,13 +311,13 @@ namespace Radzen
             await InvokeAsync(Reload);
         }
 
-        int? pageSize;
+        internal int? pageSize;
 
         /// <summary>
         /// Called when [page size changed].
         /// </summary>
         /// <param name="value">The value.</param>
-        protected async Task OnPageSizeChanged(int value)
+        protected virtual async Task OnPageSizeChanged(int value)
         {
             pageSize = value;
             await InvokeAsync(Reload);
