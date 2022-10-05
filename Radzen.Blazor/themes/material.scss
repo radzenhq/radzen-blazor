@@ -1237,6 +1237,14 @@ $scrollbar-border-radius: 0 !default;
 // Login
 $login-register-background-color: rgba(#000, 0.04) !default;
 
+.rz-login {
+  .rz-textbox  {
+    &.invalid {
+      --rz-input-focus-shadow: inset 0 0 0 1px var(--rz-danger);
+    }
+  }
+}
+
 // Lookup
 $lookup-panel-background-color: rgba(#000, 0.04) !default;
 

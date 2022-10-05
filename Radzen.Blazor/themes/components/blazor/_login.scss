@@ -20,7 +20,7 @@ $login-register-button-margin: 0 !default;
   .rz-form {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
 
     .rz-form-row {
       display: flex;
@@ -36,8 +36,12 @@ $login-register-button-margin: 0 !default;
         flex: 3 14rem;
       }
 
-      .rz-messages-error  {
-        position: initial; // Clear .rz-form .rz-messages-error position
+      .rz-textbox  {
+        display: block;
+
+        &.invalid {
+          border: var(--rz-border-danger);
+        }
       }
     }
   }
