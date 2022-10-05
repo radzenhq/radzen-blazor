@@ -44,7 +44,22 @@
                 {
                     @if (Template == null)
                     {
-                        @(string.Join(",", itemsToUse.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, TextProperty))))
+                        if (Chips)
+                        {
+                            <div class="rz-dropdown-chips-wrapper">
+                                @foreach (var item in itemsToUse)
+                                {
+                                    <div class="rz-chip">
+                                        <span class="rz-chip-text">
+                                            @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
+                                        </span>  
+                                        <button class="rz-button rz-button-sm rz-button-icon-only rz-light @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
+                                    </div>
+                                }
+                         </div>
+                        } else {
+                            @(string.Join(",", itemsToUse.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, TextProperty))))
+                        }
                     }
                     else
                     {

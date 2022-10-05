@@ -55,7 +55,7 @@
                         <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" Style="margin: 0 8px 0 40px;" />
                         <RadzenLabel Text="Row select on row click" Component="CheckBox1" class="rz-text-body2" />
                     </div>
-                    <RadzenDropDownDataGrid @ref="grid" AllowRowSelectOnRowClick="@allowRowSelectOnRowClick" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value=@multipleValues
+                    <RadzenDropDownDataGrid @ref="grid" Chips="true" AllowRowSelectOnRowClick="@allowRowSelectOnRowClick" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value=@multipleValues
                                             Multiple="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
                                             Change=@(args => OnChange(args, "DropDownDataGrid with multiple selection")) Class="w-100">
                         <Columns>
