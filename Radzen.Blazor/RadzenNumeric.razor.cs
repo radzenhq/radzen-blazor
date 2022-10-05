@@ -28,9 +28,14 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-spinner")
-                        .Add("rz-spinner-input")
+                                        .Add($"rz-text-align-{Enum.GetName(typeof(TextAlign), TextAlign).ToLower()}")
+                                        .ToString();
+        }
+
+        string GetInputCssClass()
+        {
+            return GetClassList("rz-spinner-input")
                         .Add("rz-inputtext")
-                        .Add($"rz-text-align-{Enum.GetName(typeof(TextAlign), TextAlign).ToLower()}")
                         .ToString();
         }
 
