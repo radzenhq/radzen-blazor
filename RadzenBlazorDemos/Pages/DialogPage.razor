@@ -78,7 +78,7 @@
     {
         await DialogService.OpenAsync<DialogCardPage>($"Order {orderID}",
                new Dictionary<string, object>() { { "OrderID", orderID } },
-               new DialogOptions() { Width = "700px", Height = "570px", Resizable = true, Draggable = true });
+               new DialogOptions() { Width = "700px", Height = "508px", Resizable = true, Draggable = true });
     }
 
     async Task ShowInlineDialog()

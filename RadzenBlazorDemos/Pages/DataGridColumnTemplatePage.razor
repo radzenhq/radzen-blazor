@@ -32,8 +32,8 @@
         <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
             <Template Context="order">
                 <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" />
-                <h5 class="mt-1 mb-0">@order.Employee?.FirstName @order.Employee?.LastName</h5>
-                <p class="m-0" style="font-size: 0.8em;">@order.Customer?.CompanyName</p>
+                <RadzenText TextStyle="TextStyle.Subtitle2" Class="mb-0">@order.Employee?.FirstName @order.Employee?.LastName</RadzenText>
+                <RadzenText TextStyle="TextStyle.Caption">@order.Customer?.CompanyName</RadzenText>
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}" />
@@ -45,7 +45,7 @@
         <RadzenDataGridColumn TItem="Order" Property="ShipCountry" Title="ShipCountry" />
         <RadzenDataGridColumn Width="160px" TItem="Order" Property="OrderID" Title="Order Details">
             <Template Context="data">
-                <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" Class="m-1" Click=@(() => OpenOrder(data.OrderID)) Text="@data.OrderID.ToString()" />
+                <RadzenButton ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info" Class="m-1" Click=@(() => OpenOrder(data.OrderID)) Text="@data.OrderID.ToString()" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>
@@ -60,7 +60,7 @@
     {
          await DialogService.OpenAsync<DialogCardPage>($"Order {orderId}",
                new Dictionary<string, object>() { { "OrderID", orderId } },
-               new DialogOptions() { Width = "700px", Height = "570px" });
+               new DialogOptions() { Width = "700px", Height = "520px" });
     }
 
     protected override void OnInitialized()
