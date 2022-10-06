@@ -425,7 +425,13 @@ namespace Radzen.Blazor
                         }
                         else
                         {
-                            ((List<object>)selectedItems).AddRange(values);
+                            foreach (object v in values)
+                            {
+                                if (selectedItems.IndexOf(v) == -1)
+                                {
+                                    selectedItems.Add(v);
+                                }
+                            }
                         }
 
                     }
