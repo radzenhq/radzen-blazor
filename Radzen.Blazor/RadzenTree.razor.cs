@@ -102,6 +102,12 @@ namespace Radzen.Blazor
         public EventCallback<TreeExpandEventArgs> Expand { get; set; }
 
         /// <summary>
+        /// A callback that will be invoked when the user collapse an item.
+        /// </summary>
+        [Parameter]
+        public EventCallback<TreeEventArgs> Collapse { get; set; }
+
+        /// <summary>
         /// Gets or sets the child content.
         /// </summary>
         /// <value>The child content.</value>

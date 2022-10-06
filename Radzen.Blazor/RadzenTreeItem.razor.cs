@@ -120,6 +120,23 @@ namespace Radzen.Blazor
             if (expanded)
             {
                 clientExpanded = !clientExpanded;
+
+                if (clientExpanded)
+                {
+                    await Expand();
+                }
+                else
+                {
+                    if (Tree != null)
+                    {
+                        await Tree.Collapse.InvokeAsync(new TreeEventArgs()
+                        {
+                            Text = Text,
+                            Value = Value
+                        });
+                    }
+                }
+
                 return;
             }
 
@@ -128,20 +145,25 @@ namespace Radzen.Blazor
 
             if (expanded)
             {
-                if (Tree != null)
+                await Expand();
+            }
+        }
+
+        async Task Expand()
+        {
+            if (Tree != null)
+            {
+                await Tree.ExpandItem(this);
+
+                if (Tree.SingleExpand)
                 {
-                    await Tree.ExpandItem(this);
+                    var siblings = ParentItem?.items ?? Tree.items;
 
-                    if (Tree.SingleExpand)
+                    foreach (var sibling in siblings)
                     {
-                        var siblings = ParentItem?.items ?? Tree.items;
-
-                        foreach (var sibling in siblings)
+                        if (sibling != this && sibling.expanded)
                         {
-                            if (sibling != this && sibling.expanded)
-                            {
-                                await sibling.Toggle();
-                            }
+                            await sibling.Toggle();
                         }
                     }
                 }

@@ -8,7 +8,7 @@
 <RadzenExample Name="Tree">
     <RadzenCard Class="my-5 mx-auto" style="max-width: 400px;">
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Inline definition</RadzenText>
-        <RadzenTree Expand=@OnExpand Change=@OnChange Style="width: 100%; height: 300px">
+        <RadzenTree Expand=@OnExpand Collapse=@OnCollapse Change=@OnChange Style="width: 100%; height: 300px">
             <RadzenTreeItem Text="BMW">
                 <ChildContent>
                     <RadzenTreeItem Text="M3" />
@@ -60,9 +60,11 @@
 
     void OnExpand(TreeExpandEventArgs args)
     {
-        if (args.Value is string text)
-        {
-            Log("Expand", $"Text: {text}");
-        }
+        Log("Expand", $"Text: {args.Text}");
+    }
+
+    void OnCollapse(TreeEventArgs args)
+    {
+        Log("Collapse", $"Text: {args.Text}");
     }
 }
