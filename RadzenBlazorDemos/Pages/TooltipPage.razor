@@ -13,8 +13,8 @@
         </div>
         <div class="col-md-6 col-lg-4 p-3 d-flex">
             <RadzenCard Class="w-100">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Show tooltip on mouse over Radzen component and close it after 10 sec</RadzenText>
-                <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args, new TooltipOptions(){ Duration = 10000 }))" />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Show tooltip on mouse over Radzen component with delay and close it after 10 sec</RadzenText>
+                <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args, new TooltipOptions(){ Delay = 500, Duration = 10000 }))" />
             </RadzenCard>
         </div>
         <div class="col-md-6 col-lg-4 p-3 d-flex">

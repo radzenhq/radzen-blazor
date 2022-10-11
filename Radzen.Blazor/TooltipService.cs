@@ -172,6 +172,11 @@ namespace Radzen
         /// <value>The duration.</value>
         public int? Duration { get; set; } = 2000;
         /// <summary>
+        /// Gets or sets the delay.
+        /// </summary>
+        /// <value>The delay.</value>
+        public int? Delay { get; set; }
+        /// <summary>
         /// Gets or sets a value indicating whether the tooltip should be closed by clicking the document.
         /// </summary>
         /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
