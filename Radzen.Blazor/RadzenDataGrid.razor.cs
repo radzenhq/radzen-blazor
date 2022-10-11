@@ -1509,6 +1509,7 @@ namespace Radzen.Blazor
             {
                 selectedItems.Clear();
                 expandedItems.Clear();
+                collapsedGroupItems.Clear();
             }
 
             if (resetColumnState)
