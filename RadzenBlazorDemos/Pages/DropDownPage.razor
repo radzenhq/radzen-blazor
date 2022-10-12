@@ -120,7 +120,7 @@
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown with groups</RadzenText>
                     <RadzenDropDown TValue="int" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                    Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID"
+                                    Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID" TextProperty="OrderID"
                                     Change=@(args => OnChange(args, "DropDown with groups")) Class="w-100">
                     <Template>
                             @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")
