@@ -2250,6 +2250,8 @@ namespace Radzen.Blazor
                     }
                 }
             }
+
+            SaveSettings();
         }
 
         List<RadzenDataGridColumn<TItem>> groupedColumns = new List<RadzenDataGridColumn<TItem>>();
@@ -2294,7 +2296,6 @@ namespace Radzen.Blazor
                         _groupedPagedView = null;
 
                         await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = descriptor });
-                        SaveSettings();
 
                         if (IsVirtualizationAllowed())
                         {
