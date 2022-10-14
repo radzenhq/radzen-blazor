@@ -2444,7 +2444,7 @@ namespace Radzen.Blazor
         /// </summary>
         internal void SaveSettings()
         {
-            if (SettingsChanged.HasDelegate)
+            if (SettingsChanged.HasDelegate && canSaveSettings)
             {
                 settings = new DataGridSettings()
                 {
@@ -2556,6 +2556,7 @@ namespace Radzen.Blazor
 
                 if (shouldUpdateState)
                 {
+                    skip = CurrentPage * PageSize;
                     CalculatePager();
                     UpdateColumnsOrder();
                     await Reload();
@@ -2607,6 +2608,8 @@ namespace Radzen.Blazor
             }
         }
 
+        bool canSaveSettings = true;
+
         DataGridSettings settings;
 
         /// <summary>
@@ -2627,14 +2630,19 @@ namespace Radzen.Blazor
 
                     if (settings == null)
                     {
+                        canSaveSettings = false;
+
                         Groups.Clear();
                         CurrentPage = 0;
+                        skip = 0;
                         Reset(true);
                         allColumns.ToList().ForEach(c =>
                         {
                             c.SetVisible(true);
                         });
                         InvokeAsync(Reload);
+
+                        canSaveSettings = true;
                     }
                 }
             }
@@ -2649,8 +2657,10 @@ namespace Radzen.Blazor
 
         async Task ChangePage(PagerEventArgs args)
         {
-            await OnPageChanged(args);
+            CurrentPage = args.PageIndex;
             SaveSettings();
+
+            await OnPageChanged(args);
         }
     }
 }
