@@ -669,6 +669,7 @@ namespace Radzen.Blazor
                 if (FilterTemplate != null)
                 {
                     FilterValue = filterValue;
+                    Grid.SaveSettings();
                     if (Grid.IsVirtualizationAllowed())
                     {
 #if NET5_0_OR_GREATER
