@@ -49,6 +49,13 @@ namespace Radzen.Blazor
         [Parameter]
         public object Value { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenSelectBarItem"/> is disabled.
+        /// </summary>
+        /// <value><c>true</c> if disabled; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Disabled { get; set; }
+
         IRadzenSelectBar _selectBar;
 
         /// <summary>

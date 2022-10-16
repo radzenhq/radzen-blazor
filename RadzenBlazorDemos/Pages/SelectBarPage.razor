@@ -1,128 +1,139 @@
 ﻿@page "/selectbar"
 
 <RadzenExample Name="SelectBar">
-<div class="container-fluid">
-    <div class="row px-3">
-        <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Single selection</RadzenText>
-                <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
-                    <Items>
-                        <RadzenSelectBarItem Text="On" Value="true" />
-                        <RadzenSelectBarItem Text="Off" Value="false" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple selection</RadzenText>
-                <RadzenSelectBar @bind-Value=@values TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with multiple selection"))>
-                    <Items>
-                        <RadzenSelectBarItem Text="Orders" Value="1" />
-                        <RadzenSelectBarItem Text="Employees" Value="2" />
-                        <RadzenSelectBarItem Text="Customers" Value="3" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled SelectBar with multiple selection</RadzenText>
-                <RadzenSelectBar Disabled="true" @bind-Value=@values TValue="IEnumerable<int>" Multiple="true">
-                    <Items>
-                        <RadzenSelectBarItem Text="Orders" Value="1" />
-                        <RadzenSelectBarItem Text="Employees" Value="2" />
-                        <RadzenSelectBarItem Text="Customers" Value="3" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with icons</RadzenText>
-                <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with icons"))>
-                    <Items>
-                        <RadzenSelectBarItem Icon="filter" Text="On" Value="true" />
-                        <RadzenSelectBarItem Icon="filter_none" Text="Off" Value="false" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with images</RadzenText>
-                <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with icons"))>
-                    <Items>
-                        <RadzenSelectBarItem Image="images/radzen-nuget.png" ImageStyle="zoom: 30%; margin-right: 20px;" Text="On" Value="true" />
-                        <RadzenSelectBarItem Text="Off" Value="false" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with template</RadzenText>
-                <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with template"))>
-                    <Items>
-                        <RadzenSelectBarItem Value="true">
-                            <Template>
-                                <i>On</i>
-                            </Template>
-                        </RadzenSelectBarItem>
-                        <RadzenSelectBarItem Text="Off" Value="false" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with items from data</RadzenText>
-                <RadzenSelectBar @bind-Value=@values TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with items from data"))
-                            Data="@data" TextProperty="Name" ValueProperty="Id" />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with declared items and items from data</RadzenText>
-                <RadzenSelectBar @bind-Value=@values Data="@data" TextProperty="Name" ValueProperty="Id" TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with declared items and items from data"))>
-                    <Items>
-                        <RadzenSelectBarItem Text="Static item" Value="0" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-12 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Selectbar Size</RadzenText>
-                <RadzenSelectBar Size="ButtonSize.ExtraSmall" @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
-                    <Items>
-                        <RadzenSelectBarItem Text="On" Value="true" />
-                        <RadzenSelectBarItem Text="Off" Value="false" />
-                    </Items>
-                </RadzenSelectBar>
-                <RadzenSelectBar Size="ButtonSize.Small" @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
-                    <Items>
-                        <RadzenSelectBarItem Text="On" Value="true" />
-                        <RadzenSelectBarItem Text="Off" Value="false" />
-                    </Items>
-                </RadzenSelectBar>
-                <RadzenSelectBar Size="ButtonSize.Medium" @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
-                    <Items>
-                        <RadzenSelectBarItem Text="On" Value="true" />
-                        <RadzenSelectBarItem Text="Off" Value="false" />
-                    </Items>
-                </RadzenSelectBar>
-                <RadzenSelectBar Size="ButtonSize.Large" @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
-                    <Items>
-                        <RadzenSelectBarItem Text="On" Value="true" />
-                        <RadzenSelectBarItem Text="Off" Value="false" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenCard>
+    <div class="container-fluid">
+        <div class="row px-3">
+            <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Single selection</RadzenText>
+                    <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
+                        <Items>
+                            <RadzenSelectBarItem Text="On" Value="true" />
+                            <RadzenSelectBarItem Text="Off" Value="false" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenCard>
+            </div>
+            <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple selection</RadzenText>
+                    <RadzenSelectBar @bind-Value=@values TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with multiple selection"))>
+                        <Items>
+                            <RadzenSelectBarItem Text="Orders" Value="1" />
+                            <RadzenSelectBarItem Text="Employees" Value="2" />
+                            <RadzenSelectBarItem Text="Customers" Value="3" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenCard>
+            </div>
+            <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled SelectBar with multiple selection</RadzenText>
+                    <RadzenSelectBar Disabled="true" @bind-Value=@values TValue="IEnumerable<int>" Multiple="true">
+                        <Items>
+                            <RadzenSelectBarItem Text="Orders" Value="1" />
+                            <RadzenSelectBarItem Text="Employees" Value="2" />
+                            <RadzenSelectBarItem Text="Customers" Value="3" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenCard>
+            </div>
+            <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with single selection and disabled items</RadzenText>
+                    <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection and disabled items"))>
+                        <Items>
+                            <RadzenSelectBarItem Text="On" Value="true" Disabled="true" />
+                            <RadzenSelectBarItem Text="Off" Value="false" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenCard>
+            </div>
+            <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with icons</RadzenText>
+                    <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with icons"))>
+                        <Items>
+                            <RadzenSelectBarItem Icon="filter" Text="On" Value="true" />
+                            <RadzenSelectBarItem Icon="filter_none" Text="Off" Value="false" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenCard>
+            </div>
+            <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with images</RadzenText>
+                    <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with icons"))>
+                        <Items>
+                            <RadzenSelectBarItem Image="images/radzen-nuget.png" ImageStyle="zoom: 30%; margin-right: 20px;" Text="On" Value="true" />
+                            <RadzenSelectBarItem Text="Off" Value="false" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenCard>
+            </div>
+            <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with template</RadzenText>
+                    <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with template"))>
+                        <Items>
+                            <RadzenSelectBarItem Value="true">
+                                <Template>
+                                    <i>On</i>
+                                </Template>
+                            </RadzenSelectBarItem>
+                            <RadzenSelectBarItem Text="Off" Value="false" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenCard>
+            </div>
+            <div class="col-lg-6 p-3" style="min-width: fit-content;">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with items from data</RadzenText>
+                    <RadzenSelectBar @bind-Value=@values TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with items from data"))
+                                     Data="@data" TextProperty="Name" ValueProperty="Id" />
+                </RadzenCard>
+            </div>
+            <div class="col-lg-6 p-3" style="min-width: fit-content;">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SelectBar with declared items and items from data</RadzenText>
+                    <RadzenSelectBar @bind-Value=@values Data="@data" TextProperty="Name" ValueProperty="Id" TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with declared items and items from data"))>
+                        <Items>
+                            <RadzenSelectBarItem Text="Static item" Value="0" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenCard>
+            </div>
+            <div class="col-lg-12 p-3" style="min-width: fit-content;">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Selectbar Size</RadzenText>
+                    <RadzenSelectBar Size="ButtonSize.ExtraSmall" @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
+                        <Items>
+                            <RadzenSelectBarItem Text="On" Value="true" />
+                            <RadzenSelectBarItem Text="Off" Value="false" />
+                        </Items>
+                    </RadzenSelectBar>
+                    <RadzenSelectBar Size="ButtonSize.Small" @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
+                        <Items>
+                            <RadzenSelectBarItem Text="On" Value="true" />
+                            <RadzenSelectBarItem Text="Off" Value="false" />
+                        </Items>
+                    </RadzenSelectBar>
+                    <RadzenSelectBar Size="ButtonSize.Medium" @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
+                        <Items>
+                            <RadzenSelectBarItem Text="On" Value="true" />
+                            <RadzenSelectBarItem Text="Off" Value="false" />
+                        </Items>
+                    </RadzenSelectBar>
+                    <RadzenSelectBar Size="ButtonSize.Large" @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
+                        <Items>
+                            <RadzenSelectBarItem Text="On" Value="true" />
+                            <RadzenSelectBarItem Text="Off" Value="false" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenCard>
+            </div>
         </div>
     </div>
-</div>
 </RadzenExample>
 
 <EventConsole @ref=@console Class="mt-4" />
