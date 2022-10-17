@@ -64,7 +64,7 @@
         }
 
     <div class="rz-data-grid-data">
-        <table class="rz-grid-table rz-grid-table-fixed @(AllowAlternatingRows ? "rz-grid-table-striped" : "")">
+            <table class="rz-grid-table rz-grid-table-fixed @(AllowAlternatingRows ? "rz-grid-table-striped" : "") @(allColumns.Any(c => c.Parent != null) ? "rz-grid-table-composite" : "")">
             <colgroup>
                 @foreach(var g in Groups)
                 {
