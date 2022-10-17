@@ -31,18 +31,18 @@ namespace Radzen.Blazor
         {
             return Size == ButtonSize.Medium ? "md" : Size == ButtonSize.Large ? "lg" : Size == ButtonSize.Small ? "sm" : "xs";
         }
-        
+
         /// <summary>
         /// Gets or sets the size.
         /// </summary>
         /// <value>The size.</value>
         [Parameter]
         public ButtonSize Size { get; set; } = ButtonSize.Medium;
-        
-        
+
+
         ClassList ButtonClassList(RadzenSelectBarItem item) => ClassList.Create($"rz-button rz-button-{getButtonSize()} rz-button-text-only")
                             .Add("rz-state-active", IsSelected(item))
-                            .AddDisabled(Disabled);
+                            .AddDisabled(Disabled || item.Disabled);
 
         /// <summary>
         /// Gets or sets the value property.
@@ -181,7 +181,7 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         protected async System.Threading.Tasks.Task SelectItem(RadzenSelectBarItem item)
         {
-            if (Disabled)
+            if (Disabled || item.Disabled)
                 return;
 
             if (Multiple)
