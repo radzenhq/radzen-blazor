@@ -134,11 +134,11 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.ButtonStyle, ButtonStyle.Primary));
 
-            Assert.Contains(@$"btn-primary", component.Markup);
+            Assert.Contains(@$"rz-primary", component.Markup);
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.ButtonStyle, ButtonStyle.Secondary));
 
-            Assert.Contains(@$"btn-secondary", component.Markup);
+            Assert.Contains(@$"rz-secondary", component.Markup);
         }
 
         [Fact]
