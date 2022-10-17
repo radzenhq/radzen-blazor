@@ -5,7 +5,7 @@
 </h1>
 
 <p align="center">
-    A set of <strong>60+ free and open source</strong> native Blazor UI controls.
+    A set of <strong>70+ free and open source</strong> native Blazor UI controls.
 </p>
 
 <div align="center">

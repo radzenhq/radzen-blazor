@@ -1220,12 +1220,12 @@ namespace RadzenBlazorDemos
                 return example.Title ?? $"Blazor {example.Name} | a free UI component by Radzen";
             }
 
-            return "Free Blazor Components | 60+ controls by Radzen";
+            return "Free Blazor Components | 70+ controls by Radzen";
         }
 
         public string DescriptionFor(Example example)
         {
-            return example?.Description ?? "The Radzen Blazor component library provides more than 50 UI controls for building rich ASP.NET Core web applications.";
+            return example?.Description ?? "The Radzen Blazor component library provides more than 70 UI controls for building rich ASP.NET Core web applications.";
         }
     }
 }

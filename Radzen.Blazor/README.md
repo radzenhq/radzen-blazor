@@ -1,4 +1,4 @@
-﻿## Radzen Blazor is a set of 60+ free native Blazor UI controls packed with DataGrid, Scheduler, Charts and robust theming including Material design.
+﻿## Radzen Blazor is a set of 70+ free native Blazor UI controls packed with DataGrid, Scheduler, Charts and robust theming including Material design and Fluent UI.
 
 ![Radzen Blazor Components](https://raw.githubusercontent.com/radzenhq/radzen-blazor/master/RadzenBlazorDemos/wwwroot/images/radzen-blazor-components.png)
 
