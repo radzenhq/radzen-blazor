@@ -1573,7 +1573,10 @@ namespace Radzen.Blazor
                 {
                     if(virtualize != null)
                     {
-                        await virtualize.RefreshDataAsync();
+                        Task.Delay(200).ContinueWith(async (t) =>
+                        {
+                          await virtualize.RefreshDataAsync();
+                        });
                     }
 
                     if(groupVirtualize != null)
