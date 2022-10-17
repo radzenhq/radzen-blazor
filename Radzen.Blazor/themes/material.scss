@@ -948,6 +948,11 @@ $column-draggable-shadow: var(--rz-shadow-4) !default;
   }
 }
 
+.rz-grid-table-composite {
+  --rz-grid-right-cell-border: #{$grid-cell-border};
+  --rz-grid-header-cell-border: #{$grid-cell-border};
+}
+
 // Paginator
 $paginator-background-color: transparent !default;
 $paginator-padding: 0.5rem 1rem !default;
