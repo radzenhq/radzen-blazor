@@ -18,7 +18,9 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add<double>(p => p.Value, value));
 
-            Assert.Contains(@$"<div class=""rz-progressbar-label"">{value}", component.Markup);
+
+            Assert.Contains(@$"<div class=""rz-progressbar-label"">", component.Markup);
+            Assert.Contains(@$"{value}%", component.Markup);
             Assert.Contains(@$"aria-valuenow=""{value}""", component.Markup);
             Assert.Contains(@$"aria-valuemin=""0""", component.Markup);
         }
@@ -50,13 +52,13 @@ namespace Radzen.Blazor.Tests
 
             component.Render();
 
-            Assert.Contains(@$"%</div>", component.Markup);
+            Assert.Contains(@$"0%", component.Markup);
 
-            var value = "mm";
+            var unit = "mm";
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Unit, value));
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Unit, unit));
 
-            Assert.Contains(@$"{value}</div>", component.Markup);
+            Assert.Contains(@$"0{unit}", component.Markup);
         }
 
         [Fact]
