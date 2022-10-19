@@ -18,7 +18,13 @@
             <RadzenCard class="mb-3">
                 <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => filteredOrders = view.ToList())>
                     <Properties>
-                        <RadzenDataFilterProperty TItem="Order" Property="OrderID" Title="Order ID" />
+                        <RadzenDataFilterProperty TItem="Order" Property="OrderID" Title="Order ID" FilterValue="@selectedIds" 
+                           Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.Contains">
+                            <FilterTemplate>
+                                 <RadzenDropDown @bind-Value=@selectedIds Style="width:100%;"
+                                    Change=@OnSelectedIdsChange Data="@(orderIds)" AllowClear="true" Multiple="true" />
+                            </FilterTemplate>
+                        </RadzenDataFilterProperty>
                         <RadzenDataFilterProperty TItem="Order" Property="Employee.LastName" Title="Employee Last Name" />
                         <MyCustomDataFilterProperty TItem="Order" Property="OrderDate" Title="Order Date" />
                         <RadzenDataFilterProperty TItem="Order" Property="Freight" Title="Freight" />
@@ -73,9 +79,21 @@
     IList<Order> orders;
     RadzenDataGrid<Order> ordersGrid;
 
+    IEnumerable<int> selectedIds;
+    IEnumerable<int> orderIds;
+
+    void OnSelectedIdsChange(object value)
+    {
+        if (selectedIds != null && !selectedIds.Any())
+        {
+            selectedIds = null;
+        }
+    }
+
     protected override void OnInitialized()
     {
         orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+        orderIds = orders.Select(o => o.OrderID).Distinct();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -16,6 +18,8 @@ namespace Radzen.Blazor
     /// <typeparam name="TItem">The type of the DataFilter item.</typeparam>
     public partial class RadzenDataFilterProperty<TItem> : ComponentBase, IDisposable
     {
+        internal event Action<object> FilterValueChange;
+
         /// <summary>
         /// Gets or sets the DataFilter.
         /// </summary>
@@ -184,13 +188,23 @@ namespace Radzen.Blazor
         {
             if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))
             {
-                filterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
+                var value = parameters.GetValueOrDefault<object>(nameof(FilterValue));
 
-                if (FilterTemplate != null)
+                if (filterValue != value)
                 {
-                    await DataFilter.ChangeState();
+                    filterValue = value;
 
-                    return;
+                    if (FilterTemplate != null)
+                    {
+                        if (FilterValueChange != null)
+                        {
+                            FilterValueChange(filterValue);
+                        }
+
+                        await DataFilter.Filter();
+
+                        return;
+                    }
                 }
             }
 
@@ -282,7 +296,7 @@ namespace Radzen.Blazor
             return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
                 var isStringOperator = o == FilterOperator.Contains || o == FilterOperator.DoesNotContain
                     || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith || o == FilterOperator.IsEmpty || o == FilterOperator.IsNotEmpty;
-                return FilterPropertyType == typeof(string) ? isStringOperator
+                return FilterPropertyType == typeof(string) || typeof(IEnumerable).IsAssignableFrom(FilterPropertyType) || typeof(IEnumerable<>).IsAssignableFrom(FilterPropertyType) ? isStringOperator
                       || o == FilterOperator.Equals || o == FilterOperator.NotEquals
                       || o == FilterOperator.IsNull || o == FilterOperator.IsNotNull
                     : !isStringOperator;
