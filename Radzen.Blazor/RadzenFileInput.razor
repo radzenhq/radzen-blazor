@@ -9,7 +9,7 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     <div class="rz-fileupload-buttonbar">
-        <span class="@ChooseClassList" tabindex="@TabIndex" onkeydown="if(event.keyCode == 32 || event.keyCode == 13){event.preventDefault();this.firstElementChild.click();}">
+        <span class="@ChooseClassList" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" onkeydown="if(event.keyCode == 32 || event.keyCode == 13){event.preventDefault();this.firstElementChild.click();}">
             <input tabindex="-1" disabled="@Disabled" @ref="@fileUpload" name="@Name" type="file" accept="@Accept" onkeydown="event.stopPropagation()"
                 onchange="Radzen.uploadInputChange(event, null, false, false, true)" id="@Id" />
             <span class="rz-button-text">@ChooseText</span>
@@ -42,7 +42,7 @@
                                 <span>@FileSize</span>
                             }
                         </div>
-                        <div tabindex="@TabIndex">
+                        <div tabindex="@(Disabled ? "-1" : $"{TabIndex}")">
                             <button disabled="@Disabled" type="button" class="@ButtonClassList" @onclick="@Remove">
                                 <span class="rz-button-icon-left rz-icon-trash" style="display:block"></span>
                             </button>

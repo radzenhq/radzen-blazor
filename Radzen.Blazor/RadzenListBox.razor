@@ -7,7 +7,7 @@
 @inherits DropDownBase<TValue>
 @if (Visible)
 {
-    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@TabIndex" @onkeydown="@OnKeyDown" id="@GetId()">
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@OnKeyDown" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
             <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" />
         </div>
