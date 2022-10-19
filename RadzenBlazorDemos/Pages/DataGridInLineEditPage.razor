@@ -14,7 +14,7 @@
 </RadzenText>
 
 <RadzenExample Name="DataGrid" Source="DataGridInLineEdit" Heading="false">
-    <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Add New Order" Click="@InsertRow" Disabled=@(orderToInsert != null) />
+    <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Add New Order" Click="@InsertRow" Disabled=@(orderToInsert != null || orderToUpdate != null) />
     <RadzenDataGrid @ref="ordersGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single"
                 Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow">
         <Columns>
@@ -102,6 +102,7 @@
 
     async Task EditRow(Order order)
     {
+        orderToUpdate = order;
         await ordersGrid.EditRow(order);
     }
 
@@ -111,6 +112,8 @@
         {
             orderToInsert = null;
         }
+
+        orderToUpdate = null;
 
         dbContext.Update(order);
 
@@ -124,11 +127,6 @@
 
     async Task SaveRow(Order order)
     {
-        if (order == orderToInsert)
-        {
-            orderToInsert = null;
-        }
-
         await ordersGrid.UpdateRow(order);
     }
 
@@ -138,6 +136,8 @@
         {
             orderToInsert = null;
         }
+
+        orderToUpdate = null;
 
         ordersGrid.CancelEditRow(order);
 
@@ -157,6 +157,11 @@
             orderToInsert = null;
         }
 
+        if (order == orderToUpdate)
+        {
+            orderToUpdate = null;
+        }
+
         if (orders.Contains(order))
         {
             dbContext.Remove<Order>(order);
@@ -172,10 +177,12 @@
         else
         {
             ordersGrid.CancelEditRow(order);
+            await ordersGrid.Reload();
         }
     }
 
     Order orderToInsert;
+    Order orderToUpdate;
 
     async Task InsertRow()
     {
