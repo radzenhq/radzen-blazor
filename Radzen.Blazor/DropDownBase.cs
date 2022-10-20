@@ -160,7 +160,7 @@ namespace Radzen
 
         internal object GetKey(object item)
         {
-            var value = PropertyAccess.GetItemOrValueFromProperty(item, ValueProperty);
+            var value = GetItemOrValueFromProperty(item, ValueProperty);
 
             if (!keys.Contains(value))
             {
@@ -261,7 +261,7 @@ namespace Radzen
             if (!string.IsNullOrEmpty(ValueProperty))
             {
                 System.Reflection.PropertyInfo pi = PropertyAccess.GetElementType(Data.GetType()).GetProperty(ValueProperty);
-                internalValue = selectedItems.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty)).AsQueryable().Cast(pi.PropertyType);
+                internalValue = selectedItems.Select(i => GetItemOrValueFromProperty(i, ValueProperty)).AsQueryable().Cast(pi.PropertyType);
             }
             else
             {
@@ -362,12 +362,64 @@ namespace Radzen
                         selectedItem = null;
                         selectedItems.Clear();
                     }
-
+                   
                     InvokeAsync(OnDataChanged);
-
-                    StateHasChanged();
                 }
             }
+        }
+
+        /// <inheritdoc/>
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+
+            if (_data != null)
+            {
+                var type = _data.AsQueryable().ElementType;
+
+                if (!string.IsNullOrEmpty(ValueProperty))
+                {
+                    valuePropertyGetter = PropertyAccess.Getter<object, object>(ValueProperty, type);
+                }
+
+                if (!string.IsNullOrEmpty(TextProperty))
+                {
+                    textPropertyGetter = PropertyAccess.Getter<object, object>(TextProperty, type);
+                }
+
+                if (!string.IsNullOrEmpty(DisabledProperty))
+                {
+                    disabledPropertyGetter = PropertyAccess.Getter<object, object>(DisabledProperty, type);
+                }
+            }
+        }
+
+        internal Func<object, object> valuePropertyGetter;
+        internal Func<object, object> textPropertyGetter;
+        internal Func<object, object> disabledPropertyGetter;
+
+        /// <summary>
+        /// Gets the item or value from property.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <param name="property">The property.</param>
+        /// <returns>System.Object.</returns>
+        public object GetItemOrValueFromProperty(object item, string property)
+        {
+            if (property == TextProperty && textPropertyGetter != null)
+            {
+                return textPropertyGetter(item);
+            }
+            else if (property == ValueProperty && valuePropertyGetter != null)
+            {
+                return valuePropertyGetter(item);
+            }
+            else if (property == DisabledProperty && disabledPropertyGetter != null)
+            {
+                return disabledPropertyGetter(item);
+            }
+
+            return item;
         }
 
 #if NET5_0_OR_GREATER
@@ -936,7 +988,7 @@ namespace Radzen
                 selectedItem = item;
                 if (!string.IsNullOrEmpty(ValueProperty))
                 {
-                    internalValue = PropertyAccess.GetItemOrValueFromProperty(item, ValueProperty);
+                    internalValue = GetItemOrValueFromProperty(item, ValueProperty);
                 }
                 else
                 {
@@ -977,7 +1029,7 @@ namespace Radzen
                 if (!string.IsNullOrEmpty(ValueProperty))
                 {
                     System.Reflection.PropertyInfo pi = PropertyAccess.GetElementType(Data.GetType()).GetProperty(ValueProperty);
-                    internalValue = selectedItems.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty)).AsQueryable().Cast(pi.PropertyType);
+                    internalValue = selectedItems.Select(i => GetItemOrValueFromProperty(i, ValueProperty)).AsQueryable().Cast(pi.PropertyType);
                 }
                 else
                 {

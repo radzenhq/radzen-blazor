@@ -14,7 +14,7 @@
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" aria-haspopup="listbox" readonly="" type="text" tabindex="-1"
                    name="@Name" value="@(internalValue != null ? internalValue : "")"
-                   aria-label="@(!Multiple && internalValue != null ? PropertyAccess.GetItemOrValueFromProperty(internalValue, TextProperty) : "")" />
+                   aria-label="@(!Multiple && internalValue != null ? internalValue : "")" />
         </div>
 
         @if (ValueTemplate != null && selectedItem != null)
@@ -32,7 +32,7 @@
         else if (selectedItem != null && !Multiple)
         {
             <label class="rz-dropdown-label rz-inputtext ">
-                @PropertyAccess.GetItemOrValueFromProperty(selectedItem, TextProperty)
+                @GetItemOrValueFromProperty(selectedItem, TextProperty)
             </label>
         }
         else if (Chips && selectedItems.Count > 0 && selectedItems.Count < MaxSelectedLabels)
@@ -42,7 +42,7 @@
                 {
                     <div class="rz-chip">
                         <span class="rz-chip-text">
-                            @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
+                            @GetItemOrValueFromProperty(item, TextProperty)
                         </span>  
                         <button class="rz-button rz-button-sm rz-button-icon-only rz-light @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
                     </div>
@@ -56,7 +56,7 @@
                 {
                     @if (Template == null)
                     {
-                        @(string.Join(Separator, selectedItems.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, TextProperty))))
+                        @(string.Join(Separator, selectedItems.Select(i => GetItemOrValueFromProperty(i, TextProperty))))
                     }
                     else
                     {

@@ -75,7 +75,7 @@ namespace Radzen.Blazor
 
             if (DisabledProperty != null)
             {
-                builder.AddAttribute(3, "Disabled", PropertyAccess.GetItemOrValueFromProperty(item, DisabledProperty));
+                builder.AddAttribute(3, "Disabled", GetItemOrValueFromProperty(item, DisabledProperty));
             }
 
             builder.SetKey(GetKey(item));
@@ -158,7 +158,6 @@ namespace Radzen.Blazor
                     if (!Disabled)
                     {
                         await JSRuntime.InvokeVoidAsync("Radzen.preventArrows", Element);
-                        reload = true;
                     }
 
                     if (reload)
