@@ -306,7 +306,7 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  padding-right: calc(var(--rz-dropdown-trigger-icon-width) / 2);
+  padding: var(--rz-dropdown-label-padding);
 }
 
 .rz-dropdown-chips {
