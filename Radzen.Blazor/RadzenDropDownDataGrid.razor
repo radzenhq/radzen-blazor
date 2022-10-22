@@ -39,41 +39,43 @@
         else if ((selectedItems.Count > 0 || SelectedValue is IEnumerable && !(SelectedValue is string)) && Multiple)
         {
             var itemsToUse = SelectedValue is IEnumerable && !(SelectedValue is string) ? ((IEnumerable)SelectedValue).Cast<object>().ToList() : selectedItems;
-            <label class="rz-dropdown-label rz-inputtext " style="width:100%;">
-                @if (itemsToUse.Count < MaxSelectedLabels)
-                {
-                    @if (Template == null)
+            @if (itemsToUse.Count < MaxSelectedLabels && Template == null && Chips)
+            {
+                <div class="rz-dropdown-chips-wrapper">
+                    @foreach (var item in itemsToUse)
                     {
-                        if (Chips)
+                        <div class="rz-chip">
+                            <span class="rz-chip-text">
+                                @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
+                            </span>  
+                            <button class="rz-button rz-button-sm rz-button-icon-only rz-light @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <label class="rz-dropdown-label rz-inputtext " style="width:100%;">
+                    @if (itemsToUse.Count < MaxSelectedLabels)
+                    {
+                        @if (Template == null)
                         {
-                            <div class="rz-dropdown-chips-wrapper">
-                                @foreach (var item in itemsToUse)
-                                {
-                                    <div class="rz-chip">
-                                        <span class="rz-chip-text">
-                                            @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
-                                        </span>  
-                                        <button class="rz-button rz-button-sm rz-button-icon-only rz-light @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
-                                    </div>
-                                }
-                         </div>
-                        } else {
                             @(string.Join(",", itemsToUse.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, TextProperty))))
+                        }
+                        else
+                        {
+                            foreach (var item in itemsToUse)
+                            {
+                                @Template(item)@(",")
+                            }
                         }
                     }
                     else
                     {
-                        foreach (var item in itemsToUse)
-                        {
-                            @Template(item)@(",")
-                        }
+                        @($"{itemsToUse.Count} {SelectedItemsText}")
                     }
-                }
-                else
-                {
-                    @($"{itemsToUse.Count} {SelectedItemsText}")
-                }
-            </label>
+                </label>
+            }
         }
         else if (SelectedValue != null && !(SelectedValue is IEnumerable && !(SelectedValue is string)))
         {

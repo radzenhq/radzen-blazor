@@ -7,7 +7,7 @@
 @if (DropDown.Multiple)
 {
     <li class="@GetComponentCssClass("rz-multiselect")"
-        aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)" style="display: block;white-space: nowrap;"
+        aria-label="@DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)" style="display: block;white-space: nowrap;"
     @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
         @onclick:preventDefault @onclick="args=>SelectItem(args,true)">
         <div class="rz-chkbox ">
@@ -22,14 +22,14 @@
             }
             else
             {
-                @PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
+                @DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
             }
         </span>
     </li>
 }
 else
 {
-    <li role="option" class="@GetComponentCssClass("rz-dropdown")" aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
+    <li role="option" class="@GetComponentCssClass("rz-dropdown")" aria-label="@DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
     @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
     @onclick:preventDefault @onclick="args=>SelectItem(args,true)">
         <span>
@@ -39,7 +39,7 @@ else
             }
             else
             {
-                @PropertyAccess.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
+                @DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
             }
        </span>
     </li>

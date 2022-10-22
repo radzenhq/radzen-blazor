@@ -128,9 +128,16 @@ else
         }
     }
 
-
+    bool clicking;
     async Task OnClick(MouseEventArgs args)
     {
+        if (clicking)
+        {
+            return;
+        }
+            try
+            {
+                clicking = true;
         if (Grid != null)
         {
 #if NET5_0_OR_GREATER
@@ -209,6 +216,11 @@ else
                 Type = args.Type
             });
 #endif
+            }
+        }
+        finally
+        {
+            clicking = false;
         }
     }
 

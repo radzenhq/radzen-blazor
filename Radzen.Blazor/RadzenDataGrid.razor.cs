@@ -514,7 +514,7 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    action = args => column.SetFilterValue(args, isFirst);
+                    action = args => { column.SetFilterValue(args, isFirst); SaveSettings(); };
                 }
 
                 var eventCallbackGenericCreate = typeof(NumericFilterEventCallback).GetMethod("Create").MakeGenericMethod(type);
@@ -543,6 +543,7 @@ namespace Radzen.Blazor
                         }
 
                         column.SetFilterValue(filterValue, isFirst);
+                        SaveSettings();
                     }));
                 }
                 else if (FilterMode == FilterMode.SimpleWithMenu)

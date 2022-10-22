@@ -95,20 +95,20 @@ else
             {
                 property = (Filter.Property != null ? DataFilter.properties
                     .Where(c => object.Equals(c.Property, Filter.Property)) : DataFilter.properties).FirstOrDefault();
-            }
 
-            if(property != null)
-            {
-                property.FilterValueChange -= OnFilterValueChange;
-                property.FilterValueChange += OnFilterValueChange;
-
-                Filter.Property = property.Property;
-                Filter.FilterOperator = property.GetFilterOperator();
-
-                var v = property.GetFilterValue();
-                if (v != null)
+                if (property != null)
                 {
-                    Filter.FilterValue = v;
+                    property.FilterValueChange -= OnFilterValueChange;
+                    property.FilterValueChange += OnFilterValueChange;
+
+                    Filter.Property = property.Property;
+                    Filter.FilterOperator = property.GetFilterOperator();
+
+                    var v = property.GetFilterValue();
+                    if (v != null)
+                    {
+                        Filter.FilterValue = v;
+                    }
                 }
             }
         }
