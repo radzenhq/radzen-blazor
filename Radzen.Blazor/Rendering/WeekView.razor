@@ -6,7 +6,7 @@
     @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
     {
         <div class="rz-slot-header">
-            @day.ToString("ddd", Scheduler.Culture)
+            @day.ToString(HeaderFormat, Scheduler.Culture)
         </div>
     }
     </div>
@@ -44,6 +44,9 @@
 
     [Parameter]
     public string TimeFormat { get; set; }
+
+    [Parameter]
+    public string HeaderFormat { get; set; }
 
     [Parameter]
     public int MinutesPerSlot { get; set; }
