@@ -379,7 +379,7 @@ namespace Radzen
 
                 var type = query.ElementType;
 
-                if (type == typeof(object) && query.Any())
+                if (type == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Any())
                 { 
                     type = query.FirstOrDefault().GetType();
                 }
