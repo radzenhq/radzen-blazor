@@ -86,12 +86,6 @@ $radio-checked-border: var(--rz-input-border) !default;
 
   width: var(--rz-radio-width);
   height: var(--rz-radio-height);
-
-  .rz-helper-hidden-accessible {
-    opacity: 0;
-    height: 0;
-    overflow: hidden;
-  }
 }
 
 .rz-radiobutton-box {

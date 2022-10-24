@@ -83,10 +83,6 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
   @extend %input;
 
   .rz-helper-hidden-accessible {
-    opacity: 0;
-    height: 0;
-    overflow: hidden;
-
     input {
       height: 0;
       padding: 0;

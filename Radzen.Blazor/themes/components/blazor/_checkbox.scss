@@ -87,11 +87,6 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
   min-width: var(--rz-checkbox-width);
   height: var(--rz-checkbox-height);
 
-  .rz-helper-hidden-accessible {
-    opacity: 0;
-    height: 0;
-    overflow: hidden;
-  }
 }
 
 .rz-chkbox-box {
