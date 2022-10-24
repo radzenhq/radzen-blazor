@@ -74,6 +74,7 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 }
 
 %dropdown {
+  box-sizing: border-box;
   display: inline-flex;
   flex-direction: column;
   position: relative;
@@ -90,6 +91,7 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
       height: 0;
       padding: 0;
       margin: 0;
+      border: 0;
     }
   }
 
@@ -309,6 +311,7 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
   white-space: nowrap;
   text-overflow: ellipsis;
   padding: var(--rz-dropdown-label-padding);
+  margin: 0;
 }
 
 .rz-dropdown-chips {
