@@ -13,7 +13,7 @@
         @if (Multiline)
         {
             <textarea @ref="@search" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
-                oninput="@OpenScript()" tabindex="@TabIndex"  @onchange="@OnChange"
+                oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"  @onchange="@OnChange"
                 aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
                 class="@InputClassList"
                 id="@Name" aria-expanded="true" placeholder="@Placeholder" />
@@ -21,7 +21,7 @@
         else
         {
             <input @ref="@search" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
-                oninput="@OpenScript()" tabindex="@TabIndex"  @onchange="@OnChange"
+                oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onchange="@OnChange"
                 aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
                 class="@InputClassList"
                 type="text" id="@Name" aria-expanded="true" placeholder="@Placeholder" />
