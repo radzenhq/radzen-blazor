@@ -2440,8 +2440,17 @@ namespace Radzen.Blazor
 
             SaveSettings();
 
+            await PageSizeChanged.InvokeAsync(value);
+
             await base.OnPageSizeChanged(value);
         }
+
+        /// <summary>
+        /// Gets or sets the page size changed callback.
+        /// </summary>
+        /// <value>The page size changed callback.</value>
+        [Parameter]
+        public EventCallback<int> PageSizeChanged { get; set; }
 
         /// <summary>
         /// Gets DataGrid settings as JSON string.
