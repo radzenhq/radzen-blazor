@@ -75,6 +75,7 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
 
 %dropdown {
   display: inline-flex;
+  flex-direction: column;
   position: relative;
   overflow: hidden;
 
@@ -83,11 +84,12 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
   .rz-helper-hidden-accessible {
     opacity: 0;
     height: 0;
-    width: 0;
     overflow: hidden;
 
     input {
       height: 0;
+      padding: 0;
+      margin: 0;
     }
   }
 
