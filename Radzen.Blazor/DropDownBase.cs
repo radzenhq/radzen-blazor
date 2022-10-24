@@ -375,7 +375,14 @@ namespace Radzen
 
             if (_data != null)
             {
-                var type = _data.AsQueryable().ElementType;
+                var query = _data.AsQueryable();
+
+                var type = query.ElementType;
+
+                if (type == typeof(object) && query.Any())
+                { 
+                    type = query.FirstOrDefault().GetType();
+                }
 
                 if (!string.IsNullOrEmpty(ValueProperty))
                 {
