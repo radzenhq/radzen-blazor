@@ -1040,8 +1040,14 @@ namespace Radzen
                 }
                 else
                 {
-                    var firstElement = Data.Cast<object>().FirstOrDefault();
-                    var elementType = firstElement != null ? firstElement.GetType() : null;
+                    var query = Data.AsQueryable();
+                    var elementType = query.ElementType;
+
+                    if (elementType == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Any())
+                    {
+                        elementType = query.FirstOrDefault().GetType();
+                    }
+
                     if (elementType != null)
                     {
                         internalValue = selectedItems.AsQueryable().Cast(elementType);
