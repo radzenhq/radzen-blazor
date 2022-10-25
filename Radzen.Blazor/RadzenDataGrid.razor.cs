@@ -2548,9 +2548,11 @@ namespace Radzen.Blazor
 
                 if (settings.Groups != null && !settings.Groups.SequenceEqual(Groups))
                 {
+                    groups.CollectionChanged -= GroupsCollectionChanged;
                     Groups.Clear();
                     settings.Groups.ToList().ForEach(Groups.Add);
                     shouldUpdateState = true;
+                    groups.CollectionChanged += GroupsCollectionChanged;
                 }
 
                 if (settings.CurrentPage != null && settings.CurrentPage != CurrentPage)
