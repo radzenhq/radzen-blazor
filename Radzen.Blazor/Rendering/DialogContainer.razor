@@ -49,11 +49,11 @@
     {
         @if (Dialog.Options.CloseDialogOnOverlayClick)
         {
-            <div @onclick="@Close" class="rz-dialog-mask" style="z-index: 1000;"></div>
+            <div @onclick="@Close" class="rz-dialog-mask"></div>
         }
         else
         {
-            <div class="rz-dialog-mask" style="z-index: 1000;"></div>
+            <div class="rz-dialog-mask"></div>
         }
     }
 
@@ -138,7 +138,7 @@
     {
         get
         {
-            var baseStyle = "min-width: 150px; min-height: 150px; z-index: 1001; opacity: 1;position:absolute;";
+            var baseStyle = "";
             var widthStyle = !string.IsNullOrEmpty(width) ? width : string.IsNullOrEmpty(Dialog.Options.Width) ? "" : $"width: {Dialog.Options.Width};";
             var heightStyle = !string.IsNullOrEmpty(height) ? height : string.IsNullOrEmpty(Dialog.Options.Height) ? "" : $"height: {Dialog.Options.Height};";
             var topStyle = !string.IsNullOrEmpty(top) ? top : string.IsNullOrEmpty(Dialog.Options.Top) ? "" : $"top: {Dialog.Options.Top};";

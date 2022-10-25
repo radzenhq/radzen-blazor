@@ -247,7 +247,7 @@ namespace Radzen
         {
             var dialogOptions = new DialogOptions()
             {
-                Width = options != null ? !string.IsNullOrEmpty(options.Width) ? options.Width : "355px" : "355px",
+                Width = options != null ? !string.IsNullOrEmpty(options.Width) ? options.Width : "" : "",
                 Height = options != null ? options.Height : null,
                 Left = options != null ? options.Left : null,
                 Top = options != null ? options.Top : null,
@@ -261,7 +261,7 @@ namespace Radzen
                 AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true,
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
-                CssClass = options != null ? options.CssClass : "",
+                CssClass = options != null ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm",
             };
 
             await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Reference);
@@ -271,32 +271,25 @@ namespace Radzen
                 RenderFragment content = b =>
                 {
                     var i = 0;
-                    b.OpenElement(i++, "div");
                     b.OpenElement(i++, "p");
-                    b.AddAttribute(i++, "style", "margin-bottom: 20px;");
+                    b.AddAttribute(i++, "class", "rz-dialog-confirm-message");
                     b.AddContent(i++, message);
                     b.CloseElement();
 
                     b.OpenElement(i++, "div");
-                    b.AddAttribute(i++, "class", "row");
-                    b.OpenElement(i++, "div");
-                    b.AddAttribute(i++, "class", "col-md-12");
+                    b.AddAttribute(i++, "class", "rz-dialog-confirm-buttons");
 
                     b.OpenComponent<Blazor.RadzenButton>(i++);
                     b.AddAttribute(i++, "Text", options != null ? options.OkButtonText : "Ok");
-                    b.AddAttribute(i++, "Style", "margin-bottom: 10px; width: 150px");
                     b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(true)));
                     b.CloseComponent();
 
                     b.OpenComponent<Blazor.RadzenButton>(i++);
                     b.AddAttribute(i++, "Text", options != null ? options.CancelButtonText : "Cancel");
                     b.AddAttribute(i++, "ButtonStyle", ButtonStyle.Secondary);
-                    b.AddAttribute(i++, "Style", "margin-bottom: 10px; margin-left: 10px; width: 150px");
                     b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(false)));
                     b.CloseComponent();
 
-                    b.CloseElement();
-                    b.CloseElement();
                     b.CloseElement();
                 };
                 return content;

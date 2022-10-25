@@ -38,10 +38,28 @@ $dialog-border-radius: var(--rz-border-radius) !default;
   --rz-dialog-border-radius: #{$dialog-border-radius};
 }
 
-.rz-dialog {
+.rz-dialog-wrapper {
+  display: flex;
   position: fixed;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  z-index: 1001;
+  align-items: center;
+  justify-content: center;
+}
 
+.rz-dialog {
+  position: static;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+  max-height: 100%;
+  min-height: 150px;
+  z-index: 1001;
+  opacity: 1;
   background-color: var(--rz-dialog-background-color);
   box-shadow: var(--rz-dialog-shadow);
   border-radius: var(--rz-dialog-border-radius);
@@ -80,17 +98,34 @@ $dialog-border-radius: var(--rz-border-radius) !default;
 }
 
 .rz-dialog-content {
+  flex: 0 1 auto;
   padding: var(--rz-dialog-content-padding);
   overflow: auto;
 }
 
-.rz-confirmdialog {
-  top: 50%;
-  left: 50%;
+.rz-dialog-confirm {
+  max-width: 400px;
+  margin: 0.75rem;
+}
+
+.rz-dialog-confirm-message {
+  margin-bottom: 1.5rem;
+}
+
+.rz-dialog-confirm-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  .rz-button {
+    flex: 8rem 1;
+    min-width: fit-content;
+  }
 }
 
 .rz-dialog-mask {
   position: fixed;
+  z-index: 1000;
   width: 100%;
   height: 100%;
   top: 0;
@@ -100,32 +135,18 @@ $dialog-border-radius: var(--rz-border-radius) !default;
   opacity: 0.5;
 }
 
-.rz-dialog-footer {
-  text-align: right;
-  border: 0 none;
-  padding: 1em;
-
-  .rz-button {
-    text-align: left !important;
-    padding: 6px;
-  }
-
-  .rz-button:first-child {
-    background-color: var(--rz-primary);
-    width: 80px;
-  }
-
-  .rz-button:last-child {
-    background-color: var(--rz-secondary);
-    width: 105px;
-  }
+.no-scroll {
+  overflow: hidden;
+  padding-right: 15px;
 }
 
 @media (max-width: 768px) {
   .rz-dialog {
-    &:not(.rz-confirmdialog) {
+    &:not(.rz-dialog-confirm) {
+      position: absolute;
       width: 100% !important;
       top: 0px !important;
+      border-radius: 0;
     }
   }
 
@@ -133,36 +154,11 @@ $dialog-border-radius: var(--rz-border-radius) !default;
     -webkit-overflow-scrolling: touch;
   }
 
+  .rz-dialog-confirm {
+    max-width: 355px;
+  }
+
   .no-scroll {
     padding-right: 0;
-  }
-}
-
-.no-scroll {
-  overflow: hidden;
-  padding-right: 15px;
-}
-
-.rz-dialog-wrapper {
-  display: flex;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  bottom: 0;
-  z-index: 1001;
-  align-items: center;
-  justify-content: center;
-
-  .rz-dialog {
-    max-height: 100%;
-    display: flex;
-    flex-direction: column;
-    position: static;
-  }
-
-  .rz-dialog-content {
-    flex: 0 1 auto;
-    overflow: auto;
   }
 }
