@@ -23,6 +23,7 @@ $switch-checked-circle-background-color: var(--rz-text-contrast-color) !default;
 .rz-switch {
   position: relative;
   display: inline-block;
+  vertical-align: middle;
   width: $switch-width;
   min-width: $switch-width;
   height: $switch-height;
