@@ -90,7 +90,7 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Represents the common <see cref="RadzenSelectBar{TValue}" /> API used by 
+    /// Represents the common <see cref="RadzenSelectBar{TValue}" /> API used by
     /// its items. Injected as a cascading property in <see cref="RadzenSelectBarItem" />.
     /// </summary>
     public interface IRadzenSelectBar
@@ -679,7 +679,7 @@ namespace Radzen
         /// </summary>
         Info,
         /// <summary>
-        /// Represents a success. 
+        /// Represents a success.
         /// </summary>
         Success,
         /// <summary>
@@ -698,7 +698,7 @@ namespace Radzen
         /// </summary>
         Determinate,
         /// <summary>
-        /// RadzenProgressBar displays continuous animation. 
+        /// RadzenProgressBar displays continuous animation.
         /// </summary>
         Indeterminate
     }
@@ -1357,7 +1357,7 @@ namespace Radzen
         /// </summary>
         /// <value>The filter operator.</value>
         public FilterOperator FilterOperator { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the logic used to combine the outcome of filtering by <see cref="FilterValue" />.
         /// </summary>
@@ -1809,6 +1809,9 @@ namespace Radzen
         /// Gets or sets the password.
         /// </summary>
         public string Password { get; set; }
+
+        /// <summary> Gets or sets a value indicating whether the user wants to remember their credentials. </summary>
+        public bool RememberMe { get; set; }
     }
 
     /// <summary>
@@ -1838,7 +1841,7 @@ namespace Radzen
             {
                 return Enum.Parse(Nullable.GetUnderlyingType(type), value.ToString());
             }
-            
+
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
                 Type itemType = type.GetGenericArguments()[0];
@@ -2079,11 +2082,11 @@ namespace Radzen
             return source.IsEnum;
         }
 
-        /// <summary> 
-        /// Determines whether the specified type is a Nullable enum. 
-        /// </summary> 
-        /// <param name="source">The type.</param> 
-        /// <returns><c>true</c> if the specified source is an enum; otherwise, <c>false</c>.</returns> 
+        /// <summary>
+        /// Determines whether the specified type is a Nullable enum.
+        /// </summary>
+        /// <param name="source">The type.</param>
+        /// <returns><c>true</c> if the specified source is an enum; otherwise, <c>false</c>.</returns>
         public static bool IsNullableEnum(Type source)
         {
             if (source == null) return false;
@@ -2133,7 +2136,7 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Represents the common <see cref="RadzenTemplateForm{TItem}" /> API used by 
+    /// Represents the common <see cref="RadzenTemplateForm{TItem}" /> API used by
     /// its items. Injected as a cascading property in <see cref="IRadzenFormComponent" />.
     /// </summary>
     public interface IRadzenForm

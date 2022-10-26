@@ -19,9 +19,22 @@
                     Login with register
                 </RadzenText>
                 <RadzenTemplateForm Data=@("LoginWithRegister")>
-                <RadzenLogin AllowResetPassword="false" 
-                                Login=@(args => OnLogin(args, "Login with register")) 
+                <RadzenLogin AllowResetPassword="false"
+                                Login=@(args => OnLogin(args, "Login with register"))
                                 Register=@(args => OnRegister("Login with register")) />
+                </RadzenTemplateForm>
+            </RadzenCard>
+        </div>
+        <div class="col-xl-6 p-3">
+            <RadzenCard class="p-5">
+                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" Class="mb-4">
+                    Remember Me
+                </RadzenText>
+                <RadzenTemplateForm Data=@("LoginWithRemember")>
+                <RadzenLogin AllowResetPassword="false"
+                             AllowRememberMe="true"
+                             Login=@(args => OnLogin(args, "Login with remember"))
+                             Register=@(args => OnRegister("Login with remember")) />
                 </RadzenTemplateForm>
             </RadzenCard>
         </div>
@@ -31,7 +44,7 @@
                     Register and password reset
                 </RadzenText>
                 <RadzenTemplateForm Data=@("LoginWithRegisterAndReset")>
-                <RadzenLogin Login=@(args => OnLogin(args, "Login with register and password reset")) 
+                <RadzenLogin Login=@(args => OnLogin(args, "Login with register and password reset"))
                                 ResetPassword=@(args => OnResetPassword(args, "Login with register and password reset"))
                                 Register=@(args => OnRegister("Login with register and password reset")) />
                 </RadzenTemplateForm>
@@ -44,9 +57,10 @@
                 </RadzenText>
                 <RadzenTemplateForm Data=@("LoginWithDefaultValues")>
                 <RadzenLogin AllowRegister="true" AllowResetPassword="true" Username=@userName Password=@password
-                                Login=@(args => OnLogin(args, "Login with default values"))
-                                ResetPassword=@(args => OnResetPassword(args, "Login with default values"))
-                                Register=@(args => OnRegister("Login with default values")) />
+                             AllowRememberMe="true" RememberMe="@rememberMe"
+                             Login=@(args => OnLogin(args, "Login with default values"))
+                             ResetPassword=@(args => OnResetPassword(args, "Login with default values"))
+                             Register=@(args => OnRegister("Login with default values")) />
                 </RadzenTemplateForm>
             </RadzenCard>
         </div>
@@ -57,15 +71,17 @@
                 </RadzenText>
                 <RadzenTemplateForm Data=@("Localization")>
                 <RadzenLogin AllowRegister="true" AllowResetPassword="true"
-                                LoginText="Einloggen" UserText="Benutzername" PasswordText="Passwort"
-                                UserRequired="Benutzername erforderlich"
-                                PasswordRequired="Passwort erforderlich"
-                                RegisterText="Registrieren"
-                                RegisterMessageText="Sie haben noch keinen Account?"
-                                ResetPasswordText="Passwort zurücksetzen"
-                                Login=@(args => OnLogin(args, "Localized login"))
-                                ResetPassword=@(args => OnResetPassword(args, "Localized login"))
-                                Register=@(args => OnRegister("Localized login")) />
+                             AllowRememberMe="true"
+                             LoginText="Einloggen" UserText="Benutzername" PasswordText="Passwort"
+                             UserRequired="Benutzername erforderlich"
+                             PasswordRequired="Passwort erforderlich"
+                             RegisterText="Registrieren"
+                             RegisterMessageText="Sie haben noch keinen Account?"
+                             ResetPasswordText="Passwort zurücksetzen"
+                             RememberMeText="Behalte mich in Erinnerung"
+                             Login=@(args => OnLogin(args, "Localized login"))
+                             ResetPassword=@(args => OnResetPassword(args, "Localized login"))
+                             Register=@(args => OnRegister("Localized login")) />
                 </RadzenTemplateForm>
             </RadzenCard>
         </div>
@@ -108,11 +124,13 @@
 @code {
     string userName = "admin";
     string password = "admin";
+    bool rememberMe = true;
+
     EventConsole console;
 
     void OnLogin(LoginArgs args, string name)
     {
-        console.Log($"{name} -> Username: {args.Username} and password: {args.Password}");
+        console.Log($"{name} -> Username: {args.Username}, password: {args.Password}, remember me: {args.RememberMe}");
     }
 
     void OnRegister(string name)

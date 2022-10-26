@@ -5,19 +5,29 @@
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
         <div class="rz-form">
             <div class="rz-form-row">
-                <label class="rz-label" for="username">@UserText</label>
+                <label class="rz-label" for=@Id("username")>@UserText</label>
                 <div class="rz-form-input-wrapper">
-                    <RadzenTextBox AutoComplete=@AutoComplete Name="Username" @bind-Value=@Username />
+                    <RadzenTextBox AutoComplete=@AutoComplete id=@Id("username") Name="Username" @bind-Value=@username />
                     <RadzenRequiredValidator Component="Username" Text=@UserRequired />
                 </div>
             </div>
             <div class="rz-form-row">
-                <label class="rz-label" for="password">@PasswordText</label>
+                <label class="rz-label" for=@Id("password")>@PasswordText</label>
                 <div class="rz-form-input-wrapper">
-                    <RadzenPassword AutoComplete=@AutoComplete Name="Password" @bind-Value=@Password />
+                    <RadzenPassword id=@Id("password") AutoComplete=@AutoComplete Name="Password" @bind-Value=@password />
                     <RadzenRequiredValidator Component="Password" Text=@PasswordRequired />
                 </div>
             </div>
+@if (AllowRememberMe)
+{
+            <div class="rz-form-row">
+                <label class="rz-label"></label>
+                <div class="rz-form-input-wrapper">
+                    <RadzenSwitch @bind-Value="@rememberMe" id=@Id("rememberMe") />
+                    <label class="rz-label" for=@Id("rememberme")>@RememberMeText</label>
+                </div>
+            </div>
+}
             <div class="rz-form-row">
                 <label class="rz-label"></label>
                 <div class="rz-form-input-wrapper rz-login-buttons">

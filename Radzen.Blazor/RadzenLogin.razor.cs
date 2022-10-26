@@ -20,12 +20,12 @@ namespace Radzen.Blazor
     ///   {
     ///     Console.WriteLine($"{name} -> Username: {args.Username} and password: {args.Password}");
     ///   }
-    ///   
+    ///
     ///   void OnRegister(string name)
     ///   {
     ///     Console.WriteLine($"{name} -> Register");
     ///   }
-    ///   
+    ///
     ///   void OnResetPassword(string value, string name)
     ///   {
     ///     Console.WriteLine($"{name} -> ResetPassword for user: {value}");
@@ -48,54 +48,33 @@ namespace Radzen.Blazor
             return "rz-login";
         }
 
-        string _username;
+        string username;
         /// <summary>
         /// Gets or sets the username.
         /// </summary>
         /// <value>The username.</value>
         [Parameter]
-        public string Username
-        {
-            get
-            {
-                return _username;
-            }
-            set
-            {
-                if (_username != value)
-                {
-                    _username = value;
-                }
-            }
-        }
+        public string Username { get; set; }
 
-        string _password;
+        string password;
         /// <summary>
         /// Gets or sets the password.
         /// </summary>
         /// <value>The password.</value>
         [Parameter]
-        public string Password
-        {
-            get
-            {
-                return _password;
-            }
-            set
-            {
-                if (_password != value)
-                {
-                    _password = value;
-                }
-            }
-        }
+        public string Password { get; set; }
+
+        private bool rememberMe;
+        /// <summary> Sets the initial value of the remember me switch.</summary>
+        [Parameter]
+        public bool RememberMe { get; set; }
 
         /// <summary>
         /// Gets or sets the login callback.
         /// </summary>
         /// <value>The login callback.</value>
         [Parameter]
-        public EventCallback<Radzen.LoginArgs> Login { get; set; }
+        public EventCallback<LoginArgs> Login { get; set; }
 
         /// <summary>
         /// Gets or sets the register callback.
@@ -119,6 +98,12 @@ namespace Radzen.Blazor
         public bool AllowRegister { get; set; } = true;
 
         /// <summary>
+        /// Asks the user whether to remember their credentials. Set to <c>false</c> by default.
+        /// </summary>
+        [Parameter]
+        public bool AllowRememberMe { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether reset password is allowed.
         /// </summary>
         /// <value><c>true</c> if reset password is allowed; otherwise, <c>false</c>.</value>
@@ -138,6 +123,10 @@ namespace Radzen.Blazor
         /// <value>The register text.</value>
         [Parameter]
         public string RegisterText { get; set; } = "Sign up";
+
+        /// <summary> Gets or sets the remember me text.</summary>
+        [Parameter]
+        public string RememberMeText { get; set; } = "Remember me";
 
         /// <summary>
         /// Gets or sets the register message text.
@@ -188,8 +177,43 @@ namespace Radzen.Blazor
         {
             if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
             {
-                await Login.InvokeAsync(new Radzen.LoginArgs { Username = Username, Password = Password });
+                await Login.InvokeAsync(new LoginArgs { Username = username, Password = password, RememberMe = rememberMe });
             }
+        }
+
+        private string Id(string name)
+        {
+            return $"{GetId()}-{name}";
+        }
+
+        /// <inheritdoc />
+        protected override void OnInitialized()
+        {
+            username = Username;
+            password = Password;
+            rememberMe = RememberMe;
+            base.OnInitialized();
+        }
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            if (parameters.DidParameterChange(nameof(Username), Username))
+            {
+                username = Username;
+            }
+
+            if (parameters.DidParameterChange(nameof(Password), Password))
+            {
+                password = Password;
+            }
+
+            if (parameters.DidParameterChange(nameof(RememberMe), RememberMe))
+            {
+                rememberMe = RememberMe;
+            }
+
+            await base.SetParametersAsync(parameters);
         }
 
         /// <summary>
