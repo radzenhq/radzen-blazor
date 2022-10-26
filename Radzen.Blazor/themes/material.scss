@@ -563,7 +563,7 @@ $switch-circle-margin: 0 !default;
   &:hover:not(.rz-disabled) {
     &:before {
       transition: background var(--rz-transition), transform var(--rz-transition), outlin-color var(--rz-transition);
-      outline: 10px solid rgba(0, 0, 0, 0.04);
+      box-shadow: var(--rz-switch-box-shadow), 0 0 0 10px rgba(0, 0, 0, 0.04);
     }
   }
 }
@@ -571,7 +571,7 @@ $switch-circle-margin: 0 !default;
 .rz-switch.rz-switch-checked .rz-switch-circle {
   &:hover:not(.rz-disabled) {
     &:before {
-      outline: 10px solid var(--rz-primary-lighter);
+      box-shadow: var(--rz-switch-box-shadow), 0 0 0 10px var(--rz-primary-lighter);
     }
   }
 }
