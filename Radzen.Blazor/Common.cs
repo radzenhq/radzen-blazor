@@ -1884,7 +1884,12 @@ namespace Radzen
 
             foreach (var member in propertyName.Split("."))
             {
-                body = Expression.PropertyOrField(body, member);
+                body = !body.Type.IsInterface ? 
+                    Expression.PropertyOrField(body, member) :
+                        Expression.Property(
+                            body,
+                            new Type[] { body.Type }.Concat(body.Type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(member) != null),
+                            member);
             }
 
             body = Expression.Convert(body, typeof(TValue));
