@@ -1084,6 +1084,14 @@ namespace RadzenBlazorDemos
                     Path = "notification",
                     Title = "Blazor notification component",
                     Icon = "&#xe85a",
+                    Tags = new [] { "message", "notification" }
+                },
+                new Example()
+                {
+                    Name = "Alert",
+                    Path = "alert",
+                    Title = "Blazor alert component",
+                    Icon = "&#xe88e",
                     Tags = new [] { "message", "alert" }
                 },
                 new Example()

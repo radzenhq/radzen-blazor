@@ -1,0 +1,26 @@
+﻿@page "/alert"
+
+<RadzenExample Name="Alert">
+<div class="container-fluid">
+    <div class="row" style="min-height: 200px;">
+        <div class="col-xl-6 p-3">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="mb-4">Alert with close button</RadzenText>
+            <RadzenAlert>
+                Some text
+            </RadzenAlert>
+        </div>
+        <div class="col-xl-6 p-3">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="mb-4">Alert without close button</RadzenText>
+            <RadzenAlert AllowClose=false>
+                Some text
+            </RadzenAlert>
+        </div>
+    </div>
+</div>
+</RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
+
+@code {
+    EventConsole console;
+}
