@@ -134,7 +134,11 @@ else
 
     async Task OnPropertyChange(object p)
     {
+        property.FilterValueChange -= OnFilterValueChange;
+
         property = DataFilter.properties.Where(c => object.Equals(c.Property, p)).FirstOrDefault();
+
+        property.FilterValueChange += OnFilterValueChange;
 
         Filter.FilterValue = null;
 
