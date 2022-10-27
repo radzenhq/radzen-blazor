@@ -44,6 +44,10 @@ $login-register-button-margin: 0 !default;
           border: var(--rz-border-danger);
         }
       }
+
+      .rz-switch {
+        margin-right: 0.5rem;
+      }
     }
 
     .rz-messages-error {
