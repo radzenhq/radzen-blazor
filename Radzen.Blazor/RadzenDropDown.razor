@@ -132,7 +132,7 @@
                     </a>
                 </div>
             }
-            <div class="@(Multiple ? "rz-multiselect-items-wrapper" : "rz-dropdown-items-wrapper")" style="max-height: 200px;overflow-x: hidden">
+            <div class="@(Multiple ? "rz-multiselect-items-wrapper" : "rz-dropdown-items-wrapper")" style="max-height: @PopupHeight;overflow-x: hidden">
                 <ul @ref="list" class="@(Multiple ? "rz-multiselect-items rz-multiselect-list" : "rz-dropdown-items rz-dropdown-list")" role="listbox">
                     @if (View != null)
                     {

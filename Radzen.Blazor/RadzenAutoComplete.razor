@@ -26,7 +26,7 @@
                 class="@InputClassList"
                 type="text" id="@Name" aria-expanded="true" placeholder="@Placeholder" />
         }
-        <div id="@PopupID" class="rz-autocomplete-panel" style="display:none; transform: none; box-sizing: border-box; max-height: 200px;">
+        <div id="@PopupID" class="rz-autocomplete-panel" style="display:none; transform: none; box-sizing: border-box; max-height: @PopupHeight;">
             <ul @ref="@list" class="rz-autocomplete-items rz-autocomplete-list" role="listbox">
                 @if (!string.IsNullOrEmpty(searchText) || !string.IsNullOrEmpty(customSearchText))
                 {

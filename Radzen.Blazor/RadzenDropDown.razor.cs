@@ -90,6 +90,13 @@ namespace Radzen.Blazor
         public int MaxSelectedLabels { get; set; } = 4;
 
         /// <summary>
+        /// Gets or sets the Popup height.
+        /// </summary>
+        /// <value>The number Popup height.</value>
+        [Parameter]
+        public string PopupHeight { get; set; } = "200px";
+
+        /// <summary>
         /// Gets or sets a value indicating whether the selected items will be displayed as chips. Set to <c>false</c> by default.
         /// Requires <see cref="DropDownBase{T}.Multiple" /> to be set to <c>true</c>. 
         /// </summary>
