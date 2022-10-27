@@ -1090,6 +1090,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Alert",
                     Path = "alert",
+                    New = true,
                     Title = "Blazor alert component",
                     Icon = "&#xe88e",
                     Tags = new [] { "message", "alert" }
