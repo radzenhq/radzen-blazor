@@ -24,21 +24,6 @@ $validator-transform: translateY(12px) !default;
   --rz-validator-transform: #{$validator-transform};
 }
 
-.rz-form {
-  .rz-textbox,
-  .rz-lookup,
-  .rz-dropdown,
-  .rz-multiselect,
-  .rz-calendar,
-  .rz-spinner,
-  .textarea {
-    width: 100%;
-  }
-  .rz-messages-error {
-    position: absolute;
-  }
-}
-
 .rz-messages-error {
   display: inline-block;
   color: var(--rz-form-error-color);
@@ -64,11 +49,5 @@ $validator-transform: translateY(12px) !default;
     top: 0;
     left: 0;
     transform: translate(var(--rz-validator-pointer-size), -100%);
-  }
-}
-
-.rz-template-form {
-  .row {
-    margin: 0;
   }
 }

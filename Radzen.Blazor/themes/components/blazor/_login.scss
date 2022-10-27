@@ -38,16 +38,17 @@ $login-register-button-margin: 0 !default;
 
       .rz-textbox  {
         display: block;
+        width: 100%;
 
         &.invalid {
           border: var(--rz-border-danger);
         }
       }
-
-      .rz-switch {
-        margin-right: 0.5rem;
-      }
     }
+
+    .rz-messages-error {
+      position: absolute;
+    } 
   }
 
   .rz-register {
