@@ -34,7 +34,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The number Popup height.</value>
         [Parameter]
-        public string PopupHeight { get; set; } = "200px";
+        public string PopupStyle { get; set; } = "display:none; transform: none; box-sizing: border-box; max-height: 200px;";
 
         /// <summary>
         /// Gets or sets the template.
