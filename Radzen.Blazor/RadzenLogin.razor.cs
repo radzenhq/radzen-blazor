@@ -175,7 +175,7 @@ namespace Radzen.Blazor
         /// </summary>
         protected async Task OnLogin()
         {
-            if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
             {
                 await Login.InvokeAsync(new LoginArgs { Username = username, Password = password, RememberMe = rememberMe });
             }
