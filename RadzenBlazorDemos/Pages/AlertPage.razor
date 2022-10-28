@@ -4,46 +4,16 @@
 <div class="container-fluid">
     <div class="row" style="min-height: 200px;">
         <div class="col-12 p-3">
-            <RadzenAlert>
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter">
                 Alert with close button
             </RadzenAlert>
-        </div>
-        <div class="col-12 p-3">
-            <RadzenAlert AllowClose=false>
+            <RadzenAlert  AllowClose="false" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
                 Alert without close button
             </RadzenAlert>
-        </div>
-        <div class="col-12 p-3">
-            <RadzenAlert Title="Alert with title">
-                Alert with close button
-            </RadzenAlert>
-        </div>
-        <div class="col-12 p-3">
-            <RadzenAlert Title="Alert with title" Variant="Variant.Filled" AlertStyle="AlertStyle.Info"  Shade="Shade.Lighter">
-                Alert with close button
-            </RadzenAlert>
-        </div>
-        <div class="col-12 p-3">
-            <RadzenAlert Title="Alert with title" Variant="Variant.Flat" AlertStyle="AlertStyle.Success">
-                Alert with close button
-            </RadzenAlert>
-        </div>
-        <div class="col-12 p-3">
-            <RadzenAlert Title="Alert with title" Variant="Variant.Outlined" AlertStyle="AlertStyle.Success">
-                Alert with close button
-            </RadzenAlert>
-        </div>
-        <div class="col-12 p-3">
-            <RadzenAlert Title="Alert with title" Variant="Variant.Text" AlertStyle="AlertStyle.Success">
+            <RadzenAlert Title="Alert with Title" AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
                 Alert with close button
             </RadzenAlert>
         </div>
     </div>
 </div>
 </RadzenExample>
-
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    EventConsole console;
-}

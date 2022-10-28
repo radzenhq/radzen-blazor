@@ -1074,7 +1074,7 @@ namespace RadzenBlazorDemos
                     Name = "Badge",
                     Path = "badge",
                     Updated = true,
-                    Title = "Blazor badge component",
+                    Title = "Blazor Badge component",
                     Icon = "&#xea67",
                     Tags = new[] { "badge", "link"}
                 },
@@ -1082,18 +1082,33 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Notification",
                     Path = "notification",
-                    Title = "Blazor notification component",
+                    Title = "Blazor Notification component",
                     Icon = "&#xe85a",
                     Tags = new [] { "message", "notification" }
                 },
                 new Example()
                 {
                     Name = "Alert",
-                    Path = "alert",
                     New = true,
-                    Title = "Blazor alert component",
+                    Title = "Blazor Alert component",
                     Icon = "&#xe88e",
-                    Tags = new [] { "message", "alert" }
+                    Tags = new [] { "message", "alert" },
+                    Children = new [] {
+                        new Example
+                        {
+                            Name = "Alert Configuration",
+                            Title = "Blazor Alert component",
+                            Path = "alert",
+                            Tags = new [] { "message", "alert" },
+                        },
+                        new Example
+                        {
+                            Name = "Alert Styling",
+                            Title = "Blazor Alert styling",
+                            Path = "alert-styling",
+                            Tags = new [] { "message", "alert" },
+                        }
+                    }
                 },
                 new Example()
                 {
