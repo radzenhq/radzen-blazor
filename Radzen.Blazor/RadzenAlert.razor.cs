@@ -34,6 +34,13 @@ namespace Radzen.Blazor
         public string Title { get; set; }
 
         /// <summary>
+        /// Gets or sets the icon.
+        /// </summary>
+        /// <value>The icon.</value>
+        [Parameter]
+        public string Icon { get; set; }
+
+        /// <summary>
         /// Gets or sets the severity.
         /// </summary>
         /// <value>The severity.</value>
@@ -64,6 +71,57 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return $"rz-alert rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(AlertStyle), AlertStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()}";
+        }
+
+        string getIcon()
+        {
+            if (string.IsNullOrEmpty(Icon))
+            {
+                return Icon;
+            }
+            else if (AlertStyle == AlertStyle.Primary)
+            {
+                return "";
+            }
+            else if (AlertStyle == AlertStyle.Secondary)
+            {
+                return "";
+            }
+            else if (AlertStyle == AlertStyle.Light)
+            {
+                return "";
+            }
+            else if (AlertStyle == AlertStyle.Base)
+            {
+                return "";
+            }
+            else if (AlertStyle == AlertStyle.Dark)
+            {
+                return "";
+            }
+            else if (AlertStyle == AlertStyle.Success)
+            {
+                return "";
+            }
+            else if (AlertStyle == AlertStyle.Danger)
+            {
+                return "";
+            }
+            else if (AlertStyle == AlertStyle.Warning)
+            {
+                return "";
+            }
+            else if (AlertStyle == AlertStyle.Info)
+            {
+                return "";
+            }
+
+            return "";
+        }
+
+        void Close()
+        {
+            visible = false;
         }
     }
 }
