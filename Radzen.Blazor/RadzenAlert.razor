@@ -1,22 +1,20 @@
 ﻿@inherits RadzenComponentWithChildren
 @if (GetVisible())
 {
-    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-
-        <div aria-live="polite" class="rz-growl-item-container rz-state-highlight">
-            <div class="rz-growl-item">
-                @if (AllowClose)
-                {
-                    <RadzenButton Click=@(args => visible = false) />
-                }
-                <span class="rz-growl-image rzi"></span>
-                <div class="rz-growl-message">
-                    <span class="rz-growl-title">@Title</span>
-                    <p>@ChildContent</p>
-                </div>
-                <div style="clear: both;"></div>
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" aria-live=“polite”>
+        <div class="rz-alert-item">
+            <RadzenIcon Icon="info" Class="rz-alert-icon" />
+            <div class="rz-alert-message">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <div class="rz-alert-title">@Title</div>
+            }
+                <div class="rz-alert-content">@ChildContent</div>
             </div>
         </div>
-        
+        @if (AllowClose)
+        {
+            <RadzenButton Click=@(args => visible = false) Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
+        }
     </div>
 }

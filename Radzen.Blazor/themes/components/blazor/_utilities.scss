@@ -164,6 +164,64 @@ $rz-base-background-color: var(--rz-white) !default;
   --rz-base-background-color: #{$rz-base-background-color};
 }
 
+// Base Styles Map
+
+$base-styles-map: () !default;
+$base-styles-map: map-merge(
+  (
+    base: (
+      background-color: var(--rz-base-200),
+      color: var(--rz-text-color)
+    ),
+    light: (
+      background-color: var(--rz-base-200),
+      color: var(--rz-text-color)
+    ),
+    dark: (
+      background-color: var(--rz-base-900),
+      color: var(--rz-text-contrast-color)
+    )
+  ),
+  $base-styles-map
+);
+
+// Severity Styles Map
+
+$severity-styles-map: () !default;
+$severity-styles-map: map-merge(
+  (
+    primary: (
+      background-color: var(--rz-primary),
+      color: var(--rz-text-contrast-color)
+    ),
+    secondary: (
+      background-color: var(--rz-secondary),
+      color: var(--rz-text-contrast-color)
+    ),
+    info: (
+      background-color: var(--rz-info),
+      color: var(--rz-text-contrast-color)
+    ),
+    warning: (
+      background-color: var(--rz-warning),
+      color: var(--rz-text-contrast-color)
+    ),
+    error: (
+      background-color: var(--rz-danger),
+      color: var(--rz-text-contrast-color)
+    ),
+    danger: (
+      background-color: var(--rz-danger),
+      color: var(--rz-text-contrast-color)
+    ),
+    success: (
+      background-color: var(--rz-success),
+      color: var(--rz-text-contrast-color)
+    )
+  ),
+  $severity-styles-map
+);
+
 // Border
 
 // Border CSS variables
