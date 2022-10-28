@@ -3,16 +3,39 @@
 <RadzenExample Name="Alert">
 <div class="container-fluid">
     <div class="row" style="min-height: 200px;">
-        <div class="col-xl-6 p-3">
-            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="mb-4">Alert with close button</RadzenText>
+        <div class="col-12 p-3">
             <RadzenAlert>
-                Some text
+                Alert with close button
             </RadzenAlert>
         </div>
-        <div class="col-xl-6 p-3">
-            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="mb-4">Alert without close button</RadzenText>
+        <div class="col-12 p-3">
             <RadzenAlert AllowClose=false>
-                Some text
+                Alert without close button
+            </RadzenAlert>
+        </div>
+        <div class="col-12 p-3">
+            <RadzenAlert Title="Alert with title">
+                Alert with close button
+            </RadzenAlert>
+        </div>
+        <div class="col-12 p-3">
+            <RadzenAlert Title="Alert with title" Variant="Variant.Filled" AlertStyle="AlertStyle.Info"  Shade="Shade.Lighter">
+                Alert with close button
+            </RadzenAlert>
+        </div>
+        <div class="col-12 p-3">
+            <RadzenAlert Title="Alert with title" Variant="Variant.Flat" AlertStyle="AlertStyle.Success">
+                Alert with close button
+            </RadzenAlert>
+        </div>
+        <div class="col-12 p-3">
+            <RadzenAlert Title="Alert with title" Variant="Variant.Outlined" AlertStyle="AlertStyle.Success">
+                Alert with close button
+            </RadzenAlert>
+        </div>
+        <div class="col-12 p-3">
+            <RadzenAlert Title="Alert with title" Variant="Variant.Text" AlertStyle="AlertStyle.Success">
+                Alert with close button
             </RadzenAlert>
         </div>
     </div>
