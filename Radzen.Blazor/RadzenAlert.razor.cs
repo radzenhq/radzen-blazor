@@ -19,6 +19,11 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenAlert : RadzenComponentWithChildren
     {
+        private string getAlertSize()
+        {
+            return Size == AlertSize.Medium ? "md" : Size == AlertSize.Large ? "lg" : Size == AlertSize.Small ? "sm" : "xs";
+        }
+        
         /// <summary>
         /// Gets or sets a value indicating whether close is allowed. Set to <c>true</c> by default.
         /// </summary>
@@ -61,6 +66,13 @@ namespace Radzen.Blazor
         [Parameter]
         public Shade Shade { get; set; } = Shade.Default;
 
+        /// <summary>
+        /// Gets or sets the size.
+        /// </summary>
+        /// <value>The size.</value>
+        [Parameter]
+        public AlertSize Size { get; set; } = AlertSize.Medium;
+
         bool? visible;
         bool GetVisible()
         {
@@ -70,7 +82,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-alert rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(AlertStyle), AlertStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()}";
+            return $"rz-alert rz-alert-{getAlertSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(AlertStyle), AlertStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()}";
         }
 
         string getIcon()

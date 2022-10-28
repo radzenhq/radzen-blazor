@@ -9,6 +9,37 @@ $alert-title-color: var(--rz-text-h6-color) !default;
 $alert-icon-color: var(--rz-alert-color) !default;
 $alert-icon-margin: $alert-message-margin !default;
 
+$alert-sizes: () !default;
+$alert-sizes: map-merge(
+  (
+    lg: (
+      gap: 1.5rem,
+      margin: 1.5rem 0,
+      padding: 1.5rem,
+      message-margin: 0.25rem 0
+    ),
+    md: (
+      gap: 1rem,
+      margin: 1rem 0,
+      padding: 1rem,
+      message-margin: 0.25rem 0
+    ),
+    sm: (
+      gap: 0.5rem,
+      margin: 0.5rem 0,
+      padding: 0.5rem,
+      message-margin: 0
+    ),
+    xs: (
+      gap: 0.25rem,
+      margin: 0.25rem 0,
+      padding: 0.25rem,
+      message-margin: 0
+    )
+  ),
+  $alert-sizes
+);
+
 :root {
 --rz-alert-margin: #{$alert-margin};
 --rz-alert-padding: #{$alert-padding};
@@ -23,6 +54,7 @@ $alert-icon-margin: $alert-message-margin !default;
 }
 
 .rz-alert {
+
   display: flex;
   align-items: flex-start;
   gap: var(--rz-alert-gap);
@@ -32,6 +64,16 @@ $alert-icon-margin: $alert-message-margin !default;
   border-radius: var(--rz-border-radius);
   background-color: var(--rz-alert-background-color);
   color: var(--rz-alert-color);
+
+  @each $size, $alert in $alert-sizes {
+    &-#{$size} {
+      --rz-alert-gap: #{map-get($alert, gap)};
+      --rz-alert-margin: #{map-get($alert, margin)};
+      --rz-alert-padding: #{map-get($alert, padding)};
+      --rz-alert-message-margin: #{map-get($alert, message-margin)};
+      --rz-alert-icon-margin: #{map-get($alert, message-margin)};
+    }
+  }
 
   .rz-alert-item {
     flex: auto;
@@ -72,6 +114,7 @@ $alert-icon-margin: $alert-message-margin !default;
     --rz-alert-padding: 0;
     --rz-alert-background-color: transparent;
     --rz-alert-gap: 0.5rem;
+    --rz-alert-margin: 0;
 
     .rz-alert-item {
       flex: unset;
@@ -102,9 +145,9 @@ $alert-icon-margin: $alert-message-margin !default;
         @if $name == 'background-color' { // generate the styles only once
           &.rz-shade-lighter {
             --rz-alert-background-color: var(--rz-#{$style}-lighter);
-            --rz-alert-color: var(--rz-#{$style});
-            --rz-alert-title-color: var(--rz-#{$style});
-            --rz-alert-icon-color: #{$value};
+            --rz-alert-color: var(--rz-#{$style}-dark);
+            --rz-alert-title-color: var(--rz-#{$style}-dark);
+            --rz-alert-icon-color: var(--rz-#{$style}-dark);
           }
           &.rz-shade-light {
             --rz-alert-background-color: var(--rz-#{$style}-light);
