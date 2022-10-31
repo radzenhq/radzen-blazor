@@ -20,7 +20,7 @@
             <RadzenSelectBar @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
         </div>
 
-        <RadzenAlert Variant="Variant.Flat" AlertStyle="AlertStyle.Warning" Shade="Shade.Lighter" Size="AlertSize.Small" AllowClose=false>
+        <RadzenAlert Variant="Variant.Flat" AlertStyle="AlertStyle.Warning" Icon="info_outline" Shade="Shade.Lighter" Size="AlertSize.Small" AllowClose=false>
             Base, Light and Dark alert styles don't have Shades
         </RadzenAlert>
     </RadzenCard>
