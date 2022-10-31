@@ -126,6 +126,27 @@ $rz-border-hover: var(--rz-border-width) solid var(--rz-base-600) !default;
 $rz-border-focus: var(--rz-border-width) solid var(--rz-base-600) !default;
 $rz-border-disabled: var(--rz-border-width) solid var(--rz-base-700) !default;
 
+// Base Styles Map
+
+$base-styles-map: () !default;
+$base-styles-map: map-merge(
+  (
+    base: (
+      background-color: var(--rz-base-700),
+      color: var(--rz-text-contrast-color)
+    ),
+    light: (
+      background-color: var(--rz-base-700),
+      color: var(--rz-text-contrast-color)
+    ),
+    dark: (
+      background-color: var(--rz-base-900),
+      color: var(--rz-text-contrast-color)
+    )
+  ),
+  $base-styles-map
+);
+
 // Components
 
 // Button
