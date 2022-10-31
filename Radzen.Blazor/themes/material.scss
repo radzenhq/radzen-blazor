@@ -1234,6 +1234,40 @@ $notification-error-background-color: var(--rz-danger-lighter) !default;
 $notification-info-color: var(--rz-info) !default;
 $notification-info-background-color: var(--rz-info-lighter) !default;
 
+// Alert 
+$alert-message-margin: 0 !default;
+
+$alert-sizes: () !default;
+$alert-sizes: map-merge(
+  (
+    lg: (
+      gap: 1.5rem,
+      margin: 1.5rem 0,
+      padding: 1.5rem,
+      message-margin: 0
+    ),
+    md: (
+      gap: 1rem,
+      margin: 1rem 0,
+      padding: 1rem,
+      message-margin: 0
+    ),
+    sm: (
+      gap: 0.5rem,
+      margin: 0.5rem 0,
+      padding: 0.5rem,
+      message-margin: 0
+    ),
+    xs: (
+      gap: 0.25rem,
+      margin: 0.25rem 0,
+      padding: 0.25rem,
+      message-margin: 0
+    )
+  ),
+  $alert-sizes
+);
+
 // Scrollbar
 $scrollbar-background-color: transparent !default;
 $scrollbar-color: rgba(#000, 0.12) !default;
