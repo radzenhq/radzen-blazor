@@ -3,7 +3,7 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" aria-live=“polite”>
         <div class="rz-alert-item">
-            @if (!string.IsNullOrEmpty(getIcon()))
+            @if (ShowIcon)
             {
                <RadzenIcon Icon="@getIcon()" Class="rz-alert-icon" />
             }
