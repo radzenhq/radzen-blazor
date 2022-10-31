@@ -1244,19 +1244,19 @@ $alert-sizes: map-merge(
       gap: 1.5rem,
       margin: 1.5rem 0,
       padding: 1.5rem,
-      message-margin: 0
+      message-margin: 0.125rem 0
     ),
     md: (
       gap: 1rem,
       margin: 1rem 0,
       padding: 1rem,
-      message-margin: 0
+      message-margin: 0.125rem 0
     ),
     sm: (
       gap: 0.5rem,
       margin: 0.5rem 0,
       padding: 0.5rem,
-      message-margin: 0
+      message-margin: 0.125rem 0
     ),
     xs: (
       gap: 0.25rem,
