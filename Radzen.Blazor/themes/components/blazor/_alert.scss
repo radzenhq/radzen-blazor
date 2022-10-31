@@ -8,6 +8,7 @@ $alert-message-margin: 0.25rem 0 !default;
 $alert-title-color: var(--rz-text-h6-color) !default;
 $alert-icon-color: var(--rz-alert-color) !default;
 $alert-icon-margin: $alert-message-margin !default;
+$alert-icon-size: var(--rz-icon-size) !default;
 
 $alert-sizes: () !default;
 $alert-sizes: map-merge(
@@ -51,6 +52,7 @@ $alert-sizes: map-merge(
 --rz-alert-title-color: #{$alert-title-color};
 --rz-alert-icon-color: #{$alert-icon-color};
 --rz-alert-icon-margin: #{$alert-icon-margin};
+--rz-alert-icon-size: #{$alert-icon-size};
 }
 
 .rz-alert {
@@ -86,6 +88,7 @@ $alert-sizes: map-merge(
   .rz-alert-icon {
     color: var(--rz-alert-icon-color);
     margin: var(--rz-alert-icon-margin);
+    font-size: var(--rz-alert-icon-size);
   }
   
   .rz-alert-message {
