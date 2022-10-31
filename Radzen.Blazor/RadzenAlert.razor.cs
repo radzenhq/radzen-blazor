@@ -93,39 +93,39 @@ namespace Radzen.Blazor
             }
             else if (AlertStyle == AlertStyle.Primary)
             {
-                return "";
+                return "sticky_note_2";
             }
             else if (AlertStyle == AlertStyle.Secondary)
             {
-                return "";
+                return "sticky_note_2";
             }
             else if (AlertStyle == AlertStyle.Light)
             {
-                return "";
+                return "sticky_note_2";
             }
             else if (AlertStyle == AlertStyle.Base)
             {
-                return "";
+                return "sticky_note_2";
             }
             else if (AlertStyle == AlertStyle.Dark)
             {
-                return "";
+                return "sticky_note_2";
             }
             else if (AlertStyle == AlertStyle.Success)
             {
-                return "";
+                return "check_circle_outline";
             }
             else if (AlertStyle == AlertStyle.Danger)
             {
-                return "";
+                return "error_outline";
             }
             else if (AlertStyle == AlertStyle.Warning)
             {
-                return "";
+                return "warning_amber";
             }
             else if (AlertStyle == AlertStyle.Info)
             {
-                return "";
+                return "info";
             }
 
             return "";

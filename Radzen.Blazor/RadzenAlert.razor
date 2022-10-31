@@ -3,12 +3,12 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" aria-live=“polite”>
         <div class="rz-alert-item">
-            <RadzenIcon Icon="info" Class="rz-alert-icon" />
-            <div class="rz-alert-message">
             @if (!string.IsNullOrEmpty(getIcon()))
             {
                <RadzenIcon Icon="@getIcon()" />
             }
+            <div class="rz-alert-message">
+
             @if (!string.IsNullOrEmpty(Title))
             {
                 <div class="rz-alert-title">@Title</div>
@@ -18,41 +18,63 @@
         </div>
         @if (AllowClose)
         {
-            if (AlertStyle == AlertStyle.Primary)
+            if (Shade == Shade.Lighter)
             {
-                <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
+                if (AlertStyle == AlertStyle.Primary)
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
+                }
+                else if (AlertStyle == AlertStyle.Secondary)
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small" />
+                }
+                else if (AlertStyle == AlertStyle.Light)
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
+                }
+                else if (AlertStyle == AlertStyle.Base)
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
+                }
+                else if (AlertStyle == AlertStyle.Dark)
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" />
+                }
+                else if (AlertStyle == AlertStyle.Success)
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small" />
+                }
+                else if (AlertStyle == AlertStyle.Danger)
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" />
+                }
+                else if (AlertStyle == AlertStyle.Warning)
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Small" />
+                }
+                else if (AlertStyle == AlertStyle.Info)
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Small" />
+                }
             }
-            else if (AlertStyle == AlertStyle.Secondary)
+            else
             {
-                <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
-            }
-            else if (AlertStyle == AlertStyle.Light)
-            {
-                <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
-            }
-            else if (AlertStyle == AlertStyle.Base)
-            {
-                <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
-            }
-            else if (AlertStyle == AlertStyle.Dark)
-            {
-                <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
-            }
-            else if (AlertStyle == AlertStyle.Success)
-            {
-                <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
-            }
-            else if (AlertStyle == AlertStyle.Danger)
-            {
-                <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
-            }
-            else if (AlertStyle == AlertStyle.Warning)
-            {
-                <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
-            }
-            else if (AlertStyle == AlertStyle.Info)
-            {
-                <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
+                if (AlertStyle == AlertStyle.Light)
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
+                }
+                else if (AlertStyle == AlertStyle.Base)
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" />
+                }
+                else if (AlertStyle == AlertStyle.Dark)
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" />
+                }
+                else
+                {
+                    <RadzenButton Click=@Close Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" />
+                }
             }
         }
     </div>
