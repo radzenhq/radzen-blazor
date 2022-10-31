@@ -87,7 +87,7 @@ namespace Radzen.Blazor
 
         string getIcon()
         {
-            if (string.IsNullOrEmpty(Icon))
+            if (!string.IsNullOrEmpty(Icon))
             {
                 return Icon;
             }
