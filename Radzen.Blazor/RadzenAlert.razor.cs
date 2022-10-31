@@ -93,23 +93,23 @@ namespace Radzen.Blazor
             }
             else if (AlertStyle == AlertStyle.Primary)
             {
-                return "sticky_note_2";
+                return "lightbulb_outline";
             }
             else if (AlertStyle == AlertStyle.Secondary)
             {
-                return "sticky_note_2";
+                return "lightbulb_outline";
             }
             else if (AlertStyle == AlertStyle.Light)
             {
-                return "sticky_note_2";
+                return "lightbulb_outline";
             }
             else if (AlertStyle == AlertStyle.Base)
             {
-                return "sticky_note_2";
+                return "lightbulb_outline";
             }
             else if (AlertStyle == AlertStyle.Dark)
             {
-                return "sticky_note_2";
+                return "lightbulb_outline";
             }
             else if (AlertStyle == AlertStyle.Success)
             {
@@ -125,7 +125,7 @@ namespace Radzen.Blazor
             }
             else if (AlertStyle == AlertStyle.Info)
             {
-                return "info";
+                return "info_outline";
             }
 
             return "";
