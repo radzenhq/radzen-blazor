@@ -239,4 +239,78 @@ $alert-sizes: map-merge(
     }
 
   }
+
+  @each $style, $rule in $base-styles-map {
+    
+    &.rz-#{$style} {
+      @each $name, $value in $rule {
+        --rz-alert-#{$name}: #{$value};
+        @if $name == 'color' {
+          --rz-alert-title-#{$name}: #{$value};
+          --rz-alert-icon-#{$name}: #{$value};
+        }
+      }
+    }
+
+    &.rz-variant-outlined.rz-#{$style} {
+      @each $name, $value in $rule {
+        @if $name == 'color' {
+          @if $style == 'light' {
+            @if $theme-dark == true {
+              box-shadow: inset 0 0 0 var(--rz-border-width) #{$value};
+              --rz-alert-#{$name}: #{$value};
+              --rz-alert-title-#{$name}: #{$value};
+              --rz-alert-icon-#{$name}: #{$value};
+            } @else {
+              box-shadow: inset 0 0 0 var(--rz-border-width) #{map-get($rule, background-color)};
+              --rz-alert-#{$name}: #{map-get($rule, background-color)};
+              --rz-alert-title-#{$name}: #{map-get($rule, background-color)};
+              --rz-alert-icon-#{$name}: #{map-get($rule, background-color)};
+            }
+          } @else if $style == 'dark' {
+            box-shadow: inset 0 0 0 var(--rz-border-width) #{map-get($rule, background-color)};
+            --rz-alert-#{$name}: #{map-get($rule, background-color)};
+            --rz-alert-title-#{$name}: #{map-get($rule, background-color)};
+            --rz-alert-icon-#{$name}: #{map-get($rule, background-color)};
+          } @else {
+            box-shadow: inset 0 0 0 var(--rz-border-width) #{$value};
+            --rz-alert-#{$name}: #{$value};
+            --rz-alert-title-#{$name}: #{$value};
+            --rz-alert-icon-#{$name}: #{$value};
+          }
+        }
+      }
+
+      --rz-alert-background-color: transparent;
+    }
+
+    &.rz-variant-text.rz-#{$style} {
+      @each $name, $value in $rule {
+        @if $name == 'color' {
+          @if $style == 'light' {
+            @if $theme-dark == true {
+              --rz-alert-#{$name}: #{$value};
+              --rz-alert-title-#{$name}: #{$value};
+              --rz-alert-icon-#{$name}: #{$value};
+            } @else {
+              --rz-alert-#{$name}: #{map-get($rule, background-color)};
+              --rz-alert-title-#{$name}: #{map-get($rule, background-color)};
+              --rz-alert-icon-#{$name}: #{map-get($rule, background-color)};
+            }
+          } @else if $style == 'dark' {
+            --rz-alert-#{$name}: #{map-get($rule, background-color)};
+            --rz-alert-title-#{$name}: #{map-get($rule, background-color)};
+            --rz-alert-icon-#{$name}: #{map-get($rule, background-color)};
+          } @else {
+            --rz-alert-#{$name}: #{$value};
+            --rz-alert-title-#{$name}: #{$value};
+            --rz-alert-icon-#{$name}: #{$value};
+          }
+        }
+      }
+
+      --rz-alert-background-color: transparent;
+    }
+
+  }
 }
