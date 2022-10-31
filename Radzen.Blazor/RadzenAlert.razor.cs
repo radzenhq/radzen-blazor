@@ -32,6 +32,13 @@ namespace Radzen.Blazor
         public bool AllowClose { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether icon should be shown. Set to <c>true</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if icon is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowIcon { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the title.
         /// </summary>
         /// <value>The title.</value>
