@@ -80,6 +80,11 @@ namespace Radzen.Blazor
         [Parameter]
         public AlertSize Size { get; set; } = AlertSize.Medium;
 
+        ButtonSize getCloseButtonSize()
+        {
+            return Size == AlertSize.ExtraSmall ? ButtonSize.ExtraSmall : ButtonSize.Small;
+        }
+
         bool? visible;
         bool GetVisible()
         {
