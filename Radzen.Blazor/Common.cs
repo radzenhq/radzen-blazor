@@ -2198,13 +2198,13 @@ namespace Radzen
             if (property.Contains("."))
             {
                 var part = property.Split('.').FirstOrDefault();
-                return GetPropertyType(GetPropertyIncludeInterface(type, part), property.Replace($"{part}.", ""));
+                return GetPropertyType(GetPropertyTypeIncludeInterface(type, part), property.Replace($"{part}.", ""));
             }
 
-            return GetPropertyIncludeInterface(type, property);
+            return GetPropertyTypeIncludeInterface(type, property);
         }
 
-        private static Type GetPropertyIncludeInterface(Type type, string property)
+        private static Type GetPropertyTypeIncludeInterface(Type type, string property)
         {
             if (type == null) return null;
             if (!type.IsInterface)
