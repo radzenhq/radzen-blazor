@@ -2187,7 +2187,6 @@ namespace Radzen
             return false;
         }
 
-
         /// <summary>
         /// Gets the type of the property.
         /// </summary>
@@ -2199,10 +2198,32 @@ namespace Radzen
             if (property.Contains("."))
             {
                 var part = property.Split('.').FirstOrDefault();
-                return GetPropertyType(type?.GetProperty(part)?.PropertyType, property.Replace($"{part}.", ""));
+                return GetPropertyType(GetPropertyIncludeInterface(type, part), property.Replace($"{part}.", ""));
             }
 
-            return type?.GetProperty(property)?.PropertyType;
+            return GetPropertyIncludeInterface(type, property);
+        }
+
+        private static Type GetPropertyIncludeInterface(Type type, string property)
+        {
+            if (type == null) return null;
+            if (!type.IsInterface)
+            {
+                return type.GetProperty(property)?.PropertyType;
+            }
+            else
+            {
+                foreach (var interfaceType in new Type[] { type }
+                                    .Concat(type.GetInterfaces()))
+                {
+                    var propertyInfo = interfaceType.GetProperty(property);
+                    if (propertyInfo != null)
+                    {
+                        return propertyInfo.PropertyType;
+                    }
+                }
+            }
+            return null;
         }
     }
 
