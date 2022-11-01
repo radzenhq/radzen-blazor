@@ -224,9 +224,13 @@ namespace Radzen.Blazor
             if (parameters.DidParameterChange(nameof(Expanded), Expanded))
             {
                 // The Expanded property has changed - update the expanded state
-                expanded = parameters.GetValueOrDefault<bool>(nameof(Expanded));
-                clientExpanded = expanded;
-                shouldExpand = true;
+                var e = parameters.GetValueOrDefault<bool>(nameof(Expanded));
+                if (expanded != e)
+                {
+                    expanded = e;
+                    clientExpanded = expanded;
+                    shouldExpand = expanded;
+                }
             }
 
             if (parameters.DidParameterChange(nameof(Value), Value))
