@@ -2210,7 +2210,10 @@ namespace Radzen
             {
                 return !type.IsInterface ?
                     type.GetProperty(property)?.PropertyType :
-                        new Type[] { type }.Concat(type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(property) != null);
+                        new Type[] { type }
+                        .Concat(type.GetInterfaces())
+                        .FirstOrDefault(t => t.GetProperty(property) != null)
+                        .GetProperty(property).PropertyType;
             }
 
             return null;
