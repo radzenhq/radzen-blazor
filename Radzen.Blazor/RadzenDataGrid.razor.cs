@@ -2610,9 +2610,24 @@ namespace Radzen.Blazor
                 {
                     return element.GetDateTime();
                 }
+                else if (type.IsEnum)
+                {
+                    return element.GetInt32();
+                }
                 else
                 {
-                    return element.GetRawText().Replace("\"", "");
+                    if (element.ValueKind == JsonValueKind.Number)
+                    {
+                        return element.GetDouble();
+                    }
+                    else if (element.ValueKind == JsonValueKind.True || element.ValueKind == JsonValueKind.False)
+                    {
+                        return element.GetBoolean();
+                    }
+                    else
+                    {
+                        return element.GetRawText().Replace("\"", "");
+                    }
                 }
             }
             else
