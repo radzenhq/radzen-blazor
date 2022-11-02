@@ -2206,23 +2206,13 @@ namespace Radzen
 
         private static Type GetPropertyTypeIncludeInterface(Type type, string property)
         {
-            if (type == null) return null;
-            if (!type.IsInterface)
+            if (type != null)
             {
-                return type.GetProperty(property)?.PropertyType;
+                return !type.IsInterface ?
+                    type.GetProperty(property)?.PropertyType :
+                        new Type[] { type }.Concat(type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(property) != null);
             }
-            else
-            {
-                foreach (var interfaceType in new Type[] { type }
-                                    .Concat(type.GetInterfaces()))
-                {
-                    var propertyInfo = interfaceType.GetProperty(property);
-                    if (propertyInfo != null)
-                    {
-                        return propertyInfo.PropertyType;
-                    }
-                }
-            }
+
             return null;
         }
     }
