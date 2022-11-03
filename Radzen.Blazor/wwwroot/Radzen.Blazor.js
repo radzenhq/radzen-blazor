@@ -831,8 +831,8 @@ window.Radzen = {
         }
     };
 
-    if (!Radzen.closePopupsOnScroll) {
-        Radzen.closePopupsOnScroll = function (e) {
+    if (!Radzen.closeAllPopups) {
+        Radzen.closeAllPopups = function (e) {
             for (var i = 0; i < Radzen.popups.length; i++) {
                 var p = Radzen.popups[i];
                 Radzen.closePopup(p.id, p.instance, p.callback);
@@ -853,8 +853,8 @@ window.Radzen = {
     var p = parent;
     while (p && p != document.body) {
         if (p.scrollWidth > p.clientWidth || p.scrollHeight > p.clientHeight) {
-            p.removeEventListener('scroll', Radzen.closePopupsOnScroll);
-            p.addEventListener('scroll', Radzen.closePopupsOnScroll);
+            p.removeEventListener('scroll', Radzen.closeAllPopups);
+            p.addEventListener('scroll', Radzen.closeAllPopups);
         }
         p = p.parentElement;
     }
@@ -931,6 +931,9 @@ window.Radzen = {
     }
   },
   openDialog: function (options, dialogService) {
+    if (Radzen.closeAllPopups) {
+        Radzen.closeAllPopups();
+    }
     Radzen.dialogService = dialogService;
     if (
       document.documentElement.scrollHeight >
