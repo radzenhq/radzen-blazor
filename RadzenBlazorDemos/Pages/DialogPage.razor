@@ -37,6 +37,12 @@
         </div>
         <div class="col-md-4 p-3">
             <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Alert Dialog</RadzenText>
+                <RadzenButton Text="Alert dialog" Style="width: 100%;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => DialogService.Alert("Some message!", "MyTitle", new AlertOptions() { OkButtonText = "Yes" })) />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Close Dialog by clicking outside</RadzenText>
                 <RadzenButton Text="Dialog with clickable overlay" Style="width: 100%;" ButtonStyle="ButtonStyle.Secondary" Click=@ShowCloseableFromOverlayDialog />
             </RadzenCard>

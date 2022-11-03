@@ -103,12 +103,12 @@ $dialog-border-radius: var(--rz-border-radius) !default;
   overflow: auto;
 }
 
-.rz-dialog-confirm {
+.rz-dialog-confirm, .rz-dialog-alert {
   max-width: 400px;
   margin: 0.75rem;
 }
 
-.rz-dialog-confirm-message {
+.rz-dialog-confirm-message, .rz-dialog-alert-message {
   margin-bottom: 1.5rem;
 }
 
@@ -121,6 +121,16 @@ $dialog-border-radius: var(--rz-border-radius) !default;
     flex: 8rem 1;
     min-width: fit-content;
   }
+}
+
+.rz-dialog-alert-buttons {
+    text-align: right;
+    gap: 0.5rem;
+
+    .rz-button {
+        flex: 8rem 1;
+        min-width: fit-content;
+    }
 }
 
 .rz-dialog-mask {
@@ -142,7 +152,7 @@ $dialog-border-radius: var(--rz-border-radius) !default;
 
 @media (max-width: 768px) {
   .rz-dialog {
-    &:not(.rz-dialog-confirm) {
+    &:not(.rz-dialog-confirm):not(.rz-dialog-alert) {
       position: absolute;
       width: 100% !important;
       top: 0px !important;
@@ -154,7 +164,7 @@ $dialog-border-radius: var(--rz-border-radius) !default;
     -webkit-overflow-scrolling: touch;
   }
 
-  .rz-dialog-confirm {
+  .rz-dialog-confirm, .rz-dialog-alert {
     max-width: 355px;
   }
 

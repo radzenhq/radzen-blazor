@@ -295,6 +295,60 @@ namespace Radzen
                 return content;
             }, dialogOptions);
         }
+
+        /// <summary>
+        /// Displays a alert dialog.
+        /// </summary>
+        /// <param name="message">The message displayed to the user.</param>
+        /// <param name="title">The text displayed in the title bar of the dialog.</param>
+        /// <param name="options">The options.</param>
+        /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
+        public async Task<bool?> Alert(string message = "", string title = "Message", AlertOptions options = null)
+        {
+            var dialogOptions = new DialogOptions()
+            {
+                Width = options != null ? !string.IsNullOrEmpty(options.Width) ? options.Width : "" : "",
+                Height = options != null ? options.Height : null,
+                Left = options != null ? options.Left : null,
+                Top = options != null ? options.Top : null,
+                Bottom = options != null ? options.Bottom : null,
+                ChildContent = options != null ? options.ChildContent : null,
+                ShowTitle = options != null ? options.ShowTitle : true,
+                ShowClose = options != null ? options.ShowClose : true,
+                Resizable = options != null ? options.Resizable : false,
+                Draggable = options != null ? options.Draggable : false,
+                Style = options != null ? options.Style : "",
+                AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true,
+                CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
+                CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
+                CssClass = options != null ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert",
+            };
+
+            await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Reference);
+
+            return await OpenAsync(title, ds =>
+            {
+                RenderFragment content = b =>
+                {
+                    var i = 0;
+                    b.OpenElement(i++, "p");
+                    b.AddAttribute(i++, "class", "rz-dialog-alert-message");
+                    b.AddContent(i++, message);
+                    b.CloseElement();
+
+                    b.OpenElement(i++, "div");
+                    b.AddAttribute(i++, "class", "rz-dialog-alert-buttons");
+
+                    b.OpenComponent<Blazor.RadzenButton>(i++);
+                    b.AddAttribute(i++, "Text", options != null ? options.OkButtonText : "Ok");
+                    b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(true)));
+                    b.CloseComponent();
+
+                    b.CloseElement();
+                };
+                return content;
+            }, dialogOptions);
+        }
     }
 
     /// <summary>
@@ -385,12 +439,19 @@ namespace Radzen
     /// <summary>
     /// Class ConfirmOptions.
     /// </summary>
-    public class ConfirmOptions : DialogOptions
+    public class AlertOptions : DialogOptions
     {
         /// <summary>
         /// Gets or sets the text of the OK button.
         /// </summary>
         public string OkButtonText { get; set; }
+    }
+
+    /// <summary>
+    /// Class ConfirmOptions.
+    /// </summary>
+    public class ConfirmOptions : AlertOptions
+    {
         /// <summary>
         /// Gets or sets the text of the Cancel button.
         /// </summary>
