@@ -2212,8 +2212,8 @@ namespace Radzen
                     type.GetProperty(property)?.PropertyType :
                         new Type[] { type }
                         .Concat(type.GetInterfaces())
-                        .FirstOrDefault(t => t.GetProperty(property) != null)
-                        .GetProperty(property).PropertyType;
+                        .FirstOrDefault(t => t.GetProperty(property) != null)?
+                        .GetProperty(property)?.PropertyType;
             }
 
             return null;
