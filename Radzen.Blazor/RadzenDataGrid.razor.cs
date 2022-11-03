@@ -252,7 +252,7 @@ namespace Radzen.Blazor
             }
         }
 
-        internal void RemoveGroup(GroupDescriptor gd)
+        internal async Task RemoveGroupAsync(GroupDescriptor gd)
         {
             Groups.Remove(gd); 
             _groupedPagedView = null;
@@ -260,7 +260,11 @@ namespace Radzen.Blazor
             var column = columns.Where(c => c.GetGroupProperty() == gd.Property).FirstOrDefault();
             if (column != null)
             {
-                Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = null });
+                await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = null });
+            }
+            if (IsVirtualizationAllowed())
+            {
+                await InvokeAsync(Reload);
             }
         }
 
