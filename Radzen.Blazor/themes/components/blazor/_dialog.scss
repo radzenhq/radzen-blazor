@@ -51,7 +51,7 @@ $dialog-border-radius: var(--rz-border-radius) !default;
 }
 
 .rz-dialog {
-  position: static;
+  position: absolute;
   overflow: hidden;
   display: flex;
   flex-direction: column;
