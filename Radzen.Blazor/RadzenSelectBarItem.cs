@@ -97,5 +97,10 @@ namespace Radzen.Blazor
         {
             Value = value;
         }
+
+        internal string GetItemId()
+        {
+            return GetId();
+        }
     }
 }
