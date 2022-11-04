@@ -1110,7 +1110,7 @@ namespace Radzen
                     {
                         if (typeof(EnumerableQuery).IsAssignableFrom(View.GetType()))
                         {
-                            SelectedItem = View.OfType<object>().Where(i => object.Equals(PropertyAccess.GetValue(i, ValueProperty), value)).FirstOrDefault();
+                            SelectedItem = View.OfType<object>().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), value)).FirstOrDefault();
                         }
                         else
                         {
@@ -1139,7 +1139,7 @@ namespace Radzen
 
                                 if (typeof(EnumerableQuery).IsAssignableFrom(View.GetType()))
                                 {
-                                    item = View.OfType<object>().Where(i => object.Equals(PropertyAccess.GetValue(i, ValueProperty), v)).FirstOrDefault();
+                                    item = View.OfType<object>().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).FirstOrDefault();
                                 }
                                 else
                                 {
