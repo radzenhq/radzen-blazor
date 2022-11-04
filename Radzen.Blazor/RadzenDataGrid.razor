@@ -233,7 +233,7 @@
 
                                                                             <RadzenDatePicker TValue="@object"
                                                                                       ShowTime="@column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="false" Inline="true" DateFormat="@getFilterDateFormat(column)"
-                                                                                      Value="@column.GetFilterValue()" Change="@(args => column.SetFilterValue(args.Value))" />
+                                                                                      Value="@column.GetFilterValue()" Change="@(args => { column.SetFilterValue(args.Value); SaveSettings(); })" />
 
                                                                         </div>
                                                                         <div class="rz-date-filter-buttons">

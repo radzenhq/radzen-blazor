@@ -325,6 +325,7 @@ namespace Radzen.Blazor
         protected void ApplyDateFilterByFilterOperator(RadzenDataGridColumn<TItem> column, FilterOperator filterOperator)
         {
             column.SetFilterOperator(filterOperator);
+            SaveSettings();
         }
 
         internal IJSRuntime GetJSRuntime()
