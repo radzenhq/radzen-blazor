@@ -30,40 +30,6 @@
         </div>
         <div class="col-md-6 p-3">
             <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Virtualization using IQueryable</RadzenText>
-                <RadzenDropDown AllowClear="true" TValue="string" AllowVirtualization="true" Class="w-100" 
-                                AllowFiltering="true" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                                Change=@(args => OnChange(args, "DropDown with virtualization")) />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Virtualization using LoadData event</RadzenText>
-                <RadzenDropDown AllowClear="true" TValue="string" AllowVirtualization="true" Class="w-100" 
-                                LoadData=@LoadDataVirtualization AllowFiltering="true" Count="@count"
-                                Data=@customCustomersDataVirtualization TextProperty="CompanyName" ValueProperty="CustomerID"
-                                Change=@(args => OnChange(args, "DropDown with virtualization")) />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom filter operator</RadzenText>
-                <RadzenDropDown AllowClear="true" TValue="string" Class="w-100" 
-                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
-                                Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown with custom filter operator")) />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom filtering</RadzenText>
-                <RadzenDropDown AllowClear="true" TValue="string" Class="w-100" 
-                                LoadData=@LoadData AllowFiltering="true"
-                                Data=@customCustomersData TextProperty="CompanyName" ValueProperty="CustomerID"
-                                Change=@(args => OnChange(args, "DropDown with custom filtering")) />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown with placeholder</RadzenText>
                 <RadzenDropDown AllowClear="true" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" Class="w-100" 
                                 Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown with placeholder")) />
@@ -82,14 +48,6 @@
         </div>
         <div class="col-md-6 p-3">
             <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple selection</RadzenText>
-                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                @bind-Value=@multipleValues Multiple="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                                Change=@(args => OnChange(args, "DropDown with multiple selection")) Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Bind Value to model property</RadzenText>
                 <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@myModel.MyValue
                                 TextProperty="ProductName" ValueProperty="ProductID" Change=@(args => ChangeBound(args, "DropDown with bound Value")) Class="w-100" />
@@ -100,32 +58,6 @@
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">With Disabled item</RadzenText>
                 <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@myModelDisabled.MyValue
                                 TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => ChangeBound(args, "DropDown with bound Value")) Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple with Disabled item</RadzenText>
-                <RadzenDropDown AllowClear="true" AllowFiltering="true" Multiple="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@multipleValuesdisabled
-                                TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple selection with chips</RadzenText>
-                <RadzenDropDown Multiple="true" Chips="true" MaxSelectedLabels="20" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@multipleValuesChip
-                                TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown with groups</RadzenText>
-                    <RadzenDropDown TValue="int" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                    Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID" TextProperty="OrderID"
-                                    Change=@(args => OnChange(args, "DropDown with groups")) Class="w-100">
-                    <Template>
-                            @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")
-                    </Template>
-                    </RadzenDropDown>
             </RadzenCard>
         </div>
     </div>
@@ -139,14 +71,10 @@
 
     IEnumerable<Order> orders;
     IEnumerable<Customer> customers;
-    IEnumerable<Customer> customCustomersData;
     IEnumerable<Product> products;
 
     MyObject myModel = new MyObject();
     MyObject myModelDisabled = new MyObject();
-
-    int count;
-    IEnumerable<Customer> customCustomersDataVirtualization;
 
     IEnumerable<string> multipleValues = new string[] { "ALFKI", "ANATR" };
     string value = "ALFKI";
@@ -157,8 +85,6 @@
 
     EventConsole console;
 
-    IEnumerable<GroupData> groupedData;
-
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -166,23 +92,6 @@
         customers = dbContext.Customers.ToList();
         products = dbContext.Products.ToList();
         orders = dbContext.Orders.Where(o => o.CustomerID != null).Include("Customer").ToList();
-
-        groupedData = orders.GroupBy(g => g.Customer.CompanyName)
-            .SelectMany(i => new GroupData[] { new GroupData() { CompanyName = i.Key } }
-                .Concat(i.Select(o => 
-                    new GroupData() 
-                    { 
-                        OrderID = o.OrderID,
-                        OrderDate = o.OrderDate
-                    }))).ToList();
-    }
-
-    class GroupData
-    { 
-        public string CompanyName { get; set; }
-        public int OrderID { get; set; }
-        public DateTime? OrderDate { get; set; }
-        public bool IsGroup { get { return CompanyName != null; } }
     }
 
     void OnChange(object value, string name)
@@ -207,39 +116,5 @@
     class MyObject
     {
         public int? MyValue { get; set; } = 3;
-    }
-
-    void LoadData(LoadDataArgs args)
-    {
-        var query = dbContext.Customers.AsQueryable();
-
-        if (!string.IsNullOrEmpty(args.Filter))
-        {
-            query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()));
-        }
-
-        console.Log($"LoadData with filter: {args.Filter}");
-
-        customCustomersData = query.ToList();
-
-        InvokeAsync(StateHasChanged);
-    }
-
-    void LoadDataVirtualization(LoadDataArgs args)
-    {
-        var query = dbContext.Customers.AsQueryable();
-
-        if (!string.IsNullOrEmpty(args.Filter))
-        {
-            query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()));
-        }
-
-        console.Log($"LoadData with virtualization: Skip:{args.Skip}, Top:{args.Top}, Filter:{args.Filter}");
-
-        count = query.Count();
-
-        customCustomersDataVirtualization = query.Skip(args.Skip.HasValue ? args.Skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : 10).ToList();
-
-        InvokeAsync(StateHasChanged);
     }
 }

@@ -789,11 +789,57 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "DropDown",
-                    Title = "Blazor Dropdown component with multiple selection support",
-                    Path = "dropdown",
                     Icon = "&#xe875",
-                    Updated = true,
-                    Tags = new [] { "select", "picker", "form" , "edit" }
+                    Children = new [] {
+                        new Example()
+                        {
+                            Updated = true,
+                            Name = "Single selection",
+                            Path = "dropdown",
+                            Title = "Blazor DropDown component",
+                            Tags = new [] { "select", "picker", "form" , "edit", "dropdown" },
+                        },
+                        new Example()
+                        {
+                            Updated = true,
+                            Name = "Multiple selection",
+                            Path = "dropdown-multiple",
+                            Title = "Blazor DropDown component with multiple selection support",
+                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown" },
+                        },
+                        new Example()
+                        {
+                            Updated = true,
+                            Name = "Virtualization",
+                            Path = "dropdown-virtualization",
+                            Title = "Blazor DropDown component with virtualization",
+                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "virtualization", "paging" },
+                        },
+                        new Example()
+                        {
+                            Updated = true,
+                            Name = "Filtering",
+                            Path = "dropdown-filtering",
+                            Title = "Blazor DropDown component with filtering",
+                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "filter" },
+                        },
+                        new Example()
+                        {
+                            Updated = true,
+                            Name = "Grouping",
+                            Path = "dropdown-grouping",
+                            Title = "Blazor DropDown component with grouping",
+                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "grouping" },
+                        },
+                        new Example()
+                        {
+                            Updated = true,
+                            Name = "Custom objects binding",
+                            Path = "dropdown-custom-objects",
+                            Title = "Blazor DropDown component binding to custom objects",
+                            Tags = new [] { "select", "picker", "form" , "edit", "dropdown", "custom" },
+                        },
+                    }
                 },
                 new Example()
                 {
