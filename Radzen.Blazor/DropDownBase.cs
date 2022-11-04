@@ -292,7 +292,7 @@ namespace Radzen
         {
             if (LoadData.HasDelegate && !string.IsNullOrEmpty(ValueProperty))
             {
-                return View != null && View.Cast<object>().All(i => IsItemSelectedByValue(PropertyAccess.GetValue(i, ValueProperty)));
+                return View != null && View.Cast<object>().All(i => IsItemSelectedByValue(GetItemOrValueFromProperty(i, ValueProperty)));
             }
 
             return View != null && selectedItems.Count == View.Cast<object>().Count();
@@ -838,9 +838,9 @@ namespace Radzen
         /// <returns><c>true</c> if the specified item is selected; otherwise, <c>false</c>.</returns>
         internal bool isSelected(object item)
         {
-            if (LoadData.HasDelegate && !string.IsNullOrEmpty(ValueProperty))
+            if (!string.IsNullOrEmpty(ValueProperty))
             {
-                return IsItemSelectedByValue(PropertyAccess.GetValue(item, ValueProperty));
+                return IsItemSelectedByValue(GetItemOrValueFromProperty(item, ValueProperty));
             }
             else
             {
@@ -1008,30 +1008,7 @@ namespace Radzen
             }
             else
             {
-                if (!string.IsNullOrEmpty(ValueProperty))
-                {
-                    if (LoadData.HasDelegate)
-                    {
-                        var v = PropertyAccess.GetValue(item, ValueProperty);
-                        var si = (selectedItems ?? Enumerable.Empty<object>()).AsQueryable().Where($@"object.Equals({ValueProperty},@0)", v).FirstOrDefault();
-                        if (si == null)
-                        {
-                            selectedItems.Add(item);
-                        }
-                        else
-                        {
-                            selectedItems.Remove(si);
-                        }
-                    }
-                    else
-                    {
-                        UpdateSelectedItems(item);
-                    }
-                }
-                else
-                {
-                    UpdateSelectedItems(item);
-                }
+                UpdateSelectedItems(item);
 
                 if (!string.IsNullOrEmpty(ValueProperty))
                 {
@@ -1093,13 +1070,29 @@ namespace Radzen
 
         internal void UpdateSelectedItems(object item)
         {
-            if (selectedItems.IndexOf(item) == -1)
+            if (!string.IsNullOrEmpty(ValueProperty))
             {
-                selectedItems.Add(item);
+                var value = GetItemOrValueFromProperty(item, ValueProperty);
+
+                if (!IsItemSelectedByValue(value))
+                {
+                    selectedItems.Add(item);
+                }
+                else
+                {
+                    selectedItems = selectedItems.AsQueryable().Where($@"!object.Equals({ValueProperty},@0)", value).ToList();
+                }
             }
             else
             {
-                selectedItems.Remove(item);
+                if (!selectedItems.Any(i => object.Equals(i, item)))
+                {
+                    selectedItems.Add(item);
+                }
+                else
+                {
+                    selectedItems = selectedItems.Where(i => !object.Equals(i, item)).ToList();
+                }
             }
         }
 
@@ -1153,7 +1146,7 @@ namespace Radzen
                                     item = View.AsQueryable().Where($@"{ValueProperty} == @0", v).FirstOrDefault();
                                 }
 
-                                if (!object.Equals(item, null) && (LoadData.HasDelegate ? !IsItemSelectedByValue(v) : selectedItems.IndexOf(item) == -1))
+                                if (!object.Equals(item, null) && !selectedItems.AsQueryable().Where($@"object.Equals({ValueProperty},@0)", v).Any())
                                 {
                                     selectedItems.Add(item);
                                 }
@@ -1175,8 +1168,20 @@ namespace Radzen
 
         internal bool IsItemSelectedByValue(object v)
         {
-            return ((Multiple ? selectedItems : selectedItem != null ? new[] { selectedItem } : Enumerable.Empty<object>()) ?? Enumerable.Empty<object>())
-                .AsQueryable().Where($@"object.Equals({ValueProperty},@0)", v).Any();
+            if (internalValue != null)
+            {
+                var values = internalValue as IEnumerable;
+                if (values != null)
+                {
+                    return values.Cast<object>().Contains(v);
+                }
+                else
+                {
+                    return object.Equals(internalValue, v);
+                }
+            }
+
+            return false;
         }
 
         /// <inheritdoc />
