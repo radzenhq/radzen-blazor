@@ -660,6 +660,16 @@ namespace Radzen.Blazor
             if (parameters.DidParameterChange(nameof(SortOrder), SortOrder))
             {
                 sortOrder = new SortOrder?[] { parameters.GetValueOrDefault<SortOrder?>(nameof(SortOrder)) };
+
+                if (Grid != null)
+                {
+                    var descriptor = Grid.sorts.Where(d => d.Property == GetSortProperty()).FirstOrDefault();
+                    if (descriptor == null)
+                    {
+                        Grid.sorts.Add(new SortDescriptor() { Property = GetSortProperty(), SortOrder = sortOrder.FirstOrDefault() });
+                        Grid._view = null;
+                    }
+                }
             }
 
             if (parameters.DidParameterChange(nameof(FilterValue), FilterValue))

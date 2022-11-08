@@ -141,10 +141,7 @@ namespace Radzen
         [Parameter]
         public string PagingSummaryFormat { get; set; } = "Page {0} of {1} ({2} items)";
 
-        /// <summary>
-        /// The view
-        /// </summary>
-        protected IQueryable<T> _view = null;
+        internal IQueryable<T> _view = null;
         /// <summary>
         /// Gets the paged view.
         /// </summary>
