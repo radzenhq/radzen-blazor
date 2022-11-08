@@ -355,3 +355,7 @@ $timepicker-border: none !default;
   background-color: var(--rz-timepicker-background-color);
   width: 4rem;
 }
+
+.rz-ampm-picker a {
+  text-decoration: none;
+}
