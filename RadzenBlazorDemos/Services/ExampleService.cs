@@ -662,6 +662,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Sidepanel",
                     Title = "Blazor Sidepanel component",
+                    New = true,
                     Path = "sidepanel",
                     Icon = "&#xe230",
                     Tags = new[] { "popup", "window", "panel" }
