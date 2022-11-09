@@ -29,7 +29,7 @@ namespace Radzen
     /// <param name="result">The result.,</param>
     public void Close(dynamic result = null)
     {
-      if (_task != null)
+      if (_task != null && !_task.Task.IsCompleted)
       {
         _task.SetResult(result);
         OnClose?.Invoke(result);
