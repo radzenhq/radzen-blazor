@@ -1288,7 +1288,7 @@ namespace RadzenBlazorDemos
       }
 
       return Flatten(Examples)
-                  .FirstOrDefault(example => example.Path == uri.AbsolutePath || $"/{example.Path}" == uri.AbsolutePath);
+                .FirstOrDefault(example => example.Path == uri.AbsolutePath || $"/{example.Path}" == uri.AbsolutePath);
     }
 
     public string TitleFor(Example example)
