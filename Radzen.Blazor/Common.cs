@@ -79,7 +79,8 @@ namespace Radzen
         /// </summary>
         public FilterOperator SecondFilterOperator { get; set; }
     }
-
+#if NET7_0_OR_GREATER
+#else
     /// <summary>
     /// Enables "onmouseenter" and "onmouseleave" event support in Blazor. Not for public use.
     /// </summary>
@@ -88,7 +89,7 @@ namespace Radzen
     public static class EventHandlers
     {
     }
-
+#endif
     /// <summary>
     /// Represents the common <see cref="RadzenSelectBar{TValue}" /> API used by
     /// its items. Injected as a cascading property in <see cref="RadzenSelectBarItem" />.

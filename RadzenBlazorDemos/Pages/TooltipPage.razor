@@ -32,7 +32,7 @@
         <div class="col-md-6 col-lg-4 p-3 d-flex">
             <RadzenCard Class="w-100">
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Show tooltip on mouse over HTML elment</RadzenText>
-                <button @ref="htmlButton" @onmouseover="@(args => ShowTooltip(htmlButton))">
+                <button @ref="htmlButton" @onmouseenter="@(args => ShowTooltip(htmlButton))">
                     Show tooltip
                 </button>
             </RadzenCard>
