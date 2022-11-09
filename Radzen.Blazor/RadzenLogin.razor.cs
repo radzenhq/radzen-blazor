@@ -222,7 +222,7 @@ namespace Radzen.Blazor
         /// <param name="args">The <see cref="EventArgs"/> instance containing the event data.</param>
         protected async Task OnReset(EventArgs args)
         {
-            await ResetPassword.InvokeAsync(Username);
+            await ResetPassword.InvokeAsync(username);
         }
 
         /// <summary>
