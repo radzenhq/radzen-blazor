@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace RadzenBlazorDemos
 {
-    public class ExampleService
-    {
-        Example[] allExamples = new[] {
+  public class ExampleService
+  {
+    Example[] allExamples = new[] {
         new Example()
         {
             Name = "Overview",
@@ -660,6 +660,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "Sidepanel",
+                    Title = "Blazor Sidepanel component",
+                    Path = "sidepanel",
+                    Icon = "&#xe230",
+                    Tags = new[] { "popup", "window", "panel" }
+                },
+                new Example()
+                {
                     Name = "Link",
                     Title = "Blazor Link component",
                     Path = "link",
@@ -1234,68 +1242,68 @@ namespace RadzenBlazorDemos
 
     };
 
-        public IEnumerable<Example> Examples
-        {
-            get
-            {
-                return allExamples;
-            }
-        }
-
-        public IEnumerable<Example> Filter(string term)
-        {
-            if (string.IsNullOrEmpty(term))
-                return allExamples;
-
-            bool contains(string value) => value != null && value.Contains(term, StringComparison.OrdinalIgnoreCase);
-
-            bool filter(Example example) => contains(example.Name) || (example.Tags != null && example.Tags.Any(contains));
-
-            bool deepFilter(Example example) => filter(example) || example.Children?.Any(filter) == true;
-
-            return Examples.Where(category => category.Children?.Any(deepFilter) == true || filter(category))
-                           .Select(category => new Example
-                           {
-                               Name = category.Name,
-                               Path = category.Path,
-                               Icon = category.Icon,
-                               Expanded = true,
-                               Children = category.Children?.Where(deepFilter).Select(example => new Example
-                               {
-                                   Name = example.Name,
-                                   Path = example.Path,
-                                   Icon = example.Icon,
-                                   Expanded = true,
-                                   Children = example.Children
-                               }
-                               ).ToArray()
-                           }).ToList();
-        }
-
-        public Example FindCurrent(Uri uri)
-        {
-            IEnumerable<Example> Flatten(IEnumerable<Example> e)
-            {
-                return e.SelectMany(c => c.Children != null ? Flatten(c.Children) : new[] { c });
-            }
-
-            return Flatten(Examples)
-                        .FirstOrDefault(example => example.Path == uri.AbsolutePath || $"/{example.Path}" == uri.AbsolutePath);
-        }
-
-        public string TitleFor(Example example)
-        {
-            if (example != null && example.Name != "Overview")
-            {
-                return example.Title ?? $"Blazor {example.Name} | a free UI component by Radzen";
-            }
-
-            return "Free Blazor Components | 70+ controls by Radzen";
-        }
-
-        public string DescriptionFor(Example example)
-        {
-            return example?.Description ?? "The Radzen Blazor component library provides more than 70 UI controls for building rich ASP.NET Core web applications.";
-        }
+    public IEnumerable<Example> Examples
+    {
+      get
+      {
+        return allExamples;
+      }
     }
+
+    public IEnumerable<Example> Filter(string term)
+    {
+      if (string.IsNullOrEmpty(term))
+        return allExamples;
+
+      bool contains(string value) => value != null && value.Contains(term, StringComparison.OrdinalIgnoreCase);
+
+      bool filter(Example example) => contains(example.Name) || (example.Tags != null && example.Tags.Any(contains));
+
+      bool deepFilter(Example example) => filter(example) || example.Children?.Any(filter) == true;
+
+      return Examples.Where(category => category.Children?.Any(deepFilter) == true || filter(category))
+                     .Select(category => new Example
+                     {
+                       Name = category.Name,
+                       Path = category.Path,
+                       Icon = category.Icon,
+                       Expanded = true,
+                       Children = category.Children?.Where(deepFilter).Select(example => new Example
+                       {
+                         Name = example.Name,
+                         Path = example.Path,
+                         Icon = example.Icon,
+                         Expanded = true,
+                         Children = example.Children
+                       }
+                         ).ToArray()
+                     }).ToList();
+    }
+
+    public Example FindCurrent(Uri uri)
+    {
+      IEnumerable<Example> Flatten(IEnumerable<Example> e)
+      {
+        return e.SelectMany(c => c.Children != null ? Flatten(c.Children) : new[] { c });
+      }
+
+      return Flatten(Examples)
+                  .FirstOrDefault(example => example.Path == uri.AbsolutePath || $"/{example.Path}" == uri.AbsolutePath);
+    }
+
+    public string TitleFor(Example example)
+    {
+      if (example != null && example.Name != "Overview")
+      {
+        return example.Title ?? $"Blazor {example.Name} | a free UI component by Radzen";
+      }
+
+      return "Free Blazor Components | 70+ controls by Radzen";
+    }
+
+    public string DescriptionFor(Example example)
+    {
+      return example?.Description ?? "The Radzen Blazor component library provides more than 70 UI controls for building rich ASP.NET Core web applications.";
+    }
+  }
 }

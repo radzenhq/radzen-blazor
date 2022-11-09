@@ -1,0 +1,88 @@
+$sidepanel-background-color: var(--rz-base-background-color) !default;
+$sidepanel-shadow: 0 22px 64px 0 rgba(0, 0, 0, 0.22) !default;
+$sidepanel-title-background-color: var(--rz-base-100) !default;
+$sidepanel-title-border: none !default;
+$sidepanel-title-padding: 0.6875rem 1.25rem !default;
+$sidepanel-title-font-size: 1.25rem !default;
+$sidepanel-title-line-height: 1.875rem !default;
+$sidepanel-title-font-weight: 700 !default;
+$sidepanel-title-letter-spacing: -0.03em !default;
+$sidepanel-title-color: var(--rz-text-title-color) !default;
+$sidepanel-close-font-size: var(--rz-icon-size) !default;
+$sidepanel-close-color: var(--rz-text-tertiary-color) !default;
+$sidepanel-close-hover-color: var(--rz-text-color) !default;
+$sidepanel-close-vertical-align: middle !default;
+$sidepanel-content-padding: 1.25rem !default;
+$sidepanel-mask-background-color: var(--rz-base-800) !default;
+$sidepanel-border-radius: var(--rz-border-radius) !default;
+
+:root {
+  --rz-sidepnale-background-color: #{$sidepanel-background-color};
+  --rz-sidepanel-shadow: #{$sidepanel-shadow};
+  --rz-sidepanel-title-background-color: #{$sidepanel-title-background-color};
+  --rz-sidepanel-title-border: #{$sidepanel-title-border};
+  --rz-sidepanel-title-padding: #{$sidepanel-title-padding};
+  --rz-sidepanel-title-font-size: #{$sidepanel-title-font-size};
+  --rz-sidepanel-title-line-height: #{$sidepanel-title-line-height};
+  --rz-sidepanel-title-font-weight: #{$sidepanel-title-font-weight};
+  --rz-sidepanel-title-letter-spacing: #{$sidepanel-title-letter-spacing};
+  --rz-sidepanel-title-color: #{$sidepanel-title-color};
+  --rz-sidepanel-close-font-size: #{$sidepanel-close-font-size};
+  --rz-sidepanel-close-color: #{$sidepanel-close-color};
+  --rz-sidepanel-close-hover-color: #{$sidepanel-close-hover-color};
+  --rz-sidepanel-close-vertical-align: #{$sidepanel-close-vertical-align};
+  --rz-sidepanel-content-padding: #{$sidepanel-content-padding};
+  --rz-sidepanel-mask-background-color: #{$sidepanel-mask-background-color};
+  --rz-sidepanel-border-radius: #{$sidepanel-border-radius};
+}
+
+.rz-sidepanel {
+  position: absolute;
+  right: 0;
+  min-width: 150px;
+  width: 400px;
+  height: 100%;
+  z-index: 1000;
+  opacity: 1;
+  background-color: var(--rz-sidepnale-background-color);
+  box-shadow: var(--rz-sidepanel-shadow);
+  border-radius: var(--rz-sidepanel-border-radius);
+}
+
+.rz-sidepanel-titlebar {
+  background-color: var(--rz-sidepanel-title-background-color);
+  padding: var(--rz-sidepanel-title-padding);
+  font-size: var(--rz-sidepanel-title-font-size);
+  line-height: var(--rz-sidepanel-title-line-height);
+  border-bottom: var(--rz-sidepanel-title-border);
+}
+
+.rz-sidepanel-title {
+  font-weight: var(--rz-sidepanel-title-font-weight);
+  letter-spacing: var(--rz-sidepanel-title-letter-spacing);
+  color: var(--rz-sidepanel-title-color);
+}
+
+.rz-sidepanel-titlebar-close {
+  float: right;
+
+  .rzi-times {
+    font-size: var(--rz-sidepanel-close-font-size);
+    color: var(--rz-sidepanel-close-color);
+    vertical-align: var(--rz-sidepanel-close-vertical-align);
+
+    &:before {
+      content: 'close';
+    }
+  }
+
+  &:hover .rzi-times {
+    color: var(--rz-sidepanel-close-hover-color);
+  }
+}
+
+.rz-sidepanel-content {
+  flex: 0 1 auto;
+  padding: var(--rz-sidepanel-content-padding);
+  overflow: auto;
+}

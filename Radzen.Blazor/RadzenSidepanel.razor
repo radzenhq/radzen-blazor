@@ -1,0 +1,74 @@
+﻿@inject SidepanelService _service
+@inherits RadzenComponent
+
+
+@if (Visible && isOpen)
+{
+    <aside @ref="@Element"
+        class="@GetCssClass()"
+        tabindex="@(isOpen ? "0" : "-1")"
+        style="@GetStyle()"
+        aria-labelledby="rz-sidepanel-label"
+        @onmouseenter="@OnMouseEnter"
+        @onmouseleave="@OnMouseLeave">
+        @if (options.ShowTitle)
+        {
+            <div class="rz-sidepanel-titlebar">
+        <div class="rz-sidepanel-title" style="display: inline" id="rz-sidepanel-label">@options.Title</div>
+                @if (options.ShowClose)
+                {
+                    <a href="javascript:void(0)" class="rz-sidepanel-titlebar-close" @onclick="@(_ => _service.Close(null))" role="button">
+                        <span class="rzi rzi-times"></span>
+                    </a>
+                }
+            </div>
+        }
+        <div class="rz-sidepanel-content" style="@options.Style">
+            @ChildContent
+        </div>
+      </aside>
+
+    }
+
+@code {
+
+    bool isOpen;
+    SidepanelOptions options = new SidepanelOptions();
+    Type childType;
+    Dictionary<string, object> parameters;
+
+    RenderFragment ChildContent => new RenderFragment(builder =>
+    {
+        builder.OpenComponent(0, childType);
+        foreach (var parameter in parameters)
+        {
+            builder.AddAttribute(1, parameter.Key, parameter.Value);
+        }
+        builder.CloseComponent();
+    });
+
+    protected override void OnInitialized()
+    {
+        _service.OnOpen += PanelOpened;
+        _service.OnClose += PanelClosed;
+    }
+
+    private void PanelOpened(Type component, Dictionary<string, object> parameters, SidepanelOptions options)
+    {
+        isOpen = true;
+        childType = component;
+        this.parameters = parameters ?? new Dictionary<string, object>();
+        this.options = options ?? new SidepanelOptions();
+        StateHasChanged();
+    }
+
+    private void PanelClosed(dynamic _)
+    {
+        isOpen = false;
+        StateHasChanged();
+    }
+
+    protected string GetStyle() => Style + (options.Width != null ? $" width: {options.Width}" : "");
+
+    protected override string GetComponentCssClass() => "rz-sidepanel" + (string.IsNullOrEmpty(options.CssClass) ? "" : options.CssClass);
+}

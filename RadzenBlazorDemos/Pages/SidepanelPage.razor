@@ -1,0 +1,18 @@
+﻿@page "/sidepanel"
+@inject SidepanelService service
+<RadzenExample Name="Sidepanel" AdditionalSourceCodePages="@(new List<string>() { "SidepanelContent.razor" })">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col p-3">
+                <RadzenButton Text="Open the Sidepanel" Click="@(async _ => await ClickedAsync())" Icon="border_right" />
+            </div>
+        </div>
+    </div>
+</RadzenExample>
+
+@code {
+  private async Task ClickedAsync()
+  {
+    dynamic result = await service.OpenAsync<SidepanelContent>("Sidepanel");
+  }
+}

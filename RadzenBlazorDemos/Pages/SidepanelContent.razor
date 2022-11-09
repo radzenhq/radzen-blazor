@@ -1,0 +1,12 @@
+﻿@inject SidepanelService service
+
+<RadzenCard>
+    <h3>SidepanelContent</h3>
+    <p>
+        Content displayed in the Side Panel
+    </p>
+
+    <RadzenButton Text="Close with No Result" Click="@(_ => service.Close(null))" />
+    <RadzenButton Text="Close with Result 'true'" Click="@(_ => service.Close(true))" />
+</RadzenCard>
+
