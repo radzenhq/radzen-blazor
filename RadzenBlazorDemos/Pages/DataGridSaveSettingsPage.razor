@@ -4,9 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 @using RadzenBlazorDemos.Services
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 
-@inject ProtectedLocalStorage ProtectedLocalStore
 @inject NavigationManager NavigationManager
 
 @inherits DbContextPage
@@ -72,16 +70,21 @@
 
     private async Task LoadStateAsync()
     {
+        await Task.CompletedTask;
+        /*
         var result = await ProtectedLocalStore.GetAsync<DataGridSettings>("Settings");
         if (result.Success)
-        {
+            {
             _settings = result.Value;
-        }
+        }*/
     }
 
     private async Task SaveStateAsync()
     {
+        await Task.CompletedTask;
+        /*
         await ProtectedLocalStore.SetAsync("Settings", _settings);
+        */
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

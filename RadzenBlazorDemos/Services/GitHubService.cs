@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
-using Microsoft.AspNetCore.Hosting;
 
 using RadzenBlazorDemos.Models.GitHub;
 
@@ -80,22 +79,19 @@ namespace RadzenBlazorDemos.Services
 
     public class GitHubService
     {
-        private readonly IWebHostEnvironment hostEnvironment;
-
         private readonly JsonSerializerOptions options;
 
         public Action<FetchProgressEventArgs> OnProgress;
 
-        public GitHubService(IWebHostEnvironment hostEnvironment)
+        public GitHubService()
         {
-            this.hostEnvironment = hostEnvironment;
             options = new JsonSerializerOptions();
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         }
 
         public async Task<IEnumerable<Issue>> GetIssues(DateTime date)
         {
-            var cacheFile = Path.Combine(hostEnvironment.WebRootPath, "issues.json");
+            var cacheFile = Path.Combine(Directory.GetCurrentDirectory(), "issues.json");
             var lastMonth = new DateTime(date.Month > 1 ? date.Year : date.Year - 1, date.Month > 1 ? date.Month - 1 : 12, 1);
 
             IEnumerable<Issue> issues = null;

@@ -1,6 +1,5 @@
 @page "/tree-file-system"
 @using System.IO
-@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
 
 <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
     File and directory browser
@@ -27,7 +26,7 @@
     IEnumerable<string> entries;
     protected override void OnInitialized()
     {
-        entries = Directory.GetDirectories(HostEnvironment.ContentRootPath)
+        entries = Directory.GetDirectories(Directory.GetCurrentDirectory())
                            .Where(entry =>
                            {
                                var name = Path.GetFileName(entry);

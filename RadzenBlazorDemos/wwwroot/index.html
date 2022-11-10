@@ -1,25 +1,18 @@
-﻿@using Microsoft.AspNetCore.Components.Web
-@namespace RadzenBlazorDemos.Pages
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="favicon.ico">
     <link href="css/site.css" rel="stylesheet">
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
-    @(await Html.RenderComponentAsync<Theme>(RenderMode.Static))
-    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
-    <!-- Include the base version if you are using Bootstrap already
-    <link href="_content/Radzen.Blazor/css/default-base.css" rel="stylesheet">
-    -->
-
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
     <style>
-    // Body
         :root {
             font-size: var(--rz-root-font-size);
         }
+
         body {
             font-family: var(--rz-text-font-family);
             color: var(--rz-text-color);
@@ -32,18 +25,32 @@
             color: var(--rz-link-color);
         }
 
-        a:hover,
-        a:focus {
-            color: var(--rz-link-hover-color);
-        }
+            a:hover,
+            a:focus {
+                color: var(--rz-link-hover-color);
+            }
     </style>
 </head>
+
 <body>
-    @RenderBody()
-    <script src="_framework/blazor.server.js"></script>
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
     <script async src="js/highlight.pack.js"></script>
     <script async src="blazor.polyfill.min.js"></script>
     <script async src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
     <script defer data-domain="blazor.radzen.com" src="https://analytics.radzen.com/js/plausible.js"></script>
 </body>
+
 </html>

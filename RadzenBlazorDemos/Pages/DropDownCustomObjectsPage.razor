@@ -52,6 +52,11 @@
         {
             return $"Id: {Id}, Name: {Name}";
         }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 
     MyObject singleValue = new MyObject() { Id = 5, Name = "Name5" };
