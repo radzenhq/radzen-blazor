@@ -62,7 +62,7 @@
 
     string DocumentationHref => $"/docs/guides/components/{Name.ToLower()}.html";
 
-    string ComponentSourceHref => $"https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/Radzen{Name}.razor.cs";
+    string ComponentSourceHref => Source ?? $"https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/Radzen{Name}.razor.cs";
 
     [Parameter]
     public IEnumerable<string> AdditionalSourceCodePages { get; set; } = Enumerable.Empty<string>();

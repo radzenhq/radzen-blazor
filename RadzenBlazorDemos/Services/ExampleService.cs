@@ -660,6 +660,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "Layout",
+                    Title = "Blazor Layout component",
+                    Path = "layout",
+                    New = true,
+                    Icon = "&#xe8f1"
+                },
+                new Example()
+                {
                     Name = "Link",
                     Title = "Blazor Link component",
                     Path = "link",
