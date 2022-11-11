@@ -4,7 +4,10 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 @using RadzenBlazorDemos.Services
+@using Microsoft.JSInterop
+@using System.Text.Json
 
+@inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 
 @inherits DbContextPage
@@ -71,20 +74,19 @@
     private async Task LoadStateAsync()
     {
         await Task.CompletedTask;
-        /*
-        var result = await ProtectedLocalStore.GetAsync<DataGridSettings>("Settings");
-        if (result.Success)
-            {
-            _settings = result.Value;
-        }*/
+
+        var result = await JSRuntime.InvokeAsync<string>("window.localStorage.getItem", "Settings");
+        if (!string.IsNullOrEmpty(result))
+        {
+            _settings = JsonSerializer.Deserialize<DataGridSettings>(result);
+        }
     }
 
     private async Task SaveStateAsync()
     {
         await Task.CompletedTask;
-        /*
-        await ProtectedLocalStore.SetAsync("Settings", _settings);
-        */
+
+        await JSRuntime.InvokeVoidAsync("eval", $@"window.localStorage.setItem('Settings', '{JsonSerializer.Serialize<DataGridSettings>(Settings)}')");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
