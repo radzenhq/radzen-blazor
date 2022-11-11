@@ -7,5 +7,5 @@
 {
     <input @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
            placeholder="@Placeholder" maxlength="@MaxLength" autocomplete="@(AutoComplete ? "on" : "off")" value="@Value" @onchange="@OnChange" id="@Name"
-           @oninput="@OnInput"/>
+           oninput="Radzen.mask('@Name', '@Mask', '@Pattern', '@CharacterPattern')" />
 }
