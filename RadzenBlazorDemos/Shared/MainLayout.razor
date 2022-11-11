@@ -11,12 +11,6 @@
 <RadzenTooltip />
 <RadzenContextMenu />
 
-@if (!rendered)
-{
-<div class="rz-app-loading">
-    <img src="images/radzen-loading.svg" width="240" height="240" />
-</div>
-}
 <RadzenLayout>
 <RadzenHeader>
     <ChildContent>
@@ -136,6 +130,7 @@
     </div>
 </RadzenSidebar>
 </RadzenLayout>
+<Loading />
 @code {
     RadzenSidebar sidebar0;
     RadzenBody body0;
