@@ -2,6 +2,8 @@
 @page "/"
 @inject ExampleService ExampleService
 
+@inherits DbContextPage
+
 <PageTitle>@ExampleService.TitleFor(null)</PageTitle>
 <HeadContent>
     <meta name="description" content="@ExampleService.DescriptionFor(null)">

@@ -1,0 +1,87 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inject IDbContextFactory<NorthwindContext> DbFactory
+
+@code {
+    protected NorthwindContext dbContext;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        if (dbContext == null)
+        {
+            dbContext = await DbFactory.CreateDbContextAsync();
+
+            var northwindODataService = new NorthwindODataService();
+
+            if (!dbContext.Customers.Any())
+            {
+                var result = await northwindODataService.GetCustomers(top: 91);
+                dbContext.Customers.AddRange(result.Value);
+            }
+
+            if (!dbContext.Categories.Any())
+            {
+                var result = await northwindODataService.GetCategories(top: 8);
+                dbContext.Categories.AddRange(result.Value);
+            }
+
+            if (!dbContext.Employees.Any())
+            {
+                var result = await northwindODataService.GetEmployees(top: 9);
+                dbContext.Employees.AddRange(result.Value);
+            }
+
+            if (!dbContext.Orders.Any())
+            {
+                var result = await northwindODataService.GetOrders(top: 50);
+                dbContext.Orders.AddRange(result.Value);
+            }
+
+            if (!dbContext.OrderDetails.Any())
+            {
+                var result = await northwindODataService.GetOrderDetails(top: 50);
+                dbContext.OrderDetails.AddRange(result.Value);
+            }
+
+            if (!dbContext.Products.Any())
+            {
+                var result = await northwindODataService.GetProducts(top: 77);
+                dbContext.Products.AddRange(result.Value);
+            }
+
+            if (!dbContext.Regions.Any())
+            {
+                var result = await northwindODataService.GetRegions(top: 4);
+                dbContext.Regions.AddRange(result.Value);
+            }
+
+            if (!dbContext.Territories.Any())
+            {
+                var result = await northwindODataService.GetTerritories(top: 52);
+                dbContext.Territories.AddRange(result.Value);
+            }
+
+            if (!dbContext.Suppliers.Any())
+            {
+                var result = await northwindODataService.GetSuppliers(top: 29);
+                dbContext.Suppliers.AddRange(result.Value);
+            }
+
+            if (dbContext.ChangeTracker.HasChanges())
+            {
+                try
+                {
+                    await dbContext.SaveChangesAsync();
+                }
+                catch
+                { 
+                    //
+                }
+            }
+        }
+    }
+}
