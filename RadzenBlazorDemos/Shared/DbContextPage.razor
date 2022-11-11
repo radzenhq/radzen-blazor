@@ -15,60 +15,49 @@
         {
             dbContext = await DbFactory.CreateDbContextAsync();
 
-            var northwindODataService = new NorthwindODataService();
-
             if (!dbContext.Customers.Any())
             {
-                var result = await northwindODataService.GetCustomers(top: 91);
-                dbContext.Customers.AddRange(result.Value);
+                dbContext.Customers.AddRange(Customers.Data);
             }
 
             if (!dbContext.Categories.Any())
             {
-                var result = await northwindODataService.GetCategories(top: 8);
-                dbContext.Categories.AddRange(result.Value);
+                dbContext.Categories.AddRange(Categories.Data);
             }
 
             if (!dbContext.Employees.Any())
             {
-                var result = await northwindODataService.GetEmployees(top: 9);
-                dbContext.Employees.AddRange(result.Value);
+                dbContext.Employees.AddRange(Employees.Data);
             }
 
             if (!dbContext.Orders.Any())
             {
-                var result = await northwindODataService.GetOrders(top: 50);
-                dbContext.Orders.AddRange(result.Value);
+                dbContext.Orders.AddRange(Orders.Data);
             }
 
             if (!dbContext.OrderDetails.Any())
             {
-                var result = await northwindODataService.GetOrderDetails(top: 50);
-                dbContext.OrderDetails.AddRange(result.Value);
+                dbContext.OrderDetails.AddRange(OrderDetails.Data);
             }
 
             if (!dbContext.Products.Any())
             {
-                var result = await northwindODataService.GetProducts(top: 77);
-                dbContext.Products.AddRange(result.Value);
+                dbContext.Products.AddRange(Products.Data);
             }
 
             if (!dbContext.Regions.Any())
             {
-                var result = await northwindODataService.GetRegions(top: 4);
-                dbContext.Regions.AddRange(result.Value);
+                dbContext.Regions.AddRange(Regions.Data);
             }
 
             if (!dbContext.Territories.Any())
             {
-                var result = await northwindODataService.GetTerritories(top: 52);
-                dbContext.Territories.AddRange(result.Value);
+                dbContext.Territories.AddRange(Territories.Data);
             }
 
             if (!dbContext.Suppliers.Any())
             {
-                var result = await northwindODataService.GetSuppliers(top: 29);
-                dbContext.Suppliers.AddRange(result.Value);
+                dbContext.Suppliers.AddRange(Suppliers.Data);
             }
 
             if (dbContext.ChangeTracker.HasChanges())
