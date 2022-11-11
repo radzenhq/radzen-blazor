@@ -598,7 +598,7 @@ namespace Radzen
                     //
                 }
             }
-            else if (Multiple && key == "Space")
+            else if (Multiple && key == "Enter")
             {
                 if (selectedIndex >= 0 && selectedIndex <= items.Count() - 1)
                 {
