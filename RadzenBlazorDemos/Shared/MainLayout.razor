@@ -11,6 +11,12 @@
 <RadzenTooltip />
 <RadzenContextMenu />
 
+@if (!rendered)
+{
+<div class="rz-app-loading">
+    Loading...
+</div>
+}
 <RadzenLayout>
 <RadzenHeader>
     <ChildContent>
@@ -135,16 +141,24 @@
     RadzenBody body0;
     bool sidebarExpanded = true;
     bool bodyExpanded = false;
+    bool rendered = false;
 
     IEnumerable<Example> examples;
     protected override void OnInitialized()
     {
-
         ThemeService.Initialize(UriHelper);
 
         examples = ExampleService.Examples;
 
         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            rendered = true;
+        }
     }
 
     void FilterPanelMenu(ChangeEventArgs args)

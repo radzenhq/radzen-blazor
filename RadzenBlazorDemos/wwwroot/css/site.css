@@ -589,6 +589,13 @@ svg.illustration {
     content: "An error has occurred."
 }
 
+.rz-app-loading {
+    position: fixed;
+    inset: 0;
+    background: white;
+    z-index: 1000;
+}
+
 .loading-progress {
     position: relative;
     display: block;
