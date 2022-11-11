@@ -1,14 +1,19 @@
 @page "/layout"
 
-<RadzenExample Name="Layout" Documentation="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenLayout.cs">
-<RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P">
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    Layout
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="mt-4">
     RadzenLayout allows you to define the global layout of your application (usually used in MainLayout.razor).
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="mb-4">
     It has header, sidebar, body and footer sections which correspond to the RadzenHeader, RadzenSidebar, RadzenBody and RadzenFooter components.
     Sections are optional and can be omitted.
 </RadzenText>
+<RadzenExample Name="Layout" Heading="false" Documentation="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenLayout.cs">
 <div class="row">
     <div class="col-md-6">
-        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Sidebar, Header and Footer</RadzenText>
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="my-3">Sidebar, Header and Footer</RadzenText>
         <RadzenLayout class="rz-shadow-3" style="height: 400px">
             <RadzenHeader>
                 <div class="d-flex align-items-center">
@@ -36,7 +41,7 @@
         </RadzenLayout>
     </div>
     <div class="col-md-6">
-        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Full height Sidebar</RadzenText>
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="my-3">Full height Sidebar</RadzenText>
         <RadzenLayout class="rz-shadow-3" Style="height: 400px; grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body'">
             <RadzenHeader>
                 <div class="d-flex align-items-center">
@@ -63,7 +68,7 @@
 </div>
 <div class="row mt-4">
     <div class="col-md-6">
-        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Right Sidebar</RadzenText>
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="my-3">Right Sidebar</RadzenText>
         <RadzenLayout class="rz-shadow-3" Style="height: 400px; grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-header' 'rz-body rz-sidebar'">
             <RadzenHeader>
                 <div class="d-flex justify-content-end align-items-center">
@@ -88,7 +93,7 @@
         </RadzenLayout>
     </div>
     <div class="col-md-6">
-        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Right full height Sidebar</RadzenText>
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="my-3">Right full height Sidebar</RadzenText>
         <RadzenLayout class="rz-shadow-3" Style="height: 400px; grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-sidebar' 'rz-body rz-sidebar'">
             <RadzenHeader>
                 <div class="d-flex justify-content-end align-items-center">
@@ -115,7 +120,7 @@
 </div>
 <div class="row mt-4">
     <div class="col">
-        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Right and Left Sidebar</RadzenText>
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="my-3">Right and Left Sidebar</RadzenText>
         <RadzenLayout class="rz-shadow-3" Style="height: 400px; grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-right-sidebar'">
             <RadzenHeader>
                 <div class="d-flex align-items-center">
