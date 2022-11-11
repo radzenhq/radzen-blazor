@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="~/" />
     <link href="css/site.css" rel="stylesheet" />
-    <component type="typeof(HeadOutlet)" render-mode="WebAssemblyPrerendered" />
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <style>
         :root {
@@ -37,10 +37,7 @@
     <component type="typeof(RadzenBlazorDemos.Shared.Theme)" render-mode="Static" />
 </head>
 <body>
-    <component type="typeof(RadzenBlazorDemos.App)" render-mode="WebAssemblyPrerendered" />
-    <div class="rz-app-loading">
-        <img src="images/radzen-loading.svg" width="240" height="240" />
-    </div>
+    <component type="typeof(RadzenBlazorDemos.App)" render-mode="ServerPrerendered" />
     <div id="blazor-error-ui">
         <environment include="Staging,Production">
             An error has occurred. This application may no longer respond until reloaded.
@@ -52,14 +49,8 @@
         <a class="dismiss">🗙</a>
     </div>
 
-    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script src="_framework/blazor.server.js"></script>
     <script async src="js/highlight.pack.js"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
-    <script>
-        Blazor.start().then(function () {
-            document.querySelector('.rz-app-loading').style.display = 'none';
-        });
-    </script>
-    <script defer data-domain="blazor.radzen.com" src="https://analytics.radzen.com/js/plausible.js"></script>
 </body>
 </html>
