@@ -19,8 +19,10 @@ RUN docfx DocFX/docfx.json
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0
 
-COPY --from=0 /app/RadzenBlazorDemos.Host /app
-WORKDIR /app
+COPY --from=0 /app/RadzenBlazorDemos.Host /app/RadzenBlazorDemos.Host
+COPY --from=0 /app/RadzenBlazorDemos /app/RadzenBlazorDemos
+
+WORKDIR /app/RadzenBlazorDemos.Host
 RUN dotnet publish -c Release -o out
 COPY RadzenBlazorDemos.Host/northwind.db /app/out
 COPY RadzenBlazorDemos.Host/northwind.sql /app/out
