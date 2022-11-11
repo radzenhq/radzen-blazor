@@ -86,9 +86,9 @@
     IEnumerable<Customer> customers;
     IEnumerable<Employee> employees;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         customers = dbContext.Customers.ToList();
         employees = dbContext.Employees.ToList();

@@ -58,9 +58,9 @@
     RadzenDataGrid<Employee> grid;
     IEnumerable<Employee> employees;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         employees = dbContext.Employees;
     }

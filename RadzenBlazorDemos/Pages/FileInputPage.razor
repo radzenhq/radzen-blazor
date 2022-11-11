@@ -30,6 +30,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+
         firstEmployee = await Task.FromResult(dbContext.Employees.FirstOrDefault());
     }
 

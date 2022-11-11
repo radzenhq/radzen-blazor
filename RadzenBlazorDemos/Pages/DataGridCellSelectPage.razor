@@ -47,9 +47,9 @@
     IList<Tuple<Employee, RadzenDataGridColumn<Employee>>> selectedCellData = new List<Tuple<Employee, RadzenDataGridColumn<Employee>>>();
     EventConsole console;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         employees = dbContext.Employees;
     }

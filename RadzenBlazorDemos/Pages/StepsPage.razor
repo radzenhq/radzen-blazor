@@ -97,9 +97,9 @@
     IList<Customer> selectedCustomers;
     IList<Order> selectedOrders;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         customers = dbContext.Customers.ToList();
         orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();

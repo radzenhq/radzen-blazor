@@ -8,11 +8,11 @@
 @code {
     protected NorthwindContext dbContext;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
-        dbContext = DbFactory.CreateDbContext();
+        dbContext = await DbFactory.CreateDbContextAsync();
     }
 
     public void Dispose()

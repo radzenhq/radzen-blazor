@@ -38,9 +38,9 @@
     int count;
     IEnumerable<Order> orders;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         count = dbContext.Orders.Count();
         orders = GetOrders(0, pageSize);

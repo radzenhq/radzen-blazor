@@ -48,9 +48,9 @@
         selectedEmployees = null;
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         employees = dbContext.Employees;
         selectedEmployees = employees.Take(1).ToList();

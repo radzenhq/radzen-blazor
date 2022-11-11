@@ -69,9 +69,9 @@
 @code {
     IEnumerable<Product> products;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         products = dbContext.Products.Include("Category").Include("Supplier").ToList();
     }

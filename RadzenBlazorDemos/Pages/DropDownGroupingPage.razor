@@ -44,9 +44,9 @@
     IEnumerable<Order> orders;
     IEnumerable<GroupData> groupedData;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         orders = dbContext.Orders.Where(o => o.CustomerID != null).Include("Customer").ToList();
 

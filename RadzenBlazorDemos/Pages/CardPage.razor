@@ -53,6 +53,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+
         var query = await (from order in dbContext.Orders
                             .Include("Customer")
                             .Include("Employee")

@@ -1,4 +1,3 @@
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace RadzenBlazorDemos.Data
@@ -9,13 +8,7 @@ namespace RadzenBlazorDemos.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var builder = new SqliteConnectionStringBuilder()
-                {
-                    DataSource = "northwind.db",
-                    Cache = SqliteCacheMode.Private
-                };
-
-                optionsBuilder.UseSqlite(builder.ConnectionString);
+                optionsBuilder.UseInMemoryDatabase("Northwind");
             }
         }
 
@@ -116,40 +109,31 @@ namespace RadzenBlazorDemos.Data
                   .HasPrincipalKey(i => i.RegionID);
 
             builder.Entity<RadzenBlazorDemos.Models.Northwind.Order>()
-                  .Property(p => p.Freight)
-                  .HasDefaultValueSql("(0)");
+                  .Property(p => p.Freight);
 
             builder.Entity<RadzenBlazorDemos.Models.Northwind.OrderDetail>()
-                  .Property(p => p.UnitPrice)
-                  .HasDefaultValueSql("(0)");
+                  .Property(p => p.UnitPrice);
 
             builder.Entity<RadzenBlazorDemos.Models.Northwind.OrderDetail>()
-                  .Property(p => p.Quantity)
-                  .HasDefaultValueSql("(1)");
+                  .Property(p => p.Quantity);
 
             builder.Entity<RadzenBlazorDemos.Models.Northwind.OrderDetail>()
-                  .Property(p => p.Discount)
-                  .HasDefaultValueSql("(0)");
+                  .Property(p => p.Discount);
 
             builder.Entity<RadzenBlazorDemos.Models.Northwind.Product>()
-                  .Property(p => p.UnitPrice)
-                  .HasDefaultValueSql("(0)");
+                  .Property(p => p.UnitPrice);
 
             builder.Entity<RadzenBlazorDemos.Models.Northwind.Product>()
-                  .Property(p => p.UnitsInStock)
-                  .HasDefaultValueSql("(0)");
+                  .Property(p => p.UnitsInStock);
 
             builder.Entity<RadzenBlazorDemos.Models.Northwind.Product>()
-                  .Property(p => p.UnitsOnOrder)
-                  .HasDefaultValueSql("(0)");
+                  .Property(p => p.UnitsOnOrder);
 
             builder.Entity<RadzenBlazorDemos.Models.Northwind.Product>()
-                  .Property(p => p.ReorderLevel)
-                  .HasDefaultValueSql("(0)");
+                  .Property(p => p.ReorderLevel);
 
             builder.Entity<RadzenBlazorDemos.Models.Northwind.Product>()
-                  .Property(p => p.Discontinued)
-                  .HasDefaultValueSql("(0)");
+                  .Property(p => p.Discontinued);
 
             this.OnModelBuilding(builder);
         }
