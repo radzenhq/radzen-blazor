@@ -81,8 +81,18 @@ namespace Radzen.Blazor
 
             if (firstRender)
             {
-                JSRuntime.InvokeVoidAsync("eval", $"Radzen.mask('{GetId()}', '{Mask}', '{Pattern}', '{CharacterPattern}')");
+                JSRuntime.InvokeVoidAsync("eval", $"Radzen.mask('{Name}', '{Mask}', '{Pattern}', '{CharacterPattern}')");
             }
+        }
+
+        /// <summary>
+        /// Handles the Input event
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        protected async System.Threading.Tasks.Task OnInput(ChangeEventArgs args)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", $"Radzen.mask('{Name}', '{Mask}', '{Pattern}', '{CharacterPattern}')");
         }
     }
 }

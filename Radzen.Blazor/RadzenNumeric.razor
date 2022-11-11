@@ -11,7 +11,7 @@
                class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
                placeholder="@Placeholder" autocomplete="@(AutoComplete ? "on" : "off")" value="@FormattedValue" @onchange="@OnChange"
                onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower())"
-           onblur="@getOnInput()" onpaste="@getOnPaste()" />
+               onblur="@getOnInput()" onpaste="@getOnPaste()" id="@Name" />
         @if (ShowUpDown)
         {
             <button type="button" class="rz-spinner-button rz-spinner-up rz-button" tabindex="-1"

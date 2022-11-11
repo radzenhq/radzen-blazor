@@ -16,7 +16,7 @@
                 oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"  @onchange="@OnChange"
                 aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
                 class="@InputClassList"
-                id="@Name" aria-expanded="true" placeholder="@Placeholder" />
+                id="@Name" aria-expanded="true" placeholder="@Placeholder" name="@Name" />
         }
         else
         {
@@ -24,7 +24,7 @@
                 oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onchange="@OnChange"
                 aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
                 class="@InputClassList"
-                type="text" id="@Name" aria-expanded="true" placeholder="@Placeholder" />
+                type="text" id="@Name" aria-expanded="true" placeholder="@Placeholder" name="@Name"/>
         }
         <div id="@PopupID" class="rz-autocomplete-panel" style="@PopupStyle">
             <ul @ref="@list" class="rz-autocomplete-items rz-autocomplete-list" role="listbox">
