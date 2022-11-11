@@ -44,7 +44,7 @@ builder.Services.AddDbContextFactory<NorthwindContext>();
 
 builder.Services.AddScoped<NorthwindService>();
 builder.Services.AddScoped<NorthwindODataService>();
-builder.Services.AddScoped<GitHubService>();
+builder.Services.AddSingleton<GitHubService>();
 
 builder.Services.AddLocalization();
 

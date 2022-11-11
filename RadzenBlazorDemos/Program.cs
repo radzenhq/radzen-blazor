@@ -23,7 +23,7 @@ builder.Services.AddScoped<ContextMenuService>();
 
 builder.Services.AddScoped<NorthwindService>();
 builder.Services.AddScoped<NorthwindODataService>();
-builder.Services.AddScoped<GitHubService>();
+builder.Services.AddSingleton<GitHubService>();
 
 
 await builder.Build().RunAsync();
