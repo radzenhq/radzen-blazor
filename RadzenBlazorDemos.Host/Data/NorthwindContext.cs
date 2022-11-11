@@ -1,7 +1,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-namespace RadzenBlazorDemos.Server.Data
+namespace RadzenBlazorDemos.Host.Data
 {
     public partial class NorthwindContext : Microsoft.EntityFrameworkCore.DbContext
     {

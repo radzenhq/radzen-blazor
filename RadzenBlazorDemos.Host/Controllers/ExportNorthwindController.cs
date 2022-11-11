@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RadzenBlazorDemos.Server.Data;
+using RadzenBlazorDemos.Host.Data;
 
 namespace RadzenBlazorDemos
 {
