@@ -592,8 +592,12 @@ svg.illustration {
 .rz-app-loading {
     position: fixed;
     inset: 0;
-    background: white;
+    background: var(--rz-base-background-color);
     z-index: 1000;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .loading-progress {
