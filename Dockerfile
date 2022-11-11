@@ -24,8 +24,6 @@ COPY --from=0 /app/RadzenBlazorDemos /app/RadzenBlazorDemos
 
 WORKDIR /app/RadzenBlazorDemos.Host
 RUN dotnet publish -c Release -o out
-COPY RadzenBlazorDemos.Host/northwind.db /app/out
-COPY RadzenBlazorDemos.Host/northwind.sql /app/out
 
 ENV ASPNETCORE_URLS http://*:5000
 WORKDIR /app/RadzenBlazorDemos.Host/out
