@@ -9,9 +9,32 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="~/" />
-    <link href="_content/Radzen.Blazor/css/material.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
     <component type="typeof(HeadOutlet)" render-mode="WebAssemblyPrerendered" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <style>
+        :root {
+            font-size: var(--rz-root-font-size);
+        }
+
+        body {
+            font-family: var(--rz-text-font-family);
+            color: var(--rz-text-color);
+            font-size: var(--rz-body-font-size);
+            line-height: var(--rz-body-line-height);
+            background-color: var(--rz-body-background-color);
+        }
+
+        a {
+            color: var(--rz-link-color);
+        }
+
+        a:hover,
+        a:focus {
+            color: var(--rz-link-hover-color);
+        }
+    </style>
+    <component type="typeof(RadzenBlazorDemos.Shared.Theme)" render-mode="Static" />
 </head>
 <body>
     <component type="typeof(RadzenBlazorDemos.App)" render-mode="WebAssemblyPrerendered" />
