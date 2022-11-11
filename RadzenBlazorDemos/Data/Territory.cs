@@ -3,7 +3,7 @@ using System;
 
 namespace RadzenBlazorDemos.Data
 {
-    public class Territories
+    public class TerritoriesData
     {
         public static Territory[] Data = new Territory[] {
             new Territory() {

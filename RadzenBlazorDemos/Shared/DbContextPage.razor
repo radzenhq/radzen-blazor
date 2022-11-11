@@ -14,63 +14,7 @@
         if (dbContext == null)
         {
             dbContext = await DbFactory.CreateDbContextAsync();
-
-            if (!dbContext.Customers.Any())
-            {
-                dbContext.Customers.AddRange(Customers.Data);
-            }
-
-            if (!dbContext.Categories.Any())
-            {
-                dbContext.Categories.AddRange(Categories.Data);
-            }
-
-            if (!dbContext.Employees.Any())
-            {
-                dbContext.Employees.AddRange(Employees.Data);
-            }
-
-            if (!dbContext.Orders.Any())
-            {
-                dbContext.Orders.AddRange(Orders.Data);
-            }
-
-            if (!dbContext.OrderDetails.Any())
-            {
-                dbContext.OrderDetails.AddRange(OrderDetails.Data);
-            }
-
-            if (!dbContext.Products.Any())
-            {
-                dbContext.Products.AddRange(Products.Data);
-            }
-
-            if (!dbContext.Regions.Any())
-            {
-                dbContext.Regions.AddRange(Regions.Data);
-            }
-
-            if (!dbContext.Territories.Any())
-            {
-                dbContext.Territories.AddRange(Territories.Data);
-            }
-
-            if (!dbContext.Suppliers.Any())
-            {
-                dbContext.Suppliers.AddRange(Suppliers.Data);
-            }
-
-            if (dbContext.ChangeTracker.HasChanges())
-            {
-                try
-                {
-                    await dbContext.SaveChangesAsync();
-                }
-                catch
-                { 
-                    //
-                }
-            }
+            await dbContext.Seed();
         }
     }
 }

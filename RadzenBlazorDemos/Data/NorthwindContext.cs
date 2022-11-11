@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace RadzenBlazorDemos.Data
 {
@@ -209,6 +211,65 @@ namespace RadzenBlazorDemos.Data
         {
             get;
             set;
+        }
+        public async Task Seed()
+        {
+            if (!Customers.Any())
+            {
+                Customers.AddRange(CustomersData.Data);
+            }
+
+            if (!Categories.Any())
+            {
+                Categories.AddRange(CategoriesData.Data);
+            }
+
+            if (!Employees.Any())
+            {
+                Employees.AddRange(EmployeesData.Data);
+            }
+
+            if (!Orders.Any())
+            {
+                Orders.AddRange(OrdersData.Data);
+            }
+
+            if (!OrderDetails.Any())
+            {
+                OrderDetails.AddRange(OrderDetailsData.Data);
+            }
+
+            if (!Products.Any())
+            {
+                Products.AddRange(ProductsData.Data);
+            }
+
+            if (!Regions.Any())
+            {
+                Regions.AddRange(RegionsData.Data);
+            }
+
+            if (!Territories.Any())
+            {
+                Territories.AddRange(TerritoriesData.Data);
+            }
+
+            if (!Suppliers.Any())
+            {
+                Suppliers.AddRange(SuppliersData.Data);
+            }
+
+            if (ChangeTracker.HasChanges())
+            {
+                try
+                {
+                    await SaveChangesAsync();
+                }
+                catch
+                {
+                    //
+                }
+            }
         }
     }
 }

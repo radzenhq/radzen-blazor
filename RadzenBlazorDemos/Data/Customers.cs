@@ -4,7 +4,7 @@ using System.Net;
 
 namespace RadzenBlazorDemos.Data
 {
-    public class Customers
+    public class CustomersData
     {
         public static Customer[] Data = new Customer[] {
             new Customer() {

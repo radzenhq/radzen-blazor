@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RadzenBlazorDemos.Host.Data;
+using RadzenBlazorDemos.Data;
 
 namespace RadzenBlazorDemos
 {
@@ -10,6 +10,7 @@ namespace RadzenBlazorDemos
         public ExportNorthwindController(NorthwindContext context)
         {
             this.context = context;
+            context.Seed();
         }
 
         [HttpGet("/export/Northwind/categories/csv")]

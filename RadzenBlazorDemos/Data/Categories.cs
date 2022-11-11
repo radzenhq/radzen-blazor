@@ -3,7 +3,7 @@ using System;
 
 namespace RadzenBlazorDemos.Data
 {
-    public class Categories
+    public class CategoriesData
     {
         public static Category[] Data = new Category[] {
             new Category() {

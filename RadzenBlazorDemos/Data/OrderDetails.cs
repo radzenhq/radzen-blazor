@@ -3,7 +3,7 @@ using System;
 
 namespace RadzenBlazorDemos.Data
 {
-    public class OrderDetails
+    public class OrderDetailsData
     {
         public static OrderDetail[] Data = new OrderDetail[] {
             new OrderDetail() {
