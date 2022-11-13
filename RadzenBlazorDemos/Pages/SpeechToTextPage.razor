@@ -1,0 +1,47 @@
+﻿@page "/speechtotext"
+
+<RadzenExample Name="SpeechToText">
+    <div class="container-fluid">
+        <div class="row px-3">
+            <div class="col-md-6 col-lg-4 p-3">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Speech To Text</RadzenText>
+                    <RadzenSpeechToText OnResult="@(args => OnSpeechCaptured(args, null))"></RadzenSpeechToText>
+                </RadzenCard>
+            </div>
+            <div class="col-md-6 col-lg-4 p-3">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Update TextArea</RadzenText>
+                    <RadzenTextArea @ref="textToSpeechInput" @bind-Value=@value Change=@(args => OnChange(args, "TextArea")) Class="w-100" />
+                    <RadzenSpeechToText OnResult="@(args => OnSpeechCaptured(args, textToSpeechInput))"></RadzenSpeechToText>
+                </RadzenCard>
+            </div>
+        </div>
+    </div>
+</RadzenExample>
+
+<EventConsole @ref=@console Class="mt-4" />
+
+@code {
+
+    string value;
+
+    EventConsole console;
+
+    RadzenTextArea textToSpeechInput;
+
+    void OnChange(string value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+
+    void OnSpeechCaptured(string speechValue, RadzenTextArea textArea)
+    {
+        console.Log($"Speech Captured: {speechValue}");
+
+        if (textArea != null)
+        {
+            value += speechValue;
+        }
+    }
+}

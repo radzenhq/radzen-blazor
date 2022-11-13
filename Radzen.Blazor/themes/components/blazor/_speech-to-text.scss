@@ -1,0 +1,23 @@
+@keyframes mic-blink {
+    0% {
+    }
+
+    100% {
+        background-color: $rz-primary;
+    }
+}
+
+@-webkit-keyframes mic-blink {
+    0% {
+    }
+
+    100% {
+        background-color: $rz-primary;
+    }
+}
+
+.rz-mic-on {
+    -webkit-animation: mic-blink 2s linear infinite;
+    -moz-animation: mic-blink 2s linear infinite;
+    animation: mic-blink 2s linear infinite;
+}

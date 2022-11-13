@@ -18,6 +18,7 @@ if (!Element.prototype.closest) {
 
 var resolveCallbacks = [];
 var rejectCallbacks = [];
+var radzenRecognition;
 
 window.Radzen = {
     throttle: function (callback, delay) {
@@ -1665,5 +1666,63 @@ window.Radzen = {
             clearInterval(Radzen.WaitingIntervalId);
             Radzen.WaitingIntervalId = null;
         }
+    },
+    initDictation: function () {
+
+        if (radzenRecognition) {
+            return true;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition ||
+            window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            return false;
+        }
+        radzenRecognition = new SpeechRecognition();
+        radzenRecognition.continuous = true;
+        radzenRecognition.onresult = function (event) {
+
+            if (!radzenRecognition.elementRef || event.results.length < 1) {
+                return;
+            }
+
+            if (event.results.length > 0) {
+                let current = event.results[event.results.length - 1][0]
+                let result = current.transcript;
+
+                radzenRecognition.componentRef.invokeMethodAsync("OnResultFromJs", result);
+            }
+        }
+
+        return true;
+    },
+    toggleDictation: async function (element, componentRef) {
+        if (!this.initDictation()) {
+            const apiNotAvailableMsg = "speech recognition API not available.";
+            alert(apiNotAvailableMsg);
+            console.warn(apiNotAvailableMsg);
+            return;
+        }
+
+        if (radzenRecognition.componentRef) {
+
+            radzenRecognition.abort();
+
+            let oldComponentRef = radzenRecognition.componentRef;
+            let oldElement = radzenRecognition.elementRef;
+
+            radzenRecognition.componentRef = null;
+            radzenRecognition.elementRef = null;
+
+            if (oldElement == element) {
+                return;
+            } else {
+                await oldComponentRef.invokeMethodAsync("StopRecording");
+            }
+        }
+
+        radzenRecognition.elementRef = element;
+        radzenRecognition.componentRef = componentRef;
+        radzenRecognition.start();
     }
 };
