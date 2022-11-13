@@ -165,7 +165,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
-        
+
         [Fact]
         public void TextArea_Raises_ChangedEvent()
         {
@@ -202,6 +202,103 @@ namespace Radzen.Blazor.Tests
 
             Assert.True(raised);
             Assert.True(object.Equals(value, newValue));
+        }
+
+        [Fact]
+        public void TextArea_Renders_Record_Button_When_EnableSpeechToText_Is_True_And_Not_Disabled()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextArea>();
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.EnableSpeechToText, true));
+
+            var recordButton = component.Find("button.rz-button-icon-only");
+
+            Assert.NotNull(recordButton);
+        }
+
+        [Fact]
+        public void TextArea_Does_Not_Render_Record_Button_When_EnableSpeechToText_Is_True_And_Disabled()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextArea>();
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.EnableSpeechToText, true);
+                parameters.Add(p => p.Disabled, true);
+            });
+
+            Assert.Throws<ElementNotFoundException>(() => component.Find("button.rz-button-icon-only"));
+        }
+
+        [Fact]
+        public void TextArea_Does_Not_Render_Record_Button_When_EnableSpeechToText_Is_False()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextArea>();
+
+            component.Render();
+
+            Assert.Throws<ElementNotFoundException>(() => component.Find("button.rz-button-icon-only"));
+        }
+
+        [Fact]
+        public void TextArea_Sets_Record_Button_Css_When_Record_Button_Clicked()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextArea>();
+
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.EnableSpeechToText, true));
+
+            var recordButton = component.Find("button.rz-button-icon-only.rz-mic");
+
+            Assert.NotNull(recordButton);
+
+            recordButton.Click();
+
+            component.Render();
+
+            var blinkingRecordButton = component.Find("button.rz-button-icon-only.rz-mic-on");
+
+            Assert.NotNull(blinkingRecordButton);
+        }
+
+        [Fact]
+        public void TextArea_UnSets_Record_Button_Css_When_Record_Button_Clicked_Twice()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextArea>();
+
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.EnableSpeechToText, true));
+
+            var recordButton = component.Find("button.rz-button-icon-only.rz-mic");
+
+            Assert.NotNull(recordButton);
+
+            recordButton.Click();
+
+            component.Render();
+
+            const string blinkingRecordButtonSelector = "button.rz-button-icon-only.rz-mic-on";
+            var blinkingRecordButton = component.Find(blinkingRecordButtonSelector);
+
+            Assert.NotNull(blinkingRecordButton);
+
+            blinkingRecordButton.Click();
+
+            component.Render();
+
+            Assert.Throws<ElementNotFoundException>(() => component.Find(blinkingRecordButtonSelector));
         }
     }
 }

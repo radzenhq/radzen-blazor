@@ -5,4 +5,10 @@
 {
     <textarea @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
           placeholder="@Placeholder" maxlength="@MaxLength" value="@Value" @onchange="@OnChange" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@GetId()"></textarea>
+
+    if (!Disabled && EnableSpeechToText)
+    {
+        <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="mic" class="@MicIconCss" Click="OnSpeechToTextClicked" 
+                      title="Speech To Text" aria-label="Speech To Text"></RadzenButton>
+    }
 }

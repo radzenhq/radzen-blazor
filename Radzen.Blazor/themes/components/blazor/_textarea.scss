@@ -11,3 +11,31 @@ $text-area-padding: var(--rz-input-padding) !default;
   padding: var(--rz-text-area-padding);
   height: auto;
 }
+
+.rz-mic {
+    padding: var(--rz-text-area-padding) !important;
+}
+
+@keyframes mic-blink {
+    0% {
+    }
+
+    100% {
+        background-color: $rz-primary;
+    }
+}
+
+@-webkit-keyframes mic-blink {
+    0% {
+    }
+
+    100% {
+        background-color: $rz-primary;
+    }
+}
+
+.rz-mic-on {
+    -webkit-animation: mic-blink 2s linear infinite;
+    -moz-animation: mic-blink 2s linear infinite;
+    animation: mic-blink 2s linear infinite;
+}

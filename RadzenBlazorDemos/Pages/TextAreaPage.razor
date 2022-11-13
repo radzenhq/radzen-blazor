@@ -33,6 +33,12 @@
                 <RadzenTextArea Disabled="true" @bind-Value=@value Cols="30" Rows="3" />
             </RadzenCard>
         </div>
+            <div class="col-md-6 col-lg-4 p-3">
+                <RadzenCard Style="overflow: scroll">
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Speech To Text</RadzenText>
+                    <RadzenTextArea EnableSpeechToText="true" Change=@(args => OnChange(args, "TextArea")) Class="w-100" />
+                </RadzenCard>
+            </div>
     </div>
 </div>
 </RadzenExample>

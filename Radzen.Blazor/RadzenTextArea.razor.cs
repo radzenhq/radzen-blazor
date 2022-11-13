@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Radzen.Blazor
 {
@@ -41,6 +42,13 @@ namespace Radzen.Blazor
         public int Cols { get; set; } = 20;
 
         /// <summary>
+        /// Enables speech to text functionality.
+        /// <para>This is only supported on select browsers. See https://caniuse.com/?search=SpeechRecognition</para>
+        /// </summary>
+        [Parameter]
+        public bool EnableSpeechToText { get; set; }
+
+        /// <summary>
         /// Handles the <see cref="E:Change" /> event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
@@ -58,5 +66,46 @@ namespace Radzen.Blazor
         {
             return GetClassList("rz-textarea").ToString();
         }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            _componentRef?.Dispose();
+
+            base.Dispose();
+        }
+
+        #region Speech to Text
+
+        private bool _isRecording;
+
+        private string MicIconCss => _isRecording ? "rz-mic rz-mic-on" : "rz-mic";
+
+        private DotNetObjectReference<RadzenTextArea> _componentRef;
+
+        private async System.Threading.Tasks.Task OnSpeechToTextClicked()
+        {
+            if (_componentRef == null)
+            {
+                _componentRef = DotNetObjectReference.Create(this);
+            }
+
+            await JSRuntime.InvokeVoidAsync("Radzen.toggleDictation", @Element, _componentRef);
+
+            _isRecording = !_isRecording;
+        }
+
+        /// <summary>
+        /// Provides interface for javascript to stop speech to text recording on this component if another component starts recording.
+        /// </summary>
+        [JSInvokable]
+        public void StopRecording()
+        {
+            _isRecording = false;
+
+            StateHasChanged();
+        }
+
+        #endregion
     }
 }
