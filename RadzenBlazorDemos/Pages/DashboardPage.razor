@@ -331,7 +331,7 @@
                                     .Select(group => new { User = group.Key, Count = group.Count() })
                                     .OrderByDescending(group => group.Count)
                                     .Select(group => group.User)
-                                    .First();
+                                    .FirstOrDefault();
 
                 users = issues.Select(issue => issue.User)
                             .Distinct(new UserComparer());

@@ -42,7 +42,7 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}">
                 <FooterTemplate>
-                    Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).Last().OrderDate)</b>
+                    Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).LastOrDefault()?.OrderDate)</b>
                 </FooterTemplate>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
