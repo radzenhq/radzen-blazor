@@ -1,7 +1,8 @@
 @page "/tree-data-binding"
 @using Microsoft.EntityFrameworkCore
 @using RadzenBlazorDemos.Models.Northwind
-@inject RadzenBlazorDemos.Data.NorthwindContext Northwind
+
+@inherits DbContextPage
 
 <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
     Tree data-binding
@@ -75,10 +76,12 @@
         */
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        categories = Northwind.Categories.Include(c => c.Products);
-        var allEmployees = Northwind.Employees.Include(e => e.Employees1).ToList();
+        await base.OnInitializedAsync();
+
+        categories = dbContext.Categories.Include(c => c.Products);
+        var allEmployees = dbContext.Employees.Include(e => e.Employees1).ToList();
         employees = allEmployees.Where(e => e.ReportsTo == null);
     }
 }
