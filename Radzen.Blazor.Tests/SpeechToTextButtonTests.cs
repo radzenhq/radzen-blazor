@@ -48,6 +48,23 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void SpeechToTextButton_Can_Override_Default_Title_And_Aria_Label()
+        {
+            using var ctx = new TestContext();
+
+            var component =
+                ctx.RenderComponent<RadzenSpeechToTextButton>(
+                    ComponentParameter.CreateParameter("title", "title override"),
+                    ComponentParameter.CreateParameter("aria-label", "aria-label override"));
+
+            var recordButton = component.Find("button.rz-button-icon-only.rz-mic");
+
+            Assert.NotNull(recordButton);
+            Assert.Equal("title override", recordButton.GetAttribute("title"));
+            Assert.Equal("aria-label override", recordButton.GetAttribute("aria-label"));
+        }
+
+        [Fact]
         public void SpeechToTextButton_Sets_Record_Button_Css_When_Record_Button_Clicked()
         {
             using var ctx = new TestContext();
