@@ -1,6 +1,7 @@
 ﻿@inherits RadzenComponent
 @if (Visible)
 {
-    <RadzenButton @ref="_micButton" id="@GetId()" ButtonStyle="ButtonStyle" Icon="@Icon" style="@Style" @attributes="Attributes" class="@GetCssClass()"
-              Click="OnSpeechToTextClicked" title="Speech To Text" aria-label="Speech To Text"></RadzenButton>
+    <RadzenButton @ref="_micButton" id="@GetId()" title="Speech To Text" aria-label="Speech To Text"
+              ButtonStyle="ButtonStyle" Icon="@Icon" style="@Style" @attributes="Attributes"
+              class="@GetCssClass()" Click="OnSpeechToTextClicked"></RadzenButton>
 }
