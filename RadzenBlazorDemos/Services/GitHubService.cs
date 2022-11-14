@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
-using Microsoft.AspNetCore.Hosting;
 
 using RadzenBlazorDemos.Models.GitHub;
 
@@ -23,7 +22,7 @@ namespace RadzenBlazorDemos.Services
 
         private static int ExtractPage(string value)
         {
-            var match = Regex.Match(value, "page=(?<page>\\d+)");
+            var match = Regex.Match(value, "&page=(?<page>\\d+)");
 
             if (match != null)
             {
@@ -80,52 +79,28 @@ namespace RadzenBlazorDemos.Services
 
     public class GitHubService
     {
-        private readonly IWebHostEnvironment hostEnvironment;
-
         private readonly JsonSerializerOptions options;
 
         public Action<FetchProgressEventArgs> OnProgress;
+        private IEnumerable<Issue> issues;
 
-        public GitHubService(IWebHostEnvironment hostEnvironment)
+        public GitHubService()
         {
-            this.hostEnvironment = hostEnvironment;
             options = new JsonSerializerOptions();
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         }
 
         public async Task<IEnumerable<Issue>> GetIssues(DateTime date)
         {
-            var cacheFile = Path.Combine(hostEnvironment.WebRootPath, "issues.json");
-            var lastMonth = new DateTime(date.Month > 1 ? date.Year : date.Year - 1, date.Month > 1 ? date.Month - 1 : 12, 1);
-
-            IEnumerable<Issue> issues = null;
-
-            if (File.Exists(cacheFile))
-            {
-                try
-                {
-                    var json = await File.ReadAllTextAsync(cacheFile);
-                    var cache = JsonSerializer.Deserialize<IssueCache>(json, options);
-
-                    if (date.Subtract(cache.Date).TotalHours < 24)
-                    {
-                        issues = cache.Issues;
-                    }
-                }
-                catch
-                {
-                    File.Delete(cacheFile);
-                }
-            }
+            var target = date.AddMonths(-1);
 
             if (issues == null)
             {
-                issues = await FetchIssues(lastMonth);
-
-                await File.WriteAllTextAsync(cacheFile, JsonSerializer.Serialize(new IssueCache { Date = date, Issues = issues }, options));
+                issues = await FetchIssues(target);
+                issues = issues.Where(issue => issue.CreatedAt >= target).OrderBy(issue => issue.CreatedAt);
             }
 
-            return issues.Where(issue => issue.CreatedAt >= lastMonth).OrderBy(issue => issue.CreatedAt);
+            return issues;
         }
 
         private async Task<IEnumerable<Issue>> FetchIssues(DateTime since)
@@ -134,7 +109,7 @@ namespace RadzenBlazorDemos.Services
 
             using (var http = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repos/dotnet/aspnetcore/issues?state=all&labels=area-blazor&since={since.ToString("yyyy-MM-ddThh:mm:ssZ")}");
+                var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repos/dotnet/aspnetcore/issues?state=all&labels=area-blazor&per_page=100&since={since:yyyy-MM-ddThh:mm:ssZ}");
                 request.Headers.Add("User-Agent", "Radzen");
 
                 var response = await http.SendAsync(request);

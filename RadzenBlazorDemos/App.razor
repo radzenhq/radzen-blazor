@@ -2,7 +2,7 @@
     The Router component displays whichever component has a @page
     directive matching the current URI.
 *@
-    <Router AppAssembly="typeof(Startup).Assembly">
+    <Router AppAssembly="typeof(App).Assembly">
         <Found Context="routeData">
             <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
         </Found>

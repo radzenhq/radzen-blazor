@@ -10,6 +10,7 @@ namespace RadzenBlazorDemos
         public ExportNorthwindController(NorthwindContext context)
         {
             this.context = context;
+            context.Seed();
         }
 
         [HttpGet("/export/Northwind/categories/csv")]

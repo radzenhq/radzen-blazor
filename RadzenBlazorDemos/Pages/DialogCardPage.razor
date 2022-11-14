@@ -66,9 +66,9 @@
     Order order;
     IEnumerable<OrderDetail> orderDetails;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         order = dbContext.Orders.Where(o => o.OrderID == OrderID)
                           .Include("Customer")

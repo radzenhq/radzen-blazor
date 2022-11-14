@@ -58,9 +58,9 @@
 
     IEnumerable<Order> orders;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
     }

@@ -56,9 +56,9 @@
     string CustomerID;
     int OrderID;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         customers = dbContext.Customers.ToList();
         orders = dbContext.Orders.ToList();

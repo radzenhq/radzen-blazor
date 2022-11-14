@@ -1,12 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Components
-@using Microsoft.AspNetCore.Http
 @using Radzen.Blazor
 @inherits LayoutComponentBase
 @inject ThemeService ThemeService
 @inject ExampleService ExampleService
 @inject NavigationManager UriHelper
 @inject IJSRuntime JSRuntime
-@inject IHttpContextAccessor httpContextAccessor
 
 <RadzenDialog />
 <RadzenNotification />
@@ -103,7 +101,7 @@
         <RadzenTextBox Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" />
     </div>
     <div style="flex: 1; overflow: auto">
-    <RadzenPanelMenu Match="NavLinkMatch.Prefix" Click="@PanelMenuClick">
+    <RadzenPanelMenu Match="NavLinkMatch.Prefix">
         @foreach (var category in examples)
         {
             <NavigationItem @bind-Expanded=@category.Expanded Example=@category>
@@ -132,21 +130,37 @@
     </div>
 </RadzenSidebar>
 </RadzenLayout>
+
+@if (!rendered)
+{
+<div class="rz-app-loading">
+    <div class="logo-loading"></div>
+</div>
+}
+
 @code {
     RadzenSidebar sidebar0;
     RadzenBody body0;
     bool sidebarExpanded = true;
     bool bodyExpanded = false;
+    bool rendered = false;
 
     IEnumerable<Example> examples;
     protected override void OnInitialized()
     {
-
         ThemeService.Initialize(UriHelper);
 
         examples = ExampleService.Examples;
 
         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            rendered = true;
+        }
     }
 
     void FilterPanelMenu(ChangeEventArgs args)
@@ -161,13 +175,5 @@
         var url = UriHelper.GetUriWithQueryParameter("theme", $"{value}");
 
         UriHelper.NavigateTo(url, true);
-    }
-
-    async Task PanelMenuClick(MenuItemEventArgs args)
-    {
-        if (args.Path == "/")
-        {
-            await JSRuntime.InvokeVoidAsync("document.location.reload");
-        }
     }
 }

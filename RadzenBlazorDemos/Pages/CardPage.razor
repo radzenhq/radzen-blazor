@@ -12,12 +12,12 @@
             <div class="col-lg-6 col-xl-4 offset-lg-3 offset-xl-4">
                 <RadzenCard Class="m-3">
                     <div class="d-flex flex-row p-3">
-                        <RadzenImage Path="@order.Employee?.Photo" Class="rounded-circle float-start me-3" Style="width: 100px; height: 100px;" />
+                        <RadzenImage Path="@order?.Employee?.Photo" Class="rounded-circle float-start me-3" Style="width: 100px; height: 100px;" />
                         <div>
                             <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-1 mb-0">Employee</RadzenText>
-                            <RadzenText TextStyle="TextStyle.Body1"><b>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</b></RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1"><b>@(order?.Employee?.FirstName + " " + order?.Employee?.LastName)</b></RadzenText>
                             <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-3 mb-0">Company</RadzenText>
-                            <RadzenText TextStyle="TextStyle.Body1"><b>@order.Customer?.CompanyName</b></RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1"><b>@order?.Customer?.CompanyName</b></RadzenText>
                         </div>
                     </div>
                     <RadzenCard Class="my-3 rz-background-color-primary-lighter rz-shadow-0 rz-border-radius-0" style="margin: 0 calc(-1 * var(--rz-card-padding)); padding: 2rem;">
@@ -25,15 +25,15 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <RadzenText TextStyle="TextStyle.Overline" Class="rz-color-primary-light d-flex mt-3 mb-0">Country</RadzenText>
-                                <RadzenText TextStyle="TextStyle.Body1"><b>@(order.ShipCountry)</b></RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@(order?.ShipCountry)</b></RadzenText>
                                 <RadzenText TextStyle="TextStyle.Overline" Class="rz-color-primary-light d-flex mt-3 mb-0">City</RadzenText>
-                                <RadzenText TextStyle="TextStyle.Body1"><b>@(order.ShipCity)</b></RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@(order?.ShipCity)</b></RadzenText>
                             </div>
                             <div class="col-md-8">
                                 <RadzenText TextStyle="TextStyle.Overline" Class="rz-color-primary-light d-flex mt-3 mb-0">Ship name</RadzenText>
-                                <RadzenText TextStyle="TextStyle.Body1"><b>@(order.ShipName)</b></RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@(order?.ShipName)</b></RadzenText>
                                 <RadzenText TextStyle="TextStyle.Overline" Class="rz-color-primary-light d-flex mt-3 mb-0">Freight</RadzenText>
-                                <RadzenText TextStyle="TextStyle.Body1"><b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)</b></RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order?.Freight)</b></RadzenText>
                             </div>
                         </div>
                     </RadzenCard>
@@ -53,11 +53,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var query = await (from order in dbContext.Orders
-                            .Include("Customer")
-                            .Include("Employee")
-                    select order).Take(5).ToListAsync();
+        await base.OnInitializedAsync();
 
-        order = query.FirstOrDefault();
+        order = dbContext.Orders.Include("Customer").Include("Employee").FirstOrDefault();
     }
 }

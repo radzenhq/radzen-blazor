@@ -1,7 +1,8 @@
 @page "/tree-checkboxes"
 @using Microsoft.EntityFrameworkCore
 @using RadzenBlazorDemos.Models.Northwind
-@inject RadzenBlazorDemos.Data.NorthwindContext Northwind
+
+@inherits DbContextPage
 
 <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
     Tree checkboxes
@@ -61,8 +62,10 @@
 
     EventConsole console;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        categories = Northwind.Categories.Include(c => c.Products);
+        await base.OnInitializedAsync();
+
+        categories = dbContext.Categories.Include(c => c.Products);
     }
 }

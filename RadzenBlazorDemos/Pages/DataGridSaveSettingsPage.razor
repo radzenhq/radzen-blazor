@@ -4,9 +4,10 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 @using RadzenBlazorDemos.Services
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.JSInterop
+@using System.Text.Json
 
-@inject ProtectedLocalStorage ProtectedLocalStore
+@inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 
 @inherits DbContextPage
@@ -46,9 +47,9 @@
     IEnumerable<Employee> employees;
     EventConsole console;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         employees = dbContext.Employees;
     }
@@ -72,16 +73,20 @@
 
     private async Task LoadStateAsync()
     {
-        var result = await ProtectedLocalStore.GetAsync<DataGridSettings>("Settings");
-        if (result.Success)
+        await Task.CompletedTask;
+
+        var result = await JSRuntime.InvokeAsync<string>("window.localStorage.getItem", "Settings");
+        if (!string.IsNullOrEmpty(result))
         {
-            _settings = result.Value;
+            _settings = JsonSerializer.Deserialize<DataGridSettings>(result);
         }
     }
 
     private async Task SaveStateAsync()
     {
-        await ProtectedLocalStore.SetAsync("Settings", _settings);
+        await Task.CompletedTask;
+
+        await JSRuntime.InvokeVoidAsync("eval", $@"window.localStorage.setItem('Settings', '{JsonSerializer.Serialize<DataGridSettings>(Settings)}')");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

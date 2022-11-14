@@ -38,9 +38,9 @@
     HorizontalAlign pagerHorizontalAlign = HorizontalAlign.Justify;
     IEnumerable<OrderDetail> orderDetails;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         orderDetails = dbContext.OrderDetails;
     }

@@ -1,7 +1,8 @@
 @page "/tree-selection"
 @using Microsoft.EntityFrameworkCore
 @using RadzenBlazorDemos.Models.Northwind
-@inject RadzenBlazorDemos.Data.NorthwindContext Northwind
+
+@inherits DbContextPage
 
 <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
     Tree selection
@@ -15,7 +16,7 @@
     <div class="row my-5">
         <div class="col-lg-6 offset-lg-3">
             <RadzenCard>
-                <RadzenButton Click=@(() => selection = categories.Skip(1).First()) Text="Select 'Condiments'" ButtonStyle="ButtonStyle.Secondary" Class="me-1" />
+                <RadzenButton Click=@(() => selection = categories.Skip(1).FirstOrDefault()) Text="Select 'Condiments'" ButtonStyle="ButtonStyle.Secondary" Class="me-1" />
                 <RadzenButton Click=@(() => selection = null) Text="Clear selection" ButtonStyle="ButtonStyle.Light" />
             </RadzenCard>
             <RadzenCard Class="mt-4">
@@ -50,9 +51,11 @@
         }
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        categories = Northwind.Categories.Include(c => c.Products);
-        selection = categories.First();
+        await base.OnInitializedAsync();
+
+        categories = dbContext.Categories.Include(c => c.Products);
+        selection = categories.FirstOrDefault();
     }
 }

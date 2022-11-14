@@ -1,33 +1,28 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using System.Net.Http;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace RadzenBlazorDemos
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+using RadzenBlazorDemos.Services;
+using Radzen;
+using RadzenBlazorDemos.Data;
+using RadzenBlazorDemos;
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.ConfigureKestrel((context, options) =>
-                    {
-                        options.Limits.MaxRequestBodySize = long.MaxValue;
-                    });
-                    webBuilder.UseStartup<Startup>();
-                    webBuilder.UseSetting(WebHostDefaults.DetailedErrorsKey, "true");
-                });
-    }
-}
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+builder.Services.AddDbContextFactory<NorthwindContext>();
+
+builder.Services.AddScoped<ThemeService>();
+builder.Services.AddScoped<ExampleService>();
+builder.Services.AddScoped<DialogService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<TooltipService>();
+builder.Services.AddScoped<ContextMenuService>();
+
+builder.Services.AddScoped<NorthwindService>();
+builder.Services.AddScoped<NorthwindODataService>();
+builder.Services.AddSingleton<GitHubService>();
+
+await builder.Build().RunAsync();

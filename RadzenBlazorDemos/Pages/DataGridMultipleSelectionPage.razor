@@ -49,9 +49,9 @@
     IList<Employee> selectedEmployees;
     RadzenDataGrid<Employee> grid;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         employees = dbContext.Employees;
     }

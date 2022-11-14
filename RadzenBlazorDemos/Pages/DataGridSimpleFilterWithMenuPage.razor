@@ -63,9 +63,9 @@
     FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.CaseInsensitive;
     LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.Or;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         orders = dbContext.Orders.Include("Customer").Include("Employee");
     }

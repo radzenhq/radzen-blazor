@@ -9,6 +9,11 @@
 <p>
     Sample dashboard that uses data from the <a href="https://github.com/dotnet/aspnetcore/issues" target="_blank">ASP.NET GitHub repository</a>. Data is updated 24 hours.
 </p>
+                            <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues>
+                                <Template Context="issueState">
+                                    @Enum.GetName(typeof(IssueState), issueState)
+                                </Template>
+                            </RadzenDropDown>
 <div class="container-fluid p-0" style="position: relative">
     <RadzenCard Visible=@fetchingData style="z-index: 3; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, .5)">
         <RadzenCard Visible=@(error == null) style="margin: 32px auto; width: 80%">
@@ -95,7 +100,7 @@
         <RadzenCard style="height: 280px">
             <RadzenText TextStyle="TextStyle.H6">Most Active Member</RadzenText>
             <div class="text-center">
-                <img style="width: 120px; border-radius: 50%; margin: 20px 0;" src=@mostActiveMember?.AvatarUrl /> 
+                <img style="width: 120px; border-radius: 50%; margin: 20px 0;" src=@mostActiveMember?.AvatarUrl />
                 <h4>
                     @mostActiveMember?.Login
                 </h4>
@@ -130,7 +135,11 @@
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Issue" Property="State" Title="State" Width="120px">
                         <FilterTemplate>
-                            <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues />
+                            <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues>
+                                <Template Context="issueState">
+                                    @issueState.ToString()
+                                </Template>
+                            </RadzenDropDown>
                         </FilterTemplate>
                         <Template Context="issue">
                             @if (issue.State == IssueState.Open)
@@ -268,7 +277,7 @@
     {
         currentPage = args.Current;
         totalPages = args.Total;
-        
+
         StateHasChanged();
     }
 
@@ -278,7 +287,7 @@
         {
             GitHub.OnProgress += OnProgress;
             fetchingData = true;
-            try 
+            try
             {
                 issues = await GitHub.GetIssues(DateTime.Now);
                 filteredIssues = issues.OrderByDescending(issue => issue.CreatedAt);
@@ -322,14 +331,14 @@
                                     .Select(group => new { User = group.Key, Count = group.Count() })
                                     .OrderByDescending(group => group.Count)
                                     .Select(group => group.User)
-                                    .First();
+                                    .FirstOrDefault();
 
                 users = issues.Select(issue => issue.User)
                             .Distinct(new UserComparer());
 
                 error = null;
                 fetchingData = false;
-            } 
+            }
             catch (Exception ex)
             {
                 error = ex.Message;

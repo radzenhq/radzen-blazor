@@ -1,0 +1,15 @@
+@inject NavigationManager NavigationManager
+@inject ThemeService ThemeService
+
+<link href="@Href" rel="stylesheet" />
+
+@code {
+    bool IsPremiumTheme => ThemeService.CurrentTheme == "fluent" || ThemeService.CurrentTheme == "material-dark";
+
+    string Href => IsPremiumTheme ? $"/css/{ThemeService.CurrentTheme}-base.css" : $"_content/Radzen.Blazor/css/{ThemeService.CurrentTheme}-base.css";
+
+    protected override void OnInitialized()
+    {
+        ThemeService.Initialize(NavigationManager);
+    }
+}

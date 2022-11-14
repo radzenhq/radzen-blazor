@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenExample Name="DataFilter" AdditionalSourceCodePages=@(new List<string>() { "MyCustomDataFilterProperty.razor" }) Documentation="false">
 <div class="container-fluid">
@@ -52,7 +52,7 @@
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}">
                         <FooterTemplate>
-                            Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).Last().OrderDate)</b>
+                            Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).LastOrDefault()?.OrderDate)</b>
                         </FooterTemplate>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
@@ -90,8 +90,10 @@
         }
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+
         orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
         orderIds = orders.Select(o => o.OrderID).Distinct();
     }

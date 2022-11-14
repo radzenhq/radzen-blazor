@@ -128,9 +128,9 @@
     int count;
     IEnumerable<Customer> customCustomersData;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
 
         customers = dbContext.Customers.ToList();
     }
