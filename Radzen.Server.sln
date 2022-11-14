@@ -7,10 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Radzen.Blazor", "Radzen.Bla
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadzenBlazorDemos", "RadzenBlazorDemos\RadzenBlazorDemos.csproj", "{DF9EC444-791A-415A-A3EB-C4B008E5FCB5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Radzen.Blazor.Tests", "Radzen.Blazor.Tests\Radzen.Blazor.Tests.csproj", "{BC20637F-A979-425A-9C3F-D72633FE555C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadzenBlazorDemos.Host", "RadzenBlazorDemos.Host\RadzenBlazorDemos.Host.csproj", "{18702B3F-791E-45F3-BCFD-1792A1300AAB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadzenBlazorDemos.Server", "RadzenBlazorDemos.Server\RadzenBlazorDemos.Server.csproj", "{EC869401-304A-45BC-93CA-C1CDFAAA7F7B}"
 EndProject
 Global

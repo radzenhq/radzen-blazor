@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
+@inherits DbContextPage
 
 <RadzenExample Name="DataFilter" AdditionalSourceCodePages=@(new List<string>() { "MyCustomDataFilterProperty.razor" }) Documentation="false">
 <div class="container-fluid">
@@ -90,8 +90,10 @@
         }
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+
         orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
         orderIds = orders.Select(o => o.OrderID).Distinct();
     }
