@@ -3,14 +3,14 @@ using Xunit;
 
 namespace Radzen.Blazor.Tests
 {
-    public class SpeechToTextTests
+    public class SpeechToTextButtonTests
     {
         [Fact]
-        public void SpeechToText_Renders_Record_Button_When_Visible()
+        public void SpeechToTextButton_Renders_Record_Button_When_Visible()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenSpeechToText>();
+            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
 
             component.Render();
 
@@ -20,11 +20,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void SpeechToText_Does_Not_Renders_Record_Button_When_Visible_False()
+        public void SpeechToTextButton_Does_Not_Renders_Record_Button_When_Visible_False()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenSpeechToText>();
+            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
 
             component.SetParametersAndRender(parameters =>
             {
@@ -35,12 +35,12 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void SpeechToText_Renders_Additional_Css()
+        public void SpeechToTextButton_Renders_Additional_Css()
         {
             using var ctx = new TestContext();
 
             var component =
-                ctx.RenderComponent<RadzenSpeechToText>(ComponentParameter.CreateParameter("class", "another-class"));
+                ctx.RenderComponent<RadzenSpeechToTextButton>(ComponentParameter.CreateParameter("class", "another-class"));
 
             var recordButton = component.Find("button.rz-button-icon-only.rz-mic.another-class");
 
@@ -48,11 +48,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void SpeechToText_Sets_Record_Button_Css_When_Record_Button_Clicked()
+        public void SpeechToTextButton_Sets_Record_Button_Css_When_Record_Button_Clicked()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenSpeechToText>();
+            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -72,11 +72,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void SpeechToText_UnSets_Record_Button_Css_When_Record_Button_Clicked_Twice()
+        public void SpeechToTextButton_UnSets_Record_Button_Css_When_Record_Button_Clicked_Twice()
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenSpeechToText>();
+            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -103,17 +103,17 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void SpeechToText_Invokes_OnResult_FromJs()
+        public void SpeechToTextButton_Invokes_OnResult_FromJs()
         {
             using var ctx = new TestContext();
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenSpeechToText>();
+            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
 
             string resultsFromJs = null;
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.OnResult, r => resultsFromJs = r));
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, r => resultsFromJs = r));
 
             var recordButton = component.Find("button.rz-button-icon-only.rz-mic");
 

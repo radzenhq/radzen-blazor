@@ -1,19 +1,19 @@
-﻿@page "/speechtotext"
+﻿@page "/speechtotextbutton"
 
-<RadzenExample Name="SpeechToText">
+<RadzenExample Name="SpeechToTextButton">
     <div class="container-fluid">
         <div class="row px-3">
             <div class="col-md-6 col-lg-4 p-3">
                 <RadzenCard>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Speech To Text</RadzenText>
-                    <RadzenSpeechToText OnResult="@(args => OnSpeechCaptured(args, null))"></RadzenSpeechToText>
+                    <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, false))"></RadzenSpeechToTextButton>
                 </RadzenCard>
             </div>
             <div class="col-md-6 col-lg-4 p-3">
                 <RadzenCard>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Update TextArea</RadzenText>
-                    <RadzenTextArea @ref="textToSpeechInput" @bind-Value=@value Change=@(args => OnChange(args, "TextArea")) Class="w-100" />
-                    <RadzenSpeechToText OnResult="@(args => OnSpeechCaptured(args, textToSpeechInput))"></RadzenSpeechToText>
+                    <RadzenTextArea @bind-Value=@value Change=@(args => OnTextAreaChange(args, "TextArea")) Class="w-100" />
+                    <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, true))"></RadzenSpeechToTextButton>
                 </RadzenCard>
             </div>
         </div>
@@ -28,18 +28,16 @@
 
     EventConsole console;
 
-    RadzenTextArea textToSpeechInput;
-
-    void OnChange(string value, string name)
+    void OnTextAreaChange(string value, string name)
     {
         console.Log($"{name} value changed to {value}");
     }
 
-    void OnSpeechCaptured(string speechValue, RadzenTextArea textArea)
+    void OnSpeechCaptured(string speechValue, bool updateTextArea)
     {
         console.Log($"Speech Captured: {speechValue}");
 
-        if (textArea != null)
+        if (updateTextArea)
         {
             value += speechValue;
         }

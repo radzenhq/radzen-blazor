@@ -1682,7 +1682,7 @@ window.Radzen = {
         radzenRecognition.continuous = true;
         radzenRecognition.onresult = function (event) {
 
-            if (!radzenRecognition.elementRef || event.results.length < 1) {
+            if (!radzenRecognition.componentRef || event.results.length < 1) {
                 return;
             }
 

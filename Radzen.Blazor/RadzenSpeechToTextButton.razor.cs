@@ -5,28 +5,52 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenSpeechToText component. Enables speech to text functionality.
+    /// RadzenSpeechToTextButton component. Enables speech to text functionality.
     /// <para>This is only supported on select browsers. See https://caniuse.com/?search=SpeechRecognition</para>
     /// <example>
     /// <code>
-    /// &lt;RadzenSpeechToText OnResult=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// &lt;RadzenSpeechToTextButton Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
     /// </code>
     /// </example>
     /// </summary>
-    public partial class RadzenSpeechToText: RadzenComponent
+    public partial class RadzenSpeechToTextButton : RadzenComponent
     {
+        /// <summary>
+        /// Gets or sets the button style.
+        /// </summary>
+        /// <value>The button style.</value>
+        [Parameter]
+        public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Light;
+
+        /// <summary>
+        /// Gets or sets the icon.
+        /// </summary>
+        /// <value>The icon.</value>
+        [Parameter]
+        public string Icon { get; set; } = "mic";
+
         /// <summary>
         /// Callback which provides results from the speech recognition API.
         /// </summary>
         [Parameter]
-        public EventCallback<string> OnResult { get; set; }
+        public EventCallback<string> Change { get; set; }
 
         private bool _isRecording;
 
-        private DotNetObjectReference<RadzenSpeechToText> _componentRef;
+        private DotNetObjectReference<RadzenSpeechToTextButton> _componentRef;
 
         private RadzenButton _micButton;
 
+        /// <inheritdoc />
+        protected override void OnAfterRender(bool firstRender)
+        {
+            base.OnAfterRender(firstRender);
+
+            if (firstRender)
+            {
+                Element = _micButton.Element;
+            }
+        }
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
@@ -64,7 +88,7 @@ namespace Radzen.Blazor
         [JSInvokable]
         public void OnResultFromJs(string result)
         {
-            OnResult.InvokeAsync(result);
+            Change.InvokeAsync(result);
         }
 
         /// <inheritdoc />
