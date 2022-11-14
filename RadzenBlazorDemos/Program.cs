@@ -28,6 +28,6 @@ builder.Services.AddSingleton<GitHubService>();
 var host = builder.Build();
 
 var dbContext = host.Services.GetService<NorthwindContext>();
-dbContext.Seed();
+await dbContext.Seed();
 
 await host.RunAsync();
