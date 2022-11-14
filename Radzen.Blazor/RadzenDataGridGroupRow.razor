@@ -28,7 +28,7 @@
             }
             else if(Group.GroupDescriptor != null)
             {
-                @(Group.GroupDescriptor.GetTitle() + ": " + (Group.Data.Key ?? ""))
+                @(Group.GroupDescriptor.GetTitle() + ": " + (Group.Data.Key != null ? Group.Data.Key.ToString() : ""))
             }
         </span>
     </td>
