@@ -130,6 +130,14 @@
     </div>
 </RadzenSidebar>
 </RadzenLayout>
+
+@if (!rendered)
+{
+<div class="rz-app-loading">
+    <div class="logo-loading"></div>
+</div>
+}
+
 @code {
     RadzenSidebar sidebar0;
     RadzenBody body0;
