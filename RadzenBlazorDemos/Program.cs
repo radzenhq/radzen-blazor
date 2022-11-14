@@ -25,5 +25,9 @@ builder.Services.AddScoped<NorthwindService>();
 builder.Services.AddScoped<NorthwindODataService>();
 builder.Services.AddSingleton<GitHubService>();
 
+var host = builder.Build();
 
-await builder.Build().RunAsync();
+var dbContext = host.Services.GetService<NorthwindContext>();
+dbContext.Seed();
+
+await host.RunAsync();
