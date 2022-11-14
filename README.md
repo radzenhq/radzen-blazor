@@ -137,3 +137,6 @@ Use any Radzen Blazor component by typing its tag name in a Blazor page e.g.
   }
 }
 ```
+## Run demos locally
+
+Use Radzen.Server.sln to open and run demos as Blazor server application or Radzen.WebAssembly.sln to open and run demos as Blazor WebAssembly application. Radzen.sln has reference to all projects including tests.
