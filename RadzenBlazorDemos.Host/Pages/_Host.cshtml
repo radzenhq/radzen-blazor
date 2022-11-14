@@ -38,9 +38,6 @@
 </head>
 <body>
     <component type="typeof(RadzenBlazorDemos.App)" render-mode="WebAssemblyPrerendered" />
-    <div class="rz-app-loading">
-        <div class="logo-loading"></div>
-    </div>
     <div id="blazor-error-ui">
         <environment include="Staging,Production">
             An error has occurred. This application may no longer respond until reloaded.
@@ -52,14 +49,9 @@
         <a class="dismiss">🗙</a>
     </div>
 
-    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
     <script async src="js/highlight.pack.js"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
-    <script>
-        Blazor.start().then(function () {
-            document.querySelector('.rz-app-loading').style.display = 'none';
-        });
-    </script>
     <script defer data-domain="blazor.radzen.com" src="https://analytics.radzen.com/js/plausible.js"></script>
 </body>
 </html>
