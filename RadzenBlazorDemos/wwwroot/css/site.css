@@ -148,6 +148,10 @@ body {
     padding-bottom: 3rem;
 }
 
+.next {
+    background: #f5f5f5;
+}
+
 .next a {
     color: #FF504D;
     text-decoration: none;
