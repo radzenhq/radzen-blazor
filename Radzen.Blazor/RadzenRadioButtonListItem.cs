@@ -103,5 +103,16 @@ namespace Radzen.Blazor
         {
             return GetId();
         }
+
+        internal string GetItemCssClass()
+        {
+            return GetCssClass();
+        }
+
+        /// <inheritdoc />
+        protected override string GetComponentCssClass()
+        {
+            return "rz-radio-btn";
+        }
     }
 }

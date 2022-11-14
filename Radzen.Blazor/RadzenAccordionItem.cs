@@ -109,5 +109,21 @@ namespace Radzen.Blazor
 
             Accordion?.RemoveItem(this);
         }
+
+        internal string GetItemId()
+        {
+            return GetId();
+        }
+
+        internal string GetItemCssClass()
+        {
+            return GetCssClass();
+        }
+
+        /// <inheritdoc />
+        protected override string GetComponentCssClass()
+        {
+            return "rz-accordion-header";
+        }
     }
 }
