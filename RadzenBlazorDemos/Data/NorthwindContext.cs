@@ -212,7 +212,42 @@ namespace RadzenBlazorDemos.Data
             get;
             set;
         }
-        public async Task Seed()
+
+        public async Task SeedAsync()
+        {
+            AddData();
+
+            if (ChangeTracker.HasChanges())
+            {
+                try
+                {
+                    await SaveChangesAsync();
+                }
+                catch
+                {
+                    //
+                }
+            }
+        }
+
+        public void Seed()
+        {
+            AddData();
+
+            if (ChangeTracker.HasChanges())
+            {
+                try
+                {
+                    SaveChanges();
+                }
+                catch
+                {
+                    //
+                }
+            }
+        }
+
+        public void AddData()
         {
             if (!Customers.Any())
             {
@@ -257,18 +292,6 @@ namespace RadzenBlazorDemos.Data
             if (!Suppliers.Any())
             {
                 Suppliers.AddRange(SuppliersData.Data);
-            }
-
-            if (ChangeTracker.HasChanges())
-            {
-                try
-                {
-                    await SaveChangesAsync();
-                }
-                catch
-                {
-                    //
-                }
             }
         }
     }

@@ -14,7 +14,7 @@
         if (dbContext == null)
         {
             dbContext = await DbFactory.CreateDbContextAsync();
-            await dbContext.Seed();
+            await dbContext.SeedAsync();
         }
     }
 }
