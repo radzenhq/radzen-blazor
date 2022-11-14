@@ -98,5 +98,10 @@ namespace Radzen.Blazor
         {
             Visible = value;
         }
+
+        internal string GetItemId()
+        {
+            return GetId();
+        }
     }
 }
