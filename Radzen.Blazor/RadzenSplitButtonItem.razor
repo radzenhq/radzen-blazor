@@ -1,16 +1,16 @@
 ﻿@inherits RadzenComponent
 @if (Visible)
 {
-<li class="rz-menuitem" role="menuitem" @onclick="@OnClick" @attributes="Attributes" style="@Style">
-    <a class="rz-menuitem-link">
-        @if (!string.IsNullOrEmpty(Icon))
-        {
-        <span class="rz-menuitem-icon">@((MarkupString)Icon)</span>
-        }
-        @if (!string.IsNullOrEmpty(Text))
-        {
-            <span class="rz-menuitem-text">@Text</span>
-        }
-    </a>
-</li>
+    <li class=@ItemClassList role="menuitem" @onclick="@OnClick" @attributes="Attributes" style="@Style">
+        <a class="rz-menuitem-link">
+            @if (!string.IsNullOrEmpty(Icon))
+            {
+                <span class="rz-menuitem-icon">@((MarkupString)Icon)</span>
+            }
+            @if (!string.IsNullOrEmpty(Text))
+            {
+                <span class="rz-menuitem-text">@Text</span>
+            }
+        </a>
+    </li>
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -30,6 +31,13 @@ namespace Radzen.Blazor
         public string Value { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenSplitButtonItem"/> is disabled.
+        /// </summary>
+        /// <value><c>true</c> if disabled; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Disabled { get; set; }
+
+        /// <summary>
         /// Gets or sets the split button.
         /// </summary>
         /// <value>The split button.</value>
@@ -43,11 +51,13 @@ namespace Radzen.Blazor
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         public async System.Threading.Tasks.Task OnClick(MouseEventArgs args)
         {
-            if (SplitButton != null)
+            if (SplitButton != null && !Disabled)
             {
                 SplitButton.Close();
                 await SplitButton.Click.InvokeAsync(this);
             }
         }
+
+        ClassList ItemClassList => ClassList.Create("rz-menuitem").AddDisabled(Disabled);
     }
 }
