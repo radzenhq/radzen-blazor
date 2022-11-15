@@ -19,7 +19,7 @@
                 </RadzenText>
                 <RadzenDropDown @bind-Value="filterCaseSensitivity" Data="@(Enum.GetValues(typeof(FilterCaseSensitivity)))" Change="@(args => grid.Reload())">
                     <Template>
-                        @Enum.GetName(context)
+                        @Enum.GetName((FilterCaseSensitivity)context)
                     </Template>
                 </RadzenDropDown>
             </div>
@@ -29,7 +29,7 @@
                 </RadzenText>
                 <RadzenDropDown @bind-Value="logicalFilterOperator" Data="@(Enum.GetValues(typeof(LogicalFilterOperator)))" Change="@(args => grid.Reload())">
                     <Template>
-                        @Enum.GetName(context)
+                        @Enum.GetName((LogicalFilterOperator)context)
                     </Template>
                 </RadzenDropDown>
             </div>
