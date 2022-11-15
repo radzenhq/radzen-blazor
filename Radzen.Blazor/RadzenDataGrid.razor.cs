@@ -2493,6 +2493,12 @@ namespace Radzen.Blazor
             if (SettingsChanged.HasDelegate)
             {
                 var shouldUpdateState = false;
+                var hasFilter = settings.Columns != null && settings.Columns.Any(c => 
+                    c.FilterValue != null || c.SecondFilterValue != null || 
+                    c.FilterOperator == FilterOperator.IsNull || c.FilterOperator == FilterOperator.IsNotNull ||
+                    c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty ||
+                    c.SecondFilterOperator == FilterOperator.IsNull || c.SecondFilterOperator == FilterOperator.IsNotNull ||
+                    c.SecondFilterOperator == FilterOperator.IsEmpty || c.SecondFilterOperator == FilterOperator.IsNotEmpty);
 
                 if (settings.Columns != null)
                 {
@@ -2575,9 +2581,13 @@ namespace Radzen.Blazor
                 if (shouldUpdateState)
                 {
                     skip = CurrentPage * PageSize;
-                    CalculatePager();
-                    UpdateColumnsOrder();
-                    await Reload();
+
+                    if (hasFilter ? skip < View.Count() : true)
+                    {
+                        CalculatePager();
+                        UpdateColumnsOrder();
+                        await Reload();
+                    }
                 }
             }
         }
