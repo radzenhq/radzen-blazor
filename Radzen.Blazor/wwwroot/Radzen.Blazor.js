@@ -1059,10 +1059,10 @@ window.Radzen = {
 
     return readAsDataURL(fileInput);
   },
-  toggleMenuItem: function (target, event) {
+  toggleMenuItem: function (target, event, defaultActive) {
     var item = target.closest('.rz-navigation-item');
 
-    var active = !item.classList.contains('rz-navigation-item-active');
+    var active = defaultActive != undefined ? defaultActive : !item.classList.contains('rz-navigation-item-active');
 
     function toggle(active) {
       item.classList.toggle('rz-navigation-item-active', active);

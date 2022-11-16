@@ -126,27 +126,16 @@ namespace Radzen.Blazor
         {
             var events = new Dictionary<string, object>();
 
-            if (Parent == null || Parent.ClickToOpen)
+            if (Parent.ClickToOpen)
             {
                 events.Add("onclick", "Radzen.toggleMenuItem(this)");
             }
-
-            return events;
-        }
-
-        Dictionary<string, object> getAttributes()
-        {
-            var events = new Dictionary<string, object>();
-
-            if (Parent != null && !Parent.ClickToOpen)
+            else
             {
-                events.Add("onmouseenter", "Radzen.toggleMenuItem(this)");
-                events.Add("onmouseleave", "Radzen.toggleMenuItem(this)");
+                events.Add("onclick", "Radzen.toggleMenuItem(this, event, false)");
             }
 
-            return events.Concat(Attributes != null ? 
-                    Attributes.Where(i => !events.ContainsKey(i.Key)) : new Dictionary<string, object>())
-                    .ToDictionary(x => x.Key, x => x.Value);
+            return events;
         }
     }
 }
