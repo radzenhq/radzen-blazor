@@ -2,15 +2,7 @@
 
 <RadzenExample Name="Menu">
 <RadzenCard Style="margin-bottom: 300px; width: fit-content; min-width: 200px;" Class="mt-3 mx-auto">
-    <div class="col-md-6 p-3">
-        <RadzenCard>
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Click to open</RadzenText>
-            <div style="display: flex; align-items: center">
-                <RadzenSwitch style="margin-left: 1rem" @bind-Value=@clickToOpen />
-            </div>
-        </RadzenCard>
-    </div>
-        <RadzenMenu Click="OnParentClicked" ClickToOpen="@clickToOpen">
+        <RadzenMenu Click="OnParentClicked">
             <RadzenMenuItem Text="General" Icon="home">
                 <RadzenMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenMenuItem>
                 <RadzenMenuItem Text="Menu" Path="menu" Icon="line_weight"></RadzenMenuItem>
@@ -58,7 +50,6 @@
 
 @code {
     EventConsole console;
-    bool clickToOpen = true;
 
     void OnParentClicked(MenuItemEventArgs args)
     {
