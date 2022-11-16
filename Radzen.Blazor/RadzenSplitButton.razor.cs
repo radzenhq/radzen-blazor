@@ -83,6 +83,13 @@ namespace Radzen.Blazor
         public bool Disabled { get; set; }
 
         /// <summary>
+        /// Gets or sets the value indication behaviour to always open popup with item on click and not invoke <see cref="Click"/> event.
+        /// </summary>
+        /// <value><c>true</c> to alway open popup with items; othersie, <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool AlwaysOpenPopup { get; set; }
+
+        /// <summary>
         /// Gets or sets the click callback.
         /// </summary>
         /// <value>The click callback.</value>
@@ -97,8 +104,15 @@ namespace Radzen.Blazor
         {
             if (!Disabled)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
-                await Click.InvokeAsync(null);
+                if (AlwaysOpenPopup)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                    await Click.InvokeAsync(null);
+                }
             }
         }
 
