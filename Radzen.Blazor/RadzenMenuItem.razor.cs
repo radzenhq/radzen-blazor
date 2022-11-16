@@ -126,7 +126,7 @@ namespace Radzen.Blazor
         {
             var events = new Dictionary<string, object>();
 
-            if (Parent.ClickToOpen)
+            if (Parent.ClickToOpen || ChildContent != null)
             {
                 events.Add("onclick", "Radzen.toggleMenuItem(this)");
             }
