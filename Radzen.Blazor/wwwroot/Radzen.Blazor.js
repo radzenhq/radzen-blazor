@@ -816,7 +816,7 @@ window.Radzen = {
             Radzen.closePopup(id, instance, callback);
             return;
         }
-        var closestPopup = e.target.closest('.rz-popup');
+        var closestPopup = e.target.closest && e.target.closest('.rz-popup');
         if (closestPopup && closestPopup != popup) {
           return;
         }
