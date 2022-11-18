@@ -10,7 +10,7 @@
 }
 @if (Visible)
 {
-<div @ref="@Element" role="tablist" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+<div @ref="@Element" role="tablist" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     @for (var i = 0; i < items.Count; i++)
     {
         var item = items[i];
