@@ -7,7 +7,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Parser;
 using System.Linq.Expressions;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -1936,32 +1938,10 @@ namespace Radzen
         /// <typeparam name="TItem">The owner type.</typeparam>
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <param name="propertyName">Name of the property to return.</param>
-        /// <param name="type">Type of the object.</param>
         /// <returns>A function which return the specified property by its name.</returns>
-        public static Func<TItem, TValue> Getter<TItem, TValue>(string propertyName, Type type = null)
+        public static Func<TItem, TValue> Getter<TItem, TValue>(string propertyName)
         {
-            var arg = Expression.Parameter(typeof(TItem));
-
-            Expression body = arg;
-
-            if (type != null)
-            {
-                body = Expression.Convert(body, type);
-            }
-
-            foreach (var member in propertyName.Split("."))
-            {
-                body = !body.Type.IsInterface ? 
-                    Expression.PropertyOrField(body, member) :
-                        Expression.Property(
-                            body,
-                            new Type[] { body.Type }.Concat(body.Type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(member) != null),
-                            member);
-            }
-
-            body = Expression.Convert(body, typeof(TValue));
-
-            return Expression.Lambda<Func<TItem, TValue>>(body, arg).Compile();
+            return DynamicExpressionParser.ParseLambda<TItem, TValue>(null, false, propertyName).Compile();
         }
 
         /// <summary>

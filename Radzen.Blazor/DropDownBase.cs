@@ -375,28 +375,19 @@ namespace Radzen
 
             if (_data != null)
             {
-                var query = _data.AsQueryable();
-
-                var type = query.ElementType;
-
-                if (type == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Any())
-                { 
-                    type = query.FirstOrDefault().GetType();
-                }
-
                 if (!string.IsNullOrEmpty(ValueProperty))
                 {
-                    valuePropertyGetter = PropertyAccess.Getter<object, object>(ValueProperty, type);
+                    valuePropertyGetter = PropertyAccess.Getter<object, object>(ValueProperty);
                 }
 
                 if (!string.IsNullOrEmpty(TextProperty))
                 {
-                    textPropertyGetter = PropertyAccess.Getter<object, object>(TextProperty, type);
+                    textPropertyGetter = PropertyAccess.Getter<object, object>(TextProperty);
                 }
 
                 if (!string.IsNullOrEmpty(DisabledProperty))
                 {
-                    disabledPropertyGetter = PropertyAccess.Getter<object, object>(DisabledProperty, type);
+                    disabledPropertyGetter = PropertyAccess.Getter<object, object>(DisabledProperty);
                 }
             }
         }
