@@ -2,7 +2,7 @@
 @inject DialogService DialogService
 @implements IDisposable
 
-<RadzenExample Name="Dialog" AdditionalSourceCodePages=@(new [] { "DialogCardPage.razor" })>
+<RadzenExample Name="Dialog" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/DialogService.cs" AdditionalSourceCodePages=@(new [] { "DialogCardPage.razor" })>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-4 p-3">
@@ -97,11 +97,11 @@
                     <RadzenButton Text="Ok" Click="() => ds.Close(true)" Class="me-1" Style="width: 80px;" />
                     <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" Class="me-1" />
                     <RadzenButton Text="Refresh" Click="(() => { orderID = 10249; ds.Refresh(); })" ButtonStyle="ButtonStyle.Light"  Class="me-1 float-end" />
-                    
+
                 </div>
             </div>
         </div>);
-    
+
       console.Log($"Dialog result: {result}");
     }
 
