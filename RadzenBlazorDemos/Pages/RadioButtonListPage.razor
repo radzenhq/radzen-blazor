@@ -86,6 +86,20 @@
                 </RadzenRadioButtonList>
             </RadzenCard>
         </div>
+        <div class="col-lg-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">RadioButtonList from HorizontalAlign enum</RadzenText>
+                    <RadzenRadioButtonList @bind-Value=@enumValue TValue="HorizontalAlign"
+                             Change=@((HorizontalAlign args) => { console.Log($"RadioButtonList from HorizontalAlign enum value changed to {args}");})>
+                        <Items>
+                            @foreach (var v in Enum.GetValues<HorizontalAlign>())
+                            {
+                                <RadzenRadioButtonListItem Text="@Enum.GetName((HorizontalAlign)v)" Value="@v" />
+                            }
+                        </Items>
+                    </RadzenRadioButtonList>
+            </RadzenCard>
+        </div>
     </div>
 </div>
 </RadzenExample>
@@ -93,6 +107,8 @@
 <EventConsole @ref=@console Class="mt-4" />
 
 @code {
+    HorizontalAlign enumValue;
+
     public class MyObject
     {
         public int Id { get; set; }
