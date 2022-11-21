@@ -106,7 +106,7 @@
                 @if (AllowFiltering)
                 {
                     <div class="rz-lookup-search">
-                        <input id="@SearchID" @ref="@search" tabindex="-1" placeholder="@SearchText"
+                        <input class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="-1" placeholder="@SearchText"
                                @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" style="@(ShowSearch ? "" : "margin-right:0px;")" />
                         @if (ShowSearch)
                         {

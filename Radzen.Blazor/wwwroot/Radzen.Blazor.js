@@ -889,9 +889,14 @@ window.Radzen = {
       instance.invokeMethodAsync(callback);
     }
 
-    if (Radzen.activeElement && Radzen.activeElement == document.activeElement || Radzen.activeElement && document.activeElement == document.body) {
-        Radzen.activeElement.focus();
-        Radzen.activeElement = null;
+    if (Radzen.activeElement && Radzen.activeElement == document.activeElement || 
+        Radzen.activeElement && document.activeElement == document.body ||
+        Radzen.activeElement && document.activeElement &&
+            (document.activeElement.classList.contains('rz-dropdown-filter') || document.activeElement.classList.contains('rz-lookup-search-input'))) {
+        setTimeout(function () {
+            Radzen.activeElement.focus();
+            Radzen.activeElement = null;
+        }, 100);
     }
   },
   togglePopup: function (parent, id, syncWidth, instance, callback) {
