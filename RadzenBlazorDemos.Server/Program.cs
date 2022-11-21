@@ -53,11 +53,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 /* --> Uncomment to enable localization
-var supportedCultures = new[]
-{
-    new System.Globalization.CultureInfo("de-DE"),
-};
-
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("de-DE"),
