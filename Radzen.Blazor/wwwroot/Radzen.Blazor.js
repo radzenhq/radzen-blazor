@@ -949,10 +949,23 @@ window.Radzen = {
             var lastDialog = dialogs[dialogs.length - 1];
 
             if (lastDialog) {
-                var focusable = lastDialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                var firstFocusable = focusable[0];
-                if (firstFocusable) {
-                    firstFocusable.focus();
+                if (lastDialog.firstElementChild && lastDialog.firstElementChild.classList.contains('rz-html-editor')) {
+                    var editable = lastDialog.firstElementChild.querySelector('.rz-html-editor-content');
+                    if (editable) {
+                        var selection = window.getSelection();
+                        var range = document.createRange();
+                        range.setStart(editable, 0);
+                        range.setEnd(editable, 0);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                } else {
+                    var focusable = [...lastDialog.querySelectorAll('a, button, input, textarea, select, details, iframe, embed, object, summary dialog, audio[controls], video[controls], [contenteditable], [tabindex]')]
+                        .filter(el => el.tabIndex > -1 && !el.hasAttribute('disabled') && !el.hasAttribute('hidden') && el.computedStyleMap().get('display').value !== 'none');
+                    var firstFocusable = focusable[0];
+                    if (firstFocusable) {
+                        firstFocusable.focus();
+                    }
                 }
             }
         }, 500);
