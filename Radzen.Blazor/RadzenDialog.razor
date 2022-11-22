@@ -19,8 +19,6 @@
         dialogs.Add(new Dialog() { Title = title, Type = type, Parameters = parameters, Options = options });
 
         await InvokeAsync(() => { StateHasChanged(); });
-
-        await JSRuntime.InvokeAsync<string>("Radzen.openDialog", options, Service.Reference);
     }
 
     public async Task Close(dynamic result)

@@ -174,4 +174,34 @@
     {
         Service.OnRefresh -= OnRefresh;
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            var options = Dialog.Options;
+
+            var dialogOptions = new DialogOptions()
+                {
+                    Width = options != null ? !string.IsNullOrEmpty(options.Width) ? options.Width : "" : "",
+                    Height = options != null ? options.Height : null,
+                    Left = options != null ? options.Left : null,
+                    Top = options != null ? options.Top : null,
+                    Bottom = options != null ? options.Bottom : null,
+                    ShowTitle = options != null ? options.ShowTitle : true,
+                    ShowClose = options != null ? options.ShowClose : true,
+                    Resizable = options != null ? options.Resizable : false,
+                    Draggable = options != null ? options.Draggable : false,
+                    Style = options != null ? options.Style : "",
+                    AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true,
+                    CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
+                    CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
+                    CssClass = options != null ? options.CssClass : "",
+                };
+
+            await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Service.Reference);
+        }
+    }
 }

@@ -264,8 +264,6 @@ namespace Radzen
                 CssClass = options != null ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm",
             };
 
-            await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Reference);
-
             return await OpenAsync(title, ds =>
             {
                 RenderFragment content = b =>
@@ -323,8 +321,6 @@ namespace Radzen
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                 CssClass = options != null ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert",
             };
-
-            await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Reference);
 
             return await OpenAsync(title, ds =>
             {
