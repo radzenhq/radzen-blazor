@@ -13,7 +13,7 @@
     This page demonstrates how to use templates to create a Radzen Blazor DataGrid hierarchy.
 </RadzenText>
 
-<RadzenExample Name="DataGrid" Source="MasterDetailHierarchy" Heading="false">
+<RadzenExample Name="MasterDetailHierarchy" Heading="false">
     <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" RowRender="@RowRender" ExpandMode="DataGridExpandMode.Single"
                 Data="@orders" TItem="Order">
         <Template Context="order">

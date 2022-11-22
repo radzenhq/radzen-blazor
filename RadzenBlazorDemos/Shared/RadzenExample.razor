@@ -33,7 +33,7 @@
             @ChildContent
         </RadzenTabsItem>
         <RadzenTabsItem Text="Source" Icon="code">
-            <CodeViewer PageName="@($"{Source ?? Name}Page.razor")" />
+            <CodeViewer PageName="@($"{Name}Page.razor")" />
         </RadzenTabsItem>
         @foreach (var p in AdditionalSourceCodePages)
         {
