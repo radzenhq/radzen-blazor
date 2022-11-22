@@ -954,8 +954,8 @@ window.Radzen = {
             var lastDialog = dialogs[dialogs.length - 1];
 
             if (lastDialog) {
-                if (lastDialog.querySelectorAll('.rz-html-editor-content').length) {
-                    var editable = lastDialog.querySelector('.rz-html-editor-content');
+                if (lastDialog.firstElementChild && lastDialog.firstElementChild.classList.contains('rz-html-editor')) {
+                    var editable = lastDialog.firstElementChild.querySelector('.rz-html-editor-content');
                     if (editable) {
                         var selection = window.getSelection();
                         var range = document.createRange();
