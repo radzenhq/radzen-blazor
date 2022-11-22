@@ -16,18 +16,6 @@
 
     public async Task Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
     {
-        if(options.HasParent)
-        {
-            var parent = dialogs.LastOrDefault();
-
-            if (parent is null)
-            {
-                throw new ArgumentNullException("No available dialog to bind child.");
-            }
-
-            parent.IsParent = true;
-        }
-
         dialogs.Add(new Dialog() { Title = title, Type = type, Parameters = parameters, Options = options });
 
         await InvokeAsync(() => { StateHasChanged(); });
@@ -36,25 +24,10 @@
     public async Task Close(dynamic result)
     {
         var lastDialog = dialogs.LastOrDefault();
-        var hasParent = lastDialog.Options.HasParent;
         if (lastDialog != null)
         {
             dialogs.Remove(lastDialog);
-            if (dialogs.Count==0)
-            { 
-                await JSRuntime.InvokeAsync<string>("Radzen.closeDialog");
-            }
-            else
-            {
-                if(hasParent)
-                {
-                    var parent = dialogs.LastOrDefault();
-                    if (parent != null)
-                    {
-                        parent.IsParent = false;
-                    }
-                }
-            }
+            if (dialogs.Count==0) await JSRuntime.InvokeAsync<string>("Radzen.closeDialog");
         }
 
         await InvokeAsync(() => 
