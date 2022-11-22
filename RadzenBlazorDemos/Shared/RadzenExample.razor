@@ -55,12 +55,15 @@
     public string Source { get; set; }
 
     [Parameter]
+    public string DocumentationLink { get; set; }
+
+    [Parameter]
     public bool Heading { get; set; } = true;
 
     [Parameter]
     public bool Documentation { get; set; } = true;
 
-    string DocumentationHref => $"/docs/guides/components/{Name.ToLower()}.html";
+    string DocumentationHref => DocumentationLink ?? $"/docs/guides/components/{Name.ToLower()}.html";
 
     string ComponentSourceHref => Source ?? $"https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/Radzen{Name}.razor.cs";
 
