@@ -162,6 +162,29 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Opens a dialog with the specified content and a parent.
+        /// </summary>
+        /// <param name="title">The text displayed in the title bar of the dialog.</param>
+        /// <param name="childContent">The content displayed in the dialog.</param>
+        /// <param name="options">The dialog options.</param>
+        /// <returns>The value passed as argument to <see cref="Close" />.</returns>
+        public Task<dynamic> OpenChildAsync(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
+        {
+            var task = new TaskCompletionSource<dynamic>();
+            tasks.Add(task);
+
+            options = options ?? new DialogOptions();
+
+            options.HasParent = true;
+
+            options.ChildContent = childContent;
+
+            OpenDialog<object>(title, null, options);
+
+            return task.Task;
+        }
+
+        /// <summary>
         /// Opens a dialog with the specified content.
         /// </summary>
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
@@ -201,6 +224,7 @@ namespace Radzen
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                 CssClass = options != null ? options.CssClass : "",
+                HasParent = options != null ? options.HasParent : false
             });
         }
 
@@ -430,6 +454,11 @@ namespace Radzen
         /// Gets or sets dialog box custom class
         /// </summary>
         public string CssClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets a parent dialog.
+        /// </summary>
+        public bool HasParent { get; set; }
     }
 
     /// <summary>
@@ -479,5 +508,10 @@ namespace Radzen
         /// </summary>
         /// <value>The options.</value>
         public DialogOptions Options { get; set; }
+
+        /// <summary>
+        /// Do not use explicitly.
+        /// </summary>
+        public bool IsParent { get; set; } 
     }
 }
