@@ -1680,6 +1680,7 @@ window.Radzen = {
         }
         radzenRecognition = new SpeechRecognition();
         radzenRecognition.continuous = true;
+
         radzenRecognition.onresult = function (event) {
 
             if (!radzenRecognition.componentRef || event.results.length < 1) {
@@ -1693,6 +1694,23 @@ window.Radzen = {
                 radzenRecognition.componentRef.invokeMethodAsync("OnResultFromJs", result);
             }
         }
+
+        radzenRecognition.onerror = async (event) => {
+
+            if (event.error == "aborted") {
+                return;
+            }
+
+            console.error(`Speech recognition error detected: ${event.error}`);
+
+            //cancel dictation if there is an error other than aborted
+            if (radzenRecognition.componentRef) {
+
+                await radzenRecognition.componentRef.invokeMethodAsync("StopRecording");
+                radzenRecognition.componentRef = null;
+                radzenRecognition.elementRef = null;
+            }
+        };
 
         return true;
     },
@@ -1714,10 +1732,10 @@ window.Radzen = {
             radzenRecognition.componentRef = null;
             radzenRecognition.elementRef = null;
 
+            await oldComponentRef.invokeMethodAsync("StopRecording");
+
             if (oldElement == element) {
                 return;
-            } else {
-                await oldComponentRef.invokeMethodAsync("StopRecording");
             }
         }
 

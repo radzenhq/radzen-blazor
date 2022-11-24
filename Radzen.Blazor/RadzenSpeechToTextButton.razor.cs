@@ -65,9 +65,9 @@ namespace Radzen.Blazor
                 _componentRef = DotNetObjectReference.Create(this);
             }
 
-            await JSRuntime.InvokeVoidAsync("Radzen.toggleDictation", _micButton.Element, _componentRef);
-
             _isRecording = !_isRecording;
+
+            await JSRuntime.InvokeVoidAsync("Radzen.toggleDictation", _micButton.Element, _componentRef);
         }
 
         /// <summary>
