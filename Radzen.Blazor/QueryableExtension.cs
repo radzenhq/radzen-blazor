@@ -1085,6 +1085,12 @@ namespace Radzen
             }
             else
             {
+                if (filter.Property == null || (filter.FilterValue == null && 
+                    filter.FilterOperator != FilterOperator.IsNull && filter.FilterOperator != FilterOperator.IsNotNull)) 
+                {
+                    return;
+                }
+
                 var property = PropertyAccess.GetProperty(filter.Property);
 
                 if (property.IndexOf(".") != -1)

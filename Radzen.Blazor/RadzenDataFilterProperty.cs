@@ -293,10 +293,26 @@ namespace Radzen.Blazor
             if (PropertyAccess.IsNullableEnum(FilterPropertyType))
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.IsNull, FilterOperator.IsNotNull };
 
+            if ((typeof(IEnumerable).IsAssignableFrom(FilterPropertyType) || typeof(IEnumerable<>).IsAssignableFrom(FilterPropertyType)) 
+                && FilterPropertyType != typeof(string))
+            {
+                return new FilterOperator[] 
+                {
+                    FilterOperator.Contains,
+                    FilterOperator.DoesNotContain,
+                    FilterOperator.Equals,
+                    FilterOperator.NotEquals,
+                    FilterOperator.IsNull,
+                    FilterOperator.IsNotNull,
+                    FilterOperator.IsEmpty,
+                    FilterOperator.IsNotEmpty
+                };
+            }
+
             return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
                 var isStringOperator = o == FilterOperator.Contains || o == FilterOperator.DoesNotContain
                     || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith || o == FilterOperator.IsEmpty || o == FilterOperator.IsNotEmpty;
-                return FilterPropertyType == typeof(string) || typeof(IEnumerable).IsAssignableFrom(FilterPropertyType) || typeof(IEnumerable<>).IsAssignableFrom(FilterPropertyType) ? isStringOperator
+                return FilterPropertyType == typeof(string) ? isStringOperator
                       || o == FilterOperator.Equals || o == FilterOperator.NotEquals
                       || o == FilterOperator.IsNull || o == FilterOperator.IsNotNull
                     : !isStringOperator;
