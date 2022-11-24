@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components
 @using Radzen.Blazor
 @inherits LayoutComponentBase
 @inject ThemeService ThemeService
@@ -143,7 +143,7 @@
     RadzenBody body0;
     bool sidebarExpanded = true;
     bool bodyExpanded = false;
-    bool rendered = false;
+    bool rendered;
 
     IEnumerable<Example> examples;
     protected override void OnInitialized()
