@@ -2,10 +2,17 @@
 @if (Visible)
 {
     <Microsoft.AspNetCore.Components.Routing.NavLink style="@Style" href="@Path" @attributes="Attributes" class="@GetCssClass()" target="@Target" id="@GetId()">
-        @if (!string.IsNullOrEmpty(Icon))
+        @if (ChildContent != null)
         {
-            <i class="rzi">@((MarkupString)Icon)</i>
+            @ChildContent
         }
-        <span @ref="@Element" class="rz-link-text">@Text</span>
+        else
+        {
+            if (!string.IsNullOrEmpty(Icon))
+            {
+                <i class="rzi">@((MarkupString)Icon)</i>
+            }
+            <span @ref="@Element" class="rz-link-text">@Text</span>
+        }
     </Microsoft.AspNetCore.Components.Routing.NavLink>
 }
