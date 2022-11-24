@@ -14,7 +14,7 @@
     Set the initial filter of your RadzenDataGrid via the <code>FilterValue</code> and <code>FilterOperator</code> column properties.
 </RadzenText>
 
-<RadzenExample Name="DataGridFilterApi" Heading="false" AdditionalSourceCodePages=@(new [] { "MyCustomDataGridColumn.razor" })>
+<RadzenExample Name="DataGridFilterApi" Heading="false" Documentation="false" AdditionalSourceCodePages=@(new [] { "MyCustomDataGridColumn.razor" })>
     <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 
         FilterMode="FilterMode.Simple" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" 
         FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
