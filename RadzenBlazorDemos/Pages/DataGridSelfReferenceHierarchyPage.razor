@@ -10,7 +10,7 @@
 
 <p>This page demonstrates how to use LoadChildData event to create a Radzen Blazor DataGrid self-reference hierarchy.</p>
 
-<RadzenExample Name="DataGridSelfReferenceHierarchy" Heading="false">
+<RadzenExample Name="DataGridSelfReferenceHierarchy" Heading="false" Documentation="false">
     <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowSorting="true" AllowColumnResize="true" ExpandMode="DataGridExpandMode.Single"
                     Data="@employees" TItem="Employee" RowRender="@RowRender" LoadChildData="@LoadChildData">
         <Columns>

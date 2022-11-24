@@ -13,7 +13,7 @@
     Enable column reorder by setting the AllowColumnReorder property to true. Define column initial order using column OrderIndex property.
 </RadzenText>
 
-<RadzenExample Name="DataGridColumnReoder" Heading="false">
+<RadzenExample Name="DataGridColumnReoder" Heading="false" Documentation="false">
     <RadzenButton Text="Change page state" Click="@((args) => { StateHasChanged(); })" Class="my-3" />
     <RadzenDataGrid AllowColumnReorder="true" ColumnReordered="@OnColumnReordered"
         AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or">

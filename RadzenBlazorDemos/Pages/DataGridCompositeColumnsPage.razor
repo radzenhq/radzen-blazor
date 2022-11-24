@@ -13,7 +13,7 @@
     Use DataGrid column <code>Columns</code> property to define child columns.
 </RadzenText>
 
-<RadzenExample Name="DataGridCompositeColumns" Heading="false">
+<RadzenExample Name="DataGridCompositeColumns" Heading="false" Documentation="false">
     <RadzenCard Class="m-4" style="display: flex; align-items: center; gap: 0.5rem">
         <RadzenCheckBox @bind-Value=@allowCompositeDataCells Name="CheckBox1" TValue="bool" Change=@(args => grid.Reload())/>
         <RadzenLabel Text="Allow composite data cells" Component="CheckBox1" />

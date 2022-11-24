@@ -13,7 +13,7 @@
     This page demonstrates how to use templates to create a Radzen Blazor DataGrid hierarchy and load data on demand.
 </RadzenText>
 
-<RadzenExample Name="MasterDetailHierarchyOnDemand" Heading="false">
+<RadzenExample Name="MasterDetailHierarchyOnDemand" Heading="false" Documentation="false">
     <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" RowRender="@RowRender" ExpandMode="DataGridExpandMode.Single"
                 Data="@orders" TItem="Order" RowExpand="RowExpand">
         <Template Context="order">

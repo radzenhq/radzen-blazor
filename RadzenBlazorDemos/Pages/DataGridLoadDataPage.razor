@@ -12,7 +12,7 @@
     The <code>LoadData</code> event allows you to perform custom paging, sorting and filtering.
 </RadzenText>
 
-<RadzenExample Name="DataGridLoadData" Heading="false">
+<RadzenExample Name="DataGridLoadData" Heading="false" Documentation="false">
     <RadzenButton Text="Reset" Click="@Reset" Style="margin-bottom: 20px;" />
     <RadzenDataGrid style="height: 335px" @ref="grid" IsLoading=@isLoading Count="@count" Data="@employees" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" PagerHorizontalAlign="HorizontalAlign.Center" TItem="Employee" ColumnWidth="200px">
         <Columns>
