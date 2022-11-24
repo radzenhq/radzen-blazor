@@ -14,7 +14,7 @@ namespace Radzen.Blazor.Tests
 
             component.Render();
 
-            var recordButton = component.Find("button.rz-button-icon-only.rz-mic");
+            var recordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button");
 
             Assert.NotNull(recordButton);
         }
@@ -31,7 +31,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Visible, false);
             });
 
-            Assert.Throws<ElementNotFoundException>(() => component.Find("button.rz-button-icon-only.rz-mic"));
+            Assert.Throws<ElementNotFoundException>(() => component.Find("button.rz-button-icon-only.rz-speech-to-text-button"));
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace Radzen.Blazor.Tests
             var component =
                 ctx.RenderComponent<RadzenSpeechToTextButton>(ComponentParameter.CreateParameter("class", "another-class"));
 
-            var recordButton = component.Find("button.rz-button-icon-only.rz-mic.another-class");
+            var recordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button.another-class");
 
             Assert.NotNull(recordButton);
         }
@@ -57,7 +57,7 @@ namespace Radzen.Blazor.Tests
                     ComponentParameter.CreateParameter("title", "title override"),
                     ComponentParameter.CreateParameter("aria-label", "aria-label override"));
 
-            var recordButton = component.Find("button.rz-button-icon-only.rz-mic");
+            var recordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button");
 
             Assert.NotNull(recordButton);
             Assert.Equal("title override", recordButton.GetAttribute("title"));
@@ -75,7 +75,7 @@ namespace Radzen.Blazor.Tests
 
             component.Render();
 
-            var recordButton = component.Find("button.rz-button-icon-only.rz-mic");
+            var recordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button");
 
             Assert.NotNull(recordButton);
 
@@ -83,7 +83,7 @@ namespace Radzen.Blazor.Tests
 
             component.Render();
 
-            var blinkingRecordButton = component.Find("button.rz-button-icon-only.rz-mic-on");
+            var blinkingRecordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button-recording");
 
             Assert.NotNull(blinkingRecordButton);
         }
@@ -99,7 +99,7 @@ namespace Radzen.Blazor.Tests
 
             component.Render();
 
-            var recordButton = component.Find("button.rz-button-icon-only.rz-mic");
+            var recordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button");
 
             Assert.NotNull(recordButton);
 
@@ -107,7 +107,7 @@ namespace Radzen.Blazor.Tests
 
             component.Render();
 
-            const string blinkingRecordButtonSelector = "button.rz-button-icon-only.rz-mic-on";
+            const string blinkingRecordButtonSelector = "button.rz-button-icon-only.rz-speech-to-text-button-recording";
             var blinkingRecordButton = component.Find(blinkingRecordButtonSelector);
 
             Assert.NotNull(blinkingRecordButton);
@@ -132,7 +132,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, r => resultsFromJs = r));
 
-            var recordButton = component.Find("button.rz-button-icon-only.rz-mic");
+            var recordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button");
 
             Assert.NotNull(recordButton);
 
@@ -140,7 +140,7 @@ namespace Radzen.Blazor.Tests
 
             const string speechResults = "results from js";
 
-            component.InvokeAsync(() => component.Instance.OnResultFromJs(speechResults));
+            component.InvokeAsync(() => component.Instance.OnResult(speechResults));
 
             Assert.Equal(speechResults, resultsFromJs);
         }

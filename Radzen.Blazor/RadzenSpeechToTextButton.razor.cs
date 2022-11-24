@@ -35,39 +35,25 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<string> Change { get; set; }
 
-        private bool _isRecording;
-
-        private DotNetObjectReference<RadzenSpeechToTextButton> _componentRef;
-
-        private RadzenButton _micButton;
+        private bool recording;
 
         /// <inheritdoc />
         protected override void OnAfterRender(bool firstRender)
         {
             base.OnAfterRender(firstRender);
-
-            if (firstRender)
-            {
-                Element = _micButton.Element;
-            }
         }
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return _isRecording ? "rz-mic rz-mic-on" : "rz-mic";
+            return recording ? "rz-speech-to-text-button rz-speech-to-text-button-recording" : "rz-speech-to-text-button";
         }
 
         private async Task OnSpeechToTextClicked()
         {
-            if (_componentRef == null)
-            {
-                _componentRef = DotNetObjectReference.Create(this);
-            }
+            recording = !recording;
 
-            _isRecording = !_isRecording;
-
-            await JSRuntime.InvokeVoidAsync("Radzen.toggleDictation", _micButton.Element, _componentRef);
+            await JSRuntime.InvokeVoidAsync("Radzen.toggleDictation", Reference);
         }
 
         /// <summary>
@@ -76,7 +62,7 @@ namespace Radzen.Blazor
         [JSInvokable]
         public void StopRecording()
         {
-            _isRecording = false;
+            recording = false;
 
             StateHasChanged();
         }
@@ -86,17 +72,9 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="result"></param>
         [JSInvokable]
-        public void OnResultFromJs(string result)
+        public void OnResult(string result)
         {
             Change.InvokeAsync(result);
-        }
-
-        /// <inheritdoc />
-        public override void Dispose()
-        {
-            _componentRef?.Dispose();
-
-            base.Dispose();
         }
     }
 }

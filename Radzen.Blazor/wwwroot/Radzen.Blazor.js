@@ -63,7 +63,7 @@ window.Radzen = {
      if (el) {
         var handler = function (e) {
             e.stopPropagation();
-            e.preventDefault(); 
+            e.preventDefault();
             ref.invokeMethodAsync('RadzenComponent.RaiseContextMenu',
                 {
                     ClientX: e.clientX,
@@ -1552,7 +1552,7 @@ window.Radzen = {
 
             if (value.endsWith("%"))
                 return totalLength*parseFloat(value)/100;
-            
+
             if (value.endsWith("px"))
                 return parseFloat(value);
 
@@ -1563,7 +1563,7 @@ window.Radzen = {
         maxValue=ensurevalue(maxValue);
         minNextValue=ensurevalue(minNextValue);
         maxNextValue=ensurevalue(maxNextValue);
-        
+
         Radzen[el] = {
             clientPos: clientPos,
             panePerc: parseFloat(panePerc),
@@ -1594,7 +1594,7 @@ window.Radzen = {
 
                     var length = (Radzen[el].paneLength -
                         (Radzen[el].clientPos - (isHOrientation ? e.clientX : e.clientY)));
-                    
+
                     if (length > spaceLength)
                         length = spaceLength;
 
@@ -1606,7 +1606,7 @@ window.Radzen = {
                         if (minNextValue && nextSpace < minNextValue) length = spaceLength-minNextValue;
                         if (maxNextValue && nextSpace > maxNextValue) length = spaceLength+maxNextValue;
                     }
-                    
+
                     var perc = length / Radzen[el].paneLength;
                     if (!isFinite(perc)) {
                         perc = 1;
@@ -1615,11 +1615,11 @@ window.Radzen = {
                             ? pane.getBoundingClientRect().width
                             : pane.getBoundingClientRect().height;
                     }
-                    
+
                     var newPerc =  Radzen[el].panePerc * perc;
                     if (newPerc < 0) newPerc = 0;
                     if (newPerc > 100) newPerc = 100;
-                    
+
                     pane.style.flexBasis = newPerc + '%';
                     if (paneNext)
                         paneNext.style.flexBasis = (spacePerc - newPerc) + '%';
@@ -1667,80 +1667,38 @@ window.Radzen = {
             Radzen.WaitingIntervalId = null;
         }
     },
-    initDictation: function () {
+    toggleDictation: function (componentRef) {
+        function start() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-        if (radzenRecognition) {
-            return true;
-        }
-
-        const SpeechRecognition = window.SpeechRecognition ||
-            window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            return false;
-        }
-        radzenRecognition = new SpeechRecognition();
-        radzenRecognition.continuous = true;
-
-        radzenRecognition.onresult = function (event) {
-
-            if (!radzenRecognition.componentRef || event.results.length < 1) {
+            if (!SpeechRecognition) {
                 return;
             }
 
-            if (event.results.length > 0) {
+            radzenRecognition = new SpeechRecognition();
+            radzenRecognition.continuous = true;
+            radzenRecognition.onresult = function (event) {
+                if (event.results.length < 1) {
+                    return;
+                }
+
                 let current = event.results[event.results.length - 1][0]
                 let result = current.transcript;
 
-                radzenRecognition.componentRef.invokeMethodAsync("OnResultFromJs", result);
-            }
+                componentRef.invokeMethodAsync("OnResult", result);
+            };
+            radzenRecognition.onend = function (event) {
+                console.log('StopRecording');
+                componentRef.invokeMethodAsync("StopRecording");
+                radzenRecognition = null;
+            };
+            radzenRecognition.start();
         }
-
-        radzenRecognition.onerror = async (event) => {
-
-            if (event.error == "aborted") {
-                return;
-            }
-
-            console.error(`Speech recognition error detected: ${event.error}`);
-
-            //cancel dictation if there is an error other than aborted
-            if (radzenRecognition.componentRef) {
-
-                await radzenRecognition.componentRef.invokeMethodAsync("StopRecording");
-                radzenRecognition.componentRef = null;
-                radzenRecognition.elementRef = null;
-            }
-        };
-
-        return true;
-    },
-    toggleDictation: async function (element, componentRef) {
-        if (!this.initDictation()) {
-            const apiNotAvailableMsg = "speech recognition API not available.";
-            alert(apiNotAvailableMsg);
-            console.warn(apiNotAvailableMsg);
-            return;
+        if (radzenRecognition) {
+            radzenRecognition.addEventListener('end', start);
+            radzenRecognition.stop();
+        } else {
+            start();
         }
-
-        if (radzenRecognition.componentRef) {
-
-            radzenRecognition.abort();
-
-            let oldComponentRef = radzenRecognition.componentRef;
-            let oldElement = radzenRecognition.elementRef;
-
-            radzenRecognition.componentRef = null;
-            radzenRecognition.elementRef = null;
-
-            await oldComponentRef.invokeMethodAsync("StopRecording");
-
-            if (oldElement == element) {
-                return;
-            }
-        }
-
-        radzenRecognition.elementRef = element;
-        radzenRecognition.componentRef = componentRef;
-        radzenRecognition.start();
     }
 };
