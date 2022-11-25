@@ -421,6 +421,15 @@ namespace Radzen.Blazor
         {
             var value = propertyValueGetter != null && !string.IsNullOrEmpty(Property) && !Property.Contains('.') ? propertyValueGetter(item) : !string.IsNullOrEmpty(Property) ? PropertyAccess.GetValue(item, Property) : "";
 
+            if ((PropertyAccess.IsEnum(FilterPropertyType) || PropertyAccess.IsNullableEnum(FilterPropertyType)) && value != null)
+            {
+                var enumValue = value as Enum;
+                if (enumValue != null) 
+                {
+                    value = EnumExtensions.GetDisplayDescription(enumValue);
+                }
+            }
+
             return !string.IsNullOrEmpty(FormatString) ? string.Format(FormatString, value, Grid?.Culture ?? CultureInfo.CurrentCulture) : Convert.ToString(value, Grid?.Culture ?? CultureInfo.CurrentCulture);
         }
 
