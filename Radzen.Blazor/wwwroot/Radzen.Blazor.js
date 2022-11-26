@@ -1676,6 +1676,7 @@ window.Radzen = {
             }
 
             radzenRecognition = new SpeechRecognition();
+            radzenRecognition.componentRef = componentRef;
             radzenRecognition.continuous = true;
             radzenRecognition.onresult = function (event) {
                 if (event.results.length < 1) {
@@ -1694,8 +1695,11 @@ window.Radzen = {
             };
             radzenRecognition.start();
         }
+
         if (radzenRecognition) {
-            radzenRecognition.addEventListener('end', start);
+            if (radzenRecognition.componentRef._id != componentRef._id) {
+                radzenRecognition.addEventListener('end', start);
+            }
             radzenRecognition.stop();
         } else {
             start();
