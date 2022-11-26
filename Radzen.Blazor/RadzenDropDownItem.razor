@@ -11,8 +11,8 @@
     @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
         @onclick:preventDefault @onclick="args=>SelectItem(args,true)">
         <div class="rz-chkbox ">
-            <div class="@(DropDown.isSelected(Item) ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
-                <span class="@(DropDown.isSelected(Item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon")"></span>
+            <div class="@(DropDown.IsSelected(Item) ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
+                <span class="@(DropDown.IsSelected(Item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon")"></span>
             </div>
         </div>
         <span>
@@ -69,7 +69,7 @@ else
         string result = $"{prefix}-item ";
         if (Disabled)
             result += "rz-state-disabled ";
-        else if (DropDown.isSelected(Item))
+        else if (DropDown.IsSelected(Item))
             result += "rz-state-highlight ";
 
         return result;

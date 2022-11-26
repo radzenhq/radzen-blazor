@@ -362,7 +362,7 @@ namespace Radzen
                         selectedItem = null;
                         selectedItems.Clear();
                     }
-                   
+
                     InvokeAsync(OnDataChanged);
                 }
             }
@@ -830,7 +830,7 @@ namespace Radzen
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns><c>true</c> if the specified item is selected; otherwise, <c>false</c>.</returns>
-        internal bool isSelected(object item)
+        internal bool IsSelected(object item)
         {
             if (!string.IsNullOrEmpty(ValueProperty))
             {
@@ -1162,20 +1162,17 @@ namespace Radzen
 
         internal bool IsItemSelectedByValue(object v)
         {
-            if (internalValue != null)
+            switch (internalValue)
             {
-                var values = internalValue as IEnumerable;
-                if (values != null)
-                {
-                    return values.Cast<object>().Contains(v);
-                }
-                else
-                {
+                case string s:
+                    return object.Equals(s, v);
+                case IEnumerable enumerable:
+                    return enumerable.Cast<object>().Contains(v);
+                case null:
+                    return false;
+                default:
                     return object.Equals(internalValue, v);
-                }
             }
-
-            return false;
         }
 
         /// <inheritdoc />
