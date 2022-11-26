@@ -74,11 +74,11 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            var markup = new Regex(@"\s\s+").Replace(component.Markup, "").Trim();
+            var data = component.FindAll(".rz-cell-data");
 
-            Assert.Contains(@$"<span class=""rz-cell-data"">1</span>", markup);
-            Assert.Contains(@$"<span class=""rz-cell-data"">2</span>", markup);
-            Assert.Contains(@$"<span class=""rz-cell-data"">3</span>", markup);
+            Assert.Equal("1", data[0].TextContent.Trim());
+            Assert.Equal("2", data[1].TextContent.Trim());
+            Assert.Equal("3", data[2].TextContent.Trim());
         }
 
         [Fact]
@@ -99,9 +99,8 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            var markup = new Regex(@"\s\s+").Replace(component.Markup, "").Trim();
-
-            Assert.Contains(@$"<span class=""rz-column-title"">MyId</span>", markup);
+            var title = component.Find(".rz-column-title");
+            Assert.Equal("MyId", title.TextContent.Trim());
         }
 
         [Fact]

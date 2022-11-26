@@ -30,8 +30,10 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Text, text));
 
-            Assert.Contains(@$">{text}</span>", component.Markup);
-            Assert.Contains(@$"class=""rz-link-text""", component.Markup);
+            var textElement = component.Find(".rz-link-text");
+
+            Assert.NotNull(textElement);
+            Assert.Equal(text, textElement.TextContent.Trim());
         }
 
         [Fact]

@@ -200,17 +200,17 @@ namespace Radzen.Blazor
         {
             if (parameters.DidParameterChange(nameof(Username), Username))
             {
-                username = Username;
+                username = parameters.GetValueOrDefault<string>(nameof(Username));
             }
 
             if (parameters.DidParameterChange(nameof(Password), Password))
             {
-                password = Password;
+                password = parameters.GetValueOrDefault<string>(nameof(Password));
             }
 
             if (parameters.DidParameterChange(nameof(RememberMe), RememberMe))
             {
-                rememberMe = RememberMe;
+                rememberMe = parameters.GetValueOrDefault<bool>(nameof(RememberMe));
             }
 
             await base.SetParametersAsync(parameters);
