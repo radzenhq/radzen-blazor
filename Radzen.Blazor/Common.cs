@@ -1938,10 +1938,15 @@ namespace Radzen
         /// <typeparam name="TItem">The owner type.</typeparam>
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <param name="propertyName">Name of the property to return.</param>
+        /// <param name="type">Type of the object.</param>
         /// <returns>A function which return the specified property by its name.</returns>
         public static Func<TItem, TValue> Getter<TItem, TValue>(string propertyName, Type type = null)
         {
-            if (Type.GetType(System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase($"System.{propertyName}".ToLowerInvariant())) != null)
+            if (propertyName.Contains("["))
+            {
+                return DynamicExpressionParser.ParseLambda<TItem, TValue>(null, false, propertyName).Compile();
+            }
+            else
             {
                 var arg = Expression.Parameter(typeof(TItem));
 
@@ -1966,8 +1971,6 @@ namespace Radzen
 
                 return Expression.Lambda<Func<TItem, TValue>>(body, arg).Compile();
             }
-
-            return DynamicExpressionParser.ParseLambda<TItem, TValue>(null, false, propertyName).Compile();
         }
 
         /// <summary>
