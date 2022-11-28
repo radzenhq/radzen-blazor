@@ -1939,8 +1939,34 @@ namespace Radzen
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <param name="propertyName">Name of the property to return.</param>
         /// <returns>A function which return the specified property by its name.</returns>
-        public static Func<TItem, TValue> Getter<TItem, TValue>(string propertyName)
+        public static Func<TItem, TValue> Getter<TItem, TValue>(string propertyName, Type type = null)
         {
+            if (Type.GetType(System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase($"System.{propertyName}".ToLowerInvariant())) != null)
+            {
+                var arg = Expression.Parameter(typeof(TItem));
+
+                Expression body = arg;
+
+                if (type != null)
+                {
+                    body = Expression.Convert(body, type);
+                }
+
+                foreach (var member in propertyName.Split("."))
+                {
+                    body = !body.Type.IsInterface ?
+                        Expression.PropertyOrField(body, member) :
+                            Expression.Property(
+                                body,
+                                new Type[] { body.Type }.Concat(body.Type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(member) != null),
+                                member);
+                }
+
+                body = Expression.Convert(body, typeof(TValue));
+
+                return Expression.Lambda<Func<TItem, TValue>>(body, arg).Compile();
+            }
+
             return DynamicExpressionParser.ParseLambda<TItem, TValue>(null, false, propertyName).Compile();
         }
 
