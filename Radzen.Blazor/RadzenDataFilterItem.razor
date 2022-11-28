@@ -102,7 +102,11 @@ else
                     property.FilterValueChange += OnFilterValueChange;
 
                     Filter.Property = property.Property;
-                    Filter.FilterOperator = property.GetFilterOperator();
+
+                    if (!property.GetFilterOperators().Contains(Filter.FilterOperator))
+                    {
+                        Filter.FilterOperator = property.GetFilterOperators().FirstOrDefault();
+                    }
 
                     var v = property.GetFilterValue();
                     if (v != null)
