@@ -22,5 +22,4 @@ public class StepGeneratorTests
         
         Assert.Equal("10 10 H 20 V 15 H 30 V 20 H 40 V 25 H 50 V 50", path);
     }
-    
 }
