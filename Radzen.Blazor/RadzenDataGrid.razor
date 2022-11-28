@@ -64,7 +64,7 @@
         }
 
     <div class="rz-data-grid-data">
-            <table class="rz-grid-table rz-grid-table-fixed @(AllowAlternatingRows ? "rz-grid-table-striped" : "") @(allColumns.Any(c => c.Parent != null) ? "rz-grid-table-composite" : "")">
+            <table class="rz-grid-table rz-grid-table-fixed @(AllowAlternatingRows ? "rz-grid-table-striped" : "") @(allColumns.Any(c => c.Parent != null) ? "rz-grid-table-composite" : "") @(getGridLinesCSSClass())">
             <colgroup>
                 @foreach(var g in Groups)
                 {
@@ -112,7 +112,7 @@
                         var columnIndex = visibleColumns.IndexOf(column);
                         var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
 
-                        <RadzenDataGridHeaderCell RowIndex="@i" Grid="@this" Column="@column" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)} {(column.Columns != null || column.Parent != null ? "rz-composite-cell" : "")} {getColumnAlignClass(column)}".Trim())" Attributes="@(cellAttr)" />
+                        <RadzenDataGridHeaderCell RowIndex="@i" Grid="@this" Column="@column" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)} {getCompositeCellCSSClass(column)} {getColumnAlignClass(column)}".Trim())" Attributes="@(cellAttr)" />
                     }
                 </tr>
                 }
@@ -358,7 +358,7 @@
                             }
 
                             <RadzenDataGridFooterCell RowIndex="@i" Grid="@this" Column="@column" 
-                                CssClass="@($"{column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)} {(column.Columns != null || column.Parent != null ? "rz-composite-cell" : "")}".Trim())" 
+                                CssClass="@($"{column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)} {getCompositeCellCSSClass(column)}".Trim())" 
                                 Attributes="@(cellAttr)" />
                         }
                     </tr>

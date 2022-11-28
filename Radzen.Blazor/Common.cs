@@ -669,6 +669,33 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Specifies the grid lines of <see cref="RadzenDataGrid{TItem}" />.
+    /// </summary>
+    public enum DataGridGridLines
+    {
+        /// <summary>
+        /// Theme default.
+        /// </summary>
+        Default,
+        /// <summary>
+        /// Both horizontal and vertical grid lines.
+        /// </summary>
+        Both,
+        /// <summary>
+        /// No grid lines.
+        /// </summary>
+        None,
+        /// <summary>
+        /// Horizontal grid lines.
+        /// </summary>
+        Horizontal,
+        /// <summary>
+        /// Vertical grid lines.
+        /// </summary>
+        Vertical
+    }
+
+    /// <summary>
     /// Specifies the severity of a <see cref="RadzenNotification" />. Severity changes the visual styling of the RadzenNotification (icon and background color).
     /// </summary>
     public enum NotificationSeverity

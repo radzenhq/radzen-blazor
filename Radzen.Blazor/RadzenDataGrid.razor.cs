@@ -1876,6 +1876,33 @@ namespace Radzen.Blazor
         public bool AllowAlternatingRows { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets the grid lines.
+        /// </summary>
+        /// <value>The grid lines.</value>
+        [Parameter]
+        public DataGridGridLines GridLines { get; set; } = DataGridGridLines.Default;
+
+        internal bool ShowGridLines(RadzenDataGridColumn<TItem> column)
+        {
+            return column.Columns != null || column.Parent != null;
+        }
+
+        internal string getCompositeCellCSSClass(RadzenDataGridColumn<TItem> column)
+        {
+            return column.Columns != null || column.Parent != null ? "rz-composite-cell" : "";
+        }
+
+        internal string getGridLinesCSSClass()
+        {
+            if (GridLines == DataGridGridLines.Default)
+            {
+                return "";
+            }
+
+            return $"rz-grid-gridlines-{Enum.GetName(typeof(DataGridGridLines), GridLines).ToLower()}";
+        }
+
+        /// <summary>
         /// Gets or sets the selection mode.
         /// </summary>
         /// <value>The selection mode.</value>

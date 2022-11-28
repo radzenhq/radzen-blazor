@@ -1,4 +1,4 @@
-﻿@page "/datagrid-density"
+﻿@page "/datagrid-grid-lines"
 
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
@@ -7,16 +7,16 @@
 @inherits DbContextPage
 
 <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
-    DataGrid <strong>Density</strong>
+    DataGrid <strong>GridLines</strong>
 </RadzenText>
 
-<RadzenExample Name="DataGridDensity" Heading="false" Documentation="false">
+<RadzenExample Name="DataGridGridLines" Heading="false" Documentation="false">
     <RadzenCard Class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
-        <div style="white-space:nowrap; margin-right: 16px">Density:</div>
-        <RadzenSelectBar @bind-Value="@Density" TextProperty="Text" ValueProperty="Value"
-                         Data="@(Enum.GetValues(typeof(Density)).Cast<Density>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        <div style="white-space:nowrap; margin-right: 16px">GridLines:</div>
+        <RadzenSelectBar @bind-Value="@GridLines" TextProperty="Text" ValueProperty="Value"
+                         Data="@(Enum.GetValues(typeof(DataGridGridLines)).Cast<DataGridGridLines>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
     </RadzenCard>
-    <RadzenDataGrid Data="@orderDetails" TItem="OrderDetail" Density="@Density" AllowPaging="true" AllowSorting="true">
+    <RadzenDataGrid Data="@orderDetails" TItem="OrderDetail" GridLines="@GridLines" AllowPaging="true" AllowSorting="true">
         <Columns>
             <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
             <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
@@ -36,7 +36,7 @@
 </RadzenExample>
 
 @code {
-    Density Density = Density.Default;
+    DataGridGridLines GridLines = DataGridGridLines.Default;
 
     IEnumerable<OrderDetail> orderDetails;
 
