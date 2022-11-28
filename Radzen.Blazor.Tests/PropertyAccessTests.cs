@@ -26,7 +26,7 @@ namespace Radzen.Blazor.Tests
                 new SimpleObject() { Prop1 = "TestString" },
             };
 
-            Func<object, object> getter = PropertyAccess.Getter<object, object>("Prop1");
+            Func<object, object> getter = PropertyAccess.Getter<object, object>("Prop1", typeof(SimpleObject));
 
             var value = getter(_data[0]);
             Assert.Equal("TestString", value);
