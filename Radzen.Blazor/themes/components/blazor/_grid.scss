@@ -636,8 +636,9 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 .rz-grid-table {
   // GridLines.Both
   &.rz-grid-gridlines-both {
-    thead th,
-    tr > td {
+    > thead > tr > th,
+    > tbody > tr > td,
+    > tfoot > tr > td {
       border-bottom: var(--rz-grid-cell-border);
 
       &:not(:last-child) {
@@ -648,8 +649,9 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
   // GridLines.None
   &.rz-grid-gridlines-none {
-    thead th,
-    tr > td {
+    > thead > tr > th,
+    > tbody > tr > td,
+    > tfoot > tr > td {
       border-bottom: none;
       border-right: none;
     }
@@ -657,8 +659,9 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
   // GridLines.Horizontal
   &.rz-grid-gridlines-horizontal {
-    thead th,
-    tr > td {
+    > thead > tr > th,
+    > tbody > tr > td,
+    > tfoot > tr > td {
       border-bottom: var(--rz-grid-cell-border);
       border-right: none;
     }
@@ -666,8 +669,9 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
   // GridLines.Vertical
   &.rz-grid-gridlines-vertical {
-    thead th,
-    tr > td {
+    > thead > tr > th,
+    > tbody > tr > td,
+    > tfoot > tr > td {
       border-bottom: none;
       
       &:not(:last-child) {
