@@ -836,6 +836,12 @@ window.Radzen = {
         Radzen.closeAllPopups = function (e) {
             for (var i = 0; i < Radzen.popups.length; i++) {
                 var p = Radzen.popups[i];
+
+                var closestPopup = e.target.closest && (e.target.closest('.rz-popup') || e.target.closest('.rz-overlaypanel'));
+                if (closestPopup && closestPopup != p) {
+                    return;
+                }
+
                 Radzen.closePopup(p.id, p.instance, p.callback);
             }
             Radzen.popups = [];
