@@ -23,11 +23,36 @@ namespace Radzen.Blazor
         public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Light;
 
         /// <summary>
-        /// Gets or sets the icon.
+        /// Gets or sets the icon displayed while not recording.
         /// </summary>
         /// <value>The icon.</value>
         [Parameter]
         public string Icon { get; set; } = "mic";
+
+        /// <summary>
+        /// Gets or sets the icon displayed while recording.
+        /// </summary>
+        /// <value>The icon.</value>
+        [Parameter]
+        public string StopIcon { get; set; } = "stop";
+
+        private string CurrentIcon => recording ? StopIcon : Icon;
+
+        /// <summary>
+        /// Gets or sets the message displayed when user hovers the button and it is not recording.
+        /// </summary>
+        /// <value>The message.</value>
+        [Parameter]
+        public string Title { get; set; } = "Press to start speech recognition";
+
+        /// <summary>
+        /// Gets or sets the message displayed when user hovers the button and it is recording.
+        /// </summary>
+        /// <value>The message.</value>
+        [Parameter]
+        public string StopTitle { get; set; } = "Press to stop speech recognition";
+
+        private string CurrentTitle => recording ? StopTitle : Title;
 
         /// <summary>
         /// Callback which provides results from the speech recognition API.

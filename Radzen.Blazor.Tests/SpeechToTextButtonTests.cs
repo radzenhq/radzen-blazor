@@ -89,6 +89,55 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void SpeechToTextButton_Sets_StopTitle_When_Record_Button_Clicked()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
+
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            component.Render();
+
+            var recordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button");
+
+            Assert.NotNull(recordButton);
+
+            recordButton.Click();
+
+            component.Render();
+
+            var blinkingRecordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button-recording");
+
+            Assert.Equal(component.Instance.StopTitle, blinkingRecordButton.GetAttribute("title"));
+        }
+
+        [Fact]
+        public void SpeechToTextButton_ChangesIconWhen_When_Record_Button_Clicked()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenSpeechToTextButton>();
+
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            component.Render();
+
+            var recordButton = component.Find("button.rz-button-icon-only.rz-speech-to-text-button");
+
+            Assert.NotNull(recordButton);
+
+            recordButton.Click();
+
+            component.Render();
+
+            var blinkingRecordButton = component.Find("button span");
+
+            Assert.Contains("stop", blinkingRecordButton.TextContent);
+            Assert.DoesNotContain("mic", blinkingRecordButton.TextContent);
+        }
+
+        [Fact]
         public void SpeechToTextButton_UnSets_Record_Button_Css_When_Record_Button_Clicked_Twice()
         {
             using var ctx = new TestContext();

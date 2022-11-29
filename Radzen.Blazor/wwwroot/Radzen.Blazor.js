@@ -1689,7 +1689,6 @@ window.Radzen = {
                 componentRef.invokeMethodAsync("OnResult", result);
             };
             radzenRecognition.onend = function (event) {
-                console.log('StopRecording');
                 componentRef.invokeMethodAsync("StopRecording");
                 radzenRecognition = null;
             };
