@@ -9,23 +9,49 @@
     <div class="container my-5">
         <div class="row">
             <div class="col">
-                <RadzenCard Class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem" >
-                    <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
-                    <RadzenLabel Text="Smooth" For="smooth" Style="margin-right: 1rem;"/>
+                <RadzenCard Class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem">
+                    <RadzenLabel Text="Chart Rendering Mode" For="chartRenderingMode" Style="margin-right: 1rem;"/>
+                    <RadzenDropDown AllowClear="false" Name="chartRenderingMode" @bind-Value="@chartRenderingMode" 
+                                    TValue="string"
+                                    Data="@(new [] { "Interpolation", "Smooth" })" Style="margin-right: 1rem;"/>
+                    @if (chartRenderingMode == "Smooth")
+                    {
+                        <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
+                        <RadzenLabel Text="Smooth" For="smooth" Style="margin-right: 1rem;"/>
+                    }
+                    @if (chartRenderingMode == "Interpolation")
+                    {
+                        <RadzenLabel Text="Interpolation" For="interpolation" Style="margin-right: 1rem;"/>
+                        <RadzenDropDown AllowClear="false" Name="interpolation" @bind-Value="@interpolation"
+                                        TValue="Interpolation" ValueProperty="Value" TextProperty="Text"
+                                        Data="@(Enum.GetValues<Interpolation>().Select(v => new { Value = v, Text = $"{v:G}" }))"/>
+                    }
                     <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                    <RadzenLabel Text="Show Data Labels" For="dataLabels" />
+                    <RadzenLabel Text="Show Data Labels" For="dataLabels"/>
                 </RadzenCard>
                 <RadzenChart>
-                    <RadzenAreaSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">
-                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                    </RadzenAreaSeries>
-                    <RadzenAreaSeries Smooth="@smooth" Data="@revenue2020" CategoryProperty="Date" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
-                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                    </RadzenAreaSeries>
-                    <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth" />
+                    @if (chartRenderingMode == "Interpolation")
+                    {
+                        <RadzenAreaSeries Interpolation="@interpolation" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">
+                            <RadzenSeriesDataLabels Visible="@showDataLabels"/>
+                        </RadzenAreaSeries>
+                        <RadzenAreaSeries Interpolation="@interpolation" Data="@revenue2020" CategoryProperty="Date" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                            <RadzenSeriesDataLabels Visible="@showDataLabels"/>
+                        </RadzenAreaSeries>
+                    }
+                    @if (chartRenderingMode == "Smooth")
+                    {
+                        <RadzenAreaSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">
+                            <RadzenSeriesDataLabels Visible="@showDataLabels"/>
+                        </RadzenAreaSeries>
+                        <RadzenAreaSeries Smooth="@smooth" Data="@revenue2020" CategoryProperty="Date" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                            <RadzenSeriesDataLabels Visible="@showDataLabels"/>
+                        </RadzenAreaSeries>
+                    }
+                    <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth"/>
                     <RadzenValueAxis Formatter="@FormatAsUSD">
-                        <RadzenGridLines Visible="true" />
-                        <RadzenAxisTitle Text="Revenue in USD" />
+                        <RadzenGridLines Visible="true"/>
+                        <RadzenAxisTitle Text="Revenue in USD"/>
                     </RadzenValueAxis>
                 </RadzenChart>
             </div>
@@ -35,6 +61,8 @@
 @code {
     bool smooth = true;
     bool showDataLabels = false;
+    Interpolation interpolation = Interpolation.Line;
+    string chartRenderingMode = "Interpolation";
     class DataItem
     {
         public string Date { get; set; }
