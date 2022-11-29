@@ -963,6 +963,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "SpeechToTextButton",
+                    New = true,
+                    Title = "Blazor speech to text button component",
+                    Path = "speechtotextbutton",
+                    Icon = "&#xe029"
+                },
+                new Example()
+                {
                     Name = "SplitButton",
                     Updated = true,
                     Title = "Blazor split button component",

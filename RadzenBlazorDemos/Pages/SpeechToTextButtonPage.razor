@@ -2,14 +2,14 @@
 
 <RadzenExample Name="SpeechToTextButton">
     <div class="container-fluid">
-        <div class="row px-3">
-            <div class="col-md-6 col-lg-4 p-3">
+        <div class="row">
+            <div class="col-md-6 p-3">
                 <RadzenCard>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Speech To Text</RadzenText>
                     <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, false, "Button1"))" />
                 </RadzenCard>
             </div>
-            <div class="col-md-6 col-lg-4 p-3">
+            <div class="col-md-6 p-3">
                 <RadzenCard>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Update TextArea</RadzenText>
                     <RadzenTextArea @bind-Value=@value Change=@(args => OnTextAreaChange(args, "TextArea")) Class="w-100" />
