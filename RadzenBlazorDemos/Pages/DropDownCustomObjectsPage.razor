@@ -31,7 +31,7 @@
         <div class="col-md-6 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown from Enum</RadzenText>
-                    <RadzenDropDown Data="@(Enum.GetValues(typeof(ColorType)))"@bind-Value=@color
+                    <RadzenDropDown Data="@(Enum.GetValues(typeof(ColorType)).Cast<Enum>())" @bind-Value=@color
                                     AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                     Change=@(args => OnChange(args, "DropDown from Enum")) Class="w-100">
                     </RadzenDropDown>
