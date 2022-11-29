@@ -366,7 +366,8 @@ namespace Radzen.Blazor
         void Init()
         {
             var value = Value;
-            if (String.IsNullOrEmpty(Value))
+
+            if (String.IsNullOrEmpty(Value) || RGB.Parse(Value) == null)
             {
                 value = "rgb(255, 255, 255)";
             }
