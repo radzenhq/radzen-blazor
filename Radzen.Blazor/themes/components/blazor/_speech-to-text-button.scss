@@ -1,0 +1,36 @@
+@keyframes mic-blink {
+    0% {
+        background-color: var(--rz-danger-light);
+    }
+
+    50% {
+        background-color: var(--rz-danger-darker);
+    }
+
+    100% {
+        background-color: var(--rz-danger-light);
+    }
+}
+
+@-webkit-keyframes mic-blink {
+    0% {
+        background-color: var(--rz-danger-light);
+    }
+
+    50% {
+        background-color: var(--rz-danger-darker);
+    }
+
+    100% {
+        background-color: var(--rz-danger-light);
+    }
+}
+
+.rz-button {
+    &.rz-speech-to-text-button-recording {
+        -webkit-animation: mic-blink 2s linear infinite;
+        -moz-animation: mic-blink 2s linear infinite;
+        animation: mic-blink 2s linear infinite;
+        color: var(--rz-text-contrast-color);
+    }
+}

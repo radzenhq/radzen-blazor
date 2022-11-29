@@ -18,6 +18,7 @@ if (!Element.prototype.closest) {
 
 var resolveCallbacks = [];
 var rejectCallbacks = [];
+var radzenRecognition;
 
 window.Radzen = {
     throttle: function (callback, delay) {
@@ -62,7 +63,7 @@ window.Radzen = {
      if (el) {
         var handler = function (e) {
             e.stopPropagation();
-            e.preventDefault(); 
+            e.preventDefault();
             ref.invokeMethodAsync('RadzenComponent.RaiseContextMenu',
                 {
                     ClientX: e.clientX,
@@ -1551,7 +1552,7 @@ window.Radzen = {
 
             if (value.endsWith("%"))
                 return totalLength*parseFloat(value)/100;
-            
+
             if (value.endsWith("px"))
                 return parseFloat(value);
 
@@ -1562,7 +1563,7 @@ window.Radzen = {
         maxValue=ensurevalue(maxValue);
         minNextValue=ensurevalue(minNextValue);
         maxNextValue=ensurevalue(maxNextValue);
-        
+
         Radzen[el] = {
             clientPos: clientPos,
             panePerc: parseFloat(panePerc),
@@ -1593,7 +1594,7 @@ window.Radzen = {
 
                     var length = (Radzen[el].paneLength -
                         (Radzen[el].clientPos - (isHOrientation ? e.clientX : e.clientY)));
-                    
+
                     if (length > spaceLength)
                         length = spaceLength;
 
@@ -1605,7 +1606,7 @@ window.Radzen = {
                         if (minNextValue && nextSpace < minNextValue) length = spaceLength-minNextValue;
                         if (maxNextValue && nextSpace > maxNextValue) length = spaceLength+maxNextValue;
                     }
-                    
+
                     var perc = length / Radzen[el].paneLength;
                     if (!isFinite(perc)) {
                         perc = 1;
@@ -1614,11 +1615,11 @@ window.Radzen = {
                             ? pane.getBoundingClientRect().width
                             : pane.getBoundingClientRect().height;
                     }
-                    
+
                     var newPerc =  Radzen[el].panePerc * perc;
                     if (newPerc < 0) newPerc = 0;
                     if (newPerc > 100) newPerc = 100;
-                    
+
                     pane.style.flexBasis = newPerc + '%';
                     if (paneNext)
                         paneNext.style.flexBasis = (spacePerc - newPerc) + '%';
@@ -1664,6 +1665,43 @@ window.Radzen = {
         if (Radzen.WaitingIntervalId != null) {
             clearInterval(Radzen.WaitingIntervalId);
             Radzen.WaitingIntervalId = null;
+        }
+    },
+    toggleDictation: function (componentRef) {
+        function start() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (!SpeechRecognition) {
+                return;
+            }
+
+            radzenRecognition = new SpeechRecognition();
+            radzenRecognition.componentRef = componentRef;
+            radzenRecognition.continuous = true;
+            radzenRecognition.onresult = function (event) {
+                if (event.results.length < 1) {
+                    return;
+                }
+
+                let current = event.results[event.results.length - 1][0]
+                let result = current.transcript;
+
+                componentRef.invokeMethodAsync("OnResult", result);
+            };
+            radzenRecognition.onend = function (event) {
+                componentRef.invokeMethodAsync("StopRecording");
+                radzenRecognition = null;
+            };
+            radzenRecognition.start();
+        }
+
+        if (radzenRecognition) {
+            if (radzenRecognition.componentRef._id != componentRef._id) {
+                radzenRecognition.addEventListener('end', start);
+            }
+            radzenRecognition.stop();
+        } else {
+            start();
         }
     }
 };
