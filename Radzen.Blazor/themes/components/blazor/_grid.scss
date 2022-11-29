@@ -348,7 +348,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   border-top: var(--rz-grid-cell-border);
 }
 
-.rz-datatable-thead, .rz-grid-table thead {
+.rz-datatable-thead,
+.rz-grid-table thead {
 
   th {
     background-color: var(--rz-grid-header-background-color);
@@ -571,7 +572,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   }
 }
 
-.rz-datatable-data, .rz-grid-table {
+.rz-datatable-data,
+.rz-grid-table {
   td {
     padding: var(--rz-grid-cell-padding);
     border-bottom: var(--rz-grid-bottom-cell-border);
@@ -625,6 +627,59 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     &:last-child {
       > td {
         border-bottom: none;
+      }
+    }
+  }
+}
+
+// GridLines
+.rz-grid-table {
+  // GridLines.Both
+  &.rz-grid-gridlines-both {
+    > thead > tr > th,
+    > thead > tr > th.rz-composite-cell,
+    > tbody > tr > td,
+    > tfoot > tr > td {
+      border-bottom: var(--rz-grid-cell-border);
+
+      &:not(:last-child) {
+        border-right: var(--rz-grid-cell-border);
+      }
+    }
+  }
+
+  // GridLines.None
+  &.rz-grid-gridlines-none {
+    > thead > tr > th,
+    > thead > tr > th.rz-composite-cell,
+    > tbody > tr > td,
+    > tfoot > tr > td {
+      border-bottom: none;
+      border-right: none;
+    }
+  }
+
+  // GridLines.Horizontal
+  &.rz-grid-gridlines-horizontal {
+    > thead > tr > th,
+    > thead > tr > th.rz-composite-cell,
+    > tbody > tr > td,
+    > tfoot > tr > td {
+      border-bottom: var(--rz-grid-cell-border);
+      border-right: none;
+    }
+  }
+
+  // GridLines.Vertical
+  &.rz-grid-gridlines-vertical {
+    > thead > tr > th,
+    > thead > tr > th.rz-composite-cell,
+    > tbody > tr > td,
+    > tfoot > tr > td {
+      border-bottom: none;
+      
+      &:not(:last-child) {
+        border-right: var(--rz-grid-cell-border);
       }
     }
   }

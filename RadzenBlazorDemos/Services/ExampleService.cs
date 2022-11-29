@@ -447,6 +447,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "GridLines",
+                    New = true,
+                    Path = "datagrid-grid-lines",
+                    Title = "Blazor DataGrid grid lines",
+                    Icon = "&#xf016",
+                    Tags = new [] { "grid", "lines", "border", "gridlines" }
+                },
+                new Example()
+                {
                     Name = "Cell Context Menu",
                     Path = "datagrid-cell-contextmenu",
                     Title = "Blazor DataGrid cell context menu",
