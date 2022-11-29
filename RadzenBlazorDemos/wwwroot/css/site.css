@@ -671,22 +671,3 @@ svg.illustration {
         box-shadow: 0 0 0 20px rgba(255, 80, 77, 0.2), 0 0 0 40px rgba(255, 80, 77, 0.2);
     }
 }
-
-.discount-banner {
-    position: relative;
-    background: linear-gradient(90deg, #000000 40%, #2e2c8f 100%);
-}
-
-.discount-banner a {
-    color: var(--rz-text-color) !important;
-}
-
-.discount-banner:before {
-    position: absolute;
-    content: "";
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #FE6E41 0%, #FF504D 30%, #AA01E4 70%, #534EEB 100%);
-}
