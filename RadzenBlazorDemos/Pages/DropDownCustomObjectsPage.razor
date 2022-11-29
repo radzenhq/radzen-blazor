@@ -3,6 +3,7 @@
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
+@using System.ComponentModel.DataAnnotations
 
 @inherits DbContextPage
 
@@ -24,6 +25,15 @@
                     <RadzenDropDown Data=@data TValue="IEnumerable<MyObject>" @bind-Value=@multipleValues
                                     Multiple=true AllowClear="true" AllowFiltering="true"
                                     Change=@(args => OnChange(args, "DropDown with custom objects and multiple selection")) Class="w-100">
+                    </RadzenDropDown>
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown from Enum</RadzenText>
+                    <RadzenDropDown Data="@(Enum.GetValues(typeof(ColorType)))"@bind-Value=@color
+                                    AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    Change=@(args => OnChange(args, "DropDown from Enum")) Class="w-100">
                     </RadzenDropDown>
             </RadzenCard>
         </div>
@@ -57,6 +67,25 @@
         {
             return base.GetHashCode();
         }
+    }
+
+    ColorType color;
+
+    public enum ColorType
+    {
+        Red,
+        Green,
+        Blue,
+        [Display(Description = "Almond Green")]
+        AlmondGreen,
+        [Display(Description = "Amber Gray")]
+        AmberGray,
+        [Display(Description = "Apple Blue... ")]
+        AppleBlueSeaGreen,
+        //[Display(Description = "Miss", ResourceType = typeof(ResourceFile)] localization example
+        [Display(Description = "Azure")]
+        AzureBlue,
+
     }
 
     MyObject singleValue = new MyObject() { Id = 5, Name = "Name5" };

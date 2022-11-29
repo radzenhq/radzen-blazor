@@ -427,6 +427,12 @@ namespace Radzen
                 {
                     return disabledPropertyGetter(item);
                 }
+
+                var enumValue = item as Enum;
+                if (enumValue != null)
+                {
+                    return Radzen.Blazor.EnumExtensions.GetDisplayDescription(enumValue);
+                }
             }
 
             return item;
