@@ -637,6 +637,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   // GridLines.Both
   &.rz-grid-gridlines-both {
     > thead > tr > th,
+    > thead > tr > th.rz-composite-cell,
     > tbody > tr > td,
     > tfoot > tr > td {
       border-bottom: var(--rz-grid-cell-border);
@@ -650,6 +651,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   // GridLines.None
   &.rz-grid-gridlines-none {
     > thead > tr > th,
+    > thead > tr > th.rz-composite-cell,
     > tbody > tr > td,
     > tfoot > tr > td {
       border-bottom: none;
@@ -660,6 +662,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   // GridLines.Horizontal
   &.rz-grid-gridlines-horizontal {
     > thead > tr > th,
+    > thead > tr > th.rz-composite-cell,
     > tbody > tr > td,
     > tfoot > tr > td {
       border-bottom: var(--rz-grid-cell-border);
@@ -670,6 +673,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   // GridLines.Vertical
   &.rz-grid-gridlines-vertical {
     > thead > tr > th,
+    > thead > tr > th.rz-composite-cell,
     > tbody > tr > td,
     > tfoot > tr > td {
       border-bottom: none;
