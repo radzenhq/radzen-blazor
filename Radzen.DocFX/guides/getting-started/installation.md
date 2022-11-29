@@ -11,7 +11,7 @@ Radzen Blazor Components are distributed as the [Radzen.Blazor](https://www.nuge
 You can add them to your project in one of the following ways
 - Install the package from command line by running `dotnet add package Radzen.Blazor`.
 - Add the project from the Visual Nuget Package Manager <img class="ml-0" src="../../../images/nuget-explorer.png">
-- Manually edit the .csproj file and add a project reference ``
+- Manually edit the .csproj file and add a package reference `<PackageReference Include="Radzen.Blazor" Version="*" />`
 
 ## Import the namespaces
 Open the `_Imports.razor` file of your Blazor application and add these two lines:
