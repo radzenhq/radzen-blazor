@@ -1088,6 +1088,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Interpolation",
+                    Path = "chart-interpolation",
+                    Icon = "&#xe922",
+                    New = true,
+                    Tags = new [] { "chart", "interpolation", "spline", "step" }
+                },
+                new Example
+                {
                     Name = "Styling Chart",
                     Path = "styling-chart",
                     Title = "Blazor chart styling",
