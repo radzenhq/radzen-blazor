@@ -837,7 +837,7 @@ window.Radzen = {
             for (var i = 0; i < Radzen.popups.length; i++) {
                 var p = Radzen.popups[i];
 
-                var closestPopup = e.target.closest && (e.target.closest('.rz-popup') || e.target.closest('.rz-overlaypanel'));
+                var closestPopup = e && e.target && e.target.closest && (e.target.closest('.rz-popup') || e.target.closest('.rz-overlaypanel'));
                 if (closestPopup && closestPopup != p) {
                     return;
                 }
