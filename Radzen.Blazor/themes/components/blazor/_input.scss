@@ -126,10 +126,3 @@ input {
     @extend %input-disabled;
   }
 }
-
-@media (max-width: 768px) {
-  %input,
-  input {
-    font-size: 1rem;
-  }
-}
