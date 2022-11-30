@@ -2316,7 +2316,7 @@ namespace Radzen.Blazor
 
         internal async Task EndColumnDropToGroup()
         {
-            if(indexOfColumnToReoder != null)
+            if(indexOfColumnToReoder != null && AllowGrouping)
             {
                 var column = columns.Where(c => c.GetVisible()).ElementAtOrDefault(indexOfColumnToReoder.Value);
 
