@@ -147,7 +147,7 @@ $scheduler-day-number-padding: 0 0.5rem !default;
 
 .rz-slot {
   display: flex;
-  height: 1.5em;
+  height: 1.5rem;
   border-top: 1px solid var(--rz-scheduler-border-color);
   border-left: 1px solid var(--rz-scheduler-border-color);
 }
@@ -266,12 +266,10 @@ $scheduler-day-number-padding: 0 0.5rem !default;
 
 .rz-slots {
   flex: 1;
-  font-size: var(--rz-root-font-size);
 }
 
 .rz-week {
   flex: 1;
-  font-size: var(--rz-root-font-size);
 
   .rz-slots {
     display: flex;
