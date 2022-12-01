@@ -996,6 +996,11 @@ namespace Radzen
         /// <param name="raiseChange">if set to <c>true</c> [raise change].</param>
         public async System.Threading.Tasks.Task SelectItem(object item, bool raiseChange = true)
         {
+            if (disabledPropertyGetter != null && disabledPropertyGetter(item) as bool? == true)
+            {
+                return;
+            }
+
             if (!Multiple)
             {
                 if (object.Equals(item, selectedItem))
