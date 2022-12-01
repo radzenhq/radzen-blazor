@@ -1,0 +1,9 @@
+// Flex-direction
+// Example .rz-flex-row
+$flex: row, row-reverse, column, column-reverse;
+
+@each $value in $flex {
+  .rz-flex-#{$value} {
+    flex-direction: #{$value} !important;
+  }
+}

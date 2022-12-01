@@ -299,7 +299,7 @@ $rz-border-radius-map: map-merge(
 }
 
 // Border Radius CSS classes
-@include rz-utility-css($rz-border-radius-map, 'border-radius');
+@include rz-utility-map-css('border-radius', $rz-border-radius-map);
 
 // Shadow
 
@@ -353,7 +353,7 @@ $rz-shadow-map: map-merge(
 }
 
 // Shadow CSS classes
-@include rz-utility-css($rz-shadow-map, 'box-shadow');
+@include rz-utility-map-css('box-shadow', $rz-shadow-map);
 
 // Transition
 
@@ -367,19 +367,36 @@ $rz-transition-all: all 0.1s linear !default;
   --rz-transition-all: #{$rz-transition-all};
 }
 
+// Layout
+
+// Display
+// Example .rz-display-block
+$display: block, inline, inline-block, flex, inline-flex, grid, inline-grid;
+@include rz-utility-list-css('display', $display);
+
+// Justify-content
+// Example .rz-justify-content-center
+$justify-content: normal, stretch, center, start, end, flex-start, flex-end, left, right, space-between, space-around, space-evenly;
+@include rz-utility-list-css('justify-content', $justify-content);
+
+// Align-items
+// Example .rz-align-items-center
+$align-items: normal, stretch, center, start, end, flex-start, flex-end;
+@include rz-utility-list-css('align-items', $align-items);
+
 //---- CSS classes
 
 // Color
 // Example .rz-color-primary
-@include rz-color-css($rz-theme-colors-map, 'color');
+@include rz-color-css('color', $rz-theme-colors-map);
 
 // Background Color
 // Example .rz-background-color-primary
-@include rz-color-css($rz-theme-colors-map, 'background-color');
+@include rz-color-css('background-color', $rz-theme-colors-map);
 
 // Border Color
 // Example .rz-border-color-primary
-@include rz-color-css($rz-theme-colors-map, 'border-color');
+@include rz-color-css('border-color', $rz-theme-colors-map);
 
 // Border
 // Example .rz-border-primary
