@@ -521,7 +521,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
 .rz-grid-table-striped {
   tbody {
-    tr:not(.rz-expanded-row-content)  {
+    > tr:not(.rz-expanded-row-content)  {
       &:nth-child(even) {
         > td {
           background-color: var(--rz-grid-stripe-background-color);
