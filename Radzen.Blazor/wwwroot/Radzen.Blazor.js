@@ -1673,7 +1673,7 @@ window.Radzen = {
             Radzen.WaitingIntervalId = null;
         }
     },
-    toggleDictation: function (componentRef) {
+    toggleDictation: function (componentRef, language) {
         function start() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -1684,6 +1684,11 @@ window.Radzen = {
             radzenRecognition = new SpeechRecognition();
             radzenRecognition.componentRef = componentRef;
             radzenRecognition.continuous = true;
+
+            if (language) {
+                radzenRecognition.lang = language;
+            }
+
             radzenRecognition.onresult = function (event) {
                 if (event.results.length < 1) {
                     return;
