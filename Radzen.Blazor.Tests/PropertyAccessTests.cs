@@ -9,6 +9,32 @@ namespace Radzen.Blazor.Tests
 {
     public class PropertyAccessTests
     {
+        public partial class TestData
+        {
+            public string PROPERTY { get; set; }
+            public string Property { get; set; }
+
+            public Guid Guid { get; set; }
+        }
+
+        [Fact]
+        public void Getter_With_Member_Named_As_A_Builtin_Type()
+        {
+            var o = new TestData { Guid = Guid.Empty };
+            var getter = PropertyAccess.Getter<TestData, Guid>(nameof(TestData.Guid));
+            var value = getter(o);
+            Assert.Equal(o.Guid, value);
+        }
+
+        [Fact]
+        public void Getter_With_Members_That_Differ_Only_In_Casing()
+        {
+            var o = new TestData { PROPERTY = nameof(TestData.PROPERTY), Property = nameof(TestData.Property) };
+            var getter = PropertyAccess.Getter<TestData, string>(nameof(TestData.PROPERTY));
+            var value = getter(o);
+            Assert.Equal(nameof(TestData.PROPERTY), value);
+        }
+
         [Fact]
         public void Getter_Resolves_Property_On_Simple_Object()
         {

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Dynamic.Core.Parser;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -1986,12 +1987,38 @@ namespace Radzen
 
                 foreach (var member in propertyName.Split("."))
                 {
-                    body = !body.Type.IsInterface ?
-                        Expression.PropertyOrField(body, member) :
-                            Expression.Property(
-                                body,
-                                new Type[] { body.Type }.Concat(body.Type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(member) != null),
-                                member);
+                    if (body.Type.IsInterface)
+                    {
+                        body = Expression.Property(body,
+                            new [] { body.Type }.Concat(body.Type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(member) != null),
+                            member
+                        );
+                    }
+                    else
+                    {
+                        try
+                        {
+                            body = Expression.PropertyOrField(body, member);
+                        }
+                        catch (AmbiguousMatchException)
+                        {
+                            var property = body.Type.GetProperty(member, BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+
+                            if (property != null)
+                            {
+                                body = Expression.Property(body, property);
+                            }
+                            else
+                            {
+                                var field = body.Type.GetField(member, BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+
+                                if (field != null)
+                                {
+                                    body = Expression.Field(body, field);
+                                }
+                            }
+                        }
+                    }
                 }
 
                 body = Expression.Convert(body, typeof(TValue));
