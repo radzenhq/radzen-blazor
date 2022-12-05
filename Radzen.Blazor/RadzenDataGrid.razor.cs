@@ -1733,11 +1733,6 @@ namespace Radzen.Blazor
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var emptyTextChanged = parameters.DidParameterChange(nameof(EmptyText), EmptyText);
-            if (emptyTextChanged)
-            {
-                await ChangeState();
-                return;
-            }
 
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
@@ -1753,6 +1748,11 @@ namespace Radzen.Blazor
                 {
                     Value.Where(v => v != null).ToList().ForEach(v => selectedItems.Add(v, true));
                 }
+            }
+
+            if (emptyTextChanged)
+            {
+                await ChangeState();
             }
 
             if (visibleChanged && !firstRender)
