@@ -60,6 +60,13 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<string> Change { get; set; }
 
+        /// <summary>
+        /// Gets or sets the icon displayed while recording.
+        /// </summary>
+        /// <value>The icon.</value>
+        [Parameter]
+        public string Language { get; set; }
+
         private bool recording;
 
         /// <inheritdoc />
@@ -78,7 +85,7 @@ namespace Radzen.Blazor
         {
             recording = !recording;
 
-            await JSRuntime.InvokeVoidAsync("Radzen.toggleDictation", Reference);
+            await JSRuntime.InvokeVoidAsync("Radzen.toggleDictation", Reference, Language);
         }
 
         /// <summary>
