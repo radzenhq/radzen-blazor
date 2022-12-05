@@ -1736,6 +1736,7 @@ namespace Radzen.Blazor
             if (emptyTextChanged)
             {
                 await ChangeState();
+                return;
             }
 
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
