@@ -13,17 +13,15 @@ namespace Radzen.Blazor.Tests
         {
             public string PROPERTY { get; set; }
             public string Property { get; set; }
-
-            public Guid Guid { get; set; }
         }
 
         [Fact]
-        public void Getter_With_Member_Named_As_A_Builtin_Type()
+        public void Getter_With_DifferentTargetType()
         {
-            var o = new TestData { Guid = Guid.Empty };
-            var getter = PropertyAccess.Getter<TestData, Guid>(nameof(TestData.Guid));
+            var o = new TestData { Property = "test" };
+            var getter = PropertyAccess.Getter<object, object>(nameof(TestData.Property), typeof(TestData));
             var value = getter(o);
-            Assert.Equal(o.Guid, value);
+            Assert.Equal(o.Property, value);
         }
 
         [Fact]
