@@ -973,7 +973,7 @@ window.Radzen = {
                     }
                 } else {
                     var focusable = [...lastDialog.querySelectorAll('a, button, input, textarea, select, details, iframe, embed, object, summary dialog, audio[controls], video[controls], [contenteditable], [tabindex]')]
-                        .filter(el => el.tabIndex > -1 && !el.hasAttribute('disabled') && !el.hasAttribute('hidden') && el.computedStyleMap().get('display').value !== 'none');
+                        .filter(el => el && el.tabIndex > -1 && !el.hasAttribute('disabled') && !el.hasAttribute('hidden') && el.computedStyleMap && el.computedStyleMap().get('display').value !== 'none');
                     var firstFocusable = focusable[0];
                     if (firstFocusable) {
                         firstFocusable.focus();
