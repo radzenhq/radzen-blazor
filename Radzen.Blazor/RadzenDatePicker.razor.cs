@@ -564,6 +564,9 @@ namespace Radzen.Blazor
 
         async Task Clear()
         {
+            if (Disabled || ReadOnly)
+                return;
+
             Value = null;
 
             await ValueChanged.InvokeAsync(default(TValue));
