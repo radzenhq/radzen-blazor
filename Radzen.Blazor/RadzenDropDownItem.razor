@@ -7,7 +7,7 @@
 @if (DropDown.Multiple)
 {
     <li class="@GetComponentCssClass("rz-multiselect")"
-        aria-label="@DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)" style="display: block;white-space: nowrap;"
+        aria-label="@DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
     @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
         @onclick:preventDefault @onclick="args=>SelectItem(args,true)">
         <div class="rz-chkbox ">
