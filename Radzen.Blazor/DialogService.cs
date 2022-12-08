@@ -80,6 +80,11 @@ namespace Radzen
             {
                 Close();
             }
+
+            if (_sideDialogTask?.Task.IsCompleted == false)
+            {
+                CloseSide();
+            }
         }
 
         /// <summary>
@@ -96,6 +101,16 @@ namespace Radzen
         /// Occurs when a new dialog is open.
         /// </summary>
         public event Action<string, Type, Dictionary<string, object>, DialogOptions> OnOpen;
+
+        /// <summary>
+        /// Raises the Close event for the side dialog
+        /// </summary>
+        public event Action<dynamic> OnSideClose;
+
+        /// <summary>
+        /// Raises the Open event for the side dialog
+        /// </summary>
+        public event Action<Type, Dictionary<string, object>, SideDialogOptions> OnSideOpen;
 
         /// <summary>
         /// Opens a dialog with the specified arguments.
@@ -121,6 +136,7 @@ namespace Radzen
         /// The tasks
         /// </summary>
         protected List<TaskCompletionSource<dynamic>> tasks = new List<TaskCompletionSource<dynamic>>();
+        private TaskCompletionSource<dynamic> _sideDialogTask;
 
         /// <summary>
         /// Opens a dialog with the specified arguments.
@@ -138,6 +154,42 @@ namespace Radzen
             OpenDialog<T>(title, parameters, options);
 
             return task.Task;
+        }
+
+        /// <summary>
+        /// Opens a side dialog with the specified arguments
+        /// </summary>
+        /// <typeparam name="T">The type of Blazor component which will be displayed in the side dialog.</typeparam>
+        /// <param name="title">The text displayed in the title bar of the side dialog.</param>
+        /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T"/></param>
+        /// <param name="options">The side dialog options.</param>
+        /// <returns>A task that completes when the dialog is closed or a new one opened</returns>
+        public Task<dynamic> OpenSideAsync<T>(string title, Dictionary<string, object> parameters = null, SideDialogOptions options = null)
+            where T : ComponentBase
+        {
+            CloseSide();
+            _sideDialogTask = new TaskCompletionSource<dynamic>();
+            if (options == null)
+            {
+                options = new SideDialogOptions();
+            }
+
+            options.Title = title;
+            OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object>(), options);
+            return _sideDialogTask.Task;
+        }
+
+        /// <summary>
+        /// Closes the side dialog
+        /// </summary>
+        /// <param name="result">The result of the Dialog</param>
+        public void CloseSide(dynamic result = null)
+        {
+            if (_sideDialogTask?.Task.IsCompleted == false)
+            {
+                _sideDialogTask.TrySetResult(result);
+                OnSideClose?.Invoke(result);
+            }
         }
 
         /// <summary>
@@ -348,9 +400,9 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Class DialogOptions.
+    /// Base Class for dialog options
     /// </summary>
-    public class DialogOptions
+    public abstract class DialogOptionsBase
     {
         /// <summary>
         /// Gets or sets a value indicating whether to show the title bar. Set to <c>true</c> by default.
@@ -363,7 +415,45 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> if the close button is shown; otherwise, <c>false</c>.</value>
         public bool ShowClose { get; set; } = true;
+        /// <summary>
+        /// Gets or sets the width of the dialog.
+        /// </summary>
+        /// <value>The width.</value>
+        public string Width { get; set; }
+        /// <summary>
+        /// Gets or sets the CSS style of the dialog
+        /// </summary>
+        /// <value>The style.</value>
+        public string Style { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the dialog should be closed by clicking the overlay.
+        /// </summary>
+        /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
+        public bool CloseDialogOnOverlayClick { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets dialog box custom class
+        /// </summary>
+        public string CssClass { get; set; }
+    }
+
+    /// <summary>
+    /// Class SideDialogOptions
+    /// </summary>
+    public class SideDialogOptions : DialogOptionsBase
+    {
+        /// <summary>
+        /// The title displayed on the dialog.
+        /// </summary>
+        public string Title { get; set; }
+    }
+
+    /// <summary>
+    /// Class DialogOptions.
+    /// </summary>
+    public class DialogOptions : DialogOptionsBase
+    {
         /// <summary>
         /// Gets or sets a value indicating whether the dialog is resizable. Set to <c>false</c> by default.
         /// </summary>
@@ -390,20 +480,10 @@ namespace Radzen
         /// <value>The bottom.</value>
         public string Bottom { get; set; }
         /// <summary>
-        /// Gets or sets the width of the dialog.
-        /// </summary>
-        /// <value>The width.</value>
-        public string Width { get; set; }
-        /// <summary>
         /// Gets or sets the height of the dialog.
         /// </summary>
         /// <value>The height.</value>
         public string Height { get; set; }
-        /// <summary>
-        /// Gets or sets the CSS style of the dialog
-        /// </summary>
-        /// <value>The style.</value>
-        public string Style { get; set; }
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
@@ -413,23 +493,11 @@ namespace Radzen
         /// Gets or sets a value indicating whether to focus the first focusable HTML element. Set to <c>true</c> by default.
         /// </summary>
         public bool AutoFocusFirstElement { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the dialog should be closed by clicking the overlay.
-        /// </summary>
-        /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
-        public bool CloseDialogOnOverlayClick { get; set; } = false;
-
         /// <summary>
         /// Gets or sets a value indicating whether the dialog should be closed on ESC key press.
         /// </summary>
         /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
         public bool CloseDialogOnEsc { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets dialog box custom class
-        /// </summary>
-        public string CssClass { get; set; }
     }
 
     /// <summary>

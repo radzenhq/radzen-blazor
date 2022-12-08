@@ -15,6 +15,8 @@ $dialog-close-vertical-align: middle !default;
 $dialog-content-padding: 1.25rem !default;
 $dialog-mask-background-color: var(--rz-base-800) !default;
 $dialog-border-radius: var(--rz-border-radius) !default;
+$dialog-mask-zindex: 1000 !default;
+$dialog-zindex: 1001 !default;
 
 // Dialog CSS variables
 
@@ -36,6 +38,8 @@ $dialog-border-radius: var(--rz-border-radius) !default;
   --rz-dialog-content-padding: #{$dialog-content-padding};
   --rz-dialog-mask-background-color: #{$dialog-mask-background-color};
   --rz-dialog-border-radius: #{$dialog-border-radius};
+  --rz-dialog-mask-zindex: #{$dialog-mask-zindex};
+  --rz-dialog-zindex: #{$dialog-zindex};
 }
 
 .rz-dialog-wrapper {
@@ -45,7 +49,7 @@ $dialog-border-radius: var(--rz-border-radius) !default;
   height: 100%;
   top: 0;
   bottom: 0;
-  z-index: 1001;
+  z-index: var(--rz-dialog-zindex);
   align-items: center;
   justify-content: center;
 }
@@ -58,7 +62,7 @@ $dialog-border-radius: var(--rz-border-radius) !default;
   min-width: 150px;
   max-height: 100%;
   min-height: 150px;
-  z-index: 1001;
+  z-index: var(--rz-dialog-zindex);
   opacity: 1;
   background-color: var(--rz-dialog-background-color);
   box-shadow: var(--rz-dialog-shadow);
@@ -135,7 +139,7 @@ $dialog-border-radius: var(--rz-border-radius) !default;
 
 .rz-dialog-mask {
   position: fixed;
-  z-index: 1000;
+  z-index: var(--rz-dialog-mask-zindex);
   width: 100%;
   height: 100%;
   top: 0;
@@ -171,4 +175,55 @@ $dialog-border-radius: var(--rz-border-radius) !default;
   .no-scroll {
     padding-right: 0;
   }
+}
+
+.rz-dialog-side {
+  position: absolute;
+  right: 0;
+  min-width: 150px;
+  width: 400px;
+  height: 100%;
+  z-index: var(--rz-dialog-zindex);
+  opacity: 1;
+  background-color: var(--rz-dialog-background-color);
+  box-shadow: var(--rz-dialog-shadow);
+  border-radius: var(--rz-dialog-border-radius);
+}
+
+.rz-dialog-side-titlebar {
+  background-color: var(--rz-dialog-title-background-color);
+  padding: var(--rz-dialog-title-padding);
+  font-size: var(--rz-dialog-title-font-size);
+  line-height: var(--rz-dialog-title-line-height);
+  border-bottom: var(--rz-dialog-title-border);
+}
+
+.rz-dialog-side-title {
+  font-weight: var(--rz-dialog-title-font-weight);
+  letter-spacing: var(--rz-dialog-title-letter-spacing);
+  color: var(--rz-dialog-title-color);
+}
+
+.rz-dialog-side-titlebar-close {
+  float: right;
+
+  .rzi-times {
+    font-size: var(--rz-dialog-close-font-size);
+    color: var(--rz-dialog-close-color);
+    vertical-align: var(--rz-dialog-close-vertical-align);
+
+    &:before {
+      content: 'close';
+    }
+  }
+
+  &:hover .rzi-times {
+    color: var(--rz-dialog-close-hover-color);
+  }
+}
+
+.rz-dialog-side-content {
+  flex: 0 1 auto;
+  padding: var(--rz-dialog-content-padding);
+  overflow: auto;
 }
