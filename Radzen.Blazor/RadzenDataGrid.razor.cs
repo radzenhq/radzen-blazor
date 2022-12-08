@@ -66,7 +66,7 @@ namespace Radzen.Blazor
             
             var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
 
-            virtualDataItems = (LoadData.HasDelegate ? Data : itemToInsert != null ? (new[] { itemToInsert }).Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top)).ToList();
+            virtualDataItems = (LoadData.HasDelegate ? Data : itemToInsert != null ? (new[] { itemToInsert }).Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top))?.ToList();
 
             return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(virtualDataItems, totalItemsCount);
         }
@@ -2365,7 +2365,14 @@ namespace Radzen.Blazor
                 Data = null;
             }
 
-            InvokeAsync(Reload);
+            if (IsVirtualizationAllowed() && LoadData.HasDelegate)
+            {
+                Debounce(() => InvokeAsync(Reload), 500);
+            }
+            else
+            {
+                InvokeAsync(Reload);
+            }
         }
 
         /// <summary>
