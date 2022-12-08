@@ -1009,7 +1009,7 @@ namespace Radzen
                 selectedItem = item;
                 if (!string.IsNullOrEmpty(ValueProperty))
                 {
-                    internalValue = GetItemOrValueFromProperty(item, ValueProperty);
+                    internalValue = PropertyAccess.GetItemOrValueFromProperty(item, ValueProperty);
                 }
                 else
                 {

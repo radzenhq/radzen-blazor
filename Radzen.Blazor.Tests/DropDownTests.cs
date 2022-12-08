@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Bunit;
 using Xunit;
 
@@ -36,6 +37,23 @@ namespace Radzen.Blazor.Tests
             });
 
             return component;
+        }
+
+        [Fact]
+        public async Task Dropdown_SelectItem_Method_Should_Not_Throw()
+        {
+            using var ctx = new TestContext();
+
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx);
+
+            var items = component.FindAll(".rz-dropdown-item");
+
+            Assert.Equal(2, items.Count);
+
+            //this throws
+            await component.InvokeAsync(async () => await component.Instance.SelectItem(1));
         }
 
         [Fact]
