@@ -901,7 +901,9 @@ window.Radzen = {
         Radzen.activeElement && document.activeElement &&
             (document.activeElement.classList.contains('rz-dropdown-filter') || document.activeElement.classList.contains('rz-lookup-search-input'))) {
         setTimeout(function () {
-            Radzen.activeElement.focus();
+            if (Radzen.activeElement) {
+               Radzen.activeElement.focus();
+            }
             Radzen.activeElement = null;
         }, 100);
     }
@@ -1229,7 +1231,7 @@ window.Radzen = {
     }
   },
   execCommand: function (ref, name, value) {
-    if (document.activeElement != ref) {
+    if (document.activeElement != ref && ref) {
       ref.focus();
     }
     document.execCommand(name, false, value);
@@ -1339,7 +1341,9 @@ window.Radzen = {
     var range = ref.range;
     if (range) {
       delete ref.range;
-      ref.focus();
+      if(ref) {
+          ref.focus();
+      }
       var selection = getSelection();
       selection.removeAllRanges();
       selection.addRange(range);
