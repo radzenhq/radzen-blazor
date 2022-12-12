@@ -2510,6 +2510,7 @@ namespace Radzen.Blazor
                         FilterOperator = c.GetFilterOperator(),
                         SecondFilterValue = c.GetSecondFilterValue(),
                         SecondFilterOperator = c.GetSecondFilterOperator(),
+                        LogicalFilterOperator = c.GetLogicalFilterOperator()
                     }).ToList(),
                     CurrentPage = CurrentPage,
                     PageSize = PageSize,
@@ -2586,6 +2587,18 @@ namespace Radzen.Blazor
                             if (!object.Equals(gridColumn.GetSecondFilterValue(), GetFilterValue(column.SecondFilterValue, gridColumn.FilterPropertyType)))
                             {
                                 gridColumn.SetFilterValue(GetFilterValue(column.SecondFilterValue, gridColumn.FilterPropertyType), false);
+                                shouldUpdateState = true;
+                            }
+
+                            if (gridColumn.GetSecondFilterOperator() != column.SecondFilterOperator)
+                            {
+                                gridColumn.SetSecondFilterOperator(column.SecondFilterOperator);
+                                shouldUpdateState = true;
+                            }
+
+                            if (gridColumn.GetLogicalFilterOperator() != column.LogicalFilterOperator)
+                            {
+                                gridColumn.SetLogicalFilterOperator(column.LogicalFilterOperator);
                                 shouldUpdateState = true;
                             }
                         }
