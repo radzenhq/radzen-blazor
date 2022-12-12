@@ -447,6 +447,31 @@ namespace Radzen
         /// The title displayed on the dialog.
         /// </summary>
         public string Title { get; set; }
+
+        /// <summary>
+        /// The Position on which the dialog will be positioned
+        /// </summary>
+        public DialogPosition Position { get; set; } = DialogPosition.Right;
+
+        /// <summary>
+        /// Whether to show a mask on the background or not
+        /// </summary>
+        public bool ShowMask { get; set; } = true;
+    }
+
+    /// <summary>
+    /// DialogPosition enum
+    /// </summary>
+    public enum DialogPosition
+    {
+        /// <summary>
+        /// Dialog will be positioned on the right side
+        /// </summary>
+        Right,
+        /// <summary>
+        /// Dialog will be positioned on the left side
+        /// </summary>
+        Left
     }
 
     /// <summary>

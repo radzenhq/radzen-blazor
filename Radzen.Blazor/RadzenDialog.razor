@@ -11,7 +11,7 @@
 @if (isSideDialogOpen)
 {
     <aside
-        class="@($"rz-dialog-side {sideDialogOptions.CssClass}")"
+        class="@GetSideDialogCssClass()"
         tabindex="@(isSideDialogOpen ? "0" : "-1")"
         style="@($"{sideDialogOptions.Style}{(sideDialogOptions.Width != null ? " width: {sideDialogOptions.Witdth}" : "")}")"
         aria-labelledby="rz-dialog-side-label"
@@ -32,7 +32,7 @@
             @sideDialogContent
         </div>
     </aside>
-    @if (dialogs.Count == 0)
+    @if (dialogs.Count == 0 && sideDialogOptions.ShowMask)
     {
         @if (sideDialogOptions.CloseDialogOnOverlayClick)
         {
@@ -124,5 +124,10 @@
     void OnClose(dynamic result)
     {
         Close(result).ConfigureAwait(false);
+    }
+
+    string GetSideDialogCssClass()
+    {
+        return $"rz-dialog-side rz-dialog-side-position-{sideDialogOptions.Position.ToString().ToLower()} {sideDialogOptions.CssClass}";
     }
 }

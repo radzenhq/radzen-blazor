@@ -55,12 +55,18 @@
                 <RadzenButton Text="Dialog on Side" Style="width: 100%" ButtonStyle="ButtonStyle.Secondary" Click="@(async args => await DialogService.OpenSideAsync<DialogSideContent>("Side Panel"))" />
             </RadzenCard>
         </div>
-            <div class="col-md-4 p-3">
-                <RadzenCard>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Side Dialog closes on Mask Click</RadzenText>
-                    <RadzenButton Text="Dialog on Side" Style="width: 100%" ButtonStyle="ButtonStyle.Secondary" Click="@(async args => await DialogService.OpenSideAsync<DialogSideContent>("Side Panel", options: new SideDialogOptions { CloseDialogOnOverlayClick = true }))" />
-                </RadzenCard>
-            </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Side Dialog closes on Mask Click</RadzenText>
+                <RadzenButton Text="Dialog on Side" Style="width: 100%" ButtonStyle="ButtonStyle.Secondary" Click="@(async args => await DialogService.OpenSideAsync<DialogSideContent>("Side Panel", options: new SideDialogOptions { CloseDialogOnOverlayClick = true }))" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Side Dialog on the left without Mask</RadzenText>
+                <RadzenButton Text="Dialog on Side" Style="width: 100%" ButtonStyle="ButtonStyle.Secondary" Click="@(async args => await DialogService.OpenSideAsync<DialogSideContent>("Side Panel", options: new SideDialogOptions { CloseDialogOnOverlayClick = false, Position = DialogPosition.Left, ShowMask = false }))" />
+            </RadzenCard>
+        </div>
     </div>
 </div>
 </RadzenExample>
