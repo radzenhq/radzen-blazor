@@ -1213,6 +1213,60 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<DataGridColumnReorderedEventArgs<TItem>> ColumnReordered { get; set; }
 
+        IQueryable<TItem> GetSelfRefView(IQueryable<TItem> view, string orderBy)
+        {
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                if (typeof(TItem) == typeof(object))
+                {
+                    var firstItem = view.FirstOrDefault();
+                    if (firstItem != null)
+                    {
+                        view = view.Cast(firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
+                    }
+                }
+                else
+                {
+                    view = view.OrderBy(orderBy);
+                }
+            }
+
+            var viewList = view.ToList();
+            var countWithChildren = viewList.Count + childData.SelectMany(d => d.Value.Data).Count();
+
+            for (int i = 0; i < countWithChildren; i++)
+            {
+                var item = viewList.ElementAtOrDefault(i);
+
+                if (item != null && childData.ContainsKey(item))
+                {
+                    var level = 1;
+                    var parentChildData = childData[item].ParentChildData;
+                    while (parentChildData != null)
+                    {
+                        parentChildData = parentChildData.ParentChildData;
+                        level++;
+                    }
+
+                    childData[item].Level = level;
+
+                    var cd = childData[item].Data.AsQueryable();
+                    if (!string.IsNullOrEmpty(orderBy))
+                    {
+                        cd = cd.OrderBy(orderBy);
+                    }
+
+                    viewList.InsertRange(viewList.IndexOf(item) + 1, cd);
+                }
+            }
+
+            view = viewList.AsQueryable()
+                .Where(i => childData.ContainsKey(i) && childData[i].Data.AsQueryable().Where<TItem>(allColumns).Any()
+                    || viewList.AsQueryable().Where<TItem>(allColumns).Contains(i));
+
+            return view;
+        }
+
         /// <summary>
         /// Gets the view - Data with sorting, filtering and paging applied.
         /// </summary>
@@ -1221,66 +1275,26 @@ namespace Radzen.Blazor
         {
             get
             {
-                if(LoadData.HasDelegate)
+                var orderBy = GetOrderBy();
+
+                if (LoadData.HasDelegate)
                 {
-                    return base.View;
+                    if (childData.Any())
+                    {
+                        return GetSelfRefView(base.View, orderBy);
+
+                    }
+                    else
+                    {
+                        return base.View;
+                    }
                 }
 
                 IQueryable<TItem> view;
-                var orderBy = GetOrderBy();
 
                 if (childData.Any())
                 {
-                    view = base.View;//.Where<TItem>(allColumns);
-
-                    if (!string.IsNullOrEmpty(orderBy))
-                    {
-                        if (typeof(TItem) == typeof(object))
-                        {
-                            var firstItem = view.FirstOrDefault();
-                            if (firstItem != null)
-                            {
-                                view = view.Cast(firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
-                            }
-                        }
-                        else
-                        {
-                            view = view.OrderBy(orderBy);
-                        }
-                    }
-
-                    var viewList = view.ToList();
-                    var countWithChildren = viewList.Count + childData.SelectMany(d => d.Value.Data).Count();
-
-                    for (int i = 0; i < countWithChildren; i++)
-                    {
-                        var item = viewList.ElementAtOrDefault(i);
-
-                        if (item != null && childData.ContainsKey(item))
-                        {
-                            var level = 1;
-                            var parentChildData = childData[item].ParentChildData;
-                            while (parentChildData != null)
-                            {
-                                parentChildData = parentChildData.ParentChildData;
-                                level++;
-                            }
-
-                            childData[item].Level = level;
-
-                            var cd = childData[item].Data.AsQueryable();
-                            if (!string.IsNullOrEmpty(orderBy))
-                            {
-                                cd = cd.OrderBy(orderBy);
-                            }
-
-                            viewList.InsertRange(viewList.IndexOf(item) + 1, cd);
-                        }
-                    }
-
-                    view = viewList.AsQueryable()
-                        .Where(i => childData.ContainsKey(i) && childData[i].Data.AsQueryable().Where<TItem>(allColumns).Any()
-                            || viewList.AsQueryable().Where<TItem>(allColumns).Contains(i));
+                    view = GetSelfRefView(base.View, orderBy);
                 }
                 else
                 {
