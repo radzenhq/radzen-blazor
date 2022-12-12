@@ -38,10 +38,13 @@
                 @donut.RenderTitle(MarginLeft, MarginTop)
             }
         }
-    @if (tooltip != null)
-    {
-        @tooltip
-    }
+        <ChartTooltipContainer @ref="@chartTooltipContainer">
+            @if (tooltip != null)
+            {
+                @tooltip
+            }
+        </ChartTooltipContainer>
+        
     </CascadingValue>
 }
 </div>
