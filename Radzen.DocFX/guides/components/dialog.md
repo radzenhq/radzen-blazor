@@ -94,3 +94,29 @@ async Task BusyDialog()
     </div>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });
 }
 ```
+
+# Show side dialog
+
+The `DialogService` offers the possibility to open a dialog on the side, instead of the screen center.
+
+```
+@inject DialogService DialogService
+
+<RadzenButton Text="Show side dialog" Click=@ShowDialog />
+
+@code {
+    async Task ShowInlineDialog()
+    {
+     var result = await DialogService.OpenSideAsync<DialogCardPage>("Side Dialog", new SideDialogOptions
+     {
+        Position = DialogPosition.Right
+     });
+    
+      Console.WriteLine($"Dialog result: {result}");
+    }
+}
+```
+
+The `SideDialogOptions` class can be used to modify the dialog behavior, by e.g. settings the render position to the left or right side of the screen. The Sie Dialog can be positioned on each side of the screen by setting the `SideDialogOptions.Position` property when opening.
+
+In opposite to the default dialog there can only be one side dialog open at the same time. Opening a second side dialog will close the first opened dialog with a null result!

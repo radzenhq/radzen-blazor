@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;

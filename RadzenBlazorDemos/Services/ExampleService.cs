@@ -665,7 +665,8 @@ namespace RadzenBlazorDemos
                     Title = "Blazor Dialog component",
                     Path = "dialog",
                     Icon = "&#xe8a7",
-                    Tags = new [] { "popup", "window" }
+                    Tags = new [] { "popup", "window" },
+                    Updated = true
                 },
                 new Example()
                 {

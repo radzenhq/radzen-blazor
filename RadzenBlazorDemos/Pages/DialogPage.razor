@@ -2,7 +2,7 @@
 @inject DialogService DialogService
 @implements IDisposable
 
-<RadzenExample Name="Dialog" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/DialogService.cs" AdditionalSourceCodePages=@(new [] { "DialogCardPage.razor" })>
+<RadzenExample Name="Dialog" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/DialogService.cs" AdditionalSourceCodePages=@(new [] { "DialogCardPage.razor", "DialogSideContent.razor" })>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-4 p-3">
@@ -48,6 +48,43 @@
             </RadzenCard>
         </div>
     </div>
+
+
+    <div class="row">
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Side Dialog</RadzenText>
+                <RadzenButton Text="Dialog on Side" Style="width: 100%" ButtonStyle="ButtonStyle.Secondary" Click="@(async args => await DialogService.OpenSideAsync<DialogSideContent>("Side Panel"))" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Side Dialog closes on Mask Click</RadzenText>
+                <RadzenButton Text="Dialog on Side" Style="width: 100%" ButtonStyle="ButtonStyle.Secondary" Click="@(async args => await DialogService.OpenSideAsync<DialogSideContent>("Side Panel", options: new SideDialogOptions { CloseDialogOnOverlayClick = true }))" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Side Dialog on the left without Mask</RadzenText>
+                <RadzenButton Text="Dialog on Left Side" Style="width: 100%" ButtonStyle="ButtonStyle.Secondary" Click="@(async args => await DialogService.OpenSideAsync<DialogSideContent>("Side Panel", options: new SideDialogOptions { CloseDialogOnOverlayClick = false, Position = DialogPosition.Left, ShowMask = false }))" />
+            </RadzenCard>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 p-3">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Side Dialog with position Bottom</RadzenText>
+                    <RadzenButton Text="Dialog on Bottom" Style="width: 100%" ButtonStyle="ButtonStyle.Secondary" Click="@(async args => await DialogService.OpenSideAsync<DialogSideContent>("Side Panel", options: new SideDialogOptions { Position = DialogPosition.Bottom, ShowMask = false }))" />
+                </RadzenCard>
+        </div>
+            <div class="col-md-4 p-3">
+                <RadzenCard>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Side Dialog with position Top</RadzenText>
+                    <RadzenButton Text="Dialog on Top" Style="width: 100%" ButtonStyle="ButtonStyle.Secondary" Click="@(async args => await DialogService.OpenSideAsync<DialogSideContent>("Side Panel", options: new SideDialogOptions { Position = DialogPosition.Top, ShowMask = false, Height = "30%" }))" />
+                </RadzenCard>
+            </div>
+    </div>
+
 </div>
 </RadzenExample>
 
