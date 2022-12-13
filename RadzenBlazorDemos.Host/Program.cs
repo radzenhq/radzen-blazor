@@ -38,6 +38,7 @@ builder.Services.AddScoped<ContextMenuService>();
 
 // Demo services
 builder.Services.AddScoped<ThemeService>();
+builder.Services.AddScoped<CompilerService>();
 builder.Services.AddScoped<ExampleService>();
 
 builder.Services.AddDbContextFactory<NorthwindContext>();

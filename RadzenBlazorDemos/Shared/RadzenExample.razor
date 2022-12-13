@@ -28,13 +28,13 @@
     <a target="blank" href="@ComponentSourceHref" title=@($"View {Name} source code in new tab") ><RadzenIcon Icon="launch" style="font-size: 1rem; margin-right: 4px;" /> @Name Source</a>
 }
 </div>
-<RadzenTabs>
+<RadzenTabs @bind-SelectedIndex="@selectedIndex">
     <Tabs>
         <RadzenTabsItem Text="Example" Icon="apps">
-            @ChildContent
+            @(dynamicContent ?? ChildContent)
         </RadzenTabsItem>
         <RadzenTabsItem Text="Source" Icon="code">
-            <CodeViewer PageName="@($"{Name}Page.razor")" />
+            <CodeViewer PageName="@($"{Name}Page.razor")" Compiled="OnCompiled" />
         </RadzenTabsItem>
         @foreach (var p in AdditionalSourceCodePages)
         {
@@ -46,6 +46,17 @@
 </RadzenTabs>
 
 @code {
+
+    private int selectedIndex = 0;
+}
+
+@code {
+
+    private RenderFragment dynamicContent;
+}
+
+@code {
+
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
@@ -90,6 +101,17 @@
         {
             await JSRuntime.InvokeVoidAsync("eval", $"console.log('Page {Name} render time is {(DateTime.Now - start).TotalMilliseconds} ms')");
         }
+    }
+
+    void OnCompiled(Type type)
+    {
+        dynamicContent = builder =>
+        {
+            builder.OpenComponent(0, type);
+            builder.CloseComponent();
+        };
+
+        selectedIndex = 0;
     }
 
     public void Dispose()

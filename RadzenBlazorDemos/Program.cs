@@ -15,6 +15,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddDbContextFactory<NorthwindContext>();
 
 builder.Services.AddScoped<ThemeService>();
+builder.Services.AddScoped<CompilerService>();
 builder.Services.AddScoped<ExampleService>();
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
