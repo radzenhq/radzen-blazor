@@ -221,7 +221,10 @@ namespace Radzen.Blazor
                 valueStr = value.ToString();
             }
 
-            valueStr = valueStr.Replace(Format.Replace("#", "").Trim(), "");
+            if (Format != null)
+            {
+                valueStr = valueStr.Replace(Format.Replace("#", "").Trim(), "");
+            }
 
             return new string(valueStr.Where(c => char.IsDigit(c) || char.IsPunctuation(c)).ToArray()).Replace("%", "");
         }
