@@ -1,7 +1,10 @@
 @inject NavigationManager NavigationManager
 @inject ThemeService ThemeService
 
+@if (ThemeService.CurrentTheme != null && ThemeService.CurrentTheme != ThemeService.DefaultTheme)
+{
 <link href="@Href" rel="stylesheet" />
+}
 
 @code {
     bool IsPremiumTheme => ThemeService.CurrentTheme == "fluent" || ThemeService.CurrentTheme == "material-dark";
@@ -10,6 +13,8 @@
 
     protected override void OnInitialized()
     {
+#if !RADZEN
         ThemeService.Initialize(NavigationManager);
+#endif
     }
 }

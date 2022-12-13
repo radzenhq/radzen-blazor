@@ -207,12 +207,7 @@ namespace Radzen.Blazor
             ValueScale.Fit(ValueAxis.TickDistance);
             CategoryScale.Fit(CategoryAxis.TickDistance);
 
-            var stateHasChanged = false;
-
-            if (!ValueScale.IsEqualTo(valueScale))
-            {
-                stateHasChanged = true;
-            }
+            var stateHasChanged = !ValueScale.IsEqualTo(valueScale);
 
             if (!CategoryScale.IsEqualTo(categoryScale))
             {
@@ -254,6 +249,7 @@ namespace Radzen.Blazor
             }
         }
 
+        ChartTooltipContainer chartTooltipContainer;
         RenderFragment tooltip;
         object tooltipData;
         double mouseX;
@@ -313,7 +309,7 @@ namespace Radzen.Blazor
                             {
                                 tooltipData = null;
                                 tooltip = overlay.RenderTooltip(mouseX, mouseY, MarginLeft, MarginTop);
-                                StateHasChanged();
+                                chartTooltipContainer.Refresh();
                                 await Task.Yield();
                                 
                                 return;
@@ -328,7 +324,7 @@ namespace Radzen.Blazor
                             {
                                 tooltipData = data;
                                 tooltip = series.RenderTooltip(data, MarginLeft, MarginTop);
-                                StateHasChanged();
+                                chartTooltipContainer.Refresh();
                                 await Task.Yield();
                             }
 
@@ -342,7 +338,7 @@ namespace Radzen.Blazor
                     tooltipData = null;
                     tooltip = null;
 
-                    StateHasChanged();
+                    chartTooltipContainer.Refresh();
                     await Task.Yield();
                 }
             }

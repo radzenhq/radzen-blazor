@@ -467,7 +467,7 @@ namespace Radzen.Blazor
                 builder.AddAttribute(1, nameof(ChartTooltip.X), x + marginLeft);
                 builder.AddAttribute(2, nameof(ChartTooltip.Y), y + marginTop);
 
-                builder.AddAttribute(3, nameof(ChartTooltip.ChildContent), TooltipTemplate == null ? null : TooltipTemplate(item));
+                builder.AddAttribute(3, nameof(ChartTooltip.ChildContent), TooltipTemplate?.Invoke(item));
 
                 builder.AddAttribute(4, nameof(ChartTooltip.Title), TooltipTitle(item));
                 builder.AddAttribute(5, nameof(ChartTooltip.Label), TooltipLabel(item));

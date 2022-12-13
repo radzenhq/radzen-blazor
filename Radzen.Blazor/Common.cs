@@ -81,6 +81,11 @@ namespace Radzen
         /// SecondFilterOperator.
         /// </summary>
         public FilterOperator SecondFilterOperator { get; set; }
+
+        /// <summary>
+        /// LogicalFilterOperator.
+        /// </summary>
+        public LogicalFilterOperator LogicalFilterOperator { get; set; }
     }
 #if NET7_0_OR_GREATER
 #else
