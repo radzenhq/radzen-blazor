@@ -421,6 +421,11 @@ namespace Radzen
         /// <value>The width.</value>
         public string Width { get; set; }
         /// <summary>
+        /// Gets or sets the height of the dialog.
+        /// </summary>
+        /// <value>The height.</value>
+        public string Height { get; set; }
+        /// <summary>
         /// Gets or sets the CSS style of the dialog
         /// </summary>
         /// <value>The style.</value>
@@ -471,7 +476,15 @@ namespace Radzen
         /// <summary>
         /// Dialog will be positioned on the left side
         /// </summary>
-        Left
+        Left,
+        /// <summary>
+        /// Dialog will be positioned on the top of the page
+        /// </summary>
+        Top,
+        /// <summary>
+        /// Dialog will be positioned at the bottom of the page
+        /// </summary>
+        Bottom
     }
 
     /// <summary>
@@ -504,11 +517,6 @@ namespace Radzen
         /// </summary>
         /// <value>The bottom.</value>
         public string Bottom { get; set; }
-        /// <summary>
-        /// Gets or sets the height of the dialog.
-        /// </summary>
-        /// <value>The height.</value>
-        public string Height { get; set; }
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>

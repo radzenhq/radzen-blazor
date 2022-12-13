@@ -13,7 +13,7 @@
     <aside
         class="@GetSideDialogCssClass()"
         tabindex="@(isSideDialogOpen ? "0" : "-1")"
-        style="@($"{sideDialogOptions.Style}{(sideDialogOptions.Width != null ? " width: {sideDialogOptions.Witdth}" : "")}")"
+        style="@GetSideDialogStyle()"
         aria-labelledby="rz-dialog-side-label"
         >
         @if (sideDialogOptions.ShowTitle)
@@ -129,5 +129,10 @@
     string GetSideDialogCssClass()
     {
         return $"rz-dialog-side rz-dialog-side-position-{sideDialogOptions.Position.ToString().ToLower()} {sideDialogOptions.CssClass}";
+    }
+
+    string GetSideDialogStyle()
+    {
+        return $"{sideDialogOptions.Style}{(sideDialogOptions.Width != null ? $" width: {sideDialogOptions.Width}" : "")}{(sideDialogOptions.Height != null ? $" height: {sideDialogOptions.Height}" : "")}";
     }
 }
