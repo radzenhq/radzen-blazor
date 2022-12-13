@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Radzen;
 using RadzenBlazorDemos;
 using RadzenBlazorDemos.Data;
@@ -10,6 +12,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddSingleton(sp =>
+{
+    // Get the address that the app is currently running at
+    var server = sp.GetRequiredService<IServer>();
+    var addressFeature = server.Features.Get<IServerAddressesFeature>();
+    string baseAddress = addressFeature.Addresses.First();
+    return new HttpClient { BaseAddress = new Uri(baseAddress) };
+});
 
 // Add Radzen.Blazor services
 builder.Services.AddScoped<DialogService>();
@@ -19,6 +29,7 @@ builder.Services.AddScoped<ContextMenuService>();
 
 // Demo services
 builder.Services.AddScoped<ThemeService>();
+builder.Services.AddScoped<CompilerService>();
 builder.Services.AddScoped<ExampleService>();
 
 builder.Services.AddDbContextFactory<NorthwindContext>();

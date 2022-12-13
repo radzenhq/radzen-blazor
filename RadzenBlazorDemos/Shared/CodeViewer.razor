@@ -1,11 +1,17 @@
 @using System.Text.RegularExpressions;
 @inject IJSRuntime JSRuntime
+@inject CompilerService Compiler
 
-<pre style="min-height: 500px; overflow: auto; font-size: 12px" @ref="pre">@source</pre>
+<RadzenTextArea @bind-Value="source" style="min-height: 500px; overflow: auto; font-size: 12px; width: 100%" />
+
+<RadzenButton Click="Run" />
 
 @code {
     private ElementReference pre;
     private string source;
+
+    [Parameter]
+    public EventCallback<Type> Compiled { get; set; }
 
     [Parameter]
     public string PageName { get; set; }
@@ -18,11 +24,18 @@
         source = Regex.Replace(source, "</?RadzenExample[^>]*>\n", "");
     }
 
+    private async Task Run()
+    {
+        var type = await Compiler.CompileAsync(source);
+
+        await Compiled.InvokeAsync(type);
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!String.IsNullOrEmpty(source))
         {
-            await JSRuntime.InvokeAsync<object>("hljs.highlightBlock", pre);
+            //await JSRuntime.InvokeAsync<object>("hljs.highlightBlock", pre);
         }
     }
 }
