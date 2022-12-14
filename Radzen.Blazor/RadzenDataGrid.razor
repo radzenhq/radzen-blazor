@@ -89,7 +89,7 @@
                             <span class="rz-column-title"></span>
                         </th>
                     }
-                    @if (Template != null && ShowExpandColumn)
+                    @if (Template != null && ShowExpandColumn && i == 0)
                     {
                         <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                             <span class="rz-column-title"></span>
@@ -312,7 +312,7 @@
                     else
                     {
                         <tr class=" rz-datatable-emptymessage-row">
-                            <td class="rz-datatable-emptymessage" colspan="@(visibleColumns.Count + (Template != null && ShowExpandColumn ? 1 : 0))">
+                            <td class="rz-datatable-emptymessage" colspan="@(visibleColumns.Sum(c => c.GetColSpan()) + (Template != null && ShowExpandColumn ? 1 : 0))">
                                 @if (EmptyTemplate != null)
                                 {
                                     @EmptyTemplate
@@ -338,7 +338,7 @@
                                 <span class="rz-column-title"></span>
                             </td>
                         }
-                        @if (Template != null && ShowExpandColumn)
+                        @if (Template != null && ShowExpandColumn && i == 0)
                         {
                             <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                 <span class="rz-column-title"></span>

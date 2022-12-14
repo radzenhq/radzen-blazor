@@ -129,7 +129,7 @@
 @if (Grid.Template != null && Grid.expandedItems.Keys.Contains(Item))
 {
     <tr class="rz-expanded-row-content">
-        <td colspan="@(Columns.Count + (Grid.ShowExpandColumn ? 1 : 0) + + Grid.Groups.Count)">
+        <td colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
             <div class="rz-expanded-row-template" style="position:sticky">
                 @Grid.Template(Item)
             </div>
