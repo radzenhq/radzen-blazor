@@ -2,9 +2,8 @@
 @inject IJSRuntime JSRuntime
 @inject CompilerService Compiler
 
-<RadzenTextArea @bind-Value="source" style="min-height: 500px; overflow: auto; font-size: 12px; width: 100%" />
-
-<RadzenButton Click="Run" />
+<RadzenButton Click="Run" Icon="play_circle" />
+<Monaco @bind-Value="source" />
 
 @code {
     private ElementReference pre;
