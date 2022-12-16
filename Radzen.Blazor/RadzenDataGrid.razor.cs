@@ -386,7 +386,7 @@ namespace Radzen.Blazor
             var descriptor = sorts.Where(d => d.Property == column?.GetSortProperty()).FirstOrDefault();
             if (descriptor == null && column.SortOrder.HasValue)
             {
-                descriptor = new SortDescriptor() { Property = column.Property, SortOrder = column.SortOrder.Value };
+                descriptor = new SortDescriptor() { Property = column.GetSortProperty(), SortOrder = column.SortOrder.Value };
                 sorts.Add(descriptor);
             }
 
