@@ -32,7 +32,17 @@
     public string GetColumnPropertyExpression(string name, Type type)
     {
         var expression = $@"it[""{name}""].ToString()";
-        return type == typeof(int) ? $"int.Parse({expression})" : expression;
+
+        if (type == typeof(int))
+        {
+            return $"int.Parse({expression})";
+        }
+        else if (type == typeof(DateTime))
+        {
+            return $"DateTime.Parse({expression})";
+        }
+
+        return expression;
     }
 
     protected override async Task OnInitializedAsync()
@@ -44,6 +54,7 @@
             { "EmployeeID", typeof(int) },
             { "FirstName", typeof(string) },
             { "LastName", typeof(string) },
+            { "HireDate", typeof(DateTime) },
         };
 
         data = Enumerable.Range(0, 100).Select(i =>
@@ -52,7 +63,8 @@
 
             foreach (var column in columns)
             {
-                row.Add(column.Key, column.Value == typeof(int) ? i : $"{column.Key}{i}");
+                row.Add(column.Key, column.Value == typeof(int) ? i : 
+                    column.Value == typeof(DateTime) ? DateTime.Now.AddMonths(i) : $"{column.Key}{i}");
             }
 
             return row;
