@@ -184,6 +184,7 @@ $dialog-zindex: 1001 !default;
   background-color: var(--rz-dialog-background-color);
   box-shadow: var(--rz-dialog-shadow);
   border-radius: var(--rz-dialog-border-radius);
+  overflow-y: auto;
 }
 
 .rz-dialog-side-position-right {
