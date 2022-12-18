@@ -178,7 +178,7 @@ $dialog-zindex: 1001 !default;
 }
 
 .rz-dialog-side {
-  position: absolute;
+  position: fixed;
   z-index: var(--rz-dialog-zindex);
   opacity: 1;
   background-color: var(--rz-dialog-background-color);
