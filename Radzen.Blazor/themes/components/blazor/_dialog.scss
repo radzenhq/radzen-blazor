@@ -178,12 +178,13 @@ $dialog-zindex: 1001 !default;
 }
 
 .rz-dialog-side {
-  position: absolute;
+  position: fixed;
   z-index: var(--rz-dialog-zindex);
   opacity: 1;
   background-color: var(--rz-dialog-background-color);
   box-shadow: var(--rz-dialog-shadow);
   border-radius: var(--rz-dialog-border-radius);
+  overflow-y: auto;
 }
 
 .rz-dialog-side-position-right {
