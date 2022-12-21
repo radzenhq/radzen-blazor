@@ -33,7 +33,7 @@ $icon-styles: map-merge(
 );
 
 .rzi {
-  font-family: 'Material Icons';
+  font-family: var(--rz-icon-font-family);
   font-weight: normal;
   font-style: normal;
   font-size: var(--rz-icon-size);
