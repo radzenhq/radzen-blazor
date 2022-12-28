@@ -5,8 +5,9 @@
     <div @onclick='@((args) => Grid.OnSort(args, Column))' tabindex="@SortingTabIndex" @onkeydown="OnSortKeyPressed">
         @if (Column.Parent == null && Column.Columns == null && (Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
         {
-            <span id="@Grid.getColumnResizerId(ColumnIndex)" class="rz-column-drag" 
+            <span id="@Grid.getColumnResizerId(ColumnIndex)" class="rz-column-drag"
                     @onclick:preventDefault="true" @onclick:stopPropagation="true"
+                    @onmousedown:preventDefault="true"
                     @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex))></span>
         }
         <span class="rz-column-title" title="@Column.Title">
@@ -18,7 +19,7 @@
             {
                 <span class="rz-column-title-content">@Column.Title</span>
             }
-        
+
         @if (Grid.AllowSorting && Column.Sortable)
         {
             @if (Column.GetSortOrder() == SortOrder.Ascending)
@@ -46,7 +47,8 @@
         @if (Grid.AllowColumnResize && Column.Resizable && Column.Parent == null)
         {
             <div id="@Grid.getColumnResizerId(ColumnIndex)" style="cursor:col-resize;float:right;"
-                    @onclick:preventDefault="true" @onclick:stopPropagation="true" class="rz-column-resizer" 
+                    @onclick:preventDefault="true" @onclick:stopPropagation="true" class="rz-column-resizer"
+                    @onmousedown:preventDefault="true"
                     @onmousedown=@(args => Grid.StartColumnResize(args, ColumnIndex))>&nbsp;</div>
         }
         @if (Grid.AllowFiltering && Column.Filterable && Grid.FilterMode == FilterMode.Advanced)
@@ -137,7 +139,7 @@ else
 {
     @foreach(var column in Grid.childColumns.Where(c => c.GetVisible() && c.Parent == Column))
     {
-        <RadzenDataGridHeaderCell RowIndex="@RowIndex" Grid="@Grid" Column="@column" ColumnIndex="@ColumnIndex" 
+        <RadzenDataGridHeaderCell RowIndex="@RowIndex" Grid="@Grid" Column="@column" ColumnIndex="@ColumnIndex"
             CssClass="@($"rz-unselectable-text {(Grid.AllowSorting && column.Sortable ? "rz-sortable-column" : "")} {column.HeaderCssClass} {Grid.getFrozenColumnClass(column, Grid.ColumnsCollection.Where(c => c.GetVisible()).ToList())} {Grid.getCompositeCellCSSClass(column)} {Grid.getColumnAlignClass(column)}".Trim())" />
     }
 }
@@ -164,8 +166,8 @@ else
 
     private string getFilterIconCss(RadzenDataGridColumn<TItem> column)
     {
-        var additionalStyle = column.GetFilterValue() != null || column.GetSecondFilterValue() != null || 
-            column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull 
+        var additionalStyle = column.GetFilterValue() != null || column.GetSecondFilterValue() != null ||
+            column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull
                 || column.GetFilterOperator() == FilterOperator.IsEmpty || column.GetFilterOperator() == FilterOperator.IsNotEmpty
                 ? "rz-grid-filter-active" : "";
         return $"rzi rz-grid-filter-icon {additionalStyle}";
