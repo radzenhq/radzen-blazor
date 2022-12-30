@@ -1543,6 +1543,8 @@ namespace Radzen.Blazor
                 });
                 sorts.Clear();
            }
+
+            SaveSettings();
         }
 
         /// <summary>
