@@ -191,6 +191,7 @@ $dialog-zindex: 1001 !default;
   right: 0;
   min-width: 150px;
   width: 400px;
+  max-width: 100%;
   height: 100%;
 }
 
@@ -198,6 +199,7 @@ $dialog-zindex: 1001 !default;
   left: 0;
   min-width: 150px;
   width: 400px;
+  max-width: 100%;
   height: 100%;
 }
 
