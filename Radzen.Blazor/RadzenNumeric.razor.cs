@@ -220,7 +220,7 @@ namespace Radzen.Blazor
                 valueStr = value.ToString();
             }
 
-            if (Format != null)
+            if (!string.IsNullOrEmpty(Format))
             {
                 valueStr = valueStr.Replace(Format.Replace("#", "").Trim(), "");
             }
