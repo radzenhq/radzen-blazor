@@ -45,7 +45,7 @@
     {
         await base.OnInitializedAsync();
 
-        data = await Task.FromResult(from o in dbContext.Orders
+        data = from o in dbContext.Orders.Take(100)
                from od in dbContext.OrderDetails
                from e in dbContext.Employees
                select new OrderAndDetail()
@@ -63,7 +63,7 @@
                     LastName = e.LastName,
                     Title = e.Title,
                     TitleOfCourtesy = e.TitleOfCourtesy
-               });
+               };
     }
 
     public class OrderAndDetail
