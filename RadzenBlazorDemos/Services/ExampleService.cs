@@ -136,6 +136,13 @@ namespace RadzenBlazorDemos
                             Title = "Blazor DataGrid supports dynamic data sources",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "dynamic" }
                         },
+                        new Example
+                        {
+                            Name = "Performance",
+                            Path = "datagrid-performance",
+                            Title = "Blazor DataGrid bound to large collection of data",
+                            Tags = new [] { "datagrid", "bind", "performance", "data", "large" }
+                        },
                     }
                 },
                 new Example
