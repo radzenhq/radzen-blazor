@@ -78,7 +78,7 @@
     static List<MenuModel> data = Enumerable.Range(0, 5).Select(i => new MenuModel(() => data)
     {
         Text = $"Menu{i}",
-            Items = Enumerable.Range(0, 5).Select(j => new MenuModel(() => data)
+        Items = Enumerable.Range(0, 5).Select(j => new MenuModel(() => data)
         {
             Text = $"SubMenu{i}{j}"
         })
