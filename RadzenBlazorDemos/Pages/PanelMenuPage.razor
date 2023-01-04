@@ -75,24 +75,23 @@
 
 </RadzenExample>
 @code {
-    static List<MenuModel> data = Enumerable.Range(0, 5).Select(i => new MenuModel()
+    static List<MenuModel> data = Enumerable.Range(0, 5).Select(i => new MenuModel(() => data)
     {
         Text = $"Menu{i}",
-        Items = Enumerable.Range(0, 5).Select(j => new MenuModel()
+            Items = Enumerable.Range(0, 5).Select(j => new MenuModel(() => data)
         {
             Text = $"SubMenu{i}{j}"
         })
     }).ToList();
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-
-        data.ForEach(i => i.Siblings = data.Where(j => j != i));
-    }
-
     public class MenuModel : INotifyPropertyChanged
-    { 
+    {
+        Func<List<MenuModel>> collection;
+        public MenuModel(Func<List<MenuModel>> collection)
+        {
+            this.collection = collection;
+        }
+
         public string Text { get; set; }
 
         bool _expanded;
@@ -106,7 +105,7 @@
             {
                 if (_expanded != value)
                 {
-                    Siblings?.ToList().ForEach(s => s.Expanded = false);
+                    collection()?.Where(i => i != this).ToList().ForEach(s => s.Expanded = false);
 
                     _expanded = value;
                     OnPropertyChanged(nameof(Expanded));
@@ -115,7 +114,6 @@
         }
 
         public IEnumerable<MenuModel> Items { get; set; }
-        public IEnumerable<MenuModel> Siblings { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
