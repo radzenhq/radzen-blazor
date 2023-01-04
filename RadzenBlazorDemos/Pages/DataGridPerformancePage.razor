@@ -39,13 +39,13 @@
     </RadzenDataGrid>
 </RadzenExample>
 @code {
-    IEnumerable<OrderAndDetail> data;
+    IQueryable<OrderAndDetail> data;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        data = from o in dbContext.Orders
+        data = await Task.FromResult(from o in dbContext.Orders
                from od in dbContext.OrderDetails
                from e in dbContext.Employees
                select new OrderAndDetail()
@@ -63,7 +63,7 @@
                     LastName = e.LastName,
                     Title = e.Title,
                     TitleOfCourtesy = e.TitleOfCourtesy
-               };
+               });
     }
 
     public class OrderAndDetail
