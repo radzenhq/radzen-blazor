@@ -2335,6 +2335,9 @@ namespace Radzen.Blazor
         {
             if(indexOfColumnToReoder != null && AllowGrouping)
             {
+                var functionName = $"Radzen['{getColumnResizerId(indexOfColumnToReoder.Value)}end']";
+                await JSRuntime.InvokeVoidAsync("eval", $"{functionName} && {functionName}()");
+
                 var column = columns.Where(c => c.GetVisible()).ElementAtOrDefault(indexOfColumnToReoder.Value);
 
                 if(column != null && column.Groupable && !string.IsNullOrEmpty(column.GetGroupProperty()))
