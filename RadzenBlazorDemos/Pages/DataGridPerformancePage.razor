@@ -1,4 +1,5 @@
 ﻿@page "/datagrid-performance"
+@using System.Linq.Dynamic.Core
 
 @using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
@@ -10,13 +11,13 @@
     DataGrid
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" Class="my-4">
-    DataGrid paging, sorting, filtering and grouping through large Entity Framework query without extra code.
+    DataGrid paging, sorting and filtering through large Entity Framework query.
 </RadzenText>
 
 <RadzenExample Name="DataGridPerformance" Heading="false" Documentation="false">
     <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" 
-        AllowGrouping="true" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
-        Data="@data" TItem="OrderAndDetail" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" ShowPagingSummary="true">
+        AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
+        IsLoading=@isLoading Count="@count" Data="@data" LoadData="@LoadData" TItem="OrderAndDetail" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" ShowPagingSummary="true">
         <Columns>
             <RadzenDataGridColumn TItem="OrderAndDetail" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="OrderAndDetail" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
@@ -39,31 +40,52 @@
     </RadzenDataGrid>
 </RadzenExample>
 @code {
-    IQueryable<OrderAndDetail> data;
+    IEnumerable<OrderAndDetail> data;
 
-    protected override async Task OnInitializedAsync()
+    bool isLoading = false;
+    int count;
+
+    async Task LoadData(LoadDataArgs args)
     {
-        await base.OnInitializedAsync();
+        isLoading = true;
 
-        data = from o in dbContext.Orders.Take(50)
-               from od in dbContext.OrderDetails
-               from e in dbContext.Employees
-               select new OrderAndDetail()
-               {
-                    OrderID = od.OrderID,
-                    ProductID = od.ProductID,
-                    UnitPrice = od.UnitPrice,
-                    Quantity = od.Quantity,
-                    Discount = od.Discount,
-                    CustomerID = o.CustomerID,
-                    OrderDate = o.OrderDate,
-                    EmployeeID = o.EmployeeID,
-                    Photo = e.Photo,
-                    FirstName = e.FirstName,
-                    LastName = e.LastName,
-                    Title = e.Title,
-                    TitleOfCourtesy = e.TitleOfCourtesy
-               };
+        await Task.Yield();
+
+        var query = from o in dbContext.Orders
+                    from od in dbContext.OrderDetails
+                    from e in dbContext.Employees
+                    select new OrderAndDetail()
+                        {
+                            OrderID = od.OrderID,
+                            ProductID = od.ProductID,
+                            UnitPrice = od.UnitPrice,
+                            Quantity = od.Quantity,
+                            Discount = od.Discount,
+                            CustomerID = o.CustomerID,
+                            OrderDate = o.OrderDate,
+                            EmployeeID = o.EmployeeID,
+                            Photo = e.Photo,
+                            FirstName = e.FirstName,
+                            LastName = e.LastName,
+                            Title = e.Title,
+                            TitleOfCourtesy = e.TitleOfCourtesy
+                        };
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        count = query.Count();
+
+        data = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+        isLoading = false;
     }
 
     public class OrderAndDetail
