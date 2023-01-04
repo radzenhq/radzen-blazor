@@ -3,6 +3,7 @@
 @implements IDisposable
 @inject ExampleService ExampleService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <PageTitle>@ExampleService.TitleFor(example)</PageTitle>
 <HeadContent>
@@ -72,9 +73,23 @@
 
     Example example;
 
+    DateTime start;
+
     protected override void OnInitialized()
     {
+        start = DateTime.Now;
+
         example = ExampleService.FindCurrent(NavigationManager.ToAbsoluteUri(NavigationManager.Uri));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", $"console.log('Page {Name} render time is {(DateTime.Now - start).TotalMilliseconds} ms')");
+        }
     }
 
     public void Dispose()
