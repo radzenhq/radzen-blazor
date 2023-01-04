@@ -45,7 +45,7 @@
     {
         await base.OnInitializedAsync();
 
-        data = from o in dbContext.Orders.Take(100)
+        data = from o in dbContext.Orders.Take(50)
                from od in dbContext.OrderDetails
                from e in dbContext.Employees
                select new OrderAndDetail()
