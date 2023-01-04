@@ -1094,7 +1094,7 @@ namespace Radzen
                 }
                 else
                 {
-                    selectedItems = selectedItems.AsQueryable().Where($@"!object.Equals({ValueProperty},@0)", value).ToList();
+                    selectedItems = selectedItems.AsQueryable().Where($@"!object.Equals(it.{ValueProperty},@0)", value).ToList();
                 }
             }
             else
@@ -1160,7 +1160,7 @@ namespace Radzen
                                     item = View.AsQueryable().Where($@"{ValueProperty} == @0", v).FirstOrDefault();
                                 }
 
-                                if (!object.Equals(item, null) && !selectedItems.AsQueryable().Where($@"object.Equals({ValueProperty},@0)", v).Any())
+                                if (!object.Equals(item, null) && !selectedItems.AsQueryable().Where($@"object.Equals(it.{ValueProperty},@0)", v).Any())
                                 {
                                     selectedItems.Add(item);
                                 }
