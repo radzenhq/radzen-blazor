@@ -25,14 +25,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The text.</value>
         [Parameter]
-        public string Text { get; set; } = string.Empty;
+        public string Text { get; set; } = "";
 
         /// <summary>
         /// Gets or sets the required marker.
         /// </summary>
         /// <value>The text of the required marker.</value>
         [Parameter]
-        public string RequiredMarker { get; set; } = string.Empty;
+        public string RequiredMarker { get; set; } = "";
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
