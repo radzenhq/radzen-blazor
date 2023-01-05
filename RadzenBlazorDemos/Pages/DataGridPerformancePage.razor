@@ -16,7 +16,8 @@
 <RadzenExample Name="DataGridPerformance" Heading="false" Documentation="false">
     <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" 
         AllowGrouping="true" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
-        Data="@data" TItem="OrderAndDetail" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" ShowPagingSummary="true">
+        Data="@data" TItem="OrderAndDetail" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" ShowPagingSummary="true"
+        IsLoading=@isLoading Sort="@ShowLoading" Page="@ShowLoading" Group="@ShowLoading" Filter="@ShowLoading">
         <Columns>
             <RadzenDataGridColumn TItem="OrderAndDetail" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="OrderAndDetail" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
@@ -41,9 +42,22 @@
 @code {
     IQueryable<OrderAndDetail> data;
 
+    bool isLoading = false;
+
+    async Task ShowLoading()
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        isLoading = false;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+
+        await ShowLoading();
 
         data = from o in dbContext.Orders.Take(20)
                from od in dbContext.OrderDetails
