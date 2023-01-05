@@ -2,5 +2,8 @@
 
 @if (Visible)
 {
-    <label @ref="@Element" for="@Component" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">@Text</label>
+    <label @ref="@Element" for="@Component" style="@Style"@attributes="Attributes" class="@GetCssClass()"
+           id="@GetId()">@Text@if (RequiredMarker.Trim() != string.Empty)
+        {
+ <span class="required-marker">@RequiredMarker</span>}</label>
 }

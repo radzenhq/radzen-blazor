@@ -20,6 +20,22 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Label_Renders_RequiredMarkerParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenLabel>();
+
+            var text = "Test";
+            var requiredMarker = "required";
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Text, text));
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.RequiredMarker, requiredMarker));
+
+            Assert.Contains($@">{text} <span class=""required-marker"">{requiredMarker}</span></label>", component.Markup);
+        }
+
+        [Fact]
         public void Label_Renders_ComponentParameter()
         {
             using var ctx = new TestContext();
