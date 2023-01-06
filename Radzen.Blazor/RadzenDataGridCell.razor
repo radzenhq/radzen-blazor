@@ -29,7 +29,7 @@ else
                         }
                     </span>
                 }
-                <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
+                <span class="rz-cell-data" title="@(column.Template == null && Grid.ShowCellDataAsTooltip ? column.GetValue(Item) : "")">
                     @if (Item != null)
                     {
                         @if (Grid.IsRowInEditMode(Item) && column.EditTemplate != null)
