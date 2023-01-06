@@ -22,7 +22,8 @@
     </div>
     <RadzenDataGrid @ref=grid AllowGrouping="true" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" 
         Data="@employees" TItem="Employee" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or" Render="@OnRender" 
-            HideGroupedColumn="true" GroupRowRender="OnGroupRowRender" GroupRowExpand="OnGroupRowExpand" GroupRowCollapse="OnGroupRowCollapse" Group="@OnGroup">
+            HideGroupedColumn="true" GroupRowRender="OnGroupRowRender" GroupRowExpand="OnGroupRowExpand" GroupRowCollapse="OnGroupRowCollapse" Group="@OnGroup"
+            @bind-AllGroupsExpanded="@allGroupsExpanded">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Frozen="true" Groupable="false" Width="80px" TextAlign="TextAlign.Center" >
@@ -75,8 +76,6 @@
     void ToggleGroups(bool? value)
     {
         allGroupsExpanded = value;
-
-        grid.Reset(false, true);
     }
 
     void OnGroupRowRender(GroupRowRenderEventArgs args)
@@ -89,13 +88,11 @@
 
     void OnGroupRowExpand(Group group)
     {
-        allGroupsExpanded = null;
         console.Log($"Group row with key: {group.Data.Key} expanded");
     }
 
     void OnGroupRowCollapse(Group group)
     {
-        allGroupsExpanded = null;
         console.Log($"Group row with key: {group.Data.Key} collapsed");
     }
 
