@@ -697,7 +697,7 @@ window.Radzen = {
       var rect = popup.getBoundingClientRect();
       var parentRect = parent ? parent.getBoundingClientRect() : { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0 };
 
-      if (/Edge/.test(navigator.userAgent)) {
+      if (/Edge|Edg/.test(navigator.userAgent)) {
           var scrollTop = document.body.scrollTop;
       } else {
           var scrollTop = document.documentElement.scrollTop;
@@ -1445,7 +1445,7 @@ window.Radzen = {
           if (el) {
               el.style.display = 'block';
 
-              if (/Edge/.test(navigator.userAgent)) {
+              if (/Edge|Edg/.test(navigator.userAgent)) {
                   var scrollLeft = document.body.scrollLeft;
                   var scrollTop = document.body.scrollTop;
               } else {
