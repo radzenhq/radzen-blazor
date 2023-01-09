@@ -14,6 +14,13 @@ namespace Radzen.Blazor
     public partial class RadzenLabel : RadzenComponent
     {
         /// <summary>
+        /// Gets or sets the child content.
+        /// </summary>
+        /// <value>The child content.</value>
+        [Parameter]
+        public RenderFragment ChildContent { get; set; }
+
+        /// <summary>
         /// Gets or sets the component name for the label.
         /// </summary>
         /// <value>The component name for the label.</value>
