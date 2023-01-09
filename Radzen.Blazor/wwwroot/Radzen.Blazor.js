@@ -719,7 +719,7 @@ window.Radzen = {
 
     var parentRect = parent ? parent.getBoundingClientRect() : { top: y || 0, bottom: 0, left: x || 0, right: 0, width: 0, height: 0 };
 
-    if (/Edge/.test(navigator.userAgent)) {
+    if (/Edge|Edg/.test(navigator.userAgent)) {
       var scrollLeft = document.body.scrollLeft;
       var scrollTop = document.body.scrollTop;
     } else {
