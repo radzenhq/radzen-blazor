@@ -8,7 +8,7 @@ using System.Text;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenCard component.
+    /// RadzenCol component.
     /// </summary>
     public partial class RadzenCol : RadzenFlexComponent
     {
@@ -48,6 +48,13 @@ namespace Radzen.Blazor
         public int SizeXL { get; set; }
 
         /// <summary>
+        /// Gets or sets the XX size.
+        /// </summary>
+        /// <value>The XX size.</value>
+        [Parameter]
+        public int SizeXX { get; set; }
+
+        /// <summary>
         /// Gets or sets the XS offset.
         /// </summary>
         /// <value>The XS offset.</value>
@@ -81,6 +88,13 @@ namespace Radzen.Blazor
         /// <value>The XL offset.</value>
         [Parameter]
         public int OffsetXL { get; set; }
+
+        /// <summary>
+        /// Gets or sets the XX offset.
+        /// </summary>
+        /// <value>The XX offset.</value>
+        [Parameter]
+        public int OffsetXX { get; set; }
 
         /// <summary>
         /// Gets or sets the XS order.
@@ -118,6 +132,13 @@ namespace Radzen.Blazor
         public int OrderXL { get; set; }
 
         /// <summary>
+        /// Gets or sets the XX order.
+        /// </summary>
+        /// <value>The XX order.</value>
+        [Parameter]
+        public int OrderXX { get; set; }
+
+        /// <summary>
         /// Gets the final CSS style rendered by the component. Combines it with a <c>style</c> custom attribute.
         /// </summary>
         protected string GetStyle()
@@ -141,9 +162,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            var list = new List<string>() { "rz-display-flex" };
+            var list = new List<string>() { "rz-col" };
 
-            var breakPoints = new string[] { "xs", "sm", "md", "lg", "xl" };
+            var breakPoints = new string[] { "xs", "sm", "md", "lg", "xl", "xx" };
 
             var properties = GetType().GetProperties()
                 .Where(p => breakPoints.Any(bp => p.Name.ToLower().EndsWith(bp)))
