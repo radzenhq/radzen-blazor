@@ -23,7 +23,7 @@ namespace Radzen.Blazor
         {
             return Size == AlertSize.Medium ? "md" : Size == AlertSize.Large ? "lg" : Size == AlertSize.Small ? "sm" : "xs";
         }
-        
+
         /// <summary>
         /// Gets or sets a value indicating whether close is allowed. Set to <c>true</c> by default.
         /// </summary>
@@ -44,6 +44,13 @@ namespace Radzen.Blazor
         /// <value>The title.</value>
         [Parameter]
         public string Title { get; set; }
+
+        /// <summary>
+        /// Gets or sets the text of the alert. Overriden by <see cref="ChildContent" />.
+        /// </summary>
+        /// <value>The title.</value>
+        [Parameter]
+        public string Text { get; set; }
 
         /// <summary>
         /// Gets or sets the icon.
