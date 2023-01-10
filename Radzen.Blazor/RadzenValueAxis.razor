@@ -7,14 +7,13 @@
 @code {
     internal double Measure(RadzenChart chart)
     {
-        if (Visible == false)
-        {
-            return 0;
-        }
-
         if (chart.ShouldInvertAxes())
         {
             return AxisMeasurer.YAxis(chart.ValueScale, chart.CategoryAxis, chart.CategoryAxis.Title);
+        }
+        else if (Visible == false)
+        {
+            return 0;
         }
         else
         {
