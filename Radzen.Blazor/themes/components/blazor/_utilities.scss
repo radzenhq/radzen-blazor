@@ -369,6 +369,21 @@ $rz-transition-all: all 0.1s linear !default;
 
 // Layout
 
+
+// Responsive breakpoints map
+$rz-breakpoints-map: () !default;
+$rz-breakpoints-map: map-merge(
+  (
+    xs: 576px,
+    sm: 768px,
+    md: 1024px,
+    lg: 1280px,
+    xl: 1920px,
+    xx: 2560px,
+  ),
+  $rz-breakpoints-map
+);
+
 // Display
 // Example .rz-display-block
 $display: block, inline, inline-block, flex, inline-flex, grid, inline-grid;
