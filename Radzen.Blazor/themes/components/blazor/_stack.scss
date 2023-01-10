@@ -7,3 +7,69 @@ $flex: row, row-reverse, column, column-reverse;
     flex-direction: #{$value} !important;
   }
 }
+
+// Grid Layout RadzenRow and RadzenCol styles
+$rz-col-gap: 1rem !default;
+$rz-row-gap: $rz-col-gap !default;
+
+// Grid Layout CSS variables
+:root {
+  --rz-col-gap: #{$rz-col-gap};
+  --rz-row-gap: #{$rz-row-gap};
+}
+
+
+$rz-cols-map: () !default;
+$rz-cols-map: map-merge(
+  (
+    "1": calc((100% - 11 * var(--rz-col-gap)) / 12),
+    "2": calc(2 * ((100% - 11 * var(--rz-col-gap)) / 12) + 1 * var(--rz-col-gap)),
+    "3": calc(3 * ((100% - 11 * var(--rz-col-gap)) / 12) + 2 * var(--rz-col-gap)),
+    "4": calc(4 * ((100% - 11 * var(--rz-col-gap)) / 12) + 3 * var(--rz-col-gap)),
+    "5": calc(5 * ((100% - 11 * var(--rz-col-gap)) / 12) + 4 * var(--rz-col-gap)),
+    "6": calc(6 * ((100% - 11 * var(--rz-col-gap)) / 12) + 5 * var(--rz-col-gap)),
+    "7": calc(7 * ((100% - 11 * var(--rz-col-gap)) / 12) + 6 * var(--rz-col-gap)),
+    "8": calc(8 * ((100% - 11 * var(--rz-col-gap)) / 12) + 7 * var(--rz-col-gap)),
+    "9": calc(9 * ((100% - 11 * var(--rz-col-gap)) / 12) + 8 * var(--rz-col-gap)),
+    "10": calc(10 * ((100% - 11 * var(--rz-col-gap)) / 12) + 9 * var(--rz-col-gap)),
+    "11": calc(11 * ((100% - 11 * var(--rz-col-gap)) / 12) + 10 * var(--rz-col-gap)),
+    "12": 100%,
+  ),
+  $rz-cols-map
+);
+
+// Rows
+.rz-row {
+  flex-wrap: wrap;
+  gap: var(--rz-col-gap);
+  row-gap: var(--rz-row-gap);
+}
+
+// Columns
+[class^='rz-col'] {
+  flex: 1 0 0%;
+}
+
+[class*='rz-col-'] {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+@each $cols, $cols-width in $rz-cols-map {
+  .rz-col-#{$cols} {
+    max-width: #{$cols-width};
+    flex-basis: #{$cols-width};
+  }
+}
+
+// Columns with breakpoints
+@each $breakpoint, $breakpoint-value in $rz-breakpoints-map {
+  @media (min-width: #{$breakpoint-value}) {
+    @each $cols, $cols-width in $rz-cols-map {
+      .rz-col-#{$breakpoint}-#{$cols} {
+        max-width: #{$cols-width};
+        flex-basis: #{$cols-width};
+      }
+    }
+  }
+}
