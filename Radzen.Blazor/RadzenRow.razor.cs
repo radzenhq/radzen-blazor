@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
-using System.Linq;
-using System.Text;
+using System.Collections.Generic;
 
 namespace Radzen.Blazor
 {
@@ -10,6 +9,20 @@ namespace Radzen.Blazor
     /// </summary>
     public partial class RadzenRow : RadzenFlexComponent
     {
+        /// <summary>
+        /// Gets or sets the gap.
+        /// </summary>
+        /// <value>The gap.</value>
+        [Parameter]
+        public string Gap { get; set; }
+
+        /// <summary>
+        /// Gets or sets the row gap.
+        /// </summary>
+        /// <value>The row gap.</value>
+        [Parameter]
+        public string RowGap { get; set; }
+
         /// <summary>
         /// Gets the final CSS style rendered by the component. Combines it with a <c>style</c> custom attribute.
         /// </summary>
@@ -28,7 +41,19 @@ namespace Radzen.Blazor
         /// </summary>
         protected string GetComponentStyle()
         {
-            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(";") ? ";" : "")}";
+            var list = new List<string>();
+
+            if (!string.IsNullOrEmpty(Gap))
+            {
+                list.Add($"--rz-gap:{Gap}");
+            }
+
+            if (!string.IsNullOrEmpty(RowGap))
+            {
+                list.Add($"--rz-row-gap:{RowGap}");
+            }
+
+            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(";") ? ";" : "")}{string.Join(";", list)}";
         }
 
         /// <inheritdoc />
