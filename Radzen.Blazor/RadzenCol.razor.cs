@@ -13,6 +13,13 @@ namespace Radzen.Blazor
     public partial class RadzenCol : RadzenFlexComponent
     {
         /// <summary>
+        /// Gets or sets the size.
+        /// </summary>
+        /// <value>The size.</value>
+        [Parameter]
+        public int Size { get; set; }
+
+        /// <summary>
         /// Gets or sets the XS size.
         /// </summary>
         /// <value>The XS size.</value>
@@ -163,6 +170,11 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             var list = new List<string>() { "rz-col" };
+
+            if (Size != 0)
+            {
+                list.Add($"rz-col-{GetColumnValue("Size", Size)}");
+            }
 
             var breakPoints = new string[] { "xs", "sm", "md", "lg", "xl", "xx" };
 
