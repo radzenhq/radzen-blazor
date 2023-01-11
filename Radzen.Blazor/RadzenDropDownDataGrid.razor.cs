@@ -327,9 +327,35 @@ namespace Radzen.Blazor
 
                     if (AllowFilteringByAllStringColumns)
                     {
-                        query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
-                            .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
-                                FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                        if (AllowFilteringByWord)
+                        {
+                            string[] words = searchText.Split(' ');
+
+                            foreach (string word in words)
+                            {
+                                query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
+                                    .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
+                                        FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? word.ToLower() : word);
+                            }
+                        }
+                        else
+                        {
+                            if (AllowFilteringByWord)
+                            {
+                                string[] words = searchText.Split(' ');
+
+                                foreach (string word in words)
+                                {
+                                    query = query.Where($"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
+                                        FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? word.ToLower() : word);
+                                }
+                            }
+                            else
+                            {
+                                query = query.Where($"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
+                                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                            }
+                        }
                     }
                     else
                     {
@@ -594,6 +620,13 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if filtering by all string columns is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowFilteringByAllStringColumns { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether filtering by each entered word in the search term, sperated by a space, is allowed.
+        /// </summary>
+        /// <value><c>true</c> if filtering by individual words is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowFilteringByWord { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether DataGrid row can be selected on row click.
