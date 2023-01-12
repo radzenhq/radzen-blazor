@@ -340,27 +340,28 @@ namespace Radzen.Blazor
                         }
                         else
                         {
-                            if (AllowFilteringByWord)
-                            {
-                                string[] words = searchText.Split(' ');
-
-                                foreach (string word in words)
-                                {
-                                    query = query.Where($"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
-                                        FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? word.ToLower() : word);
-                                }
-                            }
-                            else
-                            {
-                                query = query.Where($"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
-                                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
-                            }
+                            query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
+                                .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
+                                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);                            
                         }
                     }
                     else
                     {
-                        query = query.Where($"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
-                            FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                        if (AllowFilteringByWord)
+                        {
+                            string[] words = searchText.Split(' ');
+
+                            foreach (string word in words)
+                            {
+                                query = query.Where($"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
+                                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? word.ToLower() : word);
+                            }
+                        }
+                        else
+                        {
+                            query = query.Where($"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
+                                FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                        }
                     }
                 }
 
