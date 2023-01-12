@@ -2,12 +2,13 @@
 @using System.ComponentModel;
 
 <RadzenExample Name="PanelMenu">
-
      <div class="row px-3">
         <div class="col-md-6 p-3">
             <RadzenCard Style="width: fit-content" Class="mx-auto">
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Statically declared items</RadzenText>
-                <RadzenPanelMenu Style="width:300px">
+                <RadzenCheckBox @bind-Value=@multiple Name="CheckBox1" TValue="bool" />
+                <RadzenLabel Text="Allow multiple expand" Component="CheckBox1" />
+                <RadzenPanelMenu Style="width:300px" Multiple="@multiple">
                     <RadzenPanelMenuItem Text="General" Icon="home">
                         <RadzenPanelMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenPanelMenuItem>
                         <RadzenPanelMenuItem Text="Menu" Path="menu" Icon="line_weight"></RadzenPanelMenuItem>
@@ -52,7 +53,7 @@
         </div>
         <div class="col-md-6 p-3">
              <RadzenCard Style="width: fit-content" Class="mx-auto">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Programmatically created items with single expand</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Programmatically created items with Expanded binding</RadzenText>
                 <RadzenPanelMenu Style="width:300px">
                     <ChildContent>
                         @foreach (var item in data)
@@ -75,9 +76,12 @@
 
 </RadzenExample>
 @code {
+    bool multiple = true;
+
     static List<MenuModel> data = Enumerable.Range(0, 5).Select(i => new MenuModel(() => data)
     {
         Text = $"Menu{i}",
+        Expanded = i == 0,
         Items = Enumerable.Range(0, 5).Select(j => new MenuModel(() => data)
         {
             Text = $"SubMenu{i}{j}"

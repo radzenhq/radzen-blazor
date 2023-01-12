@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -95,9 +96,32 @@ namespace Radzen.Blazor
 
         async System.Threading.Tasks.Task Toggle()
         {
+            if (!expanded && !Parent.Multiple)
+            {
+                var itemsToSkip = new List<RadzenPanelMenuItem>();
+                var p = ParentItem;
+                while (p != null)
+                {
+                    itemsToSkip.Add(p);
+                    p = p.ParentItem;
+                }
+
+                Parent.CollapseAll(itemsToSkip);
+            }
+
             expanded = !expanded;
             await ExpandedChanged.InvokeAsync(expanded);
             StateHasChanged();
+        }
+
+        internal async System.Threading.Tasks.Task Collapse()
+        {
+            if (expanded)
+            {
+                expanded = false;
+                await ExpandedChanged.InvokeAsync(expanded);
+                StateHasChanged();
+            }
         }
 
         string getStyle()
@@ -164,7 +188,7 @@ namespace Radzen.Blazor
             }
         }
 
-        List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
+        internal List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
 
         /// <summary>
         /// Adds the item.
