@@ -60,13 +60,13 @@
                     {
                         @if (Template == null)
                         {
-                            @(string.Join(",", itemsToUse.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, TextProperty))))
+                            @(string.Join(Separator, itemsToUse.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, TextProperty))))
                         }
                         else
                         {
                             foreach (var item in itemsToUse)
                             {
-                                @Template(item)@(",")
+                                @Template(item)@(Separator)
                             }
                         }
                     }
