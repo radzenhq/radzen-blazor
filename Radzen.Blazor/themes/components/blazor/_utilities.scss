@@ -369,7 +369,6 @@ $rz-transition-all: all 0.1s linear !default;
 
 // Layout
 
-
 // Responsive breakpoints map
 $rz-breakpoints-map: () !default;
 $rz-breakpoints-map: map-merge(
@@ -382,6 +381,29 @@ $rz-breakpoints-map: map-merge(
     xx: 2560px,
   ),
   $rz-breakpoints-map
+);
+
+// Gutters
+$rz-gutter: 1rem;
+$rz-gutter-map: () !default;
+$rz-gutter-map: map-merge(
+  (
+    0: 0,
+    "05": ($rz-gutter * .125),
+    1: ($rz-gutter * .25),
+    2: ($rz-gutter * .5),
+    3: ($rz-gutter * .75),
+    4: $rz-gutter,
+    5: ($rz-gutter * 1.25),
+    6: ($rz-gutter * 1.5),
+    7: ($rz-gutter * 1.75),
+    8: ($rz-gutter * 2),
+    9: ($rz-gutter * 2.25),
+    10: ($rz-gutter * 2.5),
+    11: ($rz-gutter * 2.75),
+    12: ($rz-gutter * 3)
+  ),
+  $rz-gutter-map
 );
 
 // Display
