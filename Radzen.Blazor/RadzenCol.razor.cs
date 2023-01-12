@@ -62,6 +62,13 @@ namespace Radzen.Blazor
         public int SizeXX { get; set; }
 
         /// <summary>
+        /// Gets or sets the offset.
+        /// </summary>
+        /// <value>The offset.</value>
+        [Parameter]
+        public int Offset { get; set; }
+
+        /// <summary>
         /// Gets or sets the XS offset.
         /// </summary>
         /// <value>The XS offset.</value>
@@ -102,6 +109,13 @@ namespace Radzen.Blazor
         /// <value>The XX offset.</value>
         [Parameter]
         public int OffsetXX { get; set; }
+
+        /// <summary>
+        /// Gets or sets the order.
+        /// </summary>
+        /// <value>The order.</value>
+        [Parameter]
+        public int Order { get; set; }
 
         /// <summary>
         /// Gets or sets the XS order.
@@ -176,6 +190,16 @@ namespace Radzen.Blazor
                 list.Add($"rz-col-{GetColumnValue("Size", Size)}");
             }
 
+            if (Offset != null)
+            {
+                list.Add($"rz-offset-{GetColumnValue("Offset", Offset)}");
+            }
+
+            if (Order != null)
+            {
+                list.Add($"rz-order-{GetColumnValue("Order", Order)}");
+            }
+
             var breakPoints = new string[] { "xs", "sm", "md", "lg", "xl", "xx" };
 
             var properties = GetType().GetProperties()
@@ -186,7 +210,7 @@ namespace Radzen.Blazor
             {
                 if (p.Value != 0)
                 {
-                    list.Add($"rz-col-{(!p.Name.StartsWith("Size") ? p.Name.ToLower().Replace(p.BreakPoint, "") + "-" : "")}{p.BreakPoint}-{GetColumnValue(p.Name, p.Value)}");
+                    list.Add($"rz-{(!p.Name.StartsWith("Size") ? p.Name.ToLower().Replace(p.BreakPoint, "") + "-" : "col-")}{p.BreakPoint}-{GetColumnValue(p.Name, p.Value)}");
                 }
             }
 
