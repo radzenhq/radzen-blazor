@@ -40,6 +40,7 @@ $rz-col-map: map-merge(
 $rz-offset-map: () !default;
 $rz-offset-map: map-merge(
   (
+    0: 0,
     1: calc(1 * ((100% - 11 * var(--rz-gap)) / 12) + 1 * var(--rz-gap)),
     2: calc(2 * ((100% - 11 * var(--rz-gap)) / 12) + 2 * var(--rz-gap)),
     3: calc(3 * ((100% - 11 * var(--rz-gap)) / 12) + 3 * var(--rz-gap)),
