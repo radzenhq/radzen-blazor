@@ -2047,9 +2047,10 @@ namespace Radzen.Blazor
         /// Selects the row.
         /// </summary>
         /// <param name="item">The item.</param>
-        public async System.Threading.Tasks.Task SelectRow(TItem item)
+        /// <param name="raiseEvent">Should raise RowSelect event.</param>
+        public async System.Threading.Tasks.Task SelectRow(TItem item, bool raiseEvent = true)
         {
-            await OnRowSelect(item, true);
+            await OnRowSelect(item, raiseEvent);
         }
 
         internal async System.Threading.Tasks.Task OnRowDblClick(DataGridRowMouseEventArgs<TItem> args)
