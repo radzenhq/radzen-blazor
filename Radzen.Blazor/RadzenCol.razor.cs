@@ -115,49 +115,49 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The order.</value>
         [Parameter]
-        public int Order { get; set; }
+        public string Order { get; set; }
 
         /// <summary>
         /// Gets or sets the XS order.
         /// </summary>
         /// <value>The XS order.</value>
         [Parameter]
-        public int OrderXS { get; set; }
+        public string OrderXS { get; set; }
 
         /// <summary>
         /// Gets or sets the SM order.
         /// </summary>
         /// <value>The SM order.</value>
         [Parameter]
-        public int OrderSM { get; set; }
+        public string OrderSM { get; set; }
 
         /// <summary>
         /// Gets or sets the MD order.
         /// </summary>
         /// <value>The MD order.</value>
         [Parameter]
-        public int OrderMD { get; set; }
+        public string OrderMD { get; set; }
 
         /// <summary>
         /// Gets or sets the LG order.
         /// </summary>
         /// <value>The LG order.</value>
         [Parameter]
-        public int OrderLG { get; set; }
+        public string OrderLG { get; set; }
 
         /// <summary>
         /// Gets or sets the XL order.
         /// </summary>
         /// <value>The XL order.</value>
         [Parameter]
-        public int OrderXL { get; set; }
+        public string OrderXL { get; set; }
 
         /// <summary>
         /// Gets or sets the XX order.
         /// </summary>
         /// <value>The XX order.</value>
         [Parameter]
-        public int OrderXX { get; set; }
+        public string OrderXX { get; set; }
 
         /// <summary>
         /// Gets the final CSS style rendered by the component. Combines it with a <c>style</c> custom attribute.
@@ -195,9 +195,9 @@ namespace Radzen.Blazor
                 list.Add($"rz-offset-{GetColumnValue("Offset", Offset)}");
             }
 
-            if (Order != null)
+            if (!string.IsNullOrEmpty(Order))
             {
-                list.Add($"rz-order-{GetColumnValue("Order", Order)}");
+                list.Add($"rz-order-{GetOrderValue("Order", Order)}");
             }
 
             var breakPoints = new string[] { "xs", "sm", "md", "lg", "xl", "xx" };
@@ -225,6 +225,18 @@ namespace Radzen.Blazor
             if (value < 0 || value > 12)
             {
                 throw new Exception($"Property {name} value should be between 0 and 12.");
+            }
+
+            return value;
+        }
+
+        string GetOrderValue(string name, string value)
+        {
+            var orders = Enumerable.Range(0, 12).Select(i => $"{i}").ToArray().Concat(new string[] { "first", "last" }); 
+
+            if (!orders.Contains(value))
+            {
+                throw new Exception($"Property {name} value should be between 0 and 12 or first/last.");
             }
 
             return value;
