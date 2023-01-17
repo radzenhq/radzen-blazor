@@ -8,9 +8,9 @@ using System.Text;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenCol component.
+    /// RadzenColumn component.
     /// </summary>
-    public partial class RadzenCol : RadzenFlexComponent
+    public partial class RadzenColumn : RadzenFlexComponent
     {
         /// <summary>
         /// Gets or sets the size.
