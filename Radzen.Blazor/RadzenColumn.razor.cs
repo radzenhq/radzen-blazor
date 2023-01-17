@@ -204,11 +204,11 @@ namespace Radzen.Blazor
 
             var properties = GetType().GetProperties()
                 .Where(p => breakPoints.Any(bp => p.Name.ToLower().EndsWith(bp)))
-                .Select(p => new { p.Name, BreakPoint = string.Concat(p.Name.ToLower().TakeLast(2)), Value = (int)p.GetValue(this) });
+                .Select(p => new { p.Name, BreakPoint = string.Concat(p.Name.ToLower().TakeLast(2)), Value = p.GetValue(this) });
 
             foreach(var p in properties) 
             {
-                if (p.Value != 0)
+                if (!object.Equals(p.Value, null) && !object.Equals(p.Value, 0))
                 {
                     list.Add($"rz-{(!p.Name.StartsWith("Size") ? p.Name.ToLower().Replace(p.BreakPoint, "") + "-" : "col-")}{p.BreakPoint}-{GetColumnValue(p.Name, p.Value)}");
                 }
@@ -220,14 +220,19 @@ namespace Radzen.Blazor
             return string.Join(" ", list);
         }
 
-        int GetColumnValue(string name, int value)
+        string GetColumnValue(string name, object value)
         {
-            if (value < 0 || value > 12)
+            if (name.StartsWith("Order"))
+            {
+                return GetOrderValue(name, value.ToString());
+            }
+
+            if ((int)value < 0 || (int)value > 12)
             {
                 throw new Exception($"Property {name} value should be between 0 and 12.");
             }
 
-            return value;
+            return $"{value}";
         }
 
         string GetOrderValue(string name, string value)
