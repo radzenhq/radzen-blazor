@@ -11,10 +11,17 @@
 </RadzenText>
 
 <RadzenExample Name="DataGridSimpleFilter" Heading="false" Documentation="false">
-    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" 
-        FilterMode="FilterMode.Simple" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" 
-        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-        LogicalFilterOperator="LogicalFilterOperator.Or">
+    <div style="display: flex; align-items: center; margin-bottom: 16px">
+        <div style="white-space:nowrap; margin-right: 16px">Logical filter operator:</div>
+        <RadzenDropDown @bind-Value="@logicalFilterOperator" TextProperty="Text" ValueProperty="Value" Change=@(args => grid.Reload())
+                        Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = $"{t}", Value = t }))" />
+        <div style="white-space:nowrap; margin-left: 16px;margin-right: 16px">Filter case sensitivity:</div>
+        <RadzenDropDown @bind-Value="@filterCaseSensitivity" TextProperty="Text" ValueProperty="Value" Change=@(args => grid.Reload())
+                        Data="@(Enum.GetValues(typeof(FilterCaseSensitivity)).Cast<FilterCaseSensitivity>().Select(t => new { Text = $"{t}", Value = t }))" />
+    </div>
+    <RadzenDataGrid @ref=grid AllowFiltering="true" AllowColumnResize="true" 
+        FilterMode="FilterMode.Simple" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px"
+        FilterCaseSensitivity="@filterCaseSensitivity" LogicalFilterOperator="@logicalFilterOperator">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
@@ -31,6 +38,11 @@
     </RadzenDataGrid>
 </RadzenExample>
 @code {
+    RadzenDataGrid<Employee> grid;
+
+    LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.And;
+    FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.CaseInsensitive;
+
     IEnumerable<Employee> employees;
 
     protected override async Task OnInitializedAsync()
