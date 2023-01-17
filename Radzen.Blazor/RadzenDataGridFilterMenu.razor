@@ -144,6 +144,8 @@
 
         Column.SetFilterOperator(value);
 
+        Grid.SaveSettings();
+
         await Grid.Filter.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
         {
             Column = Column,
