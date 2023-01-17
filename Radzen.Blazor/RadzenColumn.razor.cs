@@ -10,105 +10,105 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenColumn component.
     /// </summary>
-    public partial class RadzenColumn : RadzenFlexComponent
+    public partial class RadzenColumn : RadzenComponentWithChildren
     {
         /// <summary>
         /// Gets or sets the size.
         /// </summary>
         /// <value>The size.</value>
         [Parameter]
-        public int Size { get; set; }
+        public int? Size { get; set; }
 
         /// <summary>
         /// Gets or sets the XS size.
         /// </summary>
         /// <value>The XS size.</value>
         [Parameter]
-        public int SizeXS { get; set; }
+        public int? SizeXS { get; set; }
 
         /// <summary>
         /// Gets or sets the SM size.
         /// </summary>
         /// <value>The SM size.</value>
         [Parameter]
-        public int SizeSM { get; set; }
+        public int? SizeSM { get; set; }
 
         /// <summary>
         /// Gets or sets the MD size.
         /// </summary>
         /// <value>The MD size.</value>
         [Parameter]
-        public int SizeMD { get; set; }
+        public int? SizeMD { get; set; }
 
         /// <summary>
         /// Gets or sets the LG size.
         /// </summary>
         /// <value>The LG size.</value>
         [Parameter]
-        public int SizeLG { get; set; }
+        public int? SizeLG { get; set; }
 
         /// <summary>
         /// Gets or sets the XL size.
         /// </summary>
         /// <value>The XL size.</value>
         [Parameter]
-        public int SizeXL { get; set; }
+        public int? SizeXL { get; set; }
 
         /// <summary>
         /// Gets or sets the XX size.
         /// </summary>
         /// <value>The XX size.</value>
         [Parameter]
-        public int SizeXX { get; set; }
+        public int? SizeXX { get; set; }
 
         /// <summary>
         /// Gets or sets the offset.
         /// </summary>
         /// <value>The offset.</value>
         [Parameter]
-        public int Offset { get; set; }
+        public int? Offset { get; set; }
 
         /// <summary>
         /// Gets or sets the XS offset.
         /// </summary>
         /// <value>The XS offset.</value>
         [Parameter]
-        public int OffsetXS { get; set; }
+        public int? OffsetXS { get; set; }
 
         /// <summary>
         /// Gets or sets the SM offset.
         /// </summary>
         /// <value>The SM offset.</value>
         [Parameter]
-        public int OffsetSM { get; set; }
+        public int? OffsetSM { get; set; }
 
         /// <summary>
         /// Gets or sets the MD offset.
         /// </summary>
         /// <value>The MD offset.</value>
         [Parameter]
-        public int OffsetMD { get; set; }
+        public int? OffsetMD { get; set; }
 
         /// <summary>
         /// Gets or sets the LG offset.
         /// </summary>
         /// <value>The LG offset.</value>
         [Parameter]
-        public int OffsetLG { get; set; }
+        public int? OffsetLG { get; set; }
 
         /// <summary>
         /// Gets or sets the XL offset.
         /// </summary>
         /// <value>The XL offset.</value>
         [Parameter]
-        public int OffsetXL { get; set; }
+        public int? OffsetXL { get; set; }
 
         /// <summary>
         /// Gets or sets the XX offset.
         /// </summary>
         /// <value>The XX offset.</value>
         [Parameter]
-        public int OffsetXX { get; set; }
+        public int? OffsetXX { get; set; }
 
         /// <summary>
         /// Gets or sets the order.
@@ -183,12 +183,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            var list = new List<string>() { "rz-col" };
-
-            if (Size != 0)
+            var list = new List<string>
             {
-                list.Add($"rz-col-{GetColumnValue("Size", Size)}");
-            }
+                Size != null ? $"rz-col-{GetColumnValue("Size", Size)}" : "rz-col"
+            };
 
             if (Offset != null)
             {
@@ -206,16 +204,13 @@ namespace Radzen.Blazor
                 .Where(p => breakPoints.Any(bp => p.Name.ToLower().EndsWith(bp)))
                 .Select(p => new { p.Name, BreakPoint = string.Concat(p.Name.ToLower().TakeLast(2)), Value = p.GetValue(this) });
 
-            foreach(var p in properties) 
+            foreach (var p in properties) 
             {
-                if (!object.Equals(p.Value, null) && !object.Equals(p.Value, 0))
+                if (p.Value != null)
                 {
                     list.Add($"rz-{(!p.Name.StartsWith("Size") ? p.Name.ToLower().Replace(p.BreakPoint, "") + "-" : "col-")}{p.BreakPoint}-{GetColumnValue(p.Name, p.Value)}");
                 }
             }
-
-            list.Add($"rz-align-items-{GetFlexCSSClass<AlignItems>(AlignItems)}");
-            list.Add($"rz-justify-content-{GetFlexCSSClass<JustifyContent>(JustifyContent)}");
 
             return string.Join(" ", list);
         }
