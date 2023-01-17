@@ -102,7 +102,7 @@ $rz-offset-map: map-merge(
 // Offsets with breakpoints
 @each $breakpoint, $breakpoint-value in $rz-breakpoints-map {
   @media (min-width: #{$breakpoint-value}) {
-    @each $offset, $offset-margin in $rz-col-offset-map {
+    @each $offset, $offset-margin in $rz-offset-map {
       .rz-offset-#{$breakpoint}-#{$offset} {
         margin-left: #{$offset-margin};
       }
