@@ -727,11 +727,20 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     New = true,
-                    Name = "Grid",
-                    Title = "Blazor Grid component",
-                    Path = "grid",
+                    Name = "Row",
+                    Title = "Blazor Row component",
+                    Path = "row",
                     Icon = "&#xe5c3",
-                    Tags = new [] { "grid" }
+                    Tags = new [] { "row, layout, responsive, grid" }
+                },
+                new Example()
+                {
+                    New = true,
+                    Name = "Column",
+                    Title = "Blazor Column component",
+                    Path = "column",
+                    Icon = "&#xe5c3",
+                    Tags = new [] { "column, col, layout, responsive, grid" }
                 },
                 new Example()
                 {
