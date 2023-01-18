@@ -9,18 +9,18 @@
 
 <RadzenExample Name="Row" Heading="false" Documentation="false">
     <RadzenCard Class="my-4">
-        <RadzenStack Orientation="Orientation.Horizontal" Spacing="1rem" AlignItems="AlignItems.Start">
-            <RadzenStack Orientation="Orientation.Vertical" Spacing="4px">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Style="flex-wrap: wrap;">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 AlignItems
                 <RadzenDropDown @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value"
                          Data="@(Enum.GetValues(typeof(AlignItems)).Cast<AlignItems>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
             </RadzenStack>
-            <RadzenStack Orientation="Orientation.Vertical" Spacing="4px">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 JustifyContent
                 <RadzenDropDown @bind-Value="@justifyContent" TextProperty="Text" ValueProperty="Value"
                          Data="@(Enum.GetValues(typeof(JustifyContent)).Cast<JustifyContent>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
             </RadzenStack>
-            <RadzenStack Orientation="Orientation.Vertical" Spacing="4px">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Gap
                 <RadzenTextBox @bind-Value="@gap" />
             </RadzenStack>
