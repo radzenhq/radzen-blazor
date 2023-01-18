@@ -1,0 +1,6 @@
+﻿@inherits RadzenFlexComponent
+
+@if (Visible)
+{
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@GetStyle()" id="@GetId()">@ChildContent</div>
+}

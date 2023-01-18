@@ -1,5 +1,6 @@
 // Blazor
 @import 'components/blazor/utilities';
+@import 'components/blazor/spacing';
 @import 'components/blazor/typography';
 @import 'components/blazor/icons';
 @import 'components/blazor/common';
@@ -66,3 +67,4 @@
 @import 'components/blazor/breadcrumb';
 @import 'components/blazor/alert';
 @import 'components/blazor/speech-to-text-button';
+@import 'components/blazor/stack';

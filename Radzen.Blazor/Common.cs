@@ -860,6 +860,80 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Represents content justification of Stack items.
+    /// </summary>
+    public enum JustifyContent
+    {
+        /// <summary>
+        /// Normal content justification of Stack items.
+        /// </summary>
+        Normal,
+        /// <summary>
+        /// Center content justification of Stack items.
+        /// </summary>
+        Center,
+        /// <summary>
+        /// Start content justification of Stack items.
+        /// </summary>
+        Start,
+        /// <summary>
+        /// End content justification of Stack items.
+        /// </summary>
+        End,
+        /// <summary>
+        /// Left content justification of Stack items.
+        /// </summary>
+        Left,
+        /// <summary>
+        /// Right content justification of Stack items.
+        /// </summary>
+        Right,
+        /// <summary>
+        /// SpaceBetween content justification of Stack items.
+        /// </summary>
+        SpaceBetween,
+        /// <summary>
+        /// SpaceAround content justification of Stack items.
+        /// </summary>
+        SpaceAround,
+        /// <summary>
+        /// SpaceEvenly content justification of Stack items.
+        /// </summary>
+        SpaceEvenly,
+        /// <summary>
+        /// Stretch content justification of Stack items.
+        /// </summary>
+        Stretch
+    }
+
+    /// <summary>
+    /// Represents the alignment of Stack items.
+    /// </summary>
+    public enum AlignItems
+    {
+        /// <summary>
+        /// Normal items alignment.
+        /// </summary>
+        Normal,
+        /// <summary>
+        /// Center items alignment.
+        /// </summary>
+        Center,
+        /// <summary>
+        /// Start items alignment.
+        /// </summary>
+        Start,
+        /// <summary>
+        /// End items alignment.
+        /// </summary>
+        End,
+        /// <summary>
+        /// Stretch items alignment.
+        /// </summary>
+        Stretch
+    }
+
+    /// <summary>
     /// Specifies the sort order in components that support sorting.
     /// </summary>
     public enum SortOrder
@@ -2392,6 +2466,52 @@ namespace Radzen
         /// <value>The content of the child.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
+    }
+
+    /// <summary>
+    /// A base class of row/col components.
+    /// </summary>
+    public class RadzenFlexComponent : RadzenComponentWithChildren
+    {
+        /// <summary>
+        /// Gets or sets the content justify.
+        /// </summary>
+        /// <value>The content justify.</value>
+        [Parameter]
+        public JustifyContent JustifyContent { get; set; } = JustifyContent.Normal;
+
+        /// <summary>
+        /// Gets or sets the items alignment.
+        /// </summary>
+        /// <value>The items alignment.</value>
+        [Parameter]
+        public AlignItems AlignItems { get; set; } = AlignItems.Normal;
+
+        internal string GetFlexCSSClass<T>(Enum v)
+        {
+            var value = ToDashCase(Enum.GetName(typeof(T), v));
+            return value == "start" || value == "end" ? $"flex-{value}" : value;
+        }
+
+        internal string ToDashCase(string value)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var ch in value)
+            {
+                if ((char.IsUpper(ch) && sb.Length > 0) || char.IsSeparator(ch))
+                {
+                    sb.Append('-');
+                }
+
+                if (char.IsLetterOrDigit(ch))
+                {
+                    sb.Append(char.ToLowerInvariant(ch));
+                }
+            }
+
+            return sb.ToString();
+        }
     }
 
     class Debouncer

@@ -299,7 +299,7 @@ $rz-border-radius-map: map-merge(
 }
 
 // Border Radius CSS classes
-@include rz-utility-css($rz-border-radius-map, 'border-radius');
+@include rz-utility-map-css('border-radius', $rz-border-radius-map);
 
 // Shadow
 
@@ -353,7 +353,7 @@ $rz-shadow-map: map-merge(
 }
 
 // Shadow CSS classes
-@include rz-utility-css($rz-shadow-map, 'box-shadow');
+@include rz-utility-map-css('box-shadow', $rz-shadow-map);
 
 // Transition
 
@@ -367,19 +367,73 @@ $rz-transition-all: all 0.1s linear !default;
   --rz-transition-all: #{$rz-transition-all};
 }
 
+// Layout
+
+// Responsive breakpoints map
+$rz-breakpoints-map: () !default;
+$rz-breakpoints-map: map-merge(
+  (
+    xs: 576px,
+    sm: 768px,
+    md: 1024px,
+    lg: 1280px,
+    xl: 1920px,
+    xx: 2560px,
+  ),
+  $rz-breakpoints-map
+);
+
+// Gutters
+$rz-gutter: 1rem;
+$rz-gutter-map: () !default;
+$rz-gutter-map: map-merge(
+  (
+    0: 0,
+    "05": ($rz-gutter * .125),
+    1: ($rz-gutter * .25),
+    2: ($rz-gutter * .5),
+    3: ($rz-gutter * .75),
+    4: $rz-gutter,
+    5: ($rz-gutter * 1.25),
+    6: ($rz-gutter * 1.5),
+    7: ($rz-gutter * 1.75),
+    8: ($rz-gutter * 2),
+    9: ($rz-gutter * 2.25),
+    10: ($rz-gutter * 2.5),
+    11: ($rz-gutter * 2.75),
+    12: ($rz-gutter * 3)
+  ),
+  $rz-gutter-map
+);
+
+// Display
+// Example .rz-display-block
+$display: none, block, inline, inline-block, flex, inline-flex, grid, inline-grid;
+@include rz-utility-list-css('display', $display);
+
+// Justify-content
+// Example .rz-justify-content-center
+$justify-content: normal, stretch, center, start, end, flex-start, flex-end, left, right, space-between, space-around, space-evenly;
+@include rz-utility-list-css('justify-content', $justify-content);
+
+// Align-items
+// Example .rz-align-items-center
+$align-items: normal, stretch, center, start, end, flex-start, flex-end;
+@include rz-utility-list-css('align-items', $align-items);
+
 //---- CSS classes
 
 // Color
 // Example .rz-color-primary
-@include rz-color-css($rz-theme-colors-map, 'color');
+@include rz-color-css('color', $rz-theme-colors-map);
 
 // Background Color
 // Example .rz-background-color-primary
-@include rz-color-css($rz-theme-colors-map, 'background-color');
+@include rz-color-css('background-color', $rz-theme-colors-map);
 
 // Border Color
 // Example .rz-border-color-primary
-@include rz-color-css($rz-theme-colors-map, 'border-color');
+@include rz-color-css('border-color', $rz-theme-colors-map);
 
 // Border
 // Example .rz-border-primary

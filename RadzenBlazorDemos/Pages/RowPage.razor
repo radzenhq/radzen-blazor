@@ -1,0 +1,49 @@
+﻿@page "/row"
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    Row
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    The <code>RadzenRow</code> component is used to create a row in a responsive grid layout. It is primarily used in conjunction with <a href="/column">RadzenColumn</a> component, but can also be used with other Radzen components, such as RadzenCard, to create responsive, visually appealing layouts.
+</RadzenText>
+
+<RadzenExample Name="Row" Heading="false" Documentation="false">
+    <RadzenCard Class="my-4">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Style="flex-wrap: wrap;">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                AlignItems
+                <RadzenDropDown @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value"
+                         Data="@(Enum.GetValues(typeof(AlignItems)).Cast<AlignItems>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                JustifyContent
+                <RadzenDropDown @bind-Value="@justifyContent" TextProperty="Text" ValueProperty="Value"
+                         Data="@(Enum.GetValues(typeof(JustifyContent)).Cast<JustifyContent>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Gap
+                <RadzenTextBox @bind-Value="@gap" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenRow JustifyContent="@justifyContent" AlignItems="@alignItems" Gap="@gap" Class="rz-border-info-light">
+        <RadzenColumn Size="2" Class="rz-background-color-info-lighter rz-color-info-dark rz-text-align-center rz-p-2">
+            Column 1
+        </RadzenColumn>
+        <RadzenColumn Size="2" Class="rz-background-color-success-lighter rz-color-success-dark rz-text-align-center rz-p-2" style="height: 60px;">
+            Column 2
+        </RadzenColumn>
+        <RadzenColumn Size="2" Class="rz-background-color-warning-lighter rz-color-warning-dark rz-text-align-center rz-p-2" style="height: 120px;">
+            Column 3
+        </RadzenColumn>
+        <RadzenColumn Size="2" Class="rz-background-color-danger-lighter rz-color-danger-dark rz-text-align-center rz-p-2" style="height: 180px;">
+            Column 4
+        </RadzenColumn>
+    </RadzenRow>
+
+</RadzenExample>
+@code {
+    AlignItems alignItems = AlignItems.Normal;
+    JustifyContent justifyContent = JustifyContent.Normal;
+    string gap = "1rem";
+}
