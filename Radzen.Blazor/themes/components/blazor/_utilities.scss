@@ -408,7 +408,7 @@ $rz-gutter-map: map-merge(
 
 // Display
 // Example .rz-display-block
-$display: block, inline, inline-block, flex, inline-flex, grid, inline-grid;
+$display: none, block, inline, inline-block, flex, inline-flex, grid, inline-grid;
 @include rz-utility-list-css('display', $display);
 
 // Justify-content
