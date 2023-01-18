@@ -17,6 +17,9 @@
                 JustifyContent
                 <RadzenDropDown @bind-Value="@justifyContent" TextProperty="Text" ValueProperty="Value"
                          Data="@(Enum.GetValues(typeof(JustifyContent)).Cast<JustifyContent>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+                Wrap
+                <RadzenDropDown @bind-Value="@wrap" TextProperty="Text" ValueProperty="Value"
+                         Data="@(Enum.GetValues(typeof(FlexWrap)).Cast<FlexWrap>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Gap
@@ -50,6 +53,7 @@
     Orientation orientation = Orientation.Horizontal;
     AlignItems alignItems = AlignItems.Normal;
     JustifyContent justifyContent = JustifyContent.Normal;
+    FlexWrap wrap = FlexWrap.NoWrap;
     string gap = "10px";
     bool reverse;
 }
