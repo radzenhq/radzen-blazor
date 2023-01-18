@@ -60,15 +60,15 @@ namespace Radzen.Blazor
 
             if (Wrap == FlexWrap.Wrap)
             {
-                wrap = "flex-wrap:wrap;";
+                wrap = ";flex-wrap:wrap;";
             }
             else if (Wrap == FlexWrap.NoWrap)
             {
-                wrap = "flex-wrap:nowrap;";
+                wrap = ";flex-wrap:nowrap;";
             } 
             else if (Wrap == FlexWrap.WrapReverse)
             {
-                wrap = "flex-wrap:wrap-reverse;";
+                wrap = ";flex-wrap:wrap-reverse;";
             }
 
             return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(";") ? ";" : "")}{(!string.IsNullOrEmpty(Gap) ? "--rz-gap:" + Gap + (Gap.All(c => Char.IsDigit(c)) ? "px;" : "") : "")}{wrap}";
