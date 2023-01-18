@@ -22,7 +22,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The spacing.</value>
         [Parameter]
-        public string Spacing { get; set; }
+        public string Gap { get; set; }
 
         /// <summary>
         /// Gets or sets the reverse
@@ -49,7 +49,7 @@ namespace Radzen.Blazor
         /// </summary>
         protected string GetComponentStyle()
         {
-            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(";") ? ";" : "")}{(!string.IsNullOrEmpty(Spacing) ? "gap:" + Spacing + (Spacing.All(c => Char.IsDigit(c)) ? "px;" : "") : "")}";
+            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(";") ? ";" : "")}{(!string.IsNullOrEmpty(Gap) ? "--rz-gap:" + Gap + (Gap.All(c => Char.IsDigit(c)) ? "px;" : "") : "")}";
         }
 
         /// <inheritdoc />
