@@ -11,6 +11,13 @@ namespace Radzen.Blazor
     public partial class RadzenStack : RadzenFlexComponent
     {
         /// <summary>
+        /// Gets or sets the wrap.
+        /// </summary>
+        /// <value>The wrap.</value>
+        [Parameter]
+        public FlexWrap Wrap { get; set; } = FlexWrap.NoWrap;
+
+        /// <summary>
         /// Gets or sets the orientation.
         /// </summary>
         /// <value>The orientation.</value>
@@ -49,7 +56,22 @@ namespace Radzen.Blazor
         /// </summary>
         protected string GetComponentStyle()
         {
-            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(";") ? ";" : "")}{(!string.IsNullOrEmpty(Gap) ? "--rz-gap:" + Gap + (Gap.All(c => Char.IsDigit(c)) ? "px;" : "") : "")}";
+            var wrap = "";
+
+            if (Wrap == FlexWrap.Wrap)
+            {
+                wrap = "flex-wrap:wrap;";
+            }
+            else if (Wrap == FlexWrap.NoWrap)
+            {
+                wrap = "flex-wrap:nowrap;";
+            } 
+            else if (Wrap == FlexWrap.WrapReverse)
+            {
+                wrap = "flex-wrap:wrap-reverse;";
+            }
+
+            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(";") ? ";" : "")}{(!string.IsNullOrEmpty(Gap) ? "--rz-gap:" + Gap + (Gap.All(c => Char.IsDigit(c)) ? "px;" : "") : "")}{wrap}";
         }
 
         /// <inheritdoc />
