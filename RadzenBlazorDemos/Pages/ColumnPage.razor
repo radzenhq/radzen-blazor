@@ -4,15 +4,28 @@
     Column
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" Class="my-4">
-    The RadzenColumn component is used within a <RadzenLink Path="row" Text="RadzenRow" /> to create a structured grid layout. Without the <code>RadzenRow</code> component, the <code>RadzenColumn</code> would not be rendered correctly.
-</RadzenText>
-
-<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
-    RadzenColumns are positioned on a 12-column based responsive grid.
+    The RadzenColumn component is used within a <a href="/row">RadzenRow</a> to create a structured grid layout. Without the <code>RadzenRow</code> component, the <code>RadzenColumn</code> would not be rendered correctly.
 </RadzenText>
 
 <RadzenExample Name="Column" Heading="false" Documentation="false">
     <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" Class="rz-mt-8">Columns</RadzenText>
+    <RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+        RadzenColumns are positioned on a 12-column based responsive grid.
+    </RadzenText>
+    <RadzenRow Class="rz-text-align-center rz-border-info-light">
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">1</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">2</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">3</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">4</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">5</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">6</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">7</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">8</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">9</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">10</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">11</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">12</RadzenColumn>
+    </RadzenRow>
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H4" Class="rz-mt-5">Auto-layout columns</RadzenText>
     <RadzenRow Class="rz-text-align-center rz-border-info-light">
         <RadzenColumn Class="rz-background-color-info-lighter rz-color-info rz-p-5">
@@ -53,7 +66,7 @@
         </RadzenColumn>
     </RadzenRow>
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H4" Class="rz-mt-5">Responsive sizes</RadzenText>
-    <RadzenText TextStyle="TextStyle.Body2">Resize your browser window to see how the column adapts to the predefined breakpoint sizes.</RadzenText>
+    <RadzenText TextStyle="TextStyle.Body2">Resize your browser window to see how the column adapts to the predefined breakpoint sizes. See <a href="/breakpoints">Breakpoints</a> to learn more.</RadzenText>
     <RadzenRow Class="rz-text-align-center rz-border-info-light">
         <RadzenColumn Size="12" SizeXS="11" SizeSM="10" SizeMD="9" SizeLG="8" SizeXL="7" SizeXX="6" Class="rz-background-color-info-lighter rz-color-info rz-p-5">
             Size="12" SizeXS="11" SizeSM="10" SizeMD="9" SizeLG="8" SizeXL="7" SizeXX="6"
@@ -85,7 +98,7 @@
         </RadzenColumn>
     </RadzenRow>
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H4" Class="rz-mt-5">Responsive offsetting</RadzenText>
-    <RadzenText TextStyle="TextStyle.Body2">Resize your browser window to see how the column adapts to the predefined breakpoint sizes.</RadzenText>
+    <RadzenText TextStyle="TextStyle.Body2">Resize your browser window to see how the column adapts to the predefined breakpoint sizes. See <a href="/breakpoints">Breakpoints</a> to learn more.</RadzenText>
     <RadzenRow Class="rz-text-align-center rz-border-info-light">
         <RadzenColumn Offset="0" OffsetXS="1" OffsetSM="2" OffsetMD="3" OffsetLG="4" OffsetXL="5" OffsetXX="6" Class="rz-background-color-info-lighter rz-color-info rz-p-5">
             Offset="0" OffsetXS="1" OffsetSM="2" OffsetMD="3" OffsetLG="4" OffsetXL="5" OffsetXX="6"
@@ -106,7 +119,7 @@
         </RadzenColumn>
     </RadzenRow>
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H4" Class="rz-mt-5">Responsive ordering</RadzenText>
-    <RadzenText TextStyle="TextStyle.Body2">You can reorder columns on different screen sizes. Resize your browser window to see how the columns reorder.</RadzenText>
+    <RadzenText TextStyle="TextStyle.Body2">You can reorder columns on different screen sizes. Resize your browser window to see how the columns reorder. See <a href="/breakpoints">Breakpoints</a> to learn more.</RadzenText>
     <RadzenRow Class="rz-text-align-center rz-border-info-light">
         <RadzenColumn Order="1" OrderMD="4" OrderLG="6" OrderXL="8" Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">
             Order="1", OrderMD="4" OrderLG="6" OrderXL="8"
@@ -184,6 +197,33 @@
                     Size="2"
                 </RadzenColumn>
             </RadzenRow>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" Class="rz-mt-8">Gutters</RadzenText>
+    <RadzenText TextStyle="TextStyle.Body1" TagName="TagName.H4" Class="rz-mt-5">By default, the spacing between columns is set to <code>1rem</code>, via the <code>--rz-gap</code> CSS variable. Spacing between coulmns can be controlled by setting the <code>Gap</code> property of the parent <code>RadzenRow</code> component.</RadzenText>
+    <RadzenRow Gap="40px" Class="rz-text-align-center rz-border-info-light">
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">1</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">2</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">3</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">4</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">5</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">6</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">7</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">8</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">9</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">10</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">11</RadzenColumn>
+        <RadzenColumn Class="rz-background-color-danger-lighter rz-color-danger rz-p-5">12</RadzenColumn>
+    </RadzenRow>
+    <RadzenRow Gap="40px" Class="rz-text-align-center rz-border-info-light">
+        <RadzenColumn Class="rz-background-color-info-lighter rz-color-info rz-p-5">
+            Column 1 of 3
+        </RadzenColumn>
+        <RadzenColumn Class="rz-background-color-info-lighter rz-color-info rz-p-5">
+            Column 2 of 3
+        </RadzenColumn>
+        <RadzenColumn Class="rz-background-color-info-lighter rz-color-info rz-p-5">
+            Column 3 of 3
         </RadzenColumn>
     </RadzenRow>
 </RadzenExample>
