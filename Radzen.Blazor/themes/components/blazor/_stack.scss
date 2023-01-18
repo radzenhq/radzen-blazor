@@ -8,11 +8,11 @@ $flex: row, row-reverse, column, column-reverse;
   }
 }
 
-// Grid Layout RadzenRow and RadzenCol styles
+// Stack/Grid Layout RadzenRow and RadzenColumn styles
 $rz-gap: 1rem !default;
 $rz-row-gap: $rz-gap !default;
 
-// Grid Layout CSS variables
+// Stack/Grid Layout CSS variables
 :root {
   --rz-gap: #{$rz-gap};
   --rz-row-gap: #{$rz-row-gap};
@@ -55,6 +55,11 @@ $rz-offset-map: map-merge(
   ),
   $rz-offset-map
 );
+
+// Stack
+.rz-stack {
+  gap: var(--rz-gap);
+}
 
 // Rows
 .rz-row {
