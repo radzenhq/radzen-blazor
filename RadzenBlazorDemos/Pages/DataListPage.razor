@@ -10,8 +10,14 @@
 <div class="container">
     <div class="row py-5">
         <div class="col">
+            <div style="display: flex; align-items: center; margin-bottom: 16px">
+                <RadzenCheckBox @bind-Value="@allowVirtualization" Name="allowVirtualization"  />
+                <RadzenLabel Text="Allow virtualization" Component="allowVirtualization" Style="margin-left: 8px; margin-right: 32px; vertical-align: middle;" />
+            </div>
             <RadzenCard>
-                <RadzenDataList WrapItems="true" AllowPaging="true" Data="@products" TItem="Product" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
+                    <RadzenDataList AllowVirtualization=@allowVirtualization Style="@(allowVirtualization ? "height:400px;overflow:auto;" : "")" 
+                        WrapItems="@(!allowVirtualization)" AllowPaging="@(!allowVirtualization)"
+                        Data="@products" TItem="Product" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
                     <Template Context="product">
                         <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
                             <div class="container">
@@ -67,6 +73,8 @@
 </RadzenExample>
 
 @code {
+    bool allowVirtualization;
+
     IEnumerable<Product> products;
 
     protected override async Task OnInitializedAsync()

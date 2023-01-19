@@ -12,36 +12,12 @@
         {
             @if (!WrapItems)
             {
-                @foreach (var item in LoadData.HasDelegate ? Data : PagedView)
-                {
-                    <ul class="rz-datalist-data">
-                        <li>
-                            @if (Template != null)
-                            {
-                                @Template(item)
-                            }
-                            else
-                            {
-                                <span>Template</span>
-                            }
-                        </li>
-                    </ul>
-                }
+                @DrawDataListRows()
             }
             else
             {
                 <div class="rz-g">
-                    @foreach (var item in LoadData.HasDelegate ? Data : PagedView)
-                    {
-                        @if (Template != null)
-                        {
-                            @Template(item)
-                        }
-                        else
-                        {
-                            <span>Template</span>
-                        }
-                    }
+                    @DrawDataListRows()
                 </div>
             }
         }
