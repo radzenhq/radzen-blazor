@@ -1,6 +1,7 @@
 $chart-axis-color: var(--rz-base-300) !default;
 $chart-axis-label-color: var(--rz-text-secondary-color) !default;
 $chart-axis-font-size: 0.875rem !default;
+$chart-legend-font-size: 0.875rem !default;
 $chart-tooltip-background: var(--rz-base-background-color) !default;
 $chart-tooltip-color: var(--rz-text-color) !default;
 
@@ -54,6 +55,7 @@ $chart-color-schemes: (
   --rz-chart-axis-color: #{$chart-axis-color};
   --rz-chart-axis-label-color: #{$chart-axis-label-color};
   --rz-chart-axis-font-size: #{$chart-axis-font-size};
+  --rz-chart-legend-font-size: #{$chart-legend-font-size};
   --rz-chart-tooltip-background: #{$chart-tooltip-background};
   --rz-chart-tooltip-color: #{$chart-tooltip-color};
 }
@@ -180,6 +182,7 @@ $chart-color-schemes: (
 .rz-legend {
   position: absolute;
   display: flex;
+  font-size: var(--rz-chart-legend-font-size);
 }
 
 .rz-legend-right {
