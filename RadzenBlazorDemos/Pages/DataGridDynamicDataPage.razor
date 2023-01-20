@@ -9,7 +9,7 @@
 </RadzenText>
 
 <RadzenExample Name="DataGridDynamicData" Heading="false" Documentation="false">
-    <RadzenDataGrid Data="@data" TItem="IDictionary<string, object>"
+    <RadzenDataGrid @bind-Value=@selectedItems Data="@data" TItem="IDictionary<string, object>" ColumnWidth="200px"
                          AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" AllowPaging="true" AllowSorting="true">
             <Columns>
                 @foreach(var column in columns)
@@ -25,6 +25,8 @@
         </RadzenDataGrid>
 </RadzenExample>
 @code {
+    IList<IDictionary<string, object>> selectedItems;
+
     public IEnumerable<IDictionary<string, object>> data { get; set; }
 
     public IDictionary<string, Type> columns { get; set; }
@@ -56,6 +58,11 @@
             { "LastName", typeof(string) },
             { "HireDate", typeof(DateTime) },
         };
+
+        foreach (var i in Enumerable.Range(0, 50))
+        {
+            columns.Add($"Column{i}", typeof(string));
+        }
 
         data = Enumerable.Range(0, 100).Select(i =>
         {
