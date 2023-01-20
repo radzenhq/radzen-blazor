@@ -15,7 +15,7 @@
             <textarea @ref="@search" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
                 oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"  @onchange="@OnChange"
                 aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
-                class="@InputClassList"
+                class="@InputClassList" onblur="Radzen.activeElement = null"
                 id="@Name" aria-expanded="true" placeholder="@Placeholder" />
         }
         else
@@ -23,7 +23,7 @@
             <input @ref="@search" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
                 oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onchange="@OnChange"
                 aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
-                class="@InputClassList"
+                class="@InputClassList" onblur="Radzen.activeElement = null"
                 type="text" id="@Name" aria-expanded="true" placeholder="@Placeholder" />
         }
         <div id="@PopupID" class="rz-autocomplete-panel" style="@PopupStyle">
