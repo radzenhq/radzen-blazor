@@ -1149,7 +1149,7 @@ namespace Radzen.Blazor
 
         internal async Task EndColumnReorder(MouseEventArgs args, int columnIndex)
         {
-            if (indexOfColumnToReoder != null)
+            if (indexOfColumnToReoder != null && AllowColumnReorder)
             {
                 var visibleColumns = columns.Where(c => c.GetVisible()).ToList();
                 var columnToReorder = visibleColumns.ElementAtOrDefault(indexOfColumnToReoder.Value);
