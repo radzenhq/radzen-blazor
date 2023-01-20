@@ -248,10 +248,10 @@ namespace Radzen
                 return;
             }
 
-            if (selectedItems.Count != View.Cast<object>().Count())
+            if (selectedItems.Count != View.Cast<object>().ToList().Where(i => disabledPropertyGetter != null ? disabledPropertyGetter(i) as bool? != true : true).Count())
             {
                 selectedItems.Clear();
-                selectedItems = View.Cast<object>().ToList();
+                selectedItems = View.Cast<object>().ToList().Where(i => disabledPropertyGetter != null ? disabledPropertyGetter(i) as bool? != true : true).ToList();
             }
             else
             {
@@ -292,10 +292,13 @@ namespace Radzen
         {
             if (LoadData.HasDelegate && !string.IsNullOrEmpty(ValueProperty))
             {
-                return View != null && View.Cast<object>().All(i => IsItemSelectedByValue(GetItemOrValueFromProperty(i, ValueProperty)));
+                return View != null && View.Cast<object>().ToList()
+                    .Where(i => disabledPropertyGetter != null ? disabledPropertyGetter(i) as bool? != true : true)
+                    .All(i => IsItemSelectedByValue(GetItemOrValueFromProperty(i, ValueProperty)));
             }
 
-            return View != null && selectedItems.Count == View.Cast<object>().Count();
+            return View != null && selectedItems.Count == View.Cast<object>().ToList()
+                    .Where(i => disabledPropertyGetter != null ? disabledPropertyGetter(i) as bool? != true : true).Count();
         }
 
         /// <summary>
