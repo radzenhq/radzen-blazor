@@ -69,17 +69,17 @@ $rz-offset-map: map-merge(
 }
 
 // Columns
-[class^='rz-col'] {
+.rz-row > [class^='rz-col'] {
   flex: 1 0 0%;
 }
 
-[class*='rz-col-'] {
+.rz-row > [class*='rz-col-'] {
   flex: 0 0 auto;
   width: 100%;
 }
 
 @each $col, $col-width in $rz-col-map {
-  .rz-col-#{$col} {
+  .rz-row > .rz-col-#{$col} {
     max-width: #{$col-width};
     flex-basis: #{$col-width};
   }
@@ -89,7 +89,7 @@ $rz-offset-map: map-merge(
 @each $breakpoint, $breakpoint-value in $rz-breakpoints-map {
   @media (min-width: #{$breakpoint-value}) {
     @each $col, $col-width in $rz-col-map {
-      .rz-col-#{$breakpoint}-#{$col} {
+      .rz-row > .rz-col-#{$breakpoint}-#{$col} {
         max-width: #{$col-width};
         flex-basis: #{$col-width};
       }
