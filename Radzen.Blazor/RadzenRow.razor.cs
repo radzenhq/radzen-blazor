@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Radzen.Blazor
@@ -45,12 +46,12 @@ namespace Radzen.Blazor
 
             if (!string.IsNullOrEmpty(Gap))
             {
-                list.Add($"--rz-gap:{Gap}");
+                list.Add($"--rz-gap:{(Gap.All(char.IsDigit) ? Gap + "px" : Gap)}");
             }
 
             if (!string.IsNullOrEmpty(RowGap))
             {
-                list.Add($"--rz-row-gap:{RowGap}");
+                list.Add($"--rz-row-gap:{(RowGap.All(char.IsDigit) ? RowGap + "px" : RowGap)}");
             }
 
             return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(";") ? ";" : "")}{string.Join(";", list)}";
