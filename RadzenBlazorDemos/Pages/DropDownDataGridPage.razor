@@ -61,7 +61,7 @@
                         <Columns>
                             <RadzenDropDownDataGridColumn Width="60px" Sortable="false">
                                 <HeaderTemplate>
-                                    <RadzenCheckBox TriState="false" TValue="bool" Value="@(customers.Any(c => multipleValues != null && multipleValues.Contains(c.CustomerID)))"
+                                    <RadzenCheckBox Disabled="@(!grid.AllowSelectAll)" TriState="false" TValue="bool" Value="@(customers.Any(c => multipleValues != null && multipleValues.Contains(c.CustomerID)))"
                                                     Change="@(args => multipleValues = args ? grid.View.Cast<Customer>().Select(c => c.CustomerID) : multipleValues = Enumerable.Empty<string>())"/>
                                 </HeaderTemplate>
                                 <Template Context="data">
