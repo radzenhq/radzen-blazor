@@ -59,6 +59,11 @@ namespace Radzen.Blazor
         /// </summary>
         protected virtual void OnRowRender(RowRenderEventArgs<object> args)
         {
+            if (disabledPropertyGetter != null && disabledPropertyGetter(args.Data) as bool? == true)
+            {
+                args.Attributes.Add("class", "rz-data-row rz-state-disabled");
+            }
+
             if (RowRender != null)
             {
                 RowRender(args);
