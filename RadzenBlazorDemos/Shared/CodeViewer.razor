@@ -19,7 +19,7 @@
     {
         var http = new HttpClient();
 
-        source = await http.GetStringAsync($"https://raw.githubusercontent.com/radzenhq/radzen-blazor/master/RadzenBlazorDemos/Pages/{PageName}");
+        source = await http.GetStringAsync($"https://raw.githubusercontent.com/radzenhq/radzen-blazor/compiler/RadzenBlazorDemos/Pages/{PageName}");
         source = Regex.Replace(source, "</?RadzenExample[^>]*>\n", "");
     }
 
