@@ -34,7 +34,7 @@
             @(dynamicContent ?? ChildContent)
         </RadzenTabsItem>
         <RadzenTabsItem Text="Source" Icon="code">
-            <CodeViewer PageName="@($"{Name}Page.razor")" Compiled="OnCompiled" />
+            <CodeViewer PageName="@ExampleUrl" Compiled="OnCompiled" />
         </RadzenTabsItem>
         @foreach (var p in AdditionalSourceCodePages)
         {
@@ -67,6 +67,9 @@
     public string Source { get; set; }
 
     [Parameter]
+    public string Example { get; set; }
+
+    [Parameter]
     public string DocumentationLink { get; set; }
 
     [Parameter]
@@ -81,6 +84,8 @@
 
     [Parameter]
     public IEnumerable<string> AdditionalSourceCodePages { get; set; } = Enumerable.Empty<string>();
+
+    private string ExampleUrl => string.IsNullOrEmpty(Example) ? $"{Name}Page.razor" : $"{Example}.razor";
 
     Example example;
 
