@@ -1,4 +1,6 @@
+@inherits Radzen.RadzenComponent
 @inject IJSRuntime JSRuntime
+
 
 <div @ref="editor" style="height: 500px; width: 100%;"></div>
 @code {
@@ -6,11 +8,14 @@
     ElementReference editor;
     DotNetObjectReference<Monaco> reference;
 
+
     [Parameter]
     public string Value { get; set; }
 
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
+
+    public string Id => GetId();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -18,7 +23,7 @@
         {
             reference = DotNetObjectReference.Create(this);
 
-            monaco = await JSRuntime.InvokeAsync<IJSObjectReference>("createEditor", editor, reference, new {
+            monaco = await JSRuntime.InvokeAsync<IJSObjectReference>("createEditor", editor, GetId(), reference, new {
                 language = "razor",
                 theme = "vs",
                 codeLens = false,

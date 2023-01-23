@@ -3,11 +3,19 @@
 @inject CompilerService Compiler
 
 <RadzenButton Click="Run" Icon="play_circle" />
-<Monaco @bind-Value="source" />
-
+<button class="rz-button rz-button-md rz-button-icon-only" onclick=@Copy>
+    <RadzenIcon Icon="content_copy" />
+</button>
+<RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+    @error
+</RadzenAlert>
+<Monaco @bind-Value="source" @ref="@monaco" />
 @code {
+    private string Copy => $"copy('{monaco?.Id}')";
+    private Monaco monaco;
     private ElementReference pre;
     private string source;
+    private string error;
 
     [Parameter]
     public EventCallback<Type> Compiled { get; set; }
@@ -25,16 +33,17 @@
 
     private async Task Run()
     {
-        var type = await Compiler.CompileAsync(source);
-
-        await Compiled.InvokeAsync(type);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!String.IsNullOrEmpty(source))
+        try
         {
-            //await JSRuntime.InvokeAsync<object>("hljs.highlightBlock", pre);
+            error = null;
+
+            var type = await Compiler.CompileAsync(source);
+
+            await Compiled.InvokeAsync(type);
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
         }
     }
 }
