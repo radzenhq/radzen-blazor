@@ -2797,6 +2797,7 @@ namespace Radzen.Blazor
                         {
                             c.SetVisible(true);
                         });
+                        columns = allColumns.Where(c => c.Parent == null).ToList();
                         InvokeAsync(Reload);
 
                         canSaveSettings = true;

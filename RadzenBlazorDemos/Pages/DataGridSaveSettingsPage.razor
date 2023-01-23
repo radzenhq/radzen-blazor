@@ -23,7 +23,7 @@
     <RadzenButton Click="@(args => NavigationManager.NavigateTo("/datagrid-save-settings", true))" Text="Reload" Style="margin-bottom: 16px" />
     <RadzenDataGrid @bind-Settings="@Settings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
                     AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" 
-                    AllowColumnResize="true" ColumnWidth="200px"
+                    AllowColumnResize="true" AllowColumnReorder="true" ColumnWidth="200px"
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@employees" TItem="Employee">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
