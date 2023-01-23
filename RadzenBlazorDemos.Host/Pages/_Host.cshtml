@@ -59,12 +59,19 @@
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.nls.js"></script>
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.js"></script>
     <script>
-        function createEditor(element, ref, options) {
+        var instances = {};
+        function createEditor(element, id, ref, options) {
             var instance = monaco.editor.create(element, options);
             instance.onDidChangeModelContent = function () {
                 ref.invokeMethodAsync('OnChangeAsync', instance.getValue());
             };
+            instances[id] = instance;
             return instance;
+        }
+
+        function copy(id) {
+            var text = instances[id].getValue();
+            navigator.clipboard.writeText(text);
         }
     </script>
 </body>
