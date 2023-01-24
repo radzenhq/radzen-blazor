@@ -814,7 +814,7 @@ window.Radzen = {
         if(e.type == 'contextmenu' || !e.target || !closeOnDocumentClick) return;
         if (!/Android/i.test(navigator.userAgent) &&
             !['input', 'textarea'].includes(document.activeElement ? document.activeElement.tagName.toLowerCase() : '') && e.type == 'resize') {
-            Radzen.closePopup(id, instance, callback);
+            Radzen.closePopup(id, instance, callback, e);
             return;
         }
         var closestPopup = e.target.closest && (e.target.closest('.rz-popup') || e.target.closest('.rz-overlaypanel'));
@@ -823,11 +823,11 @@ window.Radzen = {
         }
         if (parent) {
           if (e.type == 'mousedown' && !parent.contains(e.target) && !popup.contains(e.target)) {
-            Radzen.closePopup(id, instance, callback);
+            Radzen.closePopup(id, instance, callback, e);
           }
         } else {
           if (!popup.contains(e.target)) {
-            Radzen.closePopup(id, instance, callback);
+            Radzen.closePopup(id, instance, callback, e);
           }
         }
     };
@@ -842,7 +842,7 @@ window.Radzen = {
                     return;
                 }
 
-                Radzen.closePopup(p.id, p.instance, p.callback);
+                Radzen.closePopup(p.id, p.instance, p.callback, e);
             }
             Radzen.popups = [];
         };
@@ -871,7 +871,7 @@ window.Radzen = {
         document.addEventListener('contextmenu', Radzen[id]);
     }
   },
-  closePopup: function (id, instance, callback) {
+  closePopup: function (id, instance, callback, e) {
     var popup = document.getElementById(id);
     if (!popup) return;
     if (popup.style.display == 'none') return;
@@ -901,6 +901,9 @@ window.Radzen = {
         Radzen.activeElement && document.activeElement &&
             (document.activeElement.classList.contains('rz-dropdown-filter') || document.activeElement.classList.contains('rz-lookup-search-input'))) {
         setTimeout(function () {
+            if (e.target && e.target.tabIndex != -1) {
+                Radzen.activeElement = e.target;
+            }
             if (Radzen.activeElement) {
                Radzen.activeElement.focus();
             }
