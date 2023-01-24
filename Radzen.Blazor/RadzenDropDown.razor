@@ -42,7 +42,14 @@
                 {
                     <div class="rz-chip">
                         <span class="rz-chip-text">
-                            @GetItemOrValueFromProperty(item, TextProperty)
+                            @if(Template != null)
+                            {
+                                @Template(item)
+                            }
+                            else
+                            {
+                                @GetItemOrValueFromProperty(item, TextProperty)
+                            }
                         </span>
                         <button type=button class="rz-button rz-button-sm rz-button-icon-only rz-light @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
                     </div>
