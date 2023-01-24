@@ -34,7 +34,7 @@
                 }
                 @if (!string.IsNullOrEmpty(item.Text))
                 {
-                    <span>@item.Text</span>
+                    <span>@((MarkupString)item.Text)</span>
                 }
             </a>
         </div>
