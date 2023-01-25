@@ -901,7 +901,7 @@ window.Radzen = {
         Radzen.activeElement && document.activeElement &&
             (document.activeElement.classList.contains('rz-dropdown-filter') || document.activeElement.classList.contains('rz-lookup-search-input'))) {
         setTimeout(function () {
-            if (e.target && e.target.tabIndex != -1) {
+            if (e && e.target && e.target.tabIndex != -1) {
                 Radzen.activeElement = e.target;
             }
             if (Radzen.activeElement) {
