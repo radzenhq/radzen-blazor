@@ -42,7 +42,7 @@ else
         @if (property.FilterTemplate != null)
         {
             <div class="rz-datafilter-editor" style="display:flex">
-                @property.FilterTemplate(property)
+                @property.FilterTemplate(Filter)
             </div>
         }
         else if (PropertyAccess.IsNullableEnum(property.FilterPropertyType) || PropertyAccess.IsEnum(property.FilterPropertyType))

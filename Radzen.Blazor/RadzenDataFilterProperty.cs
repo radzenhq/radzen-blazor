@@ -130,7 +130,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The filter template.</value>
         [Parameter]
-        public RenderFragment<RadzenDataFilterProperty<TItem>> FilterTemplate { get; set; }
+        public RenderFragment<CompositeFilterDescriptor> FilterTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the data type.
