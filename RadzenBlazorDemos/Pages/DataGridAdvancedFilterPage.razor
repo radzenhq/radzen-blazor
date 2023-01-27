@@ -14,7 +14,7 @@
     <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" 
         FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" 
         FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-        LogicalFilterOperator="LogicalFilterOperator.Or">
+        LogicalFilterOperator="LogicalFilterOperator.Or" FilterPopupRenderMode="PopupRenderMode.OnDemand">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
