@@ -15,7 +15,7 @@
 
 <RadzenExample Name="DataGridConditionalTemplate" Heading="false" Documentation="false">
     <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3">Order Details</RadzenText>
-    <RadzenDataGrid AllowFiltering="false" AllowPaging="true" AllowSorting="false" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+    <RadzenDataGrid AllowFiltering="false" AllowPaging="true" AllowSorting="false" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 Data="@orderDetails" TItem="OrderDetail" ColumnWidth="200px" 
                 RowRender="@RowRender" CellRender="@CellRender" HeaderCellRender="@HeaderFooterCellRender" FooterCellRender="@HeaderFooterCellRender">
         <Columns>

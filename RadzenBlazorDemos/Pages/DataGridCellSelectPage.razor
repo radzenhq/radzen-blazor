@@ -19,7 +19,7 @@
         <RadzenDropDown @bind-Value="@type" Data="@(new string[]{ "Click", "DoubleClick" })" Name="type" style="margin-right: 16px"  />
         <RadzenButton Text="Clear selected cells" Click="@(args => selectedCellData.Clear())" />
     </div>
-    <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+    <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                 AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
                 CellClick="@OnCellClick" CellDoubleClick="OnCellDoubleClick" CellRender="OnCellRender">
         <Columns>

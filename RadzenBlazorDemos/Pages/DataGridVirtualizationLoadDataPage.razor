@@ -15,7 +15,7 @@
 
 <RadzenExample Name="DataGridVirtualizationLoadData" Heading="false" Documentation="false">
     <RadzenDataGrid Data="@orderDetails" Count="@count" LoadData="@LoadData" TItem="OrderDetail" AllowVirtualization="true" Style="height:400px"
-                    AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" LogicalFilterOperator="LogicalFilterOperator.Or"
+                    AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" LogicalFilterOperator="LogicalFilterOperator.Or"
                     AllowSorting="true">
         <Columns>
             <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />

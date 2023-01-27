@@ -21,7 +21,7 @@
 </RadzenText>
 
 <RadzenExample Name="DataGridColumnTemplate" Heading="false" Documentation="false">
-<RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" 
+<RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" PageSize="5" AllowSorting="true" 
             Data="@orders" TItem="Order">
     <Columns>
         <RadzenDataGridColumn Width="50px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">

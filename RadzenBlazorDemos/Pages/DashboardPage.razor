@@ -112,7 +112,7 @@
     <div class="col p-2">
         <RadzenCard>
             <RadzenText TextStyle="TextStyle.H6">Issue List</RadzenText>
-            <RadzenDataGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true" AllowSorting="true">
+            <RadzenDataGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowSorting="true">
                 <Columns>
                     <RadzenDataGridColumn TItem="Issue" Title="User" Width="200px" Property="User.Login" FilterValue="@selectedUser?.Login">
                         <FilterTemplate>

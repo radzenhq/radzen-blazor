@@ -35,7 +35,7 @@
             <div class="col-12 mb-4">
                 <RadzenCard>
                     <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Order Details</RadzenText>
-                    <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                    <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
                                 Data="@(orderDetails.Where(o => o.OrderID == OrderID))" TItem="OrderDetail" ColumnWidth="200px">
                         <Columns>
                             <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />

@@ -24,7 +24,7 @@
     <RadzenDataGrid @bind-Settings="@Settings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
                     AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" 
                     AllowColumnResize="true" AllowColumnReorder="true" ColumnWidth="200px"
-                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@employees" TItem="Employee">
+                    FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@employees" TItem="Employee">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
                 <Template Context="data">

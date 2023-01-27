@@ -13,7 +13,7 @@
 
 <RadzenExample Name="DataGridCellContextMenu" Heading="false" Documentation="false">
     <p>Right click on a table cell to open the context menu.</p>
-    <RadzenDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+    <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                 AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
                 SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees CellContextMenu="@OnCellContextMenu">
         <Columns>
