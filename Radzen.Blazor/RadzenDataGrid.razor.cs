@@ -2139,6 +2139,30 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Edits a range of rows.
+        /// </summary>
+        /// <param name="items">The range of rows.</param>
+        public async System.Threading.Tasks.Task EditRows(IEnumerable<TItem> items)
+        {
+            // Only allow the functionality when multiple row edits is allowed
+            if (this.EditMode != DataGridEditMode.Multiple) return;
+
+            foreach (TItem item in items)
+            {
+                if (!editedItems.Keys.Contains(item))
+                {
+                    editedItems.Add(item, true);
+
+                    var editContext = new EditContext(item);
+                    editContexts.Add(item, editContext);
+
+                    await RowEdit.InvokeAsync(item);
+                }
+            }
+            StateHasChanged();
+        }
+
+        /// <summary>
         /// Updates the row.
         /// </summary>
         /// <param name="item">The item.</param>
@@ -2213,6 +2237,23 @@ namespace Radzen.Blazor
                     StateHasChanged();
                 }
             }
+        }
+
+        /// <summary>
+        /// Cancels the edit of a range of rows.
+        /// </summary>
+        /// <param name="items">The range of rows.</param>
+        public void CancelEditRows(IEnumerable<TItem> items)
+        {
+            foreach (TItem item in items)
+            {
+                if (editedItems.Keys.Contains(item))
+                {
+                    editedItems.Remove(item);
+                    editContexts.Remove(item);
+                }
+            }
+            StateHasChanged();
         }
 
         /// <summary>
