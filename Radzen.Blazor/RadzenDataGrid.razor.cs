@@ -670,7 +670,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The render mode.</value>
         [Parameter]
-        public PopupRenderMode FilterPopupRenderMode { get; set; } = PopupRenderMode.OnDemand;
+        public PopupRenderMode FilterPopupRenderMode { get; set; } = PopupRenderMode.Initial;
 
         internal async Task ClearFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
         {
