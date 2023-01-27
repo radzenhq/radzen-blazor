@@ -123,111 +123,56 @@ text-decoration: none;
 /* next-demos */
 
 body {
-    background-color: #F4F5F9;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-.stage {
-    padding-top: 6rem;
-    padding-bottom: 6rem;
-}
-
 .light {
     padding-top: 3rem;
+    padding-bottom: 6rem;
     background-image: url("../images/background.svg");
     background-repeat: no-repeat;
     background-position: 50% -700px;
 }
 
 .dark {
+    padding-top: 6rem;
+    padding-bottom: 3rem;
     background-color: #050A23;
     background-image: url("../images/background.svg");
     background-repeat: no-repeat;
     background-position: 50% 0;
-    padding-bottom: 3rem;
 }
 
-.next {
-    background: #f5f5f5;
-}
-
-.next a {
-    color: #FF504D;
+.demos-home a {
+    color: var(--rz-link-color);
     text-decoration: none;
 }
 
-.next a:hover {
-    color: #FF7371;
+.demos-home a:hover {
+    color: var(--rz-link-hover-color);
     text-decoration: none;
 }
 
 .dark a {
-    color: #FF9C9A;
+    color: var(--rz-link-color);
     text-decoration: none;
 }
 
 .dark a:hover {
-    color: #FF504D;
+    color: var(--rz-link-hover-color);
     text-decoration: none;
 }
 
-.next h1,
-.next h2,
-.next h3,
-.next h4,
-.next h5,
-.next h6 {
-    line-height: 100%;
-    color: #050A23;
-}
-
-.next .dark,
-.next .dark h1,
-.next .dark h2,
-.next .dark h3,
-.next .dark h4,
-.next .dark h5,
-.next .dark h6,
-.next .dark p {
-    color: #ffffff;
-}
-.next h1 {
-    font-weight: bold;
-    font-size: 72px;
-    letter-spacing: -0.02em;
-}
-
-.next .subtitle {
-    font-weight: 100;
-    font-size: 24px;
-    line-height: 1.3em;
-    margin: 3rem 0 3.75rem;
-}
-
-.next .subtitle strong {
-    font-weight: 700;
-}
-
-.next .description {
-    font-weight: 300;
-    font-size: 16px;
-    line-height: 100%;
-    margin-bottom: 4rem;
-}
-
-.next h3 {
-    font-weight: 700;
-    font-size: 2rem;
-    line-height: 2.5rem;
-    letter-spacing: -0.02em;
-    margin-bottom: 1.25rem;
-}
-
-.next p {
-    font-size: 18px;
-    font-weight: 400;
-    color: #515256;
+.demos-home.dark,
+.demos-home.dark h1,
+.demos-home.dark h2,
+.demos-home.dark h3,
+.demos-home.dark h4,
+.demos-home.dark h5,
+.demos-home.dark h6,
+.demos-home.dark p {
+    color: #ffffff !important;
 }
 
 /* Top navigation links */
@@ -235,14 +180,14 @@ body {
     display: inline-block;
     height: 2rem;
     line-height: 2rem;
-    color: #050A23;
+    color: var(--rz-text-title-color);
     margin: .5rem 0 0 2.5rem;
     transition: all 0.3s;
     text-decoration: none;
 }
 
 .nav-links a:hover {
-    color: #FF504D;
+    color: var(--rz-link-hover-color);
     text-decoration: none;
 }
 
@@ -257,10 +202,6 @@ body {
 
 /* CTA Buttons */
 
-.cta-strip {
-    margin-top: 4rem;
-}
-
 .cta-button {
     text-decoration: none;
     display: inline-block;
@@ -272,11 +213,11 @@ body {
     text-align: center;
     white-space: nowrap;
     padding: 1rem 2rem;
-    margin: 1rem .5rem 0;
+    margin: 1rem 0;
     border-radius: .75rem;
-    border: 1px solid #050A23;
+    border: 1px solid var(--rz-text-color);
     box-sizing: border-box;
-    color: #050A23 !important;
+    color: var(--rz-text-color) !important;
     transition: all 0.3s ease-in-out;
 }
 
@@ -294,9 +235,9 @@ body {
 
 .cta-button:hover {
     text-decoration: none;
-    color: #ffffff !important;
-    border-color: #050A23;
-    background: #050A23;
+    color: var(--rz-text-contrast-color) !important;
+    border-color: var(--rz-base-800);
+    background: var(--rz-base-800);
 }
 .dark .cta-button:hover {
     text-decoration: none;
@@ -312,40 +253,11 @@ body {
     color: #515256 !important;
 }
 
-/* Customer Logos */
-
-.row.customers {
-    margin-top: 5rem;
-    margin-bottom: 1rem;
-    border-radius: .75rem;
-    background-color: #ffffff;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.06);
-}
-
-.row.customers h3 {
-    font-size: 1rem;
-    font-weight: 300;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    min-width: 110px;
-    margin: 2rem 0;
-}
-
-.row .logos {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-around;
-    column-gap: 32px;
-    row-gap: 48px;
-    padding: 3rem 5rem;
-}
-
-.row .logos img {
+/* Updated layout */
+.customers-logos img {
     height: 28px;
 }
-
-.row .logos .square {
+.customers-logos .square {
     height: 64px;
 }
 
@@ -380,15 +292,15 @@ video {
 .popular-components a {
     font-size: 1.125rem;
     font-weight: 600;
-    color: #1151f3;
+    color: var(--rz-link-color);
     transition: all 0.2s;
     border-bottom: 1px solid transparent;
     text-decoration: none;
 }
 
 .popular-components a:hover {
-    color: #0E44CC;
-    border-bottom-color: #0E44CC;
+    color: var(--rz-link-hover-color);
+    border-bottom-color: var(--rz-link-hover-color);
 }
 
 .popular-components .component-icon {
@@ -400,6 +312,9 @@ video {
 
 
 /* All Components */
+.all-components {
+    --rz-text-subtitle1-font-weight: 600;
+}
 
 .all-components ul {
     list-style-type: none;
@@ -410,7 +325,7 @@ video {
 .all-components li {
     display: flex;
     align-items: flex-start;
-    padding: 0.25rem 0;
+    padding: 0.5rem 0 0.25rem;
 }
 
 .all-components h4 {
@@ -422,15 +337,15 @@ video {
 
 .all-components a {
     line-height: 1rem;
-    color: #1151f3;
+    color: var(--rz-link-color);
     transition: all 0.2s;
     border-bottom: 1px solid transparent;
     text-decoration: none;
 }
 
 .all-components a:hover {
-    color: #0E44CC;
-    border-bottom-color: #0E44CC;
+    color: var(--rz-link-hover-color);
+    border-bottom-color: var(--rz-link-hover-color);
     text-decoration: none;
 }
 
@@ -443,19 +358,19 @@ video {
 
 /* Footer */
 
-.row.copyright {
+.copyright {
     margin-top: 6rem;
     opacity: .2;
     transition: all 0.4s ease-in-out;
 }
+.copyright:hover {
+    opacity: 1;
+}
+
 .row.copyright p {
     font-size: 1rem;
     font-weight: 300;
     color: #ACAFB9;
-}
-
-.row.copyright:hover {
-    opacity: 1;
 }
 
 /* Demos Content */
@@ -541,7 +456,7 @@ svg.illustration {
 }
 
 @media (max-width: 576px) {
-    .next h1 {
+    .demos-home h1 {
         font-size: 3.5rem;
     }
     .all-components h4 {
