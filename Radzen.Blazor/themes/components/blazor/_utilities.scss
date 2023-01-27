@@ -426,6 +426,7 @@ $rz-gutter-map: map-merge(
 // Example .rz-display-block
 $display: none, block, inline, inline-block, flex, inline-flex, grid, inline-grid;
 @include rz-utility-list-css('display', $display);
+@include rz-utility-list-breakpoints-css('display', $display, $rz-breakpoints-map);
 
 // Justify-content
 // Example .rz-justify-content-center
