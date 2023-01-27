@@ -1,4 +1,5 @@
 ﻿@typeparam TItem
+@using Radzen.Blazor.Rendering
 @if (RowIndex == Column.GetLevel())
 {
 <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex)) >
@@ -53,10 +54,10 @@
         }
         @if (Grid.AllowFiltering && Column.Filterable && Grid.FilterMode == FilterMode.Advanced)
         {
-            <i @onclick:stopPropagation="true" onclick="@($"Radzen.togglePopup(this, '{getColumnPopupID()}')")"
+                <i @ref=@filterButton @onclick:stopPropagation="true" @onmousedown=@ToggleFilter
                 class="@getFilterIconCss(Column)" />
 
-                <div id="@($"{getColumnPopupID()}")" class="rz-overlaypanel"
+                <Popup Lazy=@(Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand) @ref=popup id="@($"{getColumnPopupID()}")" class="rz-overlaypanel"
                     style="display:none;min-width:250px;" tabindex="0">
                         <div class="rz-grid-filter rz-overlaypanel-content">
                             @if (Column.FilterTemplate != null)
@@ -126,11 +127,11 @@
                         @if (Column.FilterTemplate == null)
                         {
                             <div class="rz-grid-filter-buttons">
-                                <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text=@Grid.ClearFilterText Click="@((args) => Grid.ClearFilter(Column, true))" />
-                                <RadzenButton ButtonStyle="ButtonStyle.Primary" Text=@Grid.ApplyFilterText Click="@((args) => Grid.ApplyFilter(Column, true))" />
+                                <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text=@Grid.ClearFilterText Click="@ClearFilter" />
+                                <RadzenButton ButtonStyle="ButtonStyle.Primary" Text=@Grid.ApplyFilterText Click="@ApplyFilter" />
                             </div>
                         }
-                    </div>
+                    </Popup>
         }
     </div>
 </th>
@@ -144,6 +145,26 @@ else
     }
 }
 @code {
+    Radzen.Blazor.Rendering.Popup popup;
+    ElementReference filterButton;
+
+    async Task ToggleFilter()
+    {
+        await popup.ToggleAsync(filterButton);
+    }
+
+    async Task ClearFilter()
+    {
+        await popup.CloseAsync();
+        await Grid.ClearFilter(Column, true);
+    }
+
+    async Task ApplyFilter()
+    {
+        await popup.CloseAsync();
+        await Grid.ApplyFilter(Column, true);
+    }
+
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object> Attributes { get; set; }
 

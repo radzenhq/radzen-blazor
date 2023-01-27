@@ -665,6 +665,13 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<DataGridColumnFilterEventArgs<TItem>> FilterCleared { get; set; }
 
+        /// <summary>
+        /// Gets or sets the render mode.
+        /// </summary>
+        /// <value>The render mode.</value>
+        [Parameter]
+        public PopupRenderMode FilterPopupRenderMode { get; set; } = PopupRenderMode.OnDemand;
+
         internal async Task ClearFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
         {
             if (closePopup)
