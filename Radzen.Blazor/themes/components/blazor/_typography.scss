@@ -115,6 +115,34 @@ $text-align: (
   }
 }
 
+// Text Align with responsive breakpoints
+@each $breakpoint, $breakpoint-value in $rz-breakpoints-map {
+  @media (min-width: #{$breakpoint-value}) {
+    @each $name, $property in $text-align {
+      .rz-text-align-#{$breakpoint}-#{$name} {
+        @each $property, $value in $property {
+          #{$property}: #{$value} !important;
+        }
+      }
+    }
+  }
+}
+
+// Text Wrap, NoWrap and Truncate
+.rz-text-wrap {
+  white-space: normal !important;
+}
+
+.rz-text-nowrap {
+  white-space: nowrap !important;
+}
+
+.rz-text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 // Body
 @if $base == false {
   :root {
