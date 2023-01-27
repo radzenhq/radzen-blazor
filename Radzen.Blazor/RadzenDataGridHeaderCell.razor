@@ -55,7 +55,7 @@
         @if (Grid.AllowFiltering && Column.Filterable && Grid.FilterMode == FilterMode.Advanced)
         {
                 <i @ref=@filterButton @onclick:stopPropagation="true" @onmousedown=@ToggleFilter
-                class="@getFilterIconCss(Column)" />
+                   class="@getFilterIconCss(Column)" onclick=@getFilterOpen() />
 
                 <Popup Lazy=@(Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand) @ref=popup id="@($"{getColumnPopupID()}")" class="rz-overlaypanel"
                     style="display:none;min-width:250px;" tabindex="0">
@@ -148,20 +148,34 @@ else
     Radzen.Blazor.Rendering.Popup popup;
     ElementReference filterButton;
 
+    string getFilterOpen()
+    {
+        return Grid.FilterPopupRenderMode == PopupRenderMode.Initial ? $"Radzen.togglePopup(this, '{getColumnPopupID()}')" : "";
+    }
+
     async Task ToggleFilter()
     {
-        await popup.ToggleAsync(filterButton);
+        if (Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand)
+        {
+            await popup.ToggleAsync(filterButton);
+        }
     }
 
     async Task ClearFilter()
     {
-        await popup.CloseAsync();
+        if (Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand)
+        {
+            await popup.CloseAsync();
+        }
         await Grid.ClearFilter(Column, true);
     }
 
     async Task ApplyFilter()
     {
-        await popup.CloseAsync();
+        if (Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand)
+        {
+            await popup.CloseAsync();
+        }
         await Grid.ApplyFilter(Column, true);
     }
 
