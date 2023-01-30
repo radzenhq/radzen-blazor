@@ -1889,16 +1889,15 @@ namespace Radzen.Blazor
                 var itemToCollapse = expandedItems.Keys.FirstOrDefault();
                 if (itemToCollapse != null)
                 {
-                    expandedItems.Remove(itemToCollapse);
-                    await RowCollapse.InvokeAsync(itemToCollapse);
-
                     if (object.Equals(item, itemToCollapse))
                     {
                         return;
                     }
 
-                }
-            }
+					expandedItems.Remove(itemToCollapse);
+					await RowCollapse.InvokeAsync(itemToCollapse);
+				}
+			}
 
             if (!expandedItems.Keys.Contains(item))
             {
@@ -1911,17 +1910,6 @@ namespace Radzen.Blazor
                 if (args.Data != null && !childData.ContainsKey(item))
                 {
                     childData.Add(item, new DataGridChildData<TItem>() { Data = args.Data, ParentChildData = childData.Where(c => c.Value.Data.Contains(item)).Select(c => c.Value).FirstOrDefault() });
-                    _view = null;
-                }
-            }
-            else
-            {
-                expandedItems.Remove(item);
-                await RowCollapse.InvokeAsync(item);
-
-                if (childData.ContainsKey(item))
-                {
-                    childData.Remove(item);
                     _view = null;
                 }
             }
