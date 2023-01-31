@@ -31,6 +31,19 @@ namespace Radzen.Blazor
     public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem>
     {
 #if NET5_0_OR_GREATER
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is virtualized.
+        /// </summary>
+        /// <value><c>true</c> if this instance is virtualized; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowVirtualization { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that determines how many additional items will be rendered before and after the visible region. This help to reduce the frequency of rendering during scrolling. However, higher values mean that more elements will be present in the page.
+        /// </summary>
+        [Parameter]
+        public int VirtualizationOverscanCount { get; set; }
+
         internal void SetAllowVirtualization(bool allowVirtualization)
         {
             AllowVirtualization = allowVirtualization;
@@ -143,6 +156,11 @@ namespace Radzen.Blazor
                                 b.CloseComponent();
                             });
                         }));
+
+                        if(VirtualizationOverscanCount != default(int))
+                        {
+                            builder.AddAttribute(1, "OverscanCount", VirtualizationOverscanCount);
+                        }
 
                         builder.AddComponentReferenceCapture(8, c => { virtualize = (Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>)c; });
 
@@ -1002,14 +1020,7 @@ namespace Radzen.Blazor
         /// <value>The empty template.</value>
         [Parameter]
         public RenderFragment EmptyTemplate { get; set; }
-#if NET5_0_OR_GREATER
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is virtualized.
-        /// </summary>
-        /// <value><c>true</c> if this instance is virtualized; otherwise, <c>false</c>.</value>
-        [Parameter]
-        public bool AllowVirtualization { get; set; }
-#endif
+
         /// <summary>
         /// Gets or sets a value indicating whether this instance loading indicator is shown.
         /// </summary>
