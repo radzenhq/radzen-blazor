@@ -1,0 +1,17 @@
+@typeparam TItem
+@inherits RadzenDataFilterProperty<TItem>
+
+@code {
+    public override IEnumerable<FilterOperator> GetFilterOperators()
+    {
+        var operators = base.GetFilterOperators();
+
+        if (typeof(System.Collections.IEnumerable).IsAssignableFrom(FilterPropertyType) || typeof(IEnumerable<>).IsAssignableFrom(FilterPropertyType))
+        {
+            operators = operators.Where(o => 
+                o == FilterOperator.Contains || o == FilterOperator.DoesNotContain);
+        }
+
+        return operators;
+    }
+}

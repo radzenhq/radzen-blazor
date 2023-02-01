@@ -553,11 +553,26 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "DataFilter",
-                    Title = "Blazor data filter component",
-                    New = true,
-                    Path = "datafilter",
                     Icon = "&#xef4f",
-                    Tags = new [] { "dataview", "grid", "table", "filter" }
+                    Tags = new [] { "dataview", "grid", "table", "filter" },
+                    Children = new [] {
+                        new Example
+                        {
+                            Name = "IQueryable",
+                            Title = "Blazor data filter component",
+                            New = true,
+                            Path = "datafilter",
+                            Tags = new [] { "dataview", "grid", "table", "filter" },
+                        },
+                        new Example
+                        {
+                            Name = "OData service",
+                            Title = "Blazor data filter with OData",
+                            New = true,
+                            Path = "datafilter-odata",
+                            Tags = new [] { "dataview", "grid", "table", "filter", "odata" },
+                        }
+                    }
                 },
                 new Example()
                 {

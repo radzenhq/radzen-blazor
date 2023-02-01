@@ -1165,6 +1165,137 @@ namespace Radzen
             }
         }
 
+
+        /// <summary>
+        /// Converts to OData filter expression.
+        /// </summary>
+        /// <param name="dataFilter">The DataFilter.</param>
+        /// <returns>System.String.</returns>
+        public static string ToODataFilterString<T>(this RadzenDataFilter<T> dataFilter)
+        {
+            Func<CompositeFilterDescriptor, bool> canFilter = (c) => dataFilter.properties.Where(col => col.Property == c.Property).FirstOrDefault()?.FilterPropertyType != null &&
+               (!(c.FilterValue == null || c.FilterValue as string == string.Empty)
+                || c.FilterOperator == FilterOperator.IsNotNull || c.FilterOperator == FilterOperator.IsNull
+                || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty)
+               && c.Property != null;
+
+            if (dataFilter.Filters.Where(canFilter).Any())
+            {
+                var filterExpressions = new List<string>();
+
+                foreach (var filter in dataFilter.Filters)
+                {
+                    AddODataExpression(canFilter, filter, ref filterExpressions, dataFilter);
+                }
+
+                return filterExpressions.Any() ?
+                    string.Join($" {dataFilter.LogicalFilterOperator.ToString().ToLower()} ", filterExpressions)
+                    : "";
+            }
+            return "";
+        }
+
+        private static void AddODataExpression<T>(Func<CompositeFilterDescriptor, bool> canFilter, CompositeFilterDescriptor filter, ref List<string> filterExpressions, RadzenDataFilter<T> dataFilter)
+        {
+            if (filter.Filters != null)
+            {
+                var innerFilterExpressions = new List<string>();
+
+                foreach (var f in filter.Filters)
+                {
+                    AddODataExpression(canFilter, f, ref innerFilterExpressions, dataFilter);
+                }
+
+                if (innerFilterExpressions.Any())
+                {
+                    filterExpressions.Add("(" + string.Join($" {filter.LogicalFilterOperator.ToString().ToLower()} ", innerFilterExpressions) + ")");
+                }
+            }
+            else
+            {
+                if (filter.Property == null || (filter.FilterValue == null &&
+                    filter.FilterOperator != FilterOperator.IsNull && filter.FilterOperator != FilterOperator.IsNotNull))
+                {
+                    return;
+                }
+
+                var property = filter.Property.Replace('.', '/');
+               
+                var column = dataFilter.properties.Where(c => c.Property == filter.Property).FirstOrDefault();
+                if (column == null) return;
+
+                if (dataFilter.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive && column.FilterPropertyType == typeof(string))
+                {
+                    property = $"tolower({property})";
+                }
+
+                if (filter.FilterOperator == FilterOperator.StartsWith || filter.FilterOperator == FilterOperator.EndsWith
+                    || filter.FilterOperator == FilterOperator.Contains || filter.FilterOperator == FilterOperator.DoesNotContain)
+                {
+                    if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) &&
+                        (filter.FilterOperator == FilterOperator.Contains || filter.FilterOperator == FilterOperator.DoesNotContain))
+                    {
+                        var enumerableValue = ((IEnumerable)(filter.FilterValue != null ? filter.FilterValue : Enumerable.Empty<object>())).AsQueryable();
+
+                        var enumerableValueAsString = "(" + String.Join(",",
+                                (enumerableValue.ElementType == typeof(string) ? enumerableValue.Cast<string>().Select(i => $@"'{i}'").Cast<object>() : enumerableValue.Cast<object>())) + ")";
+
+                        if (enumerableValue.Any() && filter.FilterOperator == FilterOperator.Contains)
+                        {
+                            filterExpressions.Add($"{property} in {enumerableValueAsString}");
+                        }
+                        else if (enumerableValue.Any() && filter.FilterOperator == FilterOperator.DoesNotContain)
+                        {
+                            filterExpressions.Add($"not({property} in {enumerableValueAsString})");
+                        }
+                    }
+                    else
+                    {
+                        var expression = dataFilter.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
+                            $"{ODataFilterOperators[filter.FilterOperator]}({property}, tolower('{filter.FilterValue}'))" :
+                            $"{ODataFilterOperators[filter.FilterOperator]}({property}, '{filter.FilterValue}')";
+
+                        if (filter.FilterOperator == FilterOperator.DoesNotContain)
+                        {
+                            expression = $"not({expression})";
+                        }
+
+                        filterExpressions.Add(expression);
+                    }
+                }
+                else 
+                {
+                    if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
+                        return;
+
+                    var value = $"{filter.FilterValue}";
+
+                    if (filter.FilterOperator == FilterOperator.IsNull || filter.FilterOperator == FilterOperator.IsNotNull)
+                    {
+                        value = $"null";
+                    }
+                    else if (filter.FilterOperator == FilterOperator.IsEmpty || filter.FilterOperator == FilterOperator.IsNotEmpty)
+                    {
+                        value = $"''";
+                    }
+                    else if (column.FilterPropertyType == typeof(string))
+                    {
+                        value = $"'{value}'";
+                    }
+                    else if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?))
+                    {
+                        value = $"{DateTime.Parse(value, null, System.Globalization.DateTimeStyles.RoundtripKind).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")}";
+                    }
+                    else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
+                    {
+                        value = $"{value?.ToLower()}";
+                    }
+
+                    filterExpressions.Add($@"{property} {ODataFilterOperators[filter.FilterOperator]} {value}");
+                }
+            }
+        }
+
         /// <summary>
         /// Ases the o data enumerable.
         /// </summary>
