@@ -73,6 +73,8 @@ font-weight: bold;
 position: relative;
 float: right;
 margin-left: -100%;
+padding-top: 0.5rem;
+padding-right: 1rem;
 }
 
 .documentation-links a {
@@ -423,6 +425,7 @@ svg.illustration {
 .example-container {
     max-width: 1440px;
 }
+
 /* Demos Sidebar */
 
 .demos-sidebar .rz-panel-menu .rz-navigation-item-icon-children {
@@ -433,6 +436,38 @@ svg.illustration {
     margin-left: 0.5rem;
     font-size: 9px;
     line-height: 12px;
+}
+
+/* Demos Tabs */
+
+.example-tabs > .rz-tabview-panels {
+    border-right: none;
+    border-bottom: none;
+    border-left: none;
+}
+
+.example-tabs > .rz-tabview-nav {
+    background-color: var(--rz-tabs-tab-background-color);
+    border-radius: var(--rz-card-border-radius) var(--rz-card-border-radius) 0 0;
+    padding: 0 1rem;
+}
+
+.rz-tabview-top.example-tabs > .rz-tabview-nav > li {
+    z-index: 1;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    transition: none;
+}
+
+.monaco-editor .view-overlays .current-line {
+    border: none !important;
+}
+
+.source-tab-item {
+    margin: calc(-1 * var(--rz-tabs-padding));
+    overflow: hidden;
 }
 
 /* Responsive */
