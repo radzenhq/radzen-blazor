@@ -143,6 +143,21 @@ $text-align: (
   white-space: nowrap;
 }
 
+// Text Transform
+$text-transform: (
+  capitalize: (text-transform: capitalize),
+  uppercase: (text-transform: uppercase),
+  lowercase: (text-transform: lowercase),
+) !default;
+
+@each $name, $property in $text-transform {
+  .rz-text-#{$name} {
+    @each $property, $value in $property {
+      #{$property}: #{$value};
+    }
+  }
+}
+
 // Body
 @if $base == false {
   :root {
