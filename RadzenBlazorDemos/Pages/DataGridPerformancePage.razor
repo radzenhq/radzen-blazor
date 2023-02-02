@@ -10,11 +10,11 @@
     DataGrid
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" Class="my-4">
-    DataGrid paging, sorting, filtering and grouping through large Entity Framework query without extra code.
+    This demo shows RadzenDataGrid can handle large amounts of data (~50,000 rows) without any performance issues.
 </RadzenText>
 
 <RadzenExample Name="DataGridPerformance" Heading="false" Documentation="false">
-    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" 
+    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced"
         AllowGrouping="true" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
         Data="@data" TItem="OrderAndDetail" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" ShowPagingSummary="true"
         IsLoading=@isLoading Sort="@ShowLoading" Page="@ShowLoading" Group="@ShowLoading" Filter="@ShowLoading">
@@ -71,7 +71,7 @@
                     Discount = od.Discount,
                     CustomerID = o.CustomerID,
                     OrderDate = o.OrderDate,
-                    EmployeeID = o.EmployeeID,
+                    EmployeeID = e.EmployeeID,
                     Photo = e.Photo,
                     FirstName = e.FirstName,
                     LastName = e.LastName,
