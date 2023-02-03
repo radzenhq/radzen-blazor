@@ -2,14 +2,31 @@
 @inject IJSRuntime JSRuntime
 @inject CompilerService Compiler
 
-<RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0.5rem" Class="rz-p-2" Style="border-bottom: var(--rz-border-disabled);">
-    <RadzenButton Click="Run" Text="Run" Icon="play_circle_outline" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Title="Preview edits" Class="rz-text-truncate" />
-    <button class="rz-button rz-button-xs rz-variant-text rz-primary  rz-shade-default rz-text-truncate" Title="Copy source code" onclick=@Copy >
-        <RadzenIcon Icon="content_copy" />
-        Copy
-    </button>
-    <RadzenButton Text="Github" Icon="open_in_new" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Title="See in Github repository" Class="rz-text-truncate" />
-</RadzenStack>
+<RadzenRow Class="rz-p-2" Gap="0.5rem" Style="border-bottom: var(--rz-border-disabled);">
+    <RadzenColumn>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0.5rem">
+            <RadzenButton Click="Run" Text="Run" Icon="play_circle_outline" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Title="Preview edits" Class="rz-text-truncate" />
+            <button class="rz-button rz-button-xs rz-variant-text rz-primary rz-shade-default rz-text-truncate" Title="Copy source code" onclick=@Copy >
+                <RadzenIcon Icon="content_copy" />
+                Copy
+            </button>
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn>
+    @if (String.IsNullOrEmpty(ComponentName)) 
+    {
+
+    }
+    else
+    {
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <a target="blank" class="rz-button rz-button-xs rz-variant-text rz-primary rz-shade-default rz-text-truncate rz-text-capitalize" href="@ComponentSourceHref" title=@($"View Radzen{ComponentName} component source code in new tab") >
+                <RadzenIcon Icon="open_in_new" /> @($"Radzen{ComponentName}") Source
+            </a>
+        </RadzenStack>
+    }
+    </RadzenColumn>
+</RadzenRow>
 <RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
     @error
 </RadzenAlert>
@@ -26,6 +43,16 @@
 
     [Parameter]
     public string PageName { get; set; }
+
+    /* Source */
+    [Parameter]
+    public string ComponentSource { get; set; }
+
+    [Parameter]
+    public string ComponentName { get; set; }
+
+    string ComponentSourceHref => ComponentSource ?? $"https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/Radzen{ComponentName}.razor.cs";
+
 
     protected override async Task OnInitializedAsync()
     {
