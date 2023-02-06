@@ -1010,7 +1010,7 @@ window.Radzen = {
                   return;
               }
           }
-
+          document.removeEventListener('keydown', Radzen.closePopupOrDialog);
           Radzen.dialogService.invokeMethodAsync('DialogService.Close', null);
       }
   },
