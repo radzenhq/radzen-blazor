@@ -90,7 +90,7 @@
                                 }
                                 else
                                 {
-                                    <RadzenTextBox Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
+                                    <RadzenTextBox @onkeydown=@KeyDown Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
                                 }
 
                                 <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px"
@@ -120,7 +120,7 @@
                                 }
                                 else
                                 {
-                                    <RadzenTextBox Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
+                                    <RadzenTextBox @onkeydown=@KeyDown Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
                                 }
                             }
                         </div>
@@ -147,6 +147,15 @@ else
 @code {
     Radzen.Blazor.Rendering.Popup popup;
     ElementReference filterButton;
+
+    async Task KeyDown(KeyboardEventArgs args)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+        if (key == "Enter")
+        {
+            await ApplyFilter();
+        }
+    }
 
     string getFilterOpen()
     {
