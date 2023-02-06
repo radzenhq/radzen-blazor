@@ -896,7 +896,7 @@ window.Radzen = {
       instance.invokeMethodAsync(callback);
     }
 
-    if (Radzen.activeElement && Radzen.activeElement == document.activeElement || 
+    if (Radzen.activeElement && Radzen.activeElement == document.activeElement ||
         Radzen.activeElement && document.activeElement == document.body ||
         Radzen.activeElement && document.activeElement &&
             (document.activeElement.classList.contains('rz-dropdown-filter') || document.activeElement.classList.contains('rz-lookup-search-input'))) {
@@ -1295,28 +1295,37 @@ window.Radzen = {
 
       if (item.kind == 'file') {
         e.preventDefault();
+        var file = item.getAsFile();
 
-        var xhr = new XMLHttpRequest();
-        var data = new FormData();
-        data.append("file", item.getAsFile());
-        xhr.onreadystatechange = function (e) {
-          if (xhr.readyState === XMLHttpRequest.DONE) {
-            var status = xhr.status;
-            if (status === 0 || (status >= 200 && status < 400)) {
-              var result = JSON.parse(xhr.responseText);
-              document.execCommand("insertHTML", false, '<img src="' + result.url + '">');
-            } else {
-              console.log(xhr.responseText);
+        if (uploadUrl) {
+            var xhr = new XMLHttpRequest();
+            var data = new FormData();
+            data.append("file", file);
+            xhr.onreadystatechange = function (e) {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    var status = xhr.status;
+                    if (status === 0 || (status >= 200 && status < 400)) {
+                    var result = JSON.parse(xhr.responseText);
+                    document.execCommand("insertHTML", false, '<img src="' + result.url + '">');
+                    } else {
+                    console.log(xhr.responseText);
+                    }
+                }
             }
-          }
+            instance.invokeMethodAsync('GetHeaders').then(function (headers) {
+                xhr.open('POST', uploadUrl, true);
+                for (var name in headers) {
+                    xhr.setRequestHeader(name, headers[name]);
+                }
+                xhr.send(data);
+            });
+        } else {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.execCommand("insertHTML", false, '<img src="' + e.target.result + '">');
+            };
+            reader.readAsDataURL(file);
         }
-        instance.invokeMethodAsync('GetHeaders').then(function (headers) {
-            xhr.open('POST', uploadUrl, true);
-            for (var name in headers) {
-              xhr.setRequestHeader(name, headers[name]);
-            }
-            xhr.send(data);
-          });
       } else if (paste) {
         e.preventDefault();
         var data = e.clipboardData.getData('text/html') || e.clipboardData.getData('text/plain');
