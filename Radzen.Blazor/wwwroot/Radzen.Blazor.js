@@ -1228,7 +1228,9 @@ window.Radzen = {
   },
   innerHTML: function (ref, value) {
     if (value != undefined) {
-      ref.innerHTML = value;
+        if (ref != null) {
+            ref.innerHTML = value;
+        }
     } else {
       return ref.innerHTML;
     }
