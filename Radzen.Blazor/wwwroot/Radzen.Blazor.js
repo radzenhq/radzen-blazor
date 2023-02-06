@@ -153,7 +153,7 @@ window.Radzen = {
         for (var i = 0; i < count; i++) {
             var content = el.parentNode.children[i];
             if (content) {
-                content.style.display = i == index ? 'block' : 'none';
+                content.style.display = i == index ? '' : 'none';
             }
             var header = el.parentNode.previousElementSibling.children[i];
             if (header) {
