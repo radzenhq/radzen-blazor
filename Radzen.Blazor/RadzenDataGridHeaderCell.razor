@@ -59,13 +59,14 @@
 
                 <Popup Lazy=@(Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand) @ref=popup id="@($"{getColumnPopupID()}")" class="rz-overlaypanel"
                     style="display:none;min-width:250px;" tabindex="0">
-                        <div class="rz-grid-filter rz-overlaypanel-content">
+                        <div class="rz-overlaypanel-content">
                             @if (Column.FilterTemplate != null)
                             {
                                 @Column.FilterTemplate(Column)
                             }
                             else
                             {
+                                <form id="@($"{getColumnPopupID()}-form")" @onsubmit="@(args => ApplyFilter())" class="rz-grid-filter">
                                 <RadzenLabel Text="@Grid.FilterText" class="rz-grid-filter-label" />
                                 <RadzenDropDown @onclick:preventDefault="true" Data="@(Column.GetFilterOperators().Select(t => new { Value = Column.GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@Column.GetFilterOperator()" Change="@(args => Column.SetFilterOperator((FilterOperator)args))" />
                                 @if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
@@ -90,7 +91,7 @@
                                 }
                                 else
                                 {
-                                    <RadzenTextBox @onkeydown=@KeyDown Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
+                                    <RadzenTextBox Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
                                 }
 
                                 <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px"
@@ -116,19 +117,20 @@
                                 }
                                 else if (Column.FilterPropertyType == typeof(bool) || Column.FilterPropertyType == typeof(bool?))
                                 {
-                                <RadzenCheckBox TriState="true" TValue="@object" Value="@Column.GetSecondFilterValue()" Change="@(args => { Column.SetFilterValue(args, false); Grid.SaveSettings(); })" />
+                                    <RadzenCheckBox TriState="true" TValue="@object" Value="@Column.GetSecondFilterValue()" Change="@(args => { Column.SetFilterValue(args, false); Grid.SaveSettings(); })" />
                                 }
                                 else
                                 {
-                                    <RadzenTextBox @onkeydown=@KeyDown Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
+                                    <RadzenTextBox Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
                                 }
+                                </form>
                             }
                         </div>
                         @if (Column.FilterTemplate == null)
                         {
                             <div class="rz-grid-filter-buttons">
                                 <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text=@Grid.ClearFilterText Click="@ClearFilter" />
-                                <RadzenButton ButtonStyle="ButtonStyle.Primary" Text=@Grid.ApplyFilterText Click="@ApplyFilter" />
+                                <RadzenButton form="@($"{getColumnPopupID()}-form")" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text=@Grid.ApplyFilterText Click="@ApplyFilter" />
                             </div>
                         }
                     </Popup>
@@ -147,15 +149,6 @@ else
 @code {
     Radzen.Blazor.Rendering.Popup popup;
     ElementReference filterButton;
-
-    async Task KeyDown(KeyboardEventArgs args)
-    {
-        var key = args.Code != null ? args.Code : args.Key;
-        if (key == "Enter")
-        {
-            await ApplyFilter();
-        }
-    }
 
     string getFilterOpen()
     {
