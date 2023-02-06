@@ -71,7 +71,7 @@
     {
         await base.OnInitializedAsync();
 
-        orders = Enumerable.Empty<Order>().AsODataEnumerable();
+        orders = Enumerable.Empty<Order>();
     }
 
     List<string> titles = new List<string> { "Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
