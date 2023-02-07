@@ -497,15 +497,7 @@
     {
         if (column != null && !string.IsNullOrEmpty(column.FormatString))
         {
-            var formats = column.FormatString.Split(new char[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
-            if (formats.Length > 0)
-            {
-                var format = formats[0].Trim().Split(':');
-                if (format.Length > 1)
-                {
-                    return format[1].Trim();
-                }
-            }
+            return column.FormatString.Replace("{0:", "").Replace("}", "");
         }
 
         return FilterDateFormat;

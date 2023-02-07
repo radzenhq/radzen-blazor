@@ -250,15 +250,7 @@ else
     {
         if (property != null && !string.IsNullOrEmpty(property.FormatString))
         {
-            var formats = property.FormatString.Split(new char[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
-            if (formats.Length > 0)
-            {
-                var format = formats[0].Trim().Split(':');
-                if (format.Length > 1)
-                {
-                    return format[1].Trim();
-                }
-            }
+            return property.FormatString.Replace("{0:", "").Replace("}", "");
         }
 
         return DataFilter.FilterDateFormat;
