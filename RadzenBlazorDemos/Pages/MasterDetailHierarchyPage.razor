@@ -14,8 +14,17 @@
 </RadzenText>
 
 <RadzenExample Name="MasterDetailHierarchy" Heading="false" Documentation="false">
-    <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" RowRender="@RowRender" ExpandMode="DataGridExpandMode.Single"
-                Data="@orders" TItem="Order">
+    <div style="display: flex; align-items: center; margin-bottom: 16px">
+        <div style="white-space:nowrap; margin-right: 16px">ExpandMode:</div>
+        <RadzenSelectBar @bind-Value="@expandMode" TextProperty="Text" ValueProperty="Value" style="margin-right: 16px"
+                         Data="@(Enum.GetValues(typeof(DataGridExpandMode)).Cast<DataGridExpandMode>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        <RadzenButton Text="Expand all rows" Click="@(args => ToggleRowsExpand(true))" style="margin-right: 16px" 
+            Disabled=@(allRowsExpanded == true || expandMode == DataGridExpandMode.Single) />
+        <RadzenButton Text="Collapse all rows" Click="@(args => ToggleRowsExpand(false))" 
+            Disabled=@(allRowsExpanded == false || expandMode == DataGridExpandMode.Single) />
+    </div>
+    <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" RowRender="@RowRender" ExpandMode="@expandMode"
+                    Data="@orders" TItem="Order">
         <Template Context="order">
             <RadzenCard Style="margin-bottom:20px">
                 Company:
@@ -73,6 +82,23 @@
     </RadzenDataGrid>
 </RadzenExample>
 @code {
+    DataGridExpandMode expandMode = DataGridExpandMode.Single;
+    bool? allRowsExpanded;
+
+    async Task ToggleRowsExpand(bool? value)
+    {
+        allRowsExpanded = value;
+
+        if (value == true)
+        {
+            await grid.ExpandRows(grid.PagedView);
+        }
+        else if (value == false)
+        { 
+            await grid.CollapseRows(grid.PagedView);
+        }
+    }
+
     IEnumerable<Order> orders;
     RadzenDataGrid<Order> grid;
 
