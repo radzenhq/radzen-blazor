@@ -51,6 +51,11 @@
         if (!string.IsNullOrEmpty(args.Filter))
         {
             query = query.Where(args.Filter);
+            count = query.Count();
+        }
+        else
+        {
+            count = dbContext.OrderDetails.Count();
         }
 
         if (!string.IsNullOrEmpty(args.OrderBy))
@@ -59,7 +64,5 @@
         }
 
         orderDetails = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
-
-        count = dbContext.OrderDetails.Count();
     }
 }
