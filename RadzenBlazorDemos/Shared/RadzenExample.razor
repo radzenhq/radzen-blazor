@@ -31,10 +31,10 @@
 <RadzenCard Class="rz-p-0">
     <RadzenTabs @bind-SelectedIndex="@selectedIndex" Class="example-tabs">
         <Tabs>
-            <RadzenTabsItem Text="Example">
+            <RadzenTabsItem Text="Example" Title="Example preview">
                 @(dynamicContent ?? ChildContent)
             </RadzenTabsItem>
-            <RadzenTabsItem Text="Source">
+            <RadzenTabsItem Text="Edit Source" Title="View and edit example source code">
                 <div class="source-tab-item rz-pb-2">
                     <CodeViewer ComponentName="@ComponentName" ComponentSource="@Source" PageName="@ExampleUrl" Compiled="OnCompiled" />
                 </div>
