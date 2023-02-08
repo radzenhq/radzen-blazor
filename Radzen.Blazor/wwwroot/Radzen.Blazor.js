@@ -994,6 +994,7 @@ window.Radzen = {
   },
   closeDialog: function () {
     document.body.classList.remove('no-scroll');
+    document.removeEventListener('keydown', Radzen.closePopupOrDialog);
   },
   closePopupOrDialog: function (e) {
       e = e || window.event;
