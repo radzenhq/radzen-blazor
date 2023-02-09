@@ -119,11 +119,11 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenPassword>();
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoComplete, ACG.NewPassword));
 
             Assert.Contains(@$"autocomplete=""new-password""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoComplete, ACG.On));
 
             Assert.Contains(@$"autocomplete=""on""", component.Markup);
         }

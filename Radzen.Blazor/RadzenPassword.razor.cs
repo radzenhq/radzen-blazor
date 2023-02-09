@@ -20,11 +20,11 @@ namespace Radzen.Blazor
         public bool ReadOnly { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether input automatic complete is allowed.
+        /// Gets or sets a value guiding the browser on how to populate the input.
         /// </summary>
-        /// <value><c>true</c> if input automatic complete is allowed; otherwise, <c>false</c>.</value>
+        /// <value>Provide an autocomplete option(<c>current-password</c> recommended) to enable autocomplete; otherwise, <c>new-password</c>.</value>
         [Parameter]
-        public bool AutoComplete { get; set; } = true;
+        public string AutoComplete { get; set; } = ACG.NewPassword;
 
         /// <summary>
         /// Handles the <see cref="E:Change" /> event.

@@ -36,11 +36,18 @@ namespace Radzen.Blazor
     public partial class RadzenLogin : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets a value indicating whether automatic complete of inputs is enabled.
+        /// Gets or sets a value guiding the browser on how to populate the username input.
         /// </summary>
-        /// <value><c>true</c> if automatic complete of inputs is enabled; otherwise, <c>false</c>.</value>
+        /// <value>Provide an autocomplete option to disable/configure autocomplete; otherwise, <c>username</c>.</value>
         [Parameter]
-        public bool AutoComplete { get; set; } = true;
+        public string UsernameAutoComplete { get; set; } = ACG.Username;
+
+        /// <summary>
+        /// Gets or sets a value guiding the browser on how to populate the password input.
+        /// </summary>
+        /// <value>Provide an autocomplete option to disable/configure autocomplete; otherwise, <c>current-password</c>.</value>
+        [Parameter]
+        public string PasswordAutoComplete { get; set; } = ACG.CurrentPassword;
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()

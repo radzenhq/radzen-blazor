@@ -21,11 +21,11 @@ namespace Radzen.Blazor
         public bool ReadOnly { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether input automatic complete is enabled.
+        /// Gets or sets a value guiding the browser on how to populate the input.
         /// </summary>
-        /// <value><c>true</c> if input automatic complete is enabled; otherwise, <c>false</c>.</value>
+        /// <value>Provide an autocomplete option to disable/configure autocomplete; otherwise, <c>on</c>.</value>
         [Parameter]
-        public bool AutoComplete { get; set; } = true;
+        public string AutoComplete { get; set; } = ACG.On;
 
         /// <summary>
         /// Gets or sets the maximum length.

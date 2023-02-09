@@ -119,11 +119,11 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenMask>();
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoComplete, ACG.Off));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoComplete, ACG.On));
 
             Assert.Contains(@$"autocomplete=""on""", component.Markup);
         }

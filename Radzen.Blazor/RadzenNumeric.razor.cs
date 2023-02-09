@@ -183,11 +183,11 @@ namespace Radzen.Blazor
         public bool ReadOnly { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether input automatic complete is enabled.
+        /// Gets or sets a value guiding the browser on how to populate the input.
         /// </summary>
-        /// <value><c>true</c> if input automatic complete is enabled; otherwise, <c>false</c>.</value>
+        /// <value>Provide an autocomplete option to enable/configure autocomplete; otherwise, <c>off</c>.</value>
         [Parameter]
-        public bool AutoComplete { get; set; } = false;
+        public string AutoComplete { get; set; } = ACG.Off;
 
         /// <summary>
         /// Gets or sets a value indicating whether up down buttons are shown.

@@ -7,14 +7,14 @@
             <div class="rz-form-row">
                 <label class="rz-label" for=@Id("username")>@UserText</label>
                 <div class="rz-form-input-wrapper">
-                    <RadzenTextBox AutoComplete=@AutoComplete id=@Id("username") Name="Username" @bind-Value=@username />
+                    <RadzenTextBox AutoComplete=@PasswordAutoComplete id=@Id("username") Name="Username" @bind-Value=@username />
                     <RadzenRequiredValidator Component="Username" Text=@UserRequired />
                 </div>
             </div>
             <div class="rz-form-row">
                 <label class="rz-label" for=@Id("password")>@PasswordText</label>
                 <div class="rz-form-input-wrapper">
-                    <RadzenPassword id=@Id("password") AutoComplete=@AutoComplete Name="Password" @bind-Value=@password />
+                    <RadzenPassword id=@Id("password") AutoComplete=@PasswordAutoComplete Name="Password" @bind-Value=@password />
                     <RadzenRequiredValidator Component="Password" Text=@PasswordRequired />
                 </div>
             </div>

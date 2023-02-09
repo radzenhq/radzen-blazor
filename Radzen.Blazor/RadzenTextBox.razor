@@ -2,5 +2,5 @@
 @if (Visible)
 {
     <input @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-           placeholder="@Placeholder" maxlength="@MaxLength" autocomplete="@(AutoComplete ? "on" : "off")" value="@Value" @onchange="@OnChange" id="@GetId()" />
+           placeholder="@Placeholder" maxlength="@MaxLength" autocomplete="@AutoComplete" value="@Value" @onchange="@OnChange" id="@GetId()" />
 }
