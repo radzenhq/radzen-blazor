@@ -6,7 +6,7 @@
 <div class="container my-4">
     <div class="row">
         <div class="col">
-            <RadzenCard Class="w-100 mb-4" >
+            <RadzenCard class="w-100 mb-4" >
             <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
                 <RadzenLabel Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
@@ -22,7 +22,7 @@
                             <small style="display: block">(3-10 characters)</small>
                         </div>
                         <div class="col">
-                            <RadzenTextBox style="display: block" Name="FirstName" @bind-Value=@model.FirstName Class="w-100" />
+                            <RadzenTextBox style="display: block" Name="FirstName" @bind-Value=@model.FirstName class="w-100" />
                             <RadzenLengthValidator Component="FirstName" Min="3" Text="First name should be at least 3 characters" Popup=@popup Style="position: absolute" />
                             <RadzenLengthValidator Component="FirstName"  Max="10" Text="First name should be at most 10 characters" Popup=@popup Style="position: absolute" />
                         </div>
@@ -33,7 +33,7 @@
                             <small style="display: block">(3-10 characters)</small>
                         </div>
                         <div class="col">
-                            <RadzenTextBox style="display: block" Name="LastName" @bind-Value=@model.LastName Class="w-100" />
+                            <RadzenTextBox style="display: block" Name="LastName" @bind-Value=@model.LastName class="w-100" />
                             <RadzenLengthValidator Component="LastName" Min="3" Text="Last name should be at least 3 characters" Popup=@popup Style="position: absolute" />
                             <RadzenLengthValidator Component="LastName"  Max="10" Text="Last name should be at most 10 characters" Popup=@popup Style="position: absolute" />
                         </div>
@@ -46,7 +46,7 @@
 </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     class Model

@@ -1,7 +1,7 @@
 @page "/column-chart"
 @using System.Globalization
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Chart column series
 </RadzenText>
 
@@ -9,7 +9,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12 my-5">
-                <RadzenCard Class="w-100 mb-4" >
+                <RadzenCard class="w-100 mb-4" >
                     <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
                     <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
                 </RadzenCard>

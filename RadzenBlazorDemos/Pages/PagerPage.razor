@@ -11,7 +11,7 @@
         <Template Context="order">
             <RadzenCard Style="width:300px;">
                 <div class="d-flex flex-row align-items-center">
-                    <RadzenImage Path="@order.Employee?.Photo" Class="rounded-circle float-start me-3" Style="width: 80px; height: 80px;" />
+                    <RadzenImage Path="@order.Employee?.Photo" class="rounded-circle float-start me-3" Style="width: 80px; height: 80px;" />
                     <div>
                         <h4 class="mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</h4>
                         <div>@order.Customer?.CompanyName</div>

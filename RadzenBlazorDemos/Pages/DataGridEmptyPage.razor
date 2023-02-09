@@ -1,7 +1,7 @@
 ﻿@page "/datagrid-empty"
 @using RadzenBlazorDemos.Models.Northwind
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Empty DataGrid
 </RadzenText>
 
@@ -27,7 +27,7 @@
 
     <h3 class="mt-4">Custom Empty Text</h3>
     <div class="mb-4">
-        Custom text: <RadzenTextBox @bind-Value="emptyText" Class="ml-2" Style="width: 300px;" />
+        Custom text: <RadzenTextBox @bind-Value="emptyText" class="ml-2" Style="width: 300px;" />
     </div>
     <RadzenDataGrid TItem="Employee" Data="@data" EmptyText="@emptyText">
         <Columns>

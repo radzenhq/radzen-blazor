@@ -1,7 +1,7 @@
 @page "/chart-trends"
 @using System.Globalization
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Chart trends
 </RadzenText>
 
@@ -9,15 +9,15 @@
     <div class="container my-5">
         <div class="row">
             <div class="col">
-                <RadzenCard Class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem" >
+                <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem" >
                     <RadzenCheckBox @bind-Value="@trend" Name="trend"></RadzenCheckBox>
-                    <RadzenLabel Text="Trend" For="trend" Style="margin-right: 1rem;" Class="rz-color-danger-dark" />
+                    <RadzenLabel Text="Trend" For="trend" Style="margin-right: 1rem;" class="rz-color-danger-dark" />
                     <RadzenCheckBox @bind-Value="@median" Name="median"></RadzenCheckBox>
-                    <RadzenLabel Text="Median" For="median" Style="margin-right: 1rem;" Class="rz-color-success-dark" />
+                    <RadzenLabel Text="Median" For="median" Style="margin-right: 1rem;" class="rz-color-success-dark" />
                     <RadzenCheckBox @bind-Value="@mean" Name="mean"></RadzenCheckBox>
-                    <RadzenLabel Text="Mean" For="mean" Style="margin-right: 1rem;" Class="rz-color-info-dark" />
+                    <RadzenLabel Text="Mean" For="mean" Style="margin-right: 1rem;" class="rz-color-info-dark" />
                     <RadzenCheckBox @bind-Value="@mode" Name="mode"></RadzenCheckBox>
-                    <RadzenLabel Text="Mode" For="mode" Class="rz-color-warning-darker" />
+                    <RadzenLabel Text="Mode" For="mode" class="rz-color-warning-darker" />
                 </RadzenCard>
                 <RadzenChart>
                     <RadzenLineSeries Smooth="true" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">

@@ -1,6 +1,6 @@
 @inject NotificationService NotificationService
 
-<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" Class="rz-mt-4">Icon only button</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Icon only button</RadzenText>
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
     <RadzenButton Click=@(args => OnClick("Primary icon button")) Icon="add_circle_outline" ButtonStyle="ButtonStyle.Primary" />
     <RadzenButton Click=@(args => OnClick("Secondary icon button")) Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
@@ -12,7 +12,7 @@
     <RadzenButton Click=@(args => OnClick("Danger icon button")) Icon="report" ButtonStyle="ButtonStyle.Danger" />
 </RadzenStack>
 
-<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" Class="rz-mt-4">Icon and text button</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Icon and text button</RadzenText>
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
     <RadzenButton Click=@(args => OnClick("Primary button with text and icon")) Text="Add New" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Primary" />
     <RadzenButton Click=@(args => OnClick("Secondary button with text and icon")) Text="Add New" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
@@ -24,7 +24,7 @@
     <RadzenButton Click=@(args => OnClick("Danger button with text and icon")) Text="Report" Icon="report" ButtonStyle="ButtonStyle.Danger" />
 </RadzenStack>
 
-<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" Class="rz-mt-4">Images</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Images</RadzenText>
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
     <RadzenButton Click=@(args => OnClick("Button with image")) Image="images/radzen-nuget.png" ButtonStyle="ButtonStyle.Light" />
     <RadzenButton Click=@(args => OnClick("Button with content")) Image="images/radzen-nuget.png" ButtonStyle="ButtonStyle.Light">

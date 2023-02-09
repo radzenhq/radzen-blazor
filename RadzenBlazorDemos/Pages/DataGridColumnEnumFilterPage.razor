@@ -2,15 +2,15 @@
 @using System.Linq.Dynamic.Core
 @using System.ComponentModel.DataAnnotations
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DataGrid Enum Column Filter
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
     This page demonstrates how to use enums in the DataGrid column filter.
 </RadzenText>
 
 <RadzenExample Name="DataGridColumnEnumFilter" Heading="false" Documentation="false">
-    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" Class="my-4">
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="my-4">
         Advanced Filter Mode of enums
     </RadzenText>
     <RadzenDataGrid LoadData="LoadData" IsLoading=@isLoading Count="count" Data=@employees FilterMode="FilterMode.Advanced" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">

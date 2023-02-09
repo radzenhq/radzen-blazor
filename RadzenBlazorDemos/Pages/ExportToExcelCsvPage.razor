@@ -7,15 +7,15 @@
 @inherits DbContextPage
 @inject NorthwindService service
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Export to Excel and CSV
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
     This page demonstrates how to export a Radzen Blazor DataGrid to Excel and CSV.
 </RadzenText>
 
 <RadzenExample Name="ExportToExcelCsv" Heading="false" Documentation="false">
-    <RadzenButton Text="Export XLS" Icon="grid_on" Click="@(args => Export("excel"))" Class="mb-4 me-2" /><RadzenButton Text="Export CSV" Icon="wrap_text" Click="@(args => Export("csv"))" Class="mb-4" />
+    <RadzenButton Text="Export XLS" Icon="grid_on" Click="@(args => Export("excel"))" class="mb-4 me-2" /><RadzenButton Text="Export CSV" Icon="wrap_text" Click="@(args => Export("csv"))" class="mb-4" />
     <RadzenDataGrid @ref="grid" AllowColumnPicking="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@orderDetails" TItem="OrderDetail">
         <Columns>
             <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />

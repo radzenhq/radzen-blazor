@@ -6,15 +6,15 @@
 
 @inherits DbContextPage
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DataGrid <strong>Column Picker</strong>
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
     Enable column picker by setting the AllowColumnPicking property to true.
 </RadzenText>
 
 <RadzenExample Name="DataGridColumnPicking" Heading="false" Documentation="false">
-    <RadzenButton Text="Toggle EmployeeID column visibility" Click=@(() => EmployeeIDVisible = !EmployeeIDVisible) Class="my-3"/>
+    <RadzenButton Text="Toggle EmployeeID column visibility" Click=@(() => EmployeeIDVisible = !EmployeeIDVisible) class="my-3"/>
     <RadzenDataGrid Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnPicking="true" PickedColumnsChanged="@PickedColumnsChanged">
         <Columns>
             <RadzenDataGridColumn Visible="@EmployeeIDVisible" TItem="Employee" Property="EmployeeID" Title="ID" Width="80px" TextAlign="TextAlign.Center" Frozen="true" />
@@ -41,7 +41,7 @@
     </RadzenDataGrid>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     bool EmployeeIDVisible = false;

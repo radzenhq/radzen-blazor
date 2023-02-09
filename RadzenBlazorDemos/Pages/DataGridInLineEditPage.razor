@@ -6,15 +6,15 @@
 
 @inherits DbContextPage
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DataGrid InLine Editing
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
     This page demonstrates how to configure the Razden Blazor DataGrid for inline editing.
 </RadzenText>
 
 <RadzenExample Name="DataGridInLineEdit" Heading="false" Documentation="false">
-    <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Add New Order" Click="@InsertRow" Disabled=@(orderToInsert != null || orderToUpdate != null) />
+    <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" class="mt-2 mb-4" Text="Add New Order" Click="@InsertRow" Disabled=@(orderToInsert != null || orderToUpdate != null) />
     <RadzenDataGrid @ref="ordersGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single"
                 Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset">
         <Columns>
@@ -64,15 +64,15 @@
                 <Template Context="order">
                     <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(order))" @onclick:stopPropagation="true">
                     </RadzenButton>
-                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => DeleteRow(order))"  @onclick:stopPropagation="true">
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(order))"  @onclick:stopPropagation="true">
                     </RadzenButton>
                 </Template>
                 <EditTemplate Context="order">
                     <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(order))">
                     </RadzenButton>
-                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@((args) => CancelEdit(order))">
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(order))">
                     </RadzenButton>
-                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => DeleteRow(order))">
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(order))">
                     </RadzenButton>
                 </EditTemplate>
             </RadzenDataGridColumn>

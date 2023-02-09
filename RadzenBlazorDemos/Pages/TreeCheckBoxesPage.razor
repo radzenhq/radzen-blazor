@@ -4,10 +4,10 @@
 
 @inherits DbContextPage
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Tree checkboxes
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
     Get or set the selected items of RadzenTree.
 </RadzenText>
 
@@ -26,7 +26,7 @@
 </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     IEnumerable<Category> categories;

@@ -1,7 +1,7 @@
 @page "/chart-interpolation"
 @using System.Globalization
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Chart interpolation mode
 </RadzenText>
 
@@ -9,7 +9,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12 my-5">
-                <RadzenCard Class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem">
+                <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem">
                     <RadzenLabel Text="Interpolation" For="interpolation" Style="margin-right: 1rem;"/>
                     <RadzenDropDown AllowClear="false" Name="interpolation" @bind-Value="@interpolation"
                                     TValue="Interpolation" ValueProperty="Value" TextProperty="Text"

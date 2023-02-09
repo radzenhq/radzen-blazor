@@ -6,15 +6,15 @@
 
 @inherits DbContextPage
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DataGrid <strong>Pager API</strong>
 </RadzenText>
 
 <RadzenExample Name="DataGridPagerApi" Heading="false" Documentation="false">
     <div style="margin-bottom: 16px">
-        <RadzenButton Click="@FirstPage" Text="First page" Class="me-2" ButtonStyle="ButtonStyle.Secondary" />
-        <RadzenButton Click="@TenthPage" Text="10th page" Class="me-2" ButtonStyle="ButtonStyle.Secondary" />
-        <RadzenButton Click="@LastPage" Text="Last page" Class="me-2" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenButton Click="@FirstPage" Text="First page" class="me-2" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenButton Click="@TenthPage" Text="10th page" class="me-2" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenButton Click="@LastPage" Text="Last page" class="me-2" ButtonStyle="ButtonStyle.Secondary" />
         <RadzenCheckBox @bind-Value=@showPagerSummary Name="CheckBox1" Style="margin-left: 5px;" />
         <RadzenLabel Text="Show pager summary" Component="CheckBox1" Style="margin-left: 5px;" />
     </div>

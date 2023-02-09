@@ -23,7 +23,7 @@
                             <div class="container">
                                 <div class="row" style="margin-left: calc(var(--bs-gutter-x) * -1); margin-right: calc(var(--bs-gutter-x) * -1)">
                                     <div class="col-lg-3 p-3 product-title">
-                                            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" Class="rz-color-secondary">@(product.ProductName)</RadzenText>
+                                            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="rz-color-secondary">@(product.ProductName)</RadzenText>
                                     </div>
                                     <div class="col-lg-7 p-3">
                                         <div class="row d-flex">
@@ -40,12 +40,12 @@
                                                 <RadzenText TextStyle="TextStyle.Body2" class="mb-sm-2 mb-lg-0">@(product.Supplier?.CompanyName)</RadzenText>
                                             </div>
                                             <div class="col-md-6 order-first order-lg-last col-lg-3 text-sm-start text-lg-end mb-3 mb-lg-0">
-                                                <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Shade="Shade.Lighter" Class="price-badge" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", product.UnitPrice)}") />
+                                                <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Shade="Shade.Lighter" class="price-badge" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", product.UnitPrice)}") />
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-2 p-3">
-                                        <RadzenButton Text="Order now" Class="w-100" />
+                                        <RadzenButton Text="Order now" class="w-100" />
                                     </div>
                                 </div>
                             </div>

@@ -12,7 +12,7 @@
         <div class="col-md-6 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom filter operator</RadzenText>
-                <RadzenDropDown AllowClear="true" TValue="string" Class="w-100" 
+                <RadzenDropDown AllowClear="true" TValue="string" class="w-100" 
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
                                 Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "DropDown with custom filter operator")) />
             </RadzenCard>
@@ -20,7 +20,7 @@
         <div class="col-md-6 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom filtering</RadzenText>
-                <RadzenDropDown AllowClear="true" TValue="string" Class="w-100" 
+                <RadzenDropDown AllowClear="true" TValue="string" class="w-100" 
                                 LoadData=@LoadData AllowFiltering="true"
                                 Data=@customCustomersData TextProperty="CompanyName" ValueProperty="CustomerID"
                                 Change=@(args => OnChange(args, "DropDown with custom filtering")) />
@@ -30,7 +30,7 @@
 </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     IEnumerable<Customer> customers;

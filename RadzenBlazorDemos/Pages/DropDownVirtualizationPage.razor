@@ -12,7 +12,7 @@
         <div class="col-md-6 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Virtualization using IQueryable</RadzenText>
-                <RadzenDropDown AllowClear="true" TValue="string" AllowVirtualization="true" Class="w-100" 
+                <RadzenDropDown AllowClear="true" TValue="string" AllowVirtualization="true" class="w-100" 
                                 AllowFiltering="true" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
                                 Change=@(args => OnChange(args, "DropDown with virtualization")) />
             </RadzenCard>
@@ -20,7 +20,7 @@
         <div class="col-md-6 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Virtualization using LoadData event</RadzenText>
-                <RadzenDropDown AllowClear="true" TValue="string" AllowVirtualization="true" Class="w-100" 
+                <RadzenDropDown AllowClear="true" TValue="string" AllowVirtualization="true" class="w-100" 
                                 LoadData=@LoadDataVirtualization AllowFiltering="true" Count="@count"
                                 Data=@customCustomersDataVirtualization TextProperty="CompanyName" ValueProperty="CustomerID"
                                 Change=@(args => OnChange(args, "DropDown with LoadData virtualization")) />
@@ -30,7 +30,7 @@
 </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     IEnumerable<Customer> customers;

@@ -6,7 +6,7 @@
 <div class="container my-4">
     <div class="row">
         <div class="col">
-            <RadzenCard Class="w-100 mb-4" >
+            <RadzenCard class="w-100 mb-4" >
             <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
                 <RadzenLabel Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
@@ -21,7 +21,7 @@
                             <RadzenLabel Text="Password" />
                         </div>
                         <div class="col">
-                            <RadzenPassword style="display: block" Name="Password" @bind-Value=@model.Password Class="w-100" />
+                            <RadzenPassword style="display: block" Name="Password" @bind-Value=@model.Password class="w-100" />
                             <RadzenRequiredValidator Component="Password" Text="Enter password" Popup="@popup" Style="position: absolute" />
                         </div>
                     </div>
@@ -30,7 +30,7 @@
                             <RadzenLabel Text="Repeat Password" />
                         </div>
                         <div class="col">
-                            <RadzenPassword style="display: block" Name="RepeatPassword" @bind-Value=@model.RepeatPassword  Class="w-100" />
+                            <RadzenPassword style="display: block" Name="RepeatPassword" @bind-Value=@model.RepeatPassword  class="w-100" />
                             <RadzenRequiredValidator Component="RepeatPassword" Text="Repeat your password" Popup=@popup Style="position: absolute" />
                             <RadzenCompareValidator Visible=@(!string.IsNullOrEmpty(model.RepeatPassword)) Value=@model.Password Component="RepeatPassword" Text="Passwords should be the same" Popup=@popup Style="position: absolute" />
                         </div>
@@ -47,7 +47,7 @@
                             <RadzenLabel Text="Operator" />
                         </div>
                         <div class="col">
-                            <RadzenDropDown @bind-Value=@compareOperator Data=@Enum.GetValues(typeof(CompareOperator)) Class="w-100" />
+                            <RadzenDropDown @bind-Value=@compareOperator Data=@Enum.GetValues(typeof(CompareOperator)) class="w-100" />
                         </div>
                     </div>
                     <div class="row mb-5">
@@ -55,7 +55,7 @@
                             <RadzenLabel Text="Value to compare with" />
                         </div>
                         <div class="col">
-                            <RadzenNumeric @bind-Value=@targetValue Class="w-100" />
+                            <RadzenNumeric @bind-Value=@targetValue class="w-100" />
                         </div>
                     </div>
                     <div class="row mb-4">
@@ -63,7 +63,7 @@
                             <RadzenLabel Text="Value" />
                         </div>
                         <div class="col">
-                            <RadzenNumeric @bind-Value=@model.Value Name="Value" style="display: block" Class="w-100" />
+                            <RadzenNumeric @bind-Value=@model.Value Name="Value" style="display: block" class="w-100" />
                             <RadzenCompareValidator Value=@targetValue Component="Value" Popup=@popup Style="position: absolute" Operator=@compareOperator />
                         </div>
                     </div>
@@ -75,7 +75,7 @@
 </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     class Model

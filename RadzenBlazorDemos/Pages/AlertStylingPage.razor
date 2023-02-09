@@ -1,15 +1,15 @@
 ﻿@page "/alert-styling"
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Alert Styling
 </RadzenText>
 
 <RadzenExample Name="AlertStyling" Heading="false" Documentation="false">
-    <RadzenCard Class="mt-4 w-100 mb-4 d-flex flex-column" style="gap: 1rem;">
+    <RadzenCard class="mt-4 w-100 mb-4 d-flex flex-column" style="gap: 1rem;">
         <div class="d-flex align-items-center">
             <RadzenLabel Text="AlertStyle:" Style="margin-right: 8px; width: 5rem;" />
-            <RadzenSelectBar @bind-Value="@alertStyle" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertStyle)).Cast<AlertStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="d-none d-xl-flex" />
-            <RadzenDropDown @bind-Value="@alertStyle" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertStyle)).Cast<AlertStyle>().Select(t => new { Text = $"{t}", Value = t }))" Class="d-inline-flex d-xl-none" />
+            <RadzenSelectBar @bind-Value="@alertStyle" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertStyle)).Cast<AlertStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" class="d-none d-xl-flex" />
+            <RadzenDropDown @bind-Value="@alertStyle" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertStyle)).Cast<AlertStyle>().Select(t => new { Text = $"{t}", Value = t }))" class="d-inline-flex d-xl-none" />
         </div>
         <div class="d-flex align-items-center">
             <RadzenLabel Text="Size:" Style="margin-right: 8px; width: 5rem;" />

@@ -6,18 +6,18 @@
 
 @inherits DbContextPage
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DataGrid <strong>Multiple Selection</strong>
 </RadzenText>
 
 <RadzenExample Name="DataGridMultipleSelection" Heading="false" Documentation="false">
-    <RadzenCard Class="m-4" style="display: flex; align-items: center; gap: 0.5rem">
+    <RadzenCard class="m-4" style="display: flex; align-items: center; gap: 0.5rem">
         <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" />
         <RadzenLabel Text="Allow row select on row click" Component="CheckBox1" />
     </RadzenCard>
     <RadzenDataGrid @ref="grid" AllowRowSelectOnRowClick="@allowRowSelectOnRowClick" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                 AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
-                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedEmployees Class="m-4">
+                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedEmployees class="m-4">
         <Columns>
             <RadzenDataGridColumn TItem="Employee" Width="60px" Sortable="false" Filterable="false">
                 <HeaderTemplate>

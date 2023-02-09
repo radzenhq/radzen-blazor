@@ -1,9 +1,9 @@
 ﻿@page "/html-editor"
 
 <RadzenExample Name="HtmlEditor">
-    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="my-4">Default set of tools</RadzenText>
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="my-4">Default set of tools</RadzenText>
     <RadzenHtmlEditor @bind-Value=@value style="height: 500px; margin-bottom: 1rem;" UploadUrl="upload/image" Change=@OnChange Paste=@OnPaste Execute=@OnExecute />
-    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="my-4">Custom set of tools (text-editing only)</RadzenText>
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="my-4">Custom set of tools (text-editing only)</RadzenText>
     <RadzenHtmlEditor @bind-Value=@value style="height: 500px; margin-bottom: 1rem;" UploadUrl="upload/image" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
         <RadzenHtmlEditorUndo />
         <RadzenHtmlEditorRedo />
@@ -19,7 +19,7 @@
     </RadzenHtmlEditor>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     string value = @"

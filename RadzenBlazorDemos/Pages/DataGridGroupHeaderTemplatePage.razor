@@ -6,20 +6,20 @@
 
 @inherits DbContextPage
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DataGrid <strong>DataGrid Group Header Template</strong>
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
     Use GroupHeaderTemplate to customize DataGrid group header rows.
 </RadzenText>
 
 <RadzenExample Name="DataGridGroupHeaderTemplate" Heading="false" Documentation="false">
-    <RadzenCard Class="m-4" style="display: flex; align-items: center; gap: 0.5rem">
+    <RadzenCard class="m-4" style="display: flex; align-items: center; gap: 0.5rem">
         <RadzenCheckBox @bind-Value=@groupsExpanded Name="CheckBox1" TValue="bool?" TriState="true" />
         <RadzenLabel Text="All groups expanded" Component="CheckBox1" />
     </RadzenCard>
     <RadzenDataGrid @ref="ordersGrid"  AllowGrouping="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
-            Data="@orders" TItem="Order" Render="@OnRender" GroupRowRender="OnGroupRowRender" Class="m-4">
+            Data="@orders" TItem="Order" Render="@OnRender" GroupRowRender="OnGroupRowRender" class="m-4">
         <GroupHeaderTemplate>
             @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Group items count: @context.Data.Count, Last order date: @(context.Data.Items.Cast<Order>().OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)
         </GroupHeaderTemplate>

@@ -1,7 +1,7 @@
 ﻿@page "/html-editor-custom-tools"
 @inject DialogService DialogService
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor HtmlEditor custom tools
 </RadzenText>
 
@@ -9,13 +9,13 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-4">
-            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="my-4">Custom button</RadzenText>
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="my-4">Custom button</RadzenText>
             <RadzenHtmlEditor style="height: 300px; margin-bottom: 1rem;" Execute=@OnExecute>
                 <RadzenHtmlEditorCustomTool CommandName="InsertToday" Icon="today" Title="Insert today" />
             </RadzenHtmlEditor>
         </div>
         <div class="col-md-4">
-            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="my-4">Custom tool with template</RadzenText>
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="my-4">Custom tool with template</RadzenText>
             <RadzenHtmlEditor style="height: 300px; margin-bottom: 1rem;">
                 <RadzenHtmlEditorCustomTool>
                     <Template Context="editor">
@@ -25,7 +25,7 @@
             </RadzenHtmlEditor>
         </div>
         <div class="col-md-4">
-            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Class="my-4">Custom dialog</RadzenText>
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="my-4">Custom dialog</RadzenText>
             <RadzenHtmlEditor style="height: 300px; margin-bottom: 1rem;" Execute=@OnExecute>
                 <RadzenHtmlEditorCustomTool CommandName="InsertImageFromList" Icon="attach_file" />
             </RadzenHtmlEditor>

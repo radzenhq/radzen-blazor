@@ -4,7 +4,7 @@
 @using RadzenBlazorDemos.Models.Northwind
 
 <RadzenExample Name="Tree">
-    <RadzenCard Class="my-5 mx-auto" style="max-width: 400px;">
+    <RadzenCard class="my-5 mx-auto" style="max-width: 400px;">
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Inline definition</RadzenText>
         <RadzenTree Expand=@OnExpand Collapse=@OnCollapse Change=@OnChange Style="width: 100%; height: 300px">
             <RadzenTreeItem Text="BMW">
@@ -41,7 +41,7 @@
     </RadzenCard>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     EventConsole console;

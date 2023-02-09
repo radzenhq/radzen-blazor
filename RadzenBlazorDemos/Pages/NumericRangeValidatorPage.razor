@@ -6,7 +6,7 @@
 <div class="container my-4">
     <div class="row">
         <div class="col">
-            <RadzenCard Class="w-100 mb-4" >
+            <RadzenCard class="w-100 mb-4" >
             <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
                 <RadzenLabel Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
@@ -22,7 +22,7 @@
                             <small style="display: block">(1-10 items)</small>
                         </div>
                         <div class="col">
-                            <RadzenNumeric style="display: block" Name="Quantity" @bind-Value=@model.Quantity @oninput=@OnInput Class="w-100" />
+                            <RadzenNumeric style="display: block" Name="Quantity" @bind-Value=@model.Quantity @oninput=@OnInput class="w-100" />
                             <RadzenNumericRangeValidator Component="Quantity" Min="1" Max="10" Text="Quantity should be between 1 and 10" Popup=@popup Style="position: absolute" />
                         </div>
                     </div>
@@ -34,7 +34,7 @@
 </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     class Model

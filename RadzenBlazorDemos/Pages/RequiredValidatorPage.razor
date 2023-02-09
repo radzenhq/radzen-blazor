@@ -6,7 +6,7 @@
 <div class="container my-4">
     <div class="row">
         <div class="col">
-            <RadzenCard Class="w-100 mb-4" >
+            <RadzenCard class="w-100 mb-4" >
             <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
                 <RadzenLabel Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
@@ -21,7 +21,7 @@
                             <RadzenLabel Text="First Name" />
                         </div>
                         <div class="col">
-                            <RadzenTextBox style="display: block" Name="FirstName" @bind-Value=@model.FirstName Class="w-100" />
+                            <RadzenTextBox style="display: block" Name="FirstName" @bind-Value=@model.FirstName class="w-100" />
                             <RadzenRequiredValidator Component="FirstName" Text="First name is required" Popup=@popup Style="position: absolute"/>
                         </div>
                     </div>
@@ -30,7 +30,7 @@
                             <RadzenLabel Text="Last Name" />
                         </div>
                         <div class="col">
-                            <RadzenTextBox style="display: block" Name="LastName" @bind-Value=@model.LastName  Class="w-100" />
+                            <RadzenTextBox style="display: block" Name="LastName" @bind-Value=@model.LastName  class="w-100" />
                             <RadzenRequiredValidator Component="LastName" Text="Last name is required" Popup=@popup Style="position: absolute"/>
                         </div>
                     </div>
@@ -42,7 +42,7 @@
 </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     class Model

@@ -6,12 +6,12 @@
 
 @inherits DbContextPage
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DataGrid <strong>Density</strong>
 </RadzenText>
 
 <RadzenExample Name="DataGridDensity" Heading="false" Documentation="false">
-    <RadzenCard Class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
+    <RadzenCard class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
         <div style="white-space:nowrap; margin-right: 16px">Density:</div>
         <RadzenSelectBar @bind-Value="@Density" TextProperty="Text" ValueProperty="Value"
                          Data="@(Enum.GetValues(typeof(Density)).Cast<Density>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />

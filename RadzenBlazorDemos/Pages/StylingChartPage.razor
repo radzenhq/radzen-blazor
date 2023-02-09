@@ -1,13 +1,13 @@
 @page "/styling-chart"
 @using System.Globalization
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Chart Styling
 </RadzenText>
 
 <RadzenExample Name="StylingChart" Heading="false" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
     <div class="container">
-        <RadzenCard Class="mt-4 w-100 mb-4 d-flex align-items-center" >
+        <RadzenCard class="mt-4 w-100 mb-4 d-flex align-items-center" >
             <RadzenLabel Text="Color scheme:" Style="margin-right: 8px; vertical-align: middle;" />
             <RadzenDropDown Data="@colorSchemes" @bind-Value="@colorScheme" />
         </RadzenCard>

@@ -1,7 +1,7 @@
 @page "/chart-annotations"
 @using System.Globalization
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Chart annotations
 </RadzenText>
 
@@ -9,7 +9,7 @@
     <div class="container my-5">
         <div class="row">
             <div class="col">
-                <RadzenCard Class="w-100 mb-4" >
+                <RadzenCard class="w-100 mb-4" >
                     <RadzenCheckBox @bind-Value="@annotation" Name="annotation"></RadzenCheckBox>
                     <RadzenLabel Text="Annotation" For="annotation" Style="margin-left: 8px; vertical-align: middle;" />
                 </RadzenCard>

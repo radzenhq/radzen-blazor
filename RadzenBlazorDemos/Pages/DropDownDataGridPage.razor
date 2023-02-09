@@ -45,7 +45,7 @@
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom filtering</RadzenText>
                     <RadzenDropDownDataGrid TValue="string" LoadData="@LoadData" AllowFiltering="true" AllowClear="true"
                                             Data=@customCustomersData Count="@count" TextProperty="CompanyName" ValueProperty="CustomerID"
-                                            Change=@(args => OnChange(args, "DropDownDataGrid with custom filtering")) Class="w-100"/>
+                                            Change=@(args => OnChange(args, "DropDownDataGrid with custom filtering")) class="w-100"/>
                 </RadzenCard>
             </div>
             <div class="col-md-6 p-3">
@@ -57,7 +57,7 @@
                     </div>
                     <RadzenDropDownDataGrid @ref="grid" Chips="true" AllowRowSelectOnRowClick="@allowRowSelectOnRowClick" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value=@multipleValues
                                             Multiple="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                                            Change=@(args => OnChange(args, "DropDownDataGrid with multiple selection")) Class="w-100">
+                                            Change=@(args => OnChange(args, "DropDownDataGrid with multiple selection")) class="w-100">
                         <Columns>
                             <RadzenDropDownDataGridColumn Width="60px" Sortable="false">
                                 <HeaderTemplate>
@@ -82,7 +82,7 @@
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom template</RadzenText>
                     <RadzenDropDownDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true"
                                             @bind-Value="value" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                                            Change=@(args => OnChange(args, "DropDownDataGrid with placeholder")) Class="w-100">
+                                            Change=@(args => OnChange(args, "DropDownDataGrid with placeholder")) class="w-100">
                         <Template>
                             Company: @((context as Customer).CompanyName)
                         </Template>
@@ -94,7 +94,7 @@
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Virtualization using IQueryable</RadzenText>
                     <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowVirtualization="true"
                                             AllowFiltering="true" AllowClear="true" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                                            Change=@(args => OnChange(args, "DropDownDataGrid with virtualization using IQueryable")) Class="w-100">
+                                            Change=@(args => OnChange(args, "DropDownDataGrid with virtualization using IQueryable")) class="w-100">
                         <Columns>
                             <RadzenDropDownDataGridColumn Property="CustomerID" Title="Customer ID"/>
                             <RadzenDropDownDataGridColumn Property="CompanyName" Title="Company Name"/>
@@ -107,14 +107,14 @@
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Virtualization using LoadData event</RadzenText>
                     <RadzenDropDownDataGrid TValue="string" LoadData="@LoadDataVirtualization" AllowFiltering="true" AllowClear="true" AllowVirtualization="true"
                                             Data=@customCustomersDataVirtualization Count="@customCustomersDataVirtualizationCount" TextProperty="CompanyName" ValueProperty="CustomerID"
-                                            Change=@(args => OnChange(args, "DropDownDataGrid with virtualization using LoadData event")) Class="w-100"/>
+                                            Change=@(args => OnChange(args, "DropDownDataGrid with virtualization using LoadData event")) class="w-100"/>
                 </RadzenCard>
             </div>
         </div>
     </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     bool allowRowSelectOnRowClick = true;

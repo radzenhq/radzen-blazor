@@ -14,28 +14,28 @@
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple selection</RadzenText>
                 <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 @bind-Value=@multipleValues Multiple="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                                Change=@(args => OnChange(args, "DropDown with multiple selection")) Class="w-100" />
+                                Change=@(args => OnChange(args, "DropDown with multiple selection")) class="w-100" />
             </RadzenCard>
         </div>
         <div class="col-md-6 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple with Disabled item</RadzenText>
                 <RadzenDropDown AllowClear="true" AllowFiltering="true" Multiple="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@multipleValuesdisabled
-                                TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
+                                TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) class="w-100" />
             </RadzenCard>
         </div>
         <div class="col-md-6 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple selection with chips</RadzenText>
                 <RadzenDropDown Multiple="true" Chips="true" MaxSelectedLabels="20" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@multipleValuesChip
-                                TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) Class="w-100" />
+                                TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) class="w-100" />
             </RadzenCard>
         </div>
     </div>
 </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     IEnumerable<Customer> customers;

@@ -1,10 +1,10 @@
 ﻿@page "/datagrid-filter-template"
 @using System.Linq.Dynamic.Core
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DataGrid custom Column FilterTemplate
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
     This page demonstrates how to define custom DataGrid column filter template.
 </RadzenText>
 
@@ -15,7 +15,7 @@
     }
     else
     {
-        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" Class="my-4">Custom filtering template with IQueryable binding</RadzenText>
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="my-4">Custom filtering template with IQueryable binding</RadzenText>
          <RadzenDataGrid @ref="grid" Data=@employees FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
             <Columns>
                 <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />

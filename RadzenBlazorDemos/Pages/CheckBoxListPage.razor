@@ -6,7 +6,7 @@
         <div class="col-lg-6 p-3 d-flex">
             <RadzenCard Style="width: 100%;">
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Horizontal Orientation</RadzenText>
-                <RadzenCheckBoxList @bind-Value=@values TValue="int" Change=@(args => OnChange(args, "CheckBoxList with horizontal orientation")) Class="mb-5">
+                <RadzenCheckBoxList @bind-Value=@values TValue="int" Change=@(args => OnChange(args, "CheckBoxList with horizontal orientation")) class="mb-5">
                     <Items>
                         <RadzenCheckBoxListItem Text="Orders" Value="1" />
                         <RadzenCheckBoxListItem Text="Employees" Value="2" />
@@ -68,7 +68,7 @@
 </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     public class MyObject

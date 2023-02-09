@@ -10,7 +10,7 @@
     <RadzenSteps Change=@OnChange>
         <Steps>
             <RadzenStepsItem Text="Customers">
-                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" Class="my-4">1. Select a Customer to continue</RadzenText>
+                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="my-4">1. Select a Customer to continue</RadzenText>
                 <RadzenDataGrid ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@customers" TItem="Customer" @bind-Value="@selectedCustomers">
                     <Columns>
                         <RadzenDataGridColumn TItem="Customer" Property="CustomerID" Title="Customer ID" Width="140px" />
@@ -28,7 +28,7 @@
                 </RadzenDataGrid>
             </RadzenStepsItem>
             <RadzenStepsItem Text="Orders" Disabled="@(selectedCustomers == null || selectedCustomers != null && !selectedCustomers.Any())">
-                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" Class="my-4">2. Select an Order to continue</RadzenText>
+                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="my-4">2. Select an Order to continue</RadzenText>
                 <RadzenDataGrid ColumnWidth="150px" PageSize="5" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
                             Data="@(selectedCustomers != null && selectedCustomers.Any() ? orders.Where(o => o.CustomerID == selectedCustomers[0].CustomerID) : Enumerable.Empty<Order>())" TItem="Order" @bind-Value="@selectedOrders">
                     <Columns>
@@ -72,7 +72,7 @@
                 </RadzenDataGrid>
             </RadzenStepsItem>
             <RadzenStepsItem Text="Order Details" Disabled="@(selectedOrders == null || selectedOrders != null && !selectedOrders.Any())">
-                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" Class="my-4">Order Details</RadzenText>
+                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="my-4">Order Details</RadzenText>
                 <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true"
                             Data="@(selectedOrders != null && selectedOrders.Any() ? orderDetails.Where(o => o.OrderID == selectedOrders[0].OrderID) : Enumerable.Empty<OrderDetail>())" TItem="OrderDetail" ColumnWidth="200px">
                     <Columns>
@@ -86,7 +86,7 @@
     </RadzenSteps>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     EventConsole console;

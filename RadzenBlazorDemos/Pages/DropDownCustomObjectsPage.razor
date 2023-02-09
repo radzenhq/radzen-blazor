@@ -15,7 +15,7 @@
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown with custom objects and single selection</RadzenText>
                     <RadzenDropDown Data=@data TValue="MyObject" @bind-Value=@singleValue
                                     AllowClear="true" AllowFiltering="true"
-                                    Change=@(args => OnChange(args, "DropDown with custom objects and single selection")) Class="w-100">
+                                    Change=@(args => OnChange(args, "DropDown with custom objects and single selection")) class="w-100">
                     </RadzenDropDown>
             </RadzenCard>
         </div>
@@ -24,7 +24,7 @@
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown with custom objects and multiple selection</RadzenText>
                     <RadzenDropDown Data=@data TValue="IEnumerable<MyObject>" @bind-Value=@multipleValues
                                     Multiple=true AllowClear="true" AllowFiltering="true"
-                                    Change=@(args => OnChange(args, "DropDown with custom objects and multiple selection")) Class="w-100">
+                                    Change=@(args => OnChange(args, "DropDown with custom objects and multiple selection")) class="w-100">
                     </RadzenDropDown>
             </RadzenCard>
         </div>
@@ -33,7 +33,7 @@
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown from Enum</RadzenText>
                     <RadzenDropDown Data="@(Enum.GetValues(typeof(ColorType)).Cast<Enum>())" @bind-Value=@color
                                     AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                    Change=@(args => OnChange(args, "DropDown from Enum")) Class="w-100">
+                                    Change=@(args => OnChange(args, "DropDown from Enum")) class="w-100">
                     </RadzenDropDown>
             </RadzenCard>
         </div>
@@ -41,7 +41,7 @@
 </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     EventConsole console;

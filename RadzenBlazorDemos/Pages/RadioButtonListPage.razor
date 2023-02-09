@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="row px-3">
         <div class="col-lg-4 p-3 d-flex">
-            <RadzenCard Class="w-100">
+            <RadzenCard class="w-100">
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Horizontal orientation</RadzenText>
                 <RadzenRadioButtonList @bind-Value=@value TValue="int" Change=@((args) => OnChange(args, "RadioButtonList with horizontal orientation"))>
                     <Items>
@@ -13,7 +13,7 @@
                         <RadzenRadioButtonListItem Text="Customers" Value="3" />
                     </Items>
                 </RadzenRadioButtonList>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Class="mt-4">Vertical orientation</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mt-4">Vertical orientation</RadzenText>
                 <RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" Change=@((args) => OnChange(args, "RadioButtonList with vertical orientation"))>
                     <Items>
                         <RadzenRadioButtonListItem Text="Orders" Value="1" />
@@ -24,14 +24,14 @@
             </RadzenCard>
         </div>
         <div class="col-lg-4 p-3 d-flex">
-            <RadzenCard Class="w-100">
+            <RadzenCard class="w-100">
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Items from data</RadzenText>
                 <RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "RadioButtonList with items from data"))
                             Data="@data" TextProperty="Name" ValueProperty="Id" />
             </RadzenCard>
         </div>
         <div class="col-lg-4 p-3 d-flex">
-            <RadzenCard Class="w-100">
+            <RadzenCard class="w-100">
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Declared items and items from data</RadzenText>
                 <RadzenRadioButtonList @bind-Value=@value Data="@data" TextProperty="Name" ValueProperty="Id" TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "RadioButtonList with declared items and items from data"))>
                     <Items>
@@ -104,7 +104,7 @@
 </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     HorizontalAlign enumValue;

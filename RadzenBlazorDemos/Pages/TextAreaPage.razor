@@ -6,19 +6,19 @@
         <div class="col-md-6 col-lg-4 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea</RadzenText>
-                <RadzenTextArea Change=@(args => OnChange(args, "TextArea")) Class="w-100" />
+                <RadzenTextArea Change=@(args => OnChange(args, "TextArea")) class="w-100" />
             </RadzenCard>
         </div>
         <div class="col-md-6 col-lg-4 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea with placeholder</RadzenText>
-                <RadzenTextArea Placeholder="Enter here..." Change=@(args => OnChange(args, "TextArea with placeholder")) Class="w-100" />
+                <RadzenTextArea Placeholder="Enter here..." Change=@(args => OnChange(args, "TextArea with placeholder")) class="w-100" />
             </RadzenCard>
         </div>
         <div class="col-md-6 col-lg-4 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea with 5 maximum characters</RadzenText>
-                <RadzenTextArea MaxLength="5" Change=@(args => OnChange(args, "TextArea with 5 maximum characters")) Class="w-100" />
+                <RadzenTextArea MaxLength="5" Change=@(args => OnChange(args, "TextArea with 5 maximum characters")) class="w-100" />
             </RadzenCard>
         </div>
         <div class="col-md-6 col-lg-4 p-3">
@@ -37,7 +37,7 @@
 </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
     string value;

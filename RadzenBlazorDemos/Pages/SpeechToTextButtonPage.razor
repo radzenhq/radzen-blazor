@@ -12,7 +12,7 @@
             <div class="col-md-6 p-3">
                 <RadzenCard>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Update TextArea</RadzenText>
-                    <RadzenTextArea @bind-Value=@value Change=@(args => OnTextAreaChange(args, "TextArea")) Class="w-100" />
+                    <RadzenTextArea @bind-Value=@value Change=@(args => OnTextAreaChange(args, "TextArea")) class="w-100" />
                     <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, true, "Button2"))" />
                 </RadzenCard>
             </div>
@@ -20,7 +20,7 @@
     </div>
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<EventConsole @ref=@console class="mt-4" />
 
 @code {
 
