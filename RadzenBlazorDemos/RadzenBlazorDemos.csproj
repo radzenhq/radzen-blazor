@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
+	<PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Radzen.Blazor" Version="*" Condition="'$(Configuration)' == 'Release'"/>
