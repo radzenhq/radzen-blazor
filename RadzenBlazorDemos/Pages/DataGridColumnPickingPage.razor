@@ -15,7 +15,7 @@
 
 <RadzenExample Name="DataGridColumnPicking" Heading="false" Documentation="false">
     <RadzenButton Text="Toggle EmployeeID column visibility" Click=@(() => EmployeeIDVisible = !EmployeeIDVisible) class="my-3"/>
-    <RadzenDataGrid Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnPicking="true" PickedColumnsChanged="@PickedColumnsChanged">
+    <RadzenDataGrid Data="@employees" AllowFiltering=true TItem="Employee" ColumnWidth="300px" AllowColumnPicking="true" PickedColumnsChanged="@PickedColumnsChanged">
         <Columns>
             <RadzenDataGridColumn Visible="@EmployeeIDVisible" TItem="Employee" Property="EmployeeID" Title="ID" Width="80px" TextAlign="TextAlign.Center" Frozen="true" />
             <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Width="200px" Pickable="false">

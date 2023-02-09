@@ -196,11 +196,6 @@ namespace Radzen.Blazor
 
             if (Grid != null)
             {
-                if (value == false)
-                {
-                    Grid.GetJSRuntime().InvokeVoidAsync("Radzen.destroyPopup", $"{Grid.PopupID}{GetFilterProperty()}");
-                }
-
                 Grid.UpdatePickableColumn(this, _visible == true);
             }
         }

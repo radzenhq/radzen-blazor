@@ -874,7 +874,20 @@ window.Radzen = {
   closePopup: function (id, instance, callback, e) {
     var popup = document.getElementById(id);
     if (!popup) return;
-    if (popup.style.display == 'none') return;
+    if (popup.style.display == 'none') {
+        var popups = Radzen.findPopup(id);
+        if (popups.length > 1) {
+            for (var i = 0; i < popups.length; i++) {
+                if (popups[i].style.display == 'none') {
+                    popups[i].parentNode.removeChild(popups[i]);
+                } else {
+                    popup = popups[i];
+                }
+            }
+        } else {
+            return;
+        }
+    }
 
     if (popup) {
       if (popup.minWidth) {
