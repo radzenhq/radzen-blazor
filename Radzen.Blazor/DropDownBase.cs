@@ -91,6 +91,15 @@ namespace Radzen
 #endif
         }
 
+        internal int GetVirtualizationOverscanCount()
+        {
+#if NET5_0_OR_GREATER
+            return VirtualizationOverscanCount;
+#else
+            return 0;
+#endif
+        }
+
         /// <summary>
         /// Renders the items.
         /// </summary>
