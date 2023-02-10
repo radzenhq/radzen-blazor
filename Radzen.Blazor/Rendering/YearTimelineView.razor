@@ -15,13 +15,13 @@
     const double CALENDAR_WIDTH = 3800.0;
 }
 
-<div class="rz-timeline-view-content">
-    <div class="rz-timeline-view-header">
-        <div class="rz-timeline-slot-header-month">
+<div class="rz-view rz-timeline-view">
+    <div class="rz-view-header">
+        <div class="rz-slot-header">
         </div>
         @for (var dateheader = StartDate; dateheader <= StartDate.AddDays(NUMBER_DAYS_COLUMNS - 1); dateheader = dateheader.AddDays(1))
         {
-            <div class="rz-timeline-slot-header">
+            <div class="rz-slot-header">
                 @dateheader.ToString("dddd", Scheduler.Culture)
             </div>
         }
@@ -32,7 +32,7 @@
         daysinmonth = DateTime.DaysInMonth(startyear, month);
         date = realstart.StartOfMonth().StartOfWeek();
 
-        <div class="rz-timeline-week">
+        <div class="rz-month">
             <div class="rz-events">
                 @for (var start = date; start < date.AddDays(NUMBER_DAYS_COLUMNS); start = start.AddDays(1))
                 {
@@ -88,9 +88,9 @@
                     }
                 }
             </div>
-            <div class="rz-timeline-slots">
-                <div @attributes=@Attributes(realstart, "rz-timeline-slot-sticky") style="background-color: var(--rz-scheduler-month-title-background-color)">
-                    <div class="rz-timeline-month-label">
+            <div class="rz-slots">
+                <div @attributes=@Attributes(realstart, "rz-slot")>
+                    <div class="rz-slot-header">
                         @realstart.ToString("MMMM", Scheduler.Culture)
                     </div>
                 </div>
@@ -105,8 +105,8 @@
 
                     @if (slotInMonth)
                     {
-                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, "rz-timeline-slot") style="background-color:@backcolor">
-                            <div class="rz-timeline-slot-title">
+                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, "rz-slot") style="background-color:@backcolor">
+                            <div class="rz-slot-title">
                                 @if (dayOfWeek.Month == month)
                                 {
                                     @dayOfWeek.Day
@@ -116,8 +116,8 @@
                     }
                     else
                     {
-                        <div @attributes=@Attributes(dayOfWeek, "rz-timeline-slot") style="background-color:@backcolor">
-                            <div class="rz-timeline-slot-title">
+                        <div @attributes=@Attributes(dayOfWeek, "rz-slot") style="background-color:@backcolor">
+                            <div class="rz-slot-title">
                                 @if (dayOfWeek.Month == month)
                                 {
                                     @dayOfWeek.Day
