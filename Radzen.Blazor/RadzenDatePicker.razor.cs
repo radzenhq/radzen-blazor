@@ -553,7 +553,7 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    await ValueChanged.InvokeAsync((TValue)(object)DateTime.SpecifyKind((DateTime)Value, Kind));
+                    await ValueChanged.InvokeAsync((TValue)Value);
                 }
 
                 if (FieldIdentifier.FieldName != null)
