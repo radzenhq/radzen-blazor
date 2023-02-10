@@ -279,7 +279,7 @@ namespace Radzen.Blazor
         {
             foreach (var series in Series)
             {
-                if (series.Visible && series.Contains(mouseX - MarginLeft, mouseY - MarginTop, 5))
+                if (series.Visible && series.Contains(mouseX - MarginLeft, mouseY - MarginTop, 25))
                 {
                     var data = series.DataAt(mouseX - MarginLeft, mouseY - MarginTop);
 
