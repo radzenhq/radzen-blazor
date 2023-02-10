@@ -17,6 +17,12 @@ namespace Radzen
     public class DropDownBase<T> : DataBoundFormComponent<T>
     {
 #if NET5_0_OR_GREATER
+        /// <summary>
+        /// Gets or sets a value that determines how many additional items will be rendered before and after the visible region. This help to reduce the frequency of rendering during scrolling. However, higher values mean that more elements will be present in the page.
+        /// </summary>
+        [Parameter]
+        public int VirtualizationOverscanCount { get; set; }
+
         internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<object> virtualize;
 
         /// <summary>
@@ -105,6 +111,11 @@ namespace Radzen
                             RenderItem(b, context);
                         });
                     }));
+
+                    if(VirtualizationOverscanCount != default(int))
+                    {
+                        builder.AddAttribute(3, "OverscanCount", VirtualizationOverscanCount);
+                    }
 
                     builder.AddComponentReferenceCapture(7, c => { virtualize = (Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<object>)c; });
 
