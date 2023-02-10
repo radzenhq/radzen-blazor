@@ -13,17 +13,17 @@
     const double NUMBER_DAYS_COLUMNS = 38.0;
 }
 
-<div class="rz-planner-view-content">
-    <div class="rz-planner-view-header">
-        <div class="rz-planner-slot-header">
+<div class="rz-view rz-planner-view">
+    <div class="rz-view-header">
+        <div class="rz-slot-header">
         </div>
         @for (var dateheader = StartDate; dateheader <= StartDate.AddDays(NUMBER_DAYS_COLUMNS - 1); dateheader = dateheader.AddDays(1))
         {
-            <div class="rz-planner-slot-header">
+            <div class="rz-slot-header">
                 @dateheader.ToString("dddd", Scheduler.Culture).Substring(0,3)
             </div>
         }
-        <div class="rz-planner-slot-header">
+        <div class="rz-slot-header">
         </div>
     </div>
     @for (int month = 1; month < 13; month++)
@@ -32,7 +32,7 @@
         daysinmonth = DateTime.DaysInMonth(startyear, month);
         date = realstart.StartOfMonth().StartOfWeek();
 
-        <div class="rz-planner-week">
+        <div class="rz-month">
             <div class="rz-events">
                 @for (var start = date; start < date.AddDays(NUMBER_DAYS_COLUMNS); start = start.AddDays(1))
                 {
@@ -88,9 +88,9 @@
                     }
                 }
             </div>
-            <div class="rz-planner-slots">
-                <div @attributes=@Attributes(realstart, "rz-planner-slot") style="background-color: var(--rz-scheduler-month-title-background-color)">
-                    <div class="rz-slot-header rz-planner-month-label-text-left">
+            <div class="rz-slots">
+                <div @attributes=@Attributes(realstart, "rz-slot")>
+                    <div class="rz-slot-header">
                         @realstart.ToString("MMM", Scheduler.Culture)
                     </div>
                 </div>
@@ -106,8 +106,8 @@
 
                     @if (slotInMonth)
                     {
-                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, "rz-planner-slot") style="background-color:@backcolor">
-                            <div class="rz-planner-slot-title">
+                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, "rz-slot") style="background-color:@backcolor">
+                            <div class="rz-slot-title">
                                 @if (dayOfWeek.Month == month)
                                 {
                                     @dayOfWeek.Day
@@ -117,8 +117,8 @@
                     }
                     else
                     {
-                        <div @attributes=@Attributes(dayOfWeek, "rz-planner-slot") style="background-color:@backcolor">
-                            <div class="rz-planner-slot-title">
+                        <div @attributes=@Attributes(dayOfWeek, "rz-slot") style="background-color:@backcolor">
+                            <div class="rz-slot-title">
                                 @if (dayOfWeek.Month == month)
                                 {
                                     @dayOfWeek.Day
@@ -127,8 +127,8 @@
                         </div>
                     }
                 }
-                <div @attributes=@Attributes(realstart, "rz-planner-slot") style="background-color:var(--rz-scheduler-month-title-background-color)">
-                    <div class="rz-slot-header rz-planner-month-label-text-right">
+                <div @attributes=@Attributes(realstart, "rz-slot")>
+                    <div class="rz-slot-header">
                         @realstart.ToString("MMM", Scheduler.Culture)
                     </div>
                 </div>
