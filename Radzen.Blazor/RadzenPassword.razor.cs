@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -12,6 +13,8 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenPassword : FormComponent<string>, IRadzenFormComponent
     {
+        private string InputType = "password";
+
         /// <summary>
         /// Gets or sets a value indicating whether is read only.
         /// </summary>
@@ -25,6 +28,13 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if input automatic complete is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AutoComplete { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to show Eye icon in password input
+        /// </summary>
+        /// <value><c>true</c> if password reveal icon is allowed otherwise, <c>fasle</c>.</value>
+        [Parameter]
+        public bool AllowPasswordReveal { get; set; }
 
         /// <summary>
         /// Handles the <see cref="E:Change" /> event.
@@ -43,6 +53,15 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-textbox").ToString();
+        }
+
+        /// <summary>
+        /// Handles the Show Password toggle
+        /// </summary>
+        protected System.Threading.Tasks.Task ToggleShowPassword()
+        {
+            InputType = InputType == "password" ? "text" : "password";
+            return Task.CompletedTask;
         }
     }
 }

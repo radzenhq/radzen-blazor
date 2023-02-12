@@ -113,6 +113,23 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Password_Renders_AllowPasswordRevealParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenPassword>();
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AllowPasswordReveal, true));
+
+            Assert.Contains(@$"rz-button-icon-left", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AllowPasswordReveal, false));
+
+            Assert.DoesNotContain(@$"rz-button-icon-left", component.Markup);
+        }
+
+
+        [Fact]
         public void Password_Renders_AutoCompleteParameter()
         {
             using var ctx = new TestContext();
@@ -139,7 +156,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
-        
+
         [Fact]
         public void Password_Raises_ChangedEvent()
         {
