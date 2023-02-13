@@ -294,6 +294,9 @@ $scheduler-header-background-color: var(--rz-base-700) !default;
 $scheduler-header-border: none !default;
 $scheduler-border-color: var(--rz-base-700) !default;
 $scheduler-minor-border-color: var(--rz-base-700) !default;
+$scheduler-weekend-color: var(--rz-text-tertiary-color) !default;
+$scheduler-weekend-background-color: var(--rz-base-700) !default;
+$scheduler-other-month-background-color: var(--rz-base-900) !default;
 
 .rz-slot-minor {
   border-top: 1px dotted var(--rz-scheduler-minor-border-color) !important;

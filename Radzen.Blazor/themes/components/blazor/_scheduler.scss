@@ -61,7 +61,9 @@ $scheduler-slot-title-padding: 0 0.25rem !default;
 
 $scheduler-day-number-padding: 0 0.5rem !default;
 
-$scheduler-weekend-background-color: var(--rz-secondary-lighter) !default;
+$scheduler-weekend-color: var(--rz-text-disabled-color) !default;
+$scheduler-weekend-background-color: var(--rz-base-50) !default;
+$scheduler-other-month-background-color: var(--rz-base-100) !default;
 
 $scheduler-timeline-slot-width: 7rem !default;
 $scheduler-timeline-slot-height: 7rem !default;
@@ -135,7 +137,9 @@ $scheduler-planner-slot-height: 4.5rem !default;
 
   --rz-scheduler-day-number-padding: #{$scheduler-day-number-padding};
 
+  --rz-scheduler-weekend-color: #{$scheduler-weekend-color};
   --rz-scheduler-weekend-background-color: #{$scheduler-weekend-background-color};
+  --rz-scheduler-other-month-background-color: #{$scheduler-other-month-background-color};
   
   --rz-scheduler-timeline-slot-width: #{$scheduler-timeline-slot-width};
   --rz-scheduler-timeline-slot-height: #{$scheduler-timeline-slot-height};
@@ -493,6 +497,15 @@ $scheduler-planner-slot-height: 4.5rem !default;
           color: var(--rz-scheduler-header-color);
         }
       }
+
+      &.rz-other-month {
+        background-color: var(--rz-scheduler-other-month-background-color);
+      }
+
+      &.rz-weekend {
+        color: var(--rz-scheduler-weekend-color);
+        background-color: var(--rz-scheduler-weekend-background-color);
+      }
     }
   }
 }
@@ -527,6 +540,15 @@ $scheduler-planner-slot-height: 4.5rem !default;
     .rz-slot {
       width: var(--rz-scheduler-timeline-slot-width);
       height: var(--rz-scheduler-timeline-slot-height);
+
+      &.rz-other-month {
+        background-color: var(--rz-scheduler-other-month-background-color);
+      }
+
+      &.rz-weekend {
+        color: var(--rz-scheduler-weekend-color);
+        background-color: var(--rz-scheduler-weekend-background-color);
+      }
     }
   }
 }
@@ -561,6 +583,7 @@ $scheduler-planner-slot-height: 4.5rem !default;
       min-width: 2rem;
       min-height: 2rem;
       border-radius: var(--rz-scheduler-year-slot-title-border-radius);
+      transition: var(--rz-datepicker-calendar-transition);
 
       &.rz-other-month {
         opacity: 0.5;
