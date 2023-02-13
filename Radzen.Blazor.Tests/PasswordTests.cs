@@ -113,7 +113,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Password_Renders_AllowPasswordRevealParameter()
+        public void Password_Renders_ShowPasswordRevealParameter()
         {
             using var ctx = new TestContext();
 
