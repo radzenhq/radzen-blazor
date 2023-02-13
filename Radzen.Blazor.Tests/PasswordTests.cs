@@ -119,11 +119,11 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenPassword>();
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AllowPasswordReveal, true));
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.ShowPasswordReveal, true));
 
             Assert.Contains(@$"rz-button-icon-left", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AllowPasswordReveal, false));
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.ShowPasswordReveal, false));
 
             Assert.DoesNotContain(@$"rz-button-icon-left", component.Markup);
         }

@@ -34,7 +34,26 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if password reveal icon is allowed otherwise, <c>fasle</c>.</value>
         [Parameter]
-        public bool AllowPasswordReveal { get; set; }
+        public bool ShowPasswordReveal { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to enable Password Reveal if the Input is disabled
+        /// </summary>
+        /// <value><c>true</c> if password reveal icon is allowed and the input is disabled otherwise, <c>fasle</c>.</value>
+        [Parameter]
+        public bool AllowRevealWhenDisabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets the input CSS class.
+        /// </summary>
+        /// <value>The input CSS class.</value>
+        [Parameter]
+        public string InputClass { get; set; }
+
+        /// <summary>
+        /// Gets input reference.
+        /// </summary>
+        protected ElementReference input;
 
         /// <summary>
         /// Handles the <see cref="E:Change" /> event.
@@ -58,10 +77,16 @@ namespace Radzen.Blazor
         /// <summary>
         /// Handles the Show Password toggle
         /// </summary>
-        protected System.Threading.Tasks.Task ToggleShowPassword()
+        protected System.Threading.Tasks.Task OnToggle()
         {
             InputType = InputType == "password" ? "text" : "password";
             return Task.CompletedTask;
         }
+
+        private string getStyle()
+        {
+            return $"display: inline-block; border:none; margin:0; padding:0; width:100%;{(Style != null ? Style : "")}";
+        }
+
     }
 }
