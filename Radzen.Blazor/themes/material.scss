@@ -1148,6 +1148,10 @@ $scheduler-year-slot-title-border-radius: 50% !default;
 
 .rz-view-header {
   border-top: none !important;
+
+  .rz-year-view & {
+    border-bottom: none !important;
+  }
 }
 
 // Tabs
