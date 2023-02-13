@@ -97,16 +97,16 @@
 
                 @for (var day = 0; day < NUMBER_DAYS_COLUMNS; day++)
                 {
-                    string backcolor = "";
+                    string dayType = "";
                     var dayOfWeek = date.AddDays(day);
                     bool slotInMonth = dayOfWeek.Month == month;
 
-                    backcolor = dayOfWeek.DayOfWeek == DayOfWeek.Saturday || dayOfWeek.DayOfWeek == DayOfWeek.Sunday ? "var(--rz-scheduler-weekend-background-color)" : "transparent";
-                    backcolor = dayOfWeek.Month != month ? "var(--rz-scheduler-not-in-month-background-color)" : backcolor;
+                    dayType = dayOfWeek.DayOfWeek == DayOfWeek.Saturday || dayOfWeek.DayOfWeek == DayOfWeek.Sunday ? "rz-weekend" : "";
+                    dayType = dayOfWeek.Month != month ? "rz-other-month" : dayType;
 
                     @if (slotInMonth)
                     {
-                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, "rz-slot") style="background-color:@backcolor">
+                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"))>
                             <div class="rz-slot-title">
                                 @if (dayOfWeek.Month == month)
                                 {
@@ -117,7 +117,7 @@
                     }
                     else
                     {
-                        <div @attributes=@Attributes(dayOfWeek, "rz-slot") style="background-color:@backcolor">
+                        <div @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"))>
                             <div class="rz-slot-title">
                                 @if (dayOfWeek.Month == month)
                                 {
