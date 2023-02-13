@@ -49,7 +49,8 @@
             { 
                 OrderBy = grid.Query.OrderBy, 
                 Filter = grid.Query.Filter, 
-                Select = string.Join(",", grid.ColumnsCollection.Where(c => c.GetVisible()).Select(c => c.Property)) 
+                Select = string.Join(",", grid.ColumnsCollection.Where(c => c.GetVisible())
+                        .Select(c => c.Property.Contains(".") ? $"{c.Property} as {c.Property.Replace(".", "")}" : c.Property))
             });
     }
 }
