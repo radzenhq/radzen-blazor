@@ -127,7 +127,24 @@ namespace Radzen.Blazor.Tests
 
             Assert.DoesNotContain(@$"rz-button-icon-left", component.Markup);
         }
+        //rz-state-disabled
+        [Fact]
+        public void Password_Renders_AllowRevealWhenDisabledParameter()
+        {
+            using var ctx = new TestContext();
 
+            var component = ctx.RenderComponent<RadzenPassword>();
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.ShowPasswordReveal, true));
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.Disabled, true));
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AllowRevealWhenDisabled, true));
+
+            Assert.DoesNotContain(@$"rz-button-icon-only rz-state-disabled", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AllowRevealWhenDisabled, false));
+
+            Assert.Contains(@$"rz-button-icon-only rz-state-disabled", component.Markup);
+        }
 
         [Fact]
         public void Password_Renders_AutoCompleteParameter()
