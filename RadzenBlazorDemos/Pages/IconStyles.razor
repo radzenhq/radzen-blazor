@@ -1,0 +1,9 @@
+﻿<RadzenDataList TItem="IconStyle" Data="@(Enum.GetValues<IconStyle>())" WrapItems="true" class="rz-p-12">
+    <Template Context="style">
+        <div>
+            <h5>@style.ToString()</h5>
+            <RadzenIcon Icon="dashboard" IconStyle="@style" />
+            <RadzenIcon Icon="open_with" IconStyle="@style" />
+        </div>
+    </Template>
+</RadzenDataList>
