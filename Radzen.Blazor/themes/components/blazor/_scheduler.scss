@@ -467,10 +467,12 @@ $scheduler-planner-slot-height: 4.5rem !default;
 // Planner View
 
 .rz-planner-view {
+  overflow: auto;
+
   .rz-view-header {
     position: sticky;
     top: 0px;
-    min-height: 36px;
+    min-height: 2.25rem;
     z-index: 9999;
   }
 
@@ -648,7 +650,6 @@ $scheduler-planner-slot-height: 4.5rem !default;
 
 @media (max-width: 1399px) {
   .rz-planner-view {
-    overflow: auto;
     flex-wrap: wrap;
     flex-direction: unset;
 
