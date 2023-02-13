@@ -15,92 +15,93 @@
 }
 
 
-<div class="rz-year-view-content">
-
+<div class="rz-view rz-year-view">
+<div class="rz-display-flex rz-row rz-align-items-normal rz-justify-content-space-between">
     @for (int month = 1; month < 13; month++)
     {
         realstart = new DateTime(year, month, 1);
         daysinmonth = DateTime.DaysInMonth(year, month);
         date = realstart.StartOfMonth().StartOfWeek();
 
-        <div class="rz-view-month">
-            <div class="rz-year-view-month-content">
-
-                <div class="rz-year-month-title">
+        <div class="rz-display-flex rz-flex-column rz-col-12 rz-col-sm-6 rz-col-md-4 rz-col-lg-3">
+        
+            <div class="rz-slot-header rz-pb-2">
+                <span class="rz-text-subtitle1">
                     @realstart.ToString("MMMM yyyy")
-                </div>
+                </span>
+            </div>
 
-                <div class="rz-year-view-header">
-                    @for (var dateheader = StartDate; dateheader <= StartDate.EndOfWeek(); dateheader = dateheader.AddDays(1))
-                    {
-                        <div class="rz-year-slot-header">
-                            @dateheader.ToString("ddd", Scheduler.Culture).Substring(0,1)
-                        </div>
-                    }
-                </div>
-
-                @for (var row = 0; row < 6; row++)
+            <div class="rz-view-header">
+                @for (var dateheader = StartDate; dateheader <= StartDate.EndOfWeek(); dateheader = dateheader.AddDays(1))
                 {
-                    <div class="rz-year-week">
-                        <div class="rz-events">
-                            <div class="rz-year-slots">
-                                @for (var col = 0; col < 7; col++)
-                                {
-                                    var day = date.AddDays((row * 7) + col);
-                                    var appointments = AppointmentsInSlot(day, day.AddDays(1));
-                                    var excessCount = appointments.Count();
-                                    string classname;
-
-                                    @if (day.Month != month)
-                                    {
-                                        if (excessCount > 0)
-                                        {
-                                            classname = "rz-year-slot-not-in-month-with-appointments";
-                                            <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-year-slot")>
-                                                <div class="@classname">
-                                                    @day.Day
-                                                </div>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            classname = "rz-year-slot-not-in-month";
-                                            <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-year-slot")>
-                                                <div class="@classname">
-                                                    @day.Day
-                                                </div>
-                                            </div>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (excessCount > 0)
-                                        {
-                                            classname = "rz-year-slot-normal-with-appointments";
-                                            <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-year-slot")>
-                                                <div class="@classname">
-                                                    @day.Day
-                                                </div>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            classname = "rz-year-slot-normal";
-                                            <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-year-slot")>
-                                                <div class="@classname">
-                                                    @day.Day
-                                                </div>
-                                            </div>
-                                        }
-                                    }
-                                }
-                            </div>
-                        </div>
+                    <div class="rz-slot-header">
+                        @dateheader.ToString("ddd", Scheduler.Culture).Substring(0,1)
                     </div>
                 }
             </div>
+
+            @for (var row = 0; row < 6; row++)
+            {
+                <div class="rz-week">
+                    <div class="rz-events">
+                        <div class="rz-slots">
+                            @for (var col = 0; col < 7; col++)
+                            {
+                                var day = date.AddDays((row * 7) + col);
+                                var appointments = AppointmentsInSlot(day, day.AddDays(1));
+                                var excessCount = appointments.Count();
+                                string classname;
+
+                                @if (day.Month != month)
+                                {
+                                    if (excessCount > 0)
+                                    {
+                                        classname = "rz-slot-title rz-other-month rz-has-appointments";
+                                        <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
+                                            <div class="@classname">
+                                                @day.Day
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        classname = "rz-slot-title rz-other-month";
+                                        <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
+                                            <div class="@classname">
+                                                @day.Day
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    if (excessCount > 0)
+                                    {
+                                        classname = "rz-slot-title rz-has-appointments";
+                                        <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
+                                            <div class="@classname">
+                                                @day.Day
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        classname = "rz-slot-title";
+                                        <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
+                                            <div class="@classname">
+                                                @day.Day
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     }
+</div>
 </div>
 <style>
 
