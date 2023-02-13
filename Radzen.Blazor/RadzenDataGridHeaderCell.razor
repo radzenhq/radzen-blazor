@@ -82,7 +82,7 @@
                                 else if (PropertyAccess.IsDate(Column.FilterPropertyType))
                                 {
                                     <RadzenDatePicker TValue="@object" ShowTime="true" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
-                                                Value="@Column.GetFilterValue()" Change="@(args => Column.SetFilterValue(args.Value))" />
+                                                      Value="@Column.GetFilterValue()" Change="@(args => Column.SetFilterValue(args.Value))" AllowInput=@(Grid.AllowFilterDateInput) />
 
                                 }
                                 else if (Column.FilterPropertyType == typeof(bool) || Column.FilterPropertyType == typeof(bool?))
@@ -112,7 +112,7 @@
                                 {
                                     <RadzenDatePicker TValue="@object"
                                                 ShowTime="@Column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
-                                                Value="@Column.GetSecondFilterValue()" Change="@(args => Column.SetFilterValue(args.Value, false))" />
+                                                      Value="@Column.GetSecondFilterValue()" Change="@(args => Column.SetFilterValue(args.Value, false))" AllowInput=@(Grid.AllowFilterDateInput) />
 
                                 }
                                 else if (Column.FilterPropertyType == typeof(bool) || Column.FilterPropertyType == typeof(bool?))

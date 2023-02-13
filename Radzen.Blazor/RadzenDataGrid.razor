@@ -231,7 +231,7 @@
                                                                                 </div>
                                                                             </div>
 
-                                                                            <RadzenDatePicker TValue="@object"
+                                                                            <RadzenDatePicker TValue="@object" AllowInput=@(AllowFilterDateInput)
                                                                                       ShowTime="@column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="false" Inline="true" DateFormat="@getFilterDateFormat(column)"
                                                                                       Value="@column.GetFilterValue()" Change="@(args => { column.SetFilterValue(args.Value); SaveSettings(); })" />
 
@@ -251,7 +251,7 @@
                                                             else
                                                             {
                                                                 <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
-                                                                <RadzenDatePicker Disabled=@column.CanSetFilterValue() TValue="@object" Style="width:100%" AllowInput="false" AllowClear="true"
+                                                                <RadzenDatePicker Disabled=@column.CanSetFilterValue() TValue="@object" Style="width:100%" AllowInput=@(AllowFilterDateInput) AllowClear="true"
                                                                                       ShowTime="false" ShowTimeOkButton="false" DateFormat="@getFilterDateFormat(column)"
                                                                                       Value="@column.GetFilterValue()" Change="@(args => { if(!args.HasValue) { ClearFilter(column, true); } else {column.SetFilterValue(args.Value); ApplyFilter(column, true);} })" />
                                                             }

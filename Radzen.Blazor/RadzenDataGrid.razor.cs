@@ -982,6 +982,13 @@ namespace Radzen.Blazor
         public string FilterDateFormat { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether input is allowed in filter DatePicker.
+        /// </summary>
+        /// <value><c>true</c> if input is allowed in filter DatePicker; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowFilterDateInput { get; set; }
+
+        /// <summary>
         /// Gets or sets the width of all columns.
         /// </summary>
         /// <value>The width of the columns.</value>
