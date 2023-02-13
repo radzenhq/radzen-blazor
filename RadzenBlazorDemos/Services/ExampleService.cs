@@ -586,6 +586,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Scheduler",
                     Path = "scheduler",
+                    Updated = true,
                     Title = "Blazor scheduler component with daily, weekly and monthly views",
                     Icon = "&#xe616",
                     Tags = new [] { "scheduler", "calendar", "event", "appointment"}
