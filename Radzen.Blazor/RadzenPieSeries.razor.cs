@@ -324,31 +324,34 @@ namespace Radzen.Blazor
         {
             var list = new List<ChartDataLabel>();
 
-            foreach (var d in Data)
+            if(Data != null)
             {
-                var x = TooltipX(d) - CenterX;
-                var y = TooltipY(d) - CenterY;
+                foreach (var d in Data)
+                {
+                    var x = TooltipX(d) - CenterX;
+                    var y = TooltipY(d) - CenterY;
 
-                // find angle and add offset
-                var phi = Math.Atan2(y, x);
+                    // find angle and add offset
+                    var phi = Math.Atan2(y, x);
 
-                phi += Polar.ToRadian(offsetY % 360);
+                    phi += Polar.ToRadian(offsetY % 360);
 
-                var textAnchor = phi >= -1.5 && phi <= 1.5 ? "start" : "end";
+                    var textAnchor = phi >= -1.5 && phi <= 1.5 ? "start" : "end";
 
-                // find radius
-                var hyp = Math.Sqrt(x * x + y * y) + offsetX + 16;
+                    // find radius
+                    var hyp = Math.Sqrt(x * x + y * y) + offsetX + 16;
 
-                // move along the radius and rotate
-                x = CenterX + hyp * Math.Cos(phi);
-                y = CenterY + hyp * Math.Sin(phi);
+                    // move along the radius and rotate
+                    x = CenterX + hyp * Math.Cos(phi);
+                    y = CenterY + hyp * Math.Sin(phi);
 
-                list.Add(new ChartDataLabel 
-                { 
-                    TextAnchor = textAnchor, 
-                    Position = new Point { X = x, Y = y },
-                    Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
-                });
+                    list.Add(new ChartDataLabel
+                    {
+                        TextAnchor = textAnchor,
+                        Position = new Point { X = x, Y = y },
+                        Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
+                    });
+                }
             }
 
             return list;

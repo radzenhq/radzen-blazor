@@ -29,12 +29,15 @@
             builder.OpenRegion(0);
             foreach (var label in series.GetDataLabels(OffsetX, OffsetY))
             {
-                builder.AddContent(1,
-                    @<g>
-                        <Text @key="@($"{label.Position}-{Chart.Series.IndexOf(series)}")" 
-                            Value="@label.Text" Position="@label.Position" TextAnchor="@label.TextAnchor" Class="rz-series-data-label" />
-                    </g>
+                if (!(double.IsNaN(label.Position.X) || double.IsNaN(label.Position.Y)))
+                {
+                    builder.AddContent(1,
+                            @<g>
+                                <Text @key="@($"{label.Position}-{Chart.Series.IndexOf(series)}")" 
+                                    Value="@label.Text" Position="@label.Position" TextAnchor="@label.TextAnchor" Class="rz-series-data-label" />
+                            </g>
                     );
+                }
             }
             builder.CloseRegion();
         };
