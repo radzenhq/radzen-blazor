@@ -97,19 +97,20 @@ namespace Radzen.Blazor
         /// Stores <see cref="Data" /> filtered to items greater than zero as an IList of <typeparamref name="TItem"/>.
         /// </summary>
         /// <value>The items.</value>
-        protected IList<TItem> ItemsGreaterZero 
-        { 
-            get
-            {
+        protected IList<TItem> PositiveItems { get; set; }
 
-                if (Items != null)
-                {
-                    return Items.Where(e => Value(e) > 0).ToList();
-                }
-                else
-                {
-                    return new List<TItem>();
-                }
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            await base.SetParametersAsync(parameters);
+
+            if (Items != null)
+            {
+                PositiveItems = Items.Where(e => Value(e) > 0).ToList();
+            }
+            else
+            {
+                PositiveItems = new List<TItem>();
             }
         }
 
@@ -228,11 +229,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipX(TItem item)
         {
-            var sum = ItemsGreaterZero.Sum(Value);
+            var sum = PositiveItems.Sum(Value);
             double startAngle = 0;
             double endAngle = 0;
 
-            foreach (var data in ItemsGreaterZero)
+            foreach (var data in PositiveItems)
             {
                 var value = Value(data);
                 endAngle = startAngle + (value / sum) * 360;
@@ -253,7 +254,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipY(TItem item)
         {
-            var sum = ItemsGreaterZero.Sum(Value);
+            var sum = PositiveItems.Sum(Value);
             double startAngle = 0;
             double endAngle = 0;
 
@@ -330,7 +331,7 @@ namespace Radzen.Blazor
 
             if (Math.Abs(end.X - start.X) < 0.01 && Math.Abs(end.Y - start.Y) < 0.01)
             {
-                // Full circle - SVG can't render a full circle arc 
+                // Full circle - SVG can't render a full circle arc
                 endX = (end.X - 0.01).ToInvariantString();
 
                 innerEndX = (innerEnd.X - 0.01).ToInvariantString();
@@ -348,7 +349,7 @@ namespace Radzen.Blazor
             {
                 //var DataGreaterZero = Data.Where(e => Value(e) > 0).ToList();
 
-                foreach (var d in ItemsGreaterZero)
+                foreach (var d in PositiveItems)
                 {
                     var x = TooltipX(d) - CenterX;
                     var y = TooltipY(d) - CenterY;

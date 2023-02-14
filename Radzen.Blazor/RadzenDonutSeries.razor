@@ -37,15 +37,15 @@
         var radius = CurrentRadius;
         var innerRadius = InnerRadius ?? radius / 2;
 
-        return 
+        return
         @<g>
             <g class="@className">
-                @if (ItemsGreaterZero.Any())
+                @if (PositiveItems.Any())
                 {
-                    var sum = ItemsGreaterZero.Sum(Value);
+                    var sum = PositiveItems.Sum(Value);
                     double startAngle = -90;
 
-                    @foreach (var data in ItemsGreaterZero)
+                    @foreach (var data in PositiveItems)
                     {
                         var value = Value(data);
                         var angle = (value / sum) * 360;
@@ -76,7 +76,7 @@
                     </g>
                 }
             </g>
-       
+
         @if (!string.IsNullOrEmpty(Title) && TitleTemplate == null)
         {
             <g class="rz-donut-title">

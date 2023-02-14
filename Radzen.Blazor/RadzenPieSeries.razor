@@ -16,15 +16,15 @@
         var y = CenterY;
         var radius = CurrentRadius;
 
-        return 
+        return
         @<g class="@className">
-            @if (ItemsGreaterZero.Any())
+            @if (PositiveItems.Any())
                 {
-                    var sum = ItemsGreaterZero.Sum(Value);
+                    var sum = PositiveItems.Sum(Value);
 
                     double startAngle = -90;
 
-                @foreach (var data in ItemsGreaterZero)
+                @foreach (var data in PositiveItems)
                     {
                         var value = Value(data);
                         var angle = sum == 0 ? 0 : (value / sum) * 360;
@@ -45,7 +45,7 @@
                                 <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
                             }
                         </g>
-                    }                        
+                    }
                 }
                 else
                 {
