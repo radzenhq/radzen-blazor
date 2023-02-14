@@ -214,12 +214,6 @@ namespace Radzen.Blazor
         /// <value>The items.</value>
         protected IList<TItem> Items { get; set; } = new List<TItem>();
 
-        /// <summary>
-        /// Stores <see cref="Data" /> filtered to items greater than zero as an IList of <typeparamref name="TItem"/>.
-        /// </summary>
-        /// <value>The items.</value>
-        protected IList<TItem> ItemsGreaterZero { get; set; } = new List<TItem>();
-
         /// <inheritdoc />
         public RadzenMarkers Markers { get; set; } = new RadzenMarkers();
 
@@ -394,8 +388,6 @@ namespace Radzen.Blazor
                     {
                         Items = Items.AsQueryable().OrderBy(CategoryProperty).ToList();
                     }
-                    
-                    ItemsGreaterZero = Items.Where(e => Value(e) > 0).ToList();
                 }
 
                 await Chart.Refresh(false);

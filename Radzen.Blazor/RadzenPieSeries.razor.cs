@@ -93,6 +93,26 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Stores <see cref="Data" /> filtered to items greater than zero as an IList of <typeparamref name="TItem"/>.
+        /// </summary>
+        /// <value>The items.</value>
+        protected IList<TItem> ItemsGreaterZero 
+        { 
+            get
+            {
+
+                if (Items != null)
+                {
+                    return Items.Where(e => Value(e) > 0).ToList();
+                }
+                else
+                {
+                    return new List<TItem>();
+                }
+            }
+        }
+
         /// <inheritdoc />
         public override double MeasureLegend()
         {
