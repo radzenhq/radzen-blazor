@@ -1,11 +1,5 @@
 ﻿@page "/datagrid-virtualization"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
-
-@inherits DbContextPage
-
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DataGrid <strong>Virtualization</strong>
 </RadzenText>
@@ -16,34 +10,6 @@
     Just set the <code>AllowVirtualization</code> property to <code>true</code>. Requires .NET Core 5.0+.
 </RadzenText>
 
-<RadzenExample Name="DataGridVirtualization" Heading="false" Documentation="false">
-    <RadzenDataGrid Data="@orderDetails" TItem="OrderDetail" AllowVirtualization="true" Style="height:400px"
-                    AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" LogicalFilterOperator="LogicalFilterOperator.Or"
-                    AllowSorting="true">
-        <Columns>
-            <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
-            <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
-            <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
-                <Template Context="detail">
-                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-            <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
-                <Template Context="detail">
-                    @String.Format("{0}%", detail.Discount * 100)
-                </Template>
-            </RadzenDataGridColumn>
-        </Columns>
-    </RadzenDataGrid>
+<RadzenExample ComponentName="DataGrid" Example="DataGridVirtualization" Heading="false" Documentation="false">
+    <DataGridVirtualization />
 </RadzenExample>
-@code {
-    IEnumerable<OrderDetail> orderDetails;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        orderDetails = dbContext.OrderDetails;
-    }
-}
