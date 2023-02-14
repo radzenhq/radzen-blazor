@@ -1,0 +1,99 @@
+﻿@using System.Collections
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using System.ComponentModel.DataAnnotations
+
+@inherits DbContextPage
+
+<div class="container-fluid">
+    <div class="row px-3">
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown with custom objects and single selection</RadzenText>
+                    <RadzenDropDown Data=@data TValue="MyObject" @bind-Value=@singleValue
+                                    AllowClear="true" AllowFiltering="true"
+                                    Change=@(args => OnChange(args, "DropDown with custom objects and single selection")) class="w-100">
+                    </RadzenDropDown>
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown with custom objects and multiple selection</RadzenText>
+                    <RadzenDropDown Data=@data TValue="IEnumerable<MyObject>" @bind-Value=@multipleValues
+                                    Multiple=true AllowClear="true" AllowFiltering="true"
+                                    Change=@(args => OnChange(args, "DropDown with custom objects and multiple selection")) class="w-100">
+                    </RadzenDropDown>
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown from Enum</RadzenText>
+                    <RadzenDropDown Data="@(Enum.GetValues(typeof(ColorType)).Cast<Enum>())" @bind-Value=@color
+                                    AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    Change=@(args => OnChange(args, "DropDown from Enum")) class="w-100">
+                    </RadzenDropDown>
+            </RadzenCard>
+        </div>
+    </div>
+</div>
+
+<EventConsole @ref=@console class="mt-4" />
+
+@code {
+    EventConsole console;
+
+    class MyObject
+    { 
+        public int Id { get; set; }
+        public string Name { get; set; }
+
+        public override bool Equals(object o)
+        {
+            var other = o as MyObject;
+
+            return other?.Id == Id;
+        }
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, Name: {Name}";
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+    }
+
+    ColorType color;
+
+    public enum ColorType
+    {
+        Red,
+        Green,
+        Blue,
+        [Display(Description = "Almond Green")]
+        AlmondGreen,
+        [Display(Description = "Amber Gray")]
+        AmberGray,
+        [Display(Description = "Apple Blue... ")]
+        AppleBlueSeaGreen,
+        //[Display(Description = "Miss", ResourceType = typeof(ResourceFile)] localization example
+        [Display(Description = "Azure")]
+        AzureBlue,
+
+    }
+
+    MyObject singleValue = new MyObject() { Id = 5, Name = "Name5" };
+    IEnumerable<MyObject> multipleValues = new[] { new MyObject() { Id = 3, Name = "Name3" }, new MyObject() { Id = 4, Name = "Name4" } };
+
+    IEnumerable<MyObject> data = Enumerable.Range(0, 100).Select(i => new MyObject() { Id = i, Name = $"Name{i}" });
+
+    void OnChange(object value, string name)
+    {
+        var str = value is IEnumerable ? string.Join(", ", ((IEnumerable)value).Cast<object>()) : value;
+
+        console.Log($"{name} value changed to {str}");
+    }
+}
