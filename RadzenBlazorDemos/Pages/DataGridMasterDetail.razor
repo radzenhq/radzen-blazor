@@ -1,19 +1,9 @@
-﻿@page "/master-detail"
-
-@using RadzenBlazorDemos.Data
+﻿@using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
 @inherits DbContextPage
 
-<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
-    DataGrid Master/Detail
-</RadzenText>
-<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
-    This page demonstrates how to create a master/detail relationship between two Radzen Blazor DataGrid components.
-</RadzenText>
-
-<RadzenExample Name="MasterDetail" Heading="false" Documentation="false">
 @if (orders == null)
 {
     <p><em>Loading...</em></p>
@@ -83,7 +73,6 @@ else
         </div>
     </div>
 }
-</RadzenExample>
 
 @code {
     IList<Order> SelectedOrders { get; set; }
