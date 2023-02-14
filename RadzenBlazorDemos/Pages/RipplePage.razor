@@ -4,30 +4,35 @@
     Ripple
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
-    Apply the ripple effect to various UI elements.
+     Apply the ripple effect to various UI elements.
 </RadzenText>
 
-<RadzenExample Name="Ripple" Heading="false" Documentation="false">
-<div class="container-fluid mb-3">
-    <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
-        Ripple effect applied to RadzenButton via <code>class="rz-ripple"</code>. Material theme buttons have the ripple effect applied by default.
-    </RadzenText>
-    <div class="my-4">
-        <RadzenButton Text="Click me!" class="rz-ripple" />
-    </div>
+<RadzenText ID="ripple-button" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Ripple RadzenButton
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Ripple effect applied to RadzenButton via <code>class="rz-ripple"</code>. Material theme buttons have the ripple effect applied by default.
+</RadzenText>
+<RadzenExample Example="RippleButton" Heading="false" Documentation="false">
+    <RippleButton />
+</RadzenExample>
 
-    <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
-        Ripple effect applied to RadzenLink via <code>class="rz-ripple"</code>.
-    </RadzenText>
-    <div class="my-4">
-        <RadzenLink Text="Click me!" class="rz-ripple" />
-    </div>
+<RadzenText ID="ripple-link" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Ripple RadzenLink
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Ripple effect applied to RadzenLink via <code>class="rz-ripple"</code>.
+</RadzenText>
+<RadzenExample Example="RippleLink" Heading="false" Documentation="false">
+    <RippleLink />
+</RadzenExample>
 
-    <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
-        Ripple effect applied to a simple <code>&lt;div&gt;</code> element via <code>class="rz-ripple"</code>. The ripple color inherits the element's text color.
-    </RadzenText>
-    <div class="my-4 p-4 rz-color-success-dark rz-ripple" style="display: inline-block; background-color: var(--rz-input-background-color)">
-        Click me!
-    </div>
-</div>
+<RadzenText ID="ripple-div" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Ripple HTML div
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Ripple effect applied to a simple <code>&lt;div&gt;</code> element via <code>class="rz-ripple"</code>. The ripple color inherits the element's text color.
+</RadzenText>
+<RadzenExample Example="RippleDiv" Heading="false" Documentation="false">
+    <RippleDiv />
 </RadzenExample>
