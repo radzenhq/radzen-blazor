@@ -687,7 +687,7 @@ namespace Radzen.Blazor
         public virtual IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
             var list = new List<ChartDataLabel>();
-            
+
             foreach (var d in Data)
             {
                 list.Add(new ChartDataLabel 
