@@ -1,0 +1,77 @@
+@using Microsoft.EntityFrameworkCore
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<div class="container-fluid">
+    <div class="row my-5">
+        <div class="col-md-4">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">Data-binding to Categories &#8250; Products</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Data from different tables.</RadzenText>
+                <RadzenTree Style="height: 300px" Data=@categories>
+                    <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
+                    <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
+                </RadzenTree>
+            </RadzenCard>
+        </div>
+        <div class="col-md-4">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">Data-binding to Employees</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Data from a single self-referencing table.</RadzenText>
+                <RadzenTree Data=@employees Style="height: 300px">
+                    <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1" 
+                        Expanded=@ShouldExpand HasChildren=@(e => (e as Employee).Employees1.Any()) 
+                    />
+                </RadzenTree>
+            </RadzenCard>
+        </div>
+        <div class="col-md-4">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mb-0">Load children on demand</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Populate children on parent expand.</RadzenText>
+                <RadzenTree Data=@categories Expand=@OnExpand Style="height: 300px">
+                    <RadzenTreeLevel TextProperty="CategoryName"/>
+                </RadzenTree>
+            </RadzenCard>
+        </div>
+    </div>
+</div>
+
+@code {
+    IEnumerable<Category> categories;
+    IEnumerable<Employee> employees;
+    
+    bool ShouldExpand(object data)
+    {
+        var employee = data as Employee;
+
+        return employee.LastName == "Fuller";
+    }
+
+    void OnExpand(TreeExpandEventArgs args)
+    {
+        var category = args.Value as Category;
+
+        args.Children.Data = category.Products;
+        args.Children.TextProperty = "ProductName";
+        args.Children.HasChildren = (product) => false;
+
+        /* Optional template
+        args.Children.Template = context => builder => {
+            builder.OpenElement(1, "strong");
+            builder.AddContent(2, (context.Value as Product).ProductName);
+            builder.CloseElement();
+        };
+        */
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        categories = dbContext.Categories.Include(c => c.Products);
+        var allEmployees = dbContext.Employees.Include(e => e.Employees1).ToList();
+        employees = allEmployees.Where(e => e.ReportsTo == null);
+    }
+}
