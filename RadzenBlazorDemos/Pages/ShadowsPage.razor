@@ -7,72 +7,25 @@
     Shadow styles and utility CSS classes.
 </RadzenText>
 
-<RadzenExample Name="Shadows" Heading="false" Documentation="false">
-<div class="container-fluid mb-3">
-    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="my-4">
-        Utility CSS classes
-    </RadzenText>
-    <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
-        Use these CSS classes to set box-shadow to an element e.g. <code>class="rz-shadow-2"</code>. Each theme has its own shadows assigned. Change the theme to preview them.
-    </RadzenText>
-    <div class="row">
-        <div class="shadows col mb-4">
-            <div class="rz-shadow-0"><span>.rz-shadow-0</span></div>
-            <div class="rz-shadow-1"><span>.rz-shadow-1</span></div>
-            <div class="rz-shadow-2"><span>.rz-shadow-2</span></div>
-            <div class="rz-shadow-3"><span>.rz-shadow-3</span></div>
-            <div class="rz-shadow-4"><span>.rz-shadow-4</span></div>
-            <div class="rz-shadow-5"><span>.rz-shadow-5</span></div>
-            <div class="rz-shadow-6"><span>.rz-shadow-6</span></div>
-            <div class="rz-shadow-7"><span>.rz-shadow-7</span></div>
-            <div class="rz-shadow-8"><span>.rz-shadow-8</span></div>
-            <div class="rz-shadow-9"><span>.rz-shadow-9</span></div>
-            <div class="rz-shadow-10"><span>.rz-shadow-10</span></div>
-        </div>
-    </div>
+<RadzenText ID="shadow-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Utility CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use these CSS classes to set box-shadow to an element e.g. <code>class="rz-shadow-2"</code>. Each theme has its own shadows assigned. Change the theme to preview them.
+</RadzenText>
+<RadzenExample Example="ShadowsClasses" Heading="false" Documentation="false">
+    <ShadowsClasses />
+</RadzenExample>
 
-    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="my-4">
-        Custom CSS properties (CSS Variables)
-    </RadzenText>
-    <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
-        These are the root theme shadow CSS variables. 
-    </RadzenText>
-    <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
-        You can use CSS variables in styles e.g. <code>style="box-shadow: var(--rz-shadow-2);"</code>
-    </RadzenText>
-    <div class="row">
-        <div class="shadows col mb-4">
-            <div style="box-shadow: var(--rz-shadow-0);"><span>--rz-shadow-0</span></div>
-            <div style="box-shadow: var(--rz-shadow-1);"><span>--rz-shadow-1</span></div>
-            <div style="box-shadow: var(--rz-shadow-2);"><span>--rz-shadow-2</span></div>
-            <div style="box-shadow: var(--rz-shadow-3);"><span>--rz-shadow-3</span></div>
-            <div style="box-shadow: var(--rz-shadow-4);"><span>--rz-shadow-4</span></div>
-            <div style="box-shadow: var(--rz-shadow-5);"><span>--rz-shadow-5</span></div>
-            <div style="box-shadow: var(--rz-shadow-6);"><span>--rz-shadow-6</span></div>
-            <div style="box-shadow: var(--rz-shadow-7);"><span>--rz-shadow-7</span></div>
-            <div style="box-shadow: var(--rz-shadow-8);"><span>--rz-shadow-8</span></div>
-            <div style="box-shadow: var(--rz-shadow-9);"><span>--rz-shadow-9</span></div>
-            <div style="box-shadow: var(--rz-shadow-10);"><span>--rz-shadow-10</span></div>
-        </div>
-    </div>
-</div>
-<style>
-    .shadows {
-        margin: 1rem;
-        padding: 3rem 0;
-        background: var(--rz-base-background-color);
-        border-radius: var(--rz-border-radius);
-        box-shadow: var(--rz-shadow-1);
-    }
-
-    .shadows div {
-        padding: 12px;
-        display: inline-block;
-        width: 8rem;
-        margin: 2rem;
-        border-radius: var(--rz-border-radius);
-        box-shadow: var(--rz-base-background-color);
-        text-align: center;
-    }
-</style>
+<RadzenText ID="shadow-css-variables" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Custom CSS properties (CSS Variables)
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    These are the root theme shadow CSS variables. 
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    You can use CSS variables in styles e.g. <code>style="box-shadow: var(--rz-shadow-2);"</code>
+</RadzenText>
+<RadzenExample Example="ShadowsVariables" Heading="false" Documentation="false">
+    <ShadowsVariables />
 </RadzenExample>
