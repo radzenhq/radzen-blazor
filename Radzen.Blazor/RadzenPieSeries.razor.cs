@@ -208,11 +208,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipX(TItem item)
         {
-            var sum = Items.Sum(Value);
+            var sum = ItemsGreaterZero.Sum(Value);
             double startAngle = 0;
             double endAngle = 0;
 
-            foreach (var data in Items)
+            foreach (var data in ItemsGreaterZero)
             {
                 var value = Value(data);
                 endAngle = startAngle + (value / sum) * 360;
@@ -233,7 +233,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipY(TItem item)
         {
-            var sum = Items.Sum(Value);
+            var sum = ItemsGreaterZero.Sum(Value);
             double startAngle = 0;
             double endAngle = 0;
 
@@ -326,7 +326,9 @@ namespace Radzen.Blazor
 
             if(Data != null)
             {
-                foreach (var d in Data)
+                //var DataGreaterZero = Data.Where(e => Value(e) > 0).ToList();
+
+                foreach (var d in ItemsGreaterZero)
                 {
                     var x = TooltipX(d) - CenterX;
                     var y = TooltipY(d) - CenterY;

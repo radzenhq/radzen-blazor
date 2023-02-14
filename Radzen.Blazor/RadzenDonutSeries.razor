@@ -25,11 +25,12 @@
 
       return @<div style="position: absolute;left: @(left)px;top: @(top)px;width: @(width.ToInvariantString())px; height: @(height.ToInvariantString())px;">
                 @TitleTemplate
-            </div>;
-      }
+          </div>
+      ;
+    }
 
-   public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
-   {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
         var className = $"rz-donut-series rz-series-{Chart.Series.IndexOf(this)}";
         var x = CenterX;
         var y = CenterY;
@@ -39,49 +40,39 @@
         return 
         @<g>
             <g class="@className">
-                @if (Items.Any())
+                @if (ItemsGreaterZero.Any())
                 {
-                    var sum = Items.Sum(Value);
+                    var sum = ItemsGreaterZero.Sum(Value);
+                    double startAngle = -90;
 
-                    if(sum == 0)
+                    @foreach (var data in ItemsGreaterZero)
                     {
-                        var arcClassName = $"rz-series-item-0";
-                        var d = Segment(x, y, radius, radius - 1, -90, 270);
+                        var value = Value(data);
+                        var angle = (value / sum) * 360;
+                        var endAngle = startAngle + angle;
+
+                        var d = Segment(x, y, radius, innerRadius, startAngle, endAngle);
+
+                        startAngle = endAngle;
+
+                        var index = Items.IndexOf(data);
+                        var arcClassName = $"rz-series-item-{index}";
+                        var fill = PickColor(index, Fills);
+                        var stroke = PickColor(index, Strokes);
+
                         <g class="@arcClassName">
-                            <Path D="@d" StrokeWidth="@StrokeWidth" />
+                            <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
                         </g>
-                    }
-                    else
-                    {
-                        double startAngle = -90;
-
-                        @foreach(var data in Items)
-                        {
-                            var value = Value(data);
-                            var angle = (value / sum) * 360;
-                            var endAngle = startAngle + angle;
-
-                            var d = Segment(x, y, radius, innerRadius, startAngle, endAngle);
-
-                            startAngle = endAngle;
-                        
-                            var index = Items.IndexOf(data);
-                            var arcClassName = $"rz-series-item-{index}";
-                            var fill = PickColor(index, Fills);
-                            var stroke = PickColor(index, Strokes);
-
-                            <g class="@arcClassName">
-                                <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
-                            </g>
-                        }
                     }
                 }
                 else
                 {
                     var arcClassName = $"rz-series-item-0";
                     var d = Segment(x, y, radius, radius - 1, -90, 270);
+                    var fill = PickColor(0, Fills);
+                    var stroke = PickColor(0, Strokes);
                     <g class="@arcClassName">
-                        <Path D="@d" StrokeWidth="@StrokeWidth" />
+                        <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
                     </g>
                 }
             </g>

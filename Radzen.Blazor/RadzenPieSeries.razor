@@ -18,23 +18,13 @@
 
         return 
         @<g class="@className">
-            @if (Items.Any())
-            {
-                var sum = Items.Sum(Value);
+            @if (ItemsGreaterZero.Any())
+                {
+                    var sum = ItemsGreaterZero.Sum(Value);
 
-                if(sum == 0)
-                {
-                    var arcClassName = $"rz-series-item-0";
-                    var d = Segment(x, y, radius, radius - 1, -90, 270);
-                    <g class="@arcClassName">
-                        <Path D="@d" StrokeWidth="@StrokeWidth" />
-                    </g>
-                }
-                else
-                {
                     double startAngle = -90;
 
-                    @foreach(var data in Items)
+                @foreach (var data in ItemsGreaterZero)
                     {
                         var value = Value(data);
                         var angle = sum == 0 ? 0 : (value / sum) * 360;
@@ -43,7 +33,7 @@
                         var d = Segment(x, y, radius, 0, startAngle, endAngle);
 
                         startAngle = endAngle;
-                    
+
                         var index = Items.IndexOf(data);
                         var arcClassName = $"rz-series-item-{index}";
                         var fill = PickColor(index, Fills);
@@ -57,15 +47,16 @@
                         </g>
                     }                        
                 }
-            }
-            else
-            {
-                var arcClassName = $"rz-series-item-0";
-                var d = Segment(x, y, radius, radius - 1, -90, 270);
-                <g class="@arcClassName">
-                    <Path D="@d" StrokeWidth="@StrokeWidth" />
-                </g>
-            }
+                else
+                {
+                    var arcClassName = $"rz-series-item-0";
+                    var d = Segment(x, y, radius, radius - 1, -90, 270);
+                    var fill = PickColor(0, Fills);
+                    var stroke = PickColor(0, Strokes);
+                    <g class="@arcClassName">
+                        <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
+                    </g>
+                }
         </g>;
     }
 }
