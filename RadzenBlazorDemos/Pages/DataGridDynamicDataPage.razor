@@ -1,5 +1,4 @@
 ﻿@page "/datagrid-dynamic"
-@using System.Linq.Dynamic.Core
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DataGrid <strong>dynamic</strong> data support
@@ -8,73 +7,6 @@
     Sometimes your data comes from external API and you don't have a C# model for it. This demo shows how to implement such a scenario.
 </RadzenText>
 
-<RadzenExample Name="DataGridDynamicData" Heading="false" Documentation="false">
-    <RadzenDataGrid @bind-Value=@selectedItems Data="@data" TItem="IDictionary<string, object>" ColumnWidth="200px"
-                         AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true">
-            <Columns>
-                @foreach(var column in columns)
-                {
-                    <RadzenDataGridColumn TItem="IDictionary<string, object>" Title="@column.Key" Type="column.Value"
-                            Property="@GetColumnPropertyExpression(column.Key, column.Value)" >
-                        <Template>
-                            @context[@column.Key]
-                        </Template>
-                    </RadzenDataGridColumn>
-                }
-        </Columns>
-        </RadzenDataGrid>
+<RadzenExample ComponentName="DataGrid" Example="DataGridDynamicData" Heading="false" Documentation="false">
+    <DataGridDynamicData />
 </RadzenExample>
-@code {
-    IList<IDictionary<string, object>> selectedItems;
-
-    public IEnumerable<IDictionary<string, object>> data { get; set; }
-
-    public IDictionary<string, Type> columns { get; set; }
-
-    public string GetColumnPropertyExpression(string name, Type type)
-    {
-        var expression = $@"it[""{name}""].ToString()";
-
-        if (type == typeof(int))
-        {
-            return $"int.Parse({expression})";
-        }
-        else if (type == typeof(DateTime))
-        {
-            return $"DateTime.Parse({expression})";
-        }
-
-        return expression;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        columns = new Dictionary<string, Type>()
-        {
-            { "EmployeeID", typeof(int) },
-            { "FirstName", typeof(string) },
-            { "LastName", typeof(string) },
-            { "HireDate", typeof(DateTime) },
-        };
-
-        foreach (var i in Enumerable.Range(0, 50))
-        {
-            columns.Add($"Column{i}", typeof(string));
-        }
-
-        data = Enumerable.Range(0, 100).Select(i =>
-        {
-            var row = new Dictionary<string, object>();
-
-            foreach (var column in columns)
-            {
-                row.Add(column.Key, column.Value == typeof(int) ? i : 
-                    column.Value == typeof(DateTime) ? DateTime.Now.AddMonths(i) : $"{column.Key}{i}");
-            }
-
-            return row;
-        });
-    }
-}
