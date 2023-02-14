@@ -1,49 +1,9 @@
 ﻿@page "/datagrid-density"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
-
-@inherits DbContextPage
-
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DataGrid <strong>Density</strong>
 </RadzenText>
 
-<RadzenExample Name="DataGridDensity" Heading="false" Documentation="false">
-    <RadzenCard class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
-        <div style="white-space:nowrap; margin-right: 16px">Density:</div>
-        <RadzenSelectBar @bind-Value="@Density" TextProperty="Text" ValueProperty="Value"
-                         Data="@(Enum.GetValues(typeof(Density)).Cast<Density>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
-    </RadzenCard>
-    <RadzenDataGrid Data="@orderDetails" TItem="OrderDetail" Density="@Density" AllowPaging="true" AllowSorting="true">
-        <Columns>
-            <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
-            <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
-            <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
-                <Template Context="detail">
-                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-            <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
-                <Template Context="detail">
-                    @String.Format("{0}%", detail.Discount * 100)
-                </Template>
-            </RadzenDataGridColumn>
-        </Columns>
-    </RadzenDataGrid>
+<RadzenExample ComponentName="DataGrid" Example="DataGridDensity" Heading="false" Documentation="false">
+    <DataGridDensity />
 </RadzenExample>
-
-@code {
-    Density Density = Density.Default;
-
-    IEnumerable<OrderDetail> orderDetails;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        orderDetails = dbContext.OrderDetails;
-    }
-}
