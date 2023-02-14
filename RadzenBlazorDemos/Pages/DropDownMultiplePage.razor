@@ -1,73 +1,9 @@
 ﻿@page "/dropdown-multiple"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DropDown <strong>multiple</strong> selection
+</RadzenText>
 
-@inherits DbContextPage
-
-<RadzenExample Name="DropDownMultiple" Heading="false" Documentation="false">
-<div class="container-fluid">
-    <div class="row px-3">
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple selection</RadzenText>
-                <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                @bind-Value=@multipleValues Multiple="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                                Change=@(args => OnChange(args, "DropDown with multiple selection")) class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple with Disabled item</RadzenText>
-                <RadzenDropDown AllowClear="true" AllowFiltering="true" Multiple="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@multipleValuesdisabled
-                                TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple selection with chips</RadzenText>
-                <RadzenDropDown Multiple="true" Chips="true" MaxSelectedLabels="20" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@products @bind-Value=@multipleValuesChip
-                                TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Change=@(args => OnChangeDisabled(args, "DropDown with multiple selection")) class="w-100" />
-            </RadzenCard>
-        </div>
-    </div>
-</div>
+<RadzenExample ComponentName="DropDown" Example="DropDownMultiple" Heading="false" Documentation="false">
+    <DropDownMultiple />
 </RadzenExample>
-
-<EventConsole @ref=@console class="mt-4" />
-
-@code {
-    IEnumerable<Customer> customers;
-    IEnumerable<Product> products;
-
-    IEnumerable<string> multipleValues = new string[] { "ALFKI", "ANATR" };
-
-    IEnumerable<int> multipleValuesdisabled = new int[] { 1,2 };
-
-    IEnumerable<int> multipleValuesChip = new int[] { 1, 2, 3, 4, 6, 7, 8 };
-
-    EventConsole console;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        customers = dbContext.Customers.ToList();
-        products = dbContext.Products.ToList();
-    }
-
-    void OnChange(object value, string name)
-    {
-        var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
-
-        console.Log($"{name} value changed to {str}");
-    }
-
-    void OnChangeDisabled(object value, string name)
-    {
-        var str = value is IEnumerable<int> ? string.Join(", ", (IEnumerable<int>)value) : value;
-
-        console.Log($"{name} value changed to {str}");
-    }
-}
