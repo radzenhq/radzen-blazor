@@ -1,33 +1,27 @@
-@page "/chart-interpolation"
 @using System.Globalization
 
-<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
-    Radzen Blazor Chart interpolation mode
-</RadzenText>
-
-<RadzenExample Name="InterpolationChart" Documentation="false" Heading="false">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12 my-5">
-                <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem">
-                    <RadzenLabel Text="Interpolation" For="interpolation" Style="margin-right: 1rem;"/>
-                    <RadzenDropDown AllowClear="false" Name="interpolation" @bind-Value="@interpolation"
-                                    TValue="Interpolation" ValueProperty="Value" TextProperty="Text"
-                                    Data="@(Enum.GetValues<Interpolation>().Select(v => new { Value = v, Text = $"{v:G}" }))"/>
-                </RadzenCard>
-                <RadzenChart>
-                    <RadzenLineSeries Interpolation="@interpolation" Data="@revenue2020" CategoryProperty="Date" Title="2019" LineType="LineType.Dashed" ValueProperty="Revenue" />
-                    <RadzenAreaSeries Interpolation="@interpolation" Data="@revenue2019" CategoryProperty="Date" Title="2020" ValueProperty="Revenue" />
-                    <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth"/>
-                    <RadzenValueAxis Formatter="@FormatAsUSD">
-                        <RadzenGridLines Visible="true"/>
-                        <RadzenAxisTitle Text="Revenue in USD"/>
-                    </RadzenValueAxis>
-                </RadzenChart>
-            </div>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 my-5">
+            <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem">
+                <RadzenLabel Text="Interpolation" For="interpolation" Style="margin-right: 1rem;"/>
+                <RadzenDropDown AllowClear="false" Name="interpolation" @bind-Value="@interpolation"
+                                TValue="Interpolation" ValueProperty="Value" TextProperty="Text"
+                                Data="@(Enum.GetValues<Interpolation>().Select(v => new { Value = v, Text = $"{v:G}" }))"/>
+            </RadzenCard>
+            <RadzenChart>
+                <RadzenLineSeries Interpolation="@interpolation" Data="@revenue2020" CategoryProperty="Date" Title="2019" LineType="LineType.Dashed" ValueProperty="Revenue" />
+                <RadzenAreaSeries Interpolation="@interpolation" Data="@revenue2019" CategoryProperty="Date" Title="2020" ValueProperty="Revenue" />
+                <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth"/>
+                <RadzenValueAxis Formatter="@FormatAsUSD">
+                    <RadzenGridLines Visible="true"/>
+                    <RadzenAxisTitle Text="Revenue in USD"/>
+                </RadzenValueAxis>
+            </RadzenChart>
         </div>
     </div>
-</RadzenExample>
+</div>
+
 @code {
     Interpolation interpolation = Interpolation.Line;
 
