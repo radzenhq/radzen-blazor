@@ -1,0 +1,26 @@
+﻿<div class="container-fluid">
+    <div class="row p-4">
+        <div class="col-md-6">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Switch</RadzenText>
+            <RadzenSwitch @bind-Value=@value Change=@(args => OnChange(args, "Switch")) />
+        </div>
+        <div class="col-md-6">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled Switch</RadzenText>
+            <RadzenSwitch @bind-Value=@disabledValue Disabled="true" />
+        </div>
+    </div>
+</div>
+
+<EventConsole @ref=@console class="mt-4" />
+
+@code {
+    bool value;
+    bool disabledValue = true;
+
+    EventConsole console;
+
+    void OnChange(bool? value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+}
