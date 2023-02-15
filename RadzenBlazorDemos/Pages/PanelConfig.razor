@@ -4,50 +4,50 @@
 
 @inherits DbContextPage
 
-<RadzenPanel AllowCollapse="true" Style="width: 700px; margin: 40px auto;"
+<RadzenPanel AllowCollapse="true" Class="rz-my-10 rz-mx-auto" Style="width: 700px;"
                 Expand=@(() => Change("Panel expanded")) Collapse=@(() => Change("Panel collapsed")) >
     <HeaderTemplate>
-        <h4 class="m-0 d-flex align-items-center">
-            <RadzenIcon Icon="account_box" class="me-1" /><b>Orders</b>
-        </h4>
+        <RadzenText TextStyle="TextStyle.H6" Class="rz-display-flex rz-align-items-center rz-m-0">
+            <RadzenIcon Icon="account_box" class="rz-mr-1" /><b>Orders</b>
+        </RadzenText>
     </HeaderTemplate>
     <ChildContent>
-        <RadzenCard class="mt-3">
+        <RadzenCard  class="rz-mt-4">
             <RadzenDataList PageSize="4" WrapItems="true" AllowPaging="true" 
-                            Data="@orders" TItem="Order" >
+                            Data="@orders" TItem="Order">
                 <Template Context="order">
                     <RadzenCard Style="width: 250px">
-                        <div class="row">
-                            <div class="col-md-8 text-truncate">
+                        <RadzenRow>
+                            <RadzenColumn Size="8" class="rz-text-truncate">
                                 <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") class="me-1" />
                                 <b>@(order.ShipName)</b>
-                            </div>
-                            <div class="col-md-4 text-end">
+                            </RadzenColumn>
+                            <RadzenColumn Size="4" class="rz-text-align-end">
                                 <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
-                            </div>
-                        </div>
-                        <hr style="border: none; background-color: rgba(0,0,0,.08); height: 1px; margin: 1rem 0;" />
-                        <div class="d-flex flex-row align-items-center">
-                            <RadzenImage Path="@order.Employee?.Photo" class="rounded-circle float-start me-3" Style="width: 80px; height: 80px;" />
-                            <div>
-                                <h4 class="mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</h4>
-                                <div>@order.ShipAddress</div>
-                                <div style="font-size: .8em">@(order.ShipCity), @(order.ShipCountry)</div>
-                            </div>
-                        </div>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin: 1rem 0;" />
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                            <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" />
+                            <RadzenStack Gap="0">
+                                <RadzenText TextStyle="TextStyle.H6" Class="rz-mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1">@order.ShipAddress</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body2">@(order.ShipCity), @(order.ShipCountry)</RadzenText>
+                            </RadzenStack>
+                        </RadzenStack>
                     </RadzenCard>
                 </Template>
             </RadzenDataList>
         </RadzenCard>
     </ChildContent>
     <SummaryTemplate>
-        <RadzenCard class="mt-3">
+        <RadzenCard class="rz-mt-4">
             <b>@orders.Count() Orders</b>
         </RadzenCard>
     </SummaryTemplate>
 </RadzenPanel>
 
-<EventConsole @ref=@console class="mt-4" />
+<EventConsole @ref=@console Class="rz-my-10 rz-mx-auto" Style="width: 700px;" />
 
 @code {
     EventConsole console;
