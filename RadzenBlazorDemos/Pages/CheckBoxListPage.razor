@@ -1,91 +1,12 @@
 ﻿@page "/checkboxlist"
 
-<RadzenExample Name="CheckBoxList">
-<div class="container-fluid">
-    <div class="row px-3">
-        <div class="col-lg-6 p-3 d-flex">
-            <RadzenCard Style="width: 100%;">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Horizontal Orientation</RadzenText>
-                <RadzenCheckBoxList @bind-Value=@values TValue="int" Change=@(args => OnChange(args, "CheckBoxList with horizontal orientation")) class="mb-5">
-                    <Items>
-                        <RadzenCheckBoxListItem Text="Orders" Value="1" />
-                        <RadzenCheckBoxListItem Text="Employees" Value="2" />
-                        <RadzenCheckBoxListItem Text="Customers" Value="3" />
-                    </Items>
-                </RadzenCheckBoxList>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Vertical Orientation</RadzenText>
-                <RadzenCheckBoxList @bind-Value=@values TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "CheckBoxList with vertical orientation"))>
-                    <Items>
-                        <RadzenCheckBoxListItem Text="Orders" Value="1" />
-                        <RadzenCheckBoxListItem Text="Employees" Value="2" />
-                        <RadzenCheckBoxListItem Text="Customers" Value="3" />
-                    </Items>
-                </RadzenCheckBoxList>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 p-3 d-flex">
-            <RadzenCard Style="width: 100%;">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">CheckBoxList with items from data</RadzenText>
-                <RadzenCheckBoxList @bind-Value=@values TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "CheckBoxList with items from data"))
-                            Data="@data" TextProperty="Name" ValueProperty="Id" />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 p-3 d-flex">
-            <RadzenCard Style="width: 100%;">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">CheckBoxList with declared items and items from data</RadzenText>
-                <RadzenCheckBoxList @bind-Value=@values Data="@data" TextProperty="Name" ValueProperty="Id" TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "CheckBoxList with declared items and items from data"))>
-                    <Items>
-                        <RadzenCheckBoxListItem Text="Static item" Value="0" />
-                    </Items>
-                </RadzenCheckBoxList>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 p-3 d-flex">
-            <RadzenCard Style="width: 100%;">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled CheckBoxList</RadzenText>
-                <RadzenCheckBoxList @bind-Value=@values Disabled="true" TValue="int" Orientation="Orientation.Vertical">
-                    <Items>
-                        <RadzenCheckBoxListItem Text="Orders" Value="1" />
-                        <RadzenCheckBoxListItem Text="Employees" Value="2" />
-                        <RadzenCheckBoxListItem Text="Customers" Value="3" />
-                    </Items>
-                </RadzenCheckBoxList>
-            </RadzenCard>
-        </div>
-         <div class="col-lg-6 p-3 d-flex">
-            <RadzenCard Style="width: 100%;">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Select all items CheckBoxList</RadzenText>
-                <RadzenCheckBoxList @bind-Value=@values AllowSelectAll="true" SelectAllText="Select all items" TValue="int" Orientation="Orientation.Vertical">
-                    <Items>
-                        <RadzenCheckBoxListItem Text="Orders" Value="1" />
-                        <RadzenCheckBoxListItem Text="Employees" Value="2" />
-                        <RadzenCheckBoxListItem Text="Customers" Value="3" />
-                    </Items>
-                </RadzenCheckBoxList>
-            </RadzenCard>
-        </div>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    CheckBoxList
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>CheckBoxList</strong> component.
+</RadzenText>
+
+<RadzenExample ComponentName="CheckBoxList" Example="CheckBoxListConfig" Heading="false" Documentation="false">
+    <CheckBoxListConfig />
 </RadzenExample>
-
-<EventConsole @ref=@console class="mt-4" />
-
-@code {
-    public class MyObject
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-
-    IEnumerable<MyObject> data = new MyObject[] {
-        new MyObject(){ Id = 1 , Name = "Orders"}, new MyObject() { Id = 2 , Name = "Employees"}, new MyObject() { Id = 3 , Name = "Customers" } };
-
-    IEnumerable<int> values = new int[] { 1 };
-
-    EventConsole console;
-
-    void OnChange(IEnumerable<int> value, string name)
-    {
-        console.Log($"{name} value changed to {string.Join(", ", value)}");
-    }
-}
