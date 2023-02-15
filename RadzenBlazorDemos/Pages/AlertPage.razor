@@ -1,22 +1,12 @@
 ﻿@page "/alert"
 
-<RadzenExample Name="Alert" Documentation="false">
-<div class="container-fluid">
-    <div class="row" style="min-height: 200px;">
-        <div class="col-12 p-3">
-            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter">
-                Alert with close button
-            </RadzenAlert>
-            <RadzenAlert  AllowClose="false" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
-                Alert without close button
-            </RadzenAlert>
-            <RadzenAlert Title="Alert with Title" AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
-                Alert with close button
-            </RadzenAlert>
-            <RadzenAlert AlertStyle="AlertStyle.Danger" ShowIcon="false" Variant="Variant.Flat" Shade="Shade.Lighter">
-                Alert without message icon
-            </RadzenAlert>
-        </div>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Alert
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Alert</strong> component.
+</RadzenText>
+
+<RadzenExample ComponentName="Alert" Example="AlertConfig" Heading="false" Documentation="false">
+    <AlertConfig />
 </RadzenExample>

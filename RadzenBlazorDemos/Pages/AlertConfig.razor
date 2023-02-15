@@ -1,0 +1,20 @@
+﻿@page "/alert"
+
+<div class="container-fluid">
+    <div class="row" style="min-height: 200px;">
+        <div class="col-12 p-3">
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter">
+                Alert with close button
+            </RadzenAlert>
+            <RadzenAlert  AllowClose="false" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
+                Alert without close button
+            </RadzenAlert>
+            <RadzenAlert Title="Alert with Title" AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
+                Alert with close button
+            </RadzenAlert>
+            <RadzenAlert AlertStyle="AlertStyle.Danger" ShowIcon="false" Variant="Variant.Flat" Shade="Shade.Lighter">
+                Alert without message icon
+            </RadzenAlert>
+        </div>
+    </div>
+</div>
