@@ -1,45 +1,12 @@
 ﻿@page "/speechtotextbutton"
 
-<RadzenExample Name="SpeechToTextButton">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6 p-3">
-                <RadzenCard>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Speech To Text</RadzenText>
-                    <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, false, "Button1"))" />
-                </RadzenCard>
-            </div>
-            <div class="col-md-6 p-3">
-                <RadzenCard>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Update TextArea</RadzenText>
-                    <RadzenTextArea @bind-Value=@value Change=@(args => OnTextAreaChange(args, "TextArea")) class="w-100" />
-                    <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, true, "Button2"))" />
-                </RadzenCard>
-            </div>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    SpeechToTextButton
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>SpeechToTextButton</strong> component.
+</RadzenText>
+
+<RadzenExample ComponentName="SpeechToTextButton" Example="SpeechToTextButtonConfig" Heading="false" Documentation="false">
+    <SpeechToTextButtonConfig />
 </RadzenExample>
-
-<EventConsole @ref=@console class="mt-4" />
-
-@code {
-
-    string value;
-
-    EventConsole console;
-
-    void OnTextAreaChange(string value, string name)
-    {
-        console.Log($"{name} value changed to {value}");
-    }
-
-    void OnSpeechCaptured(string speechValue, bool updateTextArea, string name)
-    {
-        console.Log($"Speech Captured from {name}: {speechValue}");
-
-        if (updateTextArea)
-        {
-            value += speechValue;
-        }
-    }
-}
