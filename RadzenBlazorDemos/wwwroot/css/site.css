@@ -459,6 +459,12 @@ svg.illustration {
     border-right: none;
     border-bottom: none;
     transition: none;
+    overflow: hidden;
+}
+
+.rz-tabview-top.example-tabs > .rz-tabview-nav > li > a > .rz-tabview-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .monaco-editor .view-overlays .current-line {
@@ -471,9 +477,13 @@ svg.illustration {
 }
 
 /* Demos TOC */
-.article-toc {
+.demos-right-sidebar {
     position: sticky;
     top: 2rem;
+    border-left: var(--rz-border-normal);
+}
+
+.article-toc {
     border-left: var(--rz-border-normal);
 }
 
