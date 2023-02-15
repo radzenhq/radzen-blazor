@@ -1,0 +1,66 @@
+﻿@inject ContextMenuService ContextMenuService
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 mt-4">
+            <RadzenText TextStyle="TextStyle.Body1">Right click on a button to show context menu.</RadzenText>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Defaul Radzen ContextMenu</RadzenText>
+                <RadzenButton Text="Right click me" ContextMenu=@(args => ShowContextMenuWithItems(args)) ButtonStyle="ButtonStyle.Secondary"  />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom content</RadzenText>
+                <RadzenButton Text="Right click me" ContextMenu=@(args => ShowContextMenuWithContent(args)) ButtonStyle="ButtonStyle.Secondary" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom content for HTML elment</RadzenText>
+                <button @oncontextmenu=@(args => ShowContextMenuWithContent(args)) @oncontextmenu:preventDefault="true">
+                    Right click me
+                </button>
+            </RadzenCard>
+        </div>
+    </div>
+</div>
+
+<EventConsole @ref=@console class="mt-4" />
+
+@code {
+    EventConsole console;
+
+    void ShowContextMenuWithItems(MouseEventArgs args)
+    {
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Context menu item 1", Value = 1 },
+                new ContextMenuItem(){ Text = "Context menu item 2", Value = 2 },
+                new ContextMenuItem(){ Text = "Context menu item 3", Value = 3 },
+         }, OnMenuItemClick);
+    }
+
+    void ShowContextMenuWithContent(MouseEventArgs args) => ContextMenuService.Open(args, ds =>
+        @<RadzenMenu Click="OnMenuItemClick">
+            <RadzenMenuItem Text="Item1" Value="1"></RadzenMenuItem>
+            <RadzenMenuItem Text="Item2" Value="2"></RadzenMenuItem>
+            <RadzenMenuItem Text="More items" Value="3">
+                <RadzenMenuItem Text="More sub items" Value="4">
+                    <RadzenMenuItem Text="Item1" Value="5"></RadzenMenuItem>
+                    <RadzenMenuItem Text="Item2" Value="6"></RadzenMenuItem>
+                </RadzenMenuItem>
+            </RadzenMenuItem>
+        </RadzenMenu>);
+
+    void OnMenuItemClick(MenuItemEventArgs args)
+    {
+        console.Log($"Menu item with Value={args.Value} clicked");
+        if(!args.Value.Equals(3) && !args.Value.Equals(4))
+        {
+            ContextMenuService.Close();
+        }
+    }
+}
