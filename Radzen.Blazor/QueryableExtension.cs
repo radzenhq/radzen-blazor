@@ -1048,7 +1048,7 @@ namespace Radzen
                 || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty)
                && c.Property != null;
 
-            if (dataFilter.Filters.Where(canFilter).Any())
+            if (dataFilter.Filters.Concat(dataFilter.Filters.SelectManyRecursive(i => i.Filters ?? Enumerable.Empty<CompositeFilterDescriptor>())).Where(canFilter).Any())
             {
                 var index = 0;
                 var filterExpressions = new List<string>();
@@ -1179,7 +1179,7 @@ namespace Radzen
                 || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty)
                && c.Property != null;
 
-            if (dataFilter.Filters.Where(canFilter).Any())
+            if (dataFilter.Filters.Concat(dataFilter.Filters.SelectManyRecursive(i => i.Filters ?? Enumerable.Empty<CompositeFilterDescriptor>())).Where(canFilter).Any())
             {
                 var filterExpressions = new List<string>();
 
