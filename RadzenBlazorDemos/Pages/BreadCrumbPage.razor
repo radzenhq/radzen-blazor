@@ -1,53 +1,13 @@
 ﻿@page "/breadcrumb"
 
-<RadzenExample Name="BreadCrumb" Documentation="false">
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-6 p-3">
-            <RadzenCard class="pb-4">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Default Radzen BreadCrumb</RadzenText>
-                <RadzenBreadCrumb>
-                    <RadzenBreadCrumbItem Path="/" Text="Components" />
-                    <RadzenBreadCrumbItem Path="/badge" Text="Badge" />
-                    <RadzenBreadCrumbItem Icon="add" Text="Add" />
-                </RadzenBreadCrumb>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard class="pb-4">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">With Template</RadzenText>
-                <RadzenBreadCrumb>
-                    <Template Context="item">
-                        <RadzenBadge Text="@item.Text" IsPill="true" />
-                    </Template>
-                    <ChildContent>
-                        <RadzenBreadCrumbItem Path="/" Text="Components" />
-                        <RadzenBreadCrumbItem Path="/badge" Text="Badge" />
-                        <RadzenBreadCrumbItem Icon="add" Text="Add" />
-                    </ChildContent>
-                </RadzenBreadCrumb>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard class="pb-4">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">With ChildContent</RadzenText>
-                <RadzenBreadCrumb>
-                    <Template Context="item">
-                        <RadzenLink Path="@item.Path" Icon="@item.Icon" Text="@item.Text" />
-                        (Template)
-                    </Template>
-                    <ChildContent>
-                        <RadzenBreadCrumbItem Path="/" Text="Components" />
-                        <RadzenBreadCrumbItem>
-                            <RadzenLink Path="/badge" Icon="bolt" Text="Badge" />
-                            (Child Content)
-                        </RadzenBreadCrumbItem>
-                        <RadzenBreadCrumbItem Text="Add" />
-                    </ChildContent>
-                </RadzenBreadCrumb>
-            </RadzenCard>
-        </div>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    BreadCrumb
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor BreadCrumb component.
+</RadzenText>
+
+<RadzenExample ComponentName="BreadCrumb" Example="BreadCrumbConfig" Heading="false" Documentation="false">
+    <BreadCrumbConfig />
 </RadzenExample>
 
