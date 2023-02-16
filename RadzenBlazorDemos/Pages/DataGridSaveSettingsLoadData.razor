@@ -50,25 +50,23 @@
 
         await Task.Yield();
 
-        // This demo is using https://dynamic-linq.net
         var query = dbContext.Employees.AsQueryable();
 
         if (!string.IsNullOrEmpty(args.Filter))
         {
-            // Filter via the Where method
             query = query.Where(args.Filter);
         }
 
         if (!string.IsNullOrEmpty(args.OrderBy))
         {
-            // Sort via the OrderBy method
             query = query.OrderBy(args.OrderBy);
         }
 
-        // Important!!! Make sure the Count property of RadzenDataGrid is set.
         count = query.Count();
 
-        // Perform paging via Skip and Take.
+        // Simulate async data loading
+        await Task.Delay(2000);
+
         employees = await Task.FromResult(query.Skip(args.Skip.Value).Take(args.Top.Value).ToList());
 
         isLoading = false;
