@@ -82,12 +82,12 @@
     public string DocumentationLink { get; set; }
 
     [Parameter]
-    public bool Heading { get; set; } = true;
+    public bool Heading { get; set; } = false;
 
     [Parameter]
-    public bool Documentation { get; set; } = true;
+    public bool Documentation { get; set; } = false;
 
-    string DocumentationHref => DocumentationLink ?? $"/docs/guides/components/{Name.ToLower()}.html";
+    string DocumentationHref => Documentation ? DocumentationLink ?? $"/docs/guides/components/{Name?.ToLower()}.html" : "";
 
     string ComponentSourceHref => Source ?? $"https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/Radzen{Name}.razor.cs";
 
