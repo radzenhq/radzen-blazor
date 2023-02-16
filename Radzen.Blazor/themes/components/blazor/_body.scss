@@ -12,4 +12,8 @@ $body-padding: 1rem !default;
 
 .rz-body {
   padding: var(--rz-body-padding);
+  
+  .rz-layout & {
+    transform: translateZ(0);
+  }
 }
