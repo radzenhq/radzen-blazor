@@ -495,6 +495,16 @@ namespace RadzenBlazorDemos
 
                 new Example()
                 {
+                    New = true,
+                    Name = "Save/Load settings LoadData",
+                    Path = "datagrid-save-settings-loaddata",
+                    Title = "Blazor DataGrid save/load settings with LoadData",
+                    Icon = "&#xf02e",
+                    Tags = new [] { "save", "load", "settings", "async", "loaddata" }
+                },
+
+                new Example()
+                {
                     Name = "InLine Editing",
                     Path = "datagrid-inline-edit",
                     Title = "Blazor DataGrid inline editing",
