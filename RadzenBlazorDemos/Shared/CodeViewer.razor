@@ -5,7 +5,7 @@
 <RadzenRow class="rz-p-2" Gap="0.5rem" Style="border-bottom: var(--rz-border-disabled);">
     <RadzenColumn>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0.5rem">
-            <RadzenButton Click="Run" Text="Run" Icon="play_circle_outline" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Title="Preview edits" class="rz-text-truncate" />
+            <RadzenButton IsBusy=@isBusy Disabled=@isBusy Click="Run" Text="Run" Icon="play_circle_outline" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Title="Preview edits" class="rz-text-truncate" />
             <button class="rz-button rz-button-xs rz-variant-text rz-primary rz-shade-default rz-text-truncate" Title="Copy source code" onclick=@Copy >
                 <RadzenIcon Icon="content_copy" />
                 Copy
@@ -30,7 +30,7 @@
 <RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
     @error
 </RadzenAlert>
-<Monaco @bind-Value="source" @ref="@monaco" Style="border: var(--rz-border-disabled)" />
+<Monaco @bind-Value="source" @ref="@monaco" Style="border: var(--rz-border-disabled)" Disabled=@isBusy />
 @code {
     private string Copy => $"copy('{monaco?.Id}')";
     private Monaco monaco;
@@ -62,19 +62,29 @@
         source = Regex.Replace(source, "</?RadzenExample[^>]*>\n", "");
     }
 
+    bool isBusy;
+
     private async Task Run()
     {
         try
         {
             error = null;
+            isBusy = true;
+            await JSRuntime.InvokeVoidAsync("eval", $"instances['{monaco.Id}'].updateOptions({{domReadOnly: true, readOnly: true }})");
+
+            await Task.Yield();
 
             var type = await Compiler.CompileAsync(source);
 
             await Compiled.InvokeAsync(type);
+
         }
         catch (Exception ex)
         {
             error = ex.Message;
         }
+
+        isBusy = false;
+        await JSRuntime.InvokeVoidAsync("eval", $"instances['{monaco.Id}'].updateOptions({{domReadOnly: false, readOnly: false }})");
     }
 }
