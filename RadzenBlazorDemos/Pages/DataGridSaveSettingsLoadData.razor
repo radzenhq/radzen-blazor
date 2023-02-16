@@ -68,8 +68,8 @@
         // Important!!! Make sure the Count property of RadzenDataGrid is set.
         count = query.Count();
 
-        // Perform paginv via Skip and Take.
-        employees = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+        // Perform paging via Skip and Take.
+        employees = await Task.FromResult(query.Skip(args.Skip.Value).Take(args.Top.Value).ToList());
 
         isLoading = false;
     }

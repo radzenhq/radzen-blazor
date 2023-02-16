@@ -483,24 +483,31 @@ namespace RadzenBlazorDemos
                     Tags = new [] { "cell", "row", "contextmenu", "menu", "rightclick" }
                 },
 
-                new Example()
+                new Example
                 {
-                    New = true,
+                    Updated = true,
                     Name = "Save/Load settings",
-                    Path = "datagrid-save-settings",
-                    Title = "Blazor DataGrid save/load settings",
                     Icon = "&#xf02e",
-                    Tags = new [] { "save", "load", "settings" }
-                },
+                    Children = new []
+                    {
+                        new Example()
+                        {
+                            New = true,
+                            Name = "IQueryable",
+                            Path = "datagrid-save-settings",
+                            Title = "Blazor DataGrid save/load settings",
+                            Tags = new [] { "save", "load", "settings" }
+                        },
 
-                new Example()
-                {
-                    New = true,
-                    Name = "Save/Load settings LoadData",
-                    Path = "datagrid-save-settings-loaddata",
-                    Title = "Blazor DataGrid save/load settings with LoadData",
-                    Icon = "&#xf02e",
-                    Tags = new [] { "save", "load", "settings", "async", "loaddata" }
+                        new Example()
+                        {
+                            New = true,
+                            Name = "LoadData binding",
+                            Path = "datagrid-save-settings-loaddata",
+                            Title = "Blazor DataGrid save/load settings with LoadData",
+                            Tags = new [] { "save", "load", "settings", "async", "loaddata" }
+                        }
+                    }
                 },
 
                 new Example()
