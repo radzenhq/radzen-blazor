@@ -1,0 +1,16 @@
+﻿<div class="rz-m-12">
+    <RadzenBreadCrumb>
+        <Template Context="item">
+            <RadzenLink Path="@item.Path" Icon="@item.Icon" Text="@item.Text" />
+            (Template)
+        </Template>
+        <ChildContent>
+            <RadzenBreadCrumbItem Path="/" Text="Components" />
+            <RadzenBreadCrumbItem>
+                <RadzenLink Path="/badge" Icon="bolt" Text="Badge" />
+                (Child Content)
+            </RadzenBreadCrumbItem>
+            <RadzenBreadCrumbItem Text="Add" />
+        </ChildContent>
+    </RadzenBreadCrumb>
+</div>

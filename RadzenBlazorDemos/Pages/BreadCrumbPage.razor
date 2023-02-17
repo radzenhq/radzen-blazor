@@ -4,10 +4,26 @@
     BreadCrumb
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
-    Demonstration and configuration of the Radzen Blazor BreadCrumb component.
+    The Radzen Blazor <strong>BreadCrumb</strong> component provides a navigation trail to help users keep track of their location. It consists of a horizontal row of links that represent the levels of the hierarchy that the user has navigated through.
 </RadzenText>
 
-<RadzenExample ComponentName="BreadCrumb" Example="BreadCrumbConfig">
-    <BreadCrumbConfig />
+<RadzenText ID="default-breadcrumb" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-mb-6">
+    Default Radzen BreadCrumb
+</RadzenText>
+<RadzenExample ComponentName="BreadCrumb" Example="BreadCrumbDefault">
+    <BreadCrumbDefault />
 </RadzenExample>
 
+<RadzenText ID="breadcrumb-template" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    BreadCrumb width template
+</RadzenText>
+<RadzenExample ComponentName="BreadCrumb" Example="BreadCrumbTemplate">
+    <BreadCrumbTemplate />
+</RadzenExample>
+
+<RadzenText ID="breadcrumb-child-template" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    BreadCrumb with child content
+</RadzenText>
+<RadzenExample ComponentName="BreadCrumb" Example="BreadCrumbChildContent">
+    <BreadCrumbChildContent />
+</RadzenExample>
