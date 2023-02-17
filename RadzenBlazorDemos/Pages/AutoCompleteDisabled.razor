@@ -3,9 +3,9 @@
 
 @inherits DbContextPage
 
-<RadzenCard>
-    <RadzenAutoComplete Disabled="true" @bind-Value=@companyName Data=@customers TextProperty="CompanyName" Style="width:100%" />
-</RadzenCard>
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenAutoComplete Disabled="true" @bind-Value=@companyName Data=@customers TextProperty="CompanyName" Style="width: 13rem" />
+</div>
 
 @code {
     string companyName = "Some value";

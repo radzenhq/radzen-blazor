@@ -3,12 +3,12 @@
 
 @inherits DbContextPage
 
-<RadzenCard>
-    <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Start typing e.g. France
-        @((MarkupString)(!string.IsNullOrEmpty(companyName) ? $", Value is: <strong>{companyName}</strong>" : ""))</RadzenText>
+<div class="rz-p-12 rz-text-align-center">
     <RadzenAutoComplete FilterOperator="StringFilterOperator.StartsWith" FilterDelay="100" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-        @bind-Value=@companyName Data=@customers TextProperty="CompanyName" Style="width:100%" />
-</RadzenCard>
+        @bind-Value=@companyName Data=@customers TextProperty="CompanyName" Style="width: 13rem" />
+    <RadzenText TextStyle="TextStyle.Body2">Start typing e.g. France
+        @((MarkupString)(!string.IsNullOrEmpty(companyName) ? $", Value is: <strong>{companyName}</strong>" : ""))</RadzenText>
+</div>
 
 @code {
     string companyName;
