@@ -90,38 +90,6 @@ margin-right: 8px;
 text-decoration: none;
 }
 
-.console-content {
-    height: 230px;
-    overflow: auto;
-}
-
-.console-header {
-    display: flex;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
-    padding: 0 0 16px 0;
-}
-
-.console-title {
-    flex: 1;
-    margin: 0 !important;
-}
-
-.console-message {
-    margin: 4px 0;
-    padding: 2px 0;
-    display: flex;
-    align-items: baseline;
-    color: var(--rz-text-color);
-    background: var(--rz-info-lighter);
-    border-radius: var(--rz-border-radius);
-    font-size: 0.875rem;
-}
-
-.console-message-time {
-    padding: 2px 8px;
-    color: var(--rz-info-dark);
-}
-
 /* next-demos */
 
 body {
