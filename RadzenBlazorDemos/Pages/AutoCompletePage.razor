@@ -7,6 +7,74 @@
     Demonstration and configuration of the Radzen Blazor <strong>AutoComplete</strong> component.
 </RadzenText>
 
-<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteConfig">
-    <AutoCompleteConfig/>
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of AutoComplete
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the <strong>AutoComplete</strong> has a Value property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteBindValue">
+    <AutoCompleteBindValue />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of AutoComplete using Value and Change event
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Value property can be used to set the value of the component and <code>Change</code> event to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteChangeEvent">
+    <AutoCompleteChangeEvent />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Define AutoComplete placeholder
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompletePlaceholder">
+    <AutoCompletePlaceholder />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Define AutoComplete template
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteTemplate">
+    <AutoCompleteTemplate />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Change AutoComplete filter operator, case sensitivity and delay
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Show items that <b>start with</b> a specific string, case insensitive after 100ms
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteFilterOperator">
+    <AutoCompleteFilterOperator />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Load data on-demand in AutoComplete and apply custom filter and sort
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteLoadData">
+    <AutoCompleteLoadData />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    AutoComplete with a List of Strings
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteListOfStrings">
+    <AutoCompleteListOfStrings />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Multiline AutoComplete
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteWithMultilines">
+    <AutoCompleteWithMultilines />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Disabled AutoComplete
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteDisabled">
+    <AutoCompleteDisabled />
 </RadzenExample>

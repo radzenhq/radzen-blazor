@@ -1,0 +1,23 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<RadzenCard>
+    <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Start typing e.g. Al
+        @((MarkupString)(!string.IsNullOrEmpty(companyName) ? $", Value is: <strong>{companyName}</strong>" : ""))</RadzenText>
+    <RadzenAutoComplete @bind-Value=@companyName Data=@companyNames Style="width:100%" />
+</RadzenCard>
+
+@code {
+    string companyName;
+
+    IEnumerable<string> companyNames;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        companyNames = dbContext.Customers.Select(c => c.CompanyName);
+    }
+}
