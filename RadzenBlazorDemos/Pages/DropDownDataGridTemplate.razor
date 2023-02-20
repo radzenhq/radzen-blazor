@@ -1,0 +1,26 @@
+﻿@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenDropDownDataGrid @bind-Value=@value Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID">
+        <Template>
+            Company: @((context as Customer).CompanyName)
+        </Template>
+        <ValueTemplate>
+            Company: @((context as Customer).CompanyName)
+        </ValueTemplate>
+    </RadzenDropDownDataGrid>
+</div>
+
+@code {
+    string value = "AROUT";
+    IEnumerable<Customer> customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers;
+    }
+}
