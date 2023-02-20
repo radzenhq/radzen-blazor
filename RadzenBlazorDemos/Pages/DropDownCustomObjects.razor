@@ -4,44 +4,13 @@
 @using Microsoft.EntityFrameworkCore
 @using System.ComponentModel.DataAnnotations
 
-@inherits DbContextPage
-
-<div class="container-fluid">
-    <div class="row px-3">
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown with custom objects and single selection</RadzenText>
-                    <RadzenDropDown Data=@data TValue="MyObject" @bind-Value=@singleValue
-                                    AllowClear="true" AllowFiltering="true"
-                                    Change=@(args => OnChange(args, "DropDown with custom objects and single selection")) class="w-100">
-                    </RadzenDropDown>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown with custom objects and multiple selection</RadzenText>
-                    <RadzenDropDown Data=@data TValue="IEnumerable<MyObject>" @bind-Value=@multipleValues
-                                    Multiple=true AllowClear="true" AllowFiltering="true"
-                                    Change=@(args => OnChange(args, "DropDown with custom objects and multiple selection")) class="w-100">
-                    </RadzenDropDown>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">DropDown from Enum</RadzenText>
-                    <RadzenDropDown Data="@(Enum.GetValues(typeof(ColorType)).Cast<Enum>())" @bind-Value=@color
-                                    AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                    Change=@(args => OnChange(args, "DropDown from Enum")) class="w-100">
-                    </RadzenDropDown>
-            </RadzenCard>
-        </div>
-    </div>
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenDropDown Data=@data TValue="MyObject" @bind-Value=@singleValue
+                    AllowClear="true" AllowFiltering="true">
+    </RadzenDropDown>
 </div>
 
-<EventConsole @ref=@console />
-
 @code {
-    EventConsole console;
 
     class MyObject
     { 
@@ -66,34 +35,6 @@
         }
     }
 
-    ColorType color;
-
-    public enum ColorType
-    {
-        Red,
-        Green,
-        Blue,
-        [Display(Description = "Almond Green")]
-        AlmondGreen,
-        [Display(Description = "Amber Gray")]
-        AmberGray,
-        [Display(Description = "Apple Blue... ")]
-        AppleBlueSeaGreen,
-        //[Display(Description = "Miss", ResourceType = typeof(ResourceFile)] localization example
-        [Display(Description = "Azure")]
-        AzureBlue,
-
-    }
-
-    MyObject singleValue = new MyObject() { Id = 5, Name = "Name5" };
-    IEnumerable<MyObject> multipleValues = new[] { new MyObject() { Id = 3, Name = "Name3" }, new MyObject() { Id = 4, Name = "Name4" } };
-
+    MyObject? singleValue = new MyObject() { Id = 5, Name = "Name5" };
     IEnumerable<MyObject> data = Enumerable.Range(0, 100).Select(i => new MyObject() { Id = i, Name = $"Name{i}" });
-
-    void OnChange(object value, string name)
-    {
-        var str = value is IEnumerable ? string.Join(", ", ((IEnumerable)value).Cast<object>()) : value;
-
-        console.Log($"{name} value changed to {str}");
-    }
 }
