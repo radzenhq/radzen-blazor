@@ -6,16 +6,16 @@
 @inherits DbContextPage
 
 <div class="rz-p-12 rz-text-align-center">
-    <RadzenDropDown @bind-Value=value AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                    Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID" TextProperty="OrderID">
+    <RadzenDropDown @bind-Value=values Multiple=true AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID" TextProperty="OrderID" MaxSelectedLabels="1">
         <Template>
-            @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")
+                @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")
         </Template>
     </RadzenDropDown>
 </div>
 
 @code {
-    int? value;
+    IEnumerable<int> values;
     IEnumerable<GroupData> groupedData;
 
     protected override async Task OnInitializedAsync()
