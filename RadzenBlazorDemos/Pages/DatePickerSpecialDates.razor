@@ -1,0 +1,18 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenDatePicker @bind-Value=@value DateRender=@DateRender />
+</div>
+
+@code {
+    DateTime? value = DateTime.Now;
+    IEnumerable<DateTime> dates = new DateTime[] { DateTime.Today.AddDays(-1), DateTime.Today.AddDays(1) };
+
+    void DateRender(DateRenderEventArgs args)
+    {
+        if (dates.Contains(args.Date))
+        {
+            args.Attributes.Add("style", "background-color: #ff6d41; border-color: white;");
+        }
+
+        args.Disabled = args.Disabled || args.Date.DayOfWeek == DayOfWeek.Sunday || args.Date.DayOfWeek == DayOfWeek.Saturday;
+    }
+}

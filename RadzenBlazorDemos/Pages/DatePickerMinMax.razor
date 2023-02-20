@@ -1,0 +1,7 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenDatePicker @bind-Value=@value Min="DateTime.Today.AddDays(-7)" Max="DateTime.Today.AddDays(7)" />
+</div>
+
+@code {
+    DateTime? value = DateTime.Now;
+}

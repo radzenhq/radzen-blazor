@@ -1,0 +1,11 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenDatePicker @bind-Value=@value>
+        <FooterTemplate>
+            <RadzenButton Click=@(args => value = DateTime.Now) Text="Today" class="my-3 w-100" />
+        </FooterTemplate>
+    </RadzenDatePicker>
+</div>
+
+@code {
+    DateTime? value = DateTime.Now;
+}
