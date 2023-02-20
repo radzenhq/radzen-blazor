@@ -8,7 +8,7 @@
 <RadzenSteps Change=@OnChange>
     <Steps>
         <RadzenStepsItem Text="Customers">
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="my-4">1. Select a Customer to continue</RadzenText>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="rz-my-6">1. Select a Customer to continue</RadzenText>
             <RadzenDataGrid ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@customers" TItem="Customer" @bind-Value="@selectedCustomers">
                 <Columns>
                     <RadzenDataGridColumn TItem="Customer" Property="CustomerID" Title="Customer ID" Width="140px" />
@@ -26,7 +26,7 @@
             </RadzenDataGrid>
         </RadzenStepsItem>
         <RadzenStepsItem Text="Orders" Disabled="@(selectedCustomers == null || selectedCustomers != null && !selectedCustomers.Any())">
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="my-4">2. Select an Order to continue</RadzenText>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="rz-my-6">2. Select an Order to continue</RadzenText>
             <RadzenDataGrid ColumnWidth="150px" PageSize="5" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
                         Data="@(selectedCustomers != null && selectedCustomers.Any() ? orders.Where(o => o.CustomerID == selectedCustomers[0].CustomerID) : Enumerable.Empty<Order>())" TItem="Order" @bind-Value="@selectedOrders">
                 <Columns>
@@ -34,10 +34,10 @@
                     <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
                     <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
                         <Template Context="order">
-                            <div class="d-flex align-items-center">
-                                <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px;" />
-                                <div>@order.Employee?.LastName</div>
-                            </div>
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                                <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                                <span>@order.Employee?.LastName</span>
+                            </RadzenStack>
                         </Template>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
@@ -70,7 +70,7 @@
             </RadzenDataGrid>
         </RadzenStepsItem>
         <RadzenStepsItem Text="Order Details" Disabled="@(selectedOrders == null || selectedOrders != null && !selectedOrders.Any())">
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="my-4">Order Details</RadzenText>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="rz-my-6">Order Details</RadzenText>
             <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true"
                         Data="@(selectedOrders != null && selectedOrders.Any() ? orderDetails.Where(o => o.OrderID == selectedOrders[0].OrderID) : Enumerable.Empty<OrderDetail>())" TItem="OrderDetail" ColumnWidth="200px">
                 <Columns>
