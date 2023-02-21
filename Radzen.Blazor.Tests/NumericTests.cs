@@ -194,6 +194,39 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Numeric_Renders_TypedAutoCompleteParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenNumeric<double>>();
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, "on"));
+
+            Assert.Contains(@$"autocomplete=""off""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, "off"));
+
+            Assert.Contains(@$"autocomplete=""off""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, string.Empty));
+
+            Assert.Contains(@$"autocomplete=""on""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, AutoCompleteType.BDayMonth));
+
+            Assert.Contains(@$"autocomplete=""{AutoCompleteType.BDayMonth}""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, AutoCompleteType.BdayYear));
+
+            Assert.Contains(@$"autocomplete=""{AutoCompleteType.BdayYear}""", component.Markup);
+        }
+
+        [Fact]
         public void Numeric_Raises_ChangedEvent()
         {
             using var ctx = new TestContext();

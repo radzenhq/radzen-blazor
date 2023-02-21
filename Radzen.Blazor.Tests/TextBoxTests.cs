@@ -129,6 +129,39 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void TextBox_Renders_TypedAutoCompleteParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextBox>();
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, "on"));
+
+            Assert.Contains(@$"autocomplete=""off""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, "off"));
+
+            Assert.Contains(@$"autocomplete=""off""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, string.Empty));
+
+            Assert.Contains(@$"autocomplete=""on""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, AutoCompleteType.AdditionalName));
+
+            Assert.Contains(@$"autocomplete=""{AutoCompleteType.AdditionalName}""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, AutoCompleteType.FamilyName));
+
+            Assert.Contains(@$"autocomplete=""{AutoCompleteType.FamilyName}""", component.Markup);
+        }
+
+        [Fact]
         public void TextBox_Renders_MaxLengthParameter()
         {
             using var ctx = new TestContext();

@@ -129,6 +129,39 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Password_Renders_TypedAutoCompleteParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenPassword>();
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, "on"));
+
+            Assert.Contains(@$"autocomplete=""new-password""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, "off"));
+
+            Assert.Contains(@$"autocomplete=""off""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, string.Empty));
+
+            Assert.Contains(@$"autocomplete=""on""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, AutoCompleteType.CurrentPassword));
+
+            Assert.Contains(@$"autocomplete=""{AutoCompleteType.CurrentPassword}""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, AutoCompleteType.NewPassword));
+
+            Assert.Contains(@$"autocomplete=""{AutoCompleteType.NewPassword}""", component.Markup);
+        }
+
+        [Fact]
         public void Password_Renders_UnmatchedParameter()
         {
             using var ctx = new TestContext();
