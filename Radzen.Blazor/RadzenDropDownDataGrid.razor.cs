@@ -97,7 +97,11 @@ namespace Radzen.Blazor
                 return;
 
             await JSRuntime.InvokeVoidAsync(OpenOnFocus ? "Radzen.openPopup" : "Radzen.togglePopup", Element, PopupID, true);
-            await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
+
+            if (FocusFilterOnPopup)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
+            }
 
             if (list != null)
             {
@@ -243,6 +247,13 @@ namespace Radzen.Blazor
         /// <value>The selected items text.</value>
         [Parameter]
         public string SelectedItemsText { get; set; } = "items selected";
+
+        /// <summary>
+        /// Gets or sets whether popup automatically focuses on filter input.
+        /// </summary>
+        /// <value><c>true</c> if filter input should auto focus when opened; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool FocusFilterOnPopup { get; set; } = true;
 
         /// <summary>
         /// Gets popup element reference.
