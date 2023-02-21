@@ -707,6 +707,32 @@ namespace Radzen.Blazor
                 }
             }
 
+            if (parameters.DidParameterChange(nameof(SecondFilterValue), SecondFilterValue))
+            {
+                secondFilterValue = parameters.GetValueOrDefault<object>(nameof(SecondFilterValue));
+
+                if (FilterTemplate != null)
+                {
+                    SecondFilterValue = secondFilterValue;
+                    Grid.SaveSettings();
+                    if (Grid.IsVirtualizationAllowed())
+                    {
+#if NET5_0_OR_GREATER
+                        if (Grid.virtualize != null)
+                        {
+                            await Grid.virtualize.RefreshDataAsync();
+                        }
+#endif
+                    }
+                    else
+                    {
+                        await Grid.Reload();
+                    }
+
+                    return;
+                }
+            }
+
             if (parameters.DidParameterChange(nameof(FilterOperator), FilterOperator))
             {
                 filterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(FilterOperator));
