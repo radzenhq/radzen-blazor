@@ -1,0 +1,16 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenSelectBar @bind-Value=@value TValue="bool" class="mb-5">
+        <Items>
+            <RadzenSelectBarItem Value="true">
+                <Template>
+                    <i>On</i>
+                </Template>
+            </RadzenSelectBarItem>
+            <RadzenSelectBarItem Text="Off" Value="false" />
+        </Items>
+    </RadzenSelectBar>
+</div>
+
+@code {
+    bool value;
+}
