@@ -1,0 +1,13 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenRadioButtonList Value=@value TValue="int" Change=@(args => value = args) class="mb-5">
+        <Items>
+            <RadzenRadioButtonListItem Text="Orders" Value="1" />
+            <RadzenRadioButtonListItem Text="Employees" Value="2" />
+            <RadzenRadioButtonListItem Text="Customers" Value="3" />
+        </Items>
+    </RadzenRadioButtonList>
+</div>
+
+@code {
+    int value = 1;
+}
