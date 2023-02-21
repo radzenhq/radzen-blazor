@@ -35,6 +35,6 @@
         }
     }
 
-    MyObject? singleValue = new MyObject() { Id = 5, Name = "Name5" };
+    MyObject singleValue = new MyObject() { Id = 5, Name = "Name5" };
     IEnumerable<MyObject> data = Enumerable.Range(0, 100).Select(i => new MyObject() { Id = i, Name = $"Name{i}" });
 }
