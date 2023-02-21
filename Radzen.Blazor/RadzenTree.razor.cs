@@ -274,7 +274,14 @@ namespace Radzen.Blazor
                 });
             }
         }
-
+        /// <summary>
+        /// Clear the current selection to allow re-selection by mouse click
+        /// </summary>
+        public void ClearSelection()
+        {
+            SelectedItem?.Unselect();
+            SelectedItem = null;
+        }
         internal async Task ExpandItem(RadzenTreeItem item)
         {
             var args = new TreeExpandEventArgs()
