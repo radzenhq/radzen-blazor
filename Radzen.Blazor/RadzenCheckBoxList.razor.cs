@@ -83,7 +83,7 @@ namespace Radzen.Blazor
 
             if (value == true)
             {
-                Value = items.Select(i => i.Value);
+                Value = allItems.Select(i => i.Value);
             }
             else if (value == false)
             {
@@ -100,8 +100,8 @@ namespace Radzen.Blazor
         bool? IsAllSelected()
         {
             Func<RadzenCheckBoxListItem<TValue>, bool> predicate = i => Value != null && Value.Contains(i.Value);
-            var all = items.All(predicate);
-            var any = items.Any(predicate);
+            var all = allItems.All(predicate);
+            var any = allItems.Any(predicate);
 
             if (all)
             {
