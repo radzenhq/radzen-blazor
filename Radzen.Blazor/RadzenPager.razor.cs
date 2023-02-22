@@ -157,7 +157,7 @@ namespace Radzen.Blazor
         protected async Task OnPageSizeChanged(object value)
         {
             bool isFirstPage = CurrentPage == 0;
-            bool isLastPage = CurrentPage == numberOfPages - 1;
+            bool isLastPage = CurrentPage == numberOfPages - 1 && numberOfPages > 1;
             int prevSkip = skip;
             PageSize = (int)value;
             await InvokeAsync(Reload);
