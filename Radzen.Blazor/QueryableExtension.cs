@@ -1158,8 +1158,15 @@ namespace Radzen
                 }
                 else if (!(IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)))
                 {
+                    var value = filter.FilterValue;
+
+                    if (column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
+                    {
+                        value = filter.FilterValue != null ? (object)(new DateTimeOffset((DateTime)filter.FilterValue, TimeSpan.Zero)) : null;
+                    }
+
                     filterExpressions.Add($@"{property}{filterCaseSensitivityOperator} {comparison} @{index}{filterCaseSensitivityOperator}");
-                    filterValues.Add(new object[] { filter.FilterValue });
+                    filterValues.Add(new object[] { value });
                     index++;
                 }
             }
