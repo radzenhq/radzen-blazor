@@ -4,6 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <ErrorOnDuplicatePublishOutputFiles>False</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'RadzenBlazorDemos' " />
   <ItemGroup>
     <ProjectReference Include="..\RadzenBlazorDemos\RadzenBlazorDemos.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.0" />

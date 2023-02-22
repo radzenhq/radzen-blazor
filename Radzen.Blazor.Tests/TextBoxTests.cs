@@ -136,29 +136,24 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenTextBox>();
 
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
-            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, "on"));
+            component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.On));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
 
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
-            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, "off"));
+            component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.Off));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
 
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
-            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, string.Empty));
+            component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.AdditionalName));
 
-            Assert.Contains(@$"autocomplete=""on""", component.Markup);
-
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
-            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, AutoCompleteType.AdditionalName));
-
-            Assert.Contains(@$"autocomplete=""{AutoCompleteType.AdditionalName}""", component.Markup);
+            Assert.Contains(@$"autocomplete=""{AutoCompleteType.AdditionalName.GetAutoCompleteValue()}""", component.Markup);
 
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
-            component.SetParametersAndRender(parameters => parameters.Add<string>(p => p.AutoCompleteType, AutoCompleteType.FamilyName));
+            component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.FamilyName));
 
-            Assert.Contains(@$"autocomplete=""{AutoCompleteType.FamilyName}""", component.Markup);
+            Assert.Contains(@$"autocomplete=""{AutoCompleteType.FamilyName.GetAutoCompleteValue()}""", component.Markup);
         }
 
         [Fact]

@@ -28,15 +28,14 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets a value indicating the type of built-in autocomplete
-        /// the browser should use. A helper class provides the list of
-        /// browser-supported autocomplete types.
+        /// the browser should use.
         /// <see cref="Blazor.AutoCompleteType" />
         /// </summary>
         /// <value>
-        /// The type of built-in autocomplete; otherwise, and empty string.
+        /// The type of built-in autocomplete.
         /// </value>
         [Parameter]
-        public string AutoCompleteType { get; set; } = string.Empty;
+        public AutoCompleteType AutoCompleteType { get; set; } = AutoCompleteType.On;
 
         /// <summary>
         /// Handles the <see cref="E:Change" /> event.
@@ -66,9 +65,7 @@ namespace Radzen.Blazor
         /// set, the value of AutoCompleteType.</value>
         public string AutoCompleteAttribute
         {
-            get => !AutoComplete ? "new-password" :
-                string.IsNullOrWhiteSpace(AutoCompleteType) ? "on" :
-                AutoCompleteType;
+            get => !AutoComplete ? "new-password" : AutoCompleteType.GetAutoCompleteValue();
         }
     }
 }
