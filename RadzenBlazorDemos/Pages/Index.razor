@@ -32,10 +32,10 @@
     </RadzenRow>
 
     <RadzenRow>
-      <RadzenColumn class="rz-text-align-center">
+      <RadzenColumn Size="12" class="rz-text-align-center">
         <RadzenText TextStyle="TextStyle.DisplayH2" TagName="TagName.H1" class="rz-my-12 rz-pt-12" Style="--rz-text-display-h2-font-weight: 600;">Radzen Blazor Components</RadzenText>
         <RadzenText TextStyle="TextStyle.DisplayH5" TagName="TagName.H2" Style="--rz-text-display-h5-font-weight: normal;">A set of <strong>70+ free and open source</strong> native Blazor UI controls.</RadzenText>
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1.5rem" class="rz-mt-12">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1.5rem" Wrap="FlexWrap.Wrap" class="rz-mt-12">
           <NavLink class="cta-button primary" href="/get-started">Get started</NavLink>
           <Anchor class="cta-button" href="#components">Components</Anchor>
         </RadzenStack>
@@ -67,7 +67,7 @@
     </RadzenCard>
 
     <RadzenRow>
-      <RadzenColumn>
+      <RadzenColumn Size="12">
         <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" TextAlign="TextAlign.Center" class="rz-my-12 rz-pt-6" style="--rz-text-h5-font-weight: 100;">Why choose Radzen Blazor Components?</RadzenText>
         <RadzenRow Gap="6rem">
           <RadzenColumn SizeSM="4">
@@ -91,51 +91,51 @@
     </RadzenRow>
 
     <RadzenRow class="rz-text-align-center" ID="components">
-      <RadzenColumn>
+      <RadzenColumn Size="12">
         <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-my-12 rz-pt-3" style="--rz-text-h5-font-weight: 100;" >Most Popular Components</RadzenText>
 
-        <RadzenRow>
-          <RadzenColumn class="popular-components">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceAround" Wrap="FlexWrap.Wrap" Gap="3rem">
+          <div class="popular-components">
             <a href="/datagrid">
               <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M16 0H0V16H16V0ZM15 1H11V5H15V1ZM15 6H11V10H15V6ZM15 11H11V15H15V11ZM10 11V15H6V11H10ZM10 6V10H6V6H10ZM10 1V5H6V1H10ZM5 1H1V5H5V1ZM5 6H1V10H5V6ZM5 11H1V15H5V11Z" fill="currentColor"/>
               </svg>
               DataGrid
             </a>
-          </RadzenColumn>
-          <RadzenColumn class="popular-components">
+          </div>
+          <div class="popular-components">
             <a href="/scheduler">
               <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M3 0H4V2H12V0H13V2H16V16H0V2H3V0ZM12 3V4H13V3H15V15H1V3H3V4H4V3H12ZM3 13V6H7V13H3ZM4 12V7H6V12H4ZM9 6H13V10H9V6ZM10 9V7H12V9H10Z" fill="currentColor"/>
               </svg>
               Scheduler
             </a>
-          </RadzenColumn>
-          <RadzenColumn class="popular-components">
+          </div>
+          <div class="popular-components">
             <a href="/dropdown">
               <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H13V1H0V0ZM14 0H16V1H14V0ZM0 3H16V16H0V3ZM1 4H15V15H1V4ZM14 5H13V10H14V5ZM11 6H3V7H11V6ZM11 9H3V10H11V9ZM3 12H11V13H3V12Z" fill="currentColor"/>
               </svg>
               DropDown
             </a>
-          </RadzenColumn>
-          <RadzenColumn class="popular-components">
+          </div>
+          <div class="popular-components">
             <a href="/dialog">
               <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0V16H16V0H0ZM15 1H1V15H15V1ZM8 3H3V4H8V3ZM13 7V6H3V7H13ZM13 12H10V13H13V12ZM3 8H13V9H3V8ZM12 3H13V4H12V3ZM9 12H6V13H9V12Z" fill="currentColor"/>
               </svg>
               Dialog
             </a>
-          </RadzenColumn>
-          <RadzenColumn class="popular-components">
+          </div>
+          <div class="popular-components">
             <a href="/datepicker">
               <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="component-icon">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M0 13V3H16V13H0ZM1 4H15V12H1V4ZM6.89778 10H8.05248L10.3619 6H9.20718L6.89778 10ZM6 9H3V10H6V9ZM10 9H13V10H10V9Z" fill="currentColor"/>
               </svg>
               DatePicker
             </a>
-          </RadzenColumn>
-        </RadzenRow>
+          </div>
+        </RadzenStack>
 
         <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-6 rz-pt-3" style="--rz-text-h5-font-weight: 100;" >All Components</RadzenText>
 
@@ -304,7 +304,7 @@
     </RadzenRow>
     <RadzenText TextStyle="TextStyle.DisplayH4" class="rz-mt-12 rz-mb-6">Get started today. Radzen Blazor Studio is free to use.</RadzenText>
     <RadzenText TextStyle="TextStyle.Body1">You can also test the premium features for 15 days.</RadzenText>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1.5rem" class="rz-mt-12">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1.5rem" Wrap="FlexWrap.Wrap" class="rz-mt-12">
       <NavLink class="cta-button primary" href="https://www.radzen.com/blazor-studio/download/" target="_blank" title="Get Radzen Blazor Studio for Windows, Mac or Linux">Download Now</NavLink>
       <NavLink class="cta-button" href="https://www.radzen.com/blazor-studio/" target="_blank" title="Explore Radzen Blazor Studio features">Learn More</NavLink>
     </RadzenStack>
