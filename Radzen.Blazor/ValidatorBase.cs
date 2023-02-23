@@ -96,8 +96,10 @@ namespace Radzen.Blazor
         private void ValidateField(object sender, FieldChangedEventArgs args)
         {
             var component = Form.FindComponent(Component);
+            if (component == null)
+                return;
 
-            if (args.FieldIdentifier.FieldName == component?.FieldIdentifier.FieldName)
+            if (args.FieldIdentifier.Equals(component.FieldIdentifier))
             {
                 ValidateModel(sender, ValidationRequestedEventArgs.Empty);
             }
