@@ -71,7 +71,7 @@
 
 @code {
     RadzenDataGrid<Order> ordersGrid;
-    IList<Order> orders;
+    IEnumerable<Order> orders;
     IEnumerable<Customer> customers;
     IEnumerable<Employee> employees;
 
@@ -85,14 +85,10 @@
     {
         await base.OnInitializedAsync();
 
-        customers = dbContext.Customers.ToList();
-        employees = dbContext.Employees.ToList();
+        customers = dbContext.Customers;
+        employees = dbContext.Employees;
 
-        // For demo purposes only
-        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
-
-        // For production
-        //orders = dbContext.Orders.Include("Customer").Include("Employee");
+        orders = dbContext.Orders.Include("Customer").Include("Employee");
     }
 
     async Task EditRow(Order order)
@@ -112,12 +108,7 @@
 
         dbContext.Update(order);
 
-        // For demo purposes only
-        order.Customer = dbContext.Customers.Find(order.CustomerID);
-        order.Employee = dbContext.Employees.Find(order.EmployeeID);
-
-        // For production
-        //dbContext.SaveChanges();
+        dbContext.SaveChanges();
     }
 
     async Task SaveRow(Order order)
@@ -136,7 +127,6 @@
 
         ordersGrid.CancelEditRow(order);
 
-        // For production
         var orderEntry = dbContext.Entry(order);
         if (orderEntry.State == EntityState.Modified)
         {
@@ -161,11 +151,7 @@
         {
             dbContext.Remove<Order>(order);
 
-            // For demo purposes only
-            orders.Remove(order);
-
-            // For production
-            //dbContext.SaveChanges();
+            dbContext.SaveChanges();
 
             await ordersGrid.Reload();
         }
@@ -189,12 +175,7 @@
     {
         dbContext.Add(order);
 
-        // For demo purposes only
-        order.Customer = dbContext.Customers.Find(order.CustomerID);
-        order.Employee = dbContext.Employees.Find(order.EmployeeID);
-
-        // For production
-        //dbContext.SaveChanges();
+        dbContext.SaveChanges();
         
         orderToInsert = null;
     }
