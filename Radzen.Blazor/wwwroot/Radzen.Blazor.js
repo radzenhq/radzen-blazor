@@ -1209,7 +1209,9 @@ window.Radzen = {
       var rect = ref.getBoundingClientRect();
       var x = e.clientX - rect.left;
       var y = e.clientY - rect.top;
-      instance.invokeMethodAsync('Click', x, y);
+      if (!e.target.closest('.rz-marker')) {
+        instance.invokeMethodAsync('Click', x, y);
+      }
     };
 
     ref.addEventListener('mouseenter', ref.mouseEnterHandler);
