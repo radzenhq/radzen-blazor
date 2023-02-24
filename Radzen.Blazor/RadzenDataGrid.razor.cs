@@ -147,7 +147,7 @@ namespace Radzen.Blazor
                                 b.AddAttribute(8, "InEditMode", IsRowInEditMode(context));
                                 b.AddAttribute(9, "Index", virtualDataItems.IndexOf(context));
 
-                                if (editContexts.ContainsKey(context))
+                                if (editContexts.Keys.Any(i => ItemEquals(i, context)))
                                 {
                                     b.AddAttribute(10, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[context]);
                                 }
@@ -1528,6 +1528,11 @@ namespace Radzen.Blazor
         /// </summary>
         protected override void OnDataChanged()
         {
+            if (!string.IsNullOrEmpty(KeyProperty) && keyPropertyGetter == null)
+            {
+                keyPropertyGetter = PropertyAccess.Getter<TItem, object>(KeyProperty);
+            }
+
             Reset(!IsOData() && !LoadData.HasDelegate);
 
             if (!IsOData() && !LoadData.HasDelegate && !Page.HasDelegate)
@@ -1721,6 +1726,19 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<bool?> AllGroupsExpandedChanged { get; set; }
 
+        /// <summary>
+        /// Gets or sets the key property.
+        /// </summary>
+        /// <value>The key property.</value>
+        [Parameter]
+        public string KeyProperty { get; set; }
+
+        internal Func<TItem, object> keyPropertyGetter;
+        bool ItemEquals(TItem item, TItem otherItem)
+        {
+            return keyPropertyGetter != null ? keyPropertyGetter(item).Equals(keyPropertyGetter(otherItem)) : item.Equals(otherItem);
+        }
+
         internal bool? allGroupsExpanded;
 
         internal async System.Threading.Tasks.Task ExpandGroupItem(RadzenDataGridGroupRow<TItem> item, bool? expandedOnLoad)
@@ -1749,7 +1767,7 @@ namespace Radzen.Blazor
 
         internal string ExpandedItemStyle(TItem item)
         {
-            return expandedItems.Keys.Contains(item) ? "rz-row-toggler rzi-chevron-circle-down" : "rz-row-toggler rzi-chevron-circle-right";
+            return expandedItems.Keys.Any(i => ItemEquals(i, item)) ? "rz-row-toggler rzi-chevron-circle-down" : "rz-row-toggler rzi-chevron-circle-right";
         }
 
         internal Dictionary<TItem, bool> selectedItems = new Dictionary<TItem, bool>();
@@ -1758,7 +1776,7 @@ namespace Radzen.Blazor
         {
             var isInEditMode = IsRowInEditMode(item) ? "rz-datatable-edit" : "";
 
-            return (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Contains(item) ? $"rz-state-highlight rz-data-row {isInEditMode} " : $"rz-data-row {isInEditMode} ";
+            return (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Any(i => ItemEquals(i, item)) ? $"rz-state-highlight rz-data-row {isInEditMode} " : $"rz-data-row {isInEditMode} ";
         }
 
         internal Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item)
@@ -1903,7 +1921,7 @@ namespace Radzen.Blazor
 
             foreach (TItem item in items)
             {
-                if (!expandedItems.Keys.Contains(item))
+                if (!expandedItems.Keys.Any(i => ItemEquals(i, item)))
                 {
                     expandedItems.Add(item, true);
                     await RowExpand.InvokeAsync(item);
@@ -1932,7 +1950,7 @@ namespace Radzen.Blazor
 
             foreach (TItem item in items)
             {
-                if (expandedItems.Keys.Contains(item))
+                if (expandedItems.Keys.Any(i => ItemEquals(i, item)))
                 {
                     expandedItems.Remove(item);
                     await RowCollapse.InvokeAsync(item);
@@ -1965,7 +1983,7 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (!expandedItems.Keys.Contains(item))
+            if (!expandedItems.Keys.Any(i => ItemEquals(i, item)))
             {
                 expandedItems.Add(item, true);
                 await RowExpand.InvokeAsync(item);
@@ -2068,9 +2086,9 @@ namespace Radzen.Blazor
             }
         }
 
-        internal async System.Threading.Tasks.Task OnRowSelect(object item, bool raiseChange = true)
+        internal async System.Threading.Tasks.Task OnRowSelect(TItem item, bool raiseChange = true)
         {
-            if (SelectionMode == DataGridSelectionMode.Single && item != null && selectedItems.Keys.Contains((TItem)item))
+            if (SelectionMode == DataGridSelectionMode.Single && item != null && selectedItems.Keys.Any(i => ItemEquals(i, item)))
             {
                 // Legacy RowSelect raise
                 if (raiseChange)
@@ -2092,7 +2110,7 @@ namespace Radzen.Blazor
 
             if (item != null)
             {
-                if (!selectedItems.Keys.Contains((TItem)item))
+                if (!selectedItems.Keys.Any(i => ItemEquals(i, item)))
                 {
                     selectedItems.Add((TItem)item, true);
                     if (raiseChange)
@@ -2190,7 +2208,7 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (!editedItems.Keys.Contains(item))
+            if (!editedItems.Keys.Any(i => ItemEquals(i, item)))
             {
                 editedItems.Add(item, true);
 
@@ -2214,7 +2232,7 @@ namespace Radzen.Blazor
 
             foreach (TItem item in items)
             {
-                if (!editedItems.Keys.Contains(item))
+                if (!editedItems.Keys.Any(i => ItemEquals(i, item)))
                 {
                     editedItems.Add(item, true);
 
@@ -2233,7 +2251,7 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public async System.Threading.Tasks.Task UpdateRow(TItem item)
         {
-            if (editedItems.Keys.Contains(item))
+            if (editedItems.Keys.Any(i => ItemEquals(i, item)))
             {
                 var editContext = editContexts[item];
 
@@ -2294,7 +2312,7 @@ namespace Radzen.Blazor
             {
                 int hash = item.GetHashCode();
 
-                if (editedItems.Keys.Contains(item))
+                if (editedItems.Keys.Any(i => ItemEquals(i, item)))
                 {
                     editedItems.Remove(item);
                     editContexts.Remove(item);
@@ -2312,7 +2330,7 @@ namespace Radzen.Blazor
         {
             foreach (TItem item in items)
             {
-                if (editedItems.Keys.Contains(item))
+                if (editedItems.Keys.Any(i => ItemEquals(i, item)))
                 {
                     editedItems.Remove(item);
                     editContexts.Remove(item);
@@ -2328,7 +2346,7 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if row in edit mode; otherwise, <c>false</c>.</returns>
         public bool IsRowInEditMode(TItem item)
         {
-            return editedItems.Keys.Contains(item);
+            return editedItems.Keys.Any(i => ItemEquals(i, item));
         }
 
         TItem itemToInsert;
