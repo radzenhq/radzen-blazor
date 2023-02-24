@@ -1,29 +1,26 @@
 @using System.Globalization
 
-<div class="container my-5">
-    <div class="row">
-        <div class="col">
-            <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem" >
-                <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
-                <RadzenLabel Text="Smooth" For="smooth" Style="margin-right: 1rem;"/>
-                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                <RadzenLabel Text="Show Data Labels" For="dataLabels" />
-            </RadzenCard>
-            <RadzenChart>
-                <RadzenAreaSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                </RadzenAreaSeries>
-                <RadzenAreaSeries Smooth="@smooth" Data="@revenue2020" CategoryProperty="Date" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                </RadzenAreaSeries>
-                <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth" />
-                <RadzenValueAxis Formatter="@FormatAsUSD">
-                    <RadzenGridLines Visible="true" />
-                    <RadzenAxisTitle Text="Revenue in USD" />
-                </RadzenValueAxis>
-            </RadzenChart>
-        </div>
-    </div>
+<div Class="rz-p-0 rz-p-md-12">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+        <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
+        <RadzenLabel Text="Smooth" For="smooth" Class="rz-mr-6"/>
+        <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+        <RadzenLabel Text="Show Data Labels" For="dataLabels" />
+    </RadzenStack>
+
+    <RadzenChart>
+        <RadzenAreaSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">
+            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+        </RadzenAreaSeries>
+        <RadzenAreaSeries Smooth="@smooth" Data="@revenue2020" CategoryProperty="Date" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+        </RadzenAreaSeries>
+        <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth" />
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Revenue in USD" />
+        </RadzenValueAxis>
+    </RadzenChart>
 </div>
 
 @code {
