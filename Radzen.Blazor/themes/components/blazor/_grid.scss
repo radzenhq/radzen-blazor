@@ -776,11 +776,36 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       td,
       .rz-cell-data {
         transition: background-color var(--rz-transition), color var(--rz-transition);
+
+        &.rz-frozen-cell {
+          &:before,
+          &:after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            transition: background-color var(--rz-transition), color var(--rz-transition);
+          }
+
+          &:before {
+            z-index: -1;
+          }
+
+          &:after {
+            z-index: -2;
+            background-color: var(--rz-grid-frozen-cell-background-color);
+          }
+        }
       }
 
       &.rz-state-highlight {
         > td {
           background-color: var(--rz-grid-selected-background-color);
+
+          &.rz-frozen-cell {
+            &:before {
+              background-color: var(--rz-grid-selected-background-color);
+            }
+          }
         }
 
         .rz-cell-data {
@@ -799,8 +824,14 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
       &:hover {
         &:not(.rz-state-highlight) {
-          > td:not(.rz-frozen-cell) {
+          > td {
             background-color: var(--rz-grid-hover-background-color);
+
+            &.rz-frozen-cell {
+              &:before {
+                background-color: var(--rz-grid-hover-background-color);
+              }
+            }
           }
 
           .rz-cell-data {
