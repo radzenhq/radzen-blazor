@@ -16,7 +16,7 @@
 <p>The state includes current page index, page size, groups and columns filter, sort, order, width and visibility.</p>
 <RadzenButton Click="@(args => Settings = null)" Text="Clear saved settings" Style="margin-bottom: 16px" />
 <RadzenButton Click="@(args => NavigationManager.NavigateTo("/datagrid-save-settings", true))" Text="Reload" Style="margin-bottom: 16px" />
-<RadzenDataGrid @bind-Settings="@Settings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
+<RadzenDataGrid @ref=grid @bind-Settings="@Settings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
                 AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" 
                 AllowColumnResize="true" AllowColumnReorder="true" ColumnWidth="200px"
                 FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
@@ -39,11 +39,13 @@
 <EventConsole @ref=@console />
 
 @code {
+    RadzenDataGrid<Employee> grid;
     IEnumerable<Employee> employees;
     EventConsole console;
 
     int count;
     bool isLoading = false;
+    bool loaded;
     async Task LoadData(LoadDataArgs args)
     {
         isLoading = true;
@@ -70,6 +72,8 @@
         employees = await Task.FromResult(query.Skip(args.Skip.Value).Take(args.Top.Value).ToList());
 
         isLoading = false;
+
+        loaded = true;
     }
 
     DataGridSettings _settings;
@@ -109,10 +113,16 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender || loaded)
         {
             await LoadStateAsync();
             StateHasChanged();
+
+            if (loaded)
+            {
+                await grid.Reload();
+                loaded = false;
+            }
         }
     }
 }
