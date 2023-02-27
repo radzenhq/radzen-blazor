@@ -118,7 +118,7 @@
             await LoadStateAsync();
             StateHasChanged();
 
-            if (loaded)
+            if (loaded && !isLoading)
             {
                 await grid.Reload();
                 loaded = false;
