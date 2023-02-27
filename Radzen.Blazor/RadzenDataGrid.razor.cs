@@ -340,10 +340,10 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="column">The column.</param>
         /// <param name="filterOperator">The filter operator.</param>
-        protected async Task ApplyDateFilterByFilterOperator(RadzenDataGridColumn<TItem> column, FilterOperator filterOperator)
+        protected void ApplyDateFilterByFilterOperator(RadzenDataGridColumn<TItem> column, FilterOperator filterOperator)
         {
             column.SetFilterOperator(filterOperator);
-            await SaveSettings();
+            SaveSettings();
         }
 
         internal IJSRuntime GetJSRuntime()
@@ -473,7 +473,7 @@ namespace Radzen.Blazor
             }
         }
 
-        async Task ToggleColumns()
+        void ToggleColumns()
         {
             var selected = ((IEnumerable<object>)selectedColumns).Cast<RadzenDataGridColumn<TItem>>();
 
@@ -483,7 +483,7 @@ namespace Radzen.Blazor
             }
 
             PickedColumnsChanged.InvokeAsync(new DataGridPickedColumnsChangedEventArgs<TItem>() { Columns = selected });
-            await SaveSettings();
+            SaveSettings();
         }
 
         /// <summary>
@@ -598,7 +598,7 @@ namespace Radzen.Blazor
                         LogicalFilterOperator = column.GetLogicalFilterOperator()
                     });
 
-                    await SaveSettings();
+                    SaveSettings();
 
                     if (LoadData.HasDelegate && IsVirtualizationAllowed())
                     {
@@ -635,7 +635,7 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<DataGridColumnSortEventArgs<TItem>> Sort { get; set; }
 
-        internal async Task OnSort(EventArgs args, RadzenDataGridColumn<TItem> column)
+        internal void OnSort(EventArgs args, RadzenDataGridColumn<TItem> column)
         {
             if (AllowSorting && column.Sortable)
             {
@@ -648,15 +648,15 @@ namespace Radzen.Blazor
                 {
                     SetColumnSortOrder(column);
 
-                    await Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
-                    await SaveSettings();
+                    Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
+                    SaveSettings();
 
                     if (LoadData.HasDelegate && IsVirtualizationAllowed())
                     {
                         Data = null;
                     }
 
-                    await Reload();
+                    InvokeAsync(Reload);
                 }
             }
         }
@@ -694,7 +694,7 @@ namespace Radzen.Blazor
             skip = 0;
             CurrentPage = 0;
 
-            await SaveSettings();
+            SaveSettings();
 
             await FilterCleared.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>() 
             { 
@@ -711,7 +711,7 @@ namespace Radzen.Blazor
                 Data = null;
             }
 
-            await Reload();
+            await InvokeAsync(Reload);
         }
 
         internal async Task ApplyFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
@@ -1191,7 +1191,7 @@ namespace Radzen.Blazor
                         NewIndex = actualColumnIndexTo
                     });
 
-                    await SaveSettings();
+                    SaveSettings();
 
                     StateHasChanged();
                 }
@@ -1215,7 +1215,7 @@ namespace Radzen.Blazor
                 Column = column,
                 Width = value,
             });
-            await SaveSettings();
+            SaveSettings();
         }
 
         internal string GetOrderBy()
@@ -1573,7 +1573,7 @@ namespace Radzen.Blazor
                 sorts.Clear();
            }
 
-            InvokeAsync(SaveSettings);
+            SaveSettings();
         }
 
         /// <summary>
@@ -2480,7 +2480,7 @@ namespace Radzen.Blazor
                 }
             }
 
-            InvokeAsync(SaveSettings);
+            SaveSettings();
         }
 
         List<RadzenDataGridColumn<TItem>> groupedColumns = new List<RadzenDataGridColumn<TItem>>();
@@ -2554,7 +2554,7 @@ namespace Radzen.Blazor
             {
                 SetColumnSortOrder(column);
                 Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
-                InvokeAsync(SaveSettings);
+                SaveSettings();
             }
 
             if (LoadData.HasDelegate && IsVirtualizationAllowed())
@@ -2588,7 +2588,7 @@ namespace Radzen.Blazor
                 SetColumnSortOrder(column);
 
                 Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
-                InvokeAsync(SaveSettings);
+                SaveSettings();
             }
 
             if (LoadData.HasDelegate && IsVirtualizationAllowed())
@@ -2673,7 +2673,7 @@ namespace Radzen.Blazor
         {
             pageSize = value;
 
-            await SaveSettings();
+            SaveSettings();
 
             await PageSizeChanged.InvokeAsync(value);
 
@@ -2690,7 +2690,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets DataGrid settings as JSON string.
         /// </summary>
-        internal async Task SaveSettings()
+        internal void SaveSettings()
         {
             if (SettingsChanged.HasDelegate && canSaveSettings)
             {
@@ -2714,7 +2714,7 @@ namespace Radzen.Blazor
                     Groups = Groups
                 };
 
-                await SettingsChanged.InvokeAsync(settings);
+                SettingsChanged.InvokeAsync(settings);
             }
         }
 
@@ -2947,7 +2947,7 @@ namespace Radzen.Blazor
         async Task ChangePage(PagerEventArgs args)
         {
             CurrentPage = args.PageIndex;
-            await SaveSettings();
+            SaveSettings();
 
             await OnPageChanged(args);
         }
