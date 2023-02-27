@@ -66,9 +66,6 @@
 
         count = query.Count();
 
-        // Simulate async data loading
-        await Task.Delay(2000);
-
         employees = await Task.FromResult(query.Skip(args.Skip.Value).Take(args.Top.Value).ToList());
 
         isLoading = false;
