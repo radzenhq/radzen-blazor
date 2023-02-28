@@ -174,16 +174,26 @@ namespace Radzen.Blazor
         private double GetColumnY(TItem item, Func<TItem, double> value = null)
         {
             value = value ?? ComposeValue(Chart.ValueScale);
+
+            var stackedColumnSeries = ColumnSeries.Cast<IChartStackedColumnSeries>();
             var index = Items.IndexOf(item);
+            var count = stackedColumnSeries.Max(series => series.Count);
+            var sum = stackedColumnSeries.Take(ColumnSeries.IndexOf(this)).Sum(series => series.ValueAt(index));
 
-            var y = value(item);
-
-            var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
-            var start = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
-            var offset = GetOffset(Chart.ValueScale, index);
-            y -= start - offset;
+            var y = Chart.ValueScale.Scale(Value(item) + sum);
 
             return y;
+        }
+
+        private double GetColumnY0(TItem item)
+        {
+            var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+            var index = Items.IndexOf(item);
+
+            var stackedColumnSeries = ColumnSeries.Cast<IChartStackedColumnSeries>();
+            var sum = stackedColumnSeries.Take(ColumnSeries.IndexOf(this)).Sum(series => series.ValueAt(index));
+
+            return Chart.ValueScale.Scale(Math.Max(0, Math.Max(ticks.Start, sum)));
         }
 
         /// <inheritdoc />
