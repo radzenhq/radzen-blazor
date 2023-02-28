@@ -79,6 +79,7 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  text-align: start;
 
   @extend %input;
 
