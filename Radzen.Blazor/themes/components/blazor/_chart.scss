@@ -76,36 +76,6 @@ $chart-color-schemes: (
   --rz-chart-tooltip-color: #{$chart-tooltip-color};
 }
 
-.chart,
-.pie {
-  height: 200px;
-
-  .ngx-charts {
-    overflow: visible !important;
-
-    .gridline-path {
-      stroke: var(--rz-chart-axis-color);
-    }
-  }
-
-  .chart-legend {
-    .legend-labels {
-      background-color: transparent;
-    }
-  }
-
-  .legend-title {
-    display: none;
-  }
-
-  .tick {
-    text {
-      fill: var(--rz-chart-axis-label-color);
-      font-size: var(--rz-chart-axis-font-size) !important;
-    }
-  }
-}
-
 .rz-chart {
   position: relative;
   height: 300px;
