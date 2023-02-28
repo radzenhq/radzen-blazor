@@ -12,17 +12,12 @@
     {
         var category = ComposeCategory(categoryScale);
         var value = ComposeValue(valueScale);
-        var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
-        var start = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
-        var y0 = start;
         var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
 
         var columnSeries = VisibleColumnSeries;
         var index = columnSeries.IndexOf(this);
-        var padding = Chart.ColumnOptions.Margin;
 
-        var bandWidth = BandWidth;
-        var width = bandWidth - padding;
+        var width = ColumnWidth;
         var className = $"rz-column-series rz-series-{Chart.Series.IndexOf(this)}";
 
         return
@@ -30,18 +25,16 @@
             @for (var i = 0; i < Items.Count; i++)
             {
                 var data = Items[i];
-                var x = category(data) - width / 2;
-                var y = value(data);
+                var x = GetColumnX(data, category);
+                var y = GetColumnY(data, value);
                 var radius = Chart.ColumnOptions.Radius;
 
-                if (radius > width / 2  || index < columnSeries.Count - 1)
+                if (radius > width / 2 || index < columnSeries.Count - 1)
                 {
                     radius = 0;
                 }
 
-                var offset = GetOffset(valueScale, i);
-                y -= start - offset;
-                y0 = offset;
+                var y0 = GetOffset(valueScale, i);
 
                 var path = $"M {x.ToInvariantString()} {(y+radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + radius).ToInvariantString()} {y.ToInvariantString()} L {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(y+radius).ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
 

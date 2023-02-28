@@ -152,31 +152,42 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
+            //var result = DataAt(x, y);
+            //Console.WriteLine($"Contains {this.GetTitle()} {x} {y} {result}");
             return DataAt(x, y) != null;
+        }
+
+        double ColumnWidth => BandWidth - Chart.ColumnOptions.Margin;
+
+        private double GetColumnX(TItem item, Func<TItem, double> category = null)
+        {
+            category = category ?? ComposeCategory(Chart.CategoryScale);
+
+            return category(item) - ColumnWidth / 2;
+        }
+
+        private double GetColumnY(TItem item, Func<TItem, double> value = null)
+        {
+            value = value ?? ComposeValue(Chart.ValueScale);
+            var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+            var start = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
+            var index = Items.IndexOf(item);
+            var offset = GetOffset(Chart.ValueScale, index);
+            var y = value(item);
+            y -= start - offset;
+            return y;
         }
 
         /// <inheritdoc />
         internal override double TooltipX(TItem item)
         {
-            var columnSeries = VisibleColumnSeries;
-            var index = columnSeries.IndexOf(this);
-            var padding = Chart.ColumnOptions.Margin;
-            var bandWidth = BandWidth;
-            var width = bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();
-            var category = ComposeCategory(Chart.CategoryScale);
-            var x = category(item) - bandWidth / 2 + index * width + index * padding;
-
-            return x + width / 2;
+            return GetColumnX(item) + ColumnWidth / 2;
         }
 
         /// <inheritdoc />
         internal override double TooltipY(TItem item)
         {
-            var y = base.TooltipY(item);
-            var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
-            var y0 = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
-
-            return Math.Min(y, y0);
+            return GetColumnY(item);
         }
 
         /// <inheritdoc />
@@ -184,20 +195,18 @@ namespace Radzen.Blazor
         {
             var category = ComposeCategory(Chart.CategoryScale);
             var value = ComposeValue(Chart.ValueScale);
-            var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
-            var y0 = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
-
             var columnSeries = VisibleColumnSeries;
             var index = columnSeries.IndexOf(this);
             var padding = Chart.ColumnOptions.Margin;
             var bandWidth = BandWidth;
-            var width = Chart.ColumnOptions.Width ?? bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();
+            var width = ColumnWidth;
 
             foreach (var data in Items)
             {
-                var startX = category(data) - bandWidth / 2 + index * width + index * padding;
+                var startX = GetColumnX(data, category);
                 var endX = startX + width;
-                var dataY = value(data);
+                var dataY = GetColumnY(data);
+                var y0 = GetOffset(Chart.ValueScale, Items.IndexOf(data));
                 var startY = Math.Min(dataY, y0);
                 var endY = Math.Max(dataY, y0);
 
