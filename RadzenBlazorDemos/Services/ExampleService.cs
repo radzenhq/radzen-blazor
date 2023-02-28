@@ -1123,81 +1123,111 @@ namespace RadzenBlazorDemos
             Children= new [] {
                 new Example
                 {
-                    Name = "Area Chart",
-                    Path = "area-chart",
-                    Title = "Blazor area chart component",
-                    Icon = "&#xe251",
-                    Tags = new [] { "chart", "graph", "area" }
-                },
-                new Example
-                {
-                    Name = "Bar Chart",
-                    Path = "bar-chart",
-                    Title = "Blazor bar chart component",
-                    Icon = "&#xe164",
-                    Tags = new [] { "chart", "graph", "column", "bar" }
-                },
-                new Example
-                {
-                    Name = "Column Chart",
-                    Path = "column-chart",
-                    Title = "Blazor column chart component",
-                    Icon = "&#xe24b",
-                    Tags = new [] { "chart", "graph", "column", "bar" }
-                },
-                new Example
-                {
-                    Name = "Donut Chart",
-                    Path = "donut-chart",
-                    Title = "Blazor donut chart component",
-                    Icon = "&#xe917",
-                    Tags = new [] { "chart", "graph", "donut" }
-                },
-                new Example
-                {
-                    Name = "Line Chart",
-                    Path = "line-chart",
-                    Title = "Blazor line chart component",
+                    Name="Chart",
                     Icon = "&#xe922",
-                    Tags = new [] { "chart", "graph", "line" }
-                },
-                new Example
-                {
-                    Name = "Pie Chart",
-                    Title = "Blazor pie chart component",
-                    Path = "pie-chart",
-                    Icon = "&#xe6c4",
-                    Tags = new [] { "chart", "graph", "pie" }
-                },
-                new Example
-                {
-                    Name = "Trends",
-                    Path = "chart-trends",
-                    Icon = "&#xe8e5",
-                    Tags = new [] { "chart", "trend", "median", "mean", "mode" }
-                },
-                new Example
-                {
-                    Name = "Annotations",
-                    Path = "chart-annotations",
-                    Icon = "&#xe06f",
-                    Tags = new [] { "chart", "annotation", "label" }
-                },
-                new Example
-                {
-                    Name = "Interpolation",
-                    Path = "chart-interpolation",
-                    Icon = "&#xe922",
-                    New = true,
-                    Tags = new [] { "chart", "interpolation", "spline", "step" }
-                },
-                new Example
-                {
-                    Name = "Styling Chart",
-                    Path = "styling-chart",
-                    Title = "Blazor chart styling",
-                    Icon = "&#xe41d",
-                    Tags = new [] { "chart", "graph", "styling" }
+                    Updated = true,
+                    Children = new [] {
+                        new Example
+                        {
+                            Name = "Series",
+                            Path = "chart-series",
+                            New = true,
+                            Title = "Blazor chart component - Series configuration",
+                            Tags = new [] { "chart", "graph", "series" }
+                        },
+                        new Example
+                        {
+                            Name = "Area Chart",
+                            Path = "area-chart",
+                            Title = "Blazor area chart component",
+                            Tags = new [] { "chart", "graph", "area" }
+                        },
+                        new Example
+                        {
+                            Name = "Bar Chart",
+                            Path = "bar-chart",
+                            Title = "Blazor bar chart component",
+                            Tags = new [] { "chart", "graph", "column", "bar" }
+                        },
+                        new Example
+                        {
+                            Name = "Column Chart",
+                            Path = "column-chart",
+                            Title = "Blazor column chart component",
+                            Tags = new [] { "chart", "graph", "column", "bar" }
+                        },
+                        new Example
+                        {
+                            Name = "Donut Chart",
+                            Path = "donut-chart",
+                            Title = "Blazor donut chart component",
+                            Tags = new [] { "chart", "graph", "donut" }
+                        },
+                        new Example
+                        {
+                            Name = "Line Chart",
+                            Path = "line-chart",
+                            Title = "Blazor line chart component",
+                            Tags = new [] { "chart", "graph", "line" }
+                        },
+                        new Example
+                        {
+                            Name = "Pie Chart",
+                            Title = "Blazor pie chart component",
+                            Path = "pie-chart",
+                            Tags = new [] { "chart", "graph", "pie" }
+                        },
+                        new Example
+                        {
+                            Name = "Axis",
+                            Path = "chart-axis",
+                            New = true,
+                            Title = "Blazor chart component - Axis configuration",
+                            Tags = new [] { "chart", "graph", "series" }
+                        },
+                        new Example
+                        {
+                            Name = "Legend",
+                            Path = "chart-legend",
+                            New = true,
+                            Title = "Blazor chart component - Legend configuration",
+                            Tags = new [] { "chart", "graph", "legend" }
+                        },
+                        new Example
+                        {
+                            Name = "ToolTip",
+                            Path = "chart-tooltip",
+                            New = true,
+                            Title = "Blazor chart component - ToolTip configuration",
+                            Tags = new [] { "chart", "graph", "legend" }
+                        },
+                        new Example
+                        {
+                            Name = "Trends",
+                            Path = "chart-trends",
+                            Tags = new [] { "chart", "trend", "median", "mean", "mode" }
+                        },
+                        new Example
+                        {
+                            Name = "Annotations",
+                            Path = "chart-annotations",
+                            Tags = new [] { "chart", "annotation", "label" }
+                        },
+                        new Example
+                        {
+                            Name = "Interpolation",
+                            Path = "chart-interpolation",
+                            New = true,
+                            Tags = new [] { "chart", "interpolation", "spline", "step" }
+                        },
+                        new Example
+                        {
+                            Name = "Styling Chart",
+                            Path = "styling-chart",
+                            Title = "Blazor chart styling",
+                            Tags = new [] { "chart", "graph", "styling" }
+                        },
+                    }
                 },
                 new Example
                 {
