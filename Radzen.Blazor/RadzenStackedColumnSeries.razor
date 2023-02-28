@@ -1,0 +1,59 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+@implements IChartStackedColumnSeries
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var category = ComposeCategory(categoryScale);
+        var value = ComposeValue(valueScale);
+        var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+        var start = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
+        var y0 = start;
+        var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
+
+        var columnSeries = VisibleColumnSeries;
+        var index = columnSeries.IndexOf(this);
+        var padding = Chart.ColumnOptions.Margin;
+
+        var bandWidth = BandWidth;
+        var width = bandWidth - padding;
+        var className = $"rz-column-series rz-series-{Chart.Series.IndexOf(this)}";
+
+        return
+        @<g class="@className">
+            @for (var i = 0; i < Items.Count; i++)
+            {
+                var data = Items[i];
+                var x = category(data) - width / 2;
+                var y = value(data);
+                var radius = Chart.ColumnOptions.Radius;
+
+                if (radius > width / 2  )
+                {
+                    radius = 0;
+                }
+
+                    var offset = GetOffset(valueScale, i);
+                    y -= start - offset;
+                    y0 = offset;
+
+                var path = $"M {x.ToInvariantString()} {(y+radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + radius).ToInvariantString()} {y.ToInvariantString()} L {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(y+radius).ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
+
+                if (y > y0)
+                {
+                    path = $"M {x.ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {(y-radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} L {(x + radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {x.ToInvariantString()} {(y-radius).ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
+                }
+                var fill = PickColor(Items.IndexOf(data), Fills, Fill);
+                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
+
+                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+            }
+        </g>;
+    }
+}
