@@ -91,6 +91,13 @@ namespace Radzen.Blazor
             var columnSeries = VisibleColumnSeries;
             var index = columnSeries.IndexOf(this);
 
+            if (index == 0)
+            {
+                var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+                var start = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
+                return start;
+            }
+
             return scale.Scale(columnSeries.Cast<IChartStackedColumnSeries>().Take(index).Sum(s => s.ValueAt(i)));
         }
 
@@ -152,12 +159,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
-            //var result = DataAt(x, y);
-            //Console.WriteLine($"Contains {this.GetTitle()} {x} {y} {result}");
             return DataAt(x, y) != null;
         }
 
-        double ColumnWidth => BandWidth - Chart.ColumnOptions.Margin;
+        double ColumnWidth => Chart.ColumnOptions.Width ?? BandWidth - Chart.ColumnOptions.Margin;
 
         private double GetColumnX(TItem item, Func<TItem, double> category = null)
         {
@@ -169,12 +174,15 @@ namespace Radzen.Blazor
         private double GetColumnY(TItem item, Func<TItem, double> value = null)
         {
             value = value ?? ComposeValue(Chart.ValueScale);
+            var index = Items.IndexOf(item);
+
+            var y = value(item);
+
             var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
             var start = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
-            var index = Items.IndexOf(item);
             var offset = GetOffset(Chart.ValueScale, index);
-            var y = value(item);
             y -= start - offset;
+
             return y;
         }
 
