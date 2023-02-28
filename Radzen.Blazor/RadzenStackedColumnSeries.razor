@@ -34,14 +34,14 @@
                 var y = value(data);
                 var radius = Chart.ColumnOptions.Radius;
 
-                if (radius > width / 2  )
+                if (radius > width / 2  || index < columnSeries.Count - 1)
                 {
                     radius = 0;
                 }
 
-                    var offset = GetOffset(valueScale, i);
-                    y -= start - offset;
-                    y0 = offset;
+                var offset = GetOffset(valueScale, i);
+                y -= start - offset;
+                y0 = offset;
 
                 var path = $"M {x.ToInvariantString()} {(y+radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + radius).ToInvariantString()} {y.ToInvariantString()} L {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(y+radius).ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
 

@@ -12,11 +12,6 @@ namespace Radzen.Blazor
         int Count { get; }
 
         /// <summary>
-        /// Gets maximum value.
-        /// </summary>
-        double Max { get; }
-
-        /// <summary>
         /// Gets the value at the specified index.
         /// </summary>
         double ValueAt(int index);
