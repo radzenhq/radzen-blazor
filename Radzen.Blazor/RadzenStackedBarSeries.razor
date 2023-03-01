@@ -15,29 +15,28 @@
         var value = ComposeValue(categoryScale);
         var category = ComposeCategory(valueScale);
         var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
-        var x0 = Chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
         var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
 
-        var barSeries = VisibleBarSeries;
-        var index = barSeries.IndexOf(this);
-        var padding = Chart.BarOptions.Margin;
+        var barSeries = StackedBarSeries;
+        var barIndex = barSeries.IndexOf(this);
+        var height = BarHeight;
 
-        var barHeight = BandHeight;
-        var height = barHeight / barSeries.Count() - padding + padding / barSeries.Count();;
         var className = $"rz-bar-series rz-series-{Chart.Series.IndexOf(this)}";
 
         return
         @<g class="@className">
-            @foreach(var data in Items)
+            @for (var index = 0; index < Items.Count; index++)
             {
-                var y = category(data) - barHeight / 2 + index * height + index * padding;
-                var x = value(data);
+                var data = Items[index];
+                var y = GetColumnTop(data, category);
+                var x = GetColumnRight(data, barIndex, index, barSeries);
                 var radius = Chart.BarOptions.Radius;
 
-                if (radius > height / 2)
+                if (radius > height / 2 || barIndex < barSeries.Count - 1)
                 {
                     radius = 0;
                 }
+                var x0 = GetColumnLeft(barIndex, index, barSeries);
 
                 var r = radius.ToInvariantString();
 

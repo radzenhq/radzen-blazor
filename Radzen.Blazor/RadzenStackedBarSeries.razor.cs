@@ -66,7 +66,15 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override ScaleBase TransformCategoryScale(ScaleBase scale)
         {
-            return base.TransformValueScale(scale);
+            var stackedBarSeries = BarSeries.Cast<IChartStackedBarSeries>();
+            var count = stackedBarSeries.Max(series => series.Count);
+            var sums = Enumerable.Range(0, count).Select(i => stackedBarSeries.Sum(series => series.ValueAt(i)));
+            var max = sums.Max();
+            var min = Items.Min(Value);
+
+            scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+
+            return scale;
         }
 
         /// <inheritdoc />
@@ -126,6 +134,34 @@ namespace Radzen.Blazor
             }
         }
 
+        double BarHeight => Chart.BarOptions.Height ?? BandHeight - Chart.BarOptions.Margin;
+
+        private double GetColumnTop(TItem item, Func<TItem, double> category = null)
+        {
+            category = category ?? ComposeCategory(Chart.ValueScale);
+
+            return category(item) - BarHeight / 2;
+        }
+
+        private double GetColumnRight(TItem item, int columnIndex, int index, IEnumerable<IChartStackedBarSeries> stackedBarSeries)
+        {
+            var count = stackedBarSeries.Max(series => series.Count);
+            var sum = stackedBarSeries.Take(columnIndex).Sum(series => series.ValueAt(index));
+
+            var y = Chart.CategoryScale.Scale(Value(item) + sum);
+
+            return y;
+        }
+
+        private double GetColumnLeft(int columnIndex, int index, IEnumerable<IChartStackedBarSeries> stackedBarSeries)
+        {
+            var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
+
+            var sum = stackedBarSeries.Take(columnIndex).Sum(series => series.ValueAt(index));
+
+            return Chart.CategoryScale.Scale(Math.Max(0, Math.Max(ticks.Start, sum)));
+        }
+
         int IChartBarSeries.Count
         {
             get
@@ -152,10 +188,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipX(TItem item)
         {
-            var value = Chart.CategoryScale.Compose(Value);
-            var x = value(item);
-
-            return x;
+            return GetColumnRight(item, BarSeries.IndexOf(this), Items.IndexOf(item), StackedBarSeries);
         }
 
         /// <inheritdoc />
@@ -174,22 +207,17 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override object DataAt(double x, double y)
         {
-            var value = ComposeValue(Chart.CategoryScale);
             var category = ComposeCategory(Chart.ValueScale);
-            var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
-            var x0 = Chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
-
             var barSeries = VisibleBarSeries;
-            var index = barSeries.IndexOf(this);
-            var padding = Chart.BarOptions.Margin;
-            var bandHeight = BandHeight;
-            var height = bandHeight / barSeries.Count() - padding + padding / barSeries.Count();
+            var barIndex = barSeries.IndexOf(this);
 
-            foreach (var data in Items)
+            for (var index = 0; index < Items.Count; index++)
             {
-                var startY = category(data) - bandHeight / 2 + index * height + index * padding;
-                var endY = startY + height;
-                var dataX = value(data);
+                var data = Items[index];
+                var startY = GetColumnTop(data, category);
+                var endY = startY + BandHeight;
+                var dataX = GetColumnRight(data, barIndex, index, StackedBarSeries);
+                var x0 = GetColumnLeft(barIndex, index, StackedBarSeries);
                 var startX = Math.Min(dataX, x0);
                 var endX = Math.Max(dataX, x0);
 
@@ -205,15 +233,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipY(TItem item)
         {
-            var category = ComposeCategory(Chart.ValueScale);
-            var barSeries = VisibleBarSeries;
-            var index = barSeries.IndexOf(this);
-            var padding = Chart.BarOptions.Margin;
-            var bandHeight = BandHeight;
-            var height = bandHeight / barSeries.Count() - padding + padding / barSeries.Count();
-            var y = category(item) - bandHeight / 2 + index * height + index * padding;
-
-            return y + height / 2;
+            return GetColumnTop(item) + BarHeight / 2;
         }
 
         /// <inheritdoc />

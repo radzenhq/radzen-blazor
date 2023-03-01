@@ -2,24 +2,22 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-12 my-5">
             <h4>Auto-size bar series</h4>
             <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
                 <RadzenStackedBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
                 <RadzenStackedBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
-                <RadzenValueAxis Formatter="@FormatAsUSD">
+                <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Revenue in USD" />
                 </RadzenValueAxis>
                 <RadzenBarOptions Radius="5" />
             </RadzenChart>
-        </div>
-        <div class="col-sm-6">
             <h4>Custom size bar series</h4>
             <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
                 <RadzenStackedBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
                 <RadzenStackedBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
-                <RadzenValueAxis Formatter="@FormatAsUSD">
+                <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Revenue in USD" />
                 </RadzenValueAxis>
@@ -47,7 +45,9 @@
 
     string FormatAsUSD(object value)
     {
-        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+        double num = (double)value / 1000;
+
+        return num.ToString("$0K");
     }
 
     DataItem[] revenue2019 = new DataItem[]
