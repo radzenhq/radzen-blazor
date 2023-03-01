@@ -1748,21 +1748,5 @@ window.Radzen = {
         } else {
             start();
         }
-    },
-    setHtmlEditorCustomToolDisability: function (componentRef, disabled) {
-        if (componentRef.getElementsByTagName != null) {
-            var nodes = componentRef.getElementsByTagName('*');
-            for (var i = 0; i < nodes.length; i++) {
-                if (disabled) {
-                    nodes[i].classList.add('rz-html-editor-custom-tool');
-                    nodes[i].classList.add('rz-state-disabled');
-                }
-                else {
-                    nodes[i].classList.remove('rz-html-editor-custom-tool');
-                    nodes[i].classList.remove('rz-state-disabled');
-                }
-                nodes[i].disabled = disabled;
-            }
-        }
     }
 };

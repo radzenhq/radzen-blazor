@@ -19,10 +19,11 @@ namespace Radzen.Blazor
     public partial class RadzenHtmlEditor : FormComponent<string>
     {
         /// <summary>
-        /// Gets or sets the view of the editor.
+        /// Gets or sets the mode of the editor.
         /// </summary>
-        public HtmlEditorView View { get; set; } = HtmlEditorView.Rendered;
-
+        [Parameter]
+        public HtmlEditorMode Mode { get; set; } = HtmlEditorMode.Design;
+        private HtmlEditorMode mode { get; set; }
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
@@ -216,12 +217,29 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Sets mode of editor.
+        /// </summary>
+        public void SetMode(HtmlEditorMode param)
+        {
+            mode = param;
+            Mode = param;
+        }
+        /// <inheritdoc />
+        protected override void OnParametersSet()
+        {
+            if (!firstRender)
+            {
+                Mode = mode;
+            }
+        }
         string Html { get; set; }
 
         /// <inheritdoc />
         protected override void OnInitialized()
         {
             Html = Value;
+            mode = Mode;
         }
 
         /// <summary>

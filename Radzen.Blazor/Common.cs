@@ -21,12 +21,12 @@ namespace Radzen
     /// Html editor mode (Rendered or Raw). Also used for toolbar buttons to enable/disable according to mode.
     /// </summary>
     [Flags]
-    public enum HtmlEditorView
+    public enum HtmlEditorMode
     {
         /// <summary>
-        /// The editor is in Rendered mode.
+        /// The editor is in Design mode.
         /// </summary>
-        Rendered = 1,
+        Design = 1,
         /// <summary>
         /// The editor is in Source mode.
         /// </summary>
