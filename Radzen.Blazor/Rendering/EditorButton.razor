@@ -1,4 +1,4 @@
-<button tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor.Disabled || Disabled) @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@Title>
+<button tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor.Disabled || Disabled || !ViewsEnabled.HasFlag(Editor.View)) @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@Title>
     <i class="rzi">@Icon</i>
 </button>
 @code {
@@ -18,6 +18,9 @@
     public string Icon { get; set; }
 
     [Parameter]
+    public HtmlEditorView ViewsEnabled { get; set; } = HtmlEditorView.Rendered;
+
+    [Parameter]
     public EventCallback Click { get; set; }
 
     async Task OnClick()
@@ -31,7 +34,7 @@
         {
             var classList = new List<string>() { "rz-html-editor-button" };
 
-            if (Selected && !Editor.Disabled)
+            if (Selected && !Editor.Disabled && ViewsEnabled.HasFlag(Editor.View))
             {
                 classList.Add("rz-selected");
             }

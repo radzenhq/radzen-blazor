@@ -19,6 +19,11 @@ namespace Radzen.Blazor
     public partial class RadzenHtmlEditor : FormComponent<string>
     {
         /// <summary>
+        /// Gets or sets the view of the editor.
+        /// </summary>
+        public HtmlEditorView View { get; set; } = HtmlEditorView.Rendered;
+
+        /// <summary>
         /// Gets or sets the child content.
         /// </summary>
         /// <value>The child content.</value>
@@ -115,6 +120,26 @@ namespace Radzen.Blazor
             await OnExecuteAsync(name);
             Html = State.Html;
             await OnChange();
+        }
+
+        /// <summary>
+        /// Changes the rendered view whenever the raw text has been changed.
+        /// </summary>
+        /// <param name="html">The raw html.</param>
+        public async Task RawChanged(string html)
+        {
+            Html = html;
+            await JSRuntime.InvokeVoidAsync("Radzen.innerHTML", ContentEditable, Html);
+            await OnChange();
+            await StateChanged();
+        }
+
+        /// <summary>
+        /// Exposes the editors StateHasChanged method.
+        /// </summary>
+        public async Task StateChanged()
+        {
+            await InvokeAsync(StateHasChanged);
         }
 
         async Task OnChange()

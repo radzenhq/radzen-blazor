@@ -1,13 +1,32 @@
 @using Radzen.Blazor.Rendering
+@using Microsoft.JSInterop
 
 @if (Visible)
 {
     @if (Template == null)
     {
-        <EditorButton Title=@Title Click=@OnClick Icon=@Icon Selected=@Selected Disabled=@Disabled />
+        <EditorButton Title=@Title Click=@OnClick Icon=@Icon Selected=@Selected Disabled=@Disabled ViewsEnabled="@ViewsEnabled"/>
     }
     else
     {
-        <div class="rz-html-editor-custom-tool">@Template(Editor)</div>
+        <div @ref="divTemplate" class="rz-html-editor-custom-tool">@Template(Editor)</div>
     }
+}
+
+@code{
+
+    /// <summary>
+    /// Gets or sets the js runtime.
+    /// </summary>
+    /// <value>The js runtime.</value>
+    [Inject]
+    protected IJSRuntime JSRuntime { get; set; }
+
+    ElementReference divTemplate { get; set; }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JSRuntime.InvokeVoidAsync("Radzen.setHtmlEditorCustomToolDisability", divTemplate, !ViewsEnabled.HasFlag(Editor.View) || Editor.Disabled );
+    }
+
 }

@@ -15,6 +15,8 @@
             }
             else
             {
+                <RadzenHtmlEditorSource />
+                <RadzenHtmlEditorSeparator />
                 <RadzenHtmlEditorUndo />
                 <RadzenHtmlEditorRedo />
                 <RadzenHtmlEditorSeparator />
@@ -49,6 +51,7 @@
             }
             </CascadingValue>
         </div>
-        <div @ref=@ContentEditable class="rz-html-editor-content" contenteditable=@(!Disabled) @onfocus=@OnFocus @onblur=@OnBlur></div>
+        <RadzenTextArea spellcheck="false" Visible="@(View == HtmlEditorView.Source)" class="rz-html-editor-source" @bind-Value="Html" Change="@(args => @RawChanged(args))" />
+        <div hidden="@(View != HtmlEditorView.Rendered)" @ref=@ContentEditable class="rz-html-editor-content" contenteditable=@(!Disabled) @onfocus=@OnFocus @onblur=@OnBlur></div>
     </div>
 }

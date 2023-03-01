@@ -37,6 +37,12 @@ namespace Radzen.Blazor
         public string Icon { get; set; } = "settings";
 
         /// <summary>
+        /// Specifies the views that this tool will be enabled in.
+        /// </summary>
+        [Parameter]
+        public HtmlEditorView ViewsEnabled { get; set; } = HtmlEditorView.Rendered;
+
+        /// <summary>
         /// The template of the tool. Use to render a custom tool.
         /// </summary>
         [Parameter]

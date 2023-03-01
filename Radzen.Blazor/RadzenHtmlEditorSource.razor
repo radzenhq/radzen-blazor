@@ -1,0 +1,27 @@
+@using System.Text
+@using Radzen.Blazor.Rendering
+@using Microsoft.JSInterop
+@inherits RadzenHtmlEditorButtonBase
+@inject DialogService DialogService
+@inject IJSRuntime JSRuntime
+
+<EditorButton @ref="editorbutton" Title=@Title Click=@OnClick Icon="code" Selected=@(Editor.View == HtmlEditorView.Source) ViewsEnabled="HtmlEditorView.Rendered | HtmlEditorView.Source" />
+
+@code {
+
+    EditorButton editorbutton;
+
+    protected override async Task OnClick()
+    {
+        if (Editor.View == HtmlEditorView.Rendered)
+        {
+            Editor.View = HtmlEditorView.Source;
+        }
+        else
+        {
+            Editor.View = HtmlEditorView.Rendered;
+        }
+
+        await Editor.StateChanged();
+    }
+}
