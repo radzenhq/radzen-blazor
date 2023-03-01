@@ -41,6 +41,7 @@ $listbox-header-icon-margin: 0 !default;
   background-color: var(--rz-listbox-background-color);
   border: var(--rz-listbox-border);
   border-radius: var(--rz-listbox-border-radius);
+  text-align: start;
 
   .rz-chkbox {
     margin: var(--rz-listbox-checkbox-margin);
