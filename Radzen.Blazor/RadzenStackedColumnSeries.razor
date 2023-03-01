@@ -11,30 +11,29 @@
     public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
         var category = ComposeCategory(categoryScale);
-        var value = ComposeValue(valueScale);
         var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
 
-        var columnSeries = VisibleColumnSeries;
-        var index = columnSeries.IndexOf(this);
+        var columnIndex = ColumnIndex;
+        var stackedColumnSeries = StackedColumnSeries;
 
         var width = ColumnWidth;
         var className = $"rz-column-series rz-series-{Chart.Series.IndexOf(this)}";
 
         return
         @<g class="@className">
-            @for (var i = 0; i < Items.Count; i++)
+            @for (var index = 0; index < Items.Count; index++)
             {
-                var data = Items[i];
+                var data = Items[index];
                 var x = GetColumnX(data, category);
-                var y = GetColumnY(data, value);
+                var y = GetColumnY(data, columnIndex, index, stackedColumnSeries);
                 var radius = Chart.ColumnOptions.Radius;
 
-                if (radius > width / 2 || index < columnSeries.Count - 1)
+                if (radius > width / 2 || columnIndex < stackedColumnSeries.Count - 1)
                 {
                     radius = 0;
                 }
 
-                var y0 = GetColumnY0(data);
+                var y0 = GetColumnY0(columnIndex, index, stackedColumnSeries);
 
                 var path = $"M {x.ToInvariantString()} {(y+radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + radius).ToInvariantString()} {y.ToInvariantString()} L {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(y+radius).ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
 

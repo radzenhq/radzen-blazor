@@ -86,36 +86,11 @@ namespace Radzen.Blazor
             return Value(Items[index]);
         }
 
-        double GetOffset(ScaleBase scale, int i)
-        {
-            var columnSeries = VisibleColumnSeries;
-            var index = columnSeries.IndexOf(this);
+        private IList<IChartSeries> ColumnSeries => Chart.Series.Where(series => series is IChartStackedColumnSeries).Cast<IChartSeries>().ToList();
 
-            if (index == 0)
-            {
-                var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
-                var start = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
-                return start;
-            }
+        private IList<IChartSeries> VisibleColumnSeries => ColumnSeries.Where(series => series.Visible).ToList();
 
-            return scale.Scale(columnSeries.Cast<IChartStackedColumnSeries>().Take(index).Sum(s => s.ValueAt(i)));
-        }
-
-        private IList<IChartSeries> ColumnSeries
-        {
-            get
-            {
-                return Chart.Series.Where(series => series is IChartStackedColumnSeries).Cast<IChartSeries>().ToList();
-            }
-        }
-
-        private IList<IChartSeries> VisibleColumnSeries
-        {
-            get
-            {
-                return ColumnSeries.Where(series => series.Visible).ToList();
-            }
-        }
+        private IList<IChartStackedColumnSeries> StackedColumnSeries => VisibleColumnSeries.Cast<IChartStackedColumnSeries>().ToList();
 
         /// <inheritdoc />
         protected override string TooltipStyle(TItem item)
@@ -171,30 +146,26 @@ namespace Radzen.Blazor
             return category(item) - ColumnWidth / 2;
         }
 
-        private double GetColumnY(TItem item, Func<TItem, double> value = null)
+        private double GetColumnY(TItem item, int columnIndex, int index, IEnumerable<IChartStackedColumnSeries> stackedColumnSeries)
         {
-            value = value ?? ComposeValue(Chart.ValueScale);
-
-            var stackedColumnSeries = ColumnSeries.Cast<IChartStackedColumnSeries>();
-            var index = Items.IndexOf(item);
             var count = stackedColumnSeries.Max(series => series.Count);
-            var sum = stackedColumnSeries.Take(ColumnSeries.IndexOf(this)).Sum(series => series.ValueAt(index));
+            var sum = stackedColumnSeries.Take(columnIndex).Sum(series => series.ValueAt(index));
 
             var y = Chart.ValueScale.Scale(Value(item) + sum);
 
             return y;
         }
 
-        private double GetColumnY0(TItem item)
+        private double GetColumnY0(int columnIndex, int index, IEnumerable<IChartStackedColumnSeries> stackedColumnSeries)
         {
             var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
-            var index = Items.IndexOf(item);
 
-            var stackedColumnSeries = ColumnSeries.Cast<IChartStackedColumnSeries>();
-            var sum = stackedColumnSeries.Take(ColumnSeries.IndexOf(this)).Sum(series => series.ValueAt(index));
+            var sum = stackedColumnSeries.Take(columnIndex).Sum(series => series.ValueAt(index));
 
             return Chart.ValueScale.Scale(Math.Max(0, Math.Max(ticks.Start, sum)));
         }
+
+        int ColumnIndex => VisibleColumnSeries.IndexOf(this);
 
         /// <inheritdoc />
         internal override double TooltipX(TItem item)
@@ -205,26 +176,24 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipY(TItem item)
         {
-            return GetColumnY(item);
+            return GetColumnY(item, ColumnIndex, Items.IndexOf(item), StackedColumnSeries);
         }
 
         /// <inheritdoc />
         public override object DataAt(double x, double y)
         {
             var category = ComposeCategory(Chart.CategoryScale);
-            var value = ComposeValue(Chart.ValueScale);
-            var columnSeries = VisibleColumnSeries;
-            var index = columnSeries.IndexOf(this);
-            var padding = Chart.ColumnOptions.Margin;
-            var bandWidth = BandWidth;
+            var columnIndex = ColumnIndex;
             var width = ColumnWidth;
+            var stackedColumnSeries = StackedColumnSeries;
 
-            foreach (var data in Items)
+            for (var index = 0; index < Items.Count; index++)
             {
+                var data = Items[index];
                 var startX = GetColumnX(data, category);
                 var endX = startX + width;
-                var dataY = GetColumnY(data);
-                var y0 = GetOffset(Chart.ValueScale, Items.IndexOf(data));
+                var dataY = GetColumnY(data, columnIndex, index, stackedColumnSeries);
+                var y0 = GetColumnY0(columnIndex, index, stackedColumnSeries);
                 var startY = Math.Min(dataY, y0);
                 var endY = Math.Max(dataY, y0);
 
