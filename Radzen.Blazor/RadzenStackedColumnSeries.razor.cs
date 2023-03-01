@@ -139,14 +139,14 @@ namespace Radzen.Blazor
 
         double ColumnWidth => Chart.ColumnOptions.Width ?? BandWidth - Chart.ColumnOptions.Margin;
 
-        private double GetColumnX(TItem item, Func<TItem, double> category = null)
+        private double GetColumnLeft(TItem item, Func<TItem, double> category = null)
         {
             category = category ?? ComposeCategory(Chart.CategoryScale);
 
             return category(item) - ColumnWidth / 2;
         }
 
-        private double GetColumnY(TItem item, int columnIndex, int index, IEnumerable<IChartStackedColumnSeries> stackedColumnSeries)
+        private double GetColumnTop(TItem item, int columnIndex, int index, IEnumerable<IChartStackedColumnSeries> stackedColumnSeries)
         {
             var count = stackedColumnSeries.Max(series => series.Count);
             var sum = stackedColumnSeries.Take(columnIndex).Sum(series => series.ValueAt(index));
@@ -156,7 +156,7 @@ namespace Radzen.Blazor
             return y;
         }
 
-        private double GetColumnY0(int columnIndex, int index, IEnumerable<IChartStackedColumnSeries> stackedColumnSeries)
+        private double GetColumnBottom(int columnIndex, int index, IEnumerable<IChartStackedColumnSeries> stackedColumnSeries)
         {
             var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
 
@@ -170,13 +170,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipX(TItem item)
         {
-            return GetColumnX(item) + ColumnWidth / 2;
+            return GetColumnLeft(item) + ColumnWidth / 2;
         }
 
         /// <inheritdoc />
         internal override double TooltipY(TItem item)
         {
-            return GetColumnY(item, ColumnIndex, Items.IndexOf(item), StackedColumnSeries);
+            return GetColumnTop(item, ColumnIndex, Items.IndexOf(item), StackedColumnSeries);
         }
 
         /// <inheritdoc />
@@ -190,10 +190,10 @@ namespace Radzen.Blazor
             for (var index = 0; index < Items.Count; index++)
             {
                 var data = Items[index];
-                var startX = GetColumnX(data, category);
+                var startX = GetColumnLeft(data, category);
                 var endX = startX + width;
-                var dataY = GetColumnY(data, columnIndex, index, stackedColumnSeries);
-                var y0 = GetColumnY0(columnIndex, index, stackedColumnSeries);
+                var dataY = GetColumnTop(data, columnIndex, index, stackedColumnSeries);
+                var y0 = GetColumnBottom(columnIndex, index, stackedColumnSeries);
                 var startY = Math.Min(dataY, y0);
                 var endY = Math.Max(dataY, y0);
 
