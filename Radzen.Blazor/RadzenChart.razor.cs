@@ -42,13 +42,13 @@ namespace Radzen.Blazor
         public ColorScheme ColorScheme { get; set; }
 
         /// <summary>
-        /// A callback that will be invoked when the user clicks on a series. 
+        /// A callback that will be invoked when the user clicks on a series.
         /// </summary>
         [Parameter]
         public EventCallback<SeriesClickEventArgs> SeriesClick { get; set; }
 
         /// <summary>
-        /// A callback that will be invoked when the user clicks on a legend. 
+        /// A callback that will be invoked when the user clicks on a legend.
         /// </summary>
         [Parameter]
         public EventCallback<LegendClickEventArgs> LegendClick { get; set; }
@@ -311,7 +311,7 @@ namespace Radzen.Blazor
                                 tooltip = overlay.RenderTooltip(mouseX, mouseY, MarginLeft, MarginTop);
                                 chartTooltipContainer.Refresh();
                                 await Task.Yield();
-                                
+
                                 return;
                             }
                         }
