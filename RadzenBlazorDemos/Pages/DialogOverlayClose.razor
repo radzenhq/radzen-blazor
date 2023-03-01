@@ -1,0 +1,15 @@
+﻿@inject DialogService DialogService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Dialog with clickable overlay" ButtonStyle="ButtonStyle.Secondary" Click=@ShowCloseableFromOverlayDialog />
+</div>
+
+@code {
+    async Task ShowCloseableFromOverlayDialog()
+    {
+        await DialogService.OpenAsync("Closeable from overlay Dialog", ds =>
+    @<div>
+        Click outside to close this Dialog
+    </div>, new DialogOptions() { CloseDialogOnOverlayClick = true });
+    }
+}
