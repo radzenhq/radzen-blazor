@@ -1,4 +1,5 @@
-﻿<div class="container-fluid splitbutton-demo">
+﻿@inject NotificationService NotificationService
+<div class="container-fluid splitbutton-demo">
     <div class="row mb-4">
         <div class="col">
             <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Filled</RadzenText>
@@ -717,6 +718,14 @@
         </div>
     </div>
 
+    <div class="row mb-4">
+        <div class="col">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Set IsBusy</RadzenText>
+            <RadzenButton style="width: 160px" IsBusy=@busy Click=@OnBusyClick Text="Save" />
+            <RadzenButton style="width: 160px" Icon="save" BusyText="Saving ..." IsBusy=@busy Click=@OnBusyClick Text="Save" />
+        </div>
+    </div>
+
 </div>
 <style>
     .splitbutton-demo .rz-splitbutton {
@@ -743,5 +752,19 @@
         {
             console.Log($"{buttonName} clicked");
         }
+    }
+
+    bool busy;
+
+    private void OnClick(string text)
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Button Clicked", Detail = text });
+    }
+
+    async Task OnBusyClick()
+    {
+        busy = true;
+        await Task.Delay(2000);
+        busy = false;
     }
 }
