@@ -3,29 +3,27 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12 my-5">
-            <h4>Auto-size column series</h4>
+            <h4>Auto-size stacked column series</h4>
             <RadzenChart>
                 <RadzenStackedColumnSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
                 <RadzenStackedColumnSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
                 <RadzenColumnOptions Radius="5" />
-                <RadzenValueAxis Formatter="@FormatAsUSD">
+                <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Revenue in USD" />
                 </RadzenValueAxis>
             </RadzenChart>
-            @*
-            <h4>Custom size column series</h4>
+            <h4>Custom size stacked column series</h4>
             <RadzenChart>
                 <RadzenStackedColumnSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
                 <RadzenStackedColumnSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
                 <RadzenColumnOptions Radius="5" Width="20" />
                 <RadzenCategoryAxis Padding="20" />
-                <RadzenValueAxis Formatter="@FormatAsUSD">
+                <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Revenue in USD" />
                 </RadzenValueAxis>
             </RadzenChart>
-*@
         </div>
     </div>
 </div>
