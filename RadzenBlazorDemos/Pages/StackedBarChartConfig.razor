@@ -2,11 +2,19 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-sm-12 my-5">
+        <div class="col-sm-12">
+            <RadzenCard class="w-100 mb-4" >
+                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+            </RadzenCard>
             <h4>Auto-size bar series</h4>
             <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
-                <RadzenStackedBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
-                <RadzenStackedBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
+                <RadzenStackedBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenStackedBarSeries>
+                <RadzenStackedBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenStackedBarSeries>
                 <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Revenue in USD" />
@@ -31,6 +39,7 @@
 
 @code {
     EventConsole console;
+    bool showDataLabels;
 
     void OnSeriesClick(SeriesClickEventArgs args)
     {

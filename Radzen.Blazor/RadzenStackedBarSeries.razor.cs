@@ -136,28 +136,30 @@ namespace Radzen.Blazor
 
         double BarHeight => Chart.BarOptions.Height ?? BandHeight - Chart.BarOptions.Margin;
 
-        private double GetColumnTop(TItem item, Func<TItem, double> category = null)
+        int BarIndex => VisibleBarSeries.IndexOf(this);
+
+        private double GetBarTop(TItem item, Func<TItem, double> category = null)
         {
             category = category ?? ComposeCategory(Chart.ValueScale);
 
             return category(item) - BarHeight / 2;
         }
 
-        private double GetColumnRight(TItem item, int columnIndex, int index, IEnumerable<IChartStackedBarSeries> stackedBarSeries)
+        private double GetBarRight(TItem item, int barIndex, int index, IEnumerable<IChartStackedBarSeries> stackedBarSeries)
         {
             var count = stackedBarSeries.Max(series => series.Count);
-            var sum = stackedBarSeries.Take(columnIndex).Sum(series => series.ValueAt(index));
+            var sum = stackedBarSeries.Take(barIndex).Sum(series => series.ValueAt(index));
 
             var y = Chart.CategoryScale.Scale(Value(item) + sum);
 
             return y;
         }
 
-        private double GetColumnLeft(int columnIndex, int index, IEnumerable<IChartStackedBarSeries> stackedBarSeries)
+        private double GetBarLeft(int barIndex, int index, IEnumerable<IChartStackedBarSeries> stackedBarSeries)
         {
             var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
 
-            var sum = stackedBarSeries.Take(columnIndex).Sum(series => series.ValueAt(index));
+            var sum = stackedBarSeries.Take(barIndex).Sum(series => series.ValueAt(index));
 
             return Chart.CategoryScale.Scale(Math.Max(0, Math.Max(ticks.Start, sum)));
         }
@@ -188,7 +190,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipX(TItem item)
         {
-            return GetColumnRight(item, BarSeries.IndexOf(this), Items.IndexOf(item), StackedBarSeries);
+            return GetBarRight(item, BarIndex, Items.IndexOf(item), StackedBarSeries);
         }
 
         /// <inheritdoc />
@@ -209,15 +211,15 @@ namespace Radzen.Blazor
         {
             var category = ComposeCategory(Chart.ValueScale);
             var barSeries = VisibleBarSeries;
-            var barIndex = barSeries.IndexOf(this);
+            var barIndex = BarIndex;
 
             for (var index = 0; index < Items.Count; index++)
             {
                 var data = Items[index];
-                var startY = GetColumnTop(data, category);
+                var startY = GetBarTop(data, category);
                 var endY = startY + BandHeight;
-                var dataX = GetColumnRight(data, barIndex, index, StackedBarSeries);
-                var x0 = GetColumnLeft(barIndex, index, StackedBarSeries);
+                var dataX = GetBarRight(data, barIndex, index, StackedBarSeries);
+                var x0 = GetBarLeft(barIndex, index, StackedBarSeries);
                 var startX = Math.Min(dataX, x0);
                 var endX = Math.Max(dataX, x0);
 
@@ -233,21 +235,27 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipY(TItem item)
         {
-            return GetColumnTop(item) + BarHeight / 2;
+            return GetBarTop(item) + BarHeight / 2;
         }
 
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
             var list = new List<ChartDataLabel>();
+            var barIndex = BarIndex;
+            var stackedBarSeries = StackedBarSeries;
 
-            foreach (var d in Data)
+            for (var index = 0; index < Items.Count; index++)
             {
+                var data = Items[index];
+                var left = GetBarLeft(barIndex, index, stackedBarSeries);
+                var right = GetBarRight(data, barIndex, index, stackedBarSeries);
+                var x = left + (right - left) / 2;
                 list.Add(new ChartDataLabel
                 {
-                    Position = new Point() { X = TooltipX(d) + offsetX + 8, Y = TooltipY(d) + offsetY },
-                    TextAnchor = "start",
-                    Text = Chart.ValueAxis.Format(Chart.CategoryScale, Value(d))
+                    Position = new Point() { X = x + offsetX, Y = TooltipY(data) + offsetY },
+                    TextAnchor = "middle",
+                    Text = Chart.ValueAxis.Format(Chart.CategoryScale, Value(data))
                 });
             }
 

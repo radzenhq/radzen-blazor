@@ -209,7 +209,26 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
-            return base.GetDataLabels(offsetX, offsetY - 16);
+            var list = new List<ChartDataLabel>();
+            var stackedColumnSeries = StackedColumnSeries;
+            var columnIndex = ColumnIndex;
+
+            for (var index = 0; index < Items.Count; index++)
+            {
+                var data = Items[index];
+                var top = GetColumnTop(data, columnIndex, index, stackedColumnSeries);
+                var bottom = GetColumnBottom(columnIndex, index, stackedColumnSeries);
+                var y = top + (bottom - top) / 2;
+
+                list.Add(new ChartDataLabel
+                {
+                    Position = new Point { X = TooltipX(data) + offsetX, Y = y + offsetY },
+                    TextAnchor = "middle",
+                    Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(data))
+                });
+            }
+
+            return list;
         }
 
         /// <inheritdoc />

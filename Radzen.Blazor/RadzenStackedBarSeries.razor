@@ -18,7 +18,7 @@
         var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
 
         var barSeries = StackedBarSeries;
-        var barIndex = barSeries.IndexOf(this);
+        var barIndex = BarIndex;
         var height = BarHeight;
 
         var className = $"rz-bar-series rz-series-{Chart.Series.IndexOf(this)}";
@@ -28,15 +28,15 @@
             @for (var index = 0; index < Items.Count; index++)
             {
                 var data = Items[index];
-                var y = GetColumnTop(data, category);
-                var x = GetColumnRight(data, barIndex, index, barSeries);
+                var y = GetBarTop(data, category);
+                var x = GetBarRight(data, barIndex, index, barSeries);
                 var radius = Chart.BarOptions.Radius;
 
                 if (radius > height / 2 || barIndex < barSeries.Count - 1)
                 {
                     radius = 0;
                 }
-                var x0 = GetColumnLeft(barIndex, index, barSeries);
+                var x0 = GetBarLeft(barIndex, index, barSeries);
 
                 var r = radius.ToInvariantString();
 
