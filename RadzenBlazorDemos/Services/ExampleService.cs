@@ -1179,6 +1179,22 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Stacked Bar Chart",
+                            Path = "stacked-bar-chart",
+                            Title = "Blazor stacked bar chart component",
+                            New = true,
+                            Tags = new [] { "chart", "stack", "graph", "column", "bar" }
+                        },
+                        new Example
+                        {
+                            Name = "Stacked Column Chart",
+                            Path = "stacked-column-chart",
+                            Title = "Blazor stacked column chart component",
+                            New = true,
+                            Tags = new [] { "chart", "stack", "graph", "column", "bar" }
+                        },
+                        new Example
+                        {
                             Name = "Axis",
                             Path = "chart-axis",
                             New = true,

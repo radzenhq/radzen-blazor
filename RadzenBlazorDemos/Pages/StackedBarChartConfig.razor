@@ -7,7 +7,7 @@
                 <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
                 <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
-            <h4>Auto-size bar series</h4>
+            <h4>Auto-size stacked bar series</h4>
             <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
                 <RadzenStackedBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
@@ -21,7 +21,7 @@
                 </RadzenValueAxis>
                 <RadzenBarOptions Radius="5" />
             </RadzenChart>
-            <h4>Custom size bar series</h4>
+            <h4>Custom size stacked bar series</h4>
             <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
                 <RadzenStackedBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
                 <RadzenStackedBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
