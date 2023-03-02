@@ -275,6 +275,27 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Selects the specified <see cref="ISchedulerView"/>. The view must already be present in this scheduler.
+        /// If the specified view is already selected, no action will be performed.
+        /// </summary>
+        /// <param name="view">The <see cref="ISchedulerView"/> to select</param>
+        public async Task SelectView(ISchedulerView view)
+        {
+            var viewIndex = Views.IndexOf(view);
+            if (viewIndex == -1)
+                return;
+
+            if (SelectedView == view)
+                return;
+
+            selectedIndex = viewIndex;
+            
+            await InvokeLoadData();
+            
+            StateHasChanged();
+        }
+
+        /// <summary>
         /// Causes the current scheduler view to render. Enumerates the items of <see cref="Data" /> and creates instances of <see cref="AppointmentData" /> to
         /// display in the current view. Use it when <see cref="Data" /> has changed.
         /// </summary>
