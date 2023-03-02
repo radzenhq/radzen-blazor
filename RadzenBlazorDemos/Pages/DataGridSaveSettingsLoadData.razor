@@ -93,15 +93,19 @@
         }
     }
 
-    private async Task LoadStateAsync()
+    string latestResult;
+    private async Task<bool> LoadStateAsync()
     {
         await Task.CompletedTask;
 
         var result = await JSRuntime.InvokeAsync<string>("window.localStorage.getItem", "SettingsLoadData");
-        if (!string.IsNullOrEmpty(result))
+        if (latestResult != result)
         {
             _settings = JsonSerializer.Deserialize<DataGridSettings>(result);
+            return await Task.FromResult(true);
         }
+
+        return await Task.FromResult(false);
     }
 
     private async Task SaveStateAsync()
@@ -115,13 +119,15 @@
     {
         if (firstRender || loaded)
         {
-            await LoadStateAsync();
-            StateHasChanged();
-
-            if (loaded && !isLoading)
+            if (await LoadStateAsync())
             {
-                InvokeAsync(grid.Reload);
-                loaded = false;
+                StateHasChanged();
+
+                if (loaded && !isLoading)
+                {
+                    await grid.Reload();
+                    loaded = false;
+                }
             }
         }
     }
