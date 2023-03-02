@@ -120,7 +120,7 @@
 
             if (loaded && !isLoading)
             {
-                await grid.Reload();
+                InvokeAsync(grid.Reload);
                 loaded = false;
             }
         }
