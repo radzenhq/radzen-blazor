@@ -7,7 +7,7 @@
 <RadzenCard class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
     <div style="white-space:nowrap; margin-right: 16px">GridLines:</div>
     <RadzenSelectBar @bind-Value="@GridLines" TextProperty="Text" ValueProperty="Value"
-                        Data="@(Enum.GetValues(typeof(DataGridGridLines)).Cast<DataGridGridLines>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+                     Data="@(Enum.GetValues(typeof(Radzen.DataGridGridLines)).Cast<Radzen.DataGridGridLines>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
 </RadzenCard>
 <RadzenDataGrid Data="@orderDetails" TItem="OrderDetail" GridLines="@GridLines" AllowPaging="true" AllowSorting="true">
     <Columns>
