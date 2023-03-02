@@ -821,6 +821,12 @@ window.Radzen = {
         if (closestPopup && closestPopup != popup) {
           return;
         }
+        var closestLink = e.target.closest && e.target.closest('.rz-link');
+        if (closestLink) {
+            if (Radzen.closeAllPopups) {
+                Radzen.closeAllPopups();
+            }
+        }
         if (parent) {
           if (e.type == 'mousedown' && !parent.contains(e.target) && !popup.contains(e.target)) {
             Radzen.closePopup(id, instance, callback, e);
