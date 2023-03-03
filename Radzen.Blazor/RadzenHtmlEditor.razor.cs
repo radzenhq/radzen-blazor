@@ -212,6 +212,9 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        /// <summary>
+        /// Returns the current mode of the editor.
+        /// </summary>
         public HtmlEditorMode GetMode()
         {
             return mode;
