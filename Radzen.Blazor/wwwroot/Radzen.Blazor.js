@@ -821,7 +821,7 @@ window.Radzen = {
         if (closestPopup && closestPopup != popup) {
           return;
         }
-        var closestLink = e.target.closest && e.target.closest('.rz-link');
+        var closestLink = e.target.closest && (e.target.closest('.rz-link') || e.target.closest('.rz-navigation-item-link'));
         if (closestLink) {
             if (Radzen.closeAllPopups) {
                 Radzen.closeAllPopups();
