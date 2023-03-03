@@ -12,7 +12,7 @@ namespace Radzen.Blazor
     /// <code>
     /// &lt;RadzenHtmlEditor @bind-Value=@html /&gt;
     /// @code {
-    ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!"; 
+    ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!";
     /// }
     /// </code>
     /// </example>
@@ -44,7 +44,7 @@ namespace Radzen.Blazor
         /// <code>
         /// &lt;RadzenHtmlEditor @bind-Value=@html Paste=@OnPaste /&gt;
         /// @code {
-        ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!"; 
+        ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!";
         ///   void OnPaste(HtmlEditorPasteEventArgs args)
         ///   {
         ///     // Set args.Html to filter unwanted tags.
@@ -64,7 +64,7 @@ namespace Radzen.Blazor
         ///   &lt;RadzenHtmlEditorCustomTool CommandName="InsertToday" Icon="today" Title="Insert today" /&gt;
         /// &lt;/RadzenHtmlEditor&gt;
         /// @code {
-        ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!"; 
+        ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!";
         ///   async Task OnExecute(HtmlEditorExecuteEventArgs args)
         ///   {
         ///     if (args.CommandName == "InsertToday")
@@ -123,24 +123,12 @@ namespace Radzen.Blazor
             await OnChange();
         }
 
-        /// <summary>
-        /// Changes the rendered view whenever the raw text has been changed.
-        /// </summary>
-        /// <param name="html">The raw html.</param>
-        public async Task RawChanged(string html)
+        private async Task SourceChanged(string html)
         {
             Html = html;
             await JSRuntime.InvokeVoidAsync("Radzen.innerHTML", ContentEditable, Html);
             await OnChange();
-            await StateChanged();
-        }
-
-        /// <summary>
-        /// Exposes the editors StateHasChanged method.
-        /// </summary>
-        public async Task StateChanged()
-        {
-            await InvokeAsync(StateHasChanged);
+            StateHasChanged();
         }
 
         async Task OnChange()
@@ -217,22 +205,18 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Sets mode of editor.
-        /// </summary>
-        public void SetMode(HtmlEditorMode param)
+        internal void SetMode(HtmlEditorMode value)
         {
-            mode = param;
-            Mode = param;
+            mode = value;
+
+            StateHasChanged();
         }
-        /// <inheritdoc />
-        protected override void OnParametersSet()
+
+        internal HtmlEditorMode GetMode()
         {
-            if (!firstRender)
-            {
-                Mode = mode;
-            }
+            return mode;
         }
+
         string Html { get; set; }
 
         /// <inheritdoc />
@@ -274,6 +258,11 @@ namespace Radzen.Blazor
             if (parameters.DidParameterChange(nameof(Value), Value))
             {
                 valueChanged = Html != parameters.GetValueOrDefault<string>(nameof(Value));
+            }
+
+            if (parameters.DidParameterChange(nameof(Mode), Mode))
+            {
+                mode = Mode;
             }
 
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);

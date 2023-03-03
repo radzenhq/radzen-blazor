@@ -1,11 +1,11 @@
 <div title=@Title class="rz-html-editor-colorpicker" @onmousedown:preventDefault>
-    <button tabindex="-1" class="rz-html-editor-color" @onclick=@OnClick disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.Mode)) @onclick:preventDefault>
+    <button tabindex="-1" class="rz-html-editor-color" @onclick=@OnClick disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode())) @onclick:preventDefault>
         <i class="rzi">@Icon</i>
         <div class="rz-html-editor-color-value" style="background-color:@Value"></div>
     </button>
-    <RadzenColorPicker 
+    <RadzenColorPicker
         @bind-Value=@Value Change=@OnChange @onclick:stopPropagation
-        Open=@OnOpen Disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.Mode)) ShowHSV=@ShowHSV
+        Open=@OnOpen Disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode())) ShowHSV=@ShowHSV
         ShowRGBA=@ShowRGBA ShowColors=@ShowColors ShowButton=@ShowButton
         HexText=@HexText RedText=@RedText GreenText=@GreenText BlueText=@BlueText AlphaText=@AlphaText
         ButtonText=@ButtonText

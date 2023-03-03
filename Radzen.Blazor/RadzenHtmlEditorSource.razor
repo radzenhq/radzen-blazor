@@ -5,15 +5,12 @@
 @inject DialogService DialogService
 @inject IJSRuntime JSRuntime
 
-<EditorButton @ref="editorbutton" Title=@Title Click=@OnClick Icon="code" Selected=@(Editor.Mode == HtmlEditorMode.Source) EnabledModes="HtmlEditorMode.Design | HtmlEditorMode.Source" />
-
+<EditorButton Title=@Title Click=@OnClick Icon="code" PreventBlur=false Selected=@(Editor.GetMode() == HtmlEditorMode.Source) EnabledModes="HtmlEditorMode.Design | HtmlEditorMode.Source" />
 @code {
-
-    EditorButton editorbutton;
 
     protected override async Task OnClick()
     {
-        if (Editor.Mode == HtmlEditorMode.Design)
+        if (Editor.GetMode() == HtmlEditorMode.Design)
         {
             Editor.SetMode(HtmlEditorMode.Source);
         }
@@ -21,7 +18,5 @@
         {
             Editor.SetMode(HtmlEditorMode.Design);
         }
-
-        await Editor.StateChanged();
     }
 }
