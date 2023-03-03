@@ -212,7 +212,7 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        internal HtmlEditorMode GetMode()
+        public HtmlEditorMode GetMode()
         {
             return mode;
         }
