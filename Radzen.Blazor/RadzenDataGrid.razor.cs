@@ -1573,7 +1573,10 @@ namespace Radzen.Blazor
                 sorts.Clear();
            }
 
-            SaveSettings();
+            if (!LoadData.HasDelegate)
+            {
+                SaveSettings();
+            }
         }
 
         /// <summary>

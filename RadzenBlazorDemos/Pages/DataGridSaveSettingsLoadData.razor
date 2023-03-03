@@ -95,8 +95,6 @@
 
     private async Task LoadStateAsync()
     {
-        await Task.CompletedTask;
-
         var result = await JSRuntime.InvokeAsync<string>("window.localStorage.getItem", "SettingsLoadData");
         if (!string.IsNullOrEmpty(result))
         {
@@ -106,8 +104,6 @@
 
     private async Task SaveStateAsync()
     {
-        await Task.CompletedTask;
-
         await JSRuntime.InvokeVoidAsync("eval", $@"window.localStorage.setItem('SettingsLoadData', '{JsonSerializer.Serialize<DataGridSettings>(Settings)}')");
     }
 
@@ -116,8 +112,7 @@
         if (firstRender || loaded)
         {
             await LoadStateAsync();
-            StateHasChanged();
-
+            
             if (loaded)
             {
                 await grid.Reload();

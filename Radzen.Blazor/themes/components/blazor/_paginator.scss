@@ -316,3 +316,19 @@ $paginator-button-size: ".rz-button-md" !default;
     margin: 0 !important;
   }
 }
+
+// Density
+.rz-paginator {
+  &.rz-density-compact {
+    --rz-paginator-padding: 0.25rem;
+    --rz-paginator-numeric-button-margin: 0 0.125rem;
+    --rz-paginator-first-button-margin: 0 0.25rem 0 0;
+    --rz-paginator-last-button-margin: 0 0 0 0.25rem;
+    --rz-paginator-dropdown-margin: 0 0 0 0.25rem;
+    --rz-paginator-summary-padding: 0 0.5rem 0 0;
+
+    .rz-paginator-element {
+      @extend .rz-button-sm;
+    }
+  }
+}

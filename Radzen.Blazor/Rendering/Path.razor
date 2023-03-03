@@ -18,7 +18,7 @@
             style.Append($"fill: {Fill};");
         }
 
-        if (StrokeWidth > 0)
+        if (StrokeWidth >= 0)
         {
             style.Append($"stroke-width: {StrokeWidth.ToInvariantString()};");
         }

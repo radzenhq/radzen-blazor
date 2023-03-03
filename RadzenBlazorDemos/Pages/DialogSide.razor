@@ -1,0 +1,25 @@
+﻿@inject DialogService DialogService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenCard class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
+        <div style="white-space:nowrap; margin-right: 16px">Position:</div>
+        <RadzenSelectBar @bind-Value="@Position" TextProperty="Text" ValueProperty="Value"
+                         Data="@(Enum.GetValues(typeof(DialogPosition)).Cast<DialogPosition>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+
+        <div style="white-space:nowrap; margin-left: 16px;margin-right: 16px">Show mask:</div>
+        <RadzenSwitch @bind-Value="@ShowMask" Style="margin-top: 4px;" />
+
+        <div style="white-space:nowrap; margin-left: 16px;margin-right: 16px">Close on overlay click:</div>
+        <RadzenSwitch @bind-Value="@CloseDialogOnOverlayClick" Style="margin-top: 4px;" Disabled=@(!ShowMask) />
+
+    </RadzenCard>
+    <RadzenButton Text="Dialog on Side" ButtonStyle="ButtonStyle.Secondary"
+                  Click="@(async args => await DialogService.OpenSideAsync<DialogSideContent>("Side Panel",  
+                      options: new SideDialogOptions { CloseDialogOnOverlayClick = CloseDialogOnOverlayClick, Position = Position, ShowMask = ShowMask }))" />
+</div>
+
+@code {
+    DialogPosition Position;
+    bool CloseDialogOnOverlayClick;
+    bool ShowMask;
+}

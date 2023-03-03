@@ -6,15 +6,4 @@
         {
             <i class="rzi">@((MarkupString)Icon)</i>
         }
-        <span @ref="@Element" class="rz-link-text">
-            @if (ChildContent != null)
-            {
-                @ChildContent
-            }
-            else
-            {
-                @Text
-            }
-        </span>
-    </Microsoft.AspNetCore.Components.Routing.NavLink>
-}
+        <span @ref="@Element" class="rz-link-text">@if (ChildContent != null) {@ChildContent} else {@Text}</span></Microsoft.AspNetCore.Components.Routing.NavLink>}

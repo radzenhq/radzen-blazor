@@ -27,7 +27,14 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-paginator rz-unselectable-text rz-helper-clearfix {HorizontalAlignCssClasses[HorizontalAlign]}";
+            var additionalClasses = new List<string>();
+
+            if (Density == Density.Compact)
+            {
+                additionalClasses.Add("rz-density-compact");
+            }
+
+            return $"rz-paginator rz-unselectable-text rz-helper-clearfix {HorizontalAlignCssClasses[HorizontalAlign]} {String.Join(" ", additionalClasses)}";
         }
 
         /// <summary>
@@ -36,6 +43,12 @@ namespace Radzen.Blazor
         /// <value>The horizontal align.</value>
         [Parameter]
         public HorizontalAlign HorizontalAlign { get; set; } = HorizontalAlign.Justify;
+
+        /// <summary>
+        /// Gets or sets a value indicating Pager density.
+        /// </summary>
+        [Parameter]
+        public Density Density { get; set; }
 
         /// <summary>
         /// Gets or sets the page size.

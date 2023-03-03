@@ -1,0 +1,65 @@
+﻿@inject DialogService DialogService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Busy Dialog with a string message" ButtonStyle="ButtonStyle.Secondary" Click=@(args => ShowBusyDialog(true)) />
+    <RadzenButton Text="Busy Dialog with markup" ButtonStyle="ButtonStyle.Secondary" Click=@(args => ShowBusyDialog(false)) />
+</div>
+
+@code {
+    async Task ShowBusyDialog(bool withMessageAsString)
+    {
+        InvokeAsync(async () =>
+    {
+        // Simulate background task
+        await Task.Delay(2000);
+
+        // Close the dialog
+        DialogService.Close();
+    });
+
+        if (withMessageAsString)
+        {
+            await BusyDialog("Busy ...");
+        }
+        else
+        {
+            await BusyDialog();
+        }
+    }
+
+    // Busy dialog from markup
+    async Task BusyDialog()
+    {
+        await DialogService.OpenAsync("", ds =>
+    @<div>
+        <div class="row">
+            <div class="col text-center p-5">
+                <RadzenImage Path="images/community.svg" Style="display: block; width: 200px; margin-bottom: 40px;" />
+                <b>Loading, please wait...</b>
+            </div>
+        </div>
+    </div>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
+    }
+
+    // Busy dialog from string
+    async Task BusyDialog(string message)
+    {
+        await DialogService.OpenAsync("", ds =>
+        {
+            RenderFragment content = b =>
+            {
+                b.OpenElement(0, "div");
+                b.AddAttribute(1, "class", "row");
+
+                b.OpenElement(2, "div");
+                b.AddAttribute(3, "class", "col-md-12");
+
+                b.AddContent(4, message);
+
+                b.CloseElement();
+                b.CloseElement();
+            };
+            return content;
+        }, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
+    }
+}

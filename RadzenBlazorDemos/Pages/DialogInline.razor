@@ -1,0 +1,25 @@
+﻿@inject DialogService DialogService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Dialog with inline Blazor content" ButtonStyle="ButtonStyle.Secondary" Click=@ShowInlineDialog />
+</div>
+
+@code {
+    int orderID = 10248;
+
+    async Task ShowInlineDialog()
+    {
+        var result = await DialogService.OpenAsync("Simple Dialog", ds =>
+        @<div>
+            <p class="mb-4">Confirm Order ID <b>@orderID</b>?</p>
+            <div class="row">
+                <div class="col">
+                    <RadzenButton Text="Ok" Click="() => ds.Close(true)" class="me-1" Style="width: 80px;" />
+                    <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" class="me-1" />
+                    <RadzenButton Text="Refresh" Click="(() => { orderID = 10249; ds.Refresh(); })" ButtonStyle="ButtonStyle.Light" class="me-1 float-end" />
+
+                </div>
+            </div>
+        </div>);
+    }
+}
