@@ -43,6 +43,19 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
   background-color: var(--rz-editor-content-background-color);
 }
 
+.rz-html-editor-source.rz-textarea {
+    --rz-input-hover-shadow: none;
+    --rz-input-border: none;
+    --rz-input-hover-border: none;
+    --rz-input-focus-shadow: none;
+    --rz-input-focus-border: none;
+    flex: 1;
+    padding: 0.5rem;
+    overflow: auto;
+    outline: none;
+    background-color: var(--rz-editor-content-background-color);
+}
+
 .rz-html-editor-toolbar {
   border-bottom: var(--rz-editor-border);
   display: flex;
@@ -206,19 +219,15 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
   background-color: var(--rz-editor-separator-background-color);
 }
 
-
-
-
-
 .rz-html-editor-toolbar {
-  
+
   .rz-html-editor-colorpicker {
     .rz-colorpicker {
       &:not(:disabled):not(.rz-state-disabled):hover {
         border: none;
       }
     }
-  
+
     .rz-colorpicker-trigger {
       .rzi {
         font-size: 1.25rem;
