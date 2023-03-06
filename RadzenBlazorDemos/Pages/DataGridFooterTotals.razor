@@ -5,7 +5,7 @@
 
 @inherits DbContextPage
 
-<RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true"
+<RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" ColumnWidth="200px" AllowColumnResize=true
                 Data="@orders" TItem="Order" Sort="@(args => ResetIndex(true))" Page="@(args => ResetIndex(true))" Filter="@(args => ResetIndex(true))">
     <Columns>
         <RadzenDataGridColumn Width="100px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
