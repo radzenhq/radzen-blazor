@@ -349,7 +349,7 @@ namespace Radzen.Blazor
 
             if (Disabled)
             {
-                classList.Add("rz-disabled");
+                classList.Add("rz-state-disabled");
             }
 
             return string.Join(" ", classList);

@@ -58,8 +58,8 @@ $colorpicker-input-labels-color: var(--rz-text-tertiary-color) !default;
 
   @extend %input;
 
-  &.rz-disabled {
-    color: var(--rz-text-color);
+  &.rz-state-disabled {
+    @extend %input-disabled;
     cursor: default;
   }
 }
@@ -80,6 +80,11 @@ button.rz-colorpicker-trigger {
       content: 'arrow_drop_down';
     }
   }
+
+  .rz-state-disabled & {
+    color: var(--rz-input-disabled-color);
+  }
+
 }
 
 .rz-colorpicker-popup {
