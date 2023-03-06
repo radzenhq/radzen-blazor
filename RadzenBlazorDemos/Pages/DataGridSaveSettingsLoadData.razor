@@ -115,6 +115,7 @@
             
             if (loaded)
             {
+                await Task.Yield();
                 await grid.Reload();
                 loaded = false;
             }
