@@ -117,6 +117,12 @@ namespace Radzen.Blazor
         public RenderFragment<dynamic> ValueTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating DataGrid density.
+        /// </summary>
+        [Parameter]
+        public Density Density { get; set; }
+
+        /// <summary>
         /// Gets or sets the empty template shown when Data is empty collection.
         /// </summary>
         /// <value>The empty template.</value>
