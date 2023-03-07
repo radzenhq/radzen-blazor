@@ -1,0 +1,41 @@
+﻿@typeparam TItem
+@inherits ComponentBase
+
+@if (Content != null)
+{
+    <CascadingValue Value=this.Grid>
+    <CascadingValue Value=this>
+        <div class="rz-group-header">
+            @Content
+        </div>
+    </CascadingValue>
+</CascadingValue>
+}
+@code {
+    /// <summary>
+    /// Gets or sets the grid.
+    /// </summary>
+    /// <value>The grid.</value>
+    [CascadingParameter]
+    public RadzenDataGrid<TItem> Grid { get; set; }
+
+    /// <summary>
+    /// Gets or sets the columns.
+    /// </summary>
+    /// <value>The columns.</value>
+    [Parameter]
+    public RenderFragment Content { get; set; }
+
+    /// <summary>
+    /// Gets or sets the parent column.
+    /// </summary>
+    /// <value>The parent column.</value>
+    [CascadingParameter]
+    public RadzenDataGridColumn<TItem> Parent { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+}
