@@ -36,7 +36,7 @@
             </RadzenTabsItem>
             <RadzenTabsItem Text="Edit Source" Title="View and edit example source code">
                 <div class="source-tab-item rz-pb-2">
-                    <CodeViewer ComponentName="@ComponentName" ComponentSource="@Source" PageName="@ExampleUrl" Compiled="OnCompiled" />
+                    <CodeViewer ComponentName="@ComponentName" @bind-Value="@source" ComponentSource="@Source" PageName="@ExampleUrl" Compiled="OnCompiled" />
                 </div>
             </RadzenTabsItem>
             @foreach (var p in AdditionalSourceCodePages)
@@ -99,6 +99,8 @@
     Example example;
 
     DateTime start;
+
+    string source ;
 
     protected override void OnInitialized()
     {

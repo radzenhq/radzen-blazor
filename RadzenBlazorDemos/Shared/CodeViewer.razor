@@ -10,10 +10,11 @@
                 <RadzenIcon Icon="content_copy" />
                 Copy
             </button>
+            <RadzenButton Disabled=@isBusy Click="@Reset" Text="Reset" Icon="refresh" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" class="rz-text-truncate" />
         </RadzenStack>
     </RadzenColumn>
     <RadzenColumn>
-    @if (String.IsNullOrEmpty(ComponentName)) 
+    @if (String.IsNullOrEmpty(ComponentName))
     {
 
     }
@@ -30,7 +31,7 @@
 <RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
     @error
 </RadzenAlert>
-<Monaco @bind-Value="source" @ref="@monaco" Style="border: var(--rz-border-disabled)" Disabled=@isBusy />
+<Monaco Value="@source" ValueChanged="@OnValueChanged" @ref="@monaco" Style="border: var(--rz-border-disabled)" Disabled=@isBusy />
 @code {
     private string Copy => $"copy('{monaco?.Id}')";
     private Monaco monaco;
@@ -40,6 +41,12 @@
 
     [Parameter]
     public EventCallback<Type> Compiled { get; set; }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
 
     [Parameter]
     public string PageName { get; set; }
@@ -52,19 +59,44 @@
     public string ComponentName { get; set; }
 
     string ComponentSourceHref => ComponentSource ?? $"https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/Radzen{ComponentName}.razor.cs";
-
-
     protected override async Task OnInitializedAsync()
     {
-        var http = new HttpClient();
+        source = Value ?? await Fetch();
 
-        source = await http.GetStringAsync($"https://raw.githubusercontent.com/radzenhq/radzen-blazor/master/RadzenBlazorDemos/Pages/{PageName}");
-        source = Regex.Replace(source, "</?RadzenExample[^>]*>\n", "");
+        source = Clean(source);
+    }
+
+    async Task<string> Fetch()
+    {
+        using var http = new HttpClient();
+
+        return await http.GetStringAsync($"https://raw.githubusercontent.com/radzenhq/radzen-blazor/master/RadzenBlazorDemos/Pages/{PageName}");
+    }
+
+    string Clean(string source)
+    {
+        return Regex.Replace(source, "</?RadzenExample[^>]*>\n", "");
+    }
+
+    async Task OnValueChanged(string value)
+    {
+        source = value;
+
+        await ValueChanged.InvokeAsync(value);
+    }
+
+    async Task Reset()
+    {
+        var source = await Fetch();
+
+        source = Clean(source);
+
+        await OnValueChanged(source);
     }
 
     bool isBusy;
 
-    private async Task Run()
+    async Task Run()
     {
         try
         {
