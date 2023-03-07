@@ -220,6 +220,8 @@ $text: (
 $button-shadow: var(--rz-shadow-1) !default;
 $button-hover-shadow: var(--rz-shadow-3) !default;
 $button-hover-gradient: none !default;
+$button-focus-shadow: var(--rz-shadow-3) !default;
+$button-focus-gradient: linear-gradient(rgba(#fff, 0.2), rgba(#fff, 0.2)) !default !default;
 $button-active-shadow: var(--rz-shadow-6) !default;
 $button-active-gradient: none !default;
 $button-sizes: (

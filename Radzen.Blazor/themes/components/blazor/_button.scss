@@ -11,11 +11,14 @@ $button-hover-shadow: inset 0 -3px 0 0 rgba(255, 255, 255, 0.2) !default;
 $button-hover-gradient: linear-gradient(rgba(#fff, 0.1), rgba(#fff, 0.1)) !default;
 $button-hover-background-size: $button-background-size !default;
 
+$button-focus-shadow: inset 0 -3px 0 0 rgba(255, 255, 255, 0.2) !default;
+$button-focus-gradient: linear-gradient(rgba(#fff, 0.1), rgba(#fff, 0.1)) !default;
+$button-focus-background-size: $button-background-size !default;
+$button-focus-outline: none !default;
+
 $button-active-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.1) !default;
 $button-active-gradient: linear-gradient(rgba(#000, 0.1), rgba(#000, 0.1)) !default;
 $button-active-background-size: $button-background-size !default;
-
-$button-focus-outline: none !default;
 
 $button-disabled-opacity: 0.2 !default;
 
@@ -157,20 +160,23 @@ $button-styles: map-merge(
 :root {
   --rz-button-base-background-color: #{$button-base-background-color};
   --rz-button-base-color: #{$button-base-color};
-  --rz-button-hover-shadow: #{$button-hover-shadow};
-  --rz-button-hover-gradient: #{$button-hover-gradient};
-  --rz-button-active-shadow: #{$button-active-shadow};
-  --rz-button-active-gradient: #{$button-active-gradient};
-  --rz-button-focus-outline: #{$button-focus-outline};
+  --rz-button-background-size: #{$button-background-size};
   --rz-button-border-radius: #{$button-border-radius};
   --rz-button-shadow: #{$button-shadow};
   --rz-button-transition: #{$button-transition};
-  --rz-button-disabled-opacity: #{$button-disabled-opacity};
   --rz-button-line-height: #{$button-line-height};
   --rz-button-vertical-align: #{$button-vertical-align};
-  --rz-button-background-size: #{$button-background-size};
+  --rz-button-hover-shadow: #{$button-hover-shadow};
+  --rz-button-hover-gradient: #{$button-hover-gradient};
   --rz-button-hover-background-size: #{$button-hover-background-size};
+  --rz-button-focus-shadow: #{$button-focus-shadow};
+  --rz-button-focus-gradient: #{$button-focus-gradient};
+  --rz-button-focus-background-size: #{$button-focus-background-size};
+  --rz-button-focus-outline: #{$button-focus-outline};
+  --rz-button-active-shadow: #{$button-active-shadow};
+  --rz-button-active-gradient: #{$button-active-gradient};
   --rz-button-active-background-size: #{$button-active-background-size};
+  --rz-button-disabled-opacity: #{$button-disabled-opacity};
 }
 
 .rz-button {
@@ -202,6 +208,15 @@ $button-styles: map-merge(
         background-image: var(--rz-button-hover-gradient);
         background-size: var(--rz-button-hover-background-size);
         box-shadow: var(--rz-button-hover-shadow);
+      }
+    }
+
+    &:focus {
+      &:not(:active) {
+        text-decoration: none;
+        background-image: var(--rz-button-focus-gradient);
+        background-size: var(--rz-button-focus-background-size);
+        box-shadow: var(--rz-button-focus-shadow);
       }
     }
 
@@ -315,6 +330,7 @@ $button-styles: map-merge(
           background-color: transparent;
   
           &:not(.rz-state-disabled):hover:not(:active),
+          &:not(.rz-state-disabled):focus:not(:active),
           &:not(.rz-state-disabled):active {
             &.rz-shade-lighter {
               color: var(--rz-#{$style})
@@ -366,6 +382,7 @@ $button-styles: map-merge(
           box-shadow: none;
   
           &:not(.rz-state-disabled):hover:not(:active),
+          &:not(.rz-state-disabled):focus:not(:active),
           &:not(.rz-state-disabled):active {
             &.rz-shade-lighter {
               color: var(--rz-#{$style})
