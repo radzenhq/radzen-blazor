@@ -361,7 +361,7 @@ namespace Radzen.Blazor
         /// Gives the grid a custom header, allowing the adding of components to create custom tool bars in addtion to column grouping and column picker
         /// </summary>
         [Parameter]
-        public RenderFragment RadzenDataGridCustomHeader { get; set; } 
+        public RenderFragment HeaderTemplate { get; set; } 
 
         internal object selectedColumns;
 

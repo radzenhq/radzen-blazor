@@ -6,9 +6,9 @@
 
 
 <RadzenDataGrid Data="@employees" AllowFiltering=true TItem="Employee" ColumnWidth="300px" AllowColumnPicking=@WithColumnPicker>
-    <RadzenDataGridCustomHeader>
+    <HeaderTemplate>
         <RadzenButton Text="Toggle EmployeeID column visibility" Click=@(() => EmployeeIDVisible = !EmployeeIDVisible)  />
-    </RadzenDataGridCustomHeader>
+    </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn Visible="@EmployeeIDVisible" TItem="Employee" Property="EmployeeID" Title="ID" Width="80px" TextAlign="TextAlign.Center" Frozen="true" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Width="200px" Pickable="false">
