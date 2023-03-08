@@ -1179,8 +1179,7 @@ namespace Radzen.Blazor
                     columns.Remove(columnToReorder);
                     columns.Insert(actualColumnIndexTo, columnToReorder);
 
-                    columnToReorder.SetOrderIndex(columns.IndexOf(columnToReorder));
-                    columnToReorderTo.SetOrderIndex(columns.IndexOf(columnToReorderTo));
+                    columns.ForEach(c => c.SetOrderIndex(columns.IndexOf(c)));
 
                     UpdateColumnsOrder();
 
