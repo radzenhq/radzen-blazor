@@ -102,6 +102,7 @@ namespace Radzen.Blazor
             return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<GroupResult>(_groupedPagedView.Skip(request.StartIndex).Take(top), totalItemsCount);
         }
 #endif
+       
         RenderFragment DrawRows(IList<RadzenDataGridColumn<TItem>> visibleColumns)
         {
             return new RenderFragment(builder =>
@@ -355,6 +356,13 @@ namespace Radzen.Blazor
         internal readonly List<RadzenDataGridColumn<TItem>> childColumns = new List<RadzenDataGridColumn<TItem>>();
         internal List<RadzenDataGridColumn<TItem>> allColumns = new List<RadzenDataGridColumn<TItem>>();
         private List<RadzenDataGridColumn<TItem>> allPickableColumns = new List<RadzenDataGridColumn<TItem>>();
+
+        /// <summary>
+        /// Gives the grid a custom header, allowing the adding of components to create custom tool bars in addtion to column grouping and column picker
+        /// </summary>
+        [Parameter]
+        public RenderFragment HeaderTemplate { get; set; } 
+
         internal object selectedColumns;
 
         /// <summary>

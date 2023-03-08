@@ -467,6 +467,29 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name="Custom Header",
+                    New = true,
+                    Title = "Blazor DataGrid custom header",
+                    Icon = "&#xe051",
+                    Children = new [] {
+                      new Example
+                        {
+                            Name = "Header with button",
+                            Path="datagrid-custom-header",
+                            Title = "Blazor DataGrid grouping API",
+                            Tags = new [] { "grid header","header" }
+                        },
+                      new Example
+                        {
+                            Name = "Header with column picker",
+                            Path="datagrid-custom-header-columnpicker",
+                            Title = "Blazor DataGrid grouping API",
+                            Tags = new [] { "grid header","header" }
+                        }
+                    }
+                },
+                new Example()
+                {
                     Name = "GridLines",
                     New = true,
                     Path = "datagrid-grid-lines",
@@ -560,19 +583,19 @@ namespace RadzenBlazorDemos
             Icon = "&#xe1db",
             Children = new [] {
                 new Example()
-                {
-                    Name = "DataList",
+        {
+            Name = "DataList",
                     Title = "Blazor data list component",
                     Path = "datalist",
                     Icon = "&#xe896",
-                    Tags = new [] { "dataview", "grid", "table" }
+                    Tags = new[] { "dataview", "grid", "table" }
                 },
                 new Example()
-                {
-                    Name = "DataFilter",
+        {
+            Name = "DataFilter",
                     Icon = "&#xef4f",
-                    Tags = new [] { "dataview", "grid", "table", "filter" },
-                    Children = new [] {
+                    Tags = new[] { "dataview", "grid", "table", "filter" },
+                    Children = new[] {
                         new Example
                         {
                             Name = "IQueryable",
@@ -592,28 +615,28 @@ namespace RadzenBlazorDemos
                     }
                 },
                 new Example()
-                {
-                    Name = "Pager",
+        {
+            Name = "Pager",
                     Title = "Blazor paging component",
                     Path = "pager",
                     Icon = "&#xe8be",
-                    Tags = new [] { "pager", "paging" }
+                    Tags = new[] { "pager", "paging" }
                 },
                 new Example()
-                {
-                    Name = "Scheduler",
+        {
+            Name = "Scheduler",
                     Path = "scheduler",
                     Updated = true,
                     Title = "Blazor scheduler component with daily, weekly and monthly views",
                     Icon = "&#xe616",
-                    Tags = new [] { "scheduler", "calendar", "event", "appointment"}
+                    Tags = new[] { "scheduler", "calendar", "event", "appointment" }
                 },
                 new Example()
-                {
-                    Name = "Tree",
+        {
+            Name = "Tree",
                     Icon = "&#xe8ef",
-                    Tags = new [] { "tree", "treeview", "nodes", "hierarchy" },
-                    Children = new [] {
+                    Tags = new[] { "tree", "treeview", "nodes", "hierarchy" },
+                    Children = new[] {
                         new Example
                         {
                             Name = "Inline definition",
@@ -652,12 +675,12 @@ namespace RadzenBlazorDemos
                     }
                 },
             }
-        },
+},
         new Example()
         {
             Name = "Images",
             Icon = "&#xe3d3",
-            Children = new [] {
+            Children = new[] {
                 new Example()
                 {
                     Name = "Gravatar",
@@ -676,9 +699,9 @@ namespace RadzenBlazorDemos
         },
         new Example()
         {
-            Name="Layout",
+            Name = "Layout",
             Icon = "&#xe8f1",
-            Children = new [] {
+            Children = new[] {
                 new Example()
                 {
                     Name = "Layout",
@@ -752,9 +775,9 @@ namespace RadzenBlazorDemos
         },
         new Example()
         {
-            Name="Navigation",
+            Name = "Navigation",
             Icon = "&#xe762",
-            Children = new [] {
+            Children = new[] {
                 new Example()
                 {
                     Name = "Accordion",
@@ -842,7 +865,7 @@ namespace RadzenBlazorDemos
         {
             Name = "Forms",
             Icon = "&#xf1c1",
-            Children = new [] {
+            Children = new[] {
                 new Example()
                 {
                     Name = "AutoComplete",
@@ -1120,7 +1143,7 @@ namespace RadzenBlazorDemos
         {
             Name = "Data Visualization",
             Icon = "&#xe4fb",
-            Children= new [] {
+            Children = new[] {
                 new Example
                 {
                     Name="Chart",
@@ -1281,7 +1304,7 @@ namespace RadzenBlazorDemos
         {
             Name = "Feedback",
             Icon = "&#xe0cb",
-            Children = new [] {
+            Children = new[] {
                 new Example()
                 {
                     Name = "Badge",
@@ -1346,7 +1369,7 @@ namespace RadzenBlazorDemos
         {
             Name = "Validators",
             Icon = "&#xf1c2",
-            Children = new [] {
+            Children = new[] {
                 new Example()
                 {
                     Name = "CompareValidator",
