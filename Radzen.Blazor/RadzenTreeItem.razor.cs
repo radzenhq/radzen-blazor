@@ -361,7 +361,7 @@ namespace Radzen.Blazor
             var p = ParentItem;
             while (p != null)
             {
-                if (value == false && p.AreAllChildrenUnchecked(i => !object.Equals(i, Value)))
+                if (value == false && (p.AreAllChildrenUnchecked(i => !object.Equals(i, Value)) || p.IsOneChildUnchecked()))
                 {
                     await Tree.SetCheckedValues(GetCheckedValues().Except(new object[] { p.Value }));
                 }
