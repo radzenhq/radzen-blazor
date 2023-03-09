@@ -30,6 +30,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem>
     {
+        private bool IsInInlineEditOrAddState = false;
 #if NET5_0_OR_GREATER
         /// <summary>
         /// Gets or sets a value indicating whether this instance is virtualized.
@@ -637,7 +638,7 @@ namespace Radzen.Blazor
 
         internal void OnSort(EventArgs args, RadzenDataGridColumn<TItem> column)
         {
-            if (AllowSorting && column.Sortable)
+            if ((AllowSorting && column.Sortable) && IsInInlineEditOrAddState == false )
             {
                 var property = column.GetSortProperty();
                 if (!string.IsNullOrEmpty(property))
@@ -2195,7 +2196,7 @@ namespace Radzen.Blazor
             {
                 CancelEditRow(itemToInsert);
             }
-
+            IsInInlineEditOrAddState = true;
             await EditRowInternal(item);
         }
 
@@ -2273,7 +2274,7 @@ namespace Radzen.Blazor
                         await RowUpdate.InvokeAsync(item);
                     }
                 }
-
+                IsInInlineEditOrAddState = false;
                 StateHasChanged();
             }
         }
@@ -2323,6 +2324,7 @@ namespace Radzen.Blazor
                     StateHasChanged();
                 }
             }
+            IsInInlineEditOrAddState = false;
         }
 
         /// <summary>
@@ -2339,6 +2341,7 @@ namespace Radzen.Blazor
                     editContexts.Remove(item);
                 }
             }
+            IsInInlineEditOrAddState = false;
             StateHasChanged();
         }
 
@@ -2382,7 +2385,7 @@ namespace Radzen.Blazor
                 }
 #endif
             }
-
+            IsInInlineEditOrAddState = true; 
             await EditRowInternal(item);
         }
 
