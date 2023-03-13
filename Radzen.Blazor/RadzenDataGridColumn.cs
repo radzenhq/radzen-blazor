@@ -915,6 +915,11 @@ namespace Radzen.Blazor
         public void SetWidth(string value)
         {
             runtimeWidth = value;
+
+            if (IsFrozen())
+            {
+                Grid.ChangeState();
+            }
         }
 
         /// <summary>
