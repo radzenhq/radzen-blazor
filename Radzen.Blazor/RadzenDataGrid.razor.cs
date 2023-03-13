@@ -1307,6 +1307,7 @@ namespace Radzen.Blazor
             get
             {
                 var orderBy = GetOrderBy();
+                Query.OrderBy = orderBy;
 
                 if (LoadData.HasDelegate)
                 {
