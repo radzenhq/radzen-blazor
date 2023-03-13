@@ -22,7 +22,7 @@ namespace Radzen
         /// <summary>
         /// Gets a reference to the HTML element rendered by the component.
         /// </summary>
-        public ElementReference Element { get; internal set; }
+        public ElementReference Element { get; protected set; }
 
         /// <summary>
         /// A callback that will be invoked when the user hovers the component. Commonly used to display a tooltip via 
