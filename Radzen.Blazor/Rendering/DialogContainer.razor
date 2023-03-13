@@ -85,8 +85,8 @@
 
     void OnDrag(DraggableEventArgs args)
     {
-        left = $"left: {args.Rect.Left + (args.ClientX - clientX)}px;";
-        top = $"top: {args.Rect.Top + (args.ClientY - clientY)}px;";
+        left = string.Format(System.Globalization.CultureInfo.InvariantCulture, "left: {0}px;", args.Rect.Left + (args.ClientX - clientX));
+        top = string.Format(System.Globalization.CultureInfo.InvariantCulture, "top: {0}px;", args.Rect.Top + (args.ClientY - clientY));
     }
 
     bool shouldRender = true;
