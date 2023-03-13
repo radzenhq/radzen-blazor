@@ -670,7 +670,7 @@ namespace Radzen
             {
                 return $"{property} {odataFilterOperator} {value}";
             }
-            else if (PropertyAccess.IsEnum(column.FilterPropertyType))
+            else if (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
             {
                 return $"{property} {odataFilterOperator} '{value}'";
             }
@@ -1289,7 +1289,7 @@ namespace Radzen
                     {
                         value = $"''";
                     }
-                    else if (column.FilterPropertyType == typeof(string) || PropertyAccess.IsEnum(column.FilterPropertyType))
+                    else if (column.FilterPropertyType == typeof(string) || PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
                     {
                         value = $"'{value}'";
                     }
