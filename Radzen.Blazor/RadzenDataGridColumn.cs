@@ -207,6 +207,22 @@ namespace Radzen.Blazor
         [Parameter]
         public string Title { get; set; }
 
+        string _title;
+
+        /// <summary>
+        /// Gets the column title.
+        /// </summary>
+        /// <returns>System.String.</returns>
+        public string GetTitle()
+        {
+            return _title ?? Title;
+        }
+
+        internal void SetTitle(string value)
+        {
+            _title = value;
+        }
+
         /// <summary>
         /// Gets or sets the property name.
         /// </summary>
@@ -439,9 +455,9 @@ namespace Radzen.Blazor
             {
                 return HeaderTemplate;
             }
-            else if (!string.IsNullOrEmpty(Title))
+            else if (!string.IsNullOrEmpty(GetTitle()))
             {
-                return Title;
+                return GetTitle();
             }
             else
             {

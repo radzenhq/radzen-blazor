@@ -11,14 +11,14 @@
                     @onmousedown:preventDefault="true"
                     @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex))></span>
         }
-        <span class="rz-column-title" title="@Column.Title">
+        <span class="rz-column-title" title="@Column.GetTitle()">
             @if (Column.HeaderTemplate != null)
             {
                 <span class="rz-column-title-content">@Column.HeaderTemplate</span>
             }
             else
             {
-                <span class="rz-column-title-content">@Column.Title</span>
+                <span class="rz-column-title-content">@Column.GetTitle()</span>
             }
 
         @if (Grid.AllowSorting && Column.Sortable)
