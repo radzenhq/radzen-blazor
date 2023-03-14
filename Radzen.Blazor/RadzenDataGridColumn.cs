@@ -194,7 +194,7 @@ namespace Radzen.Blazor
         {
             _visible = value;
 
-            if (Grid != null)
+            if (Grid != null && Pickable)
             {
                 Grid.UpdatePickableColumn(this, _visible == true);
             }
