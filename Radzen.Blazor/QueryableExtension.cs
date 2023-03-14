@@ -601,7 +601,11 @@ namespace Radzen
                 property = $"tolower({property})";
             }
 
-            if (column.FilterPropertyType == typeof(string))
+            if (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
+            {
+                return $"{property} {odataFilterOperator} '{value}'";
+            }
+            else if (column.FilterPropertyType == typeof(string))
             {
                 if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.Contains)
                 {
@@ -669,10 +673,6 @@ namespace Radzen
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
             {
                 return $"{property} {odataFilterOperator} {value}";
-            }
-            else if (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
-            {
-                return $"{property} {odataFilterOperator} '{value}'";
             }
             else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
             {
