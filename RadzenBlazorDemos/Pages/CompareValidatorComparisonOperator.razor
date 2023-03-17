@@ -10,7 +10,7 @@
                         <RadzenLabel Text="Operator" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8">
-                        <RadzenDropDown @bind-Value=@compareOperator Data=@Enum.GetValues(typeof(CompareOperator)) Style="width: 100%" />
+                        <RadzenDropDown @bind-Value=@compareOperator Data=@(Enum.GetValues(typeof(CompareOperator)).Cast<CompareOperator>()) Style="width: 100%" />
                     </RadzenColumn>
                 </RadzenRow>
                 <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
