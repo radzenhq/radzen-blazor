@@ -295,7 +295,7 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="options">The options.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions options = null)
+        public virtual async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions options = null)
         {
             var dialogOptions = new DialogOptions()
             {
@@ -353,7 +353,7 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="options">The options.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public async Task<bool?> Alert(string message = "", string title = "Message", AlertOptions options = null)
+        public virtual async Task<bool?> Alert(string message = "", string title = "Message", AlertOptions options = null)
         {
             var dialogOptions = new DialogOptions()
             {
