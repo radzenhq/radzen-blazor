@@ -298,6 +298,15 @@ namespace Radzen
                 }
                 await ValueChanged.InvokeAsync((T)(object)list);
             }
+            else if (typeof(T).IsGenericType && typeof(ICollection<>).MakeGenericType(typeof(T).GetGenericArguments()[0]).IsAssignableFrom(typeof(T)))
+            {
+                var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(typeof(T).GetGenericArguments()[0]));
+                foreach (var i in (IEnumerable)internalValue)
+                {
+                    list.Add(i);
+                }
+                await ValueChanged.InvokeAsync((T)(object)list);
+            }
             else
             {
                 await ValueChanged.InvokeAsync((T)internalValue);
@@ -1085,6 +1094,22 @@ namespace Radzen
                         else
                         {
                             var list = (IList)Activator.CreateInstance(typeof(T));
+                            foreach (var i in (IEnumerable)internalValue)
+                            {
+                                list.Add(i);
+                            }
+                            await ValueChanged.InvokeAsync((T)(object)list);
+                        }
+                    }
+                    else if (typeof(T).IsGenericType && typeof(ICollection<>).MakeGenericType(typeof(T).GetGenericArguments()[0]).IsAssignableFrom(typeof(T)))
+                    {
+                        if (object.Equals(internalValue, null))
+                        {
+                            await ValueChanged.InvokeAsync(default(T));
+                        }
+                        else
+                        {
+                            var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(typeof(T).GetGenericArguments()[0]));
                             foreach (var i in (IEnumerable)internalValue)
                             {
                                 list.Add(i);
