@@ -75,6 +75,9 @@
     IEnumerable<Customer> customers;
     IEnumerable<Employee> employees;
 
+    Order orderToInsert;
+    Order orderToUpdate;
+
     void Reset()
     {
         orderToInsert = null;
@@ -161,9 +164,6 @@
             await ordersGrid.Reload();
         }
     }
-
-    Order orderToInsert;
-    Order orderToUpdate;
 
     async Task InsertRow()
     {
