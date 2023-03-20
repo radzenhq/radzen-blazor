@@ -56,7 +56,11 @@ namespace Radzen
             }
             set
             {
-                _PageSize = value;
+                if (_PageSize != value)
+                {
+                    _PageSize = value;
+                    OnPageSizeChanged(value);
+                }
             }
         }
 
