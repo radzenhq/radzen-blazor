@@ -3,10 +3,10 @@
 @if (Visible)
 {
     <RadzenMenuItemWrapper Item="@this" @attributes="@Attributes" class="@GetCssClass()" style="@Style">
-        <div class="rz-navigation-item-wrapper" @attributes="getOpenEvents()">
-            @if (!string.IsNullOrEmpty(Path))
+    <div class="rz-navigation-item-wrapper" @attributes="getOpenEvents()">
+        @if (!string.IsNullOrEmpty(Path))
             {
-                <NavLink target="@Target" class="rz-navigation-item-link" href="@Path">
+                <NavLink target="@Target" class="rz-navigation-item-link" href="@Path" Match="@Match">
                     @if (!string.IsNullOrEmpty(Icon))
                     {
                         <i class="rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>
@@ -15,7 +15,7 @@
                     {
                         <img class="rz-navigation-item-icon" src="@Image" />
                     }
-                    @if(Template != null)
+                    @if (Template != null)
                     {
                         @Template
                     }
@@ -40,7 +40,7 @@
                     {
                         <img class="rz-navigation-item-icon" src="@Image" />
                     }
-                    @if(Template != null)
+                    @if (Template != null)
                     {
                         @Template
                     }

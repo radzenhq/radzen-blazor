@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Radzen.Blazor
 {
@@ -60,6 +61,12 @@ namespace Radzen.Blazor
         public string Image { get; set; }
 
         /// <summary>
+        /// Gets or sets the navigation link match.
+        /// </summary>
+        /// <value>The navigation link match.</value>
+        public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+
+        /// <summary>
         /// Gets or sets the template.
         /// </summary>
         /// <value>The template.</value>
@@ -95,8 +102,8 @@ namespace Radzen.Blazor
         {
             if (Parent != null)
             {
-                var eventArgs = new MenuItemEventArgs 
-                { 
+                var eventArgs = new MenuItemEventArgs
+                {
                     Text = Text,
                     Path = Path,
                     Value = Value,
