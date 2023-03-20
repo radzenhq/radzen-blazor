@@ -28,7 +28,7 @@
         <RadzenStepsItem Text="Orders" Disabled="@(selectedCustomers == null || selectedCustomers != null && !selectedCustomers.Any())">
             <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="rz-my-6">2. Select an Order to continue</RadzenText>
             <RadzenDataGrid ColumnWidth="150px" PageSize="5" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
-                        Data="@(selectedCustomers != null && selectedCustomers.Any() ? orders.Where(o => o.CustomerID == selectedCustomers[0].CustomerID) : Enumerable.Empty<Order>())" TItem="Order" @bind-Value="@selectedOrders">
+                        Data="@ordersByCustomers" TItem="Order" @bind-Value="@selectedOrders">
                 <Columns>
                     <RadzenDataGridColumn Width="120px" TItem="Order" Property="OrderID" Title="Order ID" />
                     <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
@@ -72,7 +72,7 @@
         <RadzenStepsItem Text="Order Details" Disabled="@(selectedOrders == null || selectedOrders != null && !selectedOrders.Any())">
             <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="rz-my-6">Order Details</RadzenText>
             <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true"
-                        Data="@(selectedOrders != null && selectedOrders.Any() ? orderDetails.Where(o => o.OrderID == selectedOrders[0].OrderID) : Enumerable.Empty<OrderDetail>())" TItem="OrderDetail" ColumnWidth="200px">
+                        Data="@(orderDetailsByOrders)" TItem="OrderDetail" ColumnWidth="200px">
                 <Columns>
                     <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
                     <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
@@ -102,8 +102,21 @@
         orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
         orderDetails = dbContext.OrderDetails.Include("Product").ToList();
     }
+
+    IEnumerable<Order> ordersByCustomers;
+    IEnumerable<OrderDetail> orderDetailsByOrders;
+
     void OnChange(int index)
     {
         console.Log($"Step with index {index} was selected.");
+
+        if (index == 1)
+        {
+            ordersByCustomers = selectedCustomers != null && selectedCustomers.Any() ? orders.Where(o => o.CustomerID == selectedCustomers[0].CustomerID) : Enumerable.Empty<Order>();
+        }
+        else if (index == 2)
+        {
+            orderDetailsByOrders = selectedOrders != null && selectedOrders.Any() ? orderDetails.Where(o => o.OrderID == selectedOrders[0].OrderID) : Enumerable.Empty<OrderDetail>();
+        }
     }
 }
