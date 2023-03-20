@@ -1,4 +1,4 @@
-﻿@inherits RadzenComponent
+@inherits RadzenComponent
 
 @if (Visible)
 {
@@ -23,8 +23,8 @@
             <div class="rz-form-row">
                 <label class="rz-label"></label>
                 <div class="rz-form-input-wrapper">
-                    <RadzenSwitch @bind-Value="@rememberMe" id=@Id("rememberMe") />
-                    <label class="rz-label" for=@Id("rememberme")>@RememberMeText</label>
+                    <RadzenSwitch @bind-Value="@rememberMe" id=@Id("rememberMe") Name="RememberMe" />
+                    <label class="rz-label" for="RememberMe">@RememberMeText</label>
                 </div>
             </div>
 }
