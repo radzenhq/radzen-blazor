@@ -1,0 +1,22 @@
+﻿<RadzenHtmlEditor style="height: 200px;">
+    <RadzenHtmlEditorCustomTool>
+        <Template Context="editor">
+            <RadzenDatePicker Change=@(args => OnDateChange(args, editor)) TValue="DateTime" />
+        </Template>
+    </RadzenHtmlEditorCustomTool>
+</RadzenHtmlEditor>
+
+@code {
+    async Task OnDateChange(DateTime? date, RadzenHtmlEditor editor)
+    {
+        if (date != null)
+        {
+            await InsertDate(editor, date.Value);
+        }
+    }
+
+    async Task InsertDate(RadzenHtmlEditor editor, DateTime date)
+    {
+        await editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, $"<strong>{date.ToLongDateString()}</strong>");
+    }
+}

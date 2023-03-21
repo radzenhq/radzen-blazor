@@ -7,6 +7,77 @@
     Demonstration and configuration of the Radzen Blazor <strong>HtmlEditor</strong> component.
 </RadzenText>
 
-<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorConfig">
-    <HtmlEditorConfig />
+<RadzenText ID="get-set-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and set the value
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the HtmlEditor has a <code>Value</code> property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorGetSetValue">
+    <HtmlEditorGetSetValue />
+</RadzenExample>
+
+<RadzenText ID="default-set-of-tools" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Default set of tools
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Here is an example of RadzenHtmlEditor with the default set of tools.
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorDefaultTools">
+    <HtmlEditorDefaultTools />
+</RadzenExample>
+
+<RadzenText ID="all-tools" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    All tools
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+The Radzen HtmlEditor supports the following tools:
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    <ul style="line-height: 2rem">
+        <li>RadzenHtmlEditorUndo - allows the user to undo the last action (result of other tool, typing or pasting).</li>
+        <li>RadzenHtmlEditorRedo - allows the use to redo the last undone action.</li>
+        <li>RadzenHtmlEditorSeparator - displays a vertical separator used to delimit group of similar tools.</li>
+        <li>RadzenHtmlEditorBold - toggles the bold style of the selected text.</li>
+        <li>RadzenHtmlEditorItalic - toggles the italic style of the selected text.</li>
+        <li>RadzenHtmlEditorUnderline - toggles the underline style of the selected text.</li>
+        <li>RadzenHtmlEditorStrikeThrough - toggles the strikethrough style of the selected text.</li>
+        <li>RadzenHtmlEditorAlignLeft - toggles left text alignment.</li>
+        <li>RadzenHtmlEditorAlignCenter - toggles center text alignment.</li>
+        <li>RadzenHtmlEditorAlignRight - toggles right text alignment.</li>
+        <li>RadzenHtmlEditorJustify - toggles justified text alignment.</li>
+        <li>RadzenHtmlEditorIndent - indents the selected text.</li>
+        <li>RadzenHtmlEditorOutdent - outdents the selected text.</li>
+        <li>RadzenHtmlEditorUnorderedList - inserts unordered (bullet) list.</li>
+        <li>RadzenHtmlEditorOrderedList - inserts ordered (numbered) list.</li>
+        <li>RadzenHtmlEditorColor - sets the foreground color of the selected text.</li>
+        <li>RadzenHtmlEditorBackground - sets the background color of the selected text.</li>
+        <li>RadzenHtmlEditorRemoveFormat - removes the visual styling of the selected text.</li>
+        <li>RadzenHtmlEditorSubscript - converts the selected text to subscript.</li>
+        <li>RadzenHtmlEditorSuperscript - converts the selected text to superscript</li>
+        <li>RadzenHtmlEditorLink - inserts a hyperlink.</li>
+        <li>RadzenHtmlEditorUnlink - removes a hyperlink.</li>
+        <li>RadzenHtmlEditorImage - allows the user to insert an image by either uploading a file or selecting a URL. Requires File upload to be implemented and the UploadUrl property of the HtmlEditor to be set.</li>
+        <li>RadzenHtmlEditorFontName - set the font of the selected text.</li>
+        <li>RadzenHtmlEditorFontSize - set the font size of the selected text.</li>
+        <li>RadzenHtmlEditorFormatBlock - allows the user to format the selected text as heading or paragraph.</li>
+        <li>RadzenHtmlEditorCustomTool - allows the developer to implement a custom tool.</li>
+    </ul>
+</RadzenText>
+
+<RadzenText ID="custom-set-of-tools" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom set of tools (text-editing only)
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Here is how to specify a custom set of tools.
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorCustomToolsSet">
+    <HtmlEditorCustomToolsSet />
+</RadzenExample>
+
+<RadzenText ID="get-set-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Upload files
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorUploadUrl">
+    <HtmlEditorUploadUrl />
 </RadzenExample>

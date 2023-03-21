@@ -1,0 +1,29 @@
+﻿@inject DialogService DialogService
+
+<RadzenHtmlEditor style="height: 200px;" Execute=@OnExecute>
+    <RadzenHtmlEditorCustomTool CommandName="InsertImageFromList" Icon="attach_file" />
+</RadzenHtmlEditor>
+
+@code {
+    async Task OnExecute(HtmlEditorExecuteEventArgs args)
+    {
+        if (args.CommandName == "InsertImageFromList")
+        {
+            await InsertImageFromList(args.Editor);
+        }
+    }
+
+    async Task InsertImageFromList(RadzenHtmlEditor editor)
+    {
+        await editor.SaveSelectionAsync();
+
+        var result = await DialogService.OpenAsync<HtmlEditorCustomDialog>("Select image file"); 
+
+        await editor.RestoreSelectionAsync();
+
+        if (result != null)
+        {
+            await editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, $"<img style=\"max-width: 100%\" src=\"{result}\">");
+        }
+    }
+}
