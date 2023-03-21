@@ -2,10 +2,10 @@
 
 @inherits DbContextPage
 
-<div class="rz-p-12 rz-text-align-center">
+<div class="rz-p-sm-12 rz-text-align-center">
     <RadzenDropDown @bind-Value=@values Data=@products TextProperty="ProductName" ValueProperty="ProductID"
                     Multiple=true AllowClear=true Placeholder="Select products" 
-                    MaxSelectedLabels="2" SelectAllText="Select all items" SelectedItemsText="are now selected" />
+                    MaxSelectedLabels="2" SelectAllText="Select all items" SelectedItemsText="are now selected" Style="width: 100%; max-width: 400px;" />
 </div>
 
 @code {

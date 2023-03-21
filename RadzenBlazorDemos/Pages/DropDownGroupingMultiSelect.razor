@@ -5,9 +5,9 @@
 
 @inherits DbContextPage
 
-<div class="rz-p-12 rz-text-align-center">
+<div class="rz-p-sm-12 rz-text-align-center">
     <RadzenDropDown @bind-Value=values Multiple=true AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                    Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID" TextProperty="OrderID" MaxSelectedLabels="1">
+                    Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID" TextProperty="OrderID" MaxSelectedLabels="1" Style="width: 100%; max-width: 400px;" >
         <Template>
                 @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")
         </Template>

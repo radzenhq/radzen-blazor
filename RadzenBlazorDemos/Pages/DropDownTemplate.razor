@@ -2,8 +2,8 @@
 
 @inherits DbContextPage
 
-<div class="rz-p-12 rz-text-align-center">
-    <RadzenDropDown @bind-Value=@value Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID">
+<div class="rz-p-sm-12 rz-text-align-center">
+    <RadzenDropDown @bind-Value=@value Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Style="width: 400px;">
         <Template>
             Company: @((context as Customer).CompanyName)
         </Template>
