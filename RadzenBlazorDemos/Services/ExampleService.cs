@@ -1003,7 +1003,6 @@ namespace RadzenBlazorDemos
                             Name = "Default Tools",
                             Path = "html-editor",
                             Title = "Blazor HTML editor componenet with lots of built-in tools",
-                            Icon = "&#xe3c9",
                             Tags = new [] { "html", "editor", "rich", "text" }
                         },
                         new Example()
@@ -1011,7 +1010,6 @@ namespace RadzenBlazorDemos
                             Name = "Custom Tools",
                             Path = "html-editor-custom-tools",
                             Title = "Blazor HTML editor componenet with custom tools",
-                            Icon = "&#xe8b8",
                             Tags = new [] { "html", "editor", "rich", "text", "tool", "custom" }
                         },
                     }
