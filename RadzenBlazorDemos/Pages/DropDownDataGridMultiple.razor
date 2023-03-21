@@ -13,7 +13,7 @@
                 </HeaderTemplate>
                 <Template Context="data">
                     <RadzenCheckBox TriState="false" Value="@(values != null && values.Contains(((Customer) data).CustomerID))"
-                                    TValue="bool" Change=@(args => grid.SelectItem(data)) />
+                                    TValue="bool" Change=@(args => grid.SelectItem(data)) @onclick:stopPropagation/>
                 </Template>
             </RadzenDropDownDataGridColumn>
             <RadzenDropDownDataGridColumn Property="CustomerID" Title="CustomerID" Width="80px" />
