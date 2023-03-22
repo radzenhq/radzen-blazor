@@ -42,7 +42,7 @@
     position: relative;
     overflow: hidden;
   
-    &:not(.rz-state-disabled):after {
+    &:not(.rz-state-disabled):before {
       content: "";
       position: absolute;
       inset: 0;
@@ -53,7 +53,7 @@
     }
   
     &:not(.rz-state-disabled):active {
-      &:after {
+      &:before {
         transition: background 0s, opacity 0s;
         opacity: .32;
         background-size: 100%;
