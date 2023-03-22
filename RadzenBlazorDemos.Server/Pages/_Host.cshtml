@@ -62,9 +62,9 @@
         var instances = {};
         function createEditor(element, id, ref, options) {
             var instance = monaco.editor.create(element, options);
-            instance.onDidChangeModelContent = function () {
+            instance.onDidChangeModelContent(function () {
                 ref.invokeMethodAsync('OnChangeAsync', instance.getValue());
-            };
+            });
             instances[id] = instance;
             return instance;
         }
