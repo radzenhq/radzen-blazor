@@ -104,6 +104,54 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DataGrid_Renders_TitleAttribute()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add(p => p.ShowColumnTitleAsTooltip, true);
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Title", "MyId");
+                    builder.CloseComponent();
+                });
+            });
+
+            var title = component.Find(".rz-column-title");
+            Assert.Equal("MyId", title.TextContent.Trim());
+            Assert.Equal("MyId", title.GetAttribute("title"));
+        }
+
+        [Fact]
+        public void DataGrid_DoesNotRender_TitleAttribute()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add(p => p.ShowColumnTitleAsTooltip, false);
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Title", "MyId");
+                    builder.CloseComponent();
+                });
+            });
+
+            var title = component.Find(".rz-column-title");
+            Assert.Equal("MyId", title.TextContent.Trim());
+            Assert.Empty(title.GetAttribute("title"));
+        }
+
+        [Fact]
         public void DataGrid_Renders_AllowSortingParameter()
         {
             using var ctx = new TestContext();

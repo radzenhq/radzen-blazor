@@ -1092,6 +1092,13 @@ namespace Radzen.Blazor
         public bool ShowCellDataAsTooltip { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether column title should be shown as tooltip.
+        /// </summary>
+        /// <value><c>true</c> if column title is shown as tooltip; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowColumnTitleAsTooltip { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the column picker columns showing text.
         /// </summary>
         /// <value>The column picker columns showing text.</value>

@@ -11,7 +11,7 @@
                     @onmousedown:preventDefault="true"
                     @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex))></span>
         }
-        <span class="rz-column-title" title="@Column.GetTitle()">
+        <span class="rz-column-title" title="@(Grid.ShowColumnTitleAsTooltip ? @Column.GetTitle() : "")">
             @if (Column.HeaderTemplate != null)
             {
                 <span class="rz-column-title-content">@Column.HeaderTemplate</span>
