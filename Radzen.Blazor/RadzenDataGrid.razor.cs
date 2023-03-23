@@ -2869,6 +2869,10 @@ namespace Radzen.Blazor
                 {
                     return element.GetDouble();
                 }
+                else if (type == typeof(decimal) || type == typeof(decimal?))
+                {
+                    return element.GetDecimal();
+                }
                 else if (type == typeof(bool) || type == typeof(bool?))
                 {
                     return element.GetBoolean();
