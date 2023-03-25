@@ -1,9 +1,21 @@
-﻿@inherits RadzenComponent
+﻿@using Microsoft.AspNetCore.Components.Routing
+@inherits RadzenComponent
 @if (Visible)
 {
-    <Microsoft.AspNetCore.Components.Routing.NavLink style="@Style" href="@Path" @attributes="Attributes" class="@GetCssClass()" target="@Target" id="@GetId()">
+    <NavLink style="@Style" href="@Path" @attributes="Attributes" class="@GetCssClass()" target="@Target" id="@GetId()" Match="@Match">
         @if (!string.IsNullOrEmpty(Icon))
         {
             <i class="rzi">@((MarkupString)Icon)</i>
         }
-        <span @ref="@Element" class="rz-link-text">@if (ChildContent != null) {@ChildContent} else {@Text}</span></Microsoft.AspNetCore.Components.Routing.NavLink>}
+        <span @ref="@Element" class="rz-link-text">
+            @if (ChildContent != null)
+            {
+                @ChildContent
+            }
+            else
+            {
+                @Text
+            }
+        </span>
+    </NavLink>
+}

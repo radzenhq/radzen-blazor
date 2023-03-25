@@ -64,6 +64,7 @@ namespace Radzen.Blazor
         /// Gets or sets the navigation link match.
         /// </summary>
         /// <value>The navigation link match.</value>
+        [Parameter]
         public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
 
         /// <summary>
