@@ -205,11 +205,6 @@
         }
     }
 
-    void OnSlotClickMouse(MouseEventArgs args, DateTime date)
-    { 
-        Scheduler.SelectSlot(date, date.AddDays(1)); 
-    }
-
     async Task OnSlotEventClick(DateTime data)
     {
         DialogService.Close();
