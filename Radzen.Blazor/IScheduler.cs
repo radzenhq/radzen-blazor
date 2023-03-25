@@ -59,6 +59,11 @@ namespace Radzen.Blazor
         /// <param name="end">The end.</param>
         Task SelectSlot(DateTime start, DateTime end);
         /// <summary>
+        /// Selects the specified slot when more text is clicked.
+        /// </summary>
+        /// <param name="date">The date.</param>
+        Task SelectMore(DateTime date);
+        /// <summary>
         /// Gets the appointment HTML attributes.
         /// </summary>
         /// <param name="item">The appointment.</param>
@@ -91,5 +96,17 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The culture.</value>
         CultureInfo Culture { get; set; }
+        /// <summary>
+        /// Returns a bool indicating whether the SelectAppointment Action has a delegate.
+        /// </summary>
+        bool HasSelectAppointmentDelegate { get; }
+        /// <summary>
+        /// Returns a bool indicating whether the SelectSlot Action has a delegate.
+        /// </summary>
+        bool HasSelectSlotDelegate { get; }
+        /// <summary>
+        /// Returns a bool indicating whether the SelectMore Action has a delegate.
+        /// </summary>
+        bool HasSelectMoreDelegate { get; }
     }
 }

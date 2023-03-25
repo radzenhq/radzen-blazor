@@ -206,15 +206,22 @@
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
     {
-        await DialogService.OpenAsync(date.ToShortDateString(), ds =>
+        if (Scheduler.HasSelectMoreDelegate)
+        {
+            await Scheduler.SelectMore(date);
+        }
+        else
+        {
+            await DialogService.OpenAsync(date.ToShortDateString(), ds =>
     @<div class="rz-event-list">
         <CascadingValue Value=@Scheduler>
             @foreach (var item in appointments)
-            {
-                <Appointment Data=@item Click="OnListEventClick" />
-            }
+                {
+            <Appointment Data=@item Click="OnListEventClick" />
+                }
         </CascadingValue>
     </div>);
+        }
     }
 
     async Task OnListEventClick(AppointmentData data)

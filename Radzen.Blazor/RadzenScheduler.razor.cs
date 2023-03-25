@@ -156,6 +156,23 @@ namespace Radzen.Blazor
         public EventCallback<SchedulerAppointmentSelectEventArgs<TItem>> AppointmentSelect { get; set; }
 
         /// <summary>
+        /// A callback that will be invoked when the user clicks the more text in the current view. Commonly used to view additional appointments.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments MoreSelect=@OnMoreSelect&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        ///  void OnMoreSelect(DateTime args) 
+        ///  {
+        ///  }
+        /// }
+        /// </code>
+        /// </example>
+        [Parameter]
+        public EventCallback<DateTime> MoreSelect { get; set; }
+
+        /// <summary>
         /// An action that will be invoked when the current view renders an appointment. Never call <c>StateHasChanged</c> when handling AppointmentRender.
         /// </summary>
         /// <example>
@@ -203,6 +220,22 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public EventCallback<SchedulerLoadDataEventArgs> LoadData { get; set; }
+
+        /// <summary>
+        /// Returns a bool to indicate whether the Scheduler has an AppointmentSelect delgate assigned 
+        /// </summary>
+        /// <value>True or False</value>
+        public bool HasSelectAppointmentDelegate { get { return AppointmentSelect.HasDelegate; } }
+        /// <summary>
+        /// Returns a bool to indicate whether the Scheduler has a SlotSelect delgate assigned 
+        /// </summary>
+        /// <value>True or False</value>
+        public bool HasSelectSlotDelegate { get { return SlotSelect.HasDelegate; } }
+        /// <summary>
+        /// Returns a bool to indicate whether the Scheduler has a MoreSelect delgate assigned 
+        /// </summary>
+        /// <value>True or False</value>
+        public bool HasSelectMoreDelegate { get { return MoreSelect.HasDelegate; } }
 
         IList<ISchedulerView> Views { get; set; } = new List<ISchedulerView>();
 
@@ -256,6 +289,12 @@ namespace Radzen.Blazor
         public async Task SelectAppointment(AppointmentData data)
         {
             await AppointmentSelect.InvokeAsync(new SchedulerAppointmentSelectEventArgs<TItem> { Start = data.Start, End = data.End, Data = (TItem)data.Data });
+        }
+
+        /// <inheritdoc />
+        public async Task SelectMore(DateTime date)
+        {
+            await MoreSelect.InvokeAsync(date);
         }
 
         /// <inheritdoc />
