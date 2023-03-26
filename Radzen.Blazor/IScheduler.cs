@@ -57,7 +57,8 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="start">The start.</param>
         /// <param name="end">The end.</param>
-        Task SelectSlot(DateTime start, DateTime end);
+        /// <param name="appointments">The appointments for this range.</param>
+        Task SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments);
         /// <summary>
         /// Gets the appointment HTML attributes.
         /// </summary>
