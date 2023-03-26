@@ -293,7 +293,16 @@ namespace Radzen.Blazor
             }
         }
 
-        internal async Task DisplayTooltip()
+        internal Task DisplayTooltip()
+        {
+            // just pass the Task through without reawaiting
+            if (Tooltip.NewDetectionMethod)
+                return DisplayTooltipNew();
+            else
+                return DisplayTooltipOld();
+        }
+
+        internal async Task DisplayTooltipOld()
         {
             if (Tooltip.Visible)
             {
@@ -341,6 +350,42 @@ namespace Radzen.Blazor
                     chartTooltipContainer.Refresh();
                     await Task.Yield();
                 }
+            }
+        }
+        internal async Task DisplayTooltipNew()
+        {
+            if (!Tooltip.Visible)
+                return;
+
+            foreach (var series in Series.OrderBy(s => s.RenderingOrder).Reverse())
+            {
+                if (!series.Visible)
+                    continue;
+
+                // if (series.Contains(mouseX - MarginLeft, mouseY - MarginTop, 25))
+                // Currently we don't handle mulitple series
+                if (true)
+                {
+                    var data = series.NewDataAt(mouseX - MarginLeft, mouseY - MarginTop);
+
+                    if (data != tooltipData)
+                    {
+                        tooltipData = data;
+                        tooltip = series.RenderTooltip(data, MarginLeft, MarginTop);
+                        chartTooltipContainer.Refresh();
+                        await Task.Yield();
+                    }
+                    return;
+                }
+            }
+
+            if (tooltip != null)
+            {
+                tooltipData = null;
+                tooltip = null;
+
+                chartTooltipContainer.Refresh();
+                await Task.Yield();
             }
         }
 

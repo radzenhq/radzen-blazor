@@ -97,6 +97,7 @@ namespace Radzen.Blazor
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
         object DataAt(double x, double y);
+        object NewDataAt(double x, double y);
         /// <summary>
         /// Returns data chart position
         /// </summary>

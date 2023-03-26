@@ -15,6 +15,13 @@ namespace Radzen.Blazor
         public bool Visible { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether to show tooltips. By defaults RadzenChart displays tooltips.
+        /// </summary>
+        /// <value><c>true</c> to display tooltips; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool NewDetectionMethod { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the CSS style of the tooltip.
         /// </summary>
         /// <value>The style.</value>

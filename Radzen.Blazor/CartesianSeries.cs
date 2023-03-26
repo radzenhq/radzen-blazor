@@ -576,7 +576,7 @@ namespace Radzen.Blazor
 
             var avgX = Data.Select(e => X(e)).Average();
             var avgY = Data.Select(e => Y(e)).Average();
-            var sumXY = Data.Sum(e => (X(e) - avgX) * (Y(e) - avgY));         
+            var sumXY = Data.Sum(e => (X(e) - avgX) * (Y(e) - avgY));
             if (Chart.ShouldInvertAxes())
             {
                 var sumYSq = Data.Sum(e => (Y(e) - avgY) * (Y(e) - avgY));
@@ -682,6 +682,24 @@ namespace Radzen.Blazor
 
             return null;
         }
+        public virtual object NewDataAt(double x, double y)
+        {
+            if (!Items.Any())
+                return null;
+
+            Func<TItem, double> dist_squared = item => {
+                var dx = TooltipX(item) - x;
+                var dy = TooltipY(item) - y;
+                return dx * dx + dy * dy;
+                };
+
+            return Items.Select(item =>
+            {
+                var distance = dist_squared(item);
+                return new { Item = item, Distance = distance };
+            }).Aggregate((a, b) => a.Distance < b.Distance ? a : b).Item;
+
+        }
 
         /// <inheritdoc />
         public virtual IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
@@ -690,8 +708,8 @@ namespace Radzen.Blazor
 
             foreach (var d in Data)
             {
-                list.Add(new ChartDataLabel 
-                { 
+                list.Add(new ChartDataLabel
+                {
                     Position = new Point { X = TooltipX(d) + offsetX, Y = TooltipY(d) + offsetY },
                     TextAnchor = "middle",
                     Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
