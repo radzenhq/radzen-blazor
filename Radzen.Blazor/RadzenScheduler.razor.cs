@@ -156,23 +156,6 @@ namespace Radzen.Blazor
         public EventCallback<SchedulerAppointmentSelectEventArgs<TItem>> AppointmentSelect { get; set; }
 
         /// <summary>
-        /// A callback that will be invoked when the user clicks a day in the YearView only. Commonly used to add or edit existing appointments.
-        /// </summary>
-        /// <example>
-        /// <code>
-        /// &lt;RadzenScheduler Data=@appointments DaySelect=@OnDaySelect&gt;
-        /// &lt;/RadzenScheduler&gt;
-        /// @code {
-        ///  void OnDaySelect(SchedulerDaySelectEventArgs args) 
-        ///  {
-        ///  }
-        /// }
-        /// </code>
-        /// </example>
-        [Parameter]
-        public EventCallback<SchedulerDaySelectEventArgs> DaySelect { get; set; }
-
-        /// <summary>
         /// An action that will be invoked when the current view renders an appointment. Never call <c>StateHasChanged</c> when handling AppointmentRender.
         /// </summary>
         /// <example>
@@ -273,12 +256,6 @@ namespace Radzen.Blazor
         public async Task SelectAppointment(AppointmentData data)
         {
             await AppointmentSelect.InvokeAsync(new SchedulerAppointmentSelectEventArgs<TItem> { Start = data.Start, End = data.End, Data = (TItem)data.Data });
-        }
-
-        /// <inheritdoc />
-        public async Task SelectDay(DateTime date, IEnumerable<AppointmentData> appointments)
-        {
-            await DaySelect.InvokeAsync(new SchedulerDaySelectEventArgs { Date = date, Appointments = appointments });
         }
 
         /// <inheritdoc />
