@@ -213,12 +213,6 @@
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
     {
-        if(Scheduler.HasSelectMoreDelegate)
-        {
-            await Scheduler.SelectMore(date);
-        }
-        else
-        {
         await DialogService.OpenAsync(date.ToShortDateString(), ds =>
     @<div class="rz-event-list">
         <CascadingValue Value=@Scheduler>
@@ -228,7 +222,6 @@
             }
         </CascadingValue>
     </div>);
-        }
     }
 
     async Task OnListEventClick(AppointmentData data)

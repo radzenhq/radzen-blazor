@@ -146,7 +146,7 @@
     {
         await Scheduler.SelectAppointment(data);
     }
-    
+
     private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
     {
         if (Appointments == null)
@@ -158,63 +158,30 @@
     }
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
-    {        
+    {
         if (appointments.Count() > 0)
         {
-            if (Scheduler.HasSelectAppointmentDelegate)
-            {
-                if (appointments.Count() == 1 && !Scheduler.HasSelectSlotDelegate)
-                {
-                    await OnAppointmentClick(appointments.FirstOrDefault());
-                }
-                else
-                {
-
-
-                    await DialogService.OpenAsync(date.ToShortDateString(), ds =>
+            await DialogService.OpenAsync(date.ToShortDateString(), ds =>
     @<div class="rz-event-list">
         <CascadingValue Value=@Scheduler>
             @foreach (var item in appointments)
-                {
-                    <Appointment Data=@item Click="OnListEventClick" />
-                }
-            </CascadingValue>
-            <br />
-            @if (Scheduler.HasSelectSlotDelegate)
             {
-                <RadzenButton Text="Slot Clicked" Click="((args) => OnSlotEventClick(date))" />
+                <Appointment Data=@item Click="OnListEventClick" />
             }
-        </div>
-    );
-                }
-            }
-            else
-            {
-                if (Scheduler.HasSelectSlotDelegate)
-                {
-                    await OnSlotClick(date);
-                }
-            }
+        </CascadingValue>
+    </div>
+        );
+
         }
         else
         {
-            if(Scheduler.HasSelectSlotDelegate)
-            {
-                await OnSlotClick(date);
-            }
+            await DialogService.OpenAsync(date.ToShortDateString(), ds =>
+    @<div class="rz-event-list">
+        There are no scheduled events taking place on this day
+    </div>
+    );
+
         }
-    }
-
-    void OnSlotClickMouse(MouseEventArgs args, DateTime date)
-    { 
-        Scheduler.SelectSlot(date, date.AddDays(1)); 
-    }
-
-    async Task OnSlotEventClick(DateTime data)
-    {
-        DialogService.Close();
-
-        await OnSlotClick(data);
     }
 
     async Task OnListEventClick(AppointmentData data)
