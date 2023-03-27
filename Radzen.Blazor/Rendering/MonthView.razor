@@ -112,7 +112,8 @@
     }
 
     async Task OnSlotClick(DateTime date)
-    {        
+    {
+        //force git
         await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInSlot(date, date.AddDays(1)));
     }
 
