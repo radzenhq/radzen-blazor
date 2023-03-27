@@ -48,7 +48,7 @@ namespace Radzen.Blazor
         /// Gets or sets a value indicating Pager density.
         /// </summary>
         [Parameter]
-        public Density Density { get; set; }
+        public Density Density { get; set; } = Density.Default;
 
         /// <summary>
         /// Gets or sets the page size.
