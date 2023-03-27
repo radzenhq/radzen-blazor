@@ -76,5 +76,38 @@ namespace Radzen.Blazor.Tests
             Assert.DoesNotContain(@$"rz-paginator-summary", component.Markup);
         }
 
+        [Fact]
+        public void RadzenPager_Renders_PagerDensityDefault()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            {
+                parameters.Add<int>(p => p.PageSize, 20);
+                parameters.Add<int>(p => p.Count, 100);
+                parameters.Add<Density>(p => p.Density, Density.Default);
+            });
+
+            Assert.DoesNotContain(@$"rz-density-compact", component.Markup);
+        }
+
+        [Fact]
+        public void RadzenPager_Renders_PagerDensityCompact()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            {
+                parameters.Add<int>(p => p.PageSize, 20);
+                parameters.Add<int>(p => p.Count, 100);
+                parameters.Add<Density>(p => p.Density, Density.Compact);
+            });
+
+            Assert.Contains(@$"rz-density-compact", component.Markup);
+        }
     }
 }

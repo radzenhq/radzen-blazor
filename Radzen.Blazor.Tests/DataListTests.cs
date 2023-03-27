@@ -65,6 +65,40 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DataList_Renders_PagerDensityDefault()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add<bool>(p => p.AllowPaging, true);
+                parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.Top);
+                parameters.Add<Density>(p => p.Density, Density.Default);
+            });
+
+            Assert.DoesNotContain(@$"rz-density-compact", component.Markup);
+        }
+
+        [Fact]
+        public void DataList_Renders_PagerDensityCompact()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenDataList<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add<bool>(p => p.AllowPaging, true);
+                parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.Top);
+                parameters.Add<Density>(p => p.Density, Density.Compact);
+            });
+
+            Assert.Contains(@$"rz-density-compact", component.Markup);
+        }
+
+        [Fact]
         public void DataList_Renders_WrapItemsParameter()
         {
             using var ctx = new TestContext();
