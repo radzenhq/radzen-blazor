@@ -5,7 +5,7 @@
 {
     <li style="@Style" @attributes="Attributes" class="@GetCssClass()" @onclick="@OnClick" @onclick:stopPropagation>
         <div class=@(Selected ? "rz-navigation-item-wrapper rz-navigation-item-wrapper-active" : "rz-navigation-item-wrapper")>
-            @if (!string.IsNullOrEmpty(Path))
+            @if (Path != null)
             {
                 <NavLink target="@Target" class=@(Selected ? "rz-navigation-item-link rz-navigation-item-link-active" : "rz-navigation-item-link") href="@Path" Match="@Match">
                     @if (!string.IsNullOrEmpty(Icon))
