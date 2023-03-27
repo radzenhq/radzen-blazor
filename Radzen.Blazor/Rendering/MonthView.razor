@@ -3,85 +3,85 @@
 @using Radzen.Blazor.Rendering
 @inject DialogService DialogService
 
-<div class="rz-view rz-month-view">
-    <div class="rz-view-header">
-        @for (var date = StartDate; date <= StartDate.EndOfWeek(); date = date.AddDays(1))
-        {
-            <div class="rz-slot-header">
-                @date.ToString("ddd", Scheduler.Culture)
-            </div>
-        }
-    </div>
-    @{
+ <div class="rz-view rz-month-view">
+        <div class="rz-view-header">
+            @for(var date = StartDate; date <= StartDate.EndOfWeek(); date = date.AddDays(1))
+            {
+                <div class="rz-slot-header">
+                    @date.ToString("ddd", Scheduler.Culture)
+                </div>
+            }
+        </div>
+    @{ 
         var days = 0;
         var points = new Dictionary<AppointmentData, double>();
     }
     <div class="rz-view-content">
-        @for (var date = StartDate; date < EndDate; date = date.AddDays(7))
-        {
-            <div class="rz-week">
-                <div class="rz-events">
-                    @for (var start = date; start < date.AddDays(7); start = start.AddDays(1))
+    @for (var date = StartDate; date < EndDate; date = date.AddDays(7))
+    {
+        <div class="rz-week">
+            <div class="rz-events">
+                @for (var start = date; start < date.AddDays(7); start = start.AddDays(1))
+                {
+                    var end = start.AddDays(1);
+                    var appointments = AppointmentsInSlot(start, end);
+                    var excessCount = appointments.Count() - MaxAppointmentsInSlot;
+                    var existingTops = ExistingTops(points, appointments.Take(MaxAppointmentsInSlot));
+
+                    @foreach(var item in appointments.Take(MaxAppointmentsInSlot))
                     {
-                        var end = start.AddDays(1);
-                        var appointments = AppointmentsInSlot(start, end);
-                        var excessCount = appointments.Count() - MaxAppointmentsInSlot;
-                        var existingTops = ExistingTops(points, appointments.Take(MaxAppointmentsInSlot));
-
-                        @foreach (var item in appointments.Take(MaxAppointmentsInSlot))
+                        var slotIndex = item.Start.Date.Subtract(date).Days;
+                        var slotWidth = 100 / 7.0;
+                        var left = slotIndex * slotWidth;
+                        var length = Math.Max(1, Math.Ceiling(item.End.Subtract(date).TotalDays) - slotIndex);
+                        var width = item.End <= date.AddDays(7) ? (length) * slotWidth : (7 - slotIndex) * slotWidth;
+                        if (!points.TryGetValue(item, out var top))
                         {
-                            var slotIndex = item.Start.Date.Subtract(date).Days;
-                            var slotWidth = 100 / 7.0;
-                            var left = slotIndex * slotWidth;
-                            var length = Math.Max(1, Math.Ceiling(item.End.Subtract(date).TotalDays) - slotIndex);
-                            var width = item.End <= date.AddDays(7) ? (length) * slotWidth : (7 - slotIndex) * slotWidth;
-                            if (!points.TryGetValue(item, out var top))
-                            {
-                                top = DetermineTop(existingTops);
-                                points.Add(item, top);
-                                existingTops.Add(top);
-                            }
-                            var height = 1.5;
-                            var data = item;
-
-                            @if (item.Start >= start && item.Start <= end)
-                            {
-                                <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick />
-                            }
-                            else if (start == date)
-                            {
-                                left = 0;
-                                length = Math.Max(1, Math.Min(7, Math.Ceiling(item.End.Subtract(date).TotalDays)));
-                                width = length * slotWidth;
-
-                                <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick />
-                            }
+                            top = DetermineTop(existingTops);
+                            points.Add(item, top);
+                            existingTops.Add(top);
                         }
+                        var height = 1.5;
+                        var data = item;
 
-                        @if (excessCount > 0)
+                        @if (item.Start >= start && item.Start <= end)
                         {
-                            var slotIndex = start.Subtract(date).Days;
-                            var slotWidth = 100 / 7.0;
-                            var left = slotIndex * slotWidth;
-                            var top = 1.5 * (MaxAppointmentsInSlot + 1);
-                            var listDate = start;
-                            <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())rem; left: @(left.ToInvariantString())%" @onclick=@(args => OnListClick(listDate, appointments))>@String.Format(MoreText, excessCount)</a>
+                            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick />
+                        }
+                        else if (start == date)
+                        {
+                            left = 0;
+                            length = Math.Max(1, Math.Min(7, Math.Ceiling(item.End.Subtract(date).TotalDays)));
+                            width = length * slotWidth;
+
+                            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick />
                         }
                     }
-                </div>
-                <div class="rz-slots">
-                    @for (var day = 0; day < 7; day++)
+
+                    @if (excessCount > 0)
                     {
-                        var dayOfWeek = StartDate.AddDays(days++);
-                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek)>
-                            <div class="rz-slot-title">
-                                @dayOfWeek.Day
-                            </div>
-                        </div>
+                        var slotIndex = start.Subtract(date).Days;
+                        var slotWidth = 100 / 7.0;
+                        var left = slotIndex * slotWidth;
+                        var top = 1.5 * (MaxAppointmentsInSlot + 1);
+                        var listDate = start;
+                        <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())rem; left: @(left.ToInvariantString())%" @onclick=@(args => OnListClick(listDate, appointments))>@String.Format(MoreText, excessCount)</a>
                     }
-                </div>
+                }
             </div>
-        }
+            <div class="rz-slots">
+            @for (var day = 0; day < 7; day ++)
+            {
+                var dayOfWeek = StartDate.AddDays(days++);
+                <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek)>
+                    <div class="rz-slot-title">
+                        @dayOfWeek.Day
+                    </div>
+                </div>
+            }
+            </div>
+        </div>
+    }
     </div>
 </div>
 
@@ -110,10 +110,10 @@
         attributes["class"] = ClassList.Create("rz-slot").Add(attributes).ToString();
         return attributes;
     }
-
+    
     async Task OnSlotClick(DateTime date)
     {
-        await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInSlot(date, date.AddDays(1)));
+        await Scheduler.SelectSlot(date, date.AddDays(1));
     }
 
     double DetermineTop(HashSet<double> existingTops)
@@ -160,15 +160,15 @@
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
     {
-        await DialogService.OpenAsync(date.ToShortDateString(), ds =>
-    @<div class="rz-event-list">
+     await DialogService.OpenAsync(date.ToShortDateString(), ds =>
+        @<div class="rz-event-list">
         <CascadingValue Value=@Scheduler>
-            @foreach (var item in appointments)
-                {
-             <Appointment Data=@item Click="OnListEventClick" />
-                }
+        @foreach(var item in appointments)
+        {
+            <Appointment Data=@item Click="OnListEventClick" />
+        }
         </CascadingValue>
-    </div>);
+        </div>);
     }
 
     async Task OnListEventClick(AppointmentData data)

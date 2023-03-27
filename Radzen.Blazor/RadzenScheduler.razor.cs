@@ -247,9 +247,9 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public async Task SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments)
+        public async Task SelectSlot(DateTime start, DateTime end)
         {
-            await SlotSelect.InvokeAsync(new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = appointments });
+            await SlotSelect.InvokeAsync(new SchedulerSlotSelectEventArgs { Start = start, End = end });
         }
 
         /// <inheritdoc />
