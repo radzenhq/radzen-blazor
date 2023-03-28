@@ -2936,25 +2936,24 @@ namespace Radzen.Blazor
             {
                 if (settings != value)
                 {
+                    canSaveSettings = false;
+
+                    Groups.Clear();
+                    CurrentPage = 0;
+                    skip = 0;
+                    Reset(true);
+                    allColumns.ToList().ForEach(c =>
+                    {
+                        c.SetVisible(true);
+
+                    });
+                    columns = allColumns.Where(c => c.Parent == null).ToList();
+
                     settings = value;
 
-                    if (settings == null)
-                    {
-                        canSaveSettings = false;
+                    InvokeAsync(Reload);
 
-                        Groups.Clear();
-                        CurrentPage = 0;
-                        skip = 0;
-                        Reset(true);
-                        allColumns.ToList().ForEach(c =>
-                        {
-                            c.SetVisible(true);
-                        });
-                        columns = allColumns.Where(c => c.Parent == null).ToList();
-                        InvokeAsync(Reload);
-
-                        canSaveSettings = true;
-                    }
+                    canSaveSettings = true;
                 }
             }
         }
