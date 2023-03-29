@@ -109,16 +109,16 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender || loaded)
+        if (firstRender)
         {
             await LoadStateAsync();
-            
-            if (loaded)
-            {
-                await Task.Yield();
-                await grid.Reload();
-                loaded = false;
-            }
         }
+
+        if (loaded)
+        {
+            await Task.Yield();
+            await grid.Reload();
+            loaded = false;
+        }        
     }
 }
