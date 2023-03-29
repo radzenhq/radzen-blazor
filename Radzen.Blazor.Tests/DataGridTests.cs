@@ -428,6 +428,44 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DataGrid_Renders_PagerDensityDefault()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add<bool>(p => p.AllowPaging, true);
+                parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.Top);
+                parameters.Add<Density>(p => p.Density, Density.Default);
+            });
+
+            Assert.DoesNotContain(@$"rz-density-compact", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Renders_PagerDensityCompact()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add<bool>(p => p.AllowPaging, true);
+                parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.Top);
+                parameters.Add<Density>(p => p.Density, Density.Compact);
+            });
+
+            Assert.Contains(@$"rz-density-compact", component.Markup);
+        }
+
+        [Fact]
         public void DataGrid_Renders_DefaultEmptyText()
         {
             using var ctx = new TestContext();

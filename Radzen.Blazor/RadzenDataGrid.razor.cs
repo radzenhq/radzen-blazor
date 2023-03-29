@@ -243,12 +243,6 @@ namespace Radzen.Blazor
         public bool Responsive { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating DataGrid density.
-        /// </summary>
-        [Parameter]
-        public Density Density { get; set; }
-
-        /// <summary>
         /// The grouped and paged View
         /// </summary>
         IEnumerable<GroupResult> _groupedPagedView;

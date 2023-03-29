@@ -36,6 +36,12 @@ namespace Radzen
         public HorizontalAlign PagerHorizontalAlign { get; set; } = HorizontalAlign.Justify;
 
         /// <summary>
+        /// Gets or sets a value indicating pager density.
+        /// </summary>
+        [Parameter]
+        public Density Density { get; set; } = Density.Default;
+
+        /// <summary>
         /// Gets or sets a value indicating whether paging is allowed. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if paging is allowed; otherwise, <c>false</c>.</value>
