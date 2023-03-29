@@ -228,6 +228,14 @@ namespace Radzen.Blazor
         public TextAlign TextAlign { get; set; } = TextAlign.Left;
 
         /// <summary>
+        /// Gets or sets whether both a comma and a dot can be used as decimal separator
+        /// Note that the separator will be replaced by the one dictated by the format.
+        /// Default: false
+        /// </summary>
+        [Parameter]
+        public bool AllowBothCommaAndDotAsDecimalSeparator { get; set; } = false;
+
+        /// <summary>
         /// Handles the <see cref="E:Change" /> event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
@@ -257,7 +265,15 @@ namespace Radzen.Blazor
             TValue newValue;
             try
             {
-                BindConverter.TryConvertTo<TValue>(RemoveNonNumericCharacters(value), Culture, out newValue);
+                string decimalSeparator = Culture.NumberFormat.NumberDecimalSeparator;
+                string valueAsString = RemoveNonNumericCharacters(value);
+                if (this.AllowBothCommaAndDotAsDecimalSeparator)
+                {
+                    valueAsString = valueAsString.Replace(".", decimalSeparator)
+                        .Replace(",", decimalSeparator);
+                }
+
+                BindConverter.TryConvertTo<TValue>(RemoveNonNumericCharacters(valueAsString), Culture, out newValue);
             }
             catch
             {
