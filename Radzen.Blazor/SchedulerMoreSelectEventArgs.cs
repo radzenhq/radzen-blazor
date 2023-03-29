@@ -5,9 +5,9 @@ using Radzen.Blazor;
 namespace Radzen
 {
     /// <summary>
-    /// Supplies information about a <see cref="RadzenScheduler{TItem}.SlotSelect" /> event that is being raised.
+    /// Supplies information about a <see cref="RadzenScheduler{TItem}.MoreSelect" /> event that is being raised.
     /// </summary>
-    public class SchedulerSlotSelectEventArgs
+    public class SchedulerMoreSelectEventArgs
     {
         /// <summary>
         /// The start of the slot.

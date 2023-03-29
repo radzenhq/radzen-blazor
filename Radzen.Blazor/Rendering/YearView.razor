@@ -52,49 +52,13 @@
                                 var excessCount = appointments.Count();
                                 string classname;
 
-                                @if (day.Month != month)
-                                {
-                                    if (excessCount > 0)
-                                    {
-                                        classname = "rz-slot-title rz-other-month rz-has-appointments";
-                                        <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
-                                            <div class="@classname">
-                                                @day.Day
-                                            </div>
+                                    classname = $"rz-slot-title {(day.Month != month ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")}";
+                                    <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
+                                        <div class="@classname">
+                                            @day.Day
                                         </div>
-                                    }
-                                    else
-                                    {
-                                        classname = "rz-slot-title rz-other-month";
-                                        <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
-                                            <div class="@classname">
-                                                @day.Day
-                                            </div>
-                                        </div>
-                                    }
+                                    </div>
                                 }
-                                else
-                                {
-                                    if (excessCount > 0)
-                                    {
-                                        classname = "rz-slot-title rz-has-appointments";
-                                        <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
-                                            <div class="@classname">
-                                                @day.Day
-                                            </div>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        classname = "rz-slot-title";
-                                        <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
-                                            <div class="@classname">
-                                                @day.Day
-                                            </div>
-                                        </div>
-                                    }
-                                }
-                            }
                         </div>
                     </div>
                 </div>
@@ -137,11 +101,6 @@
         return attributes;
     }
 
-    async Task OnSlotClick(DateTime date)
-    {
-        await Scheduler.SelectSlot(date, date.AddDays(1));
-    }
-
     async Task OnAppointmentClick(AppointmentData data)
     {
         await Scheduler.SelectAppointment(data);
@@ -159,6 +118,10 @@
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
     {
+        bool preventDefault = await Scheduler.SelectSlot(date, date.AddDays(1), appointments);
+
+        if(!preventDefault)
+        {
         if (appointments.Count() > 0)
         {
             await DialogService.OpenAsync(date.ToShortDateString(), ds =>
@@ -181,6 +144,7 @@
     </div>
     );
 
+        }
         }
     }
 
