@@ -48,6 +48,50 @@ namespace Radzen
                 Messages.Add(newMessage);
             }
         }
+        
+        /// <summary>
+        /// Notifies the specified success message.
+        /// </summary>
+        /// <param name="summary">The summary.</param>
+        /// <param name="detail">The message detail.</param>
+        /// <param name="duration">The duration. Default = 3000 and optional.</param>
+        public void NotifySuccess(string summary,string detail,double? duration=3000)
+        {   
+            var newMessage = new NotificationMessage()
+            {
+                Duration = duration,
+                Severity = NotificationSeverity.Success,
+                Summary = summary,
+                Detail = detail,
+            };
+
+            if (!Messages.Contains(newMessage))
+            {
+                Messages.Add(newMessage);
+            }
+        }
+
+        /// <summary>
+        /// Notifies the specified error message.
+        /// </summary>
+        /// <param name="summary">The summary.</param>
+        /// <param name="detail">The message detail.</param>
+        /// <param name="duration">The duration. Default = 3000 and optional.</param>
+        public void NotifyError(string summary,string detail,double? duration=3000)
+        {   
+            var newMessage = new NotificationMessage()
+            {
+                Duration = duration,
+                Severity = NotificationSeverity.Error,
+                Summary = summary,
+                Detail = detail,
+            };
+
+            if (!Messages.Contains(newMessage))
+            {
+                Messages.Add(newMessage);
+            }
+        }
 
       /// <summary>
       /// Notifies the specified severity.
