@@ -18,12 +18,6 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenNumeric<TValue> : FormComponent<TValue>
     {
-        /// <inheritdoc />
-        public RadzenNumeric() 
-        {
-            convertValue = DefaultConvertValue;
-        }
-
         /// <summary>
         /// Gets input reference.
         /// </summary>
@@ -261,25 +255,22 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets the function which returns TValue from string.
         /// </summary>
-        public Func<string, TValue> ConvertValue { get; set; } = value => default(TValue);
-
-        TValue DefaultConvertValue(string value)
-        {
-            TValue newValue;
-
-            BindConverter.TryConvertTo<TValue>(RemoveNonNumericCharacters(value), Culture, out newValue);
-
-            return newValue;
-        }
-
-        Func<string, TValue> convertValue;
+        [Parameter]
+        public Func<string, TValue> ConvertValue { get; set; }
 
         private async System.Threading.Tasks.Task InternalValueChanged(object value)
         {
             TValue newValue;
             try
             {
-                newValue = convertValue($"{value}");
+                if (ConvertValue != null)
+                {
+                    newValue = ConvertValue($"{value}");
+                }
+                else
+                {
+                    BindConverter.TryConvertTo<TValue>(RemoveNonNumericCharacters(value), Culture, out newValue);
+                }
             }
             catch
             {
@@ -342,14 +333,8 @@ namespace Radzen.Blazor
         {
             bool minChanged = parameters.DidParameterChange(nameof(Min), Min);
             bool maxChanged = parameters.DidParameterChange(nameof(Max), Max);
-            bool convertValueChanged = parameters.DidParameterChange(nameof(ConvertValue), ConvertValue);
 
             await base.SetParametersAsync(parameters);
-
-            if (convertValueChanged)
-            {
-                convertValue = parameters.GetValueOrDefault<Func<string,TValue>>(nameof(ConvertValue), DefaultConvertValue);
-            }
 
             if (minChanged && Min.HasValue && Value != null && IsJSRuntimeAvailable)
             {
