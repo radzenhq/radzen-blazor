@@ -41,7 +41,7 @@
         new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
     };
 
-    void OnSlotRender(SchedulerSlotRenderEventArgs args) 
+    void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {
         // Highlight today in month view
         if (args.View.Text == "Month" && args.Start.Date == DateTime.Today)
@@ -60,14 +60,17 @@
     {
         console.Log($"SlotSelect: Start={args.Start} End={args.End}");
 
-        Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
-            new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
-
-        if (data != null)
+        if (args.View.Text != "Year")
         {
-            appointments.Add(data);
-            // Either call the Reload method or reassign the Data property of the Scheduler
-            await scheduler.Reload();
+            Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
+                new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
+
+            if (data != null)
+            {
+                appointments.Add(data);
+                // Either call the Reload method or reassign the Data property of the Scheduler
+                await scheduler.Reload();
+            }
         }
     }
 
