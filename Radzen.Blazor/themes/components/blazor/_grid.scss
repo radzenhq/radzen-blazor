@@ -85,13 +85,6 @@ $grid-detail-template-background-color: var(--rz-base-background-color) !default
 
 $grid-loading-indicator-color: currentColor !default;
 $grid-loading-indicator-background-color: rgba(var(--rz-base-600), 0.5) !default;
-$grid-button-icon-only-padding: 0 0.25rem !default;
-$grid-button-text-padding: 0 0.6875rem !default;
-$grid-button-font-size: 0.75rem !default;
-$grid-button-icon-width: 0.75rem !default;
-$grid-button-icon-height: $grid-button-icon-width !default;
-$grid-button-height: 1.25rem !default;
-$grid-button-line-height: $grid-button-height !default;
 
 $grid-frozen-cell-border: $grid-cell-border !default;
 $grid-frozen-cell-background-color: $grid-header-background-color !default;
@@ -202,13 +195,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
   --rz-grid-loading-indicator-color: #{$grid-loading-indicator-color};
   --rz-grid-loading-indicator-background-color: #{$grid-loading-indicator-background-color};
-  --rz-grid-button-icon-only-padding: #{$grid-button-icon-only-padding};
-  --rz-grid-button-text-padding: #{$grid-button-text-padding};
-  --rz-grid-button-font-size: #{$grid-button-font-size};
-  --rz-grid-button-icon-width: #{$grid-button-icon-width};
-  --rz-grid-button-icon-height: #{$grid-button-icon-height};
-  --rz-grid-button-height: #{$grid-button-height};
-  --rz-grid-button-line-height: #{$grid-button-line-height};
 
   --rz-grid-frozen-cell-border: #{$grid-frozen-cell-border};
   --rz-grid-frozen-cell-background-color: #{$grid-frozen-cell-background-color};
@@ -546,28 +532,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       &.rz-composite-cell {
         border-right: var(--rz-grid-header-cell-border);
       }
-    }
-  }
-}
-
-.rz-datatable-data .rz-cell-data, .rz-grid-table .rz-cell-data {
-  .rz-button-sm {
-    line-height: var(--rz-grid-button-line-height);
-    padding: var(--rz-grid-button-text-padding);
-    height: var(--rz-grid-button-line-height);
-    font-size: var(--rz-grid-button-font-size);
-
-    .rz-button-icon-left {
-      font-size: var(--rz-grid-button-font-size);
-      line-height: var(--rz-grid-button-line-height);
-      width: var(--rz-grid-button-icon-width);
-    }
-
-    .rz-button-text {
-      line-height: var(--rz-grid-button-line-height);
-    }
-    &.rz-button-icon-only {
-      padding: var(--rz-grid-button-icon-only-padding);
     }
   }
 }
