@@ -252,12 +252,25 @@ namespace Radzen.Blazor
             return new string(valueStr.Where(c => char.IsDigit(c) || char.IsPunctuation(c)).ToArray()).Replace("%", "");
         }
 
+        /// <summary>
+        /// Gets or sets the function which returns TValue from string.
+        /// </summary>
+        [Parameter]
+        public Func<string, TValue> ConvertValue { get; set; }
+
         private async System.Threading.Tasks.Task InternalValueChanged(object value)
         {
             TValue newValue;
             try
             {
-                BindConverter.TryConvertTo<TValue>(RemoveNonNumericCharacters(value), Culture, out newValue);
+                if (ConvertValue != null)
+                {
+                    newValue = ConvertValue($"{value}");
+                }
+                else
+                {
+                    BindConverter.TryConvertTo<TValue>(RemoveNonNumericCharacters(value), Culture, out newValue);
+                }
             }
             catch
             {
