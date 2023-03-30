@@ -199,5 +199,10 @@ namespace Radzen
         /// </summary>
         /// <value>The value.</value>
         public object Value { get; set; }
+        /// <summary>
+        /// Gets or sets the icon.
+        /// </summary>
+        /// <value>The icon.</value>
+        public string Icon { get; set; }
     }
 }
