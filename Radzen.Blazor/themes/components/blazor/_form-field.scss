@@ -1,0 +1,35 @@
+.rz-form-field {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    border: var(--rz-input-border);
+    border-radius: var(--rz-input-border-radius);
+
+    &.rz-state-focused {
+        border: var(--rz-input-focus-border);
+    }
+}
+
+.rz-form-field * {
+    --rz-input-border: none;
+    --rz-input-focus-border: none;
+    --rz-input-focus-shadow: none;
+    --rz-input-hover-border: none;
+    --rz-input-hover-shadow: none;
+}
+
+.rz-form-field *:focus ~ .rz-form-field-label,
+.rz-form-field *:not(:placeholder-shown) ~ .rz-form-field-label {
+    transform: translate(0, -130%);
+    background-color: white;
+}
+
+.rz-form-field-label {
+    position: absolute;
+    pointer-events: none;
+    padding: 0 4px;
+    top: 50%;
+    left: 12px;
+    transform: translate(0, -50%);
+    transition: transform 0.1s ease-out;
+}

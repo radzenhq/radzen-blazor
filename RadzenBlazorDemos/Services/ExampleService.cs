@@ -1011,6 +1011,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "FormField",
+                    Path = "form-field",
+                    Title = "Blazor form field component",
+                    Icon = "&#xe226",
+                    New = true,
+                    Tags = new [] { "form", "label", "form", "edit" }
+                },
+                new Example()
+                {
                     Name="HtmlEditor",
                     Icon = "&#xe3c9",
                     Children = new [] {

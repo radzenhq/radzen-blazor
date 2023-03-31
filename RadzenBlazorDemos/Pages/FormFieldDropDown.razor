@@ -1,0 +1,7 @@
+<RadzenFormField Text="Floating Label:">
+    <RadzenDropDown Data="@data" @bind-Value="@value" Placeholder=" " />
+</RadzenFormField>
+@code {
+    string value = "";
+    string [] data = new string [] { "One", "Two", "Three" };
+}

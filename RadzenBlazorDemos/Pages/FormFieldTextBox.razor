@@ -1,0 +1,17 @@
+<RadzenFormField Text="Floating Label:">
+    <RadzenTextBox @bind-Value="@value" Placeholder=" " />
+</RadzenFormField>
+<RadzenFormField Text="Floating Label:">
+    <Start>
+        <RadzenIcon Icon="check_circle" />
+    </Start>
+    <ChildContent>
+        <RadzenTextBox Placeholder=" " />
+    </ChildContent>
+    <End>
+        <RadzenIcon Icon="autorenew" />
+    </End>
+</RadzenFormField>
+@code {
+    string value = "";
+}

@@ -1,0 +1,22 @@
+@using Radzen.Blazor
+@inherits RadzenComponent
+
+@if (Visible)
+{
+<div @ref="@Element" for="@Component" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" onfocusin="this.classList.add('rz-state-focused')" onfocusout="this.classList.remove('rz-state-focused')">
+    @if (Start != null)
+    {
+    <div class="rz-form-field-start">
+        @Start
+    </div>
+    }
+    @ChildContent
+    <label class="rz-form-field-label" for=@Component>@Text</label>
+    @if (End != null)
+    {
+    <div class="rz-form-field-end">
+        @End
+    </div>
+    }
+</div>
+}
