@@ -1,4 +1,4 @@
-﻿@implements IDisposable
+﻿@implements IAsyncDisposable
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
 
@@ -115,8 +115,12 @@
         await InvokeAsync(() => { StateHasChanged(); });
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
+        while (tooltips.Count != 0)
+        {
+            await Close();
+        }
         reference?.Dispose();
         reference = null;
 
@@ -124,7 +128,7 @@
         {
             try
             {
-               JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+               await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
             }
             catch
             {}
