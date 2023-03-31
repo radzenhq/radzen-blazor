@@ -59,6 +59,20 @@ namespace Radzen.Blazor
         /// <param name="end">The end.</param>
         Task SelectSlot(DateTime start, DateTime end);
         /// <summary>
+        /// Selects the specified slot.
+        /// </summary>
+        /// <param name="start">The start.</param>
+        /// <param name="end">The end.</param>
+        /// <param name="appointments">The appointments for this range.</param>
+        Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments);
+        /// <summary>
+        /// Selects the specified more link.
+        /// </summary>
+        /// <param name="start">The start.</param>
+        /// <param name="end">The end.</param>
+        /// <param name="appointments">The appointments for this range.</param>
+        Task<bool> SelectMore(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments);
+        /// <summary>
         /// Gets the appointment HTML attributes.
         /// </summary>
         /// <param name="item">The appointment.</param>
