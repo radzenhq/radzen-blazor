@@ -1,0 +1,30 @@
+﻿@page "/datalist-loaddata"
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenDataList IsLoading="@isLoading" PageSize="5"  WrapItems="false" AllowPaging="true" Data="@products" Count="@count" TItem="Product" LoadData="@LoadData">
+    <Template Context="product">
+        <div>Name:</div>
+        <b>@product.ProductName</b>
+    </Template>
+</RadzenDataList>
+
+@code {
+    IEnumerable<Product> products;
+    int count;
+    bool isLoading = false;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+        await Task.Delay(1000);
+        var query = dbContext.Products.AsQueryable();
+        count = query.Count();
+        // Perform paging via Skip and Take.
+        products = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+        isLoading = false;
+    }
+}

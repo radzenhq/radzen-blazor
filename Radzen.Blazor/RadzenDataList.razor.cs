@@ -36,6 +36,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance loading indicator is shown.
+        /// </summary>
+        /// <value><c>true</c> if this instance loading indicator is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool IsLoading { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether to wrap items.
         /// </summary>
         /// <value><c>true</c> if wrap items; otherwise, <c>false</c>.</value>
