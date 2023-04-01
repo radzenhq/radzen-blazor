@@ -38,6 +38,11 @@ $datalist-item-background-color: var(--rz-base-background-color) !default;
   border: var(--rz-datalist-border);
 }
 
+.rz-datalist-content {
+    position: relative;
+}
+
+
 %datalist-item {
   border-radius: var(--rz-datalist-border-radius);
   border: var(--rz-datalist-item-border);
