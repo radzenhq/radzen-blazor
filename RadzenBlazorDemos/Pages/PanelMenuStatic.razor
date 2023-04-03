@@ -4,7 +4,7 @@
         <RadzenLabel Text="Allow multiple expand" Component="CheckBox1" />
     </RadzenStack>
 
-    <RadzenPanelMenu Style="width:300px" Multiple="@multiple">
+    <RadzenPanelMenu Click="OnParentClicked" Style="width:300px" Multiple="@multiple">
         <RadzenPanelMenuItem Text="General" Icon="home">
             <RadzenPanelMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenPanelMenuItem>
             <RadzenPanelMenuItem Text="Menu" Path="menu" Icon="line_weight"></RadzenPanelMenuItem>
@@ -35,19 +35,30 @@
             <RadzenPanelMenuItem Text="Card" Path="card" Icon="line_style"></RadzenPanelMenuItem>
         </RadzenPanelMenuItem>
         <RadzenPanelMenuItem Text="More">
-            <RadzenPanelMenuItem Text="Item1"></RadzenPanelMenuItem>
-            <RadzenPanelMenuItem Text="Item2"></RadzenPanelMenuItem>
+            <RadzenPanelMenuItem Click="OnChildClicked" Text="Item1"></RadzenPanelMenuItem>
+            <RadzenPanelMenuItem Click="OnChildClicked" Text="Item2"></RadzenPanelMenuItem>
             <RadzenPanelMenuItem Text="More items">
                 <RadzenPanelMenuItem Text="More sub items">
-                    <RadzenPanelMenuItem Text="Item1"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Item2"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Click="OnChildClicked" Text="Item3"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Click="OnChildClicked" Text="Item4"></RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
             </RadzenPanelMenuItem>
         </RadzenPanelMenuItem>
     </RadzenPanelMenu>
 
 </RadzenStack>
-
+<EventConsole @ref=@console />
 @code {
     bool multiple = true;
+    EventConsole console;
+    
+    void OnParentClicked(MenuItemEventArgs args)
+    {
+        console.Log($"{args.Text} clicked from parent");
+    }
+
+    void OnChildClicked(MenuItemEventArgs args)
+    {
+        console.Log($"{args.Text} from child clicked");
+    }
 }
