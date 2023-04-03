@@ -116,7 +116,10 @@ namespace Radzen.Blazor
             var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
 
             if (value.Length < MinLength)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
                 return;
+            }
 
             if (!LoadData.HasDelegate)
             {
