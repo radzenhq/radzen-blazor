@@ -31,14 +31,10 @@
     async Task BusyDialog()
     {
         await DialogService.OpenAsync("", ds =>
-    @<div>
-        <div class="row">
-            <div class="col text-center p-5">
-                <RadzenImage Path="images/community.svg" Style="display: block; width: 200px; margin-bottom: 40px;" />
-                <b>Loading, please wait...</b>
-            </div>
-        </div>
-    </div>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
+    @<RadzenStack AlignItems="AlignItems.Center" Gap="2rem" Class="rz-p-12">
+        <RadzenImage Path="images/community.svg" Style="width: 200px;" />
+        <RadzenText TextStyle="TextStyle.H6">Loading, please wait...</RadzenText>
+    </RadzenStack>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
     }
 
     // Busy dialog from string
@@ -48,13 +44,12 @@
         {
             RenderFragment content = b =>
             {
-                b.OpenElement(0, "div");
-                b.AddAttribute(1, "class", "row");
+                b.OpenElement(0, "RadzenRow");
 
-                b.OpenElement(2, "div");
-                b.AddAttribute(3, "class", "col-md-12");
+                b.OpenElement(1, "RadzenColumn");
+                b.AddAttribute(2, "Size", "12");
 
-                b.AddContent(4, message);
+                b.AddContent(3, message);
 
                 b.CloseElement();
                 b.CloseElement();
