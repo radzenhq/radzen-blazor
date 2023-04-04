@@ -230,6 +230,7 @@ namespace Radzen
         /// <returns>ClassList.</returns>
         protected ClassList GetClassList(string className) => ClassList.Create(className)
                                                                        .AddDisabled(Disabled)
-                                                                       .Add(FieldIdentifier, EditContext);
+                                                                       .Add(FieldIdentifier, EditContext)
+                                                                       .Add("rz-state-empty", !HasValue);
     }
 }
