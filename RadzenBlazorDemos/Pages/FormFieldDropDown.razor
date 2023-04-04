@@ -1,7 +1,15 @@
-<RadzenFormField Text="Floating Label:">
-    <RadzenDropDown Data="@data" @bind-Value="@value" />
+<RadzenFormField Text="RadzenDropDown:">
+    <RadzenDropDown Data="@data" @bind-Value="@dropDownValue" />
+</RadzenFormField>
+<RadzenFormField Text="RadzenDropDownDataGrid:">
+    <RadzenDropDownDataGrid Data="@data" @bind-Value="@dropDownDataGridValue" />
+</RadzenFormField>
+<RadzenFormField Text="RadzenAutoComplete:">
+    <RadzenAutoComplete Data="@data" @bind-Value="@autoCompleteValue" />
 </RadzenFormField>
 @code {
-    string value = "";
+    string dropDownValue = "";
+    string dropDownDataGridValue = "";
+    string autoCompleteValue = "";
     string [] data = new string [] { "One", "Two", "Three" };
 }

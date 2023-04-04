@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using Radzen.Blazor;
 using Radzen.Blazor.Rendering;
 
 namespace Radzen
@@ -232,5 +233,10 @@ namespace Radzen
                                                                        .AddDisabled(Disabled)
                                                                        .Add(FieldIdentifier, EditContext)
                                                                        .Add("rz-state-empty", !HasValue);
+
+        [CascadingParameter]
+        public IFormFieldContext FormFieldContext { get; set; }
+
+        protected string CurrentPlaceholder => FormFieldContext != null ? " " : Placeholder;
     }
 }

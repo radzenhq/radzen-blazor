@@ -19,8 +19,11 @@
 }
 
 .rz-form-field .rz-textbox:focus ~ .rz-form-field-label,
+.rz-form-field .rz-textarea:focus ~ .rz-form-field-label,
+.rz-form-field .rz-spinner:focus-within ~ .rz-form-field-label,
+.rz-form-field .rz-autocomplete:focus-within ~ .rz-form-field-label,
 .rz-form-field .rz-textbox:not(:placeholder-shown) ~ .rz-form-field-label,
-.rz-form-field :not(.rz-state-empty,.rz-textbox) ~ .rz-form-field-label {
+.rz-form-field :not(.rz-state-empty) ~ .rz-form-field-label {
     transform: translate(0, -130%);
     background-color: white;
 }

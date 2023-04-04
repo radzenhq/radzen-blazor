@@ -349,5 +349,10 @@ namespace Radzen
                                                                        .AddDisabled(Disabled)
                                                                        .Add(FieldIdentifier, EditContext)
                                                                        .Add("rz-state-empty", !HasValue);
+
+        [CascadingParameter]
+        public IFormFieldContext FormFieldContext { get; set; }
+
+        protected string CurrentPlaceholder => FormFieldContext != null ? " " : Placeholder;
     }
 }

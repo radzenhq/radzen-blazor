@@ -1,17 +1,27 @@
-<RadzenFormField Text="Floating Label:">
-    <RadzenTextBox @bind-Value="@value" Placeholder=" " />
+<RadzenFormField Text="RadzenTextBox:">
+    <RadzenTextBox @bind-Value="@value" />
 </RadzenFormField>
-<RadzenFormField Text="Floating Label:">
+<RadzenFormField Text="Start and End:">
     <Start>
         <RadzenIcon Icon="check_circle" />
     </Start>
     <ChildContent>
-        <RadzenTextBox Placeholder=" " />
+        <RadzenTextBox />
     </ChildContent>
     <End>
         <RadzenIcon Icon="autorenew" />
     </End>
 </RadzenFormField>
+<RadzenFormField Text="RadzenNumeric:">
+    <RadzenNumeric @bind-Value="@number" />
+</RadzenFormField>
+<RadzenFormField Text="RadzenTextArea:">
+    <RadzenTextArea />
+</RadzenFormField>
+<RadzenFormField Text="RadzenMask:">
+    <RadzenMask Mask="***-**-****" CharacterPattern="[0-9]" />
+</RadzenFormField>
 @code {
     string value = "";
+    double? number = null;
 }
