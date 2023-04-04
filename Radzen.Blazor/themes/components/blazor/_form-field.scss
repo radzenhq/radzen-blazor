@@ -16,13 +16,15 @@ $form-field-label-font-size: 0.75rem !default;
 }
 
 .rz-form-field {
+    @extend %input-no-padding;
+
     position: relative;
     display: inline-flex;
     align-items: center;
     vertical-align: top;
     margin: var(--rz-form-field-margin);
-
-    @extend %input-no-padding;
+    box-shadow: none;
+    transition: var(--rz-input-transition);
 
     & > * {
         @extend %input-blank;
@@ -48,30 +50,13 @@ $form-field-label-font-size: 0.75rem !default;
 
     &:hover {
         @extend %input-hover;
+        box-shadow: none;
     }
 
     &.rz-state-focused {
         @extend %input-focus;
+        box-shadow: none;
     }
-}
-
-.rz-form-field .rz-textbox:focus ~ .rz-form-field-label,
-.rz-form-field .rz-textarea:focus ~ .rz-form-field-label,
-.rz-form-field .rz-spinner:focus-within ~ .rz-form-field-label,
-.rz-form-field .rz-autocomplete:focus-within ~ .rz-form-field-label,
-.rz-form-field .rz-textbox:not(:placeholder-shown) ~ .rz-form-field-label,
-.rz-form-field :not(.rz-state-empty) ~ .rz-form-field-label {
-    transform: translate(0, var(--rz-form-field-label-top));
-    background-color: white;
-    font-size: var(--rz-form-field-label-font-size);
-    line-height: var(--rz-form-field-label-font-size);
-}
-
-.rz-form-field .rz-textbox:focus ~ .rz-form-field-label,
-.rz-form-field .rz-textarea:focus ~ .rz-form-field-label,
-.rz-form-field .rz-spinner:focus-within ~ .rz-form-field-label,
-.rz-form-field .rz-autocomplete:focus-within ~ .rz-form-field-label {
-    color: var(--rz-form-field-label-focus-color);
 }
 
 .rz-form-field-label {
@@ -79,7 +64,53 @@ $form-field-label-font-size: 0.75rem !default;
     pointer-events: none;
     padding: var(--rz-form-field-label-padding);
     top: 50%;
+    right: auto;
     left: 0.75rem;
+    max-width: calc(100% - 1.5rem);
     transform: translate(0, -50%);
-    transition: transform var(--rz-transition), color var(--rz-transition), font-size var(--rz-transition);
+    background-color: transparent;
+    transition: transform var(--rz-transition), 
+                color var(--rz-transition),
+                font-size var(--rz-transition), 
+                max-width var(--rz-transition);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    &:last-child {
+        right: 1.5rem;
+    }
+
+    .rz-textarea ~ & {
+        top: 0.5rem;
+        transform: translate(0, 0);
+    }
+
+    .rz-textbox:focus ~ &,
+    .rz-textarea:focus ~ &,
+    .rz-spinner:focus-within ~ &,
+    .rz-autocomplete:focus-within ~ &,
+    .rz-textbox:not(:placeholder-shown) ~ &,
+    :not(.rz-state-empty) ~ & {
+        right: auto;
+        transform: translate(0, var(--rz-form-field-label-top));
+        color: var(--rz-input-placeholder-color);
+        background-color: var(--rz-input-background-color);
+        font-size: var(--rz-form-field-label-font-size);
+        line-height: var(--rz-form-field-label-font-size);
+        max-width: calc(100% - 1.5rem);
+    }
+
+    .rz-state-focused &,
+    .rz-textbox:focus ~ &,
+    .rz-textarea:focus ~ &,
+    .rz-spinner:focus-within ~ &,
+    .rz-autocomplete:focus-within ~ & {
+        color: var(--rz-form-field-label-focus-color);
+    }
+
+    .rz-textarea:focus ~ &,
+    .rz-textarea:not(.rz-state-empty) ~ & {
+        transform: translate(0, -120%);
+    }
 }
