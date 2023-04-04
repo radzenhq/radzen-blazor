@@ -76,3 +76,7 @@ $datalist-item-background-color: var(--rz-base-background-color) !default;
     margin: var(--rz-datalist-item-vertical-margin) var(--rz-datalist-item-horizontal-margin);
   }
 }
+
+.rz-datalist-content {
+    position: relative;
+}

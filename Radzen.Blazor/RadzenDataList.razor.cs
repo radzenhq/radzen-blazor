@@ -134,5 +134,12 @@ namespace Radzen.Blazor
             builder.SetKey(item);
             builder.CloseComponent();
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance loading indicator is shown.
+        /// </summary>
+        /// <value><c>true</c> if this instance loading indicator is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool IsLoading { get; set; }
     }
 }

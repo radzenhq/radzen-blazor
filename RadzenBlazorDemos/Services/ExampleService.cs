@@ -585,10 +585,26 @@ namespace RadzenBlazorDemos
                 new Example()
         {
             Name = "DataList",
-                    Title = "Blazor data list component",
-                    Path = "datalist",
                     Icon = "&#xe896",
-                    Tags = new[] { "dataview", "grid", "table" }
+                    Tags = new[] { "dataview", "grid", "table" },
+                    Children = new[] {
+                        new Example
+                        {
+                            Name = "IQueryable",
+                            Title = "Blazor data list component",
+                            New = true,
+                            Path = "datalist",
+                            Tags = new [] { "dataview", "grid", "table", "list"},
+                        },
+                        new Example
+                        {
+                            Name = "OData service",
+                            Title = "Blazor data list with OData",
+                            New = true,
+                            Path = "datalist-loaddata",
+                            Tags = new [] { "dataview", "grid", "table", "list", "odata" },
+                        }
+                    }
                 },
                 new Example()
         {
