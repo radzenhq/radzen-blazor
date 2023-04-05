@@ -1,4 +1,5 @@
 $form-field-margin: 0.5rem 0 0 !default;
+$form-field-padding: var(--rz-input-padding) !default;
 $form-field-shadow: none !default;
 $form-field-hover-shadow: none !default;
 $form-field-focus-shadow: none !default;
@@ -14,6 +15,7 @@ $form-field-label-textarea-floating-top: -1rem !default;
 
 :root {
     --rz-form-field-margin: #{$form-field-margin};
+    --rz-form-field-padding: #{$form-field-padding};
     --rz-form-field-shadow: #{$form-field-shadow};
     --rz-form-field-hover-shadow: #{$form-field-hover-shadow};
     --rz-form-field-focus-shadow: #{$form-field-focus-shadow};
@@ -47,7 +49,7 @@ $form-field-label-textarea-floating-top: -1rem !default;
         display: flex;
         align-items: center;
         white-space: nowrap;
-        padding: var(--rz-input-padding);
+        padding: var(--rz-form-field-padding);
         padding-top: 0;
         padding-bottom: 0;
     }
