@@ -1,9 +1,11 @@
 $form-field-margin: 0.5rem 0 0 !default;
 $form-field-label-color: var(--rz-text-color) !default;
 $form-field-label-focus-color: var(--rz-primary) !default;
-$form-field-label-padding: 0 0.25rem !default;
-$form-field-label-top: calc(-1 * (1.75rem - 1px)) !default;
-$form-field-label-font-size: 0.75rem !default;
+$form-field-label-padding: 0.125rem 0.1875rem !default;
+$form-field-label-left: 0.25rem !default;
+$form-field-label-floating-top: -1.7375rem !default;
+$form-field-label-textarea-top: 0.375rem !default;
+$form-field-label-textarea-floating-top: -1rem !default;
 
 
 :root {
@@ -11,8 +13,10 @@ $form-field-label-font-size: 0.75rem !default;
     --rz-form-field-label-color: #{$form-field-label-color};
     --rz-form-field-label-focus-color: #{$form-field-label-focus-color};
     --rz-form-field-label-padding: #{$form-field-label-padding};
-    --rz-form-field-label-top: #{$form-field-label-top};
-    --rz-form-field-label-font-size: #{$form-field-label-font-size};
+    --rz-form-field-label-left: #{$form-field-label-left};
+    --rz-form-field-label-floating-top: #{$form-field-label-floating-top};
+    --rz-form-field-label-textarea-top: #{$form-field-label-textarea-top};
+    --rz-form-field-label-textarea-floating-top: #{$form-field-label-textarea-floating-top};
 }
 
 .rz-form-field {
@@ -65,7 +69,8 @@ $form-field-label-font-size: 0.75rem !default;
     padding: var(--rz-form-field-label-padding);
     top: 50%;
     right: auto;
-    left: 0.75rem;
+    border-radius: var(--rz-border-radius);
+    left: var(--rz-form-field-label-left);
     max-width: calc(100% - 1.5rem);
     transform: translate(0, -50%);
     background-color: transparent;
@@ -73,16 +78,13 @@ $form-field-label-font-size: 0.75rem !default;
                 color var(--rz-transition),
                 font-size var(--rz-transition), 
                 max-width var(--rz-transition);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 
     &:last-child {
         right: 1.5rem;
     }
 
     .rz-textarea ~ & {
-        top: 0.5rem;
+        top: var(--rz-form-field-label-textarea-top);
         transform: translate(0, 0);
     }
 
@@ -93,11 +95,11 @@ $form-field-label-font-size: 0.75rem !default;
     .rz-textbox:not(:placeholder-shown) ~ &,
     :not(.rz-state-empty) ~ & {
         right: auto;
-        transform: translate(0, var(--rz-form-field-label-top));
+        transform: translate(0, var(--rz-form-field-label-floating-top));
         color: var(--rz-input-placeholder-color);
         background-color: var(--rz-input-background-color);
-        font-size: var(--rz-form-field-label-font-size);
-        line-height: var(--rz-form-field-label-font-size);
+        font-size: 0.75rem;
+        line-height: 0.75rem;
         max-width: calc(100% - 1.5rem);
     }
 
@@ -111,6 +113,6 @@ $form-field-label-font-size: 0.75rem !default;
 
     .rz-textarea:focus ~ &,
     .rz-textarea:not(.rz-state-empty) ~ & {
-        transform: translate(0, -120%);
+        transform: translate(0, var(--rz-form-field-label-textarea-floating-top));
     }
 }

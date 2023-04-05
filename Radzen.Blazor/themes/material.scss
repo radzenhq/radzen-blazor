@@ -1360,6 +1360,13 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
 // Splitter
 $splitter-bar-background-color-active: var(--rz-primary) !default;
 
+// FormField
+$form-field-label-padding: 0 0.25rem !default;
+$form-field-label-left: 0.6875rem !default;
+$form-field-label-floating-top: calc(-1 * (1.75rem - 1px)) !default;
+$form-field-label-textarea-top: 0.5rem !default;
+$form-field-label-textarea-floating-top: -0.9375rem !default;
+
 @import 'bootstrap';
 $bootstrap: true;
 
