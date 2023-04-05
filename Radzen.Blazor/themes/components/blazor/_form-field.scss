@@ -1,4 +1,8 @@
 $form-field-margin: 0.5rem 0 0 !default;
+$form-field-shadow: none !default;
+$form-field-hover-shadow: none !default;
+$form-field-focus-shadow: none !default;
+$form-field-shadow: none !default;
 $form-field-label-color: var(--rz-text-color) !default;
 $form-field-label-focus-color: var(--rz-primary) !default;
 $form-field-label-padding: 0.125rem 0.1875rem !default;
@@ -10,6 +14,9 @@ $form-field-label-textarea-floating-top: -1rem !default;
 
 :root {
     --rz-form-field-margin: #{$form-field-margin};
+    --rz-form-field-shadow: #{$form-field-shadow};
+    --rz-form-field-hover-shadow: #{$form-field-hover-shadow};
+    --rz-form-field-focus-shadow: #{$form-field-focus-shadow};
     --rz-form-field-label-color: #{$form-field-label-color};
     --rz-form-field-label-focus-color: #{$form-field-label-focus-color};
     --rz-form-field-label-padding: #{$form-field-label-padding};
@@ -27,10 +34,11 @@ $form-field-label-textarea-floating-top: -1rem !default;
     align-items: center;
     vertical-align: top;
     margin: var(--rz-form-field-margin);
-    box-shadow: none;
+    box-shadow: var(--rz-form-field-shadow);
     transition: var(--rz-input-transition);
 
-    & > * {
+    & > *, 
+    & input {
         @extend %input-blank;
     }
 
@@ -54,12 +62,12 @@ $form-field-label-textarea-floating-top: -1rem !default;
 
     &:hover {
         @extend %input-hover;
-        box-shadow: none;
+        box-shadow: var(--rz-form-field-hover-shadow);
     }
 
     &.rz-state-focused {
         @extend %input-focus;
-        box-shadow: none;
+        box-shadow: var(--rz-form-field-focus-shadow);
     }
 }
 

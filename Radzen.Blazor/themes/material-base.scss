@@ -1317,6 +1317,8 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
 $splitter-bar-background-color-active: var(--rz-primary) !default;
 
 // FormField
+$form-field-hover-shadow: var(--rz-input-hover-shadow) !default;
+$form-field-focus-shadow: var(--rz-input-focus-shadow) !default;
 $form-field-label-padding: 0 0.25rem !default;
 $form-field-label-left: 0.6875rem !default;
 $form-field-label-floating-top: calc(-1 * (1.75rem - 1px)) !default;
