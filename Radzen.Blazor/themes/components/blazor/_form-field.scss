@@ -10,7 +10,7 @@ $form-field-label-padding: 0.125rem 0.1875rem !default;
 $form-field-label-left: 0.25rem !default;
 $form-field-label-textarea-top: 0.375rem !default;
 $form-field-label-floating-top: -0.625rem !default;
-
+$form-field-helper-padding: 0 0.5rem !default;
 
 :root {
     --rz-form-field-margin: #{$form-field-margin};
@@ -24,6 +24,16 @@ $form-field-label-floating-top: -0.625rem !default;
     --rz-form-field-label-left: #{$form-field-label-left};
     --rz-form-field-label-textarea-top: #{$form-field-label-textarea-top};
     --rz-form-field-label-floating-top: #{$form-field-label-floating-top};
+    --rz-form-field-helper-padding: #{$form-field-helper-padding};
+}
+
+.rz-form-field-wrapper {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+.rz-form-field-helper {
+    padding: var(--rz-form-field-helper-padding);
 }
 
 .rz-form-field {
@@ -42,6 +52,7 @@ $form-field-label-floating-top: -0.625rem !default;
     & input,
     & .rz-inputtext {
         @extend %input-blank;
+
         flex: 1;
     }
 
@@ -115,6 +126,10 @@ $form-field-label-floating-top: -0.625rem !default;
         font-size: 0.75rem;
         line-height: 0.75rem;
         max-width: calc(100% - 1.5rem);
+    }
+
+    .invalid ~ & {
+        color: var(--rz-danger) !important;
     }
 
     .rz-state-focused &,

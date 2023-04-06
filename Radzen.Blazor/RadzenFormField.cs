@@ -24,6 +24,9 @@ namespace Radzen.Blazor
         public RenderFragment End { get; set; }
 
         [Parameter]
+        public RenderFragment Helper { get; set; }
+
+        [Parameter]
         public string Text { get; set; }
 
         [Parameter]
