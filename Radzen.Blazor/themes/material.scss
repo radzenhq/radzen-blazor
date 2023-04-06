@@ -1361,14 +1361,14 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
 $splitter-bar-background-color-active: var(--rz-primary) !default;
 
 // FormField
-$form-field-padding: 0 0.75rem !default;
+$form-field-margin: 0.5rem 0 0 !default;
+$form-field-start-end-padding: 0 0.75rem !default;
 $form-field-hover-shadow: var(--rz-input-hover-shadow) !default;
 $form-field-focus-shadow: var(--rz-input-focus-shadow) !default;
 $form-field-label-padding: 0 0.25rem !default;
 $form-field-label-left: 0.6875rem !default;
-$form-field-label-floating-top: calc(-1 * (1.75rem - 1px)) !default;
 $form-field-label-textarea-top: 0.5rem !default;
-$form-field-label-textarea-floating-top: -0.9375rem !default;
+$form-field-label-floating-top: -0.4375rem !default;
 
 @import 'bootstrap';
 $bootstrap: true;

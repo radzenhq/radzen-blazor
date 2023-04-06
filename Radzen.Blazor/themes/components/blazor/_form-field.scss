@@ -1,5 +1,5 @@
-$form-field-margin: 0.5rem 0 0 !default;
-$form-field-padding: var(--rz-input-padding) !default;
+$form-field-margin: 0.625rem 0 0 !default;
+$form-field-start-end-padding: var(--rz-input-padding) !default;
 $form-field-shadow: none !default;
 $form-field-hover-shadow: none !default;
 $form-field-focus-shadow: none !default;
@@ -8,14 +8,13 @@ $form-field-label-color: var(--rz-text-color) !default;
 $form-field-label-focus-color: var(--rz-primary) !default;
 $form-field-label-padding: 0.125rem 0.1875rem !default;
 $form-field-label-left: 0.25rem !default;
-$form-field-label-floating-top: -1.7375rem !default;
 $form-field-label-textarea-top: 0.375rem !default;
-$form-field-label-textarea-floating-top: -1rem !default;
+$form-field-label-floating-top: -0.625rem !default;
 
 
 :root {
     --rz-form-field-margin: #{$form-field-margin};
-    --rz-form-field-padding: #{$form-field-padding};
+    --rz-form-field-start-end-padding: #{$form-field-start-end-padding};
     --rz-form-field-shadow: #{$form-field-shadow};
     --rz-form-field-hover-shadow: #{$form-field-hover-shadow};
     --rz-form-field-focus-shadow: #{$form-field-focus-shadow};
@@ -23,9 +22,8 @@ $form-field-label-textarea-floating-top: -1rem !default;
     --rz-form-field-label-focus-color: #{$form-field-label-focus-color};
     --rz-form-field-label-padding: #{$form-field-label-padding};
     --rz-form-field-label-left: #{$form-field-label-left};
-    --rz-form-field-label-floating-top: #{$form-field-label-floating-top};
     --rz-form-field-label-textarea-top: #{$form-field-label-textarea-top};
-    --rz-form-field-label-textarea-floating-top: #{$form-field-label-textarea-floating-top};
+    --rz-form-field-label-floating-top: #{$form-field-label-floating-top};
 }
 
 .rz-form-field {
@@ -39,17 +37,21 @@ $form-field-label-textarea-floating-top: -1rem !default;
     box-shadow: var(--rz-form-field-shadow);
     transition: var(--rz-input-transition);
 
-    & > *, 
-    & input {
+    & > *,
+    & > .rz-autocomplete, 
+    & input,
+    & .rz-inputtext {
         @extend %input-blank;
+        flex: 1;
     }
 
     .rz-form-field-start,
     .rz-form-field-end {
         display: flex;
+        flex: 0;
         align-items: center;
         white-space: nowrap;
-        padding: var(--rz-form-field-padding);
+        padding: var(--rz-form-field-start-end-padding);
         padding-top: 0;
         padding-bottom: 0;
     }
@@ -84,7 +86,8 @@ $form-field-label-textarea-floating-top: -1rem !default;
     max-width: calc(100% - 1.5rem);
     transform: translate(0, -50%);
     background-color: transparent;
-    transition: transform var(--rz-transition), 
+    transition: top var(--rz-transition),
+                transform var(--rz-transition), 
                 color var(--rz-transition),
                 font-size var(--rz-transition), 
                 max-width var(--rz-transition);
@@ -105,7 +108,8 @@ $form-field-label-textarea-floating-top: -1rem !default;
     .rz-textbox:not(:placeholder-shown) ~ &,
     :not(.rz-state-empty) ~ & {
         right: auto;
-        transform: translate(0, var(--rz-form-field-label-floating-top));
+        top: var(--rz-form-field-label-floating-top);
+        transform: translate(0, 0);
         color: var(--rz-input-placeholder-color);
         background-color: var(--rz-input-background-color);
         font-size: 0.75rem;
@@ -119,10 +123,5 @@ $form-field-label-textarea-floating-top: -1rem !default;
     .rz-spinner:focus-within ~ &,
     .rz-autocomplete:focus-within ~ & {
         color: var(--rz-form-field-label-focus-color);
-    }
-
-    .rz-textarea:focus ~ &,
-    .rz-textarea:not(.rz-state-empty) ~ & {
-        transform: translate(0, var(--rz-form-field-label-textarea-floating-top));
     }
 }
