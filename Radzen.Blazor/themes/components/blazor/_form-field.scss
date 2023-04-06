@@ -30,6 +30,7 @@ $form-field-helper-padding: 0 0.5rem !default;
 .rz-form-field-wrapper {
     display: inline-flex;
     flex-direction: column;
+    vertical-align: top;
 }
 
 .rz-form-field-helper {
