@@ -77,6 +77,29 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public async void RadzenPager_Renders_Numbers()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPager>(parameters => {
+                parameters.Add<int>(p => p.PageSize, 10);
+                parameters.Add<int>(p => p.Count, 100);
+                parameters.Add<bool>(p => p.HidePagingNumbers, false);
+            });
+            await component.Instance.GoToPage(2);
+            component.Render();
+
+            Assert.Contains(@$"rz-paginator-pages", component.Markup);
+
+            component.SetParametersAndRender(parameters => {
+                parameters.Add<bool>(p => p.HidePagingNumbers, true);
+            });
+            Assert.DoesNotContain(@$"rz-paginator-pages", component.Markup);
+        }
+
+        [Fact]
         public void RadzenPager_Renders_PagerDensityDefault()
         {
             using var ctx = new TestContext();

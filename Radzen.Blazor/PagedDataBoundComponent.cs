@@ -145,6 +145,13 @@ namespace Radzen
         public bool ShowPagingSummary { get; set; } = false;
 
         /// <summary>
+        /// Gets or sets the paging numbers visibility.
+        /// </summary>
+        /// <value>The paging numbers visibility.</value>
+        [Parameter]
+        public bool HidePagingNumbers { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the pager summary format.
         /// </summary>
         /// <value>The pager summary format.</value>

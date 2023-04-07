@@ -14,12 +14,16 @@
             <span class="rz-paginator-icon rzi rzi-caret-left"></span>
         </a>
 
-        <span class="rz-paginator-pages">
-            @foreach (var i in Enumerable.Range(startPage, Math.Min(endPage + 1, PageNumbersCount)))
-            {
-                <a class="rz-paginator-page rz-paginator-element @((i == CurrentPage) ? "rz-state-active" : "")" href="javascript:void(0)" @onclick:preventDefault="true" @onclick="@(() => GoToPage(i))">@(i + 1)</a>
-            }
-        </span>
+        @if (!HidePagingNumbers)
+        {
+            <span class="rz-paginator-pages">
+                @foreach (var i in Enumerable.Range(startPage, Math.Min(endPage + 1, PageNumbersCount)))
+                {
+                    <a class="rz-paginator-page rz-paginator-element @((i == CurrentPage) ? "rz-state-active" : "")" href="javascript:void(0)" @onclick:preventDefault="true" @onclick="@(() => GoToPage(i))">@(i + 1)</a>
+                }
+            </span>
+        }
+
         <a class="rz-paginator-next rz-paginator-element @((CurrentPage != numberOfPages - 1) ? "": "rz-state-disabled")" href="javascript:void(0)" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => NextPage())">
             <span class="rz-paginator-icon rzi rzi-caret-right"></span>
         </a>

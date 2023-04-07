@@ -86,6 +86,13 @@ namespace Radzen.Blazor
         public bool ShowPagingSummary { get; set; }
 
         /// <summary>
+        /// Gets or set the paging number visibility
+        /// </summary>
+        /// <value>The paging number visibility</value>
+        [Parameter]
+        public bool HidePagingNumbers { get; set; }
+
+        /// <summary>
         /// Gets or sets the pager summary format.
         /// </summary>
         /// <value>The pager summary format.</value>
