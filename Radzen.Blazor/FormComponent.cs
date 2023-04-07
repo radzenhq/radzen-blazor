@@ -163,6 +163,8 @@ namespace Radzen
         /// <returns>Task.</returns>
         public override Task SetParametersAsync(ParameterView parameters)
         {
+            var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
+
             var result = base.SetParametersAsync(parameters);
 
             if (EditContext != null && ValueExpression != null && FieldIdentifier.Model != EditContext.Model)
@@ -170,6 +172,11 @@ namespace Radzen
                 FieldIdentifier = FieldIdentifier.Create(ValueExpression);
                 EditContext.OnValidationStateChanged -= ValidationStateChanged;
                 EditContext.OnValidationStateChanged += ValidationStateChanged;
+            }
+
+            if (disabledChanged)
+            {
+                FormFieldContext?.DisabledChanged(Disabled);
             }
 
             return result;

@@ -7,7 +7,12 @@
 <RadzenFormField Text="RadzenAutoComplete:">
     <RadzenAutoComplete Data="@data" @bind-Value="@autoCompleteValue" />
 </RadzenFormField>
+<RadzenFormField Text="Disabled:">
+    <RadzenDropDown Data="@data" @bind-Value="@dropDownValue" Disabled="@disabled" />
+</RadzenFormField>
+<RadzenCheckBox Text="Disabled" @bind-Value="disabled" />
 @code {
+    bool disabled;
     string dropDownValue = "";
     string dropDownDataGridValue = "";
     string autoCompleteValue = "";

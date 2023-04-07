@@ -1,15 +1,17 @@
+using Radzen.Blazor.Rendering;
 using Microsoft.AspNetCore.Components;
+using System;
 
 namespace Radzen.Blazor
 {
     public interface IFormFieldContext
     {
-
+        Action<bool> DisabledChanged { get; set; }
     }
 
-    class FormFieldContext : IFormFieldContext
+    public class FormFieldContext : IFormFieldContext
     {
-
+        public Action<bool> DisabledChanged { get; set; }
     }
 
     public partial class RadzenFormField : RadzenComponent
@@ -32,12 +34,26 @@ namespace Radzen.Blazor
         [Parameter]
         public string Component { get; set; }
 
-        private IFormFieldContext context = new FormFieldContext();
+        private bool disabled;
+
+        private readonly IFormFieldContext context;
+
+        /// constructor
+        public RadzenFormField()
+        {
+            context = new FormFieldContext { DisabledChanged = DisabledChanged };
+        }
+
+        private void DisabledChanged(bool value)
+        {
+            disabled = value;
+            StateHasChanged();
+        }
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-form-field";
+            return ClassList.Create("rz-form-field").AddDisabled(disabled).ToString();
         }
     }
 }

@@ -21,7 +21,15 @@
 <RadzenFormField Text="RadzenMask:">
     <RadzenMask Mask="***-**-****" CharacterPattern="[0-9]" />
 </RadzenFormField>
+<RadzenFormField Text="RadzenPassword:">
+    <RadzenPassword />
+</RadzenFormField>
+<RadzenFormField Text="Disabled:">
+    <RadzenTextBox Disabled="@disabled" />
+</RadzenFormField>
+<RadzenCheckBox Text="Disabled" @bind-Value="disabled" />
 @code {
     string value = "";
+    bool disabled = false;
     double? number = null;
 }
