@@ -1,33 +1,19 @@
-<RadzenFormField Text="RadzenTextBox:">
-    <RadzenTextBox @bind-Value="@value" />
-</RadzenFormField>
-<RadzenFormField Text="Start and End:">
-    <Start>
-        <RadzenIcon Icon="check_circle" />
-    </Start>
-    <ChildContent>
-        <RadzenTextBox />
-    </ChildContent>
-    <End>
-        <RadzenIcon Icon="autorenew" />
-    </End>
-</RadzenFormField>
-<RadzenFormField Text="RadzenNumeric:">
-    <RadzenNumeric @bind-Value="@number" />
-</RadzenFormField>
-<RadzenFormField Text="RadzenTextArea:">
-    <RadzenTextArea />
-</RadzenFormField>
-<RadzenFormField Text="RadzenMask:">
-    <RadzenMask Mask="***-**-****" CharacterPattern="[0-9]" />
-</RadzenFormField>
-<RadzenFormField Text="RadzenPassword:">
-    <RadzenPassword />
-</RadzenFormField>
-<RadzenFormField Text="Disabled:">
-    <RadzenTextBox Disabled="@disabled" />
-</RadzenFormField>
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceEvenly" Wrap="FlexWrap.Wrap" Gap="1rem" >
+    <RadzenFormField Text="Label">
+        <RadzenTextBox @bind-Value="@value" Disabled="@disabled" />
+    </RadzenFormField>
+    <RadzenFormField Text="Label" Variant="Variant.Text">
+        <RadzenTextBox @bind-Value="@value" Disabled="@disabled" />
+    </RadzenFormField>
+    <RadzenFormField Text="Label" Variant="Variant.Flat">
+        <RadzenTextBox @bind-Value="@value" Disabled="@disabled" />
+    </RadzenFormField>
+    <RadzenFormField Text="Label" Variant="Variant.Filled">
+        <RadzenTextBox @bind-Value="@value" Disabled="@disabled" />
+    </RadzenFormField>
+</RadzenStack>
 <RadzenCheckBox Text="Disabled" @bind-Value="disabled" />
+
 @code {
     string value = "";
     bool disabled = false;
