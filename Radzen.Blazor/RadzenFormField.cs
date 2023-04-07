@@ -34,6 +34,13 @@ namespace Radzen.Blazor
         [Parameter]
         public string Component { get; set; }
 
+        /// <summary>
+        /// Gets or sets the design variant of the form field.
+        /// </summary>
+        /// <value>The variant of the form field.</value>
+        [Parameter]
+        public Variant Variant { get; set; } = Variant.Outlined;
+
         private bool disabled;
 
         private readonly IFormFieldContext context;
@@ -53,7 +60,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return ClassList.Create("rz-form-field").AddDisabled(disabled).ToString();
+            return ClassList.Create($"rz-form-field rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()}").AddDisabled(disabled).ToString();
         }
     }
 }
