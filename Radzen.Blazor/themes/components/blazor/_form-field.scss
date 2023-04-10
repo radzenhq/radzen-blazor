@@ -1,5 +1,6 @@
 $form-field-margin: 0.625rem 0 0 !default;
 $form-field-start-end-padding: var(--rz-input-padding) !default;
+
 $form-field-filled-height: 3.25rem !default;
 $form-field-filled-padding: 1.4375rem 0.4375rem 0.4375rem !default;
 $form-field-filled-numeric-padding: 1.5rem 1.25rem 0.5rem 0.5rem !default;
@@ -13,6 +14,7 @@ $form-field-filled-label-floating-top: 0.25rem !default;
 $form-field-filled-hover-shadow: var(--rz-input-hover-shadow) !default;
 $form-field-filled-focus-shadow: var(--rz-input-focus-shadow) !default;
 $form-field-filled-underline-display: none !default;
+
 $form-field-shadow: none !default;
 $form-field-hover-shadow: none !default;
 $form-field-focus-shadow: none !default;
@@ -119,11 +121,11 @@ $form-field-helper-padding: 0 0.5rem !default;
 
     &.rz-variant-filled,
     &.rz-variant-flat {
-        --rz-form-field-margin: 0;
+        margin: 0;
         --rz-input-height: var(--rz-form-field-filled-height);
         --rz-input-padding: var(--rz-form-field-filled-padding);
-        --rz-form-field-label-floating-top: var(--rz-form-field-filled-label-floating-top);
         --rz-numeric-input-padding: var(--rz-form-field-filled-numeric-padding);
+        --rz-form-field-label-floating-top: var(--rz-form-field-filled-label-floating-top);
 
         .rz-spinner-up {
             top: calc(var(--rz-numeric-button-offset) + 1rem);
@@ -150,16 +152,19 @@ $form-field-helper-padding: 0 0.5rem !default;
     &.rz-variant-filled {
         border: var(--rz-form-field-filled-border);
         border-radius: var(--rz-form-field-filled-border-radius);
-        --rz-input-background-color: var(--rz-form-field-filled-background-color);
+        background-color: var(--rz-form-field-filled-background-color);
 
         &:hover {
             border: var(--rz-form-field-filled-hover-border);
             box-shadow: var(--rz-form-field-filled-hover-shadow);
+            background-color: var(--rz-form-field-filled-hover-background-color);
         }
     
-        &.rz-state-focused {
+        &.rz-state-focused,
+        &.rz-state-focused:hover {
             border: var(--rz-form-field-filled-focus-border);
             box-shadow: var(--rz-form-field-filled-focus-shadow);
+            background-color: var(--rz-form-field-filled-background-color);
         }
 
         &:before,
@@ -227,6 +232,14 @@ $form-field-helper-padding: 0 0.5rem !default;
         }
     }
 
+    .rz-spinner-button {
+        display: none;
+    }
+
+    .rz-spinner:focus-within .rz-spinner-button {
+        display: block;
+    }
+
 }
 
 
@@ -266,7 +279,7 @@ $form-field-helper-padding: 0 0.5rem !default;
         top: var(--rz-form-field-label-floating-top);
         transform: translate(0, 0);
         color: var(--rz-input-placeholder-color);
-        background-color: var(--rz-input-background-color);
+        background-color: inherit;
         font-size: 0.75rem;
         line-height: 0.75rem;
         max-width: calc(100% - 1.5rem);

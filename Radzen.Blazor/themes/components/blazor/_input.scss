@@ -132,9 +132,16 @@ input {
   box-shadow: none;
   background-color: transparent;
   outline: none;
-  --rz-input-border: none;
-  --rz-input-focus-border: none;
-  --rz-input-focus-shadow: none;
-  --rz-input-hover-border: none;
-  --rz-input-hover-shadow: none;
+  border: none;
+  &:not(:disabled):not(.rz-state-disabled) {
+    &:hover {
+      border: none;
+      box-shadow: none;
+    }
+
+    &:focus {
+      border: none;
+      box-shadow: none;
+    }
+  }
 }
