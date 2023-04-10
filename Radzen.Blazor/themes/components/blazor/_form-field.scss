@@ -217,6 +217,10 @@ $form-field-helper-padding: 0 0.5rem !default;
         .rz-form-field-end {
             padding-right: 0;
         }
+
+        & ~ .rz-form-field-helper {
+            padding: 0;
+        }
     }
 
     &.rz-variant-filled,
