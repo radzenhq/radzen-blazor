@@ -258,7 +258,7 @@ $form-field-helper-padding: 0 0.5rem !default;
             }
         }
     
-        &.rz-state-focused:before {
+        &.rz-state-focused:not(.rz-state-disabled):before {
             left: calc(-1 * var(--rz-border-width));
             right: calc(-1 * var(--rz-border-width));
             border: var(--rz-input-focus-border);
