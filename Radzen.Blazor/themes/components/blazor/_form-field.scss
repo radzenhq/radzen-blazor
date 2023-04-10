@@ -200,8 +200,8 @@ $form-field-helper-padding: 0 0.5rem !default;
             z-index: 1;
             left: 50%;
             right: 50%;
-            bottom: -1px;
-            height: 2px;
+            bottom: calc(-1 * var(--rz-border-width));
+            height: calc(var(--rz-border-width) + 1px);
             border: var(--rz-input-focus-border);
             border-left-width: 0;
             border-right-width: 0;
@@ -213,9 +213,9 @@ $form-field-helper-padding: 0 0.5rem !default;
         &:after {
             content: "";
             position: absolute;
-            inset: -1px;
+            inset: calc(-1 * var(--rz-border-width));
             top: auto;
-            height: 1px;
+            height: var(--rz-border-width);
             border-bottom: var(--rz-input-border);
         }
     
@@ -224,11 +224,11 @@ $form-field-helper-padding: 0 0.5rem !default;
         }
     
         &.rz-state-focused:before {
-            left: -1px;
-            right: -1px;
+            left: calc(-1 * var(--rz-border-width));
+            right: calc(-1 * var(--rz-border-width));
             border: var(--rz-input-focus-border);
-            border-left-width: 1px;
-            border-right-width: 1px;
+            border-left-width: var(--rz-border-width);
+            border-right-width: var(--rz-border-width);
         }
     }
 
