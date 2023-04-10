@@ -23,8 +23,28 @@
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
     The FormField can be used to render different types of form input components, such as RadzenTextBox, RadzenPassword, RadzenDropDown and more.
 </RadzenText>
-<RadzenExample ComponentName="FormField" Example="FormFieldDropDown">
-    <FormFieldDropDown />
+<RadzenExample ComponentName="FormField" Example="FormFieldInputTypes">
+    <FormFieldInputTypes />
+</RadzenExample>
+
+<RadzenText ID="start-end-child-content" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Start, End, and ChildContent
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To render content before or after the input in a RadzenFormField, you need to add <code>&lt;Start&gt;</code> or <code>&lt;End&gt;</code> elements together with a <code>&lt;ChildContent&gt;</code> that contains the input component.
+</RadzenText>
+<RadzenExample ComponentName="FormField" Example="FormFieldChildContent">
+    <FormFieldChildContent />
+</RadzenExample>
+
+<RadzenText ID="start-end-child-content" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Helper text
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To add assistive content in a RadzenFormField, you need to add <code>&lt;Helper&gt;</code>element after the <code>&lt;ChildContent&gt;</code>.
+</RadzenText>
+<RadzenExample ComponentName="FormField" Example="FormFieldChildContent">
+    <FormFieldHelper />
 </RadzenExample>
 
 <RadzenText ID="disabled-form-field" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
@@ -36,3 +56,4 @@
 <RadzenExample ComponentName="FormField" Example="FormFieldDisabled">
     <FormFieldDisabled />
 </RadzenExample>
+
