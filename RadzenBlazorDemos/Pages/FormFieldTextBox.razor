@@ -1,21 +1,18 @@
-<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceEvenly" Wrap="FlexWrap.Wrap" Gap="1rem" >
-    <RadzenFormField Text="Label">
-        <RadzenTextBox @bind-Value="@value" Disabled="@disabled" />
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap" Gap="1rem" Class="rz-p-sm-12">
+    <RadzenFormField Text="Outlined/Default">
+        <RadzenTextBox @bind-Value="@value" />
     </RadzenFormField>
-    <RadzenFormField Text="Label" Variant="Variant.Text">
-        <RadzenTextBox @bind-Value="@value" Disabled="@disabled" />
+    <RadzenFormField Text="Text" Variant="Variant.Text">
+        <RadzenTextBox @bind-Value="@value" />
     </RadzenFormField>
-    <RadzenFormField Text="Label" Variant="Variant.Flat">
-        <RadzenTextBox @bind-Value="@value" Disabled="@disabled" />
+    <RadzenFormField Text="Flat" Variant="Variant.Flat">
+        <RadzenTextBox @bind-Value="@value" />
     </RadzenFormField>
-    <RadzenFormField Text="Label" Variant="Variant.Filled">
-        <RadzenTextBox @bind-Value="@value" Disabled="@disabled" />
+    <RadzenFormField Text="Filled" Variant="Variant.Filled">
+        <RadzenTextBox @bind-Value="@value" />
     </RadzenFormField>
 </RadzenStack>
-<RadzenCheckBox Text="Disabled" @bind-Value="disabled" />
 
 @code {
     string value = "";
-    bool disabled = false;
-    double? number = null;
 }

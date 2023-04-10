@@ -7,7 +7,6 @@
     Radzen Blazor <strong>FormField</strong> component features a floating label effect. When the user focuses on an empty input field, the label floats above, providing a visual cue as to which field is being filled out. This can help improve the layout and overall user experience of your forms.
 </RadzenText>
 
-
 <RadzenText ID="variants" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Variants
 </RadzenText>
@@ -18,7 +17,7 @@
     <FormFieldTextBox />
 </RadzenExample>
 
-<RadzenText ID="variants" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+<RadzenText ID="input-types" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Input types
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -26,4 +25,14 @@
 </RadzenText>
 <RadzenExample ComponentName="FormField" Example="FormFieldDropDown">
     <FormFieldDropDown />
+</RadzenExample>
+
+<RadzenText ID="disabled-form-field" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Disabled FormField
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To disable a FormField, just set the <code>Disabled</code> property of the input component to <code>true</code>.
+</RadzenText>
+<RadzenExample ComponentName="FormField" Example="FormFieldDisabled">
+    <FormFieldDisabled />
 </RadzenExample>
