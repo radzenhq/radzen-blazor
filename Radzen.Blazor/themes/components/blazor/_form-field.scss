@@ -1,6 +1,5 @@
 $form-field-margin: 0.625rem 0 0 !default;
 $form-field-start-end-padding: var(--rz-input-padding) !default;
-
 $form-field-filled-height: 3.25rem !default;
 $form-field-filled-padding: 1.4375rem 0.4375rem 0.4375rem !default;
 $form-field-filled-numeric-padding: 1.5rem 1.25rem 0.5rem 0.5rem !default;
@@ -14,7 +13,6 @@ $form-field-filled-label-floating-top: 0.25rem !default;
 $form-field-filled-hover-shadow: var(--rz-input-hover-shadow) !default;
 $form-field-filled-focus-shadow: var(--rz-input-focus-shadow) !default;
 $form-field-filled-underline-display: none !default;
-
 $form-field-shadow: none !default;
 $form-field-hover-shadow: none !default;
 $form-field-focus-shadow: none !default;
@@ -107,6 +105,22 @@ $form-field-helper-padding: 0 0.5rem !default;
         box-shadow: var(--rz-form-field-focus-shadow);
     }
 
+    &.rz-state-disabled {
+        color: var(--rz-input-disabled-color);
+        box-shadow: var(--rz-input-disabled-shadow);
+
+        &.rz-variant-outlined,
+        &.rz-variant-filled,
+        &.rz-variant-flat {
+            border: var(--rz-input-disabled-border);
+        }
+
+        .rz-state-disabled,
+        :disabled {
+            color: var(--rz-input-disabled-color);
+        }
+    }
+
     &.rz-variant-outlined,
     &.rz-variant-filled,
     &.rz-variant-flat {
@@ -126,6 +140,7 @@ $form-field-helper-padding: 0 0.5rem !default;
         --rz-input-padding: var(--rz-form-field-filled-padding);
         --rz-numeric-input-padding: var(--rz-form-field-filled-numeric-padding);
         --rz-form-field-label-floating-top: var(--rz-form-field-filled-label-floating-top);
+        box-shadow: var(--rz-input-shadow);
 
         .rz-spinner-up {
             top: calc(var(--rz-numeric-button-offset) + 1rem);
@@ -147,14 +162,16 @@ $form-field-helper-padding: 0 0.5rem !default;
     }
 
     &.rz-variant-flat {
-        &:hover {
-            border: var(--rz-input-hover-border);
-            box-shadow: var(--rz-input-hover-shadow);
-        }
-    
-        &.rz-state-focused {
-            border: var(--rz-input-focus-border);
-            box-shadow: var(--rz-input-focus-shadow);
+        &:not(.rz-state-disabled) {
+            &:hover {
+                border: var(--rz-input-hover-border);
+                box-shadow: var(--rz-input-hover-shadow);
+            }
+        
+            &.rz-state-focused {
+                border: var(--rz-input-focus-border);
+                box-shadow: var(--rz-input-focus-shadow);
+            }
         }
     }
 
@@ -163,17 +180,19 @@ $form-field-helper-padding: 0 0.5rem !default;
         border-radius: var(--rz-form-field-filled-border-radius);
         background-color: var(--rz-form-field-filled-background-color);
 
-        &:hover {
-            border: var(--rz-form-field-filled-hover-border);
-            box-shadow: var(--rz-form-field-filled-hover-shadow);
-            background-color: var(--rz-form-field-filled-hover-background-color);
-        }
-    
-        &.rz-state-focused,
-        &.rz-state-focused:hover {
-            border: var(--rz-form-field-filled-focus-border);
-            box-shadow: var(--rz-form-field-filled-focus-shadow);
-            background-color: var(--rz-form-field-filled-background-color);
+        &:not(.rz-state-disabled) {
+            &:hover {
+                border: var(--rz-form-field-filled-hover-border);
+                box-shadow: var(--rz-form-field-filled-hover-shadow);
+                background-color: var(--rz-form-field-filled-hover-background-color);
+            }
+        
+            &.rz-state-focused,
+            &.rz-state-focused:hover {
+                border: var(--rz-form-field-filled-focus-border);
+                box-shadow: var(--rz-form-field-filled-focus-shadow);
+                background-color: var(--rz-form-field-filled-background-color);
+            }
         }
 
         &:before,
@@ -231,6 +250,13 @@ $form-field-helper-padding: 0 0.5rem !default;
         &:hover:after {
             border-bottom: var(--rz-input-hover-border);
         }
+
+        &.rz-state-disabled {
+            &:after,
+            &:hover:after {
+                border-bottom: var(--rz-input-disabled-border);
+            }
+        }
     
         &.rz-state-focused:before {
             left: calc(-1 * var(--rz-border-width));
@@ -253,6 +279,11 @@ $form-field-helper-padding: 0 0.5rem !default;
 
 
 .rz-form-field-label {
+
+    .rz-state-disabled > & {
+        color: var(--rz-input-disabled-color) !important;
+    }
+
     position: absolute;
     pointer-events: none;
     padding: var(--rz-form-field-label-padding);
