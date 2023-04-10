@@ -138,6 +138,11 @@ $form-field-helper-padding: 0 0.5rem !default;
 
         .rz-textarea {
             margin-top: 1rem;
+
+        }
+
+        .rz-datepicker-trigger {
+            top: calc(50% + 0.4375rem);
         }
     }
 
@@ -271,6 +276,11 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-textarea ~ & {
         top: var(--rz-form-field-label-textarea-top);
         transform: translate(0, 0);
+
+        .rz-variant-filled &,
+        .rz-variant-flat & {
+            transform: translate(0, 0.625rem);
+        }
     }
 
     .rz-textbox:focus ~ &,
@@ -278,7 +288,11 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-spinner:focus-within ~ &,
     .rz-autocomplete:focus-within ~ &,
     .rz-textbox:not(:placeholder-shown) ~ &,
-    :not(.rz-state-empty) ~ & {
+    :not(.rz-state-empty) ~ &,
+    .rz-variant-filled .rz-textarea:focus ~ &,
+    .rz-variant-flat .rz-textarea:focus ~ &,
+    .rz-variant-filled :not(.rz-state-empty) ~ &,
+    .rz-variant-flat :not(.rz-state-empty) ~ &  {
         right: auto;
         top: var(--rz-form-field-label-floating-top);
         transform: translate(0, 0);
@@ -294,10 +308,20 @@ $form-field-helper-padding: 0 0.5rem !default;
     }
 
     .rz-state-focused &,
+    .rz-variant-filled.rz-state-focused &,
+    .rz-variant-flat.rz-state-focused & {
+        color: var(--rz-form-field-label-focus-color);
+    }
+
     .rz-textbox:focus ~ &,
     .rz-textarea:focus ~ &,
     .rz-spinner:focus-within ~ &,
-    .rz-autocomplete:focus-within ~ & {
+    .rz-autocomplete:focus-within ~ &  {
         color: var(--rz-form-field-label-focus-color);
+
+        .rz-variant-filled &,
+        .rz-variant-flat & {
+            color: var(--rz-form-field-label-focus-color);
+        }
     }
 }
