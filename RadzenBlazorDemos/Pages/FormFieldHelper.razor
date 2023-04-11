@@ -8,10 +8,11 @@
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap" Gap="1rem" Class="rz-p-sm-12">
         <RadzenFormField Text="Password" Variant="@variant">
             <ChildContent>
-                <RadzenPassword @bind-Value="@value" />
+                <RadzenTextBox @bind-Value="@value" Visible="@(!password)" />
+                <RadzenPassword @bind-Value="@value" Visible="@password" />
             </ChildContent>
             <End>
-                <RadzenIcon Icon="visibility" />
+                <RadzenButton Variant="Variant.Text" Icon="@(password ? "visibility" : "visibility_off")" Click="TogglePassword" />
             </End>
             <Helper>
                 <RadzenText TextStyle="TextStyle.Caption">* required</RadzenText>
@@ -21,6 +22,12 @@
 </div>
 
 @code {
-    string value = "";
+    string value = "password";
+    bool password = true;
     Variant variant = Variant.Outlined;
+
+    void TogglePassword()
+    {
+        password = !password;
+    }
 }
