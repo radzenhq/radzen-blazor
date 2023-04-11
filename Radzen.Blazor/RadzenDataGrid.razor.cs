@@ -600,7 +600,7 @@ namespace Radzen.Blazor
                         LogicalFilterOperator = column.GetLogicalFilterOperator()
                     });
 
-                    SaveSettings();
+                   SaveSettings();
 
                     if (LoadData.HasDelegate && IsVirtualizationAllowed())
                     {

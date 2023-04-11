@@ -1,0 +1,16 @@
+﻿@inherits FormComponent<string>
+@if (Visible)
+{
+    if (FloatingLabel)
+    {
+    <input @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+           placeholder="@Placeholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" value="@Value" @onchange="@OnChange" id="@GetId()" />
+    <label for="@GetId()">@FloatingLabelText</label>
+    }
+    else
+    {
+        <input @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+       placeholder="@Placeholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" value="@Value" @onchange="@OnChange" id="@GetId()" />
+    }
+
+}
