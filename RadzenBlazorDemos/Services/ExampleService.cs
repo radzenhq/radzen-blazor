@@ -1014,9 +1014,9 @@ namespace RadzenBlazorDemos
                     Name = "FormField",
                     Path = "form-field",
                     Title = "Blazor form field component",
-                    Icon = "&#xe226",
+                    Icon = "&#xe578",
                     New = true,
-                    Tags = new [] { "form", "label", "form", "edit" }
+                    Tags = new [] { "form", "label", "floating", "float", "edit", "outline", "input", "helper", "valid" }
                 },
                 new Example()
                 {
@@ -1068,7 +1068,7 @@ namespace RadzenBlazorDemos
                     Name = "Password",
                     Path = "password",
                     Title = "Blazor password textbox component",
-                    Icon = "&#xe8a1",
+                    Icon = "&#xf042",
                     Tags = new [] { "input", "form", "edit" }
                 },
                 new Example()
