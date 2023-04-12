@@ -4,6 +4,9 @@ using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
+    /// <summary>
+    /// The display style of the text. It overrides the tag name and provides predefined styling.
+    /// </summary>
     public enum TextStyle
     {
         DisplayH1,
@@ -27,20 +30,37 @@ namespace Radzen.Blazor
         Overline
     }
 
+    /// <summary>
+    /// The tag name of the element that will be rendered.
+    /// </summary>
+
     public enum TagName
     {
+        /// <summary>Use &lt;div&gt; to render the text.</summary>
         Div,
+        /// <summary>Use &lt;span&gt; to render the text.</summary>
         Span,
+        /// <summary>Use &lt;p&gt; to render the text.</summary>
         P,
-        H1, 
-        H2, 
-        H3, 
-        H4, 
-        H5, 
+        /// <summary>Use &lt;h1&gt; to render the text.</summary>
+        H1,
+        /// <summary>Use &lt;h2&gt; to render the text.</summary>
+        H2,
+        /// <summary>Use &lt;h3&gt; to render the text.</summary>
+        H3,
+        /// <summary>Use &lt;h4&gt; to render the text.</summary>
+        H4,
+        /// <summary>Use &lt;h5&gt; to render the text.</summary>
+        H5,
+        /// <summary>Use &lt;h6&gt; to render the text.</summary>
         H6,
+        /// <summary>Use &lt;a&gt; to render the text.</summary>
         A,
+        /// <summary>Use &lt;button&gt; to render the text.</summary>
         Button,
+        /// <summary>Use &lt;pre&gt; to render the text.</summary>
         Pre,
+        /// <summary>The tag name will be determined depending on the TextStyle.</summary>
         Auto
     }
     /// <summary>
@@ -84,6 +104,12 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public TagName TagName { get; set; } = TagName.Auto;
+
+        /// <summary>
+        /// Gets or sets the anchor name. If set an additional anchor will be rendered. Clicking on the anchor will scroll the page to the element with the same id.
+        /// </summary>
+        [Parameter]
+        public string Anchor { get; set; }
 
         /// <inheritdoc />
         protected override void BuildRenderTree(RenderTreeBuilder builder)
@@ -256,7 +282,22 @@ namespace Radzen.Blazor
                 {
                     builder.AddContent(4, ChildContent);
                 }
-                builder.AddElementReferenceCapture(5, capture => Element = capture);
+
+                if (!string.IsNullOrEmpty(Anchor))
+                {
+                    var fragments = Anchor.Split('#');
+                    var name = fragments.Length > 1 ? fragments[1] : fragments[0];
+                    builder.OpenElement(5, "a");
+                    builder.AddAttribute(6, "name", name);
+                    builder.AddAttribute(7, "href", Anchor);
+                    builder.AddAttribute(8, "class", "rz-link");
+                    builder.OpenComponent<RadzenIcon>(9);
+                    builder.AddAttribute(10, "Icon", "link");
+                    builder.CloseComponent();
+
+                    builder.CloseElement();
+                }
+                builder.AddElementReferenceCapture(11, capture => Element = capture);
                 builder.CloseElement();
             }
         }
