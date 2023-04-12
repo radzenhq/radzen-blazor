@@ -575,6 +575,10 @@ $tooltip-shadow: $rz-shadow-4 !default;
 $gauge-pointer-color: var(--rz-primary) !default;
 $gauge-arc-value-color: var(--rz-primary) !default;
 
+// FormField
+$form-field-hover-shadow: var(--rz-input-hover-shadow) !default;
+$form-field-focus-shadow: var(--rz-input-focus-shadow) !default;
+
 @import 'fonts';
 @import 'components';
 
