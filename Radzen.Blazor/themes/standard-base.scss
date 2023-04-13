@@ -528,8 +528,8 @@ $dropdown-filter-border: var(--rz-border-base-200) !default;
 
 // ColorPicker
 $colorpicker-panel-shadow: $rz-shadow-3 !default;
-$colorpicker-value-border-radius: 50% !default;
-$colorpicker-item-border-radius: 50% !default;
+$colorpicker-value-border-radius: 1rem !default;
+$colorpicker-item-border-radius: 1rem !default;
 $colorpicker-item-shadow: $rz-shadow-inset-level-1 !default;
 $colorpicker-handle-shadow: $rz-shadow-inset-level-1, $rz-shadow-1, 0 0 0 1px rgba(0,0,0,.08);
 $colorpicker-input-labels-color: var(--rz-text-tertiary-color) !default;
