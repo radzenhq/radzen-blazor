@@ -585,10 +585,26 @@ namespace RadzenBlazorDemos
                 new Example()
         {
             Name = "DataList",
-                    Title = "Blazor data list component",
-                    Path = "datalist",
                     Icon = "&#xe896",
-                    Tags = new[] { "dataview", "grid", "table" }
+                    Tags = new[] { "dataview", "grid", "table" },
+                    Children = new[] {
+                        new Example
+                        {
+                            Name = "IQueryable",
+                            Title = "Blazor data list component",
+                            New = true,
+                            Path = "datalist",
+                            Tags = new [] { "dataview", "grid", "table", "list"},
+                        },
+                        new Example
+                        {
+                            Name = "OData service",
+                            Title = "Blazor data list with OData",
+                            New = true,
+                            Path = "datalist-loaddata",
+                            Tags = new [] { "dataview", "grid", "table", "list", "odata" },
+                        }
+                    }
                 },
                 new Example()
         {
@@ -995,6 +1011,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "FormField",
+                    Path = "form-field",
+                    Title = "Blazor form field component",
+                    Icon = "&#xe578",
+                    New = true,
+                    Tags = new [] { "form", "label", "floating", "float", "edit", "outline", "input", "helper", "valid" }
+                },
+                new Example()
+                {
                     Name="HtmlEditor",
                     Icon = "&#xe3c9",
                     Children = new [] {
@@ -1043,7 +1068,7 @@ namespace RadzenBlazorDemos
                     Name = "Password",
                     Path = "password",
                     Title = "Blazor password textbox component",
-                    Icon = "&#xe8a1",
+                    Icon = "&#xf042",
                     Tags = new [] { "input", "form", "edit" }
                 },
                 new Example()

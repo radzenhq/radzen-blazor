@@ -1316,5 +1316,30 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
 // Splitter
 $splitter-bar-background-color-active: var(--rz-primary) !default;
 
+// FormField
+$form-field-margin: 0.5rem 0 0 !default;
+$form-field-start-end-padding: 0 0.75rem !default;
+$form-field-filled-height: 3.375rem !default;
+$form-field-filled-padding: 1.4375rem 0.9375rem 0.4375rem !default;
+$form-field-filled-numeric-padding: 1.4375rem 1.25rem 0.4375rem 0.9375rem !default;
+$form-field-filled-background-color: var(--rz-base-200) !default;
+$form-field-filled-hover-background-color: var(--rz-base-300) !default;
+$form-field-filled-border: var(--rz-border-width) solid var(--rz-base-200) !default;
+$form-field-filled-hover-border: var(--rz-border-width) solid var(--rz-base-300) !default;
+$form-field-filled-focus-border: $form-field-filled-border !default;
+$form-field-filled-border-radius: var(--rz-border-radius) var(--rz-border-radius) 0 0 !default;
+$form-field-filled-label-floating-top: 0.5rem !default;
+$form-field-filled-hover-shadow: none !default;
+$form-field-filled-focus-shadow: none !default;
+$form-field-filled-underline-display: block !default;
+$form-field-hover-shadow: var(--rz-input-hover-shadow) !default;
+$form-field-focus-shadow: var(--rz-input-focus-shadow) !default;
+$form-field-label-padding: 0 0.25rem !default;
+$form-field-text-label-padding: 0 !default;
+$form-field-label-left: 0.6875rem !default;
+$form-field-label-textarea-top: 0.5rem !default;
+$form-field-label-floating-top: -0.4375rem !default;
+$form-field-helper-padding: 0 1rem !default;
+
 @import 'fonts';
 @import 'components';

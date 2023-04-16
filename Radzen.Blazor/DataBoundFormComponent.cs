@@ -289,10 +289,13 @@ namespace Radzen
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var dataChanged = parameters.DidParameterChange(nameof(Data), Data);
+
             if (dataChanged)
             {
                 await OnDataChanged();
             }
+
+            var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
 
             var result = base.SetParametersAsync(parameters);
 
@@ -300,6 +303,11 @@ namespace Radzen
             {
                 FieldIdentifier = FieldIdentifier.Create(ValueExpression);
                 EditContext.OnValidationStateChanged += ValidationStateChanged;
+            }
+
+            if (disabledChanged)
+            {
+                FormFieldContext?.DisabledChanged(Disabled);
             }
 
             await result;
@@ -347,6 +355,12 @@ namespace Radzen
         /// <returns>ClassList.</returns>
         protected ClassList GetClassList(string className) => ClassList.Create(className)
                                                                        .AddDisabled(Disabled)
-                                                                       .Add(FieldIdentifier, EditContext);
+                                                                       .Add(FieldIdentifier, EditContext)
+                                                                       .Add("rz-state-empty", !HasValue);
+
+        [CascadingParameter]
+        public IFormFieldContext FormFieldContext { get; set; }
+
+        protected string CurrentPlaceholder => FormFieldContext != null ? " " : Placeholder;
     }
 }

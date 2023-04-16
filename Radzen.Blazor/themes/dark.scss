@@ -373,6 +373,10 @@ $editor-separator-background-color: var(--rz-base-700) !default;
 $splitter-bar-background-color: var(--rz-base-700) !default;
 $splitter-bar-hover-opacity: 0.8 !default;
 
+// FormField
+$form-field-filled-background-color: var(--rz-base-700) !default;
+$form-field-filled-hover-background-color: var(--rz-base-700) !default;
+
 @import 'bootstrap';
 $bootstrap: true;
 

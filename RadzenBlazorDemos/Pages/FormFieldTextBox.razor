@@ -1,0 +1,26 @@
+<RadzenRow AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap" Gap="1rem" Class="rz-p-sm-12">
+    <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+        <RadzenFormField Text="Outlined/Default" Style="width: 100%;">
+            <RadzenTextBox @bind-Value="@value" Style="width: 100%;" />
+        </RadzenFormField>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+        <RadzenFormField Text="Text" Variant="Variant.Text" Style="width: 100%;">
+            <RadzenTextBox @bind-Value="@value" Style="width: 100%;" />
+        </RadzenFormField>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+        <RadzenFormField Text="Flat" Variant="Variant.Flat" Style="width: 100%;">
+            <RadzenTextBox @bind-Value="@value" Style="width: 100%;" />
+        </RadzenFormField>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+        <RadzenFormField Text="Filled" Variant="Variant.Filled" Style="width: 100%;">
+            <RadzenTextBox @bind-Value="@value" Style="width: 100%;" />
+        </RadzenFormField>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    string value = "";
+}
