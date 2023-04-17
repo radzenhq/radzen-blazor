@@ -331,7 +331,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenDataGridColumn{TItem}"/> is frozen.
         /// </summary>
-        /// <value><c>true</c> if frozen; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if frozen will disable horizontal scroll for the column; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Frozen { get; set; }
 
