@@ -978,13 +978,16 @@ window.Radzen = {
       document.body.classList.add('no-scroll');
     }
 
-    if (options.autoFocusFirstElement) {
-        setTimeout(function () {
-            var dialogs = document.querySelectorAll('.rz-dialog-content');
-            if (dialogs.length == 0) return;
-            var lastDialog = dialogs[dialogs.length - 1];
+    setTimeout(function () {
+        var dialogs = document.querySelectorAll('.rz-dialog-content');
+        if (dialogs.length == 0) return;
+        var lastDialog = dialogs[dialogs.length - 1];
 
-            if (lastDialog) {
+        if (lastDialog) {
+            lastDialog.removeEventListener('keydown', Radzen.focusTrapDialog);
+            lastDialog.addEventListener('keydown', Radzen.focusTrapDialog);
+
+            if (options.autoFocusFirstElement) {
                 if (lastDialog.querySelectorAll('.rz-html-editor-content').length) {
                     var editable = lastDialog.querySelector('.rz-html-editor-content');
                     if (editable) {
@@ -996,16 +999,16 @@ window.Radzen = {
                         selection.addRange(range);
                     }
                 } else {
-                    var focusable = [...lastDialog.querySelectorAll('a, button, input, textarea, select, details, iframe, embed, object, summary dialog, audio[controls], video[controls], [contenteditable], [tabindex]')]
-                        .filter(el => el && el.tabIndex > -1 && !el.hasAttribute('disabled') && !el.hasAttribute('hidden') && el.computedStyleMap && el.computedStyleMap().get('display').value !== 'none');
+                    var focusable = Radzen.getFocusableDialogElements();
                     var firstFocusable = focusable[0];
                     if (firstFocusable) {
                         firstFocusable.focus();
                     }
                 }
             }
-        }, 500);
-    }
+        }
+    }, 500);
+    
     if (options.closeDialogOnEsc) {
         document.removeEventListener('keydown', Radzen.closePopupOrDialog);
         document.addEventListener('keydown', Radzen.closePopupOrDialog);
@@ -1014,6 +1017,33 @@ window.Radzen = {
   closeDialog: function () {
     document.body.classList.remove('no-scroll');
     document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+  },
+  getFocusableDialogElements: function () {
+    var dialogs = document.querySelectorAll('.rz-dialog-content');
+    if (dialogs.length == 0) return [];
+    var lastDialog = dialogs[dialogs.length - 1];
+    return [...lastDialog.querySelectorAll('a, button, input, textarea, select, details, iframe, embed, object, summary dialog, audio[controls], video[controls], [contenteditable], [tabindex]')]
+            .filter(el => el && el.tabIndex > -1 && !el.hasAttribute('disabled') && !el.hasAttribute('hidden') && el.computedStyleMap && el.computedStyleMap().get('display').value !== 'none');
+  },
+  focusTrapDialog: function (e) {
+    e = e || window.event;
+    var isTab = false;
+    if ("key" in e) {
+        isTab = (e.key === "Tab");
+    } else {
+        isTab = (e.keyCode === 9);
+    }
+    if (isTab) {
+        var focusable = Radzen.getFocusableDialogElements();
+
+        if (focusable[0] && e.shiftKey && document.activeElement === focusable[0]) {
+            e.preventDefault();
+            focusable[0].focus();
+        } else if (focusable[focusable.length - 1] && !e.shiftKey && document.activeElement === focusable[focusable.length - 1]) {
+            e.preventDefault();
+            focusable[focusable.length - 1].focus();
+        }
+    }
   },
   closePopupOrDialog: function (e) {
       e = e || window.event;
