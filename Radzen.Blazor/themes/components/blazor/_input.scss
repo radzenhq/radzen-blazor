@@ -65,7 +65,7 @@ $input-transition: var(--rz-transition-all) !default;
 }
 
 %input-disabled {
-  div:not(.rz-form-field) > & {
+  div:not(.rz-form-field-content) > & {
     color: var(--rz-input-disabled-color);
     box-shadow: var(--rz-input-disabled-shadow);
     background-color: var(--rz-input-disabled-background-color);
