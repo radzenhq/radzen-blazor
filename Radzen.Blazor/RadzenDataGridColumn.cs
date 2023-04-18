@@ -158,7 +158,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool Visible 
+        public bool Visible
         {
             get
             {
@@ -331,7 +331,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenDataGridColumn{TItem}"/> is frozen.
         /// </summary>
-        /// <value><c>true</c> if frozen; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if frozen will disable horizontal scroll for the column; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Frozen { get; set; }
 
@@ -440,7 +440,7 @@ namespace Radzen.Blazor
             if ((PropertyAccess.IsEnum(FilterPropertyType) || PropertyAccess.IsNullableEnum(FilterPropertyType)) && value != null)
             {
                 var enumValue = value as Enum;
-                if (enumValue != null) 
+                if (enumValue != null)
                 {
                     value = EnumExtensions.GetDisplayDescription(enumValue);
                 }
@@ -842,10 +842,10 @@ namespace Radzen.Blazor
         }
 
         internal bool CanSetFilterValue()
-        { 
-            return GetFilterOperator() == FilterOperator.IsNull 
-                    || GetFilterOperator() == FilterOperator.IsNotNull 
-                    ||  GetFilterOperator() == FilterOperator.IsEmpty 
+        {
+            return GetFilterOperator() == FilterOperator.IsNull
+                    || GetFilterOperator() == FilterOperator.IsNotNull
+                    ||  GetFilterOperator() == FilterOperator.IsEmpty
                     || GetFilterOperator() == FilterOperator.IsNotEmpty;
         }
 
@@ -953,15 +953,15 @@ namespace Radzen.Blazor
         {
             if (PropertyAccess.IsEnum(FilterPropertyType))
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals };
-            
+
             if (PropertyAccess.IsNullableEnum(FilterPropertyType))
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.IsNull, FilterOperator.IsNotNull };
 
             return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
-                var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain 
+                var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain
                     || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith || o == FilterOperator.IsEmpty || o == FilterOperator.IsNotEmpty;
-                return FilterPropertyType == typeof(string) ? isStringOperator 
-                      || o == FilterOperator.Equals || o == FilterOperator.NotEquals 
+                return FilterPropertyType == typeof(string) ? isStringOperator
+                      || o == FilterOperator.Equals || o == FilterOperator.NotEquals
                       || o == FilterOperator.IsNull || o == FilterOperator.IsNotNull
                     : !isStringOperator;
             });
@@ -1042,13 +1042,33 @@ namespace Radzen.Blazor
             }
         }
 
-
         /// <summary>
         /// Gets value indicating if the user can specify time in DateTime column filter.
         /// </summary>
         public virtual bool ShowTimeForDateTimeFilter()
         {
             return true;
+        }
+
+        /// <summary>
+        /// Gets an OData expression to filter by this column.
+        /// </summary>
+        /// <param name="second">Whether to use <see cref="SecondFilterValue"/> instead of <see cref="FilterValue"/></param>
+        /// <returns>An OData expression to filter by this column.</returns>
+        public string GetColumnODataFilter(bool second = false)
+        {
+            return GetColumnODataFilter(second ? GetSecondFilterValue() : GetFilterValue(), second ? GetSecondFilterOperator() : GetFilterOperator());
+        }
+
+        /// <summary>
+        /// Gets an OData expression to filter by this column.
+        /// </summary>
+        /// <param name="filterValue">The specific value to filter by</param>
+        /// <param name="filterOperator">The operator used to compare to <paramref name="filterValue"/></param>
+        /// <returns>An OData expression to filter by this column.</returns>
+        protected virtual string GetColumnODataFilter(object filterValue, FilterOperator filterOperator)
+        {
+            return QueryableExtension.GetColumnODataFilter(this, filterValue, filterOperator);
         }
 
         /// <summary>
