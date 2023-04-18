@@ -3,7 +3,7 @@
 
 @if (Visible)
 {
-<div @ref="@Element" for="@Component" tyle="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" onfocusin="this.classList.add('rz-state-focused')" onfocusout="this.classList.remove('rz-state-focused')">
+<div @ref="@Element" for="@Component" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" onfocusin="this.classList.add('rz-state-focused')" onfocusout="this.classList.remove('rz-state-focused')">
     <div class="rz-form-field-content">
         <CascadingValue Value=@context>
         @if (Start != null)
