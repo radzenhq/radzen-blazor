@@ -1,0 +1,11 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+  <RadzenCheckBox ReadOnly=@readonlyValue @bind-Value=@value Name="CheckBox51" />
+  <RadzenLabel Text="CheckBox" Component="CheckBox41" Style="margin-left: 8px; vertical-align: middle;" />
+  <RadzenCheckBox @bind-Value=readonlyValue Name="CheckBox52" />
+  <RadzenLabel Text="Read only" Component="CheckBox52" Style="margin-left: 8px; vertical-align: middle;" />
+</div>
+
+@code {
+  bool value = true;
+  bool readonlyValue = true;
+}
