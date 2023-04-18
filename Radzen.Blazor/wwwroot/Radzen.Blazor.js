@@ -1035,13 +1035,15 @@ window.Radzen = {
     }
     if (isTab) {
         var focusable = Radzen.getFocusableDialogElements();
+        var firstFocusable = focusable[0];
+        var lastFocusable = focusable[focusable.length - 1];
 
-        if (focusable[0] && e.shiftKey && document.activeElement === focusable[0]) {
+        if (firstFocusable && e.shiftKey && document.activeElement === firstFocusable) {
             e.preventDefault();
-            focusable[0].focus();
-        } else if (focusable[focusable.length - 1] && !e.shiftKey && document.activeElement === focusable[focusable.length - 1]) {
+            firstFocusable.focus();
+        } else if (lastFocusable && !e.shiftKey && document.activeElement === lastFocusable) {
             e.preventDefault();
-            focusable[focusable.length - 1].focus();
+            lastFocusable.focus();
         }
     }
   },
