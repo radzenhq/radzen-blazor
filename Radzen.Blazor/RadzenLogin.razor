@@ -3,6 +3,25 @@
 @if (Visible)
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+        @if (FormFieldVariant != null)
+        {
+            <RadzenStack>
+                <RadzenFormField Text="@UserText" Variant="@FormFieldVariant.Value">
+                    <RadzenTextBox AutoComplete=@AutoComplete AutoCompleteType=@UserNameAutoCompleteType id=@Id("username") Name="Username" @bind-Value=@username />
+                </RadzenFormField>
+                <RadzenFormField Text="@PasswordText" Variant="@FormFieldVariant.Value">
+                    <RadzenPassword id=@Id("password") AutoComplete=@AutoComplete AutoCompleteType=@PasswordAutoCompleteType Name="Password" @bind-Value=@password />
+                </RadzenFormField>
+                @if (AllowRememberMe)
+                {
+                    <RadzenFormField Text="@RememberMeText" Variant="@FormFieldVariant.Value">
+                        <RadzenSwitch @bind-Value="@rememberMe" id=@Id("rememberMe") Name="RememberMe" />
+                    </RadzenFormField>
+                }
+            </RadzenStack>
+        }
+        else
+        {
         <div class="rz-form">
             <div class="rz-form-row">
                 <label class="rz-label" for=@Id("username")>@UserText</label>
@@ -45,6 +64,7 @@
                 @RegisterMessageText
                 <RadzenButton ButtonType="ButtonType.Button" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Lighter" Text=@RegisterText Click=@OnRegister />
             </div>
+        }
         }
     </div>
 }

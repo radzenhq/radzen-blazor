@@ -64,6 +64,13 @@ namespace Radzen.Blazor
         [Parameter]
         public AutoCompleteType PasswordAutoCompleteType { get; set; } = AutoCompleteType.CurrentPassword;
 
+        /// <summary>
+        /// Gets or sets the design variant of the form field.
+        /// </summary>
+        /// <value>The variant of the form field.</value>
+        [Parameter]
+        public Variant? FormFieldVariant { get; set; }
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
