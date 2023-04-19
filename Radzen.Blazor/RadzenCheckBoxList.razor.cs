@@ -46,6 +46,20 @@ namespace Radzen.Blazor
         [Parameter]
         public string TextProperty { get; set; }
 
+        /// <summary>
+        /// Gets or sets the disabled property.
+        /// </summary>
+        /// <value>The disabled property.</value>
+        [Parameter]
+        public string DisabledProperty { get; set; }
+
+        /// <summary>
+        /// Gets or sets the read-only property.
+        /// </summary>
+        /// <value>The read-only property.</value>
+        [Parameter]
+        public string ReadOnlyProperty { get; set; }
+
         IEnumerable<RadzenCheckBoxListItem<TValue>> allItems
         {
             get
@@ -55,6 +69,17 @@ namespace Radzen.Blazor
                     var item = new RadzenCheckBoxListItem<TValue>();
                     item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
                     item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
+
+                    if (DisabledProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, DisabledProperty, out var disabledResult))
+                    {
+                        item.SetDisabled(disabledResult);
+                    }
+
+                    if (ReadOnlyProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, ReadOnlyProperty, out var readOnlyResult))
+                    {
+                        item.SetReadOnly(readOnlyResult);
+                    }
+
                     return item;
                 }));
             }

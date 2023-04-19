@@ -77,6 +77,17 @@ namespace Radzen.Blazor
         {
             Value = value;
         }
+
+        internal void SetDisabled(bool value)
+        {
+            Disabled = value;
+        }
+
+        internal void SetReadOnly(bool value)
+        {
+            ReadOnly = value;
+        }
+
         internal string GetItemId()
         {
             return GetId();
