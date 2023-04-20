@@ -139,13 +139,12 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
-                try {
+                try 
+                {
                     await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
                 }
-                catch (JSDisconnectedException ex)
-                {
-                     // Ignore
-                }
+                catch
+                { }
             }
 
             Service.OnOpen -= OnOpen;
