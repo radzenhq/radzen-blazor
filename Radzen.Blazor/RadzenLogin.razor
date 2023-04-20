@@ -19,6 +19,20 @@
                     </RadzenFormField>
                 }
             </RadzenStack>
+            <RadzenStack style="margin-top:1rem;" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text=@LoginText Click=@OnLogin />
+                @if (AllowResetPassword)
+                {
+                    <a class="rz-link" @onclick=@OnReset>@ResetPasswordText</a>
+                }
+            </RadzenStack>
+            @if (AllowRegister)
+            {
+                <div class="rz-register">
+                    @RegisterMessageText
+                    <RadzenButton ButtonType="ButtonType.Button" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Lighter" Text=@RegisterText Click=@OnRegister />
+                </div>
+            }
         }
         else
         {
