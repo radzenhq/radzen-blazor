@@ -5,7 +5,7 @@
 @inherits FormComponent<TValue>
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onkeypress=@OnKeyPress @onkeypress:preventDefault style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@GetId()">
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onkeypress=@OnKeyPress @onkeypress:preventDefault style="@Style" tabindex="@(Disabled || ReadOnly ? "-1" : $"{TabIndex}")" id="@GetId()">
     <div class="rz-helper-hidden-accessible">
         <input type="checkbox" @onchange=@Toggle value=@CheckBoxValue name=@Name id=@Name checked=@CheckBoxChecked
             tabindex="-1" readonly="@ReadOnly">
