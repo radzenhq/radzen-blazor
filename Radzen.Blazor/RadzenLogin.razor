@@ -7,10 +7,20 @@
         {
             <RadzenStack>
                 <RadzenFormField Text="@UserText" Variant="@FormFieldVariant.Value">
-                    <RadzenTextBox AutoComplete=@AutoComplete AutoCompleteType=@UserNameAutoCompleteType id=@Id("username") Name="Username" @bind-Value=@username />
+                    <ChildContent>
+                        <RadzenTextBox AutoComplete=@AutoComplete AutoCompleteType=@UserNameAutoCompleteType id=@Id("username") Name="Username" @bind-Value=@username />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="Username" Text=@UserRequired />
+                    </Helper>
                 </RadzenFormField>
                 <RadzenFormField Text="@PasswordText" Variant="@FormFieldVariant.Value">
-                    <RadzenPassword id=@Id("password") AutoComplete=@AutoComplete AutoCompleteType=@PasswordAutoCompleteType Name="Password" @bind-Value=@password />
+                    <ChildContent>
+                        <RadzenPassword id=@Id("password") AutoComplete=@AutoComplete AutoCompleteType=@PasswordAutoCompleteType Name="Password" @bind-Value=@password />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="Password" Text=@PasswordRequired />
+                    </Helper>
                 </RadzenFormField>
                 @if (AllowRememberMe)
                 {
