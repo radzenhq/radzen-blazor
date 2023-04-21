@@ -253,7 +253,7 @@ namespace Radzen
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                 CssClass = options != null ? options.CssClass : "",
-                EscapeTabIndex = options != null ? options.EscapeTabIndex : 0,
+                CloseTabIndex = options != null ? options.CloseTabIndex : 0,
             });
         }
 
@@ -315,7 +315,7 @@ namespace Radzen
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                 CssClass = options != null ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm",
-                EscapeTabIndex = options != null ? options.EscapeTabIndex : 0,
+                CloseTabIndex = options != null ? options.CloseTabIndex : 0,
             };
 
             return await OpenAsync(title, ds =>
@@ -374,7 +374,7 @@ namespace Radzen
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                 CssClass = options != null ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert",
-                EscapeTabIndex = options != null ? options.EscapeTabIndex : 0,
+                CloseTabIndex = options != null ? options.CloseTabIndex : 0,
             };
 
             return await OpenAsync(title, ds =>
@@ -448,7 +448,7 @@ namespace Radzen
         /// <summary>
         /// Gets or sets a value the dialog escape tabindex. Set to <c>0</c> by default.
         /// </summary>
-        public int EscapeTabIndex { get; set; } = 0;
+        public int CloseTabIndex { get; set; } = 0;
     }
 
     /// <summary>
