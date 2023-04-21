@@ -86,6 +86,7 @@ $paginator-button-size: ".rz-button-md" !default;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
 
   &.rz-align-right {
     justify-content: flex-end;
