@@ -273,32 +273,33 @@ namespace Radzen.Blazor
                 builder.AddAttribute(1, "style", Style);
                 builder.AddMultipleAttributes(2, Attributes);
                 builder.AddAttribute(3, "class", classList.ToString());
+                builder.AddAttribute(4, "id", GetId());
 
                 if (!string.IsNullOrEmpty(Text))
                 {
-                    builder.AddContent(4, Text);
+                    builder.AddContent(5, Text);
                 }
                 else
                 {
-                    builder.AddContent(4, ChildContent);
+                    builder.AddContent(5, ChildContent);
                 }
 
                 if (!string.IsNullOrEmpty(Anchor))
                 {
                     var fragments = Anchor.Split('#');
                     var name = fragments.Length > 1 ? fragments[1] : fragments[0];
-                    builder.OpenElement(5, "a");
-                    builder.AddAttribute(6, "name", name);
-                    builder.AddAttribute(7, "href", Anchor);
-                    builder.AddAttribute(8, "class", "rz-link");
-                    builder.AddAttribute(9, "target", "_top"); // To support relative links without the Blazor router interfering
-                    builder.OpenComponent<RadzenIcon>(10);
-                    builder.AddAttribute(11, "Icon", "link");
+                    builder.OpenElement(6, "a");
+                    builder.AddAttribute(7, "name", name);
+                    builder.AddAttribute(8, "href", Anchor);
+                    builder.AddAttribute(9, "class", "rz-link");
+                    builder.AddAttribute(10, "target", "_top"); // To support relative links without the Blazor router interfering
+                    builder.OpenComponent<RadzenIcon>(11);
+                    builder.AddAttribute(12, "Icon", "link");
                     builder.CloseComponent();
 
                     builder.CloseElement();
                 }
-                builder.AddElementReferenceCapture(12, capture => Element = capture);
+                builder.AddElementReferenceCapture(13, capture => Element = capture);
                 builder.CloseElement();
             }
         }
