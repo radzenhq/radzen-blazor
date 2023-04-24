@@ -15,20 +15,20 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenDataGrid component.
+    /// NexusDataGrid component.
     /// </summary>
     /// <typeparam name="TItem">The type of the DataGrid data item.</typeparam>
     /// <example>
     /// <code>
-    /// &lt;RadzenDataGrid @data=@orders TItem="Order" AllowSorting="true" AllowPaging="true" AllowFiltering="true"&gt;
+    /// &lt;NexusDataGrid @data=@orders TItem="Order" AllowSorting="true" AllowPaging="true" AllowFiltering="true"&gt;
     ///     &lt;Columns&gt;
-    ///         &lt;RadzenDataGridColumn TItem="Order" Property="OrderId" Title="OrderId" /&gt;
-    ///         &lt;RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="OrderDate" /&gt;
+    ///         &lt;NexusDataGridColumn TItem="Order" Property="OrderId" Title="OrderId" /&gt;
+    ///         &lt;NexusDataGridColumn TItem="Order" Property="OrderDate" Title="OrderDate" /&gt;
     ///     &lt;/Columns&gt;
-    /// &lt;/RadzenDataGrid&gt;
+    /// &lt;/NexusDataGrid&gt;
     /// </code>
     /// </example>
-    public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem>
+    public partial class NexusDataGrid<TItem> : PagedDataBoundComponent<TItem>
     {
 #if NET5_0_OR_GREATER
         /// <summary>
@@ -103,7 +103,7 @@ namespace Radzen.Blazor
         }
 #endif
        
-        RenderFragment DrawRows(IList<RadzenDataGridColumn<TItem>> visibleColumns)
+        RenderFragment DrawRows(IList<NexusDataGridColumn<TItem>> visibleColumns)
         {
             return new RenderFragment(builder =>
             {
@@ -119,7 +119,7 @@ namespace Radzen.Blazor
                         {
                             return (RenderFragment)((b) =>
                             {
-                                b.OpenComponent(3, typeof(RadzenDataGridGroupRow<TItem>));
+                                b.OpenComponent(3, typeof(NexusDataGridGroupRow<TItem>));
                                 b.AddAttribute(4, "Columns", visibleColumns);
                                 b.AddAttribute(5, "Grid", this);
                                 b.AddAttribute(6, "GroupResult", context);
@@ -140,7 +140,7 @@ namespace Radzen.Blazor
                         {
                             return (RenderFragment)((b) =>
                             {
-                                b.OpenComponent<RadzenDataGridRow<TItem>>(3);
+                                b.OpenComponent<NexusDataGridRow<TItem>>(3);
                                 b.AddAttribute(4, "Columns", visibleColumns);
                                 b.AddAttribute(5, "Grid", this);
                                 b.AddAttribute(6, "TItem", typeof(TItem));
@@ -150,7 +150,7 @@ namespace Radzen.Blazor
 
                                 if (editContexts.Keys.Any(i => ItemEquals(i, context)))
                                 {
-                                    b.AddAttribute(10, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[context]);
+                                    b.AddAttribute(10, nameof(NexusDataGridRow<TItem>.EditContext), editContexts[context]);
                                 }
 
                                 b.SetKey(context);
@@ -179,13 +179,13 @@ namespace Radzen.Blazor
             });
         }
 
-        internal void DrawGroupOrDataRows(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, IList<RadzenDataGridColumn<TItem>> visibleColumns)
+        internal void DrawGroupOrDataRows(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, IList<NexusDataGridColumn<TItem>> visibleColumns)
         {
             if (Groups.Any())
             {
                 foreach (var group in GroupedPagedView)
                 {
-                    builder.OpenComponent(0, typeof(RadzenDataGridGroupRow<TItem>));
+                    builder.OpenComponent(0, typeof(NexusDataGridGroupRow<TItem>));
                     builder.AddAttribute(1, "Columns", visibleColumns);
                     builder.AddAttribute(3, "Grid", this);
                     builder.AddAttribute(5, "GroupResult", group);
@@ -198,7 +198,7 @@ namespace Radzen.Blazor
                 int i = 0;
                 foreach (var item in PagedView)
                 {
-                    builder.OpenComponent<RadzenDataGridRow<TItem>>(0);
+                    builder.OpenComponent<NexusDataGridRow<TItem>>(0);
                     builder.AddAttribute(1, "Columns", visibleColumns);
                     builder.AddAttribute(2, "Index", i);
                     builder.AddAttribute(3, "Grid", this);
@@ -208,7 +208,7 @@ namespace Radzen.Blazor
 
                     if (editContexts.ContainsKey(item))
                     {
-                        builder.AddAttribute(7, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[item]);
+                        builder.AddAttribute(7, nameof(NexusDataGridRow<TItem>.EditContext), editContexts[item]);
                     }
 
                     builder.CloseComponent();
@@ -273,7 +273,7 @@ namespace Radzen.Blazor
             var column = columns.Where(c => c.GetGroupProperty() == gd.Property).FirstOrDefault();
             if (column != null)
             {
-                await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = null });
+                await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { NexusColumn = column, GroupDescriptor = null });
             }
             if (IsVirtualizationAllowed())
             {
@@ -288,12 +288,12 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<DataGridColumnGroupEventArgs<TItem>> Group { get; set; }
 
-        internal string getFrozenColumnClass(RadzenDataGridColumn<TItem> column, IList<RadzenDataGridColumn<TItem>> visibleColumns)
+        internal string getFrozenColumnClass(NexusDataGridColumn<TItem> column, IList<NexusDataGridColumn<TItem>> visibleColumns)
         {
             return column.IsFrozen() ? "rz-frozen-cell" : "";
         }
 
-        internal string getColumnAlignClass(RadzenDataGridColumn<TItem> column)
+        internal string getColumnAlignClass(NexusDataGridColumn<TItem> column)
         {
             return $"rz-text-align-{column.TextAlign.ToString().ToLower()}";
         }
@@ -304,7 +304,7 @@ namespace Radzen.Blazor
         /// <param name="column">The column.</param>
         /// <param name="value">The value.</param>
         /// <returns>System.String.</returns>
-        protected string DateFilterOperatorStyle(RadzenDataGridColumn<TItem> column, FilterOperator value)
+        protected string DateFilterOperatorStyle(NexusDataGridColumn<TItem> column, FilterOperator value)
         {
             return column.GetFilterOperator() == value ?
                 "rz-listbox-item  rz-state-highlight" :
@@ -316,12 +316,12 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="args">The <see cref="EventArgs"/> instance containing the event data.</param>
         /// <param name="column">The column.</param>
-        protected void OnFilterKeyPress(EventArgs args, RadzenDataGridColumn<TItem> column)
+        protected void OnFilterKeyPress(EventArgs args, NexusDataGridColumn<TItem> column)
         {
             Debounce(() => DebounceFilter(column), FilterDelay);
         }
 
-        async Task DebounceFilter(RadzenDataGridColumn<TItem> column)
+        async Task DebounceFilter(NexusDataGridColumn<TItem> column)
         {
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", getFilterInputId(column));
             if (!object.Equals(column.GetFilterValue(), inputValue))
@@ -335,7 +335,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="column">The column.</param>
         /// <param name="filterOperator">The filter operator.</param>
-        protected void ApplyDateFilterByFilterOperator(RadzenDataGridColumn<TItem> column, FilterOperator filterOperator)
+        protected void ApplyDateFilterByFilterOperator(NexusDataGridColumn<TItem> column, FilterOperator filterOperator)
         {
             column.SetFilterOperator(filterOperator);
             SaveSettings();
@@ -346,10 +346,10 @@ namespace Radzen.Blazor
             return JSRuntime;
         }
 
-        private List<RadzenDataGridColumn<TItem>> columns = new List<RadzenDataGridColumn<TItem>>();
-        internal readonly List<RadzenDataGridColumn<TItem>> childColumns = new List<RadzenDataGridColumn<TItem>>();
-        internal List<RadzenDataGridColumn<TItem>> allColumns = new List<RadzenDataGridColumn<TItem>>();
-        private List<RadzenDataGridColumn<TItem>> allPickableColumns = new List<RadzenDataGridColumn<TItem>>();
+        private List<NexusDataGridColumn<TItem>> columns = new List<NexusDataGridColumn<TItem>>();
+        internal readonly List<NexusDataGridColumn<TItem>> childColumns = new List<NexusDataGridColumn<TItem>>();
+        internal List<NexusDataGridColumn<TItem>> allColumns = new List<NexusDataGridColumn<TItem>>();
+        private List<NexusDataGridColumn<TItem>> allPickableColumns = new List<NexusDataGridColumn<TItem>>();
 
         /// <summary>
         /// Gives the grid a custom header, allowing the adding of components to create custom tool bars in addtion to column grouping and column picker
@@ -365,6 +365,9 @@ namespace Radzen.Blazor
         /// <value>The columns.</value>
         [Parameter]
         public RenderFragment Columns { get; set; }
+
+        [Parameter]
+        public RenderFragment ChildContent { get; set; }
 
         internal void UpdateColumnsOrder()
         {
@@ -385,7 +388,7 @@ namespace Radzen.Blazor
             }
         }
 
-        internal void AddColumn(RadzenDataGridColumn<TItem> column)
+        internal void AddColumn(NexusDataGridColumn<TItem> column)
         {
             if (!columns.Contains(column) && column.Parent == null)
             {
@@ -426,7 +429,7 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        internal void UpdatePickableColumn(RadzenDataGridColumn<TItem> column, bool visible)
+        internal void UpdatePickableColumn(NexusDataGridColumn<TItem> column, bool visible)
         {
             if (selectedColumns == null)
                 return;
@@ -450,7 +453,7 @@ namespace Radzen.Blazor
             selectedColumns = columnsList;
         }
 
-        internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
+        internal void RemoveColumn(NexusDataGridColumn<TItem> column)
         {
             if (columns.Contains(column))
             {
@@ -477,14 +480,14 @@ namespace Radzen.Blazor
 
         void ToggleColumns()
         {
-            var selected = ((IEnumerable<object>)selectedColumns).Cast<RadzenDataGridColumn<TItem>>();
+            var selected = ((IEnumerable<object>)selectedColumns).Cast<NexusDataGridColumn<TItem>>();
 
             foreach (var c in allPickableColumns)
             {
                 c.SetVisible(selected.Contains(c));
             }
 
-            PickedColumnsChanged.InvokeAsync(new DataGridPickedColumnsChangedEventArgs<TItem>() { Columns = selected });
+            PickedColumnsChanged.InvokeAsync(new DataGridPickedColumnsChangedEventArgs<TItem>() { NexusColumns = selected });
             SaveSettings();
         }
 
@@ -495,12 +498,12 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<DataGridPickedColumnsChangedEventArgs<TItem>> PickedColumnsChanged { get; set; }
 
-        string getFilterInputId(RadzenDataGridColumn<TItem> column)
+        string getFilterInputId(NexusDataGridColumn<TItem> column)
         {
             return string.Join("", $"{UniqueID}".Split('.')) + column.GetFilterProperty();
         }
 
-        internal string getFilterDateFormat(RadzenDataGridColumn<TItem> column)
+        internal string getFilterDateFormat(NexusDataGridColumn<TItem> column)
         {
             if (column != null && !string.IsNullOrEmpty(column.FormatString))
             {
@@ -510,7 +513,7 @@ namespace Radzen.Blazor
             return FilterDateFormat;
         }
 
-        internal RenderFragment DrawNumericFilter(RadzenDataGridColumn<TItem> column, bool force = true, bool isFirst = true)
+        internal RenderFragment DrawNumericFilter(NexusDataGridColumn<TItem> column, bool force = true, bool isFirst = true)
         {
             return new RenderFragment(builder =>
             {
@@ -579,7 +582,7 @@ namespace Radzen.Blazor
         /// <param name="column">The column.</param>
         /// <param name="force">if set to <c>true</c> [force].</param>
         /// <param name="isFirst">if set to <c>true</c> [is first].</param>
-        protected async Task OnFilter(ChangeEventArgs args, RadzenDataGridColumn<TItem> column, bool force = false, bool isFirst = true)
+        protected async Task OnFilter(ChangeEventArgs args, NexusDataGridColumn<TItem> column, bool force = false, bool isFirst = true)
         {
             string property = column.GetFilterProperty();
             if (AllowFiltering && column.Filterable)
@@ -592,7 +595,7 @@ namespace Radzen.Blazor
 
                     await Filter.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
                     {
-                        Column = column,
+                        NexusColumn = column,
                         FilterValue = column.GetFilterValue(),
                         SecondFilterValue = column.GetSecondFilterValue(),
                         FilterOperator = column.GetFilterOperator(),
@@ -622,7 +625,7 @@ namespace Radzen.Blazor
         /// Gets the columns collection.
         /// </summary>
         /// <value>The columns collection.</value>
-        public IList<RadzenDataGridColumn<TItem>> ColumnsCollection
+        public IList<NexusDataGridColumn<TItem>> ColumnsCollection
         {
             get
             {
@@ -637,7 +640,7 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<DataGridColumnSortEventArgs<TItem>> Sort { get; set; }
 
-        internal void OnSort(EventArgs args, RadzenDataGridColumn<TItem> column)
+        internal void OnSort(EventArgs args, NexusDataGridColumn<TItem> column)
         {
             if (AllowSorting && column.Sortable)
             {
@@ -650,7 +653,7 @@ namespace Radzen.Blazor
                 {
                     SetColumnSortOrder(column);
 
-                    Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
+                    Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { NexusColumn = column, SortOrder = column.GetSortOrder() });
                     SaveSettings();
 
                     if (LoadData.HasDelegate && IsVirtualizationAllowed())
@@ -684,7 +687,7 @@ namespace Radzen.Blazor
         [Parameter]
         public PopupRenderMode FilterPopupRenderMode { get; set; } = PopupRenderMode.Initial;
 
-        internal async Task ClearFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
+        internal async Task ClearFilter(NexusDataGridColumn<TItem> column, bool closePopup = false)
         {
             if (closePopup)
             {
@@ -700,7 +703,7 @@ namespace Radzen.Blazor
 
             await FilterCleared.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>() 
             { 
-                Column = column, 
+                NexusColumn = column, 
                 FilterValue = column.GetFilterValue(),
                 SecondFilterValue = column.GetSecondFilterValue(),
                 FilterOperator = column.GetFilterOperator(),
@@ -716,7 +719,7 @@ namespace Radzen.Blazor
             await InvokeAsync(Reload);
         }
 
-        internal async Task ApplyFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
+        internal async Task ApplyFilter(NexusDataGridColumn<TItem> column, bool closePopup = false)
         {
             if (closePopup)
             {
@@ -725,9 +728,9 @@ namespace Radzen.Blazor
             OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
         }
 
-        internal IReadOnlyDictionary<string, object> CellAttributes(TItem item, RadzenDataGridColumn<TItem> column)
+        internal IReadOnlyDictionary<string, object> CellAttributes(TItem item, NexusDataGridColumn<TItem> column)
         {
-            var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { Data = item, Column = column };
+            var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { Data = item, NexusColumn = column };
 
             if (CellRender != null)
             {
@@ -737,9 +740,9 @@ namespace Radzen.Blazor
             return new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes);
         }
 
-        internal IReadOnlyDictionary<string, object> HeaderCellAttributes(RadzenDataGridColumn<TItem> column)
+        internal IReadOnlyDictionary<string, object> HeaderCellAttributes(NexusDataGridColumn<TItem> column)
         {
-            var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { Column = column };
+            var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { NexusColumn = column };
 
             if (HeaderCellRender != null)
             {
@@ -760,9 +763,9 @@ namespace Radzen.Blazor
             return new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes);
         }
 
-        internal IReadOnlyDictionary<string, object> FooterCellAttributes(RadzenDataGridColumn<TItem> column)
+        internal IReadOnlyDictionary<string, object> FooterCellAttributes(NexusDataGridColumn<TItem> column)
         {
-            var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { Column = column };
+            var args = new Radzen.DataGridCellRenderEventArgs<TItem>() { NexusColumn = column };
 
             if (FooterCellRender != null)
             {
@@ -1194,7 +1197,7 @@ namespace Radzen.Blazor
 
                     await ColumnReordered.InvokeAsync(new DataGridColumnReorderedEventArgs<TItem>
                     {
-                        Column = columnToReorder,
+                        NexusColumn = columnToReorder,
                         OldIndex = actualColumnIndexFrom,
                         NewIndex = actualColumnIndexTo
                     });
@@ -1213,14 +1216,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="columnIndex">Index of the column.</param>
         /// <param name="value">The value.</param>
-        [JSInvokable("RadzenGrid.OnColumnResized")]
+        [JSInvokable("NexusGrid.OnColumnResized")]
         public async Task OnColumnResized(int columnIndex, double value)
         {
             var column = columns.Where(c => c.GetVisible()).ToList()[columnIndex];
             column.SetWidth($"{Math.Round(value)}px");
             await ColumnResized.InvokeAsync(new DataGridColumnResizedEventArgs<TItem>
             {
-                Column = column,
+                NexusColumn = column,
                 Width = value,
             });
             SaveSettings();
@@ -1292,6 +1295,11 @@ namespace Radzen.Blazor
                 }
             }
 
+            //view = viewList.AsQueryable()
+            //    .Where(i => childData.ContainsKey(i) && childData[i].Data.AsQueryable().Where<TItem>((IEnumerable<NexusGridColumn<TItem>>)allColumns).Any()
+            //        || viewList.AsQueryable().Where<TItem>((IEnumerable<NexusGridColumn<TItem>>)allColumns).Contains(i));
+
+            //return view;
             view = viewList.AsQueryable()
                 .Where(i => childData.ContainsKey(i) && childData[i].Data.AsQueryable().Where<TItem>(allColumns).Any()
                     || viewList.AsQueryable().Where<TItem>(allColumns).Contains(i));
@@ -1350,7 +1358,7 @@ namespace Radzen.Blazor
                     }
                 }
 
-                if (!IsVirtualizationAllowed() || AllowPaging)
+                if (IsVirtualizationAllowed() || AllowPaging)
                 {
                     var count = view.Count();
                     if (count != Count)
@@ -1712,14 +1720,14 @@ namespace Radzen.Blazor
             return Task.CompletedTask;
         }
 
-        internal Dictionary<RadzenDataGridGroupRow<TItem>, bool> collapsedGroupItems = new Dictionary<RadzenDataGridGroupRow<TItem>, bool>();
+        internal Dictionary<NexusDataGridGroupRow<TItem>, bool> collapsedGroupItems = new Dictionary<NexusDataGridGroupRow<TItem>, bool>();
 
-        internal string ExpandedGroupItemStyle(RadzenDataGridGroupRow<TItem> item, bool? expandedOnLoad)
+        internal string ExpandedGroupItemStyle(NexusDataGridGroupRow<TItem> item, bool? expandedOnLoad)
         {
             return collapsedGroupItems.Keys.Contains(item) || expandedOnLoad == false ? "rz-row-toggler rzi-grid-sort rzi-chevron-circle-right" : "rz-row-toggler rzi-grid-sort rzi-chevron-circle-down";
         }
 
-        internal bool IsGroupItemExpanded(RadzenDataGridGroupRow<TItem> item)
+        internal bool IsGroupItemExpanded(NexusDataGridGroupRow<TItem> item)
         {
             return !collapsedGroupItems.Keys.Contains(item);
         }
@@ -1753,7 +1761,7 @@ namespace Radzen.Blazor
 
         internal bool? allGroupsExpanded;
 
-        internal async System.Threading.Tasks.Task ExpandGroupItem(RadzenDataGridGroupRow<TItem> item, bool? expandedOnLoad)
+        internal async System.Threading.Tasks.Task ExpandGroupItem(NexusDataGridGroupRow<TItem> item, bool? expandedOnLoad)
         {
             if (expandedOnLoad == true)
                 return;
@@ -1803,7 +1811,7 @@ namespace Radzen.Blazor
             return new Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>>(args, new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes));
         }
 
-        internal Tuple<GroupRowRenderEventArgs, IReadOnlyDictionary<string, object>> GroupRowAttributes(RadzenDataGridGroupRow<TItem> item)
+        internal Tuple<GroupRowRenderEventArgs, IReadOnlyDictionary<string, object>> GroupRowAttributes(NexusDataGridGroupRow<TItem> item)
         {
             var args = new Radzen.GroupRowRenderEventArgs() { Group = item.Group, FirstRender = firstRender };
 
@@ -1897,7 +1905,7 @@ namespace Radzen.Blazor
                     await LoadSettings(settings);
                 }
 
-                var args = new Radzen.DataGridRenderEventArgs<TItem>() { Grid = this, FirstRender = firstRender };
+                var args = new Radzen.DataGridRenderEventArgs<TItem>() { NexusGrid = this, FirstRender = firstRender };
 
                 if (Render != null)
                 {
@@ -2047,15 +2055,11 @@ namespace Radzen.Blazor
         [Parameter]
         public DataGridGridLines GridLines { get; set; } = DataGridGridLines.Default;
 
-        internal bool ShowGridLines(RadzenDataGridColumn<TItem> column)
+        internal bool ShowGridLines(NexusDataGridColumn<TItem> column)
         {
             return column.Columns != null || column.Parent != null;
         }
 
-        internal string getCompositeCellCSSClass(RadzenDataGridColumn<TItem> column)
-        {
-            return column.Columns != null || column.Parent != null ? "rz-composite-cell" : "";
-        }
         internal string getCompositeCellCSSClass(NexusDataGridColumn<TItem> column)
         {
             return column.Columns != null || column.Parent != null ? "rz-composite-cell" : "";
@@ -2414,7 +2418,7 @@ namespace Radzen.Blazor
 
         internal List<SortDescriptor> sorts = new List<SortDescriptor>();
 
-        internal void SetColumnSortOrder(RadzenDataGridColumn<TItem> column)
+        internal void SetColumnSortOrder(NexusDataGridColumn<TItem> column)
         {
             if (!AllowMultiColumnSorting)
             {
@@ -2456,7 +2460,6 @@ namespace Radzen.Blazor
                 sorts.Add(descriptor);
             }
         }
-        
 
         void GroupsCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
@@ -2500,7 +2503,7 @@ namespace Radzen.Blazor
             SaveSettings();
         }
 
-        List<RadzenDataGridColumn<TItem>> groupedColumns = new List<RadzenDataGridColumn<TItem>>();
+        List<NexusDataGridColumn<TItem>> groupedColumns = new List<NexusDataGridColumn<TItem>>();
         /// <summary>
         /// Gets or sets the group descriptors.
         /// </summary>
@@ -2544,7 +2547,7 @@ namespace Radzen.Blazor
                         Groups.Add(descriptor);
                         _groupedPagedView = null;
 
-                        await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = descriptor });
+                        await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { NexusColumn = column, GroupDescriptor = descriptor });
 
                         if (IsVirtualizationAllowed())
                         {
@@ -2570,7 +2573,7 @@ namespace Radzen.Blazor
             if (column != null)
             {
                 SetColumnSortOrder(column);
-                Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
+                Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { NexusColumn = column, SortOrder = column.GetSortOrder() });
                 SaveSettings();
             }
 
@@ -2604,7 +2607,7 @@ namespace Radzen.Blazor
                 column.SetSortOrderInternal(SortOrder.Ascending);
                 SetColumnSortOrder(column);
 
-                Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
+                Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { NexusColumn = column, SortOrder = column.GetSortOrder() });
                 SaveSettings();
             }
 

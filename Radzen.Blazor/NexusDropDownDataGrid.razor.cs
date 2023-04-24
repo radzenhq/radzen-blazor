@@ -155,7 +155,7 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Columns { get; set; }
 
-        RadzenDataGrid<TValue> grid;
+        NexusDataGrid<TValue> grid;
 
         /// <summary>
         /// Gets or sets the number of maximum selected labels.
@@ -345,6 +345,9 @@ namespace Radzen.Blazor
         public bool DataGridAllowFiltering { get; set; } = false;
         [Parameter]
         public FilterMode DataGridFilterMode { get; set; } = FilterMode.Advanced;
+
+        [Parameter]
+        public bool AllowPaging { get; set; } = false;
 
 
 

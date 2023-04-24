@@ -129,8 +129,11 @@
                                 var columnIndex = visibleColumns.IndexOf(column);
                                 var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
 
-                                <RadzenDataGridHeaderCell RowIndex="@i" Grid="@this" Column="@column" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)} {getCompositeCellCSSClass(column)} {getColumnAlignClass(column)}".Trim())" Attributes="@(cellAttr)" />
+                                <NexusDataGridHeaderCell RowIndex="@i" Grid="@this" Column="@column" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)} {getCompositeCellCSSClass(column)} {getColumnAlignClass(column)}".Trim())" Attributes="@(cellAttr)" />
                             }
+@*                            <div class="flex flex-col justify-center">
+                                @ChildContent
+                            </div>*@
                         </tr>
                     }
                     @if (AllowFiltering && (FilterMode == FilterMode.Simple || FilterMode == FilterMode.SimpleWithMenu) && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())
@@ -267,7 +270,7 @@
                                                             }
                                                             else
                                                             {
-                                                                <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
+                                                                <NexusDataGridFilterMenu Grid="@this" Column="@column" />
                                                                 <RadzenDatePicker Disabled=@column.CanSetFilterValue() TValue="@object" Style="width:100%" AllowInput=@(AllowFilterDateInput) AllowClear="true"
                                                       ShowTime="false" ShowTimeOkButton="false" DateFormat="@getFilterDateFormat(column)"
                                                       Value="@column.GetFilterValue()" Change="@(args => { if(!args.HasValue) { ClearFilter(column, true); } else {column.SetFilterValue(args.Value); ApplyFilter(column, true);} })" />
@@ -284,7 +287,7 @@
                                                         {
                                                             if (FilterMode == FilterMode.SimpleWithMenu)
                                                             {
-                                                                <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
+                                                                <NexusDataGridFilterMenu Grid="@this" Column="@column" />
                                                             }
                                                             @(DrawNumericFilter(column))
                                                         }
@@ -298,9 +301,9 @@
                                                         {
                                                             if (FilterMode == FilterMode.SimpleWithMenu)
                                                             {
-                                                                <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
+                                                                <NexusDataGridFilterMenu Grid="@this" Column="@column" />
                                                             }
-                                                            <input disabled=@column.CanSetFilterValue() id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" class="rz-textbox" style="width: 100%;" />
+                                                            <input disabled=@column.CanSetFilterValue() id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" class="rz-textbox" style="width: 100%; border-radius:0.25rem" />
                                                             @if (column.GetFilterValue() != null && filters.Any(d => d.Property == column.GetFilterProperty()))
                                                             {
                                                                 <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear" style="position:absolute;right:10px;">close</i>
@@ -319,7 +322,7 @@
                 <tbody>
                     @if (Data != null)
                     {
-                        @if ((!ShowEmptyMessage || Count > 0 && (IsVirtualizationAllowed() ? Data.Any() : true) || !AllowPaging && LoadData.HasDelegate && Count == 0) )
+                        @if ((!ShowEmptyMessage || Count > 0 && (IsVirtualizationAllowed() ? Data.Any() : true) || !AllowPaging && LoadData.HasDelegate && Count == 0) @*&& _view.Count() > 0*@ )
                         {
                             if (columns.Count > 0)
                             {
@@ -374,7 +377,7 @@
                                         j = j + (int)Convert.ChangeType(colspan, TypeCode.Int32) - 1;
                                     }
 
-                                    <RadzenDataGridFooterCell RowIndex="@i" Grid="@this" Column="@column"
+                                    <NexusDataGridFooterCell RowIndex="@i" Grid="@this" Column="@column"
                                               CssClass="@($"{column.FooterCssClass} {getFrozenColumnClass(column, visibleColumns)} {getCompositeCellCSSClass(column)}".Trim())"
                                               Attributes="@(cellAttr)" />
                                 }

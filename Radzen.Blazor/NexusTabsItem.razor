@@ -1,0 +1,22 @@
+﻿@using Radzen.Blazor.Rendering
+@implements IDisposable
+@if (Visible)
+{
+    <li role="presentation" @attributes=@Attributes style=@Style class=@ClassList>
+    <a @onclick=@OnClick role="tab" href="javascript: void(0)" tabindex=@(Disabled? "-1" : "0") id="@($"{Tabs.Id}-tabpanel-{Index}-label")"
+        aria-selected=@(IsSelected? "true" : "false") aria-controls="@($"{Tabs.Id}-tabpanel-{Index}")">
+        @if (!string.IsNullOrEmpty(Icon))
+            {
+                <span class="rz-tabview-left-icon rzi">@((MarkupString)Icon)</span>
+            }
+            @if (Template != null)
+            {
+                @Template(this)
+            }
+            else
+            {
+                <span class="rz-tabview-title">@Text</span>
+            }
+        </a>
+    </li>
+}

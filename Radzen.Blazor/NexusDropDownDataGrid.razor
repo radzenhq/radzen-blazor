@@ -113,25 +113,25 @@
                 
                 @if (Template != null)
                 {
-                    <RadzenDataGrid AllowFiltering="@DataGridAllowFiltering" FilterMode="@DataGridFilterMode" AllowRowSelectOnRowClick="@AllowRowSelectOnRowClick" PagerHorizontalAlign="@PagerHorizontalAlign" PagerAlwaysVisible="@PagerAlwaysVisible" Responsive="@Responsive" AllowColumnResize="@AllowColumnResize" ColumnWidth="@ColumnWidth" @ref="grid" Data="@(Data.Cast<TValue>())"
+                    <NexusDataGrid AllowFiltering="@DataGridAllowFiltering" AllowPaging="@AllowPaging" FilterMode="@DataGridFilterMode" AllowRowSelectOnRowClick="@AllowRowSelectOnRowClick" PagerHorizontalAlign="@PagerHorizontalAlign" PagerAlwaysVisible="@PagerAlwaysVisible" Responsive="@Responsive" AllowColumnResize="@AllowColumnResize" ColumnWidth="@ColumnWidth" @ref="grid" Data="@(Data.Cast<TValue>())"
                             TItem="TValue" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" AllowVirtualization="@AllowVirtualization" Style="@(IsVirtualizationAllowed() ? "height:285px" : "")">
                         <Columns>
-                            <RadzenDataGridColumn TItem="TValue" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)">
+                            <NexusDataGridColumn TItem="TValue" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)">
                                 <Template>
                                     @Template(context)
                                 </Template>
-                            </RadzenDataGridColumn>
+                            </NexusDataGridColumn>
                         </Columns>
                         <EmptyTemplate>
                             @EmptyTemplate
                         </EmptyTemplate>
-                    </RadzenDataGrid>
+                    </NexusDataGrid>
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(TextProperty) || Columns != null)
                     {
-                        <RadzenDataGrid AllowFiltering="@DataGridAllowFiltering" FilterMode="@DataGridFilterMode" AllowRowSelectOnRowClick="@AllowRowSelectOnRowClick" PagerHorizontalAlign="@PagerHorizontalAlign" PagerAlwaysVisible="@PagerAlwaysVisible" Responsive="@Responsive" AllowColumnResize="@AllowColumnResize" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid"  Data="@(Data.Cast<TValue>())"
+                        <NexusDataGrid AllowFiltering="@DataGridAllowFiltering" AllowPaging="@AllowPaging" FilterMode="@DataGridFilterMode" AllowRowSelectOnRowClick="@AllowRowSelectOnRowClick" PagerHorizontalAlign="@PagerHorizontalAlign" PagerAlwaysVisible="@PagerAlwaysVisible" Responsive="@Responsive" AllowColumnResize="@AllowColumnResize" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(Data.Cast<TValue>())"
                             TItem="TValue"  AllowSorting="@AllowSorting" RowSelect="@OnRowSelect"  AllowVirtualization="@AllowVirtualization" Style="@(IsVirtualizationAllowed() ? "height:285px" : "")">
                             <Columns>
                                 @if (Columns != null)
@@ -140,29 +140,29 @@
                                 }
                                 else
                                 {
-                                    <RadzenDataGridColumn TItem="TValue" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)" />
+                                    <NexusDataGridColumn TItem="TValue" Property="@TextProperty" Title="@TextProperty" Type="typeof(string)" />
                                 }
                             </Columns>
                             <EmptyTemplate>
                                 @EmptyTemplate
                             </EmptyTemplate>
-                        </RadzenDataGrid>
+                        </NexusDataGrid>
                     }
                     else
                     {
-                        <RadzenDataGrid AllowFiltering="@DataGridAllowFiltering" FilterMode="@DataGridFilterMode" AllowRowSelectOnRowClick="@AllowRowSelectOnRowClick" PagerHorizontalAlign="@PagerHorizontalAlign" PagerAlwaysVisible="@PagerAlwaysVisible" Responsive="@Responsive" AllowColumnResize="@AllowColumnResize" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(Data.Cast<TValue>())"
+                        <NexusDataGrid AllowFiltering="@DataGridAllowFiltering" AllowPaging="@AllowPaging" FilterMode="@DataGridFilterMode" AllowRowSelectOnRowClick="@AllowRowSelectOnRowClick" PagerHorizontalAlign="@PagerHorizontalAlign" PagerAlwaysVisible="@PagerAlwaysVisible" Responsive="@Responsive" AllowColumnResize="@AllowColumnResize" ColumnWidth="@ColumnWidth" EmptyText="@EmptyText" @ref="grid" Data="@(Data.Cast<TValue>())"
                             TItem="TValue" AllowSorting="@AllowSorting" RowSelect="@OnRowSelect" AllowVirtualization="@AllowVirtualization" Style="@(IsVirtualizationAllowed() ? "height:285px" : "")">
                             <Columns>
-                                <RadzenDataGridColumn TItem="TValue" Property="it" Title="Item" Type="typeof(string)">
+                                <NexusDataGridColumn TItem="TValue" Property="it" Title="Item" Type="typeof(string)">
                                     <Template>
                                         @context
                                     </Template>
-                                </RadzenDataGridColumn>
+                                </NexusDataGridColumn>
                             </Columns>
                             <EmptyTemplate>
                                 @EmptyTemplate
                             </EmptyTemplate>
-                        </RadzenDataGrid>
+                        </NexusDataGrid>
                     }
                 }
             </div>

@@ -1,0 +1,33 @@
+﻿@inherits RadzenComponent
+@using System.Linq
+@using Microsoft.JSInterop
+<CascadingValue Value=this>
+@if (Visible)
+{
+    <div @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()>
+        <ul role="tablist" class="rz-tabview-nav">
+            @Tabs
+        </ul>
+        <div class="rz-tabview-panels">
+            @if(RenderMode == TabRenderMode.Client)
+            {
+                for (var i = 0; i < tabs.Count; i++)
+                {
+                <div class="rz-tabview-panel" role="tabpanel" id="@($"{Id}-tabpanel-{i}")" style="@(tabs[i] == SelectedTab ? "" : "display:none")" aria-hidden="@(tabs[i] == SelectedTab ? "false" : "true")" aria-labelledby="@($"{Id}-tabpanel-{i}-label")">
+                    @tabs[i].ChildContent
+                </div>                            
+                }
+            }
+            else
+            {
+                @if (SelectedTab?.Visible == true)
+                {
+                    <div class="rz-tabview-panel" role="tabpanel" id="@($"{Id}-tabpanel-{selectedIndex}")" aria-hidden="false" aria-labelledby="@($"{Id}-tabpanel-{selectedIndex}-label")">
+                        @SelectedTab.ChildContent
+                    </div>
+                }
+            }
+        </div>
+    </div>
+}
+</CascadingValue>

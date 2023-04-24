@@ -1,0 +1,11 @@
+﻿@typeparam TItem
+@inherits ComponentBase
+
+@if (Columns != null)
+{
+    <CascadingValue Value=this.Grid>
+        <CascadingValue Value=this>
+            @Columns
+        </CascadingValue>
+    </CascadingValue>
+}

@@ -1,0 +1,219 @@
+@using Microsoft.AspNetCore.Components.Forms
+@typeparam TItem
+@implements IRadzenForm
+@{var rowArgs = Grid?.RowAttributes(Item); }
+@{var firstLevel = Grid.AllowCompositeDataCells ? 0 : Grid.deepestChildColumnLevel; }
+@for(var i = firstLevel; i < Grid.deepestChildColumnLevel + 1; i++)
+{
+<tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
+    @foreach(var g in Grid.Groups)
+    {
+        <td class="rz-col-icon" rowspan="@(Grid.AllowCompositeDataCells ? (Grid.deepestChildColumnLevel + 1) : 1)">
+            <span class="rz-column-title"></span>
+        </td>
+    }
+    @if (Grid.Template != null && Grid.ShowExpandColumn && i == firstLevel)
+    {
+        <td class="rz-col-icon" rowspan="@(Grid.AllowCompositeDataCells ? (Grid.deepestChildColumnLevel + 1) : 1)">
+            <span class="rz-column-title"></span>
+            @if (rowArgs.Item1.Expandable)
+            {
+                <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandItem(Item))" @onclick:stopPropagation>
+                    <span class="@(Grid.ExpandedItemStyle(Item))"></span>
+                </a>
+            }
+        </td>
+    }
+
+        @for (var j = 0; j < Columns.Count; j++)
+        {
+            if (Grid.rowSpans.ContainsKey(j))
+            {
+                Grid.rowSpans[j] = Grid.rowSpans[j] - 1;
+
+                if (Grid.rowSpans[j] <= 0)
+                {
+                    Grid.rowSpans.Remove(j);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            var column = Columns[j];
+            var cellAttr = Grid.CellAttributes(Item, column);
+
+            object colspan;
+            cellAttr.TryGetValue("colspan", out colspan);
+
+            if (colspan != null)
+            {
+                j = j + (int)Convert.ChangeType(colspan, TypeCode.Int32) - 1;
+            }
+
+            object rowspan;
+            cellAttr.TryGetValue("rowspan", out rowspan);
+
+            if (rowspan != null)
+            {
+                Grid.rowSpans.Add(j, (int)Convert.ChangeType(rowspan, TypeCode.Int32));
+            }
+
+            <NexusDataGridCell Row=@this EditContext=EditContext RowIndex="@i" Grid="@this.Grid" Item="@Item" Column="@column"
+                                Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + Grid.getFrozenColumnClass(column, Columns) + " " + Grid.getCompositeCellCSSClass(column))" Attributes="@(cellAttr)">
+                @if (Grid.Responsive)
+                {
+                    <span class="rz-column-title">
+                        @if (column.HeaderTemplate != null)
+                        {
+                            @column.HeaderTemplate
+                        }
+                        else
+                        {
+                            @column.GetTitle()
+                        }
+                    </span>
+                }
+                @if (Grid.LoadChildData.HasDelegate && Grid.ShowExpandColumn && Grid.allColumns.IndexOf(column) == 0)
+                {
+                    <span class="rz-cell-toggle">
+                        <a style="@(getExpandIconStyle(rowArgs.Item1.Expandable))" href="javascript:void(0)" @onclick="@(_ => Grid.ExpandItem(Item))" @onclick:stopPropagation>
+                            <span class="@(Grid.ExpandedItemStyle(Item))"></span>
+                        </a>
+                        <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
+                            @if (Item != null)
+                            {
+                                @if (Grid.IsRowInEditMode(Item) && column.EditTemplate != null)
+                                {
+                                    @column.EditTemplate(Item)
+                                }
+                                else if (column.Template != null)
+                                {
+                                    @column.Template(Item)
+                                }
+                                else
+                                {
+                                    @column.GetValue(Item)
+                                }
+                            }
+                        </span>
+                    </span>
+                }
+                else
+                {
+                <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
+                    @if (Item != null)
+                    {
+                        @if (Grid.IsRowInEditMode(Item) && column.EditTemplate != null)
+                        {
+                            @column.EditTemplate(Item)
+                        } 
+                        else if (column.Template != null)
+                        {
+                            @column.Template(Item)
+                        }
+                        else
+                        {
+                            @column.GetValue(Item)
+                        }
+                    }
+                </span>
+                }
+            </NexusDataGridCell>
+        }
+   
+</tr>
+}
+
+@if (Grid.Template != null && Grid.expandedItems.Keys.Contains(Item))
+{
+    <tr class="rz-expanded-row-content">
+        <td colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
+            <div class="rz-expanded-row-template" style="position:sticky">
+                @Grid.Template(Item)
+            </div>
+        </td>
+    </tr>
+}
+@code {
+        [Parameter]
+        public IList<NexusDataGridColumn<TItem>> Columns { get; set; }
+
+        [Parameter]
+        public TItem Item { get; set; }
+
+        [Parameter]
+        public int Index { get; set; }
+
+        [Parameter]
+        public NexusDataGrid<TItem> Grid { get; set; }
+
+        [Parameter(CaptureUnmatchedValues = true)]
+        public IReadOnlyDictionary<string, object> Attributes { get; set; }
+
+        [Parameter]
+        public RenderFragment ChildContent { get; set; }
+
+        [Parameter]
+        public string CssClass { get; set; }
+
+        [Parameter]
+        public bool InEditMode { get; set; }
+
+        [Parameter]
+        public EditContext EditContext { get; set; }
+
+        List<IRadzenFormComponent> components;
+
+        public void AddComponent(IRadzenFormComponent component)
+        {
+            if (components != null)
+            {
+                if (components.IndexOf(component) == -1)
+                {
+                    components.Add(component);
+                }
+            }
+        }
+        public void RemoveComponent(IRadzenFormComponent component)
+        {
+            components?.Remove(component);
+        }
+
+    public override Task SetParametersAsync(ParameterView parameters)
+    {
+        if (InEditMode != parameters.GetValueOrDefault<bool>("InEditMode"))
+        {
+            components = new List<IRadzenFormComponent>();
+        }
+
+        return base.SetParametersAsync(parameters);
+    }
+
+    public IRadzenFormComponent FindComponent(string name)
+    {
+        return components.Where(component => component.Name == name).FirstOrDefault();
+    }
+
+    internal string getExpandIconStyle(bool expandable)
+    {
+        var rules = new List<string>();
+
+        if (!expandable)
+        {
+            rules.Add("visibility:hidden");
+        }
+
+        var child = Grid.childData.Any() ? Grid.childData.Where(c => c.Value?.Data?.Contains(Item) == true).FirstOrDefault() : 
+            default(KeyValuePair<TItem, DataGridChildData<TItem>>);
+
+        var level = !object.Equals(child, default(KeyValuePair<TItem, DataGridChildData<TItem>>)) ? child.Value.Level : 0;
+        if (level > 0)
+        {
+            rules.Add($"margin-left: {level}rem");
+        }
+
+        return string.Join(';', rules);
+    }
+}

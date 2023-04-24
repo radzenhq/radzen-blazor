@@ -303,6 +303,7 @@ namespace Radzen
         /// Gets the instance of the RadzenGrid component which has rendered.
         /// </summary>
         public RadzenGrid<T> Grid { get; internal set; }
+        public NexusGrid<T> NexusGrid { get; internal set; }
         /// <summary>
         /// Gets a value indicating whether this is the first time the RadzenGrid has rendered.
         /// </summary>
@@ -320,6 +321,7 @@ namespace Radzen
         /// Gets the instance of the RadzenDataGrid component which has rendered.
         /// </summary>
         public RadzenDataGrid<T> Grid { get; internal set; }
+        public NexusDataGrid<T> NexusGrid { get; internal set; }
         /// <summary>
         /// Gets a value indicating whether this is the first time the RadzenDataGrid has rendered.
         /// </summary>
@@ -337,6 +339,7 @@ namespace Radzen
         /// Gets the RadzenGridColumn which this cells represents.
         /// </summary>
         public RadzenGridColumn<T> Column { get; internal set; }
+        public NexusGridColumn<T> NexusColumn { get; internal set; }
     }
 
     /// <summary>
@@ -349,6 +352,7 @@ namespace Radzen
         /// Gets the RadzenDataGridColumn which this cells represents.
         /// </summary>
         public RadzenDataGridColumn<T> Column { get; internal set; }
+        public NexusDataGridColumn<T> NexusColumn { get; internal set; }
     }
 
     /// <summary>
@@ -366,6 +370,7 @@ namespace Radzen
         /// Gets the RadzenDataGridColumn which this cells represents.
         /// </summary>
         public RadzenDataGridColumn<T> Column { get; internal set; }
+        public NexusDataGridColumn<T> NexusColumn { get; internal set; }
     }
 
     /// <summary>
@@ -1383,6 +1388,7 @@ namespace Radzen
         /// Gets the picked columns.
         /// </summary>
         public IEnumerable<RadzenDataGridColumn<T>> Columns { get; internal set; }
+        public IEnumerable<NexusDataGridColumn<T>> NexusColumns { get; internal set; }
     }
 
     /// <summary>
@@ -1395,6 +1401,8 @@ namespace Radzen
         /// Gets the sorted RadzenDataGridColumn.
         /// </summary>
         public RadzenDataGridColumn<T> Column { get; internal set; }
+        public NexusDataGridColumn<T> NexusColumn { get; internal set; }
+
 
         /// <summary>
         /// Gets the new sort order of the sorted column.
@@ -1412,6 +1420,7 @@ namespace Radzen
         /// Gets the sorted RadzenDataGridColumn.
         /// </summary>
         public RadzenDataGridColumn<T> Column { get; internal set; }
+        public NexusDataGridColumn<T> NexusColumn { get; internal set; }
 
         /// <summary>
         /// Gets the new sort order of the sorted column.
@@ -1429,6 +1438,7 @@ namespace Radzen
         /// Gets the filtered RadzenDataGridColumn.
         /// </summary>
         public RadzenDataGridColumn<T> Column { get; internal set; }
+        public NexusDataGridColumn<T> NexusColumn { get; internal set; }
 
         /// <summary>
         /// Gets the new filter value of the filtered column.
@@ -1466,6 +1476,7 @@ namespace Radzen
         /// Gets the resized RadzenDataGridColumn.
         /// </summary>
         public RadzenDataGridColumn<T> Column { get; internal set; }
+        public NexusDataGridColumn<T> NexusColumn { get; internal set; }
 
         /// <summary>
         /// Gets the new width of the resized column.
@@ -1483,6 +1494,7 @@ namespace Radzen
         /// Gets the reordered RadzenDataGridColumn.
         /// </summary>
         public RadzenDataGridColumn<T> Column { get; internal set; }
+        public NexusDataGridColumn<T> NexusColumn { get; internal set; }
         /// <summary>
         /// Gets the old index of the column.
         /// </summary>
@@ -1503,6 +1515,7 @@ namespace Radzen
         /// Gets the resized RadzenGridColumn.
         /// </summary>
         public RadzenGridColumn<T> Column { get; internal set; }
+        public NexusGridColumn<T> NexusColumn { get; internal set; }
         /// <summary>
         /// Gets the new width of the column.
         /// </summary>

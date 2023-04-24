@@ -1,0 +1,167 @@
+@typeparam TItem
+@using System.Linq.Dynamic.Core
+@{
+    var rowArgs = Grid?.GroupRowAttributes(this);
+}
+<tr class="rz-group-row" @attributes="@rowArgs.Item2">
+    @if (Group.GroupDescriptor != null)
+    {
+        @for (var i = 0; i < GetLevel(); i++)
+        {
+            <td class="rz-col-icon">
+                <span class="rz-column-title"></span>
+            </td>
+        }
+
+    }
+    <td class="rz-col-icon">
+        <span class="rz-column-title"></span>
+        <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandGroupItem(this, rowArgs.Item1.Expanded))">
+            <span class="@(Grid.ExpandedGroupItemStyle(this, Grid.allGroupsExpanded != null ? Grid.allGroupsExpanded : rowArgs.Item1.Expanded))"></span>
+        </a>
+    </td>
+    <td colspan="@(Columns.Count + Grid.Groups.Count - 1 - Group.Level + (Grid.Template != null && Grid.ShowExpandColumn ? 1 : 0))">
+        <span class="rz-cell-data">
+            @if (Grid.GroupHeaderTemplate != null)
+            {
+                @Grid.GroupHeaderTemplate(Group)
+            }
+            else if(Group.GroupDescriptor != null)
+            {
+                @(Group.GroupDescriptor.GetTitle() + ": " + (Group.Data.Key != null ? Group.Data.Key.ToString() : ""))
+            }
+        </span>
+    </td>
+</tr>
+@if(Grid != null)
+{
+    if (Grid.IsGroupItemExpanded(this) && rowArgs.Item1.Expanded != false && Grid.allGroupsExpanded != false)
+    {
+        @DrawDataRows()
+    }
+    else if(Grid.GroupFootersAlwaysVisible)
+    {
+        if (!Grid.collapsedGroupItems.Keys.Contains(this))
+        {
+            Grid.collapsedGroupItems.Add(this, true);
+        }
+
+        @DrawDataRows(true)
+    }
+    else
+    {
+        if (!Grid.collapsedGroupItems.Keys.Contains(this))
+        {
+            Grid.collapsedGroupItems.Add(this, true);
+        }
+    }
+}
+@code {
+        [Parameter]
+        public IList<NexusDataGridColumn<TItem>> Columns { get; set; }
+
+        GroupResult _groupResult;
+        [Parameter]
+        public GroupResult GroupResult 
+        { 
+            get
+            {
+                return _groupResult;
+            }
+            set
+            {
+                if(_groupResult != value)
+                {
+                    _groupResult = value;
+
+                    var level = GetLevel();
+                    Group = new Group()
+                    {
+                        Level = level,
+                        GroupDescriptor = Grid.Groups?.ElementAtOrDefault(level),
+                        Data = _groupResult
+                    };
+                }
+            }
+        }
+
+        [Parameter]
+        public NexusDataGrid<TItem> Grid { get; set; }
+
+        [Parameter]
+        public NexusDataGridGroupRow<TItem> Parent { get; set; }
+
+        [Parameter]
+        public Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder Builder { get; set; }
+
+        RenderFragment DrawDataRows(bool groupFootersOnly = false)
+        {
+            return new RenderFragment(builder =>
+            {
+                if(GroupResult.Subgroups != null)
+                {
+                    foreach(var g in GroupResult.Subgroups)
+                    {
+                        builder.OpenComponent(0, typeof(NexusDataGridGroupRow<TItem>));
+                        builder.AddAttribute(1, "Columns", Columns);
+                        builder.AddAttribute(3, "Grid", Grid);
+                        builder.AddAttribute(3, "Parent", this);
+                        builder.AddAttribute(5, "GroupResult", g);
+                        builder.AddAttribute(6, "Builder", builder);
+                        builder.CloseComponent();
+                    }
+                }
+                else
+                {
+                    if(!groupFootersOnly)
+                    {
+                        int i = 0;
+                        foreach(var item in GroupResult.Items)
+                        {
+                            builder.OpenComponent(0, typeof(NexusDataGridRow<TItem>));
+                            builder.AddAttribute(1, "Columns", Columns);
+                            builder.AddAttribute(2, "Index", i);
+                            builder.AddAttribute(3, "Grid", Grid);
+                            builder.AddAttribute(4, "TItem", typeof(TItem));
+                            builder.AddAttribute(5, "Item", item);
+                            builder.AddAttribute(6, "InEditMode", Grid.IsRowInEditMode((TItem)item));
+
+                            if (Grid.editContexts.ContainsKey((TItem)item))
+                            {
+                                builder.AddAttribute(7, nameof(NexusDataGridRow<TItem>.EditContext), Grid.editContexts[(TItem)item]);
+                            }
+
+                            builder.CloseComponent();
+                            i++;
+                        }
+                    }
+
+                    if (Columns.Where(c => c.GroupFooterTemplate != null).Any())
+                    {
+                        builder.OpenComponent(7, typeof(NexusDataGridGroupFooterRow<TItem>));
+                        builder.AddAttribute(8, "Columns", Columns);
+                        builder.AddAttribute(9, "Grid", Grid);
+                        builder.AddAttribute(10, "GroupResult", GroupResult);
+                        builder.AddAttribute(11, "Builder", builder);
+                        builder.AddAttribute(12, "Parent", this);
+                        builder.CloseComponent();
+                    }
+                }
+            });
+        }
+
+        public Group Group { get; set; }
+
+        int GetLevel()
+        {
+            int i = 0;
+            var p = Parent;
+            while(p != null)
+            {
+                p = p.Parent;
+                i++;
+            }
+
+            return i;
+        }
+}
