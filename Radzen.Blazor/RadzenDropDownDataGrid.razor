@@ -117,7 +117,7 @@
                                @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" style="@(ShowSearch ? "" : "margin-right:0px;")" />
                         @if (ShowSearch)
                         {
-                            <button class="rz-button rz-button-md rz-button-icon-only rz-primary" type="button" title="">
+                            <button class="rz-button rz-button-md rz-button-icon-only rz-primary" type="button" title="" @onclick="@((args) => OnFilter(new ChangeEventArgs()))">
                                 <i class="rz-button-icon-left rzi">search</i>
                             </button>
                         }

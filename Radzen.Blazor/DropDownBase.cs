@@ -201,6 +201,13 @@ namespace Radzen
         public virtual bool AllowFiltering { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether filtering is allowed as you type. Set to <c>true</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if filtering is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public virtual bool FilterAsYouType { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets a value indicating whether the user can clear the value. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if clearing is allowed; otherwise, <c>false</c>.</value>
@@ -665,7 +672,7 @@ namespace Radzen
                     Debounce(DebounceFilter, FilterDelay);
                 }
             }
-            else if (AllowFiltering && isFilter)
+            else if (AllowFiltering && isFilter && FilterAsYouType)
             {
                 Debounce(DebounceFilter, FilterDelay);
             }
