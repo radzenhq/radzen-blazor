@@ -1016,7 +1016,10 @@ window.Radzen = {
   },
   closeDialog: function () {
     document.body.classList.remove('no-scroll');
-    document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+    var dialogs = document.querySelectorAll('.rz-dialog-content');
+    if (dialogs.length == 0) {
+        document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+    }
   },
   getFocusableDialogElements: function () {
     var dialogs = document.querySelectorAll('.rz-dialog-content');
