@@ -131,9 +131,6 @@
 
                                 <NexusDataGridHeaderCell RowIndex="@i" Grid="@this" Column="@column" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)} {getCompositeCellCSSClass(column)} {getColumnAlignClass(column)}".Trim())" Attributes="@(cellAttr)" />
                             }
-@*                            <div class="flex flex-col justify-center">
-                                @ChildContent
-                            </div>*@
                         </tr>
                     }
                     @if (AllowFiltering && (FilterMode == FilterMode.Simple || FilterMode == FilterMode.SimpleWithMenu) && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())

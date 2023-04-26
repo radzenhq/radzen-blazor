@@ -1,11 +1,15 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Text.Json;
 using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
@@ -74,8 +78,24 @@ namespace Radzen.Blazor
         /// Gets or sets the value template.
         /// </summary>
         /// <value>The value template.</value>
+        /// 
+        [Parameter]
+        public bool AllowGrouping { get; set; }
+        [Parameter]
+        public bool AllowColumnPicking { get; set; }
+        [Parameter]
+        public RenderFragment HeaderTemplate { get; set; }
         [Parameter]
         public RenderFragment<dynamic> ValueTemplate { get; set; }
+        [Parameter]
+        public string AllColumnsText { get; set; } = "All";
+        [Parameter]
+        public bool AllowPickAllColumns { get; set; } = true;
+        [Parameter]
+        public string ColumnsShowingText { get; set; } = "columns showing";
+
+        [Parameter]
+        public string GroupPanelText { get; set; } = "Drag a column header here and drop it to group by that column";
 
         /// <summary>
         /// Gets or sets a value indicating DataGrid density.
@@ -185,9 +205,14 @@ namespace Radzen.Blazor
         /// </summary>
         protected ElementReference popup;
 
-    
-  
-        IEnumerable _internalView = Enumerable.Empty<TValue>();
+        int? indexOfColumnToReoder;
+        internal string getColumnResizerId(int columnIndex)
+        {
+            return string.Join("", $"{UniqueID}".Split('.')) + columnIndex;
+        }
+
+
+        IEnumerable<GroupResult> _groupedPagedView;
 
 
         /// <summary>
@@ -271,61 +296,69 @@ namespace Radzen.Blazor
 
             StateHasChanged();
         }
+        
+
+       
+
+        ObservableCollection<GroupDescriptor> groups;
 
 
        
 
-//        async Task DebounceFilter()
-//        {
-//            searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
-//            if (searchText != previousSearch)
-//            {
-//                previousSearch = searchText;
-//                _view = null;
 
-//                await InvokeAsync(RefreshAfterFilter);
-//            }
-//        }
 
-//        async Task RefreshAfterFilter()
-//        {
-//#if NET5_0_OR_GREATER
-//            if (grid?.virtualize != null)
-//            {
-//                if(string.IsNullOrEmpty(searchText))
-//                {
-//                    if(LoadData.HasDelegate)
-//                    {
-//                        Data = null;
-//                        await grid.Reload();
-//                    }
-//                    else
-//                    {
-//                        pagedData = null;
-//                        StateHasChanged();
-//                    }
-//                }
-//                await grid.virtualize.RefreshDataAsync();
-//            }
-//#endif
-//            StateHasChanged();
 
-//            if (!IsVirtualizationAllowed())
-//            {
-//                await grid.FirstPage(true);
-//            }
+        //        async Task DebounceFilter()
+        //        {
+        //            searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
+        //            if (searchText != previousSearch)
+        //            {
+        //                previousSearch = searchText;
+        //                _view = null;
 
-//            await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
-//        }
+        //                await InvokeAsync(RefreshAfterFilter);
+        //            }
+        //        }
 
-//        /// <summary>
-//        /// Handles the <see cref="E:Filter" /> event.
-//        /// </summary>
-//        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
-//        protected override async Task OnFilter(ChangeEventArgs args)
-//        {
-//            await DebounceFilter();
-//        }
+        //        async Task RefreshAfterFilter()
+        //        {
+        //#if NET5_0_OR_GREATER
+        //            if (grid?.virtualize != null)
+        //            {
+        //                if(string.IsNullOrEmpty(searchText))
+        //                {
+        //                    if(LoadData.HasDelegate)
+        //                    {
+        //                        Data = null;
+        //                        await grid.Reload();
+        //                    }
+        //                    else
+        //                    {
+        //                        pagedData = null;
+        //                        StateHasChanged();
+        //                    }
+        //                }
+        //                await grid.virtualize.RefreshDataAsync();
+        //            }
+        //#endif
+        //            StateHasChanged();
+
+        //            if (!IsVirtualizationAllowed())
+        //            {
+        //                await grid.FirstPage(true);
+        //            }
+
+        //            await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
+        //        }
+
+        //        /// <summary>
+        //        /// Handles the <see cref="E:Filter" /> event.
+        //        /// </summary>
+        //        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
+        //        protected override async Task OnFilter(ChangeEventArgs args)
+        //        {
+        //            await DebounceFilter();
+        //        }
 
         /// <summary>
         /// Gets or sets a value indicating whether sorting is allowed.
