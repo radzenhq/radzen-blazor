@@ -471,7 +471,7 @@ namespace Radzen.Blazor
         /// <param name="forCell">if set to <c>true</c> [for cell].</param>
         /// <param name="isHeaderOrFooterCell">if set to <c>true</c> [is header or footer cell].</param>
         /// <returns>System.String.</returns>
-        public string GetStyle(bool forCell = false, bool isHeaderOrFooterCell = false)
+        public virtual string GetStyle(bool forCell = false, bool isHeaderOrFooterCell = false)
         {
             var style = new List<string>();
 
