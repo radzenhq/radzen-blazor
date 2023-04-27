@@ -1923,6 +1923,15 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets boolean value indicating if the row is expanded or not.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        public bool IsRowExpanded(TItem item)
+        {
+            return expandedItems.Keys.Any(i => ItemEquals(i, item));
+        }
+
+        /// <summary>
         /// Expands a range of rows.
         /// </summary>
         /// <param name="items">The range of rows.</param>
