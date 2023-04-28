@@ -682,7 +682,20 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (parameters.DidParameterChange(nameof(SortOrder), SortOrder))
+			if (parameters.DidParameterChange(nameof(Pickable), Pickable))
+			{
+				var newPickable = parameters.GetValueOrDefault<bool>(nameof(Pickable));
+
+				Pickable = newPickable;
+
+				if (Grid != null)
+				{
+					Grid.UpdatePickableColumns();
+					await Grid.ChangeState();
+				}
+			}
+
+			if (parameters.DidParameterChange(nameof(SortOrder), SortOrder))
             {
                 sortOrder = new SortOrder?[] { parameters.GetValueOrDefault<SortOrder?>(nameof(SortOrder)) };
 
