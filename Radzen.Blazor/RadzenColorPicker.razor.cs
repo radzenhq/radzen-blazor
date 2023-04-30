@@ -379,8 +379,6 @@ namespace Radzen.Blazor
                 HSV = RGB.Parse(Color).ToHSV();
                 SaturationHandleLeft = HSV.Saturation;
                 SaturationHandleTop = 1 - HSV.Value;
-                HSV.Saturation = 1;
-                HSV.Value = 1;
                 HueHandleLeft = HSV.Hue;
 
                 if (value.StartsWith("rgba"))
