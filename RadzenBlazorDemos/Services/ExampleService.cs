@@ -1027,14 +1027,14 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Default Tools",
                             Path = "html-editor",
-                            Title = "Blazor HTML editor componenet with lots of built-in tools",
+                            Title = "Blazor HTML editor component with lots of built-in tools",
                             Tags = new [] { "html", "editor", "rich", "text" }
                         },
                         new Example()
                         {
                             Name = "Custom Tools",
                             Path = "html-editor-custom-tools",
-                            Title = "Blazor HTML editor componenet with custom tools",
+                            Title = "Blazor HTML editor component with custom tools",
                             Tags = new [] { "html", "editor", "rich", "text", "tool", "custom" }
                         },
                     }
@@ -1044,7 +1044,7 @@ namespace RadzenBlazorDemos
                     Name = "ListBox",
                     Path = "listbox",
                     Icon = "&#xe8ef",
-                    Title = "Blazor listbox componenet",
+                    Title = "Blazor listbox component",
                     Tags = new [] { "select", "picker", "form", "edit" }
                 },
                 new Example()
