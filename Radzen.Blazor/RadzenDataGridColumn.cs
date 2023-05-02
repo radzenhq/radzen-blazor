@@ -135,7 +135,7 @@ namespace Radzen.Blazor
         [Parameter]
         public int? OrderIndex { get; set; }
 
-        internal int? GetOrderIndex()
+        public int? GetOrderIndex()
         {
             return orderIndex ?? OrderIndex;
         }
