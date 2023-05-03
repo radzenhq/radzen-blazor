@@ -560,17 +560,12 @@ namespace Radzen.Blazor
                 descriptor = new SortDescriptor() { Property = GetSortProperty() };
             }
 
-            if (GetSortOrder() == null)
+            if (order.HasValue)
             {
-                SetSortOrderInternal(Radzen.SortOrder.Ascending);
-                descriptor.SortOrder = Radzen.SortOrder.Ascending;
+                SetSortOrderInternal(order.Value);
+                descriptor.SortOrder = order.Value;
             }
-            else if (GetSortOrder() == Radzen.SortOrder.Ascending)
-            {
-                SetSortOrderInternal(Radzen.SortOrder.Descending);
-                descriptor.SortOrder = Radzen.SortOrder.Descending;
-            }
-            else if (GetSortOrder() == Radzen.SortOrder.Descending)
+            else
             {
                 SetSortOrderInternal(null);
                 if (Grid.sorts.Where(d => d.Property == GetSortProperty()).Any())
