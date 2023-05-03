@@ -54,7 +54,7 @@ namespace Radzen.Blazor
             return Min != null || Max != null ? $@"Radzen.numericOnPaste(event, {minArg ?? "null"}, {maxArg ?? "null"})" : "";
         }
 
-        async System.Threading.Tasks.Task UpdateValueWithStep(bool stepUp)
+        async Task UpdateValueWithStep(bool stepUp)
         {
             if (Disabled || ReadOnly)
             {
@@ -67,9 +67,22 @@ namespace Radzen.Blazor
 
             var newValue = ((decimal)Convert.ChangeType(valueToUpdate, typeof(decimal))) + (decimal)Convert.ChangeType(stepUp ? step : -step, typeof(decimal));
 
-            if (Max.HasValue && newValue > Max.Value || Min.HasValue && newValue < Min.Value || object.Equals(Value, newValue))
+            if (object.Equals(Value, newValue))
             {
                 return;
+            }
+
+            if (Max.HasValue && newValue > Max.Value || Min.HasValue && newValue < Min.Value)
+            {
+                var wrappedValue = WrapValue(newValue);
+                if (wrappedValue.HasValue)
+                {
+                    newValue = wrappedValue.Value;
+                }
+                else
+                {
+                    return;
+                }
             }
 
             Value = (TValue)ConvertType.ChangeType(newValue, typeof(TValue));
@@ -231,7 +244,7 @@ namespace Radzen.Blazor
         /// Handles the <see cref="E:Change" /> event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
-        protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
+        protected async Task OnChange(ChangeEventArgs args)
         {
             await InternalValueChanged(args.Value);
         }
@@ -258,7 +271,7 @@ namespace Radzen.Blazor
         [Parameter]
         public Func<string, TValue> ConvertValue { get; set; }
 
-        private async System.Threading.Tasks.Task InternalValueChanged(object value)
+        private async Task InternalValueChanged(object value)
         {
             TValue newValue;
             try
@@ -295,12 +308,12 @@ namespace Radzen.Blazor
 
             if (Max.HasValue && newValueAsDecimal > Max.Value)
             {
-                newValueAsDecimal = Max.Value;
+                newValueAsDecimal = WrapValue(newValueAsDecimal) ?? Max.Value;
             }
 
             if (Min.HasValue && newValueAsDecimal < Min.Value)
             {
-                newValueAsDecimal = Min.Value;
+                newValueAsDecimal = WrapValue(newValueAsDecimal) ?? Min.Value;
             }
 
             Value = (TValue)ConvertType.ChangeType(newValueAsDecimal, typeof(TValue));
@@ -328,6 +341,28 @@ namespace Radzen.Blazor
         [Parameter]
         public decimal? Max { get; set; }
 
+        decimal? Range { get => Max - Min + 1; }
+
+        /// <summary>
+        /// Determines how a value out of the <see cref="Min"/> to <see cref="Max"/> range is handled.
+        /// </summary>
+        /// <value><c>true</c> if a value outside the range is wrapped around (like the modulo operation); <c>false</c> if such a value is ignored.</value>
+        [Parameter]
+        public bool WrapAround { get; set; } = false;
+
+        decimal? WrapValue (decimal? value)
+        {
+            if (WrapAround && Range.HasValue && value.HasValue)
+            {
+                decimal remainder = (value.Value - Min.Value) % Range.Value;
+                if (remainder < 0)
+                    remainder += Range.Value;
+
+                return remainder + Min.Value;
+            }
+            return null;
+        }
+
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
@@ -336,21 +371,24 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
-            if (minChanged && Min.HasValue && Value != null && IsJSRuntimeAvailable)
+            if (Value == null || !IsJSRuntimeAvailable)
+                return;
+
+            if (minChanged && Min.HasValue)
             {
                 decimal decimalValue = (decimal)Convert.ChangeType(Value, typeof(decimal));
                 if (decimalValue < Min.Value)
                 {
-                    await InternalValueChanged(Min.Value);
+                    await InternalValueChanged(WrapValue(decimalValue) ?? Min.Value);
                 }
             }
 
-            if (maxChanged && Max.HasValue && Value != null && IsJSRuntimeAvailable)
+            if (maxChanged && Max.HasValue)
             {
                 decimal decimalValue = (decimal)Convert.ChangeType(Value, typeof(decimal));
                 if (decimalValue > Max.Value)
                 {
-                    await InternalValueChanged(Max.Value);
+                    await InternalValueChanged(WrapValue(decimalValue) ?? Max.Value);
                 }
             }
         }
