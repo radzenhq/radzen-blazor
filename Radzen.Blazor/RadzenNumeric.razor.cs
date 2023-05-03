@@ -344,7 +344,7 @@ namespace Radzen.Blazor
         decimal? Range { get => Max - Min + 1; }
 
         /// <summary>
-        /// Determines how a value out of the <see cref="Min"/> to <see cref="Max"/> range is handled.
+        /// Determines how a value out of the range from <see cref="Min"/> to <see cref="Max"/> is handled.
         /// </summary>
         /// <value><c>true</c> if a value outside the range is wrapped around (like the modulo operation); <c>false</c> if such a value is ignored.</value>
         [Parameter]
