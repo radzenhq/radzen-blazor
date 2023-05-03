@@ -6,8 +6,10 @@
 
 <div class="rz-p-sm-12 rz-text-align-center">
     <RadzenDropDown @ref=@radzenDropDown FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
-                    Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" AllowClear="true" @bind-Value=value Style="width: 100%; max-width: 400px;" SearchTextChanged="@(args => searchTextChanged(args))"/>
-    
+                    Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" AllowClear="true" @bind-Value=value Style="width: 100%; max-width: 400px;" SearchTextChanged="@(args => searchTextChanged(args))"/>    
+</div>
+
+<div class="rz-p-sm-3 rz-text-align-left"> 
     <RadzenLabel Text="@searchTextStatus" />
 </div>
 
