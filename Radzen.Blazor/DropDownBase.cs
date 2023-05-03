@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.JSInterop;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
-using Microsoft.JSInterop;
 
 namespace Radzen
 {
@@ -255,6 +256,13 @@ namespace Radzen
         /// <value>The selected item changed.</value>
         [Parameter]
         public Action<object> SelectedItemChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the search text changed.
+        /// </summary>
+        /// <value>The search text changed.</value>
+        [Parameter]
+        public Action<string> SearchTextChanged { get; set; }
 
         /// <summary>
         /// The selected items
@@ -733,6 +741,7 @@ namespace Radzen
                 selectedIndex = -1;
 
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
+            SearchTextChanged?.Invoke(SearchText);
         }
 
         /// <summary>
@@ -898,7 +907,7 @@ namespace Radzen
                 }
                 else
                 {
-                    return object.Equals(item,selectedItem);
+                    return object.Equals(item, selectedItem);
                 }
             }
         }
