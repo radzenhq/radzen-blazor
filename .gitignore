@@ -332,7 +332,7 @@ ASALocalRun/
 .vscode
 issues.json
 
-Radzen.Blazor/wwwroot/css/
+# Radzen.Blazor/wwwroot/css/
 project.csproj
 RadzenBlazorDemos/wwwroot/docs/
 Radzen.DocFX/obj/
