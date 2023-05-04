@@ -145,5 +145,10 @@ input {
       border: none;
       box-shadow: none;
     }
+
+    &:focus-within {
+      border: none;
+      box-shadow: none;
+    }
   }
 }

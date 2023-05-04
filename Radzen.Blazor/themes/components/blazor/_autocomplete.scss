@@ -9,6 +9,10 @@
   &:hover:not(.rz-state-disabled) {
     @extend %input-hover;
   }
+
+  &:focus-within:not(.rz-state-disabled) {
+    @extend %input-focus;
+  }
 }
 
 .rz-state-disabled.rz-autocomplete {
