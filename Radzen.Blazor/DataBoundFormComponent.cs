@@ -1,14 +1,16 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+
+using Radzen.Blazor;
+using Radzen.Blazor.Rendering;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using Radzen.Blazor;
-using Radzen.Blazor.Rendering;
 
 namespace Radzen
 {
@@ -212,6 +214,11 @@ namespace Radzen
                 return Data != null ? Data.AsQueryable() : null;
             }
         }
+
+        /// <summary>
+        /// Gets the Search text typed by user
+        /// </summary>
+        public string SearchText => searchText;
 
         /// <summary>
         /// The search text
