@@ -49,6 +49,18 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets the child columns.
+        /// </summary>
+        /// <value>The child columns.</value>
+        public IList<RadzenDataGridColumn<TItem>> ColumnsCollection
+        {
+            get
+            {
+                return Grid.childColumns.Where(c => c.Parent == this).ToList();
+            }
+        }
+
         internal int GetLevel()
         {
             int i = 0;
