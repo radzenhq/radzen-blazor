@@ -140,6 +140,13 @@ namespace Radzen.Blazor
         public bool AllowResetPassword { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether default login button is shown.
+        /// </summary>
+        /// <value><c>true</c> if default login button is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowLoginButton { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the login text.
         /// </summary>
         /// <value>The login text.</value>

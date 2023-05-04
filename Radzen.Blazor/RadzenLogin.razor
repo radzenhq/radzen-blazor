@@ -28,7 +28,10 @@
                 }
             </RadzenStack>
             <RadzenStack style="margin-top:1rem;" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                @if(ShowLoginButton)
+                {
                 <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text=@LoginText Click=@OnLogin />
+                }
                 @if (AllowResetPassword)
                 {
                     <a class="rz-link" @onclick=@OnReset>@ResetPasswordText</a>
