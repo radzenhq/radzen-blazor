@@ -415,27 +415,14 @@ namespace Radzen.Blazor
             }
         }
 
-        IList<string> _abbreviatedDayNames;
-
-        IList<string> AbbreviatedDayNames
+        IEnumerable<string> ShiftedAbbreviatedDayNames
         {
             get
             {
-                if (_abbreviatedDayNames == null)
+                for (int current = (int)Culture.DateTimeFormat.FirstDayOfWeek, to = current + 7; current < to; current++)
                 {
-                    _abbreviatedDayNames = new List<string>();
-
-                    for (int i = (int)Culture.DateTimeFormat.FirstDayOfWeek; i < 7; i++)
-                    {
-                        _abbreviatedDayNames.Add(Culture.DateTimeFormat.AbbreviatedDayNames[i]);
-                    }
-
-                    for (int i = 0; i < (int)Culture.DateTimeFormat.FirstDayOfWeek; i++)
-                    {
-                        _abbreviatedDayNames.Add(Culture.DateTimeFormat.AbbreviatedDayNames[i]);
-                    }
+                    yield return Culture.DateTimeFormat.AbbreviatedDayNames[current % 7];
                 }
-                return _abbreviatedDayNames;
             }
         }
 
