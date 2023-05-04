@@ -278,6 +278,15 @@ namespace Radzen.Blazor
             await Popup.CloseAsync();
         }
 
+        async Task OnClosePopup()
+        {
+            if (ShowButton)
+            {
+                SetInitialValue();
+            }
+            await Close.InvokeAsync(null);
+        }
+
         /// <summary>
         /// Gets or sets a value indicating whether button is shown.
         /// </summary>
@@ -349,12 +358,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void OnInitialized()
         {
-            Init();
+            SetInitialValue();
 
             base.OnInitialized();
         }
 
-        void Init()
+        void SetInitialValue()
         {
             var value = Value;
 
@@ -384,7 +393,7 @@ namespace Radzen.Blazor
 
             if (valueChanged)
             {
-                Init();
+                SetInitialValue();
             }
         }
     }
