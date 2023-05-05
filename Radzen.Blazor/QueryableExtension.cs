@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 
@@ -234,8 +235,8 @@ namespace Radzen
                     }
                     else
                     {
-                        value = (string)Convert.ChangeType(column.GetFilterValue(), typeof(string));
-                        secondValue = (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string));
+                        value = (string)Convert.ChangeType(column.GetFilterValue(), typeof(string), CultureInfo.InvariantCulture);
+                        secondValue = (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string), CultureInfo.InvariantCulture);
                     }
 
                     if (!string.IsNullOrEmpty(value) || column.GetFilterOperator() == FilterOperator.IsNotNull
@@ -594,7 +595,7 @@ namespace Radzen
 
             var value = IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)
                 ? null
-                : (string)Convert.ChangeType(filterValue, typeof(string));
+                : (string)Convert.ChangeType(filterValue, typeof(string), CultureInfo.InvariantCulture);
 
             if (column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive && column.FilterPropertyType == typeof(string))
             {
