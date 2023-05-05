@@ -1,78 +1,12 @@
 ﻿@page "/datagrid-group-header-template"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid <strong>DataGrid Group Header Template</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Use GroupHeaderTemplate to customize DataGrid group header rows.
+</RadzenText>
 
-@inject NorthwindContext dbContext
-
-<h1>DataGrid <strong>DataGrid Group Header Template</strong></h1>
-
-<p>Use GroupHeaderTemplate to customize DataGrid group header rows.</p>
-
-<RadzenExample Name="DataGrid" Source="DataGridGroupHeaderTemplate" Heading="false">
-    <RadzenCheckBox @bind-Value=@groupsExpanded Name="CheckBox1" TValue="bool?" TriState="true" />
-    <RadzenLabel Text="All groups expanded" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 10px;" />
-    <RadzenDataGrid @ref="ordersGrid"  AllowGrouping="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
-            Data="@orders" TItem="Order" Render="@OnRender" GroupRowRender="OnGroupRowRender">
-        <GroupHeaderTemplate>
-            @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Group items count: @context.Data.Count, Last order date: @(context.Data.Items.Cast<Order>().OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)
-        </GroupHeaderTemplate>
-        <Columns>
-            <RadzenDataGridColumn Width="50px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
-                <Template>
-                    @(orders.IndexOf(context) + 1)
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID">
-                <FooterTemplate>
-                    Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
-                </FooterTemplate>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
-            <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
-                <Template Context="order">
-                    @order.Employee?.FirstName @order.Employee?.LastName
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}">
-                <FooterTemplate>
-                    Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).Last().OrderDate)</b>
-                </FooterTemplate>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
-                <Template Context="order">
-                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
-                </Template>
-                <FooterTemplate>
-                    Total amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orders.Sum(o => o.Freight))</b>
-                </FooterTemplate>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
-        </Columns>
-    </RadzenDataGrid>
+<RadzenExample ComponentName="DataGrid" Example="DataGridGroupHeaderTemplate">
+    <DataGridGroupHeaderTemplate />
 </RadzenExample>
-@code {
-    bool? groupsExpanded;
-    IList<Order> orders;
-    RadzenDataGrid<Order> ordersGrid;
-
-    protected override void OnInitialized()
-    {
-        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
-    }
-
-    void OnRender(DataGridRenderEventArgs<Order> args)
-    {
-        if(args.FirstRender)
-        {
-            args.Grid.Groups.Add(new GroupDescriptor(){ Title = "Customer", Property = "Customer.CompanyName", SortOrder = SortOrder.Descending });
-            StateHasChanged();
-        }
-    }
-
-    void OnGroupRowRender(GroupRowRenderEventArgs args)
-    {
-       args.Expanded = groupsExpanded;
-    }
-}

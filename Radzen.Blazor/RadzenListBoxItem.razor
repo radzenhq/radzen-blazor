@@ -4,12 +4,12 @@
 @using Microsoft.JSInterop
 @typeparam TValue
 
-<li class="@(ListBox.isSelected(Item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")" aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, ListBox.TextProperty)" style="display: block;" @onclick="@(async () => { if (!ListBox.Disabled) { await ListBox.SelectItemInternal(Item); } })">
+<li class="@(ListBox.IsSelected(Item) ? "rz-multiselect-item  rz-state-highlight" : "rz-multiselect-item ")" aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, ListBox.TextProperty)" @onclick="@(async () => { if (!ListBox.Disabled) { await ListBox.SelectItemInternal(Item); } })">
     @if (ListBox.Multiple)
     {
         <div class="rz-chkbox ">
-            <div class="@(ListBox.isSelected(Item) ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
-                <span class="@(ListBox.isSelected(Item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
+            <div class="@(ListBox.IsSelected(Item) ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
+                <span class="@(ListBox.IsSelected(Item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
             </div>
         </div>
     }

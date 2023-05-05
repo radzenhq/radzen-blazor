@@ -37,6 +37,12 @@ namespace Radzen.Blazor
         public string Icon { get; set; } = "settings";
 
         /// <summary>
+        /// Specifies the modes that this tool will be enabled in.
+        /// </summary>
+        [Parameter]
+        public HtmlEditorMode EnabledModes { get; set; } = HtmlEditorMode.Design;
+
+        /// <summary>
         /// The template of the tool. Use to render a custom tool.
         /// </summary>
         [Parameter]

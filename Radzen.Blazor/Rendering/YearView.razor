@@ -1,0 +1,157 @@
+@using Radzen
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@inject DialogService DialogService
+
+@{
+    var points = new Dictionary<AppointmentData, double>();
+
+    // delaci check usage
+    var year = StartDate.AddDays(7).Year;
+
+    DateTime date = StartDate.AddDays(7);
+    DateTime realstart = StartDate;
+    int daysinmonth;
+}
+
+
+<div class="rz-view rz-year-view">
+<div class="rz-display-flex rz-row rz-align-items-normal rz-justify-content-space-between">
+    @for (int month = 1; month < 13; month++)
+    {
+        realstart = new DateTime(year, month, 1);
+        daysinmonth = DateTime.DaysInMonth(year, month);
+        date = realstart.StartOfMonth().StartOfWeek();
+
+        <div class="rz-display-flex rz-flex-column rz-col-12 rz-col-sm-6 rz-col-md-4 rz-col-lg-3">
+        
+            <div class="rz-slot-header rz-pb-2">
+                <span class="rz-text-subtitle1">
+                    @realstart.ToString("MMMM yyyy")
+                </span>
+            </div>
+
+            <div class="rz-view-header">
+                @for (var dateheader = StartDate; dateheader <= StartDate.EndOfWeek(); dateheader = dateheader.AddDays(1))
+                {
+                    <div class="rz-slot-header">
+                        @dateheader.ToString("ddd", Scheduler.Culture).Substring(0,1)
+                    </div>
+                }
+            </div>
+
+            @for (var row = 0; row < 6; row++)
+            {
+                <div class="rz-week">
+                    <div class="rz-events">
+                        <div class="rz-slots">
+                            @for (var col = 0; col < 7; col++)
+                            {
+                                var day = date.AddDays((row * 7) + col);
+                                var appointments = AppointmentsInSlot(day, day.AddDays(1));
+                                var excessCount = appointments.Count();
+                                string classname;
+
+                                    classname = $"rz-slot-title {(day.Month != month ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")}";
+                                    <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
+                                        <div class="@classname">
+                                            @day.Day
+                                        </div>
+                                    </div>
+                                }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+</div>
+<style>
+
+
+
+</style>
+
+
+
+@code {
+    [Parameter]
+    public DateTime StartDate { get; set; }
+
+    [Parameter]
+    public DateTime EndDate { get; set; }
+
+    [Parameter]
+    public int MaxAppointmentsInSlot { get; set; }
+
+    [Parameter]
+    public string MoreText { get; set; }
+
+    [CascadingParameter]
+    public IScheduler Scheduler { get; set; }
+
+    [Parameter]
+    public IEnumerable<AppointmentData> Appointments { get; set; }
+
+    IDictionary<string, object> Attributes(DateTime start, string className)
+    {
+        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1));
+        attributes["class"] = ClassList.Create(className).Add(attributes).ToString();
+        return attributes;
+    }
+
+    async Task OnAppointmentClick(AppointmentData data)
+    {
+        await Scheduler.SelectAppointment(data);
+    }
+
+    private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
+    {
+        if (Appointments == null)
+        {
+            return Array.Empty<AppointmentData>();
+        }
+
+        return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
+    }
+
+    async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
+    {
+        bool preventDefault = await Scheduler.SelectSlot(date, date.AddDays(1), appointments);
+
+        if(!preventDefault)
+        {
+        if (appointments.Count() > 0)
+        {
+            await DialogService.OpenAsync(date.ToShortDateString(), ds =>
+    @<div class="rz-event-list">
+        <CascadingValue Value=@Scheduler>
+            @foreach (var item in appointments)
+            {
+                <Appointment Data=@item Click="OnListEventClick" />
+            }
+        </CascadingValue>
+    </div>
+        );
+
+        }
+        else
+        {
+            await DialogService.OpenAsync(date.ToShortDateString(), ds =>
+    @<div class="rz-event-list">
+        There are no scheduled events taking place on this day
+    </div>
+    );
+
+        }
+        }
+    }
+
+    async Task OnListEventClick(AppointmentData data)
+    {
+        DialogService.Close();
+
+        await OnAppointmentClick(data);
+    }
+}

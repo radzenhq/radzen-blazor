@@ -5,173 +5,182 @@
 @using RadzenBlazorDemos.Services
 @inject GitHubService GitHub
 
-<h1>Blazor GitHub Issues</h1>
-<p>
-    Sample dashboard that uses data from the <a href="https://github.com/dotnet/aspnetcore/issues" target="_blank">ASP.NET GitHub repository</a>. Data is updated 24 hours.
-</p>
-<div class="container-fluid p-0" style="position: relative">
-    <RadzenCard Visible=@fetchingData style="z-index: 2; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, .5)">
-        <RadzenCard Visible=@(error == null) style="margin: 32px auto; width: 80%">
-            <h3 style="margin: 32px 0">Fetching data from GitHub: page @currentPage of @totalPages.</h3>
-            <RadzenProgressBar Value=@currentPage Max=@totalPages ShowValue="false" Style="display: inline-block; width: 180px; height: 8px; margin-top: 16px" />
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" Class="rz-pt-8">
+    Blazor GitHub Issues
+</RadzenText>
+
+<RadzenStack Gap="1rem" Style="position: relative">
+    <RadzenCard Visible=@fetchingData Style="z-index: 3; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, .5)">
+        <RadzenCard Visible=@(error == null) Class="rz-my-12 rz-mx-auto rz-p-12" Style="width: 80%">
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-my-12">Fetching data from GitHub...</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle1">Page @currentPage of @totalPages</RadzenText>
+            <RadzenProgressBar Value=@currentPage Max=@totalPages ShowValue="false" Style="display: inline-block; width: 180px; margin-top: 16px" />
         </RadzenCard>
-        <RadzenCard Visible=@(error != null) style="margin: 32px auto; width: 80%">
-            <h3 style="margin: 32px 0">An error has occurred: @error. Try reloading your browser.</h3>
+        <RadzenCard Visible=@(error != null) Class="rz-my-12 rz-mx-auto rz-p-12" Style="width: 80%">
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-my-8">An error has occurred: @error. Try reloading your browser.</RadzenText>
         </RadzenCard>
     </RadzenCard>
-<div class="row no-gutters mx-n2">
-    <div class="col-xl-3 col-lg-6 p-2">
-        <RadzenCard>
-            <h3>Open Issues</h3>
-            <label style="color: #009B51; position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@openIssues?.Count()</label>
-            <RadzenChart style="width: 100%; height: 120px; margin-bottom: -30px;">
-                <RadzenColumnSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="#009B51" />
-                <RadzenValueAxis Visible="false" />
-                <RadzenCategoryAxis Visible="false" />
-                <RadzenColumnOptions Margin="10" />
-                <RadzenLegend Visible="false" />
-            </RadzenChart>
-        </RadzenCard>
-    </div>
-    <div class="col-xl-3 col-lg-6 p-2">
-        <RadzenCard>
-            <h3>Closed Issues</h3>
-            <label style="color: #F31155; position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@closedIssues?.Count()</label>
-            <RadzenChart style="width: 100%; height: 120px; margin-bottom: -30px;">
-                <RadzenColumnSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="#F31155" />
-                <RadzenValueAxis Visible="false" />
-                <RadzenCategoryAxis Visible="false" />
-                <RadzenColumnOptions Margin="10" />
-                <RadzenLegend Visible="false" />
-            </RadzenChart>
-        </RadzenCard>
-    </div>
-    <div class="col-xl-3 col-lg-6 p-2">
-        <RadzenCard>
-            <h3>All Issues</h3>
-            <label style="position: absolute; font-size: 3rem; right: 2rem; top: 1rem">@issues?.Count()</label>
-            <RadzenChart style="width: 100%; height: 120px; margin-bottom: -30px;">
-                <RadzenLineSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" Stroke="#009B51" />
-                <RadzenLineSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" Stroke="#F31155" />
-                <RadzenValueAxis Visible="false" />
-                <RadzenCategoryAxis Visible="false" />
-                <RadzenLegend Visible="false" />
-            </RadzenChart>
-        </RadzenCard>
-    </div>
-    <div class="col-xl-3 col-lg-6 p-2">
-        <RadzenCard>
-            <h3>Progress</h3>
-            <RadzenArcGauge style="width: 100%; height: 120px; margin-top: -30px;">
-                <RadzenArcGaugeScale Max="1" Y="0.8" Radius="2">
-                    <RadzenArcGaugeScaleValue Value=@closeRatio FormatString="{0:P0}" />
-                </RadzenArcGaugeScale>
-            </RadzenArcGauge>
-        </RadzenCard>
-    </div>
-</div>
-<div class="row no-gutters mx-n2">
-    <div class="col-lg-9">
-        <div class="row no-gutters">
-            <div class="col-lg-6 p-2">
-                <RadzenCard style="height: 280px">
-                    <h3>Top Issue Labels</h3>
-                    <RadzenChart style="width: 100%; height: 200px">
-                        <RadzenDonutSeries Data=@labelGroups CategoryProperty="Label" ValueProperty="Count" Title="Issues" Fills=@labelColors />
-                    </RadzenChart>
-                </RadzenCard>
-            </div>
-            <div class="col-lg-6 p-2">
-                <RadzenCard style="height: 280px">
-                    <h3>Top Contributors</h3>
-                    <RadzenChart style="width: 100%; height: 200px">
-                        <RadzenPieSeries Data=@openByGroups CategoryProperty="Name" ValueProperty="Count" Title="Issues" />
-                    </RadzenChart>
-                </RadzenCard>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 p-2">
-        <RadzenCard style="height: 280px">
-            <h3>Most Active Member</h3>
-            <div class="text-center">
-                <img style="width: 120px; border-radius: 50%; margin: 20px 0;" src=@mostActiveMember?.AvatarUrl /> 
-                <h4>
-                    @mostActiveMember?.Login
-                </h4>
-            </div>
-        </RadzenCard>
-    </div>
-</div>
-<div class="row no-gutters mx-n2">
-    <div class="col p-2">
-        <RadzenCard>
-            <h3>Issue List</h3>
-            <RadzenDataGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true" AllowSorting="true">
-                <Columns>
-                    <RadzenDataGridColumn TItem="Issue" Title="User" Width="200px" Property="User.Login" FilterValue="@selectedUser?.Login">
-                        <FilterTemplate>
-                            <RadzenDropDown AllowClear="true" AllowFiltering="true" Data=@users TextProperty="Login" @bind-Value="selectedUser" Change=@FilterIssues>
-                                <Template Context="user">
-                                    <div style="white-space: nowrap">
-                                        <img style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;" src=@user.AvatarUrl />@user.Login
-                                    </div>
-                                </Template>
-                            </RadzenDropDown>
-                        </FilterTemplate>
-                        <Template Context="issue">
-                            <img style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; border: 1px solid #cccccc;" src=@issue.User.AvatarUrl /><b>@issue.User.Login</b>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Issue" Property="Title" Title="Title" Width="400px">
-                        <Template Context="issue">
-                            <RadzenLink Path=@issue.Url Text=@issue.Title Target="_blank" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Issue" Property="State" Title="State" Width="100px">
-                        <FilterTemplate>
-                            <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues />
-                        </FilterTemplate>
-                        <Template Context="issue">
-                            @if (issue.State == IssueState.Open)
-                            {
-                                <div style="display: flex; align-items: center; color: #28a745">
-                                    <svg viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm9 3a1 1 0 11-2 0 1 1 0 012 0zm-.25-6.25a.75.75 0 00-1.5 0v3.5a.75.75 0 001.5 0v-3.5z"></path></svg>
-                                    <span style="margin-left: 4px">open</span>
-                                </div>
-                            }
-                            else
-                            {
-                                <div style="display: flex; align-items: center; color: #cb2431">
-                                    <svg viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" fill-rule="evenodd" d="M1.5 8a6.5 6.5 0 0110.65-5.003.75.75 0 00.959-1.153 8 8 0 102.592 8.33.75.75 0 10-1.444-.407A6.5 6.5 0 011.5 8zM8 12a1 1 0 100-2 1 1 0 000 2zm0-8a.75.75 0 01.75.75v3.5a.75.75 0 11-1.5 0v-3.5A.75.75 0 018 4zm4.78 4.28l3-3a.75.75 0 00-1.06-1.06l-2.47 2.47-.97-.97a.749.749 0 10-1.06 1.06l1.5 1.5a.75.75 0 001.06 0z"></path></svg>
-                                    <span style="margin-left: 4px">closed</span>
-                                </div>
-                            }
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Issue" Title="Labels" Sortable="false">
-                        <FilterTemplate>
-                            <RadzenDropDown Style="width: 100%" AllowClear="true" AllowFiltering="true" Multiple="true" Data=@labels @bind-Value="selectedLabels" Change=@FilterIssues>
-                                <Template Context="label">
-                                    @Regex.Replace(label, ":\\w+:", "")
-                                </Template>
-                            </RadzenDropDown>
-                        </FilterTemplate>
+    <RadzenRow JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Class="rz-mb-4">
+        <RadzenColumn Size="12" SizeSM="9">
+            <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">
+                Sample dashboard that uses data from the <a href="https://github.com/dotnet/aspnetcore/issues" target="_blank">ASP.NET GitHub repository</a>. Data is updated 24 hours.
+            </RadzenText>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeSM="3">
+            <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues>
+                <Template Context="issueState">
+                    @Enum.GetName(typeof(IssueState), issueState)
+                </Template>
+            </RadzenDropDown>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+            <RadzenCard Style="position: relative;">
+                <RadzenText TextStyle="TextStyle.H6">Open Issues</RadzenText>
+                <RadzenText TextStyle="TextStyle.H2" Class="rz-color-success" Style="position: absolute; right: 1.5rem; top: 1rem;">@openIssues?.Count()</RadzenText>
+                <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
+                    <RadzenColumnSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-success)" />
+                    <RadzenValueAxis Visible="false" />
+                    <RadzenCategoryAxis Visible="false" />
+                    <RadzenColumnOptions Margin="10" />
+                    <RadzenLegend Visible="false" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+            <RadzenCard Style="position: relative;">
+                <RadzenText TextStyle="TextStyle.H6">Closed Issues</RadzenText>
+                <RadzenText TextStyle="TextStyle.H2" Class="rz-color-danger" Style="position: absolute; right: 1.5rem; top: 1rem;">@closedIssues?.Count()</RadzenText>
+                <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
+                    <RadzenColumnSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-danger)" />
+                    <RadzenValueAxis Visible="false" />
+                    <RadzenCategoryAxis Visible="false" />
+                    <RadzenColumnOptions Margin="10" />
+                    <RadzenLegend Visible="false" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+            <RadzenCard Style="position: relative;">
+                <RadzenText TextStyle="TextStyle.H6">All Issues</RadzenText>
+                <RadzenText TextStyle="TextStyle.H2" Style="position: absolute; right: 1.5rem; top: 1rem;">@issues?.Count()</RadzenText>
+                <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
+                    <RadzenLineSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" Stroke="var(--rz-success)" />
+                    <RadzenLineSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" Stroke="var(--rz-danger)" />
+                    <RadzenValueAxis Visible="false" />
+                    <RadzenCategoryAxis Visible="false" />
+                    <RadzenLegend Visible="false" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.H6">Progress</RadzenText>
+                <RadzenArcGauge Style="width: 100%; height: 120px; margin-top: -30px;">
+                    <RadzenArcGaugeScale Max="1" Y="0.8" Radius="2">
+                        <RadzenArcGaugeScaleValue Value=@closeRatio FormatString="{0:P0}" />
+                    </RadzenArcGaugeScale>
+                </RadzenArcGauge>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeMD="6" SizeLG="4">
+            <RadzenCard Style="height: 280px">
+                <RadzenText TextStyle="TextStyle.H6">Top Issue Labels</RadzenText>
+                <RadzenChart Style="width: 100%; height: 200px">
+                    <RadzenDonutSeries Data=@labelGroups CategoryProperty="Label" ValueProperty="Count" Title="Issues" Fills=@labelColors />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6" SizeLG="4">
+            <RadzenCard Style="height: 280px">
+                <RadzenText TextStyle="TextStyle.H6">Top Contributors</RadzenText>
+                <RadzenChart Style="width: 100%; height: 200px">
+                    <RadzenPieSeries Data=@openByGroups CategoryProperty="Name" ValueProperty="Count" Title="Issues" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6" SizeLG="4">
+            <RadzenCard Style="height: 280px">
+                <RadzenText TextStyle="TextStyle.H6">Most Active Member</RadzenText>
+                <div Class="rz-text-align-center">
+                    <img Style="width: 120px; border-radius: 50%; margin: 20px 0;" src=@mostActiveMember?.AvatarUrl />
+                    <h4>
+                        @mostActiveMember?.Login
+                    </h4>
+                </div>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.H6">Issue List</RadzenText>
+                <RadzenDataGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowSorting="true">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="Issue" Title="User" Width="200px" Property="User.Login" FilterValue="@selectedUser?.Login">
+                            <FilterTemplate>
+                                <RadzenDropDown AllowClear="true" AllowFiltering="true" Data=@users TextProperty="Login" @bind-Value="selectedUser" Change=@FilterIssues>
+                                    <Template Context="user">
+                                        <div Style="white-space: nowrap">
+                                            <img Style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;" src=@user.AvatarUrl />@user.Login
+                                        </div>
+                                    </Template>
+                                </RadzenDropDown>
+                            </FilterTemplate>
+                            <Template Context="issue">
+                                <img Style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; border: 1px solid #cccccc;" src=@issue.User.AvatarUrl /><b>@issue.User.Login</b>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Issue" Property="Title" Title="Title" Width="400px">
+                            <Template Context="issue">
+                                <RadzenLink Path=@issue.Url Text=@issue.Title Target="_blank" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Issue" Property="State" Title="State" Width="120px">
+                            <FilterTemplate>
+                                <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues>
+                                    <Template Context="issueState">
+                                        @issueState.ToString()
+                                    </Template>
+                                </RadzenDropDown>
+                            </FilterTemplate>
+                            <Template Context="issue">
+                                @if (issue.State == IssueState.Open)
+                                {
+                                    <RadzenBadge Text="Open" IsPill="true" Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Success" />
+                                }
+                                else
+                                {
+                                    <RadzenBadge Text="Closed" IsPill="true" Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Info" />
+                                }
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Issue" Title="Labels" Sortable="false">
+                            <FilterTemplate>
+                                <RadzenDropDown Style="width: 100%" AllowClear="true" AllowFiltering="true" Multiple="true" Data=@labels @bind-Value="selectedLabels" Change=@FilterIssues>
+                                    <Template Context="label">
+                                        @Regex.Replace(label, ":\\w+:", "")
+                                    </Template>
+                                </RadzenDropDown>
+                            </FilterTemplate>
 
-                        <Template Context="issue">
-                            <div style="white-space: normal">
-                            @foreach(var label in issue.Labels)
-                            {
-                                <span style="display: inline-block; color: #fff; margin: 4px; padding: 0 4px; border-radius: 4px; background-color: #@label.Color">@Regex.Replace(label.Name, ":\\w+:", "")</span>
-                            }</div>
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
-        </RadzenCard>
-    </div>
-</div>
-</div>
+                            <Template Context="issue">
+                                @foreach(var label in issue.Labels)
+                                {
+                                    <span Class="rz-badge rz-badge-pill rz-mr-1 rz-mb-1" Style="background-color: #@label.Color">@Regex.Replace(label.Name, ":\\w+:", "")</span>
+                                }
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
 @code {
     IEnumerable<Issue> issues;
     IEnumerable<Issue> openIssues;
@@ -268,7 +277,7 @@
     {
         currentPage = args.Current;
         totalPages = args.Total;
-        
+
         StateHasChanged();
     }
 
@@ -278,7 +287,7 @@
         {
             GitHub.OnProgress += OnProgress;
             fetchingData = true;
-            try 
+            try
             {
                 issues = await GitHub.GetIssues(DateTime.Now);
                 filteredIssues = issues.OrderByDescending(issue => issue.CreatedAt);
@@ -322,14 +331,14 @@
                                     .Select(group => new { User = group.Key, Count = group.Count() })
                                     .OrderByDescending(group => group.Count)
                                     .Select(group => group.User)
-                                    .First();
+                                    .FirstOrDefault();
 
                 users = issues.Select(issue => issue.User)
                             .Distinct(new UserComparer());
 
                 error = null;
                 fetchingData = false;
-            } 
+            }
             catch (Exception ex)
             {
                 error = ex.Message;

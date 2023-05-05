@@ -1,0 +1,50 @@
+<div Class="rz-p-0 rz-p-md-12">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+        <RadzenLabel Text="Variant:" />
+        <RadzenSelectBar @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
+        <RadzenDropDown @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap" Gap="1rem" Class="rz-p-sm-12">
+        <RadzenFormField Text="Account" Variant="@variant">
+            <Start>
+                <RadzenIcon Icon="account_circle" />
+            </Start>
+            <ChildContent>
+                <RadzenTextBox @bind-Value="@value" />
+            </ChildContent>
+            <End>
+                <RadzenIcon Icon="add_circle_outline" IconStyle="IconStyle.Secondary" />
+            </End>
+        </RadzenFormField>
+        <RadzenFormField Text="Credit Card Number" Variant="@variant">
+            <Start>
+                <RadzenIcon Icon="credit_card" />
+            </Start>
+            <ChildContent>
+                <RadzenMask Mask="**** **** **** ****" CharacterPattern="[0-9]" Placeholder="0000 0000 0000 0000" Name="CardNr" />
+            </ChildContent>
+        </RadzenFormField>
+        <RadzenFormField Text="Password" Variant="@variant">
+            <ChildContent>
+                <RadzenTextBox @bind-Value="@passwordValue" Visible="@(!password)" />
+                <RadzenPassword @bind-Value="@passwordValue" Visible="@password" />
+            </ChildContent>
+            <End>
+                <RadzenButton Icon="@(password ? "visibility" : "visibility_off")" Click="TogglePassword" Variant="Variant.Text" Size="ButtonSize.Small" />
+            </End>
+        </RadzenFormField>
+    </RadzenStack>
+</div>
+
+@code {
+    string value = "";
+    string passwordValue = "password";
+    bool password = true;
+    Variant variant = Variant.Outlined;
+
+    void TogglePassword()
+    {
+        password = !password;
+    }
+}

@@ -1,138 +1,64 @@
 ﻿@page "/radiobuttonlist"
 
-<RadzenExample Name="RadioButtonList">
-    <div class="row px-3">
-        <div class="col-lg-4 p-3 d-flex">
-            <RadzenCard Class="w-100">
-                <h4 class="mb-4">Horizontal orientation</h4>
-                <RadzenRadioButtonList @bind-Value=@value TValue="int" Change=@((args) => OnChange(args, "RadioButtonList with horizontal orientation"))>
-                    <Items>
-                        <RadzenRadioButtonListItem Text="Orders" Value="1" />
-                        <RadzenRadioButtonListItem Text="Employees" Value="2" />
-                        <RadzenRadioButtonListItem Text="Customers" Value="3" />
-                    </Items>
-                </RadzenRadioButtonList>
-                <h4 class="mt-4">Vertical orientation</h4>
-                <RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" Change=@((args) => OnChange(args, "RadioButtonList with vertical orientation"))>
-                    <Items>
-                        <RadzenRadioButtonListItem Text="Orders" Value="1" />
-                        <RadzenRadioButtonListItem Text="Employees" Value="2" />
-                        <RadzenRadioButtonListItem Text="Customers" Value="3" />
-                    </Items>
-                </RadzenRadioButtonList>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-4 p-3 d-flex">
-            <RadzenCard Class="w-100">
-                <h4 class="mb-4">Items from data</h4>
-                <RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "RadioButtonList with items from data"))
-                            Data="@data" TextProperty="Name" ValueProperty="Id" />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-4 p-3 d-flex">
-            <RadzenCard Class="w-100">
-                <h4 class="mb-4">Declared items and items from data</h4>
-                <RadzenRadioButtonList @bind-Value=@value Data="@data" TextProperty="Name" ValueProperty="Id" TValue="int" Orientation="Orientation.Vertical" Change=@(args => OnChange(args, "RadioButtonList with declared items and items from data"))>
-                    <Items>
-                        <RadzenRadioButtonListItem Text="Static item" Value="0" />
-                    </Items>
-                </RadzenRadioButtonList>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Null as initial value</h4>
-                <RadzenRadioButtonList @bind-Value=@nullableValue TValue="int?" Change=@((args) => OnChange(args, "RadioButtonList with horizontal orientation"))>
-                    <Items>
-                        <RadzenRadioButtonListItem Text="Orders" Value="1" TValue="int?" />
-                        <RadzenRadioButtonListItem Text="Employees" Value="2" TValue="int?" />
-                        <RadzenRadioButtonListItem Text="Customers" Value="3" TValue="int?" />
-                    </Items>
-                </RadzenRadioButtonList>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Disabled RadioButtonList with initial value</h4>
-                <RadzenRadioButtonList @bind-Value=@value Disabled="true" TValue="int">
-                    <Items>
-                        <RadzenRadioButtonListItem Text="Orders" Value="1" TValue="int" />
-                        <RadzenRadioButtonListItem Text="Employees" Value="2" TValue="int" />
-                        <RadzenRadioButtonListItem Text="Customers" Value="3" TValue="int" />
-                    </Items>
-                </RadzenRadioButtonList>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">RadioButtonList using foreach</h4>
-                    <RadzenRadioButtonList @bind-Value=@value TValue="int"
-                        Change=@(args => OnChange(args, "RadioButtonList using foreach"))>
-                        <Items>
-                            @foreach (var dataItem in data)
-                            {
-                                <RadzenRadioButtonListItem Text="@dataItem.Name" Value="@dataItem.Id" Disabled="@(dataItem.IsDisabled.HasValue ? dataItem.IsDisabled.Value : false)" Visible="@(dataItem.IsVisible.HasValue ? dataItem.IsVisible.Value : true)" />
-                            }
-                        </Items>
-                    </RadzenRadioButtonList>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Items from data using optional DisabledProperty and VisibleProperty</h4>
-                <RadzenRadioButtonList @bind-Value=@value Data="@data" TextProperty="Name" ValueProperty="Id" DisabledProperty="IsDisabled" VisibleProperty="IsVisible" TValue="int" 
-                Change=@(args => OnChange(args, "RadioButtonList with items from data using optional DisabledProperty and VisibleProperty"))>
-                </RadzenRadioButtonList>
-            </RadzenCard>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    RadioButtonList
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>RadioButtonList</strong> component.
+</RadzenText>
+
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of RadioButtonList
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the <strong>RadioButtonList</strong> has a Value property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="RadioButtonList" Example="RadioButtonListBindValue">
+    <RadioButtonListBindValue />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of RadioButtonList using Value and Change event
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Value property can be used to set the value of the component and <code>Change</code> event to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="RadioButtonList" Example="RadioButtonListChangeEvent">
+    <RadioButtonListChangeEvent />
+</RadzenExample>
 
-@code {
-    public class MyObject
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public bool? IsDisabled { get; set; }
-        public bool? IsVisible { get; set; }
-    }
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Set RadioButtonList orientation
+</RadzenText>
+<RadzenExample ComponentName="RadioButtonList" Example="RadioButtonListOrientation">
+    <RadioButtonListOrientation />
+</RadzenExample>
 
-    IEnumerable<MyObject> data = new MyObject[] 
-    {
-        new MyObject() {
-            Id = 1,
-            Name = "Orders"
-        },
-        new MyObject() {
-            Id = 2,
-            Name = "Employees"
-        }, 
-        new MyObject() {
-            Id = 3,
-            Name = "Customers" 
-        }, 
-        new MyObject() {
-            Id = 4,
-            Name = "Companies",
-            IsDisabled = true,
-        }, 
-        new MyObject() {
-            Id = 5,
-            Name = "Companies (Old)",
-            IsDisabled = true,
-            IsVisible = false
-        } 
-    };
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Populate RadioButtonList items from data
+</RadzenText>
+<RadzenExample ComponentName="RadioButtonList" Example="RadioButtonListItemsFromData">
+    <RadioButtonListItemsFromData />
+</RadzenExample>
 
-    int value = 1;
-    int? nullableValue = null;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Statically declared and populated RadioButtonList items from data
+</RadzenText>
+<RadzenExample ComponentName="RadioButtonList" Example="RadioButtonListDeclaredAndItemsFromData">
+    <RadioButtonListDeclaredAndItemsFromData />
+</RadzenExample>
 
-    EventConsole console;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    RadioButtonList with null value
+</RadzenText>
+<RadzenExample ComponentName="RadioButtonList" Example="RadioButtonListNullValue">
+    <RadioButtonListNullValue />
+</RadzenExample>
 
-    void OnChange(int? value, string name)
-    {
-        console.Log($"{name} value changed to {value}");
-    }
-}
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Populate items programmatically and disable item
+</RadzenText>
+<RadzenExample ComponentName="RadioButtonList" Example="RadioButtonListForEach">
+    <RadioButtonListForEach />
+</RadzenExample>

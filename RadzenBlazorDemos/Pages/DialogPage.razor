@@ -1,164 +1,59 @@
 ﻿@page "/dialog"
-@inject DialogService DialogService
-@implements IDisposable
 
-<RadzenExample Name="Dialog" AdditionalSourceCodePages=@(new [] { "DialogCardPage.razor" })>
-    <div class="row px-3">
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Open page as a dialog</h4>
-                <RadzenButton Text=@($"Order {orderID} details") ButtonStyle="ButtonStyle.Secondary" Click=@OpenOrder />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Inline Dialog</h4>
-                <RadzenButton Text="Dialog with inline Blazor content" ButtonStyle="ButtonStyle.Secondary" Click=@ShowInlineDialog />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Busy Dialog with a string message</h4>
-                <RadzenButton Text="Busy dialog" Style="width: 140px;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => ShowBusyDialog(true)) />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Busy Dialog with markup</h4>
-                <RadzenButton Text="Busy dialog" Style="width: 140px;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => ShowBusyDialog(false)) />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Confirm Dialog</h4>
-                <RadzenButton Text="Confirm dialog" Style="width: 140px;" ButtonStyle="ButtonStyle.Secondary" Click=@(args => DialogService.Confirm("Are you sure?", "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })) />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Close Dialog by clicking outside</h4>
-                <RadzenButton Text="Dialog with clickable overlay" ButtonStyle="ButtonStyle.Secondary" Click=@ShowCloseableFromOverlayDialog />
-            </RadzenCard>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Dialog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor Dialog component.
+</RadzenText>
+
+<HelpPrerequirements/>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Open page as a dialog
+</RadzenText>
+<RadzenExample ComponentName="Dialog" Example="DialogWithPage">
+    <DialogWithPage />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Inline Dialog
+</RadzenText>
+<RadzenExample ComponentName="Dialog" Example="DialogInline">
+    <DialogInline />
+</RadzenExample>
 
-@code {
-    EventConsole console;
-    int orderID = 10248;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Busy Dialog
+</RadzenText>
+<RadzenExample ComponentName="Dialog" Example="DialogBusy">
+    <DialogBusy />
+</RadzenExample>
 
-    protected override void OnInitialized()
-    {
-        DialogService.OnOpen += Open;
-        DialogService.OnClose += Close;
-    }
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Confirm Dialog
+</RadzenText>
+<RadzenExample ComponentName="Dialog" Example="DialogConfirm">
+    <DialogConfirm />
+</RadzenExample>
 
-    public void Dispose()
-    {
-        // The DialogService is a singleton so it is advisable to unsubscribe.
-        DialogService.OnOpen -= Open;
-        DialogService.OnClose -= Close;
-    }
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Alert Dialog
+</RadzenText>
+<RadzenExample ComponentName="Dialog" Example="DialogAlert">
+    <DialogAlert />
+</RadzenExample>
 
-    void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
-    {
-        console.Log("Dialog opened");
-    }
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Close Dialog by clicking outside
+</RadzenText>
+<RadzenExample ComponentName="Dialog" Example="DialogOverlayClose">
+    <DialogOverlayClose />
+</RadzenExample>
 
-    void Close(dynamic result)
-    {
-        console.Log($"Dialog closed");
-    }
-
-    public async Task OpenOrder()
-    {
-        await DialogService.OpenAsync<DialogCardPage>($"Order {orderID}",
-               new Dictionary<string, object>() { { "OrderID", orderID } },
-               new DialogOptions() { Width = "700px", Height = "570px", Resizable = true, Draggable = true });
-    }
-
-    async Task ShowInlineDialog()
-    {
-     var result = await DialogService.OpenAsync("Simple Dialog", ds =>
-        @<div>
-            <p class="mb-4">Confirm Order ID <b>@orderID</b>?</p>
-            <div class="row">
-                <div class="col">
-                    <RadzenButton Text="Ok" Click="() => ds.Close(true)" Class="mr-1" Style="width: 80px;" />
-                    <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" Class="mr-1" />
-                    <RadzenButton Text="Refresh" Click="(() => { orderID = 10249; ds.Refresh(); })" ButtonStyle="ButtonStyle.Light"  Class="mr-1 float-right" />
-                    
-                </div>
-            </div>
-        </div>);
-    
-      console.Log($"Dialog result: {result}");
-    }
-
-    async Task ShowCloseableFromOverlayDialog()
-    {
-     await DialogService.OpenAsync("Closeable from overlay Dialog", ds =>
-        @<div>
-            Click outside to close this Dialog
-        </div>, new DialogOptions() { CloseDialogOnOverlayClick = true });
-    }
-
-    async Task ShowBusyDialog(bool withMessageAsString)
-    {
-        InvokeAsync(async () =>
-        {
-            // Simulate background task
-            await Task.Delay(2000);
-
-            // Close the dialog
-            DialogService.Close();
-        });
-
-        if (withMessageAsString)
-        {
-            await BusyDialog("Busy ...");
-        }
-        else
-        {
-            await BusyDialog();
-        }
-    }
-
-    // Busy dialog from markup
-    async Task BusyDialog()
-    {
-        await DialogService.OpenAsync("", ds =>
-            @<div>
-                <div class="row">
-                    <div class="col text-center p-5">
-                        <RadzenImage Path="images/community.svg" Style="display: block; width: 200px; margin-bottom: 40px;" />
-                        <b>Loading, please wait...</b>
-                    </div>
-                </div>
-        </div>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
-    }
-
-    // Busy dialog from string
-    async Task BusyDialog(string message)
-    {
-        await DialogService.OpenAsync("", ds =>
-        {
-            RenderFragment content = b =>
-            {
-                b.OpenElement(0, "div");
-                b.AddAttribute(1, "class", "row");
-
-                b.OpenElement(2, "div");
-                b.AddAttribute(3, "class", "col-md-12");
-
-                b.AddContent(4, message);
-
-                b.CloseElement();
-                b.CloseElement();
-            };
-            return content;
-        }, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
-    }
-}
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Side Dialog
+</RadzenText>
+<RadzenExample ComponentName="Dialog" Example="DialogSide">
+    <DialogSide />
+</RadzenExample>

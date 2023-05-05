@@ -1,4 +1,4 @@
-﻿@implements IDisposable
+﻿@implements IAsyncDisposable
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
 
@@ -46,6 +46,7 @@
             await JSRuntime.InvokeVoidAsync("Radzen.openTooltip",
                 tooltip.Element,
                 UniqueID,
+                tooltip.Options.Delay,
                 tooltip.Options.Duration,
                 Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant(),
                 tooltip.Options.CloseTooltipOnDocumentClick);
@@ -65,10 +66,41 @@
             await JSRuntime.InvokeVoidAsync("Radzen.openTooltip",
                 tooltip.Element,
                 UniqueID,
+                tooltip.Options.Delay,
                 tooltip.Options.Duration,
                 Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant(),
-                tooltip.Options.CloseTooltipOnDocumentClick);
+                tooltip.Options.CloseTooltipOnDocumentClick,
+                Reference,
+                "RadzenTooltip.CloseTooltip");
         }
+    }
+
+    private DotNetObjectReference<RadzenTooltip> reference;
+
+    /// <summary>
+    /// Gets the reference for the current component.
+    /// </summary>
+    /// <value>The reference.</value>
+    protected DotNetObjectReference<RadzenTooltip> Reference
+    {
+        get
+        {
+            if (reference == null)
+            {
+                reference = DotNetObjectReference.Create(this);
+            }
+
+            return reference;
+        }
+    }
+
+    /// <summary>
+    /// Closes this instance.
+    /// </summary>
+    [JSInvokable("RadzenTooltip.CloseTooltip")]
+    public void CloseTooltip()
+    {
+        Service.Close();
     }
 
     public async Task Close()
@@ -83,13 +115,20 @@
         await InvokeAsync(() => { StateHasChanged(); });
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
+        while (tooltips.Count != 0)
+        {
+            await Close();
+        }
+        reference?.Dispose();
+        reference = null;
+
         if (IsJSRuntimeAvailable)
         {
             try
             {
-               JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+               await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
             }
             catch
             {}

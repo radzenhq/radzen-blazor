@@ -1,68 +1,19 @@
 @page "/requiredvalidator"
-@using Radzen
-@using System.Text.Json
 
-<RadzenExample Name="RequiredValidator">
-<div class="container my-4">
-    <div class="row">
-        <div class="col">
-            <RadzenCard Class="w-100 mb-4" >
-            <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
-                <RadzenLabel Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
-            </RadzenCard>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-6 offset-lg-3">
-            <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
-                <RadzenFieldset Text="Personal information">
-                    <div class="row mb-5">
-                        <div class="col-md-4">
-                            <RadzenLabel Text="First Name" />
-                        </div>
-                        <div class="col">
-                            <RadzenTextBox style="display: block" Name="FirstName" @bind-Value=@model.FirstName Class="w-100" />
-                            <RadzenRequiredValidator Component="FirstName" Text="First name is required" Popup=@popup Style="position: absolute"/>
-                        </div>
-                    </div>
-                    <div class="row mb-5">
-                        <div class="col-md-4">
-                            <RadzenLabel Text="Last Name" />
-                        </div>
-                        <div class="col">
-                            <RadzenTextBox style="display: block" Name="LastName" @bind-Value=@model.LastName  Class="w-100" />
-                            <RadzenRequiredValidator Component="LastName" Text="Last name is required" Popup=@popup Style="position: absolute"/>
-                        </div>
-                    </div>
-                    <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
-                </RadzenFieldset>
-            </RadzenTemplateForm>
-        </div>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    RequiredValidator
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>RequiredValidator</strong> component.
+</RadzenText>
+
+<RadzenExample ComponentName="RequiredValidator" Example="RequiredValidatorConfig" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenRequiredValidator.cs">
+    <RequiredValidatorConfig />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    class Model
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-    }
-
-    bool popup;
-
-    Model model = new Model();
-    EventConsole console;
-
-    void OnSubmit(Model model)
-    {
-        console.Log($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true })}");
-    }
-
-    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
-    {
-        console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true })}");
-    }
-}
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Validate RadzenDropDown
+</RadzenText>
+<RadzenExample ComponentName="RequiredValidator" Example="RequiredValidatorDropDown" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenRequiredValidator.cs">
+    <RequiredValidatorDropDown />
+</RadzenExample>

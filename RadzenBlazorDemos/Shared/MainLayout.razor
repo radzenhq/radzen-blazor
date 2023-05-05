@@ -1,12 +1,10 @@
-﻿@using Microsoft.AspNetCore.Components
-@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Components
 @using Radzen.Blazor
 @inherits LayoutComponentBase
 @inject ThemeService ThemeService
 @inject ExampleService ExampleService
 @inject NavigationManager UriHelper
 @inject IJSRuntime JSRuntime
-@inject IHttpContextAccessor httpContextAccessor
 
 <RadzenDialog />
 <RadzenNotification />
@@ -16,68 +14,116 @@
 <RadzenLayout>
 <RadzenHeader>
     <ChildContent>
-        <div class="row justify-content-start align-items-center">
-            <div class="col-5 d-flex align-items-center">
-                <RadzenSidebarToggle Click="@(args => { sidebarExpanded = !sidebarExpanded; bodyExpanded = !bodyExpanded; })">
-                </RadzenSidebarToggle>
-                <RadzenLabel Text="Radzen Blazor Components">
-                </RadzenLabel>
-            </div>
-            <div class="col-7 d-flex align-items-center justify-content-end">
-                <div class="d-none d-md-inline-flex align-items-center">
-                    <a href="/docs/" title="Radzen Blazor Components Documentation" class="mx-2 mx-lg-3" target="_blank">Documentation</a>
-                    <a href="https://www.radzen.com/" title="Create .NET Core web applications fast & easy" class="text-nowrap mx-2 mx-lg-3" target="_blank">About Radzen</a>
-                </div>
-                <RadzenDropDown class="mx-0 mx-lg-3" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@ThemeService.Themes" Value="@ThemeService.CurrentTheme" Change="@ChangeTheme" />
-                <a href="https://github.com/radzenhq/radzen-blazor" title="GitHub" target="_blank" class="mx-3">
-                    <svg width="24" height="24" viewBox="0 0 512 499.36" xmlns="http://www.w3.org/2000/svg">
-                    <title>GitHub</title>
-                    <path fill="black" fill-rule="evenodd" d="M256 0C114.64 0 0 114.61 0 256c0 113.09 73.34 209 175.08 242.9 12.8 2.35 17.47-5.56 17.47-12.34 0-6.08-.22-22.18-.35-43.54-71.2 15.49-86.2-34.34-86.2-34.34-11.64-29.57-28.42-37.45-28.42-37.45-23.27-15.84 1.73-15.55 1.73-15.55 25.69 1.81 39.21 26.38 39.21 26.38 22.84 39.12 59.92 27.82 74.5 21.27 2.33-16.54 8.94-27.82 16.25-34.22-56.84-6.43-116.6-28.43-116.6-126.49 0-27.95 10-50.8 26.35-68.69-2.63-6.48-11.42-32.5 2.51-67.75 0 0 21.49-6.88 70.4 26.24a242.65 242.65 0 0 1 128.18 0c48.87-33.13 70.33-26.24 70.33-26.24 14 35.25 5.18 61.27 2.55 67.75 16.41 17.9 26.31 40.75 26.31 68.69 0 98.35-59.85 120-116.88 126.32 9.19 7.9 17.38 23.53 17.38 47.41 0 34.22-.31 61.83-.31 70.23 0 6.85 4.61 14.81 17.6 12.31C438.72 464.97 512 369.08 512 256.02 512 114.62 397.37 0 256 0z"></path>
-                    </svg>
-                </a>
-            </div>
-        </div>
+        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px">
+            <RadzenColumn Size="5">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                    <RadzenSidebarToggle Click="@(args => { sidebarExpanded = !sidebarExpanded; bodyExpanded = !bodyExpanded; })">
+                    </RadzenSidebarToggle>
+                    <RadzenLabel Text="Radzen Blazor Components" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                    </RadzenLabel>
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="7">
+                <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+                    <div Class="rz-display-none rz-display-sm-inline-flex align-items-center">
+                        <a href="/docs/" title="Radzen Blazor Components Documentation" Class="rz-mx-2 rz-mx-lg-4" target="_blank">Documentation</a>
+                        <a href="https://www.radzen.com/" title="Create .NET Core web applications fast & easy" Class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank">About Radzen</a>
+                    </div>
+
+                    <RadzenDropDown Class="rz-mx-0 rz-mx-lg-4" id="themes" style="width: 220px;" TValue="string" TextProperty="Text" ValueProperty="Value" Data="@ThemeService.Themes" Value="@ThemeService.CurrentTheme" Change="@ChangeTheme" >
+                        <ValueTemplate>
+                            @context.Text Theme
+                        </ValueTemplate>
+                        <Template>
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                                <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 4px; oveflow: hidden; outline: var(--rz-input-border); min-width: 80px;">
+                                    <rect width="80" height="60" fill="@context.Base"/>
+                                    <rect x="0" y="4" width="16" height="56" fill="@context.Sidebar"/>
+                                    <rect x="24" y="17" width="48" height="32" rx="2" fill="@context.Content"/>
+                                    <rect x="43" y="41" width="12" height="4" rx="1" fill="@context.Secondary"/>
+                                    <rect x="28" y="21" width="16" height="2" rx="1" fill="@context.TitleText"/>
+                                    <rect x="28" y="27" width="40" height="2" rx="1" fill="@context.ContentText"/>
+                                    <rect x="28" y="31" width="40" height="2" rx="1" fill="@context.ContentText"/>
+                                    <rect x="28" y="35" width="16" height="2" rx="1" fill="@context.ContentText"/>
+                                    <rect x="28" y="41" width="12" height="4" rx="1" fill="@context.Primary"/>
+                                    <rect width="80" height="6" fill="@context.Header"/>
+                                </svg>
+                                @context.Text
+                                @if (context.Premium)
+                                {
+                                    <RadzenBadge title="To use it in your application you need an active Radzen Professional or Enterprise subscription.">PRO</RadzenBadge>
+                                }
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDropDown>
+
+                    <a href="https://github.com/radzenhq/radzen-blazor" title="GitHub" target="_blank" Class="rz-mx-4">
+                        <svg width="24" height="24" viewBox="0 0 512 499.36" xmlns="http://www.w3.org/2000/svg">
+                        <title>GitHub</title>
+                        <path fill="currentColor" fill-rule="evenodd" d="M256 0C114.64 0 0 114.61 0 256c0 113.09 73.34 209 175.08 242.9 12.8 2.35 17.47-5.56 17.47-12.34 0-6.08-.22-22.18-.35-43.54-71.2 15.49-86.2-34.34-86.2-34.34-11.64-29.57-28.42-37.45-28.42-37.45-23.27-15.84 1.73-15.55 1.73-15.55 25.69 1.81 39.21 26.38 39.21 26.38 22.84 39.12 59.92 27.82 74.5 21.27 2.33-16.54 8.94-27.82 16.25-34.22-56.84-6.43-116.6-28.43-116.6-126.49 0-27.95 10-50.8 26.35-68.69-2.63-6.48-11.42-32.5 2.51-67.75 0 0 21.49-6.88 70.4 26.24a242.65 242.65 0 0 1 128.18 0c48.87-33.13 70.33-26.24 70.33-26.24 14 35.25 5.18 61.27 2.55 67.75 16.41 17.9 26.31 40.75 26.31 68.69 0 98.35-59.85 120-116.88 126.32 9.19 7.9 17.38 23.53 17.38 47.41 0 34.22-.31 61.83-.31 70.23 0 6.85 4.61 14.81 17.6 12.31C438.72 464.97 512 369.08 512 256.02 512 114.62 397.37 0 256 0z"></path>
+                        </svg>
+                    </a>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
     </ChildContent>
 </RadzenHeader>
 <RadzenBody @ref="@body0" @bind-Expanded="@bodyExpanded">
     <ChildContent>
         <RadzenContentContainer Name="main">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-12 pt-4 pb-5 px-3 px-lg-5">
-                        @Body
-                        <RadzenCard class="mt-5 content-footer">
-                            <div class="row align-items-center">
-                                <div class="col-12 col-lg-7 px-5 py-3 text-center text-lg-left">
-                                    <h2 class="mb-3">Boost your Blazor development with Radzen</h2>
-                                    <p class="mb-2">Radzen is a desktop tool that gives you the power to create line of business applications. Build and launch Blazor apps visually, while we generate clean code for you.</p>
-                                </div>
-                                <div class="col-12 col-lg-5 px-5 text-center text-lg-right">
-                                    <NavLink class="cta-button ml-0 my-2" href="https://www.radzen.com/features/" target="_blank">Learn More</NavLink>
-                                    <NavLink class="cta-button primary my-2" href="https://www.radzen.com/download/" target="_blank">Download Radzen</NavLink>
-                                </div>
-                            </div>
-                        </RadzenCard>
-                        <p class="mt-5 md-3 text-center">
-                            <RadzenLabel Text="Radzen Blazor Components, &copy; 2018-2022 Radzen."></RadzenLabel>
-                            <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under
-                            <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a>
-                        </p>
-                        <p class="text-center">
-                            <Social />
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <RadzenRow Gap="2rem" Class="rz-pt-6 rz-px-4 rz-px-sm-8 rz-px-xl-12">
+                <RadzenColumn Size="12">
+                    <RadzenRow Class="rz-mx-auto" Style="max-width: 1600px;">
+                        <RadzenColumn Size="12" SizeMD="9">
+                            @Body
+                            <RadzenCard Class="rz-mt-12 rz-display-block rz-display-md-none">
+                                <RadzenRow AlignItems="AlignItems.Center" Gap="0px">
+                                    <RadzenColumn Size="12" SizeMD="7" Class="rz-px-8 rz-py-5 rz-text-align-center rz-text-align-md-start">
+                                        <RadzenText TextStyle="TextStyle.H4" Class="rz-mb-4">Introducing <strong>Radzen Blazor Studio</strong></RadzenText>
+                                        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-text-secondary-color">Radzen Blazor Studio is a desktop tool that empowers <strong>developers</strong> to create beautiful business Blazor apps. Develop your <strong>Blazor Server</strong> and <strong>WebAssembly</strong> applications visually with familiar <strong>WYSIWYG</strong> interface.</RadzenText>
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="5" Class="rz-px-12 rz-text-align-center rz-text-align-md-end">
+                                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+                                            <NavLink Class="rz-button rz-button-lg rz-secondary rz-text-align-center" href="https://www.radzen.com/blazor-studio/download/" target="_blank"><RadzenIcon Icon="open_in_new" /> Try Now</NavLink>
+                                            <NavLink Class="rz-button rz-button-lg rz-light rz-text-align-center" href="https://www.youtube.com/watch?v=q9RdQa6pMx4&list=PLQyJPeb3xHcBij_RbHD__2TOo8Jv5HQVc&index=1" target="_blank"><RadzenIcon Icon="play_circle_outline" /> See in Action</NavLink>
+                                        </RadzenStack>
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </RadzenCard>
+                            <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Center" Class="rz-mt-12">
+                                <RadzenLabel Text="Radzen Blazor Components, &copy; 2018-2023 Radzen."></RadzenLabel> <br />
+                                <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under
+                                <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a>
+                            </RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Center">
+                                <Social />
+                            </RadzenText>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="3" Class="rz-pt-12 rz-display-none rz-display-md-block">
+                            <RadzenStack Gap="0" AlignItems="AlignItems.Start" Class="demos-right-sidebar rz-pl-4 rz-pl-md-6 rz-py-6 rz-py-lg-12">
+                                <RadzenBadge Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Info" Text="New" />
+                                <RadzenText TextStyle="TextStyle.H4" Class="rz-mt-1 rz-mb-4" style="line-height: 1.1"><strong>Radzen<br /> Blazor Studio</strong></RadzenText>
+                                <RadzenImage Path="images/radzen-blazor-studio.png" Class="rz-mt-4 rz-mb-8 rz-border-radius-1 rz-shadow-3" Style="width: 100%" />
+                                <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-primary-color"><strong>Radzen Blazor Studio is a desktop tool that empowers developers to create beautiful Blazor apps.</strong></RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-secondary-color rz-display-none rz-display-lg-block">Develop your Blazor Server and WebAssembly applications visually with familiar WYSIWYG interface.</RadzenText>
+                                <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="1rem" Class="rz-pt-4">
+                                    <NavLink Class="rz-button rz-button-icon-only rz-button-md rz-secondary rz-text-align-center" href="https://www.radzen.com/blazor-studio/download/" target="_blank"><RadzenIcon Icon="open_in_new" /> Try Now</NavLink>
+                                    <NavLink Class="rz-button rz-button-icon-only rz-button-md rz-light rz-text-align-center" href="https://www.youtube.com/watch?v=q9RdQa6pMx4&list=PLQyJPeb3xHcBij_RbHD__2TOo8Jv5HQVc&index=1" target="_blank"><RadzenIcon Icon="play_circle_outline" /> See in Action</NavLink>
+                                </RadzenStack>
+                            </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenColumn>
+            </RadzenRow>
         </RadzenContentContainer>
     </ChildContent>
 </RadzenBody>
-<RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded" class="demos-sidebar" style="display: flex; flex-direction: column">
+<RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded" Class="demos-sidebar" style="display: flex; flex-direction: column">
     <div style="padding: 1rem">
         <RadzenTextBox Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" />
     </div>
     <div style="flex: 1; overflow: auto">
-    <RadzenPanelMenu Match="NavLinkMatch.Prefix" Click="@PanelMenuClick">
+    <RadzenPanelMenu Match="NavLinkMatch.Prefix">
         @foreach (var category in examples)
         {
             <NavigationItem @bind-Expanded=@category.Expanded Example=@category>
@@ -106,21 +152,37 @@
     </div>
 </RadzenSidebar>
 </RadzenLayout>
+
+@if (!rendered)
+{
+<div Class="rz-app-loading">
+    <div Class="logo-loading"></div>
+</div>
+}
+
 @code {
     RadzenSidebar sidebar0;
     RadzenBody body0;
     bool sidebarExpanded = true;
     bool bodyExpanded = false;
+    bool rendered;
 
     IEnumerable<Example> examples;
     protected override void OnInitialized()
     {
-
         ThemeService.Initialize(UriHelper);
 
         examples = ExampleService.Examples;
 
         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            rendered = true;
+        }
     }
 
     void FilterPanelMenu(ChangeEventArgs args)
@@ -135,13 +197,5 @@
         var url = UriHelper.GetUriWithQueryParameter("theme", $"{value}");
 
         UriHelper.NavigateTo(url, true);
-    }
-
-    async Task PanelMenuClick(MenuItemEventArgs args)
-    {
-        if (args.Path == "/")
-        {
-            await JSRuntime.InvokeVoidAsync("document.location.reload");
-        }
     }
 }

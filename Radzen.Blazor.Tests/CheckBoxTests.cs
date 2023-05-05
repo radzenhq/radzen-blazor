@@ -160,5 +160,83 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(@$"rz-state-active", component.Markup);
             Assert.Contains(@$"rzi-times", component.Markup);
         }
+
+        [Fact]
+        public void CheckBox_Renders_ReadonlyParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.ReadOnly, true));
+
+            Assert.Contains(@$"readonly", component.Markup);
+        }
+
+        [Fact]
+        public void CheckBox_DoesNotRaise_ChangedEvent_ReadonlyParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+
+            var raised = false;
+
+            component.SetParametersAndRender(parameters => parameters
+              .Add<bool>(p => p.ReadOnly, true)
+              .Add(p => p.Change, args => { raised = true; })
+            );
+
+            component.Find("div.rz-chkbox-box").Click();
+
+            Assert.False(raised);
+        }
+
+        [Fact]
+        public void CheckBox_DoesNotRaise_ValueChangedEvent_ReadonlyParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+
+            var raised = false;
+
+            component.SetParametersAndRender(parameters => parameters
+              .Add<bool>(p => p.ReadOnly, true)
+              .Add(p => p.ValueChanged, args => { raised = true; })
+            );
+
+            component.Find("div.rz-chkbox-box").Click();
+
+            Assert.False(raised);
+        }
+
+        [Fact]
+        public void CheckBox_ValueNotChanged_ReadonlyParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenCheckBox<bool>>();
+
+            var value = true;
+
+            component.SetParametersAndRender(parameters => parameters
+              .Add<bool>(p => p.ReadOnly, true)
+              .Add<bool>(p => p.Value, value)
+            );
+
+            component.Find("div.rz-chkbox-box").Click();
+
+            Assert.Contains(@$"rz-state-active", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters
+              .Add<bool>(p => p.ReadOnly, !true)
+              .Add<bool>(p => p.Value, value)
+            );
+
+            component.Find("div.rz-chkbox-box").Click();
+
+            Assert.DoesNotContain(@$"rz-state-active", component.Markup);
+        }
     }
 }

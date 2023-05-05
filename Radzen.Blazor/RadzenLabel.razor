@@ -2,5 +2,5 @@
 
 @if (Visible)
 {
-    <label @ref="@Element" for="@Component" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">@Text</label>
+<label @ref="@Element" for="@Component" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">@if(ChildContent != null){@ChildContent}else{@Text}</label>
 }

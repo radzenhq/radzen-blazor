@@ -156,6 +156,23 @@ namespace Radzen.Blazor
         public EventCallback<SchedulerAppointmentSelectEventArgs<TItem>> AppointmentSelect { get; set; }
 
         /// <summary>
+        /// A callback that will be invoked when the user clicks the more text in the current view. Commonly used to view additional appointments.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments MoreSelect=@OnMoreSelect&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        ///  void OnMoreSelect(DateTime args) 
+        ///  {
+        ///  }
+        /// }
+        /// </code>
+        /// </example>
+        [Parameter]
+        public EventCallback<SchedulerMoreSelectEventArgs> MoreSelect { get; set; }
+
+        /// <summary>
         /// An action that will be invoked when the current view renders an appointment. Never call <c>StateHasChanged</c> when handling AppointmentRender.
         /// </summary>
         /// <example>
@@ -206,7 +223,7 @@ namespace Radzen.Blazor
 
         IList<ISchedulerView> Views { get; set; } = new List<ISchedulerView>();
 
-        ISchedulerView SelectedView
+        public ISchedulerView SelectedView
         {
             get
             {
@@ -249,7 +266,25 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public async Task SelectSlot(DateTime start, DateTime end)
         {
-            await SlotSelect.InvokeAsync(new SchedulerSlotSelectEventArgs { Start = start, End = end });
+            await SlotSelect.InvokeAsync(new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = Array.Empty<AppointmentData>(), View = SelectedView });
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments)
+        {
+            var args = new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = appointments, View = SelectedView };
+            await SlotSelect.InvokeAsync(args);
+
+            return args.IsDefaultPrevented;
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> SelectMore(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments)
+        {
+            var args = new SchedulerMoreSelectEventArgs { Start = start, End = end, Appointments = appointments, View = SelectedView };
+            await MoreSelect.InvokeAsync(args);
+
+            return args.IsDefaultPrevented;
         }
 
         /// <inheritdoc />
@@ -272,6 +307,27 @@ namespace Radzen.Blazor
 
                 StateHasChanged();
             }
+        }
+
+        /// <summary>
+        /// Selects the specified <see cref="ISchedulerView"/>. The view must already be present in this scheduler.
+        /// If the specified view is already selected, no action will be performed.
+        /// </summary>
+        /// <param name="view">The <see cref="ISchedulerView"/> to select</param>
+        public async Task SelectView(ISchedulerView view)
+        {
+            var viewIndex = Views.IndexOf(view);
+            if (viewIndex == -1)
+                return;
+
+            if (SelectedView == view)
+                return;
+
+            selectedIndex = viewIndex;
+            
+            await InvokeLoadData();
+            
+            StateHasChanged();
         }
 
         /// <summary>

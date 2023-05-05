@@ -1,0 +1,7 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenDatePicker @bind-Value=@value ShowTime="true" HourFormat="12" DateFormat="MM/dd/yyyy h:mm tt" />
+</div>
+
+@code {
+    DateTime? value = DateTime.Now;
+}

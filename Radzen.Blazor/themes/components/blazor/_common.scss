@@ -1,7 +1,17 @@
 .rz-helper-hidden-accessible {
   opacity: 0;
   height: 0;
-  overflow: hidden;
+    
+  input {
+    height: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+}
+
+.rz-helper-hidden {
+  display: none;
 }
 
 .rz-scrollbar-measure {
@@ -10,19 +20,4 @@
   overflow: scroll;
   position: absolute;
   top: -9999px;
-}
-
-.rz-helper-hidden {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  body {
-    overflow-x: hidden;
-  }
-  .header,
-  .footer,
-  .body {
-    width: 100vw;
-  }
 }

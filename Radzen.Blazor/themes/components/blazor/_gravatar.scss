@@ -3,10 +3,19 @@ $gravatar-height: $gravatar-width !default;
 $gravatar-border-radius: 50% !default;
 $gravatar-box-shadow: none !default;
 
+// Gravatar CSS variables
+
+:root {
+  --rz-gravatar-width: #{$gravatar-width};
+  --rz-gravatar-height: #{$gravatar-height};
+  --rz-gravatar-border-radius: #{$gravatar-border-radius};
+  --rz-gravatar-box-shadow: #{$gravatar-box-shadow};
+}
+
 .rz-gravatar {
-  width: $gravatar-width;
-  height: $gravatar-height;
+  width: var(--rz-gravatar-width);
+  height: var(--rz-gravatar-height);
   display: inline-block;
-  border-radius: $gravatar-border-radius;
-  box-shadow: $gravatar-box-shadow;
+  border-radius: var(--rz-gravatar-border-radius);
+  box-shadow: var(--rz-gravatar-box-shadow);
 }

@@ -1,0 +1,32 @@
+﻿@inject ContextMenuService ContextMenuService
+
+<RadzenStack Gap="1rem" Class="rz-p-sm-12">
+    <RadzenButton Text="Right click me" ContextMenu=@(args => ShowContextMenuWithContent(args)) ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Large" />
+    <EventConsole @ref=@console />
+</RadzenStack>
+
+@code {
+    EventConsole console;
+
+    void ShowContextMenuWithContent(MouseEventArgs args) => ContextMenuService.Open(args, ds =>
+        @<RadzenMenu Click="OnMenuItemClick">
+            <RadzenMenuItem Text="Item1" Value="1"></RadzenMenuItem>
+            <RadzenMenuItem Text="Item2" Value="2"></RadzenMenuItem>
+            <hr />
+            <RadzenMenuItem Text="More items" Value="3">
+                <RadzenMenuItem Text="More sub items" Value="4">
+                    <RadzenMenuItem Text="Item1" Value="5"></RadzenMenuItem>
+                    <RadzenMenuItem Text="Item2" Value="6"></RadzenMenuItem>
+                </RadzenMenuItem>
+            </RadzenMenuItem>
+        </RadzenMenu>);
+
+    void OnMenuItemClick(MenuItemEventArgs args)
+    {
+        console.Log($"Menu item with Value={args.Value} clicked");
+        if(!args.Value.Equals(3) && !args.Value.Equals(4))
+        {
+            ContextMenuService.Close();
+        }
+    }
+}

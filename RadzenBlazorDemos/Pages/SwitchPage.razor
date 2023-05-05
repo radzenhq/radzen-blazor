@@ -1,28 +1,29 @@
 ﻿@page "/switch"
 
-<RadzenExample Name="Switch">
-<div class="row p-4">
-    <div class="col-md-6">
-        <h4 class="mt-3">Switch</h4>
-        <RadzenSwitch @bind-Value=@value Change=@(args => OnChange(args, "Switch")) />
-    </div>
-    <div class="col-md-6">
-        <h4 class="mt-3">Disabled Switch</h4>
-        <RadzenSwitch @bind-Value=@disabledValue Disabled="true" />
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Switch
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Switch</strong> component.
+</RadzenText>
+
+
+<RadzenText Anchor="switch#get-set-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and set the value
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the Switch has a <code>Value</code> property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="Switch" Example="SwitchConfig">
+    <SwitchConfig />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    bool value;
-    bool disabledValue = true;
-
-    EventConsole console;
-
-    void OnChange(bool? value, string name)
-    {
-        console.Log($"{name} value changed to {value}");
-    }
-}
+<RadzenText Anchor="switch#disabled-switch" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Disabled Switch
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To disabled the switch, set <code>Disabled="true"</code>
+</RadzenText>
+<RadzenExample ComponentName="Switch" Example="SwitchDisabled">
+    <SwitchDisabled />
+</RadzenExample>

@@ -1,0 +1,68 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenPanel AllowCollapse="true" Class="rz-my-10 rz-mx-auto" Style="width: 700px;"
+                Expand=@(() => Change("Panel expanded")) Collapse=@(() => Change("Panel collapsed")) >
+    <HeaderTemplate>
+        <RadzenText TextStyle="TextStyle.H6" Class="rz-display-flex rz-align-items-center rz-m-0">
+            <RadzenIcon Icon="account_box" class="rz-mr-1" /><b>Orders</b>
+        </RadzenText>
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenCard  class="rz-mt-4">
+            <RadzenDataList PageSize="4" WrapItems="true" AllowPaging="true" 
+                            Data="@orders" TItem="Order">
+                <Template Context="order">
+                    <RadzenCard Style="width: 250px">
+                        <RadzenRow>
+                            <RadzenColumn Size="8" class="rz-text-truncate">
+                                <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") class="me-1" />
+                                <b>@(order.ShipName)</b>
+                            </RadzenColumn>
+                            <RadzenColumn Size="4" class="rz-text-align-end">
+                                <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin: 1rem 0;" />
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                            <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" />
+                            <RadzenStack Gap="0">
+                                <RadzenText TextStyle="TextStyle.H6" Class="rz-mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1">@order.ShipAddress</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body2">@(order.ShipCity), @(order.ShipCountry)</RadzenText>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
+                </Template>
+            </RadzenDataList>
+        </RadzenCard>
+    </ChildContent>
+    <SummaryTemplate>
+        <RadzenCard class="rz-mt-4">
+            <b>@orders.Count() Orders</b>
+        </RadzenCard>
+    </SummaryTemplate>
+</RadzenPanel>
+
+<EventConsole @ref=@console Class="rz-my-10 rz-mx-auto" Style="width: 700px;" />
+
+@code {
+    EventConsole console;
+
+    IEnumerable<Order> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+
+    void Change(string text)
+    {
+        console.Log($"{text}");
+    }
+}

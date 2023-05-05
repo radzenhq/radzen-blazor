@@ -15,18 +15,25 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        @if (AllowSelectAll)
+        {
+            <div class="rz-multiselect-header rz-helper-clearfix" @onclick:preventDefault>
+                <RadzenCheckBox ReadOnly="@ReadOnly" Disabled="@Disabled" Name="SelectAll" TValue="bool?" Value="@IsAllSelected()" Change="@SelectAll" />
+                <RadzenLabel Component="SelectAll" Text="@SelectAllText" class="rz-chkbox-label" />
+            </div>
+        }
         @foreach (var item in allItems.Where(i => i.Visible))
         {
-            <div class="rz-checkbox" @onclick="@(args => SelectItem(item))" @attributes="item.Attributes" style="@item.Style">
-                <div class="rz-chkbox " @onkeypress="@(async args => { if (args.Code == "Space") { await SelectItem(item); } })"  tabindex="@TabIndex">
+            <div @ref="@item.Element" id="@item.GetItemId()" @onclick="@(args => SelectItem(item))" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style">
+                <div class="rz-chkbox " @onkeypress="@(async args => { if (args.Code == "Space") { await SelectItem(item); } })" tabindex="@(Disabled || ReadOnly || item.Disabled || item.ReadOnly ? "-1" : $"{TabIndex}")">
                     <div class="rz-helper-hidden-accessible">
-                        <input type="checkbox" name="@Name" value="@item.Value" disabled="@Disabled" tabindex="-1">
+                        <input type="checkbox" name="@Name" value="@item.Value" disabled="@Disabled" readonly="@ReadOnly" tabindex="-1">
                     </div>
                     <div class=@ItemClassList(item)>
                         <span class=@IconClassList(item)></span>
                     </div>
                 </div>
-                <label class="rz-chkbox-label">@item.Text</label>
+                <label class="rz-chkbox-label">@((MarkupString)item.Text)</label>
             </div>
         }
     </div>

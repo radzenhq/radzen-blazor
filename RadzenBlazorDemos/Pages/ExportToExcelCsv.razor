@@ -1,0 +1,45 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+@inject NorthwindService service
+
+<RadzenButton Text="Export XLS" Icon="grid_on" Click="@(args => Export("excel"))" class="mb-4 me-2" /><RadzenButton Text="Export CSV" Icon="wrap_text" Click="@(args => Export("csv"))" class="mb-4" />
+<RadzenDataGrid @ref="grid" AllowColumnPicking="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@orderDetails" TItem="OrderDetail">
+    <Columns>
+        <RadzenDataGridColumn TItem="OrderDetail" Property="Order.OrderDate" Title="Order" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+        <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
+            <Template Context="detail">
+                @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+        <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount   " FormatString="{0:P}" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<OrderDetail> grid;
+
+    IEnumerable<OrderDetail> orderDetails;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orderDetails = dbContext.OrderDetails.Include("Order").Include("Product").ToList();
+    }
+
+    public void Export(string type)
+    {
+        service.Export("OrderDetails", type, new Query() 
+            { 
+                OrderBy = grid.Query.OrderBy, 
+                Filter = grid.Query.Filter, 
+                Select = string.Join(",", grid.ColumnsCollection.Where(c => c.GetVisible() && !string.IsNullOrEmpty(c.Property))
+                        .Select(c => c.Property.Contains(".") ? $"{c.Property} as {c.Property.Replace(".", "_")}" : c.Property))
+            });
+    }
+}

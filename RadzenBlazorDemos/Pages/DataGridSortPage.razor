@@ -1,29 +1,9 @@
 ﻿@page "/datagrid-sort"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid <strong>Sorting</strong>
+</RadzenText>
 
-@inject NorthwindContext dbContext
-
-<h1>DataGrid <strong>Sorting</strong></h1>
-
-<RadzenExample Name="DataGrid" Source="DataGridSort" Heading="false">
-    <RadzenDataGrid PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="400px" >
-        <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" Width="150px" />
-            <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
-            <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="150px" />
-            <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" Width="150px" />
-            <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
-        </Columns>
-    </RadzenDataGrid>
+<RadzenExample ComponentName="DataGrid" Example="DataGridSort">
+    <DataGridSort />
 </RadzenExample>
-@code {
-    IEnumerable<Employee> employees;
-
-    protected override void OnInitialized()
-    {
-        employees = dbContext.Employees;
-    }
-}

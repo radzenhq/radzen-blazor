@@ -1,0 +1,146 @@
+// Flex-direction
+// Example .rz-flex-row
+$flex: row, row-reverse, column, column-reverse;
+
+@each $value in $flex {
+  .rz-flex-#{$value} {
+    flex-direction: #{$value} !important;
+  }
+}
+
+// Stack/Grid Layout RadzenRow and RadzenColumn styles
+$rz-gap: 1rem !default;
+$rz-row-gap: $rz-gap !default;
+
+// Stack/Grid Layout CSS variables
+:root {
+  --rz-gap: #{$rz-gap};
+  --rz-row-gap: #{$rz-row-gap};
+}
+
+$rz-col-map: () !default;
+$rz-col-map: map-merge(
+  (
+    1: calc((100% - 11 * var(--rz-gap)) / 12),
+    2: calc(2 * ((100% - 11 * var(--rz-gap)) / 12) + 1 * var(--rz-gap)),
+    3: calc(3 * ((100% - 11 * var(--rz-gap)) / 12) + 2 * var(--rz-gap)),
+    4: calc(4 * ((100% - 11 * var(--rz-gap)) / 12) + 3 * var(--rz-gap)),
+    5: calc(5 * ((100% - 11 * var(--rz-gap)) / 12) + 4 * var(--rz-gap)),
+    6: calc(6 * ((100% - 11 * var(--rz-gap)) / 12) + 5 * var(--rz-gap)),
+    7: calc(7 * ((100% - 11 * var(--rz-gap)) / 12) + 6 * var(--rz-gap)),
+    8: calc(8 * ((100% - 11 * var(--rz-gap)) / 12) + 7 * var(--rz-gap)),
+    9: calc(9 * ((100% - 11 * var(--rz-gap)) / 12) + 8 * var(--rz-gap)),
+    10: calc(10 * ((100% - 11 * var(--rz-gap)) / 12) + 9 * var(--rz-gap)),
+    11: calc(11 * ((100% - 11 * var(--rz-gap)) / 12) + 10 * var(--rz-gap)),
+    12: 100%,
+  ),
+  $rz-col-map
+);
+
+$rz-offset-map: () !default;
+$rz-offset-map: map-merge(
+  (
+    0: 0,
+    1: calc(1 * ((100% - 11 * var(--rz-gap)) / 12) + 1 * var(--rz-gap)),
+    2: calc(2 * ((100% - 11 * var(--rz-gap)) / 12) + 2 * var(--rz-gap)),
+    3: calc(3 * ((100% - 11 * var(--rz-gap)) / 12) + 3 * var(--rz-gap)),
+    4: calc(4 * ((100% - 11 * var(--rz-gap)) / 12) + 4 * var(--rz-gap)),
+    5: calc(5 * ((100% - 11 * var(--rz-gap)) / 12) + 5 * var(--rz-gap)),
+    6: calc(6 * ((100% - 11 * var(--rz-gap)) / 12) + 6 * var(--rz-gap)),
+    7: calc(7 * ((100% - 11 * var(--rz-gap)) / 12) + 7 * var(--rz-gap)),
+    8: calc(8 * ((100% - 11 * var(--rz-gap)) / 12) + 8 * var(--rz-gap)),
+    9: calc(9 * ((100% - 11 * var(--rz-gap)) / 12) + 9 * var(--rz-gap)),
+    10: calc(10 * ((100% - 11 * var(--rz-gap)) / 12) + 10 * var(--rz-gap)),
+    11: calc(11 * ((100% - 11 * var(--rz-gap)) / 12) + 11 * var(--rz-gap)),
+  ),
+  $rz-offset-map
+);
+
+// Stack
+.rz-stack {
+  gap: var(--rz-gap);
+}
+
+// Rows
+.rz-row {
+  flex-wrap: wrap;
+  gap: var(--rz-gap);
+  row-gap: var(--rz-row-gap);
+}
+
+// Columns
+.rz-row > [class^='rz-col'] {
+  flex: 1 0 0%;
+}
+
+.rz-row > [class*='rz-col-'] {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+@each $col, $col-width in $rz-col-map {
+  .rz-row > .rz-col-#{$col} {
+    max-width: #{$col-width};
+    flex-basis: #{$col-width};
+  }
+}
+
+// Columns with breakpoints
+@each $breakpoint, $breakpoint-value in $rz-breakpoints-map {
+  @media (min-width: #{$breakpoint-value}) {
+    @each $col, $col-width in $rz-col-map {
+      .rz-row > .rz-col-#{$breakpoint}-#{$col} {
+        max-width: #{$col-width};
+        flex-basis: #{$col-width};
+      }
+    }
+  }
+}
+
+// Offsets
+@each $offset, $offset-margin in $rz-offset-map {
+  .rz-offset-#{$offset} {
+    margin-left: #{$offset-margin};
+  }
+}
+
+// Offsets with breakpoints
+@each $breakpoint, $breakpoint-value in $rz-breakpoints-map {
+  @media (min-width: #{$breakpoint-value}) {
+    @each $offset, $offset-margin in $rz-offset-map {
+      .rz-offset-#{$breakpoint}-#{$offset} {
+        margin-left: #{$offset-margin};
+      }
+    }
+  }
+}
+
+// Order
+.rz-order-first {
+  order: -1 !important;
+}
+.rz-order-last {
+  order: 13 !important;
+}
+@for $order from 0 through 12 {
+  .rz-order-#{$order} {
+    order: $order !important;;
+  }
+}
+
+// Order with breakpoints
+@each $breakpoint, $breakpoint-value in $rz-breakpoints-map {
+  @media (min-width: #{$breakpoint-value}) {
+    .rz-order-#{$breakpoint}-first {
+      order: -1 !important;
+    }
+    .rz-order-#{$breakpoint}-last {
+      order: 13 !important;
+    }
+    @for $order from 0 through 12 {
+      .rz-order-#{$breakpoint}-#{$order} { 
+        order: $order !important;
+      }
+    }
+  }
+}

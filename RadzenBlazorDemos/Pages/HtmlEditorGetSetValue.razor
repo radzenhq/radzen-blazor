@@ -1,0 +1,24 @@
+﻿<RadzenHtmlEditor @bind-Value=@htmlValue style="height: 300px;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute UploadUrl="upload/image" />
+
+<EventConsole @ref=@console />
+
+@code {
+    string htmlValue = "<h1>Hello World!</h1>";
+
+    EventConsole console;
+
+    void OnPaste(HtmlEditorPasteEventArgs args)
+    {
+        console.Log($"Paste: {args.Html}");
+    }
+
+    void OnChange(string html)
+    {
+        console.Log($"Change: {html}");
+    }
+
+    void OnExecute(HtmlEditorExecuteEventArgs args)
+    {
+        console.Log($"Execute: {args.CommandName}");
+    }
+}

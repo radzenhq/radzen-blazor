@@ -1,0 +1,59 @@
+﻿<div class="rz-p-sm-12" style="margin-bottom: 200px;">
+        <RadzenMenu Click="OnParentClicked">
+            <RadzenMenuItem Text="General" Icon="home">
+                <RadzenMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenMenuItem>
+                <RadzenMenuItem Text="Menu" Path="menu" Icon="line_weight"></RadzenMenuItem>
+                <RadzenMenuItem Click="OnChildClicked" Text="ChildClick" Icon="attach_file"></RadzenMenuItem>
+                <RadzenMenuItem Text="Dialog" Path="dialog" Icon="perm_media"></RadzenMenuItem>
+                <RadzenMenuItem Text="Notification" Path="notification" Icon="announcement"></RadzenMenuItem>
+            </RadzenMenuItem>
+            <RadzenMenuItem Text="Inputs" Icon="payment">
+                <RadzenMenuItem Text="CheckBox" Path="checkbox" Icon="check_circle"></RadzenMenuItem>
+                <RadzenMenuItem Text="TextBox" Path="textbox" Icon="input"></RadzenMenuItem>
+                <RadzenMenuItem Text="TextArea" Path="textarea" Icon="description"></RadzenMenuItem>
+                <RadzenMenuItem Text="Password" Path="password" Icon="payment"></RadzenMenuItem>
+                <RadzenMenuItem Text="Numeric" Path="numeric" Icon="aspect_ratio"></RadzenMenuItem>
+                <RadzenMenuItem Text="DatePicker" Path="datepicker" Icon="date_range"></RadzenMenuItem>
+            </RadzenMenuItem>
+            <RadzenMenuItem Text="Data" Icon="save">
+                <RadzenMenuItem Text="DataGrid" Path="datagrid" Icon="grid_on"></RadzenMenuItem>
+                <RadzenMenuItem Text="DataList" Path="datalist" Icon="list"></RadzenMenuItem>
+                <RadzenMenuItem Text="DropDown" Path="dropdown" Icon="dns"></RadzenMenuItem>
+                <RadzenMenuItem Text="DropDownDataGrid" Path="dropdown-datagrid" Icon="receipt"></RadzenMenuItem>
+                <RadzenMenuItem Text="ListBox" Path="listbox" Icon="view_list"></RadzenMenuItem>
+                <RadzenMenuItem Text="TemplateForm" Path="templateform" Icon="line_style"></RadzenMenuItem>
+            </RadzenMenuItem>
+            <RadzenMenuItem Text="Containers" Icon="account_box">
+                <RadzenMenuItem Text="Tabs" Path="tabs" Icon="tab"></RadzenMenuItem>
+                <RadzenMenuItem Text="Panel" Path="panel" Icon="content_paste"></RadzenMenuItem>
+                <RadzenMenuItem Text="Fieldset" Path="fieldset" Icon="account_balance_wallet"></RadzenMenuItem>
+                <RadzenMenuItem Text="Card" Path="card" Icon="line_style"></RadzenMenuItem>
+            </RadzenMenuItem>
+            <RadzenMenuItem Text="More">
+                <RadzenMenuItem Text="Item1"></RadzenMenuItem>
+                <RadzenMenuItem Text="Item2"></RadzenMenuItem>
+                <RadzenMenuItem Text="More items">
+                    <RadzenMenuItem Text="More sub items">
+                        <RadzenMenuItem Text="Item1"></RadzenMenuItem>
+                        <RadzenMenuItem Text="Item2"></RadzenMenuItem>
+                    </RadzenMenuItem>
+                </RadzenMenuItem>
+            </RadzenMenuItem>
+    </RadzenMenu>
+</div>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+
+    void OnParentClicked(MenuItemEventArgs args)
+    {
+        console.Log($"{args.Text} clicked from parent");
+    }
+
+    void OnChildClicked(MenuItemEventArgs args)
+    {
+        console.Log($"{args.Text} from child clicked");
+    }
+}

@@ -1,52 +1,61 @@
 ﻿@page "/badge"
 
-<RadzenExample Name="Badge" Documentation="false">
-    <div class="row px-3">
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Badges</h4>
-                <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Primary" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="Light" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Success" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Danger" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="Warning" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="Info" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Pills</h4>
-                <RadzenBadge BadgeStyle="BadgeStyle.Primary" IsPill="true" Text="Primary" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Secondary" IsPill="true" Text="Secondary" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Light" IsPill="true" Text="Light" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Success" IsPill="true" Text="Success" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Danger" IsPill="true" Text="Danger" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Warning" IsPill="true" Text="Warning" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Info" IsPill="true" Text="Info" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">In Button</h4>
-                    <RadzenButton ButtonStyle="ButtonStyle.Primary" Class="mr-1" >
-                    Notifications
-                    <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="15" />
-                </RadzenButton>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Badge
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-8">
+    The Radzen Blazor <strong>Badge</strong> component is a small graphic that displays important information, like a count or label, within a user interface. It's commonly used to draw attention to something or provide visual feedback to the user.
+</RadzenText>
+<RadzenExample ComponentName="Badge" Example="BadgeUsage">
+    <BadgeUsage />
+</RadzenExample>
 
-                <RadzenButton ButtonStyle="ButtonStyle.Secondary">
-                    Messages
-                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" IsPill="@true" Text="15" />
-                </RadzenButton>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Child Content</h4>
-                <RadzenBadge BadgeStyle="BadgeStyle.Primary">
-                    Childcontent
-                </RadzenBadge>
-            </RadzenCard>
-        </div>
-    </div>
+<RadzenText Anchor="badge#badge-style" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Badge Style
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To set a predefined badge style, use the <code>BadgeStyle</code> property, e.g. <code>BadgeStyle="BadgeStyle.Primary"</code>.
+</RadzenText>
+<RadzenExample ComponentName="Badge" Example="BadgeStyles">
+    <BadgeStyles />
+</RadzenExample>
+
+<RadzenText Anchor="badge#badge-shade" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Badge Shade
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Each badge style, except Light and Dark, comes with a set of shades. Use the <code>Shade</code> property, e.g. <code>Shade="Shade.Lighter"</code>.
+</RadzenText>
+<RadzenExample ComponentName="Badge" Example="BadgeShades">
+    <BadgeShades />
+</RadzenExample>
+
+<RadzenText Anchor="badge#badge-variant" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Badge Variant
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Each badge style and shade can be used with different badge variants. Use the <code>Variant</code> property, e.g. <code>Variant="Variant.Outlined"</code>.
+</RadzenText>
+<RadzenExample ComponentName="Badge" Example="BadgeVariants">
+    <BadgeVariants />
+</RadzenExample>
+
+<RadzenText Anchor="badge#pill" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Pill
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>IsPill="true"</code> for pill-shaped badges.
+</RadzenText>
+<RadzenExample ComponentName="Badge" Example="BadgePills">
+    <BadgePills />
+</RadzenExample>
+
+<RadzenText Anchor="badge#pill" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Child Content
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Define custom content with ease.
+</RadzenText>
+<RadzenExample ComponentName="Badge" Example="BadgeContent">
+    <BadgeContent />
 </RadzenExample>

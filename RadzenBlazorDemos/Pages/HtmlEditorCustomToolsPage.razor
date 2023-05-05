@@ -1,71 +1,35 @@
 ﻿@page "/html-editor-custom-tools"
-@inject DialogService DialogService
 
-<h1>Radzen Blazor HtmlEditor custom tools</h1>
-<RadzenExample Name="HtmlEditor" Source="HtmlEditorCustomTools" Heading="false">
-    <div class="row">
-        <div class="col-md-4">
-            <h3>Custom button</h3>
-            <RadzenHtmlEditor style="height: 500px; margin-bottom: 1rem;" Execute=@OnExecute>
-                <RadzenHtmlEditorCustomTool CommandName="InsertToday" Icon="today" Title="Insert today" />
-            </RadzenHtmlEditor>
-        </div>
-        <div class="col-md-4">
-            <h3>Custom tool with template</h3>
-            <RadzenHtmlEditor style="height: 500px; margin-bottom: 1rem;">
-                <RadzenHtmlEditorCustomTool>
-                    <Template Context="editor">
-                        <RadzenDatePicker Change=@(args => OnDateChange(args, editor)) TValue="DateTime" />
-                    </Template>
-                </RadzenHtmlEditorCustomTool>
-            </RadzenHtmlEditor>
-        </div>
-        <div class="col-md-4">
-            <h3>Custom dialog</h3>
-            <RadzenHtmlEditor style="height: 500px; margin-bottom: 1rem;" Execute=@OnExecute>
-                <RadzenHtmlEditorCustomTool CommandName="InsertImageFromList" Icon="attach_file" />
-            </RadzenHtmlEditor>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor HtmlEditor custom tools
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    RadzenHtmlEditor allows the developer to create custom tools via the <code>RadzenHtmlEditorCustomTool</code> tag.
+</RadzenText>
+
+<RadzenText Anchor="html-editor-custom-tools#command-execute-event" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Custom command on Execute event
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    In its basic form you create a button and handle the <code>Execute</code> event of the HtmlEditor to implement the command.
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorCustomToolExecute">
+    <HtmlEditorCustomToolExecute />
 </RadzenExample>
-@code {
-    async Task OnExecute(HtmlEditorExecuteEventArgs args)
-    {
-        if (args.CommandName == "InsertToday")
-        {
-            await InsertDate(args.Editor, DateTime.Now);
-        }
 
-        if (args.CommandName == "InsertImageFromList")
-        {
-            await InsertImageFromList(args.Editor);
-        }
-    }
+<RadzenText Anchor="html-editor-custom-tools#command-template" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom tool with template
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    You can also specify custom UI via the <code>Template</code> of the RadzenHtmlEditorCustomTool.
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorCustomToolTemplate">
+    <HtmlEditorCustomToolTemplate />
+</RadzenExample>
 
-    async Task InsertImageFromList(RadzenHtmlEditor editor)
-    {
-        await editor.SaveSelectionAsync();
-
-        var result = await DialogService.OpenAsync<HtmlEditorCustomDialog>("Select image file"); 
-
-        await editor.RestoreSelectionAsync();
-
-        if (result != null)
-        {
-            await editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, $"<img style=\"max-width: 100%\" src=\"{result}\">");
-        }
-    }
-
-    async Task OnDateChange(DateTime? date, RadzenHtmlEditor editor)
-    {
-        if (date != null)
-        {
-            await InsertDate(editor, date.Value);
-        }
-    }
-
-    async Task InsertDate(RadzenHtmlEditor editor, DateTime date)
-    {
-        await editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, $"<strong>{date.ToLongDateString()}</strong>");
-    }
-}
+<RadzenText Anchor="html-editor-custom-tools#command-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Custom dialog
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorCustomToolDialog">
+    <HtmlEditorCustomToolDialog />
+</RadzenExample>

@@ -1,0 +1,28 @@
+@page "/chart-legend"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Chart Legend
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    The Radzen Blazor Chart displays a legend by default. It uses the <code>Title</code> property of the series (or category values for pie series) as items in the legend.
+</RadzenText>
+
+<RadzenText Anchor="chart-legend#legend-position" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Legend position
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The legend is at the right side of the chart by default. Change the position of the legend via the <code>Position</code> property.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="ChartLegendPositions">
+    <ChartLegendPositions />
+</RadzenExample>
+
+<RadzenText Anchor="chart-legend#hide-the-legend" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Hide the legend
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To hide the legend set the <code>Visible</code> property to <code>false</code>.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="ChartLegendHide">
+    <ChartLegendHide />
+</RadzenExample>

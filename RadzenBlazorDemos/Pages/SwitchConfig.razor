@@ -1,0 +1,15 @@
+﻿<RadzenStack Class="rz-p-sm-12">
+    <RadzenSwitch @bind-Value=@value Change=@(args => OnChange(args, "Switch")) />
+    <EventConsole @ref=@console Style="width: 100%;" />
+</RadzenStack>
+
+@code {
+    bool value;
+
+    EventConsole console;
+
+    void OnChange(bool? value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+}

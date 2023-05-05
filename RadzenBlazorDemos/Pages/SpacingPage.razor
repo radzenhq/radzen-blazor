@@ -1,0 +1,91 @@
+﻿@page "/spacing"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Spacing
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Spacing utility CSS classes for margin and padding can be used in combination to control the overall layout of elements.
+</RadzenText>
+
+<RadzenText Anchor="spacing#margin-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Margin CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    Margin refers to the space outside of an element's border. It can be used to create space between elements. Use these CSS classes to set a margin to an element without writing any additional custom styles.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-my-6">
+    Margin on all sides
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    <code>.rz-m-{size}</code>, where <code>{size}</code> is from <code>0</code> to <code>12</code>, or <code>auto</code>.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-my-6">
+    Margin on a specific side
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>.rz-mx-{size}</code> for both left and right margins</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>.rz-my-{size}</code> for both top and bottom margins</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>.rz-mt-{size}</code> for top margin</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>.rz-mr-{size}</code> for right margin</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>.rz-mb-{size}</code> for bottom margin</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>.rz-ml-{size}</code> for left margins</RadzenText>
+
+<RadzenText Anchor="spacing#padding-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Padding CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    Padding refers to the space inside of an element's border. It can be used to create space between an element's content and its border. Use these CSS classes to set a padding to an element without writing any additional custom styles.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-my-6">
+    Padding on all sides
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    <code>.rz-p-{size}</code>, where {size} is from <code>0</code> to <code>12</code>.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="rz-my-6">
+    Padding on a specific side
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>.rz-px-{size}</code> for both left and right paddings</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>.rz-py-{size}</code> for both top and bottom paddings</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>.rz-pt-{size}</code> for top padding</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>.rz-pr-{size}</code> for right padding</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>.rz-pb-{size}</code> for bottom padding</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>.rz-pl-{size}</code> for left padding</RadzenText>
+
+<RadzenText Anchor="spacing#sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Sizes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    Each one of the padding/margin sizes is mapped to a specific value in pixels with a step of <code>4px</code>. E.g. <code>.rz-mt-3</code> = 3*4px = 12px.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>0</code> - 0px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>05</code> - 2px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>1</code> - 4px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>2</code> - 8px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>3</code> - 12px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>4</code> - 16px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>5</code> - 20px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>6</code> - 24px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>7</code> - 28px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>8</code> - 32px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>9</code> - 36px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>10</code> - 40px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>11</code> - 44px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>12</code> - 48px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>auto</code> - A suitable margin, automatically selected by the browser</RadzenText>
+
+<RadzenText Anchor="spacing#responsive-spacing" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Responsive spacing
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    You can set a specific spacing for different screen sizes by inserting the respective breakpoint abbreviation.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    For example <code>.rz-m-{breakpoint}-1</code>, where <code>{breakpoint}</code> can be <code>xs</code>, <code>sm</code>, <code>md</code>, <code>lg</code>, <code>xl</code>, <code>xx</code>.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    Learn more about <a href="/breakpoints">Breakpoints</a>.
+</RadzenText>

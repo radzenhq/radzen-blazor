@@ -1,0 +1,54 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+    <RadzenText TextStyle="TextStyle.Body1">Density:</RadzenText>
+    <RadzenSelectBar @bind-Value="@Density" TextProperty="Text" ValueProperty="Value"
+                    Data="@(Enum.GetValues(typeof(Density)).Cast<Density>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+</RadzenStack>
+
+<RadzenPager Density="@Density" HorizontalAlign="HorizontalAlign.Center" Count="count" PageSize="@pageSize" PageNumbersCount="6" PageChanged="@PageChanged" />
+
+<RadzenDataList WrapItems="true" AllowPaging="false" Data="@orders" TItem="Order">
+    <Template Context="order">
+        <RadzenCard Style="flex: 1;">
+            <RadzenStack AlignItems="AlignItems.Center" Gap="1rem">
+                <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" />
+                <RadzenStack Gap="0">
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" TextAlign="TextAlign.Center">@(order?.Employee?.FirstName + " " + order?.Employee?.LastName)</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center">@(order.ShipCity), @(order.ShipCountry)</RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+    </Template>
+</RadzenDataList>
+
+<RadzenPager Density="@Density" HorizontalAlign="HorizontalAlign.Center" Count="count" PageSize="@pageSize" PageNumbersCount="6" PageChanged="@PageChanged" />
+
+@code {
+    Density Density = Density.Compact;
+    int pageSize = 5;
+    int count;
+    IEnumerable<Order> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        count = dbContext.Orders.Count();
+        orders = GetOrders(0, pageSize);
+    }
+
+    void PageChanged(PagerEventArgs args)
+    {
+        orders = GetOrders(args.Skip, args.Top);
+    }
+
+    IEnumerable<Order> GetOrders(int skip, int take)
+    {
+        return dbContext.Orders.Include("Customer").Include("Employee").Skip(skip).Take(take).ToList();
+    }
+}

@@ -1,0 +1,43 @@
+﻿@using System.Text.Json;
+
+<RadzenTemplateForm TItem="MyObject" Data=@obj Submit=@OnSubmit>
+    <RadzenCard class="my-5 mx-auto" Style="max-width: 400px;">
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Telephone</RadzenText>
+    <RadzenMask Mask="(***) ***-****" CharacterPattern="[0-9]" Placeholder="(000) 000-0000" Name="Phone" @bind-Value=@obj.Phone Change=@(args => OnChange(args, "Telephone")) Style="width: 100%;" />
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mt-4">Credit Card</RadzenText>
+    <RadzenMask Mask="**** **** **** ****" CharacterPattern="[0-9]" Placeholder="0000 0000 0000 0000" Name="CardNr" @bind-Value=@obj.CardNr Change=@(args => OnChange(args, "Credit Card")) Style="width: 100%;" />
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" class="mt-4">SSN</RadzenText>
+    <RadzenMask Mask="***-**-****" CharacterPattern="[0-9]" Placeholder="000-00-0000" Name="SSN" @bind-Value=@obj.SSN Change=@(args => OnChange(args, "SSN")) Style="width: 100%;" />
+    <div class="row">
+        <div class="col-md-12 d-flex align-items-end justify-content-left mt-4">
+            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="margin-left: 10px;" Text="Cancel" />
+        </div>
+    </div>
+    </RadzenCard>
+</RadzenTemplateForm>
+
+<EventConsole @ref=@console />
+
+@code { 
+    public class MyObject
+    {
+        public string Phone { get; set; }
+        public string CardNr { get; set; }
+        public string SSN { get; set; }
+    }
+
+    MyObject obj = new MyObject();
+
+    EventConsole console;
+
+    void OnChange(string value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+
+    void OnSubmit(MyObject arg)
+    {
+        console.Log($"Form submitted with values {JsonSerializer.Serialize(arg)}");
+    }
+}

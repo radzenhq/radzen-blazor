@@ -27,7 +27,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "sidebar-toggle";
+            return "rz-sidebar-toggle";
         }
     }
 }

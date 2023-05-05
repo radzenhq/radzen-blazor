@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System.Collections.Generic;
@@ -34,7 +35,17 @@ namespace Radzen.Blazor
         /// Specifies whether to render a smooth line. Set to <c>false</c> by default.
         /// </summary>
         [Parameter]
-        public bool Smooth { get; set; }
+        public bool Smooth
+        {
+            get => Interpolation == Interpolation.Spline;
+            set => Interpolation = value ? Interpolation.Spline : Interpolation.Line;
+        }
+
+        /// <summary>
+        /// Specifies how to render lines between data points. Set to <see cref="Line"/> by default
+        /// </summary>
+        [Parameter]
+        public Interpolation Interpolation { get; set; } = Interpolation.Line;
 
         /// <inheritdoc />
         public override string Color
@@ -120,6 +131,21 @@ namespace Radzen.Blazor
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
             return base.GetDataLabels(offsetX, offsetY - 16);
+        }
+
+        private IPathGenerator GetPathGenerator()
+        {
+            switch(Interpolation)
+            {
+                case Interpolation.Line:
+                    return new LineGenerator();
+                case Interpolation.Spline:
+                    return new SplineGenerator();
+                case Interpolation.Step:
+                    return new StepGenerator();
+                default:
+                    throw new NotSupportedException($"Interpolation {Interpolation} is not supported yet.");
+            }
         }
     }
 }

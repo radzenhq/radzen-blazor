@@ -1,28 +1,50 @@
 $splitbutton-menu-button-width: 1.875rem !default;
 $splitbutton-menu-button-padding: 0 0 0.375rem 0 !default;
-$splitbutton-menu-button-font-size: 1.0625rem !default;
-$splitbutton-menu-button-border: solid 1px #e5613a !default;
+$splitbutton-menu-button-font-size: 1.0625rem !default; // Not Used
 $splitbutton-menu-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06) !default;
 $splitbutton-menu-min-width: 10rem !default;
 
-$splitbutton-padding: 0 $dropdown-horizontal-padding !default;
-$splitbutton-background-color: $primary-color !default;
-$splitbutton-border-radius: $input-border-radius !default;
+$splitbutton-background-color: var(--rz-primary) !default;
+$splitbutton-border-radius: var(--rz-border-radius) !default;
+
+$splitbutton-sizes: xs, sm, md, lg;
+
+// SplitButton CSS variables
+
+:root {
+  --rz-splitbutton-menu-button-width: #{$splitbutton-menu-button-width};
+  --rz-splitbutton-menu-button-padding: #{$splitbutton-menu-button-padding};
+  --rz-splitbutton-menu-button-font-size: #{$splitbutton-menu-button-font-size};
+  --rz-splitbutton-menu-shadow: #{$splitbutton-menu-shadow};
+  --rz-splitbutton-menu-min-width: #{$splitbutton-menu-min-width};
+  
+  --rz-splitbutton-background-color: #{$splitbutton-background-color};
+  --rz-splitbutton-border-radius: #{$splitbutton-border-radius};
+}
 
 .rz-splitbutton {
   display: inline-flex;
 
-  .rz-button-text-icon-left,
-  .rz-button-text-only {
-    @extend .rz-button-md;
-
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    padding: $splitbutton-padding;
+  @each $size in $splitbutton-sizes {
+    .rz-button-#{$size} {
+      @extend .rz-button-#{$size};
+    }
   }
 
-  .rz-button-text-icon-left {
-    flex: 1;
+  .rz-button-icon-only {
+    .rz-button-text {
+      display: none;
+    }
+  }
+
+  .rz-button.rz-splitbutton-menubutton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .rz-button:not(.rz-splitbutton-menubutton) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
 }
 
@@ -30,10 +52,10 @@ $splitbutton-border-radius: $input-border-radius !default;
   @extend %dropdown-panel;
   display: none;
   position: absolute;
-  min-width: $splitbutton-menu-min-width;
+  min-width: var(--rz-splitbutton-menu-min-width);
 
-  border-top-right-radius: $splitbutton-border-radius;
-  box-shadow: $splitbutton-menu-shadow;
+  border-top-right-radius: var(--rz-splitbutton-border-radius);
+  box-shadow: var(--rz-splitbutton-menu-shadow);
 }
 
 .rz-menu-list {
@@ -47,13 +69,14 @@ $splitbutton-border-radius: $input-border-radius !default;
 
   &:hover {
     &:first-child {
-      border-top-right-radius: $splitbutton-border-radius;
+      border-top-right-radius: var(--rz-splitbutton-border-radius);
     }
   }
 
   .rz-menuitem-link {
     color: inherit;
     display: block;
+    text-decoration: none;
 
     &:hover {
       text-decoration: none;
@@ -67,11 +90,12 @@ $splitbutton-border-radius: $input-border-radius !default;
 }
 
 .rz-splitbutton-menubutton {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left: $splitbutton-menu-button-border;
+  margin-left: 1px;
 
-  @extend .rz-button-md;
+  &.rz-variant-outlined {
+    border-left: 0;
+    margin-left: calc(-1 * var(--rz-border-width));
+  }
 
   .rz-button-text {
     display: none;

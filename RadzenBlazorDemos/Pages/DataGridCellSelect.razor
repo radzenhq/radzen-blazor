@@ -1,0 +1,91 @@
+﻿@using Radzen
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<p>Click on a table cell to select or deselect.</p>
+<div style="display: flex; align-items: center; margin-bottom: 16px">
+    <RadzenCheckBox @bind-Value="@multiple" Name="multiple" Change="@((bool args) => selectedCellData.Clear())" />
+    <RadzenLabel Text="Enable multiple cells selection" Component="multiple" Style="margin-left: 8px; margin-right: 32px; vertical-align: middle;" />
+    <RadzenLabel Text="Event type:" style="white-space:nowrap; margin-right: 16px" Component="type" />
+    <RadzenDropDown @bind-Value="@type" Data="@(new string[]{ "Click", "DoubleClick" })" Name="type" style="margin-right: 16px"  />
+    <RadzenButton Text="Clear selected cells" Click="@(args => selectedCellData.Clear())" />
+</div>
+<RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+            AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
+            CellClick="@OnCellClick" CellDoubleClick="OnCellDoubleClick" CellRender="OnCellRender">
+    <Columns>
+        <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px;" />
+                @data.FirstName @data.LastName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
+        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
+        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
+    </Columns>
+</RadzenDataGrid>
+
+<EventConsole @ref=@console />
+
+@code {
+    string type = "Click";
+    bool multiple = true;
+    IEnumerable<Employee> employees;
+    IList<Tuple<Employee, RadzenDataGridColumn<Employee>>> selectedCellData = new List<Tuple<Employee, RadzenDataGridColumn<Employee>>>();
+    EventConsole console;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+
+    void Select(DataGridCellMouseEventArgs<Employee> args)
+    {
+        if (!multiple)
+        {
+            selectedCellData.Clear();
+        }
+
+        var cellData = selectedCellData.FirstOrDefault(i => i.Item1 == args.Data && i.Item2 == args.Column);
+        if (cellData != null)
+        {
+            selectedCellData.Remove(cellData);
+        }
+        else
+        {
+            selectedCellData.Add(new Tuple<Employee, RadzenDataGridColumn<Employee>>(args.Data, args.Column));
+        }
+    }
+
+    void OnCellClick(DataGridCellMouseEventArgs<Employee> args)
+    {
+        if (type == "Click")
+        {
+            Select(args);
+        }
+    }
+
+    void OnCellDoubleClick(DataGridCellMouseEventArgs<Employee> args)
+    {
+        if (type != "Click")
+        {
+            Select(args);
+        }
+    }
+
+    void OnCellRender(DataGridCellRenderEventArgs<Employee> args)
+    {
+        if (selectedCellData.Any(i => i.Item1 == args.Data && i.Item2 == args.Column))
+        {
+            args.Attributes.Add("style", $"background-color: var(--rz-secondary-lighter);");
+        }
+    }
+}

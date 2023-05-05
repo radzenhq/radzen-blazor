@@ -1,0 +1,13 @@
+﻿@page "/datafilter"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataFilter
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Filter Entity Framework <strong>IQueryable</strong> without extra code.
+</RadzenText>
+
+<RadzenExample ComponentName="DataFilter" Example="DataFilterIQueryable" 
+        AdditionalSourceCodePages=@(new List<string>() { "MyCustomDataFilterProperty.razor" })>
+    <DataFilterIQueryable />
+</RadzenExample>

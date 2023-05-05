@@ -1,62 +1,15 @@
 ﻿@page "/notification"
 
-@inject NotificationService NotificationService
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Notification
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Notification</strong> component.
+</RadzenText>
 
-<RadzenExample Name="Notification">
-<div class="container">
-    <div class="row px-3">
-        <div class="col-lg-6 col-xl-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Info</h4>
-                <RadzenButton Text="Show info notification" Class="w-100"
-                    ButtonStyle="ButtonStyle.Info"
-                    Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Summary", Detail = "Info Detail", Duration = 4000 })) />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 col-xl-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Warning</h4>
-                <RadzenButton Text="Show warning notification" Class="w-100"
-                    ButtonStyle="ButtonStyle.Warning"
-                    Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Warning Summary", Detail = "Warning Detail", Duration = 4000 })) />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 col-xl-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Error</h4>
-                <RadzenButton Text="Show error notification" Class="w-100"
-                    ButtonStyle="ButtonStyle.Danger"
-                    Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error Summary", Detail = "Error Detail", Duration = 4000 })) />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 col-xl-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Success</h4>
-                <RadzenButton Text="Show success notification" Class="w-100"
-                    ButtonStyle="ButtonStyle.Success"
-                    Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success Summary", Detail = "Success Detail", Duration = 4000 })) />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 col-xl-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Notification with custom position</h4>
-                <RadzenButton Text="Show notification with custom position" Class="w-100"
-                    Click=@(args => ShowNotification(new NotificationMessage { Style = "position: absolute; left: -1000px;", Severity = NotificationSeverity.Success, Summary = "Success Summary", Detail = "Success Detail", Duration = 40000 })) />
-            </RadzenCard>
-        </div>
-    </div>
-</div>
+<HelpPrerequirements />
+
+
+<RadzenExample ComponentName="Notification" Example="NotificationConfig" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/NotificationService.cs">
+    <NotificationConfig />
 </RadzenExample>
-
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    EventConsole console;
-
-    void ShowNotification(NotificationMessage message)
-    {
-        NotificationService.Notify(message);
-
-        console.Log($"{message.Severity} notification");
-    }
-}

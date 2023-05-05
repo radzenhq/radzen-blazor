@@ -1,79 +1,102 @@
-$tooltip-background-color: #84d2c8 !default;
-$tooltip-color: #fff !default;
+$tooltip-background-color: var(--rz-info) !default;
+$tooltip-color: var(--rz-text-contrast-color) !default;
 $tooltip-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15) !default;
-$tooltip-padding: 0.25rem 1rem !default;
-$tooltip-border-radius: $input-border-radius !default;
-$tooltip-font-size: initial !default;
+$tooltip-padding: 0.25rem 0.5rem !default;
+$tooltip-border-radius: var(--rz-border-radius) !default;
+$tooltip-font-size: var(--rz-body-font-size) !default;
+
+// Tooltip CSS variables
+
+:root {
+  --rz-tooltip-background-color: #{$tooltip-background-color};
+  --rz-tooltip-color: #{$tooltip-color};
+  --rz-tooltip-shadow: #{$tooltip-shadow};
+  --rz-tooltip-padding: #{$tooltip-padding};
+  --rz-tooltip-border-radius: #{$tooltip-border-radius};
+  --rz-tooltip-font-size: #{$tooltip-font-size};
+}
 
 .rz-tooltip {
   position: absolute;
   transition: top 0.2s, left 0.2s;
   top: 0;
-  left: 0; }
+  left: 0;
+}
 
 .rz-tooltip-content {
-  background: $tooltip-background-color;
-  color: $tooltip-color;
-  box-shadow: $tooltip-shadow;
-  padding: $tooltip-padding;
-  border-radius: $tooltip-border-radius;
-  font-size: $tooltip-font-size;
-  white-space: nowrap; }
+  background: var(--rz-tooltip-background-color);
+  color: var(--rz-tooltip-color);
+  box-shadow: var(--rz-tooltip-shadow);
+  padding: var(--rz-tooltip-padding);
+  border-radius: var(--rz-tooltip-border-radius);
+  font-size: var(--rz-tooltip-font-size);
+  white-space: nowrap;
+}
 
 .rz-tooltip .rz-top-tooltip-content {
-  margin-bottom: 15px; }
+  margin-bottom: 16px;
+}
 .rz-tooltip .rz-top-tooltip-content:after {
-content: ' ';
-position: absolute;
-width: 8px;
-height: 8px;
-bottom: 0;
-background-color: inherit;
-transform-origin: center;
-transform: translate(-50%, -11px) rotate(45deg);
-border-bottom: inherit;
-border-right: inherit; }
+  content: ' ';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  bottom: 0;
+  left: 12px;
+  background-color: inherit;
+  transform-origin: center;
+  transform: translate(-50%, -12px) rotate(45deg);
+  border-bottom: inherit;
+  border-right: inherit;
+}
 
 .rz-tooltip .rz-bottom-tooltip-content {
-  margin-top: -8px; }
+  margin-top: -8px;
+}
 .rz-tooltip .rz-bottom-tooltip-content:after {
-content: ' ';
-position: absolute;
-width: 8px;
-height: 8px;
-top: 0;
-background-color: inherit;
-transform-origin: center;
-transform: translate(-50%, -11px) rotate(45deg);
-border-bottom: inherit;
-border-right: inherit; }
+  content: ' ';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  top: 0;
+  left: 12px;
+  background-color: inherit;
+  transform-origin: center;
+  transform: translate(-50%, -12px) rotate(45deg);
+  border-bottom: inherit;
+  border-right: inherit;
+}
 
 .rz-tooltip .rz-left-tooltip-content {
-  margin-right: 8px; }
+  margin-right: 8px;
+}
 .rz-tooltip .rz-left-tooltip-content:after {
-content: ' ';
-position: absolute;
-width: 8px;
-height: 8px;
-top: 20px;
-right: 0;
-background-color: inherit;
-transform-origin: center;
-transform: translate(-50%, -11px) rotate(45deg);
-border-bottom: inherit;
-border-right: inherit; }
+  content: ' ';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  top: 20px;
+  right: 0;
+  background-color: inherit;
+  transform-origin: center;
+  transform: translate(-50%, -10px) rotate(45deg);
+  border-bottom: inherit;
+  border-right: inherit;
+}
 
 .rz-tooltip .rz-right-tooltip-content {
-  margin-left: 0px; }
+  margin-left: 0;
+}
 .rz-tooltip .rz-right-tooltip-content:after {
-content: ' ';
-position: absolute;
-width: 8px;
-height: 8px;
-top: 20px;
-left: 0;
-background-color: inherit;
-transform-origin: center;
-transform: translate(-50%, -11px) rotate(45deg);
-border-bottom: inherit;
-border-right: inherit; }
+  content: ' ';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  top: 20px;
+  left: 0;
+  background-color: inherit;
+  transform-origin: center;
+  transform: translate(-50%, -10px) rotate(45deg);
+  border-bottom: inherit;
+  border-right: inherit;
+}

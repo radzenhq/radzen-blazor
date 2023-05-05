@@ -1,60 +1,57 @@
 ﻿@page "/slider"
-@using System.Collections
-<RadzenExample Name="Slider">
-<div class="row px-3">
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Slider from 0 to 100</h4>
-            <RadzenSlider @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => OnChange(args, "Slider from 0 to 100")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Slider from -100 to 100</h4>
-            <RadzenSlider @bind-Value=@negativeValue TValue="int" Min="-100" Max="100" Change=@(args => OnChange(args, "Slider from -100 to 100")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Slider with Step 10</h4>
-            <RadzenSlider @bind-Value=@valueWithStep TValue="int" Step="10" Change=@(args => OnChange(args, "Slider with Step 10")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Range Slider</h4>
-            <RadzenSlider Range="true" @bind-Value=@values TValue="IEnumerable<int>" Change=@(args => OnChange(args, "Range Slider")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Range Slider with negative values</h4>
-            <RadzenSlider Range="true" @bind-Value=@negativeValues Min="-100" Max="100" TValue="IEnumerable<int>" Change=@(args => OnChange(args, "Range Slider with negative values")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Disabled Slider</h4>
-            <RadzenSlider Disabled="true" @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => OnChange(args, "Slider from 0 to 100")) Class="w-100" />
-        </RadzenCard>
-    </div>
-</div>
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Slider
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Slider</strong> component.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of Slider
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the <strong>Slider</strong> has a Value property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="Slider" Example="SliderBindValue">
+    <SliderBindValue />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of Slider using Value and Change event
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Value property can be used to set the value of the component and <code>Change</code> event to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="Slider" Example="SliderChangeEvent">
+    <SliderChangeEvent />
+</RadzenExample>
 
-@code {
-    IEnumerable<int> values = new int[] { 14, 78 };
-    IEnumerable<int> negativeValues = new int[] { -100, 100 };
-    int value = 67;
-    int negativeValue = 0;
-    int valueWithStep = 30;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Slider from -100 to 100
+</RadzenText>
+<RadzenExample ComponentName="Slider" Example="SliderMinMax">
+    <SliderMinMax />
+</RadzenExample>
 
-    EventConsole console;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Slider with Step=10
+</RadzenText>
+<RadzenExample ComponentName="Slider" Example="SliderStep">
+    <SliderStep />
+</RadzenExample>
 
-    void OnChange(dynamic value, string name)
-    {
-        var str = value is IEnumerable ? string.Join(", ", value) : value;
-        console.Log($"{name} value changed to {str}");
-    }
-}
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Range Slider
+</RadzenText>
+<RadzenExample ComponentName="Slider" Example="SliderRange">
+    <SliderRange />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Disabled Slider
+</RadzenText>
+<RadzenExample ComponentName="Slider" Example="SliderDisabled">
+    <SliderDisabled />
+</RadzenExample>
+

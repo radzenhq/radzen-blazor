@@ -1,0 +1,67 @@
+@inherits Radzen.RadzenComponent
+@inject IJSRuntime JSRuntime
+
+
+<div @ref="editor" style="height: 500px; width: 100%;"></div>
+@code {
+    IJSObjectReference monaco;
+    ElementReference editor;
+    DotNetObjectReference<Monaco> reference;
+
+
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    public string Id => GetId();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            reference = DotNetObjectReference.Create(this);
+
+            monaco = await JSRuntime.InvokeAsync<IJSObjectReference>("createEditor", editor, GetId(), reference, new {
+                language = "razor",
+                theme = "vs",
+                codeLens = false,
+                minimap = new {
+                    enabled = false
+                },
+                automaticLaout = true
+            });
+
+            interopValue = Value;
+
+            await monaco.InvokeVoidAsync("setValue", interopValue);
+        }
+    }
+
+    private string interopValue;
+
+    [JSInvokable]
+    public async Task OnChangeAsync(string value)
+    {
+        if (Value != value)
+        {
+            interopValue = value;
+            await ValueChanged.InvokeAsync(value);
+        }
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var valueChanged = parameters.DidParameterChange(nameof(Value), Value);
+
+        await base.SetParametersAsync(parameters);
+
+        if (monaco != null && valueChanged && interopValue != Value)
+        {
+            interopValue = Value;
+
+            await monaco.InvokeVoidAsync("setValue", interopValue);
+        }
+    }
+}

@@ -1,124 +1,45 @@
-$dialog-background-color: $white !default;
+$dialog-background-color: var(--rz-base-background-color) !default;
 $dialog-shadow: 0 22px 64px 0 rgba(0, 0, 0, 0.22) !default;
-$dialog-title-background-color: rgba(#f3f5f7, 0.56) !default;
+$dialog-title-background-color: var(--rz-base-100) !default;
 $dialog-title-border: none !default;
 $dialog-title-padding: 0.6875rem 1.25rem !default;
 $dialog-title-font-size: 1.25rem !default;
 $dialog-title-line-height: 1.875rem !default;
-$dialog-title-font-weight: normal !default;
-$dialog-title-letter-spacing: normal !default;
-$dialog-title-color: inherit !default;
-$dialog-close-font-size: 1.25rem !default;
-$dialog-close-color: $cool-grey !default;
-$dialog-close-hover-color: $cool-grey !default;
+$dialog-title-font-weight: 700 !default;
+$dialog-title-letter-spacing: -0.03em !default;
+$dialog-title-color: var(--rz-text-title-color) !default;
+$dialog-close-font-size: var(--rz-icon-size) !default;
+$dialog-close-color: var(--rz-text-tertiary-color) !default;
+$dialog-close-hover-color: var(--rz-text-color) !default;
 $dialog-close-vertical-align: middle !default;
 $dialog-content-padding: 1.25rem !default;
-$dialog-mask-background-color: $charcoal-grey !default;
-$dialog-border-radius: $border-radius !default;
+$dialog-mask-background-color: var(--rz-base-800) !default;
+$dialog-border-radius: var(--rz-border-radius) !default;
+$dialog-mask-zindex: 1000 !default;
+$dialog-zindex: 1001 !default;
 
-.rz-dialog {
-  position: fixed;
-  overflow: hidden;
+// Dialog CSS variables
 
-  background-color: $dialog-background-color;
-  box-shadow: $dialog-shadow;
-  border-radius: $dialog-border-radius;
-}
-
-.rz-dialog-titlebar {
-  background-color: $dialog-title-background-color;
-  padding: $dialog-title-padding;
-  font-size: $dialog-title-font-size;
-  line-height: $dialog-title-line-height;
-  border-bottom: $dialog-title-border;
-}
-
-.rz-dialog-title {
-  font-weight: $dialog-title-font-weight;
-  letter-spacing: $dialog-title-letter-spacing;
-  color: $dialog-title-color;
-}
-
-.rz-dialog-titlebar-close {
-  float: right;
-
-  .rzi-times {
-    font-size: $dialog-close-font-size;
-    color: $dialog-close-color;
-    vertical-align: $dialog-close-vertical-align;
-
-    &:before {
-      content: 'close';
-    }
-  }
-
-  &:hover .rzi-times {
-    color: $dialog-close-hover-color;
-  }
-}
-
-.rz-dialog-content {
-  padding: $dialog-content-padding;
-  overflow: auto;
-}
-
-.rz-confirmdialog {
-  top: 50%;
-  left: 50%;
-}
-
-.rz-dialog-mask {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-
-  background-color: $dialog-mask-background-color;
-  opacity: 0.5;
-}
-
-.rz-dialog-footer {
-  text-align: right;
-  border: 0 none;
-  padding: 1em;
-
-  .rz-button {
-    text-align: left !important;
-    padding: 6px;
-  }
-
-  .rz-button:first-child {
-    background-color: $primary;
-    width: 80px;
-  }
-
-  .rz-button:last-child {
-    background-color: $secondary;
-    width: 105px;
-  }
-}
-
-@media (max-width: 768px) {
-  .rz-dialog {
-    &:not(.rz-confirmdialog) {
-      width: 100% !important;
-      top: 0px !important;
-    }
-  }
-
-  .rz-dialog-content {
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .no-scroll {
-    padding-right: 0;
-  }
-}
-
-.no-scroll {
-  overflow: hidden;
-  padding-right: 15px;
+:root {
+  --rz-dialog-background-color: #{$dialog-background-color};
+  --rz-dialog-shadow: #{$dialog-shadow};
+  --rz-dialog-title-background-color: #{$dialog-title-background-color};
+  --rz-dialog-title-border: #{$dialog-title-border};
+  --rz-dialog-title-padding: #{$dialog-title-padding};
+  --rz-dialog-title-font-size: #{$dialog-title-font-size};
+  --rz-dialog-title-line-height: #{$dialog-title-line-height};
+  --rz-dialog-title-font-weight: #{$dialog-title-font-weight};
+  --rz-dialog-title-letter-spacing: #{$dialog-title-letter-spacing};
+  --rz-dialog-title-color: #{$dialog-title-color};
+  --rz-dialog-close-font-size: #{$dialog-close-font-size};
+  --rz-dialog-close-color: #{$dialog-close-color};
+  --rz-dialog-close-hover-color: #{$dialog-close-hover-color};
+  --rz-dialog-close-vertical-align: #{$dialog-close-vertical-align};
+  --rz-dialog-content-padding: #{$dialog-content-padding};
+  --rz-dialog-mask-background-color: #{$dialog-mask-background-color};
+  --rz-dialog-border-radius: #{$dialog-border-radius};
+  --rz-dialog-mask-zindex: #{$dialog-mask-zindex};
+  --rz-dialog-zindex: #{$dialog-zindex};
 }
 
 .rz-dialog-wrapper {
@@ -128,19 +49,208 @@ $dialog-border-radius: $border-radius !default;
   height: 100%;
   top: 0;
   bottom: 0;
-  z-index: 1001;
+  z-index: var(--rz-dialog-zindex);
   align-items: center;
   justify-content: center;
+}
 
+.rz-dialog {
+  position: absolute;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+  max-height: 100%;
+  min-height: 150px;
+  z-index: var(--rz-dialog-zindex);
+  opacity: 1;
+  background-color: var(--rz-dialog-background-color);
+  box-shadow: var(--rz-dialog-shadow);
+  border-radius: var(--rz-dialog-border-radius);
+}
+
+.rz-dialog-titlebar {
+  background-color: var(--rz-dialog-title-background-color);
+  padding: var(--rz-dialog-title-padding);
+  font-size: var(--rz-dialog-title-font-size);
+  line-height: var(--rz-dialog-title-line-height);
+  border-bottom: var(--rz-dialog-title-border);
+}
+
+.rz-dialog-title {
+  font-weight: var(--rz-dialog-title-font-weight);
+  letter-spacing: var(--rz-dialog-title-letter-spacing);
+  color: var(--rz-dialog-title-color);
+}
+
+.rz-dialog-titlebar-close {
+  float: right;
+
+  .rzi-times {
+    font-size: var(--rz-dialog-close-font-size);
+    color: var(--rz-dialog-close-color);
+    vertical-align: var(--rz-dialog-close-vertical-align);
+
+    &:before {
+      content: 'close';
+    }
+  }
+
+  &:hover .rzi-times {
+    color: var(--rz-dialog-close-hover-color);
+  }
+}
+
+.rz-dialog-content {
+  flex: 0 1 auto;
+  padding: var(--rz-dialog-content-padding);
+  overflow: auto;
+}
+
+.rz-dialog-confirm, .rz-dialog-alert {
+  max-width: 400px;
+  margin: 0.75rem;
+}
+
+.rz-dialog-confirm-message, .rz-dialog-alert-message {
+  margin-bottom: 1.5rem;
+}
+
+.rz-dialog-confirm-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  .rz-button {
+    flex: 8rem 1;
+    min-width: fit-content;
+  }
+}
+
+.rz-dialog-alert-buttons {
+    text-align: right;
+    gap: 0.5rem;
+
+    .rz-button {
+        flex: 8rem 1;
+        min-width: fit-content;
+    }
+}
+
+.rz-dialog-mask {
+  position: fixed;
+  z-index: var(--rz-dialog-mask-zindex);
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+
+  background-color: var(--rz-dialog-mask-background-color);
+  opacity: 0.5;
+}
+
+.no-scroll {
+  overflow: hidden;
+  padding-right: 15px;
+}
+
+@media (max-width: 768px) {
   .rz-dialog {
-    max-height: 100%;
-    display: flex;
-    flex-direction: column;
-    position: static;
+    &:not(.rz-dialog-confirm):not(.rz-dialog-alert) {
+      position: absolute;
+      width: 100% !important;
+      top: 0px !important;
+      border-radius: 0;
+    }
   }
 
   .rz-dialog-content {
-    flex: 0 1 auto;
-    overflow: auto;
+    -webkit-overflow-scrolling: touch;
   }
+
+  .rz-dialog-confirm, .rz-dialog-alert {
+    max-width: 355px;
+  }
+
+  .no-scroll {
+    padding-right: 0;
+  }
+}
+
+.rz-dialog-side {
+  position: fixed;
+  z-index: var(--rz-dialog-zindex);
+  opacity: 1;
+  background-color: var(--rz-dialog-background-color);
+  box-shadow: var(--rz-dialog-shadow);
+  border-radius: var(--rz-dialog-border-radius);
+  overflow-y: auto;
+}
+
+.rz-dialog-side-position-right {
+  right: 0;
+  min-width: 150px;
+  width: 400px;
+  max-width: 100%;
+  height: 100%;
+}
+
+.rz-dialog-side-position-left {
+  left: 0;
+  min-width: 150px;
+  width: 400px;
+  max-width: 100%;
+  height: 100%;
+}
+
+.rz-dialog-side-position-top {
+  top: 0;
+  min-height: 150px;
+  height: 250px;
+  width: 100%;
+}
+
+.rz-dialog-side-position-bottom {
+  bottom: 0;
+  min-height: 150px;
+  height: 250px;
+  width: 100%;
+}
+
+.rz-dialog-side-titlebar {
+  background-color: var(--rz-dialog-title-background-color);
+  padding: var(--rz-dialog-title-padding);
+  font-size: var(--rz-dialog-title-font-size);
+  line-height: var(--rz-dialog-title-line-height);
+  border-bottom: var(--rz-dialog-title-border);
+}
+
+.rz-dialog-side-title {
+  font-weight: var(--rz-dialog-title-font-weight);
+  letter-spacing: var(--rz-dialog-title-letter-spacing);
+  color: var(--rz-dialog-title-color);
+}
+
+.rz-dialog-side-titlebar-close {
+  float: right;
+
+  .rzi-times {
+    font-size: var(--rz-dialog-close-font-size);
+    color: var(--rz-dialog-close-color);
+    vertical-align: var(--rz-dialog-close-vertical-align);
+
+    &:before {
+      content: 'close';
+    }
+  }
+
+  &:hover .rzi-times {
+    color: var(--rz-dialog-close-hover-color);
+  }
+}
+
+.rz-dialog-side-content {
+  flex: 0 1 auto;
+  padding: var(--rz-dialog-content-padding);
+  overflow: auto;
 }

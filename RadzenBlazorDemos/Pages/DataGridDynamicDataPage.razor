@@ -1,59 +1,12 @@
 ﻿@page "/datagrid-dynamic"
-@using System.Linq.Dynamic.Core
-<h1>DataGrid <strong>dynamic</strong> data support</h1>
 
-<p>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid <strong>dynamic</strong> data support
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
     Sometimes your data comes from external API and you don't have a C# model for it. This demo shows how to implement such a scenario.
-</p>
+</RadzenText>
 
-<RadzenExample Name="DataGrid" Source="DataGridDynamicData" Heading="false">
-    <RadzenDataGrid Data="@data" TItem="IDictionary<string, object>"
-                         AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" AllowPaging="true" AllowSorting="true">
-            <Columns>
-                @foreach(var column in columns)
-                {
-                    <RadzenDataGridColumn TItem="IDictionary<string, object>" Title="@column.Key" Type="column.Value"
-                            Property="@GetColumnPropertyExpression(column.Key, column.Value)" >
-                        <Template>
-                            @context[@column.Key]
-                        </Template>
-                    </RadzenDataGridColumn>
-                }
-        </Columns>
-        </RadzenDataGrid>
+<RadzenExample ComponentName="DataGrid" Example="DataGridDynamicData">
+    <DataGridDynamicData />
 </RadzenExample>
-@code {
-    public IEnumerable<IDictionary<string, object>> data { get; set; }
-
-    public IDictionary<string, Type> columns { get; set; }
-
-    public string GetColumnPropertyExpression(string name, Type type)
-    {
-        var expression = $@"it[""{name}""].ToString()";
-        return type == typeof(int) ? $"int.Parse({expression})" : expression;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        columns = new Dictionary<string, Type>()
-        {
-            { "EmployeeID", typeof(int) },
-            { "FirstName", typeof(string) },
-            { "LastName", typeof(string) },
-        };
-
-        data = Enumerable.Range(0, 100).Select(i =>
-        {
-            var row = new Dictionary<string, object>();
-
-            foreach (var column in columns)
-            {
-                row.Add(column.Key, column.Value == typeof(int) ? i : $"{column.Key}{i}");
-            }
-
-            return row;
-        });
-    }
-}

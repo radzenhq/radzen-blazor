@@ -6,7 +6,7 @@
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         @if (!ReadOnly)
         {
-            <a href="javascript:void(0)" class="rz-rating-cancel" tabindex="@TabIndex" @onclick="@(args => SetValue(0))" @onkeypress="@(async args => { if (args.Code == "Space") { await SetValue(0); } })">
+            <a href="javascript:void(0)" class="rz-rating-cancel" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onclick="@(args => SetValue(0))" @onkeypress="@(async args => { if (args.Code == "Space") { await SetValue(0); } })">
                 <span class="rz-rating-icon rzi rzi-ban"></span>
             </a>
         }
@@ -15,13 +15,13 @@
 
             @if (index <= Value)
             {
-                <a href="javascript:void(0)" tabindex="@TabIndex" @onclick="@(args => SetValue(index))" @onkeypress="@(async args => { if (args.Code == "Space") { await SetValue(index); } })">
+                <a href="javascript:void(0)" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onclick="@(args => SetValue(index))" @onkeypress="@(async args => { if (args.Code == "Space") { await SetValue(index); } })">
                     <span class="rz-rating-icon rzi rzi-star"></span>
                 </a>
             }
             else
             {
-                <a href="javascript:void(0)" tabindex="@TabIndex" @onclick="@(args => SetValue(index))" @onkeypress="@(async args => { if (args.Code == "Space") { await SetValue(index); } })">
+                <a href="javascript:void(0)" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onclick="@(args => SetValue(index))" @onkeypress="@(async args => { if (args.Code == "Space") { await SetValue(index); } })">
                     <span class="rz-rating-icon rzi rzi-star-o"></span>
                 </a>
             }

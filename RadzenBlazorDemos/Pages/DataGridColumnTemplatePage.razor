@@ -1,65 +1,17 @@
 ﻿@page "/datagrid-column-template"
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
-@using System.Linq 
-@inject NorthwindContext dbContext
-@inject DialogService DialogService
 
-<h1>DataGrid <strong>Column Template</strong></h1>
-
-<p>The <strong>Template</strong> allows you to customize the way data is displayed.</p>
-
-<p>Common uses: Record numbering, displaying an image depending on property value, 
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid <strong>Column Template</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    The <strong>Template</strong> allows you to customize the way data is displayed.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body2" class="my-4">
+    Common uses: Record numbering, displaying an image depending on property value, 
     displaying multiple properties in the same column, linking to other pages,
     data formatting and HTML embedding.
-</p>
+</RadzenText>
 
-<RadzenExample Name="DataGrid" Source="DataGridColumnTemplate" Heading="false">
-<RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" 
-            Data="@orders" TItem="Order">
-    <Columns>
-        <RadzenDataGridColumn Width="50px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                @(orders.IndexOf(data) + 1)
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
-            <Template Context="order">
-                <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" />
-                <h5 class="mt-1 mb-0">@order.Employee?.FirstName @order.Employee?.LastName</h5>
-                <p class="m-0" style="font-size: 0.8em;">@order.Customer?.CompanyName</p>
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
-            <Template Context="order">
-                @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="ShipCountry" Title="ShipCountry" />
-        <RadzenDataGridColumn Width="160px" TItem="Order" Property="OrderID" Title="Order Details">
-            <Template Context="data">
-                <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" Class="m-1" Click=@(() => OpenOrder(data.OrderID)) Text="@data.OrderID.ToString()" />
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+<RadzenExample ComponentName="DataGrid" Example="DataGridColumnTemplate">
+    <DataGridColumnTemplate/>
 </RadzenExample>
-
-@code {
-    RadzenDataGrid<Order> ordersGrid;
-    IList<Order> orders;
-
-    async Task OpenOrder(int orderId)
-    {
-         await DialogService.OpenAsync<DialogCardPage>($"Order {orderId}",
-               new Dictionary<string, object>() { { "OrderID", orderId } },
-               new DialogOptions() { Width = "700px", Height = "570px" });
-    }
-
-    protected override void OnInitialized()
-    {
-        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
-    }
-}

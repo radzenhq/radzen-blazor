@@ -1,0 +1,1345 @@
+@import 'variables';
+@import 'mixins';
+$base: true;
+$material: true;
+
+// Legacy Theme Tokens
+
+$primary: #4340D2 !default;
+$secondary: #e91e63 !default;
+$info: #2196f3 !default;
+$success: #4caf50 !default;
+$warning: #ff9800 !default;
+$danger: #f44336 !default;
+$body-color: #616161 !default;
+$body-bg: #f5f5f5 !default;
+$font-size: 16px !default;
+
+// Legacy Tokens Map
+
+$rz-base-100: $body-bg !default;
+$rz-base-700: $body-color !default;
+$rz-primary: $primary !default;
+$rz-secondary: $secondary !default;
+$rz-info: $info !default;
+$rz-success: $success !default;
+$rz-warning: $warning !default;
+$rz-danger: $danger !default;
+$rz-root-font-size: $font-size !default;
+
+// Theme Colors
+
+$rz-white: #ffffff !default;
+$rz-black: #000000 !default;
+
+$rz-base-50: #fafafa !default;
+$rz-base-100: #f5f5f5 !default;
+$rz-base-200: #eeeeee !default;
+$rz-base-300: #e0e0e0 !default;
+$rz-base-400: #bdbdbd !default;
+$rz-base-500: #9e9e9e !default;
+$rz-base-600: #757575 !default;
+$rz-base-700: #616161 !default;
+$rz-base-800: #424242 !default;
+$rz-base-900: #212121 !default;
+
+$rz-primary: #4340D2 !default;
+$rz-secondary: #e91e63 !default;
+$rz-info: #2196f3 !default;
+$rz-success: #4caf50 !default;
+$rz-warning: #ff9800 !default;
+$rz-danger: #f44336 !default;
+
+$rz-series-1: #3700b3 !default;
+$rz-series-2: #ba68c8 !default;
+$rz-series-3: #f06292 !default;
+$rz-series-4: #ff8a65 !default;
+$rz-series-5: #ffee58 !default;
+$rz-series-6: #9ccc65 !default;
+$rz-series-7: #26a69a !default;
+$rz-series-8: #4fc3f7 !default;
+$rz-series-9: #7f5cce !default;
+$rz-series-10: #ce93d8 !default;
+$rz-series-11: #f48fb1 !default;
+$rz-series-12: #ffab91 !default;
+$rz-series-13: #fff176 !default;
+$rz-series-14: #aed581 !default;
+$rz-series-15: #4db6ac !default;
+$rz-series-16: #81d4fa !default;
+$rz-series-17: #a58cdd !default;
+$rz-series-18: #e1bee7 !default;
+$rz-series-19: #f8bbd0 !default;
+$rz-series-20: #ffccbc !default;
+$rz-series-21: #fff59d !default;
+$rz-series-22: #c5e1a5 !default;
+$rz-series-23: #80cbc4 !default;
+$rz-series-24: #b3e5fc !default;
+
+$rz-primary-light: mix($rz-white, $rz-primary, 20%) !default;
+$rz-primary-lighter: rgba($rz-primary, .12) !default;
+$rz-primary-dark: mix($rz-black, $rz-primary, 20%) !default;
+$rz-primary-darker: mix($rz-black, $rz-primary, 32%) !default;
+
+$rz-secondary-light: mix($rz-white, $rz-secondary, 20%) !default;
+$rz-secondary-lighter: rgba($rz-secondary, .12) !default;
+$rz-secondary-dark: mix($rz-black, $rz-secondary, 20%) !default;
+$rz-secondary-darker: mix($rz-black, $rz-secondary, 32%) !default;
+
+$rz-info-light: mix($rz-white, $rz-info, 20%) !default;
+$rz-info-lighter: rgba($rz-info, .20) !default;
+$rz-info-dark: mix($rz-black, $rz-info, 20%) !default;
+$rz-info-darker: mix($rz-black, $rz-info, 32%) !default;
+
+$rz-success-light: mix($rz-white, $rz-success, 20%) !default;
+$rz-success-lighter: rgba($rz-success, .16) !default;
+$rz-success-dark: mix($rz-black, $rz-success, 20%) !default;
+$rz-success-darker: mix($rz-black, $rz-success, 32%) !default;
+
+$rz-warning-light: mix($rz-white, $rz-warning, 20%) !default;
+$rz-warning-lighter: rgba($rz-warning, .20) !default;
+$rz-warning-dark: mix($rz-black, $rz-warning, 20%) !default;
+$rz-warning-darker: mix($rz-black, $rz-warning, 32%) !default;
+
+$rz-danger-light: mix($rz-white, $rz-danger, 20%) !default;
+$rz-danger-lighter: rgba($rz-danger, .20) !default;
+$rz-danger-dark: mix($rz-black, $rz-danger, 20%) !default;
+$rz-danger-darker: mix($rz-black, $rz-danger, 32%) !default;
+
+// Theme Constants
+
+$rz-border-width: 1px !default;
+$rz-border-radius: 4px !default;
+$rz-root-font-size: 16px !default;
+$rz-body-font-size: 1rem !default;
+$rz-body-line-height: 1.5 !default;
+$rz-body-background-color: var(--rz-base-100) !default;
+$rz-text-font-family: Roboto, sans-serif !default;
+$rz-icon-font-family: 'Material Icons' !default;
+$rz-icon-size: 1.5rem !default;
+
+// Utilities
+
+// Semantic Text Color
+$rz-text-title-color: var(--rz-base-900) !default;
+$rz-text-color: var(--rz-base-800) !default;
+$rz-text-secondary-color: var(--rz-base-700) !default;
+$rz-text-tertiary-color: var(--rz-base-600) !default;
+$rz-text-disabled-color: var(--rz-base-500) !default;
+$rz-text-contrast-color: var(--rz-white) !default;
+
+// Borders
+
+$rz-border-normal: var(--rz-border-width) solid var(--rz-base-400) !default;
+$rz-border-hover: var(--rz-border-width) solid var(--rz-base-900) !default;
+$rz-border-focus: var(--rz-border-width) solid var(--rz-primary) !default;
+$rz-border-disabled: var(--rz-border-width) solid var(--rz-base-300) !default;
+
+// Shadow
+$rz-shadow-0: none !default;
+$rz-shadow-1: 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 2px 1px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-2: 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 3px 1px rgba(0, 0, 0, 0.12), 0px 1px 5px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-3: 0px 3px 4px rgba(0, 0, 0, 0.14), 0px 3px 3px rgba(0, 0, 0, 0.12), 0px 1px 8px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-4: 0px 4px 5px rgba(0, 0, 0, 0.14), 0px 1px 10px rgba(0, 0, 0, 0.12), 0px 2px 4px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-5: 0px 6px 10px rgba(0, 0, 0, 0.14), 0px 1px 18px rgba(0, 0, 0, 0.12), 0px 3px 5px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-6: 0px 8px 10px rgba(0, 0, 0, 0.14), 0px 3px 14px rgba(0, 0, 0, 0.12), 0px 5px 5px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-7: 0px 9px 12px rgba(0, 0, 0, 0.14), 0px 3px 16px rgba(0, 0, 0, 0.12), 0px 5px 6px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-8: 0px 12px 17px rgba(0, 0, 0, 0.14), 0px 5px 22px rgba(0, 0, 0, 0.12), 0px 7px 8px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-9: 0px 16px 24px rgba(0, 0, 0, 0.14), 0px 6px 30px rgba(0, 0, 0, 0.12), 0px 8px 10px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-10: 0px 24px 38px rgba(0, 0, 0, 0.14), 0px 9px 46px rgba(0, 0, 0, 0.12), 0px 11px 15px rgba(0, 0, 0, 0.14) !default;
+
+//---- Components
+
+// Typography
+$text: (
+  display-h1: (font-size: clamp(4.5rem, 6.667vw, 6rem), line-height: normal, font-weight: 100, letter-spacing: -1.5px, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  display-h2: (font-size: clamp(3rem, 4.167vw, 3.75rem), line-height: normal,  font-weight: 100, letter-spacing: -0.5px, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  display-h3: (font-size: clamp(2.25rem, 3.333vw, 3rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-bottom: 0.75rem),
+  display-h4: (font-size: clamp(1.75rem, 2.361vw, 2.125rem), line-height: normal,  font-weight: 400, letter-spacing: 0.25px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  display-h5: (font-size: clamp(1.25rem, 1.667vw, 1.5rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  display-h6: (font-size: clamp(1rem, 1.389vw, 1.25rem), line-height: normal,  font-weight: 500, letter-spacing: 0.15px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h1: (font-size: clamp(4.5rem, 6.667vw, 6rem), line-height: normal, font-weight: 100, letter-spacing: -1.5px, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  h2: (font-size: clamp(3rem, 4.167vw, 3.75rem), line-height: normal,  font-weight: 100, letter-spacing: -0.5px, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  h3: (font-size: clamp(2.25rem, 3.333vw, 3rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-bottom: 0.75rem),
+  h4: (font-size: clamp(1.75rem, 2.361vw, 2.125rem), line-height: normal,  font-weight: 400, letter-spacing: 0.25px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h5: (font-size: clamp(1.25rem, 1.667vw, 1.5rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h6: (font-size: clamp(1rem, 1.389vw, 1.25rem), line-height: normal,  font-weight: 500, letter-spacing: 0.15px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  subtitle1: (font-size: 1rem, line-height: 1.5,  font-weight: 400, letter-spacing: 0.15px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  subtitle2: (font-size: 0.875rem, line-height: 1.5,  font-weight: 500, letter-spacing: 0.1px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  body1: (font-size: 1rem, line-height: 1.5,  font-weight: 400, letter-spacing: 0.5px, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  body2: (font-size: 0.875rem, line-height: 1.5,  font-weight: 400, letter-spacing: 0.25px, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  button: (font-size: 0.875rem, line-height: normal,  font-weight: 500, letter-spacing: 1.25px, text-transform: uppercase, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  caption: (font-size: 0.75rem, line-height: normal,  font-weight: 400, letter-spacing: 0.4px, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  overline:  (font-size: 0.625rem, line-height: normal,  font-weight: 400, letter-spacing: 1.5px, text-transform: uppercase, color: var(--rz-text-color), margin-bottom: 0.5rem),
+) !default;
+
+// Button
+$button-shadow: var(--rz-shadow-1) !default;
+$button-hover-shadow: var(--rz-shadow-3) !default;
+$button-hover-gradient: none !default;
+$button-focus-shadow: var(--rz-shadow-3) !default;
+$button-focus-gradient: linear-gradient(rgba(#fff, 0.2), rgba(#fff, 0.2)) !default !default;
+$button-active-shadow: var(--rz-shadow-6) !default;
+$button-active-gradient: none !default;
+$button-sizes: (
+  lg: (
+    font-size: 1rem,
+    padding: 0.75rem 1.5rem,
+    line-height: 1.5rem,
+    height: auto,
+    min-height: 3rem,
+    min-width: 3rem,
+    font-weight: 500,
+    letter-spacing: 1.25px,
+    text-transform: uppercase,
+    gap: 0.25rem,
+    icon: (
+      font-size: 1.5rem,
+      height: 1.5rem,
+      line-height: 1.5rem,
+      width: 1.5rem
+    ),
+    text-with-icon-padding: 0 1.375rem, //not used
+    icon-only-padding: 0.75rem
+  ),
+  md: (
+    font-size: 0.875rem,
+    padding: 0.5rem 1rem,
+    line-height: 1.25rem,
+    height: auto,
+    min-height: 2.25rem,
+    min-width: 2.25rem,
+    font-weight: 500,
+    letter-spacing: 1.25px,
+    text-transform: uppercase,
+    gap: 0.25rem,
+    icon: (
+      font-size: 1.25rem,
+      height: 1.25rem,
+      line-height: 1.25rem,
+      width: 1.25rem
+    ),
+    text-with-icon-padding: 0 1.375rem, //not used
+    icon-only-padding: 0.5rem
+  ),
+  sm: (
+    font-size: 0.75rem,
+    padding: 0.375rem 0.75rem,
+    line-height: 1rem,
+    height: auto,
+    min-height: 1.75rem,
+    min-width: 1.75rem,
+    font-weight: 500,
+    letter-spacing: 0.75px,
+    text-transform: uppercase,
+    gap: 0.25rem,
+    icon: (
+      font-size: 1rem,
+      height: 1rem,
+      line-height: 1rem,
+      width: 1rem
+    ),
+    text-with-icon-padding: 0 1.375rem,
+    icon-only-padding: 0.375rem
+  ),
+  xs: (
+    font-size: 0.75rem,
+    padding: 0.25rem 0.5rem,
+    line-height: 1rem,
+    height: auto,
+    min-height: 1.25rem,
+    min-width: 1.25rem,
+    font-weight: 500,
+    letter-spacing: 0,
+    text-transform: uppercase,
+    gap: 0.125rem,
+    icon: (
+      font-size: 1rem,
+      height: 1rem,
+      line-height: 1rem,
+      width: 1rem
+    ),
+    text-with-icon-padding: 0 1rem,
+    icon-only-padding: 0.25rem
+  )
+) !default;
+
+.rz-button {
+  @include rz-ripple($pseudo: true);
+}
+
+// Badge
+$badge-font-weight: 500 !default;
+
+// Chip
+$chip-padding: 0.125rem 0.125rem 0.125rem 0.75rem !default;
+$chip-border-radius: calc(4 * var(--rz-border-radius)) !default;
+
+// Input
+$input-height: 2.5rem !default;
+$input-line-height: var(--rz-body-line-height) !default;
+$input-padding: 0.4375rem 0.9375rem !default;
+$input-shadow: none !default;
+$input-focus-shadow: inset 0 0 0 1px var(--rz-primary) !default;
+$input-disabled-background-color: var(--rz-base-background-color) !default;
+$input-disabled-color: var(--rz-text-disabled-color) !default;
+
+// Header
+$header-background-color: var(--rz-primary) !default;
+$header-border: none !default;
+$header-color: var(--rz-text-contrast-color) !default;
+$header-shadow: var(--rz-shadow-4) !default;
+
+.header {
+  a,
+  a:hover,
+  a:focus {
+    color: var(--rz-text-contrast-color);
+  }
+}
+
+// Footer
+$footer-border: none !default;
+$footer-color: var(--rz-text-secondary-color) !default;
+
+// Sidebar
+$sidebar-z: 1 !default;
+$sidebar-border-right: var(--rz-border-base-200) !default;
+$sidebar-width: 300px !default;
+$sidebar-background-color: var(--rz-base-background-color) !default;
+
+// Card
+$card-padding: 1rem !default;
+$card-shadow: var(--rz-shadow-1) !default;
+
+// Accordion
+$accordion-item-padding: 1rem !default;
+$accordion-item-color: var(--rz-text-secondary-color) !default;
+$accordion-item-line-height: 1.5rem !default;
+$accordion-item-font-weight: 500 !default;
+$accordion-icon-margin: 0 0.75rem 0 0 !default;
+$accordion-toggle-icon-margin: 0 0 0 0.75rem !default;
+$accordion-toggle-icon-order: 1 !default;
+$accordion-toggle-icon-collapsed: 'keyboard_arrow_down' !default;
+$accordion-toggle-icon-expanded: 'keyboard_arrow_up' !default;
+$accordion-selected-color: var(--rz-text-title-color) !default;
+$accordion-hover-color: $accordion-selected-color !default;
+$accordion-content-padding: 1rem !default;
+$accordion-border-radius: var(--rz-border-radius)!default;
+$accordion-item-border: var(--rz-border-base-200) !default;
+$accordion-shadow: var(--rz-shadow-1) !default;
+
+// Panel
+$panel-padding: 1rem !default;
+$panel-title-line-height: 1.5rem !default;
+$panel-title-font-weight: 500 !default;
+$panel-toggle-icon-background-color: transparent !default;
+$panel-hover-color: var(--rz-text-title-color) !default;
+$panel-shadow: var(--rz-shadow-1) !default;
+
+// SidebarToggle
+$sidebar-toggle-border: none !default;
+$sidebar-toggle-color: var(--rz-text-contrast-color) !default;
+$sidebar-toggle-background-color: transparent !default;
+$sidebar-toggle-hover-color: var(--rz-text-contrast-color) !default;
+$sidebar-toggle-hover-background-color: var(--rz-primary-light) !default;
+$sidebar-toggle-hover-border-radius: 50% !default;
+
+.sidebar-toggle {
+  @include rz-ripple($ripple-background: rgba(255,255,255,.32), $pseudo: true);
+}
+
+// Menu
+$menu-background-color: var(--rz-base-background-color) !default;
+$menu-border: none !default;
+$menu-border-radius: var(--rz-border-radius) !default;
+$menu-item-padding: 0.5rem 1rem !default;
+$menu-item-color: var(--rz-text-color) !default;
+$menu-item-hover-color: var(--rz-text-title-color) !default;
+$menu-item-hover-background-color: var(--rz-base-100) !default;
+$menu-item-selected-color: var(--rz-text-title-color) !default;
+$menu-item-icon-color: $menu-item-color !default;
+$menu-item-icon-hover-color: $menu-item-hover-color !default;
+$menu-top-item-padding: 0.5rem !default;
+$menu-top-item-color: var(--rz-text-contrast-color) !default;
+$menu-top-item-background-color: var(--rz-primary) !default;
+$menu-top-item-hover-color: var(--rz-text-contrast-color) !default;
+$menu-top-item-hover-background-color: transparent !default;
+$menu-top-item-selected-color: var(--rz-text-contrast-color) !default;
+$menu-top-item-icon-color: $menu-top-item-color !default;
+$menu-top-item-icon-hover-color: $menu-top-item-hover-color !default;
+$context-menu-padding: 0.5rem 0 !default;
+$context-menu-box-shadow: var(--rz-shadow-6) !default;
+
+.rz-navigation-item-link,
+.rz-menu-toggle {
+  @include rz-ripple($pseudo: true);
+}
+
+// PanelMenu
+$panel-menu-font-size: calc(var(--rz-body-font-size) * 0.875) !default;
+$panel-menu-font-weight: 500 !default;
+$panel-menu-background-color: var(--rz-base-background-color) !default;
+$panel-menu-color: var(--rz-text-title-color) !default;
+$panel-menu-hover-background-color: rgba(0, 0, 0, 0.04) !default;
+$panel-menu-hover-color: var(--rz-text-title-color) !default;
+$panel-menu-item-line-height: 1.5rem !default;
+$panel-menu-item-padding: 1rem !default;
+$panel-menu-item-border: var(--rz-border-base-200) !default;
+$panel-menu-item-background-color: var(--rz-base-background-color) !default;
+$panel-menu-item-active-background-color: var(--rz-primary-lighter) !default;
+$panel-menu-item-active-color: var(--rz-primary) !default;
+$panel-menu-item-offset: 0 !default;
+$panel-menu-2nd-level-vertical-offset: 0.5rem !default;
+$panel-menu-item-2nd-level-padding: 0.5rem 0.5rem 0.5rem 1rem !default;
+$panel-menu-item-2nd-level-margin: 0 0.5rem !default;
+$panel-menu-item-2nd-level-border-radius: var(--rz-border-radius) !default;
+$panel-menu-item-2nd-level-offset: 3rem !default;
+$panel-menu-item-2nd-level-background-color: var(--rz-base-background-color) !default;
+$panel-menu-item-2nd-level-color: var(--rz-text-tertiary-color) !default;
+$panel-menu-item-2nd-level-font-size: calc(var(--rz-body-font-size) * 0.875) !default;
+$panel-menu-item-2nd-level-font-weight: 400 !default;
+$panel-menu-item-2nd-level-hover-background-color: var(--rz-base-100) !default;
+$panel-menu-item-2nd-level-hover-color: var(--rz-text-title-color) !default;
+$panel-menu-item-2nd-level-active-background-color: var(--rz-primary-lighter) !default;
+$panel-menu-item-2nd-level-active-color: var(--rz-primary) !default;
+$panel-menu-item-2nd-level-active-font-weight: 500 !default;
+$panel-menu-item-3rd-level-hover-background-color: var(--rz-base-100) !default;
+$panel-menu-item-3rd-level-hover-color: var(--rz-text-title-color) !default;
+$panel-menu-item-3rd-level-active-background-color: var(--rz-primary-lighter) !default;
+$panel-menu-item-3rd-level-active-color: var(--rz-primary) !default;
+$panel-menu-icon-color: var(--rz-text-tertiary-color) !default;
+$panel-menu-icon-margin: 0 1rem 0 0 !default;
+$panel-menu-icon-2nd-level-margin: 0 1rem 0 -2.25rem !default;
+
+.panel-menu {
+  .navigation-item-wrapper-active {
+    &:before {
+      display: none;
+    }
+  }
+}
+
+.rz-panel-menu {
+  .rz-navigation-item-link {
+    @include rz-ripple($ripple-background: var(--rz-base-300));
+  }
+  .rz-navigation-item-wrapper-active {
+    &:before {
+      display: none;
+    }
+  }
+}
+
+// ProfileMenu
+$profile-menu-background-color: var(--rz-base-background-color) !default;
+$profile-menu-top-item-background-color: var(--rz-primary) !default;
+$profile-menu-border: none !default;
+$profile-menu-padding: 0.5rem 1rem !default;
+$profile-menu-toggle-button-color: var(--rz-text-contrast-color) !default;
+$profile-menu-item-hover-background-color: var(--rz-base-100) !default;
+
+
+// Gravatar
+$gravatar-width: 2.5rem !default;
+
+// Steps
+$steps-color: var(--rz-text-tertiary-color) !default;
+$steps-number-padding: 0.25rem 0 !default;
+$steps-number-background-color: var(--rz-base-500) !default;
+$steps-number-color: var(--rz-text-contrast-color) !default;
+
+.rz-steps {
+  [role='tablist'] {
+    display: flex;
+  }
+  .rz-steps-item {
+    &:not(:last-child) {
+      flex: auto;
+      display: flex;
+      align-items: center;
+      &:after {
+        display: 'block';
+        content: '';
+        flex: auto;
+        height: 1px;
+        margin-right: 16px;
+        background-color: var(--rz-base-300);
+      }
+    }
+  }
+}
+
+// Checkbox
+$checkbox-width: 1.125rem !default;
+$checkbox-border-width: 2px !default;
+$checkbox-label-margin: 0 1rem !default;
+$checkbox-checked-background-color: var(--rz-primary) !default;
+$checkbox-checked-hover-background-color: var(--rz-primary-light) !default;
+$checkbox-checked-disabled-background-color: var(--rz-base-500) !default;
+$checkbox-checked-shadow: none !default;
+$checkbox-checked-border: var(--rz-border-primary) !default;
+$checkbox-checked-hover-border: var(--rz-border-primary) !default;
+$checkbox-checked-disabled-border: var(--rz-border-base-500) !default;
+
+.rz-chkbox-box {
+  &:after {
+    content: "";
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    opacity: 0;
+    transition: background-color var(--rz-transition), width var(--rz-transition), height var(--rz-transition);
+  }
+
+  &:hover:not(.rz-state-disabled) {
+    &:after {
+      width: 2.5rem;
+      height: 2.5rem;
+      background-color: var(--rz-base-400);
+      opacity: 0.3;
+    }
+  }
+
+  &:active:not(.rz-state-disabled) {
+    &:after {
+      background-color: var(--rz-base-500);
+    }
+  }
+
+  &.rz-state-active {
+    &:hover:not(.rz-state-disabled) {
+      &:after {
+        background-color: var(--rz-primary);
+        opacity: 0.08;
+      }
+    }
+
+    &:active:hover:not(.rz-state-disabled) {
+      &:after {
+        opacity: 0.16;
+      }
+    }
+  }
+}
+
+// Switch
+$switch-background-color: var(--rz-base-400) !default;
+$switch-checked-background-color: var(--rz-primary-lighter) !default;
+$switch-box-shadow: var(--rz-shadow-1) !default;
+$switch-width: 2.25rem !default;
+$switch-height: 0.875rem !default;
+$switch-circle-background-color: var(--rz-text-contrast-color) !default;
+$switch-checked-circle-background-color: var(--rz-primary) !default;
+$switch-circle-size: 1.25rem !default;
+$switch-circle-margin: 0 !default;
+
+.rz-switch .rz-switch-circle {
+  &:hover:not(.rz-disabled) {
+    &:before {
+      transition: background var(--rz-transition), transform var(--rz-transition), outlin-color var(--rz-transition);
+      box-shadow: var(--rz-switch-box-shadow), 0 0 0 10px rgba(0, 0, 0, 0.04);
+    }
+  }
+}
+
+.rz-switch.rz-switch-checked .rz-switch-circle {
+  &:hover:not(.rz-disabled) {
+    &:before {
+      box-shadow: var(--rz-switch-box-shadow), 0 0 0 10px var(--rz-primary-lighter);
+    }
+  }
+}
+
+// RadioButtonList
+$radio-width: 1.25rem !default;
+$radio-height: $radio-width !default;
+$radio-border-radius: 50% !default;
+$radio-border-width: 2px !default;
+$radio-label-margin: 0 1rem !default;
+$radio-active-background-color: var(--rz-base-background-color) !default;
+$radio-active-shadow: none !default;
+$radio-checked-background-color: var(--rz-base-background-color) !default;
+$radio-checked-hover-background-color: var(--rz-base-background-color) !default;
+$radio-checked-hover-shadow: none !default;
+$radio-checked-color: var(--rz-text-contrast-color) !default;
+$radio-circle-background-color: var(--rz-primary) !default;
+$radio-circle-shadow: none;
+$radio-circle-hover-background-color: var(--rz-primary-light) !default;
+$radio-icon-width: 0.625rem !default;
+$radio-icon-height: $radio-icon-width !default;
+$radio-checked-border: var(--rz-border-primary) !default;
+
+.rz-radiobutton-box {
+  &:after {
+    content: "";
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    opacity: 0;
+    transition: background-color var(--rz-transition), width var(--rz-transition), height var(--rz-transition);
+  }
+
+  &:hover:not(.rz-state-disabled) {
+    &:after {
+      width: 2.5rem;
+      height: 2.5rem;
+      background-color: var(--rz-base-400);
+      opacity: 0.3;
+    }
+  }
+
+  &:active:not(.rz-state-disabled) {
+    &:after {
+      background-color: var(--rz-base-500);
+    }
+  }
+
+  &.rz-state-active {
+    &:hover:not(.rz-state-disabled) {
+      &:after {
+        background-color: var(--rz-primary);
+        opacity: 0.08;
+      }
+    }
+
+    &:active:hover:not(.rz-state-disabled) {
+      &:after {
+        opacity: 0.16;
+      }
+    }
+  }
+}
+
+// Fieldset
+$fieldset-border: var(--rz-border-base-300) !default;
+$fieldset-border-radius: var(--rz-border-radius) !default;
+$fieldset-padding: 0 1rem 1rem !default;
+$fieldset-legend-color: var(--rz-text-color) !default;
+$fieldset-legend-font-size: var(--rz-body-font-size) !default;
+$fieldset-legend-margin: 0 0 1rem 0.5rem !default;
+$fieldset-legend-padding: 0 0.5rem !default;
+$fieldset-toggle-width: 1.5rem !default;
+$fieldset-toggle-margin: 0 !default;
+$fieldset-toggle-height: $fieldset-toggle-width !default;
+$fieldset-toggle-background-color: transparent !default;
+$fieldset-toggle-color: var(--rz-text-tertiary-color) !default;
+$fieldset-toggle-font-size: 1.5rem !default;
+$fieldset-toggle-border: none !default;
+
+// Dropdown
+$dropdown-horizontal-padding: 1rem !default;
+$dropdown-items-margin: 0 (-$dropdown-horizontal-padding) !default;
+$dropdown-items-padding: 0.5rem 0 !default;
+$dropdown-item-padding: 0.75rem 1rem !default;
+$dropdown-item-font-size: var(--rz-input-font-size) !default;
+$dropdown-item-hover-background-color: var(--rz-base-100) !default;
+$dropdown-item-hover-color: var(--rz-text-title-color) !default;
+$dropdown-item-selected-background-color: var(--rz-primary-lighter) !default;
+$dropdown-item-selected-shadow: none !default;
+$dropdown-item-selected-color: var(--rz-primary) !default;
+$dropdown-item-selected-hover-background-color: var(--rz-primary-lighter) !default;
+$dropdown-item-selected-hover-color: var(--rz-primary) !default;
+$dropdown-item-transition: none !default;
+$multiselect-checkbox-margin: 0 1rem 0 0 !default;
+$dropdown-filter-border: var(--rz-border-base-200) !default;
+$dropdown-filter-padding: 1rem 0 0.5rem !default;
+$dropdown-open-background-color: var(--rz-base-background-color) !default;
+$dropdown-open-border: 2px solid var(--rz-primary) !default;
+$dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
+$dropdown-panel-border: none !default;
+$dropdown-panel-shadow: var(--rz-shadow-4) !default;
+$dropdown-chips-padding: 0.4375rem 0.9375rem 0.4375rem 0.4375rem !default;
+
+// ListBox
+$listbox-filter-border: var(--rz-border-base-200) !default;
+$listbox-checkbox-margin: 0 1rem 0 0 !default;
+$listbox-header-padding: 0.75rem 1rem !default;
+
+// SplitButton
+$splitbutton-padding:  0 1rem !default;
+
+// Slider
+$slider-border: none !default;
+$slider-background-color: var(--rz-primary-lighter) !default;
+$slider-horizontal-height: 4px !default;
+$slider-range-background-color: var(--rz-primary) !default;
+$slider-range-border: none !default;
+$slider-handle-background-color: var(--rz-primary) !default;
+$slider-handle-width: 20px !default;
+$slider-handle-height: 20px !default;
+$slider-handle-border-radius: 50% !default;
+$slider-handle-hover-background-color: var(--rz-primary) !default;
+$slider-handle-hover-shadow: 0px 0px 0px 10px var(--rz-primary-lighter) !default;
+$slider-disabled-background-color: var(--rz-base-300) !default;
+$slider-disabled-range-background-color: var(--rz-base-500) !default;
+$slider-disabled-range-border: none !default;
+$slider-disabled-border: none !default;
+$slider-disabled-handle-background-color: $slider-disabled-range-background-color !default;
+
+.rz-slider {
+  .rz-slider-range {
+    top: 0;
+    bottom: 0;
+  }
+
+  .rz-slider-handle {
+    &:before {
+      display: none;
+    }
+  }
+}
+
+// Rating
+$rating-color: var(--rz-text-secondary-color) !default;
+$rating-opacity: 1 !default;
+$rating-selected-color: var(--rz-primary) !default;
+$rating-disabled-color: var(--rz-text-disabled-color) !default;
+$rating-disabled-opacity: 0.5 !default;
+$rating-ban-icon-color: var(--rz-text-disabled-color) !default;
+
+// SelectBar
+$selectbar-background-color: var(--rz-base-backgorund-color) !default;
+$selectbar-color: var(--rz-text-color) !default;
+$selectbar-border: var(--rz-border-base-300) !default;
+$selectbar-selected-background-color: var(--rz-primary-lighter) !default;
+$selectbar-selected-color: var(--rz-primary) !default;
+$selectbar-selected-border: var(--rz-border-base-300) !default;
+$selectbar-border-radius: var(--rz-border-radius) !default;
+
+.rz-selectbutton {
+  .rz-button {
+    box-shadow: none;
+    &:hover {
+      box-shadow: none !important;
+      background: var(--rz-base-200);
+    }
+  }
+}
+
+// DatePicker
+$datepicker-line-height: 1.5rem !default;
+$datepicker-trigger-icon-color: var(--rz-text-secondary-color) !default;
+$datepicker-trigger-icon-hover-color: var(--rz-text-title-color) !default;
+$datepicker-panel-border: none !default;
+$datepicker-panel-shadow: var(--rz-shadow-4);
+$datepicker-header-background-color: var(--rz-base-background-color) !default;
+$datepicker-footer-padding: 0 0.75rem !default;
+$datepicker-header-line-height: 3.625rem !default;
+$datepicker-footer-line-height: 3rem !default;
+$datepicker-calendar-padding: 0.625rem 0 !default;
+$datepicker-calendar-header-font-size: 0.75rem !default;
+$datepicker-calendar-font-size: 0.875rem !default;
+$datepicker-calendar-hover-color: var(--rz-text-title-color) !default;
+$datepicker-calendar-hover-background-color: var(--rz-base-100) !default;
+$datepicker-calendar-selected-color: var(--rz-text-contrast-color) !default;
+$datepicker-calendar-selected-background-color: var(--rz-secondary) !default;
+$datepicker-calendar-selected-hover-color: var(--rz-text-contrast-color) !default;
+$datepicker-calendar-selected-hover-background-color: var(--rz-secondary-light) !default;
+$datepicker-calendar-border: none !default;
+$datepicker-calendar-border-radius: 50% !default;
+$datepicker-calendar-transition: var(--rz-transition-all) !default;
+$datepicker-title-height: 3.5rem !default;
+$timepicker-background-color: var(--rz-base-background-color) !default;
+$timepicker-button-background-color: var(--rz-base-300) !default;
+$timepicker-button-color: var(--rz-text-color) !default;
+$timepicker-button-width: 0.875rem !default;
+$timepicker-button-height: $timepicker-button-width !default;
+$timepicker-button-border-radius: 2px !default;
+$timepicker-button-padding: 0.5rem 1rem !important;
+$timepicker-separator-margin: 0 0.5rem !default;
+$timepicker-border: var(--rz-border-base-300) !default;
+
+.rz-datepicker-inline {
+  &:not(.ng-trigger) {
+    table {
+      width: 100%;
+    }
+  }
+}
+
+.rz-datepicker {
+  &.rz-popup {
+    width: 340px !important;
+  }
+
+  .rz-datepicker-calendar-container {
+    padding: 0 0.75rem 0.5rem;
+  }
+}
+
+.rz-datepicker-title {
+  .rz-dropdown {
+    min-width: 100px !important;
+    margin-top: 0.75rem !important
+  }
+  .rz-dropdown:first-child {
+    min-width: 140px !important;
+  }
+}
+
+.rz-datepicker-calendar {
+  td,
+  th {
+    text-align: center;
+
+    a.rz-state-default,
+    span.rz-state-default {
+      display: inline-block;
+      width: 2.25rem;
+      height: 2.25rem;
+      line-height: 1rem;
+
+      &:not(.rz-state-active) {
+        &:hover {
+          border-radius: 50%;
+        }
+      }
+    }
+    .rz-state-active {
+      border-radius: 50%;
+    }
+  }
+}
+
+.rz-timepicker {
+  flex-wrap: wrap;
+
+  .rz-spinner {
+    flex: 1;
+  }
+
+  > .rz-button {
+    flex-basis: 100%;
+  }
+}
+
+.rz-calendar {
+  .rz-inputtext {
+    padding-right: 2.5rem !important;
+  }
+}
+
+// Numeric
+$numeric-button-background-color: transparent !default;
+$numeric-button-color: var(--rz-text-color) !default;
+$numeric-button-disabled-background-color: transparent !default;
+$numeric-line-height: var(--rz-body-line-height) !default;
+$numeric-input-padding: 0.4375rem 1.25rem 0.4375rem 0.9375rem;
+$numeric-button-width: 1rem !default;
+
+.rz-spinner {
+  .rz-spinner-button {
+    box-shadow: none;
+
+    &:hover {
+      box-shadow: none !important;
+    }
+  }
+}
+
+// Upload
+$upload-button-bar-background-color: var(--rz-base-100) !default;
+$upload-button-bar-padding: 0.5rem !default;
+$upload-files-background-color: var(--rz-base-background-color) !default;
+$upload-files-remove-background-color: var(--rz-base-200) !default;
+$upload-choose-background-color: var(--rz-base-200) !default;
+$upload-choose-color: var(--rz-text-color) !default;
+$upload-choose-hover-background-color: var(--rz-base-200) !default;
+$upload-choose-hover-color: var(--rz-text-title-color) !default;
+$upload-choose-active-background-color: var(--rz-base-200) !default;
+$upload-choose-active-color: var(--rz-text-title-color) !default;
+$upload-cancel-background-color: var(--rz-base-200) !default;
+$upload-cancel-color: var(--rz-text-color) !default;
+$upload-button-background-color: var(--rz-primary) !default;
+
+.rz-fileupload-choose.rz-button {
+  @include rz-ripple($pseudo: false);
+
+  input {
+    z-index: 1;
+  }
+}
+
+// Grid
+$grid-cell-border: var(--rz-border-base-300) !default;
+$grid-right-cell-border: none !default;
+$grid-cell-padding: 0.625rem 1rem !default;
+$grid-cell-font-size: 0.875rem !default;
+$grid-hover-background-color: var(--rz-base-100) !default;
+$grid-hover-color: var(--rz-text-title-color) !default;
+$grid-selected-background-color: var(--rz-primary-lighter) !default;
+$grid-selected-color: var(--rz-primary) !default;
+$grid-stripe-background-color: var(--rz-base-50) !default;
+$grid-header-cell-border: none !default;
+$grid-header-cell-border-bottom: var(--rz-border-base-300) !default;
+$grid-header-background-color: var(--rz-base-background-color) !default;
+$grid-header-font-size: 0.875rem !default;
+$grid-header-line-height: 1.5rem !default;
+$grid-header-font-weight: 500 !default;
+$grid-header-text-transform: none !default;
+$grid-header-color: var(--rz-text-title-color) !default;
+$grid-header-cell-padding: 0.75rem 0 !default;
+$grid-header-title-padding: 0 0 0 1rem !default;
+$grid-header-sorted-background-color: var(--rz-base-200) !default;
+$grid-foot-background-color: var(--rz-base-100) !default;
+$grid-filter-background-color: var(--rz-base-background-color) !default;
+$grid-filter-border: none !default;
+$grid-filter-font-size: 0.875rem !default;
+$grid-filter-icon-font-size: 0.875rem !default;
+$grid-filter-buttons-border: none !default;
+$grid-filter-buttons-background-color: var(--rz-base-background-color) !default;
+$grid-clear-filter-button-background-color: var(--rz-base-background-color) !default;
+$grid-clear-filter-button-color: var(--rz-text-color) !default;
+$grid-clear-filter-button-shadow: none !default;
+$grid-apply-filter-button-background-color: var(--rz-base-background-color) !default;
+$grid-apply-filter-button-color: var(--rz-primary) !default;
+$grid-apply-filter-button-shadow: none !default;
+$grid-header-filter-icon-margin: 0 1rem 0 auto !default;
+$grid-header-filter-icon-hover-color: var(--rz-text-title-color) !default;
+$grid-header-filter-icon-font-size: 1.25rem !default;
+$grid-border: var(--rz-border-base-300) !default;
+$grid-sort-icon-width: 1.25rem !default;
+$grid-shadow: none !default;
+$grid-column-resizer-width: 0.25rem !default;
+$grid-column-resizer-helper-width: 0.125rem !default;
+$grid-column-resizer-helper-background-color: var(--rz-secondary) !default;
+$grid-detail-template-background-color: var(--rz-base-100) !default;
+$grid-group-header-padding: 1rem !default;
+$grid-group-header-item-background-color: var(--rz-base-200) !default;
+$grid-group-header-item-padding: 0.25rem 0.5rem 0.25rem 0.75rem !default;
+$grid-group-header-item-border: var(--rz-border-base-200) !default;
+$grid-group-header-item-border-radius: calc(4 * var(--rz-border-radius)) !default;
+$column-drag-handle-color: var(--rz-text-disabled-color) !default;
+$column-drag-handle-hover-color: var(--rz-text-title-color) !default;
+$column-drag-handle-margin: 0 !default;
+$column-draggable-shadow: var(--rz-shadow-4) !default;
+
+.rz-datatable {
+  .rz-col-icon {
+    border-right: $grid-cell-border;
+  }
+}
+
+.rz-grid-table-composite {
+  --rz-grid-right-cell-border: #{$grid-cell-border};
+  --rz-grid-header-cell-border: #{$grid-cell-border};
+}
+
+// Paginator
+$paginator-background-color: transparent !default;
+$paginator-padding: 0.5rem 1rem !default;
+$paginator-border: none !default;
+$paginator-button-border-radius: 2rem !default;
+$paginator-button-shadow: inherit !default;
+$paginator-numeric-button-background-color: transparent !default;
+$paginator-numeric-button-color: var(--rz-text-color) !default;
+$paginator-numeric-button-border: none !default;
+$paginator-numeric-button-hover-background-color: var(--rz-base-100) !default;
+$paginator-numeric-button-hover-color: var(--rz-text-title-color) !default;
+$paginator-numeric-button-margin: 0 0.25rem !default;
+$paginator-numeric-button-padding: 0.75rem 1rem !default;
+$paginator-numeric-button-selected-background-color: var(--rz-primary-lighter) !default;
+$paginator-numeric-button-selected-color: var(--rz-primary) !default;
+$paginator-numeric-button-selected-border: none !default;
+$paginator-numeric-button-min-width: 3rem !default;
+$paginator-back-button-background-color: transparent !default;
+$paginator-back-button-color: var(--rz-text-color) !default;
+$paginator-back-button-hover-background-color: var(--rz-base-100) !default;
+$paginator-back-button-hover-color: var(--rz-text-title-color) !default;
+$paginator-first-button-margin: 0 0.5rem 0 0 !default;
+$paginator-last-button-margin: 0 0 0 0.5rem !default;
+$paginator-next-button-background-color: transparent !default;
+$paginator-next-button-color: var(--rz-text-color) !default;
+$paginator-next-button-hover-background-color: var(--rz-base-100) !default;
+$paginator-next-button-hover-color: var(--rz-text-title-color) !default;
+$paginator-dropdown-width: 80px !default;
+$paginator-dropdown-margin: $paginator-last-button-margin !default;
+$paginator-summary-padding: 0 1.25rem 0 0 !default;
+$paginator-summary-font-size: 0.875rem !default;
+$paginator-summary-color: var(--rz-text-tertiary-color) !default;
+$paginator-button-size: ".rz-button-lg" !default;
+
+.rz-paginator-pages {
+  max-height: 3rem;
+}
+
+.rz-paginator-element {
+  box-shadow: var(--rz-shadow-0) !important;
+
+  &:hover {
+    box-shadow: var(--rz-shadow-0) !important;
+  }
+
+  &:active {
+    box-shadow: var(--rz-shadow-0) !important;
+  }
+}
+
+// Tree
+$tree-background-color: transparent !default;
+$tree-node-padding: 0.25rem 0.5rem !default;
+$tree-node-selected-background-color: var(--rz-primary-lighter) !default;
+$tree-node-selected-color: var(--rz-primary) !default;
+$tree-node-selected-border-radius: var(--rz-border-radius) !default;
+$tree-node-margin: 0 !default;
+$tree-node-hover-background-color: var(--rz-base-100) !default;
+$tree-node-hover-color: var(--rz-text-title-color) !default;
+$tree-node-toggle-width: 2rem !default;
+$tree-node-toggle-color: var(--rz-text-tertiary-color) !default;
+$tree-node-toggle-hover-color: var(--rz-text-color) !default;
+$tree-icon-right: 'chevron_right' !default;
+$tree-icon-down: 'expand_more' !default;
+$tree-transition: var(--rz-transition-all) !default;
+
+.rz-tree-toggler {
+  position: relative;
+}
+
+.rz-tree-toggler {
+  &.rzi-caret-right {
+    &:before {
+      margin-left: 0 !important;
+    }
+  }
+
+  &.rzi-caret-down {
+    &:before {
+      margin-left: 0 !important;
+    }
+  }
+
+  &:after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    opacity: 0;
+    transition: background-color var(--rz-transition), width var(--rz-transition), height var(--rz-transition), left var(--rz-transition), top var(--rz-transition);
+  }
+
+  &:active {
+    &:after {
+      left: 0;
+      top: -0.25rem;
+      width: 2rem;
+      height: 2rem;
+      background-color: var(--rz-base-400);
+      opacity: 0.3;
+    }
+  }
+}
+
+// DataList
+$datalist-shadow: var(--rz-shadow-1) !default;
+$datalist-border: var(--rz-border-base-300) !default;
+$datalist-item-shadow: var(--rz-shadow-0) !default;
+$datalist-item-border: var(--rz-border-base-300) !default;
+
+// Scheduler
+$scheduler-border: var(--rz-border-base-300) !default;
+$scheduler-border-color: var(--rz-base-300) !default;
+$scheduler-minor-border-color: var(--rz-base-200) !default;
+$scheduler-border-radius: var(--rz-border-radius) !default;
+$scheduler-shadow: var(--rz-shadow-0) !default;
+$scheduler-background-color: var(--rz-base-background-color) !default;
+$scheduler-color: var(--rz-text-tertiary-color) !default;
+$scheduler-toolbar-padding: 0.5rem !default;
+$scheduler-toolbar-background-color: var(--rz-base-background-color) !default;
+$scheduler-toolbar-title-font-size: 1.5rem !default;
+$scheduler-toolbar-title-font-weight: 700 !default;
+$scheduler-toolbar-title-color: var(--rz-text-title-color) !default;
+$scheduler-prev-next-button-background-color: var(--rz-base-background-color) !default;
+$scheduler-prev-next-button-color: var(--rz-text-color) !default;
+$scheduler-prev-next-button-padding: 0.5rem !default;
+$scheduler-prev-next-button-font-size: var(--rz-icon-size) !default;
+$scheduler-prev-button-border-radius: 2rem !default;
+$scheduler-next-button-border-radius: 2rem !default;
+$scheduler-today-button-margin-left: 1rem !default;
+$scheduler-today-button-padding: 0.5rem 1rem !default;
+$scheduler-today-button-font-size: 0.875rem !default;
+$scheduler-today-button-text-transform: capitalize !default;
+$scheduler-view-button-border: var(--rz-border-base-300) !default;
+$scheduler-view-button-color: var(--rz-text-secondary-color) !default;
+$scheduler-view-button-background-color: var(--rz-base-background-color) !default;
+$scheduler-view-selected-color: var(--rz-primary) !default;
+$scheduler-view-selected-background-color: var(--rz-primary-lighter) !default;
+$scheduler-view-selected-border-color: var(--rz-base-300) !default;
+$scheduler-header-background-color: var(--rz-base-background-color) !default;
+$scheduler-header-font-size: 0.75rem !default;
+$scheduler-header-text-transform: uppercase !default;
+$scheduler-header-color: inherit !default;
+$scheduler-header-border: var(--rz-border-base-300) !default;
+$scheduler-header-padding: 0.5rem 0 !default;
+$scheduler-event-color: var(--rz-text-contrast-color) !default;
+$scheduler-event-background-color: var(--rz-info) !default;
+$scheduler-event-font-size: 0.75rem !default;
+$scheduler-event-line-height: 1.25rem !default;
+$scheduler-event-padding: 0 1px 1px 1px !default;
+$scheduler-event-content-padding: 0.125rem 0.25rem !default;
+$scheduler-slot-title-padding: 0 0.25rem !default;
+$scheduler-day-number-padding: 0 0.5rem !default;
+$scheduler-year-padding: 1.5rem !default;
+$scheduler-year-slot-padding: .25rem !default;
+$scheduler-year-slot-title-width: 'fit-content' !default;
+$scheduler-year-slot-title-border-radius: 50% !default;
+
+.rz-scheduler-nav {
+  .rz-button {
+    box-shadow: var(--rz-shadow-0) !important;
+
+    &:hover {
+      box-shadow: var(--rz-shadow-0) !important;
+      background: var(--rz-base-200);
+    }
+
+    &:active {
+      box-shadow: var(--rz-shadow-0) !important;
+    }
+  }
+}
+
+.rz-view-header {
+  border-top: none !important;
+
+  .rz-year-view & {
+    border-bottom: none !important;
+  }
+}
+
+// Tabs
+$tabs-padding: 1rem !default;
+$tabs-shadow: none !default;
+$tabs-border: none !default;
+$tabs-border-radius: 0 !default;
+$tabs-background-color: transparent !default;
+$tabs-tab-font-size: 0.875rem !default;
+$tabs-tab-line-height: 1.5rem !default;
+$tabs-tab-font-weight: 500 !default;
+$tabs-tab-text-transform: uppercase !default;
+$tabs-tab-letter-spacing: 1.25px !default;
+$tabs-tab-padding: 0.75rem 1rem !default;
+$tabs-tab-background-color: transparent !default;
+$tabs-tab-color: var(--rz-text-secondary-color) !default;
+$tabs-tab-selected-color: var(--rz-primary) !default;
+$tabs-tab-selected-top-border-color: var(--rz-secondary) !default;
+$tabs-tab-selected-bottom-border-color: var(--rz-primary) !default;
+$tabs-tab-hover-background-color: var(--rz-base-200) !default;
+$tabs-tab-hover-color: var(--rz-text-title-color) !default;
+$tabs-tab-panels-border: var(--rz-border-base-300) !default;
+$tabs-icon-font-size: var(--rz-icon-size) !default;
+$tabs-icon-margin: 0 0.25rem 0 -0.25rem !default;
+$tabs-transition: var(--rz-transition-all) !default;
+
+.rz-tabview-nav > li > a {
+  @include rz-ripple($pseudo: true);
+}
+
+.rz-tabview {
+  &.rz-tabview-top > .rz-tabview-nav {
+    .rz-tabview-selected {
+      border-top-width: 0;
+      border-bottom: 2px solid $tabs-tab-selected-bottom-border-color;
+    }
+  }
+  &.rz-tabview-bottom > .rz-tabview-nav {
+    li {
+      border-top: 2px solid transparent;
+    }
+    .rz-tabview-selected {
+      border-bottom-width: 0;
+      border-top: 2px solid $tabs-tab-selected-bottom-border-color;
+    }
+  }
+  &.rz-tabview-left > .rz-tabview-nav {
+    .rz-tabview-selected {
+      border-left-width: 0;
+      border-right: 2px solid $tabs-tab-selected-bottom-border-color;
+    }
+  }
+  &.rz-tabview-right > .rz-tabview-nav {
+    li {
+      border-left: 2px solid transparent;
+    }
+    .rz-tabview-selected {
+      border-right-width: 0;
+      border-left: 2px solid $tabs-tab-selected-bottom-border-color;
+    }
+  }
+  &.rz-tabview-top > .rz-tabview-panels {
+    border-top: $tabs-tab-panels-border;
+  }
+  &.rz-tabview-bottom > .rz-tabview-panels {
+    border-bottom: $tabs-tab-panels-border;
+  }
+  &.rz-tabview-left > .rz-tabview-panels {
+    border-left: $tabs-tab-panels-border;
+  }
+  &.rz-tabview-right > .rz-tabview-panels {
+    border-right: $tabs-tab-panels-border;
+  }
+}
+
+// Dialog
+$dialog-background-color: var(--rz-base-background-color) !default;
+$dialog-shadow: var(--rz-shadow-9) !default;
+$dialog-title-background-color: var(--rz-base-background-color) !default;
+$dialog-title-border: none !default;
+$dialog-title-padding: 1.5rem 1.5rem 0 1.5rem !default;
+$dialog-title-font-size: 1.25rem !default;
+$dialog-title-line-height: 1.5rem !default;
+$dialog-title-font-weight: 500 !default;
+$dialog-title-letter-spacing: .0125em !default;
+$dialog-title-color: var(--rz-text-title-color) !default;
+$dialog-close-font-size: var(--rz-icon-size) !default;
+$dialog-close-color: var(--rz-text-tertiary-color) !default;
+$dialog-close-hover-color: var(--rz-text-title-color) !default;
+$dialog-close-vertical-align: middle !default;
+$dialog-content-padding: 1.5rem !default;
+$dialog-mask-background-color: var(--rz-base-800) !default;
+$dialog-border-radius: var(--rz-border-radius) !default;
+
+//Notification
+$notification-padding: 1rem 1.25rem !default;
+$notification-icon-margin: 0 0.625rem 0 0 !default;
+$notification-container-background-color: var(--rz-white) !default;
+$notification-success-color: var(--rz-success) !default;
+$notification-success-background-color: var(--rz-success-lighter) !default;
+$notification-warning-color: var(--rz-warning) !default;
+$notification-warning-background-color: var(--rz-warning-lighter) !default;
+$notification-error-color: var(--rz-danger) !default;
+$notification-error-background-color: var(--rz-danger-lighter) !default;
+$notification-info-color: var(--rz-info) !default;
+$notification-info-background-color: var(--rz-info-lighter) !default;
+
+// Alert 
+$alert-message-margin: 0.125rem 0 !default;
+
+$alert-sizes: () !default;
+$alert-sizes: map-merge(
+  (
+    lg: (
+      gap: 1.5rem,
+      margin: 1.5rem 0,
+      padding: 1.5rem,
+      message-margin: 0.125rem 0
+    ),
+    md: (
+      gap: 1rem,
+      margin: 1rem 0,
+      padding: 1rem,
+      message-margin: 0.125rem 0
+    ),
+    sm: (
+      gap: 0.5rem,
+      margin: 0.5rem 0,
+      padding: 0.5rem,
+      message-margin: 0.125rem 0
+    ),
+    xs: (
+      gap: 0.25rem,
+      margin: 0.25rem 0,
+      padding: 0.25rem,
+      message-margin: 0
+    )
+  ),
+  $alert-sizes
+);
+
+// Scrollbar
+$scrollbar-background-color: transparent !default;
+$scrollbar-color: rgba(#000, 0.12) !default;
+$scrollbar-border-radius: 0 !default;
+
+// Login
+$login-register-background-color: rgba(#000, 0.04) !default;
+
+.rz-login {
+  .rz-textbox  {
+    &.invalid {
+      --rz-input-focus-shadow: inset 0 0 0 1px var(--rz-danger);
+    }
+  }
+}
+
+// Lookup
+$lookup-panel-background-color: rgba(#000, 0.04) !default;
+
+// Overlay
+$overlay-shadow: var(--rz-shadow-4) !default;
+$overlay-border: none !default;
+$overlay-background-color: var(--rz-base-background-color) !default;
+
+// ProgressBar
+$progressbar-value-background-color: var(--rz-primary) !default;
+$progressbar-background-color: var(--rz-primary-lighter) !default;
+$progressbar-border-radius: 0 !default;
+$progressbar-height: 0.25rem !default;
+
+.rz-progressbar-label {
+  display: none !important;
+}
+
+// Chart
+$chart-axis-color: var(--rz-base-300) !default;
+$chart-axis-label-color: var(--rz-base-500) !default;
+
+// Gauge
+$gauge-arc-scale-color: var(--rz-base-300) !default;
+
+// Editor
+$editor-border: var(--rz-border-base-300)  !default;
+$editor-border-radius: var(--rz-border-radius) !default;
+$editor-toolbar-background-color: var(--rz-base-background-color) !default;
+$editor-toolbar-item-margin: 0.25rem 0.125rem !default;
+$editor-button-padding: 0.5rem !default;
+$editor-button-background-color: var(--rz-base-background-color) !default;
+$editor-button-color: var(--rz-text-color) !default;
+$editor-button-disabled-color: var(--rz-text-disabled-color) !default;
+$editor-button-selected-background-color: var(--rz-secondary-lighter) !default;
+$editor-button-selected-color: var(--rz-secondary) !default;
+$editor-separator-background-color: var(--rz-base-200) !default;
+$editor-content-background-color: var(--rz-base-background-color) !default;
+
+.rz-html-editor-toolbar {
+  font-size: 0.825rem;
+
+  .rz-html-editor-button {
+    @include rz-ripple($pseudo: true);
+  }
+}
+
+// Splitter
+$splitter-bar-background-color-active: var(--rz-primary) !default;
+
+// FormField
+$form-field-margin: 0.5rem 0 0 !default;
+$form-field-start-end-padding: 0 0.75rem !default;
+$form-field-filled-height: 3.375rem !default;
+$form-field-filled-padding: 1.4375rem 0.9375rem 0.4375rem !default;
+$form-field-filled-numeric-padding: 1.4375rem 1.25rem 0.4375rem 0.9375rem !default;
+$form-field-filled-background-color: var(--rz-base-200) !default;
+$form-field-filled-hover-background-color: var(--rz-base-300) !default;
+$form-field-filled-border: var(--rz-border-width) solid var(--rz-base-200) !default;
+$form-field-filled-hover-border: var(--rz-border-width) solid var(--rz-base-300) !default;
+$form-field-filled-focus-border: $form-field-filled-border !default;
+$form-field-filled-border-radius: var(--rz-border-radius) var(--rz-border-radius) 0 0 !default;
+$form-field-filled-label-floating-top: 0.5rem !default;
+$form-field-filled-hover-shadow: none !default;
+$form-field-filled-focus-shadow: none !default;
+$form-field-filled-underline-display: block !default;
+$form-field-hover-shadow: var(--rz-input-hover-shadow) !default;
+$form-field-focus-shadow: var(--rz-input-focus-shadow) !default;
+$form-field-label-padding: 0 0.25rem !default;
+$form-field-text-label-padding: 0 !default;
+$form-field-label-left: 0.6875rem !default;
+$form-field-label-textarea-top: 0.5rem !default;
+$form-field-label-floating-top: -0.4375rem !default;
+$form-field-helper-padding: 0 1rem !default;
+
+@import 'fonts';
+@import 'components';

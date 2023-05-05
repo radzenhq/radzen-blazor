@@ -1,13 +1,28 @@
-$numeric-line-height: 1.5rem !default;
-$numeric-input-padding: 1px 18px 1px 0.5rem;
+$numeric-line-height: 1.25rem !default;
+$numeric-input-padding: 0.5rem 1.25rem 0.5rem 0.5rem !default;
 $numeric-button-width: 0.875rem !default;
 $numeric-button-height: $numeric-button-width !default;
 $numeric-button-offset: 2px !default;
-$numeric-button-border-radius: 2px !default;
-$numeric-button-background-color: $default-link !default;
-$numeric-button-disabled-background-color: #dadfe2 !default;
-$numeric-button-disabled-color: $cool-grey !default;
-$numeric-button-color: $white !default;
+$numeric-button-border-radius: calc(var(--rz-border-radius) - 2px) !default;
+$numeric-button-background-color: var(--rz-secondary) !default;
+$numeric-button-color: var(--rz-text-contrast-color) !default;
+$numeric-button-disabled-background-color: var(--rz-base-300) !default;
+$numeric-button-disabled-color: var(--rz-text-disabled-color) !default;
+
+// Numeric CSS variables
+
+:root {
+  --rz-numeric-line-height: #{$numeric-line-height};
+  --rz-numeric-input-padding: #{$numeric-input-padding};
+  --rz-numeric-button-width: #{$numeric-button-width};
+  --rz-numeric-button-height: #{$numeric-button-height};
+  --rz-numeric-button-offset: #{$numeric-button-offset};
+  --rz-numeric-button-border-radius: #{$numeric-button-border-radius};
+  --rz-numeric-button-background-color: #{$numeric-button-background-color};
+  --rz-numeric-button-disabled-background-color: #{$numeric-button-disabled-background-color};
+  --rz-numeric-button-disabled-color: #{$numeric-button-disabled-color};
+  --rz-numeric-button-color: #{$numeric-button-color};
+}
 
 .rz-spinner {
   display: inline-block;
@@ -24,9 +39,9 @@ $numeric-button-color: $white !default;
     height: 100%;
     border: none;
     background-color: transparent;
-    line-height: $numeric-line-height;
+    line-height: var(--rz-numeric-line-height);
     text-align: inherit;
-    padding: $numeric-input-padding;
+    padding: var(--rz-numeric-input-padding);
     outline: none;
 
     &::-webkit-inner-spin-button,
@@ -36,17 +51,21 @@ $numeric-button-color: $white !default;
     }
   }
 
+  &:focus-within:not(.rz-state-disabled) {
+    @extend %input-focus;
+  }
+
   &.rz-state-disabled {
     @extend %input-disabled;
 
     .rz-spinner-button {
-      background-color: $numeric-button-disabled-background-color;
-      color: $numeric-button-disabled-color;
+      background-color: var(--rz-numeric-button-disabled-background-color);
+      color: var(--rz-numeric-button-disabled-color);
 
       &:active,
       &:hover {
-        background-color: $numeric-button-disabled-background-color;
-        color: $numeric-button-disabled-color;
+        background-color: var(--rz-numeric-button-disabled-background-color);
+        color: var(--rz-numeric-button-disabled-color);
         background-image: none;
         box-shadow: none;
         cursor: initial;
@@ -57,21 +76,21 @@ $numeric-button-color: $white !default;
 
 .rz-spinner-button {
   position: absolute;
-  right: $numeric-button-offset;
+  right: var(--rz-numeric-button-offset);
   padding: 0;
 
-  width: $numeric-button-width;
-  height: $numeric-button-height;
-  border-radius: $numeric-button-border-radius;
-  background-color: $numeric-button-background-color;
-  color: $numeric-button-color;
+  width: var(--rz-numeric-button-width);
+  height: var(--rz-numeric-button-height);
+  border-radius: var(--rz-numeric-button-border-radius);
+  background-color: var(--rz-numeric-button-background-color);
+  color: var(--rz-numeric-button-color);
 
   &:hover {
-    background-color: $numeric-button-background-color;
+    background-color: var(--rz-numeric-button-background-color);
   }
 
   .rzi {
-    font-size: $numeric-button-height;
+    font-size: var(--rz-numeric-button-height);
     vertical-align: top;
   }
 
@@ -89,9 +108,9 @@ $numeric-button-color: $white !default;
 }
 
 .rz-spinner-up {
-  top: $numeric-button-offset;
+  top: var(--rz-numeric-button-offset);
 }
 
 .rz-spinner-down {
-  bottom: $numeric-button-offset;
+  bottom: var(--rz-numeric-button-offset);
 }

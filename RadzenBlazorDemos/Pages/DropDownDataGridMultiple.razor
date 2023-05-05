@@ -1,0 +1,39 @@
+﻿@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenDropDownDataGrid @ref="grid" Chips="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value=@values
+                            Multiple="true" Placeholder="Select..." Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID">
+        <Columns>
+            <RadzenDropDownDataGridColumn Width="60px" Sortable="false">
+                <HeaderTemplate>
+                    <RadzenCheckBox Disabled="@(!grid.AllowSelectAll)" TriState="false" TValue="bool" Value="@(customers.Any(c => values != null && values.Contains(c.CustomerID)))"
+                                    Change="@(args => values = args ? grid.View.Cast<Customer>().Select(c => c.CustomerID) : values = Enumerable.Empty<string>())" />
+                </HeaderTemplate>
+                <Template Context="data">
+                    <RadzenCheckBox TriState="false" Value="@(values != null && values.Contains(((Customer) data).CustomerID))"
+                                    TValue="bool" Change=@(args => grid.SelectItem(data)) @onclick:stopPropagation/>
+                </Template>
+            </RadzenDropDownDataGridColumn>
+            <RadzenDropDownDataGridColumn Property="CustomerID" Title="CustomerID" Width="80px" />
+            <RadzenDropDownDataGridColumn Property="CompanyName" Title="CompanyName" Width="200px" />
+            <RadzenDropDownDataGridColumn Property="City" Title="City" Width="100px" />
+            <RadzenDropDownDataGridColumn Property="Country" Title="Country" Width="100px" />
+        </Columns>
+    </RadzenDropDownDataGrid>
+</div>
+
+@code {
+    RadzenDropDownDataGrid<IEnumerable<string>> grid;
+    IEnumerable<Customer> customers;
+
+    IEnumerable<string> values = new string[] { "ALFKI", "AROUT" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers;
+    }
+}

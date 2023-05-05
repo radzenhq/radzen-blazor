@@ -1,0 +1,17 @@
+﻿<RadzenTabs @bind-SelectedIndex=@selectedIndex>
+    <Tabs>
+        <RadzenTabsItem Text="Customers">
+            Customers
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Orders">
+            Orders
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Order Details">
+            Order Details
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+@code {
+    int selectedIndex = 0;
+}

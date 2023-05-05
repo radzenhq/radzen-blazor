@@ -102,6 +102,12 @@ namespace Radzen.Blazor
         public EventCallback<TreeExpandEventArgs> Expand { get; set; }
 
         /// <summary>
+        /// A callback that will be invoked when the user collapse an item.
+        /// </summary>
+        [Parameter]
+        public EventCallback<TreeEventArgs> Collapse { get; set; }
+
+        /// <summary>
         /// Gets or sets the child content.
         /// </summary>
         /// <value>The child content.</value>
@@ -235,6 +241,10 @@ namespace Radzen.Blazor
                             builder.AddAttribute(7, "ChildContent", RenderChildren(grandChildren, depth + 1));
                             builder.AddAttribute(8, nameof(RadzenTreeItem.Data), grandChildren);
                         }
+                        else
+                        {
+                            builder.AddAttribute(7, "ChildContent", (RenderFragment)null);
+						}
                     }
 
                     builder.CloseComponent();
@@ -264,7 +274,14 @@ namespace Radzen.Blazor
                 });
             }
         }
-
+        /// <summary>
+        /// Clear the current selection to allow re-selection by mouse click
+        /// </summary>
+        public void ClearSelection()
+        {
+            SelectedItem?.Unselect();
+            SelectedItem = null;
+        }
         internal async Task ExpandItem(RadzenTreeItem item)
         {
             var args = new TreeExpandEventArgs()

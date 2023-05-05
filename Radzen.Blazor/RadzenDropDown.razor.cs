@@ -38,6 +38,13 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if popup should open on focus; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool OpenOnFocus { get; set; }
+        
+        /// <summary>
+        /// Gets or sets a value indicating whether search field need to be cleared after selection. Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if need to be cleared; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ClearSearchAfterSelection { get; set; }
 
         private async Task OnFocus(Microsoft.AspNetCore.Components.Web.FocusEventArgs args)
         {
@@ -75,7 +82,7 @@ namespace Radzen.Blazor
 
             if (DisabledProperty != null)
             {
-                builder.AddAttribute(3, "Disabled", PropertyAccess.GetItemOrValueFromProperty(item, DisabledProperty));
+                builder.AddAttribute(3, "Disabled", GetItemOrValueFromProperty(item, DisabledProperty));
             }
 
             builder.SetKey(GetKey(item));
@@ -88,6 +95,13 @@ namespace Radzen.Blazor
         /// <value>The number of maximum selected labels.</value>
         [Parameter]
         public int MaxSelectedLabels { get; set; } = 4;
+
+        /// <summary>
+        /// Gets or sets the Popup height.
+        /// </summary>
+        /// <value>The number Popup height.</value>
+        [Parameter]
+        public string PopupStyle { get; set; } = "max-height:200px;overflow-x:hidden";
 
         /// <summary>
         /// Gets or sets a value indicating whether the selected items will be displayed as chips. Set to <c>false</c> by default.
@@ -158,7 +172,6 @@ namespace Radzen.Blazor
                     if (!Disabled)
                     {
                         await JSRuntime.InvokeVoidAsync("Radzen.preventArrows", Element);
-                        reload = true;
                     }
 
                     if (reload)
@@ -188,6 +201,12 @@ namespace Radzen.Blazor
                 if (!Multiple && !isFromKey)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                }
+                
+                if (ClearSearchAfterSelection)
+                {
+                    await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, string.Empty);
+                    await OnFilter(null);
                 }
 
                 await SelectItem(item);

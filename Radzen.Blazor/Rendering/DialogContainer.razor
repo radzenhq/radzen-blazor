@@ -3,7 +3,7 @@
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 <div class="rz-dialog-wrapper">
-    <div @ref="dialog" class="rz-dialog" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
+    <div @ref="dialog" class="@CssClass" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
         {
             @if (Dialog.Options.Draggable)
@@ -13,7 +13,7 @@
                         <div class="rz-dialog-title" style="display: inline" id="rz-dialog-0-label">@((MarkupString)Dialog.Title)</div>
                         @if (Dialog.Options.ShowClose)
                         {
-                            <a href="javascript:void(0)" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                            <a href="javascript:void(0)" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
                                 <span class="rzi rzi-times"></span>
                             </a>
                         }
@@ -26,7 +26,7 @@
                     <div class="rz-dialog-title" style="display: inline" id="rz-dialog-0-label">@((MarkupString)Dialog.Title)</div>
                     @if (Dialog.Options.ShowClose)
                     {
-                        <a href="javascript:void(0)" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                        <a href="javascript:void(0)" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
                             <span class="rzi rzi-times"></span>
                         </a>
                     }
@@ -49,11 +49,11 @@
     {
         @if (Dialog.Options.CloseDialogOnOverlayClick)
         {
-            <div @onclick="@Close" class="rz-dialog-mask" style="z-index: 1000;"></div>
+            <div @onclick="@Close" class="rz-dialog-mask"></div>
         }
         else
         {
-            <div class="rz-dialog-mask" style="z-index: 1000;"></div>
+            <div class="rz-dialog-mask"></div>
         }
     }
 
@@ -85,8 +85,8 @@
 
     void OnDrag(DraggableEventArgs args)
     {
-        left = $"left: {args.Rect.Left + (args.ClientX - clientX)}px;";
-        top = $"top: {args.Rect.Top + (args.ClientY - clientY)}px;";
+        left = string.Format(System.Globalization.CultureInfo.InvariantCulture, "left: {0}px;", args.Rect.Left + (args.ClientX - clientX));
+        top = string.Format(System.Globalization.CultureInfo.InvariantCulture, "top: {0}px;", args.Rect.Top + (args.ClientY - clientY));
     }
 
     bool shouldRender = true;
@@ -125,11 +125,20 @@
         Service.Close();
     }
 
+    string CssClass
+    {
+        get
+        {
+            var baseCss = "rz-dialog";
+            return string.IsNullOrEmpty(Dialog.Options.CssClass) ? baseCss : $"{baseCss} {Dialog.Options.CssClass}";
+        }
+    }
+
     string Style
     {
         get
         {
-            var baseStyle = "min-width: 150px; min-height: 150px; z-index: 1001; opacity: 1;position:absolute;";
+            var baseStyle = "";
             var widthStyle = !string.IsNullOrEmpty(width) ? width : string.IsNullOrEmpty(Dialog.Options.Width) ? "" : $"width: {Dialog.Options.Width};";
             var heightStyle = !string.IsNullOrEmpty(height) ? height : string.IsNullOrEmpty(Dialog.Options.Height) ? "" : $"height: {Dialog.Options.Height};";
             var topStyle = !string.IsNullOrEmpty(top) ? top : string.IsNullOrEmpty(Dialog.Options.Top) ? "" : $"top: {Dialog.Options.Top};";
@@ -164,5 +173,36 @@
     public void Dispose()
     {
         Service.OnRefresh -= OnRefresh;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            var options = Dialog.Options;
+
+            var dialogOptions = new DialogOptions()
+                {
+                    Width = options != null ? !string.IsNullOrEmpty(options.Width) ? options.Width : "" : "",
+                    Height = options != null ? options.Height : null,
+                    Left = options != null ? options.Left : null,
+                    Top = options != null ? options.Top : null,
+                    Bottom = options != null ? options.Bottom : null,
+                    ShowTitle = options != null ? options.ShowTitle : true,
+                    ShowClose = options != null ? options.ShowClose : true,
+                    Resizable = options != null ? options.Resizable : false,
+                    Draggable = options != null ? options.Draggable : false,
+                    Style = options != null ? options.Style : "",
+                    AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true,
+                    CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
+                    CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
+                    CssClass = options != null ? options.CssClass : "",
+                    CloseTabIndex = options != null ? options.CloseTabIndex : 0,
+                };
+
+            await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Service.Reference);
+        }
     }
 }

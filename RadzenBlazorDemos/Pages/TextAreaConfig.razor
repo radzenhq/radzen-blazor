@@ -1,0 +1,47 @@
+﻿<div class="container-fluid">
+    <div class="row px-3">
+        <div class="col-md-6 col-lg-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea</RadzenText>
+                <RadzenTextArea Change=@(args => OnChange(args, "TextArea")) class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea with placeholder</RadzenText>
+                <RadzenTextArea Placeholder="Enter here..." Change=@(args => OnChange(args, "TextArea with placeholder")) class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea with 5 maximum characters</RadzenText>
+                <RadzenTextArea MaxLength="5" Change=@(args => OnChange(args, "TextArea with 5 maximum characters")) class="w-100" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3">
+            <RadzenCard Style="overflow: scroll">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea with 3 rows and 30 columns</RadzenText>
+                <RadzenTextArea @bind-Value=@value Cols="30" Rows="3" Change=@(args => OnChange(args, "TextArea with 3 rows and 30 columns")) />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 col-lg-4 p-3">
+            <RadzenCard Style="overflow: scroll">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled TextArea with 3 rows and 30 columns</RadzenText>
+                <RadzenTextArea Disabled="true" @bind-Value=@value Cols="30" Rows="3" />
+            </RadzenCard>
+        </div>
+    </div>
+</div>
+
+<EventConsole @ref=@console />
+
+@code {
+    string value;
+
+    EventConsole console;
+
+    void OnChange(string value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+}

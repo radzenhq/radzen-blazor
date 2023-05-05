@@ -1,0 +1,49 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenDataGrid Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnResize="true" ColumnResized=@OnColumnResized>
+    <Columns>
+        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Width="200px" >
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" class="rz-gravatar" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
+        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
+        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
+        <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
+        <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" />
+        <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
+        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
+        <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
+        <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" />
+        <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
+    </Columns>
+</RadzenDataGrid>
+
+<EventConsole @ref=@console />
+
+@code {
+    IEnumerable<Employee> employees;
+    EventConsole console;
+
+    void OnColumnResized(DataGridColumnResizedEventArgs<Employee> args)
+    {
+        console.Log($"Resized {args.Column.Title} to {args.Width} pixels");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+}

@@ -1,67 +1,122 @@
-@import 'colors';
 @import 'variables';
-// Theme colors
-$primary-color: #598087 !default;
+@import 'mixins';
+$base: true;
+
+// Legacy Theme Tokens
+
+$primary: #598087 !default;
 $secondary: #80a4ab !default;
-$tertiary: $cool-grey !default;
-$additional-1: $soft-green !default;
-$additional-2: $tip !default;
-$additional-3: $dev !default;
-$contrast: $charcoal-grey !default;
-
-$default-background-color: $white !default;
-$button-hover-background-color: #ff7b54 !default;
-$button-active-background-color: #e5613a !default;
-$sidebar-background-color: $charcoal-grey !default;
-
-// Bootstrap overrides
-$primary: $primary-color !default;
 $danger: #f9777f !default;
-$info: $tip !default;
-$success: $additional-1 !default;
-$warning: $dull-yellow !default;
-$light: #e6ecef !default;
-$default-link: $primary;
-$link-color: $default-link;
-$link-hover-color: $default-link;
-$state-success-bg: $success;
-$state-warning-bg: $warning;
-$state-danger-bg: $danger;
-$state-info-bg: $info;
-$body-color: #212529 !default;
+$info: #2cc8c8 !default;
+$success: #5dbf74 !default;
+$warning: #fac152 !default;
+$body-color: #3a474d !default;
+$body-bg: #f6f7fa !default;
+$font-size: 16px !default;
 
-$dropdown-item-hover-background-color: $secondary;
+// Legacy Tokens Map
 
-$checkbox-checked-background-color: $secondary;
-$checkbox-checked-hover-background-color: $secondary;
+$rz-base-100: $body-bg !default;
+$rz-base-800: $body-color !default;
+$rz-primary: $primary !default;
+$rz-secondary: $secondary !default;
+$rz-info: $info !default;
+$rz-success: $success !default;
+$rz-warning: $warning !default;
+$rz-danger: $danger !default;
+$rz-root-font-size: $font-size !default;
 
-$switch-checked-background-color: $secondary;
+// Theme Colors
 
-$radio-checked-background-color: $secondary;
+$rz-white: #ffffff !default;
+$rz-black: #000000 !default;
 
-$body-bg: #f3f5f7;
-$font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-  'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
-  'Segoe UI Emoji', 'Segoe UI Symbol';
+$rz-base-50: #ffffff !default;
+$rz-base-100: #f6f7fa !default;
+$rz-base-200: #e9edf0 !default;
+$rz-base-300: #dadfe2 !default;
+$rz-base-400: #c1c9cb !default;
+$rz-base-500: #95a4a8 !default;
+$rz-base-600: #77858b !default;
+$rz-base-700: #545e61 !default;
+$rz-base-800: #3a474d !default;
+$rz-base-900: #28363c !default;
 
-$secondary-hover: $secondary;
+$rz-primary: #598087 !default;
+$rz-secondary: #80a4ab !default;
+$rz-info: #2cc8c8 !default;
+$rz-success: #5dbf74 !default;
+$rz-warning: #fac152 !default;
+$rz-danger: #f9777f !default;
 
-// Tree
-$tree-node-hover-background-color: $secondary-hover;
-// Slider
-$slider-handle-hover-background-color: $secondary-hover;
-$slider-range-background-color: $secondary-hover;
-$slider-range-border: 1px solid #598087;
-// DropDown
-$dropdown-item-hover-background-color: $secondary-hover;
-// Radio
-$radio-checked-hover-background-color: $secondary-hover;
-// SplitButton
-$splitbutton-menu-button-border: 1px solid #475359;
+$rz-series-1: #376df5 !default;
+$rz-series-2: #64dfdf !default;
+$rz-series-3: #f68769 !default;
+$rz-series-4: #c161e2 !default;
+$rz-series-5: #fdd07a !default;
+$rz-series-6: #f8629b !default;
+$rz-series-7: #74d062 !default;
+$rz-series-8: #84a7ff !default;
+$rz-series-9: #4d99f9 !default;
+$rz-series-10: #8cecec !default;
+$rz-series-11: #fab793 !default;
+$rz-series-12: #da88ee !default;
+$rz-series-13: #fee3ab !default;
+$rz-series-14: #fb89c3 !default;
+$rz-series-15: #a2e389 !default;
+$rz-series-16: #b5caff !default;
+$rz-series-17: #1750f3 !default;
+$rz-series-18: #46d7d7 !default;
+$rz-series-19: #f46e4c !default;
+$rz-series-20: #b343db !default;
+$rz-series-21: #fdc55f !default;
+$rz-series-22: #f64485 !default;
+$rz-series-23: #58c544 !default;
+$rz-series-24: #6a93ff !default;
 
-// Splitter
-$splitter-bar-background-color-active: #598087 !default;
+$rz-primary-light: mix($rz-white, $rz-primary, 12%)!default;
+$rz-primary-lighter: rgba($rz-primary, .16) !default;
+$rz-primary-dark: mix($rz-black, $rz-primary, 8%) !default;
+$rz-primary-darker: mix($rz-black, $rz-primary, 25%) !default;
+
+$rz-secondary-light: mix($rz-white, $rz-secondary, 12%) !default;
+$rz-secondary-lighter: rgba($rz-secondary, .20) !default;
+$rz-secondary-dark: mix($rz-black, $rz-secondary, 8%) !default;
+$rz-secondary-darker: mix($rz-black, $rz-secondary, 25%) !default;
+
+$rz-info-light: mix($rz-white, $rz-info, 16%) !default;
+$rz-info-lighter: rgba($rz-info, .20) !default;
+$rz-info-dark: mix($rz-black, $rz-info, 16%) !default;
+$rz-info-darker: mix($rz-black, $rz-info, 25%) !default;
+
+$rz-success-light: mix($rz-white, $rz-success, 16%) !default;
+$rz-success-lighter: rgba($rz-success, .16) !default;
+$rz-success-dark: mix($rz-black, $rz-success, 16%) !default;
+$rz-success-darker: mix($rz-black, $rz-success, 25%) !default;
+
+$rz-warning-light: mix($rz-white, $rz-warning, 16%) !default;
+$rz-warning-lighter: rgba($rz-warning, .20) !default;
+$rz-warning-dark: mix($rz-black, $rz-warning, 16%) !default;
+$rz-warning-darker: mix($rz-black, $rz-warning, 25%) !default;
+
+$rz-danger-light: mix($rz-white, $rz-danger, 16%) !default;
+$rz-danger-lighter: rgba($rz-danger, .20) !default;
+$rz-danger-dark: mix($rz-black, $rz-danger, 16%) !default;
+$rz-danger-darker: mix($rz-black, $rz-danger, 25%) !default;
+
+// Theme Constants
+
+$rz-border-width: 1px !default;
+$rz-border-radius: 4px !default;
+$rz-root-font-size: 16px !default;
+$rz-body-font-size: 0.875rem !default;
+$rz-body-line-height: 1.429 !default;
+$rz-body-background-color: var(--rz-base-100) !default;
+$rz-text-font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
+'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
+'Segoe UI Emoji', 'Segoe UI Symbol' !default;
+$rz-icon-font-family: 'Material Icons' !default;
+$rz-icon-size: 1.25rem !default;
 
 @import 'fonts';
-@import 'typography';
 @import 'components';

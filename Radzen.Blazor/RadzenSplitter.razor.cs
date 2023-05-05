@@ -100,7 +100,7 @@ namespace Radzen.Blazor
             if (!pane.Resizable)
                 return Task.CompletedTask;
 
-            var paneNextResizable = Panes.Skip(paneIndex + 1).FirstOrDefault(o => o.Resizable && !o.Collapsed);
+            var paneNextResizable = Panes.Skip(paneIndex + 1).FirstOrDefault(o => o.Resizable && !o.GetCollapsed());
 
 
             return JSRuntime.InvokeVoidAsync("Radzen.startSplitterResize",
@@ -164,7 +164,7 @@ namespace Radzen.Blazor
             var pane = Panes[paneIndex];
             var paneNext = pane.Next();
 
-            if (paneNext != null && paneNext.Collapsible && paneNext.IsLast && paneNext.Collapsed)
+            if (paneNext != null && paneNext.Collapsible && paneNext.IsLast && paneNext.GetCollapsed())
             {
                 if (Expand.HasDelegate)
                 {
@@ -197,7 +197,7 @@ namespace Radzen.Blazor
             var pane = Panes[paneIndex];
             var paneNext = pane.Next();
 
-            if (paneNext != null && paneNext.Collapsible && paneNext.IsLast && !pane.Collapsed)
+            if (paneNext != null && paneNext.Collapsible && paneNext.IsLast && !pane.GetCollapsed())
             {
                 if (Collapse.HasDelegate)
                 {

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   id="Ebene_1"
+   width="175.748"
+   height="38.785999"
+   viewBox="0 0 175.748 38.786"
+   overflow="visible"
+   enable-background="new 0 0 175.748 38.786"
+   xml:space="preserve"
+   sodipodi:docname="DHL_Logo.svg"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15, custom)"><metadata
+   id="metadata11"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+   id="defs9" /><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1680"
+   inkscape:window-height="988"
+   id="namedview7"
+   showgrid="false"
+   fit-margin-top="0"
+   fit-margin-left="0"
+   fit-margin-right="0"
+   fit-margin-bottom="0"
+   inkscape:zoom="2"
+   inkscape:cx="117.60352"
+   inkscape:cy="-18.612463"
+   inkscape:window-x="-8"
+   inkscape:window-y="-8"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Ebene_1" />
+<polygon
+   fill="#fecc00"
+   points="0,38.786 0,0 175.748,0 175.748,38.786 "
+   id="polygon2" />
+<path
+   fill="#d50029"
+   d="m 56.665,16.206 c -0.768,1.04 -2.053,2.848 -2.835,3.904 -0.397,0.537 -1.114,1.512 1.263,1.512 2.515,0 12.515,0 12.515,0 0,0 2.017,-2.744 3.708,-5.039 2.3,-3.122 0.199,-9.618 -8.024,-9.618 -7.36,0 -32.384,0 -32.384,0 l -5.615,7.629 c 0,0 29.109,0 30.603,0 1.545,0 1.524,0.588 0.769,1.612 z m -9.194,7.298 c -2.377,0 -1.66,-0.977 -1.263,-1.514 0.782,-1.056 2.088,-2.845 2.856,-3.885 0.756,-1.024 0.776,-1.612 -0.771,-1.612 -1.493,0 -13.996,0 -13.996,0 L 23.02,31.819 c 0,0 20.141,0 27.501,0 9.083,0 14.14,-6.178 15.699,-8.314 0,-10e-4 -16.235,-10e-4 -18.749,-10e-4 z m 17.89,8.315 h 16.133 l 6.116,-8.316 -16.131,0.002 c -0.005,-10e-4 -6.118,8.314 -6.118,8.314 z m 41.625,-24.854 -6.188,8.405 h -7.2 L 99.783,6.965 H 83.655 l -10.79,14.657 h 39.46 L 123.112,6.965 Z M 88.694,31.819 h 16.127 l 6.119,-8.314 H 94.813 c -0.006,-10e-4 -6.119,8.314 -6.119,8.314 z M 0,26.784 v 1.766 h 22.468 l 1.298,-1.766 z m 26.181,-3.28 H 0 v 1.764 H 24.88 Z M 0,31.819 h 20.061 l 1.292,-1.756 H 0 Z m 152.072,-3.27 h 23.676 v -1.766 h -22.376 z m -2.405,3.27 h 26.081 v -1.756 h -24.79 z m 6.116,-8.315 -1.297,1.766 h 21.262 V 23.504 Z M 134.659,21.622 145.448,6.965 h -17.081 c -0.006,0 -10.797,14.657 -10.797,14.657 z m -18.472,1.882 c 0,0 -1.179,1.611 -1.752,2.387 -2.025,2.736 -0.234,5.928 6.376,5.928 7.636,0 25.901,0 25.901,0 l 6.119,-8.314 h -36.644 z"
+   id="path4" />
+</svg>

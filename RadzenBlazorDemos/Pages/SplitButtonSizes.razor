@@ -1,0 +1,49 @@
+﻿@inject NotificationService NotificationService
+<div class="container-fluid splitbutton-demo">
+    <div class="row mb-4">
+        <div class="col">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">SplitButton Sizes</RadzenText>
+            <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="ExtraSmall" Size="ButtonSize.ExtraSmall">
+                <ChildContent>
+                    <RadzenSplitButtonItem Text="Item1" Value="1" />
+                    <RadzenSplitButtonItem Text="Item2" Value="2" />
+                </ChildContent>
+            </RadzenSplitButton>
+            <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="Small" Size="ButtonSize.Small">
+                <ChildContent>
+                    <RadzenSplitButtonItem Text="Item1" Value="1" />
+                    <RadzenSplitButtonItem Text="Item2" Value="2" />
+                </ChildContent>
+            </RadzenSplitButton>
+
+            <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="Medium" Size="ButtonSize.Medium">
+                <ChildContent>
+                    <RadzenSplitButtonItem Text="Item1" Value="1" />
+                    <RadzenSplitButtonItem Text="Item2" Value="2" />
+                </ChildContent>
+            </RadzenSplitButton>
+
+            <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="Large" Size="ButtonSize.Large">
+                <ChildContent>
+                    <RadzenSplitButtonItem Text="Item1" Value="1" />
+                    <RadzenSplitButtonItem Text="Item2" Value="2" />
+                </ChildContent>
+            </RadzenSplitButton>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    void OnClick(RadzenSplitButtonItem item, string buttonName)
+    {
+        if (item != null)
+        {
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "SplitButton Item Clicked", Detail = $"{buttonName}, item with value {item.Value} clicked" });
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "SplitButton Clicked", Detail = $"{buttonName} clicked" });
+        }
+    }
+}

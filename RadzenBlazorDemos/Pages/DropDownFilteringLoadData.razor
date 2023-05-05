@@ -1,0 +1,31 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<div class="rz-p-sm-12 rz-text-align-center">
+    <RadzenDropDown AllowClear="true" @bind-Value=value
+                    LoadData=@LoadData AllowFiltering="true"
+                    Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Style="width: 100%; max-width: 400px;" />
+</div>
+
+
+@code {
+    IEnumerable<Customer> customers;
+    string value;
+
+    void LoadData(LoadDataArgs args)
+    {
+        var query = dbContext.Customers.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()));
+        }
+
+        customers = query.ToList();
+
+        InvokeAsync(StateHasChanged);
+    }
+}

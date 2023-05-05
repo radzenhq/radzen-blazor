@@ -1,0 +1,120 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-pt-4 rz-pb-8">
+    <RadzenSelectBar @bind-Value="@tabPosition" TextProperty="Text" ValueProperty="Value" 
+                        Data="@(Enum.GetValues(typeof(TabPosition)).Cast<TabPosition>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
+    <RadzenDropDown @bind-Value="@tabPosition" TextProperty="Text" ValueProperty="Value"
+                        Data="@(Enum.GetValues(typeof(TabPosition)).Cast<TabPosition>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-flex rz-display-xl-none" />
+</RadzenStack>
+
+<RadzenTabs Change=@OnChange TabPosition="@tabPosition" RenderMode="TabRenderMode.Client" >
+    <Tabs>
+        <RadzenTabsItem Text="Orders">
+            <RadzenDataList PageSize="6" WrapItems="true" AllowPaging="true" Data="@orders" TItem="Order">
+                <Template Context="order">
+                    <RadzenCard Style="width: 250px;" Class="rz-border-radius-3">
+                        <RadzenRow Gap="0.5rem">
+                            <RadzenColumn Size="8" Class="rz-text-truncate">
+                                <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") Class="rz-mr-1" IsPill="true" />
+                                <RadzenText TextStyle="TextStyle.Caption" Class="rz-mb-0">@(order.ShipName)</RadzenText>
+                            </RadzenColumn>
+                            <RadzenColumn Size="4" Class="rz-text-align-right">
+                                <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Shade="Shade.Lighter" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") IsPill="true" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <hr style="border: none; background-color: rgba(0,0,0,.08); height: 1px; margin: 1rem 0;" />
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                            <RadzenImage Path="@order.Employee?.Photo" Class="rz-border-radius-10" Style="width: 80px; height: 80px;" />
+                            <RadzenStack Gap="0">
+                                <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-mb-0"><strong>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</strong></RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body2" Class="rz-mb-0">@order.ShipAddress</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Caption" Class="rz-mb-0">@(order.ShipCity), @(order.ShipCountry)</RadzenText>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
+                </Template>
+            </RadzenDataList>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Employee">
+            <RadzenDataGrid ColumnWidth="150px" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" Data="@employees" TItem="Employee">
+                <Columns>
+                    <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false" Width="80px">
+                        <Template Context="data">
+                            <RadzenImage Path="@data?.Photo" Style="width: 40px; height: 40px; border-radius: 8px;" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" />
+                    <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
+                    <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
+                    <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
+                    <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date">
+                        <Template Context="data">
+                            @String.Format("{0:d}", data.BirthDate)
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date">
+                        <Template Context="data">
+                            @String.Format("{0:d}", data.HireDate)
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
+                    <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
+                    <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" />
+                    <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
+                    <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
+                    <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
+                    <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" />
+                    <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Customers">
+            <RadzenDataGrid ColumnWidth="150px" AllowFiltering="true" AllowPaging="true" PageSize="8" AllowSorting="true" Data="@customers" TItem="Customer">
+                <Columns>
+                    <RadzenDataGridColumn TItem="Customer" Property="CustomerID" Title="Customer ID" />
+                    <RadzenDataGridColumn TItem="Customer" Property="CompanyName" Title="Company Name" />
+                    <RadzenDataGridColumn TItem="Customer" Property="ContactName" Title="Contact Name" />
+                    <RadzenDataGridColumn TItem="Customer" Property="ContactTitle" Title="Contact Title" />
+                    <RadzenDataGridColumn TItem="Customer" Property="Address" Title="Address" />
+                    <RadzenDataGridColumn TItem="Customer" Property="City" Title="City" />
+                    <RadzenDataGridColumn TItem="Customer" Property="Region" Title="Region" />
+                    <RadzenDataGridColumn TItem="Customer" Property="PostalCode" Title="Postal Code" />
+                    <RadzenDataGridColumn TItem="Customer" Property="Country" Title="Country" />
+                    <RadzenDataGridColumn TItem="Customer" Property="Phone" Title="Phone" />
+                    <RadzenDataGridColumn TItem="Customer" Property="Fax" Title="Fax" />
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+    IEnumerable<Order> orders;
+    IEnumerable<Employee> employees;
+    IEnumerable<Customer> customers;
+
+    TabPosition tabPosition = TabPosition.Top;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees.ToList();
+
+        customers = dbContext.Customers.ToList();
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+    }
+
+    void OnChange(int index)
+    {
+        console.Log($"Tab with index {index} was selected.");
+    }
+}

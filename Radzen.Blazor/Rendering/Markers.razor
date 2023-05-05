@@ -7,7 +7,7 @@
 
     @if (InPlotArea(x, y))
     {
-        <Marker X="@x" Y="@y" Type="@MarkerType" Fill="@Fill" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Size="@Size" />
+        <Marker Click="@(() => OnClick(data))" X="@x" Y="@y" Type="@MarkerType" Fill="@Fill" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Size="@Size" />
     }
 }
 
@@ -16,11 +16,19 @@
     public RadzenChart Chart { get; set;}
 
     [Parameter]
+    public IChartSeries Series { get; set; }
+
+    private async Task OnClick(TItem data)
+    {
+        await Series.InvokeClick(Chart.SeriesClick, data);
+    }
+
+    [Parameter]
     public IEnumerable<TItem> Data { get; set; }
 
     [Parameter]
     public Func<TItem, double> Category { get; set; }
-    
+
     [Parameter]
     public Func<TItem, double> Value { get; set; }
 

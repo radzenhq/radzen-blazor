@@ -1,89 +1,32 @@
 ﻿@page "/progressbar"
-@using Radzen
 
-<RadzenExample Name="ProgressBar">
-    <div class="row px-3">
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">ProgressBar in determinate mode</h4>
-                <RadzenProgressBar @bind-Value="@value" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">ProgressBar in indeterminate mode</h4>
-                <RadzenProgressBar Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">ProgressBar in max value > 100</h4>
-                <RadzenProgressBar Value="156" Max="200" />
-            </RadzenCard>
-        </div>
-    </div>
-    <div class="row px-3">
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">ProgressBar in determinate mode with ProgressBarStyle</h4>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value="@value" />
-                </div>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Secondary" @bind-Value="@value" />
-                </div>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Light" @bind-Value="@value" />
-                </div>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Success" @bind-Value="@value" />
-                </div>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Danger" @bind-Value="@value" />
-                </div>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Warning" @bind-Value="@value" />
-                </div>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value="@value" />
-                </div>
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">ProgressBar in indeterminate mode with ProgressBarStyle</h4>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
-                </div>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Secondary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
-                </div>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Light" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
-                </div>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Success" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
-                </div>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Danger" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
-                </div>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Warning" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
-                </div>
-                <div class="mb-1">
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
-                </div>
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">ProgressBar in max value > 100 with ProgressBarStyle</h4>
-                <RadzenProgressBar Value="156" Max="200" />
-            </RadzenCard>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    ProgressBar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>ProgressBar</strong> component.
+</RadzenText>
+
+<RadzenText Anchor="progressbar#progressbar-determinate" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    ProgressBar in determinate mode, Get and Set the value
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the <strong>ProgressBar</strong> has a Value property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="ProgressBar" Example="ProgressBarDeterminate">
+    <ProgressBarDeterminate />
 </RadzenExample>
 
-@code {
-    double value = 55;
-}
+<RadzenText Anchor="progressbar#progressbar-indeterminate" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    ProgressBar in indeterminate mode
+</RadzenText>
+<RadzenExample ComponentName="ProgressBar" Example="ProgressBarIndeterminate">
+    <ProgressBarIndeterminate />
+</RadzenExample>
+
+<RadzenText Anchor="progressbar#progressbar-max-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    ProgressBar in max value > 100
+</RadzenText>
+<RadzenExample ComponentName="ProgressBar" Example="ProgressBarMaxValue">
+    <ProgressBarMaxValue />
+</RadzenExample>

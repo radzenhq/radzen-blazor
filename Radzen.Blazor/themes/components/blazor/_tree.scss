@@ -1,20 +1,36 @@
-$tree-background-color: $white !default;
-$tree-border: 1px solid #cecece !default;
-$tree-padding: 0.6875rem !default;
-$tree-border-radius: $border-radius !default;
+$tree-background-color: var(--rz-base-background-color) !default;
 
-$tree-node-padding: 0.375rem 0.25rem !default;
-$tree-node-selected-background-color: $default-link !default;
-$tree-node-selected-color: $white !default;
-$tree-node-selected-border-radius: 2px !default;
+$tree-node-padding: 0.25rem !default;
+$tree-node-selected-background-color: var(--rz-secondary) !default;
+$tree-node-selected-color: var(--rz-text-contrast-color) !default;
+$tree-node-selected-border-radius: calc(var(--rz-border-radius)/2) !default;
 $tree-node-margin: 1px 0 !default;
-$tree-node-hover-background-color: #59a6cd !default;
-$tree-node-hover-color: $white !default;
-$tree-node-toggle-color: inherit !default;
-$tree-node-toggle-hover-color: inherit !default;
+$tree-node-hover-background-color: var(--rz-secondary-light) !default;
+$tree-node-hover-color: var(--rz-text-contrast-color) !default;
+$tree-node-toggle-width: 1rem !default;
+$tree-node-toggle-color: var(--rz-text-tertiary-color) !default;
+$tree-node-toggle-hover-color: var(--rz-text-color) !default;
 $tree-icon-right: 'arrow_right' !default;
 $tree-icon-down: 'arrow_drop_down' !default;
-$tree-transition: none !default;
+$tree-transition: var(--rz-transition-all) !default;
+
+// Tree CSS variables
+
+:root {
+  --rz-tree-background-color: #{$tree-background-color};
+  
+  --rz-tree-node-padding: #{$tree-node-padding};
+  --rz-tree-node-selected-background-color: #{$tree-node-selected-background-color};
+  --rz-tree-node-selected-color: #{$tree-node-selected-color};
+  --rz-tree-node-selected-border-radius: #{$tree-node-selected-border-radius};
+  --rz-tree-node-margin: #{$tree-node-margin};
+  --rz-tree-node-hover-background-color: #{$tree-node-hover-background-color};
+  --rz-tree-node-hover-color: #{$tree-node-hover-color};
+  --rz-tree-node-toggle-width: #{$tree-node-toggle-width};
+  --rz-tree-node-toggle-color: #{$tree-node-toggle-color};
+  --rz-tree-node-toggle-hover-color: #{$tree-node-toggle-hover-color};
+  --rz-tree-transition: #{$tree-transition};
+}
 
 .rz-tree {
   display: inline-block;
@@ -26,19 +42,19 @@ $tree-transition: none !default;
  }
 
  .rz-treenode {
-   padding-left: 1rem;
+   padding-left: var(--rz-tree-node-toggle-width);
  }
 
 .rz-tree-toggler {
   cursor: pointer;
-  margin-left: -1rem;
-  width: 1rem;
+  margin-left: calc(var(--rz-tree-node-toggle-width) * -1);
+  width: var(--rz-tree-node-toggle-width);
   height: 1.5rem;
-  font-size: 1.25rem;
+  font-size: var(--rz-icon-size);
   line-height: 1.5rem;
   text-align: center;
-  color: $tree-node-toggle-color;
-  transition: $tree-transition;
+  color: var(--rz-tree-node-toggle-color);
+  transition: var(--rz-tree-transition);
 
   &.rzi-caret-right {
     &:before {
@@ -55,20 +71,21 @@ $tree-transition: none !default;
   }
 
   &:hover {
-    color: $tree-node-toggle-hover-color;
+    color: var(--rz-tree-node-toggle-hover-color);
   }
+
 }
 
 .rz-treenode-content {
   display: flex;
   align-items: center;
   cursor: pointer;
-  margin: $tree-node-margin;
+  margin: var(--rz-tree-node-margin);
 
   .rz-treenode-label {
     display: flex;
     align-items: center;
-    padding: $tree-node-padding;
+    padding: var(--rz-tree-node-padding);
 
     .rzi:first-child {
       margin-right: 0.25rem;
@@ -77,10 +94,14 @@ $tree-transition: none !default;
 
   &:not(.rz-treenode-content-selected) {
     &:hover .rz-treenode-label {
-      background-color: $tree-node-hover-background-color;
-      color: $tree-node-hover-color;
-      border-radius: $tree-node-selected-border-radius;
+      background-color: var(--rz-tree-node-hover-background-color);
+      color: var(--rz-tree-node-hover-color);
+      border-radius: var(--rz-tree-node-selected-border-radius);
     }
+  }
+
+  .rz-chkbox {
+    margin-right: 0.25rem;
   }
 }
 
@@ -92,11 +113,11 @@ $tree-transition: none !default;
 }
 
 .rz-treenode-label {
-  transition: $tree-transition;
+  transition: var(--rz-tree-transition);
   
   .rz-treenode-content-selected & {
-    border-radius: $tree-node-selected-border-radius;
-    color: $tree-node-selected-color;
-    background-color: $tree-node-selected-background-color;
+    border-radius: var(--rz-tree-node-selected-border-radius);
+    color: var(--rz-tree-node-selected-color);
+    background-color: var(--rz-tree-node-selected-background-color);
   }
 }

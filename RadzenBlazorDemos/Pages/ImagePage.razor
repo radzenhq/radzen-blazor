@@ -1,15 +1,36 @@
 ﻿@page "/image"
 
-<RadzenExample Name="Image">
-    <div class="row">
-        <div class="col-xl-6">
-            <h3 class="mt-3">Image from application assets</h3>
-            <RadzenImage Path="images/community.svg" Style="width: 60%; margin: 3rem;" />
-        </div>
-        <div class="col-xl-6">
-            <h3 class="mt-3">Image from url</h3>
-            <RadzenImage Path="https://www.radzen.com/assets/hero-40b90af93c7bda2d44608c74e2b8eeb6785e273e02340ec44583d097b5dfb896.png" Style="width: 100%;">
-            </RadzenImage>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Image
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Image</strong> component.
+</RadzenText>
+
+<RadzenText Anchor="image#image-from-application-assets" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-mb-6">
+    Image from application assets
+</RadzenText>
+<RadzenExample ComponentName="Image" Example="ImageAppAssets">
+    <ImageAppAssets />
+</RadzenExample>
+
+<RadzenText Anchor="image#image-from-url" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Image from url
+</RadzenText>
+<RadzenExample ComponentName="Image" Example="ImageUrl">
+    <ImageUrl />
+</RadzenExample>
+
+<RadzenText Anchor="image#image-from-base64" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Image from base64 encoded string
+</RadzenText>
+<RadzenExample ComponentName="Image" Example="ImageBase64">
+    <ImageBase64 />
+</RadzenExample>
+
+<RadzenText Anchor="image#image-from-binary-data" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Image from binary data
+</RadzenText>
+<RadzenExample ComponentName="Image" Example="ImageBinaryData">
+    <ImageBinaryData />
 </RadzenExample>

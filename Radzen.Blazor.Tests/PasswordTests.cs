@@ -129,6 +129,34 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Password_Renders_TypedAutoCompleteParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenPassword>();
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
+            component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.On));
+
+            Assert.Contains(@$"autocomplete=""new-password""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.Off));
+
+            Assert.Contains(@$"autocomplete=""off""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.CurrentPassword));
+
+            Assert.Contains(@$"autocomplete=""{AutoCompleteType.CurrentPassword.GetAutoCompleteValue()}""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.NewPassword));
+
+            Assert.Contains(@$"autocomplete=""{AutoCompleteType.NewPassword.GetAutoCompleteValue()}""", component.Markup);
+        }
+
+        [Fact]
         public void Password_Renders_UnmatchedParameter()
         {
             using var ctx = new TestContext();

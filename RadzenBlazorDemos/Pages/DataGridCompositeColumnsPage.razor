@@ -1,60 +1,12 @@
 ﻿@page "/datagrid-composite-columns"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid <strong>Composite Columns</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Use DataGrid column <code>Columns</code> property to define child columns.
+</RadzenText>
 
-@inject NorthwindContext dbContext
-
-<h1>DataGrid <strong>Composite Columns</strong></h1>
-
-<p>Use DataGrid column <code>Columns</code> property to define child columns.</p>
-
-<RadzenExample Name="DataGrid" Source="DataGridCompositeColumns" Heading="false">
-    <RadzenCheckBox @bind-Value=@allowCompositeDataCells Name="CheckBox1" TValue="bool" Change=@(args => grid.Reload()) />
-    <RadzenLabel Text="Allow composite data cells" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 10px;" />
-    <RadzenDataGrid @ref="grid" AllowCompositeDataCells="@allowCompositeDataCells" AllowSorting="true" AllowFiltering="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
-        Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:400px">
-        <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="Employee" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="60px" >
-                <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Title="Title" Property="TitleOfCourtesy" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
-                <Columns>
-                    <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="FirstName" Width="140px" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
-                         <Columns>
-                            <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Job Title" Width="200px" />
-                            <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="140px" />
-                            <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="140px" />
-                         </Columns>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="LastName" Width="140px" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
-                        <Columns>
-                            <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" Width="200px" />
-                        </Columns>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" Width="140px" />
-                </Columns>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" Width="140px" />
-            <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" Width="300px" />
-        </Columns>
-    </RadzenDataGrid>
+<RadzenExample ComponentName="DataGrid" Example="DataGridCompositeColumns">
+    <DataGridCompositeColumns />
 </RadzenExample>
-@code {
-    bool allowCompositeDataCells = false;
-    RadzenDataGrid<Employee> grid;
-    IEnumerable<Employee> employees;
-
-    protected override void OnInitialized()
-    {
-        employees = dbContext.Employees;
-    }
-}

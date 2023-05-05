@@ -1,0 +1,38 @@
+﻿@using System.Linq.Expressions
+@typeparam TItem
+@inherits RadzenComponent
+
+@if (Properties != null)
+{
+    <CascadingValue Value=this>
+        @Properties
+    </CascadingValue>
+}
+
+@if (Visible)
+{
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        <RadzenSelectBar @bind-Value=LogicalFilterOperator Change="@((LogicalFilterOperator args) => { InvokeAsync(ChangeState); if(Auto) { InvokeAsync(Filter); } })" Size="ButtonSize.Small">
+            <Items>
+                <RadzenSelectBarItem Text="@AndOperatorText" Value="LogicalFilterOperator.And" title="@AndOperatorText" />
+                <RadzenSelectBarItem Text="@OrOperatorText" Value="LogicalFilterOperator.Or" title="@OrOperatorText" />
+            </Items>
+        </RadzenSelectBar>
+        <RadzenButton title="@ClearFilterText" class="rz-datafilter-item-clear" Icon="clear" Click="@(args => ClearFilters())" Visible=@(Filters.Any()) Variant="Variant.Text" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark" />
+
+        <ul class="rz-datafilter-group">
+            @foreach(var filter in Filters)
+            {
+                <li class="rz-datafilter-item @(filter.Filters != null ? "rz-datafilter-group-item" : "")">
+                <RadzenDataFilterItem DataFilter="@this" Filter="@filter" />
+              </li>
+            }
+            <li class="rz-datafilter-item rz-datafilter-bar">
+                <RadzenSplitButton Icon="add" Click="@(args => AddFilter(args?.Value == "group"))" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter">
+                    <RadzenSplitButtonItem Icon="add" Text="@AddFilterText" />
+                    <RadzenSplitButtonItem Icon="playlist_add" Value="group" Text="@AddFilterGroupText" />
+                </RadzenSplitButton>
+            </li>
+        </ul>
+    </div>
+}

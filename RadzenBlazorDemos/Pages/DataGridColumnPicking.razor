@@ -1,0 +1,51 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenButton Text="Toggle EmployeeID column visibility" Click=@(() => EmployeeIDVisible = !EmployeeIDVisible) class="my-3"/>
+<RadzenDataGrid Data="@employees" AllowFiltering=true TItem="Employee" ColumnWidth="300px" AllowColumnPicking="true" PickedColumnsChanged="@PickedColumnsChanged">
+    <Columns>
+        <RadzenDataGridColumn Visible="@EmployeeIDVisible" TItem="Employee" Property="EmployeeID" Title="ID" Width="80px" TextAlign="TextAlign.Center" Frozen="true" />
+        <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Width="200px" Pickable="false">
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" class="rz-gravatar" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
+        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
+        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
+        <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
+        <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" />
+        <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
+        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
+        <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
+        <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" />
+        <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
+    </Columns>
+</RadzenDataGrid>
+
+<EventConsole @ref=@console />
+
+@code {
+    bool EmployeeIDVisible = false;
+    IEnumerable<Employee> employees;
+    EventConsole console;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+
+    void PickedColumnsChanged(DataGridPickedColumnsChangedEventArgs<Employee> args)
+    {
+        console.Log($"Picked columns: {string.Join(", ", args.Columns.Select(c => c.Title))}");
+    }
+}

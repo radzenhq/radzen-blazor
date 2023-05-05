@@ -1,0 +1,224 @@
+$bootstrap: false !default; 
+
+// Headings
+
+$headings: (
+  h1: (font-size: 2rem, line-height: 1.1875em, font-weight: 700, letter-spacing: -0.04em, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  h2: (font-size: 1.5rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.03em, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  h3: (font-size: 1.125rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.75rem),
+  h4: (font-size: 1rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h5: (font-size: 0.875rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h6: (font-size: 0.75rem, line-height: 1.25em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem)
+) !default;
+
+// Legacy Headings
+@each $name, $heading in $headings {
+  #{$name}.rz-heading {
+    @each $name, $value in $heading {
+      #{$name}: #{$value};
+    }
+  }
+}
+
+@if $base == false {
+  @each $name, $heading in $headings {
+    #{$name},
+    .#{$name} {
+      @each $name, $value in $heading {
+        #{$name}: #{$value};
+      }
+    }
+  }
+}
+
+$headings-thin: (
+  h1: (font-size: 3rem, font-weight: 300),
+  h2: (font-size: 2rem, font-weight: 300),
+  h3: (font-size: 1.25rem, font-weight: 300),
+  h4: (font-size: 1rem, font-weight: 300),
+  h5: (font-size: 0.875rem, font-weight: 300),
+  h6: (font-size: 0.75rem, font-weight: 300)
+) !default;
+
+@if $base == false {
+  @each $name, $heading in $headings-thin {
+    #{$name}.text-thin,
+    .#{$name}.text-thin  {
+      @each $name, $value in $heading {
+        #{$name}: #{$value};
+      }
+    }
+  }
+}
+
+// Typography
+
+// Text
+$text: (
+  display-h1: (font-size: clamp(4.5rem, 6.667vw, 6rem), line-height: 1em, font-weight: 700, letter-spacing: -0.04em, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  display-h2: (font-size: clamp(3.75rem, 5.278vw, 4.75rem), line-height: calc(1em + 4px),  font-weight: 700, letter-spacing: -0.03em, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  display-h3: (font-size: clamp(2.625rem, 3.889vw, 3.5rem), line-height: calc(1em + 4px),  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.75rem),
+  display-h4: (font-size: clamp(2.25rem, 3.333vw, 3rem), line-height: 1em,  font-weight: 700, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  display-h5: (font-size: clamp(1.5rem, 2.222vw, 2rem), line-height: 1em,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  display-h6: (font-size: clamp(1.25rem, 1.667vw, 1.5rem), line-height: 1em,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h1: (font-size: clamp(3.75rem, 5.278vw, 4.75rem), line-height: calc(1em + 4px), font-weight: 600, letter-spacing: -0.04em, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  h2: (font-size: clamp(2.625rem, 3.889vw, 3.5rem), line-height: calc(1em + 4px),  font-weight: 600, letter-spacing: -0.03em, color: var(--rz-text-title-color), margin-bottom: 1rem),
+  h3: (font-size: clamp(2.25rem, 3.333vw, 3rem), line-height: 1em,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.75rem),
+  h4: (font-size: clamp(1.75rem, 2.778vw, 2.5rem), line-height: 1em,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h5: (font-size: clamp(1.25rem, 1.667vw, 1.5rem), line-height: 1em,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  h6: (font-size: clamp(1rem, 1.667vw, 1.25rem), line-height: 1em,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  subtitle1: (font-size: 1rem, line-height: 1.25rem,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  subtitle2: (font-size: 0.875rem, line-height: 1.25rem,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
+  body1: (font-size: 1rem, line-height: 1.25rem,  font-weight: 400, letter-spacing: -0.02em, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  body2: (font-size: 0.875rem, line-height: 1.25rem,  font-weight: 400, letter-spacing: -0.02em, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  button: (font-size: 0.875rem, line-height: 1.25rem,  font-weight: 600, letter-spacing: -0.02em, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  caption: (font-size: 0.75rem, line-height: normal,  font-weight: 400, letter-spacing: 0.4px, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  overline:   (font-size: 0.625rem, line-height: normal,  font-weight: 400, letter-spacing: 1.5px, text-transform: uppercase, color: var(--rz-text-color), margin-bottom: 0.5rem)
+) !default;
+
+// Text CSS variables
+
+:root {
+  @each $element, $property in $text {
+    @each $key, $value in $property {
+      --rz-text-#{$element}-#{$key}: #{$value};
+    }
+  }
+}
+
+@each $element, $property in $text {
+  .rz-text-#{$element} {
+    font-family: var(--rz-text-font-family);
+    @each $key, $value in $property {
+      #{$key}: var(--rz-text-#{$element}-#{$key});
+    }
+  }
+}
+
+// Text Align
+$text-align: (
+  start: (text-align: start),
+  end: (text-align: end),
+  left: (text-align: left),
+  right: (text-align: right),
+  center: (text-align: center),
+  justify: (text-align: justify),
+  justify-all: (text-align: justify-all),
+  match-parent: (text-align: match-parent),
+) !default;
+
+@each $name, $property in $text-align {
+  .rz-text-align-#{$name} {
+    @each $property, $value in $property {
+      #{$property}: #{$value};
+    }
+  }
+}
+
+// Text Align with responsive breakpoints
+@each $breakpoint, $breakpoint-value in $rz-breakpoints-map {
+  @media (min-width: #{$breakpoint-value}) {
+    @each $name, $property in $text-align {
+      .rz-text-align-#{$breakpoint}-#{$name} {
+        @each $property, $value in $property {
+          #{$property}: #{$value} !important;
+        }
+      }
+    }
+  }
+}
+
+// Text Wrap, NoWrap and Truncate
+.rz-text-wrap {
+  white-space: normal !important;
+}
+
+.rz-text-nowrap {
+  white-space: nowrap !important;
+}
+
+.rz-text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Text Transform
+$text-transform: (
+  capitalize: (text-transform: capitalize),
+  uppercase: (text-transform: uppercase),
+  lowercase: (text-transform: lowercase),
+) !default;
+
+@each $name, $property in $text-transform {
+  .rz-text-#{$name} {
+    @each $property, $value in $property {
+      #{$property}: #{$value};
+    }
+  }
+}
+
+// Body
+@if $base == false {
+  :root {
+    font-size: var(--rz-root-font-size);
+  }
+}
+
+@if $base == false {
+  body {
+    font-size: var(--rz-body-font-size);
+    line-height: var(--rz-body-line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+// Paragraph
+@if $base == false {
+  p {
+    line-height: var(--rz-body-line-height);
+  }
+}
+
+// Label
+.rz-label {
+  vertical-align: middle;
+  margin-bottom: 0;
+}
+
+.rz-form {
+  .row {
+    .rz-label {
+      min-height: var(--rz-input-height);
+      line-height: var(--rz-input-line-height);
+      padding: var(--rz-input-padding);
+      padding-left: 0;
+      border-top: var(--rz-input-border);
+      border-bottom: var(--rz-input-border);
+      border-color: transparent;
+    }
+  }
+}
+
+@if $base == false {
+  label {
+    margin-bottom: 0;
+  }
+}
+
+// Link
+$link-color: var(--rz-secondary) !default;
+
+// Text selection
+@if $base == false {
+  ::selection {
+    background-color: var(--rz-primary-lighter);
+  }
+}
+
+.rz-layout {
+    ::selection {
+    background-color: var(--rz-primary-lighter);
+  }
+}

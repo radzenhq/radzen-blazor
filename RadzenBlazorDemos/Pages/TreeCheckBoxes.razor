@@ -1,0 +1,61 @@
+@using Microsoft.EntityFrameworkCore
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<div class="container-fluid">
+    <div class="row my-5">
+        <div class="col-lg-6 offset-lg-3">
+            <RadzenCard>
+                <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 300px" Data=@categories>
+                    <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
+                    <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
+                </RadzenTree>
+            </RadzenCard>
+        </div>
+    </div>
+</div>
+
+<EventConsole @ref=@console />
+
+@code {
+    IEnumerable<Category> categories;
+    IEnumerable<object> checkedValues;
+
+    IEnumerable<object> CheckedValues
+    {
+        get => checkedValues;
+        set
+        {
+            checkedValues = value;
+            if (checkedValues != null)
+            {
+                console.Log($"CheckedValues Changed {string.Join(Environment.NewLine, value.Select(GetText))}");
+            }
+        }
+    }
+
+    string GetText(object data)
+    {
+        if (data is Category category)
+        {
+            return category.CategoryName;
+        }
+
+        if (data is Product product)
+        {
+            return product.ProductName;
+        }
+
+        return string.Empty;
+    }
+
+    EventConsole console;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        categories = dbContext.Categories.Include(c => c.Products);
+    }
+}

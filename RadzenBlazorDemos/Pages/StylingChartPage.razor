@@ -1,89 +1,9 @@
 @page "/styling-chart"
-@using System.Globalization
 
-<h1>Radzen Blazor Chart Styling</h1>
-<RadzenExample Name="Chart" Source="StylingChart" Heading="false">
-    <div class="container">
-        <RadzenCard Class="mt-4 w-100 mb-4 d-flex align-items-center" >
-            <RadzenLabel Text="Color scheme:" Style="margin-right: 8px; vertical-align: middle;" />
-            <RadzenDropDown Data="@colorSchemes" @bind-Value="@colorScheme" />
-        </RadzenCard>
-        <div class="row my-5">
-            <div class="col-sm-12 col-lg-8">
-                <RadzenChart ColorScheme="@colorScheme">
-                    @for (var year = 2013; year <= 2020; year++)
-                    {
-                        var currentYearRevenue = revenue.Where(r => r.Year == year).ToList();
-                        <RadzenColumnSeries Data="@currentYearRevenue" CategoryProperty="Quarter" Title="@year.ToString()" ValueProperty="Revenue" />
-                    }
-                    <RadzenColumnOptions Margin="0" />
-                    <RadzenValueAxis Formatter="@FormatAsUSD" />
-                </RadzenChart>
-            </div>
-            <div class="col-sm-12 col-lg-4">
-                <RadzenChart ColorScheme="@colorScheme">
-                    <RadzenPieSeries Data="@revenue.Where(r => r.Year == 2020)" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
-                </RadzenChart>
-            </div>
-        </div>
-        <h3>Custom colors and styling</h3>
-        <div class="row my-5">
-            <div class="col-sm-12">
-                <RadzenChart>
-                    <RadzenAreaSeries Stroke="rgb(236,72,127)" StrokeWidth="2" Fill="rgba(236,72,127,.5)" Data="@revenue.Where(r => r.Year == 2020)" CategoryProperty="Quarter" ValueProperty="Revenue">
-                        <ChildContent>
-                            <RadzenMarkers MarkerType="MarkerType.Circle" Fill="#fff" Stroke="rgba(236,72,127)" StrokeWidth="2" Size="8" />
-                        </ChildContent>
-                        <TooltipTemplate Context="data">
-                            Revenue for <span>@data.Quarter</span> 2020: <strong>@data.Revenue.ToString("C0", CultureInfo.CreateSpecificCulture("en-US"))</strong>
-                        </TooltipTemplate>
-                    </RadzenAreaSeries>
-                    <RadzenCategoryAxis>
-                        <RadzenGridLines Visible="true" Stroke="#ccc" LineType="LineType.Dashed" />
-                    </RadzenCategoryAxis>
-                    <RadzenValueAxis>
-                        <RadzenGridLines Visible="true" />
-                    </RadzenValueAxis>
-                    <RadzenChartTooltipOptions Style="border: 1px solid rgb(236,72,127); background: #eee; color: #000;" />
-                    <RadzenLegend Visible="false" />
-                </RadzenChart>
-            </div>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Chart Styling
+</RadzenText>
+
+<RadzenExample ComponentName="Chart" Example="StylingChartConfig" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <StylingChartConfig />
 </RadzenExample>
-@code {
-    IEnumerable<ColorScheme> colorSchemes = Enum.GetValues(typeof(ColorScheme)).Cast<ColorScheme>();
-    ColorScheme colorScheme = ColorScheme.Palette;
-
-    class DataItem
-    {
-        public int Year { get; set; }
-        public string Quarter { get; set; }
-        public double Revenue { get; set; }
-    }
-
-    string FormatAsUSD(object value)
-    {
-        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
-    }
-
-    IList<DataItem> revenue = new List<DataItem>();
-
-    protected override void OnInitialized()
-    {
-        var random = new Random();
-
-        for (var year = 2013; year <= 2020; year++)
-        {
-            for (var quarter = 1; quarter <= 4; quarter++)
-            {
-                revenue.Add(new DataItem
-                {
-                    Year = year,
-                    Quarter = $"Q{quarter}",
-                    Revenue = random.NextDouble() * 200000
-                });
-            }
-        }
-    }
-}

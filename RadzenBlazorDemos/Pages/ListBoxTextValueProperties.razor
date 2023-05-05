@@ -1,0 +1,19 @@
+﻿@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<div class="rz-p-sm-12 rz-text-align-center">
+    <RadzenListBox @bind-Value=@value Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Style="width: 100%; max-width: 400px; height: 200px" />
+</div>
+
+@code {
+    string value = "AROUT";
+    IEnumerable<Customer> customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers;
+    }
+}

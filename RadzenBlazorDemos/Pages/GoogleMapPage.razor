@@ -1,40 +1,12 @@
 ﻿@page "/googlemap"
 
-<RadzenExample Name="GoogleMap">
-<div class="row p-3">
-    <div class="col">
-        <RadzenCard Class="mb-4">
-            <RadzenCheckBox @bind-Value=@showMadridMarker Name="showMarker" />
-            <RadzenLabel Text="Show marker for Madrid" Component="showMarker" Style="margin-left: 8px; vertical-align: middle;" />
-        </RadzenCard>
-        <RadzenGoogleMap style="height: 400px" Zoom=@zoom Center=@(new GoogleMapPosition() { Lat = 42.6977, Lng = 23.3219 }) MapClick=@OnMapClick MarkerClick=@OnMarkerClick>
-            <Markers>
-                <RadzenGoogleMapMarker Title="London" Label="London" Position=@(new GoogleMapPosition() { Lat = 51.5074, Lng = 0.1278 }) />
-                <RadzenGoogleMapMarker Title="Paris " Label="Paris" Position=@(new GoogleMapPosition() { Lat = 48.8566, Lng = 2.3522 }) />
-                @if (showMadridMarker)
-                { 
-                    <RadzenGoogleMapMarker Title="Madrid " Label="Madrid" Position=@(new GoogleMapPosition() { Lat = 40.4168, Lng = -3.7038 }) />
-                }
-            </Markers>
-        </RadzenGoogleMap>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    GoogleMap
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>GoogleMap</strong> component.
+</RadzenText>
+
+<RadzenExample ComponentName="GoogleMap" Example="GoogleMapConfig">
+    <GoogleMapConfig />
 </RadzenExample>
-
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    int zoom = 3;
-    bool showMadridMarker;
-    EventConsole console;
-
-    void OnMapClick(GoogleMapClickEventArgs args)
-    {
-        console.Log($"Map clicked at Lat: {args.Position.Lat}, Lng: {args.Position.Lng}");
-    }
-
-    void OnMarkerClick(RadzenGoogleMapMarker marker)
-    {
-        console.Log($"Map {marker.Title} marker clicked. Marker position -> Lat: {marker.Position.Lat}, Lng: {marker.Position.Lng}");
-    }
-}

@@ -1,20 +1,20 @@
+@using Radzen
 @using System.Text.Json
 @inject IJSRuntime JSRuntime
-<RadzenCard @attributes=@Attributes>
-    <div class="console-header align-items-center">
-        <h3 class="console-title">Console log</h3>
-        <RadzenButton Click=@OnClearClick Text="Clear console" ButtonStyle="ButtonStyle.Light" />
-    </div>
-    <div class="console-content" id="event-console">
+<RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" Class="rz-mt-4 rz-p-4 rz-border-radius-1" @attributes=@Attributes Style="border: var(--rz-grid-cell-border)" >
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Console log</RadzenText>
+        <RadzenButton Click=@OnClearClick Text="Clear console" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0" ID="event-console" Class="rz-pt-1" Style="border-top: var(--rz-grid-cell-border); min-height: 2rem; max-height: 12rem; overflow: auto;">
     @foreach(var message in messages)
     {
-        <div class="console-message">
-            <span class="console-message-time">@message.Date.ToString("HH:mm:ss.ff")</span>
-            <span class="console-message-text">@message.Text</span>
-        </div>
+        <RadzenAlert ShowIcon="false" Variant="Variant.Flat" AlertStyle="AlertStyle.Info" Size="AlertSize.ExtraSmall" Shade="Shade.Lighter" AllowClose="false" Style="font-size: 0.75rem">
+            @message.Date.ToString("HH:mm:ss.ff") <span Style="color: var(--rz-text-color)">@message.Text</span>
+        </RadzenAlert>
     }
-    </div>
-</RadzenCard>
+    </RadzenStack>
+</RadzenStack>
 
 @code {
     class Message

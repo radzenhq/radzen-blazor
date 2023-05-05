@@ -1,0 +1,319 @@
+$alert-margin: 0.5rem 0 !default;
+$alert-padding: 1rem !default;
+$alert-gap: 1rem !default;
+$alert-color: var(--rz-text-color) !default;
+$alert-background-color: var(--rz-base-200) !default;
+$alert-box-shadow: var(--rz-shadow-3) !default;
+$alert-message-margin: 0.25rem 0 !default;
+$alert-title-color: var(--rz-text-h6-color) !default;
+$alert-icon-color: var(--rz-alert-color) !default;
+$alert-icon-margin: $alert-message-margin !default;
+$alert-icon-size: var(--rz-icon-size) !default;
+
+$alert-sizes: () !default;
+$alert-sizes: map-merge(
+  (
+    lg: (
+      gap: 1.5rem,
+      margin: 1.5rem 0,
+      padding: 1.5rem,
+      message-margin: 0.25rem 0
+    ),
+    md: (
+      gap: 1rem,
+      margin: 1rem 0,
+      padding: 1rem,
+      message-margin: 0.25rem 0
+    ),
+    sm: (
+      gap: 0.5rem,
+      margin: 0.5rem 0,
+      padding: 0.5rem,
+      message-margin: 0.25rem 0
+    ),
+    xs: (
+      gap: 0.25rem,
+      margin: 0.25rem 0,
+      padding: 0.25rem,
+      message-margin: 0
+    )
+  ),
+  $alert-sizes
+);
+
+:root {
+--rz-alert-margin: #{$alert-margin};
+--rz-alert-padding: #{$alert-padding};
+--rz-alert-gap: #{$alert-gap};
+--rz-alert-color: #{$alert-color};
+--rz-alert-background-color: #{$alert-background-color};
+--rz-alert-box-shadow: #{$alert-box-shadow};
+--rz-alert-message-margin: #{$alert-message-margin};
+--rz-alert-title-color: #{$alert-title-color};
+--rz-alert-icon-color: #{$alert-icon-color};
+--rz-alert-icon-margin: #{$alert-icon-margin};
+--rz-alert-icon-size: #{$alert-icon-size};
+}
+
+.rz-alert {
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rz-alert-gap);
+  margin: var(--rz-alert-margin);
+  padding: var(--rz-alert-padding);
+  width: 100%;
+  border-radius: var(--rz-border-radius);
+  background-color: var(--rz-alert-background-color);
+  color: var(--rz-alert-color);
+
+  @each $size, $alert in $alert-sizes {
+    &-#{$size} {
+      --rz-alert-gap: #{map-get($alert, gap)};
+      --rz-alert-margin: #{map-get($alert, margin)};
+      --rz-alert-padding: #{map-get($alert, padding)};
+      --rz-alert-message-margin: #{map-get($alert, message-margin)};
+      --rz-alert-icon-margin: #{map-get($alert, message-margin)};
+    }
+  }
+
+  .rz-alert-item {
+    flex: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: var(--rz-alert-gap);
+  }
+  
+  .rz-alert-icon {
+    color: var(--rz-alert-icon-color);
+    margin: var(--rz-alert-icon-margin);
+    font-size: var(--rz-alert-icon-size);
+  }
+  
+  .rz-alert-message {
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: var(--rz-alert-message-margin);
+  }
+  
+  .rz-alert-title {
+    font-family: var(--rz-text-font-family);
+    font-size: var(--rz-text-h6-font-size);
+    line-height: var(--rz-text-h6-line-height);
+    font-weight: var(--rz-text-h6-font-weight);
+    letter-spacing: var(--rz-text-h6-letter-spacing);
+    color: var(--rz-alert-title-color);
+    margin-bottom: var(--rz-text-h6-margin-bottom);
+  }
+
+  &.rz-variant-filled {
+    box-shadow: var(--rz-alert-box-shadow);
+  }
+
+  &.rz-variant-text {
+    --rz-alert-padding: 0;
+    --rz-alert-background-color: transparent;
+    --rz-alert-gap: 0.5rem;
+    --rz-alert-margin: 0;
+
+    .rz-alert-item {
+      flex: unset;
+    }
+
+    .rz-alert-message {
+      flex-direction: row;
+    }
+
+    .rz-alert-title {
+      font-size: inherit;
+      line-height: inherit;
+      letter-spacing: inherit;
+      margin-bottom: 0;
+      margin-right: 0.5rem;
+    }
+  }
+
+  @each $style, $rule in $severity-styles-map {
+    
+    &.rz-#{$style} {
+      @each $name, $value in $rule {
+        --rz-alert-#{$name}: #{$value};
+        @if $name == 'color' {
+          --rz-alert-title-#{$name}: #{$value};
+          --rz-alert-icon-#{$name}: #{$value};
+        }
+        @if $name == 'background-color' { // generate the styles only once
+          &.rz-shade-lighter {
+            --rz-alert-background-color: var(--rz-#{$style}-lighter);
+            --rz-alert-color: var(--rz-#{$style}-dark);
+            --rz-alert-title-color: var(--rz-#{$style}-dark);
+            --rz-alert-icon-color: var(--rz-#{$style}-dark);
+          }
+          &.rz-shade-light {
+            --rz-alert-background-color: var(--rz-#{$style}-light);
+          }
+          &.rz-shade-default {
+            --rz-alert-background-color: var(--rz-#{$style});
+          }
+          &.rz-shade-dark {
+            --rz-alert-background-color: var(--rz-#{$style}-dark);
+          }
+          &.rz-shade-darker {
+            --rz-alert-background-color: var(--rz-#{$style}-darker);
+          }
+        }
+      }
+    }
+
+    &.rz-variant-outlined.rz-#{$style} {
+      @each $name, $value in $rule {
+        @if $name == 'background-color' { // generate the styles only once
+          &.rz-shade-default {
+            box-shadow: inset 0 0 0 var(--rz-border-width) #{$value};
+            --rz-alert-color: #{$value};
+            --rz-alert-title-color: #{$value};
+            --rz-alert-icon-color: #{$value};
+          }
+          &.rz-shade-lighter {
+            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-lighter);
+            --rz-alert-color: var(--rz-#{$style}-lighter);
+            --rz-alert-title-color: var(--rz-#{$style}-lighter);
+            --rz-alert-icon-color: var(--rz-#{$style}-lighter);
+          }
+          &.rz-shade-light {
+            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-light);
+            --rz-alert-color: var(--rz-#{$style}-light);
+            --rz-alert-title-color: var(--rz-#{$style}-light);
+            --rz-alert-icon-color: var(--rz-#{$style}-light);
+          }
+          &.rz-shade-dark {
+            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-dark);
+            --rz-alert-color: var(--rz-#{$style}-dark);
+            --rz-alert-title-color: var(--rz-#{$style}-dark);
+            --rz-alert-icon-color: var(--rz-#{$style}-dark);
+          }
+          &.rz-shade-darker {
+            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-darker);
+            --rz-alert-color: var(--rz-#{$style}-darker);
+            --rz-alert-title-color: var(--rz-#{$style}-darker);
+            --rz-alert-icon-color: var(--rz-#{$style}-darker);
+          }
+        }
+      }
+
+      --rz-alert-background-color: transparent;
+    }
+
+    &.rz-variant-text.rz-#{$style} {
+      @each $name, $value in $rule {
+        @if $name == 'background-color' { // generate the styles only once
+          &.rz-shade-default {
+            --rz-alert-color: #{$value};
+            --rz-alert-icon-color: #{$value};
+            --rz-alert-title-color: #{$value};
+          }
+          &.rz-shade-lighter {
+            --rz-alert-color: var(--rz-#{$style}-lighter);
+            --rz-alert-title-color: var(--rz-#{$style}-lighter);
+            --rz-alert-icon-color: var(--rz-#{$style}-lighter);
+          }
+          &.rz-shade-light {
+            --rz-alert-color: var(--rz-#{$style}-light);
+            --rz-alert-title-color: var(--rz-#{$style}-light);
+            --rz-alert-icon-color: var(--rz-#{$style}-light);
+          }
+          &.rz-shade-dark {
+            --rz-alert-color: var(--rz-#{$style}-dark);
+            --rz-alert-title-color: var(--rz-#{$style}-dark);
+            --rz-alert-icon-color: var(--rz-#{$style}-dark);
+          }
+          &.rz-shade-darker {
+            --rz-alert-color: var(--rz-#{$style}-darker);
+            --rz-alert-title-color: var(--rz-#{$style}-darker);
+            --rz-alert-icon-color: var(--rz-#{$style}-darker);
+          }
+        }
+      }
+
+      --rz-alert-background-color: transparent;
+    }
+
+  }
+
+  @each $style, $rule in $base-styles-map {
+    
+    &.rz-#{$style} {
+      @each $name, $value in $rule {
+        --rz-alert-#{$name}: #{$value};
+        @if $name == 'color' {
+          --rz-alert-title-#{$name}: #{$value};
+          --rz-alert-icon-#{$name}: #{$value};
+        }
+      }
+    }
+
+    &.rz-variant-outlined.rz-#{$style} {
+      @each $name, $value in $rule {
+        @if $name == 'color' {
+          @if $style == 'light' {
+            @if $theme-dark == true {
+              box-shadow: inset 0 0 0 var(--rz-border-width) #{$value};
+              --rz-alert-#{$name}: #{$value};
+              --rz-alert-title-#{$name}: #{$value};
+              --rz-alert-icon-#{$name}: #{$value};
+            } @else {
+              box-shadow: inset 0 0 0 var(--rz-border-width) #{map-get($rule, background-color)};
+              --rz-alert-#{$name}: #{map-get($rule, background-color)};
+              --rz-alert-title-#{$name}: #{map-get($rule, background-color)};
+              --rz-alert-icon-#{$name}: #{map-get($rule, background-color)};
+            }
+          } @else if $style == 'dark' {
+            box-shadow: inset 0 0 0 var(--rz-border-width) #{map-get($rule, background-color)};
+            --rz-alert-#{$name}: #{map-get($rule, background-color)};
+            --rz-alert-title-#{$name}: #{map-get($rule, background-color)};
+            --rz-alert-icon-#{$name}: #{map-get($rule, background-color)};
+          } @else {
+            box-shadow: inset 0 0 0 var(--rz-border-width) #{$value};
+            --rz-alert-#{$name}: #{$value};
+            --rz-alert-title-#{$name}: #{$value};
+            --rz-alert-icon-#{$name}: #{$value};
+          }
+        }
+      }
+
+      --rz-alert-background-color: transparent;
+    }
+
+    &.rz-variant-text.rz-#{$style} {
+      @each $name, $value in $rule {
+        @if $name == 'color' {
+          @if $style == 'light' {
+            @if $theme-dark == true {
+              --rz-alert-#{$name}: #{$value};
+              --rz-alert-title-#{$name}: #{$value};
+              --rz-alert-icon-#{$name}: #{$value};
+            } @else {
+              --rz-alert-#{$name}: #{map-get($rule, background-color)};
+              --rz-alert-title-#{$name}: #{map-get($rule, background-color)};
+              --rz-alert-icon-#{$name}: #{map-get($rule, background-color)};
+            }
+          } @else if $style == 'dark' {
+            --rz-alert-#{$name}: #{map-get($rule, background-color)};
+            --rz-alert-title-#{$name}: #{map-get($rule, background-color)};
+            --rz-alert-icon-#{$name}: #{map-get($rule, background-color)};
+          } @else {
+            --rz-alert-#{$name}: #{$value};
+            --rz-alert-title-#{$name}: #{$value};
+            --rz-alert-icon-#{$name}: #{$value};
+          }
+        }
+      }
+
+      --rz-alert-background-color: transparent;
+    }
+
+  }
+}

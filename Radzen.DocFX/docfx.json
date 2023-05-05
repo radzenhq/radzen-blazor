@@ -36,7 +36,7 @@
         "exclude": ["obj/**", "_site/**"]
       }
     ],
-    "dest": "../RadzenBlazorDemos/wwwroot/docs",
+    "dest": "../RadzenBlazorDemos.Host/wwwroot/docs",
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],
     "template": ["templates/radzen"],

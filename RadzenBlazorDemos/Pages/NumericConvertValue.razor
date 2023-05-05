@@ -1,0 +1,14 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenNumeric @bind-Value=@value ConvertValue=@MyCustomValueConvert />
+</div>
+
+@code{
+    decimal value;
+
+    decimal MyCustomValueConvert(string value)
+    {
+        // Accept both comma and dot as decimal separator.
+        var decimalSeparator = System.Globalization.CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator;
+        return decimal.Parse(value.Replace(".", decimalSeparator).Replace(",", decimalSeparator));
+    }
+}

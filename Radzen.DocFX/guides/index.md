@@ -17,13 +17,13 @@ You can contribute to the documentation as it is open source as well.
 You can get community support for free or benefit from the dedicated support that a Radzen Professional subscription provides.
 
 ### Dedicated support
-Radzen Ltd. offers dedicated support with the [Radzen Professional and Enterprise subscriptions](https://www.radzen.com/pricing/). 
+Radzen Ltd. offers dedicated support with the [Radzen Professional and Enterprise subscriptions](https://www.radzen.com/blazor-studio/pricing/). 
 
 A Radzen subscription provides:
 
 - Dedicated support over email and forum with guaranteed response time (24 hours for Radzen Professional and 16 hours for Radzen Enterprise)
-- Full access to Radzen - the first WYSIWYG Blazor development environment on the market.
-- [Premium themes](https://www.radzen.com/documentation/premium-themes/) and visual [theme customization](https://www.radzen.com/documentation/theme-customization/).
+- Full access to [Radzen Blazor Studio](https://www.radzen.com/blazor-studio/) - a rapid application development solution for Blazor Server and WebAssembly applications.
+- Premium themes.
 - Complete Blazor application scaffolding from the most commonly used databases - MSSQL, Oracle, MySQL and PostgreSQL.
 - Built-in deploy to IIS, FTP, Zip and Azure.
 

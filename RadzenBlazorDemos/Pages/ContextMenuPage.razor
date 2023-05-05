@@ -1,66 +1,35 @@
 ﻿@page "/contextmenu"
 
-@inject ContextMenuService ContextMenuService
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    ContextMenu
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>ContextMenu</strong> component.
+</RadzenText>
 
-<RadzenExample Name="ContextMenu">
-    <p>Right click on a button to show context menu.</p>
-    <div class="row px-3">
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-3">Defaul Radzen ContextMenu</h4>
-                <RadzenButton Text="Right click me" ContextMenu=@(args => ShowContextMenuWithItems(args)) ButtonStyle="ButtonStyle.Secondary"  />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-3">Custom content</h4>
-                <RadzenButton Text="Right click me" ContextMenu=@(args => ShowContextMenuWithContent(args)) ButtonStyle="ButtonStyle.Secondary" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-3">Custom content for HTML elment</h4>
-                <button @oncontextmenu=@(args => ShowContextMenuWithContent(args)) @oncontextmenu:preventDefault="true">
-                    Right click me
-                </button>
-            </RadzenCard>
-        </div>
-    </div>
+<HelpPrerequirements />
+
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Use <code>ContextMenuService</code> to open and close context menus.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-mb-6">
+    Show ContextMenu with items
+</RadzenText>
+<RadzenExample ComponentName="ContextMenu" Example="ContextMenuDefault">
+    <ContextMenuDefault />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Show ContextMenu with custom content and separator
+</RadzenText>
+<RadzenExample ComponentName="ContextMenu" Example="ContextMenuCustomContent">
+    <ContextMenuCustomContent />
+</RadzenExample>
 
-@code {
-    EventConsole console;
-
-    void ShowContextMenuWithItems(MouseEventArgs args)
-    {
-        ContextMenuService.Open(args,
-            new List<ContextMenuItem> {
-                new ContextMenuItem(){ Text = "Context menu item 1", Value = 1 },
-                new ContextMenuItem(){ Text = "Context menu item 2", Value = 2 },
-                new ContextMenuItem(){ Text = "Context menu item 3", Value = 3 },
-         }, OnMenuItemClick);
-    }
-
-    void ShowContextMenuWithContent(MouseEventArgs args) => ContextMenuService.Open(args, ds =>
-        @<RadzenMenu Click="OnMenuItemClick">
-            <RadzenMenuItem Text="Item1" Value="1"></RadzenMenuItem>
-            <RadzenMenuItem Text="Item2" Value="2"></RadzenMenuItem>
-            <RadzenMenuItem Text="More items" Value="3">
-                <RadzenMenuItem Text="More sub items" Value="4">
-                    <RadzenMenuItem Text="Item1" Value="5"></RadzenMenuItem>
-                    <RadzenMenuItem Text="Item2" Value="6"></RadzenMenuItem>
-                </RadzenMenuItem>
-            </RadzenMenuItem>
-        </RadzenMenu>);
-
-    void OnMenuItemClick(MenuItemEventArgs args)
-    {
-        console.Log($"Menu item with Value={args.Value} clicked");
-        if(!args.Value.Equals(3) && !args.Value.Equals(4))
-        {
-            ContextMenuService.Close();
-        }
-    }
-}
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Show ContextMenu for HTML element
+</RadzenText>
+<RadzenExample ComponentName="ContextMenu" Example="ContextMenuHTMLElement">
+    <ContextMenuHTMLElement />
+</RadzenExample>

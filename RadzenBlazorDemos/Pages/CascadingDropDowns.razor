@@ -1,0 +1,57 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-6 mb-4">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">1. Customers</RadzenText>
+                <RadzenDropDown Style="width:300px" TValue="string" @bind-Value="CustomerID" Placeholder="Select customer" AllowFiltering="true" Data="@(customers)" TextProperty="CompanyName" ValueProperty="CustomerID"/>
+            </RadzenCard>
+        </div>
+        <div class="col-xl-6 mb-4">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">2. Orders</RadzenText>
+                <RadzenDropDown Style="width:300px" TValue="int" @bind-Value="OrderID" Placeholder="Select order" Data="@(orders.Where(o => o.CustomerID == CustomerID))" ValueProperty="OrderID">
+                    <Template>
+                        Order Date: @String.Format("{0:d}", ((Order)context).OrderDate)
+                    </Template>
+                </RadzenDropDown>
+            </RadzenCard>
+        </div>
+        <div class="col-12 mb-4">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Order Details</RadzenText>
+                <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                            Data="@(orderDetails.Where(o => o.OrderID == OrderID))" TItem="OrderDetail" ColumnWidth="200px">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
+                        <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
+                        <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenCard>
+        </div>
+    </div>
+</div>
+
+@code {
+    IEnumerable<Customer> customers;
+    IEnumerable<Order> orders;
+    IEnumerable<OrderDetail> orderDetails;
+
+    string CustomerID;
+    int OrderID;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers.ToList();
+        orders = dbContext.Orders.ToList();
+        orderDetails = dbContext.OrderDetails.Include("Product").ToList();
+    }
+}

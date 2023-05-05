@@ -1,0 +1,13 @@
+﻿@inject TooltipService tooltipService
+
+<div class="rz-p-12 rz-text-align-center">
+    <button @ref="htmlButton" @onmouseenter="@(args => ShowTooltip(htmlButton))">
+        Show tooltip
+    </button>
+</div>
+
+@code {
+    ElementReference htmlButton;
+
+    void ShowTooltip(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, "Some content", options);
+}

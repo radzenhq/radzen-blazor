@@ -1,0 +1,49 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenSelectBar @bind-Value=@value TValue="int" class="mb-5">
+        <Items>
+            @foreach (var dataItem in data)
+            {
+                <RadzenSelectBarItem Text="@dataItem.Name" Value="@dataItem.Id" Disabled="@(dataItem.IsDisabled.HasValue ? dataItem.IsDisabled.Value : false)" Visible="@(dataItem.IsVisible.HasValue ? dataItem.IsVisible.Value : true)" />
+            }
+        </Items>
+    </RadzenSelectBar>
+</div>
+
+@code {
+    int value = 1;
+
+    public class MyObject
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public bool? IsDisabled { get; set; }
+        public bool? IsVisible { get; set; }
+    }
+
+    IEnumerable<MyObject> data = new MyObject[]
+    {
+        new MyObject() {
+            Id = 1,
+            Name = "Orders"
+        },
+        new MyObject() {
+            Id = 2,
+            Name = "Employees"
+        },
+        new MyObject() {
+            Id = 3,
+            Name = "Customers"
+        },
+        new MyObject() {
+            Id = 4,
+            Name = "Companies",
+            IsDisabled = true,
+        },
+        new MyObject() {
+            Id = 5,
+            Name = "Companies (Old)",
+            IsDisabled = true,
+            IsVisible = false
+        }
+    };
+}

@@ -1,0 +1,23 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<div class="rz-p-sm-12 rz-text-align-center">
+    <RadzenListBox AllowClear="true" @bind-Value=value AllowVirtualization="true"
+                   AllowFiltering="true" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Style="width: 100%; max-width: 400px; height: 200px" />
+</div>
+
+
+@code {
+    string value;
+    IEnumerable<Customer> customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers.ToList();
+    }
+}

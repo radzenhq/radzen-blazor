@@ -1,100 +1,99 @@
 ﻿@page "/buttons"
 @page "/button"
 
-<RadzenExample Name="Button">
-<div class="button-demo">
-    <div class="row mb-4">
-        <div class="col">
-            <h4 class="text-thin">Button Styles</h4>
-            <RadzenButton Click=@(args => OnClick("Default button")) Text="Default" />
-            <RadzenButton Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
-            <RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-            <RadzenButton Click=@(args => OnClick("Light button")) Text="Light" ButtonStyle="ButtonStyle.Light" />
-            <RadzenButton Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
-            <RadzenButton Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
-            <RadzenButton Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
-            <RadzenButton Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
-        </div>
-    </div>
-    <div class="row mb-4">
-        <div class="col">
-            <h4 class="text-thin">Icon</h4>
-            <RadzenButton Click=@(args => OnClick("Primary icon button")) Icon="add_circle_outline" ButtonStyle="ButtonStyle.Primary" />
-            <RadzenButton Click=@(args => OnClick("Secondary icon button")) Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
-            <RadzenButton Click=@(args => OnClick("Light icon button")) Icon="refresh" ButtonStyle="ButtonStyle.Light" />
-            <RadzenButton Click=@(args => OnClick("Info icon button")) Icon="privacy_tip" ButtonStyle="ButtonStyle.Info" />
-            <RadzenButton Click=@(args => OnClick("Success icon button ")) Icon="check_circle" ButtonStyle="ButtonStyle.Success" />
-            <RadzenButton Click=@(args => OnClick("Warning icon button ")) Icon="warning_amber" ButtonStyle="ButtonStyle.Warning" />
-            <RadzenButton Click=@(args => OnClick("Danger icon button")) Icon="report" ButtonStyle="ButtonStyle.Danger" />
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Button
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Button</strong> component.
+</RadzenText>
 
-    <div class="row mb-4">
-        <div class="col">
-            <h4 class="text-thin">Icon and text</h4>
-            <RadzenButton Click=@(args => OnClick("Primary button with text and icon")) Text="Add New" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Primary" />
-            <RadzenButton Click=@(args => OnClick("Secondary button with text and icon")) Text="Add New" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
-            <RadzenButton Click=@(args => OnClick("Light button with text and icon")) Text="Refresh" Icon="refresh" ButtonStyle="ButtonStyle.Light" />
-            <RadzenButton Click=@(args => OnClick("Info button with text and icon")) Text="Privacy tip" Icon="privacy_tip" ButtonStyle="ButtonStyle.Info" />
-            <RadzenButton Click=@(args => OnClick("Success button with text and icon")) Text="Publish" Icon="check_circle" ButtonStyle="ButtonStyle.Success" />
-            <RadzenButton Click=@(args => OnClick("Warning button with text and icon")) Text="Warning" Icon="warning_amber" ButtonStyle="ButtonStyle.Warning" />
-            <RadzenButton Click=@(args => OnClick("Danger button with text and icon")) Text="Report" Icon="report" ButtonStyle="ButtonStyle.Danger" />
-        </div>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col">
-            <h4 class="text-thin">Images</h4>
-            <RadzenButton Click=@(args => OnClick("Button with image")) Image="images/radzen-nuget.png" ButtonStyle="ButtonStyle.Light" />
-            <RadzenButton Click=@(args => OnClick("Button with content")) Image="images/radzen-nuget.png" ButtonStyle="ButtonStyle.Light">
-                <span class="rz-button-text">Button with content</span>
-                <RadzenImage Path="images/radzen-nuget.png" Style="width: 20px; height: 20px; margin-left: 8px;" />
-            </RadzenButton>
-        </div>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col">
-            <h4 class="text-thin">Disabled Button</h4>
-            <RadzenButton Disabled="true" Text="Primary" ButtonStyle="ButtonStyle.Primary" />
-            <RadzenButton Disabled="true" Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-            <RadzenButton Disabled="true" Text="Light" ButtonStyle="ButtonStyle.Light" />
-            <RadzenButton Disabled="true" Text="Info" ButtonStyle="ButtonStyle.Info" />
-            <RadzenButton Disabled="true" Text="Success" ButtonStyle="ButtonStyle.Success" />
-            <RadzenButton Disabled="true" Text="Warning" ButtonStyle="ButtonStyle.Warning" />
-            <RadzenButton Disabled="true" Text="Danger" ButtonStyle="ButtonStyle.Danger" />
-        </div>
-    </div>
-    <div class="row mb-4">
-        <div class="col">
-            <h4 class="text-thin">Busy Indicator</h4>
-            <RadzenButton style="width: 160px" IsBusy=@busy Click=@OnBusyClick Text="Save" />
-            <RadzenButton style="width: 160px" Icon="save" BusyText="Saving ..." IsBusy=@busy Click=@OnBusyClick Text="Save" />
-        </div>
-    </div>
-</div>
-<style>
-    .button-demo .rz-button {
-        margin: 0 0.5rem 0.5rem 0;
-    }
-</style>
+<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Filled Buttons
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    These are the default Radzen Buttons.
+</RadzenText>
+<RadzenExample ComponentName="Button" Example="ButtonFilled">
+    <ButtonFilled />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Flat Buttons
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Variant="Variant.Flat"</code> for flat button variant.
+</RadzenText>
+<RadzenExample ComponentName="Button" Example="ButtonFlat">
+    <ButtonFlat />
+</RadzenExample>
 
-@code {
-    EventConsole console;
-    bool busy;
+<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Outlined Buttons
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Variant="Variant.Outlined"</code> for outlined button variant.
+</RadzenText>
+<RadzenExample ComponentName="Button" Example="ButtonOutlined">
+    <ButtonOutlined />
+</RadzenExample>
 
-    void OnClick(string buttonName)
-    {
-        console.Log($"{buttonName} clicked");
-    }
+<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Text Buttons
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Variant="Variant.Text"</code> for text button variant.
+</RadzenText>
+<RadzenExample ComponentName="Button" Example="ButtonText">
+    <ButtonText />
+</RadzenExample>
 
-    async Task OnBusyClick()
-    {
-        busy = true;
-        await Task.Delay(2000);
-        busy = false;
-    }
-}
+<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Content in Buttons
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Text, icons and images can be added to a button. 
+</RadzenText>
+<RadzenExample ComponentName="Button" Example="ButtonContent">
+    <ButtonContent />
+</RadzenExample>
+
+<RadzenText Anchor="buttons#button-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Button Sizes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Size</code> property to set button size. Available sizes are ExtraSmall, Small, Medium (default), and Large.
+</RadzenText>
+<RadzenExample ComponentName="Button" Example="ButtonSizes">
+    <ButtonSizes />
+</RadzenExample>
+
+<RadzenText Anchor="buttons#button-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    FAB
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Floating action button.
+</RadzenText>
+<RadzenExample ComponentName="Button" Example="ButtonFab">
+    <ButtonFab />
+</RadzenExample>
+
+<RadzenText Anchor="buttons#button-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Disabled Button
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Disabled="true"</code> to disable a button.
+</RadzenText>
+<RadzenExample ComponentName="Button" Example="ButtonDisabled">
+    <ButtonDisabled />
+</RadzenExample>
+
+<RadzenText Anchor="buttons#button-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Busy button
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>IsBusy="true"</code> to show the busy indicator.
+</RadzenText>
+<RadzenExample ComponentName="Button" Example="ButtonBusy">
+    <ButtonBusy />
+</RadzenExample>

@@ -1,0 +1,57 @@
+﻿<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H4" class="rz-mt-5">Auto-layout columns</RadzenText>
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-3">Example with 3 levels of nesting. You can nest rows and columns indefinitely.</RadzenText>
+<RadzenRow class="rz-text-align-center rz-border-info-light" Gap="1rem">
+    <RadzenColumn class="rz-background-color-info-lighter rz-color-info rz-py-5">
+        Level 1
+    </RadzenColumn>
+    <RadzenColumn class="rz-background-color-info-lighter rz-color-info">
+        <RadzenRow>
+            <RadzenColumn class="rz-background-color-info-lighter rz-color-info-dark rz-py-5">
+                Level 2
+            </RadzenColumn>
+            <RadzenColumn class="rz-background-color-info-lighter rz-color-info-dark">
+                <RadzenRow>
+                    <RadzenColumn class="rz-background-color-info-lighter rz-color-info-darker rz-py-5">
+                        Level 3
+                    </RadzenColumn>
+                    <RadzenColumn class="rz-background-color-info-lighter rz-color-info-darker rz-py-5">
+                        Level 3
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenColumn>
+            <RadzenColumn class="rz-background-color-info-lighter rz-color-info-dark rz-py-5">
+                Level 2
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenColumn>
+</RadzenRow>
+
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H4" class="rz-mt-5">Columns with a predefined Size</RadzenText>
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-3">The second column contains a nested row with 4 columns.</RadzenText>
+<RadzenRow class="rz-text-align-center rz-border-info-light" Gap="1rem">
+    <RadzenColumn Size="3" class="rz-background-color-info-lighter rz-color-info rz-py-5">
+        Size="3"
+    </RadzenColumn>
+    <RadzenColumn class="rz-background-color-info-lighter rz-color-info rz-py-5">
+        Auto size
+        <RadzenRow class="rz-text-align-center rz-border-info-light rz-mt-5">
+            <RadzenColumn Size="3" class="rz-background-color-info-lighter rz-color-info-dark rz-py-5">
+                Size="3"
+            </RadzenColumn>
+            <RadzenColumn Size="6" class="rz-background-color-info-lighter rz-color-info-dark rz-py-5">
+                Size="6"
+                <RadzenRow class="rz-text-align-center rz-border-info-light rz-mt-5">
+                    <RadzenColumn Size="6" class="rz-background-color-info-lighter rz-color-info-darker rz-py-5">
+                        Size="6"
+                    </RadzenColumn>
+                    <RadzenColumn Size="6" class="rz-background-color-info-lighter rz-color-info-darker rz-py-5">
+                        Size="6"
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenColumn>
+            <RadzenColumn Size="3" class="rz-background-color-info-lighter rz-color-info-dark rz-py-5">
+                Size="3"
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenColumn>
+</RadzenRow>

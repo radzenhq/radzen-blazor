@@ -1,59 +1,12 @@
 @page "/tree-file-system"
-@using System.IO
-@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
 
-<h1>File and directory browser</h1>
-<p>Populate RadzenTree from the file system</p>
-<RadzenExample Name="Tree" Source="TreeFileSystem" Heading="false">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    File and directory browser
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Populate RadzenTree from the file system.
+</RadzenText>
 
-<div class="row my-5">
-    <div class="col-lg-6 offset-lg-3">
-        <RadzenCard>
-            <RadzenTree Data=@entries Expand=@LoadFiles Style="width: 100%; height: 300px">
-                <RadzenTreeLevel Text=@GetTextForNode Template=@FileOrFolderTemplate />
-            </RadzenTree>
-        </RadzenCard>
-    </div>
-</div>
+<RadzenExample ComponentName="Tree" Example="TreeFileSystem">
+    <TreeFileSystem />
 </RadzenExample>
-
-@code {
-    IEnumerable<string> entries;
-    protected override void OnInitialized()
-    {
-        entries = Directory.GetDirectories(HostEnvironment.ContentRootPath)
-                           .Where(entry =>
-                           {
-                               var name = Path.GetFileName(entry);
-
-                               return !name.StartsWith(".") && name != "bin" && name != "obj";
-                           });
-
-    }
-
-    void LoadFiles(TreeExpandEventArgs args)
-    {
-        var directory = args.Value as string;
-
-        args.Children.Data = Directory.EnumerateFileSystemEntries(directory);
-        args.Children.Text = GetTextForNode;
-        args.Children.HasChildren = (path) => Directory.Exists((string)path);
-        args.Children.Template = FileOrFolderTemplate;
-    }
-
-    string GetTextForNode(object data)
-    {
-        return Path.GetFileName((string)data);
-    }
-
-    RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder =>
-    {
-        string path = context.Value as string;
-        bool isDirectory = Directory.Exists(path);
-
-        builder.OpenComponent<RadzenIcon>(0);
-        builder.AddAttribute(1, nameof(RadzenIcon.Icon), isDirectory ? "folder" : "insert_drive_file");
-        builder.CloseComponent();
-        builder.AddContent(3, context.Text);
-    };
-}

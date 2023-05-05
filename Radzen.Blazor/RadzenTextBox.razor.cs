@@ -28,6 +28,17 @@ namespace Radzen.Blazor
         public bool AutoComplete { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating the type of built-in autocomplete
+        /// the browser should use.
+        /// <see cref="Blazor.AutoCompleteType" />
+        /// </summary>
+        /// <value>
+        /// The type of built-in autocomplete.
+        /// </value>
+        [Parameter]
+        public AutoCompleteType AutoCompleteType { get; set; } = AutoCompleteType.On;
+
+        /// <summary>
         /// Gets or sets the maximum allowed text length.
         /// </summary>
         /// <value>The maximum length.</value>
@@ -68,5 +79,16 @@ namespace Radzen.Blazor
         {
             return GetClassList("rz-textbox").ToString();
         }
+
+        /// <summary>
+        /// Gets the autocomplete attribute's string value.
+        /// </summary>
+        /// <value>
+        /// <c>off</c> if the AutoComplete parameter is false or the
+        /// AutoCompleteType parameter is "off". When the AutoComplete
+        /// parameter is true, the value is <c>on</c> or, if set, the value of
+        /// AutoCompleteType.</value>
+        public string AutoCompleteAttribute { get => !AutoComplete ? "off" :
+                AutoCompleteType.GetAutoCompleteValue(); }
     }
 }

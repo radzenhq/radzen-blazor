@@ -14,10 +14,10 @@
         @if (!Inline)
         {
             <span class="@($"rz-calendar rz-calendar-w-btn{(Disabled ? " rz-state-disabled" : "")}")" style="width:100%">
-                <input @ref="@input" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@TabIndex"
+                <input @ref="@input" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
                        @onchange="@ParseDate" autocomplete="off" type="text" name="@Name"
                        class="rz-inputtext @InputClass @(IsReadonly ? "rz-readonly" : "")" id="@Name" placeholder="@Placeholder" onclick="@getOpenPopupForInput()"/>
-                <button onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
+                <button @onmousedown=@OnToggle onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
                     <span aria-hidden="true" class="rz-button-icon-left  rzi rzi-calendar"></span><span class="rz-button-text"></span>
                 </button>
                 @if (AllowClear && HasValue)
@@ -27,7 +27,7 @@
             </span>
         }
 
-            <div id="@PopupID" style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")" @onclick:preventDefault="true">
+        <Popup id="@PopupID" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@popup style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")">
                 <div class="rz-datepicker-group">
                     @if (!TimeOnly)
                     {
@@ -51,7 +51,7 @@
                             <table class="rz-datepicker-calendar" style="@(Inline ? "" : "width:100%")">
                                 <thead>
                                     <tr>
-                                        @foreach (var day in AbbreviatedDayNames)
+                                        @foreach (var day in ShiftedAbbreviatedDayNames)
                                         {
                                             <th scope="col">
                                                 <span>@day</span>
@@ -80,7 +80,7 @@
                                                 {
                                                     <td @attributes="@(dateArgs.Attributes)" onmouseup=@(Inline || ShowTime || dateArgs.Disabled ? "" : $"Radzen.closePopup('{PopupID}')")
                                                     @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
-                                                        <span class=@($"rz-state-default{(DateTimeValue.HasValue && DateTimeValue.Value.Year == date.Year && DateTimeValue.Value.Month == date.Month && DateTimeValue.Value.Day == date.Day ? " rz-state-active" : "")}{(!dateArgs.Disabled ? "" : " rz-state-disabled")}")>@date.Day</span>
+                                                        <span class=@($"rz-state-default{(DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date)== 0 ? " rz-state-active" : "")}{(DateTime.Now.Date.CompareTo(date.Date) == 0 ? " rz-datepicker-currentday" : "")}{(!dateArgs.Disabled ? "" : " rz-state-disabled")}")>@date.Day</span>
                                                     </td>
                                                 }
                                                 else
@@ -106,7 +106,7 @@
                 </div>
                 @if (ShowTime)
                 {
-                    <div class="rz-timepicker">
+                <div class="rz-timepicker" @onmousedown:stopPropagation>
                         <RadzenNumeric TValue="int" Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)" 
                            Min="@(HourFormat == "12" ? 1 : -1)" Max="@(HourFormat == "12" ? 12 : 24)" TValue="double" Step="@HoursStep"
                            Change="@UpdateHour" class="rz-hour-picker" @oninput=@OnUpdateHourInput Format="@(PadHours ? "00" : "")" />
@@ -137,7 +137,7 @@
                         }
                         @if (ShowTimeOkButton)
                         {
-                            <button type="button" class="rz-button rz-button-md btn-secondary" style="width:60px;padding:0px;margin-left:10px;"
+                            <button type="button" class="rz-button rz-button-md rz-secondary"
                         @onclick="@OkClick"
                         onmouseup="@($"Radzen.closePopup('{PopupID}')")">
                                 <span class="rz-button-text">Ok</span>
@@ -145,7 +145,7 @@
                         }
                     </div>
                 }
-            </div>
+        </Popup>
         
     </div>
 }

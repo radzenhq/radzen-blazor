@@ -1,7 +1,9 @@
 @using System.IO
 @using Radzen.Blazor
+@implements IDisposable
 @inject ExampleService ExampleService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <PageTitle>@ExampleService.TitleFor(example)</PageTitle>
 <HeadContent>
@@ -9,37 +11,58 @@
 </HeadContent>
 @if (Heading)
 {
-    <h1>@Name</h1>
-    <p>Demonstration and configuration of the Radzen Blazor <strong>@Name</strong> component.</p>
+    <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+        @Name
+    </RadzenText>
+    <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+        Demonstration and configuration of the Radzen Blazor <strong>@Name</strong> component.
+    </RadzenText>
 }
 <div class="documentation-links">
 @if (Documentation)
 {
-    <a target="blank" href="@DocumentationHref" title=@($"Open {Name} documentation in new tab") ><RadzenIcon Icon="help_outline" style="font-size: 1rem; margin-right: 4px;" /> @Name Docs</a>
+    <a target="blank" href="@DocumentationHref" title=@($"Open {Name} documentation in new tab") ><RadzenIcon Icon="launch" style="font-size: 1rem; margin-right: 4px;" /> @Name Docs</a>
 }
 @if (Heading)
 {
     <a target="blank" href="@ComponentSourceHref" title=@($"View {Name} source code in new tab") ><RadzenIcon Icon="launch" style="font-size: 1rem; margin-right: 4px;" /> @Name Source</a>
 }
 </div>
-<RadzenTabs>
-    <Tabs>
-        <RadzenTabsItem Text="Example" Icon="apps">
-            @ChildContent
-        </RadzenTabsItem>
-        <RadzenTabsItem Text="Source" Icon="code">
-            <CodeViewer PageName="@($"{Source ?? Name}Page.razor")" />
-        </RadzenTabsItem>
-        @foreach (var p in AdditionalSourceCodePages)
-        {
-        <RadzenTabsItem Text="@Path.GetFileName(p)" Icon="code">
-            <CodeViewer PageName="@p" />
-        </RadzenTabsItem>
-        }
-    </Tabs>
-</RadzenTabs>
+<RadzenCard class="rz-p-0">
+    <RadzenTabs @bind-SelectedIndex="@selectedIndex" class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Example" Title="Example preview">
+                @(dynamicContent ?? ChildContent)
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Edit Source" Title="View and edit example source code">
+                <div class="source-tab-item rz-pb-2">
+                    <CodeViewer ComponentName="@ComponentName" @bind-Value="@source" ComponentSource="@Source" PageName="@ExampleUrl" Compiled="OnCompiled" />
+                </div>
+            </RadzenTabsItem>
+            @foreach (var p in AdditionalSourceCodePages)
+            {
+            <RadzenTabsItem Text="@Path.GetFileName(p)" Icon="code">
+                <div class="source-tab-item rz-pb-2">
+                    <CodeViewer PageName="@p" />
+                </div>
+            </RadzenTabsItem>
+            }
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
 
 @code {
+
+    private int selectedIndex = 0;
+}
+
+@code {
+
+    private RenderFragment dynamicContent;
+}
+
+@code {
+
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
@@ -47,25 +70,68 @@
     public string Name { get; set; }
 
     [Parameter]
+    public string ComponentName { get; set; }
+
+    [Parameter]
     public string Source { get; set; }
 
     [Parameter]
-    public bool Heading { get; set; } = true;
+    public string Example { get; set; }
 
     [Parameter]
-    public bool Documentation { get; set; } = true;
+    public string DocumentationLink { get; set; }
 
-    string DocumentationHref => $"/docs/guides/components/{Name.ToLower()}.html";
+    [Parameter]
+    public bool Heading { get; set; } = false;
 
-    string ComponentSourceHref => $"https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/Radzen{Name}.razor.cs";
+    [Parameter]
+    public bool Documentation { get; set; } = false;
+
+    string DocumentationHref => Documentation ? DocumentationLink ?? $"/docs/guides/components/{Name?.ToLower()}.html" : "";
+
+    string ComponentSourceHref => Source ?? $"https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/Radzen{Name}.razor.cs";
 
     [Parameter]
     public IEnumerable<string> AdditionalSourceCodePages { get; set; } = Enumerable.Empty<string>();
 
+    private string ExampleUrl => string.IsNullOrEmpty(Example) ? $"{Name}Page.razor" : $"{Example}.razor";
+
     Example example;
+
+    DateTime start;
+
+    string source ;
 
     protected override void OnInitialized()
     {
+        start = DateTime.Now;
+
         example = ExampleService.FindCurrent(NavigationManager.ToAbsoluteUri(NavigationManager.Uri));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", $"console.log('Page {Name} render time is {(DateTime.Now - start).TotalMilliseconds} ms')");
+        }
+    }
+
+    void OnCompiled(Type type)
+    {
+        dynamicContent = builder =>
+        {
+            builder.OpenComponent(0, type);
+            builder.CloseComponent();
+        };
+
+        selectedIndex = 0;
+    }
+
+    public void Dispose()
+    {
+        GC.Collect();
     }
 }

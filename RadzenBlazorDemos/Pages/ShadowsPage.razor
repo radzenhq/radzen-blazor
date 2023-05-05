@@ -1,0 +1,31 @@
+﻿@page "/shadows"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Shadows
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Shadow styles and utility CSS classes.
+</RadzenText>
+
+<RadzenText Anchor="shadows#shadow-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Utility CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use these CSS classes to set box-shadow to an element e.g. <code>class="rz-shadow-2"</code>. Each theme has its own shadows assigned. Change the theme to preview them.
+</RadzenText>
+<RadzenExample Example="ShadowsClasses">
+    <ShadowsClasses />
+</RadzenExample>
+
+<RadzenText Anchor="shadows#shadow-css-variables" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom CSS properties (CSS Variables)
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    These are the root theme shadow CSS variables. 
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    You can use CSS variables in styles e.g. <code>style="box-shadow: var(--rz-shadow-2);"</code>
+</RadzenText>
+<RadzenExample Example="ShadowsVariables">
+    <ShadowsVariables />
+</RadzenExample>

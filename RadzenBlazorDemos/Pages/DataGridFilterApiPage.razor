@@ -1,63 +1,12 @@
 ﻿@page "/datagrid-filter-api"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid <strong>Filter API</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Set the initial filter of your RadzenDataGrid via the <code>FilterValue</code> and <code>FilterOperator</code> column properties.
+</RadzenText>
 
-@inject NorthwindContext dbContext
-
-<h1>DataGrid <strong>Filter API</strong></h1>
-
-<p>Set the initial filter of your RadzenDataGrid via the <code>FilterValue</code> and <code>FilterOperator</code> column properties.</p>
-
-<RadzenExample Name="DataGrid" Source="DataGridFilterApi" Heading="false">
-    <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 
-        FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px" 
-        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-        LogicalFilterOperator="LogicalFilterOperator.Or" Filter="@OnFilter">
-        <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
-                <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
-            <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
-            <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
-            <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
-            <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
-        </Columns>
-    </RadzenDataGrid>
+<RadzenExample ComponentName="DataGrid" Example="DataGridFilterApi" AdditionalSourceCodePages=@(new [] { "MyCustomDataGridColumn.razor" })>
+    <DataGridFilterApi />
 </RadzenExample>
-@code {
-    IEnumerable<Employee> employees;
-    RadzenDataGrid<Employee> grid;
-
-    protected override void OnInitialized()
-    {
-        employees = dbContext.Employees;
-    }
-
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        if(firstRender)
-        {
-            var column = grid.ColumnsCollection.Where(c => c.Property == "FirstName").FirstOrDefault();
-
-            if(column != null)
-            {
-                column.FilterValue = "Nan";
-                column.FilterOperator = FilterOperator.StartsWith;
-                grid.Reload();
-            }
-        }
-
-        return base.OnAfterRenderAsync(firstRender);
-    }
-
-    void OnFilter(DataGridColumnFilterEventArgs<Employee> args)
-    {
-        //
-    }
-}

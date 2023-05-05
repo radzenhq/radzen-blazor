@@ -1,0 +1,16 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" JustifyContent="JustifyContent.Center" Class="rz-p-12" Gap="2rem">
+    <RadzenButton ButtonStyle="ButtonStyle.Primary">
+        Notifications
+        <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Light" Text="15" class="rz-ml-2"/>
+    </RadzenButton>
+
+    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Lighter" class="rz-shadow-0">
+        Messages
+        <RadzenBadge BadgeStyle="BadgeStyle.Secondary" IsPill="@true" Text="15" class="rz-ml-2" />
+    </RadzenButton>
+
+    <RadzenButton ButtonStyle="ButtonStyle.Dark" class="rz-border-radius-6 rz-shadow-6">
+        Events
+        <RadzenBadge BadgeStyle="BadgeStyle.Warning" Shade="Shade.Lighter" IsPill="@true" Text="15" class="rz-ml-2" />
+    </RadzenButton>
+</RadzenStack>

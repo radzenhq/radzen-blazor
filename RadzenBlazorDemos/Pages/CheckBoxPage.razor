@@ -1,42 +1,49 @@
 ﻿@page "/checkbox"
 
-<RadzenExample Name="CheckBox">
-    <div class="row px-3">
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">CheckBox</h4>
-                <RadzenCheckBox @bind-Value=@checkBox1Value  Name="CheckBox1" TValue="bool" Change=@(args => OnChange(args, "CheckBox1 CheckBox")) />
-                <RadzenLabel Text="CheckBox1" Component="CheckBox1" Style="margin-left: 8px; vertical-align: middle;" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Tri State</h4>
-                <RadzenCheckBox @bind-Value=@checkBox2Value Name="CheckBox2" TriState="true" TValue="bool?" Change=@(args => OnChange(args, "TriState CheckBox")) />
-                <RadzenLabel Text="TriState" Component="CheckBox2" Style="margin-left: 8px; vertical-align: middle;" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Disabled CheckBox</h4>
-                <RadzenCheckBox @bind-Value=@checkBox3Value Disabled="true" TriState="true" TValue="bool?" />
-                <RadzenLabel Text="Disabled" Component="CheckBox3" Style="margin-left: 8px; vertical-align: middle;" />
-            </RadzenCard>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    CheckBox
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>CheckBox</strong> component.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of CheckBox
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the <strong>CheckBox</strong> has a Value property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="CheckBox" Example="CheckBoxBindValue">
+    <CheckBoxBindValue />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of CheckBox using Value and Change event
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Value property can be used to set the value of the component and <code>Change</code> event to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="CheckBox" Example="CheckBoxChangeEvent">
+    <CheckBoxChangeEvent />
+</RadzenExample>
 
-@code {
-    bool checkBox1Value;
-    bool? checkBox2Value;
-    bool? checkBox3Value = true;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    TriState CheckBox
+</RadzenText>
+<RadzenExample ComponentName="CheckBox" Example="CheckBoxTriState">
+    <CheckBoxTriState />
+</RadzenExample>
 
-    EventConsole console;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Disabled CheckBox
+</RadzenText>
+<RadzenExample ComponentName="CheckBox" Example="CheckBoxDisabled">
+    <CheckBoxDisabled />
+</RadzenExample>
 
-    void OnChange(bool? value, string name)
-    {
-        console.Log($"{name} value changed to {value}");
-    }
-}
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+  ReadOnly CheckBox
+</RadzenText>
+<RadzenExample ComponentName="CheckBox" Example="CheckBoxReadOnly">
+  <CheckBoxReadOnly />
+</RadzenExample>

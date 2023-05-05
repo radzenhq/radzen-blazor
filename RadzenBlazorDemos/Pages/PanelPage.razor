@@ -1,70 +1,25 @@
 ﻿@page "/panel"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Panel
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Panel</strong> component.
+</RadzenText>
 
-@inject NorthwindContext dbContext
+<RadzenText Anchor="panel#templates" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Templates
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>&lt;HeaderTemplate &gt;</code>, <code>&lt;ChildContent &gt;</code> and <code>&lt;SummaryTemplate &gt;</code> to define custom content for Panel component parts.
+</RadzenText>
 
-<RadzenExample Name="Panel">
-    <RadzenPanel AllowCollapse="true" Style="width: 700px; margin: 40px auto;"
-                    Expand=@(() => Change("Panel expanded")) Collapse=@(() => Change("Panel collapsed")) >
-        <HeaderTemplate>
-            <h4 class="m-0 d-flex align-items-center">
-                <RadzenIcon Icon="account_box" Class="mr-1" /><b>Orders</b>
-            </h4>
-        </HeaderTemplate>
-        <ChildContent>
-            <RadzenCard Class="mt-3">
-                <RadzenDataList PageSize="4" WrapItems="true" AllowPaging="true" 
-                                Data="@orders" TItem="Order" >
-                    <Template Context="order">
-                        <RadzenCard Style="width: 250px">
-                            <div class="row">
-                                <div class="col-md-8 text-truncate">
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") Class="mr-1" />
-                                    <b>@(order.ShipName)</b>
-                                </div>
-                                <div class="col-md-4 text-right">
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
-                                </div>
-                            </div>
-                            <hr style="border: none; background-color: rgba(0,0,0,.08); height: 1px; margin: 1rem 0;" />
-                            <div class="d-flex flex-row align-items-center">
-                                <RadzenImage Path="@order.Employee?.Photo" Class="rounded-circle float-left mr-3" Style="width: 80px; height: 80px;" />
-                                <div>
-                                    <h4 class="mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</h4>
-                                    <div>@order.ShipAddress</div>
-                                    <div style="font-size: .8em">@(order.ShipCity), @(order.ShipCountry)</div>
-                                </div>
-                            </div>
-                        </RadzenCard>
-                    </Template>
-                </RadzenDataList>
-            </RadzenCard>
-        </ChildContent>
-        <SummaryTemplate>
-            <RadzenCard class="mt-3">
-                <b>@orders.Count() Orders</b>
-            </RadzenCard>
-        </SummaryTemplate>
-    </RadzenPanel>
+<RadzenText Anchor="panel#expand-collapse" TextStyle="TextStyle.H5" TagName="TagName.H2">
+    Expand/Collapse
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>AllowCollapse</code> property to allow expand/collapse and <code>Expand</code> and <code>Collapse</code> callbacks to catch if Panel component is expanded or collapsed.
+</RadzenText>
+<RadzenExample ComponentName="Panel" Example="PanelConfig">
+    <PanelConfig />
 </RadzenExample>
-
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    EventConsole console;
-
-    IEnumerable<Order> orders;
-
-    protected override void OnInitialized()
-    {
-        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
-    }
-
-    void Change(string text)
-    {
-        console.Log($"{text}");
-    }
-}

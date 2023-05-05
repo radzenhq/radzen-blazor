@@ -1,17 +1,35 @@
 @if (ready) 
 {
-    <iframe title="Follow Radzen on twitter" frameborder="0" scrolling="no" src="https://platform.twitter.com/widgets/follow_button.html?screen_name=radzenhq&show_screen_name=false&show_count=true" width="150px" height="20px"></iframe>
-    <iframe title="Star Radzen on GitHub" src="https://ghbtns.com/github-btn.html?user=radzenhq&repo=radzen-blazor&type=star&count=true" frameborder="0" scrolling="0" width="100px" height="20px"></iframe>
-    <iframe title="Watch Radzen YouTube videos" ng-non-bindable="" frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 115px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 24px;" tabindex="0" vspace="0" width="100%" id="I23_1580801975820" name="I23_1580801975820" src="https://www.youtube.com/subscribe_embed?usegapi=1&amp;channelid=UCAX4L9SPAigw41-RqTYEeKg&amp;layout=default&amp;count=default&amp;origin=https%3A%2F%2Fdevelopers-dot-devsite-v2-prod.appspot.com&amp;gsrc=3p&amp;ic=1&amp;jsh=m%3B%2F_%2Fscs%2Fapps-static%2F_%2Fjs%2Fk%3Doz.gapi.en.xh-S9KbEGSE.O%2Fam%3DwQc%2Fd%3D1%2Fct%3Dzgms%2Frs%3DAGLTcCNaUSRWzhd71dAsiMVOstVE3KcJZw%2Fm%3D__features__#_methods=onPlusOne%2C_ready%2C_close%2C_open%2C_resizeMe%2C_renderstart%2Concircled%2Cdrefresh%2Cerefresh&amp;id=I23_1580801975820&amp;_gfid=I23_1580801975820&amp;parent=https%3A%2F%2Fdevelopers-dot-devsite-v2-prod.appspot.com&amp;pfname=&amp;rpctoken=26041136" data-gapiattached="true"></iframe>
+    <RadzenStack Gap="2rem" Class="rz-my-12">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+            <a href="https://github.com/radzenhq/radzen-blazor/" title="Star Radzen on GitHub">
+                <img alt="Star Radzen on GitHub" src="https://img.shields.io/github/stars/radzenhq/radzen-blazor?color=ff504d&logo=github&style=flat-square" style="border-radius: 20px;" />
+            </a>
+            <a href="https://github.com/radzenhq/radzen-blazor/graphs/contributors">
+                <img alt="Github Contributors" src="https://img.shields.io/github/contributors/radzenhq/radzen-blazor?color=ff504d&logo=github&style=flat-square" style="border-radius: 20px;" />
+            </a>
+            <a href="https://www.nuget.org/packages/Radzen.Blazor">
+                <img alt="Nuget Downloads" src="https://img.shields.io/nuget/dt/Radzen.Blazor?color=ff504d&label=nuget%20downloads&logo=nuget&style=flat-square" style="border-radius: 20px;" />
+            </a>
+            <a name="last-commit">
+                <img alt="Last Commit" src="https://img.shields.io/github/last-commit/radzenhq/radzen-blazor?color=ff504d&logo=github&style=flat-square" style="border-radius: 20px;" />
+            </a>
+        </RadzenStack>
+        
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem">
+            <iframe title="Watch Radzen YouTube videos" ng-non-bindable="" frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 115px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 24px;" tabindex="0" vspace="0" width="100%" id="I23_1580801975820" name="I23_1580801975820" src="https://www.youtube.com/subscribe_embed?usegapi=1&amp;channelid=UCAX4L9SPAigw41-RqTYEeKg&amp;layout=default&amp;count=default&amp;origin=https%3A%2F%2Fdevelopers-dot-devsite-v2-prod.appspot.com&amp;gsrc=3p&amp;ic=1&amp;jsh=m%3B%2F_%2Fscs%2Fapps-static%2F_%2Fjs%2Fk%3Doz.gapi.en.xh-S9KbEGSE.O%2Fam%3DwQc%2Fd%3D1%2Fct%3Dzgms%2Frs%3DAGLTcCNaUSRWzhd71dAsiMVOstVE3KcJZw%2Fm%3D__features__#_methods=onPlusOne%2C_ready%2C_close%2C_open%2C_resizeMe%2C_renderstart%2Concircled%2Cdrefresh%2Cerefresh&amp;id=I23_1580801975820&amp;_gfid=I23_1580801975820&amp;parent=https%3A%2F%2Fdevelopers-dot-devsite-v2-prod.appspot.com&amp;pfname=&amp;rpctoken=26041136" data-gapiattached="true"></iframe>
+            <iframe title="Follow Radzen on twitter" frameborder="0" scrolling="no" src="https://platform.twitter.com/widgets/follow_button.html?screen_name=radzenhq&show_screen_name=false&show_count=true" width="80px" height="20px"></iframe>
+        </RadzenStack>
+    </RadzenStack>
 }
 @code {
     bool ready;
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             ready = true;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
     }
 }

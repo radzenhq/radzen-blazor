@@ -1,0 +1,13 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenCheckBoxList @bind-Value=@values TValue="int" class="mb-5">
+        <Items>
+            <RadzenCheckBoxListItem Text="Orders" Value="1" />
+            <RadzenCheckBoxListItem Text="Employees" Value="2" />
+            <RadzenCheckBoxListItem Text="Customers" Value="3" />
+        </Items>
+    </RadzenCheckBoxList>
+</div>
+
+@code {
+    IEnumerable<int> values = new int[] { 1 };
+}

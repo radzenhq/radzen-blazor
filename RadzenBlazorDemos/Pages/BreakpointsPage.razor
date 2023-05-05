@@ -1,0 +1,46 @@
+﻿@page "/breakpoints"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Responsive Breakpoints
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Responsive breakpoints are used to adjust the layout based on the screen size of the device in use. They allow a single layout to adapt to different screen sizes, from small mobile phone screens to large desktop monitors.
+</RadzenText>
+
+<RadzenText Anchor="breakpoints#breakpoints" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Breakpoints
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-6 rz-mb-4">
+    A breakpoint is a specific screen width at which the layout of an app or web page will change. For example, a breakpoint with min-width of 576px means that when the screen width is 576 pixels or more, the layout will change to efficiently use the screen real estate.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    Here is a list of the predefined breakpoints and their abbreviations in Radzen Blazor Components, optimized for a wide range of devices.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>xs</code> - Extra Small ≥ 576px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>sm</code> - Small ≥ 768px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>md</code> - Medium ≥ 1024px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>lg</code> - Large ≥ 1280px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>xl</code> - Extra Large ≥ 1920px</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>xx</code> - Extra Extra Large ≥ 2560px</RadzenText>
+
+<RadzenText Anchor="breakpoints#border-radius" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Usage of Breakpoints
+</RadzenText>
+<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-pt-8">
+    Breakpoints in Layouts
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-6 rz-mb-4">
+    Breakpoints are primarily used in layouts. For example, you can define the width of a <code>RadzenColumn</code> component by setting the respective <code>Size</code> property. E.g. <code>SizeMD="6"</code>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-6 rz-mb-4">
+    See <a href="/column">Column</a> demos to learn how to adjust your page layouts using breakpoints.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-pt-8">
+    Breakpoints in Spacing
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-6 rz-mb-4">
+    Breakpoints can also be used with the Spacing CSS utility classes for <code>margin</code> and <code>padding</code>. For example, you can define the margin of an element by setting the respective <code>.rz-m-{breakpoint}-{size}</code> CSS class. E.g. <code>.rz-m-md-1</code>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-6 rz-mb-4">
+    See <a href="/spacing">Spacing</a> demos to learn how to use breakpoints with margins and paddings.
+</RadzenText>

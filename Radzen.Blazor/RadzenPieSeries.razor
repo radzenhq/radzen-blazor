@@ -16,37 +16,47 @@
         var y = CenterY;
         var radius = CurrentRadius;
 
-        return 
+        return
         @<g class="@className">
-            @if (Items.Any())
-            {
-                var sum = Items.Sum(Value);
-
-                double startAngle = -90;
-
-                @foreach(var data in Items)
+            @if (PositiveItems.Any())
                 {
-                    var value = Value(data);
-                    var angle = sum == 0 ? 0 : (value / sum) * 360;
-                    var endAngle = startAngle + angle;
+                    var sum = PositiveItems.Sum(Value);
 
-                    var d = Segment(x, y, radius, 0, startAngle, endAngle);
+                    double startAngle = -90;
 
-                    startAngle = endAngle;
-                    
-                    var index = Items.IndexOf(data);
-                    var arcClassName = $"rz-series-item-{index}";
-                    var fill = PickColor(index, Fills);
-                    var stroke = PickColor(index, Strokes);
+                @foreach (var data in PositiveItems)
+                    {
+                        var value = Value(data);
+                        var angle = sum == 0 ? 0 : (value / sum) * 360;
+                        var endAngle = startAngle + angle;
 
+                        var d = Segment(x, y, radius, 0, startAngle, endAngle);
+
+                        startAngle = endAngle;
+
+                        var index = Items.IndexOf(data);
+                        var arcClassName = $"rz-series-item-{index}";
+                        var fill = PickColor(index, Fills);
+                        var stroke = PickColor(index, Strokes);
+
+                        <g class="@arcClassName">
+                            @if (angle > 0)
+                            {
+                                <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
+                            }
+                        </g>
+                    }
+                }
+                else
+                {
+                    var arcClassName = $"rz-series-item-0";
+                    var d = Segment(x, y, radius, radius - 1, -90, 270);
+                    var fill = PickColor(0, Fills);
+                    var stroke = PickColor(0, Strokes);
                     <g class="@arcClassName">
-                        @if (angle > 0)
-                        {
-                            <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
-                        }
+                        <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
                     </g>
                 }
-            }
         </g>;
     }
 }

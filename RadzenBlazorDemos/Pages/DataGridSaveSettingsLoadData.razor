@@ -1,0 +1,124 @@
+﻿@using Radzen
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using RadzenBlazorDemos.Services
+@using Microsoft.JSInterop
+@using System.Text.Json
+@using System.Linq.Dynamic.Core
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+@inherits DbContextPage
+
+<p>This example shows how to save/load DataGrid state using Settings property when binding using LoadData event.</p>
+<p>The state includes current page index, page size, groups and columns filter, sort, order, width and visibility.</p>
+<RadzenButton Click="@(args => Settings = null)" Text="Clear saved settings" Style="margin-bottom: 16px" />
+<RadzenButton Click="@(args => NavigationManager.NavigateTo("/datagrid-save-settings", true))" Text="Reload" Style="margin-bottom: 16px" />
+<RadzenDataGrid @ref=grid @bind-Settings="@Settings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
+                AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" 
+                AllowColumnResize="true" AllowColumnReorder="true" ColumnWidth="200px"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                Data="@employees" IsLoading=@isLoading Count="@count" LoadData=@LoadData TItem="Employee">
+    <Columns>
+        <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px;" />
+                @data.FirstName @data.LastName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
+        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
+        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
+    </Columns>
+</RadzenDataGrid>
+
+<EventConsole @ref=@console />
+
+@code {
+    RadzenDataGrid<Employee> grid;
+    IEnumerable<Employee> employees;
+    EventConsole console;
+
+    int count;
+    bool isLoading = false;
+    bool loaded;
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        var query = dbContext.Employees.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        count = query.Count();
+
+        // Simulate async data loading
+        await Task.Delay(2000);
+
+        employees = await Task.FromResult(query.Skip(args.Skip.Value).Take(args.Top.Value).ToList());
+
+        isLoading = false;
+
+        loaded = true;
+    }
+
+    DataGridSettings _settings;
+    public DataGridSettings Settings 
+    { 
+        get
+        {
+            return _settings;
+        }
+        set
+        {
+            if (_settings != value)
+            {
+                _settings = value;
+                InvokeAsync(SaveStateAsync);
+            }
+        }
+    }
+
+    private async Task LoadStateAsync()
+    {
+        var result = await JSRuntime.InvokeAsync<string>("window.localStorage.getItem", "SettingsLoadData");
+        if (!string.IsNullOrEmpty(result))
+        {
+            _settings = JsonSerializer.Deserialize<DataGridSettings>(result);
+        }
+    }
+
+    private async Task SaveStateAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("eval", $@"window.localStorage.setItem('SettingsLoadData', '{JsonSerializer.Serialize<DataGridSettings>(Settings)}')");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender || loaded)
+        {
+            await LoadStateAsync();
+            
+            if (loaded)
+            {
+                await Task.Yield();
+                await grid.Reload();
+                loaded = false;
+            }
+        }
+    }
+}

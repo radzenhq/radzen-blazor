@@ -1,110 +1,82 @@
 @page "/comparevalidator"
-@using Radzen
-@using System.Text.Json
 
-<RadzenExample Name="CompareValidator">
-<div class="container my-4">
-    <div class="row">
-        <div class="col">
-            <RadzenCard Class="w-100 mb-4" >
-            <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
-                <RadzenLabel Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
-            </RadzenCard>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-6">
-            <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
-                <RadzenFieldset Text="Password">
-                    <div class="row mb-5">
-                        <div class="col-md-4" style="align-self: center;">
-                            <RadzenLabel Text="Password" />
-                        </div>
-                        <div class="col">
-                            <RadzenPassword style="display: block" Name="Password" @bind-Value=@model.Password Class="w-100" />
-                            <RadzenRequiredValidator Component="Password" Text="Enter password" Popup="@popup" Style="position: absolute" />
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col-md-4" style="align-self: center;">
-                            <RadzenLabel Text="Repeat Password" />
-                        </div>
-                        <div class="col">
-                            <RadzenPassword style="display: block" Name="RepeatPassword" @bind-Value=@model.RepeatPassword  Class="w-100" />
-                            <RadzenRequiredValidator Component="RepeatPassword" Text="Repeat your password" Popup=@popup Style="position: absolute" />
-                            <RadzenCompareValidator Visible=@(!string.IsNullOrEmpty(model.RepeatPassword)) Value=@model.Password Component="RepeatPassword" Text="Passwords should be the same" Popup=@popup Style="position: absolute" />
-                        </div>
-                    </div>
-                    <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
-                </RadzenFieldset>
-            </RadzenTemplateForm>
-        </div>
-        <div class="col-lg-6">
-            <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
-                <RadzenFieldset Text="Comparison operator">
-                    <div class="row mb-5">
-                        <div class="col-md-4" style="align-self: center;">
-                            <RadzenLabel Text="Operator" />
-                        </div>
-                        <div class="col">
-                            <RadzenDropDown @bind-Value=@compareOperator Data=@Enum.GetValues(typeof(CompareOperator)) Class="w-100" />
-                        </div>
-                    </div>
-                    <div class="row mb-5">
-                        <div class="col-md-4" style="align-self: center;">
-                            <RadzenLabel Text="Value to compare with" />
-                        </div>
-                        <div class="col">
-                            <RadzenNumeric @bind-Value=@targetValue Class="w-100" />
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col-md-4" style="align-self: center;">
-                            <RadzenLabel Text="Value" />
-                        </div>
-                        <div class="col">
-                            <RadzenNumeric @bind-Value=@model.Value Name="Value" style="display: block" Class="w-100" />
-                            <RadzenCompareValidator Value=@targetValue Component="Value" Popup=@popup Style="position: absolute" Operator=@compareOperator />
-                        </div>
-                    </div>
-                    <RadzenButton ButtonType="ButtonType.Submit" Text="Validate"></RadzenButton>
-                </RadzenFieldset>
-            </RadzenTemplateForm>
-        </div>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    CompareValidator
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>CompareValidator</strong> component.
+</RadzenText>
+
+<RadzenText Anchor="comparevalidator#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Basic Usage
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    RadzenCompareValidator compares the user input agains a predefined value or another component.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    To use it perform these steps:
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+<ol>
+    <li>Add an input component and set its <code>Name</code>. Data-bind its value to a model property via <code>@@bind-Value=@@model.Property</code>.</li>
+    <li>Add RadzenCompareValidator and set its <code>Component</code> property to the <code>Name</code> of the input component. Set its <code>Value</code> property to the value you want to compare with (usually another model property).</li>
+</ol>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>Important!</strong> RadzenCompareValidator works only inside  <RadzenLink Path="/templateform" Text="RadzenTemplateForm" Target="_blank" />.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    Here is a typical user registration form which checks if the user entered the same password.
+</RadzenText>
+
+<RadzenExample ComponentName="CompareValidator" Example="CompareValidatorBasicUsage" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenCompareValidator.cs">
+    <CompareValidatorBasicUsage />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText Anchor="comparevalidator#conditional-validation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Coditional Validation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    To make the validator conditional you can set its <code>Visible</code> property. When set to <code>false</code> the validator will not run. In the example above <code>Visible</code> is set to <code>!string.IsNullOrEmpty(model.RepeatPassword)</code> - the validator will not run if RepeatPassword is empty.
+</RadzenText>
 
-@code {
-    class Model
-    {
-        public string Password { get; set; }
-        public double Value { get; set; }
-        public string RepeatPassword { get; set; }
-    }
+<pre>
+    <code>
+    &lt;RadzenCompareValidator Visible=@@(!string.IsNullOrEmpty(model.RepeatPassword)) Value=@@model.Password Component="RepeatPassword" Text="Passwords should be the same" Popup=@@popup Style="position: absolute" /&gt;
+    </code>
+</pre>
 
-    bool popup;
-    double targetValue = 1;
+<RadzenText Anchor="comparevalidator#comparison-operator" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Comparison operator
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    By default RadzenCompareValidator checks if the component value is equal to <code>Value</code>. This can be changed via the <code>Operator</code> property.
+</RadzenText>
 
-    CompareOperator compareOperator = CompareOperator.Equal;
+<RadzenExample ComponentName="CompareValidator" Example="CompareValidatorComparisonOperator" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenCompareValidator.cs">
+    <CompareValidatorComparisonOperator />
+</RadzenExample>
 
-    Model model = new Model();
-    EventConsole console;
+<RadzenText Anchor="comparevalidator#appearance" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Appearance
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    By default RadzenCompareValidator appears next to the component it validates. To make it appear below add <code>Style="display:block"</code>.
+</RadzenText>
+<pre>
+    <code>
+    &lt;RadzenNumeric Name="Count" @@bind-Value=@@model.Count /&gt;
+    &lt;RadzenCompareValidator Style="display:block" Component="Count" Text="Count should be less than 10" Operator="CompareOperator.LessThan" Value="10" /&gt;
+    </code>
+</pre>
 
-    void Log(string eventName, string value)
-    {
-        console.Log($"{eventName}: {value}");
-    }
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+To make it appear as a styled popup set its <code>Popup</code> property to <code>true</code> and set its CSS <code>position</code> to <code>absolute</code>. The validated component should have <code>display: block</code> so the validation message appears right below it.
+</RadzenText>
+<pre>
+    <code>
+    &lt;RadzenNumeric Name="Count" @@bind-Value=@@model.Count Style="display:block" /&gt;
+    &lt;RadzenCompareValidator Style="position:absolute" Popup="true" Component="Count" Text="Count should be less than 10" Operator="CompareOperator.LessThan" Value="10" /&gt;
+    </code>
+</pre>
 
-    void OnSubmit(Model model)
-    {
-        Log("Submit", JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true }));
-    }
-
-    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
-    {
-        Log("InvalidSubmit", JsonSerializer.Serialize(args, new JsonSerializerOptions() { WriteIndented = true }));
-    }
-}

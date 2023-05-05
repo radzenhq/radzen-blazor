@@ -1,10 +1,22 @@
-$gauge-scale-color: #808080 !default;
-$gauge-scale-label-color: #808080 !default;
-$gauge-scale-font-size: 0.875rem !default;
-$gauge-pointer-color: $greyish-brown !default;
-$gauge-arc-scale-color: #e6ecef !default;
-$gauge-arc-scale-label-color: #808080 !default;
-$gauge-arc-value-color: $default-link !default;
+$gauge-scale-color: var(--rz-base-300) !default;
+$gauge-scale-label-color: var(--rz-text-tertiary-color) !default;
+$gauge-scale-font-size: var(--rz-body-font-size) !default;
+$gauge-pointer-color: var(--rz-text-secondary-color) !default;
+$gauge-arc-scale-color: var(--rz-base-300) !default;
+$gauge-arc-scale-label-color: var(--rz-text-tertiary-color) !default;
+$gauge-arc-value-color: var(--rz-secondary) !default;
+
+// Gauge CSS variables
+
+:root {
+  --rz-gauge-scale-color: #{$gauge-scale-color};
+  --rz-gauge-scale-label-color: #{$gauge-scale-label-color};
+  --rz-gauge-scale-font-size: #{$gauge-scale-font-size};
+  --rz-gauge-pointer-color: #{$gauge-pointer-color};
+  --rz-gauge-arc-scale-color: #{$gauge-arc-scale-color};
+  --rz-gauge-arc-scale-label-color: #{$gauge-arc-scale-label-color};
+  --rz-gauge-arc-value-color: #{$gauge-arc-value-color};
+}
 
 .rz-gauge,
 .rz-arc-gauge {
@@ -17,24 +29,24 @@ $gauge-arc-value-color: $default-link !default;
 .rz-gauge {
   .rz-line,
   .rz-tick {
-    stroke: $gauge-scale-color;
+    stroke: var(--rz-gauge-scale-color);
   }
 
   .rz-tick-text {
-    font-size: $gauge-scale-font-size;
-    fill: $gauge-scale-label-color;
+    font-size: var(--rz-gauge-scale-font-size);
+    fill: var(--rz-gauge-scale-label-color);
   }
 }
 
 .rz-arc-gauge {
   .rz-line,
   .rz-tick {
-    stroke: $gauge-arc-scale-color;
+    stroke: var(--rz-gauge-arc-scale-color);
   }
 
   .rz-tick-text {
-    font-size: $gauge-scale-font-size;
-    fill: $gauge-arc-scale-label-color;
+    font-size: var(--rz-gauge-scale-font-size);
+    fill: var(--rz-gauge-arc-scale-label-color);
   }
 }
 
@@ -51,13 +63,13 @@ $gauge-arc-value-color: $default-link !default;
 }
 
 .rz-gauge-pointer {
-  fill: $gauge-pointer-color;
+  fill: var(--rz-gauge-pointer-color);
 }
 
 .rz-arc-gauge-scale-value {
-  fill: $gauge-arc-value-color;
+  fill: var(--rz-gauge-arc-value-color);
 }
 
 .rz-arc-gauge-scale {
-  fill: $gauge-arc-scale-color;
+  fill: var(--rz-gauge-arc-scale-color);
 }

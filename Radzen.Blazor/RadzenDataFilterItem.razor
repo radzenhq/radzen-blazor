@@ -1,0 +1,258 @@
+@typeparam TItem
+@if (Filter.Filters != null)
+{
+    <RadzenSelectBar @bind-Value=Filter.LogicalFilterOperator Change="@((LogicalFilterOperator args) => { InvokeAsync(ChangeState); InvokeAsync(ApplyFilter); })" Size="ButtonSize.Small">
+        <Items>
+            <RadzenSelectBarItem Text="@DataFilter.AndOperatorText" Value="LogicalFilterOperator.And" title="@DataFilter.AndOperatorText" />
+            <RadzenSelectBarItem Text="@DataFilter.OrOperatorText" Value="LogicalFilterOperator.Or" title="@DataFilter.OrOperatorText" />
+        </Items>
+    </RadzenSelectBar>
+
+    <RadzenButton title="@DataFilter.RemoveFilterText" class="rz-datafilter-item-clear" Icon="clear" Click="@RemoveFilter" Variant="Variant.Text" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark"/>
+
+    <ul class="rz-datafilter-group">
+    @foreach(var filter in Filter.Filters)
+    {
+        <li class="rz-datafilter-item @(filter.Filters != null ? "rz-datafilter-group-item" : "")">
+            <RadzenDataFilterItem DataFilter="@this.DataFilter" Filter="@filter" Parent=@this />
+        </li>
+    }
+        <li class="rz-datafilter-item rz-datafilter-bar">
+            <RadzenSplitButton Icon="add" Click="@(args => AddFilter(args?.Value == "group"))" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter">
+                <RadzenSplitButtonItem Icon="add" Text="@DataFilter.AddFilterText" />
+                <RadzenSplitButtonItem Icon="playlist_add" Value="group" Text="@DataFilter.AddFilterGroupText" />
+            </RadzenSplitButton>
+        </li>
+    </ul>
+}
+else
+{
+    <RadzenDropDown @bind-Value="@Filter.Property" Data="@(DataFilter?.properties)" ValueProperty="Property" TValue="string" Change="@OnPropertyChange">
+        <Template>
+                @{
+                    var property = (RadzenDataFilterProperty<TItem>)context;
+                }
+                @(property.Title ?? property.Property)
+        </Template>
+    </RadzenDropDown>
+    if (property != null)
+    {
+        <RadzenDropDown @onclick:preventDefault="true" Data="@(property.GetFilterOperators().Select(t => new { Value = property.GetFilterOperatorText(t), Key = t }))" 
+                TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" @bind-Value="@Filter.FilterOperator" Change="@OnOperatorChange" />
+        @if (property.FilterTemplate != null)
+        {
+            <div class="rz-datafilter-editor" style="display:flex">
+                @property.FilterTemplate(Filter)
+            </div>
+        }
+        else if (PropertyAccess.IsNullableEnum(property.FilterPropertyType) || PropertyAccess.IsEnum(property.FilterPropertyType))
+        {
+            <RadzenDropDown AllowClear="false" AllowFiltering="false" TValue="@object" class="rz-datafilter-editor"
+                @bind-Value=@Filter.FilterValue Multiple="false" Placeholder="@DataFilter.EnumFilterSelectText" TextProperty="Text" ValueProperty="Value"
+                Data=@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(property.FilterPropertyType) ?? property.FilterPropertyType) Change=@(args  => InvokeAsync(ApplyFilter))/>
+        }
+        else if (PropertyAccess.IsNumeric(property.FilterPropertyType))
+        {
+            @(DrawNumericFilter())
+        }
+        else if (PropertyAccess.IsDate(property.FilterPropertyType))
+        {
+            <RadzenDatePicker @bind-Value=@Filter.FilterValue TValue="@object" ShowTime="true" class="rz-datafilter-editor"
+                ShowTimeOkButton="true" DateFormat="@getFilterDateFormat()" Change=@(args => InvokeAsync(ApplyFilter)) />
+        }
+        else if (property.FilterPropertyType == typeof(bool) || property.FilterPropertyType == typeof(bool?))
+        {
+            <RadzenCheckBox TriState="true" TValue="@object" @bind-Value=@Filter.FilterValue Change=@(args => InvokeAsync(ApplyFilter)) class="rz-datafilter-check" />
+        }
+        else
+        {
+            <RadzenTextBox class="rz-datafilter-editor" Value="@($"{Filter.FilterValue}")" Change=@(args => { Filter.FilterValue = args; InvokeAsync(ApplyFilter); }) />
+        }
+
+        <RadzenButton title="@DataFilter.RemoveFilterText" class="rz-datafilter-item-clear" Icon="clear" Click="@RemoveFilter" Variant="Variant.Text" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark"/>
+    }
+}
+@code {
+    [Parameter]
+    public RadzenDataFilter<TItem> DataFilter { get; set; }
+
+    [Parameter]
+    public RadzenDataFilterItem<TItem> Parent { get; set; }
+
+    CompositeFilterDescriptor _filter;
+    [Parameter]
+    public CompositeFilterDescriptor Filter
+    {
+        get
+        {
+            return _filter;
+        }
+        set
+        {
+            _filter = value;
+
+            if (property == null && Filter.Filters == null)
+            {
+                property = (Filter.Property != null ? DataFilter.properties
+                    .Where(c => object.Equals(c.Property, Filter.Property)) : DataFilter.properties).FirstOrDefault();
+
+                if (property != null)
+                {
+                    property.FilterValueChange -= OnFilterValueChange;
+                    property.FilterValueChange += OnFilterValueChange;
+
+                    Filter.Property = property.Property;
+
+                    if (!property.GetFilterOperators().Contains(Filter.FilterOperator))
+                    {
+                        Filter.FilterOperator = property.GetFilterOperators().FirstOrDefault();
+                    }
+
+                    var v = property.GetFilterValue();
+                    if (v != null)
+                    {
+                        Filter.FilterValue = v;
+                    }
+                }
+            }
+        }
+    }
+
+    void OnFilterValueChange(object value)
+    {
+        if (property != null)
+        {
+            Filter.FilterValue = property.GetFilterValue();
+        }
+    }
+
+    RadzenDataFilterProperty<TItem> property;
+
+    async Task ApplyFilter()
+    { 
+        if (DataFilter.Auto)
+        {
+            await DataFilter.Filter();
+        }
+    }
+
+    async Task OnPropertyChange(object p)
+    {
+        property.FilterValueChange -= OnFilterValueChange;
+
+        property = DataFilter.properties.Where(c => object.Equals(c.Property, p)).FirstOrDefault();
+
+        property.FilterValueChange += OnFilterValueChange;
+
+        Filter.FilterValue = null;
+
+        var defaultOperator = typeof(System.Collections.IEnumerable).IsAssignableFrom(property.FilterPropertyType) ? FilterOperator.Contains : default(FilterOperator);
+        Filter.FilterOperator = property.GetFilterOperators().Contains(defaultOperator) ? defaultOperator : property.GetFilterOperators().FirstOrDefault();
+
+        await ApplyFilter();
+    }
+
+    async Task OnOperatorChange(object p)
+    {
+        await ApplyFilter();
+    }
+
+    async Task AddFilter(bool isGroup)
+    {
+        if (isGroup)
+        {
+            Filter.Filters = Filter.Filters.Concat(new CompositeFilterDescriptor[]
+                {
+                    new CompositeFilterDescriptor()
+                    {
+                        Filters = Enumerable.Empty<CompositeFilterDescriptor>()
+                    }
+                }
+            );
+        }
+        else
+        {
+            Filter.Filters = Filter.Filters.Concat(new CompositeFilterDescriptor[] { new CompositeFilterDescriptor() });
+        }
+
+        if (DataFilter.Auto)
+        {
+            await DataFilter.Filter();
+        }
+    }
+
+    async Task RemoveFilter()
+    {
+        property = null;
+
+        if (Parent != null)
+        {
+            Parent.Filter.Filters = Parent.Filter.Filters.Where(f => f != Filter).ToList();
+            await Parent.ChangeState();
+        }
+        else
+        {
+            DataFilter.Filters = DataFilter.Filters.Where(f => f != Filter).ToList();
+            await DataFilter.ChangeState();
+        }
+
+        await ApplyFilter();
+    }
+
+    internal async Task ChangeState()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    RenderFragment DrawNumericFilter()
+    {
+        return new RenderFragment(builder =>
+        {
+            var type = Nullable.GetUnderlyingType(property.FilterPropertyType) != null ?
+                property.FilterPropertyType : typeof(Nullable<>).MakeGenericType(property.FilterPropertyType);
+
+            var numericType = typeof(RadzenNumeric<>).MakeGenericType(type);
+
+            builder.OpenComponent(0, numericType);
+
+            builder.AddAttribute(1, "Value", Filter.FilterValue);
+            builder.AddAttribute(2, "class", "rz-datafilter-editor");
+
+            Action<object> action = args =>
+            {
+                Filter.FilterValue = args; InvokeAsync(ApplyFilter);
+            };
+
+            var eventCallbackGenericCreate = typeof(NumericFilterEventCallback).GetMethod("Create").MakeGenericMethod(type);
+            var eventCallbackGenericAction = typeof(NumericFilterEventCallback).GetMethod("Action").MakeGenericMethod(type);
+
+            builder.AddAttribute(3, "Change", eventCallbackGenericCreate.Invoke(this,
+                new object[] { this, eventCallbackGenericAction.Invoke(this, new object[] { action }) }));
+
+            builder.CloseComponent();
+        });
+    }
+
+    internal class NumericFilterEventCallback
+    {
+        public static EventCallback<T> Create<T>(object receiver, Action<T> action)
+        {
+            return EventCallback.Factory.Create<T>(receiver, action);
+        }
+
+        public static Action<T> Action<T>(Action<object> action)
+        {
+            return args => action(args);
+        }
+    }
+
+    internal string getFilterDateFormat()
+    {
+        if (property != null && !string.IsNullOrEmpty(property.FormatString))
+        {
+            return property.FormatString.Replace("{0:", "").Replace("}", "");
+        }
+
+        return DataFilter.FilterDateFormat;
+    }
+}

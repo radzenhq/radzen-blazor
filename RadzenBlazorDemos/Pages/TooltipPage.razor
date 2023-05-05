@@ -1,65 +1,71 @@
 ﻿@page "/tooltip"
 
-@inject TooltipService tooltipService
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Tooltip
+</RadzenText>
 
-<RadzenExample Name="Tooltip">
-<div class="row px-3">
-    <div class="col-md-6 col-lg-4 p-3 d-flex">
-        <RadzenCard Class="w-100">
-            <h4 class="mb-4">Show tooltip on mouse over Radzen component</h4>
-            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args) )" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3 d-flex">
-        <RadzenCard Class="w-100">
-            <h4 class="mb-4">Show tooltip on mouse over Radzen component and close it after 10 sec</h4>
-            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltip(args, new TooltipOptions(){ Duration = 10000 }))" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3 d-flex">
-        <RadzenCard Class="w-100">
-            <h4 class="mb-4">Show styled tooltip on button click and close it on page click</h4>
-            <RadzenButton @ref="radzenButton" Text="Show tooltip" Click="@(args => ShowTooltip(radzenButton.Element, new TooltipOptions(){ Style = "background-color: #ffffca; color:#000", Duration = null }))" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3 d-flex">
-        <RadzenCard Class="w-100">
-            <h4 class="mb-4">Show tooltip with HTML content</h4>
-            <RadzenButton Text="Show tooltip" MouseEnter="@(args => ShowTooltipWithHtml(args, new TooltipOptions(){ Style = "color: yellow", Duration = null }))" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3 d-flex">
-        <RadzenCard Class="w-100">
-            <h4 class="mb-4">Show tooltip on mouse over HTML elment</h4>
-            <button @ref="htmlButton" @onmouseover="@(args => ShowTooltip(htmlButton))">
-                Show tooltip
-            </button>
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3 d-flex">
-        <RadzenCard Class="w-100">
-            <h4 class="mb-4">Tooltip position</h4>
-            <RadzenButton Text="Left" MouseEnter="@(args => ShowTooltip(args,
-                                                                            new TooltipOptions(){ Position = TooltipPosition.Left }))" Class="mr-1 mb-1" />
-            <RadzenButton Text="Top" MouseEnter="@(args => ShowTooltip(args,
-                                                                            new TooltipOptions(){ Position = TooltipPosition.Top }))" Class="mr-1 mb-1" />
-            <RadzenButton Text="Bottom" MouseEnter="@(args => ShowTooltip(args,
-                                                                            new TooltipOptions(){ Position = TooltipPosition.Bottom }))" Class="mr-1 mb-1" />
-            <RadzenButton Text="Right" MouseEnter="@(args => ShowTooltip(args,
-                                                                            new TooltipOptions(){ Position = TooltipPosition.Right }))" Class="mr-1 mb-1" />
-        </RadzenCard>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    The <strong>Tooltip</strong> component is a small pop-up box that appears when the user hovers or clicks on a UI element. It is commonly used to provide additional information or context to the user.
+</RadzenText>
+
+<HelpPrerequirements />
+
+<RadzenText Anchor="tooltip#tooltip-string-message" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Show tooltip with string message
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Show string message tooltip when the user hovers a Radzen component.
+</RadzenText>
+<RadzenExample ComponentName="Tooltip" Example="TooltipString">
+    <TooltipString />
 </RadzenExample>
 
-@code {
-    ElementReference htmlButton;
-    RadzenButton radzenButton;
+<RadzenText Anchor="tooltip#tooltip-positions" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Tooltip positions
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Place the Tooltip to the left, right, top, or bottom of a component.
+</RadzenText>
+<RadzenExample ComponentName="Tooltip" Example="TooltipPositions">
+    <TooltipPositions />
+</RadzenExample>
 
-    void ShowTooltip(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, "Some content", options);
+<RadzenText Anchor="tooltip#tooltip-html-content" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Show tooltip with HTML content
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Show HTML content tooltip when the user hovers a Radzen component.
+</RadzenText>
+<RadzenExample ComponentName="Tooltip" Example="TooltipHTMLContent">
+    <TooltipHTMLContent />
+</RadzenExample>
 
-    void ShowTooltipWithHtml(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, ds =>
-@<div>
-    Some <b>HTML</b> content
-</div>, options);
-}
+<RadzenText Anchor="tooltip#tooltip-delay-duration" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Tooltip delay and duration
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Show tooltip with delay when the user hovers a component and close it after 5 seconds.
+</RadzenText>
+<RadzenExample ComponentName="Tooltip" Example="TooltipDelayDuration">
+    <TooltipDelayDuration />
+</RadzenExample>
+
+<RadzenText Anchor="tooltip#tooltip-close-on-page-click" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Close Tooltip on page click
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Show styled tooltip on button click and close it on page click.
+</RadzenText>
+<RadzenExample ComponentName="Tooltip" Example="TooltipClose">
+    <TooltipClose />
+</RadzenExample>
+
+<RadzenText Anchor="tooltip#tooltip-html-element" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Tooltip on HTML element
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Show string message tooltip when the user hovers an HTML element.
+</RadzenText>
+<RadzenExample ComponentName="Tooltip" Example="TooltipHTMLElement">
+    <TooltipHTMLElement />
+</RadzenExample>

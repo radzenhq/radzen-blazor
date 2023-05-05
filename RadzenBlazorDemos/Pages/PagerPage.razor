@@ -1,56 +1,22 @@
 ﻿@page "/pager"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Pager
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Pager</strong> component.
+</RadzenText>
 
-@inject NorthwindContext dbContext
-
-<RadzenExample Name="Pager">
-    <RadzenDataList WrapItems="true" AllowPaging="false" Data="@orders" TItem="Order">
-        <Template Context="order">
-            <RadzenCard Style="width:300px;">
-                <div class="d-flex flex-row align-items-center">
-                    <RadzenImage Path="@order.Employee?.Photo" Class="rounded-circle float-left mr-3" Style="width: 80px; height: 80px;" />
-                    <div>
-                        <h4 class="mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</h4>
-                        <div>@order.Customer?.CompanyName</div>
-                        <div style="font-size: .8em">@(order.ShipCity), @(order.ShipCountry)</div>
-                    </div>
-                </div>
-                <hr style="border: none; background-color: rgba(0,0,0,.08); height: 1px; margin: 1rem 0;" />
-                <div class="row">
-                    <div class="col-md-8 text-truncate">
-                        <b>@(order.ShipName)</b>
-                    </div>
-                    <div class="col-md-4 text-right">
-                        <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
-                    </div>
-                </div>
-            </RadzenCard>
-        </Template>
-    </RadzenDataList>
-    <RadzenPager ShowPagingSummary="true" PagingSummaryFormat="@pagingSummaryFormat" HorizontalAlign="HorizontalAlign.Right" Count="count" PageSize="@pageSize" PageNumbersCount="5" PageChanged="@PageChanged" />
+<RadzenExample ComponentName="Pager" Example="PagerConfig">
+    <PagerConfig />
 </RadzenExample>
-@code {
-    string pagingSummaryFormat = "Displaying page {0} of {1} (total {2} records)";
-    int pageSize = 6;
-    int count;
-    IEnumerable<Order> orders;
 
-    protected override void OnInitialized()
-    {
-        count = dbContext.Orders.Count();
-        orders = GetOrders(0, pageSize);
-    }
-
-    void PageChanged(PagerEventArgs args)
-    {
-        orders = GetOrders(args.Skip, args.Top);
-    }
-
-    IEnumerable<Order> GetOrders(int skip, int take)
-    {
-        return dbContext.Orders.Include("Customer").Include("Employee").Skip(skip).Take(take).ToList();
-    }
-}
+<RadzenText Anchor="pager#pager-density" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Pager Density
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Density</code> property to change the size and density of the pager - <code>Density="Density.Compact"</code>.
+</RadzenText>
+<RadzenExample ComponentName="Pager" Example="PagerDensity">
+    <PagerDensity />
+</RadzenExample>

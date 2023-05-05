@@ -1,7 +1,8 @@
 .rz-navigation-item-link {
   display: flex;
   align-items: center;
-  cursor: default;
+  cursor: pointer;
+  text-decoration: none;
 
   &:hover {
     text-decoration: none;

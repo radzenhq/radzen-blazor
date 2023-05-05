@@ -1,0 +1,28 @@
+﻿@inject DialogService DialogService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+            <RadzenLabel Text="Position:" />
+            <RadzenSelectBar @bind-Value="@Position" TextProperty="Text" ValueProperty="Value"
+                            Data="@(Enum.GetValues(typeof(DialogPosition)).Cast<DialogPosition>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+            <RadzenLabel Text="Show mask:" />
+            <RadzenSwitch @bind-Value="@ShowMask" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+            <RadzenLabel Text="Close on overlay click:" />
+            <RadzenSwitch @bind-Value="@CloseDialogOnOverlayClick" Disabled=@(!ShowMask) />
+        </RadzenStack>
+    </RadzenStack>
+    <RadzenButton Text="Dialog on Side" ButtonStyle="ButtonStyle.Secondary"
+                  Click="@(async args => await DialogService.OpenSideAsync<DialogSideContent>("Side Panel",  
+                      options: new SideDialogOptions { CloseDialogOnOverlayClick = CloseDialogOnOverlayClick, Position = Position, ShowMask = ShowMask }))" />
+</div>
+
+@code {
+    DialogPosition Position;
+    bool CloseDialogOnOverlayClick;
+    bool ShowMask;
+}

@@ -1,0 +1,66 @@
+@using Radzen
+@using System.Text.Json
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col">
+            <RadzenCard class="w-100 mb-4" >
+            <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
+                <RadzenLabel Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
+            </RadzenCard>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+                <RadzenFieldset Text="Bid info">
+                    <div class="row mb-5">
+                        <div class="col-md-4">
+                            <RadzenLabel Text="Quantity" />
+                            <small style="display: block">(1-10 items)</small>
+                        </div>
+                        <div class="col">
+                            <RadzenNumeric style="display: block" Name="Quantity" @bind-Value=@model.Quantity @oninput=@OnInput class="w-100" />
+                            <RadzenNumericRangeValidator Component="Quantity" Min="1" Max="10" Text="Quantity should be between 1 and 10" Popup=@popup Style="position: absolute" />
+                        </div>
+                    </div>
+                    <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
+                </RadzenFieldset>
+            </RadzenTemplateForm>
+        </div>
+    </div>
+</div>
+
+<EventConsole @ref=@console />
+
+@code {
+    class Model
+    {
+        public decimal Quantity { get; set; }
+    }
+
+    bool popup;
+
+    Model model = new Model();
+    EventConsole console;
+
+    void OnInput(ChangeEventArgs args)
+    {
+        Log("oninput", args.Value.ToString());
+    }
+
+    void Log(string eventName, string value)
+    {
+        console.Log($"{eventName}: {value}");
+    }
+
+    void OnSubmit(Model model)
+    {
+        Log("Submit", JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true }));
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        Log("InvalidSubmit", JsonSerializer.Serialize(args, new JsonSerializerOptions() { WriteIndented = true }));
+    }
+}

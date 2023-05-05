@@ -1,0 +1,119 @@
+// Margins and Paddings
+@each $property, $shorthand in (margin: m, padding: p) {
+  @each $gutter, $gutter-value in $rz-gutter-map {
+    .rz-#{$shorthand}-#{$gutter} {
+      #{$property}: #{$gutter-value} !important;
+    }
+    .rz-#{$shorthand}y-#{$gutter},
+    .rz-#{$shorthand}t-#{$gutter} {
+      #{$property}-top: #{$gutter-value} !important;
+    }
+    .rz-#{$shorthand}x-#{$gutter},
+    .rz-#{$shorthand}r-#{$gutter} {
+      #{$property}-right: #{$gutter-value} !important;
+    }
+    .rz-#{$shorthand}y-#{$gutter},
+    .rz-#{$shorthand}b-#{$gutter} {
+      #{$property}-bottom: #{$gutter-value} !important;
+    }
+    .rz-#{$shorthand}x-#{$gutter},
+    .rz-#{$shorthand}l-#{$gutter} {
+      #{$property}-left: #{$gutter-value} !important;
+    }
+    .rz-#{$shorthand}s-#{$gutter} {
+      #{$property}-inline-start: #{$gutter-value} !important;
+    }
+    .rz-#{$shorthand}e-#{$gutter} {
+      #{$property}-inline-end: #{$gutter-value} !important;
+    }
+  }
+}
+
+// Auto Margins
+.rz-m-auto {
+  margin: auto !important;
+}
+.rz-my-auto,
+.rz-mt-auto {
+  margin-top: auto !important;
+}
+.rz-mx-auto,
+.rz-mr-auto {
+  margin-right: auto !important;
+}
+.rz-my-auto,
+.rz-mb-auto {
+  margin-bottom: auto !important;
+}
+.rz-mx-auto,
+.rz-ml-auto {
+  margin-left: auto !important;
+}
+.rz-ms-auto {
+  margin-inline-start: auto !important;
+}
+.rz-me-auto {
+  margin-inline-end: auto !important;
+}
+
+// Margins and Paddings in Breakpoints
+@each $breakpoint, $breakpoint-value in $rz-breakpoints-map {
+  @media (min-width: #{$breakpoint-value}) {
+    
+    @each $property, $shorthand in (margin: m, padding: p) {
+      @each $gutter, $gutter-value in $rz-gutter-map {
+        .rz-#{$shorthand}-#{$breakpoint}-#{$gutter} {
+          #{$property}: #{$gutter-value} !important;
+        }
+        .rz-#{$shorthand}y-#{$breakpoint}-#{$gutter},
+        .rz-#{$shorthand}t-#{$breakpoint}-#{$gutter} {
+          #{$property}-top: #{$gutter-value} !important;
+        }
+        .rz-#{$shorthand}x-#{$breakpoint}-#{$gutter},
+        .rz-#{$shorthand}r-#{$breakpoint}-#{$gutter} {
+          #{$property}-right: #{$gutter-value} !important;
+        }
+        .rz-#{$shorthand}y-#{$breakpoint}-#{$gutter},
+        .rz-#{$shorthand}b-#{$breakpoint}-#{$gutter} {
+          #{$property}-bottom: #{$gutter-value} !important;
+        }
+        .rz-#{$shorthand}x-#{$breakpoint}-#{$gutter},
+        .rz-#{$shorthand}l-#{$breakpoint}-#{$gutter} {
+          #{$property}-left: #{$gutter-value} !important;
+        }
+        .rz-#{$shorthand}s-#{$breakpoint}-#{$gutter} {
+          #{$property}-inline-start: #{$gutter-value} !important;
+        }
+        .rz-#{$shorthand}s-#{$breakpoint}-#{$gutter} {
+          #{$property}-inline-end: #{$gutter-value} !important;
+        }
+      }
+    }
+
+    .rz-m-#{$breakpoint}-auto {
+      margin: auto !important;
+    }
+    .rz-my-#{$breakpoint}-auto,
+    .rz-mt-#{$breakpoint}-auto {
+      margin-top: auto !important;
+    }
+    .rz-mx-#{$breakpoint}-auto,
+    .rz-mr-#{$breakpoint}-auto {
+      margin-right: auto !important;
+    }
+    .rz-my-#{$breakpoint}-auto,
+    .rz-mb-#{$breakpoint}-auto {
+      margin-bottom: auto !important;
+    }
+    .rz-mx-#{$breakpoint}-auto,
+    .rz-ml-#{$breakpoint}-auto {
+      margin-left: auto !important;
+    }
+    .rz-ms-#{$breakpoint}-auto {
+      margin-inline-start: auto !important;
+    }
+    .rz-me-#{$breakpoint}-auto {
+      margin-inline-end: auto !important;
+    }
+  }
+}

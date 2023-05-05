@@ -1,0 +1,90 @@
+﻿@using System.Linq.Dynamic.Core
+@using System.ComponentModel.DataAnnotations
+    
+<RadzenDataGrid LoadData="LoadData" IsLoading=@isLoading Count="count" Data=@employees FilterMode="FilterMode.Advanced" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
+    <Columns>
+        <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />
+        <RadzenDataGridColumn TItem="Employee" Property="Gender" Title="Gender" />
+        <RadzenDataGridColumn TItem="Employee" Property="Status" Title="Nullable Status" />
+        <RadzenDataGridColumn TItem="Employee" Property="Color" Title="Favorite Color (Display Attribute in Filter)" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    int count;
+    IEnumerable<Employee> initialEmployees;
+    IEnumerable<Employee> employees;
+    bool isLoading = false;
+
+    public class Employee
+    {
+        public int ID { get; set; }
+        public GenderType Gender { get; set; }
+        public StatusType? Status { get; set; }
+        public ColorType Color { get; set; }
+    }
+
+    public enum GenderType
+    {
+        Ms,
+        Mr,
+        Unknown,
+    }
+
+    public enum ColorType
+    {
+        Red,
+        Green,
+        Blue,
+        [Display(Description = "Almond Green")]
+        AlmondGreen,
+        [Display(Description = "Amber Gray")]
+        AmberGray,
+        [Display(Description = "Apple Blue... ")]
+        AppleBlueSeaGreen,
+        //[Display(Description = "Miss", ResourceType = typeof(ResourceFile)] localization example
+        [Display(Description = "Azure")]
+        AzureBlue,
+
+    }
+
+    public enum StatusType
+    {
+        Inactive,
+        Active,
+    }
+
+    protected override void OnInitialized()
+    {
+        initialEmployees = Enumerable.Range(0, 10).Select(i =>
+            new Employee
+            {
+                ID = i,
+                Gender = i < 3 ? GenderType.Mr : i < 6 ? GenderType.Ms : GenderType.Unknown,
+                Status = i < 3 ? StatusType.Active : i < 6 ? StatusType.Inactive : null,
+                Color = i < 2 ? ColorType.Red: i < 4 ? ColorType.AlmondGreen : i < 6 ? ColorType.AppleBlueSeaGreen : ColorType.AzureBlue,
+            });
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+        var query = initialEmployees.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        count = query.Count();
+
+        employees = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+        isLoading = false;
+
+    }
+}

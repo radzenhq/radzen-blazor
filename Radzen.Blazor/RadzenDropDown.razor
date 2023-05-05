@@ -9,12 +9,12 @@
 
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" onmousedown="Radzen.activeElement = null" @onclick="@(args => OpenPopup("ArrowDown", false, true))" style="@Style" tabindex="@TabIndex"
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" onmousedown="Radzen.activeElement = null" @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
          @onkeydown="@((args) => OnKeyPress(args))" id="@GetId()"  @onfocus="@((args) => OnFocus(args))">
         <div class="rz-helper-hidden-accessible">
-            <input disabled="@Disabled" style="width:100%" aria-haspopup="listbox" readonly="" type="text" tabindex="-1"
+            <input disabled="@Disabled" aria-haspopup="listbox" readonly="" type="text" tabindex="-1"
                    name="@Name" value="@(internalValue != null ? internalValue : "")"
-                   aria-label="@(!Multiple && internalValue != null ? PropertyAccess.GetItemOrValueFromProperty(internalValue, TextProperty) : "")" />
+                   aria-label="@(!Multiple && internalValue != null ? internalValue : "")" />
         </div>
 
         @if (ValueTemplate != null && selectedItem != null)
@@ -32,7 +32,7 @@
         else if (selectedItem != null && !Multiple)
         {
             <label class="rz-dropdown-label rz-inputtext ">
-                @PropertyAccess.GetItemOrValueFromProperty(selectedItem, TextProperty)
+                @GetItemOrValueFromProperty(selectedItem, TextProperty)
             </label>
         }
         else if (Chips && selectedItems.Count > 0 && selectedItems.Count < MaxSelectedLabels)
@@ -42,9 +42,16 @@
                 {
                     <div class="rz-chip">
                         <span class="rz-chip-text">
-                            @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
-                        </span>  
-                        <button class="rz-button btn-light @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
+                            @if(Template != null)
+                            {
+                                @Template(item)
+                            }
+                            else
+                            {
+                                @GetItemOrValueFromProperty(item, TextProperty)
+                            }
+                        </span>
+                        <button type=button class="rz-button rz-button-sm rz-button-icon-only rz-light @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
                     </div>
                 }
             </div>
@@ -56,13 +63,13 @@
                 {
                     @if (Template == null)
                     {
-                        @(string.Join(",", selectedItems.Select(i => PropertyAccess.GetItemOrValueFromProperty(i, TextProperty))))
+                        @(string.Join(Separator, selectedItems.Select(i => GetItemOrValueFromProperty(i, TextProperty))))
                     }
                     else
                     {
                         foreach (var item in selectedItems)
                         {
-                            @Template(item)@(",")
+                            @Template(item)@(Separator)
                         }
                     }
                 }
@@ -94,14 +101,16 @@
             @if (AllowFiltering && !Multiple)
             {
                 <div class="rz-dropdown-filter-container">
-                    <input id="@SearchID" @ref="@search" tabindex="@TabIndex" class="rz-dropdown-filter rz-inputtext   " autocomplete="off" type="text"
+                    <input id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" class="rz-dropdown-filter rz-inputtext   " autocomplete="off" type="text"
                            @onchange="@((ChangeEventArgs args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" />
                     <span class="rz-dropdown-filter-icon rzi rzi-search"></span>
                 </div>
             }
-            @if (Multiple)
+            @if (Multiple && (AllowSelectAll || AllowFiltering))
             {
                 <div class=" rz-multiselect-header rz-helper-clearfix" @onclick:preventDefault>
+                    @if(AllowSelectAll)
+                    {
                     <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)" @onclick="@SelectAll">
                         <div class="rz-helper-hidden-accessible">
                             <input readonly="readonly" type="checkbox">
@@ -110,14 +119,15 @@
                             <span class="@(IsAllSelected() ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
                         </div>
                     </div>
-                    @if (!AllowFiltering && !string.IsNullOrEmpty(SelectAllText))
+                    }
+                    @if (AllowSelectAll && !AllowFiltering && !string.IsNullOrEmpty(SelectAllText))
                     {
                         <span style="cursor:pointer" @onclick="@SelectAll">@SelectAllText</span>
                     }
                     @if (AllowFiltering)
                     {
                         <div class="rz-multiselect-filter-container">
-                            <input id="@SearchID" tabindex="@TabIndex" class="rz-inputtext" role="textbox" type="text"
+                            <input id="@SearchID" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" class="rz-inputtext" role="textbox" type="text"
                                    onclick="Radzen.preventDefaultAndStopPropagation(event)"
                                    @ref="@search"
                                    @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" />
@@ -129,7 +139,7 @@
                     </a>
                 </div>
             }
-            <div class="@(Multiple ? "rz-multiselect-items-wrapper" : "rz-dropdown-items-wrapper")" style="max-height: 200px;overflow-x: hidden">
+            <div class="@(Multiple ? "rz-multiselect-items-wrapper" : "rz-dropdown-items-wrapper")" style="@PopupStyle">
                 <ul @ref="list" class="@(Multiple ? "rz-multiselect-items rz-multiselect-list" : "rz-dropdown-items rz-dropdown-list")" role="listbox">
                     @if (View != null)
                     {

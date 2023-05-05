@@ -1,0 +1,34 @@
+@using Microsoft.AspNetCore.Components.Routing
+@inherits RadzenComponentWithChildren
+
+@if (Item.Parent.ClickToOpen)
+{
+    <li @attributes="@Attributes" @onclick="@Item.OnClick" @onclick:stopPropagation>
+        @ChildContent
+    </li>
+}
+else
+{
+    if (Item.ChildContent != null)
+    {
+        <li @attributes="@Attributes" onmouseenter="Radzen.toggleMenuItem(this, event, true)" onmouseleave="Radzen.toggleMenuItem(this, event, false)">
+            @ChildContent
+        </li>
+    }
+    else
+    {
+        <li @attributes="@Attributes" @onclick="@Item.OnClick" @onclick:stopPropagation>
+            @ChildContent
+        </li>
+    }
+}
+
+@code {
+
+    /// <summary>
+    /// Gets or sets the menu item.
+    /// </summary>
+    /// <value>The menu item.</value>
+    [Parameter]
+    public RadzenMenuItem Item { get; set; }
+}

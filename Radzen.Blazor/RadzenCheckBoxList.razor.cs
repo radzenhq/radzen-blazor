@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,6 +46,20 @@ namespace Radzen.Blazor
         [Parameter]
         public string TextProperty { get; set; }
 
+        /// <summary>
+        /// Gets or sets the disabled property.
+        /// </summary>
+        /// <value>The disabled property.</value>
+        [Parameter]
+        public string DisabledProperty { get; set; }
+
+        /// <summary>
+        /// Gets or sets the read-only property.
+        /// </summary>
+        /// <value>The read-only property.</value>
+        [Parameter]
+        public string ReadOnlyProperty { get; set; }
+
         IEnumerable<RadzenCheckBoxListItem<TValue>> allItems
         {
             get
@@ -54,12 +69,77 @@ namespace Radzen.Blazor
                     var item = new RadzenCheckBoxListItem<TValue>();
                     item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
                     item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
+
+                    if (DisabledProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, DisabledProperty, out var disabledResult))
+                    {
+                        item.SetDisabled(disabledResult);
+                    }
+
+                    if (ReadOnlyProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, ReadOnlyProperty, out var readOnlyResult))
+                    {
+                        item.SetReadOnly(readOnlyResult);
+                    }
+
                     return item;
                 }));
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the user can select all values. Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if select all values is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowSelectAll { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the select all text.
+        /// </summary>
+        /// <value>The select all text.</value>
+        [Parameter]
+        public string SelectAllText { get; set; }
+
+        async Task SelectAll(bool? value)
+        {
+            if (Disabled || ReadOnly)
+            {
+                return;
+            }
+
+            if (value == true)
+            {
+                Value = allItems.Select(i => i.Value);
+            }
+            else if (value == false)
+            {
+                Value = null;
+            }
+
+            await ValueChanged.InvokeAsync(Value);
+            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            await Change.InvokeAsync(Value);
+
+            StateHasChanged();
+        }
+
+        bool? IsAllSelected()
+        {
+            Func<RadzenCheckBoxListItem<TValue>, bool> predicate = i => Value != null && Value.Contains(i.Value);
+            var all = allItems.All(predicate);
+            var any = allItems.Any(predicate);
+
+            if (all)
+            {
+                return true;
+            }
+            else
+            {
+                return any ? null : (bool?)false;
+            }
+        }
+
         IEnumerable _data = null;
+
         /// <summary>
         /// Gets or sets the data used to generate items.
         /// </summary>
@@ -80,6 +160,13 @@ namespace Radzen.Blazor
                 }
             }
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether is read only.
+        /// </summary>
+        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ReadOnly { get; set; }
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
@@ -160,7 +247,7 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         protected async System.Threading.Tasks.Task SelectItem(RadzenCheckBoxListItem<TValue> item)
         {
-            if (Disabled || item.Disabled)
+            if (Disabled || item.Disabled || ReadOnly || item.ReadOnly)
                 return;
 
             List<TValue> selectedValues = new List<TValue>(Value != null ? Value : Enumerable.Empty<TValue>());
@@ -181,11 +268,6 @@ namespace Radzen.Blazor
             await Change.InvokeAsync(Value);
 
             StateHasChanged();
-        }
-
-        private string getDisabledState(RadzenCheckBoxListItem<TValue> item)
-        {
-            return Disabled || item.Disabled ? " rz-state-disabled" : "";
         }
     }
 }

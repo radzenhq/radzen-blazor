@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using Radzen.Blazor;
 using Radzen.Blazor.Rendering;
 
 namespace Radzen
@@ -162,6 +163,8 @@ namespace Radzen
         /// <returns>Task.</returns>
         public override Task SetParametersAsync(ParameterView parameters)
         {
+            var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
+
             var result = base.SetParametersAsync(parameters);
 
             if (EditContext != null && ValueExpression != null && FieldIdentifier.Model != EditContext.Model)
@@ -169,6 +172,11 @@ namespace Radzen
                 FieldIdentifier = FieldIdentifier.Create(ValueExpression);
                 EditContext.OnValidationStateChanged -= ValidationStateChanged;
                 EditContext.OnValidationStateChanged += ValidationStateChanged;
+            }
+
+            if (disabledChanged)
+            {
+                FormFieldContext?.DisabledChanged(Disabled);
             }
 
             return result;
@@ -230,6 +238,12 @@ namespace Radzen
         /// <returns>ClassList.</returns>
         protected ClassList GetClassList(string className) => ClassList.Create(className)
                                                                        .AddDisabled(Disabled)
-                                                                       .Add(FieldIdentifier, EditContext);
+                                                                       .Add(FieldIdentifier, EditContext)
+                                                                       .Add("rz-state-empty", !HasValue);
+
+        [CascadingParameter]
+        public IFormFieldContext FormFieldContext { get; set; }
+
+        protected string CurrentPlaceholder => FormFieldContext != null ? " " : Placeholder;
     }
 }

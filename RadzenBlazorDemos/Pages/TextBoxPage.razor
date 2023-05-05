@@ -1,49 +1,12 @@
 ﻿@page "/textbox"
 
-<RadzenExample Name="TextBox">
-<div class="row px-3">
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Default TextBox</h4>
-            <RadzenTextBox Change=@(args => OnChange(args, "TextBox")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Placeholder</h4>
-            <RadzenTextBox Placeholder="Search..." Change=@(args => OnChange(args, "TextBox with placeholder")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">5 characters maximum</h4>
-            <RadzenTextBox @bind-Value=@value MaxLength="5" Change=@(args => OnChange(args, "TextBox with 5 maximum characters")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Change on every input</h4>
-            <RadzenTextBox @oninput=@(args => OnChange(args.Value.ToString(), "TextBox with change on every input")) Class="w-100" />
-        </RadzenCard>
-    </div>
-    <div class="col-md-6 col-lg-4 p-3">
-        <RadzenCard>
-            <h4 class="mb-4">Disabled TextBox</h4>
-            <RadzenTextBox Disabled="true" Class="w-100" />
-        </RadzenCard>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    TextBox
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>TextBox</strong> component.
+</RadzenText>
+
+<RadzenExample ComponentName="TextBox" Example="TextBoxConfig">
+    <TextBoxConfig />
 </RadzenExample>
-
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    string value;
-
-    EventConsole console;
-
-    void OnChange(string value, string name)
-    {
-        console.Log($"{name} value changed to {value}");
-    }
-}

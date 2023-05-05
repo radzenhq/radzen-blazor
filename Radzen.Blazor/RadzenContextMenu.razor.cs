@@ -35,7 +35,7 @@ namespace Radzen.Blazor
     /// }
     /// </code>
     /// </example>
-    public partial class RadzenContextMenu
+    public partial class RadzenContextMenu : IAsyncDisposable
     {
         /// <summary>
         /// Gets or sets the unique identifier.
@@ -77,7 +77,28 @@ namespace Radzen.Blazor
                 await JSRuntime.InvokeVoidAsync("Radzen.openContextMenu",
                     menu.MouseEventArgs.ClientX,
                     menu.MouseEventArgs.ClientY,
-                    UniqueID);
+                    UniqueID,
+                    Reference,
+                    "RadzenContextMenu.CloseMenu");
+            }
+        }
+
+        private DotNetObjectReference<RadzenContextMenu> reference;
+
+        /// <summary>
+        /// Gets the reference for the current component.
+        /// </summary>
+        /// <value>The reference.</value>
+        protected DotNetObjectReference<RadzenContextMenu> Reference
+        {
+            get
+            {
+                if (reference == null)
+                {
+                    reference = DotNetObjectReference.Create(this);
+                }
+
+                return reference;
             }
         }
 
@@ -96,12 +117,34 @@ namespace Radzen.Blazor
             await InvokeAsync(() => { StateHasChanged(); });
         }
 
-        /// <inheritdoc />
-        public void Dispose()
+        /// <summary>
+        /// Closes this instance.
+        /// </summary>
+        [JSInvokable("RadzenContextMenu.CloseMenu")]
+        public void CloseMenu()
         {
+            Service.Close(); 
+        }
+
+        /// <inheritdoc />
+        public async ValueTask DisposeAsync()
+        {
+            while (menus.Count != 0)
+            {
+                await Close();
+            }
+
+            reference?.Dispose();
+            reference = null;
+
             if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+                try 
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+                }
+                catch
+                { }
             }
 
             Service.OnOpen -= OnOpen;

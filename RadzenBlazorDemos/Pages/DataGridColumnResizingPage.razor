@@ -1,57 +1,12 @@
 ﻿@page "/datagrid-column-resizing"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid <strong>Column Resizing</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Enable column resizing by setting the AllowColumnResizing property to true.
+</RadzenText>
 
-@inject NorthwindContext dbContext
-
-<h1>DataGrid <strong>Column Resizing</strong></h1>
-
-<p>Enable column resizing by setting the AllowColumnResizing property to true.</p>
-
-<RadzenExample Name="DataGrid" Source="DataGridColumnResizing" Heading="false">
-    <RadzenDataGrid Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnResize="true" ColumnResized=@OnColumnResized>
-        <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Width="200px" >
-                <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
-            <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
-            <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
-            <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
-            <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
-            <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
-            <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
-            <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
-            <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" />
-            <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
-            <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
-            <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
-            <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" />
-            <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
-        </Columns>
-    </RadzenDataGrid>
+<RadzenExample ComponentName="DataGrid" Example="DataGridColumnResizing">
+    <DataGridColumnResizing />
 </RadzenExample>
-
-<RadzenCard Class="mt-4">
-    <EventConsole @ref=@console />
-</RadzenCard>
-
-@code {
-    IEnumerable<Employee> employees;
-    EventConsole console;
-
-    void OnColumnResized(DataGridColumnResizedEventArgs<Employee> args)
-    {
-        console.Log($"Resized {args.Column.Title} to {args.Width} pixels");
-    }
-
-    protected override void OnInitialized()
-    {
-        employees = dbContext.Employees;
-    }
-}

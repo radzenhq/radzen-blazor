@@ -17,7 +17,6 @@ namespace Radzen.Blazor.Tests
             component.Render();
 
             Assert.Contains(@$"rz-fieldset", component.Markup);
-            Assert.Contains(@$"rz-fieldset-legend", component.Markup);
             Assert.Contains(@$"rz-fieldset-content-wrapper", component.Markup);
             Assert.Contains(@$"rz-fieldset-content", component.Markup);
         }

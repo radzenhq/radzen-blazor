@@ -127,6 +127,8 @@ namespace Radzen.Blazor.Tests
         public void SplitButton_Raises_ClickEvent()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var component = ctx.RenderComponent<RadzenSplitButton>();
 

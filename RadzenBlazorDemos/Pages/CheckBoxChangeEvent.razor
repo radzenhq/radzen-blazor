@@ -1,0 +1,8 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenCheckBox TValue="bool" Value=@value Change=@(args => value = args) Name="CheckBox2" />
+    <RadzenLabel Text="CheckBox" Component="CheckBox2" Style="margin-left: 8px; vertical-align: middle;" />
+</div>
+
+@code{
+    bool value;
+}

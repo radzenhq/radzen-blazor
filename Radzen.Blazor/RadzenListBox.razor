@@ -7,15 +7,17 @@
 @inherits DropDownBase<TValue>
 @if (Visible)
 {
-    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@TabIndex" @onkeydown="@OnKeyDown" id="@GetId()">
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@OnKeyDown" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
             <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" />
         </div>
-        @if (AllowFiltering || Multiple)
+        @if (AllowFiltering || (Multiple && AllowSelectAll))
         {
             <div class=" rz-listbox-header rz-helper-clearfix rz-listbox-header-w-checkbox">
                 @if (Multiple)
                 {
+                    @if (AllowSelectAll)
+                    {
                     <div class="rz-chkbox " @onclick="@SelectAll">
                         <div class="rz-helper-hidden-accessible">
                             <input id="@($"{UniqueID}sa")" readonly="readonly" type="checkbox">
@@ -24,7 +26,8 @@
                             <span class="@(IsAllSelected() ? "rz-chkbox-icon rzi rzi-check" : "rz-chkbox-icon")"></span>
                         </div>
                     </div>
-                    @if (!AllowFiltering && !string.IsNullOrEmpty(Placeholder))
+                    }
+                    @if (AllowSelectAll && !AllowFiltering && !string.IsNullOrEmpty(Placeholder))
                     {
                         <label for="@($"{UniqueID}sa")" class="rz-dropdown-label rz-inputtext" style="width:100%;">@Placeholder</label>
                     }

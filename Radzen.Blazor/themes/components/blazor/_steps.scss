@@ -1,19 +1,51 @@
-$steps-color: $body-color !default;
+$steps-color: var(--rz-text-color) !default;
 
+$steps-number-border-radius: 50% !default;
+$steps-number-padding: 0.375rem 0 !default;
 $steps-number-width: 2rem !default;
 $steps-number-height: $steps-number-width !default;
-$steps-number-background-color: #e6ecef !default;
-$steps-number-border-radius: 50% !default;
-$steps-number-color: $body-color !default;
-$steps-number-padding: 0.4375rem 0 !default;
-$steps-number-selected-background: $default-link !default;
-$steps-number-selected-color: $white !default;
+$steps-number-line-height: var(--rz-body-line-height) !default;
+$steps-number-color: var(--rz-text-color) !default;
+$steps-number-background-color: var(--rz-base-200) !default;
+$steps-number-selected-color: var(--rz-text-contrast-color) !default;
+$steps-number-selected-background: var(--rz-secondary) !default;
 
-$steps-title-selected-color: $default-link !default;
-$steps-title-margin: 0 0.8125rem !default;
-$steps-button-color: $battleship-grey !default;
+$steps-title-selected-color: var(--rz-secondary) !default;
+$steps-title-margin: 0 1rem 0 0.5rem !default;
+$steps-buttons-padding: 1rem 0 !default;
+$steps-button-color: var(--rz-text-secondary-color) !default;
+
+// Steps CSS variables
+
+:root {
+  --rz-steps-color: #{$steps-color};
+
+  --rz-steps-number-border-radius: #{$steps-number-border-radius};
+  --rz-steps-number-padding: #{$steps-number-padding};
+  --rz-steps-number-width: #{$steps-number-width};
+  --rz-steps-number-height: #{$steps-number-height};
+  --rz-steps-number-line-height: #{$steps-number-line-height};
+  --rz-steps-number-color: #{$steps-number-color};
+  --rz-steps-number-background-color: #{$steps-number-background-color};
+  --rz-steps-number-selected-color: #{$steps-number-selected-color};
+  --rz-steps-number-selected-background: #{$steps-number-selected-background};
+  
+  --rz-steps-title-selected-color: #{$steps-title-selected-color};
+  --rz-steps-title-margin: #{$steps-title-margin};
+  --rz-steps-buttons-padding: #{$steps-buttons-padding};
+  --rz-steps-button-color: #{$steps-button-color};
+}
 
 .rz-steps {
+  display: flex;
+  flex-direction: column;
+
+  .rz-widget-content {
+    flex: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
   ul {
     list-style: none;
     padding: 0;
@@ -22,34 +54,35 @@ $steps-button-color: $battleship-grey !default;
   .rz-menuitem-link {
     display: inline-flex;
     align-items: center;
-    color: $steps-color;
+    color: var(--rz-steps-color);
     cursor: pointer;
+    text-decoration: none;
 
     &:hover {
       text-decoration: none;
-      color: $steps-title-selected-color !important;
+      color: var(--rz-steps-title-selected-color) !important;
     }
   }
 
   .rz-state-disabled {
     .rz-menuitem-link {
-      color: rgba($steps-color, 0.5);
+      color: var(--rz-text-disabled-color);
       cursor: default;
 
       &:hover {
-        color: rgba($steps-color, 0.5) !important;
+        color: var(--rz-text-disabled-color) !important;
       }
     }
   }
 
   .rz-state-highlight {
     .rz-steps-title {
-      color: $steps-title-selected-color;
+      color: var(--rz-steps-title-selected-color);
     }
 
     .rz-steps-number {
-      background: $steps-number-selected-background;
-      color: $steps-number-selected-color;
+      background: var(--rz-steps-number-selected-background);
+      color: var(--rz-steps-number-selected-color);
     }
   }
 }
@@ -59,36 +92,38 @@ $steps-button-color: $battleship-grey !default;
 }
 
 .rz-steps-title {
-  margin: $steps-title-margin;
+  margin: var(--rz-steps-title-margin);
 }
 
 .rz-steps-number {
   text-align: center;
-  line-height: 1;
+  line-height: var(--rz-steps-number-line-height);
 
-  color: $steps-number-color;
-  padding: $steps-number-padding;
-  width: $steps-number-width;
-  height: $steps-number-height;
-  background-color: $steps-number-background-color;
-  border-radius: $steps-number-border-radius;
+  color: var(--rz-steps-number-color);
+  padding: var(--rz-steps-number-padding);
+  width: var(--rz-steps-number-width);
+  height: var(--rz-steps-number-height);
+  background-color: var(--rz-steps-number-background-color);
+  border-radius: var(--rz-steps-number-border-radius);
 }
 
 .rz-steps-buttons {
   display: flex;
   justify-content: space-between;
+  padding: var(--rz-steps-buttons-padding);
 }
 
 .rz-steps-next,
 .rz-steps-prev {
   display: inline-flex;
   align-items: center;
-  color: $steps-button-color !important;
+  color: var(--rz-steps-button-color) !important;
+  text-decoration: none;
 
   &:not(.rz-state-disabled) {
     &:hover {
       cursor: pointer;
-      color: $steps-title-selected-color !important;
+      color: var(--rz-steps-title-selected-color) !important;
     }
   }
 
@@ -97,10 +132,10 @@ $steps-button-color: $battleship-grey !default;
   }
 
   &.rz-state-disabled {
-    color: rgba($steps-button-color, 0.5) !important;
+    opacity: 0.5 !important;
   }
 
   .rzi {
-    font-size: 1.25rem;
+    font-size: var(--rz-icon-size);
   }
 }

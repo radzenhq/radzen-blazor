@@ -1,52 +1,12 @@
 ﻿@page "/cascading-dropdowns"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Cascading DropDowns
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Cascading Radzen Blazor DropDown components.
+</RadzenText>
 
-@inject NorthwindContext dbContext
-
-<h1>Cascading DropDowns</h1>
-
-<p>Cascading Radzen Blazor DropDown components.</p>
-
-<RadzenExample Name="DropDown" Source="CascadingDropDowns" Heading="false">
-    <div class="row">
-        <div class="col-xl-6 mb-4">
-            <h3>1. Customers</h3>
-            <RadzenDropDown Style="width:300px" TValue="string" @bind-Value="CustomerID" Placeholder="Select customer" AllowFiltering="true" Data="@(customers)" TextProperty="CompanyName" ValueProperty="CustomerID"/>
-        </div>
-        <div class="col-xl-6 mb-4">
-            <h3>2. Orders</h3>
-            <RadzenDropDown Style="width:300px" TValue="int" @bind-Value="OrderID" Placeholder="Select order" Data="@(orders.Where(o => o.CustomerID == CustomerID))" ValueProperty="OrderID">
-                <Template>
-                    Order Date: @String.Format("{0:d}", ((Order)context).OrderDate)
-                </Template>
-            </RadzenDropDown>
-        </div>
-    </div>
-    <h3>Order Details</h3>
-    <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-                Data="@(orderDetails.Where(o => o.OrderID == OrderID))" TItem="OrderDetail" ColumnWidth="200px">
-        <Columns>
-            <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
-            <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-            <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
-        </Columns>
-    </RadzenDataGrid>
+<RadzenExample ComponentName="DropDown" Example="CascadingDropDowns">
+    <CascadingDropDowns />
 </RadzenExample>
-@code {
-    IEnumerable<Customer> customers;
-    IEnumerable<Order> orders;
-    IEnumerable<OrderDetail> orderDetails;
-
-    string CustomerID;
-    int OrderID;
-
-    protected override void OnInitialized()
-    {
-        customers = dbContext.Customers.ToList();
-        orders = dbContext.Orders.ToList();
-        orderDetails = dbContext.OrderDetails.Include("Product").ToList();
-    }
-}

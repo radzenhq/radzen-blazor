@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -100,6 +102,18 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return "ssrsviewer";
+        }
+
+        /// <summary>
+        /// Gets or sets the load callback.
+        /// </summary>
+        /// <value>The load callback.</value>
+        [Parameter]
+        public EventCallback<ProgressEventArgs> Load { get; set; }
+
+        async Task OnLoad(ProgressEventArgs args)
+        {
+            await Load.InvokeAsync(args);
         }
     }
 }

@@ -1,37 +1,67 @@
-$scrollbar-background-color: $white !default;
-$scrollbar-color: $default-link !default;
-$scrollbar-border-radius: 8px !default;
+$scrollbar-background-color: transparent !default;
+$scrollbar-color: var(--rz-secondary) !default;
+$scrollbar-border-radius: calc(2 * var(--rz-border-radius)) !default;
+$scrollbar-size: 16px !default;
 
-body {
-  &:not(.rz-default-scrollbars) {
-    &::-webkit-scrollbar {
-      background-color: $scrollbar-background-color;
-    }
+// Scrollbar CSS variables
 
-    &::-webkit-scrollbar-thumb {
-      background: $scrollbar-color;
-      border: 4px solid rgba(0, 0, 0, 0);
-      background-clip: padding-box;
-      border-radius: $scrollbar-border-radius;
-    }
+:root {
+  --rz-scrollbar-background-color: #{$scrollbar-background-color};
+  --rz-scrollbar-color: #{$scrollbar-color};
+  --rz-scrollbar-border-radius: #{$scrollbar-border-radius};
+  --rz-scrollbar-size: #{$scrollbar-size};
+}
 
-    &::-webkit-scrollbar-corner {
-      background-color: $scrollbar-background-color;
-    }
+@if $base == false {
+  body {
+    &:not(.rz-default-scrollbars) {
+      &::-webkit-scrollbar,
+      ::-webkit-scrollbar {
+        background-color: var(--rz-scrollbar-background-color);
+        width: var(--rz-scrollbar-size);
+        height: var(--rz-scrollbar-size);
+      }
 
-    ::-webkit-scrollbar {
-      background-color: $scrollbar-background-color;
-    }
+      &::-webkit-scrollbar-thumb,
+      ::-webkit-scrollbar-thumb {
+        background: var(--rz-scrollbar-color);
+        border: 4px solid rgba(0, 0, 0, 0);
+        background-clip: padding-box;
+        border-radius: var(--rz-scrollbar-border-radius);
+        min-width: var(--rz-scrollbar-size);
+        min-height: var(--rz-scrollbar-size);
+      }
 
-    ::-webkit-scrollbar-thumb {
-      background: $scrollbar-color;
-      border: 4px solid rgba(0, 0, 0, 0);
-      background-clip: padding-box;
-      border-radius: $scrollbar-border-radius;
+      &::-webkit-scrollbar-corner,
+      ::-webkit-scrollbar-corner {
+        background-color: var(--rz-scrollbar-background-color);
+      }
     }
+  }
+}
 
-    ::-webkit-scrollbar-corner {
-      background-color: $scrollbar-background-color;
-    }
+
+.rz-layout,
+.rz-scrollbars {
+  &::-webkit-scrollbar,
+  ::-webkit-scrollbar {
+    background-color: var(--rz-scrollbar-background-color);
+    width: var(--rz-scrollbar-size);
+    height: var(--rz-scrollbar-size);
+  }
+
+  &::-webkit-scrollbar-thumb,
+  ::-webkit-scrollbar-thumb {
+    background: var(--rz-scrollbar-color);
+    border: 4px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: var(--rz-scrollbar-border-radius);
+    min-width: var(--rz-scrollbar-size);
+    min-height: var(--rz-scrollbar-size);
+  }
+
+  &::-webkit-scrollbar-corner,
+  ::-webkit-scrollbar-corner {
+    background-color: var(--rz-scrollbar-background-color);
   }
 }

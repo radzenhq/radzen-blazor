@@ -1,0 +1,28 @@
+@page "/chart-tooltip"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Chart Tooltip
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    The Radzen Blazor Chart displays a tooltip when the user hovers series with the mouse. The tooltip by default includes the series category, value and series name.
+</RadzenText>
+
+<RadzenText Anchor="chart-tooltip#customize-tooltip-content" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Customize tooltip content
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To customize the tooltip content use the <code>TooltipTemplate</code> setting of the series.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="ChartToolTipContent">
+    <ChartToolTipContent />
+</RadzenExample>
+
+<RadzenText Anchor="chart-tooltip#disable-tooltips" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Disable tooltips
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To disable the tooltips, set the <code>Visible</code> property of the <code>RadzenChartTooltipOptions</code> tag to false.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="ChartToolTipDisable">
+    <ChartToolTipDisable />
+</RadzenExample>

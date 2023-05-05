@@ -1,24 +1,36 @@
 ﻿@page "/link"
 
-<RadzenExample Name="Link">
-    <div class="row px-3">
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-3">Link to path in application</h4>
-                <RadzenLink Path="buttons" Text="Go to Buttons page" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-3">Link to path in application with icon</h4>
-                <RadzenLink Icon="accessibility" Path="button" Text="Go to the Button component page" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4 class="mb-3">Link to url</h4>
-                <RadzenLink Path="https://www.radzen.com" Text="Go to url" target="_blank" />
-            </RadzenCard>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Link
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Link</strong> component. Use <code>Path</code> and <code>Target</code> properties to specify Link component navigation.
+</RadzenText>
+
+<RadzenText Anchor="link#link-to-path" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-mb-6">
+    Link to path in application
+</RadzenText>
+<RadzenExample ComponentName="Link" Example="LinkToPath">
+    <LinkToPath />
+</RadzenExample>
+
+<RadzenText Anchor="link#link-with-icon" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Link to path in application with icon
+</RadzenText>
+<RadzenExample ComponentName="Link" Example="LinkWithIcon">
+    <LinkWithIcon />
+</RadzenExample>
+
+<RadzenText Anchor="link#link-to-url" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Link to url
+</RadzenText>
+<RadzenExample ComponentName="Link" Example="LinkToUrl">
+    <LinkToUrl />
+</RadzenExample>
+
+<RadzenText Anchor="link#link-child-content" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Link with child content
+</RadzenText>
+<RadzenExample ComponentName="Link" Example="LinkChildContent">
+    <LinkChildContent />
 </RadzenExample>

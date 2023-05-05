@@ -1,105 +1,83 @@
 ﻿@page "/html-editor"
 
-<RadzenExample Name="HtmlEditor">
-    <div class="row">
-        <div class="col-xl-6">
-            <h3>Default set of tools</h3>
-            <RadzenHtmlEditor @bind-Value=@value style="height: 500px; margin-bottom: 1rem;" UploadUrl="upload/image" Change=@OnChange Paste=@OnPaste Execute=@OnExecute />
-        </div>
-        <div class="col-xl-6">
-            <h3>Custom set of tools (text-editing only)</h3>
-            <RadzenHtmlEditor @bind-Value=@value style="height: 500px; margin-bottom: 1rem;" UploadUrl="upload/image" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
-                <RadzenHtmlEditorUndo />
-                <RadzenHtmlEditorRedo />
-                <RadzenHtmlEditorSeparator />
-                <RadzenHtmlEditorBold />
-                <RadzenHtmlEditorItalic />
-                <RadzenHtmlEditorUnderline />
-                <RadzenHtmlEditorStrikeThrough />
-                <RadzenHtmlEditorSeparator />
-                <RadzenHtmlEditorColor />
-                <RadzenHtmlEditorBackground />
-                <RadzenHtmlEditorRemoveFormat />
-            </RadzenHtmlEditor>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    HtmlEditor
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>HtmlEditor</strong> component.
+</RadzenText>
+
+<RadzenText Anchor="html-editor#get-set-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and set the value
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the HtmlEditor has a <code>Value</code> property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorGetSetValue">
+    <HtmlEditorGetSetValue />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText Anchor="html-editor#default-set-of-tools" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Default set of tools
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Here is an example of RadzenHtmlEditor with the default set of tools.
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorDefaultTools">
+    <HtmlEditorDefaultTools />
+</RadzenExample>
 
-@code {
-    string value = @"
-    <h1>Radzen.Blazor Getting Started Instructions</h1>
-    <h2>1. Install</h2>
-    <p>
-        Radzen Blazor Components are distributed as the <a href=""https://www.nuget.org/packages/Radzen.Blazor/"">Radzen.Blazor</a> nuget package.
-    </p>
-    <p>
-        You can add them to your project in one of the following ways
-    </p>
-    <ul>
-        <li>Install the package from command line by running <code>dotnet add package Radzen.Blazor</code></li>
-        <li>Add the project from the Visual Nuget Package Manager.</li>
+<RadzenText Anchor="html-editor#all-tools" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    All tools
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+The Radzen HtmlEditor supports the following tools:
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    <ul style="line-height: 2rem">
+        <li>RadzenHtmlEditorUndo - allows the user to undo the last action (result of other tool, typing or pasting).</li>
+        <li>RadzenHtmlEditorRedo - allows the use to redo the last undone action.</li>
+        <li>RadzenHtmlEditorSeparator - displays a vertical separator used to delimit group of similar tools.</li>
+        <li>RadzenHtmlEditorBold - toggles the bold style of the selected text.</li>
+        <li>RadzenHtmlEditorItalic - toggles the italic style of the selected text.</li>
+        <li>RadzenHtmlEditorUnderline - toggles the underline style of the selected text.</li>
+        <li>RadzenHtmlEditorStrikeThrough - toggles the strikethrough style of the selected text.</li>
+        <li>RadzenHtmlEditorAlignLeft - toggles left text alignment.</li>
+        <li>RadzenHtmlEditorAlignCenter - toggles center text alignment.</li>
+        <li>RadzenHtmlEditorAlignRight - toggles right text alignment.</li>
+        <li>RadzenHtmlEditorJustify - toggles justified text alignment.</li>
+        <li>RadzenHtmlEditorIndent - indents the selected text.</li>
+        <li>RadzenHtmlEditorOutdent - outdents the selected text.</li>
+        <li>RadzenHtmlEditorUnorderedList - inserts unordered (bullet) list.</li>
+        <li>RadzenHtmlEditorOrderedList - inserts ordered (numbered) list.</li>
+        <li>RadzenHtmlEditorColor - sets the foreground color of the selected text.</li>
+        <li>RadzenHtmlEditorBackground - sets the background color of the selected text.</li>
+        <li>RadzenHtmlEditorRemoveFormat - removes the visual styling of the selected text.</li>
+        <li>RadzenHtmlEditorSubscript - converts the selected text to subscript.</li>
+        <li>RadzenHtmlEditorSuperscript - converts the selected text to superscript</li>
+        <li>RadzenHtmlEditorLink - inserts a hyperlink.</li>
+        <li>RadzenHtmlEditorUnlink - removes a hyperlink.</li>
+        <li>RadzenHtmlEditorImage - allows the user to insert an image by either uploading a file or selecting a URL. Requires File upload to be implemented and the UploadUrl property of the HtmlEditor to be set.</li>
+        <li>RadzenHtmlEditorFontName - set the font of the selected text.</li>
+        <li>RadzenHtmlEditorFontSize - set the font size of the selected text.</li>
+        <li>RadzenHtmlEditorFormatBlock - allows the user to format the selected text as heading or paragraph.</li>
+        <li>RadzenHtmlEditorCustomTool - allows the developer to implement a custom tool.</li>
     </ul>
-    <h2>2. Import the namespace</h2>
-    <p>
-        Open the <code>_Imports.razor</code> file of your Blazor application and add these two lines <code>@using Radzen</code> and <code>@using Radzen.Blazor</code>.
-    </p>
-    <h2>3. Include a theme</h2>
-    <p>
-        Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6+), <code>Pages\_Host.cshtml</code> (Blazor Server before .NET 6) or <code>wwwroot/index.html</code> (Blazor WebAssembly)
-         and include a theme CSS file by adding this snippet 
-        <code>&lt;link rel=""stylesheet"" href=""_content/Radzen.Blazor/css/default-base.css""&gt;</code>
-        This version requires only the Radzen Blazor CSS. Optionally you can include Bootstrap.
-    </p>
-    <p>
-        Alternatively you can include <code>&lt;link rel=""stylesheet"" href=""_content/Radzen.Blazor/css/default.css""&gt;</code> which embeds Bootstrap.
-    </p>
-    <h2>4. Include Radzen.Blazor.js</h2>
-    <p>
-        Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side WebAssembly Blazor) and include this snippet <code>&lt;script src=""_content/Radzen.Blazor/Radzen.Blazor.js""&gt;&lt;/script&gt;</code>
-    </p>
-    <h2>5. Use a component</h2>
-    <p>
-        Use any Radzen Blazor component by typing its tag name in a Blazor page e.g. <code>&lt;RadzenButton Text=""Hi""&gt;&lt;/RadzenButton&gt;</code>
-    </p>
-    <h4>Setting a property</h4>
-<pre>
-<code>
-&lt;RadzenButton Text=""@text""&gt;&lt;/RadzenButton&gt;
-@code {
-  string text = ""Hi"";
-}
-</code>
-</pre>
-    <h4>Handing events</h4>
-<pre>
-<code>
-&lt;RadzenButton Click=""@ButtonClicked"" Text=""Hi""&gt;&lt;/RadzenButton&gt;
-@code {
-  void ButtonClicked()
-  {
-    //
-  }
-}
-</code>
-</pre>
-    ";
+</RadzenText>
 
-    EventConsole console;
+<RadzenText Anchor="html-editor#custom-set-of-tools" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom set of tools (text-editing only)
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Here is how to specify a custom set of tools.
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorCustomToolsSet">
+    <HtmlEditorCustomToolsSet />
+</RadzenExample>
 
-    void OnPaste(HtmlEditorPasteEventArgs args)
-    {
-        console.Log($"Paste: {args.Html}");
-    }
-
-    void OnChange(string html)
-    {
-        console.Log($"Change: {html}");
-    }
-
-    void OnExecute(HtmlEditorExecuteEventArgs args)
-    {
-        console.Log($"Execute: {args.CommandName}");
-    }
-}
+<RadzenText Anchor="html-editor#get-set-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Upload files
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorUploadUrl">
+    <HtmlEditorUploadUrl />
+</RadzenExample>

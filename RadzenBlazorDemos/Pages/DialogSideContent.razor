@@ -1,0 +1,12 @@
+﻿<h3>DialogSideContent</h3>
+
+<p>
+    Side Dialog
+</p>
+
+<RadzenButton Size="ButtonSize.ExtraSmall" Text="Close Side Dialog" Click="@(_ => Service.CloseSide())" />
+
+@code {
+    [Inject] DialogService Service { get; set; }
+
+}

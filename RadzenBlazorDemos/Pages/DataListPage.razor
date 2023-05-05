@@ -1,82 +1,12 @@
 ﻿@page "/datalist"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataList
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor DataList component.
+</RadzenText>
 
-@inject NorthwindContext dbContext
-
-<RadzenExample Name="DataList">
-<div class="container">
-    <div class="row py-5">
-        <div class="col">
-            <RadzenCard>
-
-                <RadzenDataList WrapItems="true" AllowPaging="true" Data="@products" TItem="Product" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
-                    <Template Context="product">
-                        <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-lg-3 p-3 product-title">
-                                            @(product.ProductName)
-                                    </div>
-                                    <div class="col-lg-7 p-3">
-                                        <div class="row d-flex">
-                                            <div class="col-md-6 col-lg-2">
-                                                <h5 class="mb-0">In Stock</h5>
-                                                <p class="mb-sm-2 mb-lg-0">@(product.UnitsInStock)</p>
-                                            </div>
-                                            <div class="col-md-6 col-lg-2">
-                                                <h5 class="mb-0">Origin</h5>
-                                                <p class="mb-sm-2 mb-lg-0">@(product.Supplier?.Country)</p>
-                                            </div>
-                                            <div class="col-md-6 col-lg-5">
-                                                <h5 class="mb-0">Sold by</h5>
-                                                <p class="mb-sm-2 mb-lg-0">@(product.Supplier?.CompanyName)</p>
-                                            </div>
-                                            <div class="col-md-6 order-first order-lg-last col-lg-3 text-sm-left text-lg-right mb-3 mb-lg-0">
-                                                <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Class="price-badge" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", product.UnitPrice)}") />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 p-3">
-                                        <RadzenButton Text="Order now" Class="w-100" />
-                                    </div>
-                                </div>
-                            </div>
-                        </RadzenCard>
-                    </Template>
-                </RadzenDataList>
-
-            </RadzenCard>
-        </div>
-    </div>
-</div>
-
-<style>
-.product-title {
-    min-height: 72px;
-    color: #da0074;
-    background-color: rgba(255, 41, 155, .1);
-    font-size: 20px;
-    font-weight: bold;
-    line-height: 20px;
-    letter-spacing: -0.02em;
-}
-.price-badge {
-    font-size: 16px;
-    font-weight: bold;
-    line-height: 20px;
-    padding: 8px;
-}
-</style>
+<RadzenExample ComponentName="DataList" Example="DataListIQueryable">
+    <DataListIQueryable />
 </RadzenExample>
-
-@code {
-    IEnumerable<Product> products;
-
-    protected override void OnInitialized()
-    {
-        products = dbContext.Products.Include("Category").Include("Supplier").ToList();
-    }
-}

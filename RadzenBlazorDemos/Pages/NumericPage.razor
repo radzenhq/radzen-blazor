@@ -1,64 +1,70 @@
 ﻿@page "/numeric"
 
-<RadzenExample Name="Numeric">
-    <div class="row px-3">
-        <div class="col-lg-3 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Default Numeric</h4>
-                <RadzenNumeric TValue="int" Change=@(args => OnChange(args, "Numeric")) Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-3 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Min set to 1 and Max set to 10</h4>
-                <RadzenNumeric TValue="int" Min="1" Max="10" Change=@(args => OnChange(args, "Numeric with Min set to 1 and Max set to 10")) Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-3 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Placeholder and 0.5 step</h4>
-                <RadzenNumeric TValue="double" Placeholder="0.0" Step="0.5" Change=@(args => OnChange(args, "Numeric with placeholder and 0.5 step")) Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-3 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Nullable numeric</h4>
-                <RadzenNumeric TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" Change=@(args => OnChange(args, "Nullable numeric")) Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-3 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Disabled numeric</h4>
-                <RadzenNumeric Disabled="true" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-3 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Without Up/Down</h4>
-                <RadzenNumeric ShowUpDown="false" TValue="int?" @bind-Value=@value Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Without Up/Down"))" Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 p-3">
-            <RadzenCard>
-                <h4 class="mb-4">Formatted Value</h4>
-                <RadzenNumeric TValue="double" Format="0.0000" @bind-Value=@dblValue Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Formatted numeric"))" Class="mr-1" />
-                <RadzenNumeric TValue="double" Format="c" @bind-Value=@dblValue Placeholder="Enter or clear value" Change="@(args => OnChange(args, "Formatted numeric"))" />
-            </RadzenCard>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Numeric
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Numeric</strong> component.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of Numeric
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the <strong>Numeric</strong> has a Value property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="Numeric" Example="NumericBindValue">
+    <NumericBindValue />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of Numeric using Value and Change event
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Value property can be used to set the value of the component and <code>Change</code> event to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="Numeric" Example="NumericChangeEvent">
+    <NumericChangeEvent />
+</RadzenExample>
 
-@code {
-    int? value;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Min set to 1 and Max set to 10
+</RadzenText>
+<RadzenExample ComponentName="Numeric" Example="NumericMinMax">
+    <NumericMinMax />
+</RadzenExample>
 
-    double dblValue = 0.0;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Placeholder and 0.5 step
+</RadzenText>
+<RadzenExample ComponentName="Numeric" Example="NumericPlaceholderAndStep">
+    <NumericPlaceholderAndStep />
+</RadzenExample>
 
-    EventConsole console;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Without Up/Down
+</RadzenText>
+<RadzenExample ComponentName="Numeric" Example="NumericWithoutUpDown">
+    <NumericWithoutUpDown />
+</RadzenExample>
 
-    void OnChange(dynamic value, string name)
-    {
-        console.Log($"{name} value changed to {value}");
-    }
-}
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Formatted value
+</RadzenText>
+<RadzenExample ComponentName="Numeric" Example="NumericFormattedValue">
+    <NumericFormattedValue />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Align value
+</RadzenText>
+<RadzenExample ComponentName="Numeric" Example="NumericAlign">
+    <NumericAlign />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Custom Value convert
+</RadzenText>
+<RadzenExample ComponentName="Numeric" Example="NumericConvertValue">
+    <NumericConvertValue />
+</RadzenExample>

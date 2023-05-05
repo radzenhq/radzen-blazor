@@ -25,6 +25,13 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Responsive { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenMenu"/> should open item on click or on hover.
+        /// </summary>
+        /// <value><c>true</c> if open item on click; otherwise, <c>false</c> and items will open on hover.</value>
+        [Parameter]
+        public bool ClickToOpen { get; set; } = true;
+
         private bool IsOpen { get; set; } = false;
 
         /// <inheritdoc />

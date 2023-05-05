@@ -1,21 +1,38 @@
-$editor-border: $input-border !default;
-$editor-border-radius: $border-radius !default;
-$editor-toolbar-background-color: $white !default;
-$editor-toolbar-item-margin: 0.5rem !default;
-$editor-button-padding: 0.625rem !default;
-$editor-button-background-color: $white !default;
-$editor-button-color: $body-color !default;
-$editor-button-disabled-color: $input-disabled-color !default;
-$editor-button-selected-background-color: $default-link !default;
-$editor-button-selected-color: $white !default;
-$editor-separator-background-color: #dadfe2 !default;
-$editor-content-background-color: $input-background-color !default;
+$editor-border: var(--rz-input-border) !default;
+$editor-border-radius: var(--rz-border-radius) !default;
+$editor-toolbar-background-color: var(--rz-base-background-color) !default;
+$editor-toolbar-item-margin: 0.25rem 0.125rem !default;
+$editor-button-padding: 0.5rem !default;
+$editor-button-background-color: var(--rz-base-background-color) !default;
+$editor-button-color: var(--rz-text-color) !default;
+$editor-button-disabled-color: var(--rz-text-disabled-color) !default;
+$editor-button-selected-background-color: var(--rz-secondary) !default;
+$editor-button-selected-color: var(--rz-text-contrast-color) !default;
+$editor-separator-background-color: var(--rz-base-200) !default;
+$editor-content-background-color: var(--rz-base-background-color) !default;
+
+// Editor CSS variables
+
+:root {
+  --rz-editor-border: #{$editor-border};
+  --rz-editor-border-radius: #{$editor-border-radius};
+  --rz-editor-toolbar-background-color: #{$editor-toolbar-background-color};
+  --rz-editor-toolbar-item-margin: #{$editor-toolbar-item-margin};
+  --rz-editor-button-padding: #{$editor-button-padding};
+  --rz-editor-button-background-color: #{$editor-button-background-color};
+  --rz-editor-button-color: #{$editor-button-color};
+  --rz-editor-button-disabled-color: #{$editor-button-disabled-color};
+  --rz-editor-button-selected-background-color: #{$editor-button-selected-background-color};
+  --rz-editor-button-selected-color: #{$editor-button-selected-color};
+  --rz-editor-separator-background-color: #{$editor-separator-background-color};
+  --rz-editor-content-background-color: #{$editor-content-background-color};
+}
 
 .rz-html-editor {
   display: flex;
   flex-direction: column;
-  border-radius: $border-radius;
-  border: $editor-border;
+  border-radius: var(--rz-editor-border-radius);
+  border: var(--rz-editor-border);
 }
 
 .rz-html-editor-content {
@@ -23,22 +40,35 @@ $editor-content-background-color: $input-background-color !default;
   overflow: auto;
   padding: 0.5rem;
   outline: none;
-  background-color: $editor-content-background-color;
+  background-color: var(--rz-editor-content-background-color);
+}
+
+.rz-html-editor-source.rz-textarea {
+    --rz-input-hover-shadow: none;
+    --rz-input-border: none;
+    --rz-input-hover-border: none;
+    --rz-input-focus-shadow: none;
+    --rz-input-focus-border: none;
+    flex: 1;
+    padding: 0.5rem;
+    overflow: auto;
+    outline: none;
+    background-color: var(--rz-editor-content-background-color);
 }
 
 .rz-html-editor-toolbar {
-  border-bottom: $editor-border;
+  border-bottom: var(--rz-editor-border);
   display: flex;
   line-height: 1rem;
   flex-wrap: wrap;
-  background-color: $editor-toolbar-background-color;
+  background-color: var(--rz-editor-toolbar-background-color);
 
   .rzi {
     font-size: 1rem;
   }
 
   > * {
-    margin: $editor-toolbar-item-margin;
+    margin: var(--rz-editor-toolbar-item-margin);
   }
 }
 
@@ -46,12 +76,17 @@ $editor-content-background-color: $input-background-color !default;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: $editor-button-background-color;
-  padding: $editor-button-padding;
+  background: var(--rz-editor-button-background-color);
+  padding: var(--rz-editor-button-padding);
 
   .rz-colorpicker-trigger {
     color: inherit;
-    background-color: $editor-button-background-color;
+    background-color: var(--rz-editor-button-background-color);
+
+    .rzi {
+      font-size: 1.25rem;
+      height: 1rem;
+    }
   }
 
   .rz-colorpicker-value {
@@ -63,8 +98,9 @@ $editor-content-background-color: $input-background-color !default;
     box-shadow: none;
     padding: 0;
     height: auto;
+    background-color: var(--rz-editor-button-background-color);
 
-    &:hover {
+    &:not(:disabled):not(.rz-state-disabled):hover {
       border: none;
       box-shadow: none;
     }
@@ -82,7 +118,7 @@ $editor-content-background-color: $input-background-color !default;
   position: relative;
 
   &:disabled {
-    color: $input-disabled-color;
+    color: var(--rz-input-disabled-color);
   }
 }
 
@@ -94,34 +130,34 @@ $editor-content-background-color: $input-background-color !default;
 }
 
 .rz-html-editor-button {
-  color: $editor-button-color;
+  color: var(--rz-editor-button-color);
   appearance: none;
   border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: $editor-button-background-color;
-  padding: $editor-button-padding;
+  background: var(--rz-editor-button-background-color);
+  padding: var(--rz-editor-button-padding);
 
   &.rz-selected {
-    background-color: $editor-button-selected-background-color;
-    color: $editor-button-selected-color;
-    border-radius: $editor-border-radius;
+    background-color: var(--rz-editor-button-selected-background-color);
+    color: var(--rz-editor-button-selected-color);
+    border-radius: var(--rz-editor-border-radius);
   }
 
   &:disabled {
-    color: $editor-button-disabled-color;
+    color: var(--rz-editor-button-disabled-color);
   }
 }
 
 .rz-html-editor-dropdown {
   display: inline-flex;
-  padding: $editor-button-padding;
+  padding: var(--rz-editor-button-padding);
   align-items: center;
   cursor: pointer;
 
   &.rz-disabled {
-    color: $input-disabled-color;
+    color: var(--rz-input-disabled-color);
     cursor: default;
   }
 }
@@ -132,15 +168,15 @@ $editor-content-background-color: $input-background-color !default;
 
 .rz-html-editor-dropdown-item {
   cursor: default;
-  font-size: $dropdown-item-font-size;
-  padding: $dropdown-item-padding;
+  font-size: var(--rz-dropdown-item-font-size);
+  padding: var(--rz-dropdown-item-padding);
   white-space: nowrap;
 
   @include dropdown-item-hover(0);
 
   &.rz-selected {
-    background-color: $dropdown-item-selected-background-color;
-    color: $dropdown-item-selected-color;
+    background-color: var(--rz-dropdown-item-selected-background-color);
+    color: var(--rz-dropdown-item-selected-color);
   }
 }
 
@@ -180,5 +216,23 @@ $editor-content-background-color: $input-background-color !default;
 
 .rz-html-editor-separator {
   width: 1px;
-  background-color: $editor-separator-background-color;
+  background-color: var(--rz-editor-separator-background-color);
+}
+
+.rz-html-editor-toolbar {
+
+  .rz-html-editor-colorpicker {
+    .rz-colorpicker {
+      &:not(:disabled):not(.rz-state-disabled):hover {
+        border: none;
+      }
+    }
+
+    .rz-colorpicker-trigger {
+      .rzi {
+        font-size: 1.25rem;
+        height: 1rem;
+      }
+    }
+  }
 }

@@ -1,0 +1,11 @@
+﻿@inject TooltipService tooltipService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton @ref="radzenButton" Text="Click to show tooltip" Click="@(args => ShowTooltip(radzenButton.Element, new TooltipOptions(){ Style = "background-color: var(--rz-secondary); color: var(--rz-text-contrast-color)", Duration = null }))" />
+</div>
+
+@code {
+    RadzenButton radzenButton;
+
+    void ShowTooltip(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, "Click anywhere on the page to close me.", options);
+}

@@ -1,0 +1,57 @@
+﻿<RadzenCard class="my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Orientation
+            <RadzenDropDown @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value"
+                        Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            AlignItems
+            <RadzenDropDown @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value"
+                        Data="@(Enum.GetValues(typeof(AlignItems)).Cast<AlignItems>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            JustifyContent
+            <RadzenDropDown @bind-Value="@justifyContent" TextProperty="Text" ValueProperty="Value"
+                        Data="@(Enum.GetValues(typeof(JustifyContent)).Cast<JustifyContent>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Wrap
+            <RadzenDropDown @bind-Value="@wrap" TextProperty="Text" ValueProperty="Value"
+                        Data="@(Enum.GetValues(typeof(FlexWrap)).Cast<FlexWrap>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Gap
+            <RadzenTextBox @bind-Value="@gap" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Reverse
+            <RadzenSwitch @bind-Value="@reverse" Style="margin-top: 4px;" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenCard>
+<RadzenCard class="p-0">
+    <RadzenStack Orientation="@orientation" Gap="@gap" Reverse="@reverse" JustifyContent="@justifyContent" AlignItems="@alignItems" Style="height: 400px">
+        <RadzenCard class="p-1 rz-background-color-info rz-color-white rz-text-align-center">
+            A
+        </RadzenCard>
+        <RadzenCard class="p-1 rz-background-color-success rz-color-white rz-text-align-center" style="height: 40px; width: 40px;">
+            B
+        </RadzenCard>
+        <RadzenCard class="p-1 rz-background-color-warning rz-color-white rz-text-align-center" style="height: 60px; width: 60px;">
+            C
+        </RadzenCard>
+        <RadzenCard class="p-1 rz-background-color-danger rz-color-white rz-text-align-center" style="height: 80px; width: 80px;">
+            D
+        </RadzenCard>
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    Orientation orientation = Orientation.Horizontal;
+    AlignItems alignItems = AlignItems.Normal;
+    JustifyContent justifyContent = JustifyContent.Normal;
+    FlexWrap wrap = FlexWrap.NoWrap;
+    string gap = "10px";
+    bool reverse;
+}

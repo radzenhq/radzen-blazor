@@ -20,12 +20,12 @@ namespace Radzen.Blazor
     ///   {
     ///     Console.WriteLine($"{name} -> Username: {args.Username} and password: {args.Password}");
     ///   }
-    ///   
+    ///
     ///   void OnRegister(string name)
     ///   {
     ///     Console.WriteLine($"{name} -> Register");
     ///   }
-    ///   
+    ///
     ///   void OnResetPassword(string value, string name)
     ///   {
     ///     Console.WriteLine($"{name} -> ResetPassword for user: {value}");
@@ -42,60 +42,68 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AutoComplete { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value indicating the type of built-in autocomplete
+        /// the browser should use.
+        /// <see cref="Blazor.AutoCompleteType" />
+        /// </summary>
+        /// <value>
+        /// The type of built-in autocomplete.
+        /// </value>
+        [Parameter]
+        public AutoCompleteType UserNameAutoCompleteType { get; set; } = AutoCompleteType.Username;
+
+        /// <summary>
+        /// Gets or sets a value indicating the type of built-in autocomplete
+        /// the browser should use.
+        /// <see cref="Blazor.AutoCompleteType" />
+        /// </summary>
+        /// <value>
+        /// The type of built-in autocomplete.
+        /// </value>
+        [Parameter]
+        public AutoCompleteType PasswordAutoCompleteType { get; set; } = AutoCompleteType.CurrentPassword;
+
+        /// <summary>
+        /// Gets or sets the design variant of the form field.
+        /// </summary>
+        /// <value>The variant of the form field.</value>
+        [Parameter]
+        public Variant? FormFieldVariant { get; set; }
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "login";
+            return "rz-login";
         }
 
-        string _username;
+        string username;
         /// <summary>
         /// Gets or sets the username.
         /// </summary>
         /// <value>The username.</value>
         [Parameter]
-        public string Username
-        {
-            get
-            {
-                return _username;
-            }
-            set
-            {
-                if (_username != value)
-                {
-                    _username = value;
-                }
-            }
-        }
+        public string Username { get; set; }
 
-        string _password;
+        string password;
         /// <summary>
         /// Gets or sets the password.
         /// </summary>
         /// <value>The password.</value>
         [Parameter]
-        public string Password
-        {
-            get
-            {
-                return _password;
-            }
-            set
-            {
-                if (_password != value)
-                {
-                    _password = value;
-                }
-            }
-        }
+        public string Password { get; set; }
+
+        private bool rememberMe;
+        /// <summary> Sets the initial value of the remember me switch.</summary>
+        [Parameter]
+        public bool RememberMe { get; set; }
 
         /// <summary>
         /// Gets or sets the login callback.
         /// </summary>
         /// <value>The login callback.</value>
         [Parameter]
-        public EventCallback<Radzen.LoginArgs> Login { get; set; }
+        public EventCallback<LoginArgs> Login { get; set; }
 
         /// <summary>
         /// Gets or sets the register callback.
@@ -119,11 +127,24 @@ namespace Radzen.Blazor
         public bool AllowRegister { get; set; } = true;
 
         /// <summary>
+        /// Asks the user whether to remember their credentials. Set to <c>false</c> by default.
+        /// </summary>
+        [Parameter]
+        public bool AllowRememberMe { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether reset password is allowed.
         /// </summary>
         /// <value><c>true</c> if reset password is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowResetPassword { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether default login button is shown.
+        /// </summary>
+        /// <value><c>true</c> if default login button is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowLoginButton { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the login text.
@@ -139,6 +160,10 @@ namespace Radzen.Blazor
         [Parameter]
         public string RegisterText { get; set; } = "Sign up";
 
+        /// <summary> Gets or sets the remember me text.</summary>
+        [Parameter]
+        public string RememberMeText { get; set; } = "Remember me";
+
         /// <summary>
         /// Gets or sets the register message text.
         /// </summary>
@@ -151,7 +176,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The reset password text.</value>
         [Parameter]
-        public string ResetPasswordText { get; set; } = "Forgot password";
+        public string ResetPasswordText { get; set; } = "Forgot password?";
 
         /// <summary>
         /// Gets or sets the user text.
@@ -186,10 +211,45 @@ namespace Radzen.Blazor
         /// </summary>
         protected async Task OnLogin()
         {
-            if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
             {
-                await Login.InvokeAsync(new Radzen.LoginArgs { Username = Username, Password = Password });
+                await Login.InvokeAsync(new LoginArgs { Username = username, Password = password, RememberMe = rememberMe });
             }
+        }
+
+        private string Id(string name)
+        {
+            return $"{GetId()}-{name}";
+        }
+
+        /// <inheritdoc />
+        protected override void OnInitialized()
+        {
+            username = Username;
+            password = Password;
+            rememberMe = RememberMe;
+            base.OnInitialized();
+        }
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            if (parameters.DidParameterChange(nameof(Username), Username))
+            {
+                username = parameters.GetValueOrDefault<string>(nameof(Username));
+            }
+
+            if (parameters.DidParameterChange(nameof(Password), Password))
+            {
+                password = parameters.GetValueOrDefault<string>(nameof(Password));
+            }
+
+            if (parameters.DidParameterChange(nameof(RememberMe), RememberMe))
+            {
+                rememberMe = parameters.GetValueOrDefault<bool>(nameof(RememberMe));
+            }
+
+            await base.SetParametersAsync(parameters);
         }
 
         /// <summary>
@@ -198,7 +258,7 @@ namespace Radzen.Blazor
         /// <param name="args">The <see cref="EventArgs"/> instance containing the event data.</param>
         protected async Task OnReset(EventArgs args)
         {
-            await ResetPassword.InvokeAsync(Username);
+            await ResetPassword.InvokeAsync(username);
         }
 
         /// <summary>

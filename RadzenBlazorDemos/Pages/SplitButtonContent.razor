@@ -1,0 +1,50 @@
+﻿@inject NotificationService NotificationService
+<div class="container-fluid splitbutton-demo">
+    <div class="row mb-4">
+        <div class="col">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Icon</RadzenText>
+            <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with icon")) Icon="account_circle">
+                <ChildContent>
+                    <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
+                    <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
+                </ChildContent>
+            </RadzenSplitButton>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Icon and text</RadzenText>
+            <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text and icon")) Text="SplitButton" Icon="account_circle">
+                <ChildContent>
+                    <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
+                    <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
+                </ChildContent>
+            </RadzenSplitButton>
+
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col">
+            <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with image")) Text="Radzen" Image="images/radzen-nuget.png">
+                <ChildContent>
+                    <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
+                    <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
+                </ChildContent>
+            </RadzenSplitButton>
+        </div>
+    </div>
+</div>
+
+@code {
+    void OnClick(RadzenSplitButtonItem item, string buttonName)
+    {
+        if (item != null)
+        {
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "SplitButton Item Clicked", Detail = $"{buttonName}, item with value {item.Value} clicked" });
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "SplitButton Clicked", Detail = $"{buttonName} clicked" });
+        }
+    }
+}

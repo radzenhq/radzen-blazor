@@ -1,89 +1,12 @@
 ﻿@page "/datagrid-filter-template"
-@using System.Linq.Dynamic.Core
 
-<h1>DataGrid custom Column FilterTemplate</h1>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid custom Column FilterTemplate
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    This page demonstrates how to define custom DataGrid column filter template.
+</RadzenText>
 
-<p>This page demonstrates how to define custom DataGrid column filter template.</p>
-
-<RadzenExample Name="DataGrid" Source="DataGridColumnFilterTemplate" Heading="false">
-    @if (employees == null)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else
-    {
-        <h3>Custom filtering template with IQueryable binding</h3>
-         <RadzenDataGrid @ref="grid" Data=@employees FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
-            <Columns>
-                <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />
-                <RadzenDataGridColumn TItem="Employee" Title="Customer" Property="CompanyName" Type="typeof(IEnumerable<string>)" 
-                        FilterValue="@selectedCompanyNames" FilterOperator="FilterOperator.Contains" LogicalFilterOperator="LogicalFilterOperator.Or">
-                    <FilterTemplate>
-                        <RadzenDropDown @bind-Value=@selectedCompanyNames Style="width:100%;"
-                            Change=@OnSelectedCompanyNamesChange Data="@(companyNames)" AllowClear="true" Multiple="true" />
-                    </FilterTemplate>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" 
-                    FilterValue="@currentTOC">
-                    <FilterTemplate>
-                        <RadzenDropDown @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%;"
-                                        Change=@OnSelectedTOCChange
-                                        Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy?>().Select(t => new { Text = $"{t}", Value = t == TitleOfCourtesy.All ? null : t }))" />
-                    </FilterTemplate>
-                </RadzenDataGridColumn>
-            </Columns>
-        </RadzenDataGrid>
-    }
+<RadzenExample ComponentName="DataGrid" Example="DataGridColumnFilterTemplate">
+    <DataGridColumnFilterTemplate />
 </RadzenExample>
-
-@code {
-    RadzenDataGrid<Employee> grid;
-
-    TitleOfCourtesy? currentTOC;
-    IEnumerable<string> selectedCompanyNames;
-
-    List<string> companyNames = new List<string> {"Vins et alcools Chevalier", "Toms Spezialitäten", "Hanari Carnes", "Richter Supermarkt", "Wellington Importadora", "Centro comercial Moctezuma" };
-
-    public enum TitleOfCourtesy
-    {
-        Ms,
-        Mr,
-        All = -1
-    }
-
-    public class Employee
-    {
-        public int ID { get; set; }
-        public string CompanyName { get; set; }
-        public TitleOfCourtesy TitleOfCourtesy { get; set; }
-    }
-
-    void OnSelectedCompanyNamesChange(object value)
-    {
-        if (selectedCompanyNames != null && !selectedCompanyNames.Any())
-        {
-            selectedCompanyNames = null;  
-        }
-    }
-
-    void OnSelectedTOCChange(object value)
-    {
-        if (currentTOC == TitleOfCourtesy.All)
-        {
-            currentTOC = null;
-        }
-    }
-
-    IEnumerable<Employee> employees; 
-
-    protected override async Task OnInitializedAsync()
-    {
-        employees = await Task.FromResult(Enumerable.Range(0, 10).Select(i =>
-            new Employee
-            {
-                ID = i,
-                CompanyName = i < 4 ? companyNames[0] : companyNames[i - 4],
-                TitleOfCourtesy = i < 5 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms
-            }).AsQueryable());
-    }
-}

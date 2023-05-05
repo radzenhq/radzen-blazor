@@ -1,0 +1,51 @@
+@using Microsoft.EntityFrameworkCore
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<div class="container-fluid">
+    <div class="row my-5">
+        <div class="col-lg-6 offset-lg-3">
+            <RadzenCard>
+                <RadzenButton Click=@(() => selection = categories.Skip(1).FirstOrDefault()) Text="Select 'Condiments'" ButtonStyle="ButtonStyle.Secondary" class="me-1" />
+                <RadzenButton Click=@(() => selection = null) Text="Clear selection" ButtonStyle="ButtonStyle.Light" />
+            </RadzenCard>
+            <RadzenCard class="mt-4">
+                <RadzenTree Style="width: 100%; height: 300px" Change=@OnChange Data=@categories @bind-Value=@selection>
+                    <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
+                    <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
+                </RadzenTree>
+            </RadzenCard>
+        </div>
+    </div>
+</div>
+
+<EventConsole @ref=@console />
+
+@code {
+    IEnumerable<Category> categories;
+    object selection;
+
+    EventConsole console;
+
+    void OnChange()
+    {
+        if (selection is Category category)
+        {
+            console.Log($"Selection changed to: {category.CategoryName}");
+        }
+
+        if (selection is Product product)
+        {
+            console.Log($"Selection changed to: {product.ProductName}");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        categories = dbContext.Categories.Include(c => c.Products);
+        selection = categories.FirstOrDefault();
+    }
+}

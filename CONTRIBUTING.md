@@ -19,7 +19,7 @@ You can ask your question here. Please use the [Radzen.Blazor Components](https:
 
 ### Dedicated technical support
 
-Radzen staff provides technical support with guaranteed response time to Radzen Professional and Enterprise subscribers. The pricing options are available [here](https://www.radzen.com/pricing/).
+Radzen staff provides technical support with guaranteed response time to Radzen Professional and Enterprise subscribers. The pricing options are available [here](https://www.radzen.com/blazor-studio/pricing/).
 
 ## How Can I Contribute?
 

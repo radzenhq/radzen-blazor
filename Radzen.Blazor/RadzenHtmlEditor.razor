@@ -46,9 +46,12 @@
                 <RadzenHtmlEditorFontName />
                 <RadzenHtmlEditorFontSize />
                 <RadzenHtmlEditorFormatBlock />
+                <RadzenHtmlEditorSeparator />
+                <RadzenHtmlEditorSource />
             }
             </CascadingValue>
         </div>
-        <div @ref=@ContentEditable class="rz-html-editor-content" contenteditable=@(!Disabled) @onfocus=@OnFocus @onblur=@OnBlur></div>
+        <RadzenTextArea spellcheck="false" Visible=@(mode == HtmlEditorMode.Source) class="rz-html-editor-source" Value=@Html Change=@SourceChanged />
+        <div hidden="@(mode != HtmlEditorMode.Design)" @ref=@ContentEditable class="rz-html-editor-content" contenteditable=@(!Disabled) @onfocus=@OnFocus @onblur=@OnBlur></div>
     </div>
 }

@@ -1,0 +1,36 @@
+﻿@typeparam TItem
+
+@if (!DataList.WrapItems)
+{
+    <ul class="rz-datalist-data">
+        <li>
+            @if (DataList.Template != null)
+            {
+                @DataList.Template(Item)
+            }
+            else
+            {
+                <span>Template</span>
+            }
+        </li>
+    </ul>
+}
+else
+{
+    @if (DataList.Template != null)
+    {
+        @DataList.Template(Item)
+    }
+    else
+    {
+        <span>Template</span>
+    }
+}
+
+@code {
+    [Parameter]
+    public RadzenDataList<TItem> DataList { get; set; }
+
+    [Parameter]
+    public TItem Item { get; set; }
+}

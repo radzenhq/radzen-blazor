@@ -1,0 +1,31 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+
+@inherits SchedulerViewBase
+
+@code {    
+    public override RenderFragment Render()
+    {
+        var appointments = Scheduler.GetAppointmentsInRange(StartDate, EndDate);
+
+        var maxAppointmentsInSlot = 0;
+
+        if (MaxAppointmentsInSlot != null)
+        {
+            maxAppointmentsInSlot = MaxAppointmentsInSlot.Value;
+        }
+        else
+        {
+            var slotHeight = (Scheduler.Height - 60) / 12;
+            maxAppointmentsInSlot = Convert.ToInt32(Math.Floor(slotHeight / 16)) - 1;
+        }
+
+        return @<CascadingValue Value=@Scheduler>
+                    <YearPlannerView StartDate=@StartDate 
+                        EndDate=@EndDate 
+                        MaxAppointmentsInSlot=@maxAppointmentsInSlot 
+                        MoreText=@MoreText 
+                        Appointments=@appointments />
+                </CascadingValue>;
+    }
+}

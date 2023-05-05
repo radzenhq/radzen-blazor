@@ -1,0 +1,118 @@
+$datafilter-item-padding-left: 2rem;
+$datafilter-item-padding-y: 0.25rem;
+$datafilter-item-indentation: 0.25rem;
+$datafilter-item-path-width: 1rem;
+$datafilter-item-path-height: calc(#{$datafilter-item-padding-y} + (var(--rz-input-height) / 2));
+$datafilter-item-path-border: var(--rz-border-normal);
+$datafilter-item-path-border-radius: calc(2 * var(--rz-border-radius));
+
+// DataFilter CSS variables
+
+:root {
+    --rz-datafilter-item-padding-y: #{$datafilter-item-padding-y};
+    --rz-datafilter-item-padding-left: #{$datafilter-item-padding-left};
+    --rz-datafilter-item-indentation: #{$datafilter-item-indentation};
+    --rz-datafilter-item-path-width: #{$datafilter-item-path-width};
+    --rz-datafilter-item-path-height: #{$datafilter-item-path-height};
+    --rz-datafilter-item-path-border: #{$datafilter-item-path-border};
+    --rz-datafilter-item-path-border-radius: #{$datafilter-item-path-border-radius};
+}
+
+
+.rz-datafilter {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.25rem;
+    align-items: center;
+
+    .rz-selectbutton {
+        display: inline-flex;
+    }
+
+    .rz-datafilter-group {
+        position: relative;
+        margin: 0.25rem 0 0;
+        padding: 0;
+        flex-basis: 100%;
+
+        .rz-datafilter-group {
+            margin: 0;
+        }
+    }
+
+    .rz-datafilter-item {
+        position: relative;
+        list-style: none;
+        margin: 0;
+        padding: var(--rz-datafilter-item-padding-y) 0 var(--rz-datafilter-item-padding-y) calc(var(--rz-datafilter-item-padding-left) + var(--rz-datafilter-item-indentation) );
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        align-items: center;
+
+        &:before {
+            content: "";
+            position: absolute;
+            background-color: transparent;
+            width: var(--rz-datafilter-item-path-width);
+            top: 0;
+            bottom: 0;
+            left: calc(var(--rz-datafilter-item-padding-left) / 2);
+            border: 0;
+            border-left: var(--rz-datafilter-item-path-border);
+        }
+
+        &:after {
+            content: "";
+            position: absolute;
+            background-color: transparent;
+            width: var(--rz-datafilter-item-path-width);
+            height: calc(var(--rz-datafilter-item-padding-y) + (var(--rz-input-height) / 2));
+            top: 0;
+            left: calc(var(--rz-datafilter-item-padding-left) / 2);
+            border: 0;
+            border-bottom: var(--rz-datafilter-item-path-border);
+            border-left: var(--rz-datafilter-item-path-border);
+        }
+
+        .rz-multiselect,
+        .rz-dropdown {
+            flex: 10rem 1;
+        }
+    }
+
+    .rz-datafilter-group-item {
+        &:after {
+            height: calc(var(--rz-input-height) / 2);
+        }
+    }
+
+    .rz-datafilter-bar {
+        padding: 0 0 0 calc(var(--rz-datafilter-item-padding-left) + var(--rz-datafilter-item-indentation) );
+        &:before {
+            display: none;
+        }
+
+        &:after {
+            height: calc(var(--rz-input-height) / 2);
+            border-bottom-left-radius: var(--rz-datafilter-item-path-border-radius);
+        }
+
+        .rz-splitbutton {
+            margin-top: 0.3125rem;
+        }
+    }
+
+    .rz-datafilter-editor {
+        flex: 10rem 4;
+    }
+
+    .rz-button.rz-datafilter-item-clear {
+        color: var(--rz-text-secondary-color);
+        opacity: 0.5;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+}

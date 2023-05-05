@@ -1,0 +1,21 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenAutoComplete Disabled="true" @bind-Value=@companyName Data=@customers TextProperty="CompanyName" Style="width: 13rem" />
+</div>
+
+@code {
+    string companyName = "Some value";
+
+    IEnumerable<Customer> customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers;
+    }
+}

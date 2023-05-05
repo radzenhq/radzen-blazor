@@ -1,0 +1,7 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenSlider Range="true" @bind-Value=@values TValue="IEnumerable<int>" />
+</div>
+
+@code {
+    IEnumerable<int> values = new int[] { 14, 78 };
+}

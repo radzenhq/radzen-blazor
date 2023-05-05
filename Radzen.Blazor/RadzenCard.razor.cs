@@ -13,7 +13,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-card card";
+            return "rz-card";
         }
     }
 }

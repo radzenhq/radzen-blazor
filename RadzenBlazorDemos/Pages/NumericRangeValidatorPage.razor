@@ -1,69 +1,12 @@
 @page "/numericrangevalidator"
-@using Radzen
-@using System.Text.Json
 
-<RadzenExample Name="NumericRangeValidator">
-<div class="container my-4">
-    <div class="row">
-        <div class="col">
-            <RadzenCard Class="w-100 mb-4" >
-            <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
-                <RadzenLabel Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
-            </RadzenCard>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-6 offset-lg-3">
-            <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
-                <RadzenFieldset Text="Bid info">
-                    <div class="row mb-5">
-                        <div class="col-md-4">
-                            <RadzenLabel Text="Quantity" />
-                            <small style="display: block">(1-10 items)</small>
-                        </div>
-                        <div class="col">
-                            <RadzenNumeric style="display: block" Name="Quantity" @bind-Value=@model.Quantity @oninput=@OnInput Class="w-100" />
-                            <RadzenNumericRangeValidator Component="Quantity" Min="1" Max="10" Text="Quantity should be between 1 and 10" Popup=@popup Style="position: absolute" />
-                        </div>
-                    </div>
-                    <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
-                </RadzenFieldset>
-            </RadzenTemplateForm>
-        </div>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    NumericRangeValidator
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>NumericRangeValidator</strong> component.
+</RadzenText>
+
+<RadzenExample ComponentName="NumericRangeValidator" Example="NumericRangeValidatorConfig" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenNumericRangeValidator.cs">
+    <NumericRangeValidatorConfig />
 </RadzenExample>
-
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    class Model
-    {
-        public decimal Quantity { get; set; }
-    }
-
-    bool popup;
-
-    Model model = new Model();
-    EventConsole console;
-
-    void OnInput(ChangeEventArgs args)
-    {
-        Log("oninput", args.Value.ToString());
-    }
-
-    void Log(string eventName, string value)
-    {
-        console.Log($"{eventName}: {value}");
-    }
-
-    void OnSubmit(Model model)
-    {
-        Log("Submit", JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true }));
-    }
-
-    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
-    {
-        Log("InvalidSubmit", JsonSerializer.Serialize(args, new JsonSerializerOptions() { WriteIndented = true }));
-    }
-}

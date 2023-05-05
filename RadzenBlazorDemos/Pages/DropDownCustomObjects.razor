@@ -1,0 +1,40 @@
+﻿@using System.Collections
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using System.ComponentModel.DataAnnotations
+
+<div class="rz-p-sm-12 rz-text-align-center">
+    <RadzenDropDown Data=@data TValue="MyObject" @bind-Value=@singleValue
+                    AllowClear="true" AllowFiltering="true" Style="width: 100%; max-width: 400px;">
+    </RadzenDropDown>
+</div>
+
+@code {
+
+    class MyObject
+    { 
+        public int Id { get; set; }
+        public string Name { get; set; }
+
+        public override bool Equals(object o)
+        {
+            var other = o as MyObject;
+
+            return other?.Id == Id;
+        }
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, Name: {Name}";
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+    }
+
+    MyObject singleValue = new MyObject() { Id = 5, Name = "Name5" };
+    IEnumerable<MyObject> data = Enumerable.Range(0, 100).Select(i => new MyObject() { Id = i, Name = $"Name{i}" });
+}

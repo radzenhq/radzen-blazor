@@ -1,0 +1,19 @@
+﻿@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<div class="rz-p-sm-12 rz-text-align-center">
+    <RadzenDropDown @bind-Value=@value Data=@products TextProperty="ProductName" ValueProperty="ProductID" AllowClear=true Placeholder="Select product" Style="width: 100%; max-width: 400px;"/>
+</div>
+
+@code {
+    int? value;
+    IEnumerable<Product> products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        products = dbContext.Products;
+    }
+}

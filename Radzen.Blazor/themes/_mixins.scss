@@ -1,0 +1,75 @@
+@mixin rz-color-css($property, $map) {
+  @each $token,
+  $value in $map {
+    .rz-#{$property}-#{$token} {
+      #{$property}: var(--rz-#{$token}) !important;
+    }
+  }
+}
+
+@mixin rz-utility-map-css($property, $map) {
+  @each $token,
+  $value in $map {
+    .rz-#{$token} {
+      #{$property}: var(--rz-#{$token}) !important;
+    }
+  }
+}
+
+@mixin rz-utility-list-css($property, $list) {
+  @each $value in $list {
+    .rz-#{$property}-#{$value} {
+      #{$property}: #{$value} !important;
+    }
+  }
+}
+
+@mixin rz-utility-list-breakpoints-css($property, $list, $breakpoints) {
+  @each $breakpoint, $breakpoint-value in $breakpoints {
+    @media (min-width: #{$breakpoint-value}) {
+      @each $value in $list {
+        .rz-#{$property}-#{$breakpoint}-#{$value} {
+          #{$property}: #{$value} !important;
+        }
+      }
+    }
+  }
+}
+
+@mixin rz-ripple($ripple-background: rgba(0,0,0,.12), $pseudo: false) {
+  @if $pseudo == true {
+
+    position: relative;
+    overflow: hidden;
+  
+    &:not(.rz-state-disabled):before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-position: center;
+      transition: background 0.8s, opacity 0.8s;
+      opacity: 0;
+      background: radial-gradient(circle, currentColor 1%, transparent 1%) center/15000%;
+    }
+  
+    &:not(.rz-state-disabled):active {
+      &:before {
+        transition: background 0s, opacity 0s;
+        opacity: .32;
+        background-size: 100%;
+      }
+    }
+
+  } @else {
+
+    background-position: center;
+    transition: background 0.8s;
+    background: radial-gradient(circle, transparent 1%, $ripple-background 1%)  center/15000%;
+
+    &:active {
+        background-color: $ripple-background;
+        transition: background 0s;
+        background-size: 100%;
+    }
+  }
+}

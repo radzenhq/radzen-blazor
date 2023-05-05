@@ -1,6 +1,6 @@
 @inherits RadzenComponent
 @using Microsoft.JSInterop
-<div title=@Title @ref=@Element class=@Class @onclick=@Toggle @onmousedown:preventDefault @attributes=@Attributes>
+<div title=@Title @ref=@Element class=@Class @onclick=@Toggle @onmousedown:preventDefault @attributes=@Attributes disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode()))>
     <div class="rz-html-editor-dropdown-value">
         @if (SelectedItem != null)
         {
@@ -11,8 +11,8 @@
             @Placeholder
         }
     </div>
-    <button @onclick:preventDefault tabindex="-1" class="rz-html-editor-dropdown-trigger" disabled=@Editor.Disabled><i class="rzi" /></button>
-    <Popup @ref=Popup class="rz-html-editor-dropdown-items" Style=@PopupStyle>
+    <button @onclick:preventDefault tabindex="-1" class="rz-html-editor-dropdown-trigger" disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode()))><i class="rzi" /></button>
+    <Popup @ref=Popup class="rz-html-editor-dropdown-items" Style=@PopupStyle PreventDefault=true>
         <CascadingValue Value=@this>
             @ChildContent
         </CascadingValue>
@@ -22,7 +22,7 @@
     [CascadingParameter]
     public RadzenHtmlEditor Editor { get; set; }
 
-    Popup Popup { get; set; } 
+    Popup Popup { get; set; }
 
     [Parameter]
     public string Title { get; set; }
@@ -36,9 +36,12 @@
     [Parameter]
     public string Placeholder { get; set; }
 
+    [Parameter]
+    public HtmlEditorMode EnabledModes { get; set; } = HtmlEditorMode.Design;
+
     async Task Toggle()
     {
-        if (!Editor.Disabled)
+        if (!Editor.Disabled && EnabledModes.HasFlag(Editor.GetMode()))
         {
             await Popup.ToggleAsync(Element);
         }
@@ -57,7 +60,7 @@
 
     internal async Task Select(EditorDropDownItem item, bool change)
     {
-        if (SelectedItem != item && !Editor.Disabled)
+        if (SelectedItem != item && !Editor.Disabled && EnabledModes.HasFlag(Editor.GetMode()))
         {
             SelectedItem = item;
 
@@ -78,7 +81,7 @@
         {
             var classList = new List<string>() { "rz-html-editor-dropdown" };
 
-            if (Editor.Disabled)
+            if (Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode()))
             {
                 classList.Add("rz-disabled");
             }

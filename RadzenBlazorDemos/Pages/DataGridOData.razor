@@ -1,0 +1,103 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inject NorthwindODataService service
+
+<RadzenDataGrid @ref="grid" @bind-Value=@selectedEmployees KeyProperty="EmployeeID" IsLoading="@isLoading" Count="@count" Data="@employees" LoadData="@LoadData" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" PagerHorizontalAlign="HorizontalAlign.Center" TItem="Employee" ColumnWidth="200px">
+<Columns>
+    <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
+    <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
+        <Template Context="data">
+            <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+        </Template>
+    </RadzenDataGridColumn>
+    <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name">
+            <EditTemplate Context="employee">
+                <RadzenTextBox @bind-Value="employee.FirstName" />
+            </EditTemplate>
+    </RadzenDataGridColumn>
+    <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
+    <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" 
+        Type="typeof(IEnumerable<string>)" FilterValue="@selectedTitles" FilterOperator="FilterOperator.Contains">
+        <FilterTemplate>
+            <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%"
+                Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
+        </FilterTemplate>
+    </RadzenDataGridColumn>
+    <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
+    <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+    <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+    <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
+    <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
+    <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" />
+    <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
+    <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
+    <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
+    <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" />
+    <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
+        <RadzenDataGridColumn TItem="Employee" Context="employee" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="156px">
+            <Template Context="employee">
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" 
+                    Click="@(args => grid.EditRow(employee))" @onclick:stopPropagation="true">
+                </RadzenButton>
+            </Template>
+        </RadzenDataGridColumn>
+</Columns>
+</RadzenDataGrid>
+
+<RadzenCard class="mt-4">
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="mb-3">Data-bind to a service</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body1">
+            1. Set the Data and Count properties.
+        </RadzenText>
+        <pre class="mt-3 p-3">
+            <code>&lt;RadzenDataGrid Count="@@count" Data="@@employees"</code>
+        </pre>
+        <RadzenText TextStyle="TextStyle.Body1">
+            2. Handle the LoadData event and update the Data and Count backing fields (<code>employees</code> and <code>count</code> in this case).
+        </RadzenText>
+            
+        <pre class="mt-3 p-3">
+            <code>
+async Task LoadData(LoadDataArgs args)
+{
+    var result = await service.GetEmployees(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+    employees = result.Value.AsODataEnumerable();
+    count = result.Count;
+}
+            </code>
+        </pre>
+</RadzenCard>
+@code {
+    bool isLoading;
+    int count;
+    IEnumerable<Employee> employees;
+    IList<Employee> selectedEmployees;
+    RadzenDataGrid<Employee> grid;
+
+    List<string> titles = new List<string> {"Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
+    IEnumerable<string> selectedTitles;
+
+    async Task OnSelectedTitlesChange(object value)
+    {
+        if (selectedTitles != null && !selectedTitles.Any())
+        {
+            selectedTitles = null;  
+        }
+
+        await grid.FirstPage();
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        var result = await service.GetEmployees(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+        // Update the Data property
+        employees = result.Value.AsODataEnumerable();
+        // Update the count
+        count = result.Count;
+
+        isLoading = false;
+    }
+}

@@ -38,14 +38,14 @@ documentType: index
     <div class="col-md-4 col-md-offset-2">
         <img class="illustration" src="images/premium.svg">
         <h3>Dedicated Support</h3>
-        <p class="text-left">Radzen offers dedicated support with the <a href="https://www.radzen.com/pricing/" target="_blank" title="See Pricing">Radzen Professional and Enterprise subscriptions</a>.</p>
+        <p class="text-left">Radzen offers dedicated support with the <a href="https://www.radzen.com/blazor-studio/pricing/" target="_blank" title="See Pricing">Radzen Professional and Enterprise subscriptions</a>.</p>
         <p >A Radzen subscription provides:</p>
         <ul class="text-left">
             <li>Dedicated support over email with guaranteed response time (24 hours for Radzen Professional and 16 hours for Radzen Enterprise).</li>
-            <li>Full access to <a href="https://www.radzen.com/" target="_blank">Radzen</a> - the first WYSIWYG Blazor development environment on the market.</li>
-            <li><a href="https://www.radzen.com/documentation/premium-themes/" target="_blank">Premium themes</a> and visual <a href="https://www.radzen.com/documentation/theme-customization/" target="_blank">theme customization</a>.</li>
+            <li>Full access to <a href="https://www.radzen.com/blazor-studio/" target="_blank">Radzen Blazor Studio</a> - a rapid application development solution for Blazor Server and WebAssembly applications.</li>
+            <li>Premium themes.</li>
             <li>Complete Blazor application scaffolding from the most commonly used databases - MSSQL, Oracle, MySQL and PostgreSQL.</li>
-            <li>Built-in deploy to IIS, FTP, Zip and Azure.</li>
+            <li>Built-in deploy to IIS, FTP, Zip and Azure.</li>s
             <li>Multi-tenancy support</li>
         </ul>
     </div>

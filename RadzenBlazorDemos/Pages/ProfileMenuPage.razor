@@ -1,19 +1,12 @@
 ﻿@page "/profile-menu"
 
-<RadzenExample Name="ProfileMenu">
-<RadzenCard Style="margin-bottom: 200px; width: fit-content; min-width: 300px;" Class="mt-5 mx-auto text-right">
-    <RadzenProfileMenu>
-        <Template>
-            <RadzenGravatar Email="user@example.com">
-            </RadzenGravatar>
-        </Template>
-        <ChildContent>
-            <RadzenProfileMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenProfileMenuItem>
-            <RadzenProfileMenuItem Text="Menu" Path="menu" Icon="line_weight"></RadzenProfileMenuItem>
-            <RadzenProfileMenuItem Text="FileInput" Path="fileinput" Icon="attach_file"></RadzenProfileMenuItem>
-            <RadzenProfileMenuItem Text="Dialog" Path="dialog" Icon="perm_media"></RadzenProfileMenuItem>
-            <RadzenProfileMenuItem Text="Notification" Path="notification" Icon="announcement"></RadzenProfileMenuItem>
-        </ChildContent>
-    </RadzenProfileMenu>
-</RadzenCard>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    ProfileMenu
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>ProfileMenu</strong> component.
+</RadzenText>
+
+<RadzenExample ComponentName="ProfileMenu" Example="ProfileMenuConfig">
+    <ProfileMenuConfig />
 </RadzenExample>

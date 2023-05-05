@@ -22,7 +22,7 @@ namespace Radzen
         /// <summary>
         /// Gets a reference to the HTML element rendered by the component.
         /// </summary>
-        public ElementReference Element { get; internal set; }
+        public ElementReference Element { get; protected internal set; }
 
         /// <summary>
         /// A callback that will be invoked when the user hovers the component. Commonly used to display a tooltip via 
@@ -233,17 +233,17 @@ namespace Radzen
                 {
                     if (ContextMenu.HasDelegate)
                     {
-                        await JSRuntime.InvokeVoidAsync("Radzen.addContextMenu", UniqueID, Reference);
+                        await JSRuntime.InvokeVoidAsync("Radzen.addContextMenu", GetId(), Reference);
                     }
 
                     if (MouseEnter.HasDelegate)
                     {
-                        await JSRuntime.InvokeVoidAsync("Radzen.addMouseEnter", UniqueID, Reference);
+                        await JSRuntime.InvokeVoidAsync("Radzen.addMouseEnter", GetId(), Reference);
                     }
 
                     if (MouseLeave.HasDelegate)
                     {
-                        await JSRuntime.InvokeVoidAsync("Radzen.addMouseLeave", UniqueID, Reference);
+                        await JSRuntime.InvokeVoidAsync("Radzen.addMouseLeave", GetId(), Reference);
                     }
                 }
             }

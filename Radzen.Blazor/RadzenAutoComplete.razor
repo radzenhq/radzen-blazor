@@ -10,19 +10,39 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@($"{Style};display:inline-block;")" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-        <input @ref="@search" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
-                oninput="@OpenScript()" tabindex="@TabIndex"  @onchange="@OnChange"
+        @if (Multiline)
+        {
+            <textarea @ref="@search" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
+                oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"  @onchange="@OnChange"
                 aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
-                class="@InputClassList"
-                type="text" id="@Name" aria-expanded="true" placeholder="@Placeholder" />
-        <div id="@PopupID" class="rz-autocomplete-panel" style="display:none; transform: none; box-sizing: border-box; max-height: 200px;">
+                class="@InputClassList" onblur="Radzen.activeElement = null"
+                id="@Name" aria-expanded="true" placeholder="@CurrentPlaceholder" />
+        }
+        else
+        {
+            <input @ref="@search" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
+                oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onchange="@OnChange"
+                aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
+                class="@InputClassList" onblur="Radzen.activeElement = null"
+                type="text" id="@Name" aria-expanded="true" placeholder="@CurrentPlaceholder" />
+        }
+        <div id="@PopupID" class="rz-autocomplete-panel" style="@PopupStyle">
             <ul @ref="@list" class="rz-autocomplete-items rz-autocomplete-list" role="listbox">
                 @if (!string.IsNullOrEmpty(searchText) || !string.IsNullOrEmpty(customSearchText))
                 {
                     @foreach (var item in LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (View != null ? View : Enumerable.Empty<object>()))
                     {
                         <li role="option" class="rz-autocomplete-list-item" @onclick="@(() => OnSelectItem(item))" onmousedown="Radzen.activeElement = null">
-                            <span>@PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)</span>
+                            <span>
+                                @if (Template != null)
+                                {
+                                    @Template(item)
+                                }
+                                else
+                                {
+                                    @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
+                                }
+                            </span>
                         </li>
                     }
                 }

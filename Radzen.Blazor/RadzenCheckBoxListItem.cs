@@ -29,6 +29,13 @@ namespace Radzen.Blazor
         [Parameter]
         public virtual bool Disabled { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether is read only.
+        /// </summary>
+        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ReadOnly { get; set; }
+
         RadzenCheckBoxList<TValue> _checkBoxList;
 
         /// <summary>
@@ -69,6 +76,32 @@ namespace Radzen.Blazor
         internal void SetValue(TValue value)
         {
             Value = value;
+        }
+
+        internal void SetDisabled(bool value)
+        {
+            Disabled = value;
+        }
+
+        internal void SetReadOnly(bool value)
+        {
+            ReadOnly = value;
+        }
+
+        internal string GetItemId()
+        {
+            return GetId();
+        }
+
+        internal string GetItemCssClass()
+        {
+            return GetCssClass();
+        }
+
+        /// <inheritdoc />
+        protected override string GetComponentCssClass()
+        {
+            return "rz-checkbox";
         }
     }
 }

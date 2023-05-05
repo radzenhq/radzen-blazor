@@ -49,7 +49,7 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>();
 
-            component.SetParametersAndRender(parameters => { 
+            component.SetParametersAndRender(parameters => {
                 parameters.Add<bool>(p => p.ShowTime, true);
                 parameters.Add<bool>(p => p.ShowSeconds, true);
             });
@@ -93,7 +93,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => {
                 parameters.Add(p => p.DateFormat, format);
-                parameters.Add<object>(p => p.Value, DateTime.Now); 
+                parameters.Add<object>(p => p.Value, DateTime.Now);
             });
 
             Assert.Contains(@$"value=""{string.Format("{0:" + format + "}", DateTime.Now)}""", component.Markup);
@@ -146,7 +146,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => {
                 parameters.Add<object>(p => p.Value, DateTime.Now);
-                parameters.Add<bool>(p => p.AllowClear, true); 
+                parameters.Add<bool>(p => p.AllowClear, true);
             });
 
             Assert.Contains(@$"<i class=""rz-dropdown-clear-icon rzi rzi-times""", component.Markup);
@@ -320,12 +320,12 @@ namespace Radzen.Blazor.Tests
             DateTime previousDay = DateTime.Today.AddDays(-1);
 
             using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;            
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>();
-            
+
             var raised = false;
-            object newValue = null;            
+            object newValue = null;
 
             component.SetParametersAndRender(parameters => {
                 parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; })
@@ -378,14 +378,14 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.Null(newValue);
         }
-        
+
         [Fact]
         public void DatePicker_Respects_DateTimeMaxValue()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
-            
+
             var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
             {
                 parameters.Add(p => p.Value, DateTime.MaxValue);

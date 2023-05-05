@@ -1,0 +1,23 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenAutoComplete @bind-Value=@companyName Data=@customers TextProperty="CompanyName" LoadData=@OnLoadData Style="width: 13rem" />
+    <RadzenText TextStyle="TextStyle.Body2">Start typing e.g. France
+        @((MarkupString)(!string.IsNullOrEmpty(companyName) ? $", Value is: <strong>{companyName}</strong>" : ""))</RadzenText>
+</div>
+
+@code {
+    string companyName;
+
+    IEnumerable<Customer> customers;
+
+    async Task OnLoadData(LoadDataArgs args)
+    {
+        customers = await Task.FromResult(dbContext.Customers
+            .Where(c => c.CustomerID.Contains(args.Filter) || c.ContactName.Contains(args.Filter))
+            .OrderBy(c => c.Country));
+    }
+}

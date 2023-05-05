@@ -1,0 +1,32 @@
+﻿@inject NotificationService NotificationService
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3">Icon</RadzenText>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+    <RadzenButton Click=@(args => OnClick("Large icon button")) Icon="add" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Large" />
+    <RadzenButton Click=@(args => OnClick("Medium icon button")) Icon="add" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium" />
+    <RadzenButton Click=@(args => OnClick("Small icon button")) Icon="add" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
+    <RadzenButton Click=@(args => OnClick("Extra Small icon button")) Icon="add" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" />
+</RadzenStack>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Text</RadzenText>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+    <RadzenButton Click=@(args => OnClick("Large Button")) Text="Create" Size="ButtonSize.Large" />
+    <RadzenButton Click=@(args => OnClick("Medium Button")) Text="Create" Size="ButtonSize.Medium" />
+    <RadzenButton Click=@(args => OnClick("Small Button")) Text="Create" Size="ButtonSize.Small" />
+    <RadzenButton Click=@(args => OnClick("Extra Small Button")) Text="Create" Size="ButtonSize.ExtraSmall" />
+</RadzenStack>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Icon and Text</RadzenText>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+    <RadzenButton Click=@(args => OnClick("Large button with text and icon")) Text="Create" Icon="add" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Large" />
+    <RadzenButton Click=@(args => OnClick("Medium button with text and icon")) Text="Create" Icon="add" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium" />
+    <RadzenButton Click=@(args => OnClick("Small button with text and icon")) Text="Create" Icon="add" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
+    <RadzenButton Click=@(args => OnClick("Extra Small button with text and icon")) Text="Create" Icon="add" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" />
+</RadzenStack>
+
+@code {
+    private void OnClick(string text)
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Button Clicked", Detail = text });
+    }
+}

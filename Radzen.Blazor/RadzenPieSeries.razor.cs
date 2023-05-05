@@ -93,6 +93,27 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Stores <see cref="Data" /> filtered to items greater than zero as an IList of <typeparamref name="TItem"/>.
+        /// </summary>
+        /// <value>The items.</value>
+        protected IList<TItem> PositiveItems { get; set; }
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            await base.SetParametersAsync(parameters);
+
+            if (Items != null)
+            {
+                PositiveItems = Items.Where(e => Value(e) > 0).ToList();
+            }
+            else
+            {
+                PositiveItems = new List<TItem>();
+            }
+        }
+
         /// <inheritdoc />
         public override double MeasureLegend()
         {
@@ -208,11 +229,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipX(TItem item)
         {
-            var sum = Items.Sum(Value);
+            var sum = PositiveItems.Sum(Value);
             double startAngle = 0;
             double endAngle = 0;
 
-            foreach (var data in Items)
+            foreach (var data in PositiveItems)
             {
                 var value = Value(data);
                 endAngle = startAngle + (value / sum) * 360;
@@ -233,7 +254,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipY(TItem item)
         {
-            var sum = Items.Sum(Value);
+            var sum = PositiveItems.Sum(Value);
             double startAngle = 0;
             double endAngle = 0;
 
@@ -310,7 +331,7 @@ namespace Radzen.Blazor
 
             if (Math.Abs(end.X - start.X) < 0.01 && Math.Abs(end.Y - start.Y) < 0.01)
             {
-                // Full circle - SVG can't render a full circle arc 
+                // Full circle - SVG can't render a full circle arc
                 endX = (end.X - 0.01).ToInvariantString();
 
                 innerEndX = (innerEnd.X - 0.01).ToInvariantString();
@@ -324,31 +345,36 @@ namespace Radzen.Blazor
         {
             var list = new List<ChartDataLabel>();
 
-            foreach (var d in Data)
+            if(Data != null)
             {
-                var x = TooltipX(d) - CenterX;
-                var y = TooltipY(d) - CenterY;
+                //var DataGreaterZero = Data.Where(e => Value(e) > 0).ToList();
 
-                // find angle and add offset
-                var phi = Math.Atan2(y, x);
+                foreach (var d in PositiveItems)
+                {
+                    var x = TooltipX(d) - CenterX;
+                    var y = TooltipY(d) - CenterY;
 
-                phi += Polar.ToRadian(offsetY % 360);
+                    // find angle and add offset
+                    var phi = Math.Atan2(y, x);
 
-                var textAnchor = phi >= -1.5 && phi <= 1.5 ? "start" : "end";
+                    phi += Polar.ToRadian(offsetY % 360);
 
-                // find radius
-                var hyp = Math.Sqrt(x * x + y * y) + offsetX + 16;
+                    var textAnchor = phi >= -1.5 && phi <= 1.5 ? "start" : "end";
 
-                // move along the radius and rotate
-                x = CenterX + hyp * Math.Cos(phi);
-                y = CenterY + hyp * Math.Sin(phi);
+                    // find radius
+                    var hyp = Math.Sqrt(x * x + y * y) + offsetX + 16;
 
-                list.Add(new ChartDataLabel 
-                { 
-                    TextAnchor = textAnchor, 
-                    Position = new Point { X = x, Y = y },
-                    Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
-                });
+                    // move along the radius and rotate
+                    x = CenterX + hyp * Math.Cos(phi);
+                    y = CenterY + hyp * Math.Sin(phi);
+
+                    list.Add(new ChartDataLabel
+                    {
+                        TextAnchor = textAnchor,
+                        Position = new Point { X = x, Y = y },
+                        Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
+                    });
+                }
             }
 
             return list;

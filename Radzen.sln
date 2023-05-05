@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadzenBlazorDemos", "Radzen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Radzen.Blazor.Tests", "Radzen.Blazor.Tests\Radzen.Blazor.Tests.csproj", "{BC20637F-A979-425A-9C3F-D72633FE555C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadzenBlazorDemos.Host", "RadzenBlazorDemos.Host\RadzenBlazorDemos.Host.csproj", "{18702B3F-791E-45F3-BCFD-1792A1300AAB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadzenBlazorDemos.Server", "RadzenBlazorDemos.Server\RadzenBlazorDemos.Server.csproj", "{EC869401-304A-45BC-93CA-C1CDFAAA7F7B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{BC20637F-A979-425A-9C3F-D72633FE555C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC20637F-A979-425A-9C3F-D72633FE555C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC20637F-A979-425A-9C3F-D72633FE555C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18702B3F-791E-45F3-BCFD-1792A1300AAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18702B3F-791E-45F3-BCFD-1792A1300AAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18702B3F-791E-45F3-BCFD-1792A1300AAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18702B3F-791E-45F3-BCFD-1792A1300AAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC869401-304A-45BC-93CA-C1CDFAAA7F7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC869401-304A-45BC-93CA-C1CDFAAA7F7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC869401-304A-45BC-93CA-C1CDFAAA7F7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC869401-304A-45BC-93CA-C1CDFAAA7F7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

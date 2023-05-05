@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -52,6 +54,13 @@ namespace Radzen.Blazor
         public string Path { get; set; }
 
         /// <summary>
+        /// Gets or sets the navigation link match.
+        /// </summary>
+        /// <value>The navigation link match.</value>
+        [Parameter]
+        public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+
+        /// <summary>
         /// Gets or sets the icon.
         /// </summary>
         /// <value>The icon.</value>
@@ -95,9 +104,32 @@ namespace Radzen.Blazor
 
         async System.Threading.Tasks.Task Toggle()
         {
+            if (!expanded && !Parent.Multiple)
+            {
+                var itemsToSkip = new List<RadzenPanelMenuItem>();
+                var p = ParentItem;
+                while (p != null)
+                {
+                    itemsToSkip.Add(p);
+                    p = p.ParentItem;
+                }
+
+                Parent.CollapseAll(itemsToSkip);
+            }
+
             expanded = !expanded;
             await ExpandedChanged.InvokeAsync(expanded);
             StateHasChanged();
+        }
+
+        internal async System.Threading.Tasks.Task Collapse()
+        {
+            if (expanded)
+            {
+                expanded = false;
+                await ExpandedChanged.InvokeAsync(expanded);
+                StateHasChanged();
+            }
         }
 
         string getStyle()
@@ -117,6 +149,13 @@ namespace Radzen.Blazor
         }
 
         RadzenPanelMenu _parent;
+        
+        /// <summary>
+        /// Gets or sets the click callback.
+        /// </summary>
+        /// <value>The click callback.</value>
+        [Parameter]
+        public EventCallback<MenuItemEventArgs> Click { get; set; }
 
         /// <summary>
         /// Gets or sets the parent.
@@ -164,7 +203,7 @@ namespace Radzen.Blazor
             }
         }
 
-        List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
+        internal List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
 
         /// <summary>
         /// Adds the item.
@@ -216,15 +255,39 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
         }
+        
         /// <summary>
         /// Handles the <see cref="E:Click" /> event.
         /// </summary>
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        public async System.Threading.Tasks.Task OnClick(MouseEventArgs args)
+        public async Task OnClick(MouseEventArgs args)
         {
             if (Parent != null)
             {
-                await Parent.Click.InvokeAsync(new MenuItemEventArgs() { Text = this.Text, Path = this.Path, Value = this.Value });
+                var eventArgs = new MenuItemEventArgs
+                {
+                    Text = Text,
+                    Path = Path,
+                    Value = Value,
+                    AltKey = args.AltKey,
+                    Button = args.Button,
+                    Buttons = args.Buttons,
+                    ClientX = args.ClientX,
+                    ClientY = args.ClientY,
+                    CtrlKey = args.CtrlKey,
+                    Detail = args.Detail,
+                    MetaKey = args.MetaKey,
+                    ScreenX = args.ScreenX,
+                    ScreenY = args.ScreenY,
+                    ShiftKey = args.ShiftKey,
+                    Type = args.Type,
+                };
+                await Parent.Click.InvokeAsync(eventArgs);
+
+                if (Click.HasDelegate)
+                {
+                    await Click.InvokeAsync(eventArgs);
+                }
             }
         }
     }

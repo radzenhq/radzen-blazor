@@ -1,0 +1,42 @@
+﻿<RadzenStack Gap="1rem">
+    <RadzenStack Gap="1rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+        <RadzenLabel Text="AlertStyle:" Style="width: 5rem;" />
+        <RadzenSelectBar @bind-Value="@alertStyle" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertStyle)).Cast<AlertStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
+        <RadzenDropDown @bind-Value="@alertStyle" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertStyle)).Cast<AlertStyle>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+    </RadzenStack>
+    <RadzenStack Gap="1rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+        <RadzenLabel Text="Size:" Style="width: 5rem;" />
+        <RadzenSelectBar @bind-Value="@size" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertSize)).Cast<AlertSize>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
+        <RadzenDropDown @bind-Value="@size" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertSize)).Cast<AlertSize>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+    </RadzenStack>
+    <RadzenStack Gap="1rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+        <RadzenLabel Text="Variant:" Style="width: 5rem;" />
+        <RadzenSelectBar @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
+        <RadzenDropDown @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+    </RadzenStack>
+    <RadzenAlert Variant="Variant.Flat" AlertStyle="AlertStyle.Warning" Icon="info_outline" Shade="Shade.Lighter" Size="AlertSize.Small" AllowClose=false>
+        Base, Light and Dark alert styles don't have Shades
+    </RadzenAlert>
+</RadzenStack>
+
+<RadzenAlert Variant="@variant" AlertStyle="@alertStyle" Size="@size" Shade="Shade.Lighter" AllowClose=false>
+    Alert Shade Lighter
+</RadzenAlert>
+<RadzenAlert Variant="@variant" AlertStyle="@alertStyle" Size="@size" Shade="Shade.Light" AllowClose=false>
+        Alert Shade Light
+</RadzenAlert>
+<RadzenAlert Variant="@variant" AlertStyle="@alertStyle" Size="@size" AllowClose=false>
+    Alert Shade Default
+</RadzenAlert>
+<RadzenAlert Variant="@variant" AlertStyle="@alertStyle" Size="@size" Shade="Shade.Dark" AllowClose=false>
+    Alert Shade Dark
+</RadzenAlert>
+<RadzenAlert Variant="@variant" AlertStyle="@alertStyle" Size="@size" Shade="Shade.Darker" AllowClose=false>
+    Alert Shade Darker
+</RadzenAlert>
+
+@code {
+    Variant variant = Variant.Filled;
+    AlertSize size = AlertSize.Medium;
+    AlertStyle alertStyle = AlertStyle.Primary;
+}

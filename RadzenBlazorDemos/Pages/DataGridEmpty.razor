@@ -1,0 +1,69 @@
+﻿@using RadzenBlazorDemos.Models.Northwind
+
+<h3>Default Empty Text</h3>
+<RadzenDataGrid TItem="Employee" Data="@data">
+    <Columns>
+        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" >
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
+        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" />
+        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
+    </Columns>
+</RadzenDataGrid>    
+
+<h3 class="mt-4">Custom Empty Text</h3>
+<div class="mb-4">
+    Custom text: <RadzenTextBox @bind-Value="emptyText" class="ml-2" Style="width: 300px;" />
+</div>
+<RadzenDataGrid TItem="Employee" Data="@data" EmptyText="@emptyText">
+    <Columns>
+        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" >
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
+        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" />
+        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
+    </Columns>
+</RadzenDataGrid>
+
+<h3 class="mt-4">Render Fragment as Empty Text</h3>
+<RadzenDataGrid TItem="Employee" Data="@data">
+    <EmptyTemplate>
+        <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No records to display.</p>
+    </EmptyTemplate>
+    <Columns>
+        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" >
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
+        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" />
+        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
+    </Columns>
+</RadzenDataGrid>
+
+@code { 
+    string emptyText = "No Items to display!";
+    List<Employee> data = new List<Employee>();
+}

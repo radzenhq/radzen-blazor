@@ -36,6 +36,14 @@ namespace Radzen.Blazor
         public Action<DataGridCellRenderEventArgs<object>> CellRender { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the selected items will be displayed as chips. Set to <c>false</c> by default.
+        /// Requires <see cref="DropDownBase{T}.Multiple" /> to be set to <c>true</c>. 
+        /// </summary>
+        /// <value><c>true</c> to display the selected items as chips; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Chips { get; set; }
+
+        /// <summary>
         /// Executes CellRender callback.
         /// </summary>
         protected virtual void OnCellRender(DataGridCellRenderEventArgs<object> args)
@@ -51,6 +59,11 @@ namespace Radzen.Blazor
         /// </summary>
         protected virtual void OnRowRender(RowRenderEventArgs<object> args)
         {
+            if (disabledPropertyGetter != null && disabledPropertyGetter(args.Data) as bool? == true)
+            {
+                args.Attributes.Add("class", "rz-data-row rz-state-disabled");
+            }
+
             if (RowRender != null)
             {
                 RowRender(args);
@@ -84,7 +97,11 @@ namespace Radzen.Blazor
                 return;
 
             await JSRuntime.InvokeVoidAsync(OpenOnFocus ? "Radzen.openPopup" : "Radzen.togglePopup", Element, PopupID, true);
-            await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
+
+            if (FocusFilterOnPopup)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
+            }
 
             if (list != null)
             {
@@ -98,6 +115,12 @@ namespace Radzen.Blazor
         /// <value>The value template.</value>
         [Parameter]
         public RenderFragment<dynamic> ValueTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating DataGrid density.
+        /// </summary>
+        [Parameter]
+        public Density Density { get; set; }
 
         /// <summary>
         /// Gets or sets the empty template shown when Data is empty collection.
@@ -232,6 +255,13 @@ namespace Radzen.Blazor
         public string SelectedItemsText { get; set; } = "items selected";
 
         /// <summary>
+        /// Gets or sets whether popup automatically focuses on filter input.
+        /// </summary>
+        /// <value><c>true</c> if filter input should auto focus when opened; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool FocusFilterOnPopup { get; set; } = true;
+
+        /// <summary>
         /// Gets popup element reference.
         /// </summary>
         protected ElementReference popup;
@@ -319,14 +349,41 @@ namespace Radzen.Blazor
 
                     if (AllowFilteringByAllStringColumns)
                     {
-                        query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
-                            .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
-                                FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                        if (AllowFilteringByWord)
+                        {
+                            string[] words = searchText.Split(' ');
+
+                            foreach (string word in words)
+                            {
+                                query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
+                                    .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
+                                        FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? word.ToLower() : word);
+                            }
+                        }
+                        else
+                        {
+                            query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
+                                .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
+                                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);                            
+                        }
                     }
                     else
                     {
-                        query = query.Where($"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
-                            FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                        if (AllowFilteringByWord)
+                        {
+                            string[] words = searchText.Split(' ');
+
+                            foreach (string word in words)
+                            {
+                                query = query.Where($"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
+                                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? word.ToLower() : word);
+                            }
+                        }
+                        else
+                        {
+                            query = query.Where($"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
+                                FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                        }
                     }
                 }
 
@@ -417,7 +474,13 @@ namespace Radzen.Blazor
                         }
                         else
                         {
-                            ((List<object>)selectedItems).AddRange(values);
+                            foreach (object v in values)
+                            {
+                                if (selectedItems.IndexOf(v) == -1)
+                                {
+                                    selectedItems.Add(v);
+                                }
+                            }
                         }
 
                     }
@@ -501,7 +564,7 @@ namespace Radzen.Blazor
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
-            else
+            else if(FilterAsYouType)
             {
                 selectedIndex = -1;
                 Debounce(DebounceFilter, FilterDelay);
@@ -582,6 +645,13 @@ namespace Radzen.Blazor
         public bool AllowFilteringByAllStringColumns { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether filtering by each entered word in the search term, sperated by a space, is allowed.
+        /// </summary>
+        /// <value><c>true</c> if filtering by individual words is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowFilteringByWord { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether DataGrid row can be selected on row click.
         /// </summary>
         /// <value><c>true</c> if DataGrid row can be selected on row click; otherwise, <c>false</c>.</value>
@@ -602,10 +672,18 @@ namespace Radzen.Blazor
             
         }
 
+        private async Task OnChipRemove(object item)
+        {
+            if (!Disabled)
+            {
+                await SelectItem(item);
+            }
+        }
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList("rz-dropdown").Add("rz-clear", AllowClear).ToString();
+            return GetClassList("rz-dropdown").Add("rz-dropdown-chips", Chips && selectedItems.Count > 0).Add("rz-clear", AllowClear).ToString();
         }
 
         /// <inheritdoc />

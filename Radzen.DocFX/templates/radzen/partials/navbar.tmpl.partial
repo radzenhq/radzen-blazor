@@ -19,7 +19,7 @@
       </form>
       <div class="navbar-right external-links">
         <a href="https://blazor.radzen.com/" target="_blank">Demos</a>
-        <a href="https://www.radzen.com/features/" target="_blank">About Radzen</a>
+        <a href="https://www.radzen.com/" target="_blank">About Radzen</a>
       </div>
     </div>
   </div>

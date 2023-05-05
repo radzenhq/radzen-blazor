@@ -1,0 +1,18 @@
+@inject NotificationService NotificationService
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
+    <RadzenButton Disabled="true" Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+    <RadzenButton Disabled="true" Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
+    <RadzenButton Disabled="true" Text="Light" ButtonStyle="ButtonStyle.Light" />
+    <RadzenButton Disabled="true" Text="Info" ButtonStyle="ButtonStyle.Info" />
+    <RadzenButton Disabled="true" Text="Success" ButtonStyle="ButtonStyle.Success" />
+    <RadzenButton Disabled="true" Text="Warning" ButtonStyle="ButtonStyle.Warning" />
+    <RadzenButton Disabled="true" Text="Danger" ButtonStyle="ButtonStyle.Danger" />
+</RadzenStack>
+
+@code {
+    private void OnClick(string text)
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Button Clicked", Detail = text });
+    }
+}

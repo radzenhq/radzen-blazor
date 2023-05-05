@@ -6,7 +6,7 @@
     @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
     {
         <div class="rz-slot-header">
-            @day.ToString("ddd", Scheduler.Culture)
+            @day.ToString(HeaderFormat, Scheduler.Culture)
         </div>
     }
     </div>
@@ -46,6 +46,9 @@
     public string TimeFormat { get; set; }
 
     [Parameter]
+    public string HeaderFormat { get; set; }
+
+    [Parameter]
     public int MinutesPerSlot { get; set; }
 
     [Parameter]
@@ -54,9 +57,19 @@
     [CascadingParameter]
     public IScheduler Scheduler { get; set; }
 
+    private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
+    {
+        if (Appointments == null)
+        {
+            return Array.Empty<AppointmentData>();
+        }
+
+        return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
+    }
+
     async Task OnSlotClick(DateTime date)
     {
-        await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot));
+        await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot), AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)));
     }
 
     IDictionary<string, object> Attributes(DateTime date)

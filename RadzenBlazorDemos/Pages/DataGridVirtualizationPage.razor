@@ -1,45 +1,15 @@
 ﻿@page "/datagrid-virtualization"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
-
-@inject NorthwindContext dbContext
-
-<h1>DataGrid <strong>Virtualization</strong></h1>
-
-<p>
-Virtualization allows you to render large amounts of data on demand. The RadzenDataGrid component uses Entity Framework to query the visible data.
-</p>
-<p>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid <strong>Virtualization</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Virtualization allows you to render large amounts of data on demand. The RadzenDataGrid component uses Entity Framework to query the visible data.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
     Just set the <code>AllowVirtualization</code> property to <code>true</code>. Requires .NET Core 5.0+.
-</p>
-<RadzenExample Name="DataGrid" Source="DataGridVirtualization" Heading="false">
-    <RadzenDataGrid Data="@orderDetails" TItem="OrderDetail" AllowVirtualization="true" Style="height:400px"
-                    AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" LogicalFilterOperator="LogicalFilterOperator.Or"
-                    AllowSorting="true">
-        <Columns>
-            <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
-            <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
-            <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
-                <Template Context="detail">
-                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-            <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
-                <Template Context="detail">
-                    @String.Format("{0}%", detail.Discount * 100)
-                </Template>
-            </RadzenDataGridColumn>
-        </Columns>
-    </RadzenDataGrid>
-</RadzenExample>
-@code {
-    IEnumerable<OrderDetail> orderDetails;
+</RadzenText>
 
-    protected override void OnInitialized()
-    {
-        orderDetails = dbContext.OrderDetails;
-    }
-}
+<RadzenExample ComponentName="DataGrid" Example="DataGridVirtualization">
+    <DataGridVirtualization />
+</RadzenExample>

@@ -65,7 +65,7 @@
                         var left = slotIndex * slotWidth;
                         var top = 1.5 * (MaxAppointmentsInSlot + 1);
                         var listDate = start;
-                        <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())em; left: @(left.ToInvariantString())%" @onclick=@(args => OnListClick(listDate, appointments))>@String.Format(MoreText, excessCount)</a>
+                        <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())rem; left: @(left.ToInvariantString())%" @onclick=@(args => OnListClick(listDate, appointments))>@String.Format(MoreText, excessCount)</a>
                     }
                 }
             </div>
@@ -113,7 +113,7 @@
     
     async Task OnSlotClick(DateTime date)
     {
-        await Scheduler.SelectSlot(date, date.AddDays(1));
+        await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInSlot(date, date.AddDays(1)));
     }
 
     double DetermineTop(HashSet<double> existingTops)
@@ -160,6 +160,10 @@
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
     {
+        bool preventDefault = await Scheduler.SelectMore(date, date.AddDays(1), appointments);
+
+        if (!preventDefault)
+        {
      await DialogService.OpenAsync(date.ToShortDateString(), ds =>
         @<div class="rz-event-list">
         <CascadingValue Value=@Scheduler>
@@ -169,6 +173,7 @@
         }
         </CascadingValue>
         </div>);
+        }
     }
 
     async Task OnListEventClick(AppointmentData data)

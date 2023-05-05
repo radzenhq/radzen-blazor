@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 
 namespace Radzen.Blazor
 {
@@ -17,6 +18,13 @@ namespace Radzen.Blazor
         {
             return "rz-link";
         }
+
+        /// <summary>
+        /// Gets or sets the child content.
+        /// </summary>
+        /// <value>The child content.</value>
+        [Parameter]
+        public RenderFragment ChildContent { get; set; }
 
         /// <summary>
         /// Gets or sets the target.
@@ -45,5 +53,12 @@ namespace Radzen.Blazor
         /// <value>The path.</value>
         [Parameter]
         public string Path { get; set; } = "";
+
+        /// <summary>
+        /// Gets or sets the navigation link match.
+        /// </summary>
+        /// <value>The navigation link match.</value>
+        [Parameter]
+        public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
     }
 }

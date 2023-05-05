@@ -1,72 +1,80 @@
 ﻿@page "/autocomplete"
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@inject NorthwindContext dbContext
 
-<RadzenExample Name="AutoComplete">
-    <div class="row px-3">
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4>AutoComplete</h4>
-                <p class="mb-4">Start typing e.g. France</p>
-                <RadzenAutoComplete Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "AutoComplete")) Style="width: 100%;" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4>AutoComplete with placeholder</h4>
-                <p class="mb-4">Start typing e.g. France</p>
-                <RadzenAutoComplete Placeholder="Select a customer..." Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "AutoComplete with placeholder")) Style="width: 100%;" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4>Custom filter operator</h4>
-                <p class="mb-4">Show items that <b>start with</b> a specific string</p>
-                <RadzenAutoComplete Data=@customers TextProperty="CompanyName" FilterOperator="StringFilterOperator.StartsWith" Change=@(args => OnChange(args, "AutoComplete with custom filter operator")) Style="width: 100%;" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4>Custom filtering</h4>
-                <p class="mb-4">Filtering with LoadData</p>
-                <RadzenAutoComplete Data=@customCustomersData TextProperty="CompanyName" LoadData=@OnLoadData Change=@(args => OnChange(args, "AutoComplete with custom filtering")) Style="width: 100%;" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-4 p-3">
-            <RadzenCard>
-                <h4>Disabled AutoComplete</h4>
-                <p class="mb-4">AutoComplete with Disabled="true"</p>
-                <RadzenAutoComplete Disabled="true" Placeholder="Select a customer..."  Data=@customers TextProperty="CompanyName" Change=@(args => OnChange(args, "Disabled AutoComplete")) Style="width: 100%;" />
-            </RadzenCard>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    AutoComplete
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>AutoComplete</strong> component.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of AutoComplete
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the <strong>AutoComplete</strong> has a Value property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteBindValue">
+    <AutoCompleteBindValue />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of AutoComplete using Value and Change event
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Value property can be used to set the value of the component and <code>Change</code> event to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteChangeEvent">
+    <AutoCompleteChangeEvent />
+</RadzenExample>
 
-@code {
-    EventConsole console;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Define AutoComplete placeholder
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompletePlaceholder">
+    <AutoCompletePlaceholder />
+</RadzenExample>
 
-    IEnumerable<Customer> customers;
-    IEnumerable<Customer> customCustomersData;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Define AutoComplete template
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteTemplate">
+    <AutoCompleteTemplate />
+</RadzenExample>
 
-    protected override void OnInitialized()
-    {
-        customers = dbContext.Customers.ToList();
-    }
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Change AutoComplete filter operator, case sensitivity and delay
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Show items that <b>start with</b> a specific string, case insensitive after 100ms
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteFilterOperator">
+    <AutoCompleteFilterOperator />
+</RadzenExample>
 
-    void OnChange(object value, string name)
-    {
-        console.Log($"{name} value changed to {value}");
-    }
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Load data on-demand in AutoComplete and apply custom filter and sort
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteLoadData">
+    <AutoCompleteLoadData />
+</RadzenExample>
 
-    void OnLoadData(LoadDataArgs args)
-    {
-        console.Log($"LoadData with filter: {args.Filter}");
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    AutoComplete with a List of Strings
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteListOfStrings">
+    <AutoCompleteListOfStrings />
+</RadzenExample>
 
-        customCustomersData = dbContext.Customers.Where(c => c.CustomerID.Contains(args.Filter) || c.ContactName.Contains(args.Filter)).ToList();
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Multiline AutoComplete
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteWithMultilines">
+    <AutoCompleteWithMultilines />
+</RadzenExample>
 
-        InvokeAsync(StateHasChanged);
-    }
-}
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Disabled AutoComplete
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteDisabled">
+    <AutoCompleteDisabled />
+</RadzenExample>

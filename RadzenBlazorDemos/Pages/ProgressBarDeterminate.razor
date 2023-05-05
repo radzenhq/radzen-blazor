@@ -1,0 +1,21 @@
+﻿@using Radzen
+
+<div class="rz-m-12">
+    <RadzenProgressBar @bind-Value="@value" />
+</div>
+
+<RadzenStack Gap="1rem" Class="rz-m-12">
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">ProgressBar with <strong>ProgressBarStyle</strong> property</RadzenText>
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value="@value" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Secondary" @bind-Value="@value" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Light" @bind-Value="@value" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Dark" @bind-Value="@value" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Success" @bind-Value="@value" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Danger" @bind-Value="@value" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Warning" @bind-Value="@value" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value="@value" />
+</RadzenStack>
+
+@code {
+    double value = 55;
+}

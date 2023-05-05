@@ -1,6 +1,5 @@
 ﻿@using System.IO
 @inject DialogService DialogService
-@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
 @inject NavigationManager NavigationManager
 
 <div style="display: flex">
@@ -65,7 +64,7 @@
 
     protected override void OnInitialized()
     {
-        entries = Directory.GetDirectories(HostEnvironment.WebRootPath)
+        entries = Directory.GetDirectories(Directory.GetCurrentDirectory())
                            .Where(entry =>
                            {
                                var name = Path.GetFileName(entry);
@@ -94,6 +93,6 @@
 
     string ToUrl(string file)
     {
-        return file.Replace(HostEnvironment.WebRootPath, "").Replace(Path.DirectorySeparatorChar, '/');
+        return file.Replace(Directory.GetCurrentDirectory(), "").Replace(Path.DirectorySeparatorChar, '/');
     }
 }

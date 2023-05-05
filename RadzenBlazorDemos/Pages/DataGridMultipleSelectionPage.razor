@@ -1,51 +1,9 @@
 ﻿@page "/datagrid-multiple-selection"
-@using Radzen
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
 
-@inject NorthwindContext dbContext
-<h1>DataGrid <strong>Multiple Selection</strong></h1>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid <strong>Multiple Selection</strong>
+</RadzenText>
 
-<RadzenExample Name="DataGrid" Source="DataGridMultipleSelection" Heading="false">
-    <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" />
-    <RadzenLabel Text="Allow row select on row click" Component="CheckBox1" Style="margin-left: 5px;margin-bottom: 10px;" />
-    <RadzenDataGrid @ref="grid" AllowRowSelectOnRowClick="@allowRowSelectOnRowClick" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
-                AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
-                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedEmployees>
-        <Columns>
-            <RadzenDataGridColumn TItem="Employee" Width="40px" Sortable="false" Filterable="false">
-                <HeaderTemplate>
-                    <RadzenCheckBox TriState="false" TValue="bool" Value="@(employees.Any(i => selectedEmployees != null && selectedEmployees.Contains(i)))"
-                                    Change="@(args => selectedEmployees = args ? employees.ToList() : null)" />
-                </HeaderTemplate>
-                <Template Context="data">
-                    <RadzenCheckBox TriState="false" Value="@(selectedEmployees != null && selectedEmployees.Contains(data))" 
-                        TValue="bool" Change=@(args => { if(!allowRowSelectOnRowClick) { grid.SelectRow(data); }}) />
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
-                <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px;" />
-                    @data.FirstName @data.LastName
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
-            <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
-            <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
-            <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
-        </Columns>
-    </RadzenDataGrid>
+<RadzenExample ComponentName="DataGrid" Example="DataGridMultipleSelection">
+    <DataGridMultipleSelection />
 </RadzenExample>
-@code {
-    bool allowRowSelectOnRowClick = true;
-    IEnumerable<Employee> employees;
-    IList<Employee> selectedEmployees;
-    RadzenDataGrid<Employee> grid;
-
-    protected override void OnInitialized()
-    {
-        employees = dbContext.Employees;
-    }
-}

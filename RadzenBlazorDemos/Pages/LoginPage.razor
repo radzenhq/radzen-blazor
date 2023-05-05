@@ -1,85 +1,76 @@
 ﻿@page "/login"
 
-<RadzenExample Name="Login">
-<div class="row d-flex px-3">
-    <div class="col-xl-4 d-flex p-3">
-        <RadzenCard Style="width: 100%;">
-            <h2 class="mb-4">Simple login</h2>
-            <RadzenTemplateForm Data=@("SimpleLogin") Action="http://www.google.com">
-                <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login=@(args => OnLogin(args, "Simple login")) />
-            </RadzenTemplateForm>
-        </RadzenCard>
-    </div>
-    <div class="col-xl-4 p-3">
-        <RadzenCard>
-            <h2 class="mb-4">Login with register</h2>
-            <RadzenTemplateForm Data=@("LoginWithRegister")>
-            <RadzenLogin AllowResetPassword="false" 
-                            Login=@(args => OnLogin(args, "Login with register")) 
-                            Register=@(args => OnRegister("Login with register")) />
-            </RadzenTemplateForm>
-        </RadzenCard>
-    </div>
-    <div class="col-xl-4 p-3">
-        <RadzenCard>
-            <h2 class="mb-4">Register and password reset</h2>
-            <RadzenTemplateForm Data=@("LoginWithRegisterAndReset")>
-            <RadzenLogin Login=@(args => OnLogin(args, "Login with register and password reset")) 
-                            ResetPassword=@(args => OnResetPassword(args, "Login with register and password reset"))
-                            Register=@(args => OnRegister("Login with register and password reset")) />
-            </RadzenTemplateForm>
-        </RadzenCard>
-    </div>
-    <div class="col-xl-4 p-3">
-        <RadzenCard>
-            <h2 class="mb-4">Default values</h2>
-            <RadzenTemplateForm Data=@("LoginWithDefaultValues")>
-            <RadzenLogin AllowRegister="true" AllowResetPassword="true" Username=@userName Password=@password
-                            Login=@(args => OnLogin(args, "Login with default values"))
-                            ResetPassword=@(args => OnResetPassword(args, "Login with default values"))
-                            Register=@(args => OnRegister("Login with default values")) />
-            </RadzenTemplateForm>
-        </RadzenCard>
-    </div>
-    <div class="col-xl-4 p-3">
-        <RadzenCard>
-            <h2 class="mb-4">Localization</h2>
-            <RadzenTemplateForm Data=@("Localization")>
-            <RadzenLogin AllowRegister="true" AllowResetPassword="true"
-                            LoginText="Einloggen" UserText="Benutzername" PasswordText="Passwort"
-                            UserRequired="Benutzername erforderlich"
-                            PasswordRequired="Passwort erforderlich"
-                            RegisterText="Registrieren"
-                            RegisterMessageText="Sie haben noch keinen Account?"
-                            ResetPasswordText="Passwort zurücksetzen"
-                            Login=@(args => OnLogin(args, "Localized login"))
-                            ResetPassword=@(args => OnResetPassword(args, "Localized login"))
-                            Register=@(args => OnRegister("Localized login")) />
-            </RadzenTemplateForm>
-        </RadzenCard>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Login
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Login</strong> component.
+</RadzenText>
+
+<RadzenText Anchor="login#login-events" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Login Events
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Login</code>, <code>Register</code> and <code>ResetPassword</code> to catch events raised by the Login component.
+</RadzenText>
+<RadzenExample ComponentName="Login" Example="LoginEvents">
+    <LoginEvents />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText Anchor="login#simple-login" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Simple Login
+</RadzenText>
+<RadzenExample ComponentName="Login" Example="LoginSimple">
+    <LoginSimple />
+</RadzenExample>
 
-@code {
-    string userName = "admin";
-    string password = "admin";
-    EventConsole console;
+<RadzenText Anchor="login#login-with-register" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Login with Register (hide password reset)
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>AllowResetPassword="false"</code> to hide the "Forgotten password" option.
+</RadzenText>
+<RadzenExample ComponentName="Login" Example="LoginRegister">
+    <LoginRegister />
+</RadzenExample>
 
-    void OnLogin(LoginArgs args, string name)
-    {
-        console.Log($"{name} -> Username: {args.Username} and password: {args.Password}");
-    }
+<RadzenText Anchor="login#remember-me" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Remember me
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>AllowRememberMe="true"</code> to show "Remember Me" option.
+</RadzenText>
+<RadzenExample ComponentName="Login" Example="LoginRemember">
+    <LoginRemember />
+</RadzenExample>
 
-    void OnRegister(string name)
-    {
-        console.Log($"{name} -> Register");
-    }
+<RadzenText Anchor="login#form-fields" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Form fields
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>FormFieldVariant</code> to set desired FormField for the user name and password inputs.
+</RadzenText>
+<RadzenExample ComponentName="Login" Example="LoginFormField">
+    <LoginFormField />
+</RadzenExample>
 
-    void OnResetPassword(string value, string name)
-    {
-        console.Log($"{name} -> ResetPassword for user: {value}");
-    }
-}
+<RadzenText Anchor="login#localization" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-8">
+    Localization
+</RadzenText>
+<RadzenExample ComponentName="Login" Example="LoginLocalization">
+    <LoginLocalization />
+</RadzenExample>
+
+<RadzenText Anchor="login#horizontal-login-example" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-8">
+    Horizontal login layout example
+</RadzenText>
+<RadzenExample ComponentName="Login" Example="LoginHorizontalExample">
+    <LoginHorizontalExample />
+</RadzenExample>
+
+<RadzenText Anchor="login#vertical-login-example" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-8">
+    Vertical login layout example
+</RadzenText>
+<RadzenExample ComponentName="Login" Example="LoginVerticalExample">
+    <LoginVerticalExample />
+</RadzenExample>

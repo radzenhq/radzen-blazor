@@ -1,81 +1,84 @@
 ﻿@page "/selectbar"
 
-<RadzenExample Name="SelectBar">
-    <div class="row px-3">
-        <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <h4 class="mb-4">Single selection</h4>
-                <RadzenSelectBar @bind-Value=@singleValue TValue="bool" Change=@(args => OnChange(args, "SelectBar with single selection"))>
-                    <Items>
-                        <RadzenSelectBarItem Text="On" Value="true" />
-                        <RadzenSelectBarItem Text="Off" Value="false" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <h4 class="mb-4">Multiple selection</h4>
-                <RadzenSelectBar @bind-Value=@values TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with multiple selection"))>
-                    <Items>
-                        <RadzenSelectBarItem Text="Orders" Value="1" />
-                        <RadzenSelectBarItem Text="Employees" Value="2" />
-                        <RadzenSelectBarItem Text="Customers" Value="3" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 col-xl-4 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <h4 class="mb-4">Disabled SelectBar with multiple selection</h4>
-                <RadzenSelectBar Disabled="true" @bind-Value=@values TValue="IEnumerable<int>" Multiple="true">
-                    <Items>
-                        <RadzenSelectBarItem Text="Orders" Value="1" />
-                        <RadzenSelectBarItem Text="Employees" Value="2" />
-                        <RadzenSelectBarItem Text="Customers" Value="3" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <h4 class="mb-4">SelectBar with items from data</h4>
-                <RadzenSelectBar @bind-Value=@values TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with items from data"))
-                            Data="@data" TextProperty="Name" ValueProperty="Id" />
-            </RadzenCard>
-        </div>
-        <div class="col-lg-6 p-3" style="min-width: fit-content;">
-            <RadzenCard>
-                <h4 class="mb-4">SelectBar with declared items and items from data</h4>
-                <RadzenSelectBar @bind-Value=@values Data="@data" TextProperty="Name" ValueProperty="Id" TValue="IEnumerable<int>" Multiple="true" Change=@(args => OnChange(args, "SelectBar with declared items and items from data"))>
-                    <Items>
-                        <RadzenSelectBarItem Text="Static item" Value="0" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenCard>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    SelectBar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>SelectBar</strong> component.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of SelectBar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the <strong>SelectBar</strong> has a Value property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="SelectBar" Example="SelectBarBindValue">
+    <SelectBarBindValue />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of SelectBar using Value and Change event
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Value property can be used to set the value of the component and <code>Change</code> event to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="SelectBar" Example="SelectBarChangeEvent">
+    <SelectBarChangeEvent />
+</RadzenExample>
 
-@code {
-    public class MyObject
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Multiple selection
+</RadzenText>
+<RadzenExample ComponentName="SelectBar" Example="SelectBarMultiple">
+    <SelectBarMultiple />
+</RadzenExample>
 
-    IEnumerable<MyObject> data = new MyObject[] {
-        new MyObject(){ Id = 1 , Name = "Orders"}, new MyObject() { Id = 2 , Name = "Employees"}, new MyObject() { Id = 3 , Name = "Customers" } };
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Populate SelectBar items from data
+</RadzenText>
+<RadzenExample ComponentName="SelectBar" Example="SelectBarItemsFromData">
+    <SelectBarItemsFromData />
+</RadzenExample>
 
-    bool singleValue = false;
-    IEnumerable<int> values = new int[] { 1, 2 };
-    EventConsole console;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Statically declared and populated SelectBar items from data
+</RadzenText>
+<RadzenExample ComponentName="SelectBar" Example="SelectBarDeclaredAndItemsFromData">
+    <SelectBarDeclaredAndItemsFromData />
+</RadzenExample>
 
-    void OnChange(object value, string name)
-    {
-        var str = value is IEnumerable<int> ? string.Join(", ", (IEnumerable<int>)value) : value;
-        console.Log($"{name} value changed to {str}");
-    }
-}
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Populate items programmatically and disable item
+</RadzenText>
+<RadzenExample ComponentName="SelectBar" Example="SelectBarForEach">
+    <SelectBarForEach />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    SelectBar with icons
+</RadzenText>
+<RadzenExample ComponentName="SelectBar" Example="SelectBarIcons">
+    <SelectBarIcons />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    SelectBar with images
+</RadzenText>
+<RadzenExample ComponentName="SelectBar" Example="SelectBarImages">
+    <SelectBarImages />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    SelectBar with template
+</RadzenText>
+<RadzenExample ComponentName="SelectBar" Example="SelectBarTemplate">
+    <SelectBarTemplate />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    SelectBar Size
+</RadzenText>
+<RadzenExample ComponentName="SelectBar" Example="SelectBarSize">
+    <SelectBarSize />
+</RadzenExample>

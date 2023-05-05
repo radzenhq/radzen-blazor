@@ -106,6 +106,70 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Opens the specified element on the top position.
+        /// </summary>
+        /// <param name="element">The element.</param>
+        /// <param name="text">The text.</param>
+        /// <param name="o">The o.</param>
+        public void OpenOnTheTop(ElementReference element, string text, TooltipOptions o = null)
+        {
+            var options = o ?? new TooltipOptions();
+
+            options.Text = text;
+            options.Position = TooltipPosition.Top;
+
+            OpenTooltip<object>(element, options);
+        }
+
+        /// <summary>
+        /// Opens the specified element on the bottom position.
+        /// </summary>
+        /// <param name="element">The element.</param>
+        /// <param name="text">The text.</param>
+        /// <param name="o">The o.</param>
+        public void OpenOnTheBottom(ElementReference element, string text, TooltipOptions o = null)
+        {
+            var options = o ?? new TooltipOptions();
+
+            options.Text = text;
+            options.Position = TooltipPosition.Bottom;
+
+            OpenTooltip<object>(element, options);
+        }
+
+        /// <summary>
+        /// Opens the specified element on the left position.
+        /// </summary>
+        /// <param name="element">The element.</param>
+        /// <param name="text">The text.</param>
+        /// <param name="o">The o.</param>
+        public void OpenOnTheLeft(ElementReference element, string text, TooltipOptions o = null)
+        {
+            var options = o ?? new TooltipOptions();
+
+            options.Text = text;
+            options.Position = TooltipPosition.Left;
+
+            OpenTooltip<object>(element, options);
+        }
+
+        /// <summary>
+        /// Opens the specified element on the right position.
+        /// </summary>
+        /// <param name="element">The element.</param>
+        /// <param name="text">The text.</param>
+        /// <param name="o">The o.</param>
+        public void OpenOnTheRight(ElementReference element, string text, TooltipOptions o = null)
+        {
+            var options = o ?? new TooltipOptions();
+
+            options.Text = text;
+            options.Position = TooltipPosition.Right;
+
+            OpenTooltip<object>(element, options);
+        }
+
+        /// <summary>
         /// Opens the tooltip.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -171,6 +235,11 @@ namespace Radzen
         /// </summary>
         /// <value>The duration.</value>
         public int? Duration { get; set; } = 2000;
+        /// <summary>
+        /// Gets or sets the delay.
+        /// </summary>
+        /// <value>The delay.</value>
+        public int? Delay { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether the tooltip should be closed by clicking the document.
         /// </summary>

@@ -1,7 +1,39 @@
-<path class="@Class" d="@D" stroke-linecap="@StrokeLineCap" fill="@Fill" stroke="@Stroke" stroke-width="@StrokeWidth.ToInvariantString()" stroke-dasharray="@StrokeDashArray" style="@Style"></path>
+@using System.Text
+<path class="@Class" d="@D" stroke-linecap="@StrokeLineCap" stroke-dasharray="@StrokeDashArray" style="@CurrentStyle()"></path>
 @code {
     [Parameter]
     public string Style { get; set; }
+
+    private string CurrentStyle()
+    {
+        var style = new StringBuilder();
+
+        if (Stroke != null)
+        {
+            style.Append($"stroke: {Stroke};");
+        }
+
+        if (Fill != null)
+        {
+            style.Append($"fill: {Fill};");
+        }
+
+        if (StrokeWidth >= 0)
+        {
+            style.Append($"stroke-width: {StrokeWidth.ToInvariantString()};");
+        }
+
+        if (!string.IsNullOrEmpty(Style))
+        {
+            if (style.Length > 0)
+            {
+                style.Append(";");
+            }
+            style.Append(Style);
+        }
+
+        return style.ToString();
+    }
 
     [Parameter]
     public string D { get; set; }

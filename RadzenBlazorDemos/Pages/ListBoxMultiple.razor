@@ -1,0 +1,20 @@
+﻿@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<div class="rz-p-sm-12 rz-text-align-center">
+    <RadzenListBox @bind-Value=@values Data=@products TextProperty="ProductName" ValueProperty="ProductID"
+                   Multiple=true AllowClear=true Placeholder="Select products" Style="width: 100%; max-width: 400px; height: 200px" />
+</div>
+
+@code {
+    IEnumerable<int> values = new int[] { 1, 2 };
+    IEnumerable<Product> products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        products = dbContext.Products;
+    }
+}

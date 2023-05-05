@@ -1,131 +1,78 @@
 ﻿@page "/listbox"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    ListBox
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>ListBox</strong> component.
+</RadzenText>
 
-@inject NorthwindContext dbContext
 
-<RadzenExample Name="ListBox">
-    <div class="row px-3">
-        <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-            <RadzenCard>
-                <h4>ListBox</h4>
-                <RadzenListBox @bind-Value=@value Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "ListBox")) Style="height:200px" Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-            <RadzenCard>
-                <h4>ListBox with template</h4>
-                <RadzenListBox @bind-Value=@value Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                               Change=@(args => OnChange(args, "ListBox with template")) Style="height:200px" Class="w-100">
-                    <Template>
-                        Company: @((context as Customer).CompanyName)
-                    </Template>
-                </RadzenListBox>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-            <RadzenCard>
-                <h4>Multiple selection</h4>
-                <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value=@multipleValues Multiple="true" Data=@customers
-                               TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "ListBox with multiple selection")) Style="height:200px" Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-            <RadzenCard>
-                <h4>Filtering</h4>
-                <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value=@value Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                               Change=@(args => OnChange(args, "ListBox with filtering")) Style="height:200px" Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-            <RadzenCard>
-                <h4>Custom filter operator</h4>
-                <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" @bind-Value=@value
-                               Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "ListBox with custom filter operator")) Style="height:200px" Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-            <RadzenCard>
-                <h4>Custom filtering</h4>
-                <RadzenListBox AllowFiltering="true" LoadData=@OnLoadData @bind-Value=@value Data=@customCustomersData TextProperty="CompanyName" ValueProperty="CustomerID"
-                               Change=@(args => OnChange(args, "ListBox with custom filtering")) Style="height:200px" Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-            <RadzenCard>
-                <h4>Virtualization using IQueryable</h4>
-                <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" @bind-Value=@value
-                               Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => OnChange(args, "ListBox with custom filter operator")) Style="height:200px" Class="w-100" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 col-xl-3 p-3">
-            <RadzenCard>
-                <h4>Virtualization using LoadData event</h4>
-                <RadzenListBox AllowVirtualization="true" AllowFiltering="true" Count="@count" LoadData=@LoadDataVirtualization @bind-Value=@value Data=@customCustomersDataVirtualization TextProperty="CompanyName" ValueProperty="CustomerID"
-                               Change=@(args => OnChange(args, "ListBox with custom filtering")) Style="height:200px" Class="w-100" />
-            </RadzenCard>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of ListBox
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the <strong>ListBox</strong> has a Value property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="ListBox" Example="ListBoxBindValue">
+    <ListBoxBindValue />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Get and Set the value of ListBox using Value and Change event
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Value property can be used to set the value of the component and <code>Change</code> event to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="ListBox" Example="ListBoxChangeEvent">
+    <ListBoxChangeEvent />
+</RadzenExample>
 
-@code {
-    IEnumerable<Customer> customers;
-    IEnumerable<Customer> customCustomersData;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Define Text and Value properties
+</RadzenText>
+<RadzenExample ComponentName="ListBox" Example="ListBoxTextValueProperties">
+    <ListBoxTextValueProperties />
+</RadzenExample>
 
-    protected override void OnInitialized()
-    {
-        customers = dbContext.Customers.ToList();
-    }
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    ListBox with template
+</RadzenText>
+<RadzenExample ComponentName="ListBox" Example="ListBoxTemplate">
+    <ListBoxTemplate />
+</RadzenExample>
 
-    IEnumerable<string> multipleValues = new string[] { "ALFKI", "ANATR" };
-    string value = "ALFKI";
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    ListBox <strong>multiple</strong> selection
+</RadzenText>
+<RadzenExample ComponentName="ListBox" Example="ListBoxMultiple">
+    <ListBoxMultiple />
+</RadzenExample>
 
-    EventConsole console;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Filtering case sensitivity and filter operator
+</RadzenText>
+<RadzenExample ComponentName="ListBox" Example="ListBoxFiltering">
+    <ListBoxFiltering />
+</RadzenExample>
 
-    void OnChange(object value, string name)
-    {
-        var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Custom filtering with <strong>LoadData</strong> event
+</RadzenText>
+<RadzenExample ComponentName="ListBox" Example="ListBoxFilteringLoadData">
+    <ListBoxFilteringLoadData />
+</RadzenExample>
 
-        console.Log($"{name} value changed to {str}");
-    }
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    ListBox virtualization using <strong>IQueryable</strong>
+</RadzenText>
+<RadzenExample ComponentName="ListBox" Example="ListBoxVirtualization">
+    <ListBoxVirtualization />
+</RadzenExample>
 
-    void OnLoadData(LoadDataArgs args)
-    {
-        var query = dbContext.Customers.AsQueryable();
-
-        if (!string.IsNullOrEmpty(args.Filter))
-        {
-            query = query.Where(c => c.CustomerID.Contains(args.Filter) || c.ContactName.Contains(args.Filter));
-        }
-
-        console.Log($"LoadData with filter: {args.Filter}");
-
-        customCustomersData = query.ToList();
-
-        InvokeAsync(StateHasChanged);
-    }
-
-    IEnumerable<Customer> customCustomersDataVirtualization;
-    int count;
-    void LoadDataVirtualization(LoadDataArgs args)
-    {
-        var query = dbContext.Customers.AsQueryable();
-
-        if (!string.IsNullOrEmpty(args.Filter))
-        {
-            query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()));
-        }
-
-        console.Log($"LoadData with virtualization: Skip:{args.Skip}, Top:{args.Top}, Filter:{args.Filter}");
-
-        count = query.Count();
-
-        customCustomersDataVirtualization = query.Skip(args.Skip.HasValue ? args.Skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : 10).ToList();
-
-        InvokeAsync(StateHasChanged);
-    }
-}
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    ListBox virtualization with <strong>LoadData</strong> event
+</RadzenText>
+<RadzenExample ComponentName="ListBox" Example="ListBoxVirtualizationLoadData">
+    <ListBoxVirtualizationLoadData />
+</RadzenExample>

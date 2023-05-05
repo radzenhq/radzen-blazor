@@ -1,41 +1,50 @@
 @page "/support"
 
-<h1>Support</h1>
-<RadzenCard class="docu px-lg-5 pb-5">
-    <div class="row">
-        <div class="col-lg-12 col-xl-4 offset-xl-1">
-            <a name="#community"></a>
-            <img class="illustration" src="images/community.svg">
-            <h2 class="mt-4 text-center"><a href="#community">Community Support</a></h2>
-            <p>
-                Everybody is welcome to visit the <a href="https://forum.radzen.com" target="_blank">Radzen Community forum</a>. Join the growing community and participate in the discussions!
-            </p>
-            <p>
-                The Radzen team monitors the forum threads but does not guarantee a response to every question. For guaranteed responses
-                you may consider the <a href="#dedicated">Dedicated support</a> option.
-            </p>
-        </div>
-        <div class="col-lg-12 col-xl-4 offset-xl-2">
-            <a name="#dedicated"></a><img class="illustration" src="images/premium.svg">
-            <h2 class="mt-4 text-center"><a href="#dedicated">Dedicated Support</a></h2>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8 rz-mb-12">
+    Support
+</RadzenText>
 
-            <p>
-                Radzen Ltd. offers dedicated support with the Radzen Professional and Enterprise subscriptions. 
-            </p>
-            <p class="text-center">
-                <a class="cta-button primary ml-0 mb-4" href="https://www.radzen.com/pricing/">See Pricing</a>
-            </p>
-            <p class="text-center">
-                A Radzen subscription provides:
-            </p>
-            <ul style="font-size: .875rem">
-                <li>Dedicated support over email with guaranteed response time (24 hours for Radzen Professional and 16 hours for Radzen Enterprise).</li>
-                <li>Full access to Radzen - the first WYSIWYG Blazor development environment on the market.</li>
-                <li><a href="https://www.radzen.com/documentation/premium-themes/" target="_blank">Premium themes</a> and visual <a href="https://www.radzen.com/documentation/theme-customization/" target="_blank">theme customization</a>.</li>
-                <li>Complete Blazor application scaffolding from the most commonly used databases - MSSQL, Oracle, MySQL and PostgreSQL.</li>
-                <li>Built-in deploy to IIS, FTP, Zip and Azure.</li>
-                <li>Multi-tenancy support</li>
-            </ul>
-        </div>
-    </div>
-</RadzenCard>
+<RadzenRow>
+    <RadzenColumn Size="12" SizeMD="4" OffsetMD="1">
+        <a name="#community"></a>
+        <svg viewBox="0 0 987.58708 714.02784" class="illustration rz-display-block rz-mx-auto">
+            <use xlink:href="images/community.svg#community"></use>
+        </svg>
+        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" TextAlign="TextAlign.Center" class="rz-pt-8">
+            Community Support
+        </RadzenText>
+        <RadzenText>
+            Everybody is welcome to visit the <a href="https://forum.radzen.com" target="_blank">Radzen Community forum</a>. Join the growing community and participate in the discussions!
+        </RadzenText>
+        <RadzenText>
+            The Radzen team monitors the forum threads but does not guarantee a response to every question. For guaranteed responses
+            you may consider the <a href="support/#dedicated">Dedicated support</a> option.
+        </RadzenText>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4" OffsetMD="2">
+        <a name="#dedicated"></a>
+        <svg viewBox="0 0 943 601.74159" class="illustration rz-display-block rz-mx-auto">
+            <use xlink:href="images/premium.svg#premium"></use>
+        </svg>
+        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" TextAlign="TextAlign.Center" class="rz-pt-8">
+            Dedicated Support
+        </RadzenText>
+        <RadzenText>
+            Radzen Ltd. offers dedicated support with the Radzen Professional and Enterprise subscriptions. 
+        </RadzenText>
+        <RadzenText TextAlign="TextAlign.Center">
+            <a class="rz-button rz-button-lg rz-secondary rz-m-4" href="https://www.radzen.com/blazor-studio/pricing/">See Pricing</a>
+        </RadzenText>
+        <RadzenText TextAlign="TextAlign.Center">
+            A Radzen subscription provides:
+        </RadzenText>
+        <ul class="rz-text-body1">
+            <li>Dedicated support over email with guaranteed response time (24 hours for Radzen Professional and 16 hours for Radzen Enterprise).</li>
+            <li>Full access to Radzen Blazor Studio - a rapid application development solution for Blazor Server and WebAssembly applications.</li>
+            <li>Premium themes</li>
+            <li>Complete Blazor application scaffolding from the most commonly used databases - MSSQL, Oracle, MySQL and PostgreSQL.</li>
+            <li>Built-in deploy to IIS, FTP, Zip and Azure.</li>
+            <li>Multi-tenancy support</li>
+        </ul>
+    </RadzenColumn>
+</RadzenRow>

@@ -26,7 +26,12 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenLogin>();
 
-            Assert.Contains(@$"<label class=""col-sm-3 col-form-label"" for=""username"">Username</label>", component.Markup);
+            component.SetParametersAndRender(p => {
+                p.AddUnmatched("id", "login");
+            });
+
+            var label = component.Find($@"label[for=""login-username""]");
+            Assert.NotNull(label);
         }
 
         [Fact]
@@ -63,7 +68,7 @@ namespace Radzen.Blazor.Tests
             component.SetParametersAndRender(parameters => {
                 parameters.Add(p => p.Username, "user");
                 parameters.Add(p => p.Password, "pwd");
-                parameters.Add(p => p.Login, args => { clicked = true; }); 
+                parameters.Add(p => p.Login, args => { clicked = true; });
             });
 
             component.Find("button").Click();
@@ -114,7 +119,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.AllowResetPassword, true);
             });
 
-            Assert.Contains(@$"Forgot password</a>", component.Markup);
+            Assert.Contains(@$"Forgot password?</a>", component.Markup);
         }
 
         [Fact]
@@ -190,7 +195,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Register, args => { clicked = true; });
             });
 
-            component.Find(".register > button").Click();
+            component.Find(".rz-secondary").Click();
 
             Assert.True(clicked);
         }

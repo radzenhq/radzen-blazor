@@ -1,0 +1,44 @@
+﻿@using System.Collections
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<div class="rz-p-sm-12 rz-text-align-center">
+    <RadzenDropDown @bind-Value=values Multiple=true AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID" TextProperty="OrderID" MaxSelectedLabels="1" Style="width: 100%; max-width: 400px;" >
+        <Template>
+                @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")
+        </Template>
+    </RadzenDropDown>
+</div>
+
+@code {
+    IEnumerable<int> values;
+    IEnumerable<GroupData> groupedData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var orders = dbContext.Orders.Where(o => o.CustomerID != null).Include("Customer").ToList();
+
+        groupedData = orders.GroupBy(g => g.Customer.CompanyName)
+            .SelectMany(i => new GroupData[] { new GroupData() { CompanyName = i.Key } }
+                .Concat(i.Select(o => 
+                    new GroupData() 
+                    { 
+                        OrderID = o.OrderID,
+                        OrderDate = o.OrderDate
+                    }))).ToList();
+    }
+
+    class GroupData
+    { 
+        public string CompanyName { get; set; }
+        public int OrderID { get; set; }
+        public DateTime? OrderDate { get; set; }
+        public bool IsGroup { get { return CompanyName != null; } }
+    }
+}

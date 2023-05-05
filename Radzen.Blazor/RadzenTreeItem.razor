@@ -1,7 +1,7 @@
 @using Radzen
 @using Radzen.Blazor.Rendering
 @implements IDisposable
-<li class="rz-treenode">
+<li class="rz-treenode" @attributes="Attributes">
     <div class=@ContentClassList @onclick="@Select">
         @if (ChildContent != null || HasChildren)
         {
@@ -9,14 +9,14 @@
         }
         @if(Tree != null && Tree.AllowCheckBoxes)
         {
-            <RadzenCheckBox TValue="bool?" Value="@IsChecked()" Change="@CheckedChange" Style="@(ParentItem != null && !HasChildren ? "margin-left:25px;margin-right:5px;" : "margin-right:5px;")" />
+            <RadzenCheckBox Name="@($"{GetHashCode()}")" TValue="bool?" Value="@IsChecked()" Change="@CheckedChange" />
         }
         @if (Template != null)
         {
             <div class="rz-treenode-label">@Template(this)</div>
         } else
         {
-            <span class="rz-treenode-label">@Text</span>
+            <label for="@(GetHashCode())" class="rz-treenode-label">@Text</label>
         }
     </div>
     @if (ChildContent != null && expanded)

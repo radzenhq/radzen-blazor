@@ -3,7 +3,7 @@
 @{
     var rowArgs = Grid?.GroupRowAttributes(this);
 }
-<tr @attributes="@rowArgs.Item2">
+<tr class="rz-group-row" @attributes="@rowArgs.Item2">
     @if (Group.GroupDescriptor != null)
     {
         @for (var i = 0; i < GetLevel(); i++)
@@ -17,7 +17,7 @@
     <td class="rz-col-icon">
         <span class="rz-column-title"></span>
         <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandGroupItem(this, rowArgs.Item1.Expanded))">
-            <span class="@(Grid.ExpandedGroupItemStyle(this, rowArgs.Item1.Expanded))"></span>
+            <span class="@(Grid.ExpandedGroupItemStyle(this, Grid.allGroupsExpanded != null ? Grid.allGroupsExpanded : rowArgs.Item1.Expanded))"></span>
         </a>
     </td>
     <td colspan="@(Columns.Count + Grid.Groups.Count - 1 - Group.Level + (Grid.Template != null && Grid.ShowExpandColumn ? 1 : 0))">
@@ -28,14 +28,14 @@
             }
             else if(Group.GroupDescriptor != null)
             {
-                @(Group.GroupDescriptor.GetTitle() + ": " + (Group.Data.Key ?? ""))
+                @(Group.GroupDescriptor.GetTitle() + ": " + (Group.Data.Key != null ? Group.Data.Key.ToString() : ""))
             }
         </span>
     </td>
 </tr>
 @if(Grid != null)
 {
-    if (Grid.IsGroupItemExpanded(this) && rowArgs.Item1.Expanded != false)
+    if (Grid.IsGroupItemExpanded(this) && rowArgs.Item1.Expanded != false && Grid.allGroupsExpanded != false)
     {
         @DrawDataRows()
     }

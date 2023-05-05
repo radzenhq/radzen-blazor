@@ -36,6 +36,12 @@ namespace Radzen
         public HorizontalAlign PagerHorizontalAlign { get; set; } = HorizontalAlign.Justify;
 
         /// <summary>
+        /// Gets or sets a value indicating pager density.
+        /// </summary>
+        [Parameter]
+        public Density Density { get; set; } = Density.Default;
+
+        /// <summary>
         /// Gets or sets a value indicating whether paging is allowed. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if paging is allowed; otherwise, <c>false</c>.</value>
@@ -56,7 +62,11 @@ namespace Radzen
             }
             set
             {
-                _PageSize = value;
+                if (_PageSize != value)
+                {
+                    _PageSize = value;
+                    OnPageSizeChanged(value);
+                }
             }
         }
 
@@ -141,10 +151,7 @@ namespace Radzen
         [Parameter]
         public string PagingSummaryFormat { get; set; } = "Page {0} of {1} ({2} items)";
 
-        /// <summary>
-        /// The view
-        /// </summary>
-        protected IQueryable<T> _view = null;
+        internal IQueryable<T> _view = null;
         /// <summary>
         /// Gets the paged view.
         /// </summary>
@@ -311,16 +318,19 @@ namespace Radzen
             await InvokeAsync(Reload);
         }
 
-        int? pageSize;
+        internal int? pageSize;
 
         /// <summary>
         /// Called when [page size changed].
         /// </summary>
         /// <param name="value">The value.</param>
-        protected async Task OnPageSizeChanged(int value)
+        protected virtual async Task OnPageSizeChanged(int value)
         {
-            pageSize = value;
-            await InvokeAsync(Reload);
+            if (pageSize != value)
+            {
+                pageSize = value;
+                await InvokeAsync(Reload);
+            }
         }
 
         /// <summary>

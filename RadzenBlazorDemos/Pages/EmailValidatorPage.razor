@@ -1,64 +1,12 @@
 @page "/emailvalidator"
-@using Radzen
-@using System.Text.Json
 
-<RadzenExample Name="EmailValidator">
-<div class="container my-4">
-    <div class="row">
-        <div class="col">
-            <RadzenCard Class="w-100 mb-4" >
-            <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
-                <RadzenLabel Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
-            </RadzenCard>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-6 offset-lg-3">
-            <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
-                <RadzenFieldset Text="Enter email">
-                    <div class="row mb-5">
-                        <div class="col-md-4" style="align-self: center;">
-                            <RadzenLabel Text="Email" />
-                        </div>
-                        <div class="col">
-                            <RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email Class="w-100" />
-                            <RadzenRequiredValidator Component="Email" Text="Email is required" Popup=@popup Style="position: absolute" />
-                            <RadzenEmailValidator Component="Email" Text="Provide a valid email address" Popup=@popup Style="position: absolute" />
-                        </div>
-                    </div>
-                    <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
-                </RadzenFieldset>
-            </RadzenTemplateForm>
-        </div>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    EmailValidator
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>EmailValidator</strong> component.
+</RadzenText>
+
+<RadzenExample ComponentName="EmailValidator" Example="EmailValidatorConfig" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenEmailValidator.cs">
+    <EmailValidatorConfig />
 </RadzenExample>
-
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    class Model
-    {
-        public string Email { get; set; }
-    }
-
-    bool popup;
-
-    Model model = new Model();
-    EventConsole console;
-
-    void Log(string eventName, string value)
-    {
-        console.Log($"{eventName}: {value}");
-    }
-
-    void OnSubmit(Model model)
-    {
-        Log("Submit", JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true }));
-    }
-
-    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
-    {
-        Log("InvalidSubmit", JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true }));
-    }
-}

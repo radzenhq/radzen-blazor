@@ -27,7 +27,14 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-paginator rz-unselectable-text rz-helper-clearfix {HorizontalAlignCssClasses[HorizontalAlign]}";
+            var additionalClasses = new List<string>();
+
+            if (Density == Density.Compact)
+            {
+                additionalClasses.Add("rz-density-compact");
+            }
+
+            return $"rz-paginator rz-unselectable-text rz-helper-clearfix {HorizontalAlignCssClasses[HorizontalAlign]} {String.Join(" ", additionalClasses)}";
         }
 
         /// <summary>
@@ -36,6 +43,12 @@ namespace Radzen.Blazor
         /// <value>The horizontal align.</value>
         [Parameter]
         public HorizontalAlign HorizontalAlign { get; set; } = HorizontalAlign.Justify;
+
+        /// <summary>
+        /// Gets or sets a value indicating Pager density.
+        /// </summary>
+        [Parameter]
+        public Density Density { get; set; } = Density.Default;
 
         /// <summary>
         /// Gets or sets the page size.
@@ -157,7 +170,7 @@ namespace Radzen.Blazor
         protected async Task OnPageSizeChanged(object value)
         {
             bool isFirstPage = CurrentPage == 0;
-            bool isLastPage = CurrentPage == numberOfPages - 1;
+            bool isLastPage = CurrentPage == numberOfPages - 1 && numberOfPages > 1;
             int prevSkip = skip;
             PageSize = (int)value;
             await InvokeAsync(Reload);
@@ -233,7 +246,7 @@ namespace Radzen.Blazor
         /// <returns>System.Int32.</returns>
         protected int GetPage()
         {
-            return (int)Math.Floor((decimal)(skip / (PageSize > 0 ? PageSize : 10)));
+            return skip / (PageSize > 0 ? PageSize : 10);
         }
 
         /// <summary>

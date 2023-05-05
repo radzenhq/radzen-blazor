@@ -1,0 +1,71 @@
+﻿@inject NotificationService NotificationService
+
+<div class="container-fluid">
+    <div class="row px-3">
+        <div class="col-lg-6 col-xl-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Info</RadzenText>
+                <RadzenButton Text="Show info notification" class="w-100"
+                    ButtonStyle="ButtonStyle.Info"
+                    Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Summary", Detail = "Info Detail", Duration = 4000 })) />
+            </RadzenCard>
+        </div>
+        <div class="col-lg-6 col-xl-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Warning</RadzenText>
+                <RadzenButton Text="Show warning notification" class="w-100"
+                    ButtonStyle="ButtonStyle.Warning"
+                    Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Warning Summary", Detail = "Warning Detail", Duration = 4000 })) />
+            </RadzenCard>
+        </div>
+        <div class="col-lg-6 col-xl-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Error</RadzenText>
+                <RadzenButton Text="Show error notification" class="w-100"
+                    ButtonStyle="ButtonStyle.Danger"
+                    Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error Summary", Detail = "Error Detail", Duration = 4000 })) />
+            </RadzenCard>
+        </div>
+        <div class="col-lg-6 col-xl-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Success</RadzenText>
+                <RadzenButton Text="Show success notification" class="w-100"
+                    ButtonStyle="ButtonStyle.Success"
+                    Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success Summary", Detail = "Success Detail", Duration = 4000 })) />
+            </RadzenCard>
+        </div>
+        <div class="col-lg-6 col-xl-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Notification with custom position</RadzenText>
+                <RadzenButton Text="Show notification at custom position" class="w-100"
+                    Click=@(args => ShowNotification(new NotificationMessage { Style = "position: absolute; left: -1000px;", Severity = NotificationSeverity.Success, Summary = "Success Summary", Detail = "Success Detail", Duration = 40000 })) />
+            </RadzenCard>
+        </div>
+         <div class="col-lg-6 col-xl-4 p-3">
+            <RadzenCard>
+               <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Info</RadzenText>
+               <RadzenButton Text="Show notification with custom click handler" class="w-100"
+                             ButtonStyle="ButtonStyle.Info"
+                             Click="@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Click Summary", Detail = "Click Me", Duration = 4000, Click=NotificationClick, CloseOnClick = true, Payload = DateTime.Now }))" />
+            </RadzenCard>
+         </div>
+    </div>
+</div>
+
+<EventConsole @ref=@console />
+
+@code {
+   EventConsole console;
+
+   void ShowNotification(NotificationMessage message)
+   {
+      NotificationService.Notify(message);
+
+      console.Log($"{message.Severity} notification");
+   }
+
+   void NotificationClick(NotificationMessage message)
+   {
+      console.Log($"{message.Summary} clicked, Payload = {message.Payload}");
+   }
+}

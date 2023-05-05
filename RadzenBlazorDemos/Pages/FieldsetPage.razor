@@ -1,67 +1,12 @@
 ﻿@page "/fieldset"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Fieldset
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Fieldset</strong> component.
+</RadzenText>
 
-@inject NorthwindContext dbContext
-
-<RadzenExample Name="Fieldset">
-    <RadzenFieldset AllowCollapse="true" Style="width: 700px; margin: 40px auto;"
-                    Expand=@(() => Change("Fieldset expanded")) Collapse=@(() => Change("Fieldset collapsed"))>
-        <HeaderTemplate>
-            <span class="d-inline-flex align-items-center align-middle">
-                <RadzenIcon Icon="account_box" Class="mr-1" /><b>Orders</b>
-            </span>
-        </HeaderTemplate>
-        <ChildContent>
-            <RadzenDataList PageSize="4" WrapItems="true" AllowPaging="true" 
-                            Data="@orders" TItem="Order">
-                <Template Context="order">
-                    <RadzenCard Style="width: 250px">
-                        <div class="row">
-                            <div class="col-md-8 text-truncate">
-                                <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") Class="mr-1" />
-                                <b>@(order.ShipName)</b>
-                            </div>
-                            <div class="col-md-4 text-right">
-                                <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
-                            </div>
-                        </div>
-                        <hr style="border: none; background-color: rgba(0,0,0,.08); height: 1px; margin: 1rem 0;" />
-                        <div class="d-flex flex-row align-items-center">
-                            <RadzenImage Path="@order.Employee?.Photo" Class="rounded-circle float-left mr-3" Style="width: 80px; height: 80px;" />
-                            <div>
-                                <h4 class="mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</h4>
-                                <div>@order.ShipAddress</div>
-                                <div style="font-size: .8em">@(order.ShipCity), @(order.ShipCountry)</div>
-                            </div>
-                        </div>
-                    </RadzenCard>
-                </Template>
-            </RadzenDataList>
-        </ChildContent>
-        <SummaryTemplate>
-            <RadzenCard class="mt-3">
-                <b>@orders.Count() Orders</b>
-            </RadzenCard>
-        </SummaryTemplate>
-    </RadzenFieldset>
+<RadzenExample ComponentName="Fieldset" Example="FieldsetConfig">
+    <FieldsetConfig />
 </RadzenExample>
-
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    EventConsole console;
-    IEnumerable<Order> orders;
-
-    protected override void OnInitialized()
-    {
-        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
-    }
-
-    void Change(string text)
-    {
-        console.Log($"{text}");
-    }
-}

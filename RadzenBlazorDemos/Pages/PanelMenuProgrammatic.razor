@@ -1,0 +1,74 @@
+﻿@using System.ComponentModel;
+
+<RadzenStack AlignItems="AlignItems.Center" Class="rz-p-12">
+    <RadzenPanelMenu Style="width:300px">
+        <ChildContent>
+            @foreach (var item in data)
+            {
+                <RadzenPanelMenuItem Text="@item.Text" @bind-Expanded="@item.Expanded">
+                    <ChildContent>
+                        @foreach (var subItem in item.Items)
+                        {
+                            <RadzenPanelMenuItem Text="@subItem.Text"  />
+                        }
+                    </ChildContent>
+                    </RadzenPanelMenuItem>
+                }
+        </ChildContent>
+    </RadzenPanelMenu>
+</RadzenStack>
+    
+@code {
+
+    static List<MenuModel> data = Enumerable.Range(0, 5).Select(i => new MenuModel(() => data)
+    {
+        Text = $"Menu{i}",
+        Expanded = i == 0,
+        Items = Enumerable.Range(0, 5).Select(j => new MenuModel(() => data)
+        {
+            Text = $"SubMenu{i}{j}"
+        })
+    }).ToList();
+
+    public class MenuModel : INotifyPropertyChanged
+    {
+        Func<List<MenuModel>> collection;
+        public MenuModel(Func<List<MenuModel>> collection)
+        {
+            this.collection = collection;
+        }
+
+        public string Text { get; set; }
+
+        bool _expanded;
+        public bool Expanded 
+        {
+            get
+            {
+                return _expanded;    
+            }
+            set
+            {
+                if (_expanded != value)
+                {
+                    collection()?.Where(i => i != this).ToList().ForEach(s => s.Expanded = false);
+
+                    _expanded = value;
+                    OnPropertyChanged(nameof(Expanded));
+                }
+            }
+        }
+
+        public IEnumerable<MenuModel> Items { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null) 
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+}

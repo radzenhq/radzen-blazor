@@ -3,7 +3,10 @@
 
 <div class="rz-event" style=@Style @onclick=@OnClick>
     <div class="rz-event-content" title=@Data?.Text @attributes=@Attributes>
-        @Scheduler.RenderAppointment(Data)
+        @if (ShowAppointmentContent)
+        {
+            @Scheduler.RenderAppointment(Data)
+        }
     </div>
 </div>
 @code {
@@ -26,6 +29,9 @@
 
     [Parameter]
     public AppointmentData Data { get; set; }
+
+    [Parameter]
+    public bool ShowAppointmentContent { get; set; } = true;
 
     [CascadingParameter]
     public IScheduler Scheduler { get; set; }

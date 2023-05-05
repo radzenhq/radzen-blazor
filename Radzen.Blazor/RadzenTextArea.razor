@@ -4,5 +4,5 @@
 @if (Visible)
 {
     <textarea @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
-        placeholder="@Placeholder" maxlength="@MaxLength" value="@Value" @onchange="@OnChange" tabindex="@TabIndex" id="@GetId()"></textarea>
+          placeholder="@CurrentPlaceholder" maxlength="@MaxLength" value="@Value" @onchange="@OnChange" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@GetId()"></textarea>
 }

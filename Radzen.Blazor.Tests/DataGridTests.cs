@@ -74,11 +74,11 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            var markup = new Regex(@"\s\s+").Replace(component.Markup, "").Trim();
+            var data = component.FindAll(".rz-cell-data");
 
-            Assert.Contains(@$"<span class=""rz-cell-data"">1</span>", markup);
-            Assert.Contains(@$"<span class=""rz-cell-data"">2</span>", markup);
-            Assert.Contains(@$"<span class=""rz-cell-data"">3</span>", markup);
+            Assert.Equal("1", data[0].TextContent.Trim());
+            Assert.Equal("2", data[1].TextContent.Trim());
+            Assert.Equal("3", data[2].TextContent.Trim());
         }
 
         [Fact]
@@ -99,9 +99,56 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            var markup = new Regex(@"\s\s+").Replace(component.Markup, "").Trim();
+            var title = component.Find(".rz-column-title");
+            Assert.Equal("MyId", title.TextContent.Trim());
+        }
 
-            Assert.Contains(@$"<span class=""rz-column-title"">MyId</span>", markup);
+        [Fact]
+        public void DataGrid_Renders_TitleAttribute()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add(p => p.ShowColumnTitleAsTooltip, true);
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Title", "MyId");
+                    builder.CloseComponent();
+                });
+            });
+
+            var title = component.Find(".rz-column-title");
+            Assert.Equal("MyId", title.TextContent.Trim());
+            Assert.Equal("MyId", title.GetAttribute("title"));
+        }
+
+        [Fact]
+        public void DataGrid_DoesNotRender_TitleAttribute()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add(p => p.ShowColumnTitleAsTooltip, false);
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Title", "MyId");
+                    builder.CloseComponent();
+                });
+            });
+
+            var title = component.Find(".rz-column-title");
+            Assert.Equal("MyId", title.TextContent.Trim());
+            Assert.Empty(title.GetAttribute("title"));
         }
 
         [Fact]
@@ -378,6 +425,44 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"rz-paginator", component.Markup);
             Assert.Contains(@$"rz-paginator-bottom", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Renders_PagerDensityDefault()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add<bool>(p => p.AllowPaging, true);
+                parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.Top);
+                parameters.Add<Density>(p => p.Density, Density.Default);
+            });
+
+            Assert.DoesNotContain(@$"rz-density-compact", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Renders_PagerDensityCompact()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenGrid<int>>(parameterBuilder => parameterBuilder.Add<IEnumerable<int>>(p => p.Data, Enumerable.Range(0, 100)));
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add<bool>(p => p.AllowPaging, true);
+                parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.Top);
+                parameters.Add<Density>(p => p.Density, Density.Compact);
+            });
+
+            Assert.Contains(@$"rz-density-compact", component.Markup);
         }
 
         [Fact]

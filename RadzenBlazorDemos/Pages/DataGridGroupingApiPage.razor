@@ -1,83 +1,12 @@
 ﻿@page "/datagrid-grouping-api"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid <strong>DataGrid Grouping API</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Set AllowGrouping="true" to enable group by column and GroupPanelText to localize the group panel text. Set Groupable="false" for column to disable grouping by that column.
+</RadzenText>
 
-@inject NorthwindContext dbContext
-
-<h1>DataGrid <strong>DataGrid Grouping API</strong></h1>
-
-<p>Set AllowGrouping="true" to enable group by column and GroupPanelText to localize the group panel text. Set Groupable="false" for column to disable grouping by that column.</p>
-
-<RadzenExample Name="DataGrid" Source="DataGridGroupingApi" Heading="false">
-    <RadzenDataGrid AllowGrouping="true" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" 
-        Data="@employees" TItem="Employee" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or" Render="@OnRender" 
-            HideGroupedColumn="true" GroupRowRender="OnGroupRowRender" GroupRowExpand="OnGroupRowExpand" GroupRowCollapse="OnGroupRowCollapse" Group="@OnGroup">
-        <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
-            <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Frozen="true" Groupable="false" Width="60px" >
-                <Template Context="data">
-                    <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
-            <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name"/>
-            <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" Width="200px" />
-            <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
-            <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
-            <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" Width="200px" />
-            <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
-            <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" />
-            <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
-            <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
-            <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
-            <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" />
-            <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" Width="400px" />
-        </Columns>
-    </RadzenDataGrid>
+<RadzenExample ComponentName="DataGrid" Example="DataGridGroupingApi">
+    <DataGridGroupingApi />
 </RadzenExample>
-
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    EventConsole console;
-    IEnumerable<Employee> employees;
-
-    protected override void OnInitialized()
-    {
-        employees = dbContext.Employees;
-    }
-
-    void OnRender(DataGridRenderEventArgs<Employee> args)
-    {
-        if(args.FirstRender)
-        {
-            args.Grid.Groups.Add(new GroupDescriptor(){ Property = "Title", SortOrder = SortOrder.Descending });
-            StateHasChanged();
-        }
-    }
-
-    void OnGroupRowRender(GroupRowRenderEventArgs args)
-    {
-        if (args.FirstRender && args.Group.Data.Key == "Vice President, Sales")
-        {
-            args.Expanded = false;  
-        }
-    }
-
-    void OnGroupRowExpand(Group group)
-    {
-        console.Log($"Group row with key: {group.Data.Key} expanded");
-    }
-
-    void OnGroupRowCollapse(Group group)
-    {
-        console.Log($"Group row with key: {group.Data.Key} collapsed");
-    }
-
-    void OnGroup(DataGridColumnGroupEventArgs<Employee> args)
-    {
-        console.Log($"DataGrid {(args.GroupDescriptor != null ? "grouped" : "ungrouped")} by {args.Column.GetGroupProperty()}");
-    }
-}

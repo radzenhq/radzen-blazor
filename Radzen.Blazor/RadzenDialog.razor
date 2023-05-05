@@ -8,19 +8,57 @@
     <DialogContainer Dialog=@dialog ShowMask=@(dialog==dialogs.LastOrDefault()) />
 }
 
+@if (isSideDialogOpen)
+{
+    <aside
+        class="@GetSideDialogCssClass()"
+        tabindex="@(isSideDialogOpen ? "0" : "-1")"
+        style="@GetSideDialogStyle()"
+        aria-labelledby="rz-dialog-side-label"
+        >
+        @if (sideDialogOptions.ShowTitle)
+        {
+            <div class="rz-dialog-side-titlebar">
+                <div class="rz-dialog-side-title" style="display: inline" id="rz-dialog-side-label">@((MarkupString)sideDialogOptions.Title)</div>
+                @if (sideDialogOptions.ShowClose)
+                {
+                    <a href="javascript:void(0)" class="rz-dialog-side-titlebar-close" @onclick="@(_ => Service.CloseSide(null))" role="button" tabindex="@sideDialogOptions.CloseTabIndex">
+                        <span class="rzi rzi-times"></span>
+                    </a>
+                }
+            </div>
+        }
+        <div class="rz-dialog-side-content" style="@sideDialogOptions.Style">
+            @sideDialogContent
+        </div>
+    </aside>
+    @if (dialogs.Count == 0 && sideDialogOptions.ShowMask)
+    {
+        @if (sideDialogOptions.CloseDialogOnOverlayClick)
+        {
+            <div @onclick="@Service.CloseSide" class="rz-dialog-mask"></div>
+        }
+        else
+        {
+            <div class="rz-dialog-mask"></div>
+        }
+    }
+}
+
 @code {
     [Inject] 
     DialogService Service { get; set; }
 
     List<Dialog> dialogs = new List<Dialog>();
+    bool isSideDialogOpen = false;
+    RenderFragment sideDialogContent;
+    SideDialogOptions sideDialogOptions;
 
     public async Task Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
     {
         dialogs.Add(new Dialog() { Title = title, Type = type, Parameters = parameters, Options = options });
 
         await InvokeAsync(() => { StateHasChanged(); });
-
-        await JSRuntime.InvokeAsync<string>("Radzen.openDialog", options, Service.Reference);
     }
 
     public async Task Close(dynamic result)
@@ -42,12 +80,40 @@
     {
         Service.OnOpen -= OnOpen;
         Service.OnClose -= OnClose;
+
+        Service.OnSideOpen -= OnSideOpen;
+        Service.OnSideClose -= OnSideClose;
     }
 
     protected override void OnInitialized()
     {
         Service.OnOpen += OnOpen;
         Service.OnClose += OnClose;
+
+        Service.OnSideOpen += OnSideOpen;
+        Service.OnSideClose += OnSideClose;
+    }
+
+    void OnSideOpen(Type sideComponent, Dictionary<string, object> parameters, SideDialogOptions options)
+    {
+        sideDialogOptions = options;
+        sideDialogContent = new RenderFragment(builder =>
+        {
+            builder.OpenComponent(0, sideComponent);
+            foreach (var parameter in parameters)
+            {
+                builder.AddAttribute(1, parameter.Key, parameter.Value);
+            }
+            builder.CloseComponent();
+        });
+        isSideDialogOpen = true;
+        StateHasChanged();
+    }
+
+    void OnSideClose(dynamic _)
+    {
+        isSideDialogOpen = false;
+        StateHasChanged();
     }
 
     void OnOpen(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
@@ -58,5 +124,15 @@
     void OnClose(dynamic result)
     {
         Close(result).ConfigureAwait(false);
+    }
+
+    string GetSideDialogCssClass()
+    {
+        return $"rz-dialog-side rz-dialog-side-position-{sideDialogOptions.Position.ToString().ToLower()} {sideDialogOptions.CssClass}";
+    }
+
+    string GetSideDialogStyle()
+    {
+        return $"{sideDialogOptions.Style}{(sideDialogOptions.Width != null ? $" width: {sideDialogOptions.Width}" : "")}{(sideDialogOptions.Height != null ? $" height: {sideDialogOptions.Height}" : "")}";
     }
 }

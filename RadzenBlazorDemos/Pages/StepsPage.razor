@@ -1,110 +1,12 @@
 ﻿@page "/steps"
 
-@using RadzenBlazorDemos.Data
-@using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Steps
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Use Radzen Blazor <strong>Steps</strong> component to guide users through a process or sequence of actions. The component consists of a series of numbered steps that represent the various stages of the process.
+</RadzenText>
 
-@inject NorthwindContext dbContext
-
-<RadzenExample Name="Steps">
-    <RadzenSteps Change=@OnChange>
-        <Steps>
-            <RadzenStepsItem Text="Customers">
-                <h3 class="mt-4">1. Select a Customer to continue</h3>
-                <RadzenDataGrid ColumnWidth="200px" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@customers" TItem="Customer" @bind-Value="@selectedCustomers">
-                    <Columns>
-                        <RadzenDataGridColumn TItem="Customer" Property="CustomerID" Title="Customer ID" Width="140px" />
-                        <RadzenDataGridColumn TItem="Customer" Property="CompanyName" Title="Company Name" />
-                        <RadzenDataGridColumn TItem="Customer" Property="ContactName" Title="Contact Name" />
-                        <RadzenDataGridColumn TItem="Customer" Property="ContactTitle" Title="Contact Title" />
-                        <RadzenDataGridColumn TItem="Customer" Property="Address" Title="Address" />
-                        <RadzenDataGridColumn TItem="Customer" Property="City" Title="City" Width="140px" />
-                        <RadzenDataGridColumn TItem="Customer" Property="Region" Title="Region" Width="140px" />
-                        <RadzenDataGridColumn TItem="Customer" Property="PostalCode" Title="Postal Code" Width="140px" />
-                        <RadzenDataGridColumn TItem="Customer" Property="Country" Title="Country" Width="140px" />
-                        <RadzenDataGridColumn TItem="Customer" Property="Phone" Title="Phone" Width="140px" />
-                        <RadzenDataGridColumn TItem="Customer" Property="Fax" Title="Fax" Width="140px" />
-                    </Columns>
-                </RadzenDataGrid>
-            </RadzenStepsItem>
-            <RadzenStepsItem Text="Orders" Disabled="@(selectedCustomers == null || selectedCustomers != null && !selectedCustomers.Any())">
-                <h3 class="mt-4">2. Select an Order to continue</h3>
-                <RadzenDataGrid ColumnWidth="150px" PageSize="5" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
-                            Data="@(selectedCustomers != null && selectedCustomers.Any() ? orders.Where(o => o.CustomerID == selectedCustomers[0].CustomerID) : Enumerable.Empty<Order>())" TItem="Order" @bind-Value="@selectedOrders">
-                    <Columns>
-                        <RadzenDataGridColumn Width="120px" TItem="Order" Property="OrderID" Title="Order ID" />
-                        <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
-                        <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
-                            <Template Context="order">
-                                <div class="d-flex align-items-center">
-                                    <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px;" />
-                                    <div>@order.Employee?.LastName</div>
-                                </div>
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date">
-                            <Template Context="order">
-                                @String.Format("{0:d}", order.OrderDate)
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Order" Property="RequiredDate" Title="Required Date">
-                            <Template Context="order">
-                                @String.Format("{0:d}", order.RequiredDate)
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Order" Property="ShippedDate" Title="Shipped Date">
-                            <Template Context="order">
-                                @String.Format("{0:d}", order.ShippedDate)
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
-                            <Template Context="order">
-                                @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
-                        <RadzenDataGridColumn TItem="Order" Property="ShipAddress" Title="Address" />
-                        <RadzenDataGridColumn TItem="Order" Property="ShipCity" Title="City" />
-                        <RadzenDataGridColumn TItem="Order" Property="ShipRegion" Title="Region" />
-                        <RadzenDataGridColumn TItem="Order" Property="ShipPostalCode" Title="Postal Code" />
-                        <RadzenDataGridColumn TItem="Order" Property="ShipCountry" Title="Country" />
-                    </Columns>
-                </RadzenDataGrid>
-            </RadzenStepsItem>
-            <RadzenStepsItem Text="Order Details" Disabled="@(selectedOrders == null || selectedOrders != null && !selectedOrders.Any())">
-                <h3 class="mt-4">Order Details</h3>
-                <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true"
-                            Data="@(selectedOrders != null && selectedOrders.Any() ? orderDetails.Where(o => o.OrderID == selectedOrders[0].OrderID) : Enumerable.Empty<OrderDetail>())" TItem="OrderDetail" ColumnWidth="200px">
-                    <Columns>
-                        <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
-                        <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-                        <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
-                    </Columns>
-                </RadzenDataGrid>
-            </RadzenStepsItem>
-        </Steps>
-    </RadzenSteps>
+<RadzenExample ComponentName="Steps" Example="StepsConfig">
+    <StepsConfig />
 </RadzenExample>
-
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    EventConsole console;
-    IEnumerable<Customer> customers;
-    IEnumerable<Order> orders;
-    IEnumerable<OrderDetail> orderDetails;
-
-    IList<Customer> selectedCustomers;
-    IList<Order> selectedOrders;
-
-    protected override void OnInitialized()
-    {
-        customers = dbContext.Customers.ToList();
-        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
-        orderDetails = dbContext.OrderDetails.Include("Product").ToList();
-    }
-    void OnChange(int index)
-    {
-        console.Log($"Step with index {index} was selected.");
-    }
-}

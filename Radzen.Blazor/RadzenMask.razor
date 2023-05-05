@@ -5,7 +5,7 @@
 @inherits FormComponent<string>
 @if (Visible)
 {
-    <input @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@TabIndex"
-           placeholder="@Placeholder" maxlength="@MaxLength" autocomplete="@(AutoComplete ? "on" : "off")" value="@Value" @onchange="@OnChange" id="@GetId()"
+    <input @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+           placeholder="@CurrentPlaceholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" value="@Value" @onchange="@OnChange" id="@GetId()"
            oninput="Radzen.mask('@GetId()', '@Mask', '@Pattern', '@CharacterPattern')"/>
 }

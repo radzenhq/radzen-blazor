@@ -20,7 +20,7 @@
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     @if (AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
     {
-        <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" ShowPagingSummary="@ShowPagingSummary" />
+            <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" ShowPagingSummary="@ShowPagingSummary" Density="@Density" />
     }
     <div class="rz-datatable-scrollable-wrapper rz-helper-clearfix" style="">
         <div class="rz-datatable-scrollable-view">
@@ -119,7 +119,7 @@
                                                                 <RadzenTextBox Value="@($"{column.FilterValue}")" Change="@(args => column.SetFilterValue(args))" />
                                                             }
 
-                                                            <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 80px"
+                                                            <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px"
                                                                             Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator" Value="@column.LogicalFilterOperator" Change="@(args => column.SetLogicalFilterOperator((LogicalFilterOperator)args))" />
 
                                                             <RadzenDropDown @onclick:preventDefault="true" Data="@(column.FilterOperators)" TextProperty="Value" ValueProperty="Key" TValue="string" Value="@column.SecondFilterOperator" Change="@(args => column.SetSecondFilterOperator($"{args}"))" />
@@ -182,7 +182,7 @@
                                                             <label class="rz-cell-filter-label" style="height:35px">
                                                                 @if (column.Type == "string" && column.Format == "date-time")
                                                                 {
-                                                                    <button class="rz-button rz-button-md rz-button-icon-only btn-light" onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")">
+                                                                    <button class="rz-button rz-button-md rz-button-icon-only rz-variant-flat rz-light" onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")">
                                                                         <i class="rzi">date_range</i>
                                                                     </button>
                                                                     @if (column.FilterValue != null)
@@ -483,7 +483,7 @@
 
         @if (AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
         {
-            <RadzenPager @ref="bottomPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" ShowPagingSummary="@ShowPagingSummary" class="rz-paginator-bottom" />
+            <RadzenPager @ref="bottomPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" ShowPagingSummary="@ShowPagingSummary" class="rz-paginator-bottom" Density="@Density" />
         }
     </div>
     }
@@ -497,15 +497,7 @@
     {
         if (column != null && !string.IsNullOrEmpty(column.FormatString))
         {
-            var formats = column.FormatString.Split(new char[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
-            if (formats.Length > 0)
-            {
-                var format = formats[0].Trim().Split(':');
-                if (format.Length > 1)
-                {
-                    return format[1].Trim();
-                }
-            }
+            return column.FormatString.Replace("{0:", "").Replace("}", "");
         }
 
         return FilterDateFormat;

@@ -13,18 +13,19 @@ RUN apt-get update && apt-get install unzip wget git -y && wget -q -P /tmp https
 COPY Radzen.Blazor /app/Radzen.Blazor
 COPY Radzen.DocFX /app/DocFX
 COPY RadzenBlazorDemos /app/RadzenBlazorDemos
+COPY RadzenBlazorDemos.Host /app/RadzenBlazorDemos.Host
 WORKDIR /app
 RUN docfx DocFX/docfx.json
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0-focal
+FROM mcr.microsoft.com/dotnet/sdk:7.0
 
-COPY --from=0 /app/RadzenBlazorDemos /app
-WORKDIR /app
+COPY --from=0 /app/RadzenBlazorDemos.Host /app/RadzenBlazorDemos.Host
+COPY --from=0 /app/RadzenBlazorDemos /app/RadzenBlazorDemos
+
+WORKDIR /app/RadzenBlazorDemos.Host
 RUN dotnet publish -c Release -o out
-COPY RadzenBlazorDemos/northwind.db /app/out
-COPY RadzenBlazorDemos/northwind.sql /app/out
 
 ENV ASPNETCORE_URLS http://*:5000
-WORKDIR /app/out
+WORKDIR /app/RadzenBlazorDemos.Host/out
 
-ENTRYPOINT ["dotnet", "RadzenBlazorDemos.dll"]
+ENTRYPOINT ["dotnet", "RadzenBlazorDemos.Host.dll"]

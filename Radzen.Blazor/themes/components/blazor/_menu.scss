@@ -1,32 +1,125 @@
-$menu-background-color: $default-background-color !default;
-$menu-border: $input-border !default;
+$menu-background-color: var(--rz-base-background-color) !default;
+$menu-border: var(--rz-border-normal) !default;
 $menu-border-radius: 2px !default;
 
-$menu-item-padding: 0.375rem 1.25rem !default;
-$menu-item-color: $charcoal-grey !default;
-$menu-item-selected-color: $charcoal-grey !default;
-$menu-item-icon-margin: 0 0.625rem 0 0 !default;
-$menu-item-hover-background-color: $default-link !default;
-$menu-item-hover-color: $white !default;
-$menu-item-offset: 0.75rem;
+$menu-item-padding: 0.5rem 1rem 0.5rem 0.5rem !default;
+$menu-item-border-radius: 0 !default;
+$menu-item-color: var(--rz-text-color) !default;
+$menu-item-hover-color: var(--rz-text-contrast-color) !default;
+$menu-item-hover-background-color: var(--rz-secondary-light) !default;
+$menu-item-selected-color: var(--rz-text-color) !default;
+$menu-item-icon-margin: 0 0.5rem 0 0 !default;
+$menu-item-icon-color: $menu-item-color !default;
+$menu-item-icon-hover-color: $menu-item-hover-color !default;
+$menu-item-offset: 1rem;
 $menu-item-transition: none !default;
 
-$menu-top-item-padding: 0.8125rem 0.625rem !default;
-$menu-top-item-hover-color: $default-link !default;
-$menu-top-item-hover-background-color: transparent !default;
-$menu-top-item-background-color: $menu-background-color !default;
+$menu-top-item-padding: 0.5rem !default;
+$menu-top-item-border-radius: $menu-item-border-radius !default;
 $menu-top-item-color: $menu-item-color !default;
+$menu-top-item-background-color: $menu-background-color !default;
+$menu-top-item-hover-color: var(--rz-secondary) !default;
+$menu-top-item-hover-background-color: transparent !default;
+$menu-top-item-selected-color: var(--rz-secondary) !default;
+$menu-top-item-icon-color: $menu-item-selected-color !default;
+$menu-top-item-icon-hover-color: $menu-top-item-hover-color !default;
 
-$context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
+$context-menu-padding: 0 !default;
+$context-menu-box-shadow: $rz-shadow-3 !default;
+
+// Menu CSS variables
+
+:root {
+  --rz-menu-background-color: #{$menu-background-color};
+  --rz-menu-border: #{$menu-border};
+  --rz-menu-border-radius: #{$menu-border-radius};
+
+  --rz-menu-item-padding: #{$menu-item-padding};
+  --rz-menu-item-border-radius: #{$menu-item-border-radius};
+  --rz-menu-item-color: #{$menu-item-color};
+  --rz-menu-item-hover-color: #{$menu-item-hover-color};
+  --rz-menu-item-hover-background-color: #{$menu-item-hover-background-color};
+  --rz-menu-item-selected-color: #{$menu-item-selected-color};
+  --rz-menu-item-icon-margin: #{$menu-item-icon-margin};
+  --rz-menu-item-icon-color: #{$menu-item-icon-color};
+  --rz-menu-item-icon-hover-color: #{$menu-item-icon-hover-color};
+  --rz-menu-item-offset: #{$menu-item-offset};
+  --rz-menu-item-transition: #{$menu-item-transition};
+
+  --rz-menu-top-item-padding: #{$menu-top-item-padding};
+  --rz-menu-top-item-border-radius: #{$menu-top-item-border-radius};
+  --rz-menu-top-item-color: #{$menu-top-item-color};
+  --rz-menu-top-item-background-color: #{$menu-top-item-background-color};
+  --rz-menu-top-item-hover-color: #{$menu-top-item-hover-color};
+  --rz-menu-top-item-hover-background-color: #{$menu-top-item-hover-background-color};
+  --rz-menu-top-item-selected-color: #{$menu-top-item-selected-color};
+  --rz-menu-top-item-icon-color: #{$menu-top-item-icon-color};
+  --rz-menu-top-item-icon-hover-color: #{$menu-top-item-icon-hover-color};
+
+  --rz-context-menu-padding: #{$context-menu-padding};
+  --rz-context-menu-box-shadow: #{$context-menu-box-shadow};
+}
 
 .rz-context-menu .rz-menu {
-    flex-direction: column;
+  flex-direction: column;
 }
 
 .rz-context-menu .rz-menu, .rz-context-menu .rz-navigation-menu {
-  box-shadow: $context-menu-box-shadow;
-  border: $menu-border;
-  border-radius: $menu-border-radius;
+  box-shadow: var(--rz-context-menu-box-shadow);
+  border: var(--rz-menu-border);
+  border-radius: var(--rz-menu-border-radius);
+}
+
+.rz-context-menu .rz-menu:not(.rz-profile-menu) {
+  align-items: stretch;
+  background-color: var(--rz-menu-background-color);
+
+  .rz-navigation-item-link {
+    color: var(--rz-menu-item-color);
+
+    .rzi:not(.rz-navigation-item-icon-children) {
+      color: var(--rz-menu-item-icon-color);
+    }
+  }
+
+  .rz-navigation-item-wrapper {
+    border-radius: var(--rz-menu-item-border-radius);;
+
+    .rz-navigation-item-link {
+      padding: var(--rz-menu-item-padding);
+
+    }
+
+    &:hover {
+      background-color: var(--rz-menu-item-hover-background-color);
+
+      .rz-navigation-item-link {
+        color: var(--rz-menu-item-hover-color);
+
+        .rzi:not(.rz-navigation-item-icon-children) {
+          color: var(--rz-menu-item-icon-hover-color);
+        }
+      }
+    }
+  }
+
+  .rz-navigation-item-wrapper-active {
+    .rz-navigation-item-link {
+      color: var(--rz-menu-item-selected-color);
+
+      .rzi:not(.rz-navigation-item-icon-children) {
+        color: var(--rz-menu-item-selected-color);
+      }
+    }
+  }
+
+  > .rz-navigation-item {
+    > .rz-navigation-item-wrapper-active {
+      &:before {
+       display: none;
+      }
+    }
+  }
 }
 
 .rz-menu:not(.rz-profile-menu) {
@@ -34,32 +127,50 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
   margin: 0;
   padding: 0;
   display: flex;
+  align-items: center;
+  background-color: var(--rz-menu-top-item-background-color);
 
-  background-color: $menu-top-item-background-color;
+  .rz-context-menu & {
+    padding: var(--rz-context-menu-padding);
+  }
 
   .rz-navigation-item-link {
-    color: $menu-top-item-color;
+    color: var(--rz-menu-top-item-color);
     white-space: nowrap;
+
+    .rzi:not(.rz-navigation-item-icon-children) {
+      color: var(--rz-menu-top-item-icon-color);
+    }
   }
 
   .rz-navigation-item-wrapper {
+    border-radius: var(--rz-menu-top-item-border-radius);;
 
     .rz-navigation-item-link {
-      padding: $menu-top-item-padding;
+      padding: var(--rz-menu-top-item-padding);
+
     }
 
     &:hover {
-      background-color: $menu-top-item-hover-background-color;
+      background-color: var(--rz-menu-top-item-hover-background-color);
 
       .rz-navigation-item-link {
-        color: $menu-top-item-hover-color;
+        color: var(--rz-menu-top-item-hover-color);
+
+        .rzi:not(.rz-navigation-item-icon-children) {
+          color: var(--rz-menu-top-item-icon-hover-color);
+        }
       }
     }
   }
 
   .rz-navigation-item-wrapper-active {
     .rz-navigation-item-link {
-      color: $menu-item-selected-color;
+      color: var(--rz-menu-top-item-selected-color);
+
+      .rzi:not(.rz-navigation-item-icon-children) {
+        color: var(--rz-menu-top-item-selected-color);
+      }
     }
   }
 
@@ -72,8 +183,9 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
         height: 1px;
         left: 0;
         right: 0;
-        background-color: $menu-item-selected-color;
-        margin-left: 0.75rem;
+        background-color: var(--rz-menu-top-item-selected-color);
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
       }
     }
   }
@@ -86,32 +198,41 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
     list-style: none;
     overflow: hidden;
     position: absolute;
-    padding: 0;
+    padding: var(--rz-context-menu-padding);
     margin: 0;
     min-width: 100%;
-    box-shadow: $context-menu-box-shadow;
+    box-shadow: var(--rz-context-menu-box-shadow);
     z-index: 3;
-    border-radius: $menu-border-radius;
-    background-color: $menu-background-color;
+    border-radius: var(--rz-menu-border-radius);
+    background-color: var(--rz-menu-background-color);
 
     .rz-navigation-item-wrapper {
+      border-radius: var(--rz-menu-item-border-radius);
 
       .rz-navigation-item-link {
-        padding: $menu-item-padding;
+        padding: var(--rz-menu-item-padding);
       }
 
       &:hover {
-        background-color: $menu-item-hover-background-color;
+        background-color: var(--rz-menu-item-hover-background-color);
 
         .rz-navigation-item-link {
-          color: $menu-item-hover-color;
+          color: var(--rz-menu-item-hover-color);
+
+          .rzi:not(.rz-navigation-item-icon-children) {
+            color: var(--rz-menu-item-icon-hover-color);
+          }
         }
       }
     }
 
     .rz-navigation-item-link {
-      color: $menu-item-color;
+      color: var(--rz-menu-item-color);
       white-space: nowrap;
+
+      .rzi:not(.rz-navigation-item-icon-children) {
+        color: var(--rz-menu-item-icon-color);
+      }
     }
 
     .rz-navigation-menu {
@@ -119,18 +240,18 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
       box-shadow: none;
 
       .rz-navigation-item-link {
-        color: $menu-item-color;
-        margin-left: $menu-item-offset;
+        color: var(--rz-menu-item-color);
+        margin-left: var(--rz-menu-item-offset);
       }
 
       .rz-navigation-menu {
         .rz-navigation-item-link {
-          margin-left: $menu-item-offset * 2;
+          margin-left: calc(var(--rz-menu-item-offset) * 2);
         }
 
         .rz-navigation-menu {
           .rz-navigation-item-link {
-            margin-left: $menu-item-offset * 3;
+            margin-left: calc(var(--rz-menu-item-offset) * 3);
           }
         }
       }
@@ -138,37 +259,56 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
   }
 
   .rzi:not(.rz-navigation-item-icon-children) {
-    margin: $menu-item-icon-margin;
+    margin: var(--rz-menu-item-icon-margin);
   }
 }
 
 .rz-navigation-item-wrapper,
 .rz-navigation-item-link,
 .rz-navigation-item-text {
-    transition: $menu-item-transition;
+  transition: var(--rz-menu-item-transition);
 }
 
 .rz-menu-toggle-item {
-    display: none;
-    padding: $menu-top-item-padding;
-    text-align: right;
-    width: 100%;
-    height: 100%;
+  display: none;
+  padding: var(--rz-menu-top-item-padding);
+  justify-content: end;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
 .rz-menu-toggle {
-    appearance: none;
-    background-color: transparent;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--rz-menu-top-item-color);
 
-    &:active {
-      background-color: transparent;
-      color: inherit;
+  &:hover {
+    background-color: transparent;
+    color: var(--rz-menu-top-item-hover-color);
+  }
+
+  &:active {
+    background-color: transparent;
+    color: var(--rz-menu-top-item-color);
+  }
+
+  .rz-context-menu & {
+    color: var(--rz-menu-item-color);
+
+    &:hover {
+      color: var(--rz-menu-item-hover-color);
     }
+  
+    &:active {
+      color: var(--rz-menu-item-color);
+    }
+  }
 }
 
 @media (max-width: 768px) {
@@ -193,11 +333,12 @@ $context-menu-box-shadow: 0 10px 8px 0 rgba(58, 71, 77, 0.06) !default;
       .rz-navigation-menu {
         position: static;
         box-shadow: none;
+        border-radius: 0;
       }
     }
 
     .rz-menu-toggle-item {
-      display: block;
+      display: flex;
     }
 
     .rz-navigation-item-wrapper-active:before {

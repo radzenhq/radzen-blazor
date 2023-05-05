@@ -1,51 +1,12 @@
 @page "/tree-selection"
-@using Microsoft.EntityFrameworkCore
-@using RadzenBlazorDemos.Models.Northwind
-@inject RadzenBlazorDemos.Data.NorthwindContext Northwind
 
-<h1>Tree selection</h1>
-<p>Get or set the selected items of RadzenTree</p>
-<RadzenExample Name="Tree" Source="TreeSelection" Heading="false">
-    <div class="row my-5">
-        <div class="col-lg-6 offset-lg-3">
-            <RadzenCard>
-                <RadzenButton Click=@(() => selection = categories.Skip(1).First()) Text="Select 'Condiments'" ButtonStyle="ButtonStyle.Secondary" Class="mr-1" />
-                <RadzenButton Click=@(() => selection = null) Text="Clear selection" ButtonStyle="ButtonStyle.Light" />
-            </RadzenCard>
-            <RadzenCard Class="mt-4">
-                <RadzenTree Style="width: 100%; height: 300px" Change=@OnChange Data=@categories @bind-Value=@selection>
-                    <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
-                    <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
-                </RadzenTree>
-            </RadzenCard>
-        </div>
-    </div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Tree selection
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Get or set the selected items of RadzenTree.
+</RadzenText>
+
+<RadzenExample ComponentName="Tree" Example="TreeSelection">
+    <TreeSelection />
 </RadzenExample>
-
-<EventConsole @ref=@console Class="mt-4" />
-
-@code {
-    IEnumerable<Category> categories;
-    object selection;
-
-    EventConsole console;
-
-    void OnChange()
-    {
-        if (selection is Category category)
-        {
-            console.Log($"Selection changed to: {category.CategoryName}");
-        }
-
-        if (selection is Product product)
-        {
-            console.Log($"Selection changed to: {product.ProductName}");
-        }
-    }
-
-    protected override void OnInitialized()
-    {
-        categories = Northwind.Categories.Include(c => c.Products);
-        selection = categories.First();
-    }
-}

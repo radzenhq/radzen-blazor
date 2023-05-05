@@ -1,0 +1,16 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenRadioButtonList Data="@data" @bind-Value=@value TValue="int" TextProperty="Name" ValueProperty="Id" class="mb-5" />
+</div>
+
+@code {
+    int value = 1;
+
+    public class MyObject
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    IEnumerable<MyObject> data = new MyObject[] {
+        new MyObject(){ Id = 1 , Name = "Orders"}, new MyObject() { Id = 2 , Name = "Employees"}, new MyObject() { Id = 3 , Name = "Customers" } };
+}

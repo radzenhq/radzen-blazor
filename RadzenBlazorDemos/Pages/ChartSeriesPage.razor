@@ -1,0 +1,49 @@
+@page "/chart-series"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Chart
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Use the Radzen Blazor Chart component to display data in a graphical format.
+</RadzenText>
+
+<RadzenText Anchor="chart-series#series" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Chart Series
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    The chart can display 
+        <strong><RadzenLink Path="/area-chart" Text="area" /></strong>, 
+        <strong><RadzenLink Path="/bar-chart" Text="bar" /></strong>, 
+        <strong><RadzenLink Path="/column-chart" Text="column" /></strong>, 
+        <strong><RadzenLink Path="/donut-chart" Text="donut" /></strong>,
+        <strong><RadzenLink Path="/line-chart" Text="line" /></strong>, and
+        <strong><RadzenLink Path="/pie-chart" Text="pie" /></strong> 
+    data series. The chart series needs data and configuration to tell it which property of the data item is the value of the series (Y axis) and which is the category (X axis).
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    All series have the following common properties:
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <code>Data</code> - specifies the data source which the series should display.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <code>ValueProperty</code> - the name of the property which provides values for the Y axis of the chart. The property should be of numeric type: <code>int</code>, <code>long</code>, <code>float</code>, <code>double</code>, <code>decimal</code>.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <code>CategoryProperty</code> - the name of the property which provides value for the X axis of the chart. The property can be <code>string</code>, <code>Date</code> or <code>numeric</code>. If not set RadzenChart will use the index of the data item as its X axis value.
+</RadzenText>
+
+<RadzenText Anchor="chart-series#series" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Basic usage
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    Here is a very basic example that creates a column chart with minimal configuration.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The <code>RadzenColumnSeries</code> tag is used to specify that the chart has a column series. The <code>Data</code> property specifies the data source. The chart will render a column for every <code>DataItem</code> instance from the <code>revenue</code> array. The Y (value) axis displays the <code>Revenue</code> property and the X (category) axis displays the <code>Quarter</code> property.
+</RadzenText>
+
+<RadzenExample ComponentName="Chart" Example="ChartSeriesConfig">
+    <ChartSeriesConfig />
+</RadzenExample>

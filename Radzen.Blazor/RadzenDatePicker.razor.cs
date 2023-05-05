@@ -415,27 +415,14 @@ namespace Radzen.Blazor
             }
         }
 
-        IList<string> _abbreviatedDayNames;
-
-        IList<string> AbbreviatedDayNames
+        IEnumerable<string> ShiftedAbbreviatedDayNames
         {
             get
             {
-                if (_abbreviatedDayNames == null)
+                for (int current = (int)Culture.DateTimeFormat.FirstDayOfWeek, to = current + 7; current < to; current++)
                 {
-                    _abbreviatedDayNames = new List<string>();
-
-                    for (int i = (int)Culture.DateTimeFormat.FirstDayOfWeek; i < 7; i++)
-                    {
-                        _abbreviatedDayNames.Add(Culture.DateTimeFormat.AbbreviatedDayNames[i]);
-                    }
-
-                    for (int i = 0; i < (int)Culture.DateTimeFormat.FirstDayOfWeek; i++)
-                    {
-                        _abbreviatedDayNames.Add(Culture.DateTimeFormat.AbbreviatedDayNames[i]);
-                    }
+                    yield return Culture.DateTimeFormat.AbbreviatedDayNames[current % 7];
                 }
-                return _abbreviatedDayNames;
             }
         }
 
@@ -547,6 +534,10 @@ namespace Radzen.Blazor
                     DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)Value, Kind);
                     await ValueChanged.InvokeAsync((TValue)(object)offset);
                 }
+                else if ((typeof(TValue) == typeof(DateTime) || typeof(TValue) == typeof(DateTime?)) && Value != null)
+                {
+                    await ValueChanged.InvokeAsync((TValue)(object)DateTime.SpecifyKind((DateTime)Value, Kind));
+                }
                 else
                 {
                     await ValueChanged.InvokeAsync((TValue)Value);
@@ -564,6 +555,9 @@ namespace Radzen.Blazor
 
         async Task Clear()
         {
+            if (Disabled || ReadOnly)
+                return;
+
             Value = null;
 
             await ValueChanged.InvokeAsync(default(TValue));
@@ -866,12 +860,12 @@ namespace Radzen.Blazor
 
         private string getOpenPopup()
         {
-            return !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
+            return PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
         }
 
         private string getOpenPopupForInput()
         {
-            return !Disabled && !ReadOnly && !Inline && !AllowInput ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
+            return PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline && !AllowInput ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
         }
 
         /// <summary>
@@ -977,6 +971,23 @@ namespace Radzen.Blazor
             this.firstRender = firstRender;
 
             return base.OnAfterRenderAsync(firstRender);
+        }
+
+        Popup popup;
+
+        /// <summary>
+        /// Gets or sets the render mode.
+        /// </summary>
+        /// <value>The render mode.</value>
+        [Parameter]
+        public PopupRenderMode PopupRenderMode { get; set; } = PopupRenderMode.Initial;
+
+        async Task OnToggle()
+        {
+            if (PopupRenderMode == PopupRenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
+            {
+                await popup.ToggleAsync(Element);
+            }
         }
     }
 }

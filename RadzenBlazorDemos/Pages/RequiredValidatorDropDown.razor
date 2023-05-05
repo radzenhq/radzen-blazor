@@ -1,0 +1,67 @@
+@using RadzenBlazorDemos.Models.Northwind
+@inherits DbContextPage
+@inject NotificationService NotificationService
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <RadzenTemplateForm TItem="Model" Data=@model Submit="@OnSubmit" InvalidSubmit="@OnIvalidSubmit">
+                <RadzenFieldset Text="Category and products">
+                    <div class="row mb-5">
+                        <div class="col-md-4">
+                            <RadzenLabel Text="Category" />
+                        </div>
+                        <div class="col">
+                            <RadzenDropDown style="display: block" Name="Category" Change="@CategoryChange" @bind-Value=@model.CategoryName Data="@categories" TextProperty="CategoryName" ValueProperty="CategoryName" Placeholder="Select category" class="w-100" />
+                            <RadzenRequiredValidator Component="Category" Text="Category is required" Style="position: absolute"/>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-md-4">
+                            <RadzenLabel Text="Products" />
+                        </div>
+                        <div class="col">
+                            <RadzenDropDown MaxSelectedLabels="2" style="display: block" Multiple="true" Name="Products" @bind-Value=@model.Products Data="@products" TextProperty="ProductName" ValueProperty="ProductName" Placeholder="Select products" class="w-100" />
+                            <RadzenRequiredValidator Component="Products" Text="Products are required" Style="position: absolute"/>
+                        </div>
+                    </div>
+                    <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
+                </RadzenFieldset>
+            </RadzenTemplateForm>
+        </div>
+    </div>
+</div>
+@code {
+    class Model
+    {
+        public string CategoryName { get; set; }
+        public IEnumerable<string> Products { get; set; }
+    }
+
+    Model model = new Model();
+    IEnumerable<Category> categories;
+    IEnumerable<Product> products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        categories = dbContext.Categories.ToList();
+    }
+
+    void CategoryChange()
+    {
+        products = dbContext.Products.Where(p => p.Category.CategoryName == model.CategoryName).ToList();
+        model.Products = null;
+    }
+
+    void OnSubmit()
+    {
+        NotificationService.Notify(NotificationSeverity.Success, "Success", "Form submitted successfully!");
+    }
+
+    void OnIvalidSubmit()
+    {
+        NotificationService.Notify(NotificationSeverity.Error, "Error", "Form has errors!");
+    }
+}

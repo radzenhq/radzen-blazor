@@ -13,18 +13,9 @@
 
     var value = ComposeValue(valueScale);
 
-    IPathGenerator pathGenerator;
-      
-    if (Smooth)
-    {
-      pathGenerator = new SplineGenerator();
-    }
-    else
-    {
-      pathGenerator = new LineGenerator();
-    }
+    var pathGenerator = GetPathGenerator();
 
-    var data = Items.Select(item => 
+    var data = Items.Select(item =>
     {
       var x = category(item);
       var y = value(item);
@@ -36,7 +27,7 @@
     var index = Chart.Series.IndexOf(this);
     var className = $"rz-line-series rz-series-{index}";
 
-    return 
+    return
     @<g class="@className">
       @if (Items.Any())
       {
@@ -44,7 +35,7 @@
         var key = $"{path}-{LineType}";
         <Path @key=@key Style="@style" D="@path" StrokeWidth="@StrokeWidth" Stroke="@Stroke" LineType="@LineType" Fill="none" />
       }
-      <Markers Data="@Items" Category="@category" Value="@value" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
+      <Markers Series="@this" Data="@Items" Category="@category" Value="@value" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
     </g>;
   }
 }

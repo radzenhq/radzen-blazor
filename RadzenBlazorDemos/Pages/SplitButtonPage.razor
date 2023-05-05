@@ -1,60 +1,96 @@
 ﻿@page "/splitbutton"
+<style>
+    .splitbutton-demo .rz-splitbutton {
+        margin: 0 0.25rem 0.5rem 0;
+    }
 
-<RadzenExample Name="SplitButton">
-<div class="row p-4">
-    <div class="col-md-6 col-xl-3">
-        <h4 class="mt-3">SplitButton with text</h4>
-        <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" >
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" />
-            </ChildContent>
-        </RadzenSplitButton>
-    </div>
-    <div class="col-md-6 col-xl-3">
-        <h4 class="mt-3">SplitButton with text and icon</h4>
-        <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text and icon")) Text="SplitButton" Icon="account_circle" >
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
-            </ChildContent>
-        </RadzenSplitButton>
-    </div>
-    <div class="col-md-6 col-xl-3">
-        <h4 class="mt-3">SplitButton with icon</h4>
-        <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with icon")) Icon="account_circle" >
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
-            </ChildContent>
-        </RadzenSplitButton>
-    </div>
-    <div class="col-md-6 col-xl-3">
-        <h4 class="mt-3">Disabled SplitButton</h4>
-        <RadzenSplitButton Disabled="true" Click=@(args => OnClick(args, "Disabled SplitButton")) Text="SplitButton" >
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" />
-            </ChildContent>
-        </RadzenSplitButton>
-    </div>
-</div>
+    .splitbutton-demo h3 {
+        margin-bottom: 1rem;
+    }
+</style>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    SplitButton
+</RadzenText>
+<RadzenText SplitButtonTextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>SplitButton</strong> component.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Filled SplitButton
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    These are the default Radzen SplitButton.
+</RadzenText>
+<RadzenExample ComponentName="SplitButton" Example="SplitButtonFilled">
+    <SplitButtonFilled />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Outlined SplitButton
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Variant="Variant.Outlined"</code> for outlined split button variant.
+</RadzenText>
+<RadzenExample ComponentName="SplitButton" Example="SplitButtonOutlined">
+    <SplitButtonOutlined />
+</RadzenExample>
 
-@code {
-    EventConsole console;
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Text SplitButton
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Variant="Variant.Text"</code> for text split button variant.
+</RadzenText>
+<RadzenExample ComponentName="SplitButton" Example="SplitButtonText">
+    <SplitButtonText />
+</RadzenExample>
 
-    void OnClick(RadzenSplitButtonItem item, string buttonName)
-    {
-        if(item != null)
-        {
-            console.Log($"{buttonName}, item with value {item.Value} clicked");
-        }
-        else
-        {
-            console.Log($"{buttonName} clicked");
-        }
-    }
-}
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Content in SplitButton
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Text, icons and images can be added to a split button.
+</RadzenText>
+<RadzenExample ComponentName="SplitButton" Example="SplitButtonContent">
+    <SplitButtonContent />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    SplitButton Sizes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Size</code> property to set split button size. Available sizes are ExtraSmall, Small, Medium (default), and Large.
+</RadzenText>
+<RadzenExample ComponentName="SplitButton" Example="SplitButtonSizes">
+    <SplitButtonSizes />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Disabled SplitButton
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Disabled="true"</code> to disable a split button.
+</RadzenText>
+<RadzenExample ComponentName="SplitButton" Example="SplitButtonDisabled">
+    <SplitButtonDisabled />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Busy SplitButton
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>IsBusy="true"</code> to show the busy indicator.
+</RadzenText>
+<RadzenExample ComponentName="SplitButton" Example="SplitButtonBusy">
+    <SplitButtonBusy />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    AlwaysOpenPopup SplitButton
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>AlwaysOpenPopup="true"</code> to open popup with items on click.
+</RadzenText>
+<RadzenExample ComponentName="SplitButton" Example="SplitButtonAlwaysOpenPopup">
+    <SplitButtonAlwaysOpenPopup />
+</RadzenExample>

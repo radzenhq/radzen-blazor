@@ -1,0 +1,125 @@
+﻿@page "/column"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Column
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    The RadzenColumn component is used within a <a href="/row">RadzenRow</a> to create a structured grid layout. Without the <code>RadzenRow</code> component, the <code>RadzenColumn</code> would not be rendered correctly.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    RadzenColumns are positioned on a 12-column based responsive grid.
+</RadzenText>
+<RadzenRow class="rz-text-align-center rz-border-info-light" Gap="1rem">
+    <RadzenColumn class="rz-background-color-danger-lighter rz-color-danger rz-py-5">1</RadzenColumn>
+    <RadzenColumn class="rz-background-color-danger-lighter rz-color-danger rz-py-5">2</RadzenColumn>
+    <RadzenColumn class="rz-background-color-danger-lighter rz-color-danger rz-py-5">3</RadzenColumn>
+    <RadzenColumn class="rz-background-color-danger-lighter rz-color-danger rz-py-5">4</RadzenColumn>
+    <RadzenColumn class="rz-background-color-danger-lighter rz-color-danger rz-py-5">5</RadzenColumn>
+    <RadzenColumn class="rz-background-color-danger-lighter rz-color-danger rz-py-5">6</RadzenColumn>
+    <RadzenColumn class="rz-background-color-danger-lighter rz-color-danger rz-py-5">7</RadzenColumn>
+    <RadzenColumn class="rz-background-color-danger-lighter rz-color-danger rz-py-5">8</RadzenColumn>
+    <RadzenColumn class="rz-background-color-danger-lighter rz-color-danger rz-py-5">9</RadzenColumn>
+    <RadzenColumn class="rz-background-color-danger-lighter rz-color-danger rz-py-5">10</RadzenColumn>
+    <RadzenColumn class="rz-background-color-danger-lighter rz-color-danger rz-py-5">11</RadzenColumn>
+    <RadzenColumn class="rz-background-color-danger-lighter rz-color-danger rz-py-5">12</RadzenColumn>
+</RadzenRow>
+
+<RadzenText Anchor="column#auto-layout-columns" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Auto-layout columns
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    If column <code>Size</code> is not specified, the column width is automatically calculated with respect to the remaining free space available.  
+</RadzenText>
+<RadzenExample ComponentName="Column" Example="ColumnAutoLayout">
+    <ColumnAutoLayout />
+</RadzenExample>
+
+<RadzenText Anchor="column#column-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Column sizes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    When setting column <code>Size</code>, make sure that the total sum of all column sizes is not greater than 12. Otherwise, columns might wrap to a second row.
+</RadzenText>
+<RadzenExample ComponentName="Column" Example="ColumnSizes">
+    <ColumnSizes />
+</RadzenExample>
+
+<RadzenText Anchor="column#responsive-column-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Responsive column sizes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Resize your browser window to see how the column adapts to the predefined breakpoint sizes. See <a href="/breakpoints">Breakpoints</a> to learn more.
+</RadzenText>
+<RadzenExample ComponentName="Column" Example="ColumnResponsiveSizes">
+    <ColumnResponsiveSizes />
+</RadzenExample>
+
+<RadzenText Anchor="column#column-wrapping" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Column wrapping
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    4 RadzenColumns with Size="6" render on two lines in a RadzenRow. Use <code>RowGap</code> property to specify the vertical spacing between columns on two or more lines in a row.
+</RadzenText>
+<RadzenExample ComponentName="Column" Example="ColumnWrapping">
+    <ColumnWrapping />
+</RadzenExample>
+
+<RadzenText Anchor="column#column-offset" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Column offset
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The <code>Offset</code> property moves the column to the right following the grid column layout. E.g. <code>Offset="3"</code> offsets 3 columns to the right.
+</RadzenText>
+<RadzenExample ComponentName="Column" Example="ColumnOffset">
+    <ColumnOffset />
+</RadzenExample>
+
+<RadzenText Anchor="column#column-responsive-offset" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Responsive offsetting
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Resize your browser window to see how the column adapts to the predefined breakpoint sizes. See <a href="/breakpoints">Breakpoints</a> to learn more.
+</RadzenText>
+<RadzenExample ComponentName="Column" Example="ColumnResponsiveOffset">
+    <ColumnResponsiveOffset />
+</RadzenExample>
+
+<RadzenText Anchor="column#column-order" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Column order
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The <code>Order</code> property is used to reorder columns visually.
+</RadzenText>
+<RadzenExample ComponentName="Column" Example="ColumnOrder">
+    <ColumnOrder />
+</RadzenExample>
+
+<RadzenText Anchor="column#column-responsive-order" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Responsive column ordering
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    You can reorder columns on different screen sizes. Resize your browser window to see how the columns reorder. See <a href="/breakpoints">Breakpoints</a> to learn more.
+</RadzenText>
+<RadzenExample ComponentName="Column" Example="ColumnResponsiveOrder">
+    <ColumnResponsiveOrder />
+</RadzenExample>
+
+<RadzenText Anchor="column#nested-layouts" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Nested Layouts
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    You can reorder columns on different screen sizes. Resize your browser window to see how the columns reorder. See <a href="/breakpoints">Breakpoints</a> to learn more.
+</RadzenText>
+<RadzenExample ComponentName="Column" Example="ColumnNestedLayouts">
+    <ColumnNestedLayouts />
+</RadzenExample>
+
+<RadzenText Anchor="column#gutters" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Gutters
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    By default, the spacing between columns is set to <code>1rem</code>, via the <code>--rz-gap</code> CSS variable. Spacing between coulmns can be controlled by setting the <code>Gap</code> property of the parent <code>RadzenRow</code> component.
+</RadzenText>
+<RadzenExample ComponentName="Column" Example="ColumnGutters">
+    <ColumnGutters />
+</RadzenExample>

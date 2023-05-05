@@ -1,10 +1,37 @@
-$chart-axis-color: rgba($greyish-brown, 0.2) !default;
-$chart-axis-label-color: rgba($greyish-brown, 0.5) !default;
+$chart-axis-color: var(--rz-base-300) !default;
+$chart-axis-label-color: var(--rz-text-secondary-color) !default;
 $chart-axis-font-size: 0.875rem !default;
-$chart-tooltip-background: rgba(#fff, 0.95) !default;
-$chart-tooltip-color: $body-color !default;
+$chart-legend-font-size: 0.875rem !default;
+$chart-tooltip-background: var(--rz-base-background-color) !default;
+$chart-tooltip-color: var(--rz-text-color) !default;
 
-$color-schemes: (
+$chart-color-schemes: (
+  pastel: (
+    var(--rz-series-1),
+    var(--rz-series-2),
+    var(--rz-series-3),
+    var(--rz-series-4),
+    var(--rz-series-5),
+    var(--rz-series-6),
+    var(--rz-series-7),
+    var(--rz-series-8),
+    var(--rz-series-9),
+    var(--rz-series-10),
+    var(--rz-series-11),
+    var(--rz-series-12),
+    var(--rz-series-13),
+    var(--rz-series-14),
+    var(--rz-series-15),
+    var(--rz-series-16),
+    var(--rz-series-17),
+    var(--rz-series-18),
+    var(--rz-series-19),
+    var(--rz-series-20),
+    var(--rz-series-21),
+    var(--rz-series-22),
+    var(--rz-series-23),
+    var(--rz-series-24)
+  ),
   palette: (
     #003f5c,
     #2f4b7c,
@@ -14,16 +41,6 @@ $color-schemes: (
     #f95d6a,
     #ff7c43,
     #ffa600
-  ),
-  pastel: (
-    #0479cc,
-    #68d5c8,
-    #ff6d41,
-    #cb6992,
-    #e6c54f,
-    #f9777f,
-    #5dbf74,
-    #4db9f2
   ),
   monochrome: (
     #004c6d,
@@ -48,34 +65,15 @@ $color-schemes: (
   )
 ) !default;
 
-.chart,
-.pie {
-  height: 200px;
+// Chart CSS variables
 
-  .ngx-charts {
-    overflow: visible !important;
-
-    .gridline-path {
-      stroke: $chart-axis-color;
-    }
-  }
-
-  .chart-legend {
-    .legend-labels {
-      background-color: transparent;
-    }
-  }
-
-  .legend-title {
-    display: none;
-  }
-
-  .tick {
-    text {
-      fill: $chart-axis-label-color;
-      font-size: $chart-axis-font-size !important;
-    }
-  }
+:root {
+  --rz-chart-axis-color: #{$chart-axis-color};
+  --rz-chart-axis-label-color: #{$chart-axis-label-color};
+  --rz-chart-axis-font-size: #{$chart-axis-font-size};
+  --rz-chart-legend-font-size: #{$chart-legend-font-size};
+  --rz-chart-tooltip-background: #{$chart-tooltip-background};
+  --rz-chart-tooltip-color: #{$chart-tooltip-color};
 }
 
 .rz-chart {
@@ -87,7 +85,7 @@ $color-schemes: (
   fill-opacity: 0.8;
 }
 
-@each $scheme, $colors in $color-schemes {
+@each $scheme, $colors in $chart-color-schemes {
   @each $color in $colors {
     $index: index($colors, $color);
     .rz-scheme-#{$scheme} {
@@ -123,17 +121,21 @@ $color-schemes: (
 }
 
 .rz-axis {
-  stroke: $chart-axis-color;
-  font-size: 0.875em;
+  stroke: var(--rz-chart-axis-color);
+  font-size: var(--rz-chart-axis-font-size);
 }
 
 .rz-axis .rz-grid-line {
-  stroke: $chart-axis-color;
+  stroke: var(--rz-chart-axis-color);
 }
 
 .rz-tick-text {
   stroke: none;
-  fill: $chart-axis-label-color;
+  fill: var(--rz-chart-axis-label-color);
+}
+
+.rz-series-data-label {
+  fill: var(--rz-chart-axis-label-color);
 }
 
 .rz-value-axis .rz-tick-text {
@@ -147,10 +149,12 @@ $color-schemes: (
 .rz-axis .rz-axis-title {
   stroke: none;
   text-anchor: middle;
+  fill: var(--rz-text-title-color)
 }
 
 .rz-donut-title {
   text-anchor: middle;
+  fill: var(--rz-text-title-color)
 }
 
 .rz-donut-content {
@@ -164,6 +168,7 @@ $color-schemes: (
 .rz-legend {
   position: absolute;
   display: flex;
+  font-size: var(--rz-chart-legend-font-size);
 }
 
 .rz-legend-right {
@@ -225,11 +230,11 @@ $color-schemes: (
 }
 
 .rz-chart-tooltip-content {
-  background: $chart-tooltip-background;
-  color: $chart-tooltip-color;
+  background: var(--rz-chart-tooltip-background);
+  color: var(--rz-chart-tooltip-color);
   box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15);
-  padding: 0.25rem 1rem;
-  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--rz-border-radius);
   white-space: nowrap;
 }
 

@@ -1,0 +1,10 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenNumeric TValue="double" Format="0.0000" @bind-Value=@value />
+    <RadzenNumeric TValue="double" Format="c" @bind-Value=@value />
+    <RadzenNumeric TValue="double" Format="### m2" @bind-Value=@value />
+
+</div>
+
+@code{
+    double value = 0.0;
+}

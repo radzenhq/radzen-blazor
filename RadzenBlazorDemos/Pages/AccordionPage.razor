@@ -1,53 +1,32 @@
 ﻿@page "/accordion"
 
-<RadzenExample Name="Accordion">
-<div class="row px-3" style="min-height: 200px;">
-    <div class="col-xl-6 p-3">
-        <RadzenCard>
-            <h4>Accordion with single expand</h4>
-            <RadzenAccordion Expand=@(args => Change(args, "Accordion with single expand", "expanded"))>
-                <Items>
-                    <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
-                        Details for Orders
-                    </RadzenAccordionItem>
-                    <RadzenAccordionItem Text="Employees" Icon="account_box">
-                        Details for Employees
-                    </RadzenAccordionItem>
-                    <RadzenAccordionItem Text="Customers" Icon="accessibility">
-                        Details for Customers
-                    </RadzenAccordionItem>
-                </Items>
-            </RadzenAccordion>
-        </RadzenCard>
-    </div>
-    <div class="col-xl-6 p-3">
-        <RadzenCard>
-            <h4>Accordion with multiple expand</h4>
-            <RadzenAccordion Multiple="true" Collapse=@(args => Change(args, "Accordion with multiple expand", "collapsed"))
-                                Expand=@(args => Change(args, "Accordion with multiple expand", "expanded"))>
-                <Items>
-                    <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
-                        Details for Orders
-                    </RadzenAccordionItem>
-                    <RadzenAccordionItem Text="Employees" Icon="account_box">
-                        Details for Employees
-                    </RadzenAccordionItem>
-                    <RadzenAccordionItem Text="Customers" Icon="accessibility">
-                        Details for Customers
-                    </RadzenAccordionItem>
-                </Items>
-            </RadzenAccordion>
-        </RadzenCard>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Accordion
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor Accordion component.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-mb-6">
+    Accordion with single expand
+</RadzenText>
+<RadzenExample ComponentName="Accordion" Example="AccordionSingleExpand">
+    <AccordionSingleExpand />
 </RadzenExample>
 
-<EventConsole @ref=@console Class="mt-4" />
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Accordion with multiple expand
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set <code>Multiple</code> to <code>true</code> to enable multiple expand.
+</RadzenText>
+<RadzenExample ComponentName="Accordion" Example="AccordionMultipleExpand">
+    <AccordionMultipleExpand />
+</RadzenExample>
 
-@code {
-    EventConsole console;
-    void Change(object value, string name, string action)
-    {
-        console.Log($"{name} item with index {value} {action}");
-    }
-}
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-mb-6">
+    Expand/Collapse events
+</RadzenText>
+<RadzenExample ComponentName="Accordion" Example="AccordionEvents">
+    <AccordionEvents />
+</RadzenExample>

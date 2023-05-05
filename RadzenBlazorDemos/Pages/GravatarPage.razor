@@ -1,6 +1,18 @@
 ﻿@page "/gravatar"
 
-<RadzenExample Name="Gravatar">
-<h3>Gravatar with email (info@radzen.com)</h3>
-<RadzenGravatar Email="info@radzen.com" />
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Gravatar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Gravatar</strong> component.
+</RadzenText>
+
+<RadzenText Anchor="gravatar#gravatar-with-email" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Gravatar with email (info@radzen.com)
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use it to display an image from a specified email.
+</RadzenText>
+<RadzenExample ComponentName="Gravatar" Example="GravatarConfig">
+    <GravatarConfig />
 </RadzenExample>

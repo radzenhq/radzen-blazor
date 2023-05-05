@@ -2,25 +2,25 @@
 
 <EditorDropDown Title=@Title Value=@Editor.State.FormatBlock Change=@OnChange Placeholder="@Placeholder"
     PopupStyle="width: 200px; max-height: 200px; overflow: auto;">
-    <EditorDropDownItem Text="Normal" Value="p">
+    <EditorDropDownItem Text=@NormalText Value="p">
         <p style="margin:0">@context.Text</p>
     </EditorDropDownItem>
-    <EditorDropDownItem Text="Heading 1" Value="h1">
+    <EditorDropDownItem Text=@Heading1Text Value="h1">
         <h1>@context.Text</h1>
     </EditorDropDownItem>
-    <EditorDropDownItem Text="Heading 2" Value="h2">
+    <EditorDropDownItem Text=@Heading2Text Value="h2">
         <h2>@context.Text</h2>
     </EditorDropDownItem>
-    <EditorDropDownItem Text="Heading 3" Value="h3">
+    <EditorDropDownItem Text=@Heading3Text Value="h3">
         <h3>@context.Text</h3>
     </EditorDropDownItem>
-    <EditorDropDownItem Text="Heading 4" Value="h4">
+    <EditorDropDownItem Text=@Heading4Text Value="h4">
         <h4>@context.Text</h4>
     </EditorDropDownItem>
-    <EditorDropDownItem Text="Heading 5" Value="h5">
+    <EditorDropDownItem Text=@Heading5Text Value="h5">
         <h5>@context.Text</h5>
     </EditorDropDownItem>
-    <EditorDropDownItem Text="Heading 6" Value="h6">
+    <EditorDropDownItem Text=@Heading6Text Value="h6">
         <h6>@context.Text</h6>
     </EditorDropDownItem>
 </EditorDropDown>

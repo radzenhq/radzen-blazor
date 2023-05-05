@@ -1,0 +1,107 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenStack Gap="2rem">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+        <RadzenCheckBox @bind-Value="@auto" Name="auto" />
+        <RadzenLabel Text="Auto filter" Component="auto" Class="rz-me-6" />
+        <RadzenButton Text="Apply Filter" Click="@(args => dataFilter.Filter())" Disabled="@auto" Size="ButtonSize.Small" />
+    </RadzenStack>
+
+    <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => filteredOrders = view.ToList())>
+        <Properties>
+            <RadzenDataFilterProperty TItem="Order" Property="OrderID" Title="Order ID" FilterValue="@selectedIds" 
+                Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.Contains">
+                <FilterTemplate>
+                        <RadzenDropDown @bind-Value=@selectedIds Style="width:100%;"
+                        Change=@OnSelectedIdsChange Data="@(orderIds)" AllowClear="true" Multiple="true" />
+                </FilterTemplate>
+            </RadzenDataFilterProperty>
+            <RadzenDataFilterProperty TItem="Order" Property="Employee.LastName" Title="Employee Last Name" />
+            <MyCustomDataFilterProperty TItem="Order" Property="OrderDate" Title="Order Date" />
+            <RadzenDataFilterProperty TItem="Order" Property="Freight" Title="Freight" />
+        </Properties>
+    </RadzenDataFilter>
+
+    <RadzenDataGrid @ref="ordersGrid" AllowPaging="true" AllowSorting="true" Data="@(filteredOrders ?? orders)" TItem="Order"
+        ColumnWidth="200px" PageSize="20" Style="height: 500px">
+        <Columns>
+            <RadzenDataGridColumn Width="50px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Frozen=true>
+                <Template>
+                    @(orders.IndexOf(context) + 1)
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID">
+                <FooterTemplate>
+                    Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
+            <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
+                <Template Context="order">
+                    @order.Employee?.FirstName @order.Employee?.LastName
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}">
+                <FooterTemplate>
+                    Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).LastOrDefault()?.OrderDate)</b>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
+                <Template Context="order">
+                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+                </Template>
+                <FooterTemplate>
+                    Total amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orders.Sum(o => o.Freight))</b>
+                </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    bool auto = true;
+    RadzenDataFilter<Order> dataFilter;
+
+    IList<Order> filteredOrders;
+    IList<Order> orders;
+    RadzenDataGrid<Order> ordersGrid;
+
+    IEnumerable<int> selectedIds;
+    IEnumerable<int> orderIds;
+
+    void OnSelectedIdsChange(object value)
+    {
+        if (selectedIds != null && !selectedIds.Any())
+        {
+            selectedIds = null;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+        orderIds = orders.Select(o => o.OrderID).Distinct();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await dataFilter.AddFilter(new CompositeFilterDescriptor() 
+            { 
+                Property = "Employee.LastName", 
+                FilterValue = "Buchanan", 
+                FilterOperator = FilterOperator.Contains 
+            });
+        }
+    }
+}
