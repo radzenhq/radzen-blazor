@@ -733,7 +733,7 @@ namespace Radzen.Blazor
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
             }
-            OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
+            await OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
         }
 
         internal IReadOnlyDictionary<string, object> CellAttributes(TItem item, RadzenDataGridColumn<TItem> column)
