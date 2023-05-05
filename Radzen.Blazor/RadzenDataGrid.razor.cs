@@ -2703,7 +2703,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override async Task OnPageSizeChanged(int value)
         {
-            pageSize = value;
+            //pageSize = value;
 
             SaveSettings();
 
