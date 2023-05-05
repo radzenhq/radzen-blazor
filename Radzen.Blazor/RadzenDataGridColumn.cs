@@ -230,7 +230,10 @@ namespace Radzen.Blazor
             return _title ?? Title;
         }
 
-        internal void SetTitle(string value)
+        /// <summary>
+        /// Sets the column title.
+        /// </summary>
+        public void SetTitle(string value)
         {
             _title = value;
         }
