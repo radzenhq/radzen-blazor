@@ -113,9 +113,13 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
   }
 
   &.rz-state-disabled {
-    @extend %input-disabled;
     cursor: initial;
+    color: var(--rz-input-disabled-color);
+    box-shadow: var(--rz-input-disabled-shadow);
+    background-color: var(--rz-input-disabled-background-color);
+    border: var(--rz-input-disabled-border);
     border-width: var(--rz-checkbox-border-width);
+    opacity: var(--rz-input-disabled-opacity);
   }
 
   .rzi {
@@ -148,23 +152,16 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
     background-color: var(--rz-checkbox-checked-background-color);
     border: var(--rz-checkbox-checked-border);
 
-    &:hover {
+    &:hover:not(.rz-state-disabled) {
       background-color: var(--rz-checkbox-checked-hover-background-color);
       border: var(--rz-checkbox-checked-hover-border);
 
     }
-  }
 
-  &.rz-state-disabled {
-
-    &.rz-state-active {
+    &.rz-state-disabled {
       background-color: var(--rz-checkbox-checked-disabled-background-color);
       border: var(--rz-checkbox-checked-disabled-border);
       opacity: 0.5;
-
-      &:hover {
-        background-color: var(--rz-checkbox-checked-disabled-background-color);
-      }
     }
   }
 }

@@ -118,6 +118,7 @@ $radio-checked-border: var(--rz-input-border) !default;
   }
 
   &.rz-state-disabled {
+    cursor: initial;
     box-shadow: var(--rz-input-disabled-shadow);
     background-color: var(--rz-input-disabled-background-color);
     border: var(--rz-input-disabled-border);
