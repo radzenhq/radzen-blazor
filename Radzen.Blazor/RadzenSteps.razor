@@ -43,7 +43,7 @@
         var step = steps[i];
         @if (step.Visible)
         {
-            @if (i == SelectedIndex)
+            @if (IsSelected(i, step))
             {
                 <div class="rz-widget-content">
                     @if (step.ChildContent != null)
