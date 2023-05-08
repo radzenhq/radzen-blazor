@@ -94,6 +94,7 @@ namespace Radzen.Blazor
         ///   &lt;/ChildContent&gt;
         /// &lt;/RadzenFormField&gt;
         /// </code>
+        /// </example>
         [Parameter]
         public RenderFragment Helper { get; set; }
 

@@ -9,24 +9,43 @@ namespace Radzen.Blazor
     /// </summary>
     public enum TextStyle
     {
+        /// <summary>Display as largest header.</summary>
         DisplayH1,
+        /// <summary>Display as second largest header.</summary>
         DisplayH2,
+        /// <summary>Display as third largest header.</summary>
         DisplayH3,
+        /// <summary>Display as fourth largest header.</summary>
         DisplayH4,
+        /// <summary>Display as fifth largest header.</summary>
         DisplayH5,
+        /// <summary>Display as sixth largest header.</summary>
         DisplayH6,
+        /// <summary>Display as H1 element.</summary>
         H1,
+        /// <summary>Display as H2 element.</summary>
         H2,
+        /// <summary>Display as H3 element.</summary>
         H3,
+        /// <summary>Display as H4 element.</summary>
         H4,
+        /// <summary>Display as H5 element.</summary>
         H5,
+        /// <summary>Display as H6 element.</summary>
         H6,
+        /// <summary>Display as subtitle.</summary>
         Subtitle1,
+        /// <summary>Display as a smaller subtitle.</summary>
         Subtitle2,
+        /// <summary>Display as a paragraph.</summary>
         Body1,
+        /// <summary>Display as a smaller paragraph.</summary>
         Body2,
+        /// <summary>Display as button text.</summary>
         Button,
+        /// <summary>Display as a caption.</summary>
         Caption,
+        /// <summary>Display as overline.</summary>
         Overline
     }
 
