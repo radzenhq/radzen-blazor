@@ -93,6 +93,7 @@ namespace Radzen.Blazor
         /// .   &lt;RadzenTextBox @bind-Value="@text" Name="Text" /&gt;
         ///   &lt;/ChildContent&gt;
         /// &lt;/RadzenFormField&gt;
+        /// </code>
         [Parameter]
         public RenderFragment Helper { get; set; }
 
