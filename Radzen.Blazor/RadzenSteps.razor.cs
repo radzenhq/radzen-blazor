@@ -257,17 +257,6 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        /// <summary>
-        /// Determines whether the specified index is selected.
-        /// </summary>
-        /// <param name="index">The index.</param>
-        /// <param name="step">The step.</param>
-        /// <returns><c>true</c> if the specified index is selected; otherwise, <c>false</c>.</returns>
-        protected bool IsSelected(int index, RadzenStepsItem step)
-        {
-            return SelectedIndex == index;
-        }
-
         internal async System.Threading.Tasks.Task SelectStep(RadzenStepsItem step, bool raiseChange = false)
         {
             var valid = true;
