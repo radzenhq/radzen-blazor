@@ -19,7 +19,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenAlert : RadzenComponentWithChildren
     {
-        private string getAlertSize()
+        private string GetAlertSize()
         {
             return Size == AlertSize.Medium ? "md" : Size == AlertSize.Large ? "lg" : Size == AlertSize.Small ? "sm" : "xs";
         }
@@ -46,7 +46,7 @@ namespace Radzen.Blazor
         public string Title { get; set; }
 
         /// <summary>
-        /// Gets or sets the text of the alert. Overriden by <see cref="ChildContent" />.
+        /// Gets or sets the text of the alert. Overriden by <see cref="RadzenComponentWithChildren.ChildContent" />.
         /// </summary>
         /// <value>The title.</value>
         [Parameter]
@@ -87,7 +87,7 @@ namespace Radzen.Blazor
         [Parameter]
         public AlertSize Size { get; set; } = AlertSize.Medium;
 
-        ButtonSize getCloseButtonSize()
+        ButtonSize GetCloseButtonSize()
         {
             return Size == AlertSize.ExtraSmall ? ButtonSize.ExtraSmall : ButtonSize.Small;
         }
@@ -101,7 +101,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-alert rz-alert-{getAlertSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(AlertStyle), AlertStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()}";
+            return $"rz-alert rz-alert-{GetAlertSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(AlertStyle), AlertStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()}";
         }
 
         string getIcon()
