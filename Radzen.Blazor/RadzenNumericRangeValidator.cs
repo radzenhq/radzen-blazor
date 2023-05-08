@@ -84,7 +84,7 @@ namespace Radzen.Blazor
                 convertedValue = Convert.ChangeType(value, type);
                 return true;
             }
-            catch (InvalidCastException)
+            catch (Exception ex) when (ex is InvalidCastException || ex is OverflowException)
             {
                 convertedValue = null;
                 return false;

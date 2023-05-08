@@ -56,6 +56,20 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Returns_False_If_Value_Overflows()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
+
+            component.SetParametersAndRender(parameters =>
+            {
+                component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0).Add(p => p.Max, 10));
+            });
+
+            Assert.False(component.Instance.Validate(long.MaxValue));
+        }
+
+        [Fact]
         public void Returns_True_If_Value_Is_Greater_Than_Min()
         {
             using var ctx = new TestContext();
