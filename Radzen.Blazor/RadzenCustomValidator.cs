@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 
+using System.Threading.Tasks;
+
 namespace Radzen.Blazor
 {
     /// <summary>
@@ -29,10 +31,10 @@ namespace Radzen.Blazor
     ///         new Model("Smith", "andy@smith.com")
     ///    };
     ///    
-    ///    bool ValidateNewEmail(string email)
-    ///    {
+    ///   async Task<bool> ValidateNewEmail(string email)
+    ///   {
     ///        return models.Where(m => m.Email.ToUpper().Equals(email?.ToUpper())).Count() == 0;
-    ///    }
+    ///   }
     /// }
     /// </code>
     /// </example>
@@ -45,15 +47,15 @@ namespace Radzen.Blazor
         public override string Text { get; set; } = "Value should match";
 
         /// <summary>
-        /// Gets or sets the Valid. Set to <c>false</c> by default.
+        /// Gets or sets the Valid. Set to <c>Task.FromResult(false)</c> by default.
         /// </summary>
         [Parameter]
-        public bool CheckIsValid { get; set; } = false;
+        public Task<bool> CheckIsValid { get; set; } = Task.FromResult(false);
 
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
-            return CheckIsValid;
+            return CheckIsValid.GetAwaiter().GetResult();
         }
     }
 }
