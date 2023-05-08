@@ -39,7 +39,8 @@ The RadzenNotification is used via the [NotificationService](xref:Radzen.Notific
    ```
 ***
 ## Add to layout
-You also need to add the RadzeNotification component to the layout used by your pages (most commonly `MainLayout.razor`). 
+You also need to add the RadzeNotification component to the layout used by your pages (most commonly `MainLayout.razor`).
 ```
 <RadzenNotification />
 ```
+>> Important! Make sure that you do not nest `<RadzenNotification />` inside a positioned element (i.e. with position: relative, position: absolute or position: fixed). To be safe you can add it at the end of the layout file after all other elements.

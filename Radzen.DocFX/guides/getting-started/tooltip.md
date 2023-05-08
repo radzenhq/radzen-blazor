@@ -39,7 +39,8 @@ The RadzenTooltip is used via the [TooltipService](xref:Radzen.TooltipService) c
    ```
 ***
 ## Add to layout
-You also need to add the RadzeTooltip component to the layout used by your pages (most commonly `MainLayout.razor`). 
+You also need to add the RadzeTooltip component to the layout used by your pages (most commonly `MainLayout.razor`).
 ```
 <RadzenTooltip />
 ```
+>> Important! Make sure that you do not nest `<RadzenTooltip />` inside a positioned element (i.e. with position: relative, position: absolute or position: fixed). To be safe you can add it at the end of the layout file after all other elements.

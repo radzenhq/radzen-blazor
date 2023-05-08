@@ -132,6 +132,10 @@
             <li><code>&lt;RadzenContextMenu/&gt;</code></li>
             <li><code>&lt;RadzenTooltip/&gt;</code></li>
         </ul>
+        <RadzenAlert AlertStyle="AlertStyle.Warning">
+            Make sure that you do not nest RadzenDialog, RadzenNotification, RadzenContextMenu or RadzenTooltip inside a positioned element (i.e. with position: relative, position: absolute or position: fixed).
+            To be safe you can add them at the end of the layout file after all other elements.
+        </RadzenAlert>
         <RadzenText>
             Open <code>Startup.cs</code> file (Blazor Server before .NET 6) or <code>Program.cs</code> (Blazor WebAssembly or Blazor Server after .NET 6) and add:
         </RadzenText>
