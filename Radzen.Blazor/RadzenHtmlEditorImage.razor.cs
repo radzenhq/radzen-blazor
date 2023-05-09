@@ -13,7 +13,7 @@ namespace Radzen.Blazor
     ///  &lt;RadzenHtmlEditorImage /&gt;
     /// &lt;/RadzenHtmlEdito&gt;
     /// @code {
-    ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!"; 
+    ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!";
     /// }
     /// </code>
     /// </example>
@@ -107,6 +107,11 @@ namespace Radzen.Blazor
             {
                 DialogService.Close(true);
             }
+        }
+
+        async Task OnUploadError(UploadErrorEventArgs args)
+        {
+            await Editor.OnError(args.Message);
         }
 
         async Task InsertHtml()
