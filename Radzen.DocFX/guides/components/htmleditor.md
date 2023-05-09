@@ -53,6 +53,7 @@ The Radzen HtmlEditor supports the following tools:
 - RadzenHtmlEditorColor - sets the foreground color of the selected text.
 - RadzenHtmlEditorBackground - sets the background color of the selected text.
 - RadzenHtmlEditorRemoveFormat - removes the visual styling of the selected text.
+- RadzenHtmlEditorSource - edit the HTML source as text.
 - RadzenHtmlEditorSubscript - converts the selected text to subscript.
 - RadzenHtmlEditorSuperscript - converts the selected text to superscript
 - RadzenHtmlEditorLink - inserts a hyperlink.
@@ -99,6 +100,8 @@ By default RadzenHtmlEditor uses these tools:
 <RadzenHtmlEditorFontName />
 <RadzenHtmlEditorFontSize />
 <RadzenHtmlEditorFormatBlock />
+<RadzenHtmlEditorSeparator />
+<RadzenHtmlEditorSource />
 ```
 ### Custom tools
 RadzenHtmlEditor allows the developer to create custom tools via the `RadzenHtmlEditorCustomTool` tag.
