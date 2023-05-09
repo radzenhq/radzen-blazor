@@ -990,7 +990,10 @@ namespace Radzen.Blazor
             });
         }
 
-        internal string GetFilterOperatorText(FilterOperator filterOperator)
+        /// <summary>
+        /// Get filter operator text
+        /// </summary>
+        public string GetFilterOperatorText(FilterOperator filterOperator)
         {
             switch (filterOperator)
             {
