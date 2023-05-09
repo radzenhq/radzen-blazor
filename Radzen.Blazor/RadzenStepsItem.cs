@@ -25,10 +25,7 @@ namespace Radzen.Blazor
                 if (_text != value)
                 {
                     _text = value;
-                    if (Steps != null)
-                    {
-                        Steps.Refresh();
-                    }
+                    Steps?.Refresh();
                 }
             }
         }
@@ -64,10 +61,7 @@ namespace Radzen.Blazor
                 if (_visible != value)
                 {
                     _visible = value;
-                    if (Steps != null)
-                    {
-                        Steps.Refresh();
-                    }
+                    Steps?.Refresh();
                 }
             }
         }
@@ -89,10 +83,7 @@ namespace Radzen.Blazor
                 if (_disabled != value)
                 {
                     _disabled = value;
-                    if (Steps != null)
-                    {
-                        Steps.Refresh();
-                    }
+                    Steps?.Refresh();
                 }
             }
         }
@@ -148,6 +139,17 @@ namespace Radzen.Blazor
             }
 
             await base.SetParametersAsync(parameters);
+        }
+
+        internal string GetItemCssClass()
+        {
+            return GetCssClass();
+        }
+
+        /// <inheritdoc />
+        protected override string GetComponentCssClass()
+        {
+            return $"rz-steps-item {(Steps.StepsCollection.IndexOf(this) == Steps.SelectedIndex ? "rz-state-highlight rz-steps-current" : string.Empty)} {(Disabled ? "rz-state-disabled" : string.Empty)}";
         }
 
         /// <summary>
