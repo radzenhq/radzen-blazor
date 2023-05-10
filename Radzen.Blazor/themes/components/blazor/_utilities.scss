@@ -52,6 +52,42 @@ $rz-theme-colors-map: map-merge(
     "danger-lighter": $rz-danger-lighter,
     "danger-dark": $rz-danger-dark,
     "danger-darker": $rz-danger-darker,
+
+    "on-primary": $rz-white,
+    "on-primary-light": $rz-white,
+    "on-primary-lighter": $rz-primary,
+    "on-primary-dark": $rz-white,
+    "on-primary-darker": $rz-white,
+    
+    "on-secondary": $rz-white,
+    "on-secondary-light": $rz-white,
+    "on-secondary-lighter": $rz-secondary,
+    "on-secondary-dark": $rz-white,
+    "on-secondary-darker": $rz-white,
+    
+    "on-info": $rz-white,
+    "on-info-light": $rz-white,
+    "on-info-lighter": $rz-info,
+    "on-info-dark": $rz-white,
+    "on-info-darker": $rz-white,
+    
+    "on-success": $rz-white,
+    "on-success-light": $rz-white,
+    "on-success-lighter": $rz-success,
+    "on-success-dark": $rz-white,
+    "on-success-darker": $rz-white,
+    
+    "on-warning": $rz-white,
+    "on-warning-light": $rz-white,
+    "on-warning-lighter": $rz-warning,
+    "on-warning-dark": $rz-white,
+    "on-warning-darker": $rz-white,
+    
+    "on-danger": $rz-white,
+    "on-danger-light": $rz-white,
+    "on-danger-lighter": $rz-danger,
+    "on-danger-dark": $rz-white,
+    "on-danger-darker": $rz-white,
     
     "series-1": $rz-series-1,
     "series-2": $rz-series-2,
@@ -209,31 +245,31 @@ $severity-styles-map: map-merge(
   (
     primary: (
       background-color: var(--rz-primary),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-primary)
     ),
     secondary: (
       background-color: var(--rz-secondary),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-secondary)
     ),
     info: (
       background-color: var(--rz-info),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-info)
     ),
     warning: (
       background-color: var(--rz-warning),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-warning)
     ),
     error: (
       background-color: var(--rz-danger),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-danger)
     ),
     danger: (
       background-color: var(--rz-danger),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-danger)
     ),
     success: (
       background-color: var(--rz-success),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-success)
     )
   ),
   $severity-styles-map

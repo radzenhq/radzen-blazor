@@ -190,7 +190,8 @@ $badge-styles: () !default;
 $badge-styles: map-merge(
   (
     primary: (
-      background-color: var(--rz-primary)
+      background-color: var(--rz-primary),
+      color: var(--rz-on-rimary)
     ),
     light: (
       background-color: var(--rz-base-200),
@@ -201,19 +202,24 @@ $badge-styles: map-merge(
       color: var(--rz-secondary)
     ),
     info: (
-      background-color: var(--rz-info)
+      background-color: var(--rz-info),
+      color: var(--rz-on-info)
     ),
     warning: (
-      background-color: var(--rz-warning)
+      background-color: var(--rz-warning),
+      color: var(--rz-on-warning)
     ),
     error: (
-      background-color: var(--rz-danger)
+      background-color: var(--rz-danger),
+      color: var(--rz-on-danger)
     ),
     danger: (
-      background-color: var(--rz-danger)
+      background-color: var(--rz-danger),
+      color: var(--rz-on-danger)
     ),
     success: (
-      background-color: var(--rz-success)
+      background-color: var(--rz-success),
+      color: var(--rz-on-success)
     )
   ),
   $badge-styles
