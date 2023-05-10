@@ -51,6 +51,10 @@ $numeric-button-disabled-color: var(--rz-text-disabled-color) !default;
     }
   }
 
+  &:focus-within:not(.rz-state-disabled) {
+    @extend %input-focus;
+  }
+
   &.rz-state-disabled {
     @extend %input-disabled;
 

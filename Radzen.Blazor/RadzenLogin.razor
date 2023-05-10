@@ -3,6 +3,50 @@
 @if (Visible)
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+        @if (FormFieldVariant != null)
+        {
+            <RadzenStack>
+                <RadzenFormField Text="@UserText" Variant="@FormFieldVariant.Value">
+                    <ChildContent>
+                        <RadzenTextBox AutoComplete=@AutoComplete AutoCompleteType=@UserNameAutoCompleteType id=@Id("username") Name="Username" @bind-Value=@username />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="Username" Text=@UserRequired />
+                    </Helper>
+                </RadzenFormField>
+                <RadzenFormField Text="@PasswordText" Variant="@FormFieldVariant.Value">
+                    <ChildContent>
+                        <RadzenPassword id=@Id("password") AutoComplete=@AutoComplete AutoCompleteType=@PasswordAutoCompleteType Name="Password" @bind-Value=@password />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="Password" Text=@PasswordRequired />
+                    </Helper>
+                </RadzenFormField>
+                @if (AllowRememberMe)
+                {
+                    <RadzenSwitch @bind-Value="@rememberMe" id=@Id("rememberMe") Name="RememberMe" />
+                }
+            </RadzenStack>
+            <RadzenStack style="margin-top:1rem;" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                @if(ShowLoginButton)
+                {
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text=@LoginText Click=@OnLogin />
+                }
+                @if (AllowResetPassword)
+                {
+                    <a class="rz-link" @onclick=@OnReset>@ResetPasswordText</a>
+                }
+            </RadzenStack>
+            @if (AllowRegister)
+            {
+                <div class="rz-register">
+                    @RegisterMessageText
+                    <RadzenButton ButtonType="ButtonType.Button" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Lighter" Text=@RegisterText Click=@OnRegister />
+                </div>
+            }
+        }
+        else
+        {
         <div class="rz-form">
             <div class="rz-form-row">
                 <label class="rz-label" for=@Id("username")>@UserText</label>
@@ -45,6 +89,7 @@
                 @RegisterMessageText
                 <RadzenButton ButtonType="ButtonType.Button" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Lighter" Text=@RegisterText Click=@OnRegister />
             </div>
+        }
         }
     </div>
 }

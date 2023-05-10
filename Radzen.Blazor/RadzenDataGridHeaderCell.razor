@@ -81,7 +81,7 @@
                                 }
                                 else if (PropertyAccess.IsDate(Column.FilterPropertyType))
                                 {
-                                    <RadzenDatePicker TValue="@object" ShowTime="true" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
+                                    <RadzenDatePicker TValue="@object" ShowTime="@Column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
                                                       Value="@Column.GetFilterValue()" Change="@(args => Column.SetFilterValue(args.Value))" AllowInput=@(Grid.AllowFilterDateInput) />
 
                                 }

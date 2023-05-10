@@ -5,18 +5,33 @@
 @inherits DbContextPage
 
 <div class="rz-p-sm-12 rz-text-align-center">
-    <RadzenDropDown FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
-                    Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" AllowClear="true" @bind-Value=value Style="width: 100%; max-width: 400px;" />
+    <RadzenDropDown @ref=@radzenDropDown FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                    Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" AllowClear="true" @bind-Value=value Style="width: 100%; max-width: 400px;" SearchTextChanged="@(args => searchTextChanged(args))"/>    
+</div>
+
+<div class="rz-p-sm-3 rz-text-align-left"> 
+    <RadzenLabel Text="@searchTextStatus" />
 </div>
 
 @code {
+    RadzenDropDown<string> radzenDropDown;
     IEnumerable<Customer> customers;
     string value;
+    string searchTextStatus;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
         customers = dbContext.Customers;
+    }
+
+    void searchTextChanged(string text)
+    {
+        searchTextStatus = $"Search text: {text}";
+
+        Console.WriteLine($"Search text: {radzenDropDown.SearchText}");
+
+        StateHasChanged();
     }
 }

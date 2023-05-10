@@ -1,0 +1,69 @@
+@page "/form-field"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    FormField
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Radzen Blazor <strong>FormField</strong> component features a floating label effect. When the user focuses on an empty input field, the label floats above, providing a visual cue as to which field is being filled out. This can help improve the layout and overall user experience of your forms.
+</RadzenText>
+
+<RadzenText ID="variants" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Variants
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The FormField can be easily customized to fit a wide range of form input needs. Set the <code>Variant</code> property to use Outlined, Flat, Filled, or Text variants.
+</RadzenText>
+<RadzenExample ComponentName="FormField" Example="FormFieldTextBox">
+    <FormFieldTextBox />
+</RadzenExample>
+
+<RadzenText ID="input-types" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Input types
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The FormField can be used to render different types of form input components, such as RadzenTextBox, RadzenPassword, RadzenDropDown and more.
+</RadzenText>
+<RadzenExample ComponentName="FormField" Example="FormFieldInputTypes">
+    <FormFieldInputTypes />
+</RadzenExample>
+
+<RadzenText ID="start-end-child-content" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Start, End, and ChildContent
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To render content before or after the input in a RadzenFormField, you need to add <code>&lt;Start&gt;</code> or <code>&lt;End&gt;</code> elements together with a <code>&lt;ChildContent&gt;</code> that contains the input component.
+</RadzenText>
+<RadzenExample ComponentName="FormField" Example="FormFieldChildContent">
+    <FormFieldChildContent />
+</RadzenExample>
+
+<RadzenText ID="start-end-child-content" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Helper text
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To display assistive content in a RadzenFormField, add <code>&lt;Helper&gt;</code> element after the <code>&lt;ChildContent&gt;</code>.
+</RadzenText>
+<RadzenExample ComponentName="FormField" Example="FormFieldHelper">
+    <FormFieldHelper />
+</RadzenExample>
+
+<RadzenText ID="form-field-validation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Validation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    You can use validators inside a FormField.
+</RadzenText>
+<RadzenExample ComponentName="FormField" Example="FormFieldValidation">
+    <FormFieldValidation />
+</RadzenExample>
+
+<RadzenText ID="disabled-form-field" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Disabled FormField
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To disable a FormField, just set the <code>Disabled</code> property of the input component to <code>true</code>.
+</RadzenText>
+<RadzenExample ComponentName="FormField" Example="FormFieldDisabled">
+    <FormFieldDisabled />
+</RadzenExample>
+

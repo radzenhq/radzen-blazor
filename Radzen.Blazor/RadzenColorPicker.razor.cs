@@ -151,16 +151,24 @@ namespace Radzen.Blazor
             }
         }
 
+        void UpdateColorUsingHsvHandles()
+        {
+            var hsv = new HSV {
+                Hue = HueHandleLeft,
+                Saturation = SaturationHandleLeft,
+                Value = 1 - SaturationHandleTop,
+                Alpha = AlphaHandleLeft
+            };
+            Color = hsv.ToRGB().ToCSS();
+            TriggerChange();
+        }
+
         void OnSaturationMove(DraggableEventArgs args)
         {
             SaturationHandleLeft = Math.Clamp((args.ClientX - args.Rect.Left) / args.Rect.Width, 0, 1);
             SaturationHandleTop = Math.Clamp((args.ClientY - args.Rect.Top) / args.Rect.Height, 0, 1);
 
-            var hsv = new HSV { Hue = HSV.Hue, Saturation = SaturationHandleLeft, Value = 1 - SaturationHandleTop, Alpha = AlphaHandleLeft };
-
-            Color = hsv.ToRGB().ToCSS();
-
-            TriggerChange();
+            UpdateColorUsingHsvHandles();
         }
 
         void TriggerChange()
@@ -176,23 +184,17 @@ namespace Radzen.Blazor
 
         void ChangeRGB(object value)
         {
-            SetValue(value as string);
-        }
-
-        void SetValue(string value)
-        {
-            var rgb = RGB.Parse(value);
-
+            var rgb = RGB.Parse(value as string);
             if (rgb != null)
             {
-                Color = rgb.ToCSS();
+                rgb.Alpha = AlphaHandleLeft;
                 UpdateColor(rgb);
             }
         }
 
         internal async Task SelectColor(string value)
         {
-            SetValue(value);
+            UpdateColor(RGB.Parse(value));
 
             if (!ShowButton)
             {
@@ -204,11 +206,12 @@ namespace Radzen.Blazor
         {
             Color = rgb.ToCSS();
 
-            HSV = rgb.ToHSV();
+            var hsv = rgb.ToHSV();
 
-            SaturationHandleLeft = HSV.Saturation;
-            SaturationHandleTop = 1 - HSV.Value;
-            HueHandleLeft = HSV.Hue;
+            SaturationHandleLeft = hsv.Saturation;
+            SaturationHandleTop = 1 - hsv.Value;
+            HueHandleLeft = hsv.Hue;
+            AlphaHandleLeft = hsv.Alpha;
 
             TriggerChange();
         }
@@ -258,25 +261,14 @@ namespace Radzen.Blazor
         {
             AlphaHandleLeft = Math.Round(Math.Clamp((args.ClientX - args.Rect.Left) / args.Rect.Width, 0, 1), 2);
 
-            HSV.Alpha = AlphaHandleLeft;
-
-            var hsv = new HSV { Hue = HSV.Hue, Saturation = SaturationHandleLeft, Value = 1 - SaturationHandleTop, Alpha = AlphaHandleLeft };
-
-            Color = hsv.ToRGB().ToCSS();
-
-            TriggerChange();
+            UpdateColorUsingHsvHandles();
         }
 
         void OnHueMove(DraggableEventArgs args)
         {
             HueHandleLeft = Math.Clamp((args.ClientX - args.Rect.Left) / args.Rect.Width, 0, 1);
 
-            HSV.Hue = HueHandleLeft;
-            var hsv = new HSV { Hue = HSV.Hue, Saturation = SaturationHandleLeft, Value = 1 - SaturationHandleTop, Alpha = AlphaHandleLeft };
-
-            Color = hsv.ToRGB().ToCSS();
-
-            TriggerChange();
+            UpdateColorUsingHsvHandles();
         }
 
         async Task OnClick()
@@ -284,6 +276,15 @@ namespace Radzen.Blazor
             await ValueChanged.InvokeAsync(Color);
             await Change.InvokeAsync(Color);
             await Popup.CloseAsync();
+        }
+
+        async Task OnClosePopup()
+        {
+            if (ShowButton)
+            {
+                SetInitialValue();
+            }
+            await Close.InvokeAsync(null);
         }
 
         /// <summary>
@@ -328,11 +329,10 @@ namespace Radzen.Blazor
         [Parameter]
         public PopupRenderMode PopupRenderMode { get; set; } = PopupRenderMode.Initial;
 
-        double SaturationHandleLeft { get; set; }
-        double HueHandleLeft { get; set; }
+        double SaturationHandleLeft { get; set; } = 0;
+        double SaturationHandleTop { get; set; } = 0;
+        double HueHandleLeft { get; set; } = 0;
         double AlphaHandleLeft { get; set; } = 1;
-        double SaturationHandleTop { get; set; }
-        HSV HSV { get; set; } = new HSV { Hue = 0, Saturation = 1, Value = 1 };
         string Color { get; set; } = "rgb(255, 255, 255)";
 
         async Task Toggle()
@@ -358,12 +358,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void OnInitialized()
         {
-            Init();
+            SetInitialValue();
 
             base.OnInitialized();
         }
 
-        void Init()
+        void SetInitialValue()
         {
             var value = Value;
 
@@ -376,17 +376,11 @@ namespace Radzen.Blazor
             {
                 Color = value;
 
-                HSV = RGB.Parse(Color).ToHSV();
-                SaturationHandleLeft = HSV.Saturation;
-                SaturationHandleTop = 1 - HSV.Value;
-                HSV.Saturation = 1;
-                HSV.Value = 1;
-                HueHandleLeft = HSV.Hue;
-
-                if (value.StartsWith("rgba"))
-                {
-                    AlphaHandleLeft = HSV.Alpha;
-                }
+                var hsv = RGB.Parse(Color).ToHSV();
+                SaturationHandleLeft = hsv.Saturation;
+                SaturationHandleTop = 1 - hsv.Value;
+                HueHandleLeft = hsv.Hue;
+                AlphaHandleLeft = hsv.Alpha;
             }
         }
 
@@ -399,7 +393,7 @@ namespace Radzen.Blazor
 
             if (valueChanged)
             {
-                Init();
+                SetInitialValue();
             }
         }
     }

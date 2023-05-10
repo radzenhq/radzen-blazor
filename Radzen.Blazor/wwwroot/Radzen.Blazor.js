@@ -978,13 +978,16 @@ window.Radzen = {
       document.body.classList.add('no-scroll');
     }
 
-    if (options.autoFocusFirstElement) {
-        setTimeout(function () {
-            var dialogs = document.querySelectorAll('.rz-dialog-content');
-            if (dialogs.length == 0) return;
-            var lastDialog = dialogs[dialogs.length - 1];
+    setTimeout(function () {
+        var dialogs = document.querySelectorAll('.rz-dialog-content');
+        if (dialogs.length == 0) return;
+        var lastDialog = dialogs[dialogs.length - 1];
 
-            if (lastDialog) {
+        if (lastDialog) {
+            lastDialog.removeEventListener('keydown', Radzen.focusTrapDialog);
+            lastDialog.addEventListener('keydown', Radzen.focusTrapDialog);
+
+            if (options.autoFocusFirstElement) {
                 if (lastDialog.querySelectorAll('.rz-html-editor-content').length) {
                     var editable = lastDialog.querySelector('.rz-html-editor-content');
                     if (editable) {
@@ -996,16 +999,16 @@ window.Radzen = {
                         selection.addRange(range);
                     }
                 } else {
-                    var focusable = [...lastDialog.querySelectorAll('a, button, input, textarea, select, details, iframe, embed, object, summary dialog, audio[controls], video[controls], [contenteditable], [tabindex]')]
-                        .filter(el => el && el.tabIndex > -1 && !el.hasAttribute('disabled') && !el.hasAttribute('hidden') && el.computedStyleMap && el.computedStyleMap().get('display').value !== 'none');
+                    var focusable = Radzen.getFocusableDialogElements();
                     var firstFocusable = focusable[0];
                     if (firstFocusable) {
                         firstFocusable.focus();
                     }
                 }
             }
-        }, 500);
-    }
+        }
+    }, 500);
+
     if (options.closeDialogOnEsc) {
         document.removeEventListener('keydown', Radzen.closePopupOrDialog);
         document.addEventListener('keydown', Radzen.closePopupOrDialog);
@@ -1013,7 +1016,39 @@ window.Radzen = {
   },
   closeDialog: function () {
     document.body.classList.remove('no-scroll');
-    document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+    var dialogs = document.querySelectorAll('.rz-dialog-content');
+    if (dialogs.length == 0) {
+        document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+    }
+  },
+  getFocusableDialogElements: function () {
+    var dialogs = document.querySelectorAll('.rz-dialog-content');
+    if (dialogs.length == 0) return [];
+    var lastDialog = dialogs[dialogs.length - 1];
+    return [...lastDialog.querySelectorAll('a, button, input, textarea, select, details, iframe, embed, object, summary dialog, audio[controls], video[controls], [contenteditable], [tabindex]')]
+            .filter(el => el && el.tabIndex > -1 && !el.hasAttribute('disabled') && !el.hasAttribute('hidden') && el.computedStyleMap && el.computedStyleMap().get('display').value !== 'none');
+  },
+  focusTrapDialog: function (e) {
+    e = e || window.event;
+    var isTab = false;
+    if ("key" in e) {
+        isTab = (e.key === "Tab");
+    } else {
+        isTab = (e.keyCode === 9);
+    }
+    if (isTab) {
+        var focusable = Radzen.getFocusableDialogElements();
+        var firstFocusable = focusable[0];
+        var lastFocusable = focusable[focusable.length - 1];
+
+        if (firstFocusable && e.shiftKey && document.activeElement === firstFocusable) {
+            e.preventDefault();
+            firstFocusable.focus();
+        } else if (lastFocusable && !e.shiftKey && document.activeElement === lastFocusable) {
+            e.preventDefault();
+            lastFocusable.focus();
+        }
+    }
   },
   closePopupOrDialog: function (e) {
       e = e || window.event;
@@ -1329,10 +1364,10 @@ window.Radzen = {
                 if (xhr.readyState === XMLHttpRequest.DONE) {
                     var status = xhr.status;
                     if (status === 0 || (status >= 200 && status < 400)) {
-                    var result = JSON.parse(xhr.responseText);
-                    document.execCommand("insertHTML", false, '<img src="' + result.url + '">');
+                        var result = JSON.parse(xhr.responseText);
+                        document.execCommand("insertHTML", false, '<img src="' + result.url + '">');
                     } else {
-                    console.log(xhr.responseText);
+                        instance.invokeMethodAsync('OnError', xhr.responseText);
                     }
                 }
             }

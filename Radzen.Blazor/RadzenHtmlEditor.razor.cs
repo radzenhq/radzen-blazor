@@ -23,7 +23,9 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public HtmlEditorMode Mode { get; set; } = HtmlEditorMode.Design;
-        private HtmlEditorMode mode { get; set; }
+
+        private HtmlEditorMode mode;
+
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
@@ -48,12 +50,28 @@ namespace Radzen.Blazor
         ///   void OnPaste(HtmlEditorPasteEventArgs args)
         ///   {
         ///     // Set args.Html to filter unwanted tags.
-        ///     args.Html = args.Html.Replace("&lt;br>&gt;", "");
+        ///     args.Html = args.Html.Replace("&lt;br&gt;", "");
         ///   }
         /// </code>
         /// </example>
         [Parameter]
         public EventCallback<HtmlEditorPasteEventArgs> Paste { get; set; }
+
+        /// <summary>
+        /// A callback that will be invoked when there is an error during upload.
+        /// </summary>
+        [Parameter]
+        public EventCallback<UploadErrorEventArgs> UploadError { get; set; }
+
+        /// <summary>
+        /// Called on upload error.
+        /// </summary>
+        /// <param name="error">The error.</param>
+        [JSInvokable("OnError")]
+        public async Task OnError(string error)
+        {
+            await UploadError.InvokeAsync(new UploadErrorEventArgs { Message = error });
+        }
 
         /// <summary>
         /// A callback that will be invoked when the user executes a command of the editor (e.g. by clicking one of the tools).

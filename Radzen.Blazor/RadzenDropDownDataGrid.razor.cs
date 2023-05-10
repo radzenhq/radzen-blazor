@@ -564,7 +564,7 @@ namespace Radzen.Blazor
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
-            else
+            else if(FilterAsYouType)
             {
                 selectedIndex = -1;
                 Debounce(DebounceFilter, FilterDelay);

@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.JSInterop;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
-using Microsoft.JSInterop;
 
 namespace Radzen
 {
@@ -201,6 +202,13 @@ namespace Radzen
         public virtual bool AllowFiltering { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether filtering is allowed as you type. Set to <c>true</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if filtering is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public virtual bool FilterAsYouType { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets a value indicating whether the user can clear the value. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if clearing is allowed; otherwise, <c>false</c>.</value>
@@ -248,6 +256,13 @@ namespace Radzen
         /// <value>The selected item changed.</value>
         [Parameter]
         public Action<object> SelectedItemChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the search text changed.
+        /// </summary>
+        /// <value>The search text changed.</value>
+        [Parameter]
+        public Action<string> SearchTextChanged { get; set; }
 
         /// <summary>
         /// The selected items
@@ -665,7 +680,7 @@ namespace Radzen
                     Debounce(DebounceFilter, FilterDelay);
                 }
             }
-            else if (AllowFiltering && isFilter)
+            else if (AllowFiltering && isFilter && FilterAsYouType)
             {
                 Debounce(DebounceFilter, FilterDelay);
             }
@@ -726,6 +741,7 @@ namespace Radzen
                 selectedIndex = -1;
 
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
+            SearchTextChanged?.Invoke(SearchText);
         }
 
         /// <summary>
@@ -891,7 +907,7 @@ namespace Radzen
                 }
                 else
                 {
-                    return object.Equals(item,selectedItem);
+                    return object.Equals(item, selectedItem);
                 }
             }
         }

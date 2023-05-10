@@ -21,7 +21,7 @@
         <img alt="License - MIT" src="https://img.shields.io/github/license/radzenhq/radzen-blazor?logo=github&style=for-the-badge" />
     </a>
     <a href="https://www.nuget.org/packages/Radzen.Blazor">
-        <img alt="Nuget Downloads" src="https://img.shields.io/nuget/dt/Radzen.Blazor?color=%232694F9&label=nuget%20downloads&logo=nuget&style=for-the-badge" />
+        <img alt="NuGet Downloads" src="https://img.shields.io/nuget/dt/Radzen.Blazor?color=%232694F9&label=nuget%20downloads&logo=nuget&style=for-the-badge" />
     </a>
     <img alt="Last Commit" src="https://img.shields.io/github/last-commit/radzenhq/radzen-blazor?logo=github&style=for-the-badge" />
     <a href="https://github.com/radzenhq/radzen-blazor/graphs/contributors">
@@ -39,7 +39,7 @@
 
 ### :sparkles: Free
 
-Radzen Blazor Components are open source and free for commercial use. You can install them from [nuget](https://www.nuget.org/packages/Radzen.Blazor) or build your own copy from source.
+Radzen Blazor Components are open source and free for commercial use. You can install them from [NuGet](https://www.nuget.org/packages/Radzen.Blazor) or build your own copy from source.
 
 Paid support is available as part of the [Radzen Professional subscription](https://www.radzen.com/blazor-studio/pricing/).
 
@@ -78,9 +78,9 @@ Our flagship product [Radzen Blazor Studio](https://www.radzen.com/blazor-studio
 
 ### 1. Install
 
-Radzen Blazor Components are distributed as a [Radzen.Blazor nuget package](https://www.nuget.org/packages/Radzen.Blazor). You can add them to your project in one of the following ways
+Radzen Blazor Components are distributed as a [Radzen.Blazor NuGet package](https://www.nuget.org/packages/Radzen.Blazor). You can add them to your project in one of the following ways
 - Install the package from command line by running `dotnet add package Radzen.Blazor`
-- Add the project from the Visual Nuget Package Manager
+- Add the project from the Visual NuGet Package Manager
 - Manually edit the .csproj file and add a project reference
 
 ### 2. Import the namespace

@@ -21,12 +21,12 @@
     @<div class="rz-html-editor-dialog">
         <div class="rz-html-editor-dialog-item">
             <label>@SelectText</label>
-            <RadzenUpload ChooseText=@UploadChooseText @ref=@FileUpload Url=@Editor.UploadUrl Auto="false" Accept="image/*"
-            style="width: 100%" Complete="OnUploadComplete">
-                @foreach (var header in uploadHeaders)
-                        {
-                            <RadzenUploadHeader Name=@header.Key Value=@header.Value />
-                        }
+                <RadzenUpload ChooseText=@UploadChooseText @ref=@FileUpload Url=@Editor.UploadUrl Auto="false" Accept="image/*"
+                    style="width: 100%" Complete="OnUploadComplete" Error="OnUploadError">
+                    @foreach (var header in uploadHeaders)
+                    {
+                        <RadzenUploadHeader Name=@header.Key Value=@header.Value />
+                    }
                     </RadzenUpload>
                 </div>
                 <div class="rz-html-editor-dialog-item">

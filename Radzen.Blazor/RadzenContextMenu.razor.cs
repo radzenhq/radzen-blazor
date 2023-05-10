@@ -35,7 +35,7 @@ namespace Radzen.Blazor
     /// }
     /// </code>
     /// </example>
-    public partial class RadzenContextMenu : IDisposable
+    public partial class RadzenContextMenu : IAsyncDisposable
     {
         /// <summary>
         /// Gets or sets the unique identifier.
@@ -127,14 +127,24 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
+            while (menus.Count != 0)
+            {
+                await Close();
+            }
+
             reference?.Dispose();
             reference = null;
 
             if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+                try 
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+                }
+                catch
+                { }
             }
 
             Service.OnOpen -= OnOpen;

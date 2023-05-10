@@ -118,8 +118,12 @@ $radio-checked-border: var(--rz-input-border) !default;
   }
 
   &.rz-state-disabled {
-    @extend %input-disabled;
+    cursor: initial;
+    box-shadow: var(--rz-input-disabled-shadow);
+    background-color: var(--rz-input-disabled-background-color);
+    border: var(--rz-input-disabled-border);
     border-width: var(--rz-radio-border-width);
+    opacity: var(--rz-input-disabled-opacity);
   }
 
   .rzi {
@@ -134,7 +138,7 @@ $radio-checked-border: var(--rz-input-border) !default;
     background-color: var(--rz-radio-circle-background-color);
     box-shadow: var(--rz-radio-circle-shadow);
 
-    &:hover {
+    &:hover:not(.rz-state-disabled) {
       background-color: var(--rz-radio-circle-hover-background-color);
     }
   }
@@ -144,34 +148,18 @@ $radio-checked-border: var(--rz-input-border) !default;
     border: var(--rz-radio-checked-border);
     border-width: var(--rz-radio-border-width);
 
-    &:hover {
+    &:hover:not(.rz-state-disabled) {
       background-color: var(--rz-radio-checked-hover-background-color);
       border: var(--rz-radio-checked-border);
       box-shadow: var(--rz-radio-checked-hover-shadow);
       border-width: var(--rz-radio-border-width);
     }
-  }
 
-  &.rz-state-disabled {
-
-    .rzi-circle-on {
-    
-      &:hover {
-        background-color: var(--rz-radio-circle-background-color);
-      }
-    }
-
-    &.rz-state-active {
+    &.rz-state-disabled {
       background-color: var(--rz-radio-checked-background-color);
       border: var(--rz-radio-checked-border);
       border-width: var(--rz-radio-border-width);
       opacity: 0.5;
-
-      &:hover {
-        background-color: var(--rz-radio-checked-background-color);
-        border: var(--rz-radio-checked-border); 
-        border-width: var(--rz-radio-border-width);
-      }
     }
   }
 }

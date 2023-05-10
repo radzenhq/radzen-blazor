@@ -293,7 +293,7 @@ namespace Radzen.Blazor
             await ViewChanged.InvokeAsync(View);
         }
 
-        // <summary>
+        /// <summary>
         /// Gets or sets the view changed callback.
         /// </summary>
         /// <value>The view changed callback.</value>

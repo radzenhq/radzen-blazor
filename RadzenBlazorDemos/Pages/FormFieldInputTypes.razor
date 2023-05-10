@@ -1,0 +1,73 @@
+@inherits DbContextPage
+
+<div Class="rz-p-0 rz-p-md-12">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+        <RadzenLabel Text="Variant:" />
+        <RadzenSelectBar @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
+        <RadzenDropDown @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+    </RadzenStack>
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="12" SizeSM="6">
+            <RadzenStack>
+                <RadzenFormField Text="RadzenTextBox" Variant="@variant">
+                    <RadzenTextBox @bind-Value="@value" />
+                </RadzenFormField>
+                <RadzenFormField Text="RadzenNumeric" Variant="@variant">
+                    <RadzenNumeric @bind-Value="@intValue" />
+                </RadzenFormField>
+                <RadzenFormField Text="RadzenPassword" Variant="@variant">
+                    <RadzenPassword @bind-Value="@value" />
+                </RadzenFormField>
+                <RadzenFormField Text="RadzenDropDown" Variant="@variant">
+                    <RadzenDropDown Data=@companyNames @bind-Value="@dropDownValue" />
+                </RadzenFormField>
+                <RadzenFormField Text="RadzenDropDownDataGrid" Variant="@variant">
+                    <RadzenDropDownDataGrid Data=@companyNames @bind-Value="@dropDownDataGridValue" />
+                </RadzenFormField>
+            </RadzenStack>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeSM="6">
+            <RadzenStack>
+                <RadzenFormField Text="RadzenAutoComplete" Variant="@variant">
+                    <RadzenAutoComplete Data=@companyNames @bind-Value="@autoCompleteValue" />
+                </RadzenFormField>
+                <RadzenFormField Text="RadzenColorPicker" Variant="@variant">
+                    <RadzenColorPicker @bind-Value="@color" />
+                </RadzenFormField>
+                <RadzenFormField Text="RadzenTextArea" Variant="@variant">
+                    <RadzenTextArea @bind-Value="@value" />
+                </RadzenFormField>
+                <RadzenFormField Text="RadzenRadioButtonList" Variant="@variant">
+                    <RadzenRadioButtonList @bind-Value=@radioButtonValue TValue="int" class="rz-m-4 rz-mt-8">
+                        <Items>
+                            <RadzenRadioButtonListItem Text="Orders" Value="1" />
+                            <RadzenRadioButtonListItem Text="Employees" Value="2" />
+                            <RadzenRadioButtonListItem Text="Customers" Value="3" />
+                        </Items>
+                    </RadzenRadioButtonList>
+                </RadzenFormField>
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+</div>
+
+@code {
+    Variant variant = Variant.Outlined;
+
+    string value = "Text";
+    int intValue = 123;
+    int radioButtonValue = 1;
+    string dropDownValue = "Around the Horn";
+    string dropDownDataGridValue = "";
+    string autoCompleteValue = "";
+    string color = "rgb(68, 58, 110)";
+
+    IEnumerable<string> companyNames;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        companyNames = dbContext.Customers.Select(c => c.CompanyName).Distinct();
+    }
+}

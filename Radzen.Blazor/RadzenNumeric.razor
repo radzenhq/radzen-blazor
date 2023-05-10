@@ -9,7 +9,7 @@
     <span @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         <input @ref="@input" type="text" inputmode="decimal" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
                class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-               placeholder="@Placeholder" autocomplete="@AutoCompleteAttribute" value="@FormattedValue" @onchange="@OnChange"
+               placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" value="@FormattedValue" @onchange="@OnChange"
                onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower())"
            onblur="@getOnInput()" onpaste="@getOnPaste()" />
         @if (ShowUpDown)

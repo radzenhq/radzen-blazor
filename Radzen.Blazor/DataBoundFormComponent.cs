@@ -1,14 +1,16 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+
+using Radzen.Blazor;
+using Radzen.Blazor.Rendering;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using Radzen.Blazor;
-using Radzen.Blazor.Rendering;
 
 namespace Radzen
 {
@@ -214,6 +216,11 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Gets the Search text typed by user
+        /// </summary>
+        public string SearchText => searchText;
+
+        /// <summary>
         /// The search text
         /// </summary>
         internal string searchText;
@@ -289,10 +296,13 @@ namespace Radzen
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var dataChanged = parameters.DidParameterChange(nameof(Data), Data);
+
             if (dataChanged)
             {
                 await OnDataChanged();
             }
+
+            var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
 
             var result = base.SetParametersAsync(parameters);
 
@@ -300,6 +310,11 @@ namespace Radzen
             {
                 FieldIdentifier = FieldIdentifier.Create(ValueExpression);
                 EditContext.OnValidationStateChanged += ValidationStateChanged;
+            }
+
+            if (disabledChanged)
+            {
+                FormFieldContext?.DisabledChanged(Disabled);
             }
 
             await result;
@@ -347,6 +362,14 @@ namespace Radzen
         /// <returns>ClassList.</returns>
         protected ClassList GetClassList(string className) => ClassList.Create(className)
                                                                        .AddDisabled(Disabled)
-                                                                       .Add(FieldIdentifier, EditContext);
+                                                                       .Add(FieldIdentifier, EditContext)
+                                                                       .Add("rz-state-empty", !HasValue);
+
+        /// <summary> Provides support for RadzenFormField integration. </summary>
+        [CascadingParameter]
+        public IFormFieldContext FormFieldContext { get; set; }
+
+        /// <summary> Gets the current placeholder. Returns empty string if this component is inside a RadzenFormField.</summary>
+        protected string CurrentPlaceholder => FormFieldContext != null ? " " : Placeholder;
     }
 }

@@ -39,7 +39,8 @@ The RadzenDialog is used via the [DialogService](xref:Radzen.DialogService) clas
    ```
 ***
 ## Add to layout
-You also need to add the RadzeDialog component to the layout used by your pages (most commonly `MainLayout.razor`). 
+You also need to add the RadzeDialog component to the layout used by your pages (most commonly `MainLayout.razor`).
 ```
 <RadzenDialog />
 ```
+>> Important! Make sure that you do not nest `<RadzenDialog />` inside a positioned element (i.e. with position: relative, position: absolute or position: fixed). To be safe you can add it at the end of the layout file after all other elements.

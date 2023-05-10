@@ -64,6 +64,13 @@ namespace Radzen.Blazor
         [Parameter]
         public AutoCompleteType PasswordAutoCompleteType { get; set; } = AutoCompleteType.CurrentPassword;
 
+        /// <summary>
+        /// Gets or sets the design variant of the form field.
+        /// </summary>
+        /// <value>The variant of the form field.</value>
+        [Parameter]
+        public Variant? FormFieldVariant { get; set; }
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
@@ -131,6 +138,13 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if reset password is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowResetPassword { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether default login button is shown.
+        /// </summary>
+        /// <value><c>true</c> if default login button is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowLoginButton { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the login text.

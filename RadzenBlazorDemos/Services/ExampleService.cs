@@ -1011,6 +1011,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "FormField",
+                    Path = "form-field",
+                    Title = "Blazor form field component",
+                    Icon = "&#xe578",
+                    New = true,
+                    Tags = new [] { "form", "label", "floating", "float", "edit", "outline", "input", "helper", "valid" }
+                },
+                new Example()
+                {
                     Name="HtmlEditor",
                     Icon = "&#xe3c9",
                     Children = new [] {
@@ -1018,14 +1027,14 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Default Tools",
                             Path = "html-editor",
-                            Title = "Blazor HTML editor componenet with lots of built-in tools",
+                            Title = "Blazor HTML editor component with lots of built-in tools",
                             Tags = new [] { "html", "editor", "rich", "text" }
                         },
                         new Example()
                         {
                             Name = "Custom Tools",
                             Path = "html-editor-custom-tools",
-                            Title = "Blazor HTML editor componenet with custom tools",
+                            Title = "Blazor HTML editor component with custom tools",
                             Tags = new [] { "html", "editor", "rich", "text", "tool", "custom" }
                         },
                     }
@@ -1035,7 +1044,7 @@ namespace RadzenBlazorDemos
                     Name = "ListBox",
                     Path = "listbox",
                     Icon = "&#xe8ef",
-                    Title = "Blazor listbox componenet",
+                    Title = "Blazor listbox component",
                     Tags = new [] { "select", "picker", "form", "edit" }
                 },
                 new Example()
@@ -1059,7 +1068,7 @@ namespace RadzenBlazorDemos
                     Name = "Password",
                     Path = "password",
                     Title = "Blazor password textbox component",
-                    Icon = "&#xe8a1",
+                    Icon = "&#xf042",
                     Tags = new [] { "input", "form", "edit" }
                 },
                 new Example()

@@ -41,7 +41,8 @@ $scrollbar-size: 16px !default;
 }
 
 
-.rz-layout {
+.rz-layout,
+.rz-scrollbars {
   &::-webkit-scrollbar,
   ::-webkit-scrollbar {
     background-color: var(--rz-scrollbar-background-color);

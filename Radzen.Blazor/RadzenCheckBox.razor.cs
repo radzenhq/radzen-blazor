@@ -49,9 +49,16 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether is read only.
+        /// </summary>
+        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ReadOnly { get; set; }
+
         async Task Toggle()
         {
-            if (Disabled)
+            if (Disabled || ReadOnly)
             {
                 return;
             }

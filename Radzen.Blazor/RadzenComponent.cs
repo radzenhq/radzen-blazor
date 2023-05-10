@@ -233,17 +233,17 @@ namespace Radzen
                 {
                     if (ContextMenu.HasDelegate)
                     {
-                        await JSRuntime.InvokeVoidAsync("Radzen.addContextMenu", UniqueID, Reference);
+                        await JSRuntime.InvokeVoidAsync("Radzen.addContextMenu", GetId(), Reference);
                     }
 
                     if (MouseEnter.HasDelegate)
                     {
-                        await JSRuntime.InvokeVoidAsync("Radzen.addMouseEnter", UniqueID, Reference);
+                        await JSRuntime.InvokeVoidAsync("Radzen.addMouseEnter", GetId(), Reference);
                     }
 
                     if (MouseLeave.HasDelegate)
                     {
-                        await JSRuntime.InvokeVoidAsync("Radzen.addMouseLeave", UniqueID, Reference);
+                        await JSRuntime.InvokeVoidAsync("Radzen.addMouseLeave", GetId(), Reference);
                     }
                 }
             }

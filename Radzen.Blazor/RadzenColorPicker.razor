@@ -6,19 +6,19 @@
 @if (Visible)
 {
     <div @ref=@Element style=@Style @onclick=@Toggle @attributes=@Attributes class=@GetCssClass() id=@GetId()>
-        @if(Icon != null)
+        @if (Icon != null)
         {
             <i class="rzi">@Icon</i>
         }
-        <div class="rz-colorpicker-value" style="background-color: @Color" ></div>
+        <div class="rz-colorpicker-value" style="background-color: @Value" ></div>
         <button type="button" tabindex="-1" class="rz-colorpicker-trigger" disabled=@Disabled @onclick:preventDefault><i class="rzi" /></button>
-        <Popup Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@Popup class="rz-colorpicker-popup" Close=@Close Open=@Open>
+        <Popup Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@Popup class="rz-colorpicker-popup" Close=@OnClosePopup Open=@Open>
             @if (ShowHSV)
             {
-                <Draggable class="rz-saturation-picker rz-colorpicker-section" style=@($"background-color: {HSV.ToRGB().ToCSS()}") Drag=@OnSaturationMove>
+                <Draggable class="rz-saturation-picker rz-colorpicker-section" style=@($"background-color: hsl({(HueHandleLeft * 360).ToInvariantString()}, 100%, 50%)") Drag=@OnSaturationMove>
                     <div class="rz-saturation-white">
                         <div class="rz-saturation-black"></div>
-                        <div class="rz-saturation-handle" style=@($"top: {(SaturationHandleTop*100).ToInvariantString()}%; left: {(SaturationHandleLeft * 100).ToInvariantString()}%")></div>
+                        <div class="rz-saturation-handle" style=@($"top: {(SaturationHandleTop * 100).ToInvariantString()}%; left: {(SaturationHandleLeft * 100).ToInvariantString()}%")></div>
                     </div>
                 </Draggable>
                 <div class="rz-colorpicker-preview-area rz-colorpicker-section">
@@ -107,7 +107,7 @@
                 </div>
 
             }
-            @if(ShowButton)
+            @if (ShowButton)
             {
                 <div class="rz-colorpicker-button rz-colorpicker-section">
                     <RadzenButton ButtonStyle="ButtonStyle.Primary" Click=@OnClick Text=@ButtonText @onclick:preventDefault />

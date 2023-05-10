@@ -1,0 +1,392 @@
+$form-field-margin: 0.625rem 0 0 !default;
+$form-field-start-end-padding: var(--rz-input-padding) !default;
+$form-field-filled-height: 3.25rem !default;
+$form-field-filled-padding: 1.4375rem 0.4375rem 0.4375rem !default;
+$form-field-filled-numeric-padding: 1.5rem 1.25rem 0.5rem 0.5rem !default;
+$form-field-filled-background-color: var(--rz-base-100) !default;
+$form-field-filled-hover-background-color: var(--rz-base-200) !default;
+$form-field-filled-border: var(--rz-input-border) !default;
+$form-field-filled-hover-border: var(--rz-input-hover-border) !default;
+$form-field-filled-focus-border: var(--rz-input-focus-border) !default;
+$form-field-filled-border-radius: var(--rz-border-radius) !default;
+$form-field-filled-label-floating-top: 0.25rem !default;
+$form-field-filled-hover-shadow: var(--rz-input-hover-shadow) !default;
+$form-field-filled-focus-shadow: var(--rz-input-focus-shadow) !default;
+$form-field-filled-underline-display: none !default;
+$form-field-shadow: none !default;
+$form-field-hover-shadow: none !default;
+$form-field-focus-shadow: none !default;
+$form-field-label-color: var(--rz-text-color) !default;
+$form-field-label-focus-color: var(--rz-primary) !default;
+$form-field-label-padding: 0.125rem 0.1875rem !default;
+$form-field-text-label-padding: 0.125rem 0 !default;
+$form-field-label-left: 0.25rem !default;
+$form-field-label-textarea-top: 0.375rem !default;
+$form-field-label-floating-top: -0.625rem !default;
+$form-field-helper-padding: 0 0.5rem !default;
+
+:root {
+    --rz-form-field-margin: #{$form-field-margin};
+    --rz-form-field-start-end-padding: #{$form-field-start-end-padding};
+    --rz-form-field-filled-height: #{$form-field-filled-height};
+    --rz-form-field-filled-padding: #{$form-field-filled-padding};
+    --rz-form-field-filled-numeric-padding: #{$form-field-filled-numeric-padding};
+    --rz-form-field-filled-background-color: #{$form-field-filled-background-color};
+    --rz-form-field-filled-hover-background-color: #{$form-field-filled-hover-background-color};
+    --rz-form-field-filled-border: #{$form-field-filled-border};
+    --rz-form-field-filled-hover-border: #{$form-field-filled-hover-border};
+    --rz-form-field-filled-focus-border: #{$form-field-filled-focus-border};
+    --rz-form-field-filled-border-radius: #{$form-field-filled-border-radius};
+    --rz-form-field-filled-label-floating-top: #{$form-field-filled-label-floating-top};
+    --rz-form-field-filled-hover-shadow: #{$form-field-filled-hover-shadow};
+    --rz-form-field-filled-focus-shadow: #{$form-field-filled-focus-shadow};
+    --rz-form-field-filled-underline-display: #{$form-field-filled-underline-display};
+    --rz-form-field-shadow: #{$form-field-shadow};
+    --rz-form-field-hover-shadow: #{$form-field-hover-shadow};
+    --rz-form-field-focus-shadow: #{$form-field-focus-shadow};
+    --rz-form-field-label-color: #{$form-field-label-color};
+    --rz-form-field-label-focus-color: #{$form-field-label-focus-color};
+    --rz-form-field-label-padding: #{$form-field-label-padding};
+    --rz-form-field-text-label-padding: #{$form-field-text-label-padding};
+    --rz-form-field-label-left: #{$form-field-label-left};
+    --rz-form-field-label-textarea-top: #{$form-field-label-textarea-top};
+    --rz-form-field-label-floating-top: #{$form-field-label-floating-top};
+    --rz-form-field-helper-padding: #{$form-field-helper-padding};
+}
+
+
+.rz-form-field-helper {
+    padding: var(--rz-form-field-helper-padding);
+}
+
+.rz-form-field-content {
+    @extend %input-no-padding;
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: top;
+    margin: var(--rz-form-field-margin);
+    box-shadow: var(--rz-form-field-shadow);
+    transition: var(--rz-input-transition);
+
+    & > *,
+    & > .rz-autocomplete, 
+    & input,
+    & .rz-inputtext {
+        @extend %input-blank;
+
+        flex: 1;
+    }
+
+    .rz-form-field-start,
+    .rz-form-field-end {
+        display: flex;
+        flex: 0;
+        align-items: center;
+        white-space: nowrap;
+        padding: var(--rz-form-field-start-end-padding);
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+}
+
+.rz-form-field {
+    display: inline-flex;
+    flex-direction: column;
+    vertical-align: top;
+
+    &:hover {
+        .rz-form-field-content {
+            @extend %input-hover;
+            box-shadow: var(--rz-form-field-hover-shadow);
+        }
+    }
+
+    &.rz-state-focused {
+        .rz-form-field-content {
+            @extend %input-focus;
+            box-shadow: var(--rz-form-field-focus-shadow);
+        }
+    }
+
+    &.rz-state-disabled {
+        .rz-form-field-content {
+            color: var(--rz-input-disabled-color);
+            box-shadow: var(--rz-input-disabled-shadow);
+        }
+
+        &.rz-variant-outlined,
+        &.rz-variant-filled,
+        &.rz-variant-flat {
+            .rz-form-field-content {
+                border: var(--rz-input-disabled-border);
+            }
+        }
+
+        .rz-state-disabled,
+        :disabled {
+            color: var(--rz-input-disabled-color);
+        }
+    }
+
+    &.rz-variant-outlined,
+    &.rz-variant-filled,
+    &.rz-variant-flat {
+        .rz-form-field-start {
+            padding-right: 0;
+        }
+    
+        .rz-form-field-end {
+            padding-left: 0;
+        }
+    }
+
+    &.rz-variant-filled,
+    &.rz-variant-flat {
+        .rz-form-field-content {
+            margin: 0;
+            --rz-input-height: var(--rz-form-field-filled-height);
+            --rz-input-padding: var(--rz-form-field-filled-padding);
+            --rz-numeric-input-padding: var(--rz-form-field-filled-numeric-padding);
+            --rz-form-field-label-floating-top: var(--rz-form-field-filled-label-floating-top);
+            box-shadow: var(--rz-input-shadow);
+
+            .rz-spinner-up {
+                top: calc(var(--rz-numeric-button-offset) + 1rem);
+            }
+
+            .rz-form-field-start,
+            .rz-form-field-end {
+                padding-top: 1rem;
+            }
+
+            .rz-textarea {
+                margin-top: 1rem;
+
+            }
+
+            .rz-datepicker-trigger {
+                top: calc(50% + 0.4375rem);
+            }
+        }
+    }
+
+    &.rz-variant-flat {
+        &:not(.rz-state-disabled) {
+            &:hover {
+                .rz-form-field-content {
+                    border: var(--rz-input-hover-border);
+                    box-shadow: var(--rz-input-hover-shadow);
+                }
+            }
+        
+            &.rz-state-focused {
+                .rz-form-field-content {
+                    border: var(--rz-input-focus-border);
+                    box-shadow: var(--rz-input-focus-shadow);
+                }
+            }
+        }
+    }
+
+    &.rz-variant-filled {
+        .rz-form-field-content {
+            border: var(--rz-form-field-filled-border);
+            border-radius: var(--rz-form-field-filled-border-radius);
+            background-color: var(--rz-form-field-filled-background-color);
+
+            &:before,
+            &:after {
+                display: var(--rz-form-field-filled-underline-display);
+            }
+        }
+
+        &:not(.rz-state-disabled) {
+            &:hover {
+                .rz-form-field-content {
+                    border: var(--rz-form-field-filled-hover-border);
+                    box-shadow: var(--rz-form-field-filled-hover-shadow);
+                    background-color: var(--rz-form-field-filled-hover-background-color);
+                }
+            }
+        
+            &.rz-state-focused,
+            &.rz-state-focused:hover {
+                .rz-form-field-content {
+                    border: var(--rz-form-field-filled-focus-border);
+                    box-shadow: var(--rz-form-field-filled-focus-shadow);
+                    background-color: var(--rz-form-field-filled-background-color);
+                }
+            }
+        }
+    }
+
+    &.rz-variant-text {
+        .rz-form-field-content {
+            border-color: transparent;
+            box-shadow: none;
+            --rz-input-background-color: transparent;
+            --rz-input-border-radius: 0;
+            --rz-input-padding: 0.4375rem 0;
+            --rz-numeric-input-padding: 0.5rem 1.25rem 0.5rem 0;
+            --rz-text-area-padding: 0.4375rem 0;
+            --rz-form-field-label-left: 0;
+            --rz-form-field-label-padding: var(--rz-form-field-text-label-padding);
+
+            & ~ .rz-form-field-helper {
+                padding: 0;
+            }
+        }
+
+        .rz-form-field-start {
+            padding-left: 0;
+        }
+    
+        .rz-form-field-end {
+            padding-right: 0;
+        }
+    }
+
+    &.rz-variant-filled,
+    &.rz-variant-text {
+        .rz-form-field-content {
+            &:before {
+                content: "";
+                position: absolute;
+                z-index: 1;
+                left: 50%;
+                right: 50%;
+                bottom: calc(-1 * var(--rz-border-width));
+                height: calc(var(--rz-border-width) + 1px);
+                border: var(--rz-input-focus-border);
+                border-left-width: 0;
+                border-right-width: 0;
+                transition: left var(--rz-transition),
+                            right var(--rz-transition), 
+                            border-width var(--rz-transition);
+            }
+        
+            &:after {
+                content: "";
+                position: absolute;
+                inset: calc(-1 * var(--rz-border-width));
+                top: auto;
+                height: var(--rz-border-width);
+                border-bottom: var(--rz-input-border);
+            }
+        }
+    
+        &:hover {
+            .rz-form-field-content:after {
+                border-bottom: var(--rz-input-hover-border);
+            }
+        }
+
+        &.rz-state-disabled,
+        &.rz-state-disabled:hover {
+            .rz-form-field-content:after {
+                border-bottom: var(--rz-input-disabled-border);
+            }
+        }
+    
+        &.rz-state-focused:not(.rz-state-disabled) {
+            .rz-form-field-content:before {
+                left: calc(-1 * var(--rz-border-width));
+                right: calc(-1 * var(--rz-border-width));
+                border: var(--rz-input-focus-border);
+                border-left-width: var(--rz-border-width);
+                border-right-width: var(--rz-border-width);
+            }
+        }
+    }
+
+    .rz-spinner-button {
+        display: none;
+    }
+
+    .rz-spinner:focus-within .rz-spinner-button {
+        display: block;
+    }
+
+}
+
+.rz-form-field-label {
+
+    .rz-state-disabled .rz-form-field-content > & {
+        color: var(--rz-input-disabled-color) !important;
+    }
+
+    position: absolute;
+    pointer-events: none;
+    padding: var(--rz-form-field-label-padding);
+    top: 50%;
+    right: auto;
+    border-radius: var(--rz-border-radius);
+    left: var(--rz-form-field-label-left);
+    max-width: calc(100% - 1.5rem);
+    transform: translate(0, -50%);
+    background-color: transparent;
+    transition: top var(--rz-transition),
+                transform var(--rz-transition), 
+                color var(--rz-transition),
+                font-size var(--rz-transition), 
+                max-width var(--rz-transition);
+
+    &:last-child {
+        right: 1.5rem;
+    }
+
+    .rz-textarea ~ & {
+        top: var(--rz-form-field-label-textarea-top);
+        transform: translate(0, 0);
+
+        .rz-variant-filled &,
+        .rz-variant-flat & {
+            transform: translate(0, 0.625rem);
+        }
+    }
+
+    .rz-textbox:focus ~ &,
+    .rz-textarea:focus ~ &,
+    .rz-spinner:focus-within ~ &,
+    .rz-autocomplete:focus-within ~ &,
+    .rz-textbox:not(:placeholder-shown) ~ &,
+    :not(.rz-state-empty) ~ &,
+    .rz-variant-filled .rz-textarea:focus ~ &,
+    .rz-variant-flat .rz-textarea:focus ~ &,
+    .rz-variant-filled :not(.rz-state-empty) ~ &,
+    .rz-variant-flat :not(.rz-state-empty) ~ &  {
+        right: auto;
+        top: var(--rz-form-field-label-floating-top);
+        transform: translate(0, 0);
+        color: var(--rz-input-placeholder-color);
+        background-color: inherit;
+        font-size: 0.75rem;
+        line-height: 0.75rem;
+        max-width: calc(100% - 1.5rem);
+    }
+
+    .invalid ~ & {
+        color: var(--rz-danger) !important;
+    }
+
+    .rz-state-focused &,
+    .rz-variant-filled.rz-state-focused &,
+    .rz-variant-flat.rz-state-focused & {
+        color: var(--rz-form-field-label-focus-color);
+    }
+
+    .rz-textbox:focus ~ &,
+    .rz-textarea:focus ~ &,
+    .rz-spinner:focus-within ~ &,
+    .rz-autocomplete:focus-within ~ &  {
+        color: var(--rz-form-field-label-focus-color);
+
+        .rz-variant-filled &,
+        .rz-variant-flat & {
+            color: var(--rz-form-field-label-focus-color);
+        }
+    }
+}

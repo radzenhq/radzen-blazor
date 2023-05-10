@@ -450,7 +450,18 @@ namespace Radzen.Blazor
             selectedColumns = columnsList;
         }
 
-        internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
+		public void UpdatePickableColumns()
+		{
+			if (allColumns.Any(c => c.Pickable))
+			{
+				if (AllowColumnPicking)
+				{
+					allPickableColumns = allColumns.Where(c => c.Pickable).OrderBy(c => c.GetOrderIndex()).ToList();
+				}
+			}
+		}
+
+		internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
         {
             if (columns.Contains(column))
             {
@@ -684,7 +695,10 @@ namespace Radzen.Blazor
         [Parameter]
         public PopupRenderMode FilterPopupRenderMode { get; set; } = PopupRenderMode.Initial;
 
-        internal async Task ClearFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
+        /// <summary>
+        /// Сlear filter on the specified column
+        /// </summary>
+        public async Task ClearFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
         {
             if (closePopup)
             {
@@ -716,13 +730,16 @@ namespace Radzen.Blazor
             await InvokeAsync(Reload);
         }
 
-        internal async Task ApplyFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
+        /// <summary>
+        /// Apply filter to the specified column
+        /// </summary>
+        public async Task ApplyFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
         {
             if (closePopup)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
             }
-            OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
+            await OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
         }
 
         internal IReadOnlyDictionary<string, object> CellAttributes(TItem item, RadzenDataGridColumn<TItem> column)
@@ -1923,6 +1940,15 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets boolean value indicating if the row is expanded or not.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        public bool IsRowExpanded(TItem item)
+        {
+            return expandedItems.Keys.Any(i => ItemEquals(i, item));
+        }
+
+        /// <summary>
         /// Expands a range of rows.
         /// </summary>
         /// <param name="items">The range of rows.</param>
@@ -2688,13 +2714,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override async Task OnPageSizeChanged(int value)
         {
-            pageSize = value;
-
-            SaveSettings();
-
-            await PageSizeChanged.InvokeAsync(value);
-
             await base.OnPageSizeChanged(value);
+            await PageSizeChanged.InvokeAsync(value);
+            SaveSettings();
         }
 
         /// <summary>
@@ -2874,6 +2896,10 @@ namespace Radzen.Blazor
                 else if (type == typeof(double) || type == typeof(double?))
                 {
                     return element.GetDouble();
+                }
+                else if (type == typeof(float) || type == typeof(float?))
+                {
+                    return element.GetSingle();
                 }
                 else if (type == typeof(decimal) || type == typeof(decimal?))
                 {
