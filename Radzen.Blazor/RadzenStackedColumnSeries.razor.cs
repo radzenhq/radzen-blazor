@@ -234,13 +234,16 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override ScaleBase TransformValueScale(ScaleBase scale)
         {
-            var stackedColumnSeries = ColumnSeries.Cast<IChartStackedColumnSeries>();
-            var count = stackedColumnSeries.Max(series => series.Count);
-            var sums = Enumerable.Range(0, count).Select(i => stackedColumnSeries.Sum(series => series.ValueAt(i)));
-            var max = sums.Max();
-            var min = Items.Min(Value);
+            if (Items.Any())
+            {
+                var stackedColumnSeries = ColumnSeries.Cast<IChartStackedColumnSeries>();
+                var count = stackedColumnSeries.Max(series => series.Count);
+                var sums = Enumerable.Range(0, count).Select(i => stackedColumnSeries.Sum(series => series.ValueAt(i)));
+                var max = sums.Max();
+                var min = Items.Min(Value);
 
-            scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+                scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+            }
 
             return scale;
         }
