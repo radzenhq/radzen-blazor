@@ -133,6 +133,9 @@
 
     string GetSideDialogStyle()
     {
-        return $"{sideDialogOptions.Style}{(sideDialogOptions.Width != null ? $" width: {sideDialogOptions.Width}" : "")}{(sideDialogOptions.Height != null ? $" height: {sideDialogOptions.Height}" : "")}";
+        string widthStyle = string.IsNullOrEmpty(sideDialogOptions.Width) ? string.Empty : $"width: {sideDialogOptions.Width};";
+        string heightStyle = string.IsNullOrEmpty(sideDialogOptions.Height) ? string.Empty : $"height: {sideDialogOptions.Height};";
+
+        return $"{widthStyle}{heightStyle}{sideDialogOptions.Style}";
     }
 }
