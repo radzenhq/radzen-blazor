@@ -172,7 +172,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public override object DataAt(double x, double y)
+        public override (object, Point) DataAt(double x, double y)
         {
             var angle = 90 - Math.Atan((CenterY - y) / (x - CenterX)) * 180 / Math.PI;
 
@@ -191,13 +191,13 @@ namespace Radzen.Blazor
 
                 if (startAngle <= angle && angle <= endAngle)
                 {
-                    return data;
+                    return (data, new Point() { X = x, Y = y });
                 }
 
                 startAngle = endAngle;
             }
 
-            return null;
+            return (null, null);
         }
 
         /// <inheritdoc />
@@ -227,15 +227,21 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        internal override double TooltipX(TItem item)
+        internal override double TooltipX(TItem item, ref object cache)
         {
-            var sum = PositiveItems.Sum(Value);
+            if (cache == null)
+            {
+                cache = Category(Chart.CategoryScale);
+            }
+            var ValueFunc = (Func<TItem, double>)cache;
+
+            var sum = PositiveItems.Sum(ValueFunc);
             double startAngle = 0;
             double endAngle = 0;
 
             foreach (var data in PositiveItems)
             {
-                var value = Value(data);
+                var value = ValueFunc(data);
                 endAngle = startAngle + (value / sum) * 360;
 
                 if (EqualityComparer<TItem>.Default.Equals(data, item))
@@ -348,10 +354,11 @@ namespace Radzen.Blazor
             if(Data != null)
             {
                 //var DataGreaterZero = Data.Where(e => Value(e) > 0).ToList();
+                object tooltipXCache = null;
 
                 foreach (var d in PositiveItems)
                 {
-                    var x = TooltipX(d) - CenterX;
+                    var x = TooltipX(d, ref tooltipXCache) - CenterX;
                     var y = TooltipY(d) - CenterY;
 
                     // find angle and add offset

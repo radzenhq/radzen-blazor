@@ -454,11 +454,12 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public virtual RenderFragment RenderTooltip(object data, double marginLeft, double marginTop)
+        public virtual RenderFragment RenderTooltip(object data, double marginLeft, double marginTop, double chartHeight)
         {
             var item = (TItem)data;
 
-            var x = TooltipX(item);
+            object dummyCache = null;
+            var x = TooltipX(item, ref dummyCache);
             var y = TooltipY(item);
 
             return builder =>
@@ -474,6 +475,7 @@ namespace Radzen.Blazor
                 builder.AddAttribute(6, nameof(ChartTooltip.Value), TooltipValue(item));
                 builder.AddAttribute(7, nameof(ChartTooltip.Class), TooltipClass(item));
                 builder.AddAttribute(8, nameof(ChartTooltip.Style), TooltipStyle(item));
+                builder.AddAttribute(9, nameof(ChartTooltip.Above), y + marginTop > chartHeight / 2);
                 builder.CloseComponent();
             };
         }
@@ -653,9 +655,15 @@ namespace Radzen.Blazor
         /// Gets the X coordinate of the tooltip of the specified item.
         /// </summary>
         /// <param name="item">The item.</param>
-        internal virtual double TooltipX(TItem item)
+        /// <param name="cache">Cache that can be passed between different calls to the method when it called on 
+        /// multiple items in a row to speed it up.</param>
+        internal virtual double TooltipX(TItem item, ref object cache)
         {
-            var category = Category(Chart.CategoryScale);
+            if (cache == null)
+            {
+                cache = Category(Chart.CategoryScale);
+            }
+            var category = (Func<TItem, double>)cache;
             return Chart.CategoryScale.Scale(category(item), true);
         }
 
@@ -669,30 +677,35 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public virtual object DataAt(double x, double y)
+        public virtual (object, Point) DataAt(double x, double y)
         {
             if (Items.Any())
             {
-                return Items.Select(item =>
+                object tooltipXCache = null;
+                var retObject = Items.Select(item =>
                 {
-                    var distance = Math.Abs(TooltipX(item) - x);
+                    var distance = Math.Abs(TooltipX(item, ref tooltipXCache) - x);
                     return new { Item = item, Distance = distance };
                 }).Aggregate((a, b) => a.Distance < b.Distance ? a : b).Item;
+
+                return (retObject, 
+                    new Point() { X = TooltipX(retObject, ref tooltipXCache), Y = TooltipY(retObject)});
             }
 
-            return null;
+            return (null, null);
         }
 
         /// <inheritdoc />
         public virtual IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
             var list = new List<ChartDataLabel>();
+            object tooltipXCache = null;
 
             foreach (var d in Data)
             {
                 list.Add(new ChartDataLabel 
                 { 
-                    Position = new Point { X = TooltipX(d) + offsetX, Y = TooltipY(d) + offsetY },
+                    Position = new Point { X = TooltipX(d, ref tooltipXCache) + offsetX, Y = TooltipY(d) + offsetY },
                     TextAnchor = "middle",
                     Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
                 });

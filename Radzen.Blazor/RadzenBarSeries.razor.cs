@@ -147,13 +147,19 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
-            return DataAt(x, y) != null;
+            return DataAt(x, y).Item1 != null;
         }
 
         /// <inheritdoc />
-        internal override double TooltipX(TItem item)
+        internal override double TooltipX(TItem item, ref object cache)
         {
-            var value = Chart.CategoryScale.Compose(Value);
+            if (cache == null)
+            {
+                cache = Category(Chart.CategoryScale);
+            }
+            var ValueFunc = (Func<TItem, double>)cache;
+
+            var value = Chart.CategoryScale.Compose(ValueFunc);
             var x = value(item);
 
             return x;
@@ -173,7 +179,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public override object DataAt(double x, double y)
+        public override (object, Point) DataAt(double x, double y)
         {
             var value = ComposeValue(Chart.CategoryScale);
             var category = ComposeCategory(Chart.ValueScale);
@@ -196,11 +202,11 @@ namespace Radzen.Blazor
 
                 if (startX <= x && x <= endX && startY <= y && y <= endY)
                 {
-                    return data;
+                    return (data, new Point() { X = x, Y = y });
                 }
             }
 
-            return null;
+            return (null, null);
         }
 
         /// <inheritdoc />
@@ -221,12 +227,13 @@ namespace Radzen.Blazor
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
             var list = new List<ChartDataLabel>();
-            
+            object tooltipXCache = null;
+
             foreach (var d in Data)
             {
                 list.Add(new ChartDataLabel 
                 { 
-                    Position = new Point() { X = TooltipX(d) + offsetX + 8, Y = TooltipY(d) + offsetY },
+                    Position = new Point() { X = TooltipX(d, ref tooltipXCache) + offsetX + 8, Y = TooltipY(d) + offsetY },
                     TextAnchor = "start",
                     Text = Chart.ValueAxis.Format(Chart.CategoryScale, Value(d))
                 });

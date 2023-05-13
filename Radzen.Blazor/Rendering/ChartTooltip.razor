@@ -1,5 +1,5 @@
-<div class="rz-chart-tooltip @Class" style="left: @(X.ToInvariantString())px; top: @(Y.ToInvariantString())px">
-    <div class="rz-chart-tooltip-content" style="@Style">
+<div class="@TooltipClass @Class" style="left: @(X.ToInvariantString())px; top: @(Y.ToInvariantString())px">
+    <div class="@TooltipContentClass" style="@Style">
     @if (ChildContent != null)
     {
         @ChildContent
@@ -15,6 +15,9 @@
 </div>
 
 @code {
+    [Parameter]
+    public bool Above { get; set; } = true;
+
     [Parameter]
     public string Style { get; set; }
 
@@ -38,4 +41,7 @@
 
     [Parameter]
     public string Class { get; set; }
+
+    string TooltipClass => Above ? "rz-chart-tooltip" : "rz-chart-under-tooltip";
+    string TooltipContentClass => Above ? "rz-chart-tooltip-content" : "rz-chart-under-tooltip-content";
 }

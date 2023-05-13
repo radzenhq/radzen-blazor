@@ -134,7 +134,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
-            return DataAt(x, y) != null;
+            return DataAt(x, y).Item1 != null;
         }
 
         double ColumnWidth => Chart.ColumnOptions.Width ?? BandWidth - Chart.ColumnOptions.Margin;
@@ -168,7 +168,7 @@ namespace Radzen.Blazor
         int ColumnIndex => VisibleColumnSeries.IndexOf(this);
 
         /// <inheritdoc />
-        internal override double TooltipX(TItem item)
+        internal override double TooltipX(TItem item, ref object cache)
         {
             return GetColumnLeft(item) + ColumnWidth / 2;
         }
@@ -180,7 +180,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public override object DataAt(double x, double y)
+        public override (object, Point) DataAt(double x, double y)
         {
             var category = ComposeCategory(Chart.CategoryScale);
             var columnIndex = ColumnIndex;
@@ -199,11 +199,11 @@ namespace Radzen.Blazor
 
                 if (startX <= x && x <= endX && startY <= y && y <= endY)
                 {
-                    return data;
+                    return (data, new Point() { X = x, Y = y });
                 }
             }
 
-            return null;
+            return (null, null);
         }
 
         /// <inheritdoc />
@@ -212,6 +212,7 @@ namespace Radzen.Blazor
             var list = new List<ChartDataLabel>();
             var stackedColumnSeries = StackedColumnSeries;
             var columnIndex = ColumnIndex;
+            object tooltipXCache = null;
 
             for (var index = 0; index < Items.Count; index++)
             {
@@ -222,7 +223,7 @@ namespace Radzen.Blazor
 
                 list.Add(new ChartDataLabel
                 {
-                    Position = new Point { X = TooltipX(data) + offsetX, Y = y + offsetY },
+                    Position = new Point { X = TooltipX(data, ref tooltipXCache) + offsetX, Y = y + offsetY },
                     TextAnchor = "middle",
                     Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(data))
                 });
