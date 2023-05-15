@@ -13,25 +13,16 @@
     <div class="row">
         <div class="col-lg-6 offset-lg-3">
             <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
-                <RadzenFieldset Text="Personal information">                  
+                <RadzenFieldset Text="Personal information">
                     <div class="row mb-5">
                         <div class="col-md-4">
-                            <RadzenLabel Text="Last Name" />
+                            <RadzenLabel Text="Email" />
                         </div>
                         <div class="col">
-                            <RadzenTextBox style="display: block" Name="LastName" @bind-Value=@model.LastName  class="w-100" />
-                            <RadzenRequiredValidator Component="LastName" Text="Last name is required" Popup=@popup Style="position: absolute"/>
-                        </div>
-                    </div>
-                    <div class="row mb-5">
-                        <div class="col-md-4">
-                            <RadzenLabel Text="Email (*unique)" />
-                        </div>
-                        <div class="col">
-                            <RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email class="w-100" Placeholder="is use: andy@smith.com"/>
-                            <RadzenRequiredValidator Component="Email" Text="Email is required" Popup=@popup Style="position: absolute" />
-                            <RadzenEmailValidator Component="Email" Text="Provide a valid email address" Popup=@popup Style="position: absolute" /> 
-                            <RadzenCustomValidator Component="Email" IsValid="@(ValidateNewEmail(model.Email))" Text="Email must be unique" Popup=@popup Style="position: absolute" />
+                            <RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email class="w-100" Placeholder="Try with mail@example.com"/>
+                            <RadzenRequiredValidator Component="Email" Text="Email is required" Popup=@popup />
+                            <RadzenEmailValidator Component="Email" Text="Provide a valid email address" Popup=@popup />
+                            <RadzenCustomValidator Component="Email" Validator="@(() => ValidateNewEmail(model.Email))" Text="Email already exists" Popup=@popup />
                         </div>
                     </div>
                     <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
@@ -46,22 +37,10 @@
 @code {
     class Model
     {
-        public string LastName { get; set; }
         public string Email { get; set; }
-
-        public Model() { }
-
-        public Model(string lastName, string email) :this()
-        {
-            LastName = lastName;
-            Email = email;
-        }
     }
 
-    IList<Model> models = new List<Model>()
-    {
-        new Model("Smith", "andy@smith.com")
-    };
+    string[] emails = new string[] { "mail@example.com" };
 
     bool popup;
 
@@ -70,9 +49,9 @@
 
     bool ValidateNewEmail(string email)
     {
-        return  models.Where(m => m.Email.ToUpper().Equals(email?.ToUpper())).Count() == 0;
+        return !emails.Any(e => e.ToUpper().Equals(email?.ToUpper()));
     }
-    
+
     void OnSubmit(Model model)
     {
         console.Log($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true })}");

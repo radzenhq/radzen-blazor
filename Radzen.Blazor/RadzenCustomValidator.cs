@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System;
+using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
 {
@@ -10,28 +11,20 @@ namespace Radzen.Blazor
     /// <code>
     /// &lt;RadzenTemplateForm TItem="Model" Data=@model&gt;
     ///    &lt;RadzenTextBox Name="Email" @bind-Value=@model.Email /&gt;
-    ///    &lt;RadzenCustomValidator Value=@model.Email Component="Email" Text="Email must be unique" CheckIsValid="@(ValidateNewEmail(model.Email))" Style="position: absolute" /&gt;
+    ///    &lt;RadzenCustomValidator Value=@model.Email Component="Email" Text="Email must be unique" Validator="@(() => ValidateNewEmail(model.Email))" Style="position: absolute" /&gt;
     /// &lt;/RadzenTemplateForm&gt;
     /// @code {
     ///    class Model
     ///    {
     ///         public string Email { get; set; }
-    ///         public Model() { }
-    ///         public Model(string email) :this()
-    ///         {
-    ///            Email = email;
-    ///         }
-    ///    } 
+    ///    }
     ///    Model model = new Model();
-    ///    
-    ///    IList<Model> models = new List<Model>()
-    ///    {
-    ///         new Model("Smith", "andy@smith.com")
-    ///    };
-    ///    
+    ///
+    ///    string[] emails = new string[] { "andy@smith" };
+    ///
     ///    bool ValidateNewEmail(string email)
     ///    {
-    ///        return models.Where(m => m.Email.ToUpper().Equals(email?.ToUpper())).Count() == 0;
+    ///        return !emails.Any(e => e.ToUpper().Equals(email.ToUpper()));
     ///    }
     /// }
     /// </code>
@@ -45,15 +38,15 @@ namespace Radzen.Blazor
         public override string Text { get; set; } = "Value should match";
 
         /// <summary>
-        /// Gets or sets the Valid. Set to <c>false</c> by default.
+        /// Specifies the function which validates the component value. Must return <c>true</c> if the component is valid.
         /// </summary>
         [Parameter]
-        public bool IsValid { get; set; } = false;
+        public Func<bool> Validator { get; set; } = () => true;
 
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
-            return IsValid;
+            return Validator();
         }
     }
 }
