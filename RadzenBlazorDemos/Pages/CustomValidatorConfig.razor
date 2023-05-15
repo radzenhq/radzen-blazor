@@ -68,7 +68,7 @@
     Model model = new Model();
     EventConsole console;
 
-    async Task<bool> ValidateNewEmail(string email)
+    bool ValidateNewEmail(string email)
     {
         return models.Where(m => m.Email.ToUpper().Equals(email?.ToUpper())).Count() == 0;
     }
