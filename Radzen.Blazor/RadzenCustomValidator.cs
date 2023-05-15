@@ -48,12 +48,12 @@ namespace Radzen.Blazor
         /// Gets or sets the Valid. Set to <c>false</c> by default.
         /// </summary>
         [Parameter]
-        public bool CheckIsValid { get; set; } = false;
+        public bool IsValid { get; set; } = false;
 
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
-            return CheckIsValid;
+            return IsValid;
         }
     }
 }
