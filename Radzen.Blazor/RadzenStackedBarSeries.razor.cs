@@ -66,13 +66,16 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override ScaleBase TransformCategoryScale(ScaleBase scale)
         {
-            var stackedBarSeries = BarSeries.Cast<IChartStackedBarSeries>();
-            var count = stackedBarSeries.Max(series => series.Count);
-            var sums = Enumerable.Range(0, count).Select(i => stackedBarSeries.Sum(series => series.ValueAt(i)));
-            var max = sums.Max();
-            var min = Items.Min(Value);
+            if (Items.Any())
+            {
+                var stackedBarSeries = BarSeries.Cast<IChartStackedBarSeries>();
+                var count = stackedBarSeries.Max(series => series.Count);
+                var sums = Enumerable.Range(0, count).Select(i => stackedBarSeries.Sum(series => series.ValueAt(i)));
+                var max = sums.Max();
+                var min = Items.Min(Value);
 
-            scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+                scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+            }
 
             return scale;
         }

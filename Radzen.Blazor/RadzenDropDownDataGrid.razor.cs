@@ -458,15 +458,16 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    var values = value as dynamic;
+                    var values = value as IEnumerable;
                     if (values != null)
                     {
+                        var valueList = values.Cast<object>().ToList();
                         if (!string.IsNullOrEmpty(ValueProperty))
                         {
-                            foreach (object v in values)
+                            foreach (object v in valueList)
                             {
                                 var item = Query.Where($@"{ValueProperty} == @0", v).FirstOrDefault();
-                                if (item != null && selectedItems.IndexOf(item) == -1)
+                                if (item != null && !selectedItems.AsQueryable().Where($@"object.Equals(it.{ValueProperty},@0)", v).Any())
                                 {
                                     selectedItems.Add(item);
                                 }
@@ -474,7 +475,7 @@ namespace Radzen.Blazor
                         }
                         else
                         {
-                            foreach (object v in values)
+                            foreach (object v in valueList)
                             {
                                 if (selectedItems.IndexOf(v) == -1)
                                 {

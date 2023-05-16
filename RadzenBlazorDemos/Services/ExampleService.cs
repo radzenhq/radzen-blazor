@@ -1441,7 +1441,14 @@ namespace RadzenBlazorDemos
                     Icon = "&#xe5ca",
                     Tags = new [] { "validator", "validation", "required"}
                 },
-
+                new Example()
+                {
+                    Name = "CustomValidator",
+                    Path = "customvalidator",
+                    Title = "Blazor custom validator component",
+                    Icon = "&#xe6b1",
+                    Tags = new [] { "validator", "validation", "custom", "unique"}
+                },
             }
         },
 

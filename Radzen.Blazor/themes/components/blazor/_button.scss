@@ -113,7 +113,7 @@ $button-styles: map-merge(
   (
     primary: (
       background-color: var(--rz-primary),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-primary)
     ),
     light: (
       background-color: var(--rz-base-200),
@@ -129,27 +129,27 @@ $button-styles: map-merge(
     ),
     secondary: (
       background-color: var(--rz-secondary),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-secondary)
     ),
     info: (
       background-color: var(--rz-info),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-info)
     ),
     warning: (
       background-color: var(--rz-warning),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-warning)
     ),
     error: (
       background-color: var(--rz-danger),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-danger)
     ),
     danger: (
       background-color: var(--rz-danger),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-danger)
     ),
     success: (
       background-color: var(--rz-success),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-success)
     )
   ),
   $button-styles
@@ -261,19 +261,23 @@ $button-styles: map-merge(
           @if $name == 'background-color' {
             &.rz-shade-lighter {
               background-color: var(--rz-#{$style}-lighter);
-              color: var(--rz-#{$style});
+              color: var(--rz-on-#{$style}-lighter);
             }
             &.rz-shade-light {
               background-color: var(--rz-#{$style}-light);
+              color: var(--rz-on-#{$style}-light);
             }
             &.rz-shade-default {
               background-color: var(--rz-#{$style});
+              color: var(--rz-on-#{$style});
             }
             &.rz-shade-dark {
               background-color: var(--rz-#{$style}-dark);
+              color: var(--rz-on-#{$style}-dark);
             }
             &.rz-shade-darker {
               background-color: var(--rz-#{$style}-darker);
+              color: var(--rz-on-#{$style}-darker);
             }
           }
         }

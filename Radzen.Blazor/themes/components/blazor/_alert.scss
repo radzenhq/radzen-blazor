@@ -148,21 +148,33 @@ $alert-sizes: map-merge(
         @if $name == 'background-color' { // generate the styles only once
           &.rz-shade-lighter {
             --rz-alert-background-color: var(--rz-#{$style}-lighter);
-            --rz-alert-color: var(--rz-#{$style}-dark);
-            --rz-alert-title-color: var(--rz-#{$style}-dark);
-            --rz-alert-icon-color: var(--rz-#{$style}-dark);
+            --rz-alert-color: var(--rz-on-#{$style}-lighter);
+            --rz-alert-title-color: var(--rz-on-#{$style}-lighter);
+            --rz-alert-icon-color: var(--rz-on-#{$style}-lighter);
           }
           &.rz-shade-light {
             --rz-alert-background-color: var(--rz-#{$style}-light);
+            --rz-alert-color: var(--rz-on-#{$style}-light);
+            --rz-alert-title-color: var(--rz-on-#{$style}-light);
+            --rz-alert-icon-color: var(--rz-on-#{$style}-light);
           }
           &.rz-shade-default {
             --rz-alert-background-color: var(--rz-#{$style});
+            --rz-alert-color: var(--rz-on-#{$style});
+            --rz-alert-title-color: var(--rz-on-#{$style});
+            --rz-alert-icon-color: var(--rz-on-#{$style});
           }
           &.rz-shade-dark {
             --rz-alert-background-color: var(--rz-#{$style}-dark);
+            --rz-alert-color: var(--rz-on-#{$style}-dark);
+            --rz-alert-title-color: var(--rz-on-#{$style}-dark);
+            --rz-alert-icon-color: var(--rz-on-#{$style}-dark);
           }
           &.rz-shade-darker {
             --rz-alert-background-color: var(--rz-#{$style}-darker);
+            --rz-alert-color: var(--rz-on-#{$style}-darker);
+            --rz-alert-title-color: var(--rz-on-#{$style}-darker);
+            --rz-alert-icon-color: var(--rz-on-#{$style}-darker);
           }
         }
       }

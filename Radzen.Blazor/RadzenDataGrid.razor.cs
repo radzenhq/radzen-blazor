@@ -1664,6 +1664,18 @@ namespace Radzen.Blazor
                 }
 #endif
             }
+
+            if (LoadData.HasDelegate && View.Count() == 0 && Count > 0)
+            {
+                if (CurrentPage > 1)
+                {
+                    await GoToPage(CurrentPage - 1);
+                }
+                else
+                {
+                    await FirstPage();
+                }
+            }
         }
 
         IEnumerable<FilterDescriptor> filters = Enumerable.Empty<FilterDescriptor>();
