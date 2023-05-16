@@ -191,7 +191,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        internal override double TooltipX(TItem item, ref object cache)
+        internal override double TooltipX(TItem item)
         {
             return GetBarRight(item, BarIndex, Items.IndexOf(item), StackedBarSeries);
         }

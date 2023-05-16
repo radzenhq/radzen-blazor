@@ -168,7 +168,7 @@ namespace Radzen.Blazor
         int ColumnIndex => VisibleColumnSeries.IndexOf(this);
 
         /// <inheritdoc />
-        internal override double TooltipX(TItem item, ref object cache)
+        internal override double TooltipX(TItem item)
         {
             return GetColumnLeft(item) + ColumnWidth / 2;
         }
@@ -212,7 +212,6 @@ namespace Radzen.Blazor
             var list = new List<ChartDataLabel>();
             var stackedColumnSeries = StackedColumnSeries;
             var columnIndex = ColumnIndex;
-            object tooltipXCache = null;
 
             for (var index = 0; index < Items.Count; index++)
             {
@@ -223,7 +222,7 @@ namespace Radzen.Blazor
 
                 list.Add(new ChartDataLabel
                 {
-                    Position = new Point { X = TooltipX(data, ref tooltipXCache) + offsetX, Y = y + offsetY },
+                    Position = new Point { X = TooltipX(data) + offsetX, Y = y + offsetY },
                     TextAnchor = "middle",
                     Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(data))
                 });

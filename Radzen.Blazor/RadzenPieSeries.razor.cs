@@ -227,21 +227,15 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        internal override double TooltipX(TItem item, ref object cache)
+        internal override double TooltipX(TItem item)
         {
-            if (cache == null)
-            {
-                cache = Category(Chart.CategoryScale);
-            }
-            var ValueFunc = (Func<TItem, double>)cache;
-
-            var sum = PositiveItems.Sum(ValueFunc);
+            var sum = PositiveItems.Sum(Value);
             double startAngle = 0;
             double endAngle = 0;
 
             foreach (var data in PositiveItems)
             {
-                var value = ValueFunc(data);
+                var value = Value(data);
                 endAngle = startAngle + (value / sum) * 360;
 
                 if (EqualityComparer<TItem>.Default.Equals(data, item))
@@ -354,11 +348,10 @@ namespace Radzen.Blazor
             if(Data != null)
             {
                 //var DataGreaterZero = Data.Where(e => Value(e) > 0).ToList();
-                object tooltipXCache = null;
 
                 foreach (var d in PositiveItems)
                 {
-                    var x = TooltipX(d, ref tooltipXCache) - CenterX;
+                    var x = TooltipX(d) - CenterX;
                     var y = TooltipY(d) - CenterY;
 
                     // find angle and add offset

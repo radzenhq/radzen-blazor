@@ -79,8 +79,7 @@ namespace Radzen.Blazor
         /// <inheritdoc/>
         public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
         {
-            object dummyCache = null;
-            double x = series.TooltipX(Data, ref dummyCache);
+            double x = series.TooltipX(Data);
             double y = series.TooltipY(Data);
 
             var coordinateSystem = series.CoordinateSystem;

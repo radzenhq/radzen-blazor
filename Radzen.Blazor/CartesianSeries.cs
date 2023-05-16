@@ -17,21 +17,33 @@ namespace Radzen.Blazor
     public abstract class CartesianSeries<TItem> : RadzenChartComponentBase, IChartSeries, IDisposable
     {
         /// <summary>
+        /// Cache for the value returned by <see cref="Category"/> when that value is only dependent on 
+        /// <see cref="CategoryProperty"/>.
+        /// </summary>
+        Func<TItem, double> categoryPropertyCache;
+
+        /// <summary>
         /// Creates a getter function that returns a value from the specified category scale for the specified data item.
         /// </summary>
         /// <param name="scale">The scale.</param>
         internal Func<TItem, double> Category(ScaleBase scale)
         {
+            if (categoryPropertyCache != null)
+            {
+                return categoryPropertyCache;
+            }
+
             if (IsNumeric(CategoryProperty))
             {
-                return PropertyAccess.Getter<TItem, double>(CategoryProperty);
+                categoryPropertyCache = PropertyAccess.Getter<TItem, double>(CategoryProperty);
+                return categoryPropertyCache;
             }
 
             if (IsDate(CategoryProperty))
             {
                 var category = PropertyAccess.Getter<TItem, DateTime>(CategoryProperty);
-
-                return (item) => category(item).Ticks;
+                categoryPropertyCache = (item) => category(item).Ticks;
+                return categoryPropertyCache;
             }
 
             if (scale is OrdinalScale ordinal)
@@ -137,10 +149,23 @@ namespace Radzen.Blazor
         public virtual CoordinateSystem CoordinateSystem => CoordinateSystem.Cartesian;
 
         /// <summary>
+        /// Storage for <see cref="CategoryProperty"/>.
+        /// </summary>
+        string categoryProperty;
+
+        /// <summary>
         /// The name of the property of <typeparamref name="TItem" /> that provides the X axis (a.k.a. category axis) values.
         /// </summary>
         [Parameter]
-        public string CategoryProperty { get; set; }
+        public string CategoryProperty 
+        { 
+            get => categoryProperty; 
+            set
+            {
+                categoryPropertyCache = null;
+                categoryProperty = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="CartesianSeries{TItem}"/> is visible.
@@ -458,8 +483,7 @@ namespace Radzen.Blazor
         {
             var item = (TItem)data;
 
-            object dummyCache = null;
-            var x = TooltipX(item, ref dummyCache);
+            var x = TooltipX(item);
             var y = TooltipY(item);
 
             return builder =>
@@ -655,15 +679,9 @@ namespace Radzen.Blazor
         /// Gets the X coordinate of the tooltip of the specified item.
         /// </summary>
         /// <param name="item">The item.</param>
-        /// <param name="cache">Cache that can be passed between different calls to the method when it called on 
-        /// multiple items in a row to speed it up.</param>
-        internal virtual double TooltipX(TItem item, ref object cache)
+        internal virtual double TooltipX(TItem item)
         {
-            if (cache == null)
-            {
-                cache = Category(Chart.CategoryScale);
-            }
-            var category = (Func<TItem, double>)cache;
+            var category = Category(Chart.CategoryScale);
             return Chart.CategoryScale.Scale(category(item), true);
         }
 
@@ -681,15 +699,14 @@ namespace Radzen.Blazor
         {
             if (Items.Any())
             {
-                object tooltipXCache = null;
                 var retObject = Items.Select(item =>
                 {
-                    var distance = Math.Abs(TooltipX(item, ref tooltipXCache) - x);
+                    var distance = Math.Abs(TooltipX(item) - x);
                     return new { Item = item, Distance = distance };
                 }).Aggregate((a, b) => a.Distance < b.Distance ? a : b).Item;
 
                 return (retObject, 
-                    new Point() { X = TooltipX(retObject, ref tooltipXCache), Y = TooltipY(retObject)});
+                    new Point() { X = TooltipX(retObject), Y = TooltipY(retObject)});
             }
 
             return (null, null);
@@ -699,13 +716,12 @@ namespace Radzen.Blazor
         public virtual IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
             var list = new List<ChartDataLabel>();
-            object tooltipXCache = null;
 
             foreach (var d in Data)
             {
                 list.Add(new ChartDataLabel 
                 { 
-                    Position = new Point { X = TooltipX(d, ref tooltipXCache) + offsetX, Y = TooltipY(d) + offsetY },
+                    Position = new Point { X = TooltipX(d) + offsetX, Y = TooltipY(d) + offsetY },
                     TextAnchor = "middle",
                     Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
                 });

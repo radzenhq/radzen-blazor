@@ -151,15 +151,9 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        internal override double TooltipX(TItem item, ref object cache)
+        internal override double TooltipX(TItem item)
         {
-            if (cache == null)
-            {
-                cache = Category(Chart.CategoryScale);
-            }
-            var ValueFunc = (Func<TItem, double>)cache;
-
-            var value = Chart.CategoryScale.Compose(ValueFunc);
+            var value = Chart.CategoryScale.Compose(Value);
             var x = value(item);
 
             return x;
@@ -227,13 +221,12 @@ namespace Radzen.Blazor
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
             var list = new List<ChartDataLabel>();
-            object tooltipXCache = null;
 
             foreach (var d in Data)
             {
                 list.Add(new ChartDataLabel 
                 { 
-                    Position = new Point() { X = TooltipX(d, ref tooltipXCache) + offsetX + 8, Y = TooltipY(d) + offsetY },
+                    Position = new Point() { X = TooltipX(d) + offsetX + 8, Y = TooltipY(d) + offsetY },
                     TextAnchor = "start",
                     Text = Chart.ValueAxis.Format(Chart.CategoryScale, Value(d))
                 });
