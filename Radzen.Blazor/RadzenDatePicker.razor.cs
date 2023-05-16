@@ -559,6 +559,11 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        private string ButtonClasses
+        {
+            get => $"rz-button-icon-left rzi rzi-{(TimeOnly ? "time" : "calendar")}";
+        }
+
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenDatePicker{TValue}"/> is inline - only Calender.
         /// </summary>
