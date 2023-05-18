@@ -630,7 +630,7 @@ window.Radzen = {
   numericOnInput: function (e, min, max) {
       var value = e.target.value;
 
-      if (value && !isNaN(+value)) {
+      if (value == "" && !isNaN(+value)) {
         var numericValue = +value;
         if (min != null && !isNaN(+min) && numericValue < min) {
             e.target.value = min;
