@@ -108,7 +108,7 @@
                         @if (Grid.IsRowInEditMode(Item) && column.EditTemplate != null)
                         {
                             @column.EditTemplate(Item)
-                        } 
+                        }
                         else if (column.Template != null)
                         {
                             @column.Template(Item)
@@ -122,7 +122,7 @@
                 }
             </RadzenDataGridCell>
         }
-   
+
 </tr>
 }
 
@@ -205,7 +205,7 @@
             rules.Add("visibility:hidden");
         }
 
-        var child = Grid.childData.Any() ? Grid.childData.Where(c => c.Value?.Data?.Contains(Item) == true).FirstOrDefault() : 
+        var child = Grid.childData.Any() ? Grid.childData.Where(c => c.Value?.Data?.Contains(Item) == true).FirstOrDefault() :
             default(KeyValuePair<TItem, DataGridChildData<TItem>>);
 
         var level = !object.Equals(child, default(KeyValuePair<TItem, DataGridChildData<TItem>>)) ? child.Value.Level : 0;

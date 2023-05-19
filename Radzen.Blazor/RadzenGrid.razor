@@ -4,9 +4,8 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Radzen;
 @using Radzen.Blazor.Rendering
-@inherits PagedDataBoundComponent<TItem>
-
 @typeparam TItem
+@inherits PagedDataBoundComponent<TItem>
 @if (Columns != null)
 {
     <CascadingValue Value=this>
@@ -46,7 +45,7 @@
                                         <span class="rz-column-title"></span>
                                     </th>
                                 }
-                                
+
                                 @foreach (var column in visibleColumns)
                                 {
                                     var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
