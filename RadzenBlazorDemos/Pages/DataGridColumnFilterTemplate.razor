@@ -17,6 +17,16 @@ else
                         Change=@OnSelectedCompanyNamesChange Data="@(companyNames)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
             </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Title="AllTitleOfCourtesy" Property="AllTitleOfCourtesy" Type="typeof(IEnumerable<TitleOfCourtesy>)"
+                                  FilterValue="@selectedTitleOfCourtesy" FilterOperator="FilterOperator.In" LogicalFilterOperator="LogicalFilterOperator.Or">
+                <FilterTemplate>
+                    <RadzenDropDown @bind-Value=@selectedTitleOfCourtesy Style="width:100%;" TextProperty="Text" ValueProperty="Value"
+                                    Change=@OnSelectedTitleOfCourtesyChange Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy>().Where(i => i != TitleOfCourtesy.All).Select(t => new { Text = $"{t}", Value = t }))" Multiple="true" />
+                </FilterTemplate>
+                <Template>
+                    @(string.Join(',', context.AllTitleOfCourtesy.Select(i => Enum.GetName((TitleOfCourtesy)i))))
+                </Template>
+            </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" 
                 FilterValue="@currentTOC">
                 <FilterTemplate>
@@ -35,6 +45,7 @@ else
 
     TitleOfCourtesy? currentTOC;
     IEnumerable<string> selectedCompanyNames;
+    IEnumerable<TitleOfCourtesy> selectedTitleOfCourtesy;
 
     List<string> companyNames = new List<string> {"Vins et alcools Chevalier", "Toms Spezialitäten", "Hanari Carnes", "Richter Supermarkt", "Wellington Importadora", "Centro comercial Moctezuma" };
 
@@ -50,6 +61,7 @@ else
         public int ID { get; set; }
         public string CompanyName { get; set; }
         public TitleOfCourtesy TitleOfCourtesy { get; set; }
+        public IEnumerable<TitleOfCourtesy> AllTitleOfCourtesy { get; set; }
     }
 
     void OnSelectedCompanyNamesChange(object value)
@@ -57,6 +69,14 @@ else
         if (selectedCompanyNames != null && !selectedCompanyNames.Any())
         {
             selectedCompanyNames = null;  
+        }
+    }
+
+    void OnSelectedTitleOfCourtesyChange(object value)
+    {
+        if (selectedTitleOfCourtesy != null && !selectedTitleOfCourtesy.Any())
+        {
+            selectedTitleOfCourtesy = null;
         }
     }
 
@@ -77,7 +97,8 @@ else
             {
                 ID = i,
                 CompanyName = i < 4 ? companyNames[0] : companyNames[i - 4],
-                TitleOfCourtesy = i < 5 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms
+                TitleOfCourtesy = i < 5 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms,
+                AllTitleOfCourtesy = i < 5 ? new TitleOfCourtesy[] { TitleOfCourtesy.Mr } : new TitleOfCourtesy[] { TitleOfCourtesy.Mr, TitleOfCourtesy.Ms }
             }).AsQueryable());
     }
 }

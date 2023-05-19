@@ -1230,6 +1230,14 @@ namespace Radzen
         /// <summary>
         /// Satisfied if the current value is null.
         /// </summary>
+        In,
+        /// <summary>
+        /// Satisfied if the current value is in the specified value.
+        /// </summary>
+        NotIn,
+        /// <summary>
+        /// Satisfied if the current value is not in the specified value.
+        /// </summary>
         IsNull,
         /// <summary>
         /// Satisfied if the current value is <see cref="string.Empty"/>.

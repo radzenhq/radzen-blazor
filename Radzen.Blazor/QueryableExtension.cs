@@ -45,6 +45,8 @@ namespace Radzen
             {FilterOperator.EndsWith, "EndsWith"},
             {FilterOperator.Contains, "Contains"},
             {FilterOperator.DoesNotContain, "DoesNotContain"},
+            {FilterOperator.Contains, "In"},
+            {FilterOperator.DoesNotContain, "NotIn"},
             {FilterOperator.IsNull, "=="},
             {FilterOperator.IsEmpty, "=="},
             {FilterOperator.IsNotNull, "!="},
@@ -986,6 +988,14 @@ namespace Radzen
                             }
 
                             index++;
+                        }
+                        else if (comparison == "In" || comparison == "NotIn")
+                        {
+                            if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && 
+                                    IsEnumerable(column.PropertyType) && column.PropertyType != typeof(string))
+                            {
+                                whereList.Add($@"{(comparison == "NotIn" ? "!" : "")}{property}.Any(i => i in @{index})", new object[] { column.GetFilterValue() });
+                            }
                         }
                         else if (!(IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)))
                         {
