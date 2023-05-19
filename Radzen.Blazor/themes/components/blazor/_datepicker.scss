@@ -175,12 +175,18 @@ $timepicker-border: none !default;
     }
   }
 
-  .rzi-calendar {
+  .rzi-calendar,
+  .rzi-time {
     font-size: inherit;
     vertical-align: top;
-    &:before {
-      content: 'calendar_today';
-    }
+  }
+
+  .rzi-calendar:before {
+    content: 'calendar_today';
+  }
+
+  .rzi-time:before {
+    content: 'schedule';
   }
 
   .rz-button-text {
