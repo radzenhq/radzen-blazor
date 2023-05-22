@@ -4,6 +4,7 @@ $chart-axis-font-size: 0.875rem !default;
 $chart-legend-font-size: 0.875rem !default;
 $chart-tooltip-background: var(--rz-base-background-color) !default;
 $chart-tooltip-color: var(--rz-text-color) !default;
+$chart-marker-stroke: var(--rz-base-background-color) !default;
 
 $chart-color-schemes: (
   pastel: (
@@ -74,6 +75,7 @@ $chart-color-schemes: (
   --rz-chart-legend-font-size: #{$chart-legend-font-size};
   --rz-chart-tooltip-background: #{$chart-tooltip-background};
   --rz-chart-tooltip-color: #{$chart-tooltip-color};
+  --rz-chart-marker-stroke: #{$chart-marker-stroke};
 }
 
 .rz-chart {
@@ -113,7 +115,7 @@ $chart-color-schemes: (
 }
 
 .rz-marker {
-  stroke: #fff;
+  stroke: var(--rz-chart-marker-stroke);
 }
 
 .rz-area-series .rz-marker {
