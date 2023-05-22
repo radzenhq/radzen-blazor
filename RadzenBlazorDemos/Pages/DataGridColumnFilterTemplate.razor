@@ -17,14 +17,14 @@ else
                         Change=@OnSelectedCompanyNamesChange Data="@(companyNames)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Title="AllTitleOfCourtesy" Property="AllTitleOfCourtesy" Type="typeof(IEnumerable<TitleOfCourtesy>)"
-                                  FilterValue="@selectedTitleOfCourtesy" FilterOperator="FilterOperator.In" LogicalFilterOperator="LogicalFilterOperator.Or">
+            <RadzenDataGridColumn TItem="Employee" Title="WorkStatus" Property="WorkStatus" Type="typeof(IEnumerable<WorkStatus>)" Sortable=false
+                                  FilterValue="@selectedWorkStatus" FilterOperator="FilterOperator.In" LogicalFilterOperator="LogicalFilterOperator.Or">
                 <FilterTemplate>
-                    <RadzenDropDown @bind-Value=@selectedTitleOfCourtesy Style="width:100%;" TextProperty="Text" ValueProperty="Value"
-                                    Change=@OnSelectedTitleOfCourtesyChange Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy>().Where(i => i != TitleOfCourtesy.All).Select(t => new { Text = $"{t}", Value = t }))" Multiple="true" />
+                    <RadzenDropDown @bind-Value=@selectedWorkStatus Multiple="true" AllowSelectAll=false Style="width:100%;"
+                                    Change=@OnSelectedWorkStatusChange Data=@allWorkStatuses />
                 </FilterTemplate>
                 <Template>
-                    @(string.Join(',', context.AllTitleOfCourtesy.Select(i => Enum.GetName((TitleOfCourtesy)i))))
+                    @(string.Join(',', context.WorkStatus.Select(i => Enum.GetName((WorkStatus)i))))
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" 
@@ -45,7 +45,8 @@ else
 
     TitleOfCourtesy? currentTOC;
     IEnumerable<string> selectedCompanyNames;
-    IEnumerable<TitleOfCourtesy> selectedTitleOfCourtesy;
+    IEnumerable<WorkStatus> selectedWorkStatus;
+    IEnumerable<WorkStatus> allWorkStatuses = Enum.GetValues(typeof(WorkStatus)).Cast<WorkStatus>();
 
     List<string> companyNames = new List<string> {"Vins et alcools Chevalier", "Toms Spezialitäten", "Hanari Carnes", "Richter Supermarkt", "Wellington Importadora", "Centro comercial Moctezuma" };
 
@@ -56,12 +57,18 @@ else
         All = -1
     }
 
+    public enum WorkStatus
+    {
+        Office,
+        Remote,
+    }
+
     public class Employee
     {
         public int ID { get; set; }
         public string CompanyName { get; set; }
         public TitleOfCourtesy TitleOfCourtesy { get; set; }
-        public IEnumerable<TitleOfCourtesy> AllTitleOfCourtesy { get; set; }
+        public IEnumerable<WorkStatus> WorkStatus { get; set; }
     }
 
     void OnSelectedCompanyNamesChange(object value)
@@ -72,11 +79,11 @@ else
         }
     }
 
-    void OnSelectedTitleOfCourtesyChange(object value)
+    void OnSelectedWorkStatusChange(object value)
     {
-        if (selectedTitleOfCourtesy != null && !selectedTitleOfCourtesy.Any())
+        if (selectedWorkStatus != null && !selectedWorkStatus.Any())
         {
-            selectedTitleOfCourtesy = null;
+            selectedWorkStatus = null;
         }
     }
 
@@ -98,7 +105,9 @@ else
                 ID = i,
                 CompanyName = i < 4 ? companyNames[0] : companyNames[i - 4],
                 TitleOfCourtesy = i < 5 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms,
-                AllTitleOfCourtesy = i < 5 ? new TitleOfCourtesy[] { TitleOfCourtesy.Mr } : new TitleOfCourtesy[] { TitleOfCourtesy.Mr, TitleOfCourtesy.Ms }
+                    WorkStatus = i < 3 ?
+                            new WorkStatus[] { WorkStatus.Office } :
+                                            i < 5 ? new WorkStatus[] { WorkStatus.Remote } : new WorkStatus[] { WorkStatus.Office, WorkStatus.Remote }
             }).AsQueryable());
     }
 }
