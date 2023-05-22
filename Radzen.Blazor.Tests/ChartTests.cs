@@ -45,9 +45,9 @@ public class ChartTests
         foreach (var _ in Enumerable.Range(0, 10))
         {
             await chart.InvokeAsync(() => chart.Instance.MouseMove(100, 80));
-            Assert.Contains("<div class=\"rz-chart-under-tooltip", chart.Markup);
+            Assert.Contains("<div class=\"rz-chart-tooltip", chart.Markup);
             await chart.InvokeAsync(() => chart.Instance.MouseMove(0, 0));
-            Assert.DoesNotContain("<div class=\"rz-chart-under-tooltip", chart.Markup);
+            Assert.DoesNotContain("<div class=\"rz-chart-tooltip", chart.Markup);
         }
         output.WriteLine($"Time took: {stopwatch.Elapsed}");
     }

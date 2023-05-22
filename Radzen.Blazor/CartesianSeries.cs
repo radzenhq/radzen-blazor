@@ -492,7 +492,6 @@ namespace Radzen.Blazor
                 builder.AddAttribute(6, nameof(ChartTooltip.Value), TooltipValue(item));
                 builder.AddAttribute(7, nameof(ChartTooltip.Class), TooltipClass(item));
                 builder.AddAttribute(8, nameof(ChartTooltip.Style), TooltipStyle(item));
-                builder.AddAttribute(9, nameof(ChartTooltip.Above), y + marginTop > chartHeight / 2);
                 builder.CloseComponent();
             };
         }
