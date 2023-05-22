@@ -17,7 +17,7 @@ namespace Radzen.Blazor
     public abstract class CartesianSeries<TItem> : RadzenChartComponentBase, IChartSeries, IDisposable
     {
         /// <summary>
-        /// Cache for the value returned by <see cref="Category"/> when that value is only dependent on 
+        /// Cache for the value returned by <see cref="Category"/> when that value is only dependent on
         /// <see cref="CategoryProperty"/>.
         /// </summary>
         Func<TItem, double> categoryPropertyCache;
@@ -149,23 +149,10 @@ namespace Radzen.Blazor
         public virtual CoordinateSystem CoordinateSystem => CoordinateSystem.Cartesian;
 
         /// <summary>
-        /// Storage for <see cref="CategoryProperty"/>.
-        /// </summary>
-        string categoryProperty;
-
-        /// <summary>
         /// The name of the property of <typeparamref name="TItem" /> that provides the X axis (a.k.a. category axis) values.
         /// </summary>
         [Parameter]
-        public string CategoryProperty 
-        { 
-            get => categoryProperty; 
-            set
-            {
-                categoryPropertyCache = null;
-                categoryProperty = value;
-            }
-        }
+        public string CategoryProperty { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="CartesianSeries{TItem}"/> is visible.
@@ -376,6 +363,7 @@ namespace Radzen.Blazor
             var shouldRefresh = parameters.DidParameterChange(nameof(Data), Data);
             var visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
             var hiddenChanged = parameters.DidParameterChange(nameof(Hidden), Hidden);
+            var categoryChanged = parameters.DidParameterChange(nameof(CategoryProperty), CategoryProperty);
 
             await base.SetParametersAsync(parameters);
 
@@ -389,6 +377,11 @@ namespace Radzen.Blazor
             {
                 IsVisible = Visible;
                 shouldRefresh = true;
+            }
+
+            if (categoryChanged || shouldRefresh)
+            {
+                categoryPropertyCache = null;
             }
 
             if (Data != null && Data.Count() != Items.Count)
@@ -602,7 +595,7 @@ namespace Radzen.Blazor
 
             var avgX = Data.Select(e => X(e)).Average();
             var avgY = Data.Select(e => Y(e)).Average();
-            var sumXY = Data.Sum(e => (X(e) - avgX) * (Y(e) - avgY));         
+            var sumXY = Data.Sum(e => (X(e) - avgX) * (Y(e) - avgY));
             if (Chart.ShouldInvertAxes())
             {
                 var sumYSq = Data.Sum(e => (Y(e) - avgY) * (Y(e) - avgY));
@@ -705,7 +698,7 @@ namespace Radzen.Blazor
                     return new { Item = item, Distance = distance };
                 }).Aggregate((a, b) => a.Distance < b.Distance ? a : b).Item;
 
-                return (retObject, 
+                return (retObject,
                     new Point() { X = TooltipX(retObject), Y = TooltipY(retObject)});
             }
 
@@ -719,8 +712,8 @@ namespace Radzen.Blazor
 
             foreach (var d in Data)
             {
-                list.Add(new ChartDataLabel 
-                { 
+                list.Add(new ChartDataLabel
+                {
                     Position = new Point { X = TooltipX(d) + offsetX, Y = TooltipY(d) + offsetY },
                     TextAnchor = "middle",
                     Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
