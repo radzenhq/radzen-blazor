@@ -103,6 +103,9 @@ namespace Radzen.Blazor
             return Columns == null && Parent == null ? Grid.deepestChildColumnLevel + 1 : 1;
         }
 
+        Type _propertyType;
+        internal Type PropertyType => _propertyType;
+
         /// <summary>
         /// Called when initialized.
         /// </summary>
@@ -114,12 +117,14 @@ namespace Radzen.Blazor
 
                 var property = GetFilterProperty();
 
+                if (!string.IsNullOrEmpty(property))
+                {
+                    _propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
+                }
+
                 if (!string.IsNullOrEmpty(property) && Type == null)
                 {
-                    if (!string.IsNullOrEmpty(property))
-                    {
-                        _filterPropertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
-                    }
+                    _filterPropertyType = _propertyType;
                 }
 
                 if (_filterPropertyType == null)
