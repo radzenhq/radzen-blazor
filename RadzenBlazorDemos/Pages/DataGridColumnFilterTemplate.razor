@@ -21,7 +21,11 @@ else
                                   FilterValue="@selectedWorkStatus" FilterOperator="FilterOperator.In" LogicalFilterOperator="LogicalFilterOperator.Or">
                 <FilterTemplate>
                     <RadzenDropDown @bind-Value=@selectedWorkStatus Multiple="true" AllowSelectAll=false Style="width:100%;"
-                                    Change=@OnSelectedWorkStatusChange Data=@allWorkStatuses />
+                                    Change=@OnSelectedWorkStatusChange Data=@allWorkStatuses>
+                        <Template Context="ddItem">
+                            @(Enum.GetName((WorkStatus)ddItem))
+                        </Template>
+                    </RadzenDropDown>
                 </FilterTemplate>
                 <Template>
                     @(string.Join(',', context.WorkStatus.Select(i => Enum.GetName((WorkStatus)i))))
