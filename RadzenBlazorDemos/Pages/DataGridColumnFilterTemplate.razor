@@ -21,11 +21,7 @@ else
                                   FilterValue="@selectedWorkStatus" FilterOperator="FilterOperator.In" LogicalFilterOperator="LogicalFilterOperator.Or">
                 <FilterTemplate>
                     <RadzenDropDown @bind-Value=@selectedWorkStatus Multiple="true" AllowSelectAll=false Style="width:100%;"
-                                    Change=@OnSelectedWorkStatusChange Data=@allWorkStatuses>
-                        <Template Context="ddItem">
-                            @(Enum.GetName((WorkStatus)ddItem))
-                        </Template>
-                    </RadzenDropDown>
+                                    Change=@OnSelectedWorkStatusChange Data=@allWorkStatuses TextProperty="Text" ValueProperty="Value" />
                 </FilterTemplate>
                 <Template>
                     @(string.Join(',', context.WorkStatus.Select(i => Enum.GetName((WorkStatus)i))))
@@ -50,7 +46,7 @@ else
     TitleOfCourtesy? currentTOC;
     IEnumerable<string> selectedCompanyNames;
     IEnumerable<WorkStatus> selectedWorkStatus;
-    IEnumerable<WorkStatus> allWorkStatuses = Enum.GetValues(typeof(WorkStatus)).Cast<WorkStatus>();
+    IEnumerable<object> allWorkStatuses = Enum.GetValues(typeof(WorkStatus)).Cast<WorkStatus>().Select(t => new { Text = $"{t}", Value = t });
 
     List<string> companyNames = new List<string> {"Vins et alcools Chevalier", "Toms Spezialitäten", "Hanari Carnes", "Richter Supermarkt", "Wellington Importadora", "Centro comercial Moctezuma" };
 
