@@ -277,19 +277,33 @@ namespace Radzen.Blazor
         [JSInvokable]
         public async Task Click(double x, double y)
         {
+            IChartSeries closestSeries = null;
+            object closestSeriesData = null;
+            double closestSeriesDistanceSquared = 5 * 5;
+
             foreach (var series in Series)
             {
-                if (series.Visible && series.Contains(mouseX - MarginLeft, mouseY - MarginTop, 5))
+                if (series.Visible)
                 {
-                    var data = series.DataAt(mouseX - MarginLeft, mouseY - MarginTop);
-
-                    if (data != null)
+                    var (seriesData, seriesDataPoint) = series.DataAt(mouseX - MarginLeft, mouseY - MarginTop);
+                    if (seriesData != null)
                     {
-                        await series.InvokeClick(SeriesClick, data);
+                        double xDelta = mouseX - seriesDataPoint.X;
+                        double yDelta = mouseY - seriesDataPoint.Y;
+                        double squaredDistance = xDelta * xDelta + yDelta * yDelta;
+                        if (squaredDistance < closestSeriesDistanceSquared)
+                        {
+                            closestSeries = series;
+                            closestSeriesData = seriesData; 
+                            closestSeriesDistanceSquared = squaredDistance;
+                        }
                     }
-
-                    return;
                 }
+            }
+
+            if (closestSeriesData != null)
+            {
+                await closestSeries.InvokeClick(SeriesClick, closestSeriesData);
             }
         }
 
@@ -298,6 +312,9 @@ namespace Radzen.Blazor
             if (Tooltip.Visible)
             {
                 var orderedSeries = Series.OrderBy(s => s.RenderingOrder).Reverse();
+                IChartSeries closestSeries = null;
+                object closestSeriesData = null;
+                double closestSeriesDistanceSquared = 25 * 25;
 
                 foreach (var series in orderedSeries)
                 {
@@ -316,21 +333,34 @@ namespace Radzen.Blazor
                             }
                         }
 
-                        if (series.Contains(mouseX - MarginLeft, mouseY - MarginTop, 25))
+                        var queryX = mouseX - MarginLeft;
+                        var queryY = mouseY - MarginTop;
+                        var (seriesData, seriesDataPoint) = series.DataAt(queryX, queryY);
+                        if (seriesData != null)
                         {
-                            var data = series.DataAt(mouseX - MarginLeft, mouseY - MarginTop);
-
-                            if (data != tooltipData)
+                            double xDelta = queryX - seriesDataPoint.X;
+                            double yDelta = queryY - seriesDataPoint.Y;
+                            double squaredDistance = xDelta * xDelta + yDelta * yDelta;
+                            if (squaredDistance < closestSeriesDistanceSquared)
                             {
-                                tooltipData = data;
-                                tooltip = series.RenderTooltip(data, MarginLeft, MarginTop);
-                                chartTooltipContainer.Refresh();
-                                await Task.Yield();
+                                closestSeries = series;
+                                closestSeriesData = seriesData; 
+                                closestSeriesDistanceSquared = squaredDistance;
                             }
-
-                            return;
                         }
                     }
+                }
+
+                if (closestSeriesData != null)
+                {
+                    if (closestSeriesData != tooltipData)
+                    { 
+                        tooltipData = closestSeriesData;
+                        tooltip = closestSeries.RenderTooltip(closestSeriesData, MarginLeft, MarginTop, Height ?? 0);
+                        chartTooltipContainer.Refresh();
+                        await Task.Yield();
+                    }
+                    return;
                 }
 
                 if (tooltip != null)
