@@ -172,7 +172,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public override object DataAt(double x, double y)
+        public override (object, Point) DataAt(double x, double y)
         {
             var angle = 90 - Math.Atan((CenterY - y) / (x - CenterX)) * 180 / Math.PI;
 
@@ -191,13 +191,13 @@ namespace Radzen.Blazor
 
                 if (startAngle <= angle && angle <= endAngle)
                 {
-                    return data;
+                    return (data, new Point() { X = x, Y = y });
                 }
 
                 startAngle = endAngle;
             }
 
-            return null;
+            return (null, null);
         }
 
         /// <inheritdoc />
