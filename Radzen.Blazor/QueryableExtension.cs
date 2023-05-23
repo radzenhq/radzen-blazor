@@ -71,7 +71,9 @@ namespace Radzen
             {FilterOperator.IsNull, "eq"},
             {FilterOperator.IsEmpty, "eq"},
             {FilterOperator.IsNotNull, "ne"},
-            {FilterOperator.IsNotEmpty, "ne"}
+            {FilterOperator.IsNotEmpty, "ne"},
+            {FilterOperator.In, "in"},
+            {FilterOperator.NotIn, "in"}
         };
 
         /// <summary>
@@ -662,6 +664,10 @@ namespace Radzen
                 var enumerableValueAsString = "(" + String.Join(",",
                         (enumerableValue.ElementType == typeof(string) ? enumerableValue.Cast<string>().Select(i => $@"'{i}'").Cast<object>() : enumerableValue.Cast<object>())) + ")";
 
+                var enumerableValueAsStringOrForAny = String.Join(" or ",
+                    (enumerableValue.ElementType == typeof(string) ? enumerableValue.Cast<string>()
+                        .Select(i => $@"i/{property} eq '{i}'").Cast<object>() : enumerableValue.Cast<object>().Select(i => $@"i/{property} eq {i}").Cast<object>()));
+
                 if (enumerableValue.Any() && columnFilterOperator == FilterOperator.Contains)
                 {
                     return $"{property} in {enumerableValueAsString}";
@@ -669,6 +675,14 @@ namespace Radzen
                 else if (enumerableValue.Any() && columnFilterOperator == FilterOperator.DoesNotContain)
                 {
                     return $"not({property} in {enumerableValueAsString})";
+                }
+                else if (enumerableValue.Any() && columnFilterOperator == FilterOperator.In)
+                {
+                    return $"{column.Property}/any(i:{enumerableValueAsStringOrForAny})";
+                }
+                else if (enumerableValue.Any() && columnFilterOperator == FilterOperator.NotIn)
+                {
+                    return $"not({column.Property}/any(i: {enumerableValueAsStringOrForAny}))";
                 }
             }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
