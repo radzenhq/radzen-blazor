@@ -253,6 +253,7 @@ namespace Radzen
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                 CssClass = options != null ? options.CssClass : "",
+                WrapperCssClass = options != null ? options.WrapperCssClass : "",
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
             });
         }
@@ -315,6 +316,7 @@ namespace Radzen
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                 CssClass = options != null ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm",
+                WrapperCssClass = options != null ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper",
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
             };
 
@@ -374,6 +376,7 @@ namespace Radzen
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                 CssClass = options != null ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert",
+                WrapperCssClass = options != null ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper",
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
             };
 
@@ -444,6 +447,11 @@ namespace Radzen
         /// Gets or sets dialog box custom class
         /// </summary>
         public string CssClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CSS classes added to the dialog's wrapper element.
+        /// </summary>
+        public string WrapperCssClass { get; set; }
         
         /// <summary>
         /// Gets or sets a value the dialog escape tabindex. Set to <c>0</c> by default.
