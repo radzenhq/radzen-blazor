@@ -174,6 +174,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override (object, Point) DataAt(double x, double y)
         {
+            if (!Contains(x, y, 0))
+            {
+                return (null, null);
+            }
+
             var angle = 90 - Math.Atan((CenterY - y) / (x - CenterX)) * 180 / Math.PI;
 
             if (x < CenterX)
