@@ -138,7 +138,8 @@
     {
         get
         {
-            return string.IsNullOrWhiteSpace(Dialog.Options.WrapperCssClass) ? "" : Dialog.Options.WrapperCssClass;
+            var baseCss = "rz-dialog-wrapper";
+            return string.IsNullOrWhiteSpace(Dialog.Options.WrapperCssClass) ? baseCss : $"{baseCss} {Dialog.Options.WrapperCssClass}";
         }
     }
 
