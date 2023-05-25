@@ -1,0 +1,19 @@
+﻿@inject DialogService DialogService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Dialog with custom CSS classes" ButtonStyle="ButtonStyle.Secondary"
+                  Click=@ShowDialogWithCustomCssClasses />
+</div>
+
+@code {
+    async Task ShowDialogWithCustomCssClasses()
+    {
+        await DialogService.OpenAsync("Dialog with custom CSS classes", ds =>
+        @<div>
+            This dialog has custom CSS classes.
+        </div>, new DialogOptions() {
+                  CssClass = "custom-dialog-class",
+                  WrapperCssClass = "custom-dialog-wrapper-class"
+              });
+    }
+}

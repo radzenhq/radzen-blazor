@@ -2,7 +2,7 @@
 @using System.Reflection;
 @inject IJSRuntime JSRuntime
 @implements IDisposable
-<div class="rz-dialog-wrapper">
+<div class="@WrapperCssClass">
     <div @ref="dialog" class="@CssClass" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
         {
@@ -131,6 +131,15 @@
         {
             var baseCss = "rz-dialog";
             return string.IsNullOrEmpty(Dialog.Options.CssClass) ? baseCss : $"{baseCss} {Dialog.Options.CssClass}";
+        }
+    }
+
+    string WrapperCssClass
+    {
+        get
+        {
+            var baseCss = "rz-dialog-wrapper";
+            return string.IsNullOrWhiteSpace(Dialog.Options.WrapperCssClass) ? baseCss : $"{baseCss} {Dialog.Options.WrapperCssClass}";
         }
     }
 
