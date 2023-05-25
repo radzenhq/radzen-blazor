@@ -11,7 +11,7 @@
         <RadzenButton Text="Apply Filter" Click="@(args => dataFilter.Filter())" Disabled="@auto" Size="ButtonSize.Small" />
     </RadzenStack>
 
-    <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => filteredOrders = view.ToList())>
+    <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => filteredOrders = view)>
         <Properties>
             <RadzenDataFilterProperty TItem="Order" Property="OrderID" Title="Order ID" FilterValue="@selectedIds" 
                 Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.Contains">
@@ -67,7 +67,7 @@
     bool auto = true;
     RadzenDataFilter<Order> dataFilter;
 
-    IList<Order> filteredOrders;
+    IQueryable<Order> filteredOrders;
     IQueryable<Order> orders;
     RadzenDataGrid<Order> ordersGrid;
 
