@@ -68,7 +68,7 @@
     RadzenDataFilter<Order> dataFilter;
 
     IList<Order> filteredOrders;
-    IList<Order> orders;
+    IQueryable<Order> orders;
     RadzenDataGrid<Order> ordersGrid;
 
     IEnumerable<int> selectedIds;
@@ -86,7 +86,7 @@
     {
         await base.OnInitializedAsync();
 
-        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+        orders = dbContext.Orders.Include("Customer").Include("Employee");
         orderIds = orders.Select(o => o.OrderID).Distinct();
     }
 
