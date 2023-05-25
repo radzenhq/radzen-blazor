@@ -67,9 +67,11 @@
                     }
                     else
                     {
+                        var last = selectedItems.LastOrDefault();
+
                         foreach (var item in selectedItems)
                         {
-                            @Template(item)@(Separator)
+                            @Template(item)@(item != last ? Separator : "")
                         }
                     }
                 }

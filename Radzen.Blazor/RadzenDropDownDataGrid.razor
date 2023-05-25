@@ -71,9 +71,10 @@
                         }
                         else
                         {
+                            var last = itemsToUse.LastOrDefault();
                             foreach (var item in itemsToUse)
                             {
-                                @Template(item)@(Separator)
+                                @Template(item)@(item != last ? Separator : "")
                             }
                         }
                     }
