@@ -14,7 +14,7 @@ $footer-z: 2 !default;
   --rz-footer-z: #{$footer-z};
 }
 
-.footer {
+.rz-footer {
   padding: var(--rz-footer-padding);
   border-top: var(--rz-footer-border);
   background-color: var(--rz-footer-background-color);

@@ -17,8 +17,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return ClassList.Create("header")
-                            .Add("rz-header")
+            return ClassList.Create("rz-header")
                             .Add("fixed", Layout == null)
                             .ToString();
         }

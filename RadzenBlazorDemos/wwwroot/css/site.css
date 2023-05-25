@@ -359,11 +359,6 @@ pre {
     border-radius: 0.25rem;
 }
 
-.body {
-    padding: 0 !important;
-    margin-bottom: 0 !important;
-}
-
 .rz-sidebar {
     bottom: 0 !important;
 }
@@ -447,11 +442,11 @@ svg.illustration {
 .demos-right-sidebar {
     position: sticky;
     top: 2rem;
-    border-left: var(--rz-border-normal);
+    border-left: var(--rz-border-base-200);
 }
 
 .article-toc {
-    border-left: var(--rz-border-normal);
+    border-left: var(--rz-border-base-200);
 }
 
 .article-toc h2 {
