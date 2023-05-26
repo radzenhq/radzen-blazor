@@ -202,17 +202,16 @@ namespace Radzen.Blazor
 
             if (firstRender || visibleChanged)
             {
-                visibleChanged = false;
-
                 if (Visible)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.createEditor", ContentEditable, UploadUrl, Paste.HasDelegate, Reference);
                 }
             }
 
-            if (valueChanged)
+            if (valueChanged || visibleChanged)
             {
                 valueChanged = false;
+                visibleChanged = false;
 
                 Html = Value;
 
