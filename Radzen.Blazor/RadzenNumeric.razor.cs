@@ -114,7 +114,7 @@ namespace Radzen.Blazor
                     if (Format != null)
                     {
                         decimal decimalValue = (decimal)Convert.ChangeType(Value, typeof(decimal));
-                        return decimalValue.ToString(Format);
+                        return decimalValue.ToString(Format, Culture);
                     }
                     return Value.ToString();
                 }
