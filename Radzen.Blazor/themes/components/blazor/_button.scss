@@ -336,15 +336,13 @@ $button-styles: map-merge(
           &:not(.rz-state-disabled):hover:not(:active),
           &:not(.rz-state-disabled):focus:not(:active),
           &:not(.rz-state-disabled):active {
-            &.rz-shade-lighter {
-              color: var(--rz-#{$style})
-            }
             @if $style == 'light' {
               background-color: rgba(255, 255, 255, .12);
             } @else if $style == 'dark' {
               background-color: rgba(0, 0, 0, .12);
             } @else {
               background-color: var(--rz-#{$style}-lighter);
+              color: var(--rz-on-#{$style}-lighter);
             }
             background-image: none;
           }
@@ -388,15 +386,13 @@ $button-styles: map-merge(
           &:not(.rz-state-disabled):hover:not(:active),
           &:not(.rz-state-disabled):focus:not(:active),
           &:not(.rz-state-disabled):active {
-            &.rz-shade-lighter {
-              color: var(--rz-#{$style})
-            }
             @if $style == 'light' {
               background-color: rgba(255, 255, 255, .12);
             } @else if $style == 'dark' {
               background-color: rgba(0, 0, 0, .12);
             } @else {
               background-color: var(--rz-#{$style}-lighter);
+              color: var(--rz-on-#{$style}-lighter);
             }
             background-image: none;
             box-shadow: none;
