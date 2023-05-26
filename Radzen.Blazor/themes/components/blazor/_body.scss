@@ -17,6 +17,10 @@ $layout-body-background-color: transparent !default;
   padding: var(--rz-layout-body-padding);
   border-radius: var(--rz-layout-body-border-radius);
   background-color: var(--rz-layout-body-background-color);
+
+  &:only-child {
+    background-color: transparent;
+  }
   
   .rz-layout & {
     transform: translateZ(0);
