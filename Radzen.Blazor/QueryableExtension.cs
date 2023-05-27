@@ -1,4 +1,5 @@
 ﻿using Radzen.Blazor;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -1005,10 +1006,10 @@ namespace Radzen
                         }
                         else if (comparison == "In" || comparison == "NotIn")
                         {
-                            if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && 
+                            if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) &&
                                     IsEnumerable(column.PropertyType) && column.PropertyType != typeof(string))
                             {
-                                whereList.Add($@"{(comparison == "NotIn" ? "!" : "")}{property}.Any(i => i in @{index})", new object[] { column.GetFilterValue() });
+                                whereList.Add($@"{(comparison == "NotIn" ? "!" : "")}{property}.Any(i => i{(string.IsNullOrEmpty(column.FilterInPropertyName) ? "" : $".{column.FilterInPropertyName}")} in @{index})", new object[] { column.GetFilterValue() });
                             }
                         }
                         else if (!(IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)))
@@ -1153,7 +1154,7 @@ namespace Radzen
                     if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "Contains")
                     {
                         filterExpressions.Add($@"(@{index}).Contains({property})");
-                        filterValues.Add(new object[] { filter.FilterValue  });
+                        filterValues.Add(new object[] { filter.FilterValue });
                     }
                     else
                     {
