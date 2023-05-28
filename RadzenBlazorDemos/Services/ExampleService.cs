@@ -285,6 +285,14 @@ namespace RadzenBlazorDemos
                             Title = "Blazor DataGrid enum filtering",
                             Tags = new [] { "filter", "enum", "grid", "datagrid", "table"}
                         },
+                         new Example
+                        {
+                            New = true,
+                            Name = "Custom filtering",
+                            Path = "datagrid-filter-template",
+                            Title = "Blazor DataGrid custom Column FilterTemplate",
+                            Tags = new [] { "filter", "enum", "grid", "datagrid", "table", "custom"}
+                        },
                         new Example
                         {
                             Name = "Filter API",
