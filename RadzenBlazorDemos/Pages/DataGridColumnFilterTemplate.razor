@@ -27,6 +27,16 @@ else
                     @(string.Join(',', context.WorkStatus.Select(i => Enum.GetName((WorkStatus)i))))
                 </Template>
             </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Title="WorkStatus (as Model)" Property="WorkStatuses" Type="typeof(IEnumerable<string>)" Sortable=false
+                                  FilterValue="@selectedWorkStatuses" FilterOperator="FilterOperator.In" FilterProperty="Name" LogicalFilterOperator="LogicalFilterOperator.Or">
+                <FilterTemplate>
+                    <RadzenDropDown @bind-Value=@selectedWorkStatuses Multiple="true" AllowSelectAll=false Style="width:100%;"
+                                    Change=@OnSelectedWorkStatusesChange Data=@allWorkStatusesObject TextProperty="Name" ValueProperty="Name" />
+                </FilterTemplate>
+                <Template>
+                    @(string.Join(',', context.WorkStatuses.Select(s => s.Name)))
+                </Template>
+            </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" 
                 FilterValue="@currentTOC">
                 <FilterTemplate>
@@ -63,12 +73,33 @@ else
         Remote,
     }
 
+    public class WorkStatusModel
+    {
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public string Name { get; set; }
+
+        public WorkStatusModel(string name) =>
+            Name = name;                   
+    }
+
     public class Employee
     {
         public int ID { get; set; }
         public string CompanyName { get; set; }
         public TitleOfCourtesy TitleOfCourtesy { get; set; }
         public IEnumerable<WorkStatus> WorkStatus { get; set; }
+        public IEnumerable<WorkStatusModel> WorkStatuses { get; set; }
+    }
+
+    IEnumerable<string> selectedWorkStatuses;
+    IEnumerable<WorkStatusModel> allWorkStatusesObject = Enum.GetValues(typeof(WorkStatus)).Cast<WorkStatus>().Select(t => new WorkStatusModel($"{t}"));
+
+    void OnSelectedWorkStatusesChange(object value)
+    {
+        if (selectedWorkStatuses != null && !selectedWorkStatuses.Any())
+        {
+            selectedWorkStatuses = null;
+        }
     }
 
     void OnSelectedCompanyNamesChange(object value)
@@ -107,7 +138,9 @@ else
                 TitleOfCourtesy = i < 5 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms,
                     WorkStatus = i < 3 ?
                             new WorkStatus[] { WorkStatus.Office } :
-                                            i < 5 ? new WorkStatus[] { WorkStatus.Remote } : new WorkStatus[] { WorkStatus.Office, WorkStatus.Remote }
+                                            i < 5 ? new WorkStatus[] { WorkStatus.Remote } : new WorkStatus[] { WorkStatus.Office, WorkStatus.Remote },
+                    WorkStatuses = i < 3 ?  new WorkStatusModel[] { new WorkStatusModel(Enum.GetName(WorkStatus.Office)) } :
+                                                i < 5 ? new WorkStatusModel[] { new WorkStatusModel(Enum.GetName(WorkStatus.Remote)) } : new WorkStatusModel[] { new WorkStatusModel(Enum.GetName(WorkStatus.Office)), new WorkStatusModel(Enum.GetName(WorkStatus.Remote)) }
             }).AsQueryable());
     }
 }
