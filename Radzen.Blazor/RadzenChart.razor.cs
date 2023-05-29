@@ -279,17 +279,20 @@ namespace Radzen.Blazor
         {
             IChartSeries closestSeries = null;
             object closestSeriesData = null;
-            double closestSeriesDistanceSquared = 5 * 5;
+            double closestSeriesDistanceSquared = 25 * 25;
+
+            var queryX = x - MarginLeft;
+            var queryY = y - MarginTop;
 
             foreach (var series in Series)
             {
                 if (series.Visible)
                 {
-                    var (seriesData, seriesDataPoint) = series.DataAt(mouseX - MarginLeft, mouseY - MarginTop);
+                    var (seriesData, seriesDataPoint) = series.DataAt(queryX, queryY);
                     if (seriesData != null)
                     {
-                        double xDelta = mouseX - seriesDataPoint.X;
-                        double yDelta = mouseY - seriesDataPoint.Y;
+                        double xDelta = queryX - seriesDataPoint.X;
+                        double yDelta = queryY - seriesDataPoint.Y;
                         double squaredDistance = xDelta * xDelta + yDelta * yDelta;
                         if (squaredDistance < closestSeriesDistanceSquared)
                         {
@@ -316,6 +319,9 @@ namespace Radzen.Blazor
                 object closestSeriesData = null;
                 double closestSeriesDistanceSquared = 25 * 25;
 
+                var queryX = mouseX - MarginLeft;
+                var queryY = mouseY - MarginTop;
+
                 foreach (var series in orderedSeries)
                 {
                     if (series.Visible)
@@ -333,8 +339,6 @@ namespace Radzen.Blazor
                             }
                         }
 
-                        var queryX = mouseX - MarginLeft;
-                        var queryY = mouseY - MarginTop;
                         var (seriesData, seriesDataPoint) = series.DataAt(queryX, queryY);
                         if (seriesData != null)
                         {
