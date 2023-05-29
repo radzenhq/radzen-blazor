@@ -1850,19 +1850,27 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            var emptyTextChanged = parameters.DidParameterChange(nameof(EmptyText), EmptyText);
+            bool emptyTextChanged = false, allowColumnPickingChanged = false, valueChanged = false, allGroupsExpandedChanged = false;
 
-            var allowColumnPickingChanged = parameters.DidParameterChange(nameof(AllowColumnPicking), AllowColumnPicking);
+            foreach (var parameter in parameters) {
+                switch (parameter.Name) {
+                    case nameof(EmptyText):
+                        emptyTextChanged = HasChanged(parameter.Value, EmptyText); break;
 
-            visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+                    case nameof(AllowColumnPicking):
+                        allowColumnPickingChanged = HasChanged(parameter.Value, AllowColumnPicking); break;
 
-            bool valueChanged = parameters.DidParameterChange(nameof(Value), Value);
+                    case nameof(Visible):
+                        visibleChanged = HasChanged(parameter.Value, Visible); break;
 
+                    case nameof(AllGroupsExpanded):
+                        allGroupsExpandedChanged = HasChanged(parameter.Value, AllGroupsExpanded);
+                        allGroupsExpanded = (bool?)parameter.Value;
+                        break;
 
-            var allGroupsExpandedChanged = parameters.DidParameterChange(nameof(AllGroupsExpanded), AllGroupsExpanded);
-            if (allGroupsExpandedChanged)
-            {
-                allGroupsExpanded = parameters.GetValueOrDefault<bool?>(nameof(AllGroupsExpanded));
+                    case nameof(Value):
+                        valueChanged = HasChanged(parameter.Value, Value); break;
+                }
             }
 
             await base.SetParametersAsync(parameters);
@@ -1900,7 +1908,9 @@ namespace Radzen.Blazor
                     Dispose();
                 }
             }
+
         }
+        private static bool HasChanged<T>(object newValue, T oldValue) => !EqualityComparer<T>.Default.Equals((T)newValue, oldValue);
 
         internal override async Task ReloadOnFirstRender()
         {
