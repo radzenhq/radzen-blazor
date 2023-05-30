@@ -43,10 +43,9 @@
         {
             if (shouldToggle)
             {
+                shouldToggle = false;
                 await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", target, GetId(), false, Reference, nameof(OnClose));
             }
-
-            shouldToggle = false;
         }
     }
 
