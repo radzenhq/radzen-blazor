@@ -270,6 +270,18 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// The minimum pixel distance from a data point to the mouse cursor required for the SeriesClick event to fire. Set to 25 by default.
+        /// </summary>
+        [Parameter]
+        public int ClickTolerance { get; set; } = 25;
+
+        /// <summary>
+        /// The minimum pixel distance from a data point to the mouse cursor required by the tooltip to show. Set to 25 by default.
+        /// </summary>
+        [Parameter]
+        public int TooltipTolerance { get; set; } = 25;
+
+        /// <summary>
         /// Invoked via interop when the user clicks the RadzenChart. Raises the <see cref="SeriesClick" /> handler.
         /// </summary>
         /// <param name="x">The x.</param>
@@ -279,7 +291,7 @@ namespace Radzen.Blazor
         {
             IChartSeries closestSeries = null;
             object closestSeriesData = null;
-            double closestSeriesDistanceSquared = 25 * 25;
+            double closestSeriesDistanceSquared = ClickTolerance * ClickTolerance;
 
             var queryX = x - MarginLeft;
             var queryY = y - MarginTop;
@@ -317,7 +329,7 @@ namespace Radzen.Blazor
                 var orderedSeries = Series.OrderBy(s => s.RenderingOrder).Reverse();
                 IChartSeries closestSeries = null;
                 object closestSeriesData = null;
-                double closestSeriesDistanceSquared = 25 * 25;
+                double closestSeriesDistanceSquared = TooltipTolerance * TooltipTolerance;
 
                 var queryX = mouseX - MarginLeft;
                 var queryY = mouseY - MarginTop;
@@ -328,7 +340,7 @@ namespace Radzen.Blazor
                     {
                         foreach (var overlay in series.Overlays.Reverse())
                         {
-                            if (overlay.Visible && overlay.Contains(mouseX - MarginLeft, mouseY - MarginTop, 25))
+                            if (overlay.Visible && overlay.Contains(mouseX - MarginLeft, mouseY - MarginTop, TooltipTolerance))
                             {
                                 tooltipData = null;
                                 tooltip = overlay.RenderTooltip(mouseX, mouseY, MarginLeft, MarginTop);
