@@ -1,4 +1,4 @@
-﻿@using System.Linq.Dynamic.Core
+@using System.Linq.Dynamic.Core
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components.Forms
 @using Radzen
@@ -100,17 +100,20 @@
                     @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
                     {
                         <tr>
-                            @foreach (var g in Groups)
+                            @if (i == 0) // Only add the th elements for the first row
                             {
-                                <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
-                                    <span class="rz-column-title"></span>
-                                </th>
-                            }
-                            @if (Template != null && ShowExpandColumn && i == 0)
-                            {
-                                <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
-                                    <span class="rz-column-title"></span>
-                                </th>
+                                    @foreach (var g in Groups)
+                                    {
+                                        <th class="rz-col-icon rz-unselectable-text mai1" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                            <span class="rz-column-title"></span>
+                                        </th>
+                                    }
+                                    @if (Template != null && ShowExpandColumn && i == 0)
+                                    {
+                                        <th class="rz-col-icon rz-unselectable-text mai2" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                            <span class="rz-column-title"></span>
+                                        </th>
+                                    }
                             }
                             @for (var j = 0; j < visibleColumns.Count; j++)
                             {
@@ -136,15 +139,16 @@
                     @if (AllowFiltering && (FilterMode == FilterMode.Simple || FilterMode == FilterMode.SimpleWithMenu) && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())
                     {
                         <tr>
+                             
                             @foreach (var g in Groups)
                             {
-                                <th class="rz-col-icon  rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                <th class="rz-col-icon  rz-unselectable-text mai3" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                     <span class="rz-column-title"></span>
                                 </th>
                             }
-                            @if (Template != null && ShowExpandColumn)
+                            @if (Template != null && ShowExpandColumn  )
                             {
-                                <th class="rz-col-icon  rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                <th class="rz-col-icon  rz-unselectable-text mai4" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                     <span class="rz-column-title"></span>
                                 </th>
                             }
@@ -349,17 +353,20 @@
                         @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
                         {
                             <tr class="">
-                                @foreach (var g in Groups)
+                                @if (i == 0) // Only add the th elements for the first row
                                 {
-                                    <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
-                                        <span class="rz-column-title"></span>
-                                    </td>
-                                }
-                                @if (Template != null && ShowExpandColumn && i == 0)
-                                {
-                                    <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
-                                        <span class="rz-column-title"></span>
-                                    </td>
+                                    @foreach (var g in Groups)
+                                    {
+                                        <td class="rz-col-icon rz-unselectable-text mai5" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                            <span class="rz-column-title"></span>
+                                        </td>
+                                    }
+                                    @if (Template != null && ShowExpandColumn && i == 0)
+                                    {
+                                        <td class="rz-col-icon rz-unselectable-text mai6" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                            <span class="rz-column-title"></span>
+                                        </td>
+                                    }
                                 }
                                 @for (var j = 0; j < visibleColumns.Count; j++)
                                 {
