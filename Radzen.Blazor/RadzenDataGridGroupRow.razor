@@ -20,7 +20,7 @@
             <span class="@(Grid.ExpandedGroupItemStyle(this, Grid.allGroupsExpanded != null ? Grid.allGroupsExpanded : rowArgs.Item1.Expanded))"></span>
         </a>
     </td>
-    <td colspan="@(Columns.Count + Grid.Groups.Count - 1 - Group.Level + (Grid.Template != null && Grid.ShowExpandColumn ? 1 : 0))">
+    <td colspan="@(TotalColumnCount + Grid.Groups.Count - 1 - Group.Level + (Grid.Template != null && Grid.ShowExpandColumn ? 1 : 0))">
         <span class="rz-cell-data">
             @if (Grid.GroupHeaderTemplate != null)
             {
@@ -82,6 +82,15 @@
                         Data = _groupResult
                     };
                 }
+            }
+        }
+
+
+        private int TotalColumnCount
+        {
+            get
+            {
+                return Columns.Sum(c => CountVisibleLeafColumns(c));
             }
         }
 
@@ -164,4 +173,19 @@
 
             return i;
         }
+
+    private int CountVisibleLeafColumns<TItem>(RadzenDataGridColumn<TItem> column)
+    {
+        if (column.ColumnsCollection?.Count == 0)
+        {
+            return column.GetVisible() && !string.IsNullOrEmpty(column.Property) ? 1 : 0;
+        }
+
+        int count = 0;
+        foreach (var childColumn in column.ColumnsCollection)
+        {
+            count += CountVisibleLeafColumns(childColumn);
+        }
+        return count;
+    }
 }
