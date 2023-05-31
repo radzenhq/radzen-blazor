@@ -321,8 +321,9 @@ video {
 .all-components .rz-badge {
     margin-left: 0.5rem;
     margin-top: 0.0625rem;
-    font-size: 0.5rem;
+    font-size: 0.625rem;
     line-height: 0.625rem;
+    --rz-badge-padding: 0.125rem 0.25rem;
 }
 
 /* Footer */
@@ -442,11 +443,11 @@ svg.illustration {
 .demos-right-sidebar {
     position: sticky;
     top: 2rem;
-    border-left: var(--rz-border-base-200);
+    border-left: var(--rz-border-disabled);
 }
 
 .article-toc {
-    border-left: var(--rz-border-base-200);
+    border-left: var(--rz-border-disabled);
 }
 
 .article-toc h2 {
