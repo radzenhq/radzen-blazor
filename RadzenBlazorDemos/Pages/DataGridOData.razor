@@ -17,7 +17,7 @@
                 Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
         </FilterTemplate>
     </RadzenDataGridColumn>
-    <RadzenDataGridColumn TItem="Employee" Title="Customers" Property="Orders" FilterProperty="Customer/CustomerID"
+    <RadzenDataGridColumn TItem="Employee" Title="Customers" Property="Orders" FilterProperty="Customer/CustomerID" Sortable=false
                               Type="typeof(IEnumerable<Customer>)" FilterValue="@selectedCustomers" FilterOperator="FilterOperator.In">
         <FilterTemplate>
             <RadzenDropDown @bind-Value=@selectedCustomers Style="width:100%" TextProperty="CompanyName" ValueProperty="CustomerID"
