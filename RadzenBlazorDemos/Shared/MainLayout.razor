@@ -36,7 +36,7 @@
                         </ValueTemplate>
                         <Template>
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-                                <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 4px; oveflow: hidden; outline: var(--rz-input-border); min-width: 80px;">
+                                <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 4px; oveflow: hidden; outline: var(--rz-border-disabled); min-width: 80px;">
                                     <rect width="80" height="60" fill="@context.Base"/>
                                     <rect x="0" y="4" width="16" height="56" fill="@context.Sidebar"/>
                                     <rect x="24" y="17" width="48" height="32" rx="2" fill="@context.Content"/>
@@ -51,7 +51,11 @@
                                 @context.Text
                                 @if (context.Premium)
                                 {
-                                    <RadzenBadge title="To use it in your application you need an active Radzen Professional or Enterprise subscription.">PRO</RadzenBadge>
+                                    <RadzenBadge title="To use it in your application you need an active Radzen Professional or Enterprise subscription." Shade="Shade.Light">PRO</RadzenBadge>
+                                }
+                                else
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Light">FREE</RadzenBadge>
                                 }
                             </RadzenStack>
                         </Template>
@@ -75,6 +79,27 @@
                 <RadzenColumn Size="12">
                     <RadzenRow Class="rz-mx-auto" Style="max-width: 1600px;">
                         <RadzenColumn Size="12" SizeMD="9">
+                            @if (@ThemeService.CurrentTheme == "material3") {
+                                <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Icon="auto_awesome" Shade="Shade.Lighter">
+                                    <RadzenText TextStyle="TextStyle.H4" style="color: var(--rz-on-info-lighter);">Enjoy Material 3</RadzenText>
+                                    <RadzenText style="color: var(--rz-on-info-lighter);">This is a preview of Radzen's new Material 3 premium theme, available only to <a href="#">Radzen subscribers</a>.</RadzenText>
+                                    <RadzenText style="color: var(--rz-on-info-lighter);">Browse components with a free theme by selecting one from the dropdown above. </RadzenText>
+                                </RadzenAlert>
+                            }
+                            else if (@ThemeService.CurrentTheme == "material3-dark") {
+                                <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Icon="auto_awesome" Shade="Shade.Dark">
+                                    <RadzenText TextStyle="TextStyle.H4" style="color: var(--rz-on-info-dark);">Enjoy Material 3</RadzenText>
+                                    <RadzenText style="color: var(--rz-on-info-dark);">This is a preview of Radzen's new Material 3 premium theme, available only to <a href="#">Radzen subscribers</a>.</RadzenText>
+                                    <RadzenText style="color: var(--rz-on-info-dark);">Browse components with a free theme by selecting one from the dropdown above. </RadzenText>
+                                </RadzenAlert>
+                            }
+                            else if (@ThemeService.CurrentTheme == "fluent" || @ThemeService.CurrentTheme == "fluent-dark") {
+                                <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Icon="auto_awesome" Shade="Shade.Lighter">
+                                    <RadzenText TextStyle="TextStyle.H4" style="color: var(--rz-on-info-lighter);">Fluent UI</RadzenText>
+                                    <RadzenText style="color: var(--rz-on-info-lighter);">This is a preview of Radzen's Fluent UI premium theme, available only to <a href="#">Radzen subscribers</a>.</RadzenText>
+                                    <RadzenText style="color: var(--rz-on-info-lighter);">Browse components with a free theme by selecting one from the dropdown above. </RadzenText>
+                                </RadzenAlert>
+                            }
                             @Body
                             <RadzenCard Class="rz-mt-12 rz-display-block rz-display-md-none">
                                 <RadzenRow AlignItems="AlignItems.Center" Gap="0px">
@@ -120,7 +145,7 @@
 </RadzenBody>
 <RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded" Class="demos-sidebar" style="display: flex; flex-direction: column">
     <div style="padding: 1rem">
-        <RadzenTextBox Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" />
+        <RadzenTextBox Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" Class="rz-search-input" />
     </div>
     <div style="flex: 1; overflow: auto">
     <RadzenPanelMenu Match="NavLinkMatch.Prefix">
