@@ -59,7 +59,7 @@
         else if (selectedItems.Count > 0)
         {
             <label class="rz-dropdown-label rz-inputtext ">
-                @if (selectedItems.Count < MaxSelectedLabels)
+                @if (ShowSelectedLabels && selectedItems.Count < MaxSelectedLabels)
                 {
                     @if (Template == null)
                     {

@@ -1131,6 +1131,20 @@ namespace Radzen.Blazor
         public string ColumnsText { get; set; } = "Columns";
 
         /// <summary>
+        /// Gets or sets the option to show the selected column names as labels in column picker.
+        /// </summary>
+        /// <value><c>true</c> (default) if selected column names are shown; otherwise <c>false</c>.</value>
+        [Parameter]
+        public bool ColumnsShowSelectedLabels { get; set; } = true;
+        
+        /// <summary>
+        /// Gets or sets the maximum number of selected column names are shown as labels in column picker.
+        /// </summary>
+        /// <value>Maximum number of labels (default: 2).</value>
+        [Parameter]
+        public int MaxColumnsSelectedLabels { get; set; } = 2;
+        
+        /// <summary>
         /// Gets or sets a value indicating whether user can pick all columns in column picker.
         /// </summary>
         /// <value><c>true</c> if pick of all columns is allowed; otherwise, <c>false</c>.</value>

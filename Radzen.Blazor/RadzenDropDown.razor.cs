@@ -97,6 +97,13 @@ namespace Radzen.Blazor
         public int MaxSelectedLabels { get; set; } = 4;
 
         /// <summary>
+        /// Gets or sets the option to show the selected values as labels.
+        /// </summary>
+        /// <value><c>true</c> (default) if selected values are shown as labels; otherwise <c>false</c>.</value>
+        [Parameter]
+        public bool ShowSelectedLabels { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the Popup height.
         /// </summary>
         /// <value>The number Popup height.</value>
@@ -110,7 +117,7 @@ namespace Radzen.Blazor
         /// <value><c>true</c> to display the selected items as chips; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Chips { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the selected items text.
         /// </summary>
