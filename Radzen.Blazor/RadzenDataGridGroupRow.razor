@@ -57,40 +57,43 @@
     }
 }
 @code {
-        [Parameter]
-        public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
+    [Parameter]
+    public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
 
-        GroupResult _groupResult;
-        [Parameter]
-        public GroupResult GroupResult 
-        { 
-            get
+    GroupResult _groupResult;
+    [Parameter]
+    public GroupResult GroupResult 
+    { 
+        get
+        {
+            return _groupResult;
+        }
+        set
+        {
+            if(_groupResult != value)
             {
-                return _groupResult;
-            }
-            set
-            {
-                if(_groupResult != value)
-                {
-                    _groupResult = value;
+                _groupResult = value;
 
-                    var level = GetLevel();
-                    Group = new Group()
+                var level = GetLevel();
+                Group = new Group()
                     {
                         Level = level,
                         GroupDescriptor = Grid.Groups?.ElementAtOrDefault(level),
                         Data = _groupResult
                     };
-                }
             }
         }
+    }
 
 
-        private int TotalColumnCount
+    private int TotalColumnCount
+    {
+        get
         {
-            get
-            {
-                return Columns.Sum(c => CountVisibleLeafColumns(c));
+             var columnsOfGrid = Columns
+                   .Where(c => c.GetVisible())
+                   .ToList();
+            return columnsOfGrid.Sum(c => CountVisibleLeafColumns(c));
             }
         }
 
@@ -178,7 +181,7 @@
     {
         if (column.ColumnsCollection?.Count == 0)
         {
-            return column.GetVisible() && !string.IsNullOrEmpty(column.Property) ? 1 : 0;
+            return column.GetVisible()  ? 1 : 0;
         }
 
         int count = 0;
