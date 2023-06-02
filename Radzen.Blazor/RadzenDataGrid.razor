@@ -51,13 +51,16 @@
                 @if (AllowColumnPicking)
                 {
                     <div class="rz-column-picker">
-                        <RadzenDropDown SelectAllText="@AllColumnsText" AllowSelectAll="@AllowPickAllColumns"
-                            MaxSelectedLabels="2"
-                            SelectedItemsText="@ColumnsShowingText" Change=@ToggleColumns
+                        <RadzenDropDown 
                             @bind-Value="@selectedColumns"
+                            AllowSelectAll="@AllowPickAllColumns"
+                            Change="@ToggleColumns"
+                            Data="allPickableColumns"
+                            MaxSelectedLabels="@MaxColumnsSelectedLabels"
                             Multiple="true"
                             Placeholder="@ColumnsText"
-                            Data="allPickableColumns"
+                            SelectAllText="@AllColumnsText" 
+                            SelectedItemsText="@ColumnsShowingText" 
                             TextProperty="Title" />
                     </div>
 
