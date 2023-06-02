@@ -1117,6 +1117,13 @@ namespace Radzen.Blazor
         public string ColumnsShowingText { get; set; } = "columns showing";
 
         /// <summary>
+        /// Gets or sets the column picker max selected labels.
+        /// </summary>
+        /// <value>The column picker max selected labels.</value>
+        [Parameter]
+        public int ColumnsPickerMaxSelectedLabels { get; set; } = 2;
+
+        /// <summary>
         /// Gets or sets the column picker all columns text.
         /// </summary>
         /// <value>The column picker all columns text.</value>
