@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
@@ -172,6 +172,19 @@ namespace Radzen.Blazor
         public bool ShowSearch { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether the create button is shown.
+        /// </summary>
+        /// <value><c>true</c> if the create button is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowCreate { get; set; } = false;
+        /// <summary>
+        /// Gets or sets a value indicating whether the component should refresh after a create action.
+        /// </summary>
+        /// <value><c>true</c> if the component should refresh after a create action; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool RefreshAfterCreate { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the page numbers count.
         /// </summary>
         /// <value>The page numbers count.</value>
@@ -219,6 +232,12 @@ namespace Radzen.Blazor
         /// <value>The columns.</value>
         [Parameter]
         public RenderFragment Columns { get; set; }
+
+        /// <summary>
+        /// Gets or sets the action to be executed when the Add button is clicked.
+        /// </summary>
+        [Parameter]
+        public EventCallback<MouseEventArgs> OnAdd { get; set; }
 
         RadzenDataGrid<object> grid;
         IEnumerable<object> pagedData;
@@ -333,7 +352,33 @@ namespace Radzen.Blazor
 
             return type == typeof(string);
         }
+        bool clicking;
+        /// <summary>
+        /// Handles the <see cref="E:Click" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
+        public async Task OnAddClick(MouseEventArgs args)
+        {
+            if (clicking)
+            {
+                return;
+            }
 
+            try
+            {
+                clicking = true;
+
+                await OnAdd.InvokeAsync(args);
+                if (RefreshAfterCreate)
+                {
+                    await Reload();
+                }
+            }
+            finally
+            {
+                clicking = false;
+            }
+        }
         async Task OnLoadData(LoadDataArgs args)
         {
             if (!LoadData.HasDelegate)
@@ -622,7 +667,10 @@ namespace Radzen.Blazor
         protected override async Task OnFilter(ChangeEventArgs args)
         {
             await DebounceFilter();
-        }
+        }   
+        
+        
+
 
         /// <summary>
         /// Gets or sets a value indicating whether sorting is allowed.
