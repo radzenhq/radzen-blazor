@@ -24,31 +24,6 @@ namespace RadzenBlazorDemos
         public static readonly Theme[] Themes = new []
         {
             new Theme {
-                Text = "Material",
-                Value = "material",
-                Primary = "#4340d2",
-                Secondary = "#e91e63",
-                Base = "#f5f5f5",
-                Header = "#4340d2",
-                Sidebar = "#ffffff",
-                Content = "#ffffff",
-                TitleText = "#212121",
-                ContentText = "#bdbdbd"
-            },
-            new Theme {
-                Text = "Material Dark",
-                Value = "material-dark",
-                Premium = true,
-                Primary = "#bb86fc",
-                Secondary = "#01a299",
-                Base = "#121212",
-                Header = "#333333",
-                Sidebar = "#252525",
-                Content = "#252525",
-                TitleText = "#ffffff",
-                ContentText = "#a0a0a0"
-            },
-            new Theme {
                 Text = "Material 3",
                 Value = "material3",
                 Premium = true,
@@ -73,6 +48,31 @@ namespace RadzenBlazorDemos
                 Content = "#1b1d20",
                 TitleText = "#e0e0e9",
                 ContentText = "#e0e0e9"
+            },
+            new Theme {
+                Text = "Material",
+                Value = "material",
+                Primary = "#4340d2",
+                Secondary = "#e91e63",
+                Base = "#f5f5f5",
+                Header = "#4340d2",
+                Sidebar = "#ffffff",
+                Content = "#ffffff",
+                TitleText = "#212121",
+                ContentText = "#bdbdbd"
+            },
+            new Theme {
+                Text = "Material Dark",
+                Value = "material-dark",
+                Premium = true,
+                Primary = "#bb86fc",
+                Secondary = "#01a299",
+                Base = "#121212",
+                Header = "#333333",
+                Sidebar = "#252525",
+                Content = "#252525",
+                TitleText = "#ffffff",
+                ContentText = "#a0a0a0"
             },
             new Theme {
                 Text = "Fluent",
