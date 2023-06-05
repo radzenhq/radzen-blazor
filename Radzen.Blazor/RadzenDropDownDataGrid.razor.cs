@@ -182,12 +182,6 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if the create button is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowAdd { get; set; } = false;
-        /// <summary>
-        /// Gets or sets a value indicating whether the component should refresh after a create action.
-        /// </summary>
-        /// <value><c>true</c> if the component should refresh after a create action; otherwise, <c>false</c>.</value>
-        [Parameter]
-        public bool RefreshAfterAdd { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the page numbers count.
@@ -733,10 +727,6 @@ namespace Radzen.Blazor
                 clicking = true;
 
                 await Add.InvokeAsync(args);
-                if (RefreshAfterAdd)
-                {
-                    await Reload();
-                }
             }
             finally
             {
