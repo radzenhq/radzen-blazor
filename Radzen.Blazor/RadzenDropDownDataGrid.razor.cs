@@ -174,7 +174,7 @@ namespace Radzen.Blazor
         /// Gets or sets the action to be executed when the Add button is clicked.
         /// </summary>
         [Parameter]
-        public EventCallback<MouseEventArgs> OnAdd { get; set; }
+        public EventCallback<MouseEventArgs> Add { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the create button is shown.
@@ -732,7 +732,7 @@ namespace Radzen.Blazor
             {
                 clicking = true;
 
-                await OnAdd.InvokeAsync(args);
+                await Add.InvokeAsync(args);
                 if (RefreshAfterAdd)
                 {
                     await Reload();
