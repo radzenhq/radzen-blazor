@@ -24,7 +24,7 @@
             @foreach(var filter in Filters)
             {
                 <li class="rz-datafilter-item @(filter.Filters != null ? "rz-datafilter-group-item" : "")">
-                <RadzenDataFilterItem DataFilter="@this" Filter="@filter" />
+                <RadzenDataFilterItem @key=@filter.GetHashCode() DataFilter="@this" Filter="@filter" />
               </li>
             }
             <li class="rz-datafilter-item rz-datafilter-bar">
