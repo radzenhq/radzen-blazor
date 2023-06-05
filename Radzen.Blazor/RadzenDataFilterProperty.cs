@@ -309,7 +309,7 @@ namespace Radzen.Blazor
                 };
             }
 
-            return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
+            return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => o != FilterOperator.In && o != FilterOperator.NotIn).Where(o => {
                 var isStringOperator = o == FilterOperator.Contains || o == FilterOperator.DoesNotContain
                     || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith || o == FilterOperator.IsEmpty || o == FilterOperator.IsNotEmpty;
                 return FilterPropertyType == typeof(string) ? isStringOperator
