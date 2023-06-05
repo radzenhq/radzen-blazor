@@ -2626,6 +2626,63 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets the sort descriptors.
+        /// </summary>
+        /// <value>The sort.</value>
+        public ObservableCollection<SortDescriptor> Sorts
+        {
+            get
+            {
+                if (sortDescriptors == null)
+                {
+                    sortDescriptors = new ObservableCollection<SortDescriptor>();
+                    sortDescriptors.CollectionChanged -= SortsCollectionChanged;
+                    sortDescriptors.CollectionChanged += SortsCollectionChanged;
+                }
+
+                return sortDescriptors;
+            }
+            set
+            {
+                sortDescriptors = value;
+            }
+        }
+
+        ObservableCollection<SortDescriptor> sortDescriptors;
+
+        void SortsCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                var column = columns.Where(c => c.GetSortProperty() == ((SortDescriptor)args.NewItems[0]).Property).FirstOrDefault();
+
+                if (column != null)
+                {
+                    column.SetSortOrder(((SortDescriptor)args.NewItems[0]).SortOrder);
+                }
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                var column = columns.Where(c => c.GetSortProperty() == ((SortDescriptor)args.OldItems[0]).Property).FirstOrDefault();
+
+                if (column != null)
+                {
+                    column.ResetSortOrder();
+                }
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Reset)
+            {
+                allColumns.ToList().ForEach(c =>
+                {
+                    c.ResetSortOrder();
+                });
+            }
+
+            SaveSettings();
+            InvokeAsync(Reload);
+        }
+
+        /// <summary>
         /// Orders the DataGrid by property name.
         /// </summary>
         /// <param name="property">The property name.</param>
