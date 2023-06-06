@@ -170,6 +170,18 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if search button is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowSearch { get; set; } = true;
+        /// <summary>
+        /// Gets or sets the action to be executed when the Add button is clicked.
+        /// </summary>
+        [Parameter]
+        public EventCallback<MouseEventArgs> Add { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the create button is shown.
+        /// </summary>
+        /// <value><c>true</c> if the create button is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowAdd { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the page numbers count.
@@ -695,6 +707,30 @@ namespace Radzen.Blazor
             if (IsJSRuntimeAvailable)
             {
                 JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+            }
+        }
+
+        bool clicking;
+        /// <summary>
+        /// Handles the <see cref="E:Click" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
+        public async Task OnAddClick(MouseEventArgs args)
+        {
+            if (clicking)
+            {
+                return;
+            }
+
+            try
+            {
+                clicking = true;
+
+                await Add.InvokeAsync(args);
+            }
+            finally
+            {
+                clicking = false;
             }
         }
     }
