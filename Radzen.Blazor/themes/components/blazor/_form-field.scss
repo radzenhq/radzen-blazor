@@ -375,14 +375,14 @@ $form-field-helper-padding: 0 0.5rem !default;
         max-width: calc(100% - 1.5rem);
     }
 
-    :not(.rz-variant-outlined) *:focus ~ &,
-    :not(.rz-variant-outlined) *:focus-within ~ &,
-    :not(.rz-variant-outlined) :not(.rz-state-empty) ~ &,
-    :not(.rz-variant-outlined) .rz-radio-button-list-vertical ~ &,
-    :not(.rz-variant-outlined) .rz-radio-button-list-horizontal ~ &,
-    :not(.rz-variant-outlined) .rz-checkbox-list-vertical ~ &,
-    :not(.rz-variant-outlined) .rz-checkbox-list-horizontal  ~ &,
-    :not(.rz-variant-outlined) .rz-chkbox ~ &  {
+    .rz-form-field:not(.rz-variant-outlined) *:focus ~ &,
+    .rz-form-field:not(.rz-variant-outlined) *:focus-within ~ &,
+    .rz-form-field:not(.rz-variant-outlined) :not(.rz-state-empty) ~ &,
+    .rz-form-field:not(.rz-variant-outlined) .rz-radio-button-list-vertical ~ &,
+    .rz-form-field:not(.rz-variant-outlined) .rz-radio-button-list-horizontal ~ &,
+    .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-vertical ~ &,
+    .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-horizontal  ~ &,
+    .rz-form-field:not(.rz-variant-outlined) .rz-chkbox ~ &  {
         background-color: inherit !important;
     }
 
