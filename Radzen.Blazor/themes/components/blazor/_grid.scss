@@ -223,6 +223,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   border: var(--rz-grid-cell-border);
   border-radius: var(--rz-grid-border-radius);
   background-color: var(--rz-grid-background-color);
+  overflow: hidden;
 
   .rz-col-icon {
     text-align: center;
@@ -263,18 +264,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
           }
         }
       }
-    }
-  }
-
-  tr:last-child {
-    border-radius: 0 0 var(--rz-grid-border-radius) var(--rz-grid-border-radius);
-
-    td:first-child {
-      border-bottom-left-radius: var(--rz-grid-border-radius);
-    }
-
-    td:last-child {
-      border-bottom-right-radius: var(--rz-grid-border-radius);
     }
   }
 }
@@ -1048,18 +1037,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   overflow: auto;
   flex: 1;
   box-shadow: var(--rz-grid-data-border-shadow);
-
-  &:first-child {
-    thead tr:first-child {
-      th:first-child {
-        border-top-left-radius: var(--rz-grid-border-radius);
-      }
-
-      th:last-child {
-        border-top-right-radius: var(--rz-grid-border-radius);
-      }
-    }
-  }
 }
 
 .rz-grid-table td, .rz-grid-table th {
@@ -1178,7 +1155,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   background-color: var(--rz-grid-header-background-color);
   padding: var(--rz-grid-group-header-padding);
   border-bottom: var(--rz-grid-bottom-cell-border);
-  border-radius: var(--rz-grid-border-radius) var(--rz-grid-border-radius) 0 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
