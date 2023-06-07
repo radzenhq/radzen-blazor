@@ -24,6 +24,32 @@ namespace RadzenBlazorDemos
         public static readonly Theme[] Themes = new []
         {
             new Theme {
+                Text = "Material 3",
+                Value = "material3",
+                Premium = true,
+                Primary = "#3481e5",
+                Secondary = "#5b6471",
+                Base = "#ffffff",
+                Header = "#f4f3f9",
+                Sidebar = "#f4f3f9",
+                Content = "#f8f7ff",
+                TitleText = "#1b1d20",
+                ContentText = "#1b1d20"
+            },
+            new Theme {
+                Text = "Material 3 Dark",
+                Value = "material3-dark",
+                Premium = true,
+                Primary = "#94c1ff",
+                Secondary = "#c2cbdc",
+                Base = "#121418",
+                Header = "#1f2226",
+                Sidebar = "#1f2226",
+                Content = "#1b1d20",
+                TitleText = "#e0e0e9",
+                ContentText = "#e0e0e9"
+            },
+            new Theme {
                 Text = "Material",
                 Value = "material",
                 Primary = "#4340d2",
@@ -60,6 +86,19 @@ namespace RadzenBlazorDemos
                 Content = "white",
                 TitleText = "black",
                 ContentText = "black"
+            },
+            new Theme {
+                Text = "Fluent Dark",
+                Value = "fluent-dark",
+                Premium = true,
+                Primary = "#0078d4",
+                Secondary = "#5c5c5c",
+                Base = "#292929",
+                Header = "#141414",
+                Sidebar = "#141414",
+                Content = "#333333",
+                TitleText = "#ffffff",
+                ContentText = "#d6d6d6"
             },
             new Theme {
                 Text = "Standard",
@@ -123,7 +162,7 @@ namespace RadzenBlazorDemos
             }
         };
 
-        public const string DefaultTheme = "material";
+        public const string DefaultTheme = "material3";
         public const string QueryParameter = "theme";
 
         public string CurrentTheme { get; set; } = DefaultTheme;
