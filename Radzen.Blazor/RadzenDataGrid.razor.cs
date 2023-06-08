@@ -1145,6 +1145,13 @@ namespace Radzen.Blazor
         public bool AllowPickAllColumns { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether user can filter columns in column picker.
+        /// </summary>
+        /// <value><c>true</c> if user can filter columns in column picker; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ColumnsPickerAllowFiltering { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets a value indicating whether grouping is allowed.
         /// </summary>
         /// <value><c>true</c> if grouping is allowed; otherwise, <c>false</c>.</value>

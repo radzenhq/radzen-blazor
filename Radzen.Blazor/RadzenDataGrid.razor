@@ -55,7 +55,7 @@
                             MaxSelectedLabels="@ColumnsPickerMaxSelectedLabels"
                             SelectedItemsText="@ColumnsShowingText" Change=@ToggleColumns
                             @bind-Value="@selectedColumns"
-                            Multiple="true"
+                            Multiple="true" AllowFiltering="@ColumnsPickerAllowFiltering"
                             Placeholder="@ColumnsText"
                             Data="allPickableColumns"
                             TextProperty="Title" />
