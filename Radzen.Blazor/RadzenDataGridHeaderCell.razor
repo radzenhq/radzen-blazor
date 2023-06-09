@@ -116,7 +116,7 @@
                                 @if (!(SelectFilterItems is null))
                                 {
                                     <RadzenDropDown AllowClear="false" AllowFiltering="false" TValue="object"
-                                                    Value="@Column.GetFilterValue()" Multiple="false" Placeholder="@Grid.EnumFilterSelectText" TextProperty="Key" ValueProperty="Value" Data=@SelectFilterItems
+                                                    Value="@Column.GetSecondFilterValue()" Multiple="false" Placeholder="@Grid.EnumFilterSelectText" TextProperty="Key" ValueProperty="Value" Data=@SelectFilterItems
                                                     Change="@(args => Column.SetFilterValue(args))">
 
                                     </RadzenDropDown>
