@@ -438,6 +438,13 @@ namespace Radzen.Blazor
         /// <value>The logical filter operator.</value>
         [Parameter]
         public LogicalFilterOperator LogicalFilterOperator { get; set; } = LogicalFilterOperator.And;
+        /// <summary>
+        /// Gets or sets the select filter items.
+        /// </summary>
+        /// <value>The select filter items.</value>
+
+        [Parameter]
+        public Dictionary<string, object> SelectFilterItems { get; set; }
 
         /// <summary>
         /// Gets or sets the data type.
@@ -445,6 +452,10 @@ namespace Radzen.Blazor
         /// <value>The data type.</value>
         [Parameter]
         public Type Type { get; set; }
+
+
+
+
 
         Func<TItem, object> propertyValueGetter;
 
