@@ -1109,5 +1109,22 @@ namespace Radzen.Blazor
         {
             Grid?.RemoveColumn(this);
         }
+
+        internal int? getSortIndex()
+        {
+            var descriptor = Grid.sorts.Where(s => s.Property == GetSortProperty()).FirstOrDefault();
+            if (descriptor != null)
+            {
+                return Grid.sorts.IndexOf(descriptor);
+            }
+            
+            return null;
+        }
+
+        internal string getSortIndexAsString()
+        {
+            var index = getSortIndex();
+            return index != null ? $"{getSortIndex() + 1}" : "";
+        }
     }
 }

@@ -28,7 +28,7 @@
                 <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
                 @if(Grid.ShowMultiColumnSortingIndex)
                 {
-                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" IsPill=true Text="@getSortIndex()" />
+                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" IsPill=true Text="@Column.getSortIndexAsString()" />
                 }
             }
             else if (Column.GetSortOrder() == SortOrder.Descending)
@@ -36,7 +36,7 @@
                 <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
                 @if(Grid.ShowMultiColumnSortingIndex)
                 {
-                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" IsPill=true Text="@getSortIndex()" />
+                            <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" IsPill=true Text="@Column.getSortIndexAsString()" />
                 }
             }
             else
@@ -219,12 +219,6 @@ else
         {
             Grid.OnSort(args, Column);
         }
-    }
-
-    string getSortIndex()
-    {
-        var descriptor = Grid.sorts.Where(s => s.Property == Column.GetSortProperty()).FirstOrDefault();
-        return descriptor != null ? $"{Grid.sorts.IndexOf(descriptor) + 1}" : "";
     }
 
     string getColumnPopupID()
