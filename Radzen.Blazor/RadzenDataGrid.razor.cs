@@ -2848,6 +2848,7 @@ namespace Radzen.Blazor
                         Visible = c.GetVisible(),
                         OrderIndex = c.GetOrderIndex(),
                         SortOrder = c.GetSortOrder(),
+                        SortIndex = c.getSortIndex(),
                         FilterValue = c.GetFilterValue(),
                         FilterOperator = c.GetFilterOperator(),
                         SecondFilterValue = c.GetSecondFilterValue(),
@@ -2880,6 +2881,20 @@ namespace Radzen.Blazor
 
                 if (settings.Columns != null)
                 {
+                    foreach (var column in settings.Columns.OrderBy(c => c.SortIndex))
+                    {
+                        var gridColumn = ColumnsCollection.Where(c => c.Property == column.Property).FirstOrDefault();
+                        if (gridColumn != null)
+                        {
+                            // Sorting
+                            if (gridColumn.GetSortOrder() != column.SortOrder)
+                            {
+                                gridColumn.SetSortOrder(column.SortOrder);
+                                shouldUpdateState = true;
+                            }
+                        }
+                    }
+
                     foreach (var column in settings.Columns)
                     {
                         var gridColumn = ColumnsCollection.Where(c => c.Property == column.Property).FirstOrDefault();
@@ -2903,13 +2918,6 @@ namespace Radzen.Blazor
                             if (gridColumn.GetOrderIndex() != column.OrderIndex)
                             {
                                 gridColumn.SetOrderIndex(column.OrderIndex);
-                                shouldUpdateState = true;
-                            }
-
-                            // Sorting
-                            if (gridColumn.GetSortOrder() != column.SortOrder)
-                            {
-                                gridColumn.SetSortOrder(column.SortOrder);
                                 shouldUpdateState = true;
                             }
 

@@ -82,6 +82,10 @@ namespace Radzen
         /// </summary>
         public SortOrder? SortOrder { get; set; }
         /// <summary>
+        /// SortIndex.
+        /// </summary>
+        public int? SortIndex { get; set; }
+        /// <summary>
         /// FilterValue.
         /// </summary>
         public object FilterValue { get; set; }
