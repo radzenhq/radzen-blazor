@@ -1009,11 +1009,13 @@ namespace Radzen
                                     IsEnumerable(column.PropertyType) && column.PropertyType != typeof(string))
                             {
                                 whereList.Add($@"{(comparison == "NotIn" ? "!" : "")}{property}.Any(i => i in @{index})", new object[] { column.GetFilterValue() });
+                                index++;
                             }
                             else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && 
                                 column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
                             {
                                 whereList.Add($@"{(comparison == "NotIn" ? "!" : "")}{column.Property}.Any(i => i.{column.FilterProperty} in @{index})", new object[] { column.GetFilterValue() });
+                                index++;
                             }
                         }
                         else if (!(IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)))
