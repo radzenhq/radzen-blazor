@@ -76,7 +76,7 @@ namespace Radzen.Blazor
             }
 
             await InvokeLoadData(request.StartIndex, top);
-            
+
             var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
 
             virtualDataItems = (LoadData.HasDelegate ? Data : itemToInsert != null ? (new[] { itemToInsert }).Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top))?.ToList();
@@ -102,7 +102,7 @@ namespace Radzen.Blazor
             return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<GroupResult>(_groupedPagedView.Skip(request.StartIndex).Take(top), totalItemsCount);
         }
 #endif
-       
+
         RenderFragment DrawRows(IList<RadzenDataGridColumn<TItem>> visibleColumns)
         {
             return new RenderFragment(builder =>
@@ -135,7 +135,7 @@ namespace Radzen.Blazor
                     {
                         builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>));
                         builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<TItem>(LoadItems));
-                    
+
                         builder.AddAttribute(2, "ChildContent", (RenderFragment<TItem>)((context) =>
                         {
                             return (RenderFragment)((b) =>
@@ -267,7 +267,7 @@ namespace Radzen.Blazor
 
         internal async Task RemoveGroupAsync(GroupDescriptor gd)
         {
-            Groups.Remove(gd); 
+            Groups.Remove(gd);
             _groupedPagedView = null;
 
             var column = columns.Where(c => c.GetGroupProperty() == gd.Property).FirstOrDefault();
@@ -355,7 +355,7 @@ namespace Radzen.Blazor
         /// Gives the grid a custom header, allowing the adding of components to create custom tool bars in addtion to column grouping and column picker
         /// </summary>
         [Parameter]
-        public RenderFragment HeaderTemplate { get; set; } 
+        public RenderFragment HeaderTemplate { get; set; }
 
         internal object selectedColumns;
 
@@ -439,7 +439,7 @@ namespace Radzen.Blazor
                     columnsList.Add(column);
                 }
             }
-            else 
+            else
             {
                 if (columnsList.Contains(column))
                 {
@@ -450,18 +450,18 @@ namespace Radzen.Blazor
             selectedColumns = columnsList;
         }
 
-		public void UpdatePickableColumns()
-		{
-			if (allColumns.Any(c => c.Pickable))
-			{
-				if (AllowColumnPicking)
-				{
-					allPickableColumns = allColumns.Where(c => c.Pickable).OrderBy(c => c.GetOrderIndex()).ToList();
-				}
-			}
-		}
+        public void UpdatePickableColumns()
+        {
+            if (allColumns.Any(c => c.Pickable))
+            {
+                if (AllowColumnPicking)
+                {
+                    allPickableColumns = allColumns.Where(c => c.Pickable).OrderBy(c => c.GetOrderIndex()).ToList();
+                }
+            }
+        }
 
-		internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
+        internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
         {
             if (columns.Contains(column))
             {
@@ -712,9 +712,9 @@ namespace Radzen.Blazor
 
             SaveSettings();
 
-            await FilterCleared.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>() 
-            { 
-                Column = column, 
+            await FilterCleared.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
+            {
+                Column = column,
                 FilterValue = column.GetFilterValue(),
                 SecondFilterValue = column.GetSecondFilterValue(),
                 FilterOperator = column.GetFilterOperator(),
@@ -951,14 +951,14 @@ namespace Radzen.Blazor
         /// <value>The null text.</value>
         [Parameter]
         public string IsNullText { get; set; } = "Is null";
-        
+
         /// <summary>
         /// Gets or sets the is empty text.
         /// </summary>
         /// <value>The empty text.</value>
         [Parameter]
         public string IsEmptyText { get; set; } = "Is empty";
-        
+
         /// <summary>
         /// Gets or sets the is not empty text.
         /// </summary>
@@ -1186,6 +1186,12 @@ namespace Radzen.Blazor
         [Parameter]
         public string GroupPanelText { get; set; } = "Drag a column header here and drop it to group by that column";
 
+        /// <summary>
+        /// Whether the underlying data source is OData. If true, <see cref="LoadDataArgs"/> will have use OData filter and order strings.
+        /// </summary>
+        [Parameter]
+        public bool? IsOData { get; set; }
+
         internal string getColumnResizerId(int columnIndex)
         {
             return string.Join("", $"{UniqueID}".Split('.')) + columnIndex;
@@ -1259,7 +1265,7 @@ namespace Radzen.Blazor
 
         internal string GetOrderBy()
         {
-            return string.Join(",", sorts.Select(d => allColumns.ToList().Where(c => c.GetSortProperty() == d.Property).FirstOrDefault()).Where(c => c != null).Select(c => c.GetSortOrderAsString(IsOData())));
+            return string.Join(",", sorts.Select(d => allColumns.ToList().Where(c => c.GetSortProperty() == d.Property).FirstOrDefault()).Where(c => c != null).Select(c => c.GetSortOrderAsString(GetIsOData())));
         }
 
         /// <summary>
@@ -1411,11 +1417,11 @@ namespace Radzen.Blazor
 
         internal bool IsVirtualizationAllowed()
         {
-    #if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER
             return AllowVirtualization;
-    #else
+#else
             return false;
-    #endif
+#endif
         }
 
         IList<TItem> _value;
@@ -1573,9 +1579,9 @@ namespace Radzen.Blazor
                 keyPropertyGetter = PropertyAccess.Getter<TItem, object>(KeyProperty);
             }
 
-            Reset(!IsOData() && !LoadData.HasDelegate);
+            Reset(!GetIsOData() && !LoadData.HasDelegate);
 
-            if (!IsOData() && !LoadData.HasDelegate && !Page.HasDelegate)
+            if (!GetIsOData() && !LoadData.HasDelegate && !Page.HasDelegate)
             {
                 skip = 0;
                 CurrentPage = 0;
@@ -1603,15 +1609,15 @@ namespace Radzen.Blazor
 
             if (resetColumnState)
             {
-                allColumns.ToList().ForEach(c => 
-                { 
-                    c.ClearFilters(); 
+                allColumns.ToList().ForEach(c =>
+                {
+                    c.ClearFilters();
                     c.ResetSortOrder();
                     c.SetOrderIndex(null);
                     c.SetWidth(null);
                 });
                 sorts.Clear();
-           }
+            }
 
             if (!LoadData.HasDelegate)
             {
@@ -1707,7 +1713,7 @@ namespace Radzen.Blazor
 
             filters = allColumns.ToList().Where(c => c.Filterable && c.GetVisible() && (c.GetFilterValue() != null
                     || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
-                    || c.GetFilterOperator() == FilterOperator.IsEmpty | c.GetFilterOperator() == FilterOperator.IsNotEmpty))
+                    || c.GetFilterOperator() == FilterOperator.IsEmpty || c.GetFilterOperator() == FilterOperator.IsNotEmpty))
                 .Select(c => new FilterDescriptor()
                 {
                     Property = c.GetFilterProperty(),
@@ -1725,7 +1731,7 @@ namespace Radzen.Blazor
                     Skip = start,
                     Top = top,
                     OrderBy = orderBy,
-                    Filter = IsOData() ? allColumns.ToList().ToODataFilterString<TItem>() : filterString,
+                    Filter = GetIsOData() ? allColumns.ToList().ToODataFilterString<TItem>() : filterString,
                     Filters = filters,
                     Sorts = sorts
                 });
@@ -2460,9 +2466,14 @@ namespace Radzen.Blazor
 
         bool? isOData;
 
-        internal bool IsOData()
+        internal bool GetIsOData()
         {
-            if(isOData == null && Data != null)
+            if (IsOData.HasValue)
+            {
+                return IsOData.Value;
+            }
+
+            if (isOData == null && Data != null)
             {
                 isOData = typeof(ODataEnumerable<TItem>).IsAssignableFrom(Data.GetType());
             }
@@ -2524,7 +2535,7 @@ namespace Radzen.Blazor
 
                 if(column == null)
                 {
-                   column = allColumns.Where(c => c.GetGroupProperty() == ((GroupDescriptor)args.NewItems[0]).Property).FirstOrDefault();
+                    column = allColumns.Where(c => c.GetGroupProperty() == ((GroupDescriptor)args.NewItems[0]).Property).FirstOrDefault();
                 }
 
                 if (HideGroupedColumn)
@@ -2574,8 +2585,8 @@ namespace Radzen.Blazor
         /// Gets or sets the group descriptors.
         /// </summary>
         /// <value>The groups.</value>
-        public ObservableCollection<GroupDescriptor> Groups 
-        { 
+        public ObservableCollection<GroupDescriptor> Groups
+        {
             get
             {
                 if (groups == null)
@@ -2603,9 +2614,9 @@ namespace Radzen.Blazor
                 await JSRuntime.InvokeVoidAsync("eval", $"{functionName} && {functionName}()");
 
                 RadzenDataGridColumn<TItem> column;
-                
+
                 column = columns.Where(c => c.GetVisible()).ElementAtOrDefault(indexOfColumnToReoder.Value);
-               
+
                 //may be its a child column
                 if (column == null)
                     column = allColumns.Where(c => c.GetVisible()).ElementAtOrDefault(indexOfColumnToReoder.Value);
@@ -2629,7 +2640,7 @@ namespace Radzen.Blazor
                 }
 
                 indexOfColumnToReoder = null;
-            }  
+            }
         }
 
         /// <summary>
@@ -2695,7 +2706,7 @@ namespace Radzen.Blazor
         /// <param name="property">The property name.</param>
         public void OrderBy(string property)
         {
-            var p = IsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
+            var p = GetIsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
 
             var column = allColumns.ToList().Where(c => c.GetSortProperty() == property).FirstOrDefault();
 
@@ -2727,7 +2738,7 @@ namespace Radzen.Blazor
         /// <param name="property">The property name.</param>
         public void OrderByDescending(string property)
         {
-            var p = IsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
+            var p = GetIsOData() ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
 
             var column = allColumns.ToList().Where(c => c.GetSortProperty() == p).FirstOrDefault();
 
@@ -2872,8 +2883,8 @@ namespace Radzen.Blazor
             if (SettingsChanged.HasDelegate)
             {
                 var shouldUpdateState = false;
-                var hasFilter = settings.Columns != null && settings.Columns.Any(c => 
-                    c.FilterValue != null || c.SecondFilterValue != null || 
+                var hasFilter = settings.Columns != null && settings.Columns.Any(c =>
+                    c.FilterValue != null || c.SecondFilterValue != null ||
                     c.FilterOperator == FilterOperator.IsNull || c.FilterOperator == FilterOperator.IsNotNull ||
                     c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty ||
                     c.SecondFilterOperator == FilterOperator.IsNull || c.SecondFilterOperator == FilterOperator.IsNotNull ||
