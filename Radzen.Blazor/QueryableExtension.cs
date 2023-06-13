@@ -922,7 +922,10 @@ namespace Radzen
             return source;
         }
 
-        private static bool IsEnumerable(Type type)
+        /// <summary>
+        /// Gets if type is IEnumerable.
+        /// </summary>
+        public static bool IsEnumerable(Type type)
         {
             return typeof(IEnumerable).IsAssignableFrom(type) || typeof(IEnumerable<>).IsAssignableFrom(type);
         }

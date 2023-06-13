@@ -433,6 +433,20 @@ namespace Radzen.Blazor
         public RenderFragment<RadzenDataGridColumn<TItem>> FilterTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the filter value template.
+        /// </summary>
+        /// <value>The filter value template.</value>
+        [Parameter]
+        public RenderFragment<RadzenDataGridColumn<TItem>> FilterValueTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the second filter value template.
+        /// </summary>
+        /// <value>The second filter value template.</value>
+        [Parameter]
+        public RenderFragment<RadzenDataGridColumn<TItem>> SecondFilterValueTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets the logical filter operator.
         /// </summary>
         /// <value>The logical filter operator.</value>
@@ -988,7 +1002,7 @@ namespace Radzen.Blazor
             return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
                 var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain
                     || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith || o == FilterOperator.IsEmpty || o == FilterOperator.IsNotEmpty;
-                return FilterPropertyType == typeof(string) ? isStringOperator
+                return FilterPropertyType == typeof(string) || QueryableExtension.IsEnumerable(FilterPropertyType) ? isStringOperator
                       || o == FilterOperator.Equals || o == FilterOperator.NotEquals
                       || o == FilterOperator.IsNull || o == FilterOperator.IsNotNull
                     : !isStringOperator;

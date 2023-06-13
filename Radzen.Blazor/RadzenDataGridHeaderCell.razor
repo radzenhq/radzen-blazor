@@ -69,7 +69,11 @@
                                 <form id="@($"{getColumnPopupID()}-form")" @onsubmit="@(args => ApplyFilter())" class="rz-grid-filter">
                                 <RadzenLabel Text="@Grid.FilterText" class="rz-grid-filter-label" />
                                 <RadzenDropDown @onclick:preventDefault="true" Data="@(Column.GetFilterOperators().Select(t => new { Value = Column.GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@Column.GetFilterOperator()" Change="@(args => Column.SetFilterOperator((FilterOperator)args))" />
-                                @if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
+                                @if (Column.FilterValueTemplate != null)
+                                {
+                                    @Column.FilterValueTemplate(Column)
+                                } 
+                                else if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
                                 {
                                     <RadzenDropDown AllowClear="false" AllowFiltering="false" TValue="@object"
                                                     Value=@Column.GetFilterValue() Multiple="false" Placeholder="@Grid.EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data=@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType)
@@ -98,7 +102,11 @@
                                         Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? Grid.AndOperatorText : Grid.OrOperatorText, Value = t }))" TValue="LogicalFilterOperator" Value="@Column.LogicalFilterOperator" Change="@(args => Column.SetLogicalFilterOperator((LogicalFilterOperator)args))" />
 
                                 <RadzenDropDown @onclick:preventDefault="true" Data="@(Column.GetFilterOperators().Select(t => new { Value = Column.GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@Column.GetSecondFilterOperator()" Change="@(args => Column.SetSecondFilterOperator((FilterOperator)args))" />
-                                @if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
+                                @if (Column.SecondFilterValueTemplate != null)
+                                {
+                                    @Column.SecondFilterValueTemplate(Column)
+                                } 
+                                else if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
                                 {
                                     <RadzenDropDown AllowClear="false" AllowFiltering="false" TValue="@object"
                                                     Value=@Column.GetSecondFilterValue() Multiple="false" Placeholder="@Grid.EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data=@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType)
