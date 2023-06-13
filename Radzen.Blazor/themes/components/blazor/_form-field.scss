@@ -367,11 +367,13 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-chkbox ~ &  {
         right: auto;
         top: var(--rz-form-field-label-floating-top);
+        padding-top: 0;
+        padding-bottom: 0;
         transform: translate(0, 0);
         color: var(--rz-input-placeholder-color);
         background-color: var(--rz-form-field-label-floating-background-color);
         font-size: 0.75rem;
-        line-height: 0.75rem;
+        line-height: 1rem;
         max-width: calc(100% - 1.5rem);
     }
 
