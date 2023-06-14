@@ -58,6 +58,10 @@ $accordion-shadow: none !default;
   & > div:last-child > div {
     border-radius: 0 0 var(--rz-accordion-border-radius) var(--rz-accordion-border-radius);
   }
+
+  & > div:only-child {
+    border-radius: var(--rz-accordion-border-radius);
+  }
 }
 
 .rz-accordion-header {
