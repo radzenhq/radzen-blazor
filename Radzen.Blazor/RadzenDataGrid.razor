@@ -54,7 +54,7 @@
                         <RadzenDropDown SelectAllText="@AllColumnsText" AllowSelectAll="@AllowPickAllColumns"
                             MaxSelectedLabels="@ColumnsPickerMaxSelectedLabels"
                             SelectedItemsText="@ColumnsShowingText" Change=@ToggleColumns
-                            @bind-Value="@selectedColumns"
+                            @bind-Value="@selectedColumns" FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                             Multiple="true" AllowFiltering="@ColumnsPickerAllowFiltering"
                             Placeholder="@ColumnsText"
                             Data="allPickableColumns"
