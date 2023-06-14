@@ -354,7 +354,9 @@ $sidebar-color: var(--rz-text-color) !default;
 
 // Card
 $card-padding: 1rem !default;
+$card-flat-background-color: var(--rz-base-background-color) !default;
 $card-shadow: var(--rz-shadow-1) !default;
+$card-border: var(--rz-border-base-300) !default;
 
 // Accordion
 $accordion-item-padding: 1rem !default;
@@ -1262,7 +1264,7 @@ $notification-info-color: var(--rz-info) !default;
 $notification-info-background-color: var(--rz-info-lighter) !default;
 
 // Alert 
-$alert-message-margin: 0 !default;
+$alert-message-margin: 0.125rem 0 !default;
 
 $alert-sizes: () !default;
 $alert-sizes: map-merge(
