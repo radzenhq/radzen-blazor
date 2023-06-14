@@ -488,7 +488,7 @@ namespace Radzen.Blazor
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
 
             var valid = DateTime.TryParseExact(inputValue, DateFormat, null, DateTimeStyles.None, out value);
-            var nullable = Nullable.GetUnderlyingType(typeof(TValue)) != null;
+            var nullable = Nullable.GetUnderlyingType(typeof(TValue)) != null || AllowClear;
 
             if (!valid)
             {
