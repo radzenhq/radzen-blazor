@@ -615,6 +615,13 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "LoadData",
+                            Title = "Blazor data filter with LoadData",
+                            Path = "datafilter-loaddata",
+                            Tags = new [] { "dataview", "grid", "table", "filter", "loaddata" },
+                        },
+                        new Example
+                        {
                             Name = "OData service",
                             Title = "Blazor data filter with OData",
                             Path = "datafilter-odata",
