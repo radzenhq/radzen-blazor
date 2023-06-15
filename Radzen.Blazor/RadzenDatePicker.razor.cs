@@ -140,6 +140,11 @@ namespace Radzen.Blazor
 
         async Task OkClick()
         {
+            if (PopupRenderMode == PopupRenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
+            {
+                await popup.CloseAsync(Element);
+            }
+
             if (!Disabled)
             {
                 DateTime date = CurrentDate;
@@ -766,6 +771,11 @@ namespace Radzen.Blazor
         /// </summary>
         public void Close()
         {
+            if (PopupRenderMode == PopupRenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
+            {
+                InvokeAsync(() => popup.CloseAsync(Element));
+            }
+
             if (!Disabled)
             {
                 contentStyle = "display:none;";

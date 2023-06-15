@@ -37,6 +37,15 @@
         shouldToggle = true;
     }
 
+    public async Task CloseAsync(ElementReference target)
+    {
+        open = false;
+        this.target = target;
+        shouldToggle = true;
+
+        await Task.CompletedTask;
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
