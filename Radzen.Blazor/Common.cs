@@ -2376,6 +2376,23 @@ namespace Radzen
             }
             return false;
         }
+        
+        /// <summary>
+        /// Method to only replace first occurence of a substring in a string
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="search"></param>
+        /// <param name="replace"></param>
+        /// <returns></returns>
+        public static string ReplaceFirst(this string text, string search, string replace)
+        {
+            int pos = text.IndexOf(search, StringComparison.Ordinal);
+            if (pos < 0)
+            {
+                return text;
+            }
+            return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
+        }
 
         /// <summary>
         /// Gets the type of the property.
@@ -2388,7 +2405,7 @@ namespace Radzen
             if (property.Contains("."))
             {
                 var part = property.Split('.').FirstOrDefault();
-                return GetPropertyType(GetPropertyTypeIncludeInterface(type, part), property.Replace($"{part}.", ""));
+                return GetPropertyType(GetPropertyTypeIncludeInterface(type, part), property.ReplaceFirst($"{part}.", ""));
             }
 
             return GetPropertyTypeIncludeInterface(type, property);
