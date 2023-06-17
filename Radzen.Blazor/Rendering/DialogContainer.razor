@@ -8,7 +8,7 @@
         {
             @if (Dialog.Options.Draggable)
             {
-                <Draggable Drag="@OnDrag" DragStart="@OnDragStart">
+                <Draggable Drag="@OnDrag" DragStart="@OnDragStart" DragEnd="@OnDragEnd">
                     <div class="rz-dialog-titlebar">
                         <div class="rz-dialog-title" style="display: inline" id="rz-dialog-0-label">@((MarkupString)Dialog.Title)</div>
                         @if (Dialog.Options.ShowClose)
@@ -81,6 +81,12 @@
         width = $"width: {rect.Width}px;";
 
         shouldRender = true;
+    }
+
+    void OnDragEnd(DraggableEventArgs args)
+    {
+        height = null;
+        width = null;
     }
 
     void OnDrag(DraggableEventArgs args)
@@ -159,7 +165,7 @@
         }
     }
 
-    [Inject] 
+    [Inject]
     DialogService Service { get; set; }
 
     protected override void OnInitialized()
@@ -171,7 +177,7 @@
     {
         var stateHasChanged = reference?.GetType().GetMethod("StateHasChanged", BindingFlags.NonPublic | BindingFlags.Instance);
 
-        InvokeAsync(() => 
+        InvokeAsync(() =>
         {
             StateHasChanged();
             stateHasChanged?.Invoke(reference, null);
