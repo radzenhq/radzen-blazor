@@ -1,5 +1,6 @@
 @using Microsoft.JSInterop
 @using System.Reflection;
+@using Microsoft.Extensions.Options
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 <div class="@WrapperCssClass">
@@ -85,6 +86,11 @@
 
     void OnDragEnd(DraggableEventArgs args)
     {
+        if (Dialog.Options.Resizable)
+        {
+            return;
+        }
+        
         height = null;
         width = null;
     }
