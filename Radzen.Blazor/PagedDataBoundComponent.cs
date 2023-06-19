@@ -326,7 +326,7 @@ namespace Radzen
         /// <param name="value">The value.</param>
         protected virtual async Task OnPageSizeChanged(int value)
         {
-            if (pageSize != value)
+            if (pageSize != value && !this.firstRender)
             {
                 pageSize = value;
                 await InvokeAsync(Reload);
