@@ -1049,7 +1049,7 @@ window.Radzen = {
     if (dialogs.length == 0) return [];
     var lastDialog = dialogs[dialogs.length - 1];
     return [...lastDialog.querySelectorAll('a, button, input, textarea, select, details, iframe, embed, object, summary dialog, audio[controls], video[controls], [contenteditable], [tabindex]')]
-            .filter(el => el && el.tabIndex > -1 && !el.hasAttribute('disabled') && !el.hasAttribute('hidden') && el.computedStyleMap && el.computedStyleMap().get('display').value !== 'none');
+        .filter(el => el && el.tabIndex > -1 && !el.hasAttribute('disabled') && el.offsetParent !== null);
   },
   focusTrapDialog: function (e) {
     e = e || window.event;
