@@ -1088,7 +1088,10 @@ window.Radzen = {
                   return;
               }
           }
-          document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+          var dialogs = document.querySelectorAll('.rz-dialog-content');
+          if (dialogs.length == 0) {
+              document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+          }
           Radzen.dialogService.invokeMethodAsync('DialogService.Close', null);
       }
   },
