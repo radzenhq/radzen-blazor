@@ -994,6 +994,7 @@ window.Radzen = {
             dialog.offsetWidth = lastDialog.parentElement.offsetWidth;
             dialog.offsetHeight = lastDialog.parentElement.offsetHeight;
             var dialogResize = function (e) {
+                if(!dialog) return;
                 if (dialog.offsetWidth != e[0].target.offsetWidth || dialog.offsetHeight != e[0].target.offsetHeight) {
 
                     dialog.offsetWidth = e[0].target.offsetWidth;
@@ -1006,7 +1007,7 @@ window.Radzen = {
                     );
                 }
             };
-            new ResizeObserver(dialogResize).observe(lastDialog.parentElement);
+            Radzen.dialogResizer = new ResizeObserver(dialogResize).observe(lastDialog.parentElement);
 
             if (options.autoFocusFirstElement) {
                 if (lastDialog.querySelectorAll('.rz-html-editor-content').length) {
@@ -1036,6 +1037,7 @@ window.Radzen = {
     }
   },
   closeDialog: function () {
+    Radzen.dialogResizer = null;
     document.body.classList.remove('no-scroll');
     var dialogs = document.querySelectorAll('.rz-dialog-content');
     if (dialogs.length == 0) {
