@@ -24,7 +24,10 @@
                 </RadzenFormField>
                 @if (AllowRememberMe)
                 {
-                    <RadzenSwitch @bind-Value="@rememberMe" id=@Id("rememberMe") Name="RememberMe" />
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                        <RadzenSwitch @bind-Value="@rememberMe" id=@Id("rememberMe") Name="RememberMe" />
+                        <label class="rz-label" for="RememberMe">@RememberMeText</label>
+                    </RadzenStack>
                 }
             </RadzenStack>
             <RadzenStack style="margin-top:1rem;" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
