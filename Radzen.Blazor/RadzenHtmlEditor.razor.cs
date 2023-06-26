@@ -102,6 +102,26 @@ namespace Radzen.Blazor
         public string UploadUrl { get; set; }
 
         ElementReference ContentEditable { get; set; }
+        RadzenTextArea TextArea { get; set; }
+
+        /// <summary>
+        /// Focuses the editor.
+        /// </summary>
+        public ValueTask FocusAsync()
+        {
+#if NET5_0_OR_GREATER
+            if (mode == HtmlEditorMode.Design)
+            {
+                return ContentEditable.FocusAsync();
+            }
+            else
+            {
+                return TextArea.Element.FocusAsync();
+            }
+#else
+            throw new System.NotSupportedException();
+#endif
+        }
 
         internal RadzenHtmlEditorCommandState State { get; set; } = new RadzenHtmlEditorCommandState();
 
