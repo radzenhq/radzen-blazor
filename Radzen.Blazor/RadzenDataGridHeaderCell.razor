@@ -235,4 +235,22 @@ else
 
         return $"{Grid.PopupID}{(string.IsNullOrEmpty(fiterProperty) ? Grid.allColumns.IndexOf(Column).ToString() : fiterProperty)}";
     }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (Column != null && Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand)
+        {
+            Column.headerCell = this;
+        }
+    }
+
+    internal async Task CloseFilter()
+    {
+        if (popup != null)
+        {
+            await popup.CloseAsync(filterButton);
+        }
+    }
 }

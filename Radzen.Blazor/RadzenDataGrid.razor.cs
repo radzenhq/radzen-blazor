@@ -702,7 +702,14 @@ namespace Radzen.Blazor
         {
             if (closePopup)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
+                if (column.headerCell != null)
+                {
+                    await column.headerCell.CloseFilter();
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
+                }
             }
 
             column.ClearFilters();
@@ -737,7 +744,14 @@ namespace Radzen.Blazor
         {
             if (closePopup)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
+                if (column.headerCell != null)
+                {
+                    await column.headerCell.CloseFilter();
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
+                }
             }
             await OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
         }

@@ -1140,5 +1140,7 @@ namespace Radzen.Blazor
             var index = getSortIndex();
             return index != null ? $"{getSortIndex() + 1}" : "";
         }
+
+        internal RadzenDataGridHeaderCell<TItem> headerCell;
     }
 }
