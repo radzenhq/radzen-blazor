@@ -451,7 +451,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return string.Format("{0:" + DateFormat + "}", Value);
+                return string.Format(Culture, "{0:" + DateFormat + "}", Value);
             }
         }
 
