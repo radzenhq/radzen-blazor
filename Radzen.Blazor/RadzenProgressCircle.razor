@@ -5,10 +5,12 @@
 {
     <div @ref="@Element" style="@Style" aria-valuemax="@Max" aria-valuemin="0" role="progressbar" @attributes="Attributes" class="@GetCssClass()"
          aria-valuenow="@Value" id="@GetId()">
-        <div class="rz-progressbar-value rz-progressbar-value-animate" style="@($"width: {Math.Min(Value / Max * 100, 100).ToInvariantString()}%;")"></div>
+        <svg class="rz-progresscircle-viewbox" viewBox="-19 -19 38 38">
+            <circle class="rz-progresscircle-value rz-progresscircle-value-animate" r="15.91549" fill="none" stroke-dashoffset="@(Math.Max(100 - Value / Max * 100, 0).ToInvariantString())" />
+        </svg>
         @if (ShowValue)
         {
-            <div class="rz-progressbar-label">
+            <div class="rz-progresscircle-label">
                 @if(Template != null)
                 {
                     @Template

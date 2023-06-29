@@ -1,0 +1,18 @@
+﻿@using Radzen
+
+<RadzenProgressCircle @bind-Value="@value" />
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">ProgressCircle with <strong>ProgressCircleStyle</strong> property</RadzenText>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+    <RadzenProgressCircle ProgressCircleStyle="ProgressCircleStyle.Primary" @bind-Value="@value" />
+    <RadzenProgressCircle ProgressCircleStyle="ProgressCircleStyle.Secondary" @bind-Value="@value" />
+    <RadzenProgressCircle ProgressCircleStyle="ProgressCircleStyle.Light" @bind-Value="@value" />
+    <RadzenProgressCircle ProgressCircleStyle="ProgressCircleStyle.Dark" @bind-Value="@value" />
+    <RadzenProgressCircle ProgressCircleStyle="ProgressCircleStyle.Success" @bind-Value="@value" />
+    <RadzenProgressCircle ProgressCircleStyle="ProgressCircleStyle.Danger" @bind-Value="@value" />
+    <RadzenProgressCircle ProgressCircleStyle="ProgressCircleStyle.Warning" @bind-Value="@value" />
+    <RadzenProgressCircle ProgressCircleStyle="ProgressCircleStyle.Info" @bind-Value="@value" />
+</RadzenStack>
+
+@code {
+    double value = 55;
+}

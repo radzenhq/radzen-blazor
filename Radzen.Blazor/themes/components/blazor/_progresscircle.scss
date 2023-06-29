@@ -1,0 +1,165 @@
+$progresscircle-stroke-color: var(--rz-secondary) !default;
+$progresscircle-stroke-width: 5 !default;
+$progresscircle-font-size: var(--rz-body-font-size) !default;
+
+// progresscircle CSS variables
+
+:root {
+  --rz-progresscircle-stroke-color: #{$progresscircle-stroke-color};
+  --rz-progresscircle-stroke-width: #{$progresscircle-stroke-width};
+  --rz-progresscircle-font-size: #{$progresscircle-font-size};
+}
+
+$progresscircle-styles: () !default;
+
+$progresscircle-styles: map-merge(
+    (
+        primary: (
+            stroke-color: var(--rz-primary)
+        ), 
+        light: (
+            stroke-color: var(--rz-base-400)
+        ),
+        dark: (
+            stroke-color: var(--rz-base-900)
+        ),
+        secondary: ( 
+            stroke-color: var(--rz-secondary)
+        ),
+        info: (
+            stroke-color: var(--rz-info)
+        ),
+        warning: (
+            stroke-color: var(--rz-warning)
+        ),
+        danger: (
+            stroke-color: var(--rz-danger)
+        ),
+        success: (
+            stroke-color: var(--rz-success)
+        )
+    ),
+    $progresscircle-styles
+);
+
+$progresscircle-sizes: () !default;
+
+$progresscircle-sizes: map-merge(
+    (
+        lg: (
+            width: 7rem,
+            font-size: calc(var(--rz-progresscircle-font-size) * 2)
+        ),
+        md: (
+            width: 3.5rem,
+            font-size: var(--rz-progresscircle-font-size)
+        ),
+        sm: (
+            width: 2rem,
+            font-size: calc(var(--rz-progresscircle-font-size) * 0.6)
+        ),
+        xs: (
+            width: 1.25rem,
+            font-size: calc(var(--rz-progresscircle-font-size) * 0.4)
+        )
+    ),
+    $progresscircle-sizes
+);
+
+.rz-progresscircle {
+  position: relative;
+  overflow: hidden;
+
+  &:before {
+    content: '';
+    display: block;
+    padding-top: 100%;
+  }
+}
+
+.rz-progresscircle-viewbox {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.rz-progresscircle-value {
+  stroke-linecap: square;
+  stroke-width: var(--rz-progresscircle-stroke-width);
+  stroke: var(--rz-progresscircle-stroke-color);
+}
+
+.rz-progresscircle-label {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rz-progresscircle-determinate {
+  .rz-progresscircle-value {
+    stroke-dasharray: 100;
+    stroke-linecap: butt;
+    transform: rotate(-.25turn);
+  }
+}
+
+.rz-progresscircle-indeterminate {
+  .rz-progresscircle-viewbox {
+    animation: rz-progresscircle-indeterminate-anim-rotate 2.1s linear infinite;
+    transform-origin: center center;
+  }
+
+  .rz-progresscircle-value {
+    animation: rz-progresscircle-indeterminate-anim-dash 1.4s cubic-bezier(.4,0,.2,1) infinite;
+  }
+
+  @keyframes rz-progresscircle-indeterminate-anim-rotate {
+    100% {
+      transform: rotate(1turn);
+    }
+  }
+
+  @keyframes rz-progresscircle-indeterminate-anim-dash {
+    0% {
+      stroke-dasharray: 1, 100;
+      stroke-dashoffset: 0;
+    }
+
+    50% {
+      stroke-dasharray: 70, 100;
+      stroke-dashoffset: -28;
+    }
+
+    100% {
+      stroke-dasharray: 70, 100;
+      stroke-dashoffset: -99;
+    }
+  }
+}
+
+@each $style, $progresscircle in $progresscircle-styles {
+  .rz-progresscircle-#{$style} {
+    .rz-progresscircle-value {
+      stroke: map-get($progresscircle, stroke-color);
+    }
+  }
+}
+
+@each $size, $progresscircle in $progresscircle-sizes {
+  .rz-progresscircle-#{$size} {
+    width: map-get($progresscircle, width);
+    font-size: map-get($progresscircle, font-size);
+    line-height: map-get($progresscircle, font-size);
+  }
+}
