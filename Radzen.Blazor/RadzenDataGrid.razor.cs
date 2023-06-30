@@ -1597,6 +1597,12 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <inheritdoc />
+        protected override void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            InvokeAsync(Reload);
+        }
+
         /// <summary>
         /// Resets the DataGrid instance to initial state with no sorting, grouping and/or filtering.
         /// </summary>
