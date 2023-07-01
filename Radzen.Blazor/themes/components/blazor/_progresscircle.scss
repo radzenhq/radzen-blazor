@@ -1,5 +1,6 @@
 $progresscircle-stroke-color: var(--rz-secondary) !default;
 $progresscircle-stroke-width: 5 !default;
+$progresscircle-stroke-transition: var(--rz-transition-all) !default;
 $progresscircle-font-size: var(--rz-body-font-size) !default;
 
 // progresscircle CSS variables
@@ -7,6 +8,7 @@ $progresscircle-font-size: var(--rz-body-font-size) !default;
 :root {
   --rz-progresscircle-stroke-color: #{$progresscircle-stroke-color};
   --rz-progresscircle-stroke-width: #{$progresscircle-stroke-width};
+  --rz-progresscircle-stroke-transition: #{$progresscircle-stroke-transition};
   --rz-progresscircle-font-size: #{$progresscircle-font-size};
 }
 
@@ -47,19 +49,19 @@ $progresscircle-sizes: () !default;
 $progresscircle-sizes: map-merge(
     (
         lg: (
-            width: 7rem,
-            font-size: calc(var(--rz-progresscircle-font-size) * 2)
+            size: 6rem,
+            font-size: calc(var(--rz-progresscircle-font-size) * 1.5)
         ),
         md: (
-            width: 3.5rem,
+            size: 3rem,
             font-size: var(--rz-progresscircle-font-size)
         ),
         sm: (
-            width: 2rem,
-            font-size: calc(var(--rz-progresscircle-font-size) * 0.6)
+            size: 2rem,
+            font-size: calc(var(--rz-progresscircle-font-size) * 0.67)
         ),
         xs: (
-            width: 1.25rem,
+            size: 1.25rem,
             font-size: calc(var(--rz-progresscircle-font-size) * 0.4)
         )
     ),
@@ -68,7 +70,6 @@ $progresscircle-sizes: map-merge(
 
 .rz-progresscircle {
   position: relative;
-  overflow: hidden;
 
   &:before {
     content: '';
@@ -87,10 +88,11 @@ $progresscircle-sizes: map-merge(
   right: 0;
 }
 
-.rz-progresscircle-value {
-  stroke-linecap: square;
-  stroke-width: var(--rz-progresscircle-stroke-width);
-  stroke: var(--rz-progresscircle-stroke-color);
+.rz-progresscircle-stroke {
+    stroke-linecap: square;
+    stroke-width: var(--rz-progresscircle-stroke-width);
+    stroke: var(--rz-progresscircle-stroke-color);
+    transition: var(--rz-progresscircle-stroke-transition);
 }
 
 .rz-progresscircle-label {
@@ -104,10 +106,11 @@ $progresscircle-sizes: map-merge(
   display: flex;
   justify-content: center;
   align-items: center;
+  line-height: 1;
 }
 
 .rz-progresscircle-determinate {
-  .rz-progresscircle-value {
+  .rz-progresscircle-stroke {
     stroke-dasharray: 100;
     stroke-linecap: butt;
     transform: rotate(-.25turn);
@@ -115,13 +118,9 @@ $progresscircle-sizes: map-merge(
 }
 
 .rz-progresscircle-indeterminate {
-  .rz-progresscircle-viewbox {
-    animation: rz-progresscircle-indeterminate-anim-rotate 2.1s linear infinite;
-    transform-origin: center center;
-  }
-
-  .rz-progresscircle-value {
-    animation: rz-progresscircle-indeterminate-anim-dash 1.4s cubic-bezier(.4,0,.2,1) infinite;
+  .rz-progresscircle-stroke {
+    animation: rz-progresscircle-indeterminate-anim-rotate 2.1s linear infinite, rz-progresscircle-indeterminate-anim-dash 1.4s cubic-bezier(.4,0,.2,1) infinite;
+    transform-origin: 0 0;
   }
 
   @keyframes rz-progresscircle-indeterminate-anim-rotate {
@@ -150,7 +149,7 @@ $progresscircle-sizes: map-merge(
 
 @each $style, $progresscircle in $progresscircle-styles {
   .rz-progresscircle-#{$style} {
-    .rz-progresscircle-value {
+    .rz-progresscircle-stroke {
       stroke: map-get($progresscircle, stroke-color);
     }
   }
@@ -158,8 +157,7 @@ $progresscircle-sizes: map-merge(
 
 @each $size, $progresscircle in $progresscircle-sizes {
   .rz-progresscircle-#{$size} {
-    width: map-get($progresscircle, width);
+    width: map-get($progresscircle, size);
     font-size: map-get($progresscircle, font-size);
-    line-height: map-get($progresscircle, font-size);
   }
 }

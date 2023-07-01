@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -30,6 +31,13 @@ namespace Radzen.Blazor
         public double Value { get; set; }
 
         /// <summary>
+        /// Determines the minimum value.
+        /// </summary>
+        /// <value>The minimum value.</value>
+        [Parameter]
+        public double Min { get; set; } = 0;
+
+        /// <summary>
         /// Determines the maximum value.
         /// </summary>
         /// <value>The maximum value.</value>
@@ -49,5 +57,16 @@ namespace Radzen.Blazor
         /// <value>The value changed callback.</value>
         [Parameter]
         public Action<double> ValueChanged { get; set; }
+
+        /// <summary>
+        /// Progress in range from 0 to 1.
+        /// </summary>
+        protected double NormalizedValue => Math.Min(Math.Max((Value - Min) / (Max - Min), 0), 1);
+
+        /// <summary>
+        /// Reloads this instance.
+        /// </summary>
+        public void Refresh()
+            => StateHasChanged();
     }
 }

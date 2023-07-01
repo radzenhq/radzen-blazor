@@ -1352,6 +1352,7 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "ProgressBar",
+                    Updated = true,
                     Title = "Blazor progress bar component",
                     Path = "progressbar",
                     Icon = "&#xe893",
@@ -1363,7 +1364,7 @@ namespace RadzenBlazorDemos
                     New = true,
                     Title = "Blazor progress spinner component",
                     Path = "progresscircle",
-                    Icon = "&#xe41a",
+                    Icon = "&#xe5d5",
                     Tags = new [] { "progress", "spinner", "circle" }
                 },
                 new Example()

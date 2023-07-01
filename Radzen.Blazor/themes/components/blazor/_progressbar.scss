@@ -3,6 +3,7 @@ $progressbar-background-color: var(--rz-base-200) !default;
 $progressbar-font-size: var(--rz-body-font-size) !default;
 $progressbar-height: 1.25rem !default;
 $progressbar-border-radius: var(--rz-border-radius) !default;
+$progressbar-value-transition: var(--rz-transition-all) !default;
 
 // ProgressBar CSS variables
 
@@ -12,6 +13,7 @@ $progressbar-border-radius: var(--rz-border-radius) !default;
   --rz-progressbar-font-size: #{$progressbar-font-size};
   --rz-progressbar-height: #{$progressbar-height};
   --rz-progressbar-border-radius: #{$progressbar-border-radius};
+  --rz-progressbar-value-transition: #{$progressbar-value-transition};
 }
 
 $progressbar-styles: () !default;
@@ -70,6 +72,7 @@ $progressbar-styles: map-merge(
   background-color: var(--rz-progressbar-value-background-color);
   height: 100%;
   width: 100%;
+  transition: var(--rz-progressbar-value-transition);
 }
 
 
