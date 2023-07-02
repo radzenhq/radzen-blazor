@@ -62,11 +62,5 @@ namespace Radzen.Blazor
         /// Progress in range from 0 to 1.
         /// </summary>
         protected double NormalizedValue => Math.Min(Math.Max((Value - Min) / (Max - Min), 0), 1);
-
-        /// <summary>
-        /// Reloads this instance.
-        /// </summary>
-        public void Refresh()
-            => StateHasChanged();
     }
 }
