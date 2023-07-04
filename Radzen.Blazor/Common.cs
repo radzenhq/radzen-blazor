@@ -811,7 +811,7 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Specifies the behavior of <see cref="RadzenProgressBar" />.
+    /// Specifies the behavior of <see cref="RadzenProgressBar" /> or <see cref="RadzenProgressCircle" />.
     /// </summary>
     public enum ProgressBarMode
     {
@@ -826,22 +826,7 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Specifies the behavior of <see cref="RadzenProgressCircle" />.
-    /// </summary>
-    public enum ProgressCircleMode
-    {
-        /// <summary>
-        /// RadzenProgressSpinner displays its value as a percentage range (0 to 100).
-        /// </summary>
-        Determinate,
-        /// <summary>
-        /// RadzenProgressSpinner displays continuous animation.
-        /// </summary>
-        Indeterminate
-    }
-
-    /// <summary>
-    /// Specifies the display style of a <see cref="RadzenProgressBar" />. Affects the visual styling of RadzenProgressCircle (background and text color).
+    /// Specifies the display style of a <see cref="RadzenProgressBar" /> and <see cref="RadzenProgressCircle" />. Affects the visual styling of RadzenProgressBar (background and text color) and RadzenProgressCircle (stroke and text color).
     /// </summary>
     public enum ProgressBarStyle
     {
@@ -880,63 +865,24 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Specifies the display style of a <see cref="RadzenProgressCircle" />. Affects the visual styling of RadzenProgressCircle (stroke and text color).
-    /// </summary>
-    public enum ProgressCircleStyle
-    {
-        /// <summary>
-        /// Primary styling. Similar to primary buttons.
-        /// </summary>
-        Primary,
-        /// <summary>
-        /// Secondary styling. Similar to secondary buttons.
-        /// </summary>
-        Secondary,
-        /// <summary>
-        /// Light styling. Similar to light buttons.
-        /// </summary>
-        Light,
-        /// <summary>
-        /// Dark styling. Similar to dark buttons.
-        /// </summary>
-        Dark,
-        /// <summary>
-        /// Success styling.
-        /// </summary>
-        Success,
-        /// <summary>
-        /// Danger styling.
-        /// </summary>
-        Danger,
-        /// <summary>
-        /// Warning styling.
-        /// </summary>
-        Warning,
-        /// <summary>
-        /// Informative styling.
-        /// </summary>
-        Info
-    }
-
-    /// <summary>
     /// Specifies the size of a <see cref="RadzenProgressCircle" />.
     /// </summary>
-    public enum ProgressCircleSize
+    public enum ProgressBarCircularSize
     {
         /// <summary>
-        /// The default size of a progress circle.
+        /// The default size of a circular progress bar.
         /// </summary>
         Medium,
         /// <summary>
-        /// A progress circle larger than the default.
+        /// A circular progress bar larger than the default.
         /// </summary>
         Large,
         /// <summary>
-        /// A progress circle smaller than the default.
+        /// A circular progress bar smaller than the default.
         /// </summary>
         Small,
         /// <summary>
-        /// The smallest progress circle.
+        /// The smallest circular progress bar.
         /// </summary>
         ExtraSmall
     }

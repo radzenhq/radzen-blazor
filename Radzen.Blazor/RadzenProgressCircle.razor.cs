@@ -23,15 +23,15 @@ namespace Radzen.Blazor
 
             switch (Mode)
             {
-                case ProgressCircleMode.Determinate:
+                case ProgressBarMode.Determinate:
                     classList.Add("rz-progresscircle-determinate");
                     break;
-                case ProgressCircleMode.Indeterminate:
+                case ProgressBarMode.Indeterminate:
                     classList.Add("rz-progresscircle-indeterminate");
                     break;
             }
 
-            classList.Add($"rz-progresscircle-{ProgressCircleStyle.ToString().ToLowerInvariant()}");
+            classList.Add($"rz-progresscircle-{ProgressBarStyle.ToString().ToLowerInvariant()}");
             classList.Add($"rz-progresscircle-{getCircleSize()}");
 
             return string.Join(" ", classList);
@@ -41,13 +41,13 @@ namespace Radzen.Blazor
         {
             switch (Size)
             {
-                case ProgressCircleSize.Medium:
+                case ProgressBarCircularSize.Medium:
                     return "md";
-                case ProgressCircleSize.Large:
+                case ProgressBarCircularSize.Large:
                     return "lg";
-                case ProgressCircleSize.Small:
+                case ProgressBarCircularSize.Small:
                     return "sm";
-                case ProgressCircleSize.ExtraSmall:
+                case ProgressBarCircularSize.ExtraSmall:
                     return "xs";
                 default:
                     return string.Empty;
@@ -59,20 +59,20 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The mode.</value>
         [Parameter]
-        public ProgressCircleMode Mode { get; set; }
+        public ProgressBarMode Mode { get; set; }
 
         /// <summary>
         /// Gets or sets the progress circle style.
         /// </summary>
         /// <value>The progress circle style.</value>
         [Parameter]
-        public ProgressCircleStyle ProgressCircleStyle { get; set; }
+        public ProgressBarStyle ProgressBarStyle { get; set; }
 
         /// <summary>
-        /// Gets or sets the mode.
+        /// Gets or sets the size.
         /// </summary>
-        /// <value>The mode.</value>
+        /// <value>The size.</value>
         [Parameter]
-        public ProgressCircleSize Size { get; set; } = ProgressCircleSize.Medium;
+        public ProgressBarCircularSize Size { get; set; } = ProgressBarCircularSize.Medium;
     }
 } 
