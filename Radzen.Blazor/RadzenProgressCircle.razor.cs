@@ -11,7 +11,7 @@ namespace Radzen.Blazor
     /// &lt;RadzenProgressCircle @bind-Value="@value" Max="200" /&gt;
     /// </code>
     /// </example>
-    public partial class RadzenProgressCircle : ProgressBase
+    public partial class RadzenProgressCircle : RadzenProgressBar
     {
         /// <inheritdoc />
         protected override string GetComponentCssClass()
@@ -32,12 +32,12 @@ namespace Radzen.Blazor
             }
 
             classList.Add($"rz-progresscircle-{ProgressBarStyle.ToString().ToLowerInvariant()}");
-            classList.Add($"rz-progresscircle-{getCircleSize()}");
+            classList.Add($"rz-progresscircle-{GetCircleSize()}");
 
             return string.Join(" ", classList);
         }
 
-        private string getCircleSize()
+        protected string GetCircleSize()
         {
             switch (Size)
             {
@@ -53,20 +53,6 @@ namespace Radzen.Blazor
                     return string.Empty;
             }
         }
-
-        /// <summary>
-        /// Gets or sets the mode.
-        /// </summary>
-        /// <value>The mode.</value>
-        [Parameter]
-        public ProgressBarMode Mode { get; set; }
-
-        /// <summary>
-        /// Gets or sets the progress circle style.
-        /// </summary>
-        /// <value>The progress circle style.</value>
-        [Parameter]
-        public ProgressBarStyle ProgressBarStyle { get; set; }
 
         /// <summary>
         /// Gets or sets the size.
