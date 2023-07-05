@@ -5,12 +5,12 @@
 {
     <div @ref="@Element" style="@Style" aria-valuemax="@Max" aria-valuemin="@Min" role="progressbar" @attributes="Attributes" class="@GetCssClass()"
          aria-valuenow="@Value" id="@GetId()">
-        <svg class="rz-progresscircle-viewbox" viewBox="-19 -19 38 38">
-            <circle class="rz-progresscircle-stroke" r="15.91549" fill="none" stroke-dashoffset="@(((1 - NormalizedValue) * 100).ToInvariantString())" />
+        <svg class="rz-progressbarcircular-viewbox" viewBox="-19 -19 38 38">
+            <circle class="rz-progressbarcircular-stroke" r="15.91549" fill="none" stroke-dashoffset="@(((1 - NormalizedValue) * 100).ToInvariantString())" />
         </svg>
         @if (ShowValue)
         {
-            <div class="rz-progresscircle-label">
+            <div class="rz-progressbarcircular-label">
                 @if(Template != null)
                 {
                     @Template

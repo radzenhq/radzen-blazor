@@ -1,0 +1,163 @@
+$progressbarcircular-stroke-color: var(--rz-secondary) !default;
+$progressbarcircular-stroke-width: 5 !default;
+$progressbarcircular-stroke-transition: var(--rz-transition-all) !default;
+$progressbarcircular-font-size: var(--rz-body-font-size) !default;
+
+// progressbarcircular CSS variables
+
+:root {
+  --rz-progressbarcircular-stroke-color: #{$progressbarcircular-stroke-color};
+  --rz-progressbarcircular-stroke-width: #{$progressbarcircular-stroke-width};
+  --rz-progressbarcircular-stroke-transition: #{$progressbarcircular-stroke-transition};
+  --rz-progressbarcircular-font-size: #{$progressbarcircular-font-size};
+}
+
+$progressbarcircular-styles: () !default;
+
+$progressbarcircular-styles: map-merge(
+    (
+        primary: (
+            stroke-color: var(--rz-primary)
+        ), 
+        light: (
+            stroke-color: var(--rz-base-400)
+        ),
+        dark: (
+            stroke-color: var(--rz-base-900)
+        ),
+        secondary: ( 
+            stroke-color: var(--rz-secondary)
+        ),
+        info: (
+            stroke-color: var(--rz-info)
+        ),
+        warning: (
+            stroke-color: var(--rz-warning)
+        ),
+        danger: (
+            stroke-color: var(--rz-danger)
+        ),
+        success: (
+            stroke-color: var(--rz-success)
+        )
+    ),
+    $progressbarcircular-styles
+);
+
+$progressbarcircular-sizes: () !default;
+
+$progressbarcircular-sizes: map-merge(
+    (
+        lg: (
+            size: 6rem,
+            font-size: calc(var(--rz-progressbarcircular-font-size) * 1.5)
+        ),
+        md: (
+            size: 3rem,
+            font-size: var(--rz-progressbarcircular-font-size)
+        ),
+        sm: (
+            size: 2rem,
+            font-size: calc(var(--rz-progressbarcircular-font-size) * 0.67)
+        ),
+        xs: (
+            size: 1.25rem,
+            font-size: calc(var(--rz-progressbarcircular-font-size) * 0.4)
+        )
+    ),
+    $progressbarcircular-sizes
+);
+
+.rz-progressbarcircular {
+  position: relative;
+
+  &:before {
+    content: '';
+    display: block;
+    padding-top: 100%;
+  }
+}
+
+.rz-progressbarcircular-viewbox {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.rz-progressbarcircular-stroke {
+    stroke-linecap: square;
+    stroke-width: var(--rz-progressbarcircular-stroke-width);
+    stroke: var(--rz-progressbarcircular-stroke-color);
+    transition: var(--rz-progressbarcircular-stroke-transition);
+}
+
+.rz-progressbarcircular-label {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1;
+}
+
+.rz-progressbarcircular-determinate {
+  .rz-progressbarcircular-stroke {
+    stroke-dasharray: 100;
+    stroke-linecap: butt;
+    transform: rotate(-.25turn);
+  }
+}
+
+.rz-progressbarcircular-indeterminate {
+  .rz-progressbarcircular-stroke {
+    animation: rz-progressbarcircular-indeterminate-anim-rotate 2.1s linear infinite, rz-progressbarcircular-indeterminate-anim-dash 1.4s cubic-bezier(.4,0,.2,1) infinite;
+    transform-origin: 0 0;
+  }
+
+  @keyframes rz-progressbarcircular-indeterminate-anim-rotate {
+    100% {
+      transform: rotate(1turn);
+    }
+  }
+
+  @keyframes rz-progressbarcircular-indeterminate-anim-dash {
+    0% {
+      stroke-dasharray: 1, 100;
+      stroke-dashoffset: 0;
+    }
+
+    50% {
+      stroke-dasharray: 70, 100;
+      stroke-dashoffset: -28;
+    }
+
+    100% {
+      stroke-dasharray: 70, 100;
+      stroke-dashoffset: -99;
+    }
+  }
+}
+
+@each $style, $progressbarcircular in $progressbarcircular-styles {
+  .rz-progressbarcircular-#{$style} {
+    .rz-progressbarcircular-stroke {
+      stroke: map-get($progressbarcircular, stroke-color);
+    }
+  }
+}
+
+@each $size, $progressbarcircular in $progressbarcircular-sizes {
+  .rz-progressbarcircular-#{$size} {
+    width: map-get($progressbarcircular, size);
+    font-size: map-get($progressbarcircular, font-size);
+  }
+}

@@ -4,35 +4,35 @@ using System.Collections.Generic;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenProgressCircle component.
+    /// RadzenProgressBarCircular component.
     /// </summary>
     /// <example>
     /// <code>
-    /// &lt;RadzenProgressCircle @bind-Value="@value" Max="200" /&gt;
+    /// &lt;RadzenProgressBarCircular @bind-Value="@value" Max="200" /&gt;
     /// </code>
     /// </example>
-    public partial class RadzenProgressCircle : RadzenProgressBar
+    public partial class RadzenProgressBarCircular : RadzenProgressBar
     {
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             var classList=new List<string>()
             {
-                "rz-progresscircle"
+                "rz-progressbarcircular"
             };
 
             switch (Mode)
             {
                 case ProgressBarMode.Determinate:
-                    classList.Add("rz-progresscircle-determinate");
+                    classList.Add("rz-progressbarcircular-determinate");
                     break;
                 case ProgressBarMode.Indeterminate:
-                    classList.Add("rz-progresscircle-indeterminate");
+                    classList.Add("rz-progressbarcircular-indeterminate");
                     break;
             }
 
-            classList.Add($"rz-progresscircle-{ProgressBarStyle.ToString().ToLowerInvariant()}");
-            classList.Add($"rz-progresscircle-{GetCircleSize()}");
+            classList.Add($"rz-progressbarcircular-{ProgressBarStyle.ToString().ToLowerInvariant()}");
+            classList.Add($"rz-progressbarcircular-{GetCircleSize()}");
 
             return string.Join(" ", classList);
         }

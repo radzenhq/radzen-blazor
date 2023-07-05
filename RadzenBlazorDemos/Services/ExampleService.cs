@@ -1356,16 +1356,16 @@ namespace RadzenBlazorDemos
                     Title = "Blazor progress bar component",
                     Path = "progressbar",
                     Icon = "&#xe893",
-                    Tags = new [] { "progress", "spinner", "bar" }
+                    Tags = new [] { "progress", "spinner", "bar", "linear" }
                 },
                 new Example()
                 {
-                    Name = "ProgressCircle",
+                    Name = "ProgressBarCircular",
                     New = true,
-                    Title = "Blazor progress spinner component",
-                    Path = "progresscircle",
+                    Title = "Blazor circular progress bar component",
+                    Path = "progressbarcircular",
                     Icon = "&#xe5d5",
-                    Tags = new [] { "progress", "spinner", "circle" }
+                    Tags = new [] { "progress", "spinner", "circle", "circular" }
                 },
                 new Example()
                 {
