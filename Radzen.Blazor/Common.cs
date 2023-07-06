@@ -2201,7 +2201,15 @@ namespace Radzen
         /// <param name="property">The property.</param>
         public static string GetProperty(string property)
         {
-            var type = Type.GetType($"System.{property}");
+            Type type = null;
+            try
+            {
+                type = Type.GetType($"System.{property}");
+            }
+            catch
+            {
+                // ignore the exception and assume the property start without a type and do not need the '@' prefix
+            }
             var propertyName = $"{(type != null ? "@" : "")}{property}";
 
             if (propertyName.IndexOf(".") != -1)
