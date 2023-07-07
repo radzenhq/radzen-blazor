@@ -342,7 +342,7 @@ namespace Radzen.Blazor
                 innerEndX = (innerEnd.X - 0.01).ToInvariantString();
             }
 
-            return $"M {startX} {startY} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {innerEndX} {innerEndY} A {innerR} {innerR} 0 {largeArcFlag} 0 {innerStartX} {innerStartY}";
+            return $"M {startX} {startY} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {innerEndX} {innerEndY} A {innerR} {innerR} 0 {largeArcFlag} 0 {innerStartX} {innerStartY} Z";
         }
 
         /// <inheritdoc />
