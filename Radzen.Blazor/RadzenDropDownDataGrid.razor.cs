@@ -287,13 +287,13 @@ namespace Radzen.Blazor
         {
             if (firstRender)
             {
-#if NET5_0_OR_GREATER
+    #if NET5_0_OR_GREATER
                 if (grid != null)
                 {
                     grid.SetAllowVirtualization(AllowVirtualization);
                 }
-#endif
-                if (Visible && LoadData.HasDelegate && Data == null)
+    #endif            
+                if(Visible && LoadData.HasDelegate && Data == null)
                 {
                     LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
                 }
@@ -376,7 +376,7 @@ namespace Radzen.Blazor
                         {
                             query = query.Where(string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
                                 .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
-                                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);                            
                         }
                     }
                     else
@@ -577,7 +577,7 @@ namespace Radzen.Blazor
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
-            else if (FilterAsYouType)
+            else if(FilterAsYouType)
             {
                 selectedIndex = -1;
                 Debounce(DebounceFilter, FilterDelay);
@@ -601,9 +601,9 @@ namespace Radzen.Blazor
 #if NET5_0_OR_GREATER
             if (grid?.virtualize != null)
             {
-                if (string.IsNullOrEmpty(searchText))
+                if(string.IsNullOrEmpty(searchText))
                 {
-                    if (LoadData.HasDelegate)
+                    if(LoadData.HasDelegate)
                     {
                         Data = null;
                         await grid.Reload();
@@ -635,13 +635,6 @@ namespace Radzen.Blazor
         {
             await DebounceFilter();
         }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance loading indicator is shown.
-        /// </summary>
-        /// <value><c>true</c> if this instance loading indicator is shown; otherwise, <c>false</c>.</value>
-        [Parameter]
-        public bool IsLoading { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether sorting is allowed.
@@ -689,7 +682,7 @@ namespace Radzen.Blazor
             {
                 await SelectItem(item);
             }
-
+            
         }
 
         private async Task OnChipRemove(object item)
