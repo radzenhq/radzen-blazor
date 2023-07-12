@@ -304,6 +304,7 @@ namespace Radzen
 
             var value = !second ? (string)Convert.ChangeType(column.FilterValue, typeof(string)) :
                 (string)Convert.ChangeType(column.SecondFilterValue, typeof(string));
+            value = value?.Replace("\"", "\\\"");
 
             var columnType = column.Type;
             var columnFormat = column.Format;
@@ -393,7 +394,8 @@ namespace Radzen
             if (column.FilterPropertyType == typeof(string))
             {
                 string filterCaseSensitivityOperator = column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
-
+                value = value?.Replace("\"", "\\\"");
+                
                 if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.Contains)
                 {
                     return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator}.Contains(""{value}""{filterCaseSensitivityOperator})";
