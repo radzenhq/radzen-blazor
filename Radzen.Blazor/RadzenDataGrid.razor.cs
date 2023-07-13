@@ -855,6 +855,13 @@ namespace Radzen.Blazor
         public string EnumFilterSelectText { get; set; } = "Select...";
 
         /// <summary>
+        /// Gets or sets the nullable enum for null value filter text.
+        /// </summary>
+        /// <value>The enum filter select text.</value>
+        [Parameter]
+        public string EnumNullFilterText { get; set; } = "No value";
+
+        /// <summary>
         /// Gets or sets the and operator text.
         /// </summary>
         /// <value>The and operator text.</value>
