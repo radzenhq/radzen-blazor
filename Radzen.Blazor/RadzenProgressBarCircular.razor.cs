@@ -18,21 +18,21 @@ namespace Radzen.Blazor
         {
             var classList=new List<string>()
             {
-                "rz-progressbarcircular"
+                "rz-progressbar-circular"
             };
 
             switch (Mode)
             {
                 case ProgressBarMode.Determinate:
-                    classList.Add("rz-progressbarcircular-determinate");
+                    classList.Add("rz-progressbar-determinate");
                     break;
                 case ProgressBarMode.Indeterminate:
-                    classList.Add("rz-progressbarcircular-indeterminate");
+                    classList.Add("rz-progressbar-indeterminate");
                     break;
             }
 
-            classList.Add($"rz-progressbarcircular-{ProgressBarStyle.ToString().ToLowerInvariant()}");
-            classList.Add($"rz-progressbarcircular-{GetCircleSize()}");
+            classList.Add($"rz-progressbar-{ProgressBarStyle.ToString().ToLowerInvariant()}");
+            classList.Add($"rz-progressbar-circular-{GetCircleSize()}");
 
             return string.Join(" ", classList);
         }

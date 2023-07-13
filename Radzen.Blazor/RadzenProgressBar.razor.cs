@@ -26,13 +26,13 @@ namespace Radzen.Blazor
             {
                 case ProgressBarMode.Determinate:
                     classList.Add("rz-progressbar-determinate");
-                    classList.Add($"rz-progressbar-determinate-{ProgressBarStyle.ToString().ToLowerInvariant()}");
                     break;
                 case ProgressBarMode.Indeterminate:
                     classList.Add("rz-progressbar-indeterminate");
-                    classList.Add($"rz-progressbar-indeterminate-{ProgressBarStyle.ToString().ToLowerInvariant()}");
                     break;
             }
+            
+            classList.Add($"rz-progressbar-{ProgressBarStyle.ToString().ToLowerInvariant()}");
 
             return string.Join(" ", classList);
         }
