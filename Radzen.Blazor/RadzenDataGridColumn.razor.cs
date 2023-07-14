@@ -1096,6 +1096,14 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets value indicating if up and down buttons are displayed in numeric column filter.
+        /// </summary>
+        public virtual bool ShowUpDownForNumericFilter()
+        {
+            return true;
+        }
+
+        /// <summary>
         /// Gets an OData expression to filter by this column.
         /// </summary>
         /// <param name="second">Whether to use <see cref="SecondFilterValue"/> instead of <see cref="FilterValue"/></param>

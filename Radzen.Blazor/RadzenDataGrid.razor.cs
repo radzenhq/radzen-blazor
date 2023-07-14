@@ -533,7 +533,8 @@ namespace Radzen.Blazor
                 builder.OpenComponent(0, numericType);
 
                 builder.AddAttribute(1, "Value", isFirst ? column.GetFilterValue() : column.GetSecondFilterValue());
-                builder.AddAttribute(2, "Style", "width:100%");
+                builder.AddAttribute(2, "ShowUpDown", column.ShowUpDownForNumericFilter());
+                builder.AddAttribute(3, "Style", "width:100%");
 
                 Action<object> action;
                 if (force)
