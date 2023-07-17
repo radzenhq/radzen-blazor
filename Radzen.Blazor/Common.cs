@@ -811,7 +811,7 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Specifies the behavior of <see cref="RadzenProgressBar" />.
+    /// Specifies the behavior of <see cref="RadzenProgressBar" /> or <see cref="RadzenProgressBarCircular" />.
     /// </summary>
     public enum ProgressBarMode
     {
@@ -826,7 +826,7 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Specifies the display style of a <see cref="RadzenProgressBar" />. Affects the visual styling of RadzenProgressBar (background and text color).
+    /// Specifies the display style of a <see cref="RadzenProgressBar" /> and <see cref="RadzenProgressBarCircular" />. Affects the visual styling of RadzenProgressBar (background and text color) and RadzenProgressBarCircular (stroke and text color).
     /// </summary>
     public enum ProgressBarStyle
     {
@@ -862,6 +862,29 @@ namespace Radzen
         /// Informative styling.
         /// </summary>
         Info
+    }
+
+    /// <summary>
+    /// Specifies the size of a <see cref="RadzenProgressBarCircular" />.
+    /// </summary>
+    public enum ProgressBarCircularSize
+    {
+        /// <summary>
+        /// The default size of a circular progress bar.
+        /// </summary>
+        Medium,
+        /// <summary>
+        /// A circular progress bar larger than the default.
+        /// </summary>
+        Large,
+        /// <summary>
+        /// A circular progress bar smaller than the default.
+        /// </summary>
+        Small,
+        /// <summary>
+        /// The smallest circular progress bar.
+        /// </summary>
+        ExtraSmall
     }
 
     /// <summary>

@@ -1287,6 +1287,11 @@ $progressbar-height: 0.25rem !default;
   display: none !important;
 }
 
+// ProgressBarCircular
+$progressbar-circular-stroke-width: 0 !default;
+$progressbar-circular-value-stroke-width: 3px !default;
+$progressbar-circular-value-endpoint: square !default;
+
 // Chart
 $chart-axis-color: var(--rz-base-300) !default;
 $chart-axis-label-color: var(--rz-base-500) !default;
