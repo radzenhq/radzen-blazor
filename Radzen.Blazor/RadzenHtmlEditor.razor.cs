@@ -46,6 +46,13 @@ namespace Radzen.Blazor
         public IDictionary<string, string> UploadHeaders { get; set; }
 
         /// <summary>
+        /// Gets or sets the input.
+        /// </summary>
+        /// <value>The input.</value>
+        [Parameter]
+        public EventCallback<string> Input { get; set; }
+
+        /// <summary>
         /// A callback that will be invoked when the user pastes content in the editor. Commonly used to filter unwanted HTML.
         /// </summary>
         /// <example>
@@ -280,6 +287,7 @@ namespace Radzen.Blazor
         public void OnChange(string html)
         {
             Html = html;
+            Input.InvokeAsync(html);
         }
 
         /// <summary>

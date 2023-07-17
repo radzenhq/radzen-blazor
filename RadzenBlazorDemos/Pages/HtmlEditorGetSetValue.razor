@@ -1,4 +1,4 @@
-﻿<RadzenHtmlEditor @bind-Value=@htmlValue style="height: 300px;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute UploadUrl="upload/image" />
+﻿<RadzenHtmlEditor @bind-Value=@htmlValue style="height: 300px;" Input=@OnInput Change=@OnChange Paste=@OnPaste Execute=@OnExecute UploadUrl="upload/image" />
 
 <EventConsole @ref=@console />
 
@@ -15,6 +15,11 @@
     void OnChange(string html)
     {
         console.Log($"Change: {html}");
+    }
+
+    void OnInput(string html)
+    {
+        console.Log($"Input: {html}");
     }
 
     void OnExecute(HtmlEditorExecuteEventArgs args)
