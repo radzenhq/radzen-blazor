@@ -19,6 +19,12 @@ namespace Radzen.Blazor
     public partial class RadzenHtmlEditor : FormComponent<string>
     {
         /// <summary>
+        /// Allows for no-tool HTML editors.
+        /// </summary>
+        [Parameter]
+        public bool NoTools { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the mode of the editor.
         /// </summary>
         [Parameter]
