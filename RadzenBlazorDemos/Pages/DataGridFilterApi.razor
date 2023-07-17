@@ -10,7 +10,7 @@
     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
     LogicalFilterOperator="LogicalFilterOperator.Or" Filter="@OnFilter">
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <MyCustomDataGridColumn TItem="Employee" Property="EmployeeID" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
