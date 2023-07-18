@@ -19,6 +19,12 @@ namespace Radzen.Blazor
     public partial class RadzenHtmlEditor : FormComponent<string>
     {
         /// <summary>
+        /// Allows for no-tool HTML editors.
+        /// </summary>
+        [Parameter]
+        public bool NoTools { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the mode of the editor.
         /// </summary>
         [Parameter]
@@ -38,6 +44,13 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public IDictionary<string, string> UploadHeaders { get; set; }
+
+        /// <summary>
+        /// Gets or sets the input.
+        /// </summary>
+        /// <value>The input.</value>
+        [Parameter]
+        public EventCallback<string> Input { get; set; }
 
         /// <summary>
         /// A callback that will be invoked when the user pastes content in the editor. Commonly used to filter unwanted HTML.
@@ -274,6 +287,7 @@ namespace Radzen.Blazor
         public void OnChange(string html)
         {
             Html = html;
+            Input.InvokeAsync(html);
         }
 
         /// <summary>
