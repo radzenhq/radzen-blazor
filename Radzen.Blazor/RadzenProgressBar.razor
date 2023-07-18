@@ -5,7 +5,7 @@
 {
     <div @ref="@Element" style="@Style" aria-valuemax="@Max" aria-valuemin="@Min" role="progressbar" @attributes="Attributes"
          aria-valuenow="@Value" id="@GetId()">
-        <div class="rz-progressbar-value rz-progressbar-value-animate" style="@($"width: {(NormalizedValue * 100).ToInvariantString()}%;{GetCssClass()}")"></div>
+        <div class=@($"rz-progressbar-value rz-progressbar-value-animate ${@GetCssClass()}") style="@($"width: {Math.Min(Value / Max * 100, 100).ToInvariantString()}%;")"></div>
         @if (ShowValue)
         {
             <div class="rz-progressbar-label">
