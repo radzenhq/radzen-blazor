@@ -49,15 +49,40 @@ namespace Radzen.Blazor
         /// Specifies whether to remove any leading or trailing whitespace from the value. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if trimming is enabled; otherwise, <c>false</c>. </value>
+        
         [Parameter]
         public bool Trim { get; set; }
+        /// <summary>
+        /// Specifies whether the component should use the real-time input event (<c>@oninput</c>) instead of the change event (<c>@onchange</c>) of the <c>input</c> element.
+        /// When set to <c>true</c>, the component will handle every real-time change in the <c>input</c> element (e.g., when the user types or deletes text).
+        /// When set to <c>false</c>, the component will handle the change event, which is fired when the <c>input</c> element loses focus after its value has changed.
+        /// By default, this parameter is set to <c>false</c>, meaning the change event is used.
+        /// </summary>
 
+        [Parameter]
+        public bool OnUsingOnInput { get; set; } = false;
         /// <summary>
         /// Handles change event of the built-in <c>input</c> elementt.
         /// </summary>
+        /// 
         protected async Task OnChange(ChangeEventArgs args)
         {
-            Value = $"{args.Value}";
+            if (OnUsingOnInput) return;
+            await ChangeText($"{args.Value}");
+        }
+        /// <summary>
+        /// Handles input event of the built-in <c>input</c> elementt.
+        /// </summary>
+        /// 
+        protected async Task OnInput(ChangeEventArgs args)
+        {
+            if (!OnUsingOnInput) return;
+
+            await ChangeText($"{args.Value}");
+        }
+
+        protected async Task ChangeText(string Value)
+        {
 
             if (Trim)
             {
