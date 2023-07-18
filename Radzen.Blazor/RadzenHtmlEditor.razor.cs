@@ -19,10 +19,10 @@ namespace Radzen.Blazor
     public partial class RadzenHtmlEditor : FormComponent<string>
     {
         /// <summary>
-        /// Allows for no-tool HTML editors.
+        /// Specifies whether to show the toolbar. Set it to false to hide the toolbar. Default value is true.
         /// </summary>
         [Parameter]
-        public bool NoTools { get; set; } = false;
+        public bool ShowToolbar { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the mode of the editor.
