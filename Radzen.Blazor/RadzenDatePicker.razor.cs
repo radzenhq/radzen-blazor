@@ -596,6 +596,13 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if input is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowInput { get; set; } = true;
+        
+        /// <summary>
+        /// Gets or sets a value indicating whether popup datepicker button is shown.
+        /// </summary>
+        /// <value><c>true</c> if need show button open datepicker popup; <c>false</c> if need hide button, click for input field open datepicker popup.</value>
+        [Parameter]
+        public bool ShowButton { get; set; } = true;
 
         private bool IsReadonly => ReadOnly || !AllowInput;
 
@@ -868,7 +875,7 @@ namespace Radzen.Blazor
 
         private string getOpenPopupForInput()
         {
-            return PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline && !AllowInput ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
+            return PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline && (!AllowInput || !ShowButton) ? $"Radzen.togglePopup(this.parentNode, '{PopupID}')" : "";
         }
 
         /// <summary>
