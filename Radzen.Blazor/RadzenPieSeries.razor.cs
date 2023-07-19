@@ -172,8 +172,13 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public override object DataAt(double x, double y)
+        public override (object, Point) DataAt(double x, double y)
         {
+            if (!Contains(x, y, 0))
+            {
+                return (null, null);
+            }
+
             var angle = 90 - Math.Atan((CenterY - y) / (x - CenterX)) * 180 / Math.PI;
 
             if (x < CenterX)
@@ -191,13 +196,13 @@ namespace Radzen.Blazor
 
                 if (startAngle <= angle && angle <= endAngle)
                 {
-                    return data;
+                    return (data, new Point() { X = x, Y = y });
                 }
 
                 startAngle = endAngle;
             }
 
-            return null;
+            return (null, null);
         }
 
         /// <inheritdoc />
@@ -337,7 +342,7 @@ namespace Radzen.Blazor
                 innerEndX = (innerEnd.X - 0.01).ToInvariantString();
             }
 
-            return $"M {startX} {startY} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {innerEndX} {innerEndY} A {innerR} {innerR} 0 {largeArcFlag} 0 {innerStartX} {innerStartY}";
+            return $"M {startX} {startY} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {innerEndX} {innerEndY} A {innerR} {innerR} 0 {largeArcFlag} 0 {innerStartX} {innerStartY} Z";
         }
 
         /// <inheritdoc />

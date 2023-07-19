@@ -43,7 +43,8 @@ namespace Radzen.Blazor
             object minArg = Min;
             object maxArg = Max;
 
-            return Min != null || Max != null ? $@"Radzen.numericOnInput(event, {minArg ?? "null"}, {maxArg ?? "null"})" : "";
+            return !(typeof(TValue).IsGenericType && typeof(TValue).GetGenericTypeDefinition() == typeof(Nullable<>)) &&
+                (Min != null || Max != null) ? $@"Radzen.numericOnInput(event, {minArg ?? "null"}, {maxArg ?? "null"})" : "";
         }
 
         private string getOnPaste()
@@ -114,7 +115,7 @@ namespace Radzen.Blazor
                     if (Format != null)
                     {
                         decimal decimalValue = (decimal)Convert.ChangeType(Value, typeof(decimal));
-                        return decimalValue.ToString(Format);
+                        return decimalValue.ToString(Format, Culture);
                     }
                     return Value.ToString();
                 }

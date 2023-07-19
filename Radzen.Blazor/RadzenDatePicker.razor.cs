@@ -140,6 +140,11 @@ namespace Radzen.Blazor
 
         async Task OkClick()
         {
+            if (PopupRenderMode == PopupRenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
+            {
+                await popup.CloseAsync(Element);
+            }
+
             if (!Disabled)
             {
                 DateTime date = CurrentDate;
@@ -446,7 +451,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return string.Format("{0:" + DateFormat + "}", Value);
+                return string.Format(Culture, "{0:" + DateFormat + "}", Value);
             }
         }
 
@@ -488,7 +493,7 @@ namespace Radzen.Blazor
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
 
             var valid = DateTime.TryParseExact(inputValue, DateFormat, null, DateTimeStyles.None, out value);
-            var nullable = Nullable.GetUnderlyingType(typeof(TValue)) != null;
+            var nullable = Nullable.GetUnderlyingType(typeof(TValue)) != null || AllowClear;
 
             if (!valid)
             {
@@ -557,6 +562,11 @@ namespace Radzen.Blazor
 
             await Change.InvokeAsync(DateTimeValue);
             StateHasChanged();
+        }
+
+        private string ButtonClasses
+        {
+            get => $"rz-button-icon-left rzi rzi-{(TimeOnly ? "time" : "calendar")}";
         }
 
         /// <summary>
@@ -761,6 +771,11 @@ namespace Radzen.Blazor
         /// </summary>
         public void Close()
         {
+            if (PopupRenderMode == PopupRenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
+            {
+                InvokeAsync(() => popup.CloseAsync(Element));
+            }
+
             if (!Disabled)
             {
                 contentStyle = "display:none;";

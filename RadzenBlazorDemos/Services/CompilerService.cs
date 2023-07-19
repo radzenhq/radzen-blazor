@@ -89,6 +89,7 @@ namespace RadzenBlazorDemos
 @using Radzen.Blazor
 @using RadzenBlazorDemos
 @using RadzenBlazorDemos.Shared
+@using RadzenBlazorDemos.Pages
 ";
         private readonly HttpClient httpClient;
 

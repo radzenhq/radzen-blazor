@@ -19,6 +19,12 @@ namespace Radzen.Blazor
     public partial class RadzenHtmlEditor : FormComponent<string>
     {
         /// <summary>
+        /// Specifies whether to show the toolbar. Set it to false to hide the toolbar. Default value is true.
+        /// </summary>
+        [Parameter]
+        public bool ShowToolbar { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the mode of the editor.
         /// </summary>
         [Parameter]
@@ -38,6 +44,13 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public IDictionary<string, string> UploadHeaders { get; set; }
+
+        /// <summary>
+        /// Gets or sets the input.
+        /// </summary>
+        /// <value>The input.</value>
+        [Parameter]
+        public EventCallback<string> Input { get; set; }
 
         /// <summary>
         /// A callback that will be invoked when the user pastes content in the editor. Commonly used to filter unwanted HTML.
@@ -102,6 +115,26 @@ namespace Radzen.Blazor
         public string UploadUrl { get; set; }
 
         ElementReference ContentEditable { get; set; }
+        RadzenTextArea TextArea { get; set; }
+
+        /// <summary>
+        /// Focuses the editor.
+        /// </summary>
+        public ValueTask FocusAsync()
+        {
+#if NET5_0_OR_GREATER
+            if (mode == HtmlEditorMode.Design)
+            {
+                return ContentEditable.FocusAsync();
+            }
+            else
+            {
+                return TextArea.Element.FocusAsync();
+            }
+#else
+            throw new System.NotSupportedException();
+#endif
+        }
 
         internal RadzenHtmlEditorCommandState State { get; set; } = new RadzenHtmlEditorCommandState();
 
@@ -202,17 +235,16 @@ namespace Radzen.Blazor
 
             if (firstRender || visibleChanged)
             {
-                visibleChanged = false;
-
                 if (Visible)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.createEditor", ContentEditable, UploadUrl, Paste.HasDelegate, Reference);
                 }
             }
 
-            if (valueChanged)
+            if (valueChanged || visibleChanged)
             {
                 valueChanged = false;
+                visibleChanged = false;
 
                 Html = Value;
 
@@ -255,6 +287,7 @@ namespace Radzen.Blazor
         public void OnChange(string html)
         {
             Html = html;
+            Input.InvokeAsync(html);
         }
 
         /// <summary>

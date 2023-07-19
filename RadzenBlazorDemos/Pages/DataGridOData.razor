@@ -1,16 +1,9 @@
 ﻿@using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 
-@inject NorthwindODataService service
-
 <RadzenDataGrid @ref="grid" @bind-Value=@selectedEmployees KeyProperty="EmployeeID" IsLoading="@isLoading" Count="@count" Data="@employees" LoadData="@LoadData" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" PagerHorizontalAlign="HorizontalAlign.Center" TItem="Employee" ColumnWidth="200px">
 <Columns>
     <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
-    <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
-        <Template Context="data">
-            <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
-        </Template>
-    </RadzenDataGridColumn>
     <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name">
             <EditTemplate Context="employee">
                 <RadzenTextBox @bind-Value="employee.FirstName" />
@@ -23,6 +16,16 @@
             <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%"
                 Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
         </FilterTemplate>
+    </RadzenDataGridColumn>
+    <RadzenDataGridColumn TItem="Employee" Title="Customers" Property="Orders" FilterProperty="Customer/CustomerID" Sortable=false
+                              Type="typeof(IEnumerable<Customer>)" FilterValue="@selectedCustomers" FilterOperator="FilterOperator.In">
+        <FilterTemplate>
+            <RadzenDropDown @bind-Value=@selectedCustomers Style="width:100%" TextProperty="CompanyName" ValueProperty="CustomerID"
+                Change=@OnSelectedCustomersChange Data="@(customers)" AllowSelectAll="false" Multiple="true" MaxSelectedLabels="2" />
+        </FilterTemplate>
+        <Template>
+                @(string.Join(',', context.Orders != null ? context.Orders.Select(i => i.Customer.CompanyName) : Enumerable.Empty<string>()))
+        </Template>
     </RadzenDataGridColumn>
     <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
     <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
@@ -88,11 +91,35 @@ async Task LoadData(LoadDataArgs args)
         await grid.FirstPage();
     }
 
+    IEnumerable<string> selectedCustomers;
+
+    async Task OnSelectedCustomersChange(object value)
+    {
+        if (selectedCustomers != null && !selectedCustomers.Any())
+        {
+            selectedCustomers = null;
+        }
+
+        await grid.FirstPage();
+    }
+
+    NorthwindODataService service = new NorthwindODataService("https://services.odata.org/V4/Northwind/Northwind.svc/");
+
+    IEnumerable<Customer> customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var result = await service.GetCustomers();
+        customers = result.Value;
+    }
+
     async Task LoadData(LoadDataArgs args)
     {
         isLoading = true;
 
-        var result = await service.GetEmployees(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true);
+        var result = await service.GetEmployees(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true, expand: "Orders($expand=Customer)");
         // Update the Data property
         employees = result.Value.AsODataEnumerable();
         // Update the count

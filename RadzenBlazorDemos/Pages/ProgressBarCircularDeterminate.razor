@@ -1,0 +1,20 @@
+﻿@using Radzen
+
+<RadzenStack AlignItems="AlignItems.Center" Class="rz-m-12" Gap="2rem">
+    <RadzenProgressBarCircular @bind-Value="@value" />
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">ProgressBarCircular with <strong>ProgressBarStyle</strong> property</RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value="@value" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Secondary" @bind-Value="@value" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Light" @bind-Value="@value" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" @bind-Value="@value" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Success" @bind-Value="@value" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Danger" @bind-Value="@value" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Warning" @bind-Value="@value" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Info" @bind-Value="@value" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    double value = 55;
+}

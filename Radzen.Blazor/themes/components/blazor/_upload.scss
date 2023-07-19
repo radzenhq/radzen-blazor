@@ -1,5 +1,6 @@
 $upload-button-bar-background-color: var(--rz-base-200) !default;
 $upload-button-bar-padding: 0.5rem !default;
+$upload-button-bar-border-radius: var(--rz-border-radius) !default;
 
 $upload-files-background-color: var(--rz-base-background-color) !default;
 $upload-files-padding: 0.5rem 0 !default;
@@ -24,6 +25,7 @@ $upload-button-background-color: var(--rz-primary) !default;
 :root {
   --rz-upload-button-bar-background-color: #{$upload-button-bar-background-color};
   --rz-upload-button-bar-padding: #{$upload-button-bar-padding};
+  --rz-upload-button-bar-border-radius: #{$upload-button-bar-border-radius};
   
   --rz-upload-files-background-color: #{$upload-files-background-color};
   --rz-upload-files-padding: #{$upload-files-padding};
@@ -133,7 +135,7 @@ $upload-button-background-color: var(--rz-primary) !default;
   position: relative;
   background-color: var(--rz-upload-button-bar-background-color);
   padding: var(--rz-upload-button-bar-padding);
-  border-radius: var(--rz-border-radius);
+  border-radius: var(--rz-upload-button-bar-border-radius);
 
   .rz-button {
     &:nth-child(3) {

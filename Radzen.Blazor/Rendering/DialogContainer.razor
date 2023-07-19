@@ -2,7 +2,7 @@
 @using System.Reflection;
 @inject IJSRuntime JSRuntime
 @implements IDisposable
-<div class="rz-dialog-wrapper">
+<div class="@WrapperCssClass">
     <div @ref="dialog" class="@CssClass" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
         {
@@ -70,23 +70,33 @@
     double clientX;
     double clientY;
 
-    async Task OnDragStart(DraggableEventArgs args)
+    void OnDragStart(DraggableEventArgs args)
     {
         clientX = args.ClientX;
         clientY = args.ClientY;
-
-        shouldRender = false;
-        var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", dialog);
-        height = $"height: {rect.Height}px;";
-        width = $"width: {rect.Width}px;";
-
-        shouldRender = true;
     }
 
     void OnDrag(DraggableEventArgs args)
     {
         left = string.Format(System.Globalization.CultureInfo.InvariantCulture, "left: {0}px;", args.Rect.Left + (args.ClientX - clientX));
         top = string.Format(System.Globalization.CultureInfo.InvariantCulture, "top: {0}px;", args.Rect.Top + (args.ClientY - clientY));
+    }
+
+
+    /// <summary>
+    /// Called when resized.
+    /// </summary>
+    /// <param name="w">The width.</param>
+    /// <param name="h">The height.</param>
+    [JSInvokable("RadzenDialog.OnResize")]
+    public void OnResize(double w, double h)
+    {
+        shouldRender = false;
+
+        width = $"width: {w}px;";
+        height = $"height: {h}px;";
+
+        shouldRender = true;
     }
 
     bool shouldRender = true;
@@ -131,6 +141,15 @@
         {
             var baseCss = "rz-dialog";
             return string.IsNullOrEmpty(Dialog.Options.CssClass) ? baseCss : $"{baseCss} {Dialog.Options.CssClass}";
+        }
+    }
+
+    string WrapperCssClass
+    {
+        get
+        {
+            var baseCss = "rz-dialog-wrapper";
+            return string.IsNullOrWhiteSpace(Dialog.Options.WrapperCssClass) ? baseCss : $"{baseCss} {Dialog.Options.WrapperCssClass}";
         }
     }
 
@@ -202,7 +221,26 @@
                     CloseTabIndex = options != null ? options.CloseTabIndex : 0,
                 };
 
-            await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Service.Reference);
+            await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Service.Reference, DotNetReference);
+        }
+    }
+
+    private DotNetObjectReference<DialogContainer> dotNetReference;
+
+    /// <summary>
+    /// Gets the reference for the current component.
+    /// </summary>
+    /// <value>The reference.</value>
+    protected DotNetObjectReference<DialogContainer> DotNetReference
+    {
+        get
+        {
+            if (dotNetReference == null)
+            {
+                dotNetReference = DotNetObjectReference.Create(this);
+            }
+
+            return dotNetReference;
         }
     }
 }

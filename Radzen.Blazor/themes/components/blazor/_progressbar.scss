@@ -1,57 +1,87 @@
-$progressbar-value-background-color: var(--rz-secondary) !default;
 $progressbar-background-color: var(--rz-base-200) !default;
 $progressbar-font-size: var(--rz-body-font-size) !default;
 $progressbar-height: 1.25rem !default;
 $progressbar-border-radius: var(--rz-border-radius) !default;
+$progressbar-value-background-color: var(--rz-secondary) !default;
+$progressbar-value-transition: var(--rz-transition-all) !default;
+$progressbar-circular-stroke-width: 2px !default;
+$progressbar-circular-value-stroke-width: 3px !default;
+$progressbar-circular-value-endpoint: round !default;
 
 // ProgressBar CSS variables
 
 :root {
-  --rz-progressbar-value-background-color: #{$progressbar-value-background-color};
   --rz-progressbar-background-color: #{$progressbar-background-color};
   --rz-progressbar-font-size: #{$progressbar-font-size};
   --rz-progressbar-height: #{$progressbar-height};
   --rz-progressbar-border-radius: #{$progressbar-border-radius};
+  --rz-progressbar-value-background-color: #{$progressbar-value-background-color};
+  --rz-progressbar-value-transition: #{$progressbar-value-transition};
+  --rz-progressbar-circular-stroke-width:  #{$progressbar-circular-stroke-width};
+  --rz-progressbar-circular-value-stroke-width:  #{$progressbar-circular-value-stroke-width};
+  --rz-progressbar-circular-value-endpoint:  #{$progressbar-circular-value-endpoint};
 }
 
 $progressbar-styles: () !default;
-
 $progressbar-styles: map-merge(
-    (
-        primary: (
-            background-color: var(--rz-primary),
-            color: var(--rz-text-contrast-color)
-        ), 
-        light: (
-            background-color: var(--rz-base-400),
-            color: var(--rz-text-title-color)
-        ),
-        dark: (
-            background-color: var(--rz-base-900),
-            color: var(--rz-text-contrast-color)
-        ),
-        secondary: ( 
-            background-color: var(--rz-secondary),
-            color: var(--rz-text-contrast-color)
-        ),
-        info: (
-            background-color: var(--rz-info),
-            color: var(--rz-text-contrast-color)
-        ),
-        warning: (
-            background-color: var(--rz-warning),
-            color: var(--rz-text-contrast-color)
-        ),
-        danger: (
-            background-color: var(--rz-danger),
-            color: var(--rz-text-contrast-color)
-        ),
-        success: (
-            background-color: var(--rz-success),
-            color: var(--rz-text-contrast-color)
-        )
+  (
+    primary: (
+      background-color: var(--rz-primary),
+      color: var(--rz-text-contrast-color)
+    ), 
+    light: (
+      background-color: var(--rz-base-400),
+      color: var(--rz-text-title-color)
     ),
-    $progressbar-styles
+    dark: (
+      background-color: var(--rz-base-900),
+      color: var(--rz-text-contrast-color)
+    ),
+    secondary: ( 
+      background-color: var(--rz-secondary),
+      color: var(--rz-text-contrast-color)
+    ),
+    info: (
+      background-color: var(--rz-info),
+      color: var(--rz-text-contrast-color)
+    ),
+    warning: (
+      background-color: var(--rz-warning),
+      color: var(--rz-text-contrast-color)
+    ),
+    danger: (
+      background-color: var(--rz-danger),
+      color: var(--rz-text-contrast-color)
+    ),
+    success: (
+      background-color: var(--rz-success),
+      color: var(--rz-text-contrast-color)
+    )
+  ),
+  $progressbar-styles
+);
+
+$progressbar-circular-sizes: () !default;
+$progressbar-circular-sizes: map-merge(
+  (
+    lg: (
+      size: 6rem,
+      font-size: calc(var(--rz-progressbar-font-size) * 1.25)
+    ),
+    md: (
+      size: 3rem,
+      font-size: calc(var(--rz-progressbar-font-size) * 0.75)
+    ),
+    sm: (
+      size: 2rem,
+      font-size: calc(var(--rz-progressbar-font-size) * 0.5)
+    ),
+    xs: (
+      size: 1.25rem,
+      font-size: calc(var(--rz-progressbar-font-size) * 0.375)
+    )
+  ),
+  $progressbar-circular-sizes
 );
 
 .rz-progressbar {
@@ -70,6 +100,7 @@ $progressbar-styles: map-merge(
   background-color: var(--rz-progressbar-value-background-color);
   height: 100%;
   width: 100%;
+  transition: var(--rz-progressbar-value-transition);
 }
 
 
@@ -81,6 +112,52 @@ $progressbar-styles: map-merge(
   line-height: var(--rz-progressbar-font-size);
 }
 
+.rz-progressbar-circular {
+  position: relative;
+}
+
+.rz-progressbar-circular-viewbox {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.rz-progressbar-circular-label {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1;
+}
+
+.rz-progressbar-circular-background {
+  stroke: var(--rz-progressbar-background-color);
+  stroke-width: var(--rz-progressbar-circular-stroke-width);
+}
+
+.rz-progressbar-circular-value {
+  stroke-linecap: var(--rz-progressbar-circular-value-endpoint);
+  stroke-width: var(--rz-progressbar-circular-value-stroke-width);
+  stroke: var(--rz-progressbar-value-background-color);
+  transition: var(--rz-progressbar-value-transition);
+}
+
+.rz-progressbar-determinate {
+  .rz-progressbar-circular-value {
+    stroke-dasharray: 100;
+    transform: rotate(-.25turn);
+  }
+}
 
 .rz-progressbar-indeterminate {
   overflow: hidden;
@@ -88,76 +165,120 @@ $progressbar-styles: map-merge(
   .rz-progressbar-value {
     background-color: transparent;
 
-        &:before {
-        content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            background-color: var(--rz-progressbar-value-background-color);
-            will-change: left, right;
-            animation: 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite rz-progressbar-indeterminate-anim;
-        }
-
-        &:after {
-        content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            background-color: var(--rz-progressbar-value-background-color);
-            will-change: left, right;
-            animation: 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite rz-progressbar-indeterminate-anim-short;
-            animation-delay: 1.15s;
-        }
-
-        @keyframes rz-progressbar-indeterminate-anim {
-            0% {
-                left: -35%;
-                right: 100%;
-            }
-
-            100%, 60% {
-                left: 100%;
-                right: -90%;
-            }
-        }
-
-        @keyframes rz-progressbar-indeterminate-anim-short {
-            0% {
-                left: -200%;
-                right: 100%;
-            }
-
-            100%, 60% {
-                left: 107%;
-                right: -8%;
-            }
-        }
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      background-color: var(--rz-progressbar-value-background-color);
+      will-change: left, right;
+      animation: 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite rz-progressbar-indeterminate-anim;
     }
+
+    &:after {
+    content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      background-color: var(--rz-progressbar-value-background-color);
+      will-change: left, right;
+      animation: 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite rz-progressbar-indeterminate-anim-short;
+      animation-delay: 1.15s;
+    }
+
+    @keyframes rz-progressbar-indeterminate-anim {
+      0% {
+        left: -35%;
+        right: 100%;
+      }
+
+      100%, 60% {
+        left: 100%;
+        right: -90%;
+      }
+    }
+
+    @keyframes rz-progressbar-indeterminate-anim-short {
+      0% {
+        left: -200%;
+        right: 100%;
+      }
+
+      100%, 60% {
+        left: 107%;
+        right: -8%;
+      }
+    }
+  }
+
+  .rz-progressbar-circular-value {
+    animation: rz-progressbar-circular-indeterminate-anim-rotate 2.1s linear infinite, rz-progressbar-circular-indeterminate-anim-dash 1.4s cubic-bezier(.4,0,.2,1) infinite;
+    transform-origin: 0 0;
+    }
+
+  @keyframes rz-progressbar-circular-indeterminate-anim-rotate {
+    100% {
+      transform: rotate(1turn);
+    }
+  }
+
+  @keyframes rz-progressbar-circular-indeterminate-anim-dash {
+    0% {
+      stroke-dasharray: 1, 100;
+      stroke-dashoffset: 0;
+    }
+
+    50% {
+      stroke-dasharray: 70, 100;
+      stroke-dashoffset: -28;
+    }
+
+    100% {
+      stroke-dasharray: 70, 100;
+      stroke-dashoffset: -99;
+    }
+  }
 }
 
 @each $style, $progressbar in $progressbar-styles {
-    .rz-progressbar-determinate-#{$style} {
-        color: map-get($progressbar, color);
-
-        .rz-progressbar-value {
-            background-color: map-get($progressbar, background-color);
-        }
+  .rz-progressbar.rz-progressbar-#{$style} {
+    color: map-get($progressbar, color);
+  }
+  
+  .rz-progressbar-determinate.rz-progressbar-#{$style} {
+    .rz-progressbar-value {
+      background-color: map-get($progressbar, background-color);
     }
 
-    .rz-progressbar-indeterminate-#{$style} {
-        color: map-get($progressbar, color);
-
-        .rz-progressbar-value {
-
-            &:before {
-                background-color: map-get($progressbar, background-color);
-            }
-
-            &:after {
-                background-color: map-get($progressbar, background-color);
-            }
-        }
+    .rz-progressbar-circular-value {
+      stroke: map-get($progressbar, background-color);
     }
+  }
+
+  .rz-progressbar-indeterminate.rz-progressbar-#{$style} {
+    .rz-progressbar-value {
+
+      &:before {
+        background-color: map-get($progressbar, background-color);
+      }
+
+      &:after {
+        background-color: map-get($progressbar, background-color);
+      }
+    }
+
+    .rz-progressbar-circular-value {
+      stroke: map-get($progressbar, background-color);
+    }
+  }
+}
+
+@each $size, $progressbar-circular in $progressbar-circular-sizes {
+  .rz-progressbar-circular-#{$size} {
+    width: map-get($progressbar-circular, size);
+    height: map-get($progressbar-circular, size);
+    font-size: map-get($progressbar-circular, font-size);
+  }
 }

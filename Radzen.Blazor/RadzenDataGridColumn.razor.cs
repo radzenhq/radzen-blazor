@@ -103,6 +103,9 @@ namespace Radzen.Blazor
             return Columns == null && Parent == null ? Grid.deepestChildColumnLevel + 1 : 1;
         }
 
+        Type _propertyType;
+        internal Type PropertyType => _propertyType;
+
         /// <summary>
         /// Called when initialized.
         /// </summary>
@@ -114,12 +117,14 @@ namespace Radzen.Blazor
 
                 var property = GetFilterProperty();
 
+                if (!string.IsNullOrEmpty(property))
+                {
+                    _propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
+                }
+
                 if (!string.IsNullOrEmpty(property) && Type == null)
                 {
-                    if (!string.IsNullOrEmpty(property))
-                    {
-                        _filterPropertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
-                    }
+                    _filterPropertyType = _propertyType;
                 }
 
                 if (_filterPropertyType == null)
@@ -426,6 +431,20 @@ namespace Radzen.Blazor
         /// <value>The filter template.</value>
         [Parameter]
         public RenderFragment<RadzenDataGridColumn<TItem>> FilterTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the filter value template.
+        /// </summary>
+        /// <value>The filter value template.</value>
+        [Parameter]
+        public RenderFragment<RadzenDataGridColumn<TItem>> FilterValueTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the second filter value template.
+        /// </summary>
+        /// <value>The second filter value template.</value>
+        [Parameter]
+        public RenderFragment<RadzenDataGridColumn<TItem>> SecondFilterValueTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the logical filter operator.
@@ -983,7 +1002,7 @@ namespace Radzen.Blazor
             return Enum.GetValues(typeof(FilterOperator)).Cast<FilterOperator>().Where(o => {
                 var isStringOperator = o == FilterOperator.Contains ||  o == FilterOperator.DoesNotContain
                     || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith || o == FilterOperator.IsEmpty || o == FilterOperator.IsNotEmpty;
-                return FilterPropertyType == typeof(string) ? isStringOperator
+                return FilterPropertyType == typeof(string) || QueryableExtension.IsEnumerable(FilterPropertyType) ? isStringOperator
                       || o == FilterOperator.Equals || o == FilterOperator.NotEquals
                       || o == FilterOperator.IsNull || o == FilterOperator.IsNotNull
                     : !isStringOperator;
@@ -1077,6 +1096,14 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets value indicating if up and down buttons are displayed in numeric column filter.
+        /// </summary>
+        public virtual bool ShowUpDownForNumericFilter()
+        {
+            return true;
+        }
+
+        /// <summary>
         /// Gets an OData expression to filter by this column.
         /// </summary>
         /// <param name="second">Whether to use <see cref="SecondFilterValue"/> instead of <see cref="FilterValue"/></param>
@@ -1104,5 +1131,24 @@ namespace Radzen.Blazor
         {
             Grid?.RemoveColumn(this);
         }
+
+        internal int? getSortIndex()
+        {
+            var descriptor = Grid.sorts.Where(s => s.Property == GetSortProperty()).FirstOrDefault();
+            if (descriptor != null)
+            {
+                return Grid.sorts.IndexOf(descriptor);
+            }
+            
+            return null;
+        }
+
+        internal string getSortIndexAsString()
+        {
+            var index = getSortIndex();
+            return index != null ? $"{getSortIndex() + 1}" : "";
+        }
+
+        internal RadzenDataGridHeaderCell<TItem> headerCell;
     }
 }

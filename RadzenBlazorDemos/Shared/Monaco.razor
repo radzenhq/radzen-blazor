@@ -8,9 +8,11 @@
     ElementReference editor;
     DotNetObjectReference<Monaco> reference;
 
-
     [Parameter]
     public string Value { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
 
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
@@ -27,6 +29,7 @@
                 language = "razor",
                 theme = "vs",
                 codeLens = false,
+                readOnly = ReadOnly,
                 minimap = new {
                     enabled = false
                 },
@@ -54,6 +57,7 @@
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         var valueChanged = parameters.DidParameterChange(nameof(Value), Value);
+        var readOnlyChanged = parameters.DidParameterChange(nameof(ReadOnly), ReadOnly);
 
         await base.SetParametersAsync(parameters);
 
@@ -62,6 +66,11 @@
             interopValue = Value;
 
             await monaco.InvokeVoidAsync("setValue", interopValue);
+        }
+
+        if (monaco != null && readOnlyChanged)
+        {
+            await monaco.InvokeVoidAsync("setOptions", new { readOnly = ReadOnly });
         }
     }
 }

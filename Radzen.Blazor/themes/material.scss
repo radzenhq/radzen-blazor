@@ -333,7 +333,7 @@ $header-border: none !default;
 $header-color: var(--rz-text-contrast-color) !default;
 $header-shadow: var(--rz-shadow-4) !default;
 
-.header {
+.rz-header {
   a,
   a:hover,
   a:focus {
@@ -350,10 +350,13 @@ $sidebar-z: 1 !default;
 $sidebar-border-right: var(--rz-border-base-200) !default;
 $sidebar-width: 300px !default;
 $sidebar-background-color: var(--rz-base-background-color) !default;
+$sidebar-color: var(--rz-text-color) !default;
 
 // Card
 $card-padding: 1rem !default;
+$card-flat-background-color: var(--rz-base-background-color) !default;
 $card-shadow: var(--rz-shadow-1) !default;
+$card-border: var(--rz-border-base-300) !default;
 
 // Accordion
 $accordion-item-padding: 1rem !default;
@@ -1261,7 +1264,7 @@ $notification-info-color: var(--rz-info) !default;
 $notification-info-background-color: var(--rz-info-lighter) !default;
 
 // Alert 
-$alert-message-margin: 0 !default;
+$alert-message-margin: 0.125rem 0 !default;
 
 $alert-sizes: () !default;
 $alert-sizes: map-merge(
@@ -1328,6 +1331,11 @@ $progressbar-height: 0.25rem !default;
   display: none !important;
 }
 
+// ProgressBarCircular
+$progressbar-circular-stroke-width: 0 !default;
+$progressbar-circular-value-stroke-width: 3px !default;
+$progressbar-circular-value-endpoint: square !default;
+
 // Chart
 $chart-axis-color: var(--rz-base-300) !default;
 $chart-axis-label-color: var(--rz-base-500) !default;
@@ -1382,7 +1390,7 @@ $form-field-label-padding: 0 0.25rem !default;
 $form-field-text-label-padding: 0 !default;
 $form-field-label-left: 0.6875rem !default;
 $form-field-label-textarea-top: 0.5rem !default;
-$form-field-label-floating-top: -0.4375rem !default;
+$form-field-label-floating-top: -0.5625rem !default;
 $form-field-helper-padding: 0 1rem !default;
 
 @import 'bootstrap';

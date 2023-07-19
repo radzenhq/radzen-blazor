@@ -62,12 +62,12 @@
 @code {
     bool allowVirtualization;
 
-    IEnumerable<Product> products;
+    IQueryable<Product> products;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        products = dbContext.Products.Include("Category").Include("Supplier").ToList();
+        products = dbContext.Products.Include("Category").Include("Supplier");
     }
 }

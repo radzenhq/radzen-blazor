@@ -28,7 +28,7 @@
     <a target="blank" href="@ComponentSourceHref" title=@($"View {Name} source code in new tab") ><RadzenIcon Icon="launch" style="font-size: 1rem; margin-right: 4px;" /> @Name Source</a>
 }
 </div>
-<RadzenCard class="rz-p-0">
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
     <RadzenTabs @bind-SelectedIndex="@selectedIndex" class="example-tabs">
         <Tabs>
             <RadzenTabsItem Text="Example" Title="Example preview">
@@ -43,7 +43,7 @@
             {
             <RadzenTabsItem Text="@Path.GetFileName(p)" Icon="code">
                 <div class="source-tab-item rz-pb-2">
-                    <CodeViewer PageName="@p" />
+                    <CodeViewer PageName="@p" ReadOnly="true" />
                 </div>
             </RadzenTabsItem>
             }

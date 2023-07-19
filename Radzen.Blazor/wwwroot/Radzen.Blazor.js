@@ -630,6 +630,10 @@ window.Radzen = {
   numericOnInput: function (e, min, max) {
       var value = e.target.value;
 
+      if (value == '' && min != null) {
+          e.target.value = min;
+      }
+
       if (value && !isNaN(+value)) {
         var numericValue = +value;
         if (min != null && !isNaN(+min) && numericValue < min) {
@@ -966,7 +970,7 @@ window.Radzen = {
         }
     }
   },
-  openDialog: function (options, dialogService) {
+  openDialog: function (options, dialogService, dialog) {
     if (Radzen.closeAllPopups) {
         Radzen.closeAllPopups();
     }
@@ -986,6 +990,24 @@ window.Radzen = {
         if (lastDialog) {
             lastDialog.removeEventListener('keydown', Radzen.focusTrapDialog);
             lastDialog.addEventListener('keydown', Radzen.focusTrapDialog);
+
+            dialog.offsetWidth = lastDialog.parentElement.offsetWidth;
+            dialog.offsetHeight = lastDialog.parentElement.offsetHeight;
+            var dialogResize = function (e) {
+                if(!dialog) return;
+                if (dialog.offsetWidth != e[0].target.offsetWidth || dialog.offsetHeight != e[0].target.offsetHeight) {
+
+                    dialog.offsetWidth = e[0].target.offsetWidth;
+                    dialog.offsetHeight = e[0].target.offsetHeight;
+
+                    dialog.invokeMethodAsync(
+                        'RadzenDialog.OnResize',
+                        e[0].target.offsetWidth,
+                        e[0].target.offsetHeight
+                    );
+                }
+            };
+            Radzen.dialogResizer = new ResizeObserver(dialogResize).observe(lastDialog.parentElement);
 
             if (options.autoFocusFirstElement) {
                 if (lastDialog.querySelectorAll('.rz-html-editor-content').length) {
@@ -1015,6 +1037,7 @@ window.Radzen = {
     }
   },
   closeDialog: function () {
+    Radzen.dialogResizer = null;
     document.body.classList.remove('no-scroll');
     var dialogs = document.querySelectorAll('.rz-dialog-content');
     if (dialogs.length == 0) {
@@ -1026,7 +1049,7 @@ window.Radzen = {
     if (dialogs.length == 0) return [];
     var lastDialog = dialogs[dialogs.length - 1];
     return [...lastDialog.querySelectorAll('a, button, input, textarea, select, details, iframe, embed, object, summary dialog, audio[controls], video[controls], [contenteditable], [tabindex]')]
-            .filter(el => el && el.tabIndex > -1 && !el.hasAttribute('disabled') && !el.hasAttribute('hidden') && el.computedStyleMap && el.computedStyleMap().get('display').value !== 'none');
+        .filter(el => el && el.tabIndex > -1 && !el.hasAttribute('disabled') && el.offsetParent !== null);
   },
   focusTrapDialog: function (e) {
     e = e || window.event;
@@ -1065,7 +1088,10 @@ window.Radzen = {
                   return;
               }
           }
-          document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+          var dialogs = document.querySelectorAll('.rz-dialog-content');
+          if (dialogs.length == 0) {
+              document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+          }
           Radzen.dialogService.invokeMethodAsync('DialogService.Close', null);
       }
   },

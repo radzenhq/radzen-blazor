@@ -56,8 +56,9 @@ namespace Radzen.Blazor
         /// <param name="data">The data.</param>
         /// <param name="marginLeft">The left margin.</param>
         /// <param name="marginTop">The right margin.</param>
+        /// <param name="chartHeight">Height of the whole char area.</param>
         /// <returns>RenderFragment.</returns>
-        RenderFragment RenderTooltip(object data, double marginLeft, double marginTop);
+        RenderFragment RenderTooltip(object data, double marginLeft, double marginTop, double chartHeight);
         /// <summary>
         /// Renders the legend item.
         /// </summary>
@@ -96,7 +97,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
-        object DataAt(double x, double y);
+        (object, Point) DataAt(double x, double y);
         /// <summary>
         /// Returns data chart position
         /// </summary>

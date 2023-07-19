@@ -1,16 +1,18 @@
 $notification-padding: 1rem 1.25rem !default;
 $notification-icon-margin: 0 0.625rem 0 0 !default;
 $notification-container-background-color: transparent !default;
-$notification-success-color: var(--rz-text-contrast-color) !default;
+$notification-shadow: none !default;
+$notification-border-radius: var(--rz-border-radius) !default;
+$notification-success-color: var(--rz-on-success) !default;
 $notification-success-background-color: var(--rz-success) !default;
 $notification-success-icon-color: $notification-success-color !default;
-$notification-warning-color: var(--rz-text-contrast-color) !default;
+$notification-warning-color: var(--rz-on-warning) !default;
 $notification-warning-background-color: var(--rz-warning) !default;
 $notification-warning-icon-color: $notification-warning-color !default;
-$notification-error-color: var(--rz-text-contrast-color) !default;
+$notification-error-color: var(--rz-on-danger) !default;
 $notification-error-background-color: var(--rz-danger) !default;
 $notification-error-icon-color: $notification-error-color !default;
-$notification-info-color: var(--rz-text-contrast-color) !default;
+$notification-info-color: var(--rz-on-info) !default;
 $notification-info-background-color: var(--rz-info) !default;
 $notification-info-icon-color: $notification-info-color !default;
 
@@ -20,6 +22,8 @@ $notification-info-icon-color: $notification-info-color !default;
   --rz-notification-padding: #{$notification-padding};
   --rz-notification-icon-margin: #{$notification-icon-margin};
   --rz-notification-container-background-color: #{$notification-container-background-color};
+  --rz-notification-shadow: #{$notification-shadow};
+  --rz-notification-border-radius: #{$notification-border-radius};
   --rz-notification-success-color: #{$notification-success-color};
   --rz-notification-success-background-color: #{$notification-success-background-color};
   --rz-notification-success-icon-color: #{$notification-success-icon-color};
@@ -46,7 +50,8 @@ $notification-info-icon-color: $notification-info-color !default;
 }
 
 .rz-growl-item {
-  border-radius: var(--rz-border-radius);
+  border-radius: var(--rz-notification-border-radius);
+  box-shadow: var(--rz-notification-shadow);
   padding: var(--rz-notification-padding);
 }
 

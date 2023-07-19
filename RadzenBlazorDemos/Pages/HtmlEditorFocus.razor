@@ -1,0 +1,12 @@
+﻿<RadzenButton style="margin-bottom: 1rem" Click=@OnClick>Focus</RadzenButton>
+<RadzenHtmlEditor @ref=@htmlEditor @bind-Value=@htmlValue style="height: 300px;" UploadUrl="upload/image" />
+@code {
+    RadzenHtmlEditor htmlEditor;
+
+    string htmlValue = "<h1>Hello World!</h1>";
+
+    async Task OnClick()
+    {
+        await htmlEditor.FocusAsync();
+    }
+}
