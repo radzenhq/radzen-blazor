@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -549,67 +548,33 @@ namespace Radzen.Blazor
                 return "left:0";
             }
 
-            var widthsWithUnits = new Dictionary<string, decimal>();
-            var calculatedWidths = new List<string>();
-            var otherWidths = new List<string>();
-
-            var valueWithUnitRegex = new Regex(@"^(?<value>\d+|\d*(?:\.\d+)?)(?<unit>%|\w+)$");
-
+            var widths = new List<string>();
             foreach (var column in stackColumns)
             {
                 var w = column.GetWidthOrGridSetting()?.Trim();
 
                 if (string.IsNullOrEmpty(w))
                 {
-                    if (!widthsWithUnits.TryAdd("px", 200))
-                    {
-                        widthsWithUnits["px"] += 200;
-                    }
+                    widths.Add("200px");
                     continue;
                 }
 
                 if (w.StartsWith("calc(") && w.EndsWith(")"))
                 {
                     var calcExpression = w.Remove(w.Length - 1).Substring("calc(".Length);
-                    calculatedWidths.Add(calcExpression);
+                    widths.Add(calcExpression);
                     continue;
                 }
 
-                var valueWithUnitMatch = valueWithUnitRegex.Match(w);
-
-                if (!valueWithUnitMatch.Success
-                    || !decimal.TryParse(
-                        valueWithUnitMatch.Groups["value"].Value,
-                        NumberStyles.AllowDecimalPoint,
-                        CultureInfo.InvariantCulture,
-                        out decimal value)
-                    )
-                {
-                    otherWidths.Add(w); // probably it's a var()
-                    continue;
-                }
-
-                var unit = valueWithUnitMatch.Groups["unit"].Value;
-                if (!widthsWithUnits.TryAdd(unit, value))
-                {
-                    widthsWithUnits[unit] += value;
-                }
+                widths.Add(w);
             }
 
-            if (calculatedWidths.Any() || widthsWithUnits.Count + otherWidths.Count > 1)
+            if (widths.Count == 1)
             {
-                calculatedWidths.AddRange(widthsWithUnits.Select(x => $"{x.Value.ToString(CultureInfo.InvariantCulture)}{x.Key}"));
-                calculatedWidths.AddRange(otherWidths);
-                return $"left:calc({string.Join(" + ", calculatedWidths)})";
+                return $"left:{widths.First()}";
             }
 
-            if (widthsWithUnits.Any())
-            {
-                var onlyValue = widthsWithUnits.First();
-                return $"left:{onlyValue.Value.ToString(CultureInfo.InvariantCulture)}{onlyValue.Key}";
-            }
-
-            return $"left:{otherWidths.First()}";
+            return $"left:calc({string.Join(" + ", widths)})";
         }
 
         internal bool IsFrozen()
