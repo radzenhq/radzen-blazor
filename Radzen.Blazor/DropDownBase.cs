@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
-
+using Radzen.Blazor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -984,7 +984,35 @@ namespace Radzen
 
                         query.Add($"{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)");
 
-                        _view = Query.Where(String.Join(".", query), ignoreCase ? searchText.ToLower() : searchText);
+                        var search = ignoreCase ? searchText.ToLower() : searchText;
+
+                        if (Query.ElementType == typeof(Enum))
+                        {
+                            _view = Query.Cast<Enum>()
+                                .Where((Func<Enum, bool>)(i =>
+                                {
+                                    var value = ignoreCase ? i.GetDisplayDescription().ToLower() : i.GetDisplayDescription();
+
+                                    if (FilterOperator == StringFilterOperator.Contains)
+                                    {
+                                        return value.Contains(search);
+                                    }
+                                    else if (FilterOperator == StringFilterOperator.StartsWith)
+                                    {
+                                        return value.StartsWith(search);
+                                    }
+                                    else if (FilterOperator == StringFilterOperator.EndsWith)
+                                    {
+                                        return value.EndsWith(search);
+                                    }
+
+                                    return value == search;
+                                })).AsQueryable();
+                        }
+                        else
+                        {
+                            _view = Query.Where(String.Join(".", query), search);
+                        }
                     }
                     else
                     {

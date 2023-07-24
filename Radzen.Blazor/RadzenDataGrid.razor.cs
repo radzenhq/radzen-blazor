@@ -533,7 +533,8 @@ namespace Radzen.Blazor
                 builder.OpenComponent(0, numericType);
 
                 builder.AddAttribute(1, "Value", isFirst ? column.GetFilterValue() : column.GetSecondFilterValue());
-                builder.AddAttribute(2, "Style", "width:100%");
+                builder.AddAttribute(2, "ShowUpDown", column.ShowUpDownForNumericFilter());
+                builder.AddAttribute(3, "Style", "width:100%");
 
                 Action<object> action;
                 if (force)
@@ -853,6 +854,13 @@ namespace Radzen.Blazor
         /// <value>The enum filter select text.</value>
         [Parameter]
         public string EnumFilterSelectText { get; set; } = "Select...";
+
+        /// <summary>
+        /// Gets or sets the nullable enum for null value filter text.
+        /// </summary>
+        /// <value>The enum filter select text.</value>
+        [Parameter]
+        public string EnumNullFilterText { get; set; } = "No value";
 
         /// <summary>
         /// Gets or sets the and operator text.

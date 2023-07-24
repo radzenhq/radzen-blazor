@@ -1,13 +1,45 @@
 @using Radzen.Blazor
 
 <div class="rz-events">
-    @foreach (var kvp in Layout())
+@{
+    var eventGroups = AppointmentGroups(); 
+    var lefts = new Dictionary<AppointmentData, double>();
+}
+@for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
+{
+    var start = date;
+    var end = start.AddMinutes(MinutesPerSlot);
+
+    var appointments = AppointmentsInSlot(start, end);
+    var existingLefts = ExistingLefts(lefts, appointments);
+
+    @foreach (var item in appointments)
     {
-        var appointment = kvp.Key;
-        var rectangle = kvp.Value;
-        <Appointment Data=@appointment Top=@rectangle.Top Left=@rectangle.Left Width=@rectangle.Width
-            Height=@rectangle.Height Click=@OnAppointmentSelect />
+        var width = 90.0 / appointments.Max(data => eventGroups[Appointments.IndexOf(data)]);
+
+        if (!lefts.TryGetValue(item, out var left))
+        {
+            left = DetermineLeft(existingLefts, width);
+            lefts.Add(item, left);
+            existingLefts.Add(left);
+        }
+
+        var eventStart = item.Start < StartDate ? StartDate : item.Start;
+        var eventEnd = item.End > EndDate ? EndDate : item.End;
+        var length = eventStart.Subtract(StartDate).TotalMinutes / MinutesPerSlot;
+        var top = 1.5 * length;
+        var height = Math.Max(1.5, 1.5 * eventEnd.Subtract(eventStart).TotalHours * (60 / MinutesPerSlot));
+
+        @if (item.Start >= start && item.Start <= end)
+        {
+            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect />
+        } 
+        else if (date == StartDate)
+        {
+            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect />
+        }
     }
+}
 </div>
 
 @code {
@@ -31,88 +63,69 @@
         await Scheduler.SelectAppointment(data);
     }
 
-    private IList<AppointmentData> Overlapping(IList<AppointmentData> appointments)
+    private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
     {
-        if (appointments.Count <= 1)
+        if (Appointments == null)
         {
-            return appointments;
+            return Array.Empty<AppointmentData>();
         }
 
-        return appointments.Where(a => appointments.Any(b => a != b && a.Start < b.End && a.End > b.Start)).ToList();
+        return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
     }
 
-    private List<IList<AppointmentData>> PartitionAppointments()
+    double DetermineLeft(HashSet<double> existingLefts, double width)
     {
-        var appointments = Scheduler.GetAppointmentsInRange(StartDate, EndDate)
-                                    .OrderBy(e => e.Start)
-                                    .ThenByDescending(e => e.End - e.Start)
-                                    .ToArray();
+        double left = 0;
 
-        var partitions = new List<List<AppointmentData>>();
+        while (existingLefts.Contains(left))
+        {
+            left += width;
+        }
+
+        return left;
+    }
+
+    HashSet<double> ExistingLefts(IDictionary<AppointmentData, double> lefts, IEnumerable<AppointmentData> appointments)
+    {
+        var existingLefts = new HashSet<double>();
 
         foreach (var appointment in appointments)
         {
-            var slotsOccupied = (int)Math.Ceiling((appointment.End - appointment.Start).TotalMinutes / MinutesPerSlot);
-
-            for (var i = 0; i < slotsOccupied; i++)
+            if (lefts.TryGetValue(appointment, out var existingLeft))
             {
-                var partitionIndex = (int)(appointment.Start - appointments[0].Start).TotalMinutes / MinutesPerSlot + i;
-
-                while (partitions.Count <= partitionIndex)
-                {
-                    partitions.Add(new List<AppointmentData>());
-                }
-
-                partitions[partitionIndex].Add(appointment);
+                existingLefts.Add(existingLeft);
             }
         }
 
-        return partitions.Select(Overlapping).ToList();
+        return existingLefts;
     }
-
-    private IDictionary<AppointmentData, Rect> Layout()
+    private IDictionary<int, int> AppointmentGroups()
     {
-        var partitions = PartitionAppointments();
+        var groups = new Dictionary<int, int>();
 
-        var rectangles = new Dictionary<AppointmentData, Rect>();
-
-        foreach (var appointments in partitions)
+        for (var index = 0; index < Appointments.Count(); index++)
         {
-            var previous = new Rect();
+            groups[index] = 0;
+        }
 
-            foreach (var appointment in appointments)
+        for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
+        {
+            var start = date;
+            var end = start.AddMinutes(MinutesPerSlot);
+
+            var appointments = AppointmentsInSlot(start, end);
+
+            foreach (var item in appointments)
             {
-                if (!rectangles.TryGetValue(appointment, out var rectangle))
-                {
-                    var width = GetAppointmentWidth(partitions, appointment);
-                    var start = appointment.Start < StartDate ? StartDate : appointment.Start;
-                    var eventEnd = appointment.End > EndDate ? EndDate : appointment.End;
-                    var length = start.Subtract(StartDate).TotalMinutes / MinutesPerSlot;
-                    var top = 1.5 * length;
-                    var height = Math.Max(1.5, 1.5 * eventEnd.Subtract(start).TotalHours * (60 / MinutesPerSlot));
+                var index = Appointments.IndexOf(item);
 
-                    rectangle = new Rect();
+                var count = groups[index];
 
-                    rectangle.Left = previous.Left + previous.Width;
-                    rectangle.Width = previous.Width == 0 ? width : previous.Width;
-                    rectangle.Top = top;
-                    rectangle.Height = height;
-
-                    rectangles[appointment] = rectangle;
-                }
-
-                previous = rectangle;
+                groups[index] = Math.Max(appointments.Length, count);
             }
         }
 
-        return rectangles;
+        return groups;
     }
 
-    private static double GetAppointmentWidth(IList<IList<AppointmentData>> partitions, AppointmentData appointment)
-    {
-        var count = partitions.Where(appointments => appointments.Contains(appointment))
-                              .Max(appointments => appointments.Count());
-
-        return 90 / Math.Max(count, 1);
-    }
 }
