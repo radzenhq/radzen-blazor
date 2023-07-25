@@ -294,7 +294,7 @@ namespace Radzen.Blazor
 
         DateRenderEventArgs DateAttributes(DateTime value)
         {
-            var args = new Radzen.DateRenderEventArgs() { Date = value, Disabled = (Min.HasValue && value < Min.Value) || (Max.HasValue && value > Max.Value) };
+            var args = new DateRenderEventArgs() { Date = value, Disabled = (Min.HasValue && value < Min.Value) || (Max.HasValue && value > Max.Value) };
 
             if (DateRender != null)
             {
@@ -489,16 +489,10 @@ namespace Radzen.Blazor
         protected async Task ParseDate()
         {
             DateTime? newValue;
-            DateTime value;
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
+            bool valid = TryParseInput(inputValue, out DateTime value);
 
-            var valid = DateTime.TryParseExact(inputValue, DateFormat, null, DateTimeStyles.None, out value);
             var nullable = Nullable.GetUnderlyingType(typeof(TValue)) != null || AllowClear;
-
-            if (!valid)
-            {
-                valid = DateTime.TryParse(inputValue, out value);
-            }
 
             if (valid && !DateAttributes(value).Disabled)
             {
@@ -544,6 +538,40 @@ namespace Radzen.Blazor
                 await Change.InvokeAsync(DateTimeValue);
                 StateHasChanged();
             }
+        }
+
+        /// <summary>
+        /// Parse the input using an function outside the Radzen-library
+        /// </summary>
+        [Parameter]
+        public Func<string, DateTime?> ParseInput { get; set; }
+
+        private bool TryParseInput(string inputValue, out DateTime value)
+        {
+            value = DateTime.MinValue;
+            bool valid = false;
+
+            if (ParseInput != null)
+            {
+                DateTime? custom = ParseInput.Invoke(inputValue);
+
+                if (custom.HasValue)
+                {
+                    valid = true;
+                    value = custom.Value;
+                }
+            }
+            else
+            {
+                valid = DateTime.TryParseExact(inputValue, DateFormat, null, DateTimeStyles.None, out value);
+
+                if (!valid)
+                {
+                    valid = DateTime.TryParse(inputValue, out value);
+                }
+            }
+
+            return valid;
         }
 
         async Task Clear()
@@ -596,7 +624,7 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if input is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowInput { get; set; } = true;
-        
+
         /// <summary>
         /// Gets or sets a value indicating whether popup datepicker button is shown.
         /// </summary>
@@ -707,7 +735,7 @@ namespace Radzen.Blazor
 
         double parseStep(string step)
         {
-            return string.IsNullOrEmpty(step) || step == "any" ? 1 : double.Parse(step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+            return string.IsNullOrEmpty(step) || step == "any" ? 1 : double.Parse(step.Replace(",", "."), CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -805,7 +833,7 @@ namespace Radzen.Blazor
             }
         }
 
-        async System.Threading.Tasks.Task OnChange()
+        async Task OnChange()
         {
             if ((typeof(TValue) == typeof(DateTimeOffset) || typeof(TValue) == typeof(DateTimeOffset?)) && Value != null)
             {
@@ -831,7 +859,7 @@ namespace Radzen.Blazor
                             .ToString();
         }
 
-        private async System.Threading.Tasks.Task SetDay(DateTime newValue)
+        private async Task SetDay(DateTime newValue)
         {
             if (ShowTimeOkButton)
             {
