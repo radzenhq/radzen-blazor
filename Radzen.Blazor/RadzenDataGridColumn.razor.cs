@@ -509,15 +509,10 @@ namespace Radzen.Blazor
         {
             var style = new List<string>();
 
-            var width = GetWidth();
-
-            if (width != null)
+            var width = GetWidthOrGridSetting()?.Trim();
+            if (!string.IsNullOrEmpty(width))
             {
                 style.Add($"width:{width}");
-            }
-            else if (Grid != null && Grid.ColumnWidth != null)
-            {
-                style.Add($"width:{Grid.ColumnWidth}");
             }
 
             if (forCell && TextAlign != TextAlign.Left)
@@ -527,24 +522,10 @@ namespace Radzen.Blazor
 
             if (forCell && IsFrozen())
             {
-                var visibleColumns = Grid.ColumnsCollection.Where(c => c.GetVisible()).ToList();
-                var left = visibleColumns
-                    .Where((c, i) => visibleColumns.IndexOf(this) > i && c.IsFrozen())
-                    .Sum(c =>
-                    {
-                        var w = !string.IsNullOrEmpty(c.GetWidth()) ? c.GetWidth() : Grid.ColumnWidth;
-                        var cw = 200;
-                        if (!string.IsNullOrEmpty(w) && w.Contains("px"))
-                        {
-                            int.TryParse(w.Replace("px", ""), out cw);
-                        }
-                        return cw;
-                    });
-
-                style.Add($"left:{left}px");
+                style.Add(GetStackedStyleForFrozen());
             }
 
-            if ((isHeaderOrFooterCell && IsFrozen() || isHeaderOrFooterCell && !IsFrozen() || !isHeaderOrFooterCell && IsFrozen()) && Grid.ColumnsCollection.Where(c => c.GetVisible() && c.IsFrozen()).Any())
+            if (!isHeaderOrFooterCell && IsFrozen() || (isHeaderOrFooterCell && Grid.ColumnsCollection.Where(c => c.GetVisible() && c.IsFrozen()).Any()))
             {
                 style.Add($"z-index:{(isHeaderOrFooterCell && IsFrozen() ? 2 : 1)}");
             }
@@ -555,6 +536,45 @@ namespace Radzen.Blazor
             }
 
             return string.Join(";", style);
+        }
+
+        private string GetStackedStyleForFrozen()
+        {
+            var visibleFrozenColumns = Grid.ColumnsCollection.Where(c => c.GetVisible() && c.IsFrozen()).ToList();
+            var stackColumns = visibleFrozenColumns.Where((c, i) => visibleFrozenColumns.IndexOf(this) > i);
+
+            if (!stackColumns.Any())
+            {
+                return "left:0";
+            }
+
+            var widths = new List<string>();
+            foreach (var column in stackColumns)
+            {
+                var w = column.GetWidthOrGridSetting()?.Trim();
+
+                if (string.IsNullOrEmpty(w))
+                {
+                    widths.Add("200px");
+                    continue;
+                }
+
+                if (w.StartsWith("calc(") && w.EndsWith(")"))
+                {
+                    var calcExpression = w.Remove(w.Length - 1).Substring("calc(".Length);
+                    widths.Add(calcExpression);
+                    continue;
+                }
+
+                widths.Add(w);
+            }
+
+            if (widths.Count == 1)
+            {
+                return $"left:{widths.First()}";
+            }
+
+            return $"left:calc({string.Join(" + ", widths)})";
         }
 
         internal bool IsFrozen()
@@ -999,6 +1019,15 @@ namespace Radzen.Blazor
         public string GetWidth()
         {
             return !string.IsNullOrEmpty(runtimeWidth) ? runtimeWidth : Width;
+        }
+
+        /// <summary>
+        /// Get column width if it's set, otherwise get a column width set on the grid.
+        /// </summary>
+        internal string GetWidthOrGridSetting()
+        {
+            var internalWidth = GetWidth();
+            return !string.IsNullOrWhiteSpace(internalWidth) ? internalWidth : Grid?.ColumnWidth;
         }
 
         /// <summary>
