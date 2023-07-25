@@ -105,7 +105,7 @@
         await Task.Yield();
 
         // This demo is using https://dynamic-linq.net
-        var query = dbContext.Orders.AsQueryable();
+        var query = dbContext.Orders.Include("Customer").Include("Employee").AsQueryable();
 
         // Filter via the Where method
         query = query.Where(dataFilter);
