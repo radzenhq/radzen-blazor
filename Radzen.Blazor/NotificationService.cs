@@ -39,6 +39,7 @@ namespace Radzen
                 Detail = message.Detail,
                 Style = message.Style,
                 Click = message.Click,
+                Close = message.Close,
                 CloseOnClick = message.CloseOnClick,
                 Payload = message.Payload
             };
@@ -59,7 +60,7 @@ namespace Radzen
       /// <param name="click">The click event.</param>
       /// <param name="closeOnClick">If true, then the notification will be closed when clicked on.</param>
       /// <param name="payload">Used to store a custom payload that can be retreived later in the click event handler.</param>
-      public void Notify(NotificationSeverity severity = NotificationSeverity.Info, string summary = "", string detail = "", double duration = 3000, Action<NotificationMessage> click = null, bool closeOnClick = false, object payload = null)
+      public void Notify(NotificationSeverity severity = NotificationSeverity.Info, string summary = "", string detail = "", double duration = 3000, Action<NotificationMessage> click = null, bool closeOnClick = false, object payload = null, Action<NotificationMessage> close = null)
         {
             var newMessage = new NotificationMessage()
             {
@@ -68,6 +69,7 @@ namespace Radzen
                 Summary = summary,
                 Detail = detail,
                 Click = click,
+                Close = close,
                 CloseOnClick = closeOnClick,
                 Payload = payload
             };
@@ -114,6 +116,10 @@ namespace Radzen
         /// </summary>
         /// <value>This event handler is called when the notification is clicked on.</value>
         public Action<NotificationMessage> Click { get; set; }
+        /// <summary>
+        /// Get or set the event for when the notification is closed
+        /// </summary>
+        public Action<NotificationMessage> Close { get; set; }
         /// <summary>
         /// Gets or sets click on close action.
         /// </summary>
