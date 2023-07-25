@@ -54,6 +54,7 @@
    public void Close()
    {
       Service.Messages.Remove(Message);
+      Message?.Close?.Invoke(Message);
       //System.Threading.Tasks.Task.Delay(0).ContinueWith(r => { Visible = false; });
    }
 

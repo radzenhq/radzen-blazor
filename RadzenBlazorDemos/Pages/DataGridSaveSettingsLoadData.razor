@@ -17,9 +17,9 @@
 <RadzenButton Click="@(args => Settings = null)" Text="Clear saved settings" Style="margin-bottom: 16px" />
 <RadzenButton Click="@(args => NavigationManager.NavigateTo("/datagrid-save-settings", true))" Text="Reload" Style="margin-bottom: 16px" />
 <RadzenDataGrid @ref=grid @bind-Settings="@Settings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
-                AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" 
+                AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true"
                 AllowColumnResize="true" AllowColumnReorder="true" ColumnWidth="200px"
-                FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 Data="@employees" IsLoading=@isLoading Count="@count" LoadData=@LoadData TItem="Employee">
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
@@ -48,6 +48,7 @@
     bool loaded;
     async Task LoadData(LoadDataArgs args)
     {
+        console.Log("LoadData");
         isLoading = true;
 
         await Task.Yield();
@@ -77,8 +78,8 @@
     }
 
     DataGridSettings _settings;
-    public DataGridSettings Settings 
-    { 
+    public DataGridSettings Settings
+    {
         get
         {
             return _settings;
@@ -88,6 +89,7 @@
             if (_settings != value)
             {
                 _settings = value;
+                console.Log("Set");
                 InvokeAsync(SaveStateAsync);
             }
         }
@@ -95,6 +97,7 @@
 
     private async Task LoadStateAsync()
     {
+        console.Log("LoadStateAsync");
         var result = await JSRuntime.InvokeAsync<string>("window.localStorage.getItem", "SettingsLoadData");
         if (!string.IsNullOrEmpty(result))
         {
@@ -104,6 +107,7 @@
 
     private async Task SaveStateAsync()
     {
+        console.Log("SaveStateAsync");
         await JSRuntime.InvokeVoidAsync("eval", $@"window.localStorage.setItem('SettingsLoadData', '{JsonSerializer.Serialize<DataGridSettings>(Settings)}')");
     }
 
@@ -112,9 +116,10 @@
         if (firstRender || loaded)
         {
             await LoadStateAsync();
-            
+
             if (loaded)
             {
+                loaded = false;
                 await Task.Yield();
                 await grid.Reload();
                 loaded = false;

@@ -1573,6 +1573,7 @@ window.Radzen = {
                       columnIndex,
                       cell.getBoundingClientRect().width
                   );
+                  el.style.width = null;
                   document.removeEventListener('mousemove', Radzen[el].mouseMoveHandler);
                   document.removeEventListener('mouseup', Radzen[el].mouseUpHandler);
                   document.removeEventListener('touchmove', Radzen[el].touchMoveHandler)
@@ -1603,6 +1604,7 @@ window.Radzen = {
               }
           }
       };
+      el.style.width = "100%";
       document.addEventListener('mousemove', Radzen[el].mouseMoveHandler);
       document.addEventListener('mouseup', Radzen[el].mouseUpHandler);
       document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: true })
