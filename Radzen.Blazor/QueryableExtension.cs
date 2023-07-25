@@ -1330,6 +1330,15 @@ namespace Radzen
                     }
                     else if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?))
                     {
+                        try
+                        {
+                            value = Convert.ToDateTime(filter.FilterValue).ToString(CultureInfo.InvariantCulture);
+                        }
+                        catch
+                        {
+                            //
+                        }
+
                         value = $"{DateTime.Parse(value, CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")}";
                     }
                     else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
