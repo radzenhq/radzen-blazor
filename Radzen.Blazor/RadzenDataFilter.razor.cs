@@ -266,6 +266,18 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AllowColumnFiltering { get; set; }
 
+        /// <summary>
+        /// Gets the properties collection.
+        /// </summary>
+        /// <value>The properties collection.</value>
+        public IList<RadzenDataFilterProperty<TItem>> PropertiesCollection
+        {
+            get
+            {
+                return properties;
+            }
+        }
+
         internal List<RadzenDataFilterProperty<TItem>> properties = new List<RadzenDataFilterProperty<TItem>>();
         internal void AddProperty(RadzenDataFilterProperty<TItem> property)
         {
