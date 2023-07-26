@@ -77,6 +77,16 @@
 </RadzenExample>
 
 <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    DatePicker with custom input parsing
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The Radzen Blazor <strong>DatePicker</strong> has a parameter named <code>ParseInput</code> which allows for a fully custom parse-method. This way you can accept inputs like '3012' or '30122023' and support more than one input-format. Click on the 'Edit Source' to see the implementation.
+</RadzenText>
+<RadzenExample ComponentName="DatePicker" Example="DatePickerParseInput">
+    <DatePickerParseInput />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     DatePicker as calendar
 </RadzenText>
 <RadzenExample ComponentName="DatePicker" Example="DatePickerCalendar">
