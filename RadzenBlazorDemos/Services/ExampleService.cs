@@ -780,6 +780,14 @@ namespace RadzenBlazorDemos
                     Path = "splitter",
                     Icon = "&#xe94f",
                     Tags = new [] { "splitter", "layout"}
+                },
+                new Example()
+                {
+                    Name = "Popup",
+                    Title = "Blazor Popup component",
+                    Path = "popup",
+                    Icon = "&#xe0cb",
+                    Tags = new [] { "popup", "dropdown"}
                 }
             }
         },
