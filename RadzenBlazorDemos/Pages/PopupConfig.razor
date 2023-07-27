@@ -4,12 +4,15 @@
 @using Radzen.Blazor.Rendering
 
 @inherits DbContextPage
+@inject IJSRuntime JSRuntime
 
 <RadzenButton @ref=button Text="@(orderId != null ? "Selected order: " + orderId.ToString() : "Select order")" Click="@(args => popup.ToggleAsync(button.Element))" />
 
-<Popup @ref=popup Lazy=true 
-    Style="display:none;position:absolute;height:300px;width:600px;overflow:auto;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color);">
-    <RadzenDataList AllowVirtualization=true PageSize="4" WrapItems="false" Data="@orders" TItem="Order">
+<Popup @ref=popup Lazy=true Open="@OnOpen"
+    Style="display:none;position:absolute;height:300px;width:600px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color);">
+    <RadzenTextBox id="search" Placeholder="Type to search..." Style="width:100%;margin:5px;"
+        oninput="CustomPopup.invokeMethodAsync('CustomPopup.Search', document.getElementById('search').value)" />
+    <RadzenDataList @ref=dataList AllowVirtualization=true Data="@orders" TItem="Order" Style="height:100%;overflow:auto;">
         <Template Context="order">
             <RadzenCard Style="width:100%">
                 <RadzenRow>
@@ -39,19 +42,50 @@
     @code {
     RadzenButton button;
     Popup popup;
+    RadzenDataList<Order> dataList;
     IEnumerable<Order> orders;
     int? orderId;
+    string searchString = "";
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+        orders = dbContext.Orders.Include("Customer").Include("Employee")
+            .Where(o => o.OrderID.ToString().Contains(searchString)
+                || o.Customer.CompanyName.ToLowerInvariant().Contains(searchString)
+                    || o.Employee.FirstName.ToLowerInvariant().Contains(searchString)
+                        || o.Employee.LastName.ToLowerInvariant().Contains(searchString)
+                            || o.ShipCity.ToLowerInvariant().Contains(searchString)
+                                || o.ShipCountry.ToLowerInvariant().Contains(searchString));
     }
 
     async Task SelectOrder(Order order)
     {
         orderId = order.OrderID; 
         await popup.CloseAsync();
+    }
+
+    [JSInvokable("CustomPopup.Search")]
+    public async System.Threading.Tasks.Task OnSearch(string value)
+    {
+        searchString = value.ToLowerInvariant();
+
+        await dataList.Reload();
+    }
+
+    async Task OnOpen()
+    {
+        await JSRuntime.InvokeVoidAsync("eval", "setTimeout(function(){ document.getElementById('search').focus(); }, 200)"); 
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("createReference", "CustomPopup", DotNetObjectReference.Create(this));
+        }
     }
 }
