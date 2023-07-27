@@ -118,6 +118,72 @@ namespace Radzen.Blazor
             });
         }
 
+        /// <summary>
+        /// Reloads this instance.
+        /// </summary>
+        public async override Task Reload()
+        {
+            _view = null;
+
+            if (Data != null && !LoadData.HasDelegate)
+            {
+                Count = 1;
+            }
+#if NET5_0_OR_GREATER
+            if (AllowVirtualization)
+            {
+                if (!LoadData.HasDelegate)
+                {
+                    if (virtualize != null)
+                    {
+                        await virtualize.RefreshDataAsync();
+                    }
+                }
+                else
+                {
+                    Data = null;
+                }
+            }
+#endif
+            await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
+            {
+                Skip = 0,
+                Top = PageSize
+            });
+
+            CalculatePager();
+
+            if (!LoadData.HasDelegate)
+            {
+                StateHasChanged();
+            }
+            else
+            {
+#if NET5_0_OR_GREATER
+                if (AllowVirtualization)
+                {
+                    if (virtualize != null)
+                    {
+                        await virtualize.RefreshDataAsync();
+                        await virtualize.RefreshDataAsync();
+                    }
+                }
+#endif
+            }
+
+            if (LoadData.HasDelegate && View.Count() == 0 && Count > 0)
+            {
+                if (CurrentPage > 1)
+                {
+                    await GoToPage(CurrentPage - 1);
+                }
+                else
+                {
+                    await FirstPage();
+                }
+            }
+        }
+
         internal void DrawRows(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
         {
             foreach (var item in LoadData.HasDelegate ? Data : PagedView)
