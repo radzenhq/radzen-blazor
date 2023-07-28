@@ -1,0 +1,8 @@
+@inherits RadzenComponent
+
+@if (Visible)
+{
+<div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+@Items
+</div>
+}
