@@ -69,6 +69,12 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Tabs { get; set; }
 
+        /// <summary>
+        /// Enabled Scroll in Tabs
+        /// </summary>
+        [Parameter]
+        public bool Scrollable { get; set; }
+
         List<RadzenTabsItem> tabs = new List<RadzenTabsItem>();
 
         /// <summary>
