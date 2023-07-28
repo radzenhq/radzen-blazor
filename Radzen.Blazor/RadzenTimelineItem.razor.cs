@@ -24,11 +24,15 @@ namespace Radzen.Blazor
         [Parameter]
         public PointSize Size { get; set; } = PointSize.Medium;
 
+        [Parameter]
+        public PointStyle PointStyle { get; set; } = PointStyle.Base;
+
         private string PointClass => ClassList.Create($"rz-timeline-stop")
                                 .Add("rz-timeline-stop-xs", Size == PointSize.ExtraSmall)
                                 .Add("rz-timeline-stop-sm", Size == PointSize.Small)
                                 .Add("rz-timeline-stop-md", Size == PointSize.Medium)
                                 .Add("rz-timeline-stop-lg", Size == PointSize.Large)
+                                .Add($"rz-timeline-stop-{PointStyle.ToString().ToLowerInvariant()}")
                                 .Add("rz-timeline-stop-filled").ToString();
 
         /// <inheritdoc />
