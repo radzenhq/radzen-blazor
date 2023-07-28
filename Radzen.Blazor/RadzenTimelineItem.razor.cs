@@ -22,6 +22,9 @@ namespace Radzen.Blazor
         public RenderFragment End { get; set; }
 
         [Parameter]
+        public RenderFragment Point { get; set; }
+
+        [Parameter]
         public PointSize Size { get; set; } = PointSize.Medium;
 
         [Parameter]
