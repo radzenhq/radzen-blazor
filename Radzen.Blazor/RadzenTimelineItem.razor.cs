@@ -30,13 +30,13 @@ namespace Radzen.Blazor
         [Parameter]
         public PointStyle PointStyle { get; set; } = PointStyle.Base;
 
-        private string PointClass => ClassList.Create($"rz-timeline-stop")
-                                .Add("rz-timeline-stop-xs", Size == PointSize.ExtraSmall)
-                                .Add("rz-timeline-stop-sm", Size == PointSize.Small)
-                                .Add("rz-timeline-stop-md", Size == PointSize.Medium)
-                                .Add("rz-timeline-stop-lg", Size == PointSize.Large)
-                                .Add($"rz-timeline-stop-{PointStyle.ToString().ToLowerInvariant()}")
-                                .Add("rz-timeline-stop-filled").ToString();
+        private string PointClass => ClassList.Create($"rz-timeline-point")
+                                .Add("rz-timeline-point-xs", Size == PointSize.ExtraSmall)
+                                .Add("rz-timeline-point-sm", Size == PointSize.Small)
+                                .Add("rz-timeline-point-md", Size == PointSize.Medium)
+                                .Add("rz-timeline-point-lg", Size == PointSize.Large)
+                                .Add($"rz-timeline-point-{PointStyle.ToString().ToLowerInvariant()}")
+                                .Add("rz-timeline-point-filled").ToString();
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()

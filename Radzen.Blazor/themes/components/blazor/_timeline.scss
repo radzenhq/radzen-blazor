@@ -1,11 +1,11 @@
 $rz-timeline-item-gap: 0 !default;
 $rz-timeline-item-padding: 0.5rem !default;
 $rz-timeline-axis-size: 4rem !default;
-$rz-timeline-stop-size: 1rem !default;
-$rz-timeline-stop-border: 3px solid var(--rz-base-background-color) !default;
-$rz-timeline-stop-border-radius: calc(var(--rz-border-radius) * 12) !default;
-$rz-timeline-stop-background-color: var(--rz-base-300) !default;
-$rz-timeline-stop-color: var(--rz-base-700) !default;
+$rz-timeline-point-size: 1rem !default;
+$rz-timeline-point-border: 3px solid var(--rz-base-background-color) !default;
+$rz-timeline-point-border-radius: calc(var(--rz-border-radius) * 12) !default;
+$rz-timeline-point-background-color: var(--rz-base-300) !default;
+$rz-timeline-point-color: var(--rz-base-700) !default;
 $rz-timeline-line-color: var(--rz-base-300) !default;
 $rz-timeline-line-width: 0.125rem !default;
 
@@ -15,36 +15,36 @@ $rz-timeline-line-width: 0.125rem !default;
   --rz-timeline-item-gap: #{$rz-timeline-item-gap};
   --rz-timeline-item-padding: #{$rz-timeline-item-padding};
   --rz-timeline-axis-size: #{$rz-timeline-axis-size};
-  --rz-timeline-stop-size: #{$rz-timeline-stop-size};
-  --rz-timeline-stop-border: #{$rz-timeline-stop-border};
-  --rz-timeline-stop-border-radius: #{$rz-timeline-stop-border-radius};
-  --rz-timeline-stop-background-color: #{$rz-timeline-stop-background-color};
-  --rz-timeline-stop-color: #{$rz-timeline-stop-color};
+  --rz-timeline-point-size: #{$rz-timeline-point-size};
+  --rz-timeline-point-border: #{$rz-timeline-point-border};
+  --rz-timeline-point-border-radius: #{$rz-timeline-point-border-radius};
+  --rz-timeline-point-background-color: #{$rz-timeline-point-background-color};
+  --rz-timeline-point-color: #{$rz-timeline-point-color};
   --rz-timeline-line-color: #{$rz-timeline-line-color};
   --rz-timeline-line-width: #{$rz-timeline-line-width};
 }
 
-$timeline-stop-sizes: () !default;
-$timeline-stop-sizes: map-merge(
+$timeline-point-sizes: () !default;
+$timeline-point-sizes: map-merge(
   (
     lg: (
-      size: calc(var(--rz-timeline-stop-size) * 3),
+      size: calc(var(--rz-timeline-point-size) * 3),
       font-size: 2rem
     ),
     md: (
-      size: calc(var(--rz-timeline-stop-size) * 2),
-      font-size: 1.5rem
-    ),
-    sm: (
-      size: calc(var(--rz-timeline-stop-size) * 1.25),
+      size: calc(var(--rz-timeline-point-size) * 1.5),
       font-size: 1rem
     ),
+    sm: (
+      size: var(--rz-timeline-point-size),
+      font-size: 0.75rem
+    ),
     xs: (
-      size: var(--rz-timeline-stop-size),
+      size: calc(var(--rz-timeline-point-size) * 0.75),
       font-size: 0.5rem
     )
   ),
-  $timeline-stop-sizes
+  $timeline-point-sizes
 );
 
 .rz-timeline-item {
@@ -114,60 +114,60 @@ $timeline-stop-sizes: map-merge(
   }
 }
 
-.rz-timeline-stop {
+.rz-timeline-point {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: var(--rz-timeline-stop-size);
-  width: var(--rz-timeline-stop-size);
-  border: var(--rz-timeline-stop-border);
-  border-radius: var(--rz-timeline-stop-border-radius);
-  background-color: var(--rz-timeline-stop-background-color);
-  color: var(--rz-timeline-stop-color);
+  height: var(--rz-timeline-point-size);
+  width: var(--rz-timeline-point-size);
+  border: var(--rz-timeline-point-border);
+  border-radius: var(--rz-timeline-point-border-radius);
+  background-color: var(--rz-timeline-point-background-color);
+  color: var(--rz-timeline-point-color);
 }
 
-.rz-timeline-stop-outlined {
+.rz-timeline-point-outlined {
   background-color: var(--rz-base-background-color);
-  color: var(--rz-timeline-stop-color);
-  border-color: var(--rz-timeline-stop-background-color);
+  color: var(--rz-timeline-point-color);
+  border-color: var(--rz-timeline-point-background-color);
 }
 
-.rz-timeline-stop-flat {
+.rz-timeline-point-flat {
   border: 0;
 }
 
-.rz-timeline-stop-text {
+.rz-timeline-point-text {
   background-color: var(--rz-base-background-color);
-  color: var(--rz-timeline-stop-color);
+  color: var(--rz-timeline-point-color);
   border: 0;
 }
 
 @each $style, $rule in $severity-styles-map {
-  .rz-timeline-stop-#{$style} {
+  .rz-timeline-point-#{$style} {
     background-color: map-get($rule, background-color);
     color: map-get($rule, color);
   }
 
-  .rz-timeline-stop-outlined.rz-timeline-stop-#{$style} {
+  .rz-timeline-point-outlined.rz-timeline-point-#{$style} {
     background-color: var(--rz-base-background-color);
     color: map-get($rule, background-color);
     border-color: map-get($rule, background-color);
   }
-  .rz-timeline-stop-text.rz-timeline-stop-#{$style} {
+  .rz-timeline-point-text.rz-timeline-point-#{$style} {
     background-color: var(--rz-base-background-color);
     color: map-get($rule, background-color);
   }
 }
 
-@each $size, $timeline-stop in $timeline-stop-sizes {
-  .rz-timeline-stop-#{$size} {
-    width: map-get($timeline-stop, size);
-    height: map-get($timeline-stop, size);
-    flex: 0 1 map-get($timeline-stop, size);
+@each $size, $timeline-point in $timeline-point-sizes {
+  .rz-timeline-point-#{$size} {
+    width: map-get($timeline-point, size);
+    height: map-get($timeline-point, size);
+    flex: 0 1 map-get($timeline-point, size);
 
     .rzi {
-      font-size: map-get($timeline-stop, font-size);
+      font-size: map-get($timeline-point, font-size);
     }
   }
 }
