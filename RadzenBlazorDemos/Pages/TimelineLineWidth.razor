@@ -1,56 +1,23 @@
-﻿<div class="rz-timeline rz-display-flex rz-flex-column" style="--rz-timeline-line-width: 32px;">
-    <div class="rz-timeline-item rz-display-flex rz-flex-row rz-align-items-center">
-        <div class="rz-timeline-content-start rz-text-align-right"></div>
-        <div class="rz-timeline-axis rz-display-flex rz-align-items-center rz-justify-content-center">
-            <div class="rz-timeline-point rz-timeline-point-sm rz-timeline-point-primary rz-timeline-point-filled"></div>
-        </div>
-        <div class="rz-timeline-content-end">
-            1
-        </div>
-    </div>
-    <div class="rz-timeline-item rz-display-flex rz-flex-row rz-align-items-center">
-        <div class="rz-timeline-content-start rz-text-align-right"></div>
-        <div class="rz-timeline-axis rz-display-flex rz-align-items-center rz-justify-content-center">
-            <div class="rz-timeline-point rz-timeline-point-sm rz-timeline-point-filled"></div>
-        </div>
-        <div class="rz-timeline-content-end">
-            2
-        </div>
-    </div>
-    <div class="rz-timeline-item rz-display-flex rz-flex-row rz-align-items-center">
-        <div class="rz-timeline-content-start rz-text-align-right"></div>
-        <div class="rz-timeline-axis rz-display-flex rz-align-items-center rz-justify-content-center">
-            <div class="rz-timeline-point rz-timeline-point-sm rz-timeline-point-primary rz-timeline-point-filled"></div>
-        </div>
-        <div class="rz-timeline-content-end">
-            3
-        </div>
-    </div>
-    <div class="rz-timeline-item rz-display-flex rz-flex-row rz-align-items-center">
-        <div class="rz-timeline-content-start rz-text-align-right"></div>
-        <div class="rz-timeline-axis rz-display-flex rz-align-items-center rz-justify-content-center">
-            <div class="rz-timeline-point rz-timeline-point-sm rz-timeline-point-filled"></div>
-        </div>
-        <div class="rz-timeline-content-end">
-            4
-        </div>
-    </div>
-    <div class="rz-timeline-item rz-display-flex rz-flex-row rz-align-items-center">
-        <div class="rz-timeline-content-start rz-text-align-right"></div>
-        <div class="rz-timeline-axis rz-display-flex rz-align-items-center rz-justify-content-center">
-            <div class="rz-timeline-point rz-timeline-point-sm rz-timeline-point-primary rz-timeline-point-filled"></div>
-        </div>
-        <div class="rz-timeline-content-end">
-            5
-        </div>
-    </div>
-    <div class="rz-timeline-item rz-display-flex rz-flex-row rz-align-items-center">
-        <div class="rz-timeline-content-start rz-text-align-right"></div>
-        <div class="rz-timeline-axis rz-display-flex rz-align-items-center rz-justify-content-center">
-            <div class="rz-timeline-point rz-timeline-point-sm rz-timeline-point-filled"></div>
-        </div>
-        <div class="rz-timeline-content-end">
-            6
-        </div>
-    </div>
-</div>
+﻿<RadzenTimeline style="--rz-timeline-line-width: 32px;">
+    <Items>
+        <RadzenTimelineItem Variant="Variant.Flat" Size="PointSize.Small" PointStyle="PointStyle.Info">
+            <Point><RadzenIcon Icon="check" /></Point>
+            <End>Step 1</End>
+        </RadzenTimelineItem>
+        <RadzenTimelineItem Variant="Variant.Flat" Size="PointSize.Small" PointStyle="PointStyle.Info">
+            <Point><RadzenIcon Icon="check" /></Point>
+            <End>Step 2</End>
+        </RadzenTimelineItem>
+        <RadzenTimelineItem Variant="Variant.Text" PointStyle="PointStyle.Info">
+            <Point><RadzenIcon Icon="more_horiz" /></Point>
+            <End>
+                <span class="rz-color-info">
+                    Step 3
+                </span>
+            </End>
+        </RadzenTimelineItem>
+        <RadzenTimelineItem Variant="Variant.Text" Size="PointSize.Small">
+            <End>Step 4</End>
+        </RadzenTimelineItem>
+    </Items>
+</RadzenTimeline>
