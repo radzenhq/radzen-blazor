@@ -36,7 +36,8 @@
                 {
                     <div class="rz-listbox-filter-container">
                         <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@Placeholder"
-                               @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" @onkeydown:stopPropagation="true" />
+                               @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" @onkeydown:stopPropagation="true"
+                               @oninput=@(args => searchText = $"{args.Value}") />
                         <span class="rz-listbox-filter-icon rzi rzi-search"></span>
                     </div>
                 }

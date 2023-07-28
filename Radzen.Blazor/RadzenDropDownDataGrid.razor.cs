@@ -586,7 +586,6 @@ namespace Radzen.Blazor
 
         async Task DebounceFilter()
         {
-            searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
             if (searchText != previousSearch)
             {
                 previousSearch = searchText;

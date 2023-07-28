@@ -53,7 +53,7 @@ namespace Radzen
 
             if (LoadData.HasDelegate)
             {
-                await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = request.Count, Filter = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) });
+                await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = request.Count, Filter = searchText });
             }
 
             virtualItems = (LoadData.HasDelegate ? Data : view.Skip(request.StartIndex).Take(top)).Cast<object>().ToList();
@@ -702,7 +702,6 @@ namespace Radzen
         {
             if (!LoadData.HasDelegate)
             {
-                searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
                 _view = null;
                 if (IsVirtualizationAllowed())
                 {
@@ -781,14 +780,14 @@ namespace Radzen
 #if NET5_0_OR_GREATER
             if (AllowVirtualization)
             {
-                return new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, Filter = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) };
+                return new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, Filter = searchText };
             }
             else
             {
-                return new Radzen.LoadDataArgs() { Filter = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) };
+                return new Radzen.LoadDataArgs() { Filter = searchText };
             }
 #else
-            return new Radzen.LoadDataArgs() { Filter = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) };
+            return new Radzen.LoadDataArgs() { Filter = searchText };
 #endif
         }
 
