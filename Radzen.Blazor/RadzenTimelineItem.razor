@@ -5,7 +5,7 @@
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     <div class="rz-timeline-content-start rz-text-align-right">@Start</div>
     <div class="rz-timeline-axis rz-display-flex rz-align-items-center rz-justify-content-center">
-        <div class="rz-timeline-stop rz-timeline-stop-sm rz-timeline-stop-filled"></div>
+        <div class=@PointClass></div>
     </div>
     <div class="rz-timeline-content-end">
         @(End ?? ChildContent)

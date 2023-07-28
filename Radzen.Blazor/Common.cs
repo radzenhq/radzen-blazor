@@ -811,6 +811,29 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Specifies the size of a point in <see cref="RadzenTimelineItem" />.
+    /// </summary>
+    public enum PointSize
+    {
+        /// <summary>
+        /// The smallest.
+        /// </summary>
+        ExtraSmall,
+        /// <summary>
+        /// Smaller than the default.
+        /// </summary>
+        Small,
+        /// <summary>
+        /// The default size.
+        /// </summary>
+        Medium,
+        /// <summary>
+        /// Larger than the default.
+        /// </summary>
+        Large
+    }
+
+    /// <summary>
     /// Specifies the behavior of <see cref="RadzenProgressBar" /> or <see cref="RadzenProgressBarCircular" />.
     /// </summary>
     public enum ProgressBarMode
