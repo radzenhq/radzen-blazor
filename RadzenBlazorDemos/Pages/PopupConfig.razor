@@ -9,9 +9,8 @@
 <RadzenButton @ref=button Text="@(orderId != null ? "Selected order: " + orderId.ToString() : "Select order")" Click="@(args => popup.ToggleAsync(button.Element))" />
 
 <Popup @ref=popup Lazy=true Open="@OnOpen"
-    Style="display:none;position:absolute;height:300px;width:600px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color);">
-    <RadzenTextBox id="search" Placeholder="Type to search..." Style="width:100%;margin:5px;"
-        oninput="CustomPopup.invokeMethodAsync('CustomPopup.Search', document.getElementById('search').value)" />
+    Style="display:none;position:absolute;height:300px;width:600px;padding:5px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color);">
+    <RadzenTextBox id="search" Placeholder="Type to search..." Style="width:100%;" @oninput=@(args => searchString = $"{args.Value}") Value="@searchString" />
     <RadzenDataList @ref=dataList AllowVirtualization=true Data="@orders" TItem="Order" Style="height:100%;overflow:auto;">
         <Template Context="order">
             <RadzenCard Style="width:100%">
@@ -39,7 +38,7 @@
     </RadzenDataList>
 </Popup>
 
-    @code {
+@code {
     RadzenButton button;
     Popup popup;
     RadzenDataList<Order> dataList;
@@ -66,26 +65,8 @@
         await popup.CloseAsync();
     }
 
-    [JSInvokable("CustomPopup.Search")]
-    public async System.Threading.Tasks.Task OnSearch(string value)
-    {
-        searchString = value.ToLowerInvariant();
-
-        await dataList.Reload();
-    }
-
     async Task OnOpen()
     {
         await JSRuntime.InvokeVoidAsync("eval", "setTimeout(function(){ document.getElementById('search').focus(); }, 200)"); 
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-
-        if (firstRender)
-        {
-            await JSRuntime.InvokeVoidAsync("createReference", "CustomPopup", DotNetObjectReference.Create(this));
-        }
     }
 }

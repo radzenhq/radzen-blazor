@@ -783,6 +783,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    New = true,
                     Name = "Popup",
                     Title = "Blazor Popup component",
                     Path = "popup",
