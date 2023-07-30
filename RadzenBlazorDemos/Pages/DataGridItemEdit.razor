@@ -1,0 +1,140 @@
+﻿@using System.Linq.Dynamic.Core
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<RadzenButton Text="Reset" Click="@Reset" Style="margin-bottom: 20px;" />
+<RadzenButton Text="InsertRow" Click="@InsertItem" Style="margin-bottom: 20px;" />
+<RadzenDataGrid @ref="grid" ColumnWidth="200px" LoadData="@LoadData" IsLoading=@isLoading Count="@count" PageSize="10"
+                TItem="Customer" Data="@Customers" KeyProperty="CustomerID">
+    <Columns>
+        <RadzenDataGridColumn TItem="Customer" Property="CustomerID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="Customer" Property="CompanyName" Title="Company Name" Frozen="true" Width="160px" />
+        <RadzenDataGridColumn TItem="Customer" Property="Address" Title="Address" Width="200px" />
+        <RadzenDataGridColumn TItem="Customer" Property="City" Title="City" Width="160px" />
+        <RadzenDataGridColumn TItem="Customer" Context="customer" TextAlign="TextAlign.Center" Width="320px">
+            <Template Context="customer">
+                <RadzenButton Text="UpdateByObject" Size="ButtonSize.Small" Variant="Variant.Text"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click=@(args => UpdateItemByObject(customer)) @onclick:stopPropagation="true" />
+                <RadzenButton Text="UpdateByObject" Size="ButtonSize.Small" Variant="Variant.Text"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click=@(args => UpdateItemByID(customer.CustomerID)) @onclick:stopPropagation="true" />
+                <RadzenButton Text="Delete" Size="ButtonSize.Small" Variant="Variant.Text"
+                              ButtonStyle="ButtonStyle.Danger"
+                              Click=@(args => DeleteItem(customer)) @onclick:stopPropagation="true" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<Customer> grid;
+    int count;
+    IEnumerable<Customer> Customers;
+    bool isLoading = false;
+
+    List<string> titles = new List<string> { "Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
+    IEnumerable<string> selectedTitles;
+
+    async Task OnSelectedTitlesChange(object value)
+    {
+        if (selectedTitles != null && !selectedTitles.Any())
+        {
+            selectedTitles = null;
+        }
+
+        await grid.FirstPage();
+    }
+
+    async Task Reset()
+    {
+        grid.Reset(true);
+        await grid.FirstPage(true);
+    }
+
+    /// <summary>
+    /// Create a random object
+    /// </summary>
+    /// <returns></returns>
+    async Task InsertItem()
+    {
+        var customerID = Guid.NewGuid().ToString().Substring(0, 5).ToUpper();
+        var r = new Random();
+        await grid.InsertItem(new Customer()
+            {
+                CustomerID = customerID,
+                CompanyName = $"Name {customerID}",
+                Address = $"Address {r.Next(1000)}",
+                City = $"City {r.Next(1000)}",
+            });
+
+    }
+
+    /// <summary>
+    /// Update records using Object
+    /// </summary>
+    /// <returns></returns>
+    async Task UpdateItemByObject(Customer customer)
+    {
+        var r = new Random();
+        customer.Address = $"Address {r.Next(1000)}";
+        customer.City = $"City {r.Next(1000)}";
+    }
+
+    /// <summary>
+    /// Update records using ID matching
+    /// </summary>
+    /// <returns></returns>
+    async Task UpdateItemByID(string customerID)
+    {
+        var r = new Random();
+        await grid.UpdateItem(new Customer()
+            {
+                CustomerID = customerID,
+                CompanyName = $"Name {customerID}",
+                Address = $"Address {r.Next(1000)}",
+                City = $"City {r.Next(1000)}",
+            });
+    }
+
+    /// <summary>
+    /// Delete a piece of data directly from the list
+    /// </summary>
+    /// <returns></returns>
+    async Task DeleteItem(Customer customer)
+    {
+        await grid.DeleteItem(customer);
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        // This demo is using https://dynamic-linq.net
+        var query = dbContext.Customers.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            // Filter via the Where method
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            // Sort via the OrderBy method
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        // Important!!! Make sure the Count property of RadzenDataGrid is set.
+        count = query.Count();
+
+        // Perform paging via Skip and Take.
+        Customers = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+        isLoading = false;
+    }
+}

@@ -538,6 +538,15 @@ namespace RadzenBlazorDemos
 
                 new Example()
                 {
+                    Name = "Rows Editing",
+                    Path = "datagrid-item-edit",
+                    Title = "Blazor DataGrid item editing",
+                    Icon = "&#xe22b",
+                    Tags = new [] { "item", "row", "editor", "datagrid", "table", "dataview" }
+                },
+
+                new Example()
+                {
                     Name = "Conditional formatting",
                     Path = "datagrid-conditional-template",
                     Title = "Blazor DataGrid conditional template",
