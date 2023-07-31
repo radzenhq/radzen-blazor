@@ -132,7 +132,7 @@
                                 var columnIndex = visibleColumns.IndexOf(column);
                                 var sortableClass = AllowSorting && column.Sortable ? "rz-sortable-column" : "";
 
-                                <RadzenDataGridHeaderCell RowIndex="@i" Grid="@this" Column="@column" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)} {getCompositeCellCSSClass(column)} {getColumnAlignClass(column)}".Trim())" Attributes="@(cellAttr)" />
+                                <RadzenDataGridHeaderCell CustomFilterEvent=@CustomFilterEvent RowIndex="@i" Grid="@this" Column="@column" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)} {getCompositeCellCSSClass(column)} {getColumnAlignClass(column)}".Trim())" Attributes="@(cellAttr)" />
                             }
                         </tr>
                     }

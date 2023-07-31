@@ -167,6 +167,10 @@ else
 
     async Task ToggleFilter()
     {
+        if (CustomFilterEvent.HasDelegate)
+        {
+            await CustomFilterEvent.InvokeAsync(Column);
+        }
         if (Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand)
         {
             await popup.ToggleAsync(filterButton);
@@ -196,6 +200,8 @@ else
 
     [Parameter]
     public RadzenDataGridColumn<TItem> Column { get; set; }
+    [Parameter]
+    public EventCallback<RadzenDataGridColumn<TItem>> CustomFilterEvent { get; set; }
 
     [Parameter]
     public int ColumnIndex { get; set; }

@@ -520,6 +520,10 @@ namespace Radzen.Blazor
 
             return FilterDateFormat;
         }
+        /// <summary>
+        /// Execute a function when the filter icon is clicked when using FilterMode.Advanced
+        [Parameter]
+        public EventCallback<RadzenDataGridColumn<TItem>> CustomFilterEvent { get; set; }
 
         internal RenderFragment DrawNumericFilter(RadzenDataGridColumn<TItem> column, bool force = true, bool isFirst = true)
         {
