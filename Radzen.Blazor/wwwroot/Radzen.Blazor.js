@@ -842,24 +842,11 @@ window.Radzen = {
         }
     };
 
-    if (!Radzen.closeAllPopups) {
-        Radzen.closeAllPopups = function (e) {
-            for (var i = 0; i < Radzen.popups.length; i++) {
-                var p = Radzen.popups[i];
-
-                var closestPopup = e && e.target && e.target.closest && (e.target.closest('.rz-popup') || e.target.closest('.rz-overlaypanel'));
-                if (closestPopup && closestPopup != p) {
-                    return;
-                }
-
-                Radzen.closePopup(p.id, p.instance, p.callback, e);
-            }
-            Radzen.popups = [];
-        };
+    if (!Radzen.popups) {
         Radzen.popups = [];
     }
 
-    Radzen.popups.push({id, instance, callback});
+    Radzen.popups.push({ id, instance, callback });
 
     document.body.appendChild(popup);
     document.removeEventListener('mousedown', Radzen[id]);
@@ -880,6 +867,21 @@ window.Radzen = {
         document.removeEventListener('contextmenu', Radzen[id]);
         document.addEventListener('contextmenu', Radzen[id]);
     }
+  },
+  closeAllPopups: function (e, id) {
+    if (!Radzen.popups) return;
+    var el = e && e.target || id && documentElement.getElementById(id);
+    for (var i = 0; i < Radzen.popups.length; i++) {
+        var p = Radzen.popups[i];
+
+        var closestPopup = el && el.closest && (el.closest('.rz-popup') || el.closest('.rz-overlaypanel'));
+        if (closestPopup && closestPopup != p) {
+            return;
+        }
+
+        Radzen.closePopup(p.id, p.instance, p.callback, e);
+    }
+    Radzen.popups = [];
   },
   closePopup: function (id, instance, callback, e) {
     var popup = document.getElementById(id);
