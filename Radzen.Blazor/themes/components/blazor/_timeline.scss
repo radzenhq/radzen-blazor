@@ -253,6 +253,26 @@ $timeline-point-sizes: map-merge(
   padding: var(--rz-timeline-item-padding);
   position: relative;
 
+  .rz-timeline-align-items-center & {
+    align-items: center;
+  }
+
+  .rz-timeline-align-items-normal & {
+    align-items: normal;
+  }
+
+  .rz-timeline-align-items-start & {
+    align-items: start;
+  }
+
+  .rz-timeline-align-items-end & {
+    align-items: end;
+  }
+
+  .rz-timeline-align-items-stretch & {
+    align-items: stretch;
+  }
+
   // Timeline Line
   &:before {
     content: '';
@@ -274,10 +294,26 @@ $timeline-point-sizes: map-merge(
     border-top-right-radius: var(--rz-timeline-line-width);
   }
 
+  .rz-timeline-column.rz-timeline-align-items-start &:first-child:before {
+    top: var(--rz-timeline-item-padding);
+  }
+
+  .rz-timeline-column.rz-timeline-align-items-end &:first-child:before {
+    top: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-line-width) / 2));
+  }
+
   .rz-timeline-column &:last-child:before {
     bottom: calc(50% - (var(--rz-timeline-line-width) / 2));
     border-bottom-left-radius: var(--rz-timeline-line-width);
     border-bottom-right-radius: var(--rz-timeline-line-width);
+  }
+
+  .rz-timeline-column.rz-timeline-align-items-start &:last-child:before {
+    bottom: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-line-width) / 2));
+  }
+
+  .rz-timeline-column.rz-timeline-align-items-end &:last-child:before {
+    bottom: var(--rz-timeline-item-padding);
   }
 
   .rz-timeline-row &:before {

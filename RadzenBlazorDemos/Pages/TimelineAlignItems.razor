@@ -1,0 +1,37 @@
+﻿<RadzenCard class="my-4">
+    <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+        <RadzenLabel Text="AlignItems:" />
+        <RadzenSelectBar @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value" 
+                    Data="@(Enum.GetValues(typeof(AlignItems)).Cast<AlignItems>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
+        <RadzenDropDown @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value"
+                    Data="@(Enum.GetValues(typeof(AlignItems)).Cast<AlignItems>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+    </RadzenStack>
+</RadzenCard>
+<RadzenTimeline AlignItems="@alignItems" TimelinePosition="TimelinePosition.Alternate" style="width: 500px; margin: 0 auto;">
+    <Items>
+        <RadzenTimelineItem Size="PointSize.Medium" PointStyle="PointStyle.Warning">
+            <Start><RadzenBadge BadgeStyle="BadgeStyle.Warning" IsPill="true" Text="6th century BC" /></Start>
+            <End><RadzenText TextStyle="TextStyle.H6" Class="rz-m-0">Persian soldiers baked flatbreads with cheese and dates</RadzenText></End>
+        </RadzenTimelineItem>
+        <RadzenTimelineItem Size="PointSize.Medium" PointStyle="PointStyle.Danger">
+            <Start><RadzenBadge BadgeStyle="BadgeStyle.Danger" IsPill="true" Text="19 BC" /></Start>
+            <End><RadzenText TextStyle="TextStyle.H6" Class="rz-m-0">An early reference to a pizza-like food</RadzenText></End>
+        </RadzenTimelineItem>
+        <RadzenTimelineItem Size="PointSize.Medium" PointStyle="PointStyle.Warning">
+            <Start><RadzenBadge BadgeStyle="BadgeStyle.Warning" IsPill="true" Text="997 AD" /></Start>
+            <End><RadzenText TextStyle="TextStyle.H6" Class="rz-m-0">The word pizza was first documented</RadzenText></End>
+        </RadzenTimelineItem>
+        <RadzenTimelineItem Size="PointSize.Medium" PointStyle="PointStyle.Danger">
+            <Start><RadzenBadge BadgeStyle="BadgeStyle.Danger" IsPill="true" Text="16th century" /></Start>
+            <End><RadzenText TextStyle="TextStyle.H6" Class="rz-m-0">A galette flatbread was referred to as a pizza in Naples</RadzenText></End>
+        </RadzenTimelineItem>
+        <RadzenTimelineItem Size="PointSize.Medium" PointStyle="PointStyle.Warning">
+            <Start><RadzenBadge BadgeStyle="BadgeStyle.Warning" IsPill="true" Text="1843" /></Start>
+            <End><RadzenText TextStyle="TextStyle.H6" Class="rz-m-0">Alezandre Dumans described the diversity of pizza toppings</RadzenText></End>
+        </RadzenTimelineItem>
+    </Items>
+</RadzenTimeline>
+
+@code {
+    AlignItems alignItems = AlignItems.Center;
+}

@@ -93,7 +93,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return ClassList.Create($"rz-timeline-item rz-align-items-center").ToString();
+            return ClassList.Create($"rz-timeline-item").ToString();
         }
     }
 }
