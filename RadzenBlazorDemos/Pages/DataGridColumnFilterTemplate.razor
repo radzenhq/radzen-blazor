@@ -9,7 +9,11 @@ else
     <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="my-4">Custom filtering template with IQueryable binding</RadzenText>
         <RadzenDataGrid @ref="grid" Data=@employees FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />
+            <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" FilterValue="@idValue">
+                <FilterTemplate>
+                    <RadzenNumeric @bind-Value=idValue ShowUpDown=false Style="width:100%" />
+                </FilterTemplate>
+            </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Title="Customer" Property="CompanyName" Type="typeof(IEnumerable<string>)" 
                     FilterValue="@selectedCompanyNames" FilterOperator="FilterOperator.Contains" LogicalFilterOperator="LogicalFilterOperator.Or">
                 <FilterTemplate>
@@ -52,7 +56,7 @@ else
 
 @code {
     RadzenDataGrid<Employee> grid;
-
+    int? idValue;
     TitleOfCourtesy? currentTOC;
     IEnumerable<string> selectedCompanyNames;
     IEnumerable<WorkStatus> selectedWorkStatus;
