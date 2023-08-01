@@ -8,14 +8,14 @@
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
         <RadzenCheckBox @bind-Value="@auto" Name="auto" />
         <RadzenLabel Text="Auto filter" Component="auto" Class="rz-me-6" />
-        <RadzenButton Text="Apply Filter" Click="@(args => dataFilter.Filter())" Disabled="@auto" Size="ButtonSize.Small" />
+        <RadzenButton Text="Apply Filter" Click="@ApplyFilter" Disabled="@auto" Size="ButtonSize.Small" />
     </RadzenStack>
 
     <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => ordersGrid.Reload())>
         <Properties>
             <RadzenDataFilterProperty TItem="Order" Property="OrderID" Title="Order ID" />
             <RadzenDataFilterProperty TItem="Order" Property="Employee.LastName" Title="Employee Last Name" />
-            <MyCustomEnumerableDataFilterProperty TItem="Order" Property="Employee.Title" Title="Employee Title" FilterValue="@selectedTitles"
+            <MyCustomEnumerableDataFilterProperty TItem="Order" Property="Employee.Title" Title="Employee Title" FilterValue="@finalSelectedTitles"
                                                     Type="typeof(IEnumerable<string>)" FilterOperator="FilterOperator.Contains">
                 <FilterTemplate>
                     <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%;"
@@ -68,6 +68,7 @@
 
     List<string> titles = new List<string> { "Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
     IEnumerable<string> selectedTitles;
+    IEnumerable<string> finalSelectedTitles;
 
     async Task OnSelectedTitlesChange(object value)
     {
@@ -76,7 +77,18 @@
             selectedTitles = null;
         }
 
+        if (auto)
+        {
+            finalSelectedTitles = selectedTitles;
+        }
+
         await ordersGrid.FirstPage();
+    }
+
+    async Task ApplyFilter()
+    {
+        finalSelectedTitles = selectedTitles;
+        await dataFilter.Filter();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
