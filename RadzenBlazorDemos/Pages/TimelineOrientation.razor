@@ -16,26 +16,39 @@
         </RadzenStack>
     </RadzenStack>
 </RadzenCard>
-<RadzenTimeline Orientation="@orientation" TimelinePosition="@position" Reverse="@reverse" style="--rz-timeline-line-width: 32px;">
+<RadzenTimeline Orientation="@orientation" TimelinePosition="@position" Reverse="@reverse" Class="rz-m-4">
     <Items>
-        <RadzenTimelineItem Variant="Variant.Flat" Size="PointSize.Small" PointStyle="PointStyle.Info">
-            <Point><RadzenIcon Icon="check" /></Point>
-            <End>Step 1</End>
-        </RadzenTimelineItem>
-        <RadzenTimelineItem Variant="Variant.Flat" Size="PointSize.Small" PointStyle="PointStyle.Info">
-            <Point><RadzenIcon Icon="check" /></Point>
-            <End>Step 2</End>
-        </RadzenTimelineItem>
-        <RadzenTimelineItem Variant="Variant.Text" PointStyle="PointStyle.Info">
-            <Point><RadzenIcon Icon="more_horiz" /></Point>
+        <RadzenTimelineItem PointStyle="PointStyle.Primary">
+            <Start>
+                <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-m-0 rz-color-primary">NOV 2022</RadzenText>
+            </Start>
             <End>
-                <span class="rz-color-info">
-                    Step 3
-                </span>
+                Celebrating the official release of Radzen Blazor Studio.
             </End>
         </RadzenTimelineItem>
-        <RadzenTimelineItem Variant="Variant.Text" Size="PointSize.Small">
-            <End>Step 4</End>
+        <RadzenTimelineItem>
+            <Start>
+                <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-m-0 rz-color-primary">JAN 2021</RadzenText>
+            </Start>
+            <End>
+                Radzen Blazor components open sourced under the MIT license.
+            </End>
+        </RadzenTimelineItem>
+        <RadzenTimelineItem>
+            <Start>
+                <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-m-0 rz-color-primary">JUN 2018</RadzenText>
+            </Start>
+            <End>
+                Radzen 2.0 is a fact.
+            </End>
+        </RadzenTimelineItem>
+        <RadzenTimelineItem>
+            <Start>
+                <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-m-0 rz-color-primary">APR 2017</RadzenText>
+            </Start>
+            <End>
+                Radzen 1.0 is out the door - automatic page generation and MS SQL support.
+            </End>
         </RadzenTimelineItem>
     </Items>
 </RadzenTimeline>

@@ -66,7 +66,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The point shadow level.</value>
         [Parameter]
-        public int Shadow { get; set; } = 0;
+        public int Shadow { get; set; } = 1;
 
         private string PointClass => ClassList.Create($"rz-timeline-point")
                                 .Add("rz-timeline-point-xs", Size == PointSize.ExtraSmall)
@@ -93,7 +93,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return ClassList.Create($"rz-timeline-item rz-display-flex rz-flex-row rz-align-items-center").ToString();
+            return ClassList.Create($"rz-timeline-item rz-align-items-center").ToString();
         }
     }
 }
