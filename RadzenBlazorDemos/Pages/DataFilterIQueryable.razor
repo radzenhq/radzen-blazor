@@ -8,12 +8,12 @@
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
         <RadzenCheckBox @bind-Value="@auto" Name="auto" />
         <RadzenLabel Text="Auto filter" Component="auto" Class="rz-me-6" />
-        <RadzenButton Text="Apply Filter" Click="@(args => dataFilter.Filter())" Disabled="@auto" Size="ButtonSize.Small" />
+        <RadzenButton Text="Apply Filter" Click="@ApplyFilter" Disabled="@auto" Size="ButtonSize.Small" />
     </RadzenStack>
 
     <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => filteredOrders = view)>
         <Properties>
-            <RadzenDataFilterProperty TItem="Order" Property="OrderID" Title="Order ID" FilterValue="@selectedIds" 
+            <RadzenDataFilterProperty TItem="Order" Property="OrderID" Title="Order ID" FilterValue="@finalSelectedIds" 
                 Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.Contains">
                 <FilterTemplate>
                         <RadzenDropDown @bind-Value=@selectedIds Style="width:100%;"
@@ -66,6 +66,7 @@
     IQueryable<Order> orders;
     RadzenDataGrid<Order> ordersGrid;
 
+    IEnumerable<int> finalSelectedIds;
     IEnumerable<int> selectedIds;
     IEnumerable<int> orderIds;
 
@@ -75,6 +76,17 @@
         {
             selectedIds = null;
         }
+
+        if (auto)
+        {
+            finalSelectedIds = selectedIds;
+        }
+    }
+
+    async Task ApplyFilter()
+    {
+        finalSelectedIds = selectedIds;
+        await dataFilter.Filter();
     }
 
     protected override async Task OnInitializedAsync()
