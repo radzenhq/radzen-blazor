@@ -28,19 +28,19 @@ $timeline-point-sizes: () !default;
 $timeline-point-sizes: map-merge(
   (
     lg: (
-      size: calc(var(--rz-timeline-point-size) * 3),
+      size: 3rem,
       font-size: 2rem
     ),
     md: (
-      size: calc(var(--rz-timeline-point-size) * 1.5),
+      size: 1.5rem,
       font-size: 1.25rem
     ),
     sm: (
-      size: var(--rz-timeline-point-size),
+      size: 1rem,
       font-size: 0.75rem
     ),
     xs: (
-      size: calc(var(--rz-timeline-point-size) * 0.75),
+      size: 0.75rem,
       font-size: 0.5rem
     )
   ),
@@ -54,12 +54,12 @@ $timeline-point-sizes: map-merge(
   &.rz-timeline-column {
     flex-direction: column;
 
-    // TimelinePosition.Center
+    // LinePosition.Center
     .rz-timeline-item {flex-direction: row;}
     .rz-timeline-content-start {text-align: right;}
     .rz-timeline-content-end {text-align: left;}
 
-    // TimelinePosition.Alternate
+    // LinePosition.Alternate
     &.rz-timeline-alternate {
       .rz-timeline-item:nth-child(even) {
         flex-direction: row-reverse;
@@ -69,7 +69,7 @@ $timeline-point-sizes: map-merge(
       }
     }
 
-    // TimelinePosition.Start
+    // LinePosition.Start
     &.rz-timeline-start:not(.rz-timeline-reverse) {
       .rz-timeline-item:before {
         left: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
@@ -79,7 +79,7 @@ $timeline-point-sizes: map-merge(
       .rz-timeline-content-end {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: start;}
     }
 
-    // TimelinePosition.End
+    // LinePosition.End
     &.rz-timeline-end:not(.rz-timeline-reverse) {
       .rz-timeline-item {flex-direction: row-reverse;}
       .rz-timeline-item:before {
@@ -90,7 +90,7 @@ $timeline-point-sizes: map-merge(
       .rz-timeline-content-end {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: end;}
     }
 
-    // TimelinePosition.Left
+    // LinePosition.Left
     &.rz-timeline-left:not(.rz-timeline-reverse) {
       .rz-timeline-item:before {
         left: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
@@ -100,7 +100,7 @@ $timeline-point-sizes: map-merge(
       .rz-timeline-content-end {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: left;}
     }
 
-    // TimelinePosition.Right
+    // LinePosition.Right
     &.rz-timeline-right:not(.rz-timeline-reverse) {
       .rz-timeline-item {flex-direction: row-reverse;}
       .rz-timeline-item:before {
@@ -114,12 +114,12 @@ $timeline-point-sizes: map-merge(
     // Orientation.Vertical Reverse
     &.rz-timeline-reverse {
 
-      // TimelinePosition.Center
+      // LinePosition.Center
       .rz-timeline-item {flex-direction: row-reverse;}
       .rz-timeline-content-start {text-align: left;}
       .rz-timeline-content-end {text-align: right;}
 
-      // TimelinePosition.Alternate
+      // LinePosition.Alternate
       &.rz-timeline-alternate {
         .rz-timeline-item:nth-child(even) {
           flex-direction: row;
@@ -129,7 +129,7 @@ $timeline-point-sizes: map-merge(
         }
       }
 
-      // TimelinePosition.Start
+      // LinePosition.Start
       &.rz-timeline-start {
         .rz-timeline-item:before {
           left: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
@@ -139,7 +139,7 @@ $timeline-point-sizes: map-merge(
         .rz-timeline-content-end {display: none;}
       }
 
-      // TimelinePosition.End
+      // LinePosition.End
       &.rz-timeline-end {
         .rz-timeline-item {flex-direction: row;}
         .rz-timeline-item:before {
@@ -150,7 +150,7 @@ $timeline-point-sizes: map-merge(
         .rz-timeline-content-end {display: none;}
       }
 
-      // TimelinePosition.Left
+      // LinePosition.Left
       &.rz-timeline-left {
         .rz-timeline-item:before {
           left: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
@@ -160,7 +160,7 @@ $timeline-point-sizes: map-merge(
         .rz-timeline-content-end {display: none;}
       }
 
-      // TimelinePosition.Right
+      // LinePosition.Right
       &.rz-timeline-right {
         .rz-timeline-item {flex-direction: row;}
         .rz-timeline-item:before {
@@ -177,15 +177,15 @@ $timeline-point-sizes: map-merge(
   &.rz-timeline-row {
     flex-direction: row;
 
-    // TimelinePosition.Center
+    // LinePosition.Center
     .rz-timeline-item {flex-direction: column;}
 
-    // TimelinePosition.Alternate
+    // LinePosition.Alternate
     &.rz-timeline-alternate {
       .rz-timeline-item:nth-child(even) {flex-direction: column-reverse;}
     }
 
-    // TimelinePosition.Start/Top
+    // LinePosition.Start/Top
     &.rz-timeline-start:not(.rz-timeline-reverse),
     &.rz-timeline-top:not(.rz-timeline-reverse) {
       .rz-timeline-item:before {
@@ -196,7 +196,7 @@ $timeline-point-sizes: map-merge(
       .rz-timeline-content-end {max-height: calc(100% - var(--rz-timeline-axis-size));}
     }
 
-    // TimelinePosition.End/Bottom
+    // LinePosition.End/Bottom
     &.rz-timeline-end:not(.rz-timeline-reverse),
     &.rz-timeline-bottom:not(.rz-timeline-reverse) {
       .rz-timeline-item {flex-direction: column-reverse;}
@@ -211,17 +211,17 @@ $timeline-point-sizes: map-merge(
     // Orientation.Horizontal Reverse
     &.rz-timeline-reverse {
 
-      // TimelinePosition.Center
+      // LinePosition.Center
       .rz-timeline-item {flex-direction: column-reverse;}
 
-      // TimelinePosition.Alternate
+      // LinePosition.Alternate
       &.rz-timeline-alternate {
         .rz-timeline-item:nth-child(even) {
           flex-direction: column;
         }
       }
 
-      // TimelinePosition.Start/Top
+      // LinePosition.Start/Top
       &.rz-timeline-start,
       &.rz-timeline-top {
         .rz-timeline-item:before {
@@ -232,7 +232,7 @@ $timeline-point-sizes: map-merge(
         .rz-timeline-content-end {display: none;}
       }
 
-      // TimelinePosition.Start/Top
+      // LinePosition.Start/Top
       &.rz-timeline-end,
       &.rz-timeline-bottom {
         .rz-timeline-item {flex-direction: column;}
@@ -295,11 +295,11 @@ $timeline-point-sizes: map-merge(
   }
 
   .rz-timeline-column.rz-timeline-align-items-start &:first-child:before {
-    top: var(--rz-timeline-item-padding);
+    top: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
   }
 
   .rz-timeline-column.rz-timeline-align-items-end &:first-child:before {
-    top: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-line-width) / 2));
+    top: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
   }
 
   .rz-timeline-column &:last-child:before {
@@ -309,11 +309,11 @@ $timeline-point-sizes: map-merge(
   }
 
   .rz-timeline-column.rz-timeline-align-items-start &:last-child:before {
-    bottom: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-line-width) / 2));
+    bottom: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
   }
 
   .rz-timeline-column.rz-timeline-align-items-end &:last-child:before {
-    bottom: var(--rz-timeline-item-padding);
+    bottom: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
   }
 
   .rz-timeline-row &:before {
@@ -330,10 +330,26 @@ $timeline-point-sizes: map-merge(
     border-bottom-left-radius: var(--rz-timeline-line-width);
   }
 
+  .rz-timeline-row.rz-timeline-align-items-start &:first-child:before {
+    left: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+  }
+
+  .rz-timeline-row.rz-timeline-align-items-end &:first-child:before {
+    left: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+  }
+
   .rz-timeline-row &:last-child:before {
     right: calc(50% - (var(--rz-timeline-line-width) / 2));
     border-top-right-radius: var(--rz-timeline-line-width);
     border-bottom-right-radius: var(--rz-timeline-line-width);
+  }
+
+  .rz-timeline-row.rz-timeline-align-items-start &:last-child:before {
+    right: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+  }
+
+  .rz-timeline-row.rz-timeline-align-items-end &:last-child:before {
+    right: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
   }
 }
 
@@ -372,6 +388,7 @@ $timeline-point-sizes: map-merge(
 .rz-timeline-point {
   position: relative;
   display: flex;
+  flex: 0 1 var(--rz-timeline-point-size);
   align-items: center;
   justify-content: center;
   height: var(--rz-timeline-point-size);
@@ -416,10 +433,8 @@ $timeline-point-sizes: map-merge(
 }
 
 @each $size, $timeline-point in $timeline-point-sizes {
-  .rz-timeline-point-#{$size} {
-    width: map-get($timeline-point, size);
-    height: map-get($timeline-point, size);
-    flex: 0 1 map-get($timeline-point, size);
+  .rz-timeline-axis-#{$size} {
+    --rz-timeline-point-size: #{map-get($timeline-point, size)};
 
     .rzi {
       font-size: map-get($timeline-point, font-size);

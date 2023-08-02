@@ -7,7 +7,7 @@
                     Data="@(Enum.GetValues(typeof(AlignItems)).Cast<AlignItems>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
     </RadzenStack>
 </RadzenCard>
-<RadzenTimeline AlignItems="@alignItems" TimelinePosition="TimelinePosition.Alternate" style="width: 500px; margin: 0 auto;">
+<RadzenTimeline AlignItems="@alignItems" LinePosition="LinePosition.Alternate" style="width: 500px; margin: 0 auto;">
     <Items>
         <RadzenTimelineItem Size="PointSize.Medium" PointStyle="PointStyle.Warning">
             <Start><RadzenBadge BadgeStyle="BadgeStyle.Warning" IsPill="true" Text="6th century BC" /></Start>

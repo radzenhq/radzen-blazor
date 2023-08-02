@@ -633,7 +633,7 @@ namespace Radzen
     /// <summary>
     /// Specifies the ways a <see cref="RadzenTimeline" /> component renders line and content items.
     /// </summary>
-    public enum TimelinePosition
+    public enum LinePosition
     {
         /// <summary>
         /// The RadzenTimeline line is displayed at the center of the component.

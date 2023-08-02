@@ -27,7 +27,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The position.</value>
         [Parameter]
-        public TimelinePosition TimelinePosition { get; set; } = TimelinePosition.Center;
+        public LinePosition LinePosition { get; set; } = LinePosition.Center;
 
         /// <summary>
         /// Gets or sets the reverse.
@@ -50,31 +50,31 @@ namespace Radzen.Blazor
             
             var positionCSS = "center";
 
-            if (TimelinePosition == TimelinePosition.Alternate)
+            if (LinePosition == LinePosition.Alternate)
             {
                 positionCSS = "alternate";
             }
-            else if (TimelinePosition == TimelinePosition.Start)
+            else if (LinePosition == LinePosition.Start)
             {
                 positionCSS = "start";
             }
-            else if (TimelinePosition == TimelinePosition.End)
+            else if (LinePosition == LinePosition.End)
             {
                 positionCSS = "end";
             }
-            else if(TimelinePosition == TimelinePosition.Left)
+            else if(LinePosition == LinePosition.Left)
             {
                 positionCSS = "left";
             }
-            else if (TimelinePosition == TimelinePosition.Right)
+            else if (LinePosition == LinePosition.Right)
             {
                 positionCSS = "right";
             }
-            else if(TimelinePosition == TimelinePosition.Top)
+            else if(LinePosition == LinePosition.Top)
             {
                 positionCSS = "top";
             }
-            else if (TimelinePosition == TimelinePosition.Bottom)
+            else if (LinePosition == LinePosition.Bottom)
             {
                 positionCSS = "bottom";
             }

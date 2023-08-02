@@ -6,9 +6,9 @@
                         Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-            TimelinePosition
+            LinePosition
             <RadzenDropDown @bind-Value="@position" TextProperty="Text" ValueProperty="Value"
-                        Data="@(Enum.GetValues(typeof(TimelinePosition)).Cast<TimelinePosition>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+                        Data="@(Enum.GetValues(typeof(LinePosition)).Cast<LinePosition>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
             Reverse
@@ -16,7 +16,7 @@
         </RadzenStack>
     </RadzenStack>
 </RadzenCard>
-<RadzenTimeline Orientation="@orientation" TimelinePosition="@position" Reverse="@reverse" Class="rz-m-4">
+<RadzenTimeline Orientation="@orientation" LinePosition="@position" Reverse="@reverse" Class="rz-m-4">
     <Items>
         <RadzenTimelineItem PointStyle="PointStyle.Primary">
             <Start>
@@ -55,6 +55,6 @@
 
 @code {
     Orientation orientation = Orientation.Vertical;
-    TimelinePosition position = TimelinePosition.Center;
+    LinePosition position = LinePosition.Center;
     bool reverse;
 }

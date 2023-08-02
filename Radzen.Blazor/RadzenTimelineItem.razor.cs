@@ -69,10 +69,6 @@ namespace Radzen.Blazor
         public int Shadow { get; set; } = 1;
 
         private string PointClass => ClassList.Create($"rz-timeline-point")
-                                .Add("rz-timeline-point-xs", Size == PointSize.ExtraSmall)
-                                .Add("rz-timeline-point-sm", Size == PointSize.Small)
-                                .Add("rz-timeline-point-md", Size == PointSize.Medium)
-                                .Add("rz-timeline-point-lg", Size == PointSize.Large)
                                 .Add("rz-timeline-point-filled", Variant == Variant.Filled)
                                 .Add("rz-timeline-point-flat", Variant == Variant.Flat)
                                 .Add("rz-timeline-point-outlined", Variant == Variant.Outlined)
@@ -93,7 +89,22 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return ClassList.Create($"rz-timeline-item").ToString();
+            var pointSizeCSS = "md";
+
+            if (Size == PointSize.ExtraSmall)
+            {
+                pointSizeCSS = "xs";
+            }
+            else if (Size == PointSize.Small)
+            {
+                pointSizeCSS = "sm";
+            }
+            else if (Size == PointSize.Large)
+            {
+                pointSizeCSS = "lg";
+            }
+            
+            return ClassList.Create($"rz-timeline-item rz-timeline-axis-{pointSizeCSS}").ToString();
         }
     }
 }
