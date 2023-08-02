@@ -1,47 +1,45 @@
-﻿<RadzenCard class="my-4">
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
-        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-            Orientation
-            <RadzenDropDown @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value"
-                        Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
-        </RadzenStack>
-        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-            LinePosition
-            <RadzenDropDown @bind-Value="@position" TextProperty="Text" ValueProperty="Value"
-                        Data="@(Enum.GetValues(typeof(LinePosition)).Cast<LinePosition>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
-        </RadzenStack>
-        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-            Reverse
-            <RadzenSwitch @bind-Value="@reverse" Style="margin-top: 4px;" />
+﻿<div Class="rz-p-0 rz-p-md-12">
+    <RadzenStack Gap="1rem" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+        <RadzenStack Gap="1rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">    
+            <RadzenLabel Text="Orientation:" Style="width: 6rem;" />
+            <RadzenSelectBar @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
+            <RadzenDropDown @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
         </RadzenStack>
     </RadzenStack>
-</RadzenCard>
-<RadzenTimeline Orientation="@orientation" LinePosition="@position" Reverse="@reverse" style="--rz-timeline-line-width: 32px;">
-    <Items>
-        <RadzenTimelineItem Variant="Variant.Flat" Size="PointSize.Small" PointStyle="PointStyle.Info">
-            <Point><RadzenIcon Icon="check" /></Point>
-            <End>Step 1</End>
-        </RadzenTimelineItem>
-        <RadzenTimelineItem Variant="Variant.Flat" Size="PointSize.Small" PointStyle="PointStyle.Info">
-            <Point><RadzenIcon Icon="check" /></Point>
-            <End>Step 2</End>
-        </RadzenTimelineItem>
-        <RadzenTimelineItem Variant="Variant.Text" PointStyle="PointStyle.Info">
-            <Point><RadzenIcon Icon="more_horiz" /></Point>
-            <End>
-                <span class="rz-color-info">
-                    Step 3
-                </span>
-            </End>
-        </RadzenTimelineItem>
-        <RadzenTimelineItem Variant="Variant.Text" Size="PointSize.Small">
-            <End>Step 4</End>
-        </RadzenTimelineItem>
-    </Items>
-</RadzenTimeline>
+    <RadzenTimeline Orientation="@orientation" style="--rz-timeline-line-width: 36px; max-width: 600px; margin: 0 auto;">
+        <Items>
+            <RadzenTimelineItem Variant="Variant.Flat" Size="PointSize.Small" PointStyle="PointStyle.Info">
+                <Point><RadzenIcon Icon="check" /></Point>
+                <End>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Step 1</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">Register Your Account</RadzenText>
+                </End>
+            </RadzenTimelineItem>
+            <RadzenTimelineItem Variant="Variant.Flat" Size="PointSize.Small" PointStyle="PointStyle.Info">
+                <Point><RadzenIcon Icon="check" /></Point>
+                <End>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Step 2</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">Verify Your Identity</RadzenText>
+                </End>
+            </RadzenTimelineItem>
+            <RadzenTimelineItem Variant="Variant.Text" PointStyle="PointStyle.Info">
+                <Point><RadzenIcon Icon="more_horiz" /></Point>
+                <End>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Step 3</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">Complete Self-Certification</RadzenText>
+                </End>
+            </RadzenTimelineItem>
+            <RadzenTimelineItem Variant="Variant.Text" Size="PointSize.Small">
+                <End>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Step 4</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">Complete Your Profile</RadzenText>
+                </End>
+            </RadzenTimelineItem>
+        </Items>
+    </RadzenTimeline>
+</div>
 
 @code {
     Orientation orientation = Orientation.Vertical;
-    LinePosition position = LinePosition.Center;
     bool reverse;
 }
