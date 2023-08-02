@@ -45,7 +45,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The point size.</value>
         [Parameter]
-        public PointSize Size { get; set; } = PointSize.Medium;
+        public PointSize PointSize { get; set; } = PointSize.Medium;
 
         /// <summary>
         /// Gets or sets the Point style.
@@ -59,31 +59,31 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The point variant.</value>
         [Parameter]
-        public Variant Variant { get; set; } = Variant.Filled;
+        public Variant PointVariant { get; set; } = Variant.Filled;
 
         /// <summary>
         /// Gets or sets the Shadow level.
         /// </summary>
         /// <value>The point shadow level.</value>
         [Parameter]
-        public int Shadow { get; set; } = 1;
+        public int PointShadow { get; set; } = 1;
 
         private string PointClass => ClassList.Create($"rz-timeline-point")
-                                .Add("rz-timeline-point-filled", Variant == Variant.Filled)
-                                .Add("rz-timeline-point-flat", Variant == Variant.Flat)
-                                .Add("rz-timeline-point-outlined", Variant == Variant.Outlined)
-                                .Add("rz-timeline-point-text", Variant == Variant.Text)
-                                .Add("rz-shadow-0", Shadow == 0)
-                                .Add("rz-shadow-1", Shadow == 1)
-                                .Add("rz-shadow-2", Shadow == 2)
-                                .Add("rz-shadow-3", Shadow == 3)
-                                .Add("rz-shadow-4", Shadow == 4)
-                                .Add("rz-shadow-5", Shadow == 5)
-                                .Add("rz-shadow-6", Shadow == 6)
-                                .Add("rz-shadow-7", Shadow == 7)
-                                .Add("rz-shadow-8", Shadow == 8)
-                                .Add("rz-shadow-9", Shadow == 9)
-                                .Add("rz-shadow-10", Shadow == 10)
+                                .Add("rz-timeline-point-filled", PointVariant == Variant.Filled)
+                                .Add("rz-timeline-point-flat", PointVariant == Variant.Flat)
+                                .Add("rz-timeline-point-outlined", PointVariant == Variant.Outlined)
+                                .Add("rz-timeline-point-text", PointVariant == Variant.Text)
+                                .Add("rz-shadow-0", PointShadow == 0)
+                                .Add("rz-shadow-1", PointShadow == 1)
+                                .Add("rz-shadow-2", PointShadow == 2)
+                                .Add("rz-shadow-3", PointShadow == 3)
+                                .Add("rz-shadow-4", PointShadow == 4)
+                                .Add("rz-shadow-5", PointShadow == 5)
+                                .Add("rz-shadow-6", PointShadow == 6)
+                                .Add("rz-shadow-7", PointShadow == 7)
+                                .Add("rz-shadow-8", PointShadow == 8)
+                                .Add("rz-shadow-9", PointShadow == 9)
+                                .Add("rz-shadow-10", PointShadow == 10)
                                 .Add($"rz-timeline-point-{PointStyle.ToString().ToLowerInvariant()}").ToString();
 
         /// <inheritdoc />
@@ -91,15 +91,15 @@ namespace Radzen.Blazor
         {
             var pointSizeCSS = "md";
 
-            if (Size == PointSize.ExtraSmall)
+            if (PointSize == PointSize.ExtraSmall)
             {
                 pointSizeCSS = "xs";
             }
-            else if (Size == PointSize.Small)
+            else if (PointSize == PointSize.Small)
             {
                 pointSizeCSS = "sm";
             }
-            else if (Size == PointSize.Large)
+            else if (PointSize == PointSize.Large)
             {
                 pointSizeCSS = "lg";
             }
