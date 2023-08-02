@@ -1,4 +1,3 @@
-$rz-timeline-item-gap: 0 !default;
 $rz-timeline-item-padding: 0.5rem !default;
 $rz-timeline-axis-size: 4rem !default;
 $rz-timeline-point-size: 1rem !default;
@@ -15,7 +14,6 @@ $rz-timeline-line-end-offset: calc(100% - var(--rz-timeline-item-padding) - (var
 // Timeline CSS variables
 
 :root {
-  --rz-timeline-item-gap: #{$rz-timeline-item-gap};
   --rz-timeline-item-padding: #{$rz-timeline-item-padding};
   --rz-timeline-axis-size: #{$rz-timeline-axis-size};
   --rz-timeline-point-size: #{$rz-timeline-point-size};
@@ -36,11 +34,11 @@ $timeline-point-sizes: map-merge(
     ),
     md: (
       size: 1.5rem,
-      font-size: 1.25rem
+      font-size: 1rem
     ),
     sm: (
       size: 1rem,
-      font-size: 0.75rem
+      font-size: 0.625rem
     ),
     xs: (
       size: 0.75rem,
@@ -250,7 +248,6 @@ $timeline-point-sizes: map-merge(
 
 .rz-timeline-item {
   display: flex;
-  gap: var(--rz-timeline-item-gap);
   padding: var(--rz-timeline-item-padding);
   position: relative;
 
