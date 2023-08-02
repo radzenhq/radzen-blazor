@@ -8,6 +8,9 @@ $rz-timeline-point-background-color: var(--rz-base-300) !default;
 $rz-timeline-point-color: var(--rz-base-700) !default;
 $rz-timeline-line-color: var(--rz-base-300) !default;
 $rz-timeline-line-width: 0.125rem !default;
+$rz-timeline-line-position-offset: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+$rz-timeline-line-start-offset: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+$rz-timeline-line-end-offset: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
 
 // Timeline CSS variables
 
@@ -72,7 +75,7 @@ $timeline-point-sizes: map-merge(
     // LinePosition.Start
     &.rz-timeline-start:not(.rz-timeline-reverse) {
       .rz-timeline-item:before {
-        left: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+        left: $rz-timeline-line-position-offset;
         right: auto;
       }
       .rz-timeline-content-start {display: none;}
@@ -83,7 +86,7 @@ $timeline-point-sizes: map-merge(
     &.rz-timeline-end:not(.rz-timeline-reverse) {
       .rz-timeline-item {flex-direction: row-reverse;}
       .rz-timeline-item:before {
-        right: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+        right: $rz-timeline-line-position-offset;
         left: auto;
       }
       .rz-timeline-content-start {display: none;}
@@ -93,7 +96,7 @@ $timeline-point-sizes: map-merge(
     // LinePosition.Left
     &.rz-timeline-left:not(.rz-timeline-reverse) {
       .rz-timeline-item:before {
-        left: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+        left: $rz-timeline-line-position-offset;
         right: auto;
       }
       .rz-timeline-content-start {display: none;}
@@ -104,7 +107,7 @@ $timeline-point-sizes: map-merge(
     &.rz-timeline-right:not(.rz-timeline-reverse) {
       .rz-timeline-item {flex-direction: row-reverse;}
       .rz-timeline-item:before {
-        right: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+        right: $rz-timeline-line-position-offset;
         left: auto;
       }
       .rz-timeline-content-start {display: none;}
@@ -132,7 +135,7 @@ $timeline-point-sizes: map-merge(
       // LinePosition.Start
       &.rz-timeline-start {
         .rz-timeline-item:before {
-          left: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+          left: $rz-timeline-line-position-offset;
           right: auto;
         }
         .rz-timeline-content-start {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: start;}
@@ -143,7 +146,7 @@ $timeline-point-sizes: map-merge(
       &.rz-timeline-end {
         .rz-timeline-item {flex-direction: row;}
         .rz-timeline-item:before {
-          right: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+          right: $rz-timeline-line-position-offset;
           left: auto;
         }
         .rz-timeline-content-start {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: end;}
@@ -153,7 +156,7 @@ $timeline-point-sizes: map-merge(
       // LinePosition.Left
       &.rz-timeline-left {
         .rz-timeline-item:before {
-          left: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+          left: $rz-timeline-line-position-offset;
           right: auto;
         }
         .rz-timeline-content-start {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: left;}
@@ -164,7 +167,7 @@ $timeline-point-sizes: map-merge(
       &.rz-timeline-right {
         .rz-timeline-item {flex-direction: row;}
         .rz-timeline-item:before {
-          right: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+          right: $rz-timeline-line-position-offset;
           left: auto;
         }
         .rz-timeline-content-start {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: right;}
@@ -189,7 +192,7 @@ $timeline-point-sizes: map-merge(
     &.rz-timeline-start:not(.rz-timeline-reverse),
     &.rz-timeline-top:not(.rz-timeline-reverse) {
       .rz-timeline-item:before {
-        top: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+        top: $rz-timeline-line-position-offset;
         bottom: auto;
       }
       .rz-timeline-content-start {display: none;}
@@ -201,7 +204,7 @@ $timeline-point-sizes: map-merge(
     &.rz-timeline-bottom:not(.rz-timeline-reverse) {
       .rz-timeline-item {flex-direction: column-reverse;}
       .rz-timeline-item:before {
-        bottom: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+        bottom: $rz-timeline-line-position-offset;
         top: auto;
       }
       .rz-timeline-content-start {display: none;}
@@ -223,7 +226,7 @@ $timeline-point-sizes: map-merge(
       &.rz-timeline-start,
       &.rz-timeline-top {
         .rz-timeline-item:before {
-          top: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+          top: $rz-timeline-line-position-offset;
           bottom: auto;
         }
         .rz-timeline-content-start {max-height: calc(100% - var(--rz-timeline-axis-size));}
@@ -235,7 +238,7 @@ $timeline-point-sizes: map-merge(
       &.rz-timeline-bottom {
         .rz-timeline-item {flex-direction: column;}
         .rz-timeline-item:before {
-          bottom: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+          bottom: $rz-timeline-line-position-offset;
           top: auto;
         }
         .rz-timeline-content-start {max-height: calc(100% - var(--rz-timeline-axis-size));}
@@ -293,11 +296,11 @@ $timeline-point-sizes: map-merge(
   }
 
   .rz-timeline-column.rz-timeline-align-items-start &:first-child:before {
-    top: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+    top: $rz-timeline-line-start-offset;
   }
 
   .rz-timeline-column.rz-timeline-align-items-end &:first-child:before {
-    top: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+    top: $rz-timeline-line-end-offset;
   }
 
   .rz-timeline-column &:last-child:before {
@@ -307,11 +310,11 @@ $timeline-point-sizes: map-merge(
   }
 
   .rz-timeline-column.rz-timeline-align-items-start &:last-child:before {
-    bottom: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+    bottom: $rz-timeline-line-end-offset;
   }
 
   .rz-timeline-column.rz-timeline-align-items-end &:last-child:before {
-    bottom: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+    bottom: $rz-timeline-line-start-offset;
   }
 
   .rz-timeline-row &:before {
@@ -329,11 +332,11 @@ $timeline-point-sizes: map-merge(
   }
 
   .rz-timeline-row.rz-timeline-align-items-start &:first-child:before {
-    left: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+    left: $rz-timeline-line-start-offset;
   }
 
   .rz-timeline-row.rz-timeline-align-items-end &:first-child:before {
-    left: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+    left: $rz-timeline-line-end-offset;
   }
 
   .rz-timeline-row &:last-child:before {
@@ -343,11 +346,11 @@ $timeline-point-sizes: map-merge(
   }
 
   .rz-timeline-row.rz-timeline-align-items-start &:last-child:before {
-    right: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+    right: $rz-timeline-line-end-offset;
   }
 
   .rz-timeline-row.rz-timeline-align-items-end &:last-child:before {
-    right: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+    right: $rz-timeline-line-start-offset;
   }
 }
 
