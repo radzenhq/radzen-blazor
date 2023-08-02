@@ -178,11 +178,11 @@ $timeline-point-sizes: map-merge(
     flex-direction: row;
 
     // LinePosition.Center
-    .rz-timeline-item {flex-direction: column;}
+    .rz-timeline-item {flex-direction: column; justify-content: end;}
 
     // LinePosition.Alternate
     &.rz-timeline-alternate {
-      .rz-timeline-item:nth-child(even) {flex-direction: column-reverse;}
+      .rz-timeline-item:nth-child(even) {flex-direction: column-reverse; justify-content: start;}
     }
 
     // LinePosition.Start/Top
@@ -212,13 +212,11 @@ $timeline-point-sizes: map-merge(
     &.rz-timeline-reverse {
 
       // LinePosition.Center
-      .rz-timeline-item {flex-direction: column-reverse;}
+      .rz-timeline-item {flex-direction: column-reverse; justify-content: start;}
 
       // LinePosition.Alternate
       &.rz-timeline-alternate {
-        .rz-timeline-item:nth-child(even) {
-          flex-direction: column;
-        }
+        .rz-timeline-item:nth-child(even) {flex-direction: column; justify-content: end;}
       }
 
       // LinePosition.Start/Top
@@ -353,7 +351,15 @@ $timeline-point-sizes: map-merge(
   }
 }
 
-.rz-timeline-content-start,
+.rz-timeline-content-start {
+  text-align: center;
+
+  .rz-timeline-column & {
+    flex: 1 1 auto;
+    max-width: calc(50% - (var(--rz-timeline-axis-size) / 2));
+  }
+}
+
 .rz-timeline-content-end {
   flex: 1 1 auto;
   text-align: center;
