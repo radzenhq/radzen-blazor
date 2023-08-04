@@ -373,6 +373,11 @@ $progressbar-background-color: var(--rz-base-700) !default;
 $chart-axis-color: var(--rz-base-600) !default ;
 $chart-axis-label-color: var(--rz-text-secondary-color) !default;
 
+// Timeline
+$rz-timeline-point-background-color: var(--rz-base-600) !default;
+$rz-timeline-point-color: var(--rz-text-color) !default;
+$rz-timeline-line-color: var(--rz-base-600) !default;
+
 // Editor
 $editor-separator-background-color: var(--rz-base-700) !default;
 
