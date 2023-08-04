@@ -7,6 +7,7 @@ $rz-timeline-point-background-color: var(--rz-base-300) !default;
 $rz-timeline-point-color: var(--rz-base-700) !default;
 $rz-timeline-line-color: var(--rz-base-300) !default;
 $rz-timeline-line-width: 0.125rem !default;
+$rz-timeline-line-border-radius: var(--rz-timeline-line-width) !default;
 $rz-timeline-line-position-offset: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
 $rz-timeline-line-start-offset: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
 $rz-timeline-line-end-offset: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
@@ -23,6 +24,7 @@ $rz-timeline-line-end-offset: calc(100% - var(--rz-timeline-item-padding) - (var
   --rz-timeline-point-color: #{$rz-timeline-point-color};
   --rz-timeline-line-color: #{$rz-timeline-line-color};
   --rz-timeline-line-width: #{$rz-timeline-line-width};
+  --rz-timeline-line-border-radius: #{$rz-timeline-line-border-radius};
 }
 
 $timeline-point-sizes: () !default;
@@ -179,7 +181,7 @@ $timeline-point-sizes: map-merge(
     flex-direction: row;
 
     // LinePosition.Center
-    .rz-timeline-item {flex-direction: column; justify-content: end;}
+    .rz-timeline-item {flex-direction: column; justify-content: end; width: 100%;}
 
     // LinePosition.Alternate
     &.rz-timeline-alternate {
@@ -288,8 +290,8 @@ $timeline-point-sizes: map-merge(
 
   .rz-timeline-column &:first-child:before {
     top: calc(50% - (var(--rz-timeline-line-width) / 2));
-    border-top-left-radius: var(--rz-timeline-line-width);
-    border-top-right-radius: var(--rz-timeline-line-width);
+    border-top-left-radius: var(--rz-timeline-line-border-radius);
+    border-top-right-radius: var(--rz-timeline-line-border-radius);
   }
 
   .rz-timeline-column.rz-timeline-align-items-start &:first-child:before {
@@ -302,8 +304,8 @@ $timeline-point-sizes: map-merge(
 
   .rz-timeline-column &:last-child:before {
     bottom: calc(50% - (var(--rz-timeline-line-width) / 2));
-    border-bottom-left-radius: var(--rz-timeline-line-width);
-    border-bottom-right-radius: var(--rz-timeline-line-width);
+    border-bottom-left-radius: var(--rz-timeline-line-border-radius);
+    border-bottom-right-radius: var(--rz-timeline-line-border-radius);
   }
 
   .rz-timeline-column.rz-timeline-align-items-start &:last-child:before {
@@ -324,8 +326,8 @@ $timeline-point-sizes: map-merge(
 
   .rz-timeline-row &:first-child:before {
     left: calc(50% - (var(--rz-timeline-line-width) / 2));
-    border-top-left-radius: var(--rz-timeline-line-width);
-    border-bottom-left-radius: var(--rz-timeline-line-width);
+    border-top-left-radius: var(--rz-timeline-line-border-radius);
+    border-bottom-left-radius: var(--rz-timeline-line-border-radius);
   }
 
   .rz-timeline-row.rz-timeline-align-items-start &:first-child:before {
@@ -338,8 +340,8 @@ $timeline-point-sizes: map-merge(
 
   .rz-timeline-row &:last-child:before {
     right: calc(50% - (var(--rz-timeline-line-width) / 2));
-    border-top-right-radius: var(--rz-timeline-line-width);
-    border-bottom-right-radius: var(--rz-timeline-line-width);
+    border-top-right-radius: var(--rz-timeline-line-border-radius);
+    border-bottom-right-radius: var(--rz-timeline-line-border-radius);
   }
 
   .rz-timeline-row.rz-timeline-align-items-start &:last-child:before {
