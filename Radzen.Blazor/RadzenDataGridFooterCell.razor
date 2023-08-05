@@ -1,7 +1,7 @@
 @typeparam TItem
 @if (RowIndex == Column.GetLevel())
 {
-<td rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)">
+<td rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@GetStyle()">
     <span class="rz-column-footer">
         @if (Column.FooterTemplate != null)
         {
@@ -14,7 +14,7 @@ else
 {
     @foreach(var column in Grid.childColumns.Where(c => c.GetVisible() && c.Parent == Column))
     {
-        <RadzenDataGridFooterCell RowIndex="@RowIndex" Grid="@Grid" Column="@column" 
+        <RadzenDataGridFooterCell RowIndex="@RowIndex" Grid="@Grid" Column="@column" Style="@column.GetStyle(true, true)"
                                 CssClass="@($"{Column.FooterCssClass} {Grid.getFrozenColumnClass(column, Grid.ColumnsCollection.Where(c => c.GetVisible()).ToList())} {Grid.getCompositeCellCSSClass(column)}")" 
                                 Attributes="@(Attributes)" />
     }
@@ -34,4 +34,17 @@ else
 
     [Parameter]
     public string CssClass { get; set; }
+
+    [Parameter]
+    public string Style { get; set; }
+
+    string GetStyle()
+    {
+        if (Attributes != null && Attributes.TryGetValue("style", out var style) == true && !string.IsNullOrEmpty(Convert.ToString(style)))
+        {
+            return String.IsNullOrEmpty(Style) ? $"{style}" : $"{Style.TrimEnd(';')};{style}";
+        }
+
+        return Style;
+    }
 }
