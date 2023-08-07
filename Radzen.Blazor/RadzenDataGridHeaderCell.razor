@@ -2,7 +2,7 @@
 @using Radzen.Blazor.Rendering
 @if (RowIndex == Column.GetLevel())
 {
-<th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@Column.GetStyle(true, true)" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex)) >
+    <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@GetStyle()" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex))>
     <div @onclick='@((args) => Grid.OnSort(args, Column))' tabindex="@SortingTabIndex" @onkeydown="OnSortKeyPressed">
         @if ((Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
         {
@@ -152,7 +152,7 @@ else
     {
         ColumnIndex = Grid.allColumns.IndexOf(column);//for child must have different columnindex
 
-        <RadzenDataGridHeaderCell RowIndex="@RowIndex" Grid="@Grid" Column="@column" ColumnIndex="@ColumnIndex"
+        <RadzenDataGridHeaderCell RowIndex="@RowIndex" Grid="@Grid" Column="@column" Style="@column.GetStyle(true, true)" ColumnIndex="@ColumnIndex"
             CssClass="@($" maitest rz-unselectable-text {(Grid.AllowSorting && column.Sortable ? "rz-sortable-column" : "")} {column.HeaderCssClass} {Grid.getFrozenColumnClass(column, Grid.ColumnsCollection.Where(c => c.GetVisible()).ToList())} {Grid.getCompositeCellCSSClass(column)} {Grid.getColumnAlignClass(column)}".Trim())" />
     }
 }
@@ -208,6 +208,19 @@ else
 
     [Parameter]
     public string CssClass { get; set; }
+
+    [Parameter]
+    public string Style { get; set; }
+
+    string GetStyle()
+    {
+        if (Attributes != null && Attributes.TryGetValue("style", out var style) == true && !string.IsNullOrEmpty(Convert.ToString(style)))
+        {
+            return String.IsNullOrEmpty(Style) ? $"{style}" : $"{Style.TrimEnd(';')};{style}";
+        }
+
+        return Style;
+    }
 
     private int SortingTabIndex => Grid.AllowSorting && Column.Sortable ? 0 : -1;
 
