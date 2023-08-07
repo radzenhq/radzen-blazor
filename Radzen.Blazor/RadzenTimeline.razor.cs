@@ -5,9 +5,24 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
+    /// RadzenTimeline component is a graphical representation used to display a chronological sequence of events or data points.
     /// </summary>
     /// <example>
     /// <code>
+    /// &lt;RadzenTimeline&gt;
+    /// &lt;Items&gt;
+    ///     &lt;RadzenTimelineItem&gt;
+    ///         &lt;ChildContent&gt;
+    ///             Checkpoint 1
+    ///         &lt;/ChildContent&gt;
+    ///     &lt;/RadzenTimelineItem&gt;
+    ///     &lt;RadzenTimelineItem&gt;
+    ///         &lt;ChildContent&gt;
+    ///             Checkpoint 2
+    ///         &lt;/ChildContent&gt;
+    ///     &lt;/RadzenTimelineItem&gt;
+    /// &lt;/Items&gt;
+    /// &lt;/RadzenTimeline&gt;
     /// </code>
     /// </example>
     public partial class RadzenTimeline : RadzenComponent
@@ -16,30 +31,27 @@ namespace Radzen.Blazor
         public RenderFragment Items { get; set; }
 
         /// <summary>
-        /// Gets or sets the orientation.
+        /// Specifies the orientation - whether items flow in horizontal or vertical direction. Set to <c>Orientation.Vertical</c> by default.
         /// </summary>
-        /// <value>The orientation.</value>
         [Parameter]
         public Orientation Orientation { get; set; } = Orientation.Vertical;
 
         /// <summary>
-        /// Gets or sets the position.
+        /// Specifies the line position. Set to <c>LinePosition.Center</c> by default.
         /// </summary>
-        /// <value>The position.</value>
         [Parameter]
         public LinePosition LinePosition { get; set; } = LinePosition.Center;
 
         /// <summary>
-        /// Gets or sets the reverse.
+        /// Specifies if the LinePosition is reversed.
         /// </summary>
-        /// <value>The reverse.</value>
+        /// <value><c>true</c> if reverse; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Reverse { get; set; }
 
         /// <summary>
-        /// Gets or sets the TimelineItems content alignment.
+        /// Specifies the alignment of LabelContent, PointContent and ChildContent inside TimelineItems. Set to <c>AlignItems.Center</c> by default.
         /// </summary>
-        /// <value>The TimelineItems content alignment.</value>
         [Parameter]
         public AlignItems AlignItems { get; set; } = AlignItems.Center;
 

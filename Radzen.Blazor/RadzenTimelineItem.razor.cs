@@ -5,9 +5,18 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
+    /// RadzenTimeline item.
     /// </summary>
     /// <example>
     /// <code>
+    /// &lt;RadzenTimelineItem PointStyle="PointStyle.Primary"&gt;
+    ///     &lt;LabelContent&gt;
+    ///         NOV 2022
+    ///     &lt;/LabelContent&gt;
+    ///     &lt;ChildContent&gt;
+    ///         Celebrating the official release of Radzen Blazor Studio.
+    ///     &lt;/ChildContent&gt;
+    /// &lt;/RadzenTimelineItem&gt;
     /// </code>
     /// </example>
     public partial class RadzenTimelineItem : RadzenComponent
@@ -15,7 +24,6 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
-        /// <value>The child content.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
@@ -23,9 +31,8 @@ namespace Radzen.Blazor
         public string Text { get; set; }
 
         /// <summary>
-        /// Gets or sets the Start content.
+        /// Gets or sets the label content.
         /// </summary>
-        /// <value>The Start content.</value>
         [Parameter]
         public RenderFragment LabelContent { get; set; }
 
@@ -33,37 +40,32 @@ namespace Radzen.Blazor
         public string Label { get; set; }
 
         /// <summary>
-        /// Gets or sets the Point content.
+        /// Gets or sets the content inside a point on the timeline.
         /// </summary>
-        /// <value>The point content.</value>
         [Parameter]
         public RenderFragment PointContent { get; set; }
 
         /// <summary>
-        /// Gets or sets the Point size.
+        /// Specifies the Point size from ExtraSmall to Large. Set to <c>PointSize.Medium</c> by default.
         /// </summary>
-        /// <value>The point size.</value>
         [Parameter]
         public PointSize PointSize { get; set; } = PointSize.Medium;
 
         /// <summary>
-        /// Gets or sets the Point style.
+        /// Gets or sets the Point style. Set to <c>PointStyle.Base</c> by default.
         /// </summary>
-        /// <value>The point style.</value>
         [Parameter]
         public PointStyle PointStyle { get; set; } = PointStyle.Base;
 
         /// <summary>
-        /// Gets or sets the Point variant.
+        /// Specifies if the Point variant is filled, flat, outlined or text only. Set to <c>Variant.Filled</c> by default.
         /// </summary>
-        /// <value>The point variant.</value>
         [Parameter]
         public Variant PointVariant { get; set; } = Variant.Filled;
 
         /// <summary>
-        /// Gets or sets the Shadow level.
+        /// Specifies the Shadow level from <c>0</c> (no shadow) to <c>10<c>. Set to <c>1</c> by default.
         /// </summary>
-        /// <value>The point shadow level.</value>
         [Parameter]
         public int PointShadow { get; set; } = 1;
 
