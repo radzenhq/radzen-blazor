@@ -19,26 +19,25 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
+        [Parameter]
+        public string Text { get; set; }
+
         /// <summary>
         /// Gets or sets the Start content.
         /// </summary>
         /// <value>The Start content.</value>
         [Parameter]
-        public RenderFragment Start { get; set; }
+        public RenderFragment LabelContent { get; set; }
 
-        /// <summary>
-        /// Gets or sets the End content.
-        /// </summary>
-        /// <value>The End content.</value>
         [Parameter]
-        public RenderFragment End { get; set; }
+        public string Label { get; set; }
 
         /// <summary>
         /// Gets or sets the Point content.
         /// </summary>
         /// <value>The point content.</value>
         [Parameter]
-        public RenderFragment Point { get; set; }
+        public RenderFragment PointContent { get; set; }
 
         /// <summary>
         /// Gets or sets the Point size.
