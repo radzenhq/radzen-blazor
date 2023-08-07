@@ -46,59 +46,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            var horizontal = Orientation == Orientation.Horizontal;
-            
-            var positionCSS = "center";
-
-            if (LinePosition == LinePosition.Alternate)
-            {
-                positionCSS = "alternate";
-            }
-            else if (LinePosition == LinePosition.Start)
-            {
-                positionCSS = "start";
-            }
-            else if (LinePosition == LinePosition.End)
-            {
-                positionCSS = "end";
-            }
-            else if(LinePosition == LinePosition.Left)
-            {
-                positionCSS = "left";
-            }
-            else if (LinePosition == LinePosition.Right)
-            {
-                positionCSS = "right";
-            }
-            else if(LinePosition == LinePosition.Top)
-            {
-                positionCSS = "top";
-            }
-            else if (LinePosition == LinePosition.Bottom)
-            {
-                positionCSS = "bottom";
-            }
-
-            var alignItemsCSS = "center";
-
-            if (AlignItems == AlignItems.Normal)
-            {
-                alignItemsCSS = "normal";
-            }
-            else if (AlignItems == AlignItems.Start)
-            {
-                alignItemsCSS = "start";
-            }
-            else if (AlignItems == AlignItems.End)
-            {
-                alignItemsCSS = "end";
-            }
-            else if (AlignItems == AlignItems.Stretch)
-            {
-                alignItemsCSS = "stretch";
-            }
-
-            return ClassList.Create($"rz-timeline rz-timeline-{(horizontal ? "row" : "column")} rz-timeline-{positionCSS} {(Reverse ? "rz-timeline-reverse" : "")} rz-timeline-align-items-{alignItemsCSS}").ToString();
+            return ClassList.Create($"rz-timeline")
+                            .Add("rz-timeline-row", Orientation == Orientation.Horizontal)
+                            .Add("rz-timeline-column", Orientation == Orientation.Vertical)
+                            .Add($"rz-timeline-{LinePosition.ToString().ToLowerInvariant()}")
+                            .Add("rz-timeline-reverse", Reverse)
+                            .Add($"rz-timeline-align-items-{AlignItems.ToString().ToLowerInvariant()}")
+                            .ToString();
         }
     }
 }
