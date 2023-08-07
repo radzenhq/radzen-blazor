@@ -107,10 +107,18 @@ namespace Radzen.Blazor
         internal Type PropertyType => _propertyType;
 
         /// <summary>
+        /// Gets or sets the unique identifier.
+        /// </summary>
+        /// <value>The unique identifier.</value>
+        public string UniqueID { get; set; }
+
+        /// <summary>
         /// Called when initialized.
         /// </summary>
         protected override void OnInitialized()
         {
+            UniqueID = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("/", "-").Replace("+", "-").Substring(0, 10);
+
             if (Grid != null)
             {
                 Grid.AddColumn(this);

@@ -64,6 +64,11 @@ namespace Radzen
         /// <summary>
         /// Property.
         /// </summary>
+        public string UniqueID { get; set; }
+
+        /// <summary>
+        /// Property.
+        /// </summary>
         public string Property { get; set; }
         /// <summary>
         /// Visible.

@@ -2871,8 +2871,9 @@ namespace Radzen.Blazor
             {
                 settings = new DataGridSettings()
                 {
-                    Columns = ColumnsCollection.ToList().Where(c => !string.IsNullOrEmpty(c.Property)).Select(c => new DataGridColumnSettings()
+                    Columns = ColumnsCollection.ToList().Select(c => new DataGridColumnSettings()
                     {
+                        UniqueID = c.UniqueID,
                         Property = c.Property,
                         Width = c.GetWidth(),
                         Visible = c.GetVisible(),
@@ -2913,7 +2914,8 @@ namespace Radzen.Blazor
                 {
                     foreach (var column in settings.Columns.OrderBy(c => c.SortIndex))
                     {
-                        var gridColumn = ColumnsCollection.Where(c => c.Property == column.Property).FirstOrDefault();
+                        var gridColumn = ColumnsCollection.Where(c => c.Property == column.Property).FirstOrDefault() ??
+                                ColumnsCollection.Where(c => c.UniqueID == column.UniqueID).FirstOrDefault();
                         if (gridColumn != null)
                         {
                             // Sorting
@@ -2927,7 +2929,8 @@ namespace Radzen.Blazor
 
                     foreach (var column in settings.Columns)
                     {
-                        var gridColumn = ColumnsCollection.Where(c => c.Property == column.Property).FirstOrDefault();
+                        var gridColumn = ColumnsCollection.Where(c => c.Property == column.Property).FirstOrDefault() ??
+                                ColumnsCollection.Where(c => c.UniqueID == column.UniqueID).FirstOrDefault();
                         if (gridColumn != null)
                         {
                             // Visibility

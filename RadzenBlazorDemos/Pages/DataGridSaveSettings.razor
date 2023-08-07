@@ -20,7 +20,7 @@
                 AllowColumnResize="true" AllowColumnReorder="true" ColumnWidth="200px"
                 FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data="@employees" TItem="Employee">
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
+        <RadzenDataGridColumn TItem="Employee" Title="Employee" Sortable="false" Filterable="false">
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px;" />
                 @data.FirstName @data.LastName
