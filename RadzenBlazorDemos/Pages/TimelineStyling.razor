@@ -1,0 +1,86 @@
+﻿<div Class="rz-p-0 rz-p-md-12">
+    <RadzenStack Gap="1rem" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+        <RadzenStack Gap="1rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenLabel Text="Orientation:" Style="width: 6rem;" />
+            <RadzenSelectBar @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" PointSize="ButtonPointSize.Small" Class="rz-display-none rz-display-xl-flex" />
+            <RadzenDropDown @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+        </RadzenStack>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" FlexWrap="FlexWrap.Wrap" Gap="1rem" Class="rz-p-4 rz-mb-6">
+        <RadzenTimeline Orientation="@orientation" LinePosition="LinePosition.Start"
+            style="--rz-timeline-line-width: 36px;
+                   max-width: 600px;
+                   margin: 0 auto;">
+            <Items>
+                <RadzenTimelineItem PointVariant="Variant.Flat" PointSize="PointSize.Small" PointStyle="PointStyle.Info">
+                    <PointContent><RadzenIcon Icon="check" /></PointContent>
+                    <ChildContent>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Step 1</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">Register Your Account</RadzenText>
+                    </ChildContent>
+                </RadzenTimelineItem>
+                <RadzenTimelineItem PointVariant="Variant.Flat" PointSize="PointSize.Small" PointStyle="PointStyle.Info">
+                    <PointContent><RadzenIcon Icon="check" /></PointContent>
+                    <ChildContent>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Step 2</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">Verify Your Identity</RadzenText>
+                    </ChildContent>
+                </RadzenTimelineItem>
+                <RadzenTimelineItem PointVariant="Variant.Text" PointStyle="PointStyle.Info">
+                    <PointContent><RadzenIcon Icon="more_horiz" /></PointContent>
+                    <ChildContent>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Step 3</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">Complete Self-Certification</RadzenText>
+                    </ChildContent>
+                </RadzenTimelineItem>
+                <RadzenTimelineItem PointVariant="Variant.Text" PointSize="PointSize.Small">
+                    <ChildContent>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Step 4</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">Complete Your Profile</RadzenText>
+                    </ChildContent>
+                </RadzenTimelineItem>
+            </Items>
+        </RadzenTimeline>
+
+        <RadzenTimeline Orientation="@orientation" LinePosition="LinePosition.Start"
+            style="--rz-timeline-line-width: 3px;
+                   --rz-timeline-line-color: var(--rz-info);
+                   --rz-timeline-axis-size: 72px;
+                   max-width: 600px;
+                   margin: 0 auto;">
+            <Items>
+                <RadzenTimelineItem PointVariant="Variant.Outlined" PointStyle="PointStyle.Info" PointShadow="0">
+                    <PointContent><RadzenIcon Icon="how_to_reg" /></PointContent>
+                    <ChildContent>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Step 1</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">Register Your Account</RadzenText>
+                    </ChildContent>
+                </RadzenTimelineItem>
+                <RadzenTimelineItem PointVariant="Variant.Outlined" PointStyle="PointStyle.Info" PointShadow="0">
+                    <PointContent><RadzenIcon Icon="fingerprint" /></PointContent>
+                    <ChildContent>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Step 2</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">Verify Your Identity</RadzenText>
+                    </ChildContent>
+                </RadzenTimelineItem>
+                <RadzenTimelineItem PointVariant="Variant.Outlined" PointSize="PointSize.Large" PointStyle="PointStyle.Info" PointShadow="0">
+                    <PointContent><RadzenIcon Icon="workspace_premium" /></PointContent>
+                    <ChildContent>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0 rz-color-info">Step 3</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0 rz-color-info">Complete Self-Certification</RadzenText>
+                    </ChildContent>
+                </RadzenTimelineItem>
+                <RadzenTimelineItem PointVariant="Variant.Outlined" PointSize="PointSize.Small" PointStyle="PointStyle.Info" PointShadow="0">
+                    <ChildContent>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Step 4</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">Complete Your Profile</RadzenText>
+                    </ChildContent>
+                </RadzenTimelineItem>
+            </Items>
+        </RadzenTimeline>
+    </RadzenStack>
+</div>
+
+@code {
+    Orientation orientation = Orientation.Vertical;
+}

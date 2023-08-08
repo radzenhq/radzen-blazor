@@ -1,0 +1,451 @@
+$rz-timeline-item-padding: 0.5rem !default;
+$rz-timeline-axis-size: 4rem !default;
+$rz-timeline-point-size: 1rem !default;
+$rz-timeline-point-border: 3px solid var(--rz-base-background-color) !default;
+$rz-timeline-point-border-radius: calc(var(--rz-border-radius) * 12) !default;
+$rz-timeline-point-background-color: var(--rz-base-300) !default;
+$rz-timeline-point-color: var(--rz-text-color) !default;
+$rz-timeline-line-color: var(--rz-base-300) !default;
+$rz-timeline-line-width: 0.125rem !default;
+$rz-timeline-line-border-radius: calc(var(--rz-border-radius) * 20) !default;
+$rz-timeline-line-position-offset: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-axis-size) / 2) - (var(--rz-timeline-line-width) / 2));
+$rz-timeline-line-start-offset: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+$rz-timeline-line-end-offset: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
+
+// Timeline CSS variables
+
+:root {
+  --rz-timeline-item-padding: #{$rz-timeline-item-padding};
+  --rz-timeline-axis-size: #{$rz-timeline-axis-size};
+  --rz-timeline-point-size: #{$rz-timeline-point-size};
+  --rz-timeline-point-border: #{$rz-timeline-point-border};
+  --rz-timeline-point-border-radius: #{$rz-timeline-point-border-radius};
+  --rz-timeline-point-background-color: #{$rz-timeline-point-background-color};
+  --rz-timeline-point-color: #{$rz-timeline-point-color};
+  --rz-timeline-line-color: #{$rz-timeline-line-color};
+  --rz-timeline-line-width: #{$rz-timeline-line-width};
+  --rz-timeline-line-border-radius: #{$rz-timeline-line-border-radius};
+}
+
+$timeline-point-sizes: () !default;
+$timeline-point-sizes: map-merge(
+  (
+    lg: (
+      size: 3rem,
+      font-size: 2rem
+    ),
+    md: (
+      size: 1.5rem,
+      font-size: 1rem
+    ),
+    sm: (
+      size: 1rem,
+      font-size: 0.625rem
+    ),
+    xs: (
+      size: 0.75rem,
+      font-size: 0.5rem
+    )
+  ),
+  $timeline-point-sizes
+);
+
+.rz-timeline {
+  display: flex;
+
+  // Orientation.Vertical
+  &.rz-timeline-column {
+    flex-direction: column;
+
+    // LinePosition.Center
+    .rz-timeline-item {flex-direction: row;}
+    .rz-timeline-content-start {text-align: right;}
+    .rz-timeline-content-end {text-align: left;}
+
+    // LinePosition.Alternate
+    &.rz-timeline-alternate {
+      .rz-timeline-item:nth-child(even) {
+        flex-direction: row-reverse;
+
+        .rz-timeline-content-start {text-align: left;}
+        .rz-timeline-content-end {text-align: right;}
+      }
+    }
+
+    // LinePosition.Start
+    &.rz-timeline-start:not(.rz-timeline-reverse) {
+      .rz-timeline-item:before {
+        left: $rz-timeline-line-position-offset;
+        right: auto;
+      }
+      .rz-timeline-content-start {display: none;}
+      .rz-timeline-content-end {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: start;}
+    }
+
+    // LinePosition.End
+    &.rz-timeline-end:not(.rz-timeline-reverse) {
+      .rz-timeline-item {flex-direction: row-reverse;}
+      .rz-timeline-item:before {
+        right: $rz-timeline-line-position-offset;
+        left: auto;
+      }
+      .rz-timeline-content-start {display: none;}
+      .rz-timeline-content-end {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: end;}
+    }
+
+    // LinePosition.Left
+    &.rz-timeline-left:not(.rz-timeline-reverse) {
+      .rz-timeline-item:before {
+        left: $rz-timeline-line-position-offset;
+        right: auto;
+      }
+      .rz-timeline-content-start {display: none;}
+      .rz-timeline-content-end {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: left;}
+    }
+
+    // LinePosition.Right
+    &.rz-timeline-right:not(.rz-timeline-reverse) {
+      .rz-timeline-item {flex-direction: row-reverse;}
+      .rz-timeline-item:before {
+        right: $rz-timeline-line-position-offset;
+        left: auto;
+      }
+      .rz-timeline-content-start {display: none;}
+      .rz-timeline-content-end {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: right;}
+    }
+
+    // Orientation.Vertical Reverse
+    &.rz-timeline-reverse {
+
+      // LinePosition.Center
+      .rz-timeline-item {flex-direction: row-reverse;}
+      .rz-timeline-content-start {text-align: left;}
+      .rz-timeline-content-end {text-align: right;}
+
+      // LinePosition.Alternate
+      &.rz-timeline-alternate {
+        .rz-timeline-item:nth-child(even) {
+          flex-direction: row;
+
+          .rz-timeline-content-start {text-align: right;}
+          .rz-timeline-content-end {text-align: left;}
+        }
+      }
+
+      // LinePosition.Start
+      &.rz-timeline-start {
+        .rz-timeline-item:before {
+          left: $rz-timeline-line-position-offset;
+          right: auto;
+        }
+        .rz-timeline-content-start {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: start;}
+        .rz-timeline-content-end {display: none;}
+      }
+
+      // LinePosition.End
+      &.rz-timeline-end {
+        .rz-timeline-item {flex-direction: row;}
+        .rz-timeline-item:before {
+          right: $rz-timeline-line-position-offset;
+          left: auto;
+        }
+        .rz-timeline-content-start {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: end;}
+        .rz-timeline-content-end {display: none;}
+      }
+
+      // LinePosition.Left
+      &.rz-timeline-left {
+        .rz-timeline-item:before {
+          left: $rz-timeline-line-position-offset;
+          right: auto;
+        }
+        .rz-timeline-content-start {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: left;}
+        .rz-timeline-content-end {display: none;}
+      }
+
+      // LinePosition.Right
+      &.rz-timeline-right {
+        .rz-timeline-item {flex-direction: row;}
+        .rz-timeline-item:before {
+          right: $rz-timeline-line-position-offset;
+          left: auto;
+        }
+        .rz-timeline-content-start {max-width: calc(100% - var(--rz-timeline-axis-size)); text-align: right;}
+        .rz-timeline-content-end {display: none;}
+      }
+    }
+  }
+
+  // Orientation.Horizontal
+  &.rz-timeline-row {
+    flex-direction: row;
+
+    // LinePosition.Center
+    .rz-timeline-item {flex-direction: column; justify-content: end; width: 100%;}
+
+    // LinePosition.Alternate
+    &.rz-timeline-alternate {
+      .rz-timeline-item:nth-child(even) {flex-direction: column-reverse; justify-content: start;}
+    }
+
+    // LinePosition.Start/Top
+    &.rz-timeline-start:not(.rz-timeline-reverse),
+    &.rz-timeline-top:not(.rz-timeline-reverse) {
+      .rz-timeline-item:before {
+        top: $rz-timeline-line-position-offset;
+        bottom: auto;
+      }
+      .rz-timeline-content-start {display: none;}
+      .rz-timeline-content-end {max-height: calc(100% - var(--rz-timeline-axis-size));}
+    }
+
+    // LinePosition.End/Bottom
+    &.rz-timeline-end:not(.rz-timeline-reverse),
+    &.rz-timeline-bottom:not(.rz-timeline-reverse) {
+      .rz-timeline-item {flex-direction: column-reverse;}
+      .rz-timeline-item:before {
+        bottom: $rz-timeline-line-position-offset;
+        top: auto;
+      }
+      .rz-timeline-content-start {display: none;}
+      .rz-timeline-content-end {max-height: calc(100% - var(--rz-timeline-axis-size));}
+    }
+
+    // Orientation.Horizontal Reverse
+    &.rz-timeline-reverse {
+
+      // LinePosition.Center
+      .rz-timeline-item {flex-direction: column-reverse; justify-content: start;}
+
+      // LinePosition.Alternate
+      &.rz-timeline-alternate {
+        .rz-timeline-item:nth-child(even) {flex-direction: column; justify-content: end;}
+      }
+
+      // LinePosition.Start/Top
+      &.rz-timeline-start,
+      &.rz-timeline-top {
+        .rz-timeline-item:before {
+          top: $rz-timeline-line-position-offset;
+          bottom: auto;
+        }
+        .rz-timeline-content-start {max-height: calc(100% - var(--rz-timeline-axis-size));}
+        .rz-timeline-content-end {display: none;}
+      }
+
+      // LinePosition.Start/Top
+      &.rz-timeline-end,
+      &.rz-timeline-bottom {
+        .rz-timeline-item {flex-direction: column;}
+        .rz-timeline-item:before {
+          bottom: $rz-timeline-line-position-offset;
+          top: auto;
+        }
+        .rz-timeline-content-start {max-height: calc(100% - var(--rz-timeline-axis-size));}
+        .rz-timeline-content-end {display: none;}
+      }
+    }
+  }
+}
+
+.rz-timeline-item {
+  display: flex;
+  padding: var(--rz-timeline-item-padding);
+  position: relative;
+
+  .rz-timeline-align-items-center & {
+    align-items: center;
+  }
+
+  .rz-timeline-align-items-normal & {
+    align-items: normal;
+  }
+
+  .rz-timeline-align-items-start & {
+    align-items: start;
+  }
+
+  .rz-timeline-align-items-end & {
+    align-items: end;
+  }
+
+  .rz-timeline-align-items-stretch & {
+    align-items: stretch;
+  }
+
+  // Timeline Line
+  &:before {
+    content: '';
+    position: absolute;
+    background-color: var(--rz-timeline-line-color);
+  }
+
+  .rz-timeline-column &:before {
+    width: var(--rz-timeline-line-width);
+    top: 0;
+    bottom: 0;
+    left: calc(50% - (var(--rz-timeline-line-width) / 2));
+    right: auto;
+  }
+
+  .rz-timeline-column &:first-child:before {
+    top: calc(50% - (var(--rz-timeline-line-width) / 2));
+    border-top-left-radius: var(--rz-timeline-line-border-radius);
+    border-top-right-radius: var(--rz-timeline-line-border-radius);
+  }
+
+  .rz-timeline-column.rz-timeline-align-items-start &:first-child:before {
+    top: $rz-timeline-line-start-offset;
+  }
+
+  .rz-timeline-column.rz-timeline-align-items-end &:first-child:before {
+    top: $rz-timeline-line-end-offset;
+  }
+
+  .rz-timeline-column &:last-child:before {
+    bottom: calc(50% - (var(--rz-timeline-line-width) / 2));
+    border-bottom-left-radius: var(--rz-timeline-line-border-radius);
+    border-bottom-right-radius: var(--rz-timeline-line-border-radius);
+  }
+
+  .rz-timeline-column.rz-timeline-align-items-start &:last-child:before {
+    bottom: $rz-timeline-line-end-offset;
+  }
+
+  .rz-timeline-column.rz-timeline-align-items-end &:last-child:before {
+    bottom: $rz-timeline-line-start-offset;
+  }
+
+  .rz-timeline-row &:before {
+    top: calc(50% - (var(--rz-timeline-line-width) / 2));
+    bottom: auto;
+    left: 0;
+    right: 0;
+    height: var(--rz-timeline-line-width);
+  }
+
+  .rz-timeline-row &:first-child:before {
+    left: calc(50% - (var(--rz-timeline-line-width) / 2));
+    border-top-left-radius: var(--rz-timeline-line-border-radius);
+    border-bottom-left-radius: var(--rz-timeline-line-border-radius);
+  }
+
+  .rz-timeline-row.rz-timeline-align-items-start &:first-child:before {
+    left: $rz-timeline-line-start-offset;
+  }
+
+  .rz-timeline-row.rz-timeline-align-items-end &:first-child:before {
+    left: $rz-timeline-line-end-offset;
+  }
+
+  .rz-timeline-row &:last-child:before {
+    right: calc(50% - (var(--rz-timeline-line-width) / 2));
+    border-top-right-radius: var(--rz-timeline-line-border-radius);
+    border-bottom-right-radius: var(--rz-timeline-line-border-radius);
+  }
+
+  .rz-timeline-row.rz-timeline-align-items-start &:last-child:before {
+    right: $rz-timeline-line-end-offset;
+  }
+
+  .rz-timeline-row.rz-timeline-align-items-end &:last-child:before {
+    right: $rz-timeline-line-start-offset;
+  }
+}
+
+.rz-timeline-content-start {
+  text-align: center;
+
+  .rz-timeline-column & {
+    flex: 1 1 auto;
+    max-width: calc(50% - (var(--rz-timeline-axis-size) / 2));
+  }
+}
+
+.rz-timeline-content-end {
+  flex: 1 1 auto;
+  text-align: center;
+
+  .rz-timeline-column & {
+    max-width: calc(50% - (var(--rz-timeline-axis-size) / 2));
+  }
+
+  .rz-timeline-row & {
+    max-height: calc(50% - (var(--rz-timeline-axis-size) / 2));
+  }
+}
+
+// Timeline Point Wrapper
+.rz-timeline-axis {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 var(--rz-timeline-axis-size);
+
+  .rz-timeline-column & {
+    width: var(--rz-timeline-axis-size);
+  }
+
+  .rz-timeline-row & {
+    height: var(--rz-timeline-axis-size);
+  }
+}
+
+// Timeline Point
+.rz-timeline-point {
+  position: relative;
+  display: flex;
+  flex: 0 1 var(--rz-timeline-point-size);
+  align-items: center;
+  justify-content: center;
+  height: var(--rz-timeline-point-size);
+  width: var(--rz-timeline-point-size);
+  border: var(--rz-timeline-point-border);
+  border-radius: var(--rz-timeline-point-border-radius);
+  background-color: var(--rz-timeline-point-background-color);
+  color: var(--rz-timeline-point-color);
+}
+
+.rz-timeline-point-outlined {
+  background-color: var(--rz-base-background-color);
+  color: var(--rz-timeline-point-color);
+  border-color: var(--rz-timeline-point-background-color);
+}
+
+.rz-timeline-point-flat {
+  border: 0;
+}
+
+.rz-timeline-point-text {
+  background-color: var(--rz-base-background-color);
+  color: var(--rz-timeline-point-color);
+  border: 0;
+}
+
+@each $style, $rule in $severity-styles-map {
+  .rz-timeline-point-#{$style} {
+    background-color: map-get($rule, background-color);
+    color: map-get($rule, color);
+  }
+
+  .rz-timeline-point-outlined.rz-timeline-point-#{$style} {
+    background-color: var(--rz-base-background-color);
+    color: map-get($rule, background-color);
+    border-color: map-get($rule, background-color);
+  }
+  .rz-timeline-point-text.rz-timeline-point-#{$style} {
+    background-color: var(--rz-base-background-color);
+    color: map-get($rule, background-color);
+  }
+}
+
+@each $size, $timeline-point in $timeline-point-sizes {
+  .rz-timeline-axis-#{$size} {
+    --rz-timeline-point-size: #{map-get($timeline-point, size)};
+
+    .rzi {
+      font-size: map-get($timeline-point, font-size);
+    }
+  }
+}

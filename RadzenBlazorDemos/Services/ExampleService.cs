@@ -1306,6 +1306,15 @@ namespace RadzenBlazorDemos
                     Icon = "&#xe41d",
                     Tags = new [] { "gauge", "graph", "styling" }
                 },
+                new Example
+                {
+                    Name = "Timeline",
+                    New = true,
+                    Path = "timeline",
+                    Title = "Timeline component",
+                    Icon = "&#xe00d",
+                    Tags = new [] { "timeline", "time", "line" }
+                },
                 new Example()
                 {
                     Name = "GoogleMap",

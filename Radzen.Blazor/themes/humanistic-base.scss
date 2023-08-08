@@ -118,5 +118,8 @@ $rz-text-font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
 $rz-icon-font-family: 'Material Icons' !default;
 $rz-icon-size: 1.25rem !default;
 
+// Timeline
+$rz-timeline-line-border-radius: 0 !default;
+
 @import 'fonts';
 @import 'components';

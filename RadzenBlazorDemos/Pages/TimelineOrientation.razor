@@ -1,0 +1,60 @@
+﻿<div Class="rz-p-0 rz-p-md-12">
+    <RadzenStack Gap="1rem" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+        <RadzenStack Gap="1rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenLabel Text="Orientation:" Style="width: 6rem;" />
+            <RadzenSelectBar @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
+            <RadzenDropDown @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+        </RadzenStack>
+        <RadzenStack Gap="1rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenLabel Text="LinePosition:" Style="width: 6rem;" />
+            <RadzenSelectBar @bind-Value="@position" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(LinePosition)).Cast<LinePosition>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
+            <RadzenDropDown @bind-Value="@position" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(LinePosition)).Cast<LinePosition>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+        </RadzenStack>
+        <RadzenStack Gap="1rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenLabel Text="Reverse:" Style="width: 6rem;" />
+            <RadzenSwitch @bind-Value="@reverse" Style="margin-top: 4px;" />
+        </RadzenStack>
+    </RadzenStack>
+    <RadzenTimeline Orientation="@orientation" LinePosition="@position" Reverse="@reverse" Class="rz-m-4">
+        <Items>
+            <RadzenTimelineItem PointStyle="PointStyle.Primary">
+                <LabelContent>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-m-0 rz-color-primary">NOV 2022</RadzenText>
+                </LabelContent>
+                <ChildContent>
+                    Celebrating the official release of Radzen Blazor Studio.
+                </ChildContent>
+            </RadzenTimelineItem>
+            <RadzenTimelineItem>
+                <LabelContent>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-m-0 rz-color-primary">JAN 2021</RadzenText>
+                </LabelContent>
+                <ChildContent>
+                    Radzen Blazor components open sourced under the MIT license.
+                </ChildContent>
+            </RadzenTimelineItem>
+            <RadzenTimelineItem>
+                <LabelContent>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-m-0 rz-color-primary">JUN 2018</RadzenText>
+                </LabelContent>
+                <ChildContent>
+                    Radzen 2.0 is a fact.
+                </ChildContent>
+            </RadzenTimelineItem>
+            <RadzenTimelineItem>
+                <LabelContent>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-m-0 rz-color-primary">APR 2017</RadzenText>
+                </LabelContent>
+                <ChildContent>
+                    Radzen 1.0 is out the door - automatic page generation and MS SQL support.
+                </ChildContent>
+            </RadzenTimelineItem>
+        </Items>
+    </RadzenTimeline>
+</div>
+
+@code {
+    Orientation orientation = Orientation.Vertical;
+    LinePosition position = LinePosition.Center;
+    bool reverse;
+}
