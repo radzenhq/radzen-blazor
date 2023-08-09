@@ -82,7 +82,7 @@
                 @if (Grid.LoadChildData.HasDelegate && Grid.ShowExpandColumn && Grid.allColumns.IndexOf(column) == 0)
                 {
                     <span class="rz-cell-toggle">
-                        <a style="@(getExpandIconStyle(rowArgs.Item1.Expandable))" href="javascript:void(0)" @onclick="@(_ => Grid.ExpandItem(Item))" @onclick:stopPropagation>
+                        <a class="@(getExpandIconCssClass())" style="@(getExpandIconStyle(rowArgs.Item1.Expandable))" href="javascript:void(0)" @onclick="@(_ => Grid.ExpandItem(Item))" @onclick:stopPropagation>
                             <span class="@(Grid.ExpandedItemStyle(Item))"></span>
                         </a>
                         <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
@@ -219,5 +219,15 @@
         }
 
         return string.Join(';', rules);
+    }
+
+    internal string getExpandIconCssClass()
+    {
+        var child = Grid.childData.Any() ? Grid.childData.Where(c => c.Value?.Data?.Contains(Item) == true).FirstOrDefault() :
+            default(KeyValuePair<TItem, DataGridChildData<TItem>>);
+
+        var level = !object.Equals(child, default(KeyValuePair<TItem, DataGridChildData<TItem>>)) ? child.Value.Level : 0;
+
+        return $"rz-cell-toggle-level{level}";
     }
 }
