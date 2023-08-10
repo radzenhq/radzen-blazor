@@ -6,7 +6,7 @@
     <div @onclick='@((args) => Grid.OnSort(args, Column))' tabindex="@SortingTabIndex" @onkeydown="OnSortKeyPressed">
         @if ((Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
         {
-            <span id="@Grid.getColumnUniqueId(ColumnIndex)-drag" class="rz-column-drag"
+            <span id="@(Grid.getColumnUniqueId(ColumnIndex) + "-drag")" class="rz-column-drag"
                     @onclick:preventDefault="true" @onclick:stopPropagation="true"
                     @onmousedown:preventDefault="true"
                     @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex))></span>
