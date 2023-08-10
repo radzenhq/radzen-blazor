@@ -2879,7 +2879,7 @@ namespace Radzen.Blazor
             {
                 settings = new DataGridSettings()
                 {
-                    Columns = ColumnsCollection.ToList().Select(c => new DataGridColumnSettings()
+                    Columns = ColumnsCollection.ToList().Where(c => !string.IsNullOrEmpty(c.Property) || !string.IsNullOrEmpty(c.UniqueID)).Select(c => new DataGridColumnSettings()
                     {
                         UniqueID = c.UniqueID,
                         Property = c.Property,

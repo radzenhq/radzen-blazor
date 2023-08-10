@@ -110,6 +110,7 @@ namespace Radzen.Blazor
         /// Gets or sets the unique identifier.
         /// </summary>
         /// <value>The unique identifier.</value>
+        [Parameter]
         public string UniqueID { get; set; }
 
         /// <summary>
@@ -117,8 +118,6 @@ namespace Radzen.Blazor
         /// </summary>
         protected override void OnInitialized()
         {
-            UniqueID = $"Column{Grid.ColumnsCollection.IndexOf(this)}";
-
             if (Grid != null)
             {
                 Grid.AddColumn(this);
