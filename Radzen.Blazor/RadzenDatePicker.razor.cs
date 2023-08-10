@@ -145,6 +145,11 @@ namespace Radzen.Blazor
                 await popup.CloseAsync(Element);
             }
 
+            if(Min.HasValue && CurrentDate < Min.Value || Max.HasValue && CurrentDate > Max.Value) 
+            {
+                return;
+            }
+
             if (!Disabled)
             {
                 DateTime date = CurrentDate;
