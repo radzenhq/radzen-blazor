@@ -710,7 +710,6 @@ namespace Radzen.Blazor
                 else
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
-                    await JSRuntime.InvokeVoidAsync("Radzen.closeAllPopups", $"{PopupID}{column.GetFilterProperty()}");
                 }
             }
 
@@ -736,6 +735,11 @@ namespace Radzen.Blazor
                 Data = null;
             }
 
+            if (closePopup)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.closeAllPopups", $"{PopupID}{column.GetFilterProperty()}");
+            }
+
             await InvokeAsync(Reload);
         }
 
@@ -753,10 +757,14 @@ namespace Radzen.Blazor
                 else
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
-                    await JSRuntime.InvokeVoidAsync("Radzen.closeAllPopups", $"{PopupID}{column.GetFilterProperty()}");
                 }
             }
             await OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
+
+            if (closePopup)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.closeAllPopups", $"{PopupID}{column.GetFilterProperty()}");
+            }
         }
 
         internal IReadOnlyDictionary<string, object> CellAttributes(TItem item, RadzenDataGridColumn<TItem> column)
