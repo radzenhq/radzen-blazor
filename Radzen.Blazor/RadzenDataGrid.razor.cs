@@ -2922,8 +2922,8 @@ namespace Radzen.Blazor
                 {
                     foreach (var column in settings.Columns.OrderBy(c => c.SortIndex))
                     {
-                        var gridColumn = ColumnsCollection.Where(c => c.Property == column.Property).FirstOrDefault() ??
-                                ColumnsCollection.Where(c => c.UniqueID == column.UniqueID).FirstOrDefault();
+                        var gridColumn = ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault() ??
+                                ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault();
                         if (gridColumn != null)
                         {
                             // Sorting
@@ -2937,8 +2937,8 @@ namespace Radzen.Blazor
 
                     foreach (var column in settings.Columns)
                     {
-                        var gridColumn = ColumnsCollection.Where(c => c.Property == column.Property).FirstOrDefault() ??
-                                ColumnsCollection.Where(c => c.UniqueID == column.UniqueID).FirstOrDefault();
+                        var gridColumn = ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault() ??
+                                ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault();
                         if (gridColumn != null)
                         {
                             // Visibility
