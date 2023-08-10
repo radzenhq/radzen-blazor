@@ -117,7 +117,7 @@ namespace Radzen.Blazor
         /// </summary>
         protected override void OnInitialized()
         {
-            UniqueID = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("/", "-").Replace("+", "-").Substring(0, 10);
+            UniqueID = $"Column{Grid.ColumnsCollection.IndexOf(this)}";
 
             if (Grid != null)
             {
