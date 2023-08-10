@@ -1218,14 +1218,14 @@ namespace Radzen.Blazor
         [Parameter]
         public string GroupPanelText { get; set; } = "Drag a column header here and drop it to group by that column";
 
-        internal string getColumnResizerId(int columnIndex)
+        internal string getColumnUniqueId(int columnIndex)
         {
             return string.Join("", $"{UniqueID}".Split('.')) + columnIndex;
         }
 
         internal async Task StartColumnResize(MouseEventArgs args, int columnIndex)
         {
-            await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnResizerId(columnIndex), Reference, columnIndex, args.ClientX);
+            await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnUniqueId(columnIndex), Reference, columnIndex, args.ClientX);
         }
 
         int? indexOfColumnToReoder;
@@ -1233,7 +1233,7 @@ namespace Radzen.Blazor
         internal async Task StartColumnReorder(MouseEventArgs args, int columnIndex)
         {
             indexOfColumnToReoder = columnIndex;
-            await JSRuntime.InvokeVoidAsync("Radzen.startColumnReorder", getColumnResizerId(columnIndex));
+            await JSRuntime.InvokeVoidAsync("Radzen.startColumnReorder", getColumnUniqueId(columnIndex));
         }
 
         internal async Task EndColumnReorder(MouseEventArgs args, int columnIndex)
@@ -2637,7 +2637,7 @@ namespace Radzen.Blazor
         {
             if(indexOfColumnToReoder != null && AllowGrouping)
             {
-                var functionName = $"Radzen['{getColumnResizerId(indexOfColumnToReoder.Value)}end']";
+                var functionName = $"Radzen['{getColumnUniqueId(indexOfColumnToReoder.Value)}end']";
                 await JSRuntime.InvokeVoidAsync("eval", $"{functionName} && {functionName}()");
 
                 RadzenDataGridColumn<TItem> column;

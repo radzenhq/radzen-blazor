@@ -6,7 +6,7 @@
     <div @onclick='@((args) => Grid.OnSort(args, Column))' tabindex="@SortingTabIndex" @onkeydown="OnSortKeyPressed">
         @if ((Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
         {
-            <span id="@Grid.getColumnResizerId(ColumnIndex)" class="rz-column-drag"
+            <span id="@Grid.getColumnUniqueId(ColumnIndex)-drag" class="rz-column-drag"
                     @onclick:preventDefault="true" @onclick:stopPropagation="true"
                     @onmousedown:preventDefault="true"
                     @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex))></span>
@@ -47,7 +47,7 @@
         </span>
         @if (Grid.AllowColumnResize && Column.Resizable && Column.Parent == null)
         {
-            <div id="@Grid.getColumnResizerId(ColumnIndex)" style="cursor:col-resize;float:right;"
+            <div id="@(Grid.getColumnUniqueId(ColumnIndex) + "-resizer")" style="cursor:col-resize;float:right;"
                     @onclick:preventDefault="true" @onclick:stopPropagation="true" class="rz-column-resizer"
                     @onmousedown:preventDefault="true"
                     @onmousedown=@(args => Grid.StartColumnResize(args, ColumnIndex))>&nbsp;</div>

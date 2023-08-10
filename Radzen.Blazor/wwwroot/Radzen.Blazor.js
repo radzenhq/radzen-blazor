@@ -1514,7 +1514,7 @@ window.Radzen = {
     document.removeEventListener('touchend', ref.mouseUpHandler);
   },
   startColumnReorder: function(id) {
-      var el = document.getElementById(id);
+      var el = document.getElementById(id + '-drag');
       var cell = el.parentNode.parentNode;
       var visual = document.createElement("th");
       visual.className = cell.className + ' rz-column-draggable';
@@ -1560,7 +1560,7 @@ window.Radzen = {
       document.addEventListener('mousemove', Radzen[id + 'move']);
   },
   startColumnResize: function(id, grid, columnIndex, clientX) {
-      var el = document.getElementById(id);
+      var el = document.getElementById(id + '-resizer');
       var cell = el.parentNode.parentNode;
       var col = document.getElementById(id + '-col');
       var dataCol = document.getElementById(id + '-data-col');
