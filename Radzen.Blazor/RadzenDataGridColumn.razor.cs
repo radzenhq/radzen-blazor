@@ -1003,6 +1003,10 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task CloseFilter()
         {
+            if (Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand && headerCell != null)
+            {
+                await headerCell.CloseFilter();
+            }
             await Grid.GetJSRuntime().InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{GetFilterProperty()}");
         }
 
