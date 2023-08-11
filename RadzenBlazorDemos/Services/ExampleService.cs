@@ -531,6 +531,14 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-save-settings-loaddata",
                             Title = "Blazor DataGrid save/load settings with LoadData",
                             Tags = new [] { "save", "load", "settings", "async", "loaddata" }
+                        },
+                        new Example()
+                        {
+                            New = true,
+                            Name = "URL query parameter",
+                            Path = "datagrid-save-settings-url-loaddata",
+                            Title = "Blazor DataGrid save/load settings with URL query parameter",
+                            Tags = new [] { "save", "load", "settings", "async", "loaddata", "url", "query" }
                         }
                     }
                 },
