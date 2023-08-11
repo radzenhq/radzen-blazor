@@ -286,13 +286,7 @@ namespace Radzen.Blazor
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
-            {
-    #if NET5_0_OR_GREATER
-                if (grid != null)
-                {
-                    grid.SetAllowVirtualization(AllowVirtualization);
-                }
-    #endif            
+            {          
                 if(Visible && LoadData.HasDelegate && Data == null)
                 {
                     LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
@@ -598,7 +592,7 @@ namespace Radzen.Blazor
         async Task RefreshAfterFilter()
         {
 #if NET5_0_OR_GREATER
-            if (grid?.virtualize != null)
+            if (IsVirtualizationAllowed() && grid != null)
             {
                 if(string.IsNullOrEmpty(searchText))
                 {
@@ -613,7 +607,15 @@ namespace Radzen.Blazor
                         StateHasChanged();
                     }
                 }
-                await grid.virtualize.RefreshDataAsync();
+
+                if (grid.Virtualize != null)
+                {
+                    await grid.Virtualize.RefreshDataAsync();
+                }
+                else
+                {
+                    await grid.Reload();
+                }
             }
 #endif
             StateHasChanged();
