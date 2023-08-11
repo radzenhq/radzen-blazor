@@ -34,7 +34,7 @@
                             }
                             @foreach (var column in visibleColumns)
                             {
-                                <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-col") style="@column.GetStyle()">
+                                <col id=@(getColumnUniqueId(visibleColumns.IndexOf(column)) + "-col") style="@column.GetStyle()">
                             }
                         </colgroup>
                         <thead class="rz-datatable-thead">
@@ -79,7 +79,7 @@
                                             @if (AllowColumnResize)
                                             {
                                                 var columnIndex = visibleColumns.IndexOf(column);
-                                                <div id="@getColumnResizerId(columnIndex)" style="cursor:col-resize;float:right;"
+                                                <div id="@(getColumnUniqueId(columnIndex) + "-resizer")" style="cursor:col-resize;float:right;"
                                                      @onclick:preventDefault="true" @onclick:stopPropagation="true"
                                                      @onmousedown=@(args => StartColumnResize(args, columnIndex))>&nbsp;</div>
                                             }
@@ -273,7 +273,7 @@
                             }
                             @foreach (var column in visibleColumns)
                             {
-                                <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-data-col") style="@column.GetStyle()">
+                                <col id=@(getColumnUniqueId(visibleColumns.IndexOf(column)) + "-data-col") style="@column.GetStyle()">
                             }
                         </colgroup>
                         <tbody class="rz-datatable-data  rz-datatable-hoverable-rows">
@@ -449,7 +449,7 @@
                                     }
                                     @foreach (var column in visibleColumns)
                                     {
-                                        <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-footer-col") style="@column.GetStyle()">
+                                        <col id=@(getColumnUniqueId(visibleColumns.IndexOf(column)) + "-footer-col") style="@column.GetStyle()">
                                     }
                                 </colgroup>
                                 <tfoot class="rz-datatable-tfoot">
@@ -646,14 +646,14 @@
     [Parameter]
     public bool AllowColumnResize { get; set; }
 
-    string getColumnResizerId(int columnIndex)
+    string getColumnUniqueId(int columnIndex)
     {
         return string.Join("", $"{UniqueID}".Split('.')) + columnIndex;
     }
 
     async Task StartColumnResize(MouseEventArgs args, int columnIndex)
     {
-        await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnResizerId(columnIndex), Reference, columnIndex, args.ClientX);
+        await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnUniqueId(columnIndex), Reference, columnIndex, args.ClientX);
     }
 
     [JSInvokable("RadzenGrid.OnColumnResized")]
