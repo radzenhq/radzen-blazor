@@ -2,7 +2,7 @@
 @using Radzen.Blazor.Rendering
 @if (RowIndex == Column.GetLevel())
 {
-    <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@GetStyle()" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex))>
+<th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@GetStyle()" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex))>
     <div @onclick='@((args) => Grid.OnSort(args, Column))' tabindex="@SortingTabIndex" @onkeydown="OnSortKeyPressed">
         @if ((Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
         {
@@ -212,14 +212,22 @@ else
     [Parameter]
     public string Style { get; set; }
 
-    string GetStyle()
+    private string GetStyle()
     {
-        if (Attributes != null && Attributes.TryGetValue("style", out var style) == true && !string.IsNullOrEmpty(Convert.ToString(style)))
+        var styles = new List<string>() { Column.GetStyle(true, true), Style };
+
+        if (Attributes?.TryGetValue("style", out var styleAttribute) == true)
         {
-            return String.IsNullOrEmpty(Style) ? $"{style}" : $"{Style.TrimEnd(';')};{style}";
+            styles.Add(Convert.ToString(styleAttribute));
         }
 
-        return Style;
+        var finalStyle = string.Join(";",
+                styles
+                .Select(x => x?.Trim().TrimEnd(';'))
+                .Where(x => !string.IsNullOrEmpty(x))
+            );
+
+        return finalStyle;
     }
 
     private int SortingTabIndex => Grid.AllowSorting && Column.Sortable ? 0 : -1;
