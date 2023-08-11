@@ -1970,7 +1970,7 @@ namespace Radzen.Blazor
             {
                 await InvokeLoadData(skip, PageSize);
             }
-            else
+            else if (settings == null)
             {
                 await base.ReloadOnFirstRender();
             }
