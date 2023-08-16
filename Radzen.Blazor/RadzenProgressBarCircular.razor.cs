@@ -37,6 +37,9 @@ namespace Radzen.Blazor
             return string.Join(" ", classList);
         }
 
+        /// <summary>
+        /// Gets the circle size.
+        /// </summary>
         protected string GetCircleSize()
         {
             switch (Size)

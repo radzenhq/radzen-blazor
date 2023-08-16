@@ -27,6 +27,10 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenTimeline : RadzenComponent
     {
+        /// <summary>
+        /// Gets or sets the items.
+        /// </summary>
+        /// <value>The items.</value>
         [Parameter]
         public RenderFragment Items { get; set; }
 

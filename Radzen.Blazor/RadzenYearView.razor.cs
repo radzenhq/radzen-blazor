@@ -31,7 +31,7 @@ namespace Radzen.Blazor
         public override string Text { get; set; } = "Year";
 
         /// <summary>
-        /// Specifies the text displayed when there are more appointments in a slot than <see cref="MaxAppointmentsInSlot" />.
+        /// Specifies the text displayed when there are more appointments in a slot than MaxAppointmentsInSlot.
         /// </summary>
         /// <value>The more text. Set to <c>"+ {0} more"</c> by default.</value>
         [Parameter]

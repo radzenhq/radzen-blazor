@@ -93,7 +93,7 @@
              var columnsOfGrid = Columns
                    .Where(c => c.GetVisible())
                    .ToList();
-            return columnsOfGrid.Sum(c => CountVisibleLeafColumns(c));
+            return columnsOfGrid.Sum(c => CountVisibleLeafColumns<TItem>(c));
             }
         }
 
@@ -177,7 +177,7 @@
             return i;
         }
 
-    private int CountVisibleLeafColumns<TItem>(RadzenDataGridColumn<TItem> column)
+    private int CountVisibleLeafColumns<T>(RadzenDataGridColumn<TItem> column)
     {
         if (column.ColumnsCollection?.Count == 0)
         {
@@ -187,7 +187,7 @@
         int count = 0;
         foreach (var childColumn in column.ColumnsCollection)
         {
-            count += CountVisibleLeafColumns(childColumn);
+            count += CountVisibleLeafColumns<T>(childColumn);
         }
         return count;
     }

@@ -94,7 +94,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Stores <see cref="Data" /> filtered to items greater than zero as an IList of <typeparamref name="TItem"/>.
+        /// Stores Data filtered to items greater than zero as an IList of <typeparamref name="TItem"/>.
         /// </summary>
         /// <value>The items.</value>
         protected IList<TItem> PositiveItems { get; set; }

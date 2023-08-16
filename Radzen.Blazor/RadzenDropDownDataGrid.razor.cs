@@ -216,7 +216,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The search input placeholder text.</value>
         [Parameter]
-        public string SearchText { get; set; } = "Search...";
+        public string SearchTextPlaceholder { get; set; } = "Search...";
 
         /// <summary>
         /// Gets or sets the selected value.

@@ -66,7 +66,7 @@ namespace Radzen
                 if (_PageSize != value)
                 {
                     _PageSize = value;
-                    OnPageSizeChanged(value);
+                    InvokeAsync(() => OnPageSizeChanged(value));
                 }
             }
         }

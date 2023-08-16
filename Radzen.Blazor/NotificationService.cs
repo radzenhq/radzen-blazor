@@ -50,17 +50,18 @@ namespace Radzen
             }
         }
 
-      /// <summary>
-      /// Notifies the specified severity.
-      /// </summary>
-      /// <param name="severity">The severity.</param>
-      /// <param name="summary">The summary.</param>
-      /// <param name="detail">The detail.</param>
-      /// <param name="duration">The duration.</param>
-      /// <param name="click">The click event.</param>
-      /// <param name="closeOnClick">If true, then the notification will be closed when clicked on.</param>
-      /// <param name="payload">Used to store a custom payload that can be retreived later in the click event handler.</param>
-      public void Notify(NotificationSeverity severity = NotificationSeverity.Info, string summary = "", string detail = "", double duration = 3000, Action<NotificationMessage> click = null, bool closeOnClick = false, object payload = null, Action<NotificationMessage> close = null)
+        /// <summary>
+        /// Notifies the specified severity.
+        /// </summary>
+        /// <param name="severity">The severity.</param>
+        /// <param name="summary">The summary.</param>
+        /// <param name="detail">The detail.</param>
+        /// <param name="duration">The duration.</param>
+        /// <param name="click">The click event.</param>
+        /// <param name="closeOnClick">If true, then the notification will be closed when clicked on.</param>
+        /// <param name="payload">Used to store a custom payload that can be retreived later in the click event handler.</param>
+        /// <param name="close">Action to be executed on close.</param>
+        public void Notify(NotificationSeverity severity = NotificationSeverity.Info, string summary = "", string detail = "", double duration = 3000, Action<NotificationMessage> click = null, bool closeOnClick = false, object payload = null, Action<NotificationMessage> close = null)
         {
             var newMessage = new NotificationMessage()
             {

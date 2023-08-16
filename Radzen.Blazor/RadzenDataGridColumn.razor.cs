@@ -159,6 +159,9 @@ namespace Radzen.Blazor
         [Parameter]
         public int? OrderIndex { get; set; }
 
+        /// <summary>
+        /// Gets the order index.
+        /// </summary>
         public int? GetOrderIndex()
         {
             return orderIndex ?? OrderIndex;
@@ -1020,7 +1023,7 @@ namespace Radzen.Blazor
 
             if (IsFrozen())
             {
-                Grid.ChangeState();
+                InvokeAsync(() => Grid.ChangeState());
             }
         }
 

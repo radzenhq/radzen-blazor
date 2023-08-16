@@ -223,6 +223,9 @@ namespace Radzen.Blazor
 
         IList<ISchedulerView> Views { get; set; } = new List<ISchedulerView>();
 
+        /// <summary>
+        /// Gets the SelectedView.
+        /// </summary>
         public ISchedulerView SelectedView
         {
             get

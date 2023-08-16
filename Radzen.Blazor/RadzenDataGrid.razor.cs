@@ -97,12 +97,12 @@ namespace Radzen.Blazor
             var query = view.AsQueryable().OrderBy(string.Join(',', Groups.Select(g => $"np({g.Property})")));
             _groupedPagedView = query.GroupByMany(Groups.Select(g => $"np({g.Property})").ToArray()).ToList();
 
-            var totalItemsCount = _groupedPagedView.Count();
+            var totalItemsCount = await Task.FromResult(_groupedPagedView.Count());
 
             return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<GroupResult>(_groupedPagedView.Skip(request.StartIndex).Take(top), totalItemsCount);
         }
 #endif
-       
+
         RenderFragment DrawRows(IList<RadzenDataGridColumn<TItem>> visibleColumns)
         {
             return new RenderFragment(builder =>
@@ -326,7 +326,7 @@ namespace Radzen.Blazor
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", getFilterInputId(column));
             if (!object.Equals(column.GetFilterValue(), inputValue))
             {
-                await InvokeAsync(() => { OnFilter(new ChangeEventArgs() { Value = inputValue }, column); });
+                await OnFilter(new ChangeEventArgs() { Value = inputValue }, column);
             }
         }
 
@@ -450,7 +450,10 @@ namespace Radzen.Blazor
             selectedColumns = columnsList;
         }
 
-		public void UpdatePickableColumns()
+        /// <summary>
+        /// Updates pickable columns.
+        /// </summary>
+        public void UpdatePickableColumns()
 		{
 			if (allColumns.Any(c => c.Pickable))
 			{
@@ -539,7 +542,7 @@ namespace Radzen.Blazor
                 Action<object> action;
                 if (force)
                 {
-                    action = args => OnFilter(new ChangeEventArgs() { Value = args }, column, isFirst);
+                    action = args => InvokeAsync(() => OnFilter(new ChangeEventArgs() { Value = args }, column, isFirst));
                 }
                 else
                 {

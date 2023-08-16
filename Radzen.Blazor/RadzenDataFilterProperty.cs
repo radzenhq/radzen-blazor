@@ -177,7 +177,6 @@ namespace Radzen.Blazor
 
         object filterValue;
         FilterOperator? filterOperator;
-        LogicalFilterOperator? logicalFilterOperator;
 
         /// <summary>
         /// Set parameters as an asynchronous operation.

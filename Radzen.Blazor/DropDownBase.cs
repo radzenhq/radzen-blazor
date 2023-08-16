@@ -780,14 +780,14 @@ namespace Radzen
 #if NET5_0_OR_GREATER
             if (AllowVirtualization)
             {
-                return new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, Filter = searchText };
+                return await Task.FromResult(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, Filter = searchText });
             }
             else
             {
-                return new Radzen.LoadDataArgs() { Filter = searchText };
+                return await Task.FromResult(new Radzen.LoadDataArgs() { Filter = searchText });
             }
 #else
-            return new Radzen.LoadDataArgs() { Filter = searchText };
+            return await Task.FromResult(new Radzen.LoadDataArgs() { Filter = searchText });
 #endif
         }
 

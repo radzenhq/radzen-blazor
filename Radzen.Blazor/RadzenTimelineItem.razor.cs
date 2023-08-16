@@ -27,6 +27,9 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
+        /// <summary>
+        /// Gets or sets the text.
+        /// </summary>
         [Parameter]
         public string Text { get; set; }
 
@@ -36,6 +39,9 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment LabelContent { get; set; }
 
+        /// <summary>
+        /// Gets or sets the label.
+        /// </summary>
         [Parameter]
         public string Label { get; set; }
 
@@ -64,7 +70,7 @@ namespace Radzen.Blazor
         public Variant PointVariant { get; set; } = Variant.Filled;
 
         /// <summary>
-        /// Specifies the Shadow level from <c>0</c> (no shadow) to <c>10<c>. Set to <c>1</c> by default.
+        /// Specifies the Shadow level from <c>0</c> (no shadow) to <c>10</c>. Set to <c>1</c> by default.
         /// </summary>
         [Parameter]
         public int PointShadow { get; set; } = 1;
