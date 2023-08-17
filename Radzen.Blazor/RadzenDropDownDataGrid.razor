@@ -116,7 +116,7 @@
                     <div class="rz-lookup-search">
                         <input class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="-1" placeholder="@SearchTextPlaceholder"
                                @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" style="@(ShowSearch ? "" : "margin-right:0px;")"
-                               @oninput=@(args => searchText = $"{args.Value}")/>
+                        @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) />
                         @if (ShowSearch)
                         {
                             <button class="rz-button rz-button-md rz-button-icon-only rz-primary" type="button" title="" @onclick="@((args) => OnFilter(new ChangeEventArgs()))">

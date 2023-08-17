@@ -258,13 +258,6 @@ namespace Radzen
         public Action<object> SelectedItemChanged { get; set; }
 
         /// <summary>
-        /// Gets or sets the search text changed.
-        /// </summary>
-        /// <value>The search text changed.</value>
-        [Parameter]
-        public Action<string> SearchTextChanged { get; set; }
-
-        /// <summary>
         /// The selected items
         /// </summary>
         protected IList<object> selectedItems = new List<object>();
@@ -363,6 +356,7 @@ namespace Radzen
                 return;
 
             searchText = null;
+            await SearchTextChanged.InvokeAsync(searchText);
             await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, "");
 
             internalValue = default(T);
@@ -740,7 +734,7 @@ namespace Radzen
                 selectedIndex = -1;
 
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
-            SearchTextChanged?.Invoke(SearchText);
+            await SearchTextChanged.InvokeAsync(SearchText);
         }
 
         /// <summary>
