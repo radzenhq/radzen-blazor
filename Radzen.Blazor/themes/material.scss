@@ -1188,6 +1188,9 @@ $tabs-transition: var(--rz-transition-all) !default;
 
 .rz-tabview {
   &.rz-tabview-top > .rz-tabview-nav {
+    li {
+      border-bottom: 2px solid transparent;
+    }
     .rz-tabview-selected {
       border-top-width: 0;
       border-bottom: 2px solid $tabs-tab-selected-bottom-border-color;
@@ -1203,6 +1206,9 @@ $tabs-transition: var(--rz-transition-all) !default;
     }
   }
   &.rz-tabview-left > .rz-tabview-nav {
+    li {
+      border-right: 2px solid transparent;
+    }
     .rz-tabview-selected {
       border-left-width: 0;
       border-right: 2px solid $tabs-tab-selected-bottom-border-color;
