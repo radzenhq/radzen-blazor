@@ -354,7 +354,7 @@ namespace Radzen.Blazor
                     }
                     else
                     {
-                        if (value is DateTime dateTime)
+                        if (value is DateTime dateTime && dateTime != default(DateTime))
                         {
                             DateTimeValue = DateTime.SpecifyKind(dateTime, Kind);
                         }
@@ -444,7 +444,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return DateTimeValue.HasValue;
+                return DateTimeValue.HasValue && DateTimeValue != default(DateTime);
             }
         }
 
@@ -456,7 +456,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return string.Format(Culture, "{0:" + DateFormat + "}", Value);
+                return HasValue ? string.Format(Culture, "{0:" + DateFormat + "}", Value) : "";
             }
         }
 
