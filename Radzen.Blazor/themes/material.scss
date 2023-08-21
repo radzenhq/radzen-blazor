@@ -1333,8 +1333,8 @@ $progressbar-background-color: var(--rz-primary-lighter) !default;
 $progressbar-border-radius: 0 !default;
 $progressbar-height: 0.25rem !default;
 
-.rz-progressbar-label {
-  display: none !important;
+.rz-progressbar:has(.rz-progressbar-label) {
+  --rz-progressbar-height: 1.25rem;
 }
 
 // ProgressBarCircular
