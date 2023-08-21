@@ -129,7 +129,7 @@ namespace Radzen.Blazor
         /// &lt;RadzenScheduler Data=@appointments SlotSelect=@OnSlotSelect&gt;
         /// &lt;/RadzenScheduler&gt;
         /// @code {
-        ///  void OnSlotSelect(SchedulerSlotSelectEventArgs args) 
+        ///  void OnSlotSelect(SchedulerSlotSelectEventArgs args)
         ///  {
         ///  }
         /// }
@@ -146,7 +146,7 @@ namespace Radzen.Blazor
         /// &lt;RadzenScheduler Data=@appointments AppointmentSelect=@OnAppointmentSelect&gt;
         /// &lt;/RadzenScheduler&gt;
         /// @code {
-        ///  void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs&lt;TItem&gt; args) 
+        ///  void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs&lt;TItem&gt; args)
         ///  {
         ///  }
         /// }
@@ -157,14 +157,16 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// A callback that will be invoked when the user clicks the more text in the current view. Commonly used to view additional appointments.
+        /// Invoke the <see cref="SchedulerMoreSelectEventArgs.PreventDefault"/> method to prevent the default action (showing the additional appointments).
         /// </summary>
         /// <example>
         /// <code>
         /// &lt;RadzenScheduler Data=@appointments MoreSelect=@OnMoreSelect&gt;
         /// &lt;/RadzenScheduler&gt;
         /// @code {
-        ///  void OnMoreSelect(DateTime args) 
+        ///  void OnMoreSelect(SchedulerMoreSelectEventArgs args)
         ///  {
+        ///     args.PreventDefault();
         ///  }
         /// }
         /// </code>
@@ -180,7 +182,7 @@ namespace Radzen.Blazor
         /// &lt;RadzenScheduler Data=@appointments AppointmentRender=@OnAppointmentRendert&gt;
         /// &lt;/RadzenScheduler&gt;
         /// @code {
-        ///   void OnAppintmentRender(SchedulerAppointmentRenderEventArgs&lt;TItem&gt; args) 
+        ///   void OnAppintmentRender(SchedulerAppointmentRenderEventArgs&lt;TItem&gt; args)
         ///   {
         ///     if (args.Data.Text == "Birthday")
         ///     {
@@ -201,7 +203,7 @@ namespace Radzen.Blazor
         /// &lt;RadzenScheduler Data=@appointments SlotRender=@OnSlotRender&gt;
         /// &lt;/RadzenScheduler&gt;
         /// @code {
-        ///   void OnSlotRender(SchedulerSlotRenderEventArgs args) 
+        ///   void OnSlotRender(SchedulerSlotRenderEventArgs args)
         ///   {
         ///     if (args.View.Text == "Month" &amp;&amp; args.Start.Date == DateTime.Today)
         ///     {
@@ -327,9 +329,9 @@ namespace Radzen.Blazor
                 return;
 
             selectedIndex = viewIndex;
-            
+
             await InvokeLoadData();
-            
+
             StateHasChanged();
         }
 
