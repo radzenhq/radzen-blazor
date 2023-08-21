@@ -423,7 +423,7 @@ $timeline-point-sizes: map-merge(
   border: 0;
 }
 
-@each $style, $rule in $severity-styles-map {
+@each $style, $rule in map-merge($severity-styles-map, $light-dark-styles-map) {
   .rz-timeline-point-#{$style} {
     background-color: map-get($rule, background-color);
     color: map-get($rule, color);
