@@ -26,11 +26,11 @@ namespace Radzen
         /// </summary>
         public ISchedulerView View { get; set; }
         /// <summary>
-        /// Has default action been prevented from occuring?
+        /// Has default action been prevented from occuring.
         /// </summary>
         public bool IsDefaultPrevented { get; private set; }
         /// <summary>
-        /// Prevent default action from occuring.
+        /// Prevent the default action from occuring.
         /// </summary>
         public void PreventDefault()
         {

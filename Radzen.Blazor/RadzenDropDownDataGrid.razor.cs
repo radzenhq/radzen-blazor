@@ -289,7 +289,7 @@ namespace Radzen.Blazor
             {          
                 if(Visible && LoadData.HasDelegate && Data == null)
                 {
-                    LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
+                    LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, Filter = searchText });
                 }
 
                 StateHasChanged();
@@ -308,6 +308,21 @@ namespace Radzen.Blazor
             if (!LoadData.HasDelegate)
             {
                 searchText = null;
+                await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
+            }
+        }
+
+        /// <summary>
+        /// Set parameters as an asynchronous operation.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            await base.SetParametersAsync(parameters);
+
+            if (!string.IsNullOrEmpty(searchText) && !LoadData.HasDelegate)
+            {
                 await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
             }
         }

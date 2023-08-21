@@ -5,8 +5,8 @@
 @inherits DbContextPage
 
 <div class="rz-p-sm-12 rz-text-align-center">
-    <RadzenDropDown @ref=@radzenDropDown FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
-                    Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" AllowClear="true" @bind-Value=value Style="width: 100%; max-width: 400px;" SearchTextChanged="@(args => searchTextChanged(args))"/>    
+    <RadzenDropDown @ref=@radzenDropDown @bind-SearchText=SearchText FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                    Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" AllowClear="true" @bind-Value=value Style="width: 100%; max-width: 400px;" />    
 </div>
 
 <div class="rz-p-sm-3 rz-text-align-left"> 
@@ -24,14 +24,26 @@
         await base.OnInitializedAsync();
 
         customers = dbContext.Customers;
+
+        searchTextStatus = $"Search text: {searchText}";
     }
 
-    void searchTextChanged(string text)
+    string searchText = "al";
+
+    public string SearchText
     {
-        searchTextStatus = $"Search text: {text}";
-
-        Console.WriteLine($"Search text: {radzenDropDown.SearchText}");
-
-        StateHasChanged();
+        get
+        {
+            return searchText;
+        }
+        set
+        {
+            if (searchText != value)
+            {
+                searchText = value;
+                searchTextStatus = $"Search text: {searchText}";
+                Console.WriteLine($"Search text: {radzenDropDown.SearchText}");
+            }
+        }
     }
 }

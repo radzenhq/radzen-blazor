@@ -627,10 +627,10 @@ window.Radzen = {
       e.preventDefault();
     }
   },
-  numericOnInput: function (e, min, max) {
+  numericOnInput: function (e, min, max, isNullable) {
       var value = e.target.value;
 
-      if (value == '' && min != null) {
+      if (!isNullable && value == '' && min != null) {
           e.target.value = min;
       }
 

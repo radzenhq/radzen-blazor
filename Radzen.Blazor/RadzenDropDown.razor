@@ -105,7 +105,7 @@
                 <div class="rz-dropdown-filter-container">
                     <input id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" class="rz-dropdown-filter rz-inputtext   " autocomplete="off" type="text"
                            @onchange="@((ChangeEventArgs args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText"
-                           @oninput=@(args => searchText = $"{args.Value}")/>
+                            @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) />
                     <span class="rz-dropdown-filter-icon rzi rzi-search"></span>
                 </div>
             }
@@ -132,7 +132,7 @@
                         <div class="rz-multiselect-filter-container">
                             <input id="@SearchID" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" class="rz-inputtext" role="textbox" type="text"
                                    onclick="Radzen.preventDefaultAndStopPropagation(event)"
-                                   @ref="@search" @oninput=@(args => searchText = $"{args.Value}")
+                                   @ref="@search" @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);})
                                    @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" />
                             <span class="rz-multiselect-filter-icon rzi rzi-search"></span>
                         </div>

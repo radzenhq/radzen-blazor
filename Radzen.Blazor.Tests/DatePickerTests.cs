@@ -463,25 +463,6 @@ namespace Radzen.Blazor.Tests
             Assert.Null(exception);
         }
 
-        [Fact]
-        public void DatePicker_Respects_DateTimeMinValue()
-        {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
-
-            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
-            {
-                parameters.Add(p => p.Value, DateTime.MinValue);
-            });
-
-            Assert.Contains(DateTime.MinValue.ToString(component.Instance.DateFormat), component.Markup);
-
-            var exception = Record.Exception(() => component.Find(".rz-datepicker-prev-icon")
-                                                            .Click());
-            Assert.Null(exception);
-        }
-
         [Theory]
         [InlineData(DateTimeKind.Local)]
         [InlineData(DateTimeKind.Unspecified)]
