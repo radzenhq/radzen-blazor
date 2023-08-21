@@ -1,6 +1,5 @@
 @inherits Radzen.RadzenComponent
-@inject IJSRuntime JSRuntime
-
+@implements IDisposable
 
 <div @ref="editor" style="height: 500px; width: 100%;"></div>
 @code {
@@ -17,6 +16,9 @@
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
 
+    [Parameter]
+    public string Language { get; set; }
+
     public string Id => GetId();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -26,7 +28,7 @@
             reference = DotNetObjectReference.Create(this);
 
             monaco = await JSRuntime.InvokeAsync<IJSObjectReference>("createEditor", editor, GetId(), reference, new {
-                language = "razor",
+                language = Language,
                 theme = "vs",
                 codeLens = false,
                 readOnly = ReadOnly,
@@ -72,5 +74,15 @@
         {
             await monaco.InvokeVoidAsync("setOptions", new { readOnly = ReadOnly });
         }
+    }
+
+    public void Dispose()
+    {
+        if (JSRuntime != null && monaco != null)
+        {
+            monaco.InvokeVoidAsync("dispose");
+        }
+        monaco?.DisposeAsync();
+        reference?.Dispose();
     }
 }

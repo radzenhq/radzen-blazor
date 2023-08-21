@@ -31,13 +31,14 @@
 <RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
     @error
 </RadzenAlert>
-<Monaco Value=@source ValueChanged=@OnValueChanged @ref="@monaco" Style="border: var(--rz-border-disabled)" Disabled=@isBusy ReadOnly=@ReadOnly />
+<Monaco Value=@source Language="@language" ValueChanged=@OnValueChanged @ref="@monaco" Style="border: var(--rz-border-disabled)" Disabled=@isBusy ReadOnly=@ReadOnly />
 @code {
     private string Copy => $"copy('{monaco?.Id}')";
     private Monaco monaco;
     private ElementReference pre;
     private string source;
     private string error;
+    private string language = "razor";
 
     [Parameter]
     public EventCallback<Type> Compiled { get; set; }
@@ -62,8 +63,10 @@
     public string ComponentName { get; set; }
 
     string ComponentSourceHref => ComponentSource ?? $"https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/Radzen{ComponentName}.razor.cs";
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        language = PageName == null ? "razor" :  PageName.EndsWith(".razor") ? "razor" : "csharp";
+
         source = Value ?? await Fetch();
 
         source = Clean(source);
