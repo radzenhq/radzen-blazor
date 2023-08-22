@@ -58,6 +58,13 @@ namespace Radzen.Blazor
         public int FilterDelay { get; set; } = 500;
 
         /// <summary>
+        /// Gets or sets the item selected.
+        /// </summary>
+        /// <value>The item selected.</value>
+        [Parameter]
+        public EventCallback<object> ItemSelected { get; set; }
+
+        /// <summary>
         /// Gets search input reference.
         /// </summary>
         protected ElementReference search;
@@ -209,6 +216,7 @@ namespace Radzen.Blazor
             await ValueChanged.InvokeAsync($"{Value}");
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);
+            await ItemSelected.InvokeAsync(item);
 
             StateHasChanged();
         }
