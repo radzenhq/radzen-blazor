@@ -217,10 +217,15 @@ $rz-base-background-color: var(--rz-white) !default;
   --rz-base-background-color: #{$rz-base-background-color};
 }
 
-// Light/Dark Styles Map
-$light-dark-styles-map: () !default;
-$light-dark-styles-map: map-merge(
+// Base/Light/Dark Styles Map 
+
+$base-styles-map: () !default;
+$base-styles-map: map-merge(
   (
+    base: (
+      background-color: var(--rz-base-200),
+      color: var(--rz-text-color)
+    ),
     light: (
       background-color: var(--rz-base-200),
       color: var(--rz-text-color)
@@ -230,23 +235,6 @@ $light-dark-styles-map: map-merge(
       color: var(--rz-text-contrast-color)
     )
   ),
-  $light-dark-styles-map
-);
-
-// Base Styles Map
-
-$base-styles-map: () !default;
-$base-styles-map: map-merge(
-  (
-    base: (
-      background-color: var(--rz-base-200),
-      color: var(--rz-text-color)
-    ),
-  ),
-  $base-styles-map
-);
-$base-styles-map: map-merge(
-  $light-dark-styles-map,
   $base-styles-map
 );
 
