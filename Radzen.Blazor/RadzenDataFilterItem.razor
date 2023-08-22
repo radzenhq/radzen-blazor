@@ -27,12 +27,13 @@
 }
 else
 {
-    <RadzenDropDown @bind-Value="@Filter.Property" Data="@(DataFilter?.properties)" ValueProperty="Property" TValue="string" Change="@OnPropertyChange">
+    <RadzenDropDown @bind-Value="@Filter.Property" Data="@(DataFilter?.properties)" TextProperty="Title" ValueProperty="Property" TValue="string"
+        Change="@OnPropertyChange" AllowFiltering="@(DataFilter?.AllowColumnFiltering ?? false)" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
         <Template>
-                @{
-                    var property = (RadzenDataFilterProperty<TItem>)context;
-                }
-                @(property.Title ?? property.Property)
+            @{
+                var property = (RadzenDataFilterProperty<TItem>)context;
+            }
+            @(property.Title ?? property.Property)
         </Template>
     </RadzenDropDown>
     if (property != null)

@@ -55,7 +55,7 @@ To display data in DropDownDataGrid component you need to set collection of item
 ### Binding using LoadData event with filtering.
 
 ```
-<RadzenDropDownDataGrid TValue="string" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" LoadData=@LoadData AllowFiltering="true" />
+<RadzenDropDownDataGrid TValue="string" Data=@customers Count=@count TextProperty="CompanyName" ValueProperty="CustomerID" LoadData=@LoadData AllowFiltering="true" />
 
 @code {
     IEnumerable<Customer> customers;
@@ -68,6 +68,8 @@ To display data in DropDownDataGrid component you need to set collection of item
         {
             query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()));
         }
+
+        count = query.Count();
 
         customers = query.ToList();
 

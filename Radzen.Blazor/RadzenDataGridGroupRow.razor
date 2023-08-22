@@ -20,7 +20,7 @@
             <span class="@(Grid.ExpandedGroupItemStyle(this, Grid.allGroupsExpanded != null ? Grid.allGroupsExpanded : rowArgs.Item1.Expanded))"></span>
         </a>
     </td>
-    <td colspan="@(Columns.Count + Grid.Groups.Count - 1 - Group.Level + (Grid.Template != null && Grid.ShowExpandColumn ? 1 : 0))">
+    <td colspan="@(TotalColumnCount + Grid.Groups.Count - 1 - Group.Level + (Grid.Template != null && Grid.ShowExpandColumn ? 1 : 0))">
         <span class="rz-cell-data">
             @if (Grid.GroupHeaderTemplate != null)
             {
@@ -57,31 +57,43 @@
     }
 }
 @code {
-        [Parameter]
-        public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
+    [Parameter]
+    public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
 
-        GroupResult _groupResult;
-        [Parameter]
-        public GroupResult GroupResult 
-        { 
-            get
+    GroupResult _groupResult;
+    [Parameter]
+    public GroupResult GroupResult 
+    { 
+        get
+        {
+            return _groupResult;
+        }
+        set
+        {
+            if(_groupResult != value)
             {
-                return _groupResult;
-            }
-            set
-            {
-                if(_groupResult != value)
-                {
-                    _groupResult = value;
+                _groupResult = value;
 
-                    var level = GetLevel();
-                    Group = new Group()
+                var level = GetLevel();
+                Group = new Group()
                     {
                         Level = level,
                         GroupDescriptor = Grid.Groups?.ElementAtOrDefault(level),
                         Data = _groupResult
                     };
-                }
+            }
+        }
+    }
+
+
+    private int TotalColumnCount
+    {
+        get
+        {
+             var columnsOfGrid = Columns
+                   .Where(c => c.GetVisible())
+                   .ToList();
+            return columnsOfGrid.Sum(c => CountVisibleLeafColumns<TItem>(c));
             }
         }
 
@@ -164,4 +176,19 @@
 
             return i;
         }
+
+    private int CountVisibleLeafColumns<T>(RadzenDataGridColumn<TItem> column)
+    {
+        if (column.ColumnsCollection?.Count == 0)
+        {
+            return column.GetVisible()  ? 1 : 0;
+        }
+
+        int count = 0;
+        foreach (var childColumn in column.ColumnsCollection)
+        {
+            count += CountVisibleLeafColumns<T>(childColumn);
+        }
+        return count;
+    }
 }

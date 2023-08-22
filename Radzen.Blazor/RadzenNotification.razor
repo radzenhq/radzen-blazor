@@ -4,7 +4,9 @@
 <div class="rz-notification" style="position:fixed;z-index:1002;top:100px;float:right;right:10px;@Style">
 @for (var i = 0; i < Service.Messages.Count; i++)
 {
-    @DrawMessage(i, Service.Messages[i])
+    <div @key="Service.Messages[i]">
+        @DrawMessage(i, Service.Messages[i])
+    </div>
 }
 </div>
 @code {

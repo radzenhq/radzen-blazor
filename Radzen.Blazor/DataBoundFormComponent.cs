@@ -216,9 +216,30 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Gets the Search text typed by user
+        /// Gets or sets the search text
         /// </summary>
-        public string SearchText => searchText;
+        [Parameter]
+        public string SearchText
+        {
+            get
+            {
+                return searchText;
+            }
+            set
+            {
+                if (searchText != value)
+                {
+                    searchText = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the search text changed.
+        /// </summary>
+        /// <value>The search text changed.</value>
+        [Parameter]
+        public EventCallback<string> SearchTextChanged { get; set; }
 
         /// <summary>
         /// The search text
@@ -295,6 +316,12 @@ namespace Radzen
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            var searchTextChanged = parameters.DidParameterChange(nameof(SearchText), SearchText);
+            if (searchTextChanged)
+            {
+                searchText = parameters.GetValueOrDefault<string>(SearchText);
+            }
+
             var dataChanged = parameters.DidParameterChange(nameof(Data), Data);
 
             if (dataChanged)

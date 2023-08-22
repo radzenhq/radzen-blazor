@@ -63,6 +63,7 @@ $grid-header-filter-icon-active-color: var(--rz-primary) !default;
 $grid-header-filter-icon-font-size: 1rem !default;
 
 $grid-border: var(--rz-border-normal) !default;
+$grid-border-radius: 0 !default;
 
 $grid-sort-icon-width: 1rem !default;
 $grid-sort-icon-height: $grid-sort-icon-width !default;
@@ -173,6 +174,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   --rz-grid-header-filter-icon-font-size: #{$grid-header-filter-icon-font-size};
 
   --rz-grid-border: #{$grid-border};
+  --rz-grid-border-radius: #{$grid-border-radius};
 
   --rz-grid-sort-icon-width: #{$grid-sort-icon-width};
   --rz-grid-sort-icon-height: #{$grid-sort-icon-height};
@@ -219,7 +221,9 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   position: relative;
   box-shadow: var(--rz-grid-shadow);
   border: var(--rz-grid-cell-border);
+  border-radius: var(--rz-grid-border-radius);
   background-color: var(--rz-grid-background-color);
+  overflow: hidden;
 
   .rz-col-icon {
     text-align: center;

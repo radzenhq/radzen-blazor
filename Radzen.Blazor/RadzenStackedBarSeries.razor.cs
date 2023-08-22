@@ -66,13 +66,16 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override ScaleBase TransformCategoryScale(ScaleBase scale)
         {
-            var stackedBarSeries = BarSeries.Cast<IChartStackedBarSeries>();
-            var count = stackedBarSeries.Max(series => series.Count);
-            var sums = Enumerable.Range(0, count).Select(i => stackedBarSeries.Sum(series => series.ValueAt(i)));
-            var max = sums.Max();
-            var min = Items.Min(Value);
+            if (Items.Any())
+            {
+                var stackedBarSeries = BarSeries.Cast<IChartStackedBarSeries>();
+                var count = stackedBarSeries.Max(series => series.Count);
+                var sums = Enumerable.Range(0, count).Select(i => stackedBarSeries.Sum(series => series.ValueAt(i)));
+                var max = sums.Max();
+                var min = Items.Min(Value);
 
-            scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+                scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+            }
 
             return scale;
         }
@@ -184,7 +187,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
-            return DataAt(x, y) != null;
+            return DataAt(x, y).Item1 != null;
         }
 
         /// <inheritdoc />
@@ -207,7 +210,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public override object DataAt(double x, double y)
+        public override (object, Point) DataAt(double x, double y)
         {
             var category = ComposeCategory(Chart.ValueScale);
             var barSeries = VisibleBarSeries;
@@ -225,11 +228,11 @@ namespace Radzen.Blazor
 
                 if (startX <= x && x <= endX && startY <= y && y <= endY)
                 {
-                    return data;
+                    return (data, new Point() { X = x, Y = y });
                 }
             }
 
-            return null;
+            return (null, null);
         }
 
         /// <inheritdoc />

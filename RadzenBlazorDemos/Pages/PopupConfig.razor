@@ -1,0 +1,72 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using Radzen.Blazor.Rendering
+
+@inherits DbContextPage
+@inject IJSRuntime JSRuntime
+
+<RadzenButton @ref=button Text="@(orderId != null ? "Selected order: " + orderId.ToString() : "Select order")" Click="@(args => popup.ToggleAsync(button.Element))" />
+
+<Popup @ref=popup Lazy=true Open="@OnOpen"
+    Style="display:none;position:absolute;height:300px;width:600px;padding:5px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color);">
+    <RadzenTextBox id="search" Placeholder="Type to search..." Style="width:100%;" @oninput=@(args => searchString = $"{args.Value}") Value="@searchString" />
+    <RadzenDataList @ref=dataList AllowVirtualization=true Data="@orders" TItem="Order" Style="height:100%;overflow:auto;">
+        <Template Context="order">
+            <RadzenCard Style="width:100%">
+                <RadzenRow>
+                    <RadzenColumn Size="8" class="rz-text-truncate">
+                        <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") class="me-1" />
+                        <b>@(order.ShipName)</b>
+                    </RadzenColumn>
+                    <RadzenColumn Size="4" class="rz-text-align-end">
+                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
+                    </RadzenColumn>
+                </RadzenRow>
+                <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin: 1rem 0;" />
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                    <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" />
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.H6" Class="rz-mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1">@order.ShipAddress</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2">@(order.ShipCity), @(order.ShipCountry)</RadzenText>
+                    </RadzenStack>
+                    <RadzenButton Text="Select" Click="@(args => SelectOrder(order))" Visible=@(orderId != order.OrderID) />
+                </RadzenStack>
+            </RadzenCard>
+        </Template>
+    </RadzenDataList>
+</Popup>
+
+@code {
+    RadzenButton button;
+    Popup popup;
+    RadzenDataList<Order> dataList;
+    IEnumerable<Order> orders;
+    int? orderId;
+    string searchString = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee")
+            .Where(o => o.OrderID.ToString().Contains(searchString)
+                || o.Customer.CompanyName.ToLowerInvariant().Contains(searchString)
+                    || o.Employee.FirstName.ToLowerInvariant().Contains(searchString)
+                        || o.Employee.LastName.ToLowerInvariant().Contains(searchString)
+                            || o.ShipCity.ToLowerInvariant().Contains(searchString)
+                                || o.ShipCountry.ToLowerInvariant().Contains(searchString));
+    }
+
+    async Task SelectOrder(Order order)
+    {
+        orderId = order.OrderID; 
+        await popup.CloseAsync();
+    }
+
+    async Task OnOpen()
+    {
+        await JSRuntime.InvokeVoidAsync("eval", "setTimeout(function(){ document.getElementById('search').focus(); }, 200)"); 
+    }
+}

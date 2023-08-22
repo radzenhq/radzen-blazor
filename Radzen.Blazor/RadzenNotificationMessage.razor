@@ -54,7 +54,8 @@
    public void Close()
    {
       Service.Messages.Remove(Message);
-      System.Threading.Tasks.Task.Delay(0).ContinueWith(r => { Visible = false; });
+      Message?.Close?.Invoke(Message);
+      //System.Threading.Tasks.Task.Delay(0).ContinueWith(r => { Visible = false; });
    }
 
    protected override void OnInitialized()

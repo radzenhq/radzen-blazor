@@ -36,7 +36,7 @@
                         </ValueTemplate>
                         <Template>
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-                                <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 4px; oveflow: hidden; outline: var(--rz-input-border); min-width: 80px;">
+                                <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 4px; overflow: hidden; outline: var(--rz-border-disabled); min-width: 80px;">
                                     <rect width="80" height="60" fill="@context.Base"/>
                                     <rect x="0" y="4" width="16" height="56" fill="@context.Sidebar"/>
                                     <rect x="24" y="17" width="48" height="32" rx="2" fill="@context.Content"/>
@@ -51,7 +51,11 @@
                                 @context.Text
                                 @if (context.Premium)
                                 {
-                                    <RadzenBadge title="To use it in your application you need an active Radzen Professional or Enterprise subscription.">PRO</RadzenBadge>
+                                    <RadzenBadge title="To use it in your application you need an active Radzen Professional or Enterprise subscription." Shade="Shade.Light">PRO</RadzenBadge>
+                                }
+                                else
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter">FREE</RadzenBadge>
                                 }
                             </RadzenStack>
                         </Template>
@@ -75,6 +79,20 @@
                 <RadzenColumn Size="12">
                     <RadzenRow Class="rz-mx-auto" Style="max-width: 1600px;">
                         <RadzenColumn Size="12" SizeMD="9">
+                            @if (@ThemeService.CurrentTheme == "material3" || ThemeService.CurrentTheme == "material3-dark") {
+                                <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Icon="auto_awesome" Shade="Shade.Lighter">
+                                    <RadzenText TextStyle="TextStyle.H4" style="color: var(--rz-on-info-lighter);">Enjoy Material 3</RadzenText>
+                                    <RadzenText style="color: var(--rz-on-info-lighter);">This is a preview of Radzen's new Material 3 premium theme, available only to <a href="https://www.radzen.com/pricing/" title="See Radzen Pricing" target="_blank">Radzen Professional or Enterprise subscribers</a>.</RadzenText>
+                                    <RadzenText style="color: var(--rz-on-info-lighter);">Browse components with a free theme by selecting one from the dropdown above. </RadzenText>
+                                </RadzenAlert>
+                            }
+                            else if (@ThemeService.CurrentTheme == "fluent" || @ThemeService.CurrentTheme == "fluent-dark") {
+                                <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Icon="auto_awesome" Shade="Shade.Lighter">
+                                    <RadzenText TextStyle="TextStyle.H4" style="color: var(--rz-on-info-lighter);">Fluent UI</RadzenText>
+                                    <RadzenText style="color: var(--rz-on-info-lighter);">This is a preview of Radzen's Fluent UI premium theme, available only to <a href="https://www.radzen.com/pricing/" title="See Radzen Pricing" target="_blank">Radzen Professional or Enterprise subscribers</a>.</RadzenText>
+                                    <RadzenText style="color: var(--rz-on-info-lighter);">Browse components with a free theme by selecting one from the dropdown above. </RadzenText>
+                                </RadzenAlert>
+                            }
                             @Body
                             <RadzenCard Class="rz-mt-12 rz-display-block rz-display-md-none">
                                 <RadzenRow AlignItems="AlignItems.Center" Gap="0px">
@@ -85,7 +103,7 @@
                                     <RadzenColumn Size="12" SizeMD="5" Class="rz-px-12 rz-text-align-center rz-text-align-md-end">
                                         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
                                             <NavLink Class="rz-button rz-button-lg rz-secondary rz-text-align-center" href="https://www.radzen.com/blazor-studio/download/" target="_blank"><RadzenIcon Icon="open_in_new" /> Try Now</NavLink>
-                                            <NavLink Class="rz-button rz-button-lg rz-light rz-text-align-center" href="https://www.youtube.com/watch?v=q9RdQa6pMx4&list=PLQyJPeb3xHcBij_RbHD__2TOo8Jv5HQVc&index=1" target="_blank"><RadzenIcon Icon="play_circle_outline" /> See in Action</NavLink>
+                                            <NavLink Class="rz-button rz-button-lg rz-light rz-text-align-center" href="https://www.youtube.com/watch?v=_F-CUWxYvCA&list=PLQyJPeb3xHcBij_RbHD__2TOo8Jv5HQVc&index=1" target="_blank"><RadzenIcon Icon="play_circle_outline" /> See in Action</NavLink>
                                         </RadzenStack>
                                     </RadzenColumn>
                                 </RadzenRow>
@@ -107,8 +125,8 @@
                                 <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-primary-color"><strong>Radzen Blazor Studio is a desktop tool that empowers developers to create beautiful Blazor apps.</strong></RadzenText>
                                 <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-secondary-color rz-display-none rz-display-lg-block">Develop your Blazor Server and WebAssembly applications visually with familiar WYSIWYG interface.</RadzenText>
                                 <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="1rem" Class="rz-pt-4">
-                                    <NavLink Class="rz-button rz-button-icon-only rz-button-md rz-secondary rz-text-align-center" href="https://www.radzen.com/blazor-studio/download/" target="_blank"><RadzenIcon Icon="open_in_new" /> Try Now</NavLink>
-                                    <NavLink Class="rz-button rz-button-icon-only rz-button-md rz-light rz-text-align-center" href="https://www.youtube.com/watch?v=q9RdQa6pMx4&list=PLQyJPeb3xHcBij_RbHD__2TOo8Jv5HQVc&index=1" target="_blank"><RadzenIcon Icon="play_circle_outline" /> See in Action</NavLink>
+                                    <NavLink Class="rz-button rz-button-md rz-secondary rz-text-align-center" href="https://www.radzen.com/blazor-studio/download/" target="_blank"><RadzenIcon Icon="open_in_new" /> Try Now</NavLink>
+                                    <NavLink Class="rz-button rz-button-md rz-light rz-text-align-center" href="https://www.youtube.com/watch?v=_F-CUWxYvCA&list=PLQyJPeb3xHcBij_RbHD__2TOo8Jv5HQVc&index=1" target="_blank"><RadzenIcon Icon="play_circle_outline" /> See in Action</NavLink>
                                 </RadzenStack>
                             </RadzenStack>
                         </RadzenColumn>
@@ -120,7 +138,7 @@
 </RadzenBody>
 <RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded" Class="demos-sidebar" style="display: flex; flex-direction: column">
     <div style="padding: 1rem">
-        <RadzenTextBox Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" />
+        <RadzenTextBox Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" Class="rz-search-input" />
     </div>
     <div style="flex: 1; overflow: auto">
     <RadzenPanelMenu Match="NavLinkMatch.Prefix">

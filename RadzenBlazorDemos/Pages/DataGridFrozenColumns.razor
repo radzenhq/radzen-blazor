@@ -7,7 +7,7 @@
 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" 
     ColumnWidth="140px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:300px">
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="5rem" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Frozen="@frozen" Width="80px" TextAlign="TextAlign.Center">
             <HeaderTemplate>
                 <RadzenCheckBox @bind-Value="frozen" title="Pin/Unpin this column" />

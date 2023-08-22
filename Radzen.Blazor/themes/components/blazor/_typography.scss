@@ -211,14 +211,24 @@ $text-transform: (
 $link-color: var(--rz-secondary) !default;
 
 // Text selection
+$rz-text-selection-background-color: var(--rz-primary-lighter) !default;
+$rz-text-selection-color: inherit !default;
+
+:root {
+  --rz-text-selection-background-color: #{$rz-text-selection-background-color};
+  --rz-text-selection-color: #{$rz-text-selection-color};
+}
+
 @if $base == false {
   ::selection {
-    background-color: var(--rz-primary-lighter);
+    background-color: var(--rz-text-selection-background-color);
+    color: var(--rz-text-selection-color);
   }
 }
 
 .rz-layout {
     ::selection {
-    background-color: var(--rz-primary-lighter);
+      background-color: var(--rz-text-selection-background-color);
+      color: var(--rz-text-selection-color);
   }
 }

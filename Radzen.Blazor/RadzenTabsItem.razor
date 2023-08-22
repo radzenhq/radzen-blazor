@@ -1,6 +1,6 @@
 ﻿@using Radzen.Blazor.Rendering
 @implements IDisposable
-@if (Visible)
+@if (Tabs.RenderMode == TabRenderMode.Server ? Visible : true)
 {
     <li role="presentation" @attributes=@Attributes style=@Style class=@ClassList>
     <a @onclick=@OnClick role="tab" href="javascript: void(0)" tabindex=@(Disabled? "-1" : "0") id="@($"{Tabs.Id}-tabpanel-{Index}-label")"

@@ -8,12 +8,12 @@
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
         <RadzenCheckBox @bind-Value="@auto" Name="auto" />
         <RadzenLabel Text="Auto filter" Component="auto" Class="rz-me-6" />
-        <RadzenButton Text="Apply Filter" Click="@(args => dataFilter.Filter())" Disabled="@auto" Size="ButtonSize.Small" />
+        <RadzenButton Text="Apply Filter" Click="@ApplyFilter" Disabled="@auto" Size="ButtonSize.Small" />
     </RadzenStack>
 
-    <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => filteredOrders = view.ToList())>
+    <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => filteredOrders = view)>
         <Properties>
-            <RadzenDataFilterProperty TItem="Order" Property="OrderID" Title="Order ID" FilterValue="@selectedIds" 
+            <RadzenDataFilterProperty TItem="Order" Property="OrderID" Title="Order ID" FilterValue="@finalSelectedIds" 
                 Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.Contains">
                 <FilterTemplate>
                         <RadzenDropDown @bind-Value=@selectedIds Style="width:100%;"
@@ -29,11 +29,6 @@
     <RadzenDataGrid @ref="ordersGrid" AllowPaging="true" AllowSorting="true" Data="@(filteredOrders ?? orders)" TItem="Order"
         ColumnWidth="200px" PageSize="20" Style="height: 500px">
         <Columns>
-            <RadzenDataGridColumn Width="50px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Frozen=true>
-                <Template>
-                    @(orders.IndexOf(context) + 1)
-                </Template>
-            </RadzenDataGridColumn>
             <RadzenDataGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID">
                 <FooterTemplate>
                     Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
@@ -67,10 +62,11 @@
     bool auto = true;
     RadzenDataFilter<Order> dataFilter;
 
-    IList<Order> filteredOrders;
-    IList<Order> orders;
+    IQueryable<Order> filteredOrders;
+    IQueryable<Order> orders;
     RadzenDataGrid<Order> ordersGrid;
 
+    IEnumerable<int> finalSelectedIds;
     IEnumerable<int> selectedIds;
     IEnumerable<int> orderIds;
 
@@ -80,13 +76,24 @@
         {
             selectedIds = null;
         }
+
+        if (auto)
+        {
+            finalSelectedIds = selectedIds;
+        }
+    }
+
+    async Task ApplyFilter()
+    {
+        finalSelectedIds = selectedIds;
+        await dataFilter.Filter();
     }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        orders = dbContext.Orders.Include("Customer").Include("Employee").ToList();
+        orders = dbContext.Orders.Include("Customer").Include("Employee");
         orderIds = orders.Select(o => o.OrderID).Distinct();
     }
 

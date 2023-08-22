@@ -1,14 +1,22 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Bunit;
 using Radzen.Blazor.Rendering;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Radzen.Blazor.Tests;
 
 public class ChartTests
 {
+    private readonly ITestOutputHelper output;
+    public ChartTests(ITestOutputHelper output)
+    {
+        this.output = output;
+    }
+
     [Fact(Timeout = 30000)]
     public async Task Chart_Tooltip_Performance()
     {
@@ -33,12 +41,14 @@ public class ChartTests
                             return $"{x}";
                         })));
 
+        var stopwatch = Stopwatch.StartNew();
         foreach (var _ in Enumerable.Range(0, 10))
         {
-            await chart.InvokeAsync(() => chart.Instance.MouseMove(100, 100));
+            await chart.InvokeAsync(() => chart.Instance.MouseMove(100, 80));
             Assert.Contains("<div class=\"rz-chart-tooltip", chart.Markup);
             await chart.InvokeAsync(() => chart.Instance.MouseMove(0, 0));
             Assert.DoesNotContain("<div class=\"rz-chart-tooltip", chart.Markup);
         }
+        output.WriteLine($"Time took: {stopwatch.Elapsed}");
     }
 }

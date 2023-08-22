@@ -1,3 +1,4 @@
+$panel-menu-padding: 0 !default;
 $panel-menu-font-size: var(--rz-body-font-size) !default;
 $panel-menu-font-weight: 600 !default;
 $panel-menu-color: var(--rz-text-contrast-color) !default;
@@ -7,7 +8,9 @@ $panel-menu-hover-color: $panel-menu-color !default;
 
 $panel-menu-item-line-height: 1.25rem !default;
 $panel-menu-item-padding: 0.75rem 1rem !default;
+$panel-menu-item-margin: 0 !default;
 $panel-menu-item-border: var(--rz-border-base-900) !default;
+$panel-menu-item-border-radius: 0 !default;
 $panel-menu-item-active-background-color: var(--rz-base-900) !default;
 $panel-menu-item-background-color: $panel-menu-item-active-background-color !default;
 $panel-menu-item-active-color: $panel-menu-color !default;
@@ -48,6 +51,7 @@ $panel-menu-toggle-icon-opacity: 1 !default;
 // PanelMenu CSS variables
 
 :root {
+  --rz-panel-menu-padding: #{$panel-menu-padding};
   --rz-panel-menu-font-size: #{$panel-menu-font-size};
   --rz-panel-menu-font-weight: #{$panel-menu-font-weight};
   --rz-panel-menu-color: #{$panel-menu-color};
@@ -57,7 +61,9 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   
   --rz-panel-menu-item-line-height: #{$panel-menu-item-line-height};
   --rz-panel-menu-item-padding: #{$panel-menu-item-padding};
+  --rz-panel-menu-item-margin: #{$panel-menu-item-margin};
   --rz-panel-menu-item-border: #{$panel-menu-item-border};
+  --rz-panel-menu-item-border-radius: #{$panel-menu-item-border-radius};
   --rz-panel-menu-item-active-background-color: #{$panel-menu-item-active-background-color};
   --rz-panel-menu-item-background-color: #{$panel-menu-item-background-color};
   --rz-panel-menu-item-active-color: #{$panel-menu-item-active-color};
@@ -99,7 +105,7 @@ $panel-menu-toggle-icon-opacity: 1 !default;
 
 .rz-panel-menu {
   list-style: none;
-  padding: 0;
+  padding: var(--rz-panel-menu-padding);
   margin-bottom: 0;
   overflow: auto;
   font-size: var(--rz-panel-menu-font-size);
@@ -107,14 +113,22 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   color: var(--rz-panel-menu-color);
   background-color: var(--rz-panel-menu-background-color);
 
+  & > .rz-navigation-item {
+    margin: var(--rz-panel-menu-item-margin);
+  }
+  
   .rz-navigation-item {
     border-bottom: var(--rz-panel-menu-item-border);
+    border-radius: var(--rz-panel-menu-item-border-radius);
+    overflow: hidden;
   }
 
   .rz-navigation-item-wrapper {
     position: relative;
     line-height: var(--rz-panel-menu-item-line-height);
     transition: var(--rz-panel-menu-item-transition);
+    border-radius: var(--rz-panel-menu-item-border-radius);
+    overflow: hidden;
 
     &:hover {
       background-color: var(--rz-panel-menu-hover-background-color);

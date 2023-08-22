@@ -18,7 +18,7 @@ $accordion-selected-color: var(--rz-secondary) !default;
 $accordion-hover-color: $accordion-selected-color !default;
 $accordion-content-padding: 0.5rem 0.5rem 0.5rem 1.5rem !default;
 $accordion-content-font-size: $accordion-item-font-size !default;
-$accordion-border-radius: var(--rz-border-radius)!default;
+$accordion-border-radius: var(--rz-border-radius) !default;
 $accordion-shadow: none !default;
 
 // Accordion CSS variables
@@ -47,7 +47,21 @@ $accordion-shadow: none !default;
 }
 
 .rz-accordion {
+  border-radius: var(--rz-accordion-border-radius);
   box-shadow: var(--rz-accordion-shadow);
+
+  & > div:first-child {
+    border-radius: var(--rz-accordion-border-radius) var(--rz-accordion-border-radius) 0 0;
+  }
+
+  & > div:last-child,
+  & > div:last-child > div {
+    border-radius: 0 0 var(--rz-accordion-border-radius) var(--rz-accordion-border-radius);
+  }
+
+  & > div:only-child {
+    border-radius: var(--rz-accordion-border-radius);
+  }
 }
 
 .rz-accordion-header {

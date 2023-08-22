@@ -170,6 +170,18 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if search button is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ShowSearch { get; set; } = true;
+        /// <summary>
+        /// Gets or sets the action to be executed when the Add button is clicked.
+        /// </summary>
+        [Parameter]
+        public EventCallback<MouseEventArgs> Add { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the create button is shown.
+        /// </summary>
+        /// <value><c>true</c> if the create button is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowAdd { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the page numbers count.
@@ -204,7 +216,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The search input placeholder text.</value>
         [Parameter]
-        public string SearchText { get; set; } = "Search...";
+        public string SearchTextPlaceholder { get; set; } = "Search...";
 
         /// <summary>
         /// Gets or sets the selected value.
@@ -274,16 +286,10 @@ namespace Radzen.Blazor
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
-            {
-    #if NET5_0_OR_GREATER
-                if (grid != null)
-                {
-                    grid.SetAllowVirtualization(AllowVirtualization);
-                }
-    #endif            
+            {          
                 if(Visible && LoadData.HasDelegate && Data == null)
                 {
-                    LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
+                    LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, Filter = searchText });
                 }
 
                 StateHasChanged();
@@ -302,6 +308,21 @@ namespace Radzen.Blazor
             if (!LoadData.HasDelegate)
             {
                 searchText = null;
+                await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
+            }
+        }
+
+        /// <summary>
+        /// Set parameters as an asynchronous operation.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            await base.SetParametersAsync(parameters);
+
+            if (!string.IsNullOrEmpty(searchText) && !LoadData.HasDelegate)
+            {
                 await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
             }
         }
@@ -458,15 +479,16 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    var values = value as dynamic;
+                    var values = value as IEnumerable;
                     if (values != null)
                     {
+                        var valueList = values.Cast<object>().ToList();
                         if (!string.IsNullOrEmpty(ValueProperty))
                         {
-                            foreach (object v in values)
+                            foreach (object v in valueList)
                             {
                                 var item = Query.Where($@"{ValueProperty} == @0", v).FirstOrDefault();
-                                if (item != null && selectedItems.IndexOf(item) == -1)
+                                if (item != null && !selectedItems.AsQueryable().Where($@"object.Equals(it.{ValueProperty},@0)", v).Any())
                                 {
                                     selectedItems.Add(item);
                                 }
@@ -474,7 +496,7 @@ namespace Radzen.Blazor
                         }
                         else
                         {
-                            foreach (object v in values)
+                            foreach (object v in valueList)
                             {
                                 if (selectedItems.IndexOf(v) == -1)
                                 {
@@ -573,7 +595,6 @@ namespace Radzen.Blazor
 
         async Task DebounceFilter()
         {
-            searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
             if (searchText != previousSearch)
             {
                 previousSearch = searchText;
@@ -586,7 +607,7 @@ namespace Radzen.Blazor
         async Task RefreshAfterFilter()
         {
 #if NET5_0_OR_GREATER
-            if (grid?.virtualize != null)
+            if (IsVirtualizationAllowed() && grid != null)
             {
                 if(string.IsNullOrEmpty(searchText))
                 {
@@ -601,7 +622,15 @@ namespace Radzen.Blazor
                         StateHasChanged();
                     }
                 }
-                await grid.virtualize.RefreshDataAsync();
+
+                if (grid.Virtualize != null)
+                {
+                    await grid.Virtualize.RefreshDataAsync();
+                }
+                else
+                {
+                    await grid.Reload();
+                }
             }
 #endif
             StateHasChanged();
@@ -622,6 +651,13 @@ namespace Radzen.Blazor
         {
             await DebounceFilter();
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance loading indicator is shown.
+        /// </summary>
+        /// <value><c>true</c> if this instance loading indicator is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool IsLoading { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether sorting is allowed.
@@ -694,6 +730,30 @@ namespace Radzen.Blazor
             if (IsJSRuntimeAvailable)
             {
                 JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+            }
+        }
+
+        bool clicking;
+        /// <summary>
+        /// Handles the <see cref="E:Click" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
+        public async Task OnAddClick(MouseEventArgs args)
+        {
+            if (clicking)
+            {
+                return;
+            }
+
+            try
+            {
+                clicking = true;
+
+                await Add.InvokeAsync(args);
+            }
+            finally
+            {
+                clicking = false;
             }
         }
     }

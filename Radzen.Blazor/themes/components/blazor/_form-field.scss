@@ -23,6 +23,7 @@ $form-field-text-label-padding: 0.125rem 0 !default;
 $form-field-label-left: 0.25rem !default;
 $form-field-label-textarea-top: 0.375rem !default;
 $form-field-label-floating-top: -0.625rem !default;
+$form-field-label-floating-background-color: var(--rz-input-background-color) !default;
 $form-field-helper-padding: 0 0.5rem !default;
 
 :root {
@@ -51,6 +52,7 @@ $form-field-helper-padding: 0 0.5rem !default;
     --rz-form-field-label-left: #{$form-field-label-left};
     --rz-form-field-label-textarea-top: #{$form-field-label-textarea-top};
     --rz-form-field-label-floating-top: #{$form-field-label-floating-top};
+    --rz-form-field-label-floating-background-color: #{$form-field-label-floating-background-color};
     --rz-form-field-helper-padding: #{$form-field-helper-padding};
 }
 
@@ -357,15 +359,33 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-variant-filled .rz-textarea:focus ~ &,
     .rz-variant-flat .rz-textarea:focus ~ &,
     .rz-variant-filled :not(.rz-state-empty) ~ &,
-    .rz-variant-flat :not(.rz-state-empty) ~ &  {
+    .rz-variant-flat :not(.rz-state-empty) ~ &,
+    .rz-radio-button-list-vertical ~ &,
+    .rz-radio-button-list-horizontal ~ &,
+    .rz-checkbox-list-vertical ~ &,
+    .rz-checkbox-list-horizontal  ~ &,
+    .rz-chkbox ~ &  {
         right: auto;
         top: var(--rz-form-field-label-floating-top);
+        padding-top: 0;
+        padding-bottom: 0;
         transform: translate(0, 0);
         color: var(--rz-input-placeholder-color);
-        background-color: inherit;
+        background-color: var(--rz-form-field-label-floating-background-color);
         font-size: 0.75rem;
-        line-height: 0.75rem;
+        line-height: 1rem;
         max-width: calc(100% - 1.5rem);
+    }
+
+    .rz-form-field:not(.rz-variant-outlined) *:focus ~ &,
+    .rz-form-field:not(.rz-variant-outlined) *:focus-within ~ &,
+    .rz-form-field:not(.rz-variant-outlined) :not(.rz-state-empty) ~ &,
+    .rz-form-field:not(.rz-variant-outlined) .rz-radio-button-list-vertical ~ &,
+    .rz-form-field:not(.rz-variant-outlined) .rz-radio-button-list-horizontal ~ &,
+    .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-vertical ~ &,
+    .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-horizontal  ~ &,
+    .rz-form-field:not(.rz-variant-outlined) .rz-chkbox ~ &  {
+        background-color: inherit !important;
     }
 
     .invalid ~ & {

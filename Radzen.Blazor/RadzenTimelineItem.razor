@@ -1,0 +1,12 @@
+@inherits RadzenComponent
+
+@if (Visible)
+{
+<div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+    <div class="rz-timeline-content-start">@(LabelContent)@(Label)</div>
+    <div class="rz-timeline-axis">
+        <div class=@PointClass>@PointContent</div>
+    </div>
+    <div class="rz-timeline-content-end">@(ChildContent)@(Text)</div>
+</div>
+}

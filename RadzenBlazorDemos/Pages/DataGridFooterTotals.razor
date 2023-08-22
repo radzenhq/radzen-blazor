@@ -5,24 +5,25 @@
 
 @inherits DbContextPage
 
-<RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" ColumnWidth="200px" AllowColumnResize=true
+<RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" ColumnWidth="220px" AllowColumnResize=true
                 Data="@orders" TItem="Order" Sort="@(args => ResetIndex(true))" Page="@(args => ResetIndex(true))" Filter="@(args => ResetIndex(true))">
     <Columns>
-        <RadzenDataGridColumn Width="100px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn Width="60px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
             <Template>
+                <RenderOnceComponent CanRender=@(!(index >= ordersGrid.PageSize))>
                 @{
                     ResetIndex(index >= ordersGrid.PageSize);
                 }
                 @((ordersGrid.CurrentPage * ordersGrid.PageSize) + index++ + 1)
+                </RenderOnceComponent>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID">
+        <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID">
             <FooterTemplate>
                 Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
-        <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
+        <RadzenDataGridColumn  Width="160px" TItem="Order" Property="Employee.LastName" Title="Employee">
             <Template Context="order">
                 @order.Employee?.FirstName @order.Employee?.LastName
             </Template>
@@ -40,7 +41,6 @@
                 Total amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orders.Sum(o => o.Freight))</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
     </Columns>
 </RadzenDataGrid>
 

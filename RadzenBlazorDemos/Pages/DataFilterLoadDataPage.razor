@@ -1,0 +1,10 @@
+﻿@page "/datafilter-loaddata"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataFilter with DataGrid <strong>LoadData</strong> event.
+</RadzenText>
+
+<RadzenExample ComponentName="DataFilter" Example="DataFilterLoadData"
+               AdditionalSourceCodePages=@(new List<string>() { "MyCustomDataFilterProperty.razor", "MyCustomEnumerableDataFilterProperty.razor" })>
+    <DataFilterLoadData />
+</RadzenExample>

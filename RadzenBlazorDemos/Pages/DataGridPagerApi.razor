@@ -31,7 +31,7 @@ PageSizeOptions="@pageSizeOptions" ShowPagingSummary="@showPagerSummary" PagingS
 </RadzenDataGrid>
 
 @code {
-    string pagingSummaryFormat = "Displaying page {0} of {1} (total {2} records)";
+    string pagingSummaryFormat = "Displaying page {0} of {1} <b>(total {2} records)</b>";
 
     RadzenDataGrid<OrderDetail> dataGrid;
     IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30 };

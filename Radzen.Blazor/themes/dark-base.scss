@@ -1,7 +1,7 @@
 @import 'variables';
 @import 'mixins';
+$theme-dark: true;
 $base: true;
-$dark: true;
 
 // Legacy Theme Tokens
 
@@ -226,6 +226,9 @@ $sidebar-toggle-hover-color: var(--rz-secondary) !default;
 $sidebar-toggle-background-color: var(--rz-base-background-color) !default;
 $sidebar-toggle-color: var(--rz-text-color) !default;
 
+// Card
+$card-flat-background-color: var(--rz-base-700) !default;
+
 // ProfileMenu
 $profile-menu-border: var(--rz-border-base-900) !default;
 $profile-menu-toggle-button-color: var(--rz-text-color) !default;
@@ -330,6 +333,11 @@ $progressbar-background-color: var(--rz-base-700) !default;
 // Chart
 $chart-axis-color: var(--rz-base-600) !default ;
 $chart-axis-label-color: var(--rz-text-secondary-color) !default;
+
+// Timeline
+$rz-timeline-point-background-color: var(--rz-base-600) !default;
+$rz-timeline-point-color: var(--rz-text-color) !default;
+$rz-timeline-line-color: var(--rz-base-600) !default;
 
 // Editor
 $editor-separator-background-color: var(--rz-base-700) !default;

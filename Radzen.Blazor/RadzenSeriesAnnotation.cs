@@ -5,7 +5,7 @@ using Radzen.Blazor.Rendering;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Displays a text label for the specifiad data item from the series.
+    /// Displays a text label for the specified data item from the series.
     /// </summary>
     /// <example>
     /// <code>

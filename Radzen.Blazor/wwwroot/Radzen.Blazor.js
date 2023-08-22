@@ -627,8 +627,12 @@ window.Radzen = {
       e.preventDefault();
     }
   },
-  numericOnInput: function (e, min, max) {
+  numericOnInput: function (e, min, max, isNullable) {
       var value = e.target.value;
+
+      if (!isNullable && value == '' && min != null) {
+          e.target.value = min;
+      }
 
       if (value && !isNaN(+value)) {
         var numericValue = +value;
@@ -838,24 +842,11 @@ window.Radzen = {
         }
     };
 
-    if (!Radzen.closeAllPopups) {
-        Radzen.closeAllPopups = function (e) {
-            for (var i = 0; i < Radzen.popups.length; i++) {
-                var p = Radzen.popups[i];
-
-                var closestPopup = e && e.target && e.target.closest && (e.target.closest('.rz-popup') || e.target.closest('.rz-overlaypanel'));
-                if (closestPopup && closestPopup != p) {
-                    return;
-                }
-
-                Radzen.closePopup(p.id, p.instance, p.callback, e);
-            }
-            Radzen.popups = [];
-        };
+    if (!Radzen.popups) {
         Radzen.popups = [];
     }
 
-    Radzen.popups.push({id, instance, callback});
+    Radzen.popups.push({ id, instance, callback });
 
     document.body.appendChild(popup);
     document.removeEventListener('mousedown', Radzen[id]);
@@ -876,6 +867,21 @@ window.Radzen = {
         document.removeEventListener('contextmenu', Radzen[id]);
         document.addEventListener('contextmenu', Radzen[id]);
     }
+  },
+  closeAllPopups: function (e, id) {
+    if (!Radzen.popups) return;
+    var el = e && e.target || id && documentElement.getElementById(id);
+    for (var i = 0; i < Radzen.popups.length; i++) {
+        var p = Radzen.popups[i];
+
+        var closestPopup = el && el.closest && (el.closest('.rz-popup') || el.closest('.rz-overlaypanel'));
+        if (closestPopup && closestPopup != p) {
+            return;
+        }
+
+        Radzen.closePopup(p.id, p.instance, p.callback, e);
+    }
+    Radzen.popups = [];
   },
   closePopup: function (id, instance, callback, e) {
     var popup = document.getElementById(id);
@@ -966,7 +972,7 @@ window.Radzen = {
         }
     }
   },
-  openDialog: function (options, dialogService) {
+  openDialog: function (options, dialogService, dialog) {
     if (Radzen.closeAllPopups) {
         Radzen.closeAllPopups();
     }
@@ -986,6 +992,24 @@ window.Radzen = {
         if (lastDialog) {
             lastDialog.removeEventListener('keydown', Radzen.focusTrapDialog);
             lastDialog.addEventListener('keydown', Radzen.focusTrapDialog);
+
+            dialog.offsetWidth = lastDialog.parentElement.offsetWidth;
+            dialog.offsetHeight = lastDialog.parentElement.offsetHeight;
+            var dialogResize = function (e) {
+                if(!dialog) return;
+                if (dialog.offsetWidth != e[0].target.offsetWidth || dialog.offsetHeight != e[0].target.offsetHeight) {
+
+                    dialog.offsetWidth = e[0].target.offsetWidth;
+                    dialog.offsetHeight = e[0].target.offsetHeight;
+
+                    dialog.invokeMethodAsync(
+                        'RadzenDialog.OnResize',
+                        e[0].target.offsetWidth,
+                        e[0].target.offsetHeight
+                    );
+                }
+            };
+            Radzen.dialogResizer = new ResizeObserver(dialogResize).observe(lastDialog.parentElement);
 
             if (options.autoFocusFirstElement) {
                 if (lastDialog.querySelectorAll('.rz-html-editor-content').length) {
@@ -1015,6 +1039,7 @@ window.Radzen = {
     }
   },
   closeDialog: function () {
+    Radzen.dialogResizer = null;
     document.body.classList.remove('no-scroll');
     var dialogs = document.querySelectorAll('.rz-dialog-content');
     if (dialogs.length == 0) {
@@ -1026,7 +1051,7 @@ window.Radzen = {
     if (dialogs.length == 0) return [];
     var lastDialog = dialogs[dialogs.length - 1];
     return [...lastDialog.querySelectorAll('a, button, input, textarea, select, details, iframe, embed, object, summary dialog, audio[controls], video[controls], [contenteditable], [tabindex]')]
-            .filter(el => el && el.tabIndex > -1 && !el.hasAttribute('disabled') && !el.hasAttribute('hidden') && el.computedStyleMap && el.computedStyleMap().get('display').value !== 'none');
+        .filter(el => el && el.tabIndex > -1 && !el.hasAttribute('disabled') && el.offsetParent !== null);
   },
   focusTrapDialog: function (e) {
     e = e || window.event;
@@ -1065,7 +1090,10 @@ window.Radzen = {
                   return;
               }
           }
-          document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+          var dialogs = document.querySelectorAll('.rz-dialog-content');
+          if (dialogs.length == 0) {
+              document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+          }
           Radzen.dialogService.invokeMethodAsync('DialogService.Close', null);
       }
   },
@@ -1486,7 +1514,7 @@ window.Radzen = {
     document.removeEventListener('touchend', ref.mouseUpHandler);
   },
   startColumnReorder: function(id) {
-      var el = document.getElementById(id);
+      var el = document.getElementById(id + '-drag');
       var cell = el.parentNode.parentNode;
       var visual = document.createElement("th");
       visual.className = cell.className + ' rz-column-draggable';
@@ -1532,7 +1560,7 @@ window.Radzen = {
       document.addEventListener('mousemove', Radzen[id + 'move']);
   },
   startColumnResize: function(id, grid, columnIndex, clientX) {
-      var el = document.getElementById(id);
+      var el = document.getElementById(id + '-resizer');
       var cell = el.parentNode.parentNode;
       var col = document.getElementById(id + '-col');
       var dataCol = document.getElementById(id + '-data-col');
@@ -1547,6 +1575,7 @@ window.Radzen = {
                       columnIndex,
                       cell.getBoundingClientRect().width
                   );
+                  el.style.width = null;
                   document.removeEventListener('mousemove', Radzen[el].mouseMoveHandler);
                   document.removeEventListener('mouseup', Radzen[el].mouseUpHandler);
                   document.removeEventListener('touchmove', Radzen[el].touchMoveHandler)
@@ -1577,6 +1606,7 @@ window.Radzen = {
               }
           }
       };
+      el.style.width = "100%";
       document.addEventListener('mousemove', Radzen[el].mouseMoveHandler);
       document.addEventListener('mouseup', Radzen[el].mouseUpHandler);
       document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: true })

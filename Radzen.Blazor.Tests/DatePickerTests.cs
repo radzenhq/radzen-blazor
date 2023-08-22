@@ -380,6 +380,71 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DatePicker_Parses_Input_Using_DateFormat()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime?>>();
+
+            var raised = false;
+            object newValue = null;
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.DateFormat, "ddMM");
+                parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; });
+            });
+
+            var inputElement = component.Find(".rz-inputtext");
+
+            string input = "3012";
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(input);
+            inputElement.Change(input);
+
+            Assert.True(raised);
+            Assert.Equal(new DateTime(DateTime.Now.Year, 12, 30), newValue);
+        }
+
+
+        [Fact]
+        public void DatePicker_Parses_Input_Using_ParseInput()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime?>>();
+
+            Func<string, DateTime?> customParseInput = (input) => {
+                if (DateTime.TryParseExact(input, "ddMM", null, DateTimeStyles.None, out var result))
+                {
+                    return result;
+                }
+
+                return null;
+            };
+
+            var raised = false;
+            object newValue = null;
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.ParseInput, customParseInput);
+                parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; });
+            });
+
+            var inputElement = component.Find(".rz-inputtext");
+
+            string input = "3012";
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(input);
+            inputElement.Change(input);
+
+            Assert.True(raised);
+            Assert.Equal(new DateTime(DateTime.Now.Year, 12, 30), newValue);
+        }
+
+
+        [Fact]
         public void DatePicker_Respects_DateTimeMaxValue()
         {
             using var ctx = new TestContext();
@@ -394,25 +459,6 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(DateTime.MaxValue.ToString(component.Instance.DateFormat), component.Markup);
 
             var exception = Record.Exception(() => component.Find(".rz-datepicker-next-icon")
-                                                            .Click());
-            Assert.Null(exception);
-        }
-
-        [Fact]
-        public void DatePicker_Respects_DateTimeMinValue()
-        {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
-
-            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
-            {
-                parameters.Add(p => p.Value, DateTime.MinValue);
-            });
-
-            Assert.Contains(DateTime.MinValue.ToString(component.Instance.DateFormat), component.Markup);
-
-            var exception = Record.Exception(() => component.Find(".rz-datepicker-prev-icon")
                                                             .Click());
             Assert.Null(exception);
         }
@@ -504,6 +550,33 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(kind, (component.Instance.Value as DateTime?)?.Kind);
             Assert.Equal(valueUtc.UtcDateTime.ToString(CultureInfo.InvariantCulture), (component.Instance.Value as DateTime?)?.ToString(CultureInfo.InvariantCulture));
+        }
+
+        [Fact]
+        public void DatePicker_Displays_Calender_Icon()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>();
+
+            Assert.Contains(@$"rzi-calendar", component.Markup);
+        }
+
+        [Fact]
+        public void DatePicker_Displays_Schedule_Icon()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.TimeOnly, true);
+            });
+
+            Assert.Contains(@$"rzi-time", component.Markup);
         }
     }
 }

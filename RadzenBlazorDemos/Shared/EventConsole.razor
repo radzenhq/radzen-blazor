@@ -10,7 +10,7 @@
     @foreach(var message in messages)
     {
         <RadzenAlert ShowIcon="false" Variant="Variant.Flat" AlertStyle="AlertStyle.Info" Size="AlertSize.ExtraSmall" Shade="Shade.Lighter" AllowClose="false" Style="font-size: 0.75rem">
-            @message.Date.ToString("HH:mm:ss.ff") <span Style="color: var(--rz-text-color)">@message.Text</span>
+            <span Style="opacity: 0.6;">@message.Date.ToString("HH:mm:ss.ff")</span> @message.Text
         </RadzenAlert>
     }
     </RadzenStack>

@@ -9,13 +9,43 @@ else
     <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="my-4">Custom filtering template with IQueryable binding</RadzenText>
         <RadzenDataGrid @ref="grid" Data=@employees FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />
+            <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" FilterValue="@idValue">
+                <FilterTemplate>
+                    <RadzenNumeric @bind-Value=idValue ShowUpDown=false Style="width:100%" />
+                </FilterTemplate>
+            </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Title="Customer" Property="CompanyName" Type="typeof(IEnumerable<string>)" 
                     FilterValue="@selectedCompanyNames" FilterOperator="FilterOperator.Contains" LogicalFilterOperator="LogicalFilterOperator.Or">
                 <FilterTemplate>
                     <RadzenDropDown @bind-Value=@selectedCompanyNames Style="width:100%;"
                         Change=@OnSelectedCompanyNamesChange Data="@(companyNames)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Title="Hire Date" Property="HireDate.Date" FormatString="{0:d}"
+                                  FilterValue="@hireDate?.Date">
+                <FilterTemplate>
+                    <RadzenDatePicker @bind-Value=@hireDate Style="width:100%;" AllowClear="true" DateFormat="d" />
+                </FilterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Title="WorkStatus" Property="WorkStatus" Type="typeof(IEnumerable<WorkStatus>)" Sortable=false
+                                  FilterValue="@selectedWorkStatus" FilterOperator="FilterOperator.In" LogicalFilterOperator="LogicalFilterOperator.Or">
+                <FilterTemplate>
+                    <RadzenDropDown @bind-Value=@selectedWorkStatus Multiple="true" AllowSelectAll=false Style="width:100%;"
+                                    Change=@OnSelectedWorkStatusChange Data=@allWorkStatuses TextProperty="Text" ValueProperty="Value" />
+                </FilterTemplate>
+                <Template>
+                    @(string.Join(',', context.WorkStatus.Select(i => Enum.GetName((WorkStatus)i))))
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Title="WorkStatus (as Model)" Property="WorkStatuses" Type="typeof(IEnumerable<string>)" Sortable=false
+                                  FilterValue="@selectedWorkStatuses" FilterOperator="FilterOperator.In" FilterProperty="Name" LogicalFilterOperator="LogicalFilterOperator.Or">
+                <FilterTemplate>
+                    <RadzenDropDown @bind-Value=@selectedWorkStatuses Multiple="true" AllowSelectAll=false Style="width:100%;"
+                                    Change=@OnSelectedWorkStatusesChange Data=@allWorkStatusesObject TextProperty="Name" ValueProperty="Name" />
+                </FilterTemplate>
+                <Template>
+                    @(string.Join(',', context.WorkStatuses.Select(s => s.Name)))
+                </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" 
                 FilterValue="@currentTOC">
@@ -32,9 +62,12 @@ else
 
 @code {
     RadzenDataGrid<Employee> grid;
-
+    int? idValue;
+    DateTime? hireDate;
     TitleOfCourtesy? currentTOC;
     IEnumerable<string> selectedCompanyNames;
+    IEnumerable<WorkStatus> selectedWorkStatus;
+    IEnumerable<object> allWorkStatuses = Enum.GetValues(typeof(WorkStatus)).Cast<WorkStatus>().Select(t => new { Text = $"{t}", Value = t });
 
     List<string> companyNames = new List<string> {"Vins et alcools Chevalier", "Toms Spezialitäten", "Hanari Carnes", "Richter Supermarkt", "Wellington Importadora", "Centro comercial Moctezuma" };
 
@@ -45,11 +78,40 @@ else
         All = -1
     }
 
+    public enum WorkStatus
+    {
+        Office,
+        Remote,
+    }
+
+    public class WorkStatusModel
+    {
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public string Name { get; set; }
+
+        public WorkStatusModel(string name) =>
+            Name = name;                   
+    }
+
     public class Employee
     {
         public int ID { get; set; }
         public string CompanyName { get; set; }
+        public DateTime HireDate { get; set; }
         public TitleOfCourtesy TitleOfCourtesy { get; set; }
+        public IEnumerable<WorkStatus> WorkStatus { get; set; }
+        public IEnumerable<WorkStatusModel> WorkStatuses { get; set; }
+    }
+
+    IEnumerable<string> selectedWorkStatuses;
+    IEnumerable<WorkStatusModel> allWorkStatusesObject = Enum.GetValues(typeof(WorkStatus)).Cast<WorkStatus>().Select(t => new WorkStatusModel($"{t}"));
+
+    void OnSelectedWorkStatusesChange(object value)
+    {
+        if (selectedWorkStatuses != null && !selectedWorkStatuses.Any())
+        {
+            selectedWorkStatuses = null;
+        }
     }
 
     void OnSelectedCompanyNamesChange(object value)
@@ -57,6 +119,14 @@ else
         if (selectedCompanyNames != null && !selectedCompanyNames.Any())
         {
             selectedCompanyNames = null;  
+        }
+    }
+
+    void OnSelectedWorkStatusChange(object value)
+    {
+        if (selectedWorkStatus != null && !selectedWorkStatus.Any())
+        {
+            selectedWorkStatus = null;
         }
     }
 
@@ -77,7 +147,13 @@ else
             {
                 ID = i,
                 CompanyName = i < 4 ? companyNames[0] : companyNames[i - 4],
-                TitleOfCourtesy = i < 5 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms
+                HireDate = DateTime.Now.AddMonths(-i),
+                TitleOfCourtesy = i < 5 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms,
+                    WorkStatus = i < 3 ?
+                            new WorkStatus[] { WorkStatus.Office } :
+                                            i < 5 ? new WorkStatus[] { WorkStatus.Remote } : new WorkStatus[] { WorkStatus.Office, WorkStatus.Remote },
+                    WorkStatuses = i < 3 ?  new WorkStatusModel[] { new WorkStatusModel(Enum.GetName(WorkStatus.Office)) } :
+                                                i < 5 ? new WorkStatusModel[] { new WorkStatusModel(Enum.GetName(WorkStatus.Remote)) } : new WorkStatusModel[] { new WorkStatusModel(Enum.GetName(WorkStatus.Office)), new WorkStatusModel(Enum.GetName(WorkStatus.Remote)) }
             }).AsQueryable());
     }
 }

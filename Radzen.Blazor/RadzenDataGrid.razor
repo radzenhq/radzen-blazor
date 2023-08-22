@@ -1,4 +1,4 @@
-﻿@using System.Linq.Dynamic.Core
+@using System.Linq.Dynamic.Core
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components.Forms
 @using Radzen
@@ -52,10 +52,10 @@
                 {
                     <div class="rz-column-picker">
                         <RadzenDropDown SelectAllText="@AllColumnsText" AllowSelectAll="@AllowPickAllColumns"
-                            MaxSelectedLabels="2"
+                            MaxSelectedLabels="@ColumnsPickerMaxSelectedLabels"
                             SelectedItemsText="@ColumnsShowingText" Change=@ToggleColumns
-                            @bind-Value="@selectedColumns"
-                            Multiple="true"
+                            @bind-Value="@selectedColumns" FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                            Multiple="true" AllowFiltering="@ColumnsPickerAllowFiltering"
                             Placeholder="@ColumnsText"
                             Data="allPickableColumns"
                             TextProperty="Title" />
@@ -93,24 +93,27 @@
                     }
                     @foreach (var column in visibleColumns)
                     {
-                        <col id=@(getColumnResizerId(visibleColumns.IndexOf(column)) + "-col") style="@column.GetStyle()">
+                        <col id=@(getColumnUniqueId(visibleColumns.IndexOf(column)) + "-col") style="@column.GetStyle()">
                     }
                 </colgroup>
                 <thead>
                     @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
                     {
                         <tr>
-                            @foreach (var g in Groups)
+                            @if (i == 0) // Only add the th elements for the first row
                             {
-                                <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
-                                    <span class="rz-column-title"></span>
-                                </th>
-                            }
-                            @if (Template != null && ShowExpandColumn && i == 0)
-                            {
-                                <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
-                                    <span class="rz-column-title"></span>
-                                </th>
+                                    @foreach (var g in Groups)
+                                    {
+                                        <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                            <span class="rz-column-title"></span>
+                                        </th>
+                                    }
+                                    @if (Template != null && ShowExpandColumn && i == 0)
+                                    {
+                                        <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                            <span class="rz-column-title"></span>
+                                        </th>
+                                    }
                             }
                             @for (var j = 0; j < visibleColumns.Count; j++)
                             {
@@ -136,13 +139,14 @@
                     @if (AllowFiltering && (FilterMode == FilterMode.Simple || FilterMode == FilterMode.SimpleWithMenu) && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())
                     {
                         <tr>
+                             
                             @foreach (var g in Groups)
                             {
                                 <th class="rz-col-icon  rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                     <span class="rz-column-title"></span>
                                 </th>
                             }
-                            @if (Template != null && ShowExpandColumn)
+                            @if (Template != null && ShowExpandColumn  )
                             {
                                 <th class="rz-col-icon  rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                     <span class="rz-column-title"></span>
@@ -161,7 +165,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <label class="rz-cell-filter-label" style="height:35px" onclick="event.preventDefault()">
+                                                    <label class="rz-cell-filter-label" style="height:35px; width:100%;" onclick="event.preventDefault()">
                                                         @if (PropertyAccess.IsDate(column.FilterPropertyType))
                                                         {
                                                             if (FilterMode == FilterMode.Simple)
@@ -270,15 +274,15 @@
                                                                 <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
                                                                 <RadzenDatePicker Disabled=@column.CanSetFilterValue() TValue="@object" Style="width:100%" AllowInput=@(AllowFilterDateInput) AllowClear="true"
                                                       ShowTime="false" ShowTimeOkButton="false" DateFormat="@getFilterDateFormat(column)"
-                                                      Value="@column.GetFilterValue()" Change="@(args => { if(!args.HasValue) { ClearFilter(column, true); } else {column.SetFilterValue(args.Value); ApplyFilter(column, true);} })" />
+                                                      Value="@column.GetFilterValue()" Change="@(args => { if(!args.HasValue) { InvokeAsync(() => ClearFilter(column, true)); } else {column.SetFilterValue(args.Value); InvokeAsync(() => ApplyFilter(column, true));} })" />
                                                             }
                                                         }
                                                         else if (PropertyAccess.IsNullableEnum(column.FilterPropertyType) || PropertyAccess.IsEnum(column.FilterPropertyType))
                                                         {
                                                             <RadzenDropDown Style="width:100%" AllowClear="true" AllowFiltering="false" TValue="@object"
                                                     Value=@column.GetFilterValue() Multiple="false" Placeholder="@EnumFilterSelectText" TextProperty="Text" ValueProperty="Value"
-                                                    Data=@((PropertyAccess.IsNullableEnum(column.FilterPropertyType) ? new object[]{ new { Value = -1, Text = "<null>"}} : Enumerable.Empty<object>()).Concat(EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(column.FilterPropertyType) ?? column.FilterPropertyType)))
-                                                    Change="@(args => {column.SetFilterValue(args);column.SetFilterOperator(object.Equals(args, -1) ? FilterOperator.IsNull : FilterOperator.Equals);ApplyFilter(column, true);})" />
+                                                                            Data=@((PropertyAccess.IsNullableEnum(column.FilterPropertyType) ? new object[]{ new { Value = -1, Text = EnumNullFilterText}} : Enumerable.Empty<object>()).Concat(EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(column.FilterPropertyType) ?? column.FilterPropertyType)))
+                                                    Change="@(args => {column.SetFilterValue(args);column.SetFilterOperator(object.Equals(args, -1) ? FilterOperator.IsNull : FilterOperator.Equals);InvokeAsync(() => ApplyFilter(column, true));})" />
                                                         }
                                                         else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
                                                         {
@@ -319,7 +323,7 @@
                 <tbody>
                     @if (Data != null)
                     {
-                        @if (!ShowEmptyMessage || Count > 0 && (IsVirtualizationAllowed() ? Data.Any() : true) || !AllowPaging && LoadData.HasDelegate && Count == 0)
+                        @if (!ShowEmptyMessage || Count > 0 && (IsVirtualizationAllowed() ? Data.Any() : true) || LoadData.HasDelegate && Data != null && Data.Any())
                         {
                             if (columns.Count > 0)
                             {
@@ -349,17 +353,20 @@
                         @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
                         {
                             <tr class="">
-                                @foreach (var g in Groups)
+                                @if (i == 0) // Only add the th elements for the first row
                                 {
-                                    <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
-                                        <span class="rz-column-title"></span>
-                                    </td>
-                                }
-                                @if (Template != null && ShowExpandColumn && i == 0)
-                                {
-                                    <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
-                                        <span class="rz-column-title"></span>
-                                    </td>
+                                    @foreach (var g in Groups)
+                                    {
+                                        <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                            <span class="rz-column-title"></span>
+                                        </td>
+                                    }
+                                    @if (Template != null && ShowExpandColumn && i == 0)
+                                    {
+                                        <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                            <span class="rz-column-title"></span>
+                                        </td>
+                                    }
                                 }
                                 @for (var j = 0; j < visibleColumns.Count; j++)
                                 {

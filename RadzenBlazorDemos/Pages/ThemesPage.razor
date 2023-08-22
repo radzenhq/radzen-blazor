@@ -1,0 +1,86 @@
+@page "/themes"
+@inject ThemeService ThemeService
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Themes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    The Radzen Blazor Components package features an array of both free and premium themes, allowing you to choose the style that best suits your project's requirements.
+</RadzenText>
+<RadzenRow RowGap="2rem" class="rz-pt-6">
+    <RadzenColumn Size="12" SizeSM="6" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined" class="rz-p-7">
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2">
+                Free Themes
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+                These themes are free for commercial use. The source SCSS files are licensed under MIT and available on <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">GitHub</a>.
+            </RadzenText>
+            <RadzenStack Gap="1rem">
+                <RadzenDataList Data="@ThemeService.Themes.Where(t => !t.Premium)">
+                    <Template>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+                            <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 4px; overflow: hidden; outline: var(--rz-border-disabled); min-width: 80px;">
+                                <rect width="80" height="60" fill="@context.Base" />
+                                <rect x="0" y="4" width="16" height="56" fill="@context.Sidebar" />
+                                <rect x="24" y="17" width="48" height="32" rx="2" fill="@context.Content" />
+                                <rect x="43" y="41" width="12" height="4" rx="1" fill="@context.Secondary" />
+                                <rect x="28" y="21" width="16" height="2" rx="1" fill="@context.TitleText" />
+                                <rect x="28" y="27" width="40" height="2" rx="1" fill="@context.ContentText" />
+                                <rect x="28" y="31" width="40" height="2" rx="1" fill="@context.ContentText" />
+                                <rect x="28" y="35" width="16" height="2" rx="1" fill="@context.ContentText" />
+                                <rect x="28" y="41" width="12" height="4" rx="1" fill="@context.Primary" />
+                                <rect width="80" height="6" fill="@context.Header" />
+                            </svg>
+                            @context.Text
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataList>
+            </RadzenStack>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeSM="6" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined" class="rz-p-7">
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2">
+                Premium Themes <RadzenBadge title="To use it in your application you need an active Radzen Professional or Enterprise subscription." Shade="Shade.Light" Style="vertical-align: top;">PRO</RadzenBadge>
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+                Premium themes can be used with an active <a href="https://www.radzen.com/pricing/" title="See Radzen Pricing" target="_blank">Radzen Professional or Enterprise subscription</a>.
+            </RadzenText>
+            <RadzenStack Gap="1rem">
+                <RadzenDataList Data="@ThemeService.Themes.Where(t => t.Premium)">
+                    <Template>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+                            <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 4px; overflow: hidden; outline: var(--rz-border-disabled); min-width: 80px;">
+                                <rect width="80" height="60" fill="@context.Base" />
+                                <rect x="0" y="4" width="16" height="56" fill="@context.Sidebar" />
+                                <rect x="24" y="17" width="48" height="32" rx="2" fill="@context.Content" />
+                                <rect x="43" y="41" width="12" height="4" rx="1" fill="@context.Secondary" />
+                                <rect x="28" y="21" width="16" height="2" rx="1" fill="@context.TitleText" />
+                                <rect x="28" y="27" width="40" height="2" rx="1" fill="@context.ContentText" />
+                                <rect x="28" y="31" width="40" height="2" rx="1" fill="@context.ContentText" />
+                                <rect x="28" y="35" width="16" height="2" rx="1" fill="@context.ContentText" />
+                                <rect x="28" y="41" width="12" height="4" rx="1" fill="@context.Primary" />
+                                <rect width="80" height="6" fill="@context.Header" />
+                            </svg>
+                            @context.Text
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataList>
+            </RadzenStack>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined" class="rz-p-7">
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2">
+                Swatches <RadzenBadge title="To use it in your application you need an active Radzen Professional or Enterprise subscription." Shade="Shade.Light" Style="vertical-align: top;">PRO</RadzenBadge>
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+                Swatches are a premium feature of Radzen Blazor Studio. Each theme contains a collection of predefined color swatches to pick from.
+            </RadzenText>
+                <RadzenLink Path="https://www.radzen.com/blazor-studio/documentation/appearance/themes-and-swatches/#swatches" target="_blank">
+                    <RadzenImage Path="images/radzen-blazor-material3-theme.gif" Style="width: 100%" Class="rz-mb-6"></RadzenImage>
+                    Read more about swatches ↗
+                </RadzenLink>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>

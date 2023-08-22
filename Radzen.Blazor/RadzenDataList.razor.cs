@@ -118,6 +118,20 @@ namespace Radzen.Blazor
             });
         }
 
+        /// <summary>
+        /// Reloads this instance.
+        /// </summary>
+        public async override Task Reload()
+        {
+            await base.Reload();
+#if NET5_0_OR_GREATER
+            if (virtualize != null)
+            {
+                await virtualize.RefreshDataAsync();
+            }
+#endif
+        }
+
         internal void DrawRows(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
         {
             foreach (var item in LoadData.HasDelegate ? Data : PagedView)

@@ -129,18 +129,18 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenProgressBar>();
 
             component.SetParametersAndRender(parameters=>parameters.Add(p=>p.ProgressBarStyle, ProgressBarStyle.Success));
-            Assert.Contains(@$"rz-progressbar-determinate-success", component.Markup);
+            Assert.Contains(@$"rz-progressbar-success", component.Markup);
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Info));
-            Assert.Contains(@$"rz-progressbar-determinate-info", component.Markup);
+            Assert.Contains(@$"rz-progressbar-info", component.Markup);
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Success));
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Mode, ProgressBarMode.Indeterminate));
-            Assert.Contains(@$"rz-progressbar-indeterminate-success", component.Markup);
+            Assert.Contains(@$"rz-progressbar-success", component.Markup);
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.ProgressBarStyle, ProgressBarStyle.Info));
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Mode, ProgressBarMode.Indeterminate));
-            Assert.Contains(@$"rz-progressbar-indeterminate-info", component.Markup);
+            Assert.Contains(@$"rz-progressbar-info", component.Markup);
         }
     }
 }

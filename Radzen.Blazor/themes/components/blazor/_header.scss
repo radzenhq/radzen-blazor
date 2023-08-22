@@ -16,7 +16,7 @@ $header-shadow: none !default;
   --rz-header-shadow: #{$header-shadow};
 }
 
-.header {
+.rz-header {
   background-color: var(--rz-header-background-color);
   min-height: var(--rz-header-min-height);
   border-bottom: var(--rz-header-border);

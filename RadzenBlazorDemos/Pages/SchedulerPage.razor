@@ -7,7 +7,7 @@
     Demonstration and configuration of the Radzen Blazor <strong>Scheduler</strong> component.
 </RadzenText>
 
-<RadzenExample ComponentName="Scheduler" Example="SchedulerConfig" AdditionalSourceCodePages=@(new List<string>() { "AddAppointmentPage.razor", "EditAppointmentPage.razor" })>
+<RadzenExample ComponentName="Scheduler" Example="SchedulerConfig" AdditionalSourceCodePages=@(new [] { "../Models/Appointment.cs", "AddAppointmentPage.razor", "EditAppointmentPage.razor" })>
     <SchedulerConfig />
 </RadzenExample>
 
@@ -18,6 +18,6 @@
     Plan out the whole year with <code>&lt;RadzenYearPlannerView /&gt;</code> and <code>&lt;RadzenYearTimelineView /&gt;</code>.
 </RadzenText>
 
-<RadzenExample ComponentName="Scheduler" Example="SchedulerPlannerTimeline" AdditionalSourceCodePages=@(new List<string>() { "AddAppointmentPage.razor", "EditAppointmentPage.razor" })>
+<RadzenExample ComponentName="Scheduler" Example="SchedulerPlannerTimeline" AdditionalSourceCodePages=@(new [] { "../Models/Appointment.cs", "AddAppointmentPage.razor", "EditAppointmentPage.razor" })>
     <SchedulerPlannerTimeline />
 </RadzenExample>

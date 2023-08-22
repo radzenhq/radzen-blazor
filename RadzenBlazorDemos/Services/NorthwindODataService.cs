@@ -18,10 +18,10 @@ namespace RadzenBlazorDemos
         private readonly HttpClient httpClient;
         private readonly Uri baseUri;
 
-        public NorthwindODataService()
+        public NorthwindODataService(string url = "https://services.radzen.com/odata/Northwind/")
         {
             this.httpClient = new HttpClient();
-            this.baseUri = new Uri("https://services.radzen.com/odata/Northwind/");
+            this.baseUri = new Uri(url);
         }
         partial void OnGetCategories(HttpRequestMessage requestMessage);
         public async Task<ODataServiceResult<Category>> GetCategories(string filter = default(string), int? top = default(int?), int? skip = default(int?), string orderby = default(string), string expand = default(string), string select = default(string), bool? count = default(bool?))

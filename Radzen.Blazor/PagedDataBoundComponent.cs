@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -65,7 +66,7 @@ namespace Radzen
                 if (_PageSize != value)
                 {
                     _PageSize = value;
-                    OnPageSizeChanged(value);
+                    InvokeAsync(() => OnPageSizeChanged(value));
                 }
             }
         }
@@ -117,9 +118,34 @@ namespace Radzen
                 if (_data != value)
                 {
                     _data = value;
+
+                    if (_data != null && _data is INotifyCollectionChanged)
+                    {
+                        ((INotifyCollectionChanged)_data).CollectionChanged += OnCollectionChanged;
+                    }
+
                     OnDataChanged();
                     StateHasChanged();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Called when INotifyCollectionChanged CollectionChanged is raised.
+        /// </summary>
+        protected virtual void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            if (_data != null && _data is INotifyCollectionChanged)
+            {
+                ((INotifyCollectionChanged)_data).CollectionChanged -= OnCollectionChanged;
             }
         }
 
@@ -326,7 +352,7 @@ namespace Radzen
         /// <param name="value">The value.</param>
         protected virtual async Task OnPageSizeChanged(int value)
         {
-            if (pageSize != value)
+            if (pageSize != value && !this.firstRender)
             {
                 pageSize = value;
                 await InvokeAsync(Reload);

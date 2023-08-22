@@ -1,3 +1,11 @@
+$layout-background-color: var(--rz-body-background-color) !default;
+
+// Layout CSS variables
+
+:root {
+  --rz-layout-background-color: #{$layout-background-color};
+}
+
 .rz-layout {
   height: 100vh;
   overflow: hidden;
@@ -8,6 +16,7 @@
   "rz-header rz-header"
   "rz-sidebar rz-body"
   "rz-footer rz-footer";
+  background-color: var(--rz-layout-background-color);
 
   .rz-body {
     grid-area: rz-body;

@@ -1,0 +1,26 @@
+﻿@inherits RadzenProgressBar
+@using Radzen
+@using Radzen.Blazor.Rendering;
+@if (Visible)
+{
+    <div @ref="@Element" style="@Style" aria-valuemax="@Max" aria-valuemin="@Min" role="progressbar" @attributes="Attributes" class="@GetCssClass()"
+         aria-valuenow="@Value" id="@GetId()">
+        <svg class="rz-progressbar-circular-viewbox" viewBox="-19 -19 38 38">
+            <circle class="rz-progressbar-circular-background" r="15.91549" fill="none" />
+            <circle class="rz-progressbar-circular-value" r="15.91549" fill="none" stroke-dashoffset="@(((1 - NormalizedValue) * 100).ToInvariantString())" />
+        </svg>
+        @if (ShowValue)
+        {
+            <div class="rz-progressbar-circular-label">
+                @if(Template != null)
+                {
+                    @Template
+                }
+                else
+                {
+                    @Value@Unit
+                }
+            </div>
+        }
+    </div>
+}

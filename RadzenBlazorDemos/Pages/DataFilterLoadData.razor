@@ -1,0 +1,139 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using System.Linq.Dynamic.Core
+
+@inherits DbContextPage
+
+<RadzenStack Gap="2rem">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+        <RadzenCheckBox @bind-Value="@auto" Name="auto" />
+        <RadzenLabel Text="Auto filter" Component="auto" Class="rz-me-6" />
+        <RadzenButton Text="Apply Filter" Click="@ApplyFilter" Disabled="@auto" Size="ButtonSize.Small" />
+    </RadzenStack>
+
+    <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => ordersGrid.Reload())>
+        <Properties>
+            <RadzenDataFilterProperty TItem="Order" Property="OrderID" Title="Order ID" />
+            <RadzenDataFilterProperty TItem="Order" Property="Employee.LastName" Title="Employee Last Name" />
+            <MyCustomEnumerableDataFilterProperty TItem="Order" Property="Employee.Title" Title="Employee Title" FilterValue="@finalSelectedTitles"
+                                                    Type="typeof(IEnumerable<string>)" FilterOperator="FilterOperator.Contains">
+                <FilterTemplate>
+                    <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%;"
+                                    Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
+                </FilterTemplate>
+            </MyCustomEnumerableDataFilterProperty>
+            <MyCustomDataFilterProperty TItem="Order" Property="OrderDate" Title="Order Date" />
+            <RadzenDataFilterProperty TItem="Order" Property="Freight" Title="Freight" />
+        </Properties>
+    </RadzenDataFilter>
+
+    <RadzenDataGrid @ref="ordersGrid" AllowPaging="true" AllowSorting="true" IsLoading="@isLoading"
+                    Data="@(filteredOrders)" TItem="Order" Count="@count" LoadData="@LoadData"
+                    ColumnWidth="200px" PageSize="20" Style="height: 500px">
+        <Columns>
+            <RadzenDataGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID" />
+            <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
+            <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
+                <Template Context="order">
+                    @order.Employee?.FirstName @order.Employee?.LastName
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="Employee.Title" Title="Employee Title" />
+            <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
+                <Template Context="order">
+                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    bool auto = true;
+    RadzenDataFilter<Order> dataFilter;
+
+    IEnumerable<Order> filteredOrders;
+    IEnumerable<Order> orders;
+    RadzenDataGrid<Order> ordersGrid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = Enumerable.Empty<Order>();
+    }
+
+    List<string> titles = new List<string> { "Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
+    IEnumerable<string> selectedTitles;
+    IEnumerable<string> finalSelectedTitles;
+
+    async Task OnSelectedTitlesChange(object value)
+    {
+        if (selectedTitles != null && !selectedTitles.Any())
+        {
+            selectedTitles = null;
+        }
+
+        if (auto)
+        {
+            finalSelectedTitles = selectedTitles;
+        }
+
+        await ordersGrid.FirstPage();
+    }
+
+    async Task ApplyFilter()
+    {
+        finalSelectedTitles = selectedTitles;
+        await dataFilter.Filter();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await dataFilter.AddFilter(new CompositeFilterDescriptor() 
+            { 
+                Property = "Employee.LastName", 
+                FilterValue = "Buchanan", 
+                FilterOperator = FilterOperator.Contains 
+            });
+        }
+    }
+
+    bool isLoading;
+    int count;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        // This demo is using https://dynamic-linq.net
+        var query = dbContext.Orders.Include("Customer").Include("Employee").AsQueryable();
+
+        // Filter via the Where method
+        query = query.Where(dataFilter);
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            // Sort via the OrderBy method
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        // Important!!! Make sure the Count property of RadzenDataGrid is set.
+        count = query.Count();
+
+        // Perform paging via Skip and Take.
+        filteredOrders = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+        isLoading = false;
+    }
+}

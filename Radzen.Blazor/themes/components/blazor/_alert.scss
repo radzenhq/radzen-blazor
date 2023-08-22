@@ -4,6 +4,7 @@ $alert-gap: 1rem !default;
 $alert-color: var(--rz-text-color) !default;
 $alert-background-color: var(--rz-base-200) !default;
 $alert-box-shadow: var(--rz-shadow-3) !default;
+$alert-border-radius: var(--rz-border-radius) !default;
 $alert-message-margin: 0.25rem 0 !default;
 $alert-title-color: var(--rz-text-h6-color) !default;
 $alert-icon-color: var(--rz-alert-color) !default;
@@ -48,6 +49,7 @@ $alert-sizes: map-merge(
 --rz-alert-color: #{$alert-color};
 --rz-alert-background-color: #{$alert-background-color};
 --rz-alert-box-shadow: #{$alert-box-shadow};
+--rz-alert-border-radius: #{$alert-border-radius};
 --rz-alert-message-margin: #{$alert-message-margin};
 --rz-alert-title-color: #{$alert-title-color};
 --rz-alert-icon-color: #{$alert-icon-color};
@@ -63,7 +65,7 @@ $alert-sizes: map-merge(
   margin: var(--rz-alert-margin);
   padding: var(--rz-alert-padding);
   width: 100%;
-  border-radius: var(--rz-border-radius);
+  border-radius: var(--rz-alert-border-radius);
   background-color: var(--rz-alert-background-color);
   color: var(--rz-alert-color);
 
@@ -148,21 +150,33 @@ $alert-sizes: map-merge(
         @if $name == 'background-color' { // generate the styles only once
           &.rz-shade-lighter {
             --rz-alert-background-color: var(--rz-#{$style}-lighter);
-            --rz-alert-color: var(--rz-#{$style}-dark);
-            --rz-alert-title-color: var(--rz-#{$style}-dark);
-            --rz-alert-icon-color: var(--rz-#{$style}-dark);
+            --rz-alert-color: var(--rz-on-#{$style}-lighter);
+            --rz-alert-title-color: var(--rz-on-#{$style}-lighter);
+            --rz-alert-icon-color: var(--rz-on-#{$style}-lighter);
           }
           &.rz-shade-light {
             --rz-alert-background-color: var(--rz-#{$style}-light);
+            --rz-alert-color: var(--rz-on-#{$style}-light);
+            --rz-alert-title-color: var(--rz-on-#{$style}-light);
+            --rz-alert-icon-color: var(--rz-on-#{$style}-light);
           }
           &.rz-shade-default {
             --rz-alert-background-color: var(--rz-#{$style});
+            --rz-alert-color: var(--rz-on-#{$style});
+            --rz-alert-title-color: var(--rz-on-#{$style});
+            --rz-alert-icon-color: var(--rz-on-#{$style});
           }
           &.rz-shade-dark {
             --rz-alert-background-color: var(--rz-#{$style}-dark);
+            --rz-alert-color: var(--rz-on-#{$style}-dark);
+            --rz-alert-title-color: var(--rz-on-#{$style}-dark);
+            --rz-alert-icon-color: var(--rz-on-#{$style}-dark);
           }
           &.rz-shade-darker {
             --rz-alert-background-color: var(--rz-#{$style}-darker);
+            --rz-alert-color: var(--rz-on-#{$style}-darker);
+            --rz-alert-title-color: var(--rz-on-#{$style}-darker);
+            --rz-alert-icon-color: var(--rz-on-#{$style}-darker);
           }
         }
       }

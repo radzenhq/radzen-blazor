@@ -289,7 +289,7 @@ $header-border: none !default;
 $header-color: var(--rz-text-contrast-color) !default;
 $header-shadow: var(--rz-shadow-4) !default;
 
-.header {
+.rz-header {
   a,
   a:hover,
   a:focus {
@@ -306,10 +306,13 @@ $sidebar-z: 1 !default;
 $sidebar-border-right: var(--rz-border-base-200) !default;
 $sidebar-width: 300px !default;
 $sidebar-background-color: var(--rz-base-background-color) !default;
+$sidebar-color: var(--rz-text-color) !default;
 
 // Card
 $card-padding: 1rem !default;
+$card-flat-background-color: var(--rz-base-background-color) !default;
 $card-shadow: var(--rz-shadow-1) !default;
+$card-border: var(--rz-border-base-300) !default;
 
 // Accordion
 $accordion-item-padding: 1rem !default;
@@ -1141,6 +1144,9 @@ $tabs-transition: var(--rz-transition-all) !default;
 
 .rz-tabview {
   &.rz-tabview-top > .rz-tabview-nav {
+    li {
+      border-bottom: 2px solid transparent;
+    }
     .rz-tabview-selected {
       border-top-width: 0;
       border-bottom: 2px solid $tabs-tab-selected-bottom-border-color;
@@ -1156,6 +1162,9 @@ $tabs-transition: var(--rz-transition-all) !default;
     }
   }
   &.rz-tabview-left > .rz-tabview-nav {
+    li {
+      border-right: 2px solid transparent;
+    }
     .rz-tabview-selected {
       border-left-width: 0;
       border-right: 2px solid $tabs-tab-selected-bottom-border-color;
@@ -1280,9 +1289,14 @@ $progressbar-background-color: var(--rz-primary-lighter) !default;
 $progressbar-border-radius: 0 !default;
 $progressbar-height: 0.25rem !default;
 
-.rz-progressbar-label {
-  display: none !important;
+.rz-progressbar:has(.rz-progressbar-label) {
+  --rz-progressbar-height: 1.25rem;
 }
+
+// ProgressBarCircular
+$progressbar-circular-stroke-width: 0 !default;
+$progressbar-circular-value-stroke-width: 3px !default;
+$progressbar-circular-value-endpoint: square !default;
 
 // Chart
 $chart-axis-color: var(--rz-base-300) !default;
@@ -1290,6 +1304,9 @@ $chart-axis-label-color: var(--rz-base-500) !default;
 
 // Gauge
 $gauge-arc-scale-color: var(--rz-base-300) !default;
+
+// Timeline
+$rz-timeline-item-padding: 1rem !default;
 
 // Editor
 $editor-border: var(--rz-border-base-300)  !default;
@@ -1338,7 +1355,7 @@ $form-field-label-padding: 0 0.25rem !default;
 $form-field-text-label-padding: 0 !default;
 $form-field-label-left: 0.6875rem !default;
 $form-field-label-textarea-top: 0.5rem !default;
-$form-field-label-floating-top: -0.4375rem !default;
+$form-field-label-floating-top: -0.5625rem !default;
 $form-field-helper-padding: 0 1rem !default;
 
 @import 'fonts';

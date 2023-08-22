@@ -1,0 +1,47 @@
+﻿@page "/progressbarcircular"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    ProgressBarCircular
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>ProgressBarCircular</strong> component.
+</RadzenText>
+
+<RadzenText Anchor="progressbarcircular#progressbarcircular-determinate" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    ProgressBarCircular in determinate mode, Get and Set the value
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components the <strong>ProgressBarCircular</strong> has a <code>Value</code> property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="ProgressBarCircular" Example="ProgressBarCircularDeterminate">
+    <ProgressBarCircularDeterminate />
+</RadzenExample>
+
+<RadzenText Anchor="progressbarcircular#progressbarcircular-indeterminate" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    ProgressBarCircular in indeterminate mode
+</RadzenText>
+<RadzenExample ComponentName="ProgressBarCircular" Example="ProgressBarCircularIndeterminate">
+    <ProgressBarCircularIndeterminate />
+</RadzenExample>
+
+<RadzenText Anchor="progressbarcircular#progressbarcircular-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    ProgressBarCircular sizes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Size</code> property to set sizes of the progress circle and the text inside it.
+    Available sizes are ExtraSmall, Small, Medium (default), and Large.
+</RadzenText>
+<RadzenExample ComponentName="ProgressBarCircular" Example="ProgressBarCircularSizes">
+    <ProgressBarCircularSizes />
+</RadzenExample>
+
+<RadzenText Anchor="progressbarcircular#progressbarcircular-min-max-values" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    ProgressBarCircular Min and Max values
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    By default, the value range is between 0 and 100.
+    Use the <code>Min</code> and <code>Max</code> properties to set a custom range.
+</RadzenText>
+<RadzenExample ComponentName="ProgressBarCircular" Example="ProgressBarCircularMinMaxValues">
+    <ProgressBarCircularMinMaxValues />
+</RadzenExample>

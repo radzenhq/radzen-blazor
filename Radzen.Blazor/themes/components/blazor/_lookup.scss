@@ -11,6 +11,8 @@ $lookup-panel-padding: 1rem !default;
 .rz-lookup-panel {
   background-color: var(--rz-lookup-panel-background-color);
   padding: var(--rz-lookup-panel-padding);
+  container-type: inline-size;
+  container-name: rz-lookup-panel;
 }
 
 .rz-lookup-search {

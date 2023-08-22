@@ -119,7 +119,7 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T" />.</param>
         /// <param name="options">The dialog options.</param>
-        public void Open<T>(string title, Dictionary<string, object> parameters = null, DialogOptions options = null) where T : ComponentBase
+        public virtual void Open<T>(string title, Dictionary<string, object> parameters = null, DialogOptions options = null) where T : ComponentBase
         {
             OpenDialog<T>(title, parameters, options);
         }
@@ -146,7 +146,7 @@ namespace Radzen
         /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T" />.</param>
         /// <param name="options">The dialog options.</param>
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
-        public Task<dynamic> OpenAsync<T>(string title, Dictionary<string, object> parameters = null, DialogOptions options = null) where T : ComponentBase
+        public virtual Task<dynamic> OpenAsync<T>(string title, Dictionary<string, object> parameters = null, DialogOptions options = null) where T : ComponentBase
         {
             var task = new TaskCompletionSource<dynamic>();
             tasks.Add(task);
@@ -199,7 +199,7 @@ namespace Radzen
         /// <param name="childContent">The content displayed in the dialog.</param>
         /// <param name="options">The dialog options.</param>
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
-        public Task<dynamic> OpenAsync(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
+        public virtual Task<dynamic> OpenAsync(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
         {
             var task = new TaskCompletionSource<dynamic>();
             tasks.Add(task);
@@ -219,7 +219,7 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="childContent">The content displayed in the dialog.</param>
         /// <param name="options">The dialog options.</param>
-        public void Open(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
+        public virtual void Open(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
         {
             options = options ?? new DialogOptions();
 
@@ -253,6 +253,7 @@ namespace Radzen
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                 CssClass = options != null ? options.CssClass : "",
+                WrapperCssClass = options != null ? options.WrapperCssClass : "",
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
             });
         }
@@ -315,6 +316,7 @@ namespace Radzen
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                 CssClass = options != null ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm",
+                WrapperCssClass = options != null ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper",
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
             };
 
@@ -374,6 +376,7 @@ namespace Radzen
                 CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                 CssClass = options != null ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert",
+                WrapperCssClass = options != null ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper",
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
             };
 
@@ -444,6 +447,11 @@ namespace Radzen
         /// Gets or sets dialog box custom class
         /// </summary>
         public string CssClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CSS classes added to the dialog's wrapper element.
+        /// </summary>
+        public string WrapperCssClass { get; set; }
         
         /// <summary>
         /// Gets or sets a value the dialog escape tabindex. Set to <c>0</c> by default.

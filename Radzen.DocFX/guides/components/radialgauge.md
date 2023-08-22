@@ -5,7 +5,7 @@ Here is basic example that creates a radial gauge with minimal configuration.
 ```
 <RadzenRadialGauge Style="width: 300px; height: 300px">
   <RadzenRadialGaugeScale>
-    <RadzenRadialGaugeScalePoiner Value="50" />
+    <RadzenRadialGaugeScalePointer Value="50" />
   </RadzenRadialGaugeScale>
 </RadzenRadialGauge>
 ```

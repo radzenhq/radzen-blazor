@@ -14,20 +14,20 @@
             <RadzenText TextStyle="TextStyle.Body1"><b>@order?.Customer?.CompanyName</b></RadzenText>
         </RadzenStack>
     </RadzenStack>
-    <RadzenCard class="rz-background-color-primary-lighter rz-shadow-0 rz-border-radius-0 rz-p-8" style="margin: 1rem calc(-1 * var(--rz-card-padding));">
-        <RadzenText TextStyle="TextStyle.H6" class="rz-color-primary-light"><strong>Delivery Information</strong></RadzenText>
+    <RadzenCard class="rz-background-color-primary-light rz-shadow-0 rz-border-radius-0 rz-p-8" style="margin: 1rem calc(-1 * var(--rz-card-padding));">
+        <RadzenText TextStyle="TextStyle.H6" class="rz-color-on-primary-light"><strong>Delivery Information</strong></RadzenText>
         <RadzenRow RowGap="0">
             <RadzenColumn SizeSM="4">
-                <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Country</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body1"><b>@(order?.ShipCountry)</b></RadzenText>
-                <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">City</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body1"><b>@(order?.ShipCity)</b></RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-color-on-primary-light rz-display-flex rz-mt-4 rz-mb-0">Country</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1" class="rz-color-on-primary-light"><b>@(order?.ShipCountry)</b></RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-color-on-primary-light rz-display-flex rz-mt-4 rz-mb-0">City</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1" class="rz-color-on-primary-light"><b>@(order?.ShipCity)</b></RadzenText>
             </RadzenColumn>
             <RadzenColumn SizeSM="8">
-                <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Ship name</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body1"><b>@(order?.ShipName)</b></RadzenText>
-                <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Freight</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body1"><b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order?.Freight)</b></RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-color-on-primary-light rz-display-flex rz-mt-4 rz-mb-0">Ship name</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1" class="rz-color-on-primary-light"><b>@(order?.ShipName)</b></RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-color-on-primary-light rz-display-flex rz-mt-4 rz-mb-0">Freight</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1" class="rz-color-on-primary-light"><b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order?.Freight)</b></RadzenText>
             </RadzenColumn>
         </RadzenRow>
     </RadzenCard>

@@ -1,4 +1,4 @@
-﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
@@ -102,12 +102,7 @@
 
     void OnUpdateRow(Order order)
     {
-        if (order == orderToInsert)
-        {
-            orderToInsert = null;
-        }
-
-        orderToUpdate = null;
+        Reset();
 
         dbContext.Update(order);
 
@@ -121,12 +116,7 @@
 
     void CancelEdit(Order order)
     {
-        if (order == orderToInsert)
-        {
-            orderToInsert = null;
-        }
-
-        orderToUpdate = null;
+        Reset();
 
         ordersGrid.CancelEditRow(order);
 
@@ -140,15 +130,7 @@
 
     async Task DeleteRow(Order order)
     {
-        if (order == orderToInsert)
-        {
-            orderToInsert = null;
-        }
-
-        if (order == orderToUpdate)
-        {
-            orderToUpdate = null;
-        }
+        Reset();
 
         if (orders.Contains(order))
         {

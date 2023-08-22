@@ -8,8 +8,8 @@
     <RadzenCheckBox @bind-Value=@allowCompositeDataCells Name="CheckBox1" TValue="bool" Change=@(args => grid.Reload())/>
     <RadzenLabel Text="Allow composite data cells" Component="CheckBox1" />
 </RadzenCard>
-<RadzenDataGrid @ref="grid" AllowCompositeDataCells="@allowCompositeDataCells" AllowSorting="true" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand"  FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
-    Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:420px" class="m-4">
+<RadzenDataGrid @ref="grid" AllowGrouping=true AllowCompositeDataCells="@allowCompositeDataCells" AllowSorting="true" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand"  FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
+    Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:420px" class="m-4" HideGroupedColumn="false" >
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >

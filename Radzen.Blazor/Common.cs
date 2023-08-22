@@ -64,6 +64,11 @@ namespace Radzen
         /// <summary>
         /// Property.
         /// </summary>
+        public string UniqueID { get; set; }
+
+        /// <summary>
+        /// Property.
+        /// </summary>
         public string Property { get; set; }
         /// <summary>
         /// Visible.
@@ -81,6 +86,10 @@ namespace Radzen
         /// SortOrder.
         /// </summary>
         public SortOrder? SortOrder { get; set; }
+        /// <summary>
+        /// SortIndex.
+        /// </summary>
+        public int? SortIndex { get; set; }
         /// <summary>
         /// FilterValue.
         /// </summary>
@@ -627,6 +636,45 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Specifies the ways a <see cref="RadzenTimeline" /> component renders line and content items.
+    /// </summary>
+    public enum LinePosition
+    {
+        /// <summary>
+        /// The RadzenTimeline line is displayed at the center of the component.
+        /// </summary>
+        Center,
+        /// <summary>
+        /// The RadzenTimeline line is displayed at the center of the component with alternating content position.
+        /// </summary>
+        Alternate,
+        /// <summary>
+        /// The RadzenTimeline line is displayed at the start of the component.
+        /// </summary>
+        Start,
+        /// <summary>
+        /// The RadzenTimeline line is displayed at the end of the component.
+        /// </summary>
+        End,
+        /// <summary>
+        /// The RadzenTimeline line is displayed at the left side of the component.
+        /// </summary>
+        Left,
+        /// <summary>
+        /// The RadzenTimeline line is displayed at the right side of the component.
+        /// </summary>
+        Right,
+        /// <summary>
+        /// The RadzenTimeline line is displayed at the top of the component.
+        /// </summary>
+        Top,
+        /// <summary>
+        /// The RadzenTimeline line is displayed at the bottom of the component.
+        /// </summary>
+        Bottom
+    }
+
+    /// <summary>
     /// Specifies the position at which a Radzen Blazor component renders its built-in <see cref="RadzenPager" />.
     /// </summary>
     public enum PagerPosition
@@ -807,7 +855,73 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Specifies the behavior of <see cref="RadzenProgressBar" />.
+    /// Specifies the size of a point in <see cref="RadzenTimelineItem" />.
+    /// </summary>
+    public enum PointSize
+    {
+        /// <summary>
+        /// The smallest.
+        /// </summary>
+        ExtraSmall,
+        /// <summary>
+        /// Smaller than the default.
+        /// </summary>
+        Small,
+        /// <summary>
+        /// The default size.
+        /// </summary>
+        Medium,
+        /// <summary>
+        /// Larger than the default.
+        /// </summary>
+        Large
+    }
+
+    /// <summary>
+    /// Specifies the display style or severity of a <see cref="RadzenTimelineItem" />
+    /// </summary>
+    public enum PointStyle
+    {
+        /// <summary>
+        /// Primary styling. Similar to primary buttons.
+        /// </summary>
+        Primary,
+        /// <summary>
+        /// Secondary styling. Similar to secondary buttons.
+        /// </summary>
+        Secondary,
+        /// <summary>
+        /// Light styling. Similar to light buttons.
+        /// </summary>
+        Light,
+        /// <summary>
+        /// Dark styling. Similar to dark buttons.
+        /// </summary>
+        Base,
+        /// <summary>
+        /// The default styling.
+        /// </summary>
+        Dark,
+        /// <summary>
+        /// Success styling.
+        /// </summary>
+        Success,
+        /// <summary>
+        /// Danger styling.
+        /// </summary>
+        Danger,
+        /// <summary>
+        /// Warning styling.
+        /// </summary>
+        Warning,
+        /// <summary>
+        /// Informative styling.
+        /// </summary>
+        Info
+    }
+
+    /// <summary>
+    /// Specifies the behavior of <see cref="RadzenProgressBar" /> or <see cref="RadzenProgressBarCircular" />.
     /// </summary>
     public enum ProgressBarMode
     {
@@ -822,7 +936,7 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Specifies the display style of a <see cref="RadzenProgressBar" />. Affects the visual styling of RadzenProgressBar (background and text color).
+    /// Specifies the display style of a <see cref="RadzenProgressBar" /> and <see cref="RadzenProgressBarCircular" />. Affects the visual styling of RadzenProgressBar (background and text color) and RadzenProgressBarCircular (stroke and text color).
     /// </summary>
     public enum ProgressBarStyle
     {
@@ -858,6 +972,29 @@ namespace Radzen
         /// Informative styling.
         /// </summary>
         Info
+    }
+
+    /// <summary>
+    /// Specifies the size of a <see cref="RadzenProgressBarCircular" />.
+    /// </summary>
+    public enum ProgressBarCircularSize
+    {
+        /// <summary>
+        /// The default size of a circular progress bar.
+        /// </summary>
+        Medium,
+        /// <summary>
+        /// A circular progress bar larger than the default.
+        /// </summary>
+        Large,
+        /// <summary>
+        /// A circular progress bar smaller than the default.
+        /// </summary>
+        Small,
+        /// <summary>
+        /// The smallest circular progress bar.
+        /// </summary>
+        ExtraSmall
     }
 
     /// <summary>
@@ -1229,6 +1366,14 @@ namespace Radzen
         DoesNotContain,
         /// <summary>
         /// Satisfied if the current value is null.
+        /// </summary>
+        In,
+        /// <summary>
+        /// Satisfied if the current value is in the specified value.
+        /// </summary>
+        NotIn,
+        /// <summary>
+        /// Satisfied if the current value is not in the specified value.
         /// </summary>
         IsNull,
         /// <summary>
@@ -2189,7 +2334,15 @@ namespace Radzen
         /// <param name="property">The property.</param>
         public static string GetProperty(string property)
         {
-            var type = Type.GetType($"System.{property}");
+            Type type = null;
+            try
+            {
+                type = Type.GetType($"System.{property}");
+            }
+            catch
+            {
+                // ignore the exception and assume the property start without a type and do not need the '@' prefix
+            }
             var propertyName = $"{(type != null ? "@" : "")}{property}";
 
             if (propertyName.IndexOf(".") != -1)
@@ -2364,6 +2517,23 @@ namespace Radzen
             }
             return false;
         }
+        
+        /// <summary>
+        /// Method to only replace first occurence of a substring in a string
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="search"></param>
+        /// <param name="replace"></param>
+        /// <returns></returns>
+        public static string ReplaceFirst(this string text, string search, string replace)
+        {
+            int pos = text.IndexOf(search, StringComparison.Ordinal);
+            if (pos < 0)
+            {
+                return text;
+            }
+            return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
+        }
 
         /// <summary>
         /// Gets the type of the property.
@@ -2376,7 +2546,7 @@ namespace Radzen
             if (property.Contains("."))
             {
                 var part = property.Split('.').FirstOrDefault();
-                return GetPropertyType(GetPropertyTypeIncludeInterface(type, part), property.Replace($"{part}.", ""));
+                return GetPropertyType(GetPropertyTypeIncludeInterface(type, part), property.ReplaceFirst($"{part}.", ""));
             }
 
             return GetPropertyTypeIncludeInterface(type, property);
@@ -2791,9 +2961,18 @@ namespace Radzen
         }
     }
 
+    /// <summary>
+    /// CoordinateSystem enum
+    /// </summary>
     public enum CoordinateSystem
     {
+        /// <summary>
+        /// Cartesian CoordinateSystem
+        /// </summary>
         Cartesian,
+        /// <summary>
+        /// Cartesian CoordinateSystem
+        /// </summary>
         Polar
     }
 }

@@ -160,13 +160,18 @@ $font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
 
 // Utilities
 
-// Semantic Text Color
+// Text Color
 $rz-text-title-color: var(--rz-base-50) !default;
 $rz-text-color: var(--rz-base-100) !default;
 $rz-text-secondary-color: var(--rz-base-300) !default;
 $rz-text-tertiary-color: var(--rz-base-400) !default; //cool-grey
 $rz-text-disabled-color: var(--rz-base-600) !default;
 $rz-text-contrast-color: var(--rz-white) !default;
+
+// Link Color
+$rz-link-color: var(--rz-secondary) !default;
+$rz-link-hover-color: var(--rz-secondary-dark) !default;
+$rz-link-hover-decoration: underline !default;
 
 // Background Color
 $rz-base-background-color: var(--rz-base-800) !default;
@@ -260,6 +265,9 @@ $sidebar-toggle-hover-color: var(--rz-secondary) !default;
 $sidebar-toggle-background-color: var(--rz-base-background-color) !default;
 $sidebar-toggle-color: var(--rz-text-color) !default;
 
+// Card
+$card-flat-background-color: var(--rz-base-700) !default;
+
 // ProfileMenu
 $profile-menu-border: var(--rz-border-base-900) !default;
 $profile-menu-toggle-button-color: var(--rz-text-color) !default;
@@ -308,7 +316,6 @@ $grid-header-sorted-background-color: var(--rz-base-800) !default;
 $grid-filter-background-color: var(--rz-base-800) !default;
 $grid-filter-buttons-background-color: var(--rz-base-900) !default;
 $grid-detail-template-background-color: var(--rz-base-900) !default;
-
 
 // Paginator
 $paginator-back-button-background-color: var(--rz-base-700) !default;
@@ -365,6 +372,11 @@ $progressbar-background-color: var(--rz-base-700) !default;
 // Chart
 $chart-axis-color: var(--rz-base-600) !default ;
 $chart-axis-label-color: var(--rz-text-secondary-color) !default;
+
+// Timeline
+$rz-timeline-point-background-color: var(--rz-base-600) !default;
+$rz-timeline-point-color: var(--rz-text-color) !default;
+$rz-timeline-line-color: var(--rz-base-600) !default;
 
 // Editor
 $editor-separator-background-color: var(--rz-base-700) !default;

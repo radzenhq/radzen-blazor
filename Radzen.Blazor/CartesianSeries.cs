@@ -17,21 +17,33 @@ namespace Radzen.Blazor
     public abstract class CartesianSeries<TItem> : RadzenChartComponentBase, IChartSeries, IDisposable
     {
         /// <summary>
+        /// Cache for the value returned by <see cref="Category"/> when that value is only dependent on
+        /// <see cref="CategoryProperty"/>.
+        /// </summary>
+        Func<TItem, double> categoryPropertyCache;
+
+        /// <summary>
         /// Creates a getter function that returns a value from the specified category scale for the specified data item.
         /// </summary>
         /// <param name="scale">The scale.</param>
         internal Func<TItem, double> Category(ScaleBase scale)
         {
+            if (categoryPropertyCache != null)
+            {
+                return categoryPropertyCache;
+            }
+
             if (IsNumeric(CategoryProperty))
             {
-                return PropertyAccess.Getter<TItem, double>(CategoryProperty);
+                categoryPropertyCache = PropertyAccess.Getter<TItem, double>(CategoryProperty);
+                return categoryPropertyCache;
             }
 
             if (IsDate(CategoryProperty))
             {
                 var category = PropertyAccess.Getter<TItem, DateTime>(CategoryProperty);
-
-                return (item) => category(item).Ticks;
+                categoryPropertyCache = (item) => category(item).Ticks;
+                return categoryPropertyCache;
             }
 
             if (scale is OrdinalScale ordinal)
@@ -351,6 +363,7 @@ namespace Radzen.Blazor
             var shouldRefresh = parameters.DidParameterChange(nameof(Data), Data);
             var visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
             var hiddenChanged = parameters.DidParameterChange(nameof(Hidden), Hidden);
+            var categoryChanged = parameters.DidParameterChange(nameof(CategoryProperty), CategoryProperty);
 
             await base.SetParametersAsync(parameters);
 
@@ -364,6 +377,11 @@ namespace Radzen.Blazor
             {
                 IsVisible = Visible;
                 shouldRefresh = true;
+            }
+
+            if (categoryChanged || shouldRefresh)
+            {
+                categoryPropertyCache = null;
             }
 
             if (Data != null && Data.Count() != Items.Count)
@@ -454,7 +472,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public virtual RenderFragment RenderTooltip(object data, double marginLeft, double marginTop)
+        public virtual RenderFragment RenderTooltip(object data, double marginLeft, double marginTop, double chartHeight)
         {
             var item = (TItem)data;
 
@@ -576,7 +594,7 @@ namespace Radzen.Blazor
 
             var avgX = Data.Select(e => X(e)).Average();
             var avgY = Data.Select(e => Y(e)).Average();
-            var sumXY = Data.Sum(e => (X(e) - avgX) * (Y(e) - avgY));         
+            var sumXY = Data.Sum(e => (X(e) - avgX) * (Y(e) - avgY));
             if (Chart.ShouldInvertAxes())
             {
                 var sumYSq = Data.Sum(e => (Y(e) - avgY) * (Y(e) - avgY));
@@ -669,18 +687,21 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public virtual object DataAt(double x, double y)
+        public virtual (object, Point) DataAt(double x, double y)
         {
             if (Items.Any())
             {
-                return Items.Select(item =>
+                var retObject = Items.Select(item =>
                 {
                     var distance = Math.Abs(TooltipX(item) - x);
                     return new { Item = item, Distance = distance };
                 }).Aggregate((a, b) => a.Distance < b.Distance ? a : b).Item;
+
+                return (retObject,
+                    new Point() { X = TooltipX(retObject), Y = TooltipY(retObject)});
             }
 
-            return null;
+            return (null, null);
         }
 
         /// <inheritdoc />
@@ -690,8 +711,8 @@ namespace Radzen.Blazor
 
             foreach (var d in Data)
             {
-                list.Add(new ChartDataLabel 
-                { 
+                list.Add(new ChartDataLabel
+                {
                     Position = new Point { X = TooltipX(d) + offsetX, Y = TooltipY(d) + offsetY },
                     TextAnchor = "middle",
                     Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))

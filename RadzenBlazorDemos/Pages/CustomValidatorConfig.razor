@@ -1,0 +1,64 @@
+@using Radzen
+@using System.Text.Json
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col">
+            <RadzenCard class="w-100 mb-4" >
+            <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
+                <RadzenLabel Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
+            </RadzenCard>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+                <RadzenFieldset Text="Personal information">
+                    <div class="row mb-5">
+                        <div class="col-md-4">
+                            <RadzenLabel Text="Email" />
+                        </div>
+                        <div class="col">
+                            <RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email class="w-100" Placeholder="Try with mail@example.com"/>
+                            <RadzenRequiredValidator Component="Email" Text="Email is required" Popup=@popup />
+                            <RadzenEmailValidator Component="Email" Text="Provide a valid email address" Popup=@popup />
+                            <RadzenCustomValidator Component="Email" Validator="@(() => ValidateNewEmail(model.Email))" Text="Email already exists" Popup=@popup />
+                        </div>
+                    </div>
+                    <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
+                </RadzenFieldset>
+            </RadzenTemplateForm>
+        </div>
+    </div>
+</div>
+
+<EventConsole @ref=@console />
+
+@code {
+    class Model
+    {
+        public string Email { get; set; }
+    }
+
+    string[] emails = new string[] { "mail@example.com" };
+
+    bool popup;
+
+    Model model = new Model();
+    EventConsole console;
+
+    bool ValidateNewEmail(string email)
+    {
+        return !emails.Any(e => e.ToUpper().Equals(email?.ToUpper()));
+    }
+
+    void OnSubmit(Model model)
+    {
+        console.Log($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true })}");
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true })}");
+    }
+}

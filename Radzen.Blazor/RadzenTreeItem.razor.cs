@@ -13,6 +13,10 @@ namespace Radzen.Blazor
     /// </summary>
     public partial class RadzenTreeItem : IDisposable
     {
+        /// <summary>
+        /// Specifies additional custom attributes that will be rendered by the component.
+        /// </summary>
+        /// <value>The attributes.</value>
         [Parameter(CaptureUnmatchedValues = true)]
         public IReadOnlyDictionary<string, object> Attributes { get; set; }
 

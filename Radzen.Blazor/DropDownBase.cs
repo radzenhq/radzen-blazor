@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
-
+using Radzen.Blazor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -53,7 +53,7 @@ namespace Radzen
 
             if (LoadData.HasDelegate)
             {
-                await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = request.Count, Filter = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) });
+                await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = request.Count, Filter = searchText });
             }
 
             virtualItems = (LoadData.HasDelegate ? Data : view.Skip(request.StartIndex).Take(top)).Cast<object>().ToList();
@@ -258,13 +258,6 @@ namespace Radzen
         public Action<object> SelectedItemChanged { get; set; }
 
         /// <summary>
-        /// Gets or sets the search text changed.
-        /// </summary>
-        /// <value>The search text changed.</value>
-        [Parameter]
-        public Action<string> SearchTextChanged { get; set; }
-
-        /// <summary>
         /// The selected items
         /// </summary>
         protected IList<object> selectedItems = new List<object>();
@@ -363,6 +356,7 @@ namespace Radzen
                 return;
 
             searchText = null;
+            await SearchTextChanged.InvokeAsync(searchText);
             await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, "");
 
             internalValue = default(T);
@@ -702,7 +696,6 @@ namespace Radzen
         {
             if (!LoadData.HasDelegate)
             {
-                searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
                 _view = null;
                 if (IsVirtualizationAllowed())
                 {
@@ -741,7 +734,7 @@ namespace Radzen
                 selectedIndex = -1;
 
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
-            SearchTextChanged?.Invoke(SearchText);
+            await SearchTextChanged.InvokeAsync(SearchText);
         }
 
         /// <summary>
@@ -781,14 +774,14 @@ namespace Radzen
 #if NET5_0_OR_GREATER
             if (AllowVirtualization)
             {
-                return new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, Filter = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) };
+                return await Task.FromResult(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, Filter = searchText });
             }
             else
             {
-                return new Radzen.LoadDataArgs() { Filter = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) };
+                return await Task.FromResult(new Radzen.LoadDataArgs() { Filter = searchText });
             }
 #else
-            return new Radzen.LoadDataArgs() { Filter = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) };
+            return await Task.FromResult(new Radzen.LoadDataArgs() { Filter = searchText });
 #endif
         }
 
@@ -868,7 +861,7 @@ namespace Radzen
 
             if (valueAsEnumerable != null)
             {
-                if (valueAsEnumerable.OfType<object>().Count() != selectedItems.Count)
+                if (valueAsEnumerable.Cast<object>().ToList().Count != selectedItems.Count)
                 {
                     selectedItems.Clear();
                 }
@@ -984,7 +977,35 @@ namespace Radzen
 
                         query.Add($"{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)");
 
-                        _view = Query.Where(String.Join(".", query), ignoreCase ? searchText.ToLower() : searchText);
+                        var search = ignoreCase ? searchText.ToLower() : searchText;
+
+                        if (Query.ElementType == typeof(Enum))
+                        {
+                            _view = Query.Cast<Enum>()
+                                .Where((Func<Enum, bool>)(i =>
+                                {
+                                    var value = ignoreCase ? i.GetDisplayDescription().ToLower() : i.GetDisplayDescription();
+
+                                    if (FilterOperator == StringFilterOperator.Contains)
+                                    {
+                                        return value.Contains(search);
+                                    }
+                                    else if (FilterOperator == StringFilterOperator.StartsWith)
+                                    {
+                                        return value.StartsWith(search);
+                                    }
+                                    else if (FilterOperator == StringFilterOperator.EndsWith)
+                                    {
+                                        return value.EndsWith(search);
+                                    }
+
+                                    return value == search;
+                                })).AsQueryable();
+                        }
+                        else
+                        {
+                            _view = Query.Where(String.Join(".", query), search);
+                        }
                     }
                     else
                     {
