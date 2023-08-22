@@ -164,6 +164,8 @@
     {
         Column.ClearFilters();
 
+        Grid.SaveSettings();
+
         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{Column.GetFilterProperty()}");
 
         await Grid.FilterCleared.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
