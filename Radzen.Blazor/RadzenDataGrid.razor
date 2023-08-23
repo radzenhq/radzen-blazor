@@ -174,9 +174,15 @@
                                                                     <i class="rzi">date_range</i>
                                                                 </button>
                                                                 var filterValue = column.GetFilterValue();
+                                                                var filterOperator = column.GetFilterOperator();
                                                                 @if (filterValue != null && filters.Any(d => d.Property == column.GetFilterProperty()))
                                                                 {
                                                                     <span class="rz-current-filter">@string.Format("{0:" + getFilterDateFormat(column) + "}", filterValue)</span>
+                                                                    <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear">close</i>
+                                                                }
+                                                                else if ((filterOperator == FilterOperator.IsNull || filterOperator == FilterOperator.IsNotNull) && filters.Any(d => d.Property == column.GetFilterProperty()))
+                                                                {
+                                                                    <span class="rz-current-filter">@column.GetFilterOperatorText(filterOperator)</span>
                                                                     <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear">close</i>
                                                                 }
                                                                 <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel"
