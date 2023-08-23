@@ -184,8 +184,8 @@ namespace Radzen.Blazor
 
         async Task OnChange()
         {
-            await Change.InvokeAsync(Html);
             await ValueChanged.InvokeAsync(Html);
+            await Change.InvokeAsync(Html);
         }
 
         internal async Task OnExecuteAsync(string name)
