@@ -855,6 +855,12 @@ namespace Radzen.Blazor
         public DataGridEditMode EditMode { get; set; } = DataGridEditMode.Multiple;
 
         /// <summary>
+        /// Gets or set the filter icon to use.
+        /// </summary>
+        [Parameter]
+        public string FilterIcon { get; set; } = "filter_alt";
+
+        /// <summary>
         /// Gets or sets the filter text.
         /// </summary>
         /// <value>The filter text.</value>
