@@ -8,6 +8,7 @@
 <RadzenCard class="m-4" style="display: flex; align-items: center; gap: 0.5rem">
     <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" />
     <RadzenLabel Text="Allow row select on row click" Component="CheckBox1" />
+    <RadzenButton Text="Clear selected rows" Click="@(args => selectedEmployees = null)" />
 </RadzenCard>
 <RadzenDataGrid @ref="grid" AllowRowSelectOnRowClick="@allowRowSelectOnRowClick" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
             AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
