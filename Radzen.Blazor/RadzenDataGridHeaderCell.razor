@@ -55,7 +55,9 @@
         @if (Grid.AllowFiltering && Column.Filterable && Grid.FilterMode == FilterMode.Advanced)
         {
                 <i @ref=@filterButton @onclick:stopPropagation="true" @onmousedown=@ToggleFilter
-                   class="@getFilterIconCss(Column)" onclick=@getFilterOpen() />
+                   class="@getFilterIconCss(Column)" onclick=@getFilterOpen() >
+                   @Grid.FilterIcon
+                </i>
 
                 <Popup Lazy=@(Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand) @ref=popup id="@($"{getColumnPopupID()}")" class="rz-overlaypanel"
                     style="display:none;min-width:250px;" tabindex="0">

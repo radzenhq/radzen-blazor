@@ -1018,10 +1018,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     cursor: pointer;
     color: var(--rz-grid-header-filter-icon-hover-color);
   }
-
-  &:after {
-    content: 'filter_alt';
-  }
 }
 
 .rz-grid-filter-active {
