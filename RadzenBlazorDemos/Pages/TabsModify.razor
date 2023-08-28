@@ -1,0 +1,37 @@
+﻿<RadzenTabs @ref="tabs" RenderMode="TabRenderMode.Client" @bind-SelectedIndex=@selectedIndex>
+    <Tabs>
+        @foreach (var item in items)
+        {
+            <RadzenTabsItem Text="@(item)">
+                @item
+            </RadzenTabsItem>
+        }
+    </Tabs>
+</RadzenTabs>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-pt-4 rz-pb-8">
+    <RadzenButton Click="AddItem">Add Item</RadzenButton>
+    <RadzenButton Click="RemoveItem">Remove Item</RadzenButton>
+</RadzenStack>
+
+
+@code {
+    RadzenTabs tabs;
+    int selectedIndex = 0;
+
+    List<string> items = new List<string> { "Customers", "Orders", "Order Details" };
+    int i = 0;
+
+    void AddItem()
+    {
+        items.Add($"TabItem{++i}");
+        tabs.Reload();
+    }
+
+    void RemoveItem()
+    {
+        items.RemoveAt(selectedIndex);
+        if (selectedIndex >= items.Count) selectedIndex = items.Count - 1;
+        tabs.Reload();
+    }
+}
