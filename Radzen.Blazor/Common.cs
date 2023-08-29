@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.DependencyInjection;
 using Radzen.Blazor;
 using System;
 using System.Collections;
@@ -17,6 +18,26 @@ using System.Threading.Tasks;
 
 namespace Radzen
 {
+    /// <summary>
+    /// Class with IServiceCollection extensions methods.
+    /// </summary>
+    public static class ServiceCollectionExtensions
+    {
+        /// <summary>
+        /// Add Radzen Blazor components services
+        /// </summary>
+        /// <param name="services">Service collection</param>
+        public static IServiceCollection AddRadzenComponents(this IServiceCollection services)
+        {
+            services.AddScoped<DialogService>();
+            services.AddScoped<NotificationService>();
+            services.AddScoped<TooltipService>();
+            services.AddScoped<ContextMenuService>();
+
+            return services;
+        }
+    }
+
     /// <summary>
     /// Html editor mode (Rendered or Raw). Also used for toolbar buttons to enable/disable according to mode.
     /// </summary>
