@@ -71,6 +71,16 @@ namespace Radzen
             }
         }
 
+        internal int GetPageSize()
+        {
+            return _PageSize;
+        }
+
+        internal void SetPageSize(int value)
+        {
+            _PageSize = value;
+        }
+
         /// <summary>
         /// Gets or sets the page numbers count.
         /// </summary>

@@ -3022,15 +3022,15 @@ namespace Radzen.Blazor
                     shouldUpdateState = true;
                 }
 
-                if (settings.PageSize != null && settings.PageSize != PageSize)
+                if (settings.PageSize != null && settings.PageSize != GetPageSize())
                 {
-                    PageSize = settings.PageSize.Value;
+                    SetPageSize(settings.PageSize.Value);
                     shouldUpdateState = true;
                 }
 
                 if (shouldUpdateState)
                 {
-                    skip = CurrentPage * PageSize;
+                    skip = CurrentPage * GetPageSize();
 
                     if (hasFilter ? skip <= View.Count() : true)
                     {
