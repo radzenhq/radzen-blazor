@@ -109,7 +109,7 @@
         if (lastTooltip != null)
         {
             tooltips.Remove(lastTooltip);
-            await JSRuntime.InvokeVoidAsync("Radzen.closePopup", UniqueID);
+            await JSRuntime.InvokeVoidAsync("Radzen.closeTooltip", UniqueID);
         }
 
         await InvokeAsync(() => { StateHasChanged(); });
