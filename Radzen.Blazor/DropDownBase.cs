@@ -1201,19 +1201,20 @@ namespace Radzen
         /// <param name="value">The value.</param>
         protected virtual void SelectItemFromValue(object value)
         {
-            if (value != null && View != null)
+            var view = LoadData.HasDelegate ? Data : View;
+            if (value != null && view != null)
             {
                 if (!Multiple)
                 {
                     if (!string.IsNullOrEmpty(ValueProperty))
                     {
-                        if (typeof(EnumerableQuery).IsAssignableFrom(View.GetType()))
+                        if (typeof(EnumerableQuery).IsAssignableFrom(view.GetType()))
                         {
-                            SelectedItem = View.OfType<object>().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), value)).FirstOrDefault();
+                            SelectedItem = view.OfType<object>().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), value)).FirstOrDefault();
                         }
                         else
                         {
-                            SelectedItem = View.AsQueryable().Where($@"{ValueProperty} == @0", value).FirstOrDefault();
+                            SelectedItem = view.AsQueryable().Where($@"{ValueProperty} == @0", value).FirstOrDefault();
                         }
                     }
                     else
@@ -1236,13 +1237,13 @@ namespace Radzen
                             {
                                 dynamic item;
 
-                                if (typeof(EnumerableQuery).IsAssignableFrom(View.GetType()))
+                                if (typeof(EnumerableQuery).IsAssignableFrom(view.GetType()))
                                 {
-                                    item = View.OfType<object>().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).FirstOrDefault();
+                                    item = view.OfType<object>().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).FirstOrDefault();
                                 }
                                 else
                                 {
-                                    item = View.AsQueryable().Where($@"{ValueProperty} == @0", v).FirstOrDefault();
+                                    item = view.AsQueryable().Where($@"{ValueProperty} == @0", v).FirstOrDefault();
                                 }
 
                                 if (!object.Equals(item, null) && !selectedItems.AsQueryable().Where($@"object.Equals(it.{ValueProperty},@0)", v).Any())
