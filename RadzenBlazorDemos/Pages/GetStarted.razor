@@ -172,14 +172,8 @@
             To be safe you can add them at the end of the layout file after all other elements.
         </RadzenAlert>
         <RadzenText>
-            Open <code>Startup.cs</code> file (Blazor Server before .NET 6) or <code>Program.cs</code> (Blazor WebAssembly or Blazor Server after .NET 6) and add:
+            Open <code>Startup.cs</code> file (Blazor Server before .NET 6) or <code>Program.cs</code> (Blazor WebAssembly or Blazor Server after .NET 6) and add required services:
         </RadzenText>
-        <ul class="rz-text-body1">
-            <li>DialogService</li>
-            <li>NotificationService</li>
-            <li>ContextMenuService</li>
-            <li>TooltipService</li>
-        </ul>
         <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="rz-my-6">Startup.cs (Blazor Server before .NET 6)</RadzenText>
 <pre>
     <code>
@@ -188,10 +182,7 @@
     public void ConfigureServices(IServiceCollection services)
     {
         ...
-        services.AddScoped&lt;DialogService&gt;();
-        services.AddScoped&lt;NotificationService&gt;();
-        services.AddScoped&lt;TooltipService&gt;();
-        services.AddScoped&lt;ContextMenuService&gt;();
+        services.AddRadzenComponents();
         ...
     }
     </code>
@@ -210,10 +201,7 @@
 
         ...
 
-        builder.Services.AddScoped&lt;DialogService&gt;();
-        builder.Services.AddScoped&lt;NotificationService&gt;();
-        builder.Services.AddScoped&lt;TooltipService&gt;();
-        builder.Services.AddScoped&lt;ContextMenuService&gt;();
+        builder.Services.AddRadzenComponents();
         ...
 
         await builder.Build().RunAsync();
