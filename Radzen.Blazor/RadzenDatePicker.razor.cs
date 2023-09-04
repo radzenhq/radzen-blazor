@@ -889,7 +889,6 @@ namespace Radzen.Blazor
             var newValue = new DateTime(currentValue.Year, month, Math.Min(currentValue.Day, DateTime.DaysInMonth(currentValue.Year, month)), currentValue.Hour, currentValue.Minute, currentValue.Second);
 
             CurrentDate = newValue;
-            Close();
         }
 
         private void SetYear(int year)
@@ -898,7 +897,6 @@ namespace Radzen.Blazor
             var newValue = new DateTime(year, currentValue.Month, Math.Min(currentValue.Day, DateTime.DaysInMonth(year, currentValue.Month)), currentValue.Hour, currentValue.Minute, currentValue.Second);
 
             CurrentDate = newValue;
-            Close();
         }
 
         private string getOpenPopup()
