@@ -4,7 +4,7 @@
 
 @inherits DbContextPage
 
-<RadzenDataGrid @ref="grid" AllowFiltering="true" AllowSorting="true" AllowColumnResize="true" ExpandMode="DataGridExpandMode.Single"
+<RadzenDataGrid @ref="grid" AllowFiltering="true" AllowSorting="true" AllowColumnResize="true"
                 Data="@employees" TItem="Employee" RowRender="@RowRender" LoadChildData="@LoadChildData" 
                 RowCollapse="@(args => grid.ColumnsCollection.ToList().ForEach(c => c.ClearFilters()))">
     <Columns>
