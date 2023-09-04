@@ -151,14 +151,5 @@ namespace Radzen.Blazor
         {
             return $"rz-steps-item {(Steps.StepsCollection.IndexOf(this) == Steps.SelectedIndex ? "rz-state-highlight rz-steps-current" : string.Empty)} {(Disabled ? "rz-state-disabled" : string.Empty)}";
         }
-
-        /// <summary>
-        /// Disposes this instance.
-        /// </summary>
-        public override void Dispose()
-        {
-            base.Dispose();
-            Steps?.RemoveStep(this);
-        }
     }
 }
