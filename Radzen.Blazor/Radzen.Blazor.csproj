@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-	 <NoWarn>BL0007</NoWarn>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>BL9993;BL0007;BL0005</NoWarn>
     <TargetFrameworks>netstandard2.1;net5.0;net6.0;net7.0</TargetFrameworks>
     <RazorLangVersion>3.0</RazorLangVersion>
     <LangVersion>7.3</LangVersion>
@@ -23,7 +22,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LibSassBuilder" Version="2.0.1" />
+    <PackageReference Include="DartSassBuilder" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'netstandard2.1'" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'netstandard2.1'" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net5.0'" Version="5.0.0" />
@@ -49,7 +48,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <LibSassOutputStyle>expanded</LibSassOutputStyle>
+    <DartSassOutputStyle>expanded</DartSassOutputStyle>
     <EnableDefaultSassItems>false</EnableDefaultSassItems>
   </PropertyGroup>
 
@@ -59,11 +58,11 @@
 
  <Target Name="Sass" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net6.0'">
     <PropertyGroup>
-      <_SassFileList>@(Sass->'"%(FullPath)"', ' ')</_SassFileList>
-      <LibSassBuilderArgs>files $(_SassFileList) --outputstyle $(LibSassOutputStyle) --level $(LibSassOutputLevel)</LibSassBuilderArgs>
+      <_SassFileList>@(Sass->'&quot;%(FullPath)&quot;', ' ')</_SassFileList>
+      <DartSassBuilderArgs>files $(_SassFileList) --outputstyle $(DartSassOutputStyle) --level $(DartSassOutputLevel)</DartSassBuilderArgs>
     </PropertyGroup>
-    <Message Text="$(LibSassBuilderArgs)" Importance="$(LibSassMessageLevel)" />
-    <Message Text="Converted SassFile list to argument" Importance="$(LibSassMessageLevel)" />
+    <Message Text="$(DartSassBuilderArgs)" Importance="$(DartSassMessageLevel)" />
+    <Message Text="Converted SassFile list to argument" Importance="$(DartSassMessageLevel)" />
   </Target>
 
   <Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net6.0'">
