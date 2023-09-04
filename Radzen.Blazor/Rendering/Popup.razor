@@ -27,14 +27,17 @@
     public async Task ToggleAsync(ElementReference target)
     {
         open = !open;
+        this.target = target;
 
         if (open)
         {
             await Open.InvokeAsync(null);
+            await JSRuntime.InvokeVoidAsync("Radzen.openPopup", target, GetId(), false, null, null, null, Reference, nameof(OnClose));
         }
-
-        this.target = target;
-        shouldToggle = true;
+        else
+        {
+            await CloseAsync();
+        }
     }
 
     public async Task CloseAsync(ElementReference target)
@@ -42,23 +45,10 @@
         open = false;
         this.target = target;
 
-        await Task.CompletedTask;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-        {
-            if (shouldToggle)
-            {
-                shouldToggle = false;
-                await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", target, GetId(), false, Reference, nameof(OnClose));
-            }
-        }
+        await CloseAsync();
     }
 
     ElementReference target;
-    bool shouldToggle;
 
     [JSInvokable]
     public async Task OnClose()
