@@ -3032,7 +3032,7 @@ namespace Radzen.Blazor
                 {
                     skip = CurrentPage * GetPageSize();
 
-                    if (hasFilter ? skip <= View.Count() : true)
+                    if (hasFilter && View.Any() ? skip <= View.Count() : true)
                     {
                         CalculatePager();
                         UpdateColumnsOrder();
