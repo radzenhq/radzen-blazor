@@ -108,7 +108,7 @@
     private async Task SaveStateAsync()
     {
         console.Log("SaveStateAsync");
-        await JSRuntime.InvokeVoidAsync("eval", $@"window.localStorage.setItem('SettingsLoadData', '{JsonSerializer.Serialize<DataGridSettings>(Settings)}')");
+        await JSRuntime.InvokeVoidAsync("window.localStorage.setItem", "Settings", JsonSerializer.Serialize<DataGridSettings>(Settings));
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

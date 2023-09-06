@@ -79,7 +79,7 @@
     {
         await Task.CompletedTask;
 
-        await JSRuntime.InvokeVoidAsync("eval", $@"window.localStorage.setItem('Settings', '{JsonSerializer.Serialize<DataGridSettings>(Settings)}')");
+        await JSRuntime.InvokeVoidAsync("window.localStorage.setItem", "Settings", JsonSerializer.Serialize<DataGridSettings>(Settings));
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

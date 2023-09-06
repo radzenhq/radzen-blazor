@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -3086,6 +3087,21 @@ namespace Radzen.Blazor
                 else if (type.IsEnum)
                 {
                     return element.GetInt32();
+                }
+                else if (!typeof(string).IsAssignableFrom(type) && (typeof(IEnumerable<>).IsAssignableFrom(type) || typeof(IEnumerable).IsAssignableFrom(type)))
+                {
+                    var valueType = type.GetGenericArguments().Any() ? type.GetGenericArguments().FirstOrDefault() : typeof(object);
+                    var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(valueType));
+
+                    if (element.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var v in element.EnumerateArray())
+                        {
+                            list.Add(GetFilterValue(v, valueType));
+                        }
+                    }
+
+                    return list;
                 }
                 else
                 {
