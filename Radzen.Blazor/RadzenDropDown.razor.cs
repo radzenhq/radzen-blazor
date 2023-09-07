@@ -206,6 +206,8 @@ namespace Radzen.Blazor
                 if (ClearSearchAfterSelection)
                 {
                     await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, string.Empty);
+                    searchText = null;
+                    await SearchTextChanged.InvokeAsync(searchText);
                     await OnFilter(null);
                 }
 
