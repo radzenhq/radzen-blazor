@@ -254,6 +254,20 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets the title in column picker.
+        /// Value of Title is used when ColumnPickerTitle is not set
+        /// </summary>
+        /// <value>The column picker title.</value>
+        [Parameter]
+        public string ColumnPickerTitle
+        {
+            get => _columnPickerTitle ?? Title;
+            set => _columnPickerTitle = value;
+        }
+
+        string _columnPickerTitle;
+
+        /// <summary>
         /// Gets or sets the property name.
         /// </summary>
         /// <value>The property name.</value>
