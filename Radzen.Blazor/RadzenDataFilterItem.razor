@@ -48,7 +48,7 @@ else
         }
         else if (PropertyAccess.IsNullableEnum(property.FilterPropertyType) || PropertyAccess.IsEnum(property.FilterPropertyType))
         {
-            <RadzenDropDown AllowClear="false" AllowFiltering="false" TValue="@object" class="rz-datafilter-editor"
+            <RadzenDropDown Disabled="@IsOperatorNullOrEmpty()" AllowClear="false" AllowFiltering="false" TValue="@object" class="rz-datafilter-editor"
                 @bind-Value=@Filter.FilterValue Multiple="false" Placeholder="@DataFilter.EnumFilterSelectText" TextProperty="Text" ValueProperty="Value"
                 Data=@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(property.FilterPropertyType) ?? property.FilterPropertyType) Change=@(args  => InvokeAsync(ApplyFilter))/>
         }
@@ -58,16 +58,16 @@ else
         }
         else if (PropertyAccess.IsDate(property.FilterPropertyType))
         {
-            <RadzenDatePicker @bind-Value=@Filter.FilterValue TValue="@object" ShowTime="true" class="rz-datafilter-editor"
+            <RadzenDatePicker Disabled="@IsOperatorNullOrEmpty()" @bind-Value=@Filter.FilterValue TValue="@object" ShowTime="true" class="rz-datafilter-editor"
                 ShowTimeOkButton="true" DateFormat="@getFilterDateFormat()" Change=@(args => InvokeAsync(ApplyFilter)) />
         }
         else if (property.FilterPropertyType == typeof(bool) || property.FilterPropertyType == typeof(bool?))
         {
-            <RadzenCheckBox TriState="true" TValue="@object" @bind-Value=@Filter.FilterValue Change=@(args => InvokeAsync(ApplyFilter)) class="rz-datafilter-check" />
+            <RadzenCheckBox Disabled="@IsOperatorNullOrEmpty()" TriState="true" TValue="@object" @bind-Value=@Filter.FilterValue Change=@(args => InvokeAsync(ApplyFilter)) class="rz-datafilter-check" />
         }
         else
         {
-            <RadzenTextBox class="rz-datafilter-editor" Value="@($"{Filter.FilterValue}")" Change=@(args => { Filter.FilterValue = args; InvokeAsync(ApplyFilter); }) />
+            <RadzenTextBox Disabled="@IsOperatorNullOrEmpty()" class="rz-datafilter-editor" Value="@($"{Filter.FilterValue}")" Change=@(args => { Filter.FilterValue = args; InvokeAsync(ApplyFilter); }) />
         }
 
         <RadzenButton title="@DataFilter.RemoveFilterText" class="rz-datafilter-item-clear" Icon="clear" Click="@RemoveFilter" Variant="Variant.Text" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark"/>
@@ -153,8 +153,24 @@ else
         await ApplyFilter();
     }
 
+    bool IsOperatorNullOrEmpty()
+    {
+        if (Filter != null)
+        {
+            return Filter.FilterOperator == FilterOperator.IsEmpty ||  Filter.FilterOperator == FilterOperator.IsNotEmpty || 
+                    Filter.FilterOperator == FilterOperator.IsNull || Filter.FilterOperator == FilterOperator.IsNotNull;
+        }
+
+        return false;
+    }
+
     async Task OnOperatorChange(object p)
     {
+        if (IsOperatorNullOrEmpty())
+        {
+            Filter.FilterValue = null;
+        }
+
         await ApplyFilter();
     }
 
@@ -218,6 +234,7 @@ else
 
             builder.AddAttribute(1, "Value", Filter.FilterValue);
             builder.AddAttribute(2, "class", "rz-datafilter-editor");
+            builder.AddAttribute(3, "Disabled", IsOperatorNullOrEmpty());
 
             Action<object> action = args =>
             {
