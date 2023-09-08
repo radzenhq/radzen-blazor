@@ -1030,5 +1030,16 @@ namespace Radzen.Blazor
                 await popup.ToggleAsync(Element);
             }
         }
+
+        string GetDayCssClass(DateTime date, DateRenderEventArgs dateArgs, bool forCell = true)
+        {
+            return ClassList.Create()
+                               .Add("rz-state-default", !forCell)
+                               .Add("rz-datepicker-other-month", CurrentDate.Month != date.Month)
+                               .Add("rz-state-active", !forCell && DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0)
+                               .Add("rz-datepicker-currentday", !forCell && DateTime.Now.Date.CompareTo(date.Date) == 0)
+                               .Add("rz-state-disabled", !forCell && dateArgs.Disabled)
+                               .ToString();
+        }
     }
 }

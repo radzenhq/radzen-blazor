@@ -79,20 +79,10 @@
                                                 DateTime date = StartDate.AddDays(dayNumber++);
                                                 var dateArgs = DateAttributes(date);
 
-                                                @if (CurrentDate.Month == date.Month)
-                                                {
-                                                    <td @attributes="@(dateArgs.Attributes)" onmouseup=@(PopupRenderMode == PopupRenderMode.OnDemand || Inline || ShowTime || dateArgs.Disabled ? "" : $"Radzen.closePopup('{PopupID}')")
-                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
-                                                        <span class=@($"rz-state-default{(DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date)== 0 ? " rz-state-active" : "")}{(DateTime.Now.Date.CompareTo(date.Date) == 0 ? " rz-datepicker-currentday" : "")}{(!dateArgs.Disabled ? "" : " rz-state-disabled")}")>@date.Day</span>
-                                                    </td>
-                                                }
-                                                else
-                                                {
-                                                    <td @attributes="@(dateArgs.Attributes)" class="rz-datepicker-other-month" onmouseup=@(PopupRenderMode == PopupRenderMode.OnDemand || Inline || ShowTime || dateArgs.Disabled ? "" : $"Radzen.closePopup('{PopupID}')")
-                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
-                                                        <span class=@($"rz-state-default{(!dateArgs.Disabled ? "" : " rz-state-disabled")} rz-datepicker-other-month")>@date.Day</span>
-                                                    </td>
-                                                }
+                                                <td @attributes="@(dateArgs.Attributes)" class="@GetDayCssClass(date, dateArgs)" onmouseup=@(PopupRenderMode == PopupRenderMode.OnDemand || Inline || ShowTime || dateArgs.Disabled ? "" : $"Radzen.closePopup('{PopupID}')")
+                                                @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
+                                                    <span class=@GetDayCssClass(date, dateArgs, false)>@date.Day</span>
+                                                </td>
                                             }
                                         </tr>
                                     }
