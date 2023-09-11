@@ -1,6 +1,6 @@
 ﻿<RadzenStack AlignItems="AlignItems.Center" Class="rz-p-12">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-        <div style="white-space:nowrap; margin-right: 16px">Density:</div>
+        <div style="white-space:nowrap; margin-right: 16px">DisplayStyle:</div>
         <RadzenSelectBar @bind-Value="@DisplayStyle" TextProperty="Text" ValueProperty="Value"
                          Data="@(Enum.GetValues(typeof(MenuItemDisplayStyle)).Cast<MenuItemDisplayStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
     </RadzenStack>

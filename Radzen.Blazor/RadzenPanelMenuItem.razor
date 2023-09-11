@@ -7,12 +7,12 @@
         <div class=@(Selected ? "rz-navigation-item-wrapper rz-navigation-item-wrapper-active" : "rz-navigation-item-wrapper")>
             @if (Path != null)
             {
-                <NavLink target="@Target" class=@(Selected ? "rz-navigation-item-link rz-navigation-item-link-active" : "rz-navigation-item-link") style="@(DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")" href="@Path" Match="@Match">
-                    @if (!string.IsNullOrEmpty(Icon) && (DisplayStyle == MenuItemDisplayStyle.Icon || DisplayStyle == MenuItemDisplayStyle.IconAndText))
+                <NavLink target="@Target" class=@(Selected ? "rz-navigation-item-link rz-navigation-item-link-active" : "rz-navigation-item-link") style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")" href="@Path" Match="@Match">
+                    @if (!string.IsNullOrEmpty(Icon) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
-                        <i class="rzi rz-navigation-item-icon" style="@(DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")">@((MarkupString)Icon)</i>
+                        <i class="rzi rz-navigation-item-icon" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")">@((MarkupString)Icon)</i>
                     }
-                    @if (!string.IsNullOrEmpty(Image) && (DisplayStyle == MenuItemDisplayStyle.Icon || DisplayStyle == MenuItemDisplayStyle.IconAndText))
+                    @if (!string.IsNullOrEmpty(Image) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
                         <img class="rz-navigation-item-icon" src="@Image" />
                     }
@@ -20,7 +20,7 @@
                     {
                         @Template
                     }
-                    else if (DisplayStyle == MenuItemDisplayStyle.Text || DisplayStyle == MenuItemDisplayStyle.IconAndText)
+                    else if (Parent?.DisplayStyle == MenuItemDisplayStyle.Text || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText)
                     {
                         <span class="rz-navigation-item-text" @onclick="@Toggle">@Text</span>
                     }
@@ -32,12 +32,12 @@
             }
             else
             {
-                <div class="rz-navigation-item-link" style="@(DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")" @onclick="@Toggle">
-                    @if (!string.IsNullOrEmpty(Icon) && (DisplayStyle == MenuItemDisplayStyle.Icon || DisplayStyle == MenuItemDisplayStyle.IconAndText))
+                <div class="rz-navigation-item-link" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")" @onclick="@Toggle">
+                    @if (!string.IsNullOrEmpty(Icon) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
-                        <i class="rzi rz-navigation-item-icon" style="@(DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")">@((MarkupString)Icon)</i>
+                        <i class="rzi rz-navigation-item-icon" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")">@((MarkupString)Icon)</i>
                     }
-                    @if (!string.IsNullOrEmpty(Image) && (DisplayStyle == MenuItemDisplayStyle.Icon || DisplayStyle == MenuItemDisplayStyle.IconAndText))
+                    @if (!string.IsNullOrEmpty(Image) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
                         <img class="rz-navigation-item-icon" src="@Image" />
                     }
@@ -45,7 +45,7 @@
                     {
                         @Template
                     }
-                    else if (DisplayStyle == MenuItemDisplayStyle.Text || DisplayStyle == MenuItemDisplayStyle.IconAndText)
+                    else if (Parent?.DisplayStyle == MenuItemDisplayStyle.Text || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText)
                     {
                         <span class="rz-navigation-item-text">@Text</span>
                     }

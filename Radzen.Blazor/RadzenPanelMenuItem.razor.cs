@@ -75,13 +75,6 @@ namespace Radzen.Blazor
         public string Image { get; set; }
 
         /// <summary>
-        /// Gets or sets the display style.
-        /// </summary>
-        [CascadingParameter]
-        public MenuItemDisplayStyle DisplayStyle { get; set; } = MenuItemDisplayStyle.IconAndText;
-
-
-        /// <summary>
         /// Gets or sets the template.
         /// </summary>
         /// <value>The template.</value>
@@ -259,8 +252,6 @@ namespace Radzen.Blazor
             {
                 expanded = parameters.GetValueOrDefault<bool>(nameof(Expanded));
             }
-
-            DisplayStyle = Parent?.DisplayStyle ?? DisplayStyle;
 
             await base.SetParametersAsync(parameters);
         }
