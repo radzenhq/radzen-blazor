@@ -2659,12 +2659,7 @@ namespace Radzen.Blazor
 
         internal async Task EndColumnDropToGroup()
         {
-            if (CanModifyGroups is false)
-            {
-                return;
-            }
-
-            if (indexOfColumnToReoder == null || AllowGrouping is false)
+            if (CanModifyGroups is false || indexOfColumnToReoder == null || AllowGrouping is false)
             {
                 return;
             }
