@@ -1215,13 +1215,6 @@ namespace Radzen.Blazor
         public bool CanModifyGroups { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether grouping is allowed.
-        /// </summary>
-        /// <value><c>true</c> if grouping is allowed; otherwise, <c>false</c>.</value>
-        [Parameter]
-        public bool AllowGroupChange { get; set; } = true;
-
-        /// <summary>
         /// Gets or sets a value indicating whether grouped column should be hidden.
         /// </summary>
         /// <value><c>true</c> if grouped columns should be hidden; otherwise, <c>false</c>.</value>
