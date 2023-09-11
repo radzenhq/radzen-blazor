@@ -149,7 +149,7 @@ namespace Radzen.Blazor
         }
 
         RadzenPanelMenu _parent;
-        
+
         /// <summary>
         /// Gets or sets the click callback.
         /// </summary>
@@ -255,7 +255,7 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
         }
-        
+
         /// <summary>
         /// Handles the <see cref="E:Click" /> event.
         /// </summary>
