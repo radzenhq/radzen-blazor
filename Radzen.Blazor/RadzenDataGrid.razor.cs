@@ -2675,21 +2675,15 @@ namespace Radzen.Blazor
 
             indexOfColumnToReoder = null;
 
-            if (column == null || column.Groupable is false || string.IsNullOrEmpty(column.GetGroupProperty()))
+            if (column == null || 
+                column.Groupable is false ||
+                string.IsNullOrEmpty(column.GetGroupProperty()) ||
+                Groups.Any(gd => gd.Property == column.GetGroupProperty()))
             {
                 return;
             }
 
-            var groupDescriptor = Groups
-                .Where(d => d.Property == column.GetGroupProperty())
-                .FirstOrDefault();
-
-            if (groupDescriptor != null)
-            {
-                return;
-            }
-
-            groupDescriptor = new GroupDescriptor() 
+            var groupDescriptor = new GroupDescriptor() 
             {
                 Property = column.GetGroupProperty(),
                 Title = column.GetTitle(),
