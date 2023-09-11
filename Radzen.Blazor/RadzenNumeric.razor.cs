@@ -42,8 +42,8 @@ namespace Radzen.Blazor
         {
             object minArg = Min;
             object maxArg = Max;
-
-            return (Min != null || Max != null) ? $@"Radzen.numericOnInput(event, {minArg ?? "null"}, {maxArg ?? "null"}, {IsNullable})" : "";
+            string isNull = IsNullable.ToString().ToLower();
+            return (Min != null || Max != null) ? $@"Radzen.numericOnInput(event, {minArg ?? "null"}, {maxArg ?? "null"}, {isNull})" : "";
         }
 
         private string getOnPaste()
