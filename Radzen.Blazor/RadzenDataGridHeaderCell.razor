@@ -4,7 +4,7 @@
 {
 <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@GetStyle()" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex))>
     <div @onclick='@((args) => Grid.OnSort(args, Column))' tabindex="@SortingTabIndex" @onkeydown="OnSortKeyPressed">
-        @if ((Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
+        @if ((Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable && Grid.CanModifyGroups))
         {
             <span id="@(Grid.getColumnUniqueId(ColumnIndex) + "-drag")" class="rz-column-drag"
                     @onclick:preventDefault="true" @onclick:stopPropagation="true"

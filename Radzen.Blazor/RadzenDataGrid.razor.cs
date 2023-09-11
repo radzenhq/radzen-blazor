@@ -268,6 +268,11 @@ namespace Radzen.Blazor
 
         internal async Task RemoveGroupAsync(GroupDescriptor gd)
         {
+            if (CanModifyGroups is false)
+            {
+                return;
+            }
+
             Groups.Remove(gd); 
             _groupedPagedView = null;
 
@@ -1201,6 +1206,20 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if grouping is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowGrouping { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether modifying groups (adding or removing) is allowed
+        /// </summary>
+        /// <value><c>true</c> if groups can't be added and removed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool CanModifyGroups { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether grouping is allowed.
+        /// </summary>
+        /// <value><c>true</c> if grouping is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowGroupChange { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether grouped column should be hidden.
@@ -2647,39 +2666,57 @@ namespace Radzen.Blazor
 
         internal async Task EndColumnDropToGroup()
         {
-            if(indexOfColumnToReoder != null && AllowGrouping)
+            if (CanModifyGroups is false)
             {
-                var functionName = $"Radzen['{getColumnUniqueId(indexOfColumnToReoder.Value)}end']";
-                await JSRuntime.InvokeVoidAsync("eval", $"{functionName} && {functionName}()");
+                return;
+            }
 
-                RadzenDataGridColumn<TItem> column;
-                
-                column = columns.Where(c => c.GetVisible()).ElementAtOrDefault(indexOfColumnToReoder.Value);
-               
-                //may be its a child column
-                if (column == null)
-                    column = allColumns.Where(c => c.GetVisible()).ElementAtOrDefault(indexOfColumnToReoder.Value);
+            if (indexOfColumnToReoder == null || AllowGrouping is false)
+            {
+                return;
+            }
 
-                if (column != null && column.Groupable && !string.IsNullOrEmpty(column.GetGroupProperty()))
-                {
-                    var descriptor = Groups.Where(d => d.Property == column.GetGroupProperty()).FirstOrDefault();
-                    if (descriptor == null)
-                    {
-                        descriptor = new GroupDescriptor() { Property = column.GetGroupProperty(), Title = column.GetTitle(), SortOrder = column.GetSortOrder() ?? SortOrder.Ascending  };
-                        Groups.Add(descriptor);
-                        _groupedPagedView = null;
+            var functionName = $"Radzen['{getColumnUniqueId(indexOfColumnToReoder.Value)}end']";
+            await JSRuntime.InvokeVoidAsync("eval", $"{functionName} && {functionName}()");
 
-                        await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = descriptor });
+            RadzenDataGridColumn<TItem> column = columns
+                .Where(c => c.GetVisible())
+                .ElementAtOrDefault(indexOfColumnToReoder.Value) ?? allColumns //may be its a child column
+                    .Where(c => c.GetVisible())
+                    .ElementAtOrDefault(indexOfColumnToReoder.Value);
 
-                        if (IsVirtualizationAllowed())
-                        {
-                            await Reload();
-                        }
-                    }
-                }
+            indexOfColumnToReoder = null;
 
-                indexOfColumnToReoder = null;
-            }  
+            if (column == null || column.Groupable is false || string.IsNullOrEmpty(column.GetGroupProperty()))
+            {
+                return;
+            }
+
+            var groupDescriptor = Groups
+                .Where(d => d.Property == column.GetGroupProperty())
+                .FirstOrDefault();
+
+            if (groupDescriptor != null)
+            {
+                return;
+            }
+
+            groupDescriptor = new GroupDescriptor() 
+            {
+                Property = column.GetGroupProperty(),
+                Title = column.GetTitle(),
+                SortOrder = column.GetSortOrder() ?? SortOrder.Ascending 
+            };
+
+            Groups.Add(groupDescriptor);
+            _groupedPagedView = null;
+
+            await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = groupDescriptor });
+
+            if (IsVirtualizationAllowed())
+            {
+                await Reload();
+            }
         }
 
         /// <summary>
