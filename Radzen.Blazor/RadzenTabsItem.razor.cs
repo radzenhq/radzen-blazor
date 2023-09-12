@@ -138,6 +138,14 @@ namespace Radzen.Blazor
             }
         }
 
+        async Task OnTabCloseClick()
+        {
+            if (Tabs.TabCloseClick.HasDelegate)
+            {
+                await Tabs.TabCloseClick.InvokeAsync(this);
+            }
+        }
+
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {

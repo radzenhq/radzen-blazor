@@ -72,6 +72,13 @@ namespace Radzen.Blazor
         List<RadzenTabsItem> tabs = new List<RadzenTabsItem>();
 
         /// <summary>
+        /// Gets or sets tab close button event 
+        /// </summary>
+        /// <value>The close button callback.</value>
+        [Parameter]
+        public EventCallback<RadzenTabsItem> TabCloseClick { get; set; }
+
+        /// <summary>
         /// Adds the tab.
         /// </summary>
         /// <param name="tab">The tab.</param>

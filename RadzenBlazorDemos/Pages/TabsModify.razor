@@ -1,4 +1,4 @@
-﻿<RadzenTabs @ref="tabs" RenderMode="TabRenderMode.Client" @bind-SelectedIndex=@selectedIndex>
+﻿<RadzenTabs @ref="tabs" RenderMode="TabRenderMode.Client" @bind-SelectedIndex=@selectedIndex TabCloseClick="OnTabCloseClick">
     <Tabs>
         @foreach (var item in items)
         {
@@ -31,6 +31,13 @@
     void RemoveItem()
     {
         items.RemoveAt(selectedIndex);
+        if (selectedIndex >= items.Count) selectedIndex = items.Count - 1;
+        tabs.Reload();
+    }
+
+    void OnTabCloseClick(RadzenTabsItem item)
+    {
+        items.RemoveAt(item.Index);
         if (selectedIndex >= items.Count) selectedIndex = items.Count - 1;
         tabs.Reload();
     }
