@@ -625,7 +625,7 @@ namespace Radzen.Blazor
 
                 if (grid.Virtualize != null)
                 {
-                    await grid.Virtualize.RefreshDataAsync();
+                    await grid.RefreshDataAsync();
                 }
                 else
                 {
