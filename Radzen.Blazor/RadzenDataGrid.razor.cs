@@ -1625,6 +1625,13 @@ namespace Radzen.Blazor
         public Action<DataGridRenderEventArgs<TItem>> Render { get; set; }
 
         /// <summary>
+        /// Gets or sets the load settings callback.
+        /// </summary>
+        /// <value>The load settings callback.</value>
+        [Parameter]
+        public Action<DataGridLoadSettingsEventArgs> LoadSettings { get; set; }
+
+        /// <summary>
         /// Called when data is changed.
         /// </summary>
         protected override void OnDataChanged()
@@ -2018,20 +2025,33 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            if (LoadSettings != null)
+            {
+                var args = new Radzen.DataGridLoadSettingsEventArgs() { Settings = settings };
+
+                if (LoadSettings != null)
+                {
+                    LoadSettings(args);
+                }
+
+                if (args.Settings != settings)
+                {
+                    settings = args.Settings;
+                }
+            }
+
             await base.OnAfterRenderAsync(firstRender);
 
             if (Visible)
             {
                 if (settings != null)
                 {
-                    await LoadSettings(settings);
+                    await LoadSettingsInternal(settings);
                 }
-
-                var args = new Radzen.DataGridRenderEventArgs<TItem>() { Grid = this, FirstRender = firstRender };
 
                 if (Render != null)
                 {
-                    Render(args);
+                    Render(new Radzen.DataGridRenderEventArgs<TItem>() { Grid = this, FirstRender = firstRender });
                 }
             }
 
@@ -2945,7 +2965,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Load DataGrid settings saved from GetSettings() method.
         /// </summary>
-        internal async Task LoadSettings(DataGridSettings settings)
+        internal async Task LoadSettingsInternal(DataGridSettings settings)
         {
             if (SettingsChanged.HasDelegate)
             {

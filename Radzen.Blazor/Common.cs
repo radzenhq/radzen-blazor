@@ -358,6 +358,17 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Supplies information about a <see cref="RadzenDataGrid{TItem}.LoadSettings" /> event that is being raised.
+    /// </summary>
+    public class DataGridLoadSettingsEventArgs
+    {
+        /// <summary>
+        /// Gets or sets the settings.
+        /// </summary>
+        public DataGridSettings Settings { get; set; }
+    }
+
+    /// <summary>
     /// Supplies information about a <see cref="RadzenGrid{TItem}.CellRender" /> event that is being raised.
     /// </summary>
     /// <typeparam name="T"></typeparam>

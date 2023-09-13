@@ -16,7 +16,7 @@
 <p>The state includes current page index, page size, groups and columns filter, sort, order, width and visibility.</p>
 <RadzenButton Click="@(args => Settings = null)" Text="Clear saved settings" Style="margin-bottom: 16px" />
 <RadzenButton Click="@(args => NavigationManager.NavigateTo("/datagrid-save-settings-loaddata", true))" Text="Reload" Style="margin-bottom: 16px" />
-<RadzenDataGrid @ref=grid @bind-Settings="@Settings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
+<RadzenDataGrid @ref=grid @bind-Settings="@Settings" LoadSettings="@LoadSettings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
                 AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true"
                 AllowColumnResize="true" AllowColumnReorder="true" ColumnWidth="200px"
                 FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
@@ -113,17 +113,17 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender || loaded)
+        if (firstRender)
         {
             await LoadStateAsync();
+        }
+    }
 
-            if (loaded)
-            {
-                loaded = false;
-                await Task.Yield();
-                await grid.Reload();
-                loaded = false;
-            }
+    void LoadSettings(DataGridLoadSettingsEventArgs args)
+    {
+        if (Settings != null)
+        {
+            args.Settings = Settings;
         }
     }
 }
