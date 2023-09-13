@@ -118,7 +118,10 @@ $tabs-transition: var(--rz-transition-all) !default;
       &:hover {
         text-decoration: none;
       }
-    }
+
+      .close-botton {
+        display: none;
+      }
 
     &.rz-state-disabled {
       opacity: 0.5;
@@ -131,8 +134,11 @@ $tabs-transition: var(--rz-transition-all) !default;
 
     a {
       color: var(--rz-tabs-tab-selected-color);
+
+      .close-botton {
+        display: inline;
+      }
     }
-  }
 
   .rz-tabview-top > & {
     flex-direction: row;

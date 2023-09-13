@@ -657,6 +657,21 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Specify how the <see cref="RadzenTabs" /> component tab close button is displayed
+    /// </summary>
+    public enum TabCloseMode
+    {
+        /// <summary>
+        /// All Tabs
+        /// </summary>
+        All,
+        /// <summary>
+        /// Selected tab
+        /// </summary>
+        Selected
+    }
+
+    /// <summary>
     /// Specifies the ways a <see cref="RadzenTimeline" /> component renders line and content items.
     /// </summary>
     public enum LinePosition

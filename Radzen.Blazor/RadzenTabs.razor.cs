@@ -76,7 +76,13 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The close button callback.</value>
         [Parameter]
-        public EventCallback<RadzenTabsItem> TabCloseClick { get; set; }
+        public EventCallback<RadzenTabsItem> TabClose { get; set; }
+
+        /// <summary>
+        /// Gets or sets tab close button display mode 
+        /// </summary>
+        [Parameter]
+        public TabCloseMode CloseMode { get; set; } = TabCloseMode.Selected;
 
         /// <summary>
         /// Adds the tab.

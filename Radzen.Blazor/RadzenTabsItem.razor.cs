@@ -138,12 +138,9 @@ namespace Radzen.Blazor
             }
         }
 
-        async Task OnTabCloseClick()
+        async Task OnTabClose()
         {
-            if (Tabs.TabCloseClick.HasDelegate)
-            {
-                await Tabs.TabCloseClick.InvokeAsync(this);
-            }
+            await Tabs.TabClose.InvokeAsync(this);
         }
 
         /// <inheritdoc />

@@ -16,15 +16,16 @@
             else
             {
                 <span class="rz-tabview-title">@Text</span>
-                @if (Tabs.TabCloseClick.HasDelegate)
+
+                @if (Tabs.TabClose.HasDelegate)
                 {
-                    <span class="rz-ml-05">
-                        <RadzenButton Click="@OnTabCloseClick" class="rz-border-radius" Icon="close" Variant="Variant.Text"
-                                      ButtonStyle="ButtonStyle.Dark" Shade="Shade.Darker" Size="ButtonSize.ExtraSmall"
-                                      Style="hover{opacity:0}" />
+                    <span class="rz-ml-05 @(Tabs.CloseMode==TabCloseMode.Selected?"close-botton":"")">
+                        <RadzenButton Click="@OnTabClose" class="rz-border-radius" Icon="close" Variant="Variant.Text"
+                                      Size="ButtonSize.ExtraSmall" />
                     </span>
                 }
             }
         </a>
+
     </li>
 }

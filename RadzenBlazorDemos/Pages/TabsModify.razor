@@ -1,4 +1,13 @@
-﻿<RadzenTabs @ref="tabs" RenderMode="TabRenderMode.Client" @bind-SelectedIndex=@selectedIndex TabCloseClick="OnTabCloseClick">
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenLabel Text="CloseMode:" />
+        <RadzenSelectBar @bind-Value="@closeMode" TextProperty="Text" ValueProperty="Value"
+                         Data="@(Enum.GetValues(typeof(TabCloseMode)).Cast<TabCloseMode>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+    </RadzenStack>
+
+</div>
+
+<RadzenTabs @ref="tabs" RenderMode="TabRenderMode.Client" @bind-SelectedIndex=@selectedIndex TabClose="OnTabClose" CloseMode="closeMode">
     <Tabs>
         @foreach (var item in items)
         {
@@ -16,6 +25,8 @@
 
 
 @code {
+    TabCloseMode closeMode = TabCloseMode.Selected;
+
     RadzenTabs tabs;
     int selectedIndex = 0;
 
@@ -35,7 +46,7 @@
         tabs.Reload();
     }
 
-    void OnTabCloseClick(RadzenTabsItem item)
+    void OnTabClose(RadzenTabsItem item)
     {
         items.RemoveAt(item.Index);
         if (selectedIndex >= items.Count) selectedIndex = items.Count - 1;
