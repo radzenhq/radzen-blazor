@@ -642,7 +642,7 @@ namespace Radzen.Blazor
                         Data = null;
                     }
 
-                    await InvokeAsync(Reload);
+                    await InvokeAsync(ReloadInternal);
 
                     if (IsVirtualizationAllowed())
                     {
@@ -693,7 +693,7 @@ namespace Radzen.Blazor
                         Data = null;
                     }
 
-                    InvokeAsync(Reload);
+                    InvokeAsync(ReloadInternal);
                 }
             }
         }
@@ -763,7 +763,7 @@ namespace Radzen.Blazor
                 await JSRuntime.InvokeVoidAsync("Radzen.closeAllPopups", $"{PopupID}{column.GetFilterProperty()}");
             }
 
-            await InvokeAsync(Reload);
+            await InvokeAsync(ReloadInternal);
         }
 
         /// <summary>
@@ -1689,22 +1689,15 @@ namespace Radzen.Blazor
         /// <summary>
         /// Reloads this instance.
         /// </summary>
-        /// <param name="clearCache">Clears the cache.</param>
-        public async Task Reload(bool clearCache)
+        public async override Task Reload()
         {
 #if NET5_0_OR_GREATER
-            if (clearCache)
-            {
-                lastLoadDataArgs = null;
-            }
+            lastLoadDataArgs = null;
 #endif
-            await Reload();
+            await ReloadInternal();
         }
 
-        /// <summary>
-        /// Reloads this instance.
-        /// </summary>
-        public async override Task Reload()
+        internal async Task ReloadInternal()
         {
             _groupedPagedView = null;
             _view = null;
@@ -1716,14 +1709,14 @@ namespace Radzen.Blazor
 #if NET5_0_OR_GREATER
             if (AllowVirtualization)
             {
-                if(!LoadData.HasDelegate)
+                if (!LoadData.HasDelegate)
                 {
-                    if(virtualize != null)
+                    if (virtualize != null)
                     {
                         await virtualize.RefreshDataAsync();
                     }
 
-                    if(groupVirtualize != null)
+                    if (groupVirtualize != null)
                     {
                         await groupVirtualize.RefreshDataAsync();
                     }
@@ -1750,12 +1743,12 @@ namespace Radzen.Blazor
 #if NET5_0_OR_GREATER
                 if (AllowVirtualization)
                 {
-                    if(virtualize != null)
+                    if (virtualize != null)
                     {
                         await virtualize.RefreshDataAsync();
                     }
 
-                    if(groupVirtualize != null)
+                    if (groupVirtualize != null)
                     {
                         await groupVirtualize.RefreshDataAsync();
                     }
@@ -2770,7 +2763,7 @@ namespace Radzen.Blazor
             }
 
             SaveSettings();
-            InvokeAsync(Reload);
+            InvokeAsync(ReloadInternal);
         }
 
         /// <summary>
@@ -2797,11 +2790,11 @@ namespace Radzen.Blazor
 
             if (IsVirtualizationAllowed() && LoadData.HasDelegate)
             {
-                Debounce(() => InvokeAsync(Reload), 500);
+                Debounce(() => InvokeAsync(ReloadInternal), 500);
             }
             else
             {
-                InvokeAsync(Reload);
+                InvokeAsync(ReloadInternal);
             }
         }
 
@@ -2829,7 +2822,7 @@ namespace Radzen.Blazor
                 Data = null;
             }
 
-            InvokeAsync(Reload);
+            InvokeAsync(ReloadInternal);
         }
 
         /// <inheritdoc />

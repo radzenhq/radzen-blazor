@@ -157,7 +157,7 @@
         });
 
         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{Column.GetFilterProperty()}");
-        await Grid.Reload();
+        await Grid.ReloadInternal();
     }
 
     protected async Task ClearFilter()
@@ -178,6 +178,6 @@
             LogicalFilterOperator = Column.GetLogicalFilterOperator()
         });
 
-        await Grid.Reload();
+        await Grid.ReloadInternal();
     }
 }

@@ -5,7 +5,7 @@
 
 @inherits DbContextPage
 
-<RadzenButton Text="Refresh" Click="@(args => grid.Reload(true))" class="my-3" />
+<RadzenButton Text="Refresh" Click="@(args => grid.Reload())" class="my-3" />
 
 <RadzenDataGrid @ref=grid Data="@orderDetails" Count="@count" LoadData="@LoadData" TItem="OrderDetail" AllowVirtualization="true" Style="height:400px"
                 AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" LogicalFilterOperator="LogicalFilterOperator.Or"
