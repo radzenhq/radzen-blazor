@@ -88,7 +88,8 @@ $tabs-transition: var(--rz-transition-all) !default;
 
   li {
     border: var(--rz-tabs-border);
-    background-color: var(--rz-tabs-tab-background-color);;
+    background-color: var(--rz-tabs-tab-background-color);
+    ;
     transition: var(--rz-tabs-transition);
 
     &:hover {
@@ -118,13 +119,14 @@ $tabs-transition: var(--rz-transition-all) !default;
       &:hover {
         text-decoration: none;
       }
-
-      .close-botton {
-        display: none;
-      }
+    }
 
     &.rz-state-disabled {
       opacity: 0.5;
+    }
+
+    .close-botton {
+      display: none;
     }
   }
 
@@ -134,13 +136,14 @@ $tabs-transition: var(--rz-transition-all) !default;
 
     a {
       color: var(--rz-tabs-tab-selected-color);
-
-      .close-botton {
-        display: inline;
-      }
     }
 
-  .rz-tabview-top > & {
+    .close-botton {
+      display: inline;
+    }
+  }
+
+  .rz-tabview-top>& {
     flex-direction: row;
 
     li {
@@ -164,11 +167,11 @@ $tabs-transition: var(--rz-transition-all) !default;
     }
   }
 
-  .rz-tabview-top-right > & {
+  .rz-tabview-top-right>& {
     justify-content: flex-end;
   }
 
-  .rz-tabview-bottom > & {
+  .rz-tabview-bottom>& {
     flex-direction: row;
 
     li {
@@ -193,11 +196,11 @@ $tabs-transition: var(--rz-transition-all) !default;
     }
   }
 
-  .rz-tabview-bottom-right > & {
+  .rz-tabview-bottom-right>& {
     justify-content: flex-end;
   }
 
-  .rz-tabview-left > & {
+  .rz-tabview-left>& {
     flex-direction: column;
 
     li {
@@ -221,7 +224,7 @@ $tabs-transition: var(--rz-transition-all) !default;
     }
   }
 
-  .rz-tabview-right > & {
+  .rz-tabview-right>& {
     flex-direction: column;
 
     li {
@@ -254,24 +257,25 @@ $tabs-transition: var(--rz-transition-all) !default;
   flex: 1;
   overflow: auto;
 
-  .rz-tabview-top > & {
+  .rz-tabview-top>& {
     border-radius: 0 0 var(--rz-tabs-border-radius) var(--rz-tabs-border-radius);
   }
 
-  .rz-tabview-bottom > & {
+  .rz-tabview-bottom>& {
     border-radius: var(--rz-tabs-border-radius) var(--rz-tabs-border-radius) 0 0;
   }
 
-  .rz-tabview-left > & {
+  .rz-tabview-left>& {
     border-radius: 0 var(--rz-tabs-border-radius) var(--rz-tabs-border-radius) 0;
   }
 
-  .rz-tabview-right > & {
+  .rz-tabview-right>& {
     border-radius: var(--rz-tabs-border-radius) 0 0 var(--rz-tabs-border-radius);
   }
 }
 
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+@media screen and (-ms-high-contrast: active),
+(-ms-high-contrast: none) {
   .rz-tabview-panels {
     flex: auto;
   }
