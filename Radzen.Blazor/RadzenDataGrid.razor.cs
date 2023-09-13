@@ -2033,7 +2033,7 @@ namespace Radzen.Blazor
         {
             if (firstRender && Visible && (LoadData.HasDelegate && Data == null) && IsVirtualizationAllowed())
             {
-                await InvokeLoadData(skip, PageSize);
+                Data = Enumerable.Empty<TItem>().Append(default(TItem));
             }
             else if(settings == null)
             {
