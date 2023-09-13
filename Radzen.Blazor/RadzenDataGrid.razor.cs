@@ -66,6 +66,23 @@ namespace Radzen.Blazor
 
         List<TItem> virtualDataItems = new List<TItem>();
 
+        internal async Task RefreshDataAsync()
+        {
+            lastOrderBy = null;
+            lastFilter = null;
+            lastTop = 0;
+            lastStartIndex = 0;
+
+            if (Virtualize != null)
+            {
+                await Virtualize.RefreshDataAsync();
+            }
+        }
+
+        string lastOrderBy;
+        string lastFilter;
+        int lastTop;
+        int lastStartIndex;
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
             var view = AllowPaging ? PagedView : View;
@@ -76,8 +93,19 @@ namespace Radzen.Blazor
                 top = PageSize;
             }
 
-            await InvokeLoadData(request.StartIndex, top);
-            
+            var orderBy = GetOrderBy();
+            var filter= allColumns.ToList().ToFilterString<TItem>();
+
+            if (lastOrderBy != orderBy || lastFilter != filter || lastTop != top || lastStartIndex != request.StartIndex)
+            {
+                lastOrderBy = orderBy;
+                lastFilter = filter;
+                lastTop = top;
+                lastStartIndex = request.StartIndex;
+
+                await InvokeLoadData(request.StartIndex, top);
+            }
+
             var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
 
             virtualDataItems = (LoadData.HasDelegate ? Data : itemToInsert != null ? (new[] { itemToInsert }).Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top))?.ToList();
@@ -1702,7 +1730,10 @@ namespace Radzen.Blazor
                 }
             }
 #endif
-            await InvokeLoadData(skip, PageSize);
+            if (!IsVirtualizationAllowed())
+            {
+                await InvokeLoadData(skip, PageSize);
+            }
 
             CalculatePager();
 
@@ -1717,7 +1748,6 @@ namespace Radzen.Blazor
                 {
                     if(virtualize != null)
                     {
-                        await virtualize.RefreshDataAsync();
                         await virtualize.RefreshDataAsync();
                     }
 

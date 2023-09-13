@@ -42,6 +42,12 @@ namespace Radzen.Blazor
         [Parameter]
         public NavLinkMatch Match { get; set; }
 
+        /// <summary>
+        /// Gets or sets the display style.
+        /// </summary>
+        [Parameter]
+        public MenuItemDisplayStyle DisplayStyle { get; set; } = MenuItemDisplayStyle.IconAndText;
+
         internal List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
 
         /// <summary>
