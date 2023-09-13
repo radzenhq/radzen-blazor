@@ -68,10 +68,7 @@ namespace Radzen.Blazor
 
         internal async Task RefreshDataAsync()
         {
-            lastOrderBy = null;
-            lastFilter = null;
-            lastTop = 0;
-            lastStartIndex = 0;
+            lastLoadDataArgs = null;
 
             if (Virtualize != null)
             {
@@ -79,10 +76,7 @@ namespace Radzen.Blazor
             }
         }
 
-        string lastOrderBy;
-        string lastFilter;
-        int lastTop;
-        int lastStartIndex;
+        string lastLoadDataArgs;
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
             var view = AllowPaging ? PagedView : View;
@@ -92,16 +86,11 @@ namespace Radzen.Blazor
             {
                 top = PageSize;
             }
+            var loadDataArgs = $"{request.StartIndex}{top}{GetOrderBy()}{allColumns.ToList().ToFilterString<TItem>()}";
 
-            var orderBy = GetOrderBy();
-            var filter= allColumns.ToList().ToFilterString<TItem>();
-
-            if (lastOrderBy != orderBy || lastFilter != filter || lastTop != top || lastStartIndex != request.StartIndex)
+            if (lastLoadDataArgs != loadDataArgs)
             {
-                lastOrderBy = orderBy;
-                lastFilter = filter;
-                lastTop = top;
-                lastStartIndex = request.StartIndex;
+                lastLoadDataArgs = loadDataArgs;
 
                 await InvokeLoadData(request.StartIndex, top);
             }
@@ -1719,10 +1708,7 @@ namespace Radzen.Blazor
             if (shouldClearLastLoadDataArgs)
             {
                 shouldClearLastLoadDataArgs = false;
-                lastOrderBy = null;
-                lastFilter = null;
-                lastTop = 0;
-                lastStartIndex = 0;
+                lastLoadDataArgs = null;
             }
 #endif
             _groupedPagedView = null;
