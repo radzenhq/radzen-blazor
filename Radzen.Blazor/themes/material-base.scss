@@ -743,6 +743,8 @@ $datepicker-calendar-selected-hover-background-color: var(--rz-secondary-light) 
 $datepicker-calendar-border: none !default;
 $datepicker-calendar-border-radius: 50% !default;
 $datepicker-calendar-transition: var(--rz-transition-all) !default;
+$datepicker-calendar-today-color: var(--rz-text-color) !default;
+$datepicker-calendar-today-box-shadow: inset 0 0 0 1px var(--rz-text-color) !default;
 $datepicker-title-height: 3.5rem !default;
 $timepicker-background-color: var(--rz-base-background-color) !default;
 $timepicker-button-background-color: var(--rz-base-300) !default;
