@@ -1686,16 +1686,18 @@ namespace Radzen.Blazor
             }
         }
 
-
-        bool shouldClearLastLoadDataArgs;
-
         /// <summary>
         /// Reloads this instance.
         /// </summary>
         /// <param name="clearCache">Clears the cache.</param>
         public async Task Reload(bool clearCache)
         {
-            shouldClearLastLoadDataArgs = clearCache;
+#if NET5_0_OR_GREATER
+            if (clearCache)
+            {
+                lastLoadDataArgs = null;
+            }
+#endif
             await Reload();
         }
 
@@ -1704,13 +1706,6 @@ namespace Radzen.Blazor
         /// </summary>
         public async override Task Reload()
         {
-#if NET5_0_OR_GREATER
-            if (shouldClearLastLoadDataArgs)
-            {
-                shouldClearLastLoadDataArgs = false;
-                lastLoadDataArgs = null;
-            }
-#endif
             _groupedPagedView = null;
             _view = null;
 
