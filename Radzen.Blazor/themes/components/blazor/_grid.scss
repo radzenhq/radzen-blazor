@@ -1138,6 +1138,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
   .rz-column-title {
     display: inline-flex;
+    flex: auto;
     font-size: var(--rz-grid-header-font-size);
     font-weight: var(--rz-grid-header-font-weight);
     line-height: var(--rz-grid-header-line-height);
