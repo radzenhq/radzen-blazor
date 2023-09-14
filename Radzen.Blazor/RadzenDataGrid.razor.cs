@@ -66,7 +66,10 @@ namespace Radzen.Blazor
 
         List<TItem> virtualDataItems = new List<TItem>();
 
-        internal async Task RefreshDataAsync()
+        /// <summary>
+        /// Clears the cache and refreshes the Virtualize component.
+        /// </summary>
+        public async Task RefreshDataAsync()
         {
             lastLoadDataArgs = null;
 
