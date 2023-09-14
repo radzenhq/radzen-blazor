@@ -61,8 +61,7 @@ namespace Radzen
             {
                 componentType = replacedTypes[componentType];
             }
-
-            if (componentType.IsGenericType)
+            else if (componentType.IsGenericType)
             {
                 var genericTypeDefinition = componentType.GetGenericTypeDefinition();
 
