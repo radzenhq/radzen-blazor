@@ -26,7 +26,16 @@
                         <span class=@IconClassList(item)></span>
                     </div>
                 </div>
-                <label class="rz-radiobutton-label">@((MarkupString)item.Text)</label>
+                @if (item.Template != null)
+                {
+                    <div class="rz-radiobutton-template">
+                        @item.Template(item)
+                    </div>
+                } 
+                else 
+                {
+                    <label class="rz-radiobutton-label">@((MarkupString)item.Text)</label>
+                }
             </div>
         }
     </div>
