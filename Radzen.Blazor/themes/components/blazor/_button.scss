@@ -179,7 +179,7 @@ $button-styles: map-merge(
   --rz-button-disabled-opacity: #{$button-disabled-opacity};
 }
 
-.rz-button {
+%button, .rz-button {
   -webkit-appearance: none;
   display: inline-block;
   border-radius: var(--rz-button-border-radius);
@@ -405,7 +405,7 @@ $button-styles: map-merge(
 }
 
 @each $size, $button in $button-sizes {
-  .rz-button-#{$size} {
+  %button-#{$size}, .rz-button-#{$size} {
     font-size: map-get($button, font-size);
     font-weight: map-get($button, font-weight);
     padding: map-get($button, padding);

@@ -1008,7 +1008,7 @@ $paginator-dropdown-margin: $paginator-last-button-margin !default;
 $paginator-summary-padding: 0 1.25rem 0 0 !default;
 $paginator-summary-font-size: 0.875rem !default;
 $paginator-summary-color: var(--rz-text-tertiary-color) !default;
-$paginator-button-size: ".rz-button-lg" !default;
+$paginator-button-size: "%button-lg" !default;
 
 .rz-paginator-pages {
   max-height: 3rem;
