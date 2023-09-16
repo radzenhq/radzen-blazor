@@ -48,6 +48,13 @@ namespace Radzen.Blazor
         [Parameter]
         public MenuItemDisplayStyle DisplayStyle { get; set; } = MenuItemDisplayStyle.IconAndText;
 
+        /// <summary>
+        /// Gets or sets the show arrow.
+        /// </summary>
+        [Parameter]
+        public bool IsShowArrow { get; set; } = true;
+
+
         internal List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
 
         /// <summary>
