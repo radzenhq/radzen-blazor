@@ -32,6 +32,11 @@ $datepicker-calendar-border: var(--rz-border-base-100) !default;
 $datepicker-calendar-border-radius: 0 !default;
 $datepicker-calendar-transition: var(--rz-transition-all) !default;
 
+$datepicker-calendar-today-color: var(--rz-secondary) !default;
+$datepicker-calendar-today-background-color: transparent !default;
+$datepicker-calendar-today-box-shadow: none !default;
+$datepicker-calendar-today-border-radius: var(--rz-datepicker-calendar-border-radius) !default;
+
 $datepicker-title-height: 47px !default;
 
 $timepicker-background-color: var(--rz-base-200)!default;
@@ -85,6 +90,11 @@ $timepicker-border: none !default;
   --rz-datepicker-calendar-border: #{$datepicker-calendar-border};
   --rz-datepicker-calendar-border-radius: #{$datepicker-calendar-border-radius};
   --rz-datepicker-calendar-transition: #{$datepicker-calendar-transition};
+
+  --rz-datepicker-calendar-today-color: #{$datepicker-calendar-today-color};
+  --rz-datepicker-calendar-today-background-color: #{$datepicker-calendar-today-background-color};
+  --rz-datepicker-calendar-today-box-shadow: #{$datepicker-calendar-today-box-shadow};
+  --rz-datepicker-calendar-today-border-radius: #{$datepicker-calendar-today-border-radius};
 
   --rz-datepicker-title-height: #{$datepicker-title-height};
 
@@ -286,6 +296,13 @@ $timepicker-border: none !default;
       border-radius: var(--rz-datepicker-calendar-border-radius);
       transition: var(--rz-datepicker-calendar-transition);
 
+      &.rz-datepicker-today {
+        color: var(--rz-datepicker-calendar-today-color);
+        background-color: var(--rz-datepicker-calendar-today-background-color);
+        box-shadow: var(--rz-datepicker-calendar-today-box-shadow);
+        border-radius: var(--rz-datepicker-calendar-today-border-radius);
+      }
+
       &:hover {
         text-decoration: none;
         color: var(--rz-datepicker-calendar-hover-color);
@@ -294,10 +311,12 @@ $timepicker-border: none !default;
       }
     }
 
-    .rz-state-active {
+    .rz-state-active,
+    .rz-state-active.rz-datepicker-today {
       color: var(--rz-datepicker-calendar-selected-color);
       background-color: var(--rz-datepicker-calendar-selected-background-color);
       padding: var(--rz-datepicker-calendar-padding);
+      box-shadow: none;
 
       &:hover {
         color: var(--rz-datepicker-calendar-selected-hover-color);

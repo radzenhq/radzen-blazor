@@ -1119,24 +1119,32 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   border-radius: var(--rz-border-radius);
   box-shadow: var(--rz-column-draggable-shadow);
   padding: 0;
+  display: flex;
+  align-items: center;
 
   > div {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     width: 100%;
+    height: 100%;
     outline: none;
-    padding: var(--rz-grid-header-cell-padding);
+    padding: 0;
+  }
+
+  .rz-column-drag {
+    max-width: 1rem;
   }
 
   .rz-column-title {
-    display: inline-block;
+    display: inline-flex;
+    flex: auto;
     font-size: var(--rz-grid-header-font-size);
+    font-weight: var(--rz-grid-header-font-weight);
     line-height: var(--rz-grid-header-line-height);
     text-transform: var(--rz-grid-header-text-transform);
     color: var(--rz-grid-header-color);
-    padding: var(--rz-grid-header-title-padding);
-    font-weight: var(--rz-grid-header-font-weight);
+    padding: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1161,6 +1169,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 }
 
 .rz-group-header-item {
+  display: flex;
+  align-items: center;
   background-color: var(--rz-grid-group-header-item-background-color);
   border: var(--rz-grid-group-header-item-border);
   border-radius: var(--rz-grid-group-header-item-border-radius);
@@ -1168,6 +1178,12 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   margin: var(--rz-grid-group-header-item-margin);
   width: fit-content;
   float: left;
+
+  .rz-dialog-titlebar-close {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
 }
 
 .rz-group-header-item-title {
@@ -1205,7 +1221,14 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     --rz-grid-header-padding: 0.25rem 1rem;
     --rz-grid-header-title-padding: 0 0 0 0.5rem;
     --rz-grid-filter-padding: 0.25rem 0.5rem;
-    --rz-grid-group-header-padding: 0.25 0.5rem;
-    --rz-grid-group-header-item-padding: 0.25 0.5rem;
+    --rz-grid-group-header-padding: 0.25rem;
+    --rz-grid-group-header-items-margin: 0 0 -0.25rem 0;
+    --rz-grid-group-header-item-padding: 0.125rem 0.25rem 0.125rem 0.5rem;
+    --rz-grid-group-header-item-margin: 0 0.25rem 0.25rem 0;
+    --rz-dialog-close-font-size: 1rem;
+
+    .rz-group-header-item-title {
+      margin-right: 0.25rem;
+    }
   }
 }
