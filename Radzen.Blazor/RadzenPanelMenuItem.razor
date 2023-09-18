@@ -4,10 +4,10 @@
 @if (Visible)
 {
     <li @ref="@Element" id="@GetId()" style="@Style" @attributes="Attributes" class="@GetCssClass()" @onclick="@OnClick" @onclick:stopPropagation>
-        <div class=@(Selected ? "rz-navigation-item-wrapper rz-navigation-item-wrapper-active" : "rz-navigation-item-wrapper")>
+        <div class=@(Selected ? "rz-navigation-item-wrapper rz-navigation-item-wrapper-active" : "rz-navigation-item-wrapper") style="margin-right:0px">
             @if (Path != null)
             {
-                <NavLink target="@Target" class=@(Selected ? "rz-navigation-item-link rz-navigation-item-link-active" : "rz-navigation-item-link") style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")" href="@Path" Match="@Match">
+                <NavLink target="@Target" class=@(Selected ? "rz-navigation-item-link rz-navigation-item-link-active" : "rz-navigation-item-link") style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px;":"")" href="@Path" Match="@Match">
                     @if (!string.IsNullOrEmpty(Icon) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
                         <i class="rzi rz-navigation-item-icon" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")">@((MarkupString)Icon)</i>
@@ -24,7 +24,7 @@
                     {
                         <span class="rz-navigation-item-text" @onclick="@Toggle">@Text</span>
                     }
-                    @if (items.Any())
+                    @if (items.Any() && Parent?.ShowArrow == true)
                     {
                         <i class="rzi rz-navigation-item-icon-children" style="@getStyle()" @onclick="@Toggle" @onclick:preventDefault>keyboard_arrow_down</i>
                     }
@@ -32,7 +32,7 @@
             }
             else
             {
-                <div class="rz-navigation-item-link" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")" @onclick="@Toggle">
+                <div class="rz-navigation-item-link" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px;":"")" @onclick="@Toggle">
                     @if (!string.IsNullOrEmpty(Icon) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
                         <i class="rzi rz-navigation-item-icon" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")">@((MarkupString)Icon)</i>
@@ -49,7 +49,7 @@
                     {
                         <span class="rz-navigation-item-text">@Text</span>
                     }
-                    @if (items.Any())
+                    @if (items.Any() && Parent?.ShowArrow == true)
                     {
                         <i class="rzi rz-navigation-item-icon-children" style="@getStyle()">keyboard_arrow_down</i>
                     }
