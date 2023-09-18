@@ -1,0 +1,13 @@
+﻿@if (IsLoading)
+{
+    <div class="rz-datatable-loading"></div>
+    <div class="rz-datatable-loading-content text-center">
+        <i class="rzi-circle-o-notch"></i>
+        @if (!string.IsNullOrWhiteSpace(LoadingText))
+        {
+            <div>
+                <span>@LoadingText</span>
+            </div>
+        }
+    </div>
+}
