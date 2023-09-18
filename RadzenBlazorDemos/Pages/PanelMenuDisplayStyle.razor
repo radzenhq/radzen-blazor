@@ -5,10 +5,10 @@
                          Data="@(Enum.GetValues(typeof(MenuItemDisplayStyle)).Cast<MenuItemDisplayStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
 
         <RadzenCheckBox @bind-Value=@isShowArrow Name="CheckBox2" TValue="bool" />
-        <RadzenLabel Text="Allow multiple expand" Component="CheckBox2" />
+        <RadzenLabel Text="Show Arrow" Component="CheckBox2" />
     </RadzenStack>
 
-    <RadzenPanelMenu DisplayStyle="@DisplayStyle" IsShowArrow="@isShowArrow" Multiple=false>
+    <RadzenPanelMenu DisplayStyle="@DisplayStyle" ShowArrow="@isShowArrow" Multiple=false>
         <RadzenPanelMenuItem Text="General" Icon="home">
             <RadzenPanelMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenPanelMenuItem>
             <RadzenPanelMenuItem Text="Menu" Path="menu" Icon="line_weight"></RadzenPanelMenuItem>

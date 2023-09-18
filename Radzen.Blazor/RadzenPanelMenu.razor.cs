@@ -52,7 +52,7 @@ namespace Radzen.Blazor
         /// Gets or sets the show arrow.
         /// </summary>
         [Parameter]
-        public bool IsShowArrow { get; set; } = true;
+        public bool ShowArrow { get; set; } = true;
 
 
         internal List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();

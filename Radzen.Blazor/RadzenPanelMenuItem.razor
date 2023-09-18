@@ -24,7 +24,7 @@
                     {
                         <span class="rz-navigation-item-text" @onclick="@Toggle">@Text</span>
                     }
-                    @if (items.Any() && Parent?.IsShowArrow == true)
+                    @if (items.Any() && Parent?.ShowArrow == true)
                     {
                         <i class="rzi rz-navigation-item-icon-children" style="@getStyle()" @onclick="@Toggle" @onclick:preventDefault>keyboard_arrow_down</i>
                     }
@@ -49,7 +49,7 @@
                     {
                         <span class="rz-navigation-item-text">@Text</span>
                     }
-                    @if (items.Any() && Parent?.IsShowArrow == true)
+                    @if (items.Any() && Parent?.ShowArrow == true)
                     {
                         <i class="rzi rz-navigation-item-icon-children" style="@getStyle()">keyboard_arrow_down</i>
                     }
