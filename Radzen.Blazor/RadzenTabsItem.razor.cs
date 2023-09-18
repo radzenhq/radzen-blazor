@@ -54,6 +54,13 @@ namespace Radzen.Blazor
         public string Icon { get; set; }
 
         /// <summary>
+        /// Gets or sets the badge text.
+        /// </summary>
+        /// <value>The badge text.</value>
+        [Parameter]
+        public string BadgeText { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenTabsItem"/> is selected.
         /// </summary>
         /// <value><c>true</c> if selected; otherwise, <c>false</c>.</value>

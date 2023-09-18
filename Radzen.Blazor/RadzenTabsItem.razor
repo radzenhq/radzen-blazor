@@ -16,7 +16,10 @@
             else
             {
                 <span class="rz-tabview-title">@Text</span>
-
+                @if (!string.IsNullOrEmpty(BadgeText))
+                {
+                    <RadzenBadge Text="@BadgeText" class="rz-ml-1" />
+                }
                 @if (Tabs.TabClose.HasDelegate)
                 {
                     <span class="rz-ml-05 @(Tabs.CloseMode==TabCloseMode.Selected?"close-botton":"")">
