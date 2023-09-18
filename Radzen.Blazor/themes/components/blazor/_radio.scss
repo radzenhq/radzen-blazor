@@ -75,7 +75,8 @@ $radio-checked-border: var(--rz-input-border) !default;
   cursor: initial;
 }
 
-.rz-radiobutton-label {
+.rz-radiobutton-label,
+.rz-radiobutton-template {
   margin: var(--rz-radio-label-margin);
 }
 

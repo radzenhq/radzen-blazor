@@ -34,6 +34,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets the template.
+        /// </summary>
+        /// <value>The template.</value>
+        [Parameter]
+        public RenderFragment<RadzenRadioButtonListItem<TValue>> Template { get; set; }
+
+        /// <summary>
         /// Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
