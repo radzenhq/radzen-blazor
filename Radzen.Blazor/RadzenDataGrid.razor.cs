@@ -77,6 +77,10 @@ namespace Radzen.Blazor
             {
                 await Virtualize.RefreshDataAsync();
             }
+            else
+            {
+                await ReloadInternal();
+            }
         }
 
         /// <summary>
