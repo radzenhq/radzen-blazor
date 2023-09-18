@@ -275,5 +275,15 @@ namespace Radzen.Blazor
                 await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
             }
         }
+
+#if NET5_0_OR_GREATER
+        /// <summary>
+        /// Sets the focus on the input element.
+        /// </summary>
+        public async Task FocusAsync()
+        {
+            await search.FocusAsync();
+        }
+#endif
     }
 }
