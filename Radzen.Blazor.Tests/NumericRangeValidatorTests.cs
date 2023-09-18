@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Bunit;
 using Microsoft.AspNetCore.Components.Forms;
 using Xunit;
@@ -20,6 +21,11 @@ namespace Radzen.Blazor.Tests
             public object GetValue()
             {
                 return Value;
+            }
+
+            public ValueTask FocusAsync()
+            {
+                throw new NotImplementedException();
             }
 
             public object Value { get; set; }

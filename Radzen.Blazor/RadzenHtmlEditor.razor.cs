@@ -117,12 +117,13 @@ namespace Radzen.Blazor
         ElementReference ContentEditable { get; set; }
         RadzenTextArea TextArea { get; set; }
 
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Focuses the editor.
         /// </summary>
-        public ValueTask FocusAsync()
+        public override ValueTask FocusAsync()
         {
-#if NET5_0_OR_GREATER
+
             if (mode == HtmlEditorMode.Design)
             {
                 return ContentEditable.FocusAsync();
@@ -131,10 +132,8 @@ namespace Radzen.Blazor
             {
                 return TextArea.Element.FocusAsync();
             }
-#else
-            throw new System.NotSupportedException();
-#endif
         }
+#endif
 
         internal RadzenHtmlEditorCommandState State { get; set; } = new RadzenHtmlEditorCommandState();
 

@@ -1041,5 +1041,12 @@ namespace Radzen.Blazor
                                .Add("rz-state-disabled", !forCell && dateArgs.Disabled)
                                .ToString();
         }
+#if NET5_0_OR_GREATER
+        /// <inheritdoc/>
+        public async ValueTask FocusAsync()
+        {
+            await input.FocusAsync();
+        }
+#endif
     }
 }

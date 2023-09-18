@@ -280,7 +280,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Sets the focus on the input element.
         /// </summary>
-        public async Task FocusAsync()
+        public override async ValueTask FocusAsync()
         {
             await search.FocusAsync();
         }
