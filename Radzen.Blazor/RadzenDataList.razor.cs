@@ -155,5 +155,12 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if this instance loading indicator is shown; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool IsLoading { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value of the text while loading indicator is shown
+        /// </summary>
+        /// <value>Value of the loading indicator text; default: string.Empty</value>
+        [Parameter]
+        public string LoadingText { get; set; } = string.Empty;
     }
 }

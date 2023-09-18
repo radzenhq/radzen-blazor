@@ -5,7 +5,7 @@
 @inherits DbContextPage
 
 <RadzenButton Text="Reset" Click="@Reset" Style="margin-bottom: 20px;" />
-<RadzenDataGrid style="height: 335px" @ref="grid" IsLoading=@isLoading Count="@count" Data="@employees" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" PagerHorizontalAlign="HorizontalAlign.Center" TItem="Employee" ColumnWidth="200px">
+<RadzenDataGrid style="height: 335px" @ref="grid" IsLoading=@isLoading LoadingText="Loading..." Count="@count" Data="@employees" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" PagerHorizontalAlign="HorizontalAlign.Center" TItem="Employee" ColumnWidth="200px">
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >
@@ -87,7 +87,7 @@ void LoadData(LoadDataArgs args)
         {
             selectedTitles = null;  
         }
-        
+
         await grid.FirstPage();
     }
 

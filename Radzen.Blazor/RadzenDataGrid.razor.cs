@@ -1132,6 +1132,13 @@ namespace Radzen.Blazor
         public bool IsLoading { get; set; }
 
         /// <summary>
+        /// Gets or sets a value of the text while loading indicator is shown
+        /// </summary>
+        /// <value>Value of the loading indicator text; default: string.Empty</value>
+        [Parameter]
+        public string LoadingText { get; set; } = string.Empty;
+
+        /// <summary>
         /// Gets or sets a value indicating whether sorting is allowed.
         /// </summary>
         /// <value><c>true</c> if sorting is allowed; otherwise, <c>false</c>.</value>

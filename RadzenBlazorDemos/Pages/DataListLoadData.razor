@@ -11,7 +11,7 @@
 </RadzenStack>
 
 <RadzenDataList AllowVirtualization=@allowVirtualization Style="@(allowVirtualization ? "height:400px;overflow:auto;" : "")" 
-                WrapItems="@(!allowVirtualization)" AllowPaging="@(!allowVirtualization)" IsLoading=@isLoading LoadData=@LoadData
+                WrapItems="@(!allowVirtualization)" AllowPaging="@(!allowVirtualization)" IsLoading=@isLoading LoadingText="Loading..." LoadData=@LoadData
                 Data="@products" Count=@count TItem="Product" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
     <Template Context="product">
         <RadzenCard Style="width: 100%; padding: 0;">
@@ -59,7 +59,7 @@
 }
 </style>
 
-@code {
+    @code {
     bool allowVirtualization;
     int count;
     bool isLoading;
