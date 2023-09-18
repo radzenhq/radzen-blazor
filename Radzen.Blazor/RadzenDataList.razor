@@ -25,7 +25,14 @@
         {
             <div class="rz-datatable-loading"></div>
             <div class="rz-datatable-loading-content">
+                @if(LoadingTemplate != null)
+                {
+                @LoadingTemplate
+                }
+                else
+                {
                 <i class="rzi-circle-o-notch"></i>
+                }
             </div>
         }
         @if (AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))

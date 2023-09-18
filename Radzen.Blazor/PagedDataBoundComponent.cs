@@ -108,6 +108,13 @@ namespace Radzen
         public RenderFragment<T> Template { get; set; }
 
         /// <summary>
+        /// Gets or sets the loading template.
+        /// </summary>
+        /// <value>The loading template.</value>
+        [Parameter]
+        public RenderFragment LoadingTemplate { get; set; }
+
+        /// <summary>
         /// The data
         /// </summary>
         IEnumerable<T> _data;
