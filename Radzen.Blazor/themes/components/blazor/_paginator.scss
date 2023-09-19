@@ -389,7 +389,7 @@ $paginator-button-size: "%button-md" !default;
     --rz-paginator-summary-padding: 0 0.5rem 0 0;
 
     .rz-paginator-element {
-      @extend .rz-button-sm;
+      @extend %button-sm;
     }
   }
 }
