@@ -32,7 +32,7 @@ $icon-styles: map-merge(
   $icon-styles
 );
 
-.rzi {
+%rzi, .rzi {
   font-family: var(--rz-icon-font-family);
   font-weight: normal;
   font-style: normal;
