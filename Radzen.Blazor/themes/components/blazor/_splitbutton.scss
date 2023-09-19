@@ -78,7 +78,7 @@ $splitbutton-sizes: xs, sm, md, lg;
   }
 
   .rz-menuitem-icon {
-    @extend .rzi;
+    @extend %rzi;
     vertical-align: top;
   }
 }
