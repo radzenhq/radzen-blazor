@@ -25,12 +25,6 @@ $splitbutton-sizes: xs, sm, md, lg;
 .rz-splitbutton {
   display: inline-flex;
 
-  @each $size in $splitbutton-sizes {
-    .rz-button-#{$size} {
-      @extend .rz-button-#{$size};
-    }
-  }
-
   .rz-button-icon-only {
     .rz-button-text {
       display: none;
