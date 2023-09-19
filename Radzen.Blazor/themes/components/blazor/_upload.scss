@@ -118,7 +118,7 @@ $upload-button-background-color: var(--rz-primary) !default;
     .rzi-close,
     .rzi-times,
     .rz-icon-trash {
-      @extend .rzi;
+      @extend %rzi;
       display: block;
 
       &:before {
