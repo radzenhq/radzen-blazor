@@ -1649,6 +1649,13 @@ namespace Radzen.Blazor
         public Action<DataGridRenderEventArgs<TItem>> Render { get; set; }
 
         /// <summary>
+        /// Gets or sets the render async callback.
+        /// </summary>
+        /// <value>The render async callback.</value>
+        [Parameter]
+        public Func<DataGridRenderEventArgs<TItem>, Task> RenderAsync { get; set; }
+
+        /// <summary>
         /// Gets or sets the load settings callback.
         /// </summary>
         /// <value>The load settings callback.</value>
@@ -2076,6 +2083,11 @@ namespace Radzen.Blazor
                 if (Render != null)
                 {
                     Render(new Radzen.DataGridRenderEventArgs<TItem>() { Grid = this, FirstRender = firstRender });
+                }
+
+                if (RenderAsync != null)
+                {
+                    await RenderAsync(new Radzen.DataGridRenderEventArgs<TItem>() { Grid = this, FirstRender = firstRender });
                 }
             }
 
