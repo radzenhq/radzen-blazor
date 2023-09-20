@@ -756,5 +756,16 @@ namespace Radzen.Blazor
                 clicking = false;
             }
         }
+
+        /// <summary>
+        /// Handles the reference to the DataGrid component.
+        /// </summary>
+        public RadzenDataGrid<object> DataGrid
+        {
+            get
+            {
+                return grid;
+            }
+        }
     }
 }
