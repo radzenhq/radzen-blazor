@@ -295,8 +295,6 @@ $scheduler-planner-slot-height: 4.5rem !default;
   display: flex;
 
   .rz-button.rz-primary {
-    @extend .rz-button-md;
-
     background: var(--rz-scheduler-view-button-background-color);
     color: var(--rz-scheduler-view-button-color);
     border: var(--rz-scheduler-view-button-border);

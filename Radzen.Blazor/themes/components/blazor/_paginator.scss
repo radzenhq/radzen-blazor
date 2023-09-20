@@ -37,7 +37,7 @@ $paginator-summary-padding: 0 1.25rem 0 0 !default;
 $paginator-summary-font-size: var(--rz-body-font-size) !default;
 $paginator-summary-color: var(--rz-text-secondary-color) !default;
 
-$paginator-button-size: ".rz-button-md" !default;
+$paginator-button-size: "%button-md" !default;
 
 // Pager CSS variables
 
@@ -164,7 +164,7 @@ $paginator-button-size: ".rz-button-md" !default;
 }
 
 .rz-paginator-element {
-  @extend .rz-button, #{$paginator-button-size}, .rz-button-icon-only;
+  @extend %button, #{$paginator-button-size}, .rz-button-icon-only;
   letter-spacing: 0;
 }
 
@@ -389,7 +389,7 @@ $paginator-button-size: ".rz-button-md" !default;
     --rz-paginator-summary-padding: 0 0.5rem 0 0;
 
     .rz-paginator-element {
-      @extend .rz-button-sm;
+      @extend %button-sm;
     }
   }
 }

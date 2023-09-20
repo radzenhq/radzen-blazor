@@ -50,9 +50,8 @@ $upload-button-background-color: var(--rz-primary) !default;
   display: inline-block;
 
   .rz-button {
-    @extend .rz-button-sm;
+    @extend %button-sm;
     vertical-align: middle;
-
     -webkit-appearance: none !important;
 
     &[disabled] {
@@ -65,8 +64,6 @@ $upload-button-background-color: var(--rz-primary) !default;
   position: relative;
   display: inline-block;
   overflow: hidden;
-  vertical-align: middle;
-  @extend .rz-button-md;
   background-color: var(--rz-upload-choose-background-color);
   color: var(--rz-upload-choose-color);
 
@@ -121,7 +118,7 @@ $upload-button-background-color: var(--rz-primary) !default;
     .rzi-close,
     .rzi-times,
     .rz-icon-trash {
-      @extend .rzi;
+      @extend %rzi;
       display: block;
 
       &:before {

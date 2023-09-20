@@ -233,7 +233,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   }
 
   .rzi-chevron-circle-right {
-    @extend .rzi;
+    @extend %rzi;
 
     vertical-align: top;
     &:before {
@@ -242,7 +242,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   }
 
   .rzi-chevron-circle-down {
-    @extend .rzi;
+    @extend %rzi;
     vertical-align: top;
     &:before {
       content: 'arrow_drop_down';
@@ -477,7 +477,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   }
 
   .rzi-grid-sort {
-    @extend .rzi;
+    @extend %rzi;
     width: var(--rz-grid-sort-icon-width);
     height: var(--rz-grid-sort-icon-height);
     font-size: var(--rz-grid-sort-icon-height);
@@ -698,7 +698,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   border-bottom: var(--rz-grid-bottom-cell-border);
 
   .rzi-plus {
-    @extend .rzi;
+    @extend %rzi;
 
     font-size: var(--rz-grid-cell-font-size);
     &:before {
@@ -889,7 +889,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   border-top: var(--rz-grid-filter-buttons-border);
 
   .rz-button {
-    @extend .rz-button-md;
+    @extend %button-md;
   }
 }
 
@@ -924,7 +924,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   z-index: 2;
 
   .rzi-circle-o-notch {
-    @extend .rzi;
+    @extend %rzi;
 
     animation: rotation .5s linear infinite;
     font-size: 2rem;
@@ -1092,7 +1092,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 }
 
 .rz-column-drag {
-  @extend .rzi;
+  @extend %rzi;
 
   cursor: grab;
   font-size: inherit;

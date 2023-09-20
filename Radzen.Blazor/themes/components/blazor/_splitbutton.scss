@@ -25,12 +25,6 @@ $splitbutton-sizes: xs, sm, md, lg;
 .rz-splitbutton {
   display: inline-flex;
 
-  @each $size in $splitbutton-sizes {
-    .rz-button-#{$size} {
-      @extend .rz-button-#{$size};
-    }
-  }
-
   .rz-button-icon-only {
     .rz-button-text {
       display: none;
@@ -65,7 +59,7 @@ $splitbutton-sizes: xs, sm, md, lg;
 }
 
 .rz-menuitem {
-  @extend .rz-dropdown-item;
+  @extend %rz-dropdown-item;
 
   &:hover {
     &:first-child {
@@ -84,7 +78,7 @@ $splitbutton-sizes: xs, sm, md, lg;
   }
 
   .rz-menuitem-icon {
-    @extend .rzi;
+    @extend %rzi;
     vertical-align: top;
   }
 }

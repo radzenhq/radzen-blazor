@@ -47,9 +47,9 @@
 }
 
 .rz-autocomplete-items {
-  @extend .rz-dropdown-items;
+  @extend %rz-dropdown-items;
 }
 
 .rz-autocomplete-list-item {
-  @extend .rz-dropdown-item;
+  @extend %rz-dropdown-item;
 }
