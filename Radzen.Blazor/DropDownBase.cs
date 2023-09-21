@@ -1233,6 +1233,8 @@ namespace Radzen
                     {
                         if (!string.IsNullOrEmpty(ValueProperty))
                         {
+                            selectedItems.Clear();
+
                             foreach (object v in values.ToDynamicList())
                             {
                                 dynamic item;
