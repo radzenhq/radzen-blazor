@@ -861,7 +861,7 @@ namespace Radzen
 
             if (valueAsEnumerable != null)
             {
-                if (valueAsEnumerable.Cast<object>().ToList().Count != selectedItems.Count)
+                if (!valueAsEnumerable.Cast<object>().SequenceEqual(selectedItems.Select(i => GetItemOrValueFromProperty(i, ValueProperty))))
                 {
                     selectedItems.Clear();
                 }
@@ -1233,8 +1233,6 @@ namespace Radzen
                     {
                         if (!string.IsNullOrEmpty(ValueProperty))
                         {
-                            selectedItems.Clear();
-
                             foreach (object v in values.ToDynamicList())
                             {
                                 dynamic item;
