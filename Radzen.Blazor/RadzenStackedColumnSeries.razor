@@ -21,11 +21,10 @@
 
         return
         @<g class="@className">
-            @for (var index = 0; index < Items.Count; index++)
+            @foreach(var data in Items)
             {
-                var data = Items[index];
                 var x = GetColumnLeft(data, category);
-                var y = GetColumnTop(data, columnIndex, index, stackedColumnSeries);
+                var y = GetColumnTop(data, columnIndex, category, stackedColumnSeries);
                 var radius = Chart.ColumnOptions.Radius;
 
                 if (radius > width / 2 || columnIndex < stackedColumnSeries.Count - 1)
@@ -33,7 +32,7 @@
                     radius = 0;
                 }
 
-                var y0 = GetColumnBottom(columnIndex, index, stackedColumnSeries);
+                var y0 = GetColumnBottom(data, columnIndex, category, stackedColumnSeries);
 
                 var path = $"M {x.ToInvariantString()} {(y+radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + radius).ToInvariantString()} {y.ToInvariantString()} L {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(y+radius).ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
 

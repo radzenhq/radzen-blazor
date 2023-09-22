@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Radzen.Blazor
 {
     /// <summary>
@@ -10,6 +12,11 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The count.</value>
         int Count { get; }
+
+        /// <summary>
+        /// Gets the values for category.
+        /// </summary>
+        IEnumerable<double> ValuesForCategory(double category);
 
         /// <summary>
         /// Gets the value at the specified index.

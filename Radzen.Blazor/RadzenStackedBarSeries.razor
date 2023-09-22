@@ -25,18 +25,17 @@
 
         return
         @<g class="@className">
-            @for (var index = 0; index < Items.Count; index++)
+            @foreach (var data in Items)
             {
-                var data = Items[index];
                 var y = GetBarTop(data, category);
-                var x = GetBarRight(data, barIndex, index, barSeries);
+                var x = GetBarRight(data, barIndex, category, barSeries);
                 var radius = Chart.BarOptions.Radius;
 
                 if (radius > height / 2 || barIndex < barSeries.Count - 1)
                 {
                     radius = 0;
                 }
-                var x0 = GetBarLeft(barIndex, index, barSeries);
+                var x0 = GetBarLeft(data, barIndex, category, barSeries);
 
                 var r = radius.ToInvariantString();
 

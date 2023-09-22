@@ -148,21 +148,27 @@ namespace Radzen.Blazor
             return category(item) - BarHeight / 2;
         }
 
-        private double GetBarRight(TItem item, int barIndex, int index, IEnumerable<IChartStackedBarSeries> stackedBarSeries)
+        private static double Sum(int barIndex, IEnumerable<IChartStackedBarSeries> stackedBarSeries, double category)
+        {
+            return stackedBarSeries.Take(barIndex).SelectMany(series => series.ValuesForCategory(category)).DefaultIfEmpty(0).Sum();
+        }
+
+        private double GetBarRight(TItem item, int barIndex, Func<TItem, double> category, IEnumerable<IChartStackedBarSeries> stackedBarSeries)
         {
             var count = stackedBarSeries.Max(series => series.Count);
-            var sum = stackedBarSeries.Take(barIndex).Sum(series => series.ValueAt(index));
+
+            var sum = Sum(barIndex, stackedBarSeries, category(item));
 
             var y = Chart.CategoryScale.Scale(Value(item) + sum);
 
             return y;
         }
 
-        private double GetBarLeft(int barIndex, int index, IEnumerable<IChartStackedBarSeries> stackedBarSeries)
+        private double GetBarLeft(TItem item, int barIndex, Func<TItem, double> category, IEnumerable<IChartStackedBarSeries> stackedBarSeries)
         {
             var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
 
-            var sum = stackedBarSeries.Take(barIndex).Sum(series => series.ValueAt(index));
+            var sum = Sum(barIndex, stackedBarSeries, category(item));
 
             return Chart.CategoryScale.Scale(Math.Max(0, Math.Max(ticks.Start, sum)));
         }
@@ -184,6 +190,18 @@ namespace Radzen.Blazor
             return Value(Items[index]);
         }
 
+        IEnumerable<double> IChartStackedBarSeries.ValuesForCategory(double value)
+        {
+            if (Items == null)
+            {
+                return Enumerable.Empty<double>();
+            }
+
+            var category = ComposeCategory(Chart.ValueScale);
+
+            return Items.Where(item => category(item) == value).Select(Value);
+        }
+
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
@@ -193,7 +211,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipX(TItem item)
         {
-            return GetBarRight(item, BarIndex, Items.IndexOf(item), StackedBarSeries);
+            var category = ComposeCategory(Chart.ValueScale);
+
+            return GetBarRight(item, BarIndex, category, StackedBarSeries);
         }
 
         /// <inheritdoc />
@@ -216,13 +236,12 @@ namespace Radzen.Blazor
             var barSeries = VisibleBarSeries;
             var barIndex = BarIndex;
 
-            for (var index = 0; index < Items.Count; index++)
+            foreach (var data in Items)
             {
-                var data = Items[index];
                 var startY = GetBarTop(data, category);
                 var endY = startY + BandHeight;
-                var dataX = GetBarRight(data, barIndex, index, StackedBarSeries);
-                var x0 = GetBarLeft(barIndex, index, StackedBarSeries);
+                var dataX = GetBarRight(data, barIndex, category, StackedBarSeries);
+                var x0 = GetBarLeft(data, barIndex, category, StackedBarSeries);
                 var startX = Math.Min(dataX, x0);
                 var endX = Math.Max(dataX, x0);
 
@@ -244,15 +263,15 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
+            var category = ComposeCategory(Chart.ValueScale);
             var list = new List<ChartDataLabel>();
             var barIndex = BarIndex;
             var stackedBarSeries = StackedBarSeries;
 
-            for (var index = 0; index < Items.Count; index++)
+            foreach (var data in Items)
             {
-                var data = Items[index];
-                var left = GetBarLeft(barIndex, index, stackedBarSeries);
-                var right = GetBarRight(data, barIndex, index, stackedBarSeries);
+                var left = GetBarLeft(data, barIndex, category, stackedBarSeries);
+                var right = GetBarRight(data, barIndex, category, stackedBarSeries);
                 var x = left + (right - left) / 2;
                 list.Add(new ChartDataLabel
                 {
