@@ -105,7 +105,7 @@ namespace Radzen.Blazor
             }
         }
 
-        RadzenTabsItem SelectedTab
+        public RadzenTabsItem SelectedTab
         {
             get
             {
