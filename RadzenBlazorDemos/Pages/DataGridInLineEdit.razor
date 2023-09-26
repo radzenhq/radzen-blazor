@@ -67,6 +67,25 @@
             </EditTemplate>
         </RadzenDataGridColumn>
     </Columns>
+
+    <Template Context="order">
+        <RadzenCard Style="margin-bottom:20px">
+            <b>Address</b>: <br />
+            @order.ShipAddress <br />
+            @order.ShipCity @order.ShipRegion @order.ShipPostalCode @order.ShipCountry
+        </RadzenCard>
+    </Template>
+
+    <EditTemplate Context="order">
+        <RadzenCard Style="margin-bottom:20px">
+            <b>Address</b>: <br />
+            <RadzenTextBox @bind-Value="order.ShipAddress" Style="width:100%;" /> <br />
+            <RadzenTextBox @bind-Value="order.ShipCity" />
+            <RadzenTextBox @bind-Value="order.ShipRegion" />
+            <RadzenTextBox @bind-Value="order.ShipPostalCode" />
+            <RadzenTextBox @bind-Value="order.ShipCountry" />
+        </RadzenCard>
+    </EditTemplate>
 </RadzenDataGrid>
 
 @code {
