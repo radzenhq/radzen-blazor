@@ -1125,6 +1125,13 @@ namespace Radzen.Blazor
         public RenderFragment EmptyTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the edit template.
+        /// </summary>
+        /// <value>The template.</value>
+        [Parameter]
+        public RenderFragment<TItem> EditTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this instance loading indicator is shown.
         /// </summary>
         /// <value><c>true</c> if this instance loading indicator is shown; otherwise, <c>false</c>.</value>
