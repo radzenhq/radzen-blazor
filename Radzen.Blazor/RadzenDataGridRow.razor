@@ -130,15 +130,32 @@
 </tr>
 }
 
-@if (Grid.Template != null && Grid.expandedItems.Keys.Contains(Item))
+@if (Grid.expandedItems.Keys.Contains(Item))
 {
-    <tr class="rz-expanded-row-content">
-        <td colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
-            <div class="rz-expanded-row-template" style="position:sticky">
-                @Grid.Template(Item)
-            </div>
-        </td>
-    </tr>
+    @if (Grid.IsRowInEditMode(Item) && Grid.EditTemplate != null)
+    {
+        <tr class="rz-expanded-row-content">
+            <td colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
+                <div class="rz-expanded-row-template" style="position:sticky">
+                    <CascadingValue Value=@EditContext>
+                        <CascadingValue Value=this>
+                            @Grid.EditTemplate(Item)
+                        </CascadingValue>
+                    </CascadingValue>
+                </div>
+            </td>
+        </tr>
+    }
+    else if (Grid.Template != null)
+    {
+        <tr class="rz-expanded-row-content">
+            <td colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
+                <div class="rz-expanded-row-template" style="position:sticky">
+                    @Grid.Template(Item)
+                </div>
+            </td>
+        </tr>
+    }
 }
 @code {
         [Parameter]
