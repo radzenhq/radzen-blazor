@@ -1419,7 +1419,11 @@ namespace Radzen
         /// <summary>
         /// Satisfied if the current value is not <see cref="string.Empty"/>.
         /// </summary>
-        IsNotEmpty
+        IsNotEmpty, 
+        /// <summary>
+        /// Custom operator if not need to generate the filter.
+        /// </summary>
+        Custom
     }
 
     /// <summary>
