@@ -937,7 +937,7 @@ namespace Radzen.Blazor
         {
             SetFilterValue(value, isFirst);
             Grid.SaveSettings();
-            await Grid.Reload();
+            await Grid.FirstPage(true);
         }
 
         internal bool CanSetFilterValue()
