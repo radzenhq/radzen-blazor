@@ -3118,6 +3118,11 @@ namespace Radzen.Blazor
                     shouldUpdateState = true;
                 }
 
+                if (View.Any() == false && Query.Top == null)
+                {
+                    shouldUpdateState = true;
+                }
+
                 if (shouldUpdateState)
                 {
                     skip = CurrentPage * GetPageSize();
