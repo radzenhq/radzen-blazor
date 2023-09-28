@@ -199,7 +199,7 @@ window.Radzen = {
 
     document.body.appendChild(script);
   },
-  createMap: function (wrapper, ref, id, apiKey, zoom, center, markers, options) {
+    createMap: function (wrapper, ref, id, apiKey, zoom, center, markers, options, fitBoundsToMarkersOnUpdate) {
     var api = function () {
       var defaultView = document.defaultView;
 
@@ -227,10 +227,12 @@ window.Radzen = {
         });
       });
 
-      Radzen.updateMap(id, zoom, center, markers, options);
+            Radzen.updateMap(id, zoom, center, markers, options, fitBoundsToMarkersOnUpdate);
     });
   },
-  updateMap: function (id, zoom, center, markers, options) {
+    updateMap: function (id, zoom, center, markers, options, fitBoundsToMarkersOnUpdate) {
+        let markerBounds = new google.maps.LatLngBounds();
+
     if (Radzen[id] && Radzen[id].instance) {
         if (Radzen[id].instance.markers && Radzen[id].instance.markers.length) {
             for (var i = 0; i < Radzen[id].instance.markers.length; i++) {
@@ -259,6 +261,8 @@ window.Radzen = {
                 marker.setMap(Radzen[id].instance);
 
                 Radzen[id].instance.markers.push(marker);
+
+                    markerBounds.extend(marker.position);
             });
         }
 
@@ -273,6 +277,10 @@ window.Radzen = {
         if (options) {
             Radzen[id].instance.setOptions(options);
         }
+
+            if (markers && fitBoundsToMarkersOnUpdate) {
+                Radzen[id].instance.fitBounds(markerBounds);
+            }
     }
   },
   destroyMap: function (id) {
