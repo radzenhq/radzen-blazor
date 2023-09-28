@@ -69,9 +69,16 @@ namespace Radzen.Blazor
             if (firstRender)
             {
                 initialized = true;
-                var matches = await JSRuntime.InvokeAsync<bool>("Radzen.mediaQuery", Query, Reference);
+                try
+                {
+                    var matches = await JSRuntime.InvokeAsync<bool>("Radzen.mediaQuery", Query, Reference);
 
-                await Change.InvokeAsync(matches);
+                    await Change.InvokeAsync(matches);
+                }
+                catch
+                { 
+                    //
+                }
             }
         }
 
@@ -82,7 +89,14 @@ namespace Radzen.Blazor
         {
             if (initialized)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.mediaQuery", Reference);
+                try
+                {
+                    JSRuntime.InvokeVoidAsync("Radzen.mediaQuery", Reference);
+                }
+                catch
+                {
+                    //
+                }
             }
 
             reference?.Dispose();
