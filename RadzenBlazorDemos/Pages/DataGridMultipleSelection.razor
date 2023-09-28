@@ -17,7 +17,7 @@
         <RadzenDataGridColumn TItem="Employee" Width="60px" Sortable="false" Filterable="false">
             <HeaderTemplate>
                 <RadzenCheckBox TriState="false" TValue="bool?" 
-                   Value="@(selectedEmployees == null ? false : !employees.All(i => selectedEmployees.Contains(i)) ? null : employees.Any(i => selectedEmployees.Contains(i)))"
+                   Value="@(selectedEmployees == null || selectedEmployees?.Any() != true ? false : !employees.All(i => selectedEmployees.Contains(i)) ? null : employees.Any(i => selectedEmployees.Contains(i)))"
                    Change="@(args => selectedEmployees = args == true ? employees.ToList() : null)" />
             </HeaderTemplate>
             <Template Context="data">
