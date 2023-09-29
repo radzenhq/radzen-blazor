@@ -90,6 +90,12 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Flag indicating whether map will be zoomed to marker bounds on update or not.
+        /// </summary>
+        [Parameter]
+        public bool FitBoundsToMarkersOnUpdate { get; set; } = false;
+
         GoogleMapPosition center = new GoogleMapPosition() { Lat = 0, Lng = 0 };
         /// <summary>
         /// Gets or sets the center map position.
@@ -194,12 +200,12 @@ namespace Radzen.Blazor
             if (firstRender)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center,
-                     data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }), Options);
+                     data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate);
             }
             else
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, null, null,
-                             data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }), Options);
+                             data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate);
             }
         }
 
