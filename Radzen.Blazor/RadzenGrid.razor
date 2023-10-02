@@ -815,6 +815,21 @@
         var filterString = columns.ToFilterString<TItem>();
         Query.Filter = filterString;
 
+	    var filters = columns
+		    .Where(c => c.Filterable && c.Visible && c.FilterValue != null)
+		    .Select(c => new FilterDescriptor()
+		    {
+			    Property = c.GetFilterProperty(),
+			    FilterValue = c.FilterValue,
+			    FilterOperator = (FilterOperator)Enum.Parse(typeof(FilterOperator), QueryableExtension.FilterOperators[c.FilterOperator]),
+			    SecondFilterValue = c.SecondFilterValue,
+			    SecondFilterOperator = (FilterOperator)Enum.Parse(typeof(FilterOperator), QueryableExtension.FilterOperators[c.SecondFilterOperator]),
+			    LogicalFilterOperator = c.LogicalFilterOperator
+		    })
+		    .ToList();
+
+	    Query.Filters = filters;
+
         if (LoadData.HasDelegate)
         {
             await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
@@ -823,15 +838,7 @@
                 Top = PageSize,
                 OrderBy = orderBy,
                 Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString,
-                Filters = columns.Where(c => c.Filterable && c.Visible && c.FilterValue != null).Select(c => new FilterDescriptor()
-                {
-                    Property = c.GetFilterProperty(),
-                    FilterValue = c.FilterValue,
-                    FilterOperator = (FilterOperator)Enum.Parse(typeof(FilterOperator), QueryableExtension.FilterOperators[c.FilterOperator]),
-                    SecondFilterValue = c.SecondFilterValue,
-                    SecondFilterOperator = (FilterOperator)Enum.Parse(typeof(FilterOperator), QueryableExtension.FilterOperators[c.SecondFilterOperator]),
-                    LogicalFilterOperator = c.LogicalFilterOperator
-                }),
+                Filters = filters,
                 Sorts = columns.Where(c => c.Sortable && c.Visible && (orderBy.Contains($"{c.GetSortProperty()} asc") || orderBy.Contains($"{c.GetSortProperty()} desc"))).Select(c => new SortDescriptor()
                 {
                     Property = c.GetSortProperty(),

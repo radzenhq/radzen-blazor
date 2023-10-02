@@ -518,10 +518,10 @@ namespace Radzen
         /// <value>The filter.</value>
         public string Filter { get; set; }
         /// <summary>
-        /// Gets or sets the filter parameters.
+        /// Gets the filter expression as a collection of filter descriptors.
         /// </summary>
         /// <value>The filter parameters.</value>
-        public object[] FilterParameters { get; set; }
+        public IEnumerable<FilterDescriptor> Filters { get; set; }
         /// <summary>
         /// Gets or sets the order by.
         /// </summary>

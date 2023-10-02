@@ -1827,7 +1827,8 @@ namespace Radzen.Blazor
             var filterString = allColumns.ToList().ToFilterString<TItem>();
             Query.Filter = filterString;
 
-            filters = allColumns.ToList().Where(c => c.Filterable && c.GetVisible() && (c.GetFilterValue() != null
+            filters = allColumns.ToList()
+                .Where(c => c.Filterable && c.GetVisible() && (c.GetFilterValue() != null
                     || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
                     || c.GetFilterOperator() == FilterOperator.IsEmpty | c.GetFilterOperator() == FilterOperator.IsNotEmpty))
                 .Select(c => new FilterDescriptor()
@@ -1838,7 +1839,10 @@ namespace Radzen.Blazor
                     SecondFilterValue = c.GetSecondFilterValue(),
                     SecondFilterOperator = c.GetSecondFilterOperator(),
                     LogicalFilterOperator = c.GetLogicalFilterOperator()
-                }).ToList();
+                })
+                .ToList();
+
+            Query.Filters = filters;
 
             if (LoadData.HasDelegate)
             {
