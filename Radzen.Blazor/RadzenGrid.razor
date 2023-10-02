@@ -799,54 +799,54 @@
         }
     }
 
-	public async override Task Reload()
-	{
-		_view = null;
+    public async override Task Reload()
+    {
+        _view = null;
 
-		if (Data != null && !LoadData.HasDelegate)
-		{
-			Count = View.Count();
-		}
+        if (Data != null && !LoadData.HasDelegate)
+        {
+            Count = View.Count();
+        }
 
-		Query.Skip = skip;
-		Query.Top = PageSize;
-		Query.OrderBy = orderBy;
+        Query.Skip = skip;
+        Query.Top = PageSize;
+        Query.OrderBy = orderBy;
 
-		var filterString = columns.ToFilterString<TItem>();
-		Query.Filter = filterString;
+        var filterString = columns.ToFilterString<TItem>();
+        Query.Filter = filterString;
 
-		if (LoadData.HasDelegate)
-		{
-			await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
-			{
-				Skip = skip,
-				Top = PageSize,
-				OrderBy = orderBy,
-				Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString,
-				Filters = columns.Where(c => c.Filterable && c.Visible && c.FilterValue != null).Select(c => new FilterDescriptor()
-				{
-					Property = c.GetFilterProperty(),
-					FilterValue = c.FilterValue,
-					FilterOperator = (FilterOperator)Enum.Parse(typeof(FilterOperator), QueryableExtension.FilterOperators[c.FilterOperator]),
-					SecondFilterValue = c.SecondFilterValue,
-					SecondFilterOperator = (FilterOperator)Enum.Parse(typeof(FilterOperator), QueryableExtension.FilterOperators[c.SecondFilterOperator]),
-					LogicalFilterOperator = c.LogicalFilterOperator
-				}),
-				Sorts = columns.Where(c => c.Sortable && c.Visible && (orderBy.Contains($"{c.GetSortProperty()} asc") || orderBy.Contains($"{c.GetSortProperty()} desc"))).Select(c => new SortDescriptor()
-				{
-					Property = c.GetSortProperty(),
-					SortOrder = orderBy.Contains($"{c.GetSortProperty()} asc") ? SortOrder.Ascending : SortOrder.Descending,
-				})
-			});
-		}
+        if (LoadData.HasDelegate)
+        {
+            await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
+            {
+                Skip = skip,
+                Top = PageSize,
+                OrderBy = orderBy,
+                Filter = IsOData() ? columns.ToODataFilterString<TItem>() : filterString,
+                Filters = columns.Where(c => c.Filterable && c.Visible && c.FilterValue != null).Select(c => new FilterDescriptor()
+                {
+                    Property = c.GetFilterProperty(),
+                    FilterValue = c.FilterValue,
+                    FilterOperator = (FilterOperator)Enum.Parse(typeof(FilterOperator), QueryableExtension.FilterOperators[c.FilterOperator]),
+                    SecondFilterValue = c.SecondFilterValue,
+                    SecondFilterOperator = (FilterOperator)Enum.Parse(typeof(FilterOperator), QueryableExtension.FilterOperators[c.SecondFilterOperator]),
+                    LogicalFilterOperator = c.LogicalFilterOperator
+                }),
+                Sorts = columns.Where(c => c.Sortable && c.Visible && (orderBy.Contains($"{c.GetSortProperty()} asc") || orderBy.Contains($"{c.GetSortProperty()} desc"))).Select(c => new SortDescriptor()
+                {
+                    Property = c.GetSortProperty(),
+                    SortOrder = orderBy.Contains($"{c.GetSortProperty()} asc") ? SortOrder.Ascending : SortOrder.Descending,
+                })
+            });
+        }
 
-		CalculatePager();
+        CalculatePager();
 
-		if (!LoadData.HasDelegate)
-		{
-			StateHasChanged();
-		}
-	}
+        if (!LoadData.HasDelegate)
+        {
+            StateHasChanged();
+        }
+    }
 
     internal async Task ChangeState()
     {
