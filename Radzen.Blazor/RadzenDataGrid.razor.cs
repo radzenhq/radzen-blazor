@@ -3182,7 +3182,7 @@ namespace Radzen.Blazor
                 {
                     return element.GetDateTime();
                 }
-                else if (type.IsEnum)
+                else if (type.IsEnum || Nullable.GetUnderlyingType(type)?.IsEnum == true)
                 {
                     return element.GetInt32();
                 }
