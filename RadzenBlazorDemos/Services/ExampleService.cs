@@ -907,6 +907,13 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "ToggleButton",
+                    Title = "Blazor ToggleButton component",
+                    Path = "toggle-button",
+                    Icon = "&#xf1c1"
+                },
+                new Example()
+                {
                     Name = "CheckBox",
                     Path = "checkbox",
                     Title = "Blazor checkbox component with optional tri-state support",

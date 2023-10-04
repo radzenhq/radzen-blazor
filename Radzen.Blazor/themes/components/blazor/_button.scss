@@ -21,6 +21,7 @@ $button-active-gradient: linear-gradient(rgba(#000, 0.1), rgba(#000, 0.1)) !defa
 $button-active-background-size: $button-background-size !default;
 
 $button-disabled-opacity: 0.2 !default;
+$button-empty-opacity: 0.4 !default;
 
 $button-sizes: () !default;
 
@@ -177,77 +178,83 @@ $button-styles: map-merge(
   --rz-button-active-gradient: #{$button-active-gradient};
   --rz-button-active-background-size: #{$button-active-background-size};
   --rz-button-disabled-opacity: #{$button-disabled-opacity};
+  --rz-button-empty-opacity: #{$button-empty-opacity};
 }
 
 %button, .rz-button {
-  -webkit-appearance: none;
-  display: inline-block;
-  border-radius: var(--rz-button-border-radius);
-  background-color: var(--rz-button-base-background-color);
-  color: var(--rz-button-base-color);
-  border: none;
-  outline: none;
-  line-height: var(--rz-button-line-height);
-  font-size: 1.0625rem;
-  text-decoration: none;
-  box-shadow: var(--rz-button-shadow);
-  transition: var(--rz-button-transition);
-  background-size: var(--rz-button-background-size);
-  background-repeat: no-repeat;
-
-  &:focus {
-    outline: var(--rz-button-focus-outline);
-  }
-
-  &:not(.rz-state-disabled) {
-    cursor: pointer;
-
-    &:hover {
-      &:not(:active) {
-        text-decoration: none;
-        background-image: var(--rz-button-hover-gradient);
-        background-size: var(--rz-button-hover-background-size);
-        box-shadow: var(--rz-button-hover-shadow);
-      }
-    }
+    -webkit-appearance: none;
+    display: inline-block;
+    border-radius: var(--rz-button-border-radius);
+    background-color: var(--rz-button-base-background-color);
+    color: var(--rz-button-base-color);
+    border: none;
+    outline: none;
+    line-height: var(--rz-button-line-height);
+    font-size: 1.0625rem;
+    text-decoration: none;
+    box-shadow: var(--rz-button-shadow);
+    transition: var(--rz-button-transition);
+    background-size: var(--rz-button-background-size);
+    background-repeat: no-repeat;
 
     &:focus {
-      &:not(:active) {
-        text-decoration: none;
-        background-image: var(--rz-button-focus-gradient);
-        background-size: var(--rz-button-focus-background-size);
-        box-shadow: var(--rz-button-focus-shadow);
-      }
+        outline: var(--rz-button-focus-outline);
     }
 
-    &:active {
-      text-decoration: none;
-      background-image: var(--rz-button-active-gradient);
-      background-size: var(--rz-button-active-background-size);
-      box-shadow: var(--rz-button-active-shadow);
+    &:not(.rz-state-disabled) {
+        cursor: pointer;
+
+        &:hover {
+            &:not(:active) {
+                text-decoration: none;
+                background-image: var(--rz-button-hover-gradient);
+                background-size: var(--rz-button-hover-background-size);
+                box-shadow: var(--rz-button-hover-shadow);
+            }
+        }
+
+        &:focus {
+            &:not(:active) {
+                text-decoration: none;
+                background-image: var(--rz-button-focus-gradient);
+                background-size: var(--rz-button-focus-background-size);
+                box-shadow: var(--rz-button-focus-shadow);
+            }
+        }
+
+        &:active {
+            text-decoration: none;
+            background-image: var(--rz-button-active-gradient);
+            background-size: var(--rz-button-active-background-size);
+            box-shadow: var(--rz-button-active-shadow);
+        }
     }
-  }
 
-  &.rz-state-disabled {
-    opacity: var(--rz-button-disabled-opacity);
-    cursor: initial;
-  }
+    &.rz-state-disabled {
+        opacity: var(--rz-button-disabled-opacity);
+        cursor: initial;
+    }
 
-  .rz-button-box {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    vertical-align: var(--rz-button-vertical-align);
-    line-height: var(--rz-button-line-height);
-  }
+    &.rz-state-empty {
+        opacity: var(--rz-button-empty-opacity);
+        cursor: initial;
+    }
 
-  .rz-button-text {
-    vertical-align: var(--rz-button-vertical-align);
-  }
+    .rz-button-box {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        vertical-align: var(--rz-button-vertical-align);
+        line-height: var(--rz-button-line-height);
+    }
 
-  .rzi {
-    vertical-align: var(--rz-button-vertical-align);
-  }
+    .rz-button-text {
+        vertical-align: var(--rz-button-vertical-align);
+    }
+
+    .rzi {
+        vertical-align: var(--rz-button-vertical-align);
+    }
 }
 
 @each $style, $button in $button-styles {

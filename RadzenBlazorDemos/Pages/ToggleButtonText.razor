@@ -1,0 +1,61 @@
+@inject NotificationService NotificationService
+
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
+</RadzenStack>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Text Shades</RadzenText>
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
+    </RadzenStack>
+</RadzenStack>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Text Light and Dark</RadzenText>
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">Light and Dark button styles don't have Shades</RadzenText>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-background-color-base-500 rz-p-4">
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Light button")) Text="Light" ButtonStyle="ButtonStyle.Light" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Dark button")) Text="Dark" ButtonStyle="ButtonStyle.Dark" />
+</RadzenStack>
+
+@code {
+    private void OnClick(string text)
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "ToggleButton Clicked", Detail = text });
+    }
+}

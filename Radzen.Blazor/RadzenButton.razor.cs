@@ -130,7 +130,7 @@ namespace Radzen.Blazor
         /// Handles the <see cref="E:Click" /> event.
         /// </summary>
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        public async Task OnClick(MouseEventArgs args)
+        public virtual async Task OnClick(MouseEventArgs args)
         {
             if (clicking)
             {

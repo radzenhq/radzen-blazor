@@ -1,0 +1,12 @@
+@inject NotificationService NotificationService
+
+<RadzenToggleButton @bind-Value=@value Change=@OnChange Text="ToggleButton" />
+
+@code {
+    bool value;
+
+    private void OnChange(bool newValue)
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "ToggleButton Changed", Detail = $"{newValue}" });
+    }
+}
