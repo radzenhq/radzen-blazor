@@ -204,5 +204,10 @@ namespace Radzen
         /// </summary>
         /// <value>The icon.</value>
         public string Icon { get; set; }
+        /// <summary>
+        /// Gets or sets the icon color.
+        /// </summary>
+        /// <value>The icon color.</value>
+        public string IconColor { get; set; }
     }
 }
