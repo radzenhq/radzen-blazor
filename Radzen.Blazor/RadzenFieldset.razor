@@ -34,7 +34,7 @@
             {
                 @if (!string.IsNullOrEmpty(Icon))
                 {
-                    <i class="rzi">@((MarkupString)Icon)</i><span>@Text</span>
+                    <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i><span>@Text</span>
                 }
                 else
                 {

@@ -13,7 +13,7 @@
                    onchange="Radzen.uploadInputChange(event, '@Url', @Auto.ToString().ToLower(), @Multiple.ToString().ToLower(), true, '@ParameterName')" />
             @if (!string.IsNullOrEmpty(Icon))
             {
-            <i class="rzi">@((MarkupString)Icon)</i>
+            <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
             }
             <span class="rz-button-text">@ChooseText</span>
         </span>

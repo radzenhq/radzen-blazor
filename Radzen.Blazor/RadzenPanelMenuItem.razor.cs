@@ -68,6 +68,13 @@ namespace Radzen.Blazor
         public string Icon { get; set; }
 
         /// <summary>
+        /// Gets or sets the icon color.
+        /// </summary>
+        /// <value>The icon color.</value>
+        [Parameter]
+        public string IconColor { get; set; }
+
+        /// <summary>
         /// Gets or sets the image.
         /// </summary>
         /// <value>The image.</value>
@@ -136,6 +143,11 @@ namespace Radzen.Blazor
         {
             string deg = expanded ? "180" : "0";
             return $@"transform: rotate({deg}deg);";
+        }
+
+        string getIconStyle()
+        { 
+            return $"{(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon ? "margin-right:0px;" : "")}{(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : "")}";
         }
 
         string getItemStyle()

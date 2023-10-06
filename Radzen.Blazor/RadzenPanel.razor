@@ -8,7 +8,7 @@
                 <div>
                     @if (!string.IsNullOrEmpty(Icon))
                     {
-                        <i class="rzi">@((MarkupString)Icon)</i>
+                        <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
                     }
                     @if (!string.IsNullOrEmpty(Text))
                     {

@@ -1,13 +1,13 @@
 @if (PreventBlur)
 {
 <button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor.Disabled || Disabled || !EnabledModes.HasFlag(Editor.GetMode())) @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@Title>
-    <i class="rzi">@Icon</i>
+    <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
 </button>
 }
 else
 {
 <button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor.Disabled || Disabled || !EnabledModes.HasFlag(Editor.GetMode())) title=@Title>
-    <i class="rzi">@Icon</i>
+    <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
 </button>
 }
 @code {
@@ -28,6 +28,13 @@ else
 
     [Parameter]
     public string Icon { get; set; }
+
+    /// <summary>
+    /// Gets or sets the icon color.
+    /// </summary>
+    /// <value>The icon color.</value>
+    [Parameter]
+    public string IconColor { get; set; }
 
     [Parameter]
     public HtmlEditorMode EnabledModes { get; set; } = HtmlEditorMode.Design;
