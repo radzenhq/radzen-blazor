@@ -30,7 +30,7 @@
                 }
                 @if (!string.IsNullOrEmpty(item.Icon))
                 {
-            <i class="rzi">@((MarkupString)item.Icon)</i>
+            <i class="rzi" style="@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : null)">@((MarkupString)item.Icon)</i>
                 }
                 @if (!string.IsNullOrEmpty(item.Text))
                 {

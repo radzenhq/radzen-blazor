@@ -17,7 +17,7 @@
             {
                 @if (!string.IsNullOrEmpty(@Icon))
                 {
-                    <i class="rz-button-icon-left rzi">@((MarkupString)Icon)</i>
+                    <i class="rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
                 }
                 @if (!string.IsNullOrEmpty(Image))
                 {

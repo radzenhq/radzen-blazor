@@ -2,5 +2,5 @@
 
 @if (Visible)
 {
-    <i @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">@((MarkupString)Icon)</i>
+    <i @ref="@Element" style="@getStyle()" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">@((MarkupString)Icon)</i>
 }

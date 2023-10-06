@@ -20,6 +20,13 @@ namespace Radzen.Blazor
         public string Icon { get; set; }
 
         /// <summary>
+        /// Gets or sets the icon color.
+        /// </summary>
+        /// <value>The icon color.</value>
+        [Parameter]
+        public string IconColor { get; set; }
+
+        /// <summary>
         /// Specifies the display style of the icon.
         /// </summary>
         [Parameter]
@@ -29,6 +36,11 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return $"rzi{(IconStyle.HasValue ? $" rzi-{IconStyle.Value.ToString().ToLowerInvariant()}" : "")}";
+        }
+
+        string getStyle()
+        {
+            return $"{(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor};" : null)}{(!string.IsNullOrEmpty(Style) ? Style : null)}";
         }
     }
 }

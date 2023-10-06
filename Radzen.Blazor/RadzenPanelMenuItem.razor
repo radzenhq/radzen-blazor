@@ -10,7 +10,7 @@
                 <NavLink target="@Target" class=@(Selected ? "rz-navigation-item-link rz-navigation-item-link-active" : "rz-navigation-item-link") style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px;":"")" href="@Path" Match="@Match">
                     @if (!string.IsNullOrEmpty(Icon) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
-                        <i class="rzi rz-navigation-item-icon" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")">@((MarkupString)Icon)</i>
+                        <i class="rzi rz-navigation-item-icon" style="@getIconStyle()">@((MarkupString)Icon)</i>
                     }
                     @if (!string.IsNullOrEmpty(Image) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
@@ -35,7 +35,7 @@
                 <div class="rz-navigation-item-link" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px;":"")" @onclick="@Toggle">
                     @if (!string.IsNullOrEmpty(Icon) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
-                        <i class="rzi rz-navigation-item-icon" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-right:0px":"")">@((MarkupString)Icon)</i>
+                        <i class="rzi rz-navigation-item-icon" style="@getIconStyle()">@((MarkupString)Icon)</i>
                     }
                     @if (!string.IsNullOrEmpty(Image) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
