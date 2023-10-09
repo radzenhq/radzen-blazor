@@ -162,13 +162,10 @@
             Open the <code>Shared\MainLayout.razor</code> file and include:
         </RadzenText>
         <ul class="rz-text-body1">
-            <li><code>&lt;RadzenDialog/&gt;</code></li>
-            <li><code>&lt;RadzenNotification/&gt;</code></li>
-            <li><code>&lt;RadzenContextMenu/&gt;</code></li>
-            <li><code>&lt;RadzenTooltip/&gt;</code></li>
+            <li><code>&lt;RadzenComponents/&gt;</code></li>
         </ul>
         <RadzenAlert AlertStyle="AlertStyle.Warning">
-            Make sure that you do not nest RadzenDialog, RadzenNotification, RadzenContextMenu or RadzenTooltip inside a positioned element (i.e. with position: relative, position: absolute or position: fixed).
+            Make sure that you do not nest RadzenComponents inside a positioned element (i.e. with position: relative, position: absolute or position: fixed).
             To be safe you can add them at the end of the layout file after all other elements.
         </RadzenAlert>
         <RadzenText>
