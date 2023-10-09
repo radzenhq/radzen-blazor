@@ -960,7 +960,11 @@ namespace Radzen.Blazor
 
             FilterValue = null;
             SecondFilterValue = null;
-            FilterOperator = typeof(System.Collections.IEnumerable).IsAssignableFrom(FilterPropertyType) ? FilterOperator.Contains : default(FilterOperator);
+            FilterOperator = FilterOperator == FilterOperator.Custom
+                ? FilterOperator.Custom
+                : typeof(System.Collections.IEnumerable).IsAssignableFrom(FilterPropertyType)
+                    ? FilterOperator.Contains
+                    : default(FilterOperator);
             SecondFilterOperator = default(FilterOperator);
             LogicalFilterOperator = default(LogicalFilterOperator);
         }
