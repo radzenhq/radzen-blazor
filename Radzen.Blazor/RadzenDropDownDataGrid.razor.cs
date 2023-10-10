@@ -368,7 +368,7 @@ namespace Radzen.Blazor
                 {
                     string filterCaseSensitivityOperator = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
 
-                    if (AllowFilteringByAllStringColumns)
+                    if (AllowFilteringByAllStringColumns && grid != null)
                     {
                         if (AllowFilteringByWord)
                         {
