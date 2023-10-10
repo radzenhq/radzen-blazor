@@ -181,5 +181,10 @@ namespace Radzen.Blazor
         {
             Tabs?.RemoveItem(this);
         }
+
+        string getStyle()
+        {
+            return $"{(!Visible ? $"display:none;" : null)}{(!string.IsNullOrEmpty(Style) ? Style : null)}";
+        }
     }
 }
