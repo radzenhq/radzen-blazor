@@ -16,19 +16,22 @@
         var y = CenterY;
         var radius = CurrentRadius;
 
+        double startAngle = StartAngle.HasValue ? (double)StartAngle - 90 : -90;
+        double totalAngle = TotalAngle.HasValue ? (double)TotalAngle : 360;
+        double endAngle = startAngle + totalAngle;
+
         return
         @<g class="@className">
             @if (PositiveItems.Any())
                 {
                     var sum = PositiveItems.Sum(Value);
 
-                    double startAngle = -90;
 
                 @foreach (var data in PositiveItems)
                     {
                         var value = Value(data);
-                        var angle = sum == 0 ? 0 : (value / sum) * 360;
-                        var endAngle = startAngle + angle;
+                        var angle = sum == 0 ? 0 : (value / sum) * totalAngle;
+                        endAngle = startAngle + angle;
 
                         var d = Segment(x, y, radius, 0, startAngle, endAngle);
 
@@ -50,7 +53,7 @@
                 else
                 {
                     var arcClassName = $"rz-series-item-0";
-                    var d = Segment(x, y, radius, radius - 1, -90, 270);
+                    var d = Segment(x, y, radius, radius - 1, startAngle, endAngle);
                     var fill = PickColor(0, Fills);
                     var stroke = PickColor(0, Strokes);
                     <g class="@arcClassName">

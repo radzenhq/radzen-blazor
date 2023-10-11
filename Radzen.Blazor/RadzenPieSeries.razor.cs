@@ -53,6 +53,18 @@ namespace Radzen.Blazor
         public double StrokeWidth { get; set; }
 
         /// <summary>
+        /// Gets or sets the start angle of the donut, defaults to -90.
+        /// </summary>
+        [Parameter]
+        public double? StartAngle { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total angle of the donut, defaults to 360. 
+        /// </summary>
+        [Parameter]
+        public double? TotalAngle { get; set; }
+
+        /// <summary>
         /// Returns the current radius - either a specified <see cref="Radius" /> or automatically calculated one.
         /// </summary>
         protected double CurrentRadius
@@ -187,12 +199,18 @@ namespace Radzen.Blazor
             }
 
             var sum = Items.Sum(Value);
-            double startAngle = 0;
+            double startAngle = StartAngle.HasValue ? (double)StartAngle : 0;
+            double totalAngle = TotalAngle.HasValue ? (double)TotalAngle : 360;
+            //handling charts with an end point > 360 degrees
+            if (angle < startAngle && //cursor angle "behind" the start point
+                (startAngle + totalAngle) > 360 && //end of the chart past 360 degrees
+                (angle + 360) < (startAngle + totalAngle))//updated cursor angle within the range of the chart
+                angle += 360;
 
             foreach (var data in Items)
             {
                 var value = Value(data);
-                var endAngle = startAngle + (value / sum) * 360;
+                var endAngle = startAngle + (value / sum) * totalAngle;
 
                 if (startAngle <= angle && angle <= endAngle)
                 {
@@ -235,13 +253,14 @@ namespace Radzen.Blazor
         internal override double TooltipX(TItem item)
         {
             var sum = PositiveItems.Sum(Value);
-            double startAngle = 0;
+            double startAngle = StartAngle.HasValue ? (double)StartAngle : 0;
+            double totalAngle = TotalAngle.HasValue ? (double)TotalAngle : 360;
             double endAngle = 0;
 
             foreach (var data in PositiveItems)
             {
                 var value = Value(data);
-                endAngle = startAngle + (value / sum) * 360;
+                endAngle = startAngle + (value / sum) * totalAngle;
 
                 if (EqualityComparer<TItem>.Default.Equals(data, item))
                 {
@@ -260,13 +279,14 @@ namespace Radzen.Blazor
         internal override double TooltipY(TItem item)
         {
             var sum = PositiveItems.Sum(Value);
-            double startAngle = 0;
+            double startAngle = StartAngle.HasValue ? (double)StartAngle : 0;
+            double totalAngle = TotalAngle.HasValue ? (double)TotalAngle : 360;
             double endAngle = 0;
 
             foreach (var data in Items)
             {
                 var value = Value(data);
-                endAngle = startAngle + (value / sum) * 360;
+                endAngle = startAngle + (value / sum) * totalAngle;
 
                 if (EqualityComparer<TItem>.Default.Equals(data, item))
                 {
@@ -316,6 +336,13 @@ namespace Radzen.Blazor
         /// <param name="endAngle">The end angle.</param>
         protected string Segment(double x, double y, double radius, double innerRadius, double startAngle, double endAngle)
         {
+            //if its a single full segment set start angle to 180 to stop rendering off center
+            if (endAngle - startAngle == 360)
+            {
+                startAngle = 180;
+                endAngle = 540;
+            }
+
             var start = ToCartesian(x, y, radius, startAngle);
             var end = ToCartesian(x, y, radius, endAngle);
 
