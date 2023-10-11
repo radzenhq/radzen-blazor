@@ -37,8 +37,8 @@
         var radius = CurrentRadius;
         var innerRadius = InnerRadius ?? radius / 2;
 
-        double startAngle = StartAngle.HasValue ? (double)StartAngle - 90 : -90;
-        double totalAngle = TotalAngle.HasValue ? (double)TotalAngle : 360;
+        double startAngle = StartAngle - 90;
+        double totalAngle = TotalAngle;
         double endAngle = startAngle + totalAngle;
 
         return

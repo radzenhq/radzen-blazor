@@ -56,13 +56,13 @@ namespace Radzen.Blazor
         /// Gets or sets the start angle of the donut, defaults to -90.
         /// </summary>
         [Parameter]
-        public double? StartAngle { get; set; }
+        public double StartAngle { get; set; } = 0;
 
         /// <summary>
         /// Gets or sets the total angle of the donut, defaults to 360. 
         /// </summary>
         [Parameter]
-        public double? TotalAngle { get; set; }
+        public double TotalAngle { get; set; } = 360;
 
         /// <summary>
         /// Returns the current radius - either a specified <see cref="Radius" /> or automatically calculated one.
@@ -199,8 +199,8 @@ namespace Radzen.Blazor
             }
 
             var sum = Items.Sum(Value);
-            double startAngle = StartAngle.HasValue ? (double)StartAngle : 0;
-            double totalAngle = TotalAngle.HasValue ? (double)TotalAngle : 360;
+            double startAngle = StartAngle;
+            double totalAngle = TotalAngle;
             //handling charts with an end point > 360 degrees
             if (angle < startAngle && //cursor angle "behind" the start point
                 (startAngle + totalAngle) > 360 && //end of the chart past 360 degrees
@@ -253,8 +253,8 @@ namespace Radzen.Blazor
         internal override double TooltipX(TItem item)
         {
             var sum = PositiveItems.Sum(Value);
-            double startAngle = StartAngle.HasValue ? (double)StartAngle : 0;
-            double totalAngle = TotalAngle.HasValue ? (double)TotalAngle : 360;
+            double startAngle = StartAngle;
+            double totalAngle = TotalAngle;
             double endAngle = 0;
 
             foreach (var data in PositiveItems)
@@ -279,8 +279,8 @@ namespace Radzen.Blazor
         internal override double TooltipY(TItem item)
         {
             var sum = PositiveItems.Sum(Value);
-            double startAngle = StartAngle.HasValue ? (double)StartAngle : 0;
-            double totalAngle = TotalAngle.HasValue ? (double)TotalAngle : 360;
+            double startAngle = StartAngle;
+            double totalAngle = TotalAngle;
             double endAngle = 0;
 
             foreach (var data in Items)

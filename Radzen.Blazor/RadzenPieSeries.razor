@@ -16,8 +16,8 @@
         var y = CenterY;
         var radius = CurrentRadius;
 
-        double startAngle = StartAngle.HasValue ? (double)StartAngle - 90 : -90;
-        double totalAngle = TotalAngle.HasValue ? (double)TotalAngle : 360;
+        double startAngle = StartAngle - 90;
+        double totalAngle = TotalAngle;
         double endAngle = startAngle + totalAngle;
 
         return
