@@ -7,13 +7,13 @@
                 <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
             <RadzenChart>
-                <RadzenDonutSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue">
+                <RadzenDonutSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue" TotalAngle="180" StartAngle="180">
                     <ChildContent>
                         <RadzenSeriesDataLabels Visible="@showDataLabels" />
                     </ChildContent>
                     <TitleTemplate>
                         <div class="rz-donut-content">
-                            <div>Revenue</div> 
+                            <div>Revenue</div>
                             <div>for 2020</div>
                         </div>
                     </TitleTemplate>
