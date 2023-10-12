@@ -321,9 +321,9 @@ namespace Radzen.Blazor
         /// <param name="endAngle">The end angle.</param>
         protected string Segment(double x, double y, double radius, double innerRadius, double startAngle, double endAngle)
         {
-            var largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
+            var largeArcFlag = 0;
 
-            if (Math.Abs(endAngle - startAngle) >= 360)
+            if (Math.Abs(endAngle - startAngle) >= 180)
             {
                 endAngle += 0.01;
                 largeArcFlag = 1;
