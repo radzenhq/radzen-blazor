@@ -53,7 +53,7 @@ namespace Radzen.Blazor
         public double StrokeWidth { get; set; }
 
         /// <summary>
-        /// Gets or sets the start angle of the donut, defaults to -90.
+        /// Gets or sets the start angle of the donut, defaults to 0.
         /// </summary>
         [Parameter]
         public double StartAngle { get; set; } = 0;
