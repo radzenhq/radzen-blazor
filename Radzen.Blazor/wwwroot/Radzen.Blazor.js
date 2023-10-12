@@ -331,13 +331,11 @@ window.Radzen = {
       }
 
       var newValue = percent * (max - min) + min;
-      var oldValue = range ? value[slider.isMin ? 0 : 1] : value;
 
       if (
         slider.canChange &&
         newValue >= min &&
-        newValue <= max &&
-        newValue != oldValue
+        newValue <= max 
       ) {
         slider.invokeMethodAsync(
           'RadzenSlider.OnValueChange',
