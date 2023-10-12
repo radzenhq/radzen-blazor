@@ -303,6 +303,22 @@ namespace Radzen.Blazor
         public object FilterValue { get; set; }
 
         /// <summary>
+        /// Gets or sets the filter placeholder.
+        /// </summary>
+        /// <value>The filter placeholder value.</value>
+        [Parameter]
+        public string FilterPlaceholder { get; set; }
+        
+        /// <summary>
+        /// Gets the filter placeholder.
+        /// </summary>
+        /// <returns>System.String.</returns>
+        public string GetFilterPlaceholder()
+        {
+            return FilterPlaceholder ?? string.Empty;
+        }
+        
+        /// <summary>
         /// Gets or sets the second filter value.
         /// </summary>
         /// <value>The second filter value.</value>

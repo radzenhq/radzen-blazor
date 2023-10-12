@@ -310,7 +310,7 @@
                                                             {
                                                                 <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
                                                             }
-                                                            <input disabled=@column.CanSetFilterValue() id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" class="rz-textbox" style="width: 100%;" />
+                                                            <input disabled=@column.CanSetFilterValue() id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" placeholder="@column.GetFilterPlaceholder()" class="rz-textbox" style="width: 100%;" />
                                                             @if (column.GetFilterValue() != null && filters.Any(d => d.Property == column.GetFilterProperty()))
                                                             {
                                                                 <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear" style="position:absolute;right:10px;">close</i>
