@@ -16,11 +16,12 @@
 <p>The state includes current page index, page size, groups and columns filter, sort, order, width and visibility.</p>
 <RadzenButton Click="@(args => Settings = null)" Text="Clear saved settings" Style="margin-bottom: 16px" />
 <RadzenButton Click="@(args => NavigationManager.NavigateTo("/datagrid-save-settings-loaddata", true))" Text="Reload" Style="margin-bottom: 16px" />
-<RadzenDataGrid @ref=grid @bind-Settings="@Settings" LoadSettings="@LoadSettings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" PageSize="4"
+<RadzenDataGrid @ref=grid @bind-Settings="@Settings" LoadSettings="@LoadSettings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" 
                 AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true"
                 AllowColumnResize="true" AllowColumnReorder="true" ColumnWidth="200px"
                 FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                Data="@employees" IsLoading=@isLoading Count="@count" LoadData=@LoadData TItem="Employee">
+                Data="@employees" IsLoading=@isLoading Count="@count" LoadData=@LoadData TItem="Employee"
+                PageSize="@pageSize" PageSizeOptions="@pageSizeOptions" ShowPagingSummary="true" PageSizeChanged="@(args => pageSize = args)">
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
             <Template Context="data">
@@ -39,6 +40,9 @@
 <EventConsole @ref=@console />
 
 @code {
+    IEnumerable<int> pageSizeOptions = new int[] { 4, 6, 8 };
+    int pageSize = 4;
+
     RadzenDataGrid<Employee> grid;
     IEnumerable<Employee> employees;
     EventConsole console;
@@ -102,6 +106,10 @@
         if (!string.IsNullOrEmpty(result))
         {
             _settings = JsonSerializer.Deserialize<DataGridSettings>(result);
+            if (_settings.PageSize.HasValue)
+            {
+                pageSize = _settings.PageSize.Value;
+            }
         }
     }
 
