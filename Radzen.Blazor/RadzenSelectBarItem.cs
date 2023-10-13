@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -108,6 +109,25 @@ namespace Radzen.Blazor
         internal string GetItemId()
         {
             return GetId();
+        }
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            var shouldRefresh = parameters.DidParameterChange(nameof(Disabled), Disabled) ||
+                parameters.DidParameterChange(nameof(Text), Text) ||
+                parameters.DidParameterChange(nameof(Value), Value) ||
+                parameters.DidParameterChange(nameof(Icon), Icon) ||
+                parameters.DidParameterChange(nameof(IconColor), IconColor) ||
+                parameters.DidParameterChange(nameof(Image), Image) ||
+                parameters.DidParameterChange(nameof(ImageStyle), ImageStyle);
+
+            await base.SetParametersAsync(parameters);
+
+            if (shouldRefresh)
+            {
+                SelectBar.Refresh();
+            }
         }
     }
 }

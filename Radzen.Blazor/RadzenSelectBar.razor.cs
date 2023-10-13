@@ -212,5 +212,13 @@ namespace Radzen.Blazor
 
             StateHasChanged();
         }
+
+        /// <summary>
+        /// Refreshes this instance.
+        /// </summary>
+        public void Refresh()
+        {
+            StateHasChanged();
+        }
     }
 }

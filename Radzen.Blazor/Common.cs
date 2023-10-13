@@ -417,6 +417,11 @@ namespace Radzen
         /// </summary>
         /// <param name="item">The item.</param>
         void RemoveItem(RadzenSelectBarItem item);
+
+        /// <summary>
+        /// Refreshes this instance.
+        /// </summary>
+        void Refresh();
     }
 
     /// <summary>

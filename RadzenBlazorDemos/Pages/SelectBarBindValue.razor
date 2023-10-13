@@ -1,12 +1,70 @@
-﻿<div class="rz-p-12 rz-text-align-center">
-    <RadzenSelectBar @bind-Value=@value TValue="bool" class="mb-5">
-        <Items>
-            <RadzenSelectBarItem Text="On" Value="true" />
-            <RadzenSelectBarItem Text="Off" Value="false" />
-        </Items>
-    </RadzenSelectBar>
-</div>
+﻿@page "/select-bar-test"
+
+<RadzenCard>
+    <RadzenDataGrid @bind-Data="@Items" TItem="GridItem" class="mt-4 w-100">
+        <HeaderTemplate>
+            <div class="row d-flex w-100">
+                <div class="col-auto p-2 justify-content-end bd-highlight">
+                    <RadzenSelectBar class="bg-white rounded-pill my-auto" TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedAnimal">
+                        <Items>
+                            <RadzenSelectBarItem Value="1" Text="Cat " Disabled="@_disableCat" />
+                            <RadzenSelectBarItem Value="2" Text="Birds" />
+                        </Items>
+                    </RadzenSelectBar>
+                </div>
+            </div>
+        </HeaderTemplate>
+        <Columns>
+            <RadzenDataGridColumn Title="Name" Property="Name" TItem="GridItem" />
+            <RadzenDataGridColumn Title="Action" TItem="GridItem">
+                <Template Context="data">
+                    <div class="d-flex justify-content-center">
+                        <RadzenSelectBar class="bg-white rounded-pill my-auto" TValue="int" Size="ButtonSize.Small" @bind-Value="@data.Action" Change="() => CheckHeader()">
+                            <Items>
+                                <RadzenSelectBarItem Value="1" Text="Eats food" />
+                                <RadzenSelectBarItem Value="2" Text="drinks water" />
+                                <RadzenSelectBarItem Value="3" Text="flaps wings" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+
+</RadzenCard>
 
 @code {
-    bool value;
+    public List<GridItem> Items { get; private set; }
+    public int SelectedAnimal { get; private set; }
+
+    private const int _flapsWingsAction = 3;
+    private const int _birdAnimal = 2;
+
+    private bool _disableCat;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Items = new List<GridItem>
+        {
+            new() { Name = "Animal Action", Action = 1 },
+            new() { Name = "Animal Action", Action = 2 }
+        };
+    }
+
+    private async Task CheckHeader()
+    {
+        _disableCat = false;
+        if (Items.Any(x => x.Action == _flapsWingsAction))
+        {
+            _disableCat = true;
+            SelectedAnimal = _birdAnimal;
+        }
+    }
+
+    public class GridItem
+    {
+        public string Name { get; set; }
+        public int Action { get; set; }
+    }
 }
