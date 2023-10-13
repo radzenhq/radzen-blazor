@@ -5,13 +5,13 @@ This article shows you how to add Radzen Blazor components to your project.
 1. [Import the namespaces](#import-the-namespaces)
 1. [Include the CSS and JS](#include-the-css-and-js)
 
-> [!Info]
+> [!Information]
 > If you want to use the Radzen.Blazor components in Blazor .NET 8 static rendering mode (SSR) you should be aware that:
-- Static rendering mode <a target="_blank" href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#render-modes">does not support</a> events and all component interactivity will not be available (e.g. opening a dropdown, sorting a datagrid, opening a dialog).
-- Applications created using the Blazor 8 template use static rendering mode by default and only some pages (Counter.razor) have interactivity enabled.
-- The layout is not interactive by default (MainLayout.razor). Blazor components added to it will not be interactive as a result.
-- You can <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#apply-a-render-mode-to-a-component-instance" target="_blank">enable interactivity per component basis</a> via the `@rendermode` attribute e.g. `<RadzenDialog @rendermode="@RenderMode.InteractiveServer" />`.
-- Components that have child content cannot use that approach. You will need a <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#child-component-with-a-serializable-parameter" target="_blank">wrapper component</a> with render mode set as an attribute.- You can <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#set-the-render-mode-for-the-entire-app" target="_blank">enable interactivity</a> for the entire application.
+  - Static rendering mode <a target="_blank" href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#render-modes">does not support</a> events and all component interactivity will not be available (e.g. opening a dropdown, sorting a datagrid, opening a dialog).
+  - Applications created using the Blazor 8 template use static rendering mode by default and only some pages (Counter.razor) have interactivity enabled.
+  - The layout is not interactive by default (MainLayout.razor). Blazor components added to it will not be interactive as a result.
+  - You can <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#apply-a-render-mode-to-a-component-instance" target="_blank">enable interactivity per component basis</a> via the `@rendermode` attribute e.g. `<RadzenDialog @rendermode="@RenderMode.InteractiveServer" />`.
+  - Components that have child content cannot use that approach. You will need a <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#child-component-with-a-serializable-parameter" target="_blank">wrapper component</a> with render mode set as an attribute.- You can <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#set-the-render-mode-for-the-entire-app" target="_blank">enable interactivity</a> for the entire application.
 
 ## Install the Nuget package
 Radzen Blazor Components are distributed as the [Radzen.Blazor](https://www.nuget.org/packages/Radzen.Blazor) nuget package.
