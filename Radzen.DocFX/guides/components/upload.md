@@ -1,17 +1,24 @@
 # Upload component
-This article demonstrates how to use the Upload component. 
+This article demonstrates how to use the Upload component.
+
+Single file upload
 
 ```
-Single file upload
 <RadzenUpload Url="upload/single" Progress="@((args) => OnProgress(args, "Single file upload"))" />
+```
 
 Multiple files upload
+```
 <RadzenUpload Multiple="true" Url="upload/multiple" Progress="@((args) => OnProgress(args, "Multiple files upload"))" />
+```
 
 Upload images only
+```
 <RadzenUpload Multiple="true" Accept="image/*" Url="upload/multiple" Progress="@((args) => OnProgress(args, "Images only upload"))" />
+```
 
 Upload with additional parameter
+```
 <RadzenUpload Multiple="true" Accept="image/*" Url=@($"upload/{1}") Progress="@((args) => OnProgress(args, "Upload with additional parameter"))" />
 
 @code {
