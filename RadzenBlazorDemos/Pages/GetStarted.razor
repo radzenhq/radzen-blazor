@@ -58,6 +58,27 @@
             <li>Add the project from the Visual Nuget Package Manager <img class="rz-ml-0" src="images/nuget-explorer.png"></li>
             <li>Manually edit the .csproj file and add a project reference <code></code></li>
         </ul>
+        <RadzenAlert AlertStyle="AlertStyle.Info" Shade="Shade.Lighter">
+            If you want to use the Radzen.Blazor components in Blazor 8 static rendering mode (SSR) you should be aware that:
+            <ul>
+                <li>
+                    Static rendering mode <a target="_blank" href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#render-modes">does not support</a> events and all component interactivity will not be available (e.g. opening a dropdown, sorting a datagrid, opening a dialog).
+                </li>
+                <li>
+                    Applications created using the Blazor 8 template use static rendering mode by default and only some pages (Counter.razor) have interactivity enabled.
+                </li>
+                <li>
+                    The layout is not interactive by default (MainLayout.razor). Blazor components added to it will not be interactive as a result.
+                </li>
+                <li>
+                    You can <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#apply-a-render-mode-to-a-component-instance" target="_blank">enable interactivity per component basis</a> via the <code>@@rendermode</code> attribute e.g. <code>&lt;RadzenDialog @@rendermode="@@RenderMode.InteractiveServer" /&gt;</code>.
+                    Components that have child content cannot use that approach. You will need a <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#child-component-with-a-serializable-parameter" target="_blank">wrapper component</a> with render mode set as an attribute.
+                </li>
+                <li>
+                    You can <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#set-the-render-mode-for-the-entire-app" target="_blank">enable interactivity</a> for the entire application.
+                </li>
+            </ul>
+        </RadzenAlert>
     </RadzenColumn>
 </RadzenRow>
 
@@ -84,7 +105,8 @@
     <RadzenColumn Size="12" SizeLG="8">
         <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-mt-8 rz-mb-4">3. Include a theme</RadzenText>
         <RadzenText>
-            Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6), <code>Pages\_Host.cshtml</code> (Blazor Server .NET 7) or <code>wwwroot/index.html</code> (Blazor WebAssembly) and include a theme CSS file by adding this snippet:
+            Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6), <code>Pages\_Host.cshtml</code> (Blazor Server .NET 7), <code>wwwroot/index.html</code> (Blazor WebAssembly)
+            or <code>Components\App.razor</code> (Blazor .NET 8) and include a theme CSS file by adding this snippet:
         </RadzenText>
 <pre>
 <code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css"&gt;</code>
@@ -107,7 +129,8 @@
     <RadzenColumn Size="12" SizeLG="8">
         <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-mt-8 rz-mb-4">4. Include Radzen.Blazor.js</RadzenText>
         <RadzenText>
-            Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6), <code>Pages\_Host.cshtml</code> (Blazor Server .NET 7) or <code>wwwroot/index.html</code> (Blazor WebAssembly) and include this snippet
+            Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6), <code>Pages\_Host.cshtml</code> (Blazor Server .NET 7), <code>wwwroot/index.html</code> (Blazor WebAssembly)
+            or <code>Components\App.razor</code> (Blazor .NET 8) and include this snippet
         </RadzenText>
 <pre>
 <code>&lt;script src="_content/Radzen.Blazor/Radzen.Blazor.js"&gt;&lt;/script&gt;</code>
