@@ -6,7 +6,17 @@
                 <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
             <RadzenChart SeriesClick=@OnSeriesClick>
-                <RadzenPieSeries Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue">
+                <RadzenPieSeries Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" StartAngle="90">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenPieSeries>
+            </RadzenChart>
+            <RadzenChart SeriesClick=@OnSeriesClick>
+                <RadzenPieSeries Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" TotalAngle="180" StartAngle="180">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenPieSeries>
+            </RadzenChart>
+            <RadzenChart SeriesClick=@OnSeriesClick>
+                <RadzenPieSeries Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" StartAngle="0">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenPieSeries>
             </RadzenChart>
@@ -32,6 +42,7 @@
     }
 
     DataItem[] revenue = new DataItem[] {
+        /*
         new DataItem
         {
             Quarter = "Q1",
@@ -40,7 +51,7 @@
         new DataItem
         {
             Quarter = "Q2",
-            Revenue = 40000
+            Revenue = 400
         },
         new DataItem
         {
@@ -52,5 +63,6 @@
             Quarter = "Q4",
             Revenue = 80000
         },
+        */
     };
 }
