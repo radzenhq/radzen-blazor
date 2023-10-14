@@ -31,6 +31,18 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets text of the next button.
+        /// </summary>
+        [Parameter]
+        public string NextText { get; set; } = null;
+
+        /// <summary>
+        /// Gets or sets text of the previous button.
+        /// </summary>
+        [Parameter]
+        public string PreviousText { get; set; } = null;
+
+        /// <summary>
         /// Gets or sets the template.
         /// </summary>
         /// <value>The template.</value>

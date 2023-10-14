@@ -43,13 +43,7 @@ namespace Radzen.Blazor
         /// Gets the steps collection.
         /// </summary>
         /// <value>The steps collection.</value>
-        public IList<RadzenStepsItem> StepsCollection
-        {
-            get
-            {
-                return steps;
-            }
-        }
+        public IList<RadzenStepsItem> StepsCollection { get => steps; }
 
         bool IsFirstVisibleStep()
         {
@@ -176,7 +170,10 @@ namespace Radzen.Blazor
         [Parameter]
         public string NextText
         {
-            get { return _nextStep; }
+            get
+            {
+                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextText ?? _nextStep;
+            }
             set
             {
                 if (value != _nextStep)
@@ -196,7 +193,10 @@ namespace Radzen.Blazor
         [Parameter]
         public string PreviousText
         {
-            get { return _previousText; }
+            get
+            {
+                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousText ?? _previousText;
+            }
             set
             {
                 if (value != _previousText)
