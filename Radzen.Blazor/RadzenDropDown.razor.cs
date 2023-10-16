@@ -47,9 +47,9 @@ namespace Radzen.Blazor
         public bool ClearSearchAfterSelection { get; set; }
 
         /// <summary>
-        /// Gets or sets the placeholder.
+        /// Gets or sets the filter placeholder.
         /// </summary>
-        /// <value>The placeholder.</value>
+        /// <value>The filter placeholder.</value>
         [Parameter]
         public string FilterPlaceholder { get; set; } = string.Empty;
 
