@@ -1,5 +1,4 @@
 @inherits Radzen.RadzenComponent
-@implements IDisposable
 
 <div @ref="editor" style="height: 500px; width: 100%;"></div>
 @code {
@@ -76,13 +75,17 @@
         }
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
+        base.Dispose();
+
         if (JSRuntime != null && monaco != null)
         {
             monaco.InvokeVoidAsync("dispose");
         }
+
         monaco?.DisposeAsync();
+
         reference?.Dispose();
     }
 }
