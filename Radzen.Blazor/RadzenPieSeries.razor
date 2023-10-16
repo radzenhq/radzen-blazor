@@ -21,14 +21,13 @@
             @if (PositiveItems.Any())
                 {
                     var sum = PositiveItems.Sum(Value);
-
-                    double startAngle = -90;
+                    var startAngle = StartAngle;
 
                 @foreach (var data in PositiveItems)
                     {
                         var value = Value(data);
-                        var angle = sum == 0 ? 0 : (value / sum) * 360;
-                        var endAngle = startAngle + angle;
+                        var sweepAngle = sum == 0 ? 0 : (value / sum) * TotalAngle;
+                        var endAngle = startAngle - sweepAngle;
 
                         var d = Segment(x, y, radius, 0, startAngle, endAngle);
 
@@ -40,7 +39,7 @@
                         var stroke = PickColor(index, Strokes);
 
                         <g class="@arcClassName">
-                            @if (angle > 0)
+                            @if (sweepAngle > 0)
                             {
                                 <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
                             }
@@ -50,7 +49,7 @@
                 else
                 {
                     var arcClassName = $"rz-series-item-0";
-                    var d = Segment(x, y, radius, radius - 1, -90, 270);
+                    var d = Segment(x, y, radius, radius - 1, StartAngle, StartAngle - TotalAngle);
                     var fill = PickColor(0, Fills);
                     var stroke = PickColor(0, Strokes);
                     <g class="@arcClassName">
