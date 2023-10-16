@@ -46,6 +46,13 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ClearSearchAfterSelection { get; set; }
 
+        /// <summary>
+        /// Gets or sets the placeholder.
+        /// </summary>
+        /// <value>The placeholder.</value>
+        [Parameter]
+        public string FilterPlaceholder { get; set; } = string.Empty;
+
         private async Task OnFocus(Microsoft.AspNetCore.Components.Web.FocusEventArgs args)
         {
             if (OpenOnFocus)
