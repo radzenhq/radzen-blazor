@@ -175,6 +175,7 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   }
 
   .rz-navigation-item-icon-children {
+    margin-left: auto;
     font-size: var(--rz-panel-menu-toggle-icon-font-size);
     opacity: var(--rz-panel-menu-toggle-icon-opacity);
     z-index: 1;

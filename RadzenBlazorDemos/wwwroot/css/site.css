@@ -391,10 +391,6 @@ svg.illustration {
 
 /* Demos Sidebar */
 
-.demos-sidebar .rz-panel-menu .rz-navigation-item-icon-children {
-    margin-left: auto;
-}
-
 .demos-sidebar .rz-panel-menu .rz-badge {
     margin-left: 0.5rem;
     font-size: 9px;
