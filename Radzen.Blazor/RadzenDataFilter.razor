@@ -12,13 +12,13 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-        <RadzenSelectBar @bind-Value=LogicalFilterOperator Change="@((LogicalFilterOperator args) => { InvokeAsync(ChangeState); if(Auto) { InvokeAsync(Filter); } })" Size="ButtonSize.Small">
+        <RadzenSelectBar @bind-Value=LogicalFilterOperator Change="@((LogicalFilterOperator args) => { InvokeAsync(ChangeState); if(Auto) { InvokeAsync(Filter); } })" Size="ButtonSize.Small" class="rz-datafilter-operator-bar">
             <Items>
                 <RadzenSelectBarItem Text="@AndOperatorText" Value="LogicalFilterOperator.And" title="@AndOperatorText" />
                 <RadzenSelectBarItem Text="@OrOperatorText" Value="LogicalFilterOperator.Or" title="@OrOperatorText" />
             </Items>
         </RadzenSelectBar>
-        <RadzenButton title="@ClearFilterText" class="rz-datafilter-item-clear" Icon="clear" Click="@(args => ClearFilters())" Visible=@(Filters.Any()) Variant="Variant.Text" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark" />
+        <RadzenButton title="@ClearFilterText" class="rz-datafilter-item-clear rz-datafilter-all-items-clear" Icon="clear" Click="@(args => ClearFilters())" Visible=@(Filters.Any()) Variant="Variant.Text" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark" />
 
         <ul class="rz-datafilter-group">
             @foreach(var filter in Filters)
