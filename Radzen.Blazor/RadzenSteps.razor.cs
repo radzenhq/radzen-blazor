@@ -268,27 +268,52 @@ namespace Radzen.Blazor
             return SelectedIndex == index;
         }
 
-        internal async System.Threading.Tasks.Task SelectStep(RadzenStepsItem step, bool raiseChange = false)
+        internal async Task SelectStep(RadzenStepsItem step, bool raiseChange = false)
         {
-            var valid = true;
-
-            if (EditContext != null)
+            var newIndex = steps.IndexOf(step);
+            if (EditContext == null)
             {
-                valid = EditContext.Validate();
+                await SelectStep(newIndex, raiseChange);
+                return;
             }
 
-            var newIndex = steps.IndexOf(step);
+            var isValid = EditContext.Validate();
 
-            if (valid || newIndex < SelectedIndex)
+            var currentStep = StepsCollection.ElementAtOrDefault(SelectedIndex);
+            var shouldValidateStep = currentStep?.ValidationFieldNames != null;
+            var isStepValid = true;
+            if (shouldValidateStep)
             {
-                SelectedIndex = newIndex;
-
-                if (raiseChange)
+                foreach (var validationFieldName in currentStep.ValidationFieldNames)
                 {
-                    await Change.InvokeAsync(SelectedIndex);
-                    await SelectedIndexChanged.InvokeAsync(SelectedIndex);
-                    StateHasChanged();
+                    var field = EditContext.Field(validationFieldName);
+                    if (EditContext.GetValidationMessages(field).Any())
+                    {
+                        isStepValid = false;
+                        break;
+                    }
                 }
+            }
+            else
+            {
+                isStepValid = isValid;
+            }
+
+            if (isStepValid || newIndex < SelectedIndex)
+            {
+                await SelectStep(newIndex, raiseChange);
+            }
+        }
+
+        internal async Task SelectStep(int newIndex, bool raiseChange = false)
+        {
+            SelectedIndex = newIndex;
+
+            if (raiseChange)
+            {
+                await Change.InvokeAsync(SelectedIndex);
+                await SelectedIndexChanged.InvokeAsync(SelectedIndex);
+                StateHasChanged();
             }
         }
 

@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -41,6 +43,12 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string PreviousText { get; set; } = null;
+
+        /// <summary>
+        /// Gets or sets validation field names which must be valid in this step
+        /// </summary>
+        [Parameter]
+        public IEnumerable<string> ValidationFieldNames { get; set; }
 
         /// <summary>
         /// Gets or sets the template.
