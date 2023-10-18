@@ -308,8 +308,10 @@ namespace Radzen.Blazor
             {
                 await Group.InvokeAsync(new DataGridColumnGroupEventArgs<TItem>() { Column = column, GroupDescriptor = null });
             }
+
             if (IsVirtualizationAllowed())
             {
+                StateHasChanged();
                 await InvokeAsync(Reload);
             }
         }
