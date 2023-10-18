@@ -168,7 +168,19 @@ else
         Filter.FilterValue = null;
 
         var defaultOperator = typeof(System.Collections.IEnumerable).IsAssignableFrom(property.FilterPropertyType) ? FilterOperator.Contains : default(FilterOperator);
-	    Filter.FilterOperator = property.GetFilterOperators().Contains(defaultOperator) ? defaultOperator : property.GetFilterOperators().FirstOrDefault();
+	    
+	    if (property.GetFilterOperators().Any(o => o == property.FilterOperator))
+	    {
+		    Filter.FilterOperator = property.FilterOperator;
+	    }
+	    else if (property.GetFilterOperators().Contains(defaultOperator))
+	    {
+		    Filter.FilterOperator = defaultOperator;
+	    }
+	    else
+	    {
+		    Filter.FilterOperator = property.GetFilterOperators().FirstOrDefault();
+	    }
 
         await ApplyFilter();
     }
