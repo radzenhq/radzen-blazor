@@ -3215,7 +3215,7 @@ namespace Radzen.Blazor
                     }
                     else
                     {
-                        return element.GetRawText().Replace("\"", "");
+                        return element.GetString();
                     }
                 }
             }
