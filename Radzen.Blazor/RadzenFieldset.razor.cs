@@ -47,6 +47,34 @@ namespace Radzen.Blazor
         public bool Collapsed { get; set; }
 
         /// <summary>
+        /// Gets or sets the title attribute of the expand button.
+        /// </summary>
+        /// <value>The title attribute value of the expand button.</value>
+        [Parameter]
+        public string ExpandTitle { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the title attribute of the collapse button.
+        /// </summary>
+        /// <value>The title attribute value of the collapse button.</value>
+        [Parameter]
+        public string CollapseTitle { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the aria-label attribute of the expand button.
+        /// </summary>
+        /// <value>The aria-label attribute value of the expand button.</value>
+        [Parameter]
+        public string ExpandLabel { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the aria-label attribute of the collapse button.
+        /// </summary>
+        /// <value>The aria-label attribute value of the collapse button.</value>
+        [Parameter]
+        public string CollapseLabel { get; set; }
+        
+        /// <summary>
         /// Gets or sets the icon.
         /// </summary>
         /// <value>The icon.</value>
@@ -129,6 +157,24 @@ namespace Radzen.Blazor
             collapsed = Collapsed;
         }
 
+        private string TitleAttribute()
+        {
+            if (collapsed)
+            {
+                return string.IsNullOrWhiteSpace(ExpandTitle) ? "Expand" : ExpandTitle;
+            }
+            return string.IsNullOrWhiteSpace(CollapseTitle) ? "Collapse" : CollapseTitle;
+        }
+        
+        private string LabelAttribute()
+        {
+            if (collapsed)
+            {
+                return string.IsNullOrWhiteSpace(ExpandLabel) ? "Expand" : ExpandLabel;  
+            }
+            return string.IsNullOrWhiteSpace(CollapseLabel) ? "Collapse" : CollapseLabel;
+        }
+        
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
