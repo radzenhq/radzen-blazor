@@ -153,13 +153,13 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         /// <returns>The item's collapse or expand aria-label value depending on if the item is expanded or collapsed.
         /// If the relevant aria-label is null or whitespace this method returns "Expand" or "Collapse".</returns>
-        protected string ItemLabel(int index, RadzenAccordionItem item)
+        protected string ItemAriaLabel(int index, RadzenAccordionItem item)
         {
             if (IsSelected(index, item))
             {
-                return string.IsNullOrWhiteSpace(item.CollapseLabel) ? "Collapse" : item.CollapseLabel;
+                return string.IsNullOrWhiteSpace(item.CollapseAriaLabel) ? "Collapse" : item.CollapseAriaLabel;
             }
-            return string.IsNullOrWhiteSpace(item.ExpandLabel) ? "Expand" : item.ExpandLabel;          
+            return string.IsNullOrWhiteSpace(item.ExpandAriaLabel) ? "Expand" : item.ExpandAriaLabel;          
         }
         
         internal async System.Threading.Tasks.Task SelectItem(RadzenAccordionItem item)

@@ -55,14 +55,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The aria-label attribute value of the expand button.</value>
         [Parameter]
-        public string ExpandLabel { get; set; }
+        public string ExpandAriaLabel { get; set; }
         
         /// <summary>
         /// Gets or sets the aria-label attribute of the collapse button.
         /// </summary>
         /// <value>The aria-label attribute value of the collapse button.</value>
         [Parameter]
-        public string CollapseLabel { get; set; }
+        public string CollapseAriaLabel { get; set; }
         
         /// <summary>
         /// Gets or sets the child content.

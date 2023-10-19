@@ -65,14 +65,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The aria-label attribute value of the expand button.</value>
         [Parameter]
-        public string ExpandLabel { get; set; }
+        public string ExpandAriaLabel { get; set; }
         
         /// <summary>
         /// Gets or sets the aria-label attribute of the collapse button.
         /// </summary>
         /// <value>The aria-label attribute value of the collapse button.</value>
         [Parameter]
-        public string CollapseLabel { get; set; }
+        public string CollapseAriaLabel { get; set; }
         
         /// <summary>
         /// Gets or sets the icon.
@@ -166,13 +166,13 @@ namespace Radzen.Blazor
             return string.IsNullOrWhiteSpace(CollapseTitle) ? "Collapse" : CollapseTitle;
         }
         
-        private string LabelAttribute()
+        private string AriaLabelAttribute()
         {
             if (collapsed)
             {
-                return string.IsNullOrWhiteSpace(ExpandLabel) ? "Expand" : ExpandLabel;  
+                return string.IsNullOrWhiteSpace(ExpandAriaLabel) ? "Expand" : ExpandAriaLabel;  
             }
-            return string.IsNullOrWhiteSpace(CollapseLabel) ? "Collapse" : CollapseLabel;
+            return string.IsNullOrWhiteSpace(CollapseAriaLabel) ? "Collapse" : CollapseAriaLabel;
         }
         
         /// <inheritdoc />
