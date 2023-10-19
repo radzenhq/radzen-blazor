@@ -162,7 +162,6 @@ namespace Radzen.Blazor
         public EventCallback<int> Change { get; set; }
 
         private string _nextStep = "Next";
-
         /// <summary>
         /// Gets or sets the next button text.
         /// </summary>
@@ -207,6 +206,62 @@ namespace Radzen.Blazor
                 }
             }
         }
+
+        private string _nextTitle = "Go to the next step.";
+        /// <summary>
+        /// Gets or sets the next button title attribute.
+        /// </summary>
+        /// <value>The next button title attribute.</value>
+        [Parameter]
+        public string NextTitle
+        {
+            get
+            {
+                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextTitle ?? _nextTitle;
+            }
+            set
+            {
+                if (value != _nextTitle)
+                {
+                    _nextTitle = value;
+                    Refresh();
+                }
+            }
+        }
+        
+        private string _previousTitle = "Go to the previous step.";
+        /// <summary>
+        /// Gets or sets the previous button title attribute.
+        /// </summary>
+        /// <value>The previous button title attribute.</value>
+        [Parameter]
+        public string PreviousTitle
+        {
+            get
+            {
+                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousTitle ?? _previousTitle;
+            }
+            set
+            {
+                if (value != _previousTitle)
+                {
+                    _previousTitle = value;
+                    Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the next button aria-label attribute.
+        /// </summary>
+        /// <value>The next button aria-label attribute.</value>
+        public string NextAriaLabel => StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextAriaLabel;
+        
+        /// <summary>
+        /// Gets the previous button aria-label attribute.
+        /// </summary>
+        /// <value>The previous button aria-label attribute.</value>
+        public string PreviousAriaLabel => StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousAriaLabel;
 
         /// <summary>
         /// Gets or sets the steps.

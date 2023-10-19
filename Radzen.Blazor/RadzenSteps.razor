@@ -22,7 +22,9 @@
             @if (step.Visible)
             {
                 <li class="@step.GetItemCssClass()" @attributes="step.Attributes" style="@step.Style">
-                    <a @onclick="@(async (args) => { if (!step.Disabled) { await SelectStep(step, true); } })" href="javascript:void(0)" class="rz-menuitem-link">
+                    <a title="@step.Title" aria-label="@step.AriaLabel"
+                       @onclick="@(async (args) => { if (!step.Disabled) { await SelectStep(step, true); } })"
+                       href="javascript:void(0)" class="rz-menuitem-link">
                         <span class="rz-steps-number">@(steps.Where(s => s.Visible).ToList().IndexOf(step) + 1)</span>
                         @if (step.Template != null)
                         {
@@ -57,8 +59,12 @@
     @if(ShowStepsButtons)
     {
     <div class="rz-steps-buttons">
-        <a class='@($"rz-steps-prev {(IsFirstVisibleStep() ?  "rz-state-disabled" : "")}")' @onclick="@PrevStep" href="javascript:void(0)"><i class="rzi">navigate_before</i>@PreviousText</a>
-        <a class='@($"rz-steps-next {(IsLastVisibleStep() ?  "rz-state-disabled" : "")}")' @onclick="@NextStep" href="javascript:void(0)">@NextText<i class="rzi">navigate_next</i></a>
+        <a title="@PreviousTitle" arial-label="@PreviousAriaLabel"
+           class='@($"rz-steps-prev {(IsFirstVisibleStep() ?  "rz-state-disabled" : "")}")' @onclick="@PrevStep"
+           href="javascript:void(0)"><i class="rzi">navigate_before</i>@PreviousText</a>
+        <a title="@NextTitle" arial-label="@NextAriaLabel"
+           class='@($"rz-steps-next {(IsLastVisibleStep() ?  "rz-state-disabled" : "")}")' @onclick="@NextStep"
+           href="javascript:void(0)">@NextText<i class="rzi">navigate_next</i></a>
     </div>
     }
 </div>
