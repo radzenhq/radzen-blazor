@@ -213,7 +213,6 @@ namespace Radzen
         /// Gets or sets the image.
         /// </summary>
         /// <value>The image.</value>
-        [Parameter]
         public string Image { get; set; }
     }
 }
