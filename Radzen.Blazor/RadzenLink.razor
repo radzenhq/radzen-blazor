@@ -7,6 +7,10 @@
         {
             <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
         }
+        @if (!string.IsNullOrEmpty(Image))
+        {
+            <img class="rzi" src="@Image" />
+        }
         <span @ref="@Element" class="rz-link-text">@if (ChildContent != null) {@ChildContent} else {@Text}</span>
     </NavLink>
 }
