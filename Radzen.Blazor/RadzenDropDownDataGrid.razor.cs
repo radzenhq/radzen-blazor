@@ -214,7 +214,7 @@ namespace Radzen.Blazor
         /// Gets or sets the pager's first page button's aria-label attribute.
         /// </summary>
         [Parameter]
-        public string FirstPageLabel { get; set; } = "Go to first page.";
+        public string FirstPageAriaLabel { get; set; } = "Go to first page.";
 
         /// <summary>
         /// Gets or sets the pager's previous page button's title attribute.
@@ -226,7 +226,7 @@ namespace Radzen.Blazor
         /// Gets or sets the pager's previous page button's aria-label attribute.
         /// </summary>
         [Parameter]
-        public string PrevPageLabel { get; set; } = "Go to previous page.";
+        public string PrevPageAriaLabel { get; set; } = "Go to previous page.";
 
         /// <summary>
         /// Gets or sets the pager's last page button's title attribute.
@@ -238,7 +238,7 @@ namespace Radzen.Blazor
         /// Gets or sets the pager's last page button's aria-label attribute.
         /// </summary>
         [Parameter]
-        public string LastPageLabel { get; set; } = "Go to last page.";
+        public string LastPageAriaLabel { get; set; } = "Go to last page.";
 
         /// <summary>
         /// Gets or sets the pager's next page button's title attribute.
@@ -250,7 +250,7 @@ namespace Radzen.Blazor
         /// Gets or sets the pager's next page button's aria-label attribute.
         /// </summary>
         [Parameter]
-        public string NextPageLabel { get; set; } = "Go to next page.";
+        public string NextPageAriaLabel { get; set; } = "Go to next page.";
         
         /// <summary>
         /// Gets or sets the pager's numeric page number buttons' title attributes.
@@ -262,7 +262,7 @@ namespace Radzen.Blazor
         /// Gets or sets the pager's numeric page number buttons' aria-label attributes.
         /// </summary>
         [Parameter]
-        public string PageLabelFormat { get; set; } = "Go to page {0}.";
+        public string PageAriaLabelFormat { get; set; } = "Go to page {0}.";
         
         /// <summary>
         /// Gets or sets the empty text.
