@@ -1845,7 +1845,7 @@ namespace Radzen.Blazor
                 .ToList();
 
             Query.Filters = filters;
-
+            Query.Sorts = sorts;
             if (LoadData.HasDelegate)
             {
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs()

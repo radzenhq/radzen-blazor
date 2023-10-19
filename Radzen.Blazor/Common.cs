@@ -784,6 +784,11 @@ namespace Radzen
         /// <value>The filter parameters.</value>
         public IEnumerable<FilterDescriptor> Filters { get; set; }
         /// <summary>
+        /// Gets the sort expression as a collection of sort descriptors.
+        /// </summary>
+        /// <value>The sorts.</value>
+        public IEnumerable<SortDescriptor> Sorts { get; set; }
+        /// <summary>
         /// Gets or sets the filter parameters.
         /// </summary>
         /// <value>The filter parameters.</value>
