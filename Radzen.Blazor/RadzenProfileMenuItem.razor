@@ -11,6 +11,10 @@
                     {
                         <i class="rzi rz-navigation-item-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
                     }
+                    @if (!string.IsNullOrEmpty(Image))
+                    {
+                        <img class="rzi rz-navigation-item-icon" src="@Image" />
+                    }
                     <span class="rz-navigation-item-text">@Text</span>
                 </NavLink>
             }
@@ -20,6 +24,10 @@
                     @if (!string.IsNullOrEmpty(Icon))
                     {
                         <i class="rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>
+                    }
+                    @if (!string.IsNullOrEmpty(Image))
+                    {
+                        <img class="rzi rz-navigation-item-icon" src="@Image" />
                     }
                     <span class="rz-navigation-item-text">@Text</span>
                 </div>
