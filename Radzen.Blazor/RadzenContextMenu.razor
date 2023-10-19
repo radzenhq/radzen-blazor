@@ -17,7 +17,7 @@
                 <RadzenMenu Click="@(args => { if (menu.Options.Click != null) { menu.Options.Click(args); } })" Responsive="false">
                     @foreach (var item in menu.Options.Items)
                     {
-                        <RadzenMenuItem Text="@item.Text" Value="@item.Value" Icon="@item.Icon" IconColor="@item.IconColor"></RadzenMenuItem>
+                        <RadzenMenuItem Text="@item.Text" Value="@item.Value" Icon="@item.Icon" IconColor="@item.IconColor" Image="@item.Image"></RadzenMenuItem>
                     }
                 </RadzenMenu>
             </div>
