@@ -13,12 +13,12 @@
 <div @ref="@Element" role="tablist" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     @for (var i = 0; i < items.Count; i++)
     {
-        var item = items[i];
+        var item = items[i];    
         if (!item.Visible)
             continue;
 
         <div @ref="@item.Element" id="@item.GetItemId()" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style">
-            <a @onclick="@((args) => SelectItem(item))" href="javascript:void(0)" role="tab" tabindex="0"
+            <a @onclick="@((args) => SelectItem(item))" aria-label="@ItemAriaLabel(i, item)" title="@ItemTitle(i, item)"  href="javascript:void(0)" role="tab" tabindex="0"
                id="@($"rz-accordiontab-{items.IndexOf(item)}")" aria-controls="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-expanded="true">
                 @if (IsSelected(i, item))
                 {

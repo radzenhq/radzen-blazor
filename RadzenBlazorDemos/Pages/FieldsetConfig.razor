@@ -4,7 +4,8 @@
 
 @inherits DbContextPage
 
-<RadzenFieldset AllowCollapse="true" Style="width: 700px; margin: 40px auto;"
+<RadzenFieldset AllowCollapse="true" Style="width: 700px; margin: 40px auto;" ExpandTitle="Expand orders." CollapseTitle="Collapse orders."
+                ExpandAriaLabel="Expand the list of orders." CollapseAriaLabel="Collapse the list of orders."
                 Expand=@(() => Change("Fieldset expanded")) Collapse=@(() => Change("Fieldset collapsed"))>
     <HeaderTemplate>
         <span class="d-inline-flex align-items-center align-middle">
