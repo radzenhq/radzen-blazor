@@ -336,6 +336,7 @@ namespace Radzen
             if (EditContext != null && ValueExpression != null && FieldIdentifier.Model != EditContext.Model)
             {
                 FieldIdentifier = FieldIdentifier.Create(ValueExpression);
+                EditContext.OnValidationStateChanged -= ValidationStateChanged;
                 EditContext.OnValidationStateChanged += ValidationStateChanged;
             }
 

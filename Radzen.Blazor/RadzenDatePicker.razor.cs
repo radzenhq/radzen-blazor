@@ -145,7 +145,7 @@ namespace Radzen.Blazor
                 await popup.CloseAsync(Element);
             }
 
-            if(Min.HasValue && CurrentDate < Min.Value || Max.HasValue && CurrentDate > Max.Value) 
+            if(Min.HasValue && CurrentDate < Min.Value || Max.HasValue && CurrentDate > Max.Value)
             {
                 return;
             }
@@ -956,6 +956,7 @@ namespace Radzen.Blazor
             if (EditContext != null && ValueExpression != null && FieldIdentifier.Model != EditContext.Model)
             {
                 FieldIdentifier = FieldIdentifier.Create(ValueExpression);
+                EditContext.OnValidationStateChanged -= ValidationStateChanged;
                 EditContext.OnValidationStateChanged += ValidationStateChanged;
             }
         }

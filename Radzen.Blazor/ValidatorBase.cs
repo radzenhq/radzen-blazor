@@ -64,6 +64,7 @@ namespace Radzen.Blazor
                 if (EditContext != null && messages == null)
                 {
                     messages = new ValidationMessageStore(EditContext);
+                    Unsubscribe();
                     EditContext.OnFieldChanged += ValidateField;
                     EditContext.OnValidationRequested += ValidateModel;
                     EditContext.OnValidationStateChanged += ValidationStateChanged;
@@ -75,13 +76,18 @@ namespace Radzen.Blazor
             }
         }
 
+        void Unsubscribe()
+        {
+            EditContext.OnFieldChanged -= ValidateField;
+            EditContext.OnValidationRequested -= ValidateModel;
+            EditContext.OnValidationStateChanged -= ValidationStateChanged;
+        }
+
         void RemoveFromEditContext()
         {
             if (EditContext != null && messages != null)
             {
-                EditContext.OnFieldChanged -= ValidateField;
-                EditContext.OnValidationRequested -= ValidateModel;
-                EditContext.OnValidationStateChanged -= ValidationStateChanged;
+                Unsubscribe();
 
                 if (FieldIdentifier.FieldName != null)
                 {
