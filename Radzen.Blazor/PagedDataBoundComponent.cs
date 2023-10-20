@@ -194,6 +194,66 @@ namespace Radzen
         [Parameter]
         public string PagingSummaryFormat { get; set; } = "Page {0} of {1} ({2} items)";
 
+        /// <summary>
+        /// Gets or sets the pager's first page button's title attribute.
+        /// </summary>
+        [Parameter]
+        public string FirstPageTitle { get; set; } = "First page.";
+
+        /// <summary>
+        /// Gets or sets the pager's first page button's aria-label attribute.
+        /// </summary>
+        [Parameter]
+        public string FirstPageAriaLabel { get; set; } = "Go to first page.";
+
+        /// <summary>
+        /// Gets or sets the pager's previous page button's title attribute.
+        /// </summary>
+        [Parameter]
+        public string PrevPageTitle { get; set; } = "Previous page";
+
+        /// <summary>
+        /// Gets or sets the pager's previous page button's aria-label attribute.
+        /// </summary>
+        [Parameter]
+        public string PrevPageAriaLabel { get; set; } = "Go to previous page.";
+
+        /// <summary>
+        /// Gets or sets the pager's last page button's title attribute.
+        /// </summary>
+        [Parameter]
+        public string LastPageTitle { get; set; } = "Last page";
+
+        /// <summary>
+        /// Gets or sets the pager's last page button's aria-label attribute.
+        /// </summary>
+        [Parameter]
+        public string LastPageAriaLabel { get; set; } = "Go to last page.";
+
+        /// <summary>
+        /// Gets or sets the pager's next page button's title attribute.
+        /// </summary>
+        [Parameter]
+        public string NextPageTitle { get; set; } = "Next page";
+
+        /// <summary>
+        /// Gets or sets the pager's next page button's aria-label attribute.
+        /// </summary>
+        [Parameter]
+        public string NextPageAriaLabel { get; set; } = "Go to next page.";
+        
+        /// <summary>
+        /// Gets or sets the pager's numeric page number buttons' title attributes.
+        /// </summary>
+        [Parameter]
+        public string PageTitleFormat { get; set; } = "Page {0}";
+        
+        /// <summary>
+        /// Gets or sets the pager's numeric page number buttons' aria-label attributes.
+        /// </summary>
+        [Parameter]
+        public string PageAriaLabelFormat { get; set; } = "Go to page {0}.";
+        
         internal IQueryable<T> _view = null;
         /// <summary>
         /// Gets the paged view.
