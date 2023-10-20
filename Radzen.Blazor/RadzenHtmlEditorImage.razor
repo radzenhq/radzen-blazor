@@ -3,7 +3,6 @@
 @using Microsoft.JSInterop
 @inherits RadzenHtmlEditorButtonBase
 @inject DialogService DialogService
-@inject IJSRuntime JSRuntime
 
 <EditorButton Click=@OnClick Icon="insert_photo" Title=@Title />
 
@@ -14,8 +13,7 @@
 
         var uploadHeaders = Editor.UploadHeaders ?? new Dictionary<string, string>();
 
-        Attributes = await JSRuntime.InvokeAsync<ImageAttributes>("Radzen.selectionAttributes", "img", new[] {"src", "alt",
-"width", "height"});
+        Attributes = await Editor.GetSelectionAttributes<ImageAttributes>("img", new[] {"src", "alt", "width", "height"});
 
         var result = await DialogService.OpenAsync(Title, ds =>
     @<div class="rz-html-editor-dialog">

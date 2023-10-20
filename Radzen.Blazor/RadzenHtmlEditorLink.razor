@@ -3,7 +3,6 @@
 @using Microsoft.JSInterop
 @inherits RadzenHtmlEditorButtonBase
 @inject DialogService DialogService
-@inject IJSRuntime JSRuntime
 
 <EditorButton Title=@Title Click=@OnClick Icon="insert_link" />
 
@@ -14,8 +13,7 @@
 
         bool blank = false;
 
-        var attributes = await JSRuntime.InvokeAsync<LinkAttributes>("Radzen.selectionAttributes", "a", new[] {"innerText",
-"href", "target" });
+        var attributes = await Editor.GetSelectionAttributes<LinkAttributes>("a", new[] {"innerText", "href", "target" });
 
         if (attributes.Target == "_blank")
         {

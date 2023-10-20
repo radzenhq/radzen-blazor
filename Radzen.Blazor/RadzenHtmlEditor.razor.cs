@@ -225,6 +225,11 @@ namespace Radzen.Blazor
         bool visibleChanged = false;
         bool firstRender = true;
 
+        internal ValueTask<T> GetSelectionAttributes<T>(string selector, string[] attributes)
+        {
+            return JSRuntime.InvokeAsync<T>("Radzen.selectionAttributes", selector, attributes, ContentEditable);
+        }
+
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -276,6 +281,8 @@ namespace Radzen.Blazor
         {
             Html = Value;
             mode = Mode;
+
+            base.OnInitialized();
         }
 
         /// <summary>
