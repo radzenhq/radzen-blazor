@@ -3307,4 +3307,10 @@ namespace Radzen
         /// </summary>
         IconAndText
     }
+
+    public enum FrozenPosition
+    {
+        Left,
+        Right
+    }
 }

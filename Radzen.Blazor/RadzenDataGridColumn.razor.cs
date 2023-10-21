@@ -395,6 +395,9 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Frozen { get; set; }
 
+        [Parameter]
+        public FrozenPosition FrozenPosition { get; set; } = FrozenPosition.Left;
+
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenDataGridColumn{TItem}"/> is resizable.
         /// </summary>
@@ -580,12 +583,26 @@ namespace Radzen.Blazor
 
         private string GetStackedStyleForFrozen()
         {
-            var visibleFrozenColumns = Grid.ColumnsCollection.Where(c => c.GetVisible() && c.IsFrozen()).ToList();
-            var stackColumns = visibleFrozenColumns.Where((c, i) => visibleFrozenColumns.IndexOf(this) > i);
+            var visibleFrozenColumns = Grid.ColumnsCollection.Where(c => c.GetVisible() && c.IsFrozen() && c.FrozenPosition == FrozenPosition).ToList();
+            if (FrozenPosition == FrozenPosition.Left)
+            {
+                var stackColumns = visibleFrozenColumns.Where((c, i) => visibleFrozenColumns.IndexOf(this) > i);
 
+                return GetStackedStyleForFrozen(stackColumns, "left");
+            }
+            else
+            {
+                var stackColumns = visibleFrozenColumns.Where((c, i) => visibleFrozenColumns.IndexOf(this) < i);
+
+                return GetStackedStyleForFrozen(stackColumns, "right");
+            }
+        }
+
+        private static string GetStackedStyleForFrozen(IEnumerable<RadzenDataGridColumn<TItem>> stackColumns, string position)
+        {
             if (!stackColumns.Any())
             {
-                return "left:0";
+                return $"{position}:0";
             }
 
             var widths = new List<string>();
@@ -611,10 +628,10 @@ namespace Radzen.Blazor
 
             if (widths.Count == 1)
             {
-                return $"left:{widths.First()}";
+                return $"{position}:{widths.First()}";
             }
 
-            return $"left:calc({string.Join(" + ", widths)})";
+            return $"{position}:calc({string.Join(" + ", widths)})";
         }
 
         internal bool IsFrozen()

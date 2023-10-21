@@ -27,7 +27,7 @@
             </FooterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" Width="200px" />
-        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Frozen="true" />
+        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Frozen="true" FrozenPosition="FrozenPosition.Left"/>
         <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
         <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
         <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
@@ -36,7 +36,7 @@
         <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
         <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
         <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" />
-        <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
+        <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" Frozen="true" FrozenPosition="FrozenPosition.Right" />
     </Columns>
 </RadzenDataGrid>
 
