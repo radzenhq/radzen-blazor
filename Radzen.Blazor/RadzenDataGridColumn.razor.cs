@@ -581,6 +581,10 @@ namespace Radzen.Blazor
             return string.Join(";", style);
         }
 
+        // https://stackoverflow.com/questions/25308823/targeting-positionsticky-elements-that-are-currently-in-a-stuck-state
+        // https://codepen.io/TomAnthony/pen/qBqgErK
+        // https://github.com/w3c/csswg-drafts/issues/1656
+
         private string GetStackedStyleForFrozen()
         {
             var visibleFrozenColumns = Grid.ColumnsCollection.Where(c => c.GetVisible() && c.IsFrozen() && c.FrozenPosition == FrozenPosition).ToList();

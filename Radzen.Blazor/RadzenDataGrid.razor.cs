@@ -325,7 +325,7 @@ namespace Radzen.Blazor
 
         internal string getFrozenColumnClass(RadzenDataGridColumn<TItem> column, IList<RadzenDataGridColumn<TItem>> visibleColumns)
         {
-            return column.IsFrozen() ? "rz-frozen-cell" : "";
+            return column.IsFrozen() ? (column.FrozenPosition == FrozenPosition.Left ? "rz-frozen-cell rz-frozen-cell-left" : "rz-frozen-cell rz-frozen-cell-right") : "";
         }
 
         internal string getColumnAlignClass(RadzenDataGridColumn<TItem> column)
