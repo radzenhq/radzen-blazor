@@ -4,28 +4,35 @@
 
 @inherits DbContextPage
 
-<RadzenDataGrid Data="@frozenInfos" TItem="FrozenInfo" AllowAlternatingRows="false">
-    <Columns>
-        <RadzenDataGridColumn TItem="FrozenInfo" Property="PropertyName" Title="Title" />
-        <RadzenDataGridColumn TItem="FrozenInfo" Title="Frozen">
-            <Template Context="data">
-                <RadzenCheckBox @bind-Value=@data.Frozen Name="FrozenCheckbox" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="FrozenInfo" Title="Position">
-            <Template Context="data">
-                <RadzenDropDown @bind-Value=@data.FrozenPosition Data=@frozenPositions>
-                    <Template Context="postion">
-                        @postion
-                    </Template>
-                </RadzenDropDown>
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+<RadzenCard class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
+    <div style="white-space:nowrap; margin-right: 16px">GridLines:</div>
+    <RadzenSelectBar @bind-Value="@GridLines" TextProperty="Text" ValueProperty="Value"
+                     Data="@(Enum.GetValues(typeof(Radzen.DataGridGridLines)).Cast<Radzen.DataGridGridLines>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+</RadzenCard>
+<RadzenCard class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
+    <RadzenDataGrid Data="@frozenInfos" TItem="FrozenInfo" AllowAlternatingRows="false">
+        <Columns>
+            <RadzenDataGridColumn TItem="FrozenInfo" Property="PropertyName" Title="Title" Width="150px" />
+            <RadzenDataGridColumn TItem="FrozenInfo" Title="Frozen" Width="60px">
+                <Template Context="data">
+                    <RadzenCheckBox @bind-Value=@data.Frozen Name="FrozenCheckbox" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="FrozenInfo" Title="Position" Width="140px">
+                <Template Context="data">
+                    <RadzenDropDown @bind-Value=@data.FrozenPosition Data=@frozenPositions Style="width: 120px">
+                        <Template Context="postion">
+                            @postion
+                        </Template>
+                    </RadzenDropDown>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
 
-<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" 
-    ColumnWidth="140px" LogicalFilterOperator="LogicalFilterOperator.Or">
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee"
+                GridLines="@GridLines" ColumnWidth="140px" LogicalFilterOperator="LogicalFilterOperator.Or">
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Width="5rem" TextAlign="TextAlign.Center" Frozen="@isFrozen("EmployeeID")" FrozenPosition="@frozenPosition("EmployeeID")" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" Frozen="@isFrozen("Photo")" FrozenPosition="@frozenPosition("Photo")">
@@ -63,7 +70,7 @@
         public bool Frozen { get; set; }
         public FrozenPosition FrozenPosition { get; set; }
     }
-
+    Radzen.DataGridGridLines GridLines = Radzen.DataGridGridLines.Default;
     IEnumerable<Employee> employees;
     List<FrozenPosition> frozenPositions = new List<FrozenPosition>
     {

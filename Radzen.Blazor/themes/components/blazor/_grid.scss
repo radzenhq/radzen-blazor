@@ -351,10 +351,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
         &:not(:last-child) {
             border-right: var(--rz-grid-header-cell-border);
-
-/*            &.rz-frozen-cell-right {
-                border-right: var(--rz-grid-frozen-cell-border);
-            }*/
         }
 
         > div:not(.rz-cell-filter) {
@@ -439,10 +435,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
         &:not(:last-child) {
             border-right: var(--rz-grid-right-cell-border);
-
-/*            &.rz-frozen-cell-right {
-                border-right: var(--rz-grid-frozen-cell-border);
-            }*/
         }
 
         &.rz-composite-cell {
@@ -558,11 +550,9 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
         &:not(:last-child) {
             border-right: var(--rz-grid-right-cell-border);
-
-/*            &.rz-frozen-cell-right {
-                border-right: var(--rz-grid-frozen-cell-border);
-            }*/
         }
+
+
 
         &.rz-composite-cell {
             border-right: var(--rz-grid-right-cell-border);
@@ -617,55 +607,58 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
 // GridLines
 .rz-grid-table {
-  // GridLines.Both
-  &.rz-grid-gridlines-both {
-    > thead > tr > th,
-    > thead > tr > th.rz-composite-cell,
-    > tbody > tr > td,
-    > tfoot > tr > td {
-      border-bottom: var(--rz-grid-cell-border);
+    // GridLines.Both
+    &.rz-grid-gridlines-both {
+        > thead > tr > th,
+        > thead > tr > th.rz-composite-cell,
+        > tbody > tr > td,
+        > tfoot > tr > td {
+            border-bottom: var(--rz-grid-cell-border);
 
-      &:not(:last-child) {
-        border-right: var(--rz-grid-cell-border);
-      }
-    }
-  }
+            &:not(:last-child) {
+                border-right: var(--rz-grid-cell-border);
+            }
+        }
 
-  // GridLines.None
-  &.rz-grid-gridlines-none {
-    > thead > tr > th,
-    > thead > tr > th.rz-composite-cell,
-    > tbody > tr > td,
-    > tfoot > tr > td {
-      border-bottom: none;
-      border-right: none;
+        > tbody > tr > td {
+            &.rz-frozen-cell {
+                background: var(--rz-grid-frozen-cell-background-color);
+            }
+        }
     }
-  }
+    // GridLines.None
+    &.rz-grid-gridlines-none {
+        > thead > tr > th,
+        > thead > tr > th.rz-composite-cell,
+        > tbody > tr > td,
+        > tfoot > tr > td {
+            border-bottom: none;
+            border-right: none;
+        }
+    }
+    // GridLines.Horizontal
+    &.rz-grid-gridlines-horizontal {
+        > thead > tr > th,
+        > thead > tr > th.rz-composite-cell,
+        > tbody > tr > td,
+        > tfoot > tr > td {
+            border-bottom: var(--rz-grid-cell-border);
+            border-right: none;
+        }
+    }
+    // GridLines.Vertical
+    &.rz-grid-gridlines-vertical {
+        > thead > tr > th,
+        > thead > tr > th.rz-composite-cell,
+        > tbody > tr > td,
+        > tfoot > tr > td {
+            border-bottom: none;
 
-  // GridLines.Horizontal
-  &.rz-grid-gridlines-horizontal {
-    > thead > tr > th,
-    > thead > tr > th.rz-composite-cell,
-    > tbody > tr > td,
-    > tfoot > tr > td {
-      border-bottom: var(--rz-grid-cell-border);
-      border-right: none;
+            &:not(:last-child) {
+                border-right: var(--rz-grid-cell-border);
+            }
+        }
     }
-  }
-
-  // GridLines.Vertical
-  &.rz-grid-gridlines-vertical {
-    > thead > tr > th,
-    > thead > tr > th.rz-composite-cell,
-    > tbody > tr > td,
-    > tfoot > tr > td {
-      border-bottom: none;
-      
-      &:not(:last-child) {
-        border-right: var(--rz-grid-cell-border);
-      }
-    }
-  }
 }
 
 .rz-datatable-reflow {
@@ -1097,7 +1090,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     .rz-frozen-cell {
         position: -webkit-sticky;
         position: sticky;
-        background: var(--rz-grid-frozen-cell-background-color);
     }
 
     .rz-frozen-cell-left, .rz-frozen-cell-right {
