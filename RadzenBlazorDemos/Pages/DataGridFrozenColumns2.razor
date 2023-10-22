@@ -1,0 +1,121 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenDataGrid Data="@frozenInfos" TItem="FrozenInfo" AllowAlternatingRows="false">
+    <Columns>
+        <RadzenDataGridColumn TItem="FrozenInfo" Property="PropertyName" Title="Title" />
+        <RadzenDataGridColumn TItem="FrozenInfo" Title="Frozen">
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.Frozen Name="FrozenCheckbox" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="FrozenInfo" Title="Position">
+            <Template Context="data">
+                <RadzenDropDown @bind-Value=@data.FrozenPosition Data=@frozenPositions>
+                    <Template Context="postion">
+                        @postion
+                    </Template>
+                </RadzenDropDown>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" 
+    ColumnWidth="140px" LogicalFilterOperator="LogicalFilterOperator.Or">
+    <Columns>
+        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Width="5rem" TextAlign="TextAlign.Center" Frozen="@isFrozen("EmployeeID")" FrozenPosition="@frozenPosition("EmployeeID")" />
+        <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" Frozen="@isFrozen("Photo")" FrozenPosition="@frozenPosition("Photo")">
+            <Template Context="data">
+                <RadzenImage Path="@data.Photo" class="rz-gravatar" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" Frozen="@isFrozen("FirstName")" FrozenPosition="@frozenPosition("FirstName")">
+            <FooterTemplate>
+                Total employees: <b>@employees.Count()</b>
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Frozen="@isFrozen("LastName")" FrozenPosition="@frozenPosition("LastName")">
+                <FooterTemplate>
+                Footer
+            </FooterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" Width="200px" Frozen="@isFrozen("Title")" FrozenPosition="@frozenPosition("Title")" />
+        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Frozen="@isFrozen("BirthDate")" FrozenPosition="@frozenPosition("BirthDate")" />
+        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" Frozen="@isFrozen("HireDate")" FrozenPosition="@frozenPosition("HireDate")" />
+        <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" Frozen="@isFrozen("Address")" FrozenPosition="@frozenPosition("Address")" />
+        <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" Frozen="@isFrozen("City")" FrozenPosition="@frozenPosition("City")" />
+        <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" Frozen="@isFrozen("Region")" FrozenPosition="@frozenPosition("Region")" />
+        <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" Frozen="@isFrozen("PostalCode")" FrozenPosition="@frozenPosition("PostalCode")" />
+        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" Frozen="@isFrozen("Country")" FrozenPosition="@frozenPosition("Country")" />
+        <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" Frozen="@isFrozen("HomePhone")" FrozenPosition="@frozenPosition("HomePhone")" />
+        <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" Frozen="@isFrozen("Extension")" FrozenPosition="@frozenPosition("Extension")" />
+        <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" Frozen="@isFrozen("Notes")" FrozenPosition="@frozenPosition("Notes")" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    class FrozenInfo{
+        public string PropertyName { get; set; }
+        public bool Frozen { get; set; }
+        public FrozenPosition FrozenPosition { get; set; }
+    }
+
+    IEnumerable<Employee> employees;
+    List<FrozenPosition> frozenPositions = new List<FrozenPosition>
+    {
+        FrozenPosition.Left,
+        FrozenPosition.Right
+    };
+    List<FrozenInfo> frozenInfos = new List<FrozenInfo>
+    {
+        new FrozenInfo{PropertyName = "EmployeeID", Frozen = true, FrozenPosition = FrozenPosition.Left },
+        new FrozenInfo{PropertyName = "Photo", Frozen = true, FrozenPosition = FrozenPosition.Left },
+        new FrozenInfo{PropertyName = "FirstName", Frozen = true, FrozenPosition = FrozenPosition.Left },
+        new FrozenInfo{PropertyName = "LastName", Frozen = false },
+        new FrozenInfo{PropertyName = "Title", Frozen = false },
+        new FrozenInfo{PropertyName = "BirthDate", Frozen = true, FrozenPosition = FrozenPosition.Left },
+        new FrozenInfo{PropertyName = "HireDate", Frozen = false },
+        new FrozenInfo{PropertyName = "Address", Frozen = false },
+        new FrozenInfo{PropertyName = "City", Frozen = false },
+        new FrozenInfo{PropertyName = "Region", Frozen = false },
+        new FrozenInfo{PropertyName = "Country", Frozen = false },
+        new FrozenInfo{PropertyName = "HomePhone", Frozen = false },
+        new FrozenInfo{PropertyName = "Extension", Frozen = true, FrozenPosition = FrozenPosition.Right },
+        new FrozenInfo{PropertyName = "Notes", Frozen = true, FrozenPosition = FrozenPosition.Right },
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employees = dbContext.Employees;
+    }
+
+    private bool isFrozen(string propertyName)
+    {
+        var frozenInfo = frozenInfos.FirstOrDefault(i => i.PropertyName == propertyName);
+
+        if(frozenInfo == null)
+        {
+            return false;
+        }
+
+        return frozenInfo.Frozen;
+    }
+
+    private FrozenPosition frozenPosition(string propertyName)
+    {
+        var frozenInfo = frozenInfos.FirstOrDefault(i => i.PropertyName == propertyName);
+
+        if (frozenInfo == null)
+        {
+            return FrozenPosition.Left;
+        }
+
+        return frozenInfo.FrozenPosition;
+    }
+}
