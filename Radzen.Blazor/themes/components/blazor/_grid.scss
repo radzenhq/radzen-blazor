@@ -394,7 +394,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
                 justify-content: center;
                 padding-left: 0;
             }
-
             &.rz-sortable-column {
                 .rz-column-title {
                     padding-left: var(--rz-grid-sort-icon-width);
@@ -406,7 +405,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
             .rz-column-title {
                 justify-content: right;
             }
-
             &.rz-sortable-column {
                 .rz-column-title {
                     padding-left: var(--rz-grid-sort-icon-width);
@@ -552,8 +550,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
             border-right: var(--rz-grid-right-cell-border);
         }
 
-
-
         &.rz-composite-cell {
             border-right: var(--rz-grid-right-cell-border);
         }
@@ -585,7 +581,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
             &:first-child {
                 border-left: none;
             }
-
             &:last-child:not(.rz-composite-cell) {
                 border-right: none;
             }
@@ -619,13 +614,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
                 border-right: var(--rz-grid-cell-border);
             }
         }
-
-        > tbody > tr > td {
-            &.rz-frozen-cell {
-                background: var(--rz-grid-frozen-cell-background-color);
-            }
-        }
     }
+
     // GridLines.None
     &.rz-grid-gridlines-none {
         > thead > tr > th,
@@ -636,6 +626,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
             border-right: none;
         }
     }
+
     // GridLines.Horizontal
     &.rz-grid-gridlines-horizontal {
         > thead > tr > th,
@@ -646,6 +637,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
             border-right: none;
         }
     }
+
     // GridLines.Vertical
     &.rz-grid-gridlines-vertical {
         > thead > tr > th,
@@ -1093,6 +1085,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     }
 
     .rz-frozen-cell-left, .rz-frozen-cell-right {
+        background: var(--rz-grid-frozen-cell-background-color);
         z-index: 1;
     }
 
