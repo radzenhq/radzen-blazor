@@ -396,7 +396,7 @@ namespace Radzen.Blazor
         public bool Frozen { get; set; }
 
         [Parameter]
-        public FrozenPosition FrozenPosition { get; set; } = FrozenPosition.Left;
+        public FrozenColumnPosition FrozenPosition { get; set; } = FrozenColumnPosition.Left;
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenDataGridColumn{TItem}"/> is resizable.
@@ -588,7 +588,7 @@ namespace Radzen.Blazor
         private string GetStackedStyleForFrozen()
         {
             var visibleFrozenColumns = Grid.ColumnsCollection.Where(c => c.GetVisible() && c.IsFrozen() && c.FrozenPosition == FrozenPosition).ToList();
-            if (FrozenPosition == FrozenPosition.Left)
+            if (FrozenPosition == FrozenColumnPosition.Left)
             {
                 var stackColumns = visibleFrozenColumns.Where((c, i) => visibleFrozenColumns.IndexOf(this) > i);
 

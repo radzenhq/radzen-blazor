@@ -68,31 +68,31 @@
     class FrozenInfo{
         public string PropertyName { get; set; }
         public bool Frozen { get; set; }
-        public FrozenPosition FrozenPosition { get; set; }
+        public FrozenColumnPosition FrozenPosition { get; set; }
     }
     Radzen.DataGridGridLines GridLines = Radzen.DataGridGridLines.Default;
     IEnumerable<Employee> employees;
-    List<FrozenPosition> frozenPositions = new List<FrozenPosition>
+    List<FrozenColumnPosition> frozenPositions = new List<FrozenColumnPosition>
     {
-        FrozenPosition.Left,
-        FrozenPosition.Right
+        FrozenColumnPosition.Left,
+        FrozenColumnPosition.Right
     };
     List<FrozenInfo> frozenInfos = new List<FrozenInfo>
     {
-        new FrozenInfo{PropertyName = "EmployeeID", Frozen = true, FrozenPosition = FrozenPosition.Left },
-        new FrozenInfo{PropertyName = "Photo", Frozen = true, FrozenPosition = FrozenPosition.Left },
-        new FrozenInfo{PropertyName = "FirstName", Frozen = true, FrozenPosition = FrozenPosition.Left },
+        new FrozenInfo{PropertyName = "EmployeeID", Frozen = true, FrozenPosition = FrozenColumnPosition.Left },
+        new FrozenInfo{PropertyName = "Photo", Frozen = true, FrozenPosition = FrozenColumnPosition.Left },
+        new FrozenInfo{PropertyName = "FirstName", Frozen = true, FrozenPosition = FrozenColumnPosition.Left },
         new FrozenInfo{PropertyName = "LastName", Frozen = false },
         new FrozenInfo{PropertyName = "Title", Frozen = false },
-        new FrozenInfo{PropertyName = "BirthDate", Frozen = true, FrozenPosition = FrozenPosition.Left },
+        new FrozenInfo{PropertyName = "BirthDate", Frozen = true, FrozenPosition = FrozenColumnPosition.Left },
         new FrozenInfo{PropertyName = "HireDate", Frozen = false },
         new FrozenInfo{PropertyName = "Address", Frozen = false },
         new FrozenInfo{PropertyName = "City", Frozen = false },
         new FrozenInfo{PropertyName = "Region", Frozen = false },
         new FrozenInfo{PropertyName = "Country", Frozen = false },
         new FrozenInfo{PropertyName = "HomePhone", Frozen = false },
-        new FrozenInfo{PropertyName = "Extension", Frozen = true, FrozenPosition = FrozenPosition.Right },
-        new FrozenInfo{PropertyName = "Notes", Frozen = true, FrozenPosition = FrozenPosition.Right },
+        new FrozenInfo{PropertyName = "Extension", Frozen = true, FrozenPosition = FrozenColumnPosition.Right },
+        new FrozenInfo{PropertyName = "Notes", Frozen = true, FrozenPosition = FrozenColumnPosition.Right },
     };
 
     protected override async Task OnInitializedAsync()
@@ -114,13 +114,13 @@
         return frozenInfo.Frozen;
     }
 
-    private FrozenPosition frozenPosition(string propertyName)
+    private FrozenColumnPosition frozenPosition(string propertyName)
     {
         var frozenInfo = frozenInfos.FirstOrDefault(i => i.PropertyName == propertyName);
 
         if (frozenInfo == null)
         {
-            return FrozenPosition.Left;
+            return FrozenColumnPosition.Left;
         }
 
         return frozenInfo.FrozenPosition;
