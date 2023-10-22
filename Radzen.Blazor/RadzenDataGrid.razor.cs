@@ -325,7 +325,52 @@ namespace Radzen.Blazor
 
         internal string getFrozenColumnClass(RadzenDataGridColumn<TItem> column, IList<RadzenDataGridColumn<TItem>> visibleColumns)
         {
-            return column.IsFrozen() ? (column.FrozenPosition == FrozenPosition.Left ? "rz-frozen-cell rz-frozen-cell-left" : "rz-frozen-cell rz-frozen-cell-right") : "";
+            if(!column.IsFrozen())
+            {
+                return "";
+            }
+
+            if(column.FrozenPosition == FrozenPosition.Left)
+            {
+                for(var i=0; i<ColumnsCollection.Count; i++)
+                {
+                    if (ColumnsCollection[i] == column)
+                    {
+                        if (i + 1 < ColumnsCollection.Count && (!ColumnsCollection[i + 1].IsFrozen() || ColumnsCollection[i + 1].FrozenPosition == FrozenPosition.Right))
+                        {
+                            return "rz-frozen-cell rz-frozen-cell-left rz-frozen-cell-left-end";
+                        }
+                        else
+                        {
+                            return "rz-frozen-cell rz-frozen-cell-left";
+                        }
+                    }
+                    if(!ColumnsCollection[i].IsFrozen())
+                    {
+                        break;
+                    }
+                }
+                return "rz-frozen-cell rz-frozen-cell-left-inner";
+            }
+            for (var i = ColumnsCollection.Count-1; i >=0; i--)
+            {
+                if (ColumnsCollection[i] == column)
+                {
+                    if (i - 1 >=0 && (!ColumnsCollection[i-1].IsFrozen() || ColumnsCollection[i-1].FrozenPosition == FrozenPosition.Left))
+                    {
+                        return "rz-frozen-cell rz-frozen-cell-right rz-frozen-cell-right-end";
+                    }
+                    else
+                    {
+                        return "rz-frozen-cell rz-frozen-cell-right";
+                    }
+                }
+                if (!ColumnsCollection[i].IsFrozen())
+                {
+                    break;
+                }
+            }
+            return "rz-frozen-cell rz-frozen-cell-right-inner";
         }
 
         internal string getColumnAlignClass(RadzenDataGridColumn<TItem> column)
