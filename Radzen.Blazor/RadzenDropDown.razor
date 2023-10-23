@@ -143,12 +143,19 @@
                 </div>
             }
             <div class="@(Multiple ? "rz-multiselect-items-wrapper" : "rz-dropdown-items-wrapper")" style="@PopupStyle">
-                <ul @ref="list" class="@(Multiple ? "rz-multiselect-items rz-multiselect-list" : "rz-dropdown-items rz-dropdown-list")" role="listbox">
-                    @if (View != null)
-                    {
-                        @RenderItems()
-                    }
-                </ul>
+                @if (Data != null && Data.Cast<object>().Any())
+                {
+                    <ul @ref="list" class="@(Multiple ? "rz-multiselect-items rz-multiselect-list" : "rz-dropdown-items rz-dropdown-list")" role="listbox">
+                        @if (View != null)
+                        {
+                            @RenderItems()
+                        }
+                    </ul>   
+                }
+                else
+                {
+                    @EmptyTemplate
+                }
             </div>
         </div>
         @if (AllowClear && (!Multiple && HasValue || Multiple && selectedItems.Count > 0))

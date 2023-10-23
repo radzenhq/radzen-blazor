@@ -31,6 +31,13 @@ namespace Radzen.Blazor
         /// <value>The value template.</value>
         [Parameter]
         public RenderFragment<dynamic> ValueTemplate { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the empty template.
+        /// </summary>
+        /// <value>The empty template.</value>
+        [Parameter]
+        public RenderFragment EmptyTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether popup should open on focus. Set to <c>false</c> by default.
