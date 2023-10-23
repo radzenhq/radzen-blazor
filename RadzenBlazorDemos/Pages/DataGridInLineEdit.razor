@@ -4,11 +4,17 @@
 
 @inherits DbContextPage
 
+ <style>
+    .rz-grid-table {
+        width: unset;
+    }
+</style>
+
 <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" class="mt-2 mb-4" Text="Add New Order" Click="@InsertRow" Disabled=@(orderToInsert != null || orderToUpdate != null) />
 <RadzenDataGrid @ref="ordersGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single"
             Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="200px">
     <Columns>
-        <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID" Width="120px" />
+        <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID" Width="120px" Frozen="true"/>
         <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" Width="280px" >
             <EditTemplate Context="order">
                 <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%; display: block;" />
@@ -46,11 +52,23 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name">
             <EditTemplate Context="order">
-                <RadzenTextBox @bind-Value="order.ShipName" Style="width:100%; display: block" Name="ShipName" />
+                <RadzenTextBox @bind-Value="order.ShipName" Style="width:200px; display: block" Name="ShipName" />
                 <RadzenRequiredValidator Text="ShipName is required" Component="ShipName" Popup="true" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Context="order" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="156px">
+        <RadzenDataGridColumn TItem="Order" Property="ShipCountry" Title="ShipCountry">
+            <EditTemplate Context="order">
+                <RadzenTextBox @bind-Value="order.ShipCountry" Style="width:200px; display: block" Name="ShipCountry" />
+                <RadzenRequiredValidator Text="ShipCountry is required" Component="ShipCountry" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Order" Property="ShipCity" Title="ShipCity">
+            <EditTemplate Context="order">
+                <RadzenTextBox @bind-Value="order.ShipCity" Style="width:200px; display: block" Name="ShipCity" />
+                <RadzenRequiredValidator Text="ShipCity is required" Component="ShipCity" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Order" Context="order" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
             <Template Context="order">
                 <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(order))" @onclick:stopPropagation="true">
                 </RadzenButton>
