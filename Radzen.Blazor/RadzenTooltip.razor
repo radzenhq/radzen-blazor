@@ -108,8 +108,19 @@
         var lastTooltip = tooltips.LastOrDefault();
         if (lastTooltip != null)
         {
-            tooltips.Remove(lastTooltip);
-            await JSRuntime.InvokeVoidAsync("Radzen.closeTooltip", UniqueID);
+            if (IsJSRuntimeAvailable)
+            {
+                try
+                {
+                    tooltips.Remove(lastTooltip);
+                    await JSRuntime.InvokeVoidAsync("Radzen.closeTooltip", UniqueID);   
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+            
         }
 
         await InvokeAsync(() => { StateHasChanged(); });
@@ -131,7 +142,9 @@
                await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
             }
             catch
-            {}
+            {
+                // ignored
+            }
         }
 
         Service.OnOpen -= OnOpen;
