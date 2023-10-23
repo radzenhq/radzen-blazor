@@ -117,7 +117,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   --rz-grid-cell-color: #{$grid-cell-color};
   --rz-grid-cell-font-size: #{$grid-cell-font-size};
   --rz-grid-cell-line-height: #{$grid-cell-line-height};
-
+ 
   --rz-grid-hover-background-color: #{$grid-hover-background-color};
   --rz-grid-hover-color: #{$grid-hover-color};
 
@@ -139,10 +139,10 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   --rz-grid-header-title-padding: #{$grid-header-title-padding};
   --rz-grid-header-sorted-background-color: #{$grid-header-sorted-background-color};
   --rz-grid-header-padding: #{$grid-header-padding};
-
+  
   --rz-grid-foot-cell-color: #{$grid-foot-cell-color};
   --rz-grid-foot-background-color: #{$grid-foot-background-color};
-
+  
   --rz-grid-filter-background-color: #{$grid-filter-background-color};
   --rz-grid-filter-padding: #{$grid-filter-padding};
   --rz-grid-filter-margin: #{$grid-filter-margin};
@@ -152,57 +152,57 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   --rz-grid-filter-icon-height: #{$grid-filter-icon-height};
   --rz-grid-filter-icon-margin: #{$grid-filter-icon-margin};
   --rz-grid-filter-icon-font-size: #{$grid-filter-icon-font-size};
-
+  
   --rz-grid-filter-color: #{$grid-filter-color};
   --rz-grid-filter-focus-color: #{$grid-filter-focus-color};
   --rz-grid-filter-gap: #{$grid-filter-gap};
   --rz-grid-filter-buttons-padding: #{$grid-filter-buttons-padding};
   --rz-grid-filter-buttons-border: #{$grid-filter-buttons-border};
   --rz-grid-filter-buttons-background-color: #{$grid-filter-buttons-background-color};
-
+  
   --rz-grid-clear-filter-button-background-color: #{$grid-clear-filter-button-background-color};
   --rz-grid-clear-filter-button-color: #{$grid-clear-filter-button-color};
   --rz-grid-clear-filter-button-shadow: #{$grid-clear-filter-button-shadow};
   --rz-grid-apply-filter-button-background-color: #{$grid-apply-filter-button-background-color};
   --rz-grid-apply-filter-button-color: #{$grid-apply-filter-button-color};
   --rz-grid-apply-filter-button-shadow: #{$grid-apply-filter-button-shadow};
-
-
+ 
+  
   --rz-grid-header-filter-icon-margin: #{$grid-header-filter-icon-margin};
   --rz-grid-header-filter-icon-hover-color: #{$grid-header-filter-icon-hover-color};
   --rz-grid-header-filter-icon-active-color: #{$grid-header-filter-icon-active-color};
   --rz-grid-header-filter-icon-font-size: #{$grid-header-filter-icon-font-size};
-
+  
   --rz-grid-border: #{$grid-border};
   --rz-grid-border-radius: #{$grid-border-radius};
-
+  
   --rz-grid-sort-icon-width: #{$grid-sort-icon-width};
   --rz-grid-sort-icon-height: #{$grid-sort-icon-height};
   --rz-grid-sort-icon-color: #{$grid-sort-icon-color};
-
+  
   --rz-grid-shadow: #{$grid-shadow};
   --rz-grid-background-color: #{$grid-background-color};
-
+  
   --rz-grid-column-resizer-width: #{$grid-column-resizer-width};
   --rz-grid-column-resizer-helper-width: #{$grid-column-resizer-helper-width};
   --rz-grid-column-resizer-helper-background-color: #{$grid-column-resizer-helper-background-color};
-
+  
   --rz-grid-column-icon-width: #{$grid-column-icon-width};
   --rz-grid-column-icon-padding: #{$grid-column-icon-padding};
-
+  
   --rz-grid-detail-template-border: #{$grid-detail-template-border};
   --rz-grid-detail-template-border-radius: #{$grid-detail-template-border-radius};
   --rz-grid-detail-template-padding: #{$grid-detail-template-padding};
   --rz-grid-detail-template-background-color: #{$grid-detail-template-background-color};
-
+  
   --rz-grid-loading-indicator-color: #{$grid-loading-indicator-color};
   --rz-grid-loading-indicator-background-color: #{$grid-loading-indicator-background-color};
-
+  
   --rz-grid-frozen-cell-border: #{$grid-frozen-cell-border};
   --rz-grid-frozen-cell-background-color: #{$grid-frozen-cell-background-color};
-
+  
   --rz-grid-state-transition: #{$grid-state-transition};
-
+  
   --rz-grid-group-header-padding: #{$grid-group-header-padding};
   --rz-grid-group-header-item-background-color: #{$grid-group-header-item-background-color};
   --rz-grid-group-header-item-padding: #{$grid-group-header-item-padding};
@@ -210,7 +210,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   --rz-grid-group-header-item-border: #{$grid-group-header-item-border};
   --rz-grid-group-header-item-border-radius: #{$grid-group-header-item-border-radius};
   --rz-grid-group-header-items-margin: #{$grid-group-header-items-margin};
-
+  
   --rz-column-drag-handle-color: #{$column-drag-handle-color};
   --rz-column-drag-handle-hover-color: #{$column-drag-handle-hover-color};
   --rz-column-drag-handle-margin: #{$column-drag-handle-margin};
@@ -413,7 +413,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     }
 
     .rz-column-drag {
-        + .rz-column-title {
+      + .rz-column-title {
         padding-left: 0;
       }
     }
@@ -532,7 +532,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   &.rz-grid-table thead {
     th {
       border-bottom: var(--rz-grid-header-cell-border);
-  
+
       &.rz-composite-cell {
         border-right: var(--rz-grid-header-cell-border);
       }
@@ -645,7 +645,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     > tbody > tr > td,
     > tfoot > tr > td {
       border-bottom: none;
-      
+
       &:not(:last-child) {
         border-right: var(--rz-grid-cell-border);
       }
@@ -716,21 +716,21 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   font-weight: normal;
 
   .rz-cell-filter-label {
-      display: flex;
-      flex: auto;
-      align-items: center;
+    display: flex;
+    flex: auto;
+    align-items: center;
 
-      > .rzi {
-        width: var(--rz-grid-filter-icon-width);
-        height: var(--rz-grid-filter-icon-height);
-        font-size: var(--rz-grid-filter-icon-font-size);
-        margin: var(--rz-grid-filter-icon-margin);
-        color: var(--rz-grid-filter-color);
+    > .rzi {
+      width: var(--rz-grid-filter-icon-width);
+      height: var(--rz-grid-filter-icon-height);
+      font-size: var(--rz-grid-filter-icon-font-size);
+      margin: var(--rz-grid-filter-icon-margin);
+      color: var(--rz-grid-filter-color);
 
-        &.rz-cell-filter-clear {
-          margin-left: auto;
-        }
+      &.rz-cell-filter-clear {
+        margin-left: auto;
       }
+    }
 
     .rz-current-filter {
       margin-left: 0.5rem;
@@ -753,7 +753,9 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
             inset: 0;
             transition: background-color var(--rz-transition), color var(--rz-transition);
           }
+        }
 
+        &.rz-frozen-cell-left {
           &:before {
             z-index: -1;
           }
@@ -763,14 +765,31 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
             background-color: var(--rz-grid-frozen-cell-background-color);
           }
         }
+
+        &.rz-frozen-cell-right {
+          &:before {
+            z-index: -2;
+            background-color: var(--rz-grid-frozen-cell-background-color);
+          }
+
+          &:after {
+            z-index: -1;
+          }
+        }
       }
 
       &.rz-state-highlight {
         > td {
           background-color: var(--rz-grid-selected-background-color);
 
-          &.rz-frozen-cell {
+          &.rz-frozen-cell-left {
             &:before {
+              background-color: var(--rz-grid-selected-background-color);
+            }
+          }
+
+          &.rz-frozen-cell-right {
+            &:after {
               background-color: var(--rz-grid-selected-background-color);
             }
           }
@@ -795,8 +814,14 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
           > td {
             background-color: var(--rz-grid-hover-background-color);
 
-            &.rz-frozen-cell {
+            &.rz-frozen-cell-left {
               &:before {
+                background-color: var(--rz-grid-hover-background-color);
+              }
+            }
+
+            &.rz-frozen-cell-right {
+              &:after {
                 background-color: var(--rz-grid-hover-background-color);
               }
             }
@@ -1057,10 +1082,21 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   .rz-frozen-cell {
     position: -webkit-sticky;
     position: sticky;
+  }
+
+  .rz-frozen-cell-left, .rz-frozen-cell-right {
     background: var(--rz-grid-frozen-cell-background-color);
-    border-right: var(--rz-grid-frozen-cell-border) !important;
-    box-shadow: 1px 0 2px 0 rgba(0,0,0,0.12);
     z-index: 1;
+  }
+
+  .rz-frozen-cell-left.rz-frozen-cell-left-end {
+    box-shadow: 5px 0 5px -5px rgba(0,0,0,0.12);
+    border-right: var(--rz-grid-frozen-cell-border) !important;
+  }
+
+  .rz-frozen-cell-right.rz-frozen-cell-right-end {
+    box-shadow: -5px 0 5px -5px rgba(0,0,0,0.12);
+    border-left: var(--rz-grid-frozen-cell-border) !important;
   }
 }
 
@@ -1088,7 +1124,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 }
 
 .rz-grid-table tbody > div {
-    display: table-row;
+  display: table-row;
 }
 
 .rz-column-drag {

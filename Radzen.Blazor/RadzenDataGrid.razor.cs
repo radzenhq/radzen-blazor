@@ -325,7 +325,72 @@ namespace Radzen.Blazor
 
         internal string getFrozenColumnClass(RadzenDataGridColumn<TItem> column, IList<RadzenDataGridColumn<TItem>> visibleColumns)
         {
-            return column.IsFrozen() ? "rz-frozen-cell" : "";
+            if (!column.IsFrozen())
+            {
+                return "";
+            }
+
+            // Frozen columns are grouped to:
+            // - left frozen columns: all of the frozen columns marked by FrozenColumnPosition.Left from left till the first not frozen column
+            // - left inner frozen columns: any frozen column marked by FrozenColumnPosition.Left which are not "left frozen columns"
+            // - right frozen columns: all of the frozen columns marked by FrozenColumnPosition.Right from right till the first not frozen column
+            // - right inner frozen columns: any frozen column marked by FrozenColumnPosition.Right which are not "right frozen columns"
+
+            // According to https://github.com/w3c/csswg-drafts/issues/1656 stucked columns cannot be detected by pseudo classes, so the stucked state had to be managed somehow.
+
+            // A good solution for the problem, might be:
+            // https://stackoverflow.com/questions/25308823/targeting-positionsticky-elements-that-are-currently-in-a-stuck-state
+            // https://codepen.io/TomAnthony/pen/qBqgErK
+            // It seemed too complicated, so left + right frozen columns problme has been solved by following css classes:
+            // - rz-frozen-cell-left            all of the "left frozen columns" get this class 
+            // - rz-frozen-cell-left-end        the most right column of the "left frozen columns" get this class to draw the shadow for it
+            // - rz-frozen-cell-left-inner      all of the "left inner frozen columns" get this class
+            // - rz-frozen-cell-right           all of the "right frozen columns" get this class
+            // - rz-frozen-cell-right-end       the most left column of the "right frozen columns" get this class to draw the shadow for it
+            // - rz-frozen-cell-right-inner     all of the "right inner frozen columns" get this class
+
+            if (column.FrozenPosition == FrozenColumnPosition.Left)
+            {
+                for(var i=0; i<ColumnsCollection.Count; i++)
+                {
+                    if (ColumnsCollection[i] == column)
+                    {
+                        if (i + 1 < ColumnsCollection.Count && (!ColumnsCollection[i + 1].IsFrozen() || ColumnsCollection[i + 1].FrozenPosition == FrozenColumnPosition.Right))
+                        {
+                            return "rz-frozen-cell rz-frozen-cell-left rz-frozen-cell-left-end";
+                        }
+                        else
+                        {
+                            return "rz-frozen-cell rz-frozen-cell-left";
+                        }
+                    }
+                    if(!ColumnsCollection[i].IsFrozen())
+                    {
+                        break;
+                    }
+                }
+                return "rz-frozen-cell rz-frozen-cell-left-inner";
+            }
+
+            for (var i = ColumnsCollection.Count-1; i >=0; i--)
+            {
+                if (ColumnsCollection[i] == column)
+                {
+                    if (i - 1 >=0 && (!ColumnsCollection[i-1].IsFrozen() || ColumnsCollection[i-1].FrozenPosition == FrozenColumnPosition.Left))
+                    {
+                        return "rz-frozen-cell rz-frozen-cell-right rz-frozen-cell-right-end";
+                    }
+                    else
+                    {
+                        return "rz-frozen-cell rz-frozen-cell-right";
+                    }
+                }
+                if (!ColumnsCollection[i].IsFrozen())
+                {
+                    break;
+                }
+            }
+            return "rz-frozen-cell rz-frozen-cell-right-inner";
         }
 
         internal string getColumnAlignClass(RadzenDataGridColumn<TItem> column)
