@@ -215,4 +215,9 @@ namespace Radzen
         /// <value>The image.</value>
         public string Image { get; set; }
     }
+
+    /// <summary>
+    /// Class ContextMenuSeparator.
+    /// </summary>
+    public class ContextMenuSeparator : ContextMenuItem { }
 }
