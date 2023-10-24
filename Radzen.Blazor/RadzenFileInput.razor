@@ -10,7 +10,7 @@
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     <div class="rz-fileupload-buttonbar">
         <span class="@ChooseClassList" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" onkeydown="if(event.keyCode == 32 || event.keyCode == 13){event.preventDefault();this.firstElementChild.click();}">
-            <input tabindex="-1" disabled="@Disabled" @ref="@fileUpload" name="@Name" type="file" accept="@Accept" onkeydown="event.stopPropagation()"
+            <input @attributes="InputAttributes" tabindex="-1" disabled="@Disabled" @ref="@fileUpload" name="@Name" type="file" accept="@Accept" onkeydown="event.stopPropagation()"
                 onchange="Radzen.uploadInputChange(event, null, false, false, true)" id="@Id" />
             <span class="rz-button-text">@ChooseText</span>
         </span>

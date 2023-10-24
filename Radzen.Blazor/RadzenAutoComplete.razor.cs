@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components.Web;
 using System.Linq;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Radzen.Blazor
 {
@@ -22,6 +23,13 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenAutoComplete : DataBoundFormComponent<string>
     {
+        /// <summary>
+        /// Specifies additional custom attributes that will be rendered by the input.
+        /// </summary>
+        /// <value>The attributes.</value>
+        [Parameter(CaptureUnmatchedValues = true)]
+        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenAutoComplete"/> is multiline.
         /// </summary>

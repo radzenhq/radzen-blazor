@@ -35,6 +35,13 @@ namespace Radzen.Blazor
     public partial class RadzenUpload : RadzenComponent
     {
         /// <summary>
+        /// Specifies additional custom attributes that will be rendered by the input.
+        /// </summary>
+        /// <value>The attributes.</value>
+        [Parameter(CaptureUnmatchedValues = true)]
+        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+
+        /// <summary>
         /// Gets file input reference.
         /// </summary>
         protected ElementReference fileUpload;
