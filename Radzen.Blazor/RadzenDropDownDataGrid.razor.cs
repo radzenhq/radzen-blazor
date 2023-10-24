@@ -590,6 +590,11 @@ namespace Radzen.Blazor
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(internalValue);
 
+            if (!Multiple)
+            {
+                await grid.SelectRow(null);
+            }
+
             await grid.Reload();
 
             StateHasChanged();
