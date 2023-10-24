@@ -27,7 +27,6 @@ namespace Radzen.Blazor
         /// Specifies additional custom attributes that will be rendered by the input.
         /// </summary>
         /// <value>The attributes.</value>
-        [Parameter(CaptureUnmatchedValues = true)]
         public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
 
         RadzenDropDown<int> monthDropDown;
