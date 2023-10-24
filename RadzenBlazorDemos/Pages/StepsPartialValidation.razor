@@ -1,0 +1,32 @@
+﻿@using RadzenBlazorDemos.Models;
+
+<RadzenTemplateForm TItem="UserInput" Data="@_userInput" >
+    <RadzenSteps>
+        <Steps>
+            <RadzenStepsItem ValidationFieldNames="@(new List<string>() { nameof(UserInput.FirstName), nameof(UserInput.Surename) })">
+                <RadzenText Text="Enter User Name!" />
+                <RadzenRow>
+                    <RadzenTextBox Name="FirstName" Placeholder="First name" @bind-Value="@_userInput.FirstName"/>
+                    <RadzenRequiredValidator Component="FirstName" Text="First name is required"/>
+                </RadzenRow>
+                <RadzenRow>
+                    <RadzenTextBox Name="Surname" Placeholder="Surname" @bind-Value="@_userInput.Surename" />
+                    <RadzenRequiredValidator Component="Surname" Text="Surname is required"/>
+                </RadzenRow>
+            </RadzenStepsItem>
+            <RadzenStepsItem>
+                <RadzenText Text="Enter Email Address" />
+                <RadzenRow>
+                    <RadzenTextBox Name="EmailAddress" Placeholder="Email address" @bind-Value="@_userInput.Email" />
+                    <RadzenRequiredValidator Component="EmailAddress" Text="Email address is required"/>
+                </RadzenRow>
+                <RadzenButton Icon="save" Text="Save" />
+            </RadzenStepsItem>
+        </Steps>
+    </RadzenSteps>
+
+</RadzenTemplateForm>
+
+@code {
+    public UserInput _userInput = new();
+}
