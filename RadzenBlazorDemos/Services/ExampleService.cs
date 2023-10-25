@@ -730,7 +730,8 @@ namespace RadzenBlazorDemos
                     Name = "Layout",
                     Title = "Blazor Layout component",
                     Path = "layout",
-                    Icon = "&#xe8f1"
+                    Icon = "&#xe8f1",
+                    Tags = new [] { "layout", "sidebar", "drawer", "header", "body", "footer" }
                 },
                 new Example()
                 {
