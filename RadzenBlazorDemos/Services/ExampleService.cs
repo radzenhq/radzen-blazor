@@ -723,6 +723,7 @@ namespace RadzenBlazorDemos
         new Example()
         {
             Name = "Layout",
+            Updated = true,
             Icon = "&#xe8f1",
             Children = new[] {
                 new Example()
