@@ -6,8 +6,8 @@
         </RadzenStack>
     </RadzenHeader>
     <RadzenSidebar Responsive="false" @bind-Expanded="@sidebarExpanded" style="position: absolute; z-index: 2">
-        <RadzenStack AlignItems="AlignItems.End">
-            <RadzenButton style="width: 32px;height: 32px" Icon="close" Click="@(() => sidebarExpanded = false)" />
+        <RadzenStack AlignItems="AlignItems.End" Class="rz-p-2">
+            <RadzenButton Icon="west" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary" Click="@(() => sidebarExpanded = false)" />
         </RadzenStack>
         <RadzenPanelMenu>
             <RadzenPanelMenuItem Text="Home" Icon="home" />
