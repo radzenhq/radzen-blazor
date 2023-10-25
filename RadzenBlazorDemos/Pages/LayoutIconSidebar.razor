@@ -1,12 +1,12 @@
-<RadzenLayout style="height: 400px">
+<RadzenLayout>
     <RadzenHeader>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
-            <RadzenSidebarToggle Click="@(() => sidebar1Expanded = !sidebar1Expanded)" />
+            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
             <RadzenLabel Text="Header" />
         </RadzenStack>
     </RadzenHeader>
-    <RadzenSidebar Style="width:auto">
-        <RadzenPanelMenu DisplayStyle="@(sidebar1Expanded?MenuItemDisplayStyle.IconAndText:MenuItemDisplayStyle.Icon)" ShowArrow=false>
+    <RadzenSidebar Responsive="false" Style="width: max-content">
+        <RadzenPanelMenu DisplayStyle="@(sidebarExpanded ? MenuItemDisplayStyle.IconAndText : MenuItemDisplayStyle.Icon)" ShowArrow="false">
             <RadzenPanelMenuItem Text="Overview" Icon="home" />
             <RadzenPanelMenuItem Text="Dashboard" Icon="dashboard" />
             <RadzenPanelMenuItem Text="UI Fundamentals" Icon="auto_awesome">
@@ -26,5 +26,5 @@
 </RadzenLayout>
 
 @code {
-    bool sidebar1Expanded = true;
+    bool sidebarExpanded = true;
 }

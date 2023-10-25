@@ -1,11 +1,11 @@
-<RadzenLayout Style="grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-header' 'rz-body rz-sidebar'">
+<RadzenLayout style="position: relative">
     <RadzenHeader>
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center" Gap="1rem">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
             <RadzenLabel Text="Header" />
-            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" Class="rz-m-0" />
         </RadzenStack>
     </RadzenHeader>
-    <RadzenSidebar @bind-Expanded="@sidebarExpanded">
+    <RadzenSidebar Responsive="false" @bind-Expanded="@sidebarExpanded" style="position: absolute">
         <RadzenPanelMenu>
             <RadzenPanelMenuItem Text="Home" Icon="home" />
             <RadzenPanelMenuItem Text="Users" Icon="account_box" />
@@ -19,8 +19,11 @@
             Body
         </div>
     </RadzenBody>
+    <RadzenFooter>
+        Footer
+    </RadzenFooter>
 </RadzenLayout>
 
 @code {
-    bool sidebarExpanded = true;
+    bool sidebarExpanded = false;
 }

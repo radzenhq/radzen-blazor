@@ -1,5 +1,9 @@
 @page "/layout"
-
+<style>
+    .example-tabs .rz-layout {
+        height: 300px;
+    }
+</style>
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Layout
 </RadzenText>
@@ -13,35 +17,49 @@
     Sidebar, Header and Footer
 </RadzenText>
 <RadzenExample ComponentName="Layout" Example="LayoutSidebarHeaderFooter" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenLayout.cs">
-        <LayoutSidebarHeaderFooter />
+    <LayoutSidebarHeaderFooter />
 </RadzenExample>
 
 <RadzenText Anchor="layout#full-height-sidebar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
     Full height Sidebar
 </RadzenText>
 <RadzenExample ComponentName="Layout" Example="LayoutFullHeightSidebar" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenLayout.cs">
-        <LayoutFullHeightSidebar />
+    <LayoutFullHeightSidebar />
+</RadzenExample>
+
+<RadzenText Anchor="layout#overlay" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Overlay Sidebar
+</RadzenText>
+<RadzenExample ComponentName="Layout" Example="LayoutSidebarOverlay" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenLayout.cs">
+    <LayoutSidebarOverlay />
+</RadzenExample>
+
+<RadzenText Anchor="layout#overlay-full" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Full height overlay Sidebar
+</RadzenText>
+<RadzenExample ComponentName="Layout" Example="LayoutSidebarFullHeightOverlay" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenLayout.cs">
+    <LayoutSidebarFullHeightOverlay />
 </RadzenExample>
 
 <RadzenText Anchor="layout#right-sidebar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
     Right Sidebar
 </RadzenText>
 <RadzenExample ComponentName="Layout" Example="LayoutRightSidebar" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenLayout.cs">
-        <LayoutRightSidebar />
+    <LayoutRightSidebar />
 </RadzenExample>
 
 <RadzenText Anchor="layout#right-full-height-sidebar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
     Right full height Sidebar
 </RadzenText>
 <RadzenExample ComponentName="Layout" Example="LayoutRightFullHeightSidebar" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenLayout.cs">
-        <LayoutRightFullHeightSidebar />
+    <LayoutRightFullHeightSidebar />
 </RadzenExample>
 
 <RadzenText Anchor="layout#right-left-sidebar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
     Right and Left Sidebar
 </RadzenText>
 <RadzenExample ComponentName="Layout" Example="LayoutRightLeftSidebar" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenLayout.cs">
-        <LayoutRightLeftSidebar />
+    <LayoutRightLeftSidebar />
 </RadzenExample>
 
 <RadzenText Anchor="layout#icon-sidebar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
