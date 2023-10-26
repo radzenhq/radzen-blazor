@@ -101,7 +101,10 @@ namespace Radzen.Blazor
             {
                 top = PageSize;
             }
-            var loadDataArgs = $"{request.StartIndex}|{top}{GetOrderBy()}{allColumns.ToList().ToFilterString<TItem>()}";
+
+            var filter = isOData == true ? 
+                    allColumns.ToList().ToODataFilterString<TItem>() : allColumns.ToList().ToFilterString<TItem>();
+            var loadDataArgs = $"{request.StartIndex}|{top}{GetOrderBy()}{filter}";
 
             if (lastLoadDataArgs != loadDataArgs)
             {
@@ -721,6 +724,7 @@ namespace Radzen.Blazor
 
                     if (LoadData.HasDelegate && IsVirtualizationAllowed())
                     {
+                        isOData = Data != null && typeof(ODataEnumerable<TItem>).IsAssignableFrom(Data.GetType());
                         Data = null;
 #if NET5_0_OR_GREATER
                         ResetLoadData();
