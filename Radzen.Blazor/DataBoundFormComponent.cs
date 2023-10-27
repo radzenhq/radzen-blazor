@@ -377,7 +377,7 @@ namespace Radzen
         /// Gets the value.
         /// </summary>
         /// <returns>System.Object.</returns>
-        public object GetValue()
+        public virtual object GetValue()
         {
             return Value;
         }

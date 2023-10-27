@@ -1167,6 +1167,12 @@ namespace Radzen
             StateHasChanged();
         }
 
+        /// <inheritdoc />
+        public override object GetValue()
+        {
+            return internalValue;
+        }
+
         internal void UpdateSelectedItems(object item)
         {
             if (!string.IsNullOrEmpty(ValueProperty))
