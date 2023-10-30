@@ -226,8 +226,7 @@ namespace Radzen.Blazor
         /// <returns>ClassList.</returns>
         protected ClassList GetClassList(string className) => ClassList.Create(className)
                                                                        .AddDisabled(Disabled)
-                                                                       .Add(FieldIdentifier, EditContext)
-                                                                       .Add("rz-state-active", HasValue);
+                                                                       .Add(FieldIdentifier, EditContext);
 
         /// <summary> Provides support for RadzenFormField integration. </summary>
         [CascadingParameter]
@@ -278,7 +277,9 @@ namespace Radzen.Blazor
                 classes.Add("rz-state-active", Value);
             }
 
-            return $"{base.GetComponentCssClass()} {classes.ToString()} rz-{Enum.GetName(typeof(ButtonStyle), ToggleButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), ToggleShade).ToLowerInvariant()}";
+            var toggleStyle = Value ? $"rz-{Enum.GetName(typeof(ButtonStyle), ToggleButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), ToggleShade).ToLowerInvariant()}" : "";
+
+            return $"{base.GetComponentCssClass()} {classes.ToString()} {toggleStyle}";
         }
 
         /// <summary>
