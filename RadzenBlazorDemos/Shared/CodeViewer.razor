@@ -29,7 +29,7 @@
     </RadzenColumn>
 </RadzenRow>
 <RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
-    @error
+    @((MarkupString)error)
 </RadzenAlert>
 <Monaco Value=@source Language="@language" ValueChanged=@OnValueChanged @ref="@monaco" Style="border: var(--rz-border-disabled)" Disabled=@isBusy ReadOnly=@ReadOnly />
 @code {
@@ -63,20 +63,29 @@
     public string ComponentName { get; set; }
 
     string ComponentSourceHref => ComponentSource ?? $"https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/Radzen{ComponentName}.razor.cs";
+
+    string PageSourceHref => $"https://raw.githubusercontent.com/radzenhq/radzen-blazor/master/RadzenBlazorDemos/Pages/{PageName}";
     protected override async Task OnParametersSetAsync()
     {
         language = PageName == null ? "razor" :  PageName.EndsWith(".razor") ? "razor" : "csharp";
 
-        source = Value ?? await Fetch();
-
-        source = Clean(source);
+        try
+        {
+            error = null;
+            source = Value ?? await Fetch();
+            source = Clean(source);
+        }
+        catch (Exception ex)
+        {
+            error = $"<p>Cannot fetch the example source code: <code>{ex.Message}</code></p><p>Make sure your browser has access to <a href=\"{PageSourceHref}\" target=\"_blank\">{PageSourceHref}</a></p>";
+        }
     }
 
     async Task<string> Fetch()
     {
         using var http = new HttpClient();
 
-        return await http.GetStringAsync($"https://raw.githubusercontent.com/radzenhq/radzen-blazor/master/RadzenBlazorDemos/Pages/{PageName}");
+        return await http.GetStringAsync(PageSourceHref);
     }
 
     string Clean(string source)
