@@ -227,7 +227,7 @@ namespace Radzen.Blazor
         protected ClassList GetClassList(string className) => ClassList.Create(className)
                                                                        .AddDisabled(Disabled)
                                                                        .Add(FieldIdentifier, EditContext)
-                                                                       .Add("rz-state-empty", !HasValue);
+                                                                       .Add("rz-state-active", HasValue);
 
         /// <summary> Provides support for RadzenFormField integration. </summary>
         [CascadingParameter]
@@ -273,12 +273,26 @@ namespace Radzen.Blazor
         {
             var classes = GetClassList("rz-toggle-button");
 
-            if (!HasValue)
+            if (HasValue)
             {
-                classes.Add("rz-state-empty", Value);
+                classes.Add("rz-state-active", Value);
             }
 
-            return $"{base.GetComponentCssClass()} {classes.ToString()}";
+            return $"{base.GetComponentCssClass()} {classes.ToString()} rz-{Enum.GetName(typeof(ButtonStyle), ToggleButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), ToggleShade).ToLowerInvariant()}";
         }
+
+        /// <summary>
+        /// Gets or sets the ToggleButton style.
+        /// </summary>
+        /// <value>The ToggleButton style.</value>
+        [Parameter]
+        public ButtonStyle ToggleButtonStyle { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ToggleButton shade.
+        /// </summary>
+        /// <value>The ToggleButton shade.</value>
+        [Parameter]
+        public Shade ToggleShade { get; set; }
     }
 }
