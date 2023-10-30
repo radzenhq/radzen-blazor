@@ -1059,8 +1059,8 @@ window.Radzen = {
         }
     }, 500);
 
+    document.removeEventListener('keydown', Radzen.closePopupOrDialog);
     if (options.closeDialogOnEsc) {
-        document.removeEventListener('keydown', Radzen.closePopupOrDialog);
         document.addEventListener('keydown', Radzen.closePopupOrDialog);
     }
   },
