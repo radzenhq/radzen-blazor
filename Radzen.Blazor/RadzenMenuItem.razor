@@ -3,7 +3,7 @@
 @if (Visible)
 {
     <RadzenMenuItemWrapper Item="@this" @attributes="@Attributes" class="@GetCssClass()" style="@Style">
-    <div class="rz-navigation-item-wrapper" @attributes="getOpenEvents()">
+    <div class="rz-navigation-item-wrapper" @attributes="getOpenEvents()" @ref="@Element" id="@GetId()">
         @if (Path != null)
             {
                 <NavLink target="@Target" class="rz-navigation-item-link" href="@Path" Match="@Match">
