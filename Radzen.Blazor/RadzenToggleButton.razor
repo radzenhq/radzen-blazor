@@ -26,9 +26,9 @@
                 }
                 else
                 {
-                    @if (!string.IsNullOrEmpty(@Icon))
+                    @if (!string.IsNullOrEmpty(@getIcon()))
                     {
-                        <i class="rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
+                        <i class="rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)getIcon())</i>
                     }
                     @if (!string.IsNullOrEmpty(Image))
                     {

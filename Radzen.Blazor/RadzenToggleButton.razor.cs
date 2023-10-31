@@ -41,6 +41,18 @@ namespace Radzen.Blazor
         public string Placeholder { get; set; }
 
         /// <summary>
+        /// Gets or sets the toggle icon.
+        /// </summary>
+        /// <value>The toggle icon.</value>
+        [Parameter]
+        public string ToggleIcon { get; set; }
+
+        private string getIcon()
+        {
+            return Value ? ToggleIcon : Icon;
+        }
+
+        /// <summary>
         /// The form
         /// </summary>
         IRadzenForm _form;
