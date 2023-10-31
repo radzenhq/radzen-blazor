@@ -76,7 +76,7 @@ namespace Radzen
 
         private void UriHelper_OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
         {
-            if (dialogs.Count > 0)
+            while (dialogs.Any())
             {
                 Close();
             }
