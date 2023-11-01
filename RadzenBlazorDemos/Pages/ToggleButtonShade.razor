@@ -1,0 +1,26 @@
+@inject NotificationService NotificationService
+
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="2rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenToggleButton Shade="Shade.Lighter" ToggleShade="Shade.Default" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenToggleButton Shade="Shade.Light" ToggleShade="Shade.Dark" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenToggleButton ToggleShade="Shade.Darker" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenToggleButton Shade="Shade.Dark" ToggleShade="Shade.Default" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenToggleButton Shade="Shade.Darker" ToggleShade="Shade.Light" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+    </RadzenStack>
+
+    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3">Light and Dark button styles don't have Shades</RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenToggleButton Click=@(args => OnClick("Light button")) Text="Light" ButtonStyle="ButtonStyle.Light" ToggleButtonStyle="ButtonStyle.Dark" />
+        <RadzenToggleButton Click=@(args => OnClick("Dark button")) Text="Dark" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Light" />
+    </RadzenStack>
+</RadzenStack>
+
+
+
+@code {
+    private void OnClick(string text)
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "ToggleButton Clicked", Detail = text });
+    }
+}

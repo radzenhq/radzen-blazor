@@ -4,60 +4,56 @@
     ToggleButton
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
-    Demonstration and configuration of the Radzen Blazor <strong>ToggleButton</strong> component.
+    Radzen Blazor <strong>ToggleButton</strong> is a button that changes its appearance or color when activated and returns to its original state when deactivated.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+Toggle buttons are versatile and can be used for various purposes, including filtering. You could have toggle buttons for different categories or criteria, and users can activate or deactivate them to filter content based on their preferences. For example, if you have a list of items and each item belongs to a certain category, toggle buttons could be used to show or hide items from specific categories, creating a customized and dynamic filtering system.
 </RadzenText>
 
-<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
-    Bound ToggleButtons
+<RadzenText Anchor="toggle-button#bound-toggle-button" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Bound ToggleButton
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Binding Radzen ToggleButtons Value.
+    Binding Radzen ToggleButton's Value.
 </RadzenText>
 <RadzenExample ComponentName="ToggleButton" Example="ToggleButtonFilled">
     <ToggleButtonBound />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
-    Filled ToggleButtons
+<RadzenText Anchor="toggle-button#shade" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    ToggleButton Shade
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    These are the default Radzen ToggleButtons.
+    Use <code>ToggleButtonShade</code> to define the shade of the ToggleButton's toggled active state.
 </RadzenText>
-<RadzenExample ComponentName="ToggleButton" Example="ToggleButtonFilled">
-    <ToggleButtonFilled />
+<RadzenExample ComponentName="ToggleButton" Example="ToggleButtonShade">
+    <ToggleButtonShade />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
-    Flat ToggleButtons
+<RadzenText Anchor="toggle-button#style" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    ToggleButton Style
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Use <code>Variant="Variant.Flat"</code> for flat button variant.
+    Use <code>ToggleButtonStyle</code> to define the style of the ToggleButton's toggled active state.
 </RadzenText>
-<RadzenExample ComponentName="ToggleButton" Example="ToggleButtonFlat">
-    <ToggleButtonFlat />
+<RadzenExample ComponentName="ToggleButton" Example="ToggleButtonStyle">
+    <ToggleButtonStyle />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
-    Outlined ToggleButtons
+
+
+<RadzenText Anchor="toggle-button#variants" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    ToggleButton Variants
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Use <code>Variant="Variant.Outlined"</code> for outlined button variant.
+    Use <code>Variant</code> for different button variants.
 </RadzenText>
-<RadzenExample ComponentName="ToggleButton" Example="ToggleButtonOutlined">
-    <ToggleButtonOutlined />
+<RadzenExample ComponentName="ToggleButton" Example="ToggleButtonVariants">
+    <ToggleButtonVariants />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
-    Text ToggleButtons
-</RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Use <code>Variant="Variant.Text"</code> for text button variant.
-</RadzenText>
-<RadzenExample ComponentName="ToggleButton" Example="ToggleButtonText">
-    <ToggleButtonText />
-</RadzenExample>
 
-<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="toggle-button#content" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Content in ToggleButtons
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -67,7 +63,7 @@
     <ToggleButtonContent />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#button-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="toggle-button#sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     ToggleButton Sizes
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -77,17 +73,7 @@
     <ToggleButtonSizes />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#button-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
-    FAB
-</RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Floating action button.
-</RadzenText>
-<RadzenExample ComponentName="ToggleButton" Example="ToggleButtonFab">
-    <ToggleButtonFab />
-</RadzenExample>
-
-<RadzenText Anchor="buttons#button-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="toggle-button#disabled" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Disabled ToggleButton
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -95,14 +81,4 @@
 </RadzenText>
 <RadzenExample ComponentName="ToggleButton" Example="ToggleButtonDisabled">
     <ToggleButtonDisabled />
-</RadzenExample>
-
-<RadzenText Anchor="buttons#button-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
-    Busy button
-</RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Use <code>IsBusy="true"</code> to show the busy indicator.
-</RadzenText>
-<RadzenExample ComponentName="ToggleButton" Example="ToggleButtonBusy">
-    <ToggleButtonBusy />
 </RadzenExample>
