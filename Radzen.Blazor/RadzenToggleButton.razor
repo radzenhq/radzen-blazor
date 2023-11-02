@@ -1,0 +1,45 @@
+﻿@inherits RadzenButton
+
+@if (Visible)
+{
+    <button @ref="@Element" style="@Style" disabled="@IsDisabled"
+            type="@Enum.GetName(typeof(ButtonType), ButtonType).ToLower()"
+            @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
+            @onclick="@OnClick" tabindex="@(Disabled ? "-1" : $"{TabIndex}")">
+        <div class="rz-helper-hidden-accessible">
+            <input type="checkbox" name="@Name" id="@Name" checked="@Value" value="@(Value.ToString().ToLower())" tabindex="-1">
+        </div>
+        <span class="rz-button-box">
+            @if (ChildContent != null)
+            {
+                @ChildContent
+            }
+            else
+            {
+                @if (IsBusy)
+                {
+                    <RadzenIcon Icon="refresh" Style="animation: rotation 700ms linear infinite" />
+                    @if (!string.IsNullOrEmpty(BusyText))
+                    {
+                        <span class="rz-button-text">@BusyText</span>
+                    }
+                }
+                else
+                {
+                    @if (!string.IsNullOrEmpty(getIcon()))
+                    {
+                        <i class="rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)getIcon())</i>
+                    }
+                    @if (!string.IsNullOrEmpty(Image))
+                    {
+                        <img class="rz-button-icon-left rzi" src="@Image" />
+                    }
+                    @if (!string.IsNullOrEmpty(Text))
+                    {
+                        <span class="rz-button-text">@Text</span>
+                    }
+                }
+            }
+        </span>
+    </button>
+}

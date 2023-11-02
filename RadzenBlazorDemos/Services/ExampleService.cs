@@ -905,7 +905,15 @@ namespace RadzenBlazorDemos
                     Name = "Button",
                     Title = "Blazor Button component",
                     Path = "button",
-                    Icon = "&#xe86d"
+                    Icon = "&#xf1c1"
+                },
+                new Example()
+                {
+                    Name = "ToggleButton",
+                    Title = "Blazor ToggleButton component",
+                    Path = "toggle-button",
+                    Icon = "&#xe8e0",
+                    Tags = new [] { "button", "switch", "toggle" }
                 },
                 new Example()
                 {
@@ -1132,7 +1140,7 @@ namespace RadzenBlazorDemos
                     Name = "Switch",
                     Path = "switch",
                     Title = "Blazor switch component",
-                    Icon = "&#xe8e0",
+                    Icon = "&#xe9f6",
                     Tags = new [] { "form", "edit", "switch" }
                 },
                 new Example()

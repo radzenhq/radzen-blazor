@@ -1,0 +1,18 @@
+@inject NotificationService NotificationService
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
+    <RadzenToggleButton Click=@(args => OnClick("Primary icon button")) Icon="add_circle_outline" ToggleIcon="add_circle" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Light" ToggleShade="Shade.Dark" />
+    <RadzenToggleButton Click=@(args => OnClick("Primary button with text and icon")) Text="Add New" Icon="add_circle_outline" ToggleIcon="add_circle" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Light" ToggleShade="Shade.Dark" />
+    <RadzenToggleButton Click=@(args => OnClick("ToggleButton with image")) Image="images/radzen-nuget.png" ButtonStyle="ButtonStyle.Light" Shade="Shade.Light" ToggleShade="Shade.Dark" />
+    <RadzenToggleButton Click=@(args => OnClick("ToggleButton with content")) Image="images/radzen-nuget.png" ButtonStyle="ButtonStyle.Light" Shade="Shade.Light" ToggleShade="Shade.Dark">
+        <span class="rz-button-text">ToggleButton with content</span>
+        <RadzenImage Path="images/radzen-nuget.png" Style="width: 20px; height: 20px; margin-left: 8px;" />
+    </RadzenToggleButton>
+</RadzenStack>
+
+@code {
+    private void OnClick(string text)
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "ToggleButton Clicked", Detail = text });
+    }
+}

@@ -1,0 +1,17 @@
+﻿@inject NotificationService NotificationService
+
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
+    <RadzenToggleButton Click=@(args => OnClick("Large ToggleButton")) Text="Large" Size="ButtonSize.Large" Shade="Shade.Light" ToggleShade="Shade.Darker" />
+    <RadzenToggleButton Click=@(args => OnClick("Medium ToggleButton")) Text="Medium" Size="ButtonSize.Medium" Shade="Shade.Light" ToggleShade="Shade.Darker" />
+    <RadzenToggleButton Click=@(args => OnClick("Small ToggleButton")) Text="Small" Size="ButtonSize.Small" Shade="Shade.Light" ToggleShade="Shade.Darker" />
+    <RadzenToggleButton Click=@(args => OnClick("Extra Small ToggleButton")) Text="ExtraSmall" Size="ButtonSize.ExtraSmall" Shade="Shade.Light" ToggleShade="Shade.Darker" />
+</RadzenStack>
+
+
+@code {
+    private void OnClick(string text)
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "ToggleButton Clicked", Detail = text });
+    }
+}
