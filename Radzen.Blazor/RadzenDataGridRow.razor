@@ -1,6 +1,8 @@
 @using Microsoft.AspNetCore.Components.Forms
 @typeparam TItem
 @implements IRadzenForm
+ <CascadingValue Value=@EditContext>
+    <CascadingValue Value=this>
 @{var rowArgs = Grid?.RowAttributes(Item); }
 @{var firstLevel = Grid.AllowCompositeDataCells ? 0 : Grid.deepestChildColumnLevel; }
 @for(var i = firstLevel; i < Grid.deepestChildColumnLevel + 1; i++)
@@ -64,67 +66,7 @@
                 Grid.rowSpans.Add(j, (int)Convert.ChangeType(rowspan, TypeCode.Int32));
             }
 
-            <RadzenDataGridCell Row=@this EditContext=EditContext RowIndex="@i" Grid="@this.Grid" Item="@Item" Column="@column"
-                                Style="@column.GetStyle(true)" CssClass="@(column.CssClass + " " + Grid.getFrozenColumnClass(column, Columns) + " " + Grid.getCompositeCellCSSClass(column))" Attributes="@(cellAttr)">
-                @if (Grid.Responsive)
-                {
-                    <span class="rz-column-title">
-                        @if (column.HeaderTemplate != null)
-                        {
-                            @column.HeaderTemplate
-                        }
-                        else
-                        {
-                            @column.GetTitle()
-                        }
-                    </span>
-                }
-                @if (Grid.LoadChildData.HasDelegate && Grid.ShowExpandColumn && Grid.allColumns.IndexOf(column) == 0)
-                {
-                    <span class="rz-cell-toggle">
-                        <a class="@(getExpandIconCssClass())" style="@(getExpandIconStyle(rowArgs.Item1.Expandable))" href="javascript:void(0)" @onclick="@(_ => Grid.ExpandItem(Item))" @onclick:stopPropagation>
-                            <span class="@(Grid.ExpandedItemStyle(Item))"></span>
-                        </a>
-                        <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
-                            @if (Item != null)
-                            {
-                                @if (Grid.IsRowInEditMode(Item) && column.EditTemplate != null)
-                                {
-                                    @column.EditTemplate(Item)
-                                }
-                                else if (column.Template != null)
-                                {
-                                    @column.Template(Item)
-                                }
-                                else
-                                {
-                                    @column.GetValue(Item)
-                                }
-                            }
-                        </span>
-                    </span>
-                }
-                else
-                {
-                <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
-                    @if (Item != null)
-                    {
-                        @if (Grid.IsRowInEditMode(Item) && column.EditTemplate != null)
-                        {
-                            @column.EditTemplate(Item)
-                        }
-                        else if (column.Template != null)
-                        {
-                            @column.Template(Item)
-                        }
-                        else
-                        {
-                            @column.GetValue(Item)
-                        }
-                    }
-                </span>
-                }
-            </RadzenDataGridCell>
+            @Grid.RenderCell(column, Item, cellAttr, rowArgs, i);
         }
 
 </tr>
@@ -157,6 +99,8 @@
         </tr>
     }
 }
+    </CascadingValue>
+</CascadingValue>
 @code {
         [Parameter]
         public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
@@ -202,49 +146,18 @@
             components?.Remove(component);
         }
 
-    public override Task SetParametersAsync(ParameterView parameters)
-    {
-        if (InEditMode != parameters.GetValueOrDefault<bool>("InEditMode"))
+        public override Task SetParametersAsync(ParameterView parameters)
         {
-            components = new List<IRadzenFormComponent>();
+            if (InEditMode != parameters.GetValueOrDefault<bool>("InEditMode"))
+            {
+                components = new List<IRadzenFormComponent>();
+            }
+
+            return base.SetParametersAsync(parameters);
         }
 
-        return base.SetParametersAsync(parameters);
-    }
-
-    public IRadzenFormComponent FindComponent(string name)
-    {
-        return components.Where(component => component.Name == name).FirstOrDefault();
-    }
-
-    internal string getExpandIconStyle(bool expandable)
-    {
-        var rules = new List<string>();
-
-        if (!expandable)
+        public IRadzenFormComponent FindComponent(string name)
         {
-            rules.Add("visibility:hidden");
+            return components.Where(component => component.Name == name).FirstOrDefault();
         }
-
-        var child = Grid.childData.Any() ? Grid.childData.Where(c => c.Value?.Data?.Contains(Item) == true).FirstOrDefault() :
-            default(KeyValuePair<TItem, DataGridChildData<TItem>>);
-
-        var level = !object.Equals(child, default(KeyValuePair<TItem, DataGridChildData<TItem>>)) ? child.Value.Level : 0;
-        if (level > 0)
-        {
-            rules.Add($"margin-left: {level}rem");
-        }
-
-        return string.Join(';', rules);
-    }
-
-    internal string getExpandIconCssClass()
-    {
-        var child = Grid.childData.Any() ? Grid.childData.Where(c => c.Value?.Data?.Contains(Item) == true).FirstOrDefault() :
-            default(KeyValuePair<TItem, DataGridChildData<TItem>>);
-
-        var level = !object.Equals(child, default(KeyValuePair<TItem, DataGridChildData<TItem>>)) ? child.Value.Level : 0;
-
-        return $"rz-cell-toggle-level{level}";
-    }
 }
