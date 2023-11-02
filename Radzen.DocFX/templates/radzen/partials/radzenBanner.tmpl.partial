@@ -1,7 +1,7 @@
 <div class="row radzen-banner">
   <div class="col-12 col-lg-6 text-left">
     <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
-    <p>Radzen Blazor Studio is a desktop tool that empowers <strong>developers</strong> to create beautiful business Blazor apps. Develop your <strong>Blazor Server</strong> and <strong>WebAssembly</strong> applications visually with familiar <strong>WYSIWYG</strong> interface.</p>
+    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
     <p><a href="https://www.radzen.com/blazor-studio/" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
   </div>
   <div class="col-12 col-lg-6 text-right visible-lg">
