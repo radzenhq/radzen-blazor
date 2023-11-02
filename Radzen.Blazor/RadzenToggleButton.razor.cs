@@ -309,6 +309,6 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The ToggleButton shade.</value>
         [Parameter]
-        public Shade ToggleShade { get; set; }
+        public Shade ToggleShade { get; set; } = Shade.Default;
     }
 }
