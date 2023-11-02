@@ -60,6 +60,25 @@ namespace Radzen.Blazor
         [Parameter]
         public string FilterPlaceholder { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Gets or sets the <c>id</c> attribute value of the <c>RadzenDropDown</c> component's <c>input</c> element.
+        /// </summary>
+        /// <remarks>Form fields should be linked to their labels through the <c>input</c>'s <c>id</c> attribute and
+        /// the label's <c>for</c> attribute. The <c>Component</c> parameter of a <c>RadnzenLabel</c> should match the
+        /// <c>id</c> attribute of the <c>input</c> element it labels.</remarks>
+        /// <example>
+        /// For example:
+        /// <code>
+        /// <RadzenLabel Component="myInput" />
+        /// <RadzenDropDown InputId="myInput" />
+        /// </code>
+        /// This links the label with the input through the <c>Component</c> parameter and the <c>InputId</c> parameter.
+        /// results in <c>p</c>'s having the value (2,8).
+        /// </example>
+        /// <see href="https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/for" />
+        /// <value>The <c>id</c> attribute value of the <c>RadzenDropDown</c> component's <c>input</c> element.</value>
+        public string InputId { get; set; } = null;
+        
         private async Task OnFocus(Microsoft.AspNetCore.Components.Web.FocusEventArgs args)
         {
             if (OpenOnFocus)
