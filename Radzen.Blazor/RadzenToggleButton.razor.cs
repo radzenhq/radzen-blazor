@@ -291,7 +291,7 @@ namespace Radzen.Blazor
 
             var toggleStyle = Value ? $"rz-{Enum.GetName(typeof(ButtonStyle), ToggleButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), ToggleShade).ToLowerInvariant()}" : "";
 
-            return $"{base.GetComponentCssClass()} {classes.ToString()} {toggleStyle}";
+            return $"{(HasValue ? base.GetComponentCssClass().Replace("rz-shade-default", "") : base.GetComponentCssClass())} {classes.ToString()} {toggleStyle}";
         }
 
         /// <summary>
