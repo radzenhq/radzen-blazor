@@ -49,7 +49,7 @@ namespace Radzen.Blazor
 
         private string getIcon()
         {
-            return Value ? ToggleIcon : Icon;
+            return Value && !string.IsNullOrEmpty(ToggleIcon) ? ToggleIcon : Icon;
         }
 
         /// <summary>
