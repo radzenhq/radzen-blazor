@@ -15,7 +15,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenButton : RadzenComponent
     {
-        private string getButtonSize()
+        internal string getButtonSize()
         {
             return Size == ButtonSize.Medium ? "md" : Size == ButtonSize.Large ? "lg" : Size == ButtonSize.Small ? "sm" : "xs";
         }

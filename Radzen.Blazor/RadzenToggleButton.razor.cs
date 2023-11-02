@@ -283,23 +283,18 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             var classes = GetClassList("rz-toggle-button");
-            var baseClasses = base.GetComponentCssClass();
-
-            var buttonStyle = $"rz-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLowerInvariant()}";
-            var toggleStyle = Value ? $"rz-{Enum.GetName(typeof(ButtonStyle), ToggleButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), ToggleShade).ToLowerInvariant()}" : "";
 
             if (HasValue)
             {
                 classes.Add("rz-state-active", Value);
-                baseClasses = baseClasses.Replace(buttonStyle, "");
-
-                if (Shade == Shade.Default)
-                {
-                    baseClasses = baseClasses.Replace("rz-shade-default", "");
-                }
             }
 
-            return $"{baseClasses} {classes.ToString()} {toggleStyle}";
+            var baseClasses = HasValue ?
+                $"rz-button rz-button-{getButtonSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(ButtonStyle), ToggleButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), ToggleShade).ToLowerInvariant()}{(IsDisabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}" :
+            $"rz-button rz-button-{getButtonSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()}{(IsDisabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}";
+
+
+            return $"{baseClasses} {classes.ToString()}";
         }
 
         /// <summary>
