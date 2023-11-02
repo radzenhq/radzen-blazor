@@ -289,9 +289,11 @@ namespace Radzen.Blazor
                 classes.Add("rz-state-active", Value);
             }
 
+            var buttonStyle = $"rz-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLowerInvariant()}";
+
             var toggleStyle = Value ? $"rz-{Enum.GetName(typeof(ButtonStyle), ToggleButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), ToggleShade).ToLowerInvariant()}" : "";
 
-            return $"{(HasValue ? base.GetComponentCssClass().Replace("rz-shade-default", "") : base.GetComponentCssClass())} {classes.ToString()} {toggleStyle}";
+            return $"{(HasValue ? base.GetComponentCssClass().Replace("rz-shade-default", "").Replace(buttonStyle, "") : base.GetComponentCssClass())} {classes.ToString()} {toggleStyle}";
         }
 
         /// <summary>
