@@ -589,7 +589,7 @@ namespace Radzen
         /// </summary>
         /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.KeyboardEventArgs"/> instance containing the event data.</param>
         /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
-        private async System.Threading.Tasks.Task HandleKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args, bool isFilter = false)
+        protected virtual async System.Threading.Tasks.Task HandleKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args, bool isFilter = false)
         {
             if (Disabled)
                 return;
@@ -741,7 +741,7 @@ namespace Radzen
         /// Handles the <see cref="E:KeyPress" /> event.
         /// </summary>
         /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.KeyboardEventArgs"/> instance containing the event data.</param>
-        protected async System.Threading.Tasks.Task OnKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
+        protected virtual async System.Threading.Tasks.Task OnKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
         {
             await HandleKeyPress(args);
         }

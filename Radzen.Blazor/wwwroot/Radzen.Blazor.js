@@ -482,6 +482,50 @@ window.Radzen = {
     }
 
     return ul.nextSelectedIndex;
+    },
+  focusTableRow: function (gridId, isDown, startIndex) {
+    var grid = document.getElementById(gridId);
+    if (!grid) return;
+
+    var table = grid.querySelector('.rz-grid-table').getElementsByTagName("tbody")[0];
+
+    if (!table.rows || table.rows.length == 0) return;
+
+    if (startIndex == undefined || startIndex == null) {
+      startIndex = -1;
+    }
+
+    table.nextSelectedIndex = startIndex;
+    if (isDown) {
+        while (table.nextSelectedIndex < table.rows.length - 1) {
+            table.nextSelectedIndex++;
+            if (!table.rows[table.nextSelectedIndex].classList.contains('rz-state-disabled'))
+                break;
+        }
+    } else {
+        while (table.nextSelectedIndex > 0) {
+            table.nextSelectedIndex--;
+            if (!table.rows[table.nextSelectedIndex].classList.contains('rz-state-disabled'))
+                break;
+        }
+    }
+
+    var highlighted = table.querySelectorAll('.rz-state-highlight');
+    if (highlighted.length) {
+      for (var i = 0; i < highlighted.length; i++) {
+        highlighted[i].classList.remove('rz-state-highlight');
+      }
+    }
+
+    if (
+      table.nextSelectedIndex >= 0 &&
+      table.nextSelectedIndex <= table.rows.length - 1
+    ) {
+      table.rows[table.nextSelectedIndex].classList.add('rz-state-highlight');
+      table.parentNode.parentNode.scrollTop = table.rows[table.nextSelectedIndex].offsetTop - table.rows[table.nextSelectedIndex].offsetHeight;
+    }
+
+    return table.nextSelectedIndex;
   },
   uploadInputChange: function (e, url, auto, multiple, clear, parameterName) {
       if (auto) {

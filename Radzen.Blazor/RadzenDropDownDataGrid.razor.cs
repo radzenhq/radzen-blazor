@@ -600,38 +600,37 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-
         string previousSearch;
 
-        /// <summary>
-        /// Handles the <see cref="E:FilterKeyPress" /> event.
-        /// </summary>
-        /// <param name="args">The <see cref="KeyboardEventArgs"/> instance containing the event data.</param>
-        protected override async Task OnFilterKeyPress(KeyboardEventArgs args)
+        /// <inheritdoc />
+        protected override async Task HandleKeyPress(KeyboardEventArgs args, bool isFilter)
         {
             var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (pagedData != null ? pagedData : Enumerable.Empty<object>())).OfType<object>().ToList();
 
             var key = args.Code != null ? args.Code : args.Key;
 
-            if (key == "ArrowDown" || key == "ArrowUp")
+            if (!args.AltKey && (key == "ArrowDown" || key == "ArrowLeft" || key == "ArrowUp" || key == "ArrowRight"))
             {
                 try
                 {
-                    if (key == "ArrowDown" && selectedIndex < items.Count - 1)
+                    var currentViewIndex = Multiple ? selectedIndex : items.IndexOf(selectedItem);
+
+                    var newSelectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusTableRow", grid.UniqueID, key == "ArrowDown" || key == "ArrowRight", currentViewIndex);
+
+                    var item = items.ElementAtOrDefault(newSelectedIndex);
+
+                    if (!Multiple)
                     {
-                        selectedIndex++;
+                        if (newSelectedIndex != currentViewIndex && newSelectedIndex >= 0 && newSelectedIndex <= items.Count() - 1)
+                        {
+                            selectedIndex = newSelectedIndex;
+                            await grid.OnRowSelect(item, false);
+                            await OnSelectItem(item, true);
+                        }
                     }
-
-                    if (key == "ArrowUp" && selectedIndex > 0)
+                    else
                     {
-                        selectedIndex--;
-                    }
-
-                    var item = items.ElementAtOrDefault(selectedIndex);
-
-                    if (item != null && (!Multiple ? selectedItem != item : true))
-                    {
-                        await grid.OnRowSelect(item, false);
+                        selectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusTableRow", grid.UniqueID, key == "ArrowDown", currentViewIndex);
                     }
                 }
                 catch (Exception)
@@ -639,19 +638,35 @@ namespace Radzen.Blazor
                     //
                 }
             }
-            else if (key == "Enter")
+            else if (Multiple && key == "Enter")
             {
-                var item = items.ElementAtOrDefault(selectedIndex);
-                if (item != null && (!Multiple ? selectedItem != item : true))
+                if (selectedIndex >= 0 && selectedIndex <= items.Count() - 1)
                 {
-                    await OnRowSelect(item);
+                    await OnSelectItem(items.ElementAt(selectedIndex), true);
                 }
             }
-            else if (key == "Escape")
+            else if (key == "Enter" || (args.AltKey && key == "ArrowDown"))
+            {
+                await OpenPopup(key, isFilter);
+            }
+            else if (key == "Escape" || key == "Tab")
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
-            else if(FilterAsYouType)
+            else if (key == "Delete" && AllowClear)
+            {
+                if (!Multiple && selectedItem != null)
+                {
+                    selectedIndex = -1;
+                    await OnSelectItem(null, true);
+                }
+
+                if (AllowFiltering && isFilter)
+                {
+                    Debounce(DebounceFilter, FilterDelay);
+                }
+            }
+            else if (AllowFiltering && isFilter && FilterAsYouType)
             {
                 selectedIndex = -1;
                 Debounce(DebounceFilter, FilterDelay);
