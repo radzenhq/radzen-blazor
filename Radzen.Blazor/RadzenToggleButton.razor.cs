@@ -284,15 +284,12 @@ namespace Radzen.Blazor
         {
             var classes = GetClassList("rz-toggle-button");
 
-            var shade = ToggleShade;
-
             if (HasValue)
             {
                 classes.Add("rz-state-active", Value);
-                shade = Shade.Darker;
             }
 
-            var toggleStyle = Value ? $"rz-{Enum.GetName(typeof(ButtonStyle), ToggleButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), shade).ToLowerInvariant()}" : "";
+            var toggleStyle = Value ? $"rz-{Enum.GetName(typeof(ButtonStyle), ToggleButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), ToggleShade).ToLowerInvariant()}" : "";
 
             return $"{base.GetComponentCssClass()} {classes.ToString()} {toggleStyle}";
         }
@@ -309,6 +306,6 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The ToggleButton shade.</value>
         [Parameter]
-        public Shade ToggleShade { get; set; } = Shade.Default;
+        public Shade ToggleShade { get; set; } = Shade.Darker;
     }
 }
