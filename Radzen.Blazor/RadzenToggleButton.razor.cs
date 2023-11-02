@@ -283,17 +283,23 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             var classes = GetClassList("rz-toggle-button");
+            var baseClasses = base.GetComponentCssClass();
+
+            var buttonStyle = $"rz-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLowerInvariant()}";
+            var toggleStyle = Value ? $"rz-{Enum.GetName(typeof(ButtonStyle), ToggleButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), ToggleShade).ToLowerInvariant()}" : "";
 
             if (HasValue)
             {
                 classes.Add("rz-state-active", Value);
+                baseClasses = baseClasses.Replace(buttonStyle, "");
+
+                if (Shade == Shade.Default)
+                {
+                    baseClasses = baseClasses.Replace("rz-shade-default", "");
+                }
             }
 
-            var buttonStyle = $"rz-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLowerInvariant()}";
-
-            var toggleStyle = Value ? $"rz-{Enum.GetName(typeof(ButtonStyle), ToggleButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), ToggleShade).ToLowerInvariant()}" : "";
-
-            return $"{(HasValue ? base.GetComponentCssClass().Replace("rz-shade-default", "").Replace(buttonStyle, "") : base.GetComponentCssClass())} {classes.ToString()} {toggleStyle}";
+            return $"{baseClasses} {classes.ToString()} {toggleStyle}";
         }
 
         /// <summary>
