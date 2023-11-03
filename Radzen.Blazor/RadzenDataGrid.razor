@@ -419,3 +419,356 @@
         }
     </div>
 }
+@code {
+        internal RenderFragment RenderCell(RadzenDataGridColumn<TItem> column, TItem Item, IReadOnlyDictionary<string, object> Attributes, Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> rowArgs, int RowIndex)
+        {
+            return __builder => {
+            <text>
+            @if (this.AllowCompositeDataCells ? RowIndex == column.GetLevel() : (column.Parent != null && RowIndex == column.GetLevel() || column.Columns == null))
+            {
+                <td rowspan="@(column.GetRowSpan(true))" colspan="@(column.GetColSpan(true))" @attributes="@Attributes" style="@GetCellStyle(column, Attributes)" class="@GetCellCssClass(column, Attributes)" @onclick="args => OnClick(column, Item, args)" @ondblclick="args => OnDblClick(column, Item, args)" @oncontextmenu="args => OnContextMenu(column, Item, args)" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate">
+                    @if (this.Responsive)
+                    {
+                        <span class="rz-column-title">
+                            @if (column.HeaderTemplate != null)
+                            {
+                                @column.HeaderTemplate
+                            }
+                            else
+                            {
+                                @column.GetTitle()
+                            }
+                        </span>
+                    }
+                    @if (this.LoadChildData.HasDelegate && this.ShowExpandColumn && this.allColumns.IndexOf(column) == 0)
+                    {
+                        <span class="rz-cell-toggle">
+                            <a class="@(getExpandIconCssClass(this, Item))" style="@(getExpandIconStyle(this, Item, rowArgs.Item1.Expandable))" href="javascript:void(0)" @onclick="_ => this.ExpandItem(Item)" @onclick:stopPropagation>
+                                <span class="@(this.ExpandedItemStyle(Item))"></span>
+                            </a>
+                            <span class="rz-cell-data" title="@(column.Template == null ? column.GetValue(Item) : "")">
+                                @if (Item != null)
+                                {
+                                    @if (this.IsRowInEditMode(Item) && column.EditTemplate != null)
+                                    {
+                                        @column.EditTemplate(Item)
+                                    }
+                                    else if (column.Template != null)
+                                    {
+                                        @column.Template(Item)
+                                    }
+                                    else
+                                    {
+                                        @column.GetValue(Item)
+                                    }
+                                }
+                            </span>
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="rz-cell-data" title="@(column.Template == null && this.ShowCellDataAsTooltip ? column.GetValue(Item) : "")">
+                            @if (Item != null)
+                            {
+                                @if (this.IsRowInEditMode(Item) && column.EditTemplate != null)
+                                {
+                                    @column.EditTemplate(Item)
+                                }
+                                else if (column.Template != null)
+                                {
+                                    @column.Template(Item)
+                                }
+                                else
+                                {
+                                    @column.GetValue(Item)
+                                }
+                            }
+                        </span>
+                    }
+                </td>
+            }
+            else
+            {
+                @foreach (var c in this.childColumns.Where(c => c.GetVisible() && c.Parent == column))
+                {
+                    
+                    @RenderCell(c, Item, Attributes, rowArgs, RowIndex)
+                    
+                }
+            }
+        </text>
+        };
+    }
+
+    string GetCellStyle(RadzenDataGridColumn<TItem> column, IReadOnlyDictionary<string, object> Attributes)
+    {
+        var columnStyle = column.GetStyle(true);
+
+        if (Attributes != null && Attributes.TryGetValue("style", out var style) == true && !string.IsNullOrEmpty(Convert.ToString(style)))
+        {
+            return String.IsNullOrEmpty(columnStyle) ? $"{style}" : $"{columnStyle.TrimEnd(';')};{style}";
+        }
+
+        return columnStyle;
+    }
+
+    string GetCellCssClass(RadzenDataGridColumn<TItem> column, IReadOnlyDictionary<string, object> Attributes)
+    {
+        var CssClass = column.CssClass + " " + getFrozenColumnClass(column, columns.Where(c => c.GetVisible()).ToList()) + " " + getCompositeCellCSSClass(column);
+
+        if (Attributes != null && Attributes.TryGetValue("class", out var @class) && !string.IsNullOrEmpty(Convert.ToString(@class)))
+        {
+            return $"{CssClass} {@class}".Trim();
+        }
+
+        return String.IsNullOrWhiteSpace(CssClass) ? null : CssClass;
+    }
+
+
+    async Task OnContextMenu(RadzenDataGridColumn<TItem> Column, TItem Item, MouseEventArgs args)
+    {
+#if NET5_0_OR_GREATER
+        await OnCellContextMenu(new DataGridCellMouseEventArgs<TItem>
+        {
+            Data = Item,
+            AltKey = args.AltKey,
+            Button = args.Button,
+            Buttons = args.Buttons,
+            ClientX = args.ClientX,
+            ClientY = args.ClientY,
+            CtrlKey = args.CtrlKey,
+            Detail = args.Detail,
+            MetaKey = args.MetaKey,
+            OffsetX = args.OffsetX,
+            OffsetY = args.OffsetY,
+            ScreenX = args.ScreenX,
+            ScreenY = args.ScreenY,
+            ShiftKey = args.ShiftKey,
+            Type = args.Type,
+            Column = Column
+        });
+#else
+        await OnCellContextMenu(new DataGridCellMouseEventArgs<TItem>
+        {
+            Data = Item,
+            AltKey = args.AltKey,
+            Button = args.Button,
+            Buttons = args.Buttons,
+            ClientX = args.ClientX,
+            ClientY = args.ClientY,
+            CtrlKey = args.CtrlKey,
+            Detail = args.Detail,
+            MetaKey = args.MetaKey,
+            ScreenX = args.ScreenX,
+            ScreenY = args.ScreenY,
+            ShiftKey = args.ShiftKey,
+            Type = args.Type,
+            Column = Column
+        });
+#endif
+    }
+
+    bool clicking;
+    async Task OnClick(RadzenDataGridColumn<TItem> Column, TItem Item, MouseEventArgs args)
+    {
+        if (clicking)
+        {
+            return;
+        }
+        try
+        {
+            clicking = true;
+#if NET5_0_OR_GREATER
+        await OnCellClick(new DataGridCellMouseEventArgs<TItem>
+        {
+            Data = Item,
+            AltKey = args.AltKey,
+            Button = args.Button,
+            Buttons = args.Buttons,
+            ClientX = args.ClientX,
+            ClientY = args.ClientY,
+            CtrlKey = args.CtrlKey,
+            Detail = args.Detail,
+            MetaKey = args.MetaKey,
+            OffsetX = args.OffsetX,
+            OffsetY = args.OffsetY,
+            ScreenX = args.ScreenX,
+            ScreenY = args.ScreenY,
+            ShiftKey = args.ShiftKey,
+            Type = args.Type,
+            Column = Column
+        });
+#else
+        await OnCellClick(new DataGridCellMouseEventArgs<TItem>
+        {
+            Data = Item,
+            AltKey = args.AltKey,
+            Button = args.Button,
+            Buttons = args.Buttons,
+            ClientX = args.ClientX,
+            ClientY = args.ClientY,
+            CtrlKey = args.CtrlKey,
+            Detail = args.Detail,
+            MetaKey = args.MetaKey,
+            ScreenX = args.ScreenX,
+            ScreenY = args.ScreenY,
+            ShiftKey = args.ShiftKey,
+            Type = args.Type,
+            Column = Column
+        });
+#endif
+#if NET5_0_OR_GREATER
+        await OnRowClick(new DataGridRowMouseEventArgs<TItem>
+        {
+            Data = Item,
+            AltKey = args.AltKey,
+            Button = args.Button,
+            Buttons = args.Buttons,
+            ClientX = args.ClientX,
+            ClientY = args.ClientY,
+            CtrlKey = args.CtrlKey,
+            Detail = args.Detail,
+            MetaKey = args.MetaKey,
+            OffsetX = args.OffsetX,
+            OffsetY = args.OffsetY,
+            ScreenX = args.ScreenX,
+            ScreenY = args.ScreenY,
+            ShiftKey = args.ShiftKey,
+            Type = args.Type
+        });
+#else
+        await OnRowClick(new DataGridRowMouseEventArgs<TItem>
+        {
+            Data = Item,
+            AltKey = args.AltKey,
+            Button = args.Button,
+            Buttons = args.Buttons,
+            ClientX = args.ClientX,
+            ClientY = args.ClientY,
+            CtrlKey = args.CtrlKey,
+            Detail = args.Detail,
+            MetaKey = args.MetaKey,
+            ScreenX = args.ScreenX,
+            ScreenY = args.ScreenY,
+            ShiftKey = args.ShiftKey,
+            Type = args.Type
+        });
+#endif
+        }
+        finally
+        {
+            clicking = false;
+        }
+    }
+
+    async Task OnDblClick(RadzenDataGridColumn<TItem> Column, TItem Item, MouseEventArgs args)
+    {
+#if NET5_0_OR_GREATER
+        await OnCellDblClick(new DataGridCellMouseEventArgs<TItem>
+        {
+            Data = Item,
+            AltKey = args.AltKey,
+            Button = args.Button,
+            Buttons = args.Buttons,
+            ClientX = args.ClientX,
+            ClientY = args.ClientY,
+            CtrlKey = args.CtrlKey,
+            Detail = args.Detail,
+            MetaKey = args.MetaKey,
+            OffsetX = args.OffsetX,
+            OffsetY = args.OffsetY,
+            ScreenX = args.ScreenX,
+            ScreenY = args.ScreenY,
+            ShiftKey = args.ShiftKey,
+            Type = args.Type,
+            Column = Column
+        });
+#else
+            await OnCellDblClick(new DataGridCellMouseEventArgs<TItem>
+            {
+                Data = Item,
+                AltKey = args.AltKey,
+                Button = args.Button,
+                Buttons = args.Buttons,
+                ClientX = args.ClientX,
+                ClientY = args.ClientY,
+                CtrlKey = args.CtrlKey,
+                Detail = args.Detail,
+                MetaKey = args.MetaKey,
+                ScreenX = args.ScreenX,
+                ScreenY = args.ScreenY,
+                ShiftKey = args.ShiftKey,
+                Type = args.Type,
+                Column = Column
+            });
+#endif
+#if NET5_0_OR_GREATER
+        await OnRowDblClick(new DataGridRowMouseEventArgs<TItem>
+        {
+            Data = Item,
+            AltKey = args.AltKey,
+            Button = args.Button,
+            Buttons = args.Buttons,
+            ClientX = args.ClientX,
+            ClientY = args.ClientY,
+            CtrlKey = args.CtrlKey,
+            Detail = args.Detail,
+            MetaKey = args.MetaKey,
+            OffsetX = args.OffsetX,
+            OffsetY = args.OffsetY,
+            ScreenX = args.ScreenX,
+            ScreenY = args.ScreenY,
+            ShiftKey = args.ShiftKey,
+            Type = args.Type
+        });
+#else
+        await OnRowDblClick(new DataGridRowMouseEventArgs<TItem>
+        {
+            Data = Item,
+            AltKey = args.AltKey,
+            Button = args.Button,
+            Buttons = args.Buttons,
+            ClientX = args.ClientX,
+            ClientY = args.ClientY,
+            CtrlKey = args.CtrlKey,
+            Detail = args.Detail,
+            MetaKey = args.MetaKey,
+            ScreenX = args.ScreenX,
+            ScreenY = args.ScreenY,
+            ShiftKey = args.ShiftKey,
+            Type = args.Type
+        });
+#endif
+    }
+
+    static string getExpandIconStyle(RadzenDataGrid<TItem> Grid, TItem Item, bool expandable)
+    {
+        var rules = new List<string>();
+
+        if (!expandable)
+        {
+            rules.Add("visibility:hidden");
+        }
+
+        var child = Grid.childData.Any() ? Grid.childData.Where(c => c.Value?.Data?.Contains(Item) == true).FirstOrDefault() :
+            default(KeyValuePair<TItem, DataGridChildData<TItem>>);
+
+        var level = !object.Equals(child, default(KeyValuePair<TItem, DataGridChildData<TItem>>)) ? child.Value.Level : 0;
+        if (level > 0)
+        {
+            rules.Add($"margin-left: {level}rem");
+        }
+
+        return string.Join(';', rules);
+    }
+
+    static string getExpandIconCssClass(RadzenDataGrid<TItem> Grid, TItem Item)
+    {
+        var child = Grid.childData.Any() ? Grid.childData.Where(c => c.Value?.Data?.Contains(Item) == true).FirstOrDefault() :
+            default(KeyValuePair<TItem, DataGridChildData<TItem>>);
+
+        var level = !object.Equals(child, default(KeyValuePair<TItem, DataGridChildData<TItem>>)) ? child.Value.Level : 0;
+
+        return $"rz-cell-toggle-level{level}";
+    }
+}
