@@ -105,7 +105,11 @@ namespace Radzen.Blazor
             }
         }
 
-        RadzenTabsItem SelectedTab
+        /// <summary>
+        /// Gets the currently selected RadzenTabsItem based on the selectedIndex.
+        /// </summary>
+
+        public RadzenTabsItem SelectedTab
         {
             get
             {
