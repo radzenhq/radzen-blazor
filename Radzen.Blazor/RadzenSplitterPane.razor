@@ -9,7 +9,7 @@
     </div>
 
 
-    @if (!IsLast)
+    @if (!IsLast && BarVisible)
     {
         <div class="@GetComponentBarCssClass()"
              @onclick:preventDefault="true"

@@ -151,6 +151,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets the visibility of the splitter bar.
+        /// </summary>
+        /// <value>The visibility of the splitter bar.</value>
+        [Parameter]
+        public bool BarVisible { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the splitter.
         /// </summary>
         /// <value>The splitter.</value>
