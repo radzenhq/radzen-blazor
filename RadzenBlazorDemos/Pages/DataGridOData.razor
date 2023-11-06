@@ -77,7 +77,7 @@ async Task LoadData(LoadDataArgs args)
 @code {
     bool isLoading;
     int count;
-    IEnumerable<Employee> employees;
+    ODataEnumerable<Employee> employees;
     IList<Employee> selectedEmployees;
     RadzenDataGrid<Employee> grid;
 
@@ -106,7 +106,7 @@ async Task LoadData(LoadDataArgs args)
         await grid.FirstPage();
     }
 
-    NorthwindODataService service = new NorthwindODataService("https://services.odata.org/V4/Northwind/Northwind.svc/");
+    NorthwindODataService service = new NorthwindODataService("https://services.radzen.com/odata/Northwind/");
 
     IEnumerable<Customer> customers;
 
@@ -122,7 +122,7 @@ async Task LoadData(LoadDataArgs args)
     {
         isLoading = true;
 
-        var result = await service.GetEmployees(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true, expand: "Orders($expand=Customer)");
+        var result = await service.GetEmployees(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true, expand: "NorthwindOrders($expand=Customer)");
         // Update the Data property
         employees = result.Value.AsODataEnumerable();
         // Update the count
