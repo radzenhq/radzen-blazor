@@ -1767,7 +1767,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Resets the DataGrid instance to initial state with no sorting, grouping and/or filtering.
+        /// Resets the DataGrid instance to initial state with no sorting, grouping and/or filtering, column visibility.
         /// </summary>
         /// <param name="resetColumnState">if set to <c>true</c> [reset column state].</param>
         /// <param name="resetRowState">if set to <c>true</c> [reset row state].</param>
@@ -1792,7 +1792,9 @@ namespace Radzen.Blazor
                     c.ResetSortOrder();
                     c.SetOrderIndex(null);
                     c.SetWidth(null);
+                    c.SetVisible(null);
                 });
+                selectedColumns = allColumns.Where(c => c.Pickable && c.GetVisible()).ToList();
                 sorts.Clear();
            }
 
@@ -3322,10 +3324,6 @@ namespace Radzen.Blazor
                         CurrentPage = 0;
                         skip = 0;
                         Reset(true);
-                        allColumns.ToList().ForEach(c =>
-                        {
-                            c.SetVisible(true);
-                        });
                         columns = allColumns.Where(c => c.Parent == null).ToList();
                         InvokeAsync(Reload);
 
