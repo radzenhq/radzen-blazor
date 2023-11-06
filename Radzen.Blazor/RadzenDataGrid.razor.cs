@@ -1889,7 +1889,7 @@ namespace Radzen.Blazor
 
         IEnumerable<FilterDescriptor> filters = Enumerable.Empty<FilterDescriptor>();
 
-        async Task InvokeLoadData(int start, int top)
+        internal async Task InvokeLoadData(int start, int top)
         {
             var orderBy = GetOrderBy();
 

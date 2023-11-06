@@ -715,7 +715,14 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    await grid.Reload();
+                    if(grid.LoadData.HasDelegate)
+                    {
+                        await grid.InvokeLoadData(0, PageSize);
+                    }
+                    else
+                    {
+                        await grid.Reload();
+                    }
                 }
             }
 #endif
