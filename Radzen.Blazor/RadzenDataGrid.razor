@@ -422,11 +422,30 @@
 @code {
         internal RenderFragment RenderCell(RadzenDataGridColumn<TItem> column, TItem Item, IReadOnlyDictionary<string, object> Attributes, Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> rowArgs, int RowIndex)
         {
+            var cellAttributes = new Dictionary<string, object>(Attributes);
+
+            if (CellClick.HasDelegate)
+            {
+                cellAttributes.Add("onclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnClick(column, Item, eventArgs)));
+            }
+
+            if (CellDoubleClick.HasDelegate)
+            {
+                cellAttributes.Add("ondblclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnDblClick(column, Item, eventArgs)));
+            }
+
+            if (CellContextMenu.HasDelegate)
+            {
+                cellAttributes.Add("oncontextmenu", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnContextMenu(column, Item, eventArgs)));
+            }
+
+            IReadOnlyDictionary<string, object> CellAttributes = new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(cellAttributes);
+
             return __builder => {
             <text>
             @if (this.AllowCompositeDataCells ? RowIndex == column.GetLevel() : (column.Parent != null && RowIndex == column.GetLevel() || column.Columns == null))
             {
-                <td rowspan="@(column.GetRowSpan(true))" colspan="@(column.GetColSpan(true))" @attributes="@Attributes" style="@GetCellStyle(column, Attributes)" class="@GetCellCssClass(column, Attributes)" @onclick="args => OnClick(column, Item, args)" @ondblclick="args => OnDblClick(column, Item, args)" @oncontextmenu="args => OnContextMenu(column, Item, args)" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate">
+                <td rowspan="@(column.GetRowSpan(true))" colspan="@(column.GetColSpan(true))" @attributes="@CellAttributes" style="@GetCellStyle(column, Attributes)" class="@GetCellCssClass(column, Attributes)" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate">
                     @if (this.Responsive)
                     {
                         <span class="rz-column-title">
