@@ -1988,7 +1988,13 @@ namespace Radzen.Blazor
         public string KeyProperty { get; set; }
 
         internal Func<TItem, object> keyPropertyGetter;
-        bool ItemEquals(TItem item, TItem otherItem)
+        /// <summary>
+        /// Compares two items
+        /// </summary>
+        /// <param name="item">The first item</param>
+        /// <param name="otherItem">The second item</param>
+        /// <returns>Are items equal</returns>
+        protected bool ItemEquals(TItem item, TItem otherItem)
         {
             return keyPropertyGetter != null ? keyPropertyGetter(item).Equals(keyPropertyGetter(otherItem)) : item.Equals(otherItem);
         }
