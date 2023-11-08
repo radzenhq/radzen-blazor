@@ -46,6 +46,12 @@ To include a different theme (i.e. Standard) just change the name of the CSS fil
 ```
 <link rel="stylesheet" href="_content/Radzen.Blazor/css/standard-base.css">
 ```
+> [!IMPORTANT]
+> You will need to include also bootstrap CSS: 
+   ```html
+   <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+   ```
+
 
 ### Include the JS
 Open `Pages\_Layout.cshtml` (Blazor Server .NET 6), `Pages\_Host.cshtml` (Blazor Server .NET 7), `wwwroot/index.html` (Blazor WebAssembly) or
