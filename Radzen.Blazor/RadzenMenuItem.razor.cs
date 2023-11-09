@@ -82,6 +82,12 @@ namespace Radzen.Blazor
         public RenderFragment Template { get; set; }
 
         /// <summary>
+        /// Gets a value indicating whether this instance is disabled.
+        /// </summary>
+        /// <value><c>true</c> if this instance is disabled; otherwise, <c>false</c>.</value>
+        public bool IsDisabled { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the child content.
         /// </summary>
         /// <value>The child content.</value>
@@ -140,6 +146,9 @@ namespace Radzen.Blazor
         Dictionary<string, object> getOpenEvents()
         {
             var events = new Dictionary<string, object>();
+
+            if (IsDisabled)
+                return events;
 
             if (Parent.ClickToOpen || ChildContent != null)
             {
