@@ -98,15 +98,20 @@ namespace Radzen.Blazor
                     //
                 }
             }
-            else if (key == "Enter")
+            else if (key == "Enter" || key == "Tab")
             {
                 if (selectedIndex >= 0 && selectedIndex <= items.Count() - 1)
                 {
                     await OnSelectItem(items.ElementAt(selectedIndex));
                     selectedIndex = -1;
                 }
+
+                if (key == "Tab")
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                }
             }
-            else if (key == "Escape" || key == "Tab")
+            else if (key == "Escape")
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
