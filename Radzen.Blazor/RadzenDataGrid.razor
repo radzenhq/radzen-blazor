@@ -424,10 +424,7 @@
         {
             var cellAttributes = new Dictionary<string, object>(Attributes);
 
-            if (CellClick.HasDelegate)
-            {
-                cellAttributes.Add("onclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnClick(column, Item, eventArgs)));
-            }
+            cellAttributes.Add("onclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnClick(column, Item, eventArgs)));
 
             if (CellDoubleClick.HasDelegate)
             {
