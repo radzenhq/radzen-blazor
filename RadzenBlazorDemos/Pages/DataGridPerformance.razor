@@ -4,10 +4,16 @@
 
 @inherits DbContextPage
 
+<RadzenCard class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
+    <div style="white-space:nowrap; margin-right: 16px">Enable virtualization:</div>
+    <RadzenSwitch @bind-Value="@virtualization" Style="margin-top: 4px;" />
+</RadzenCard>
+
 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced"
-    AllowGrouping="true" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
+    AllowGrouping="true" AllowSorting="true" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left"
     Data="@data" TItem="OrderAndDetail" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" ShowPagingSummary="true"
-    IsLoading=@isLoading Sort="@ShowLoading" Page="@ShowLoading" Group="@ShowLoading" Filter="@ShowLoading">
+                IsLoading=@isLoading Sort="@ShowLoading" Page="@ShowLoading" Group="@ShowLoading" Filter="@ShowLoading" 
+                AllowVirtualization="@virtualization" AllowPaging="@(!virtualization)" Style="height:500px">
     <Columns>
         <RadzenDataGridColumn TItem="OrderAndDetail" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="OrderAndDetail" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
@@ -30,6 +36,8 @@
 </RadzenDataGrid>
 
 @code {
+    bool virtualization;
+
     IQueryable<OrderAndDetail> data;
 
     bool isLoading = false;
