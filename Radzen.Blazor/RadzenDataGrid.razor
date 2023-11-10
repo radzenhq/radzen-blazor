@@ -420,9 +420,21 @@
     </div>
 }
 @code {
-        internal RenderFragment RenderCell(RadzenDataGridColumn<TItem> column, TItem Item, IReadOnlyDictionary<string, object> Attributes, Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> rowArgs, int RowIndex)
-        {
+    internal RenderFragment RenderCell(RadzenDataGridColumn<TItem> column, TItem Item, IReadOnlyDictionary<string, object> Attributes, Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> rowArgs, int RowIndex)
+    {
             var cellAttributes = new Dictionary<string, object>(Attributes);
+
+            var rowspan = column.GetRowSpan(true);
+            if(rowspan != 1)
+            {
+                cellAttributes.Add("rowspan", rowspan);
+            }
+
+            var colspan = column.GetColSpan(true);
+            if(colspan != 1)
+            {
+                cellAttributes.Add("colspan", colspan);
+            }
 
             if (CellClick.HasDelegate || RowClick.HasDelegate || RowSelect.HasDelegate || RowDeselect.HasDelegate  || ValueChanged.HasDelegate)
             {
@@ -445,7 +457,7 @@
             <text>
             @if (this.AllowCompositeDataCells ? RowIndex == column.GetLevel() : (column.Parent != null && RowIndex == column.GetLevel() || column.Columns == null))
             {
-                <td rowspan="@(column.GetRowSpan(true))" colspan="@(column.GetColSpan(true))" @attributes="@CellAttributes" style="@GetCellStyle(column, Attributes)" class="@GetCellCssClass(column, Attributes)" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate">
+                <td @attributes="@CellAttributes" style="@GetCellStyle(column, Attributes)" class="@GetCellCssClass(column, Attributes)" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate">
                     @if (this.Responsive)
                     {
                         <span class="rz-column-title">
