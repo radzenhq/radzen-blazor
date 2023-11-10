@@ -424,9 +424,12 @@
         {
             var cellAttributes = new Dictionary<string, object>(Attributes);
 
-            cellAttributes.Add("onclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnClick(column, Item, eventArgs)));
+            if (CellClick.HasDelegate || RowClick.HasDelegate || RowSelect.HasDelegate || RowDeselect.HasDelegate  || ValueChanged.HasDelegate)
+            {
+                cellAttributes.Add("onclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnClick(column, Item, eventArgs)));
+            }
 
-            if (CellDoubleClick.HasDelegate)
+            if (CellDoubleClick.HasDelegate || RowDoubleClick.HasDelegate)
             {
                 cellAttributes.Add("ondblclick", EventCallback.Factory.Create<MouseEventArgs>(receiver: this, callback: (eventArgs) => OnDblClick(column, Item, eventArgs)));
             }
