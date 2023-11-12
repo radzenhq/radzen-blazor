@@ -4,7 +4,7 @@
 
 @inherits DbContextPage
 
-<RadzenDataGrid Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnResize="true" ColumnResized=@OnColumnResized>
+<RadzenDataGrid GridLines="Radzen.DataGridGridLines.Vertical" Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnResize="true" ColumnResized=@OnColumnResized>
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Width="200px" >
