@@ -557,7 +557,7 @@ namespace Radzen.Blazor
             var style = new List<string>();
 
             var width = GetWidthOrGridSetting()?.Trim();
-            if (!string.IsNullOrEmpty(width))
+            if (!string.IsNullOrEmpty(width) && !forCell)
             {
                 style.Add($"width:{width}");
             }
