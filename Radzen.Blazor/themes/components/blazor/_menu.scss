@@ -272,7 +272,7 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
 }
 
 li.rz-navigation-item.rz-state-disabled {
-    opacity: var(--rz-button-disabled-opacity);
+    opacity: var(--rz-menu-item-disabled-opacity);
     cursor: initial;
     pointer-events: none;
 }
