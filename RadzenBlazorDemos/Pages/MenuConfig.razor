@@ -2,12 +2,12 @@
         <RadzenMenu Click="OnParentClicked">
             <RadzenMenuItem Text="General" Icon="home">
                 <RadzenMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenMenuItem>
-                <RadzenMenuItem Text="Menu" Path="menu" Icon="line_weight"></RadzenMenuItem>
-                <RadzenMenuItem Click="OnChildClicked" Text="ChildClick" Icon="attach_file"></RadzenMenuItem>
+                <RadzenMenuItem Text="Menu" Path="menu" Icon="line_weight" Disabled="true"></RadzenMenuItem>
+                <RadzenMenuItem Click="OnChildClicked" Text="ChildClick" Icon="attach_file" Disabled="true"></RadzenMenuItem>
                 <RadzenMenuItem Text="Dialog" Path="dialog" Icon="perm_media"></RadzenMenuItem>
                 <RadzenMenuItem Text="Notification" Path="notification" Icon="announcement"></RadzenMenuItem>
             </RadzenMenuItem>
-            <RadzenMenuItem Text="Inputs" Icon="payment">
+            <RadzenMenuItem Text="Inputs" Icon="payment" Disabled="true">
                 <RadzenMenuItem Text="CheckBox" Path="checkbox" Icon="check_circle"></RadzenMenuItem>
                 <RadzenMenuItem Text="TextBox" Path="textbox" Icon="input"></RadzenMenuItem>
                 <RadzenMenuItem Text="TextArea" Path="textarea" Icon="description"></RadzenMenuItem>

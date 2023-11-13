@@ -13,7 +13,7 @@
         ContextMenuService.Open(args,
             new List<ContextMenuItem> {
                 new ContextMenuItem(){ Text = "Context menu item 1", Value = 1, Icon = "home" },
-                new ContextMenuItem(){ Text = "Context menu item 2", Value = 2, Icon = "search" },
+                new ContextMenuItem(){ Text = "Context menu item 2", Value = 2, Icon = "search", Disabled = true },
                 new ContextMenuItem(){ Text = "Context menu item 3", Value = 3, Icon = "info" },
          }, OnMenuItemClick);
     }

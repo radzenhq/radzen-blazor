@@ -13,6 +13,7 @@ $menu-item-icon-color: $menu-item-color !default;
 $menu-item-icon-hover-color: $menu-item-hover-color !default;
 $menu-item-offset: 1rem;
 $menu-item-transition: none !default;
+$menu-item-disabled-opacity: 0.2 !default;
 
 $menu-top-item-padding: 0.5rem !default;
 $menu-top-item-border-radius: $menu-item-border-radius !default;
@@ -45,6 +46,7 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
   --rz-menu-item-icon-hover-color: #{$menu-item-icon-hover-color};
   --rz-menu-item-offset: #{$menu-item-offset};
   --rz-menu-item-transition: #{$menu-item-transition};
+  --rz-menu-item-disabled-opacity: #{$menu-item-disabled-opacity};
 
   --rz-menu-top-item-padding: #{$menu-top-item-padding};
   --rz-menu-top-item-border-radius: #{$menu-top-item-border-radius};
@@ -267,6 +269,12 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
 .rz-navigation-item-link,
 .rz-navigation-item-text {
   transition: var(--rz-menu-item-transition);
+}
+
+li.rz-navigation-item.rz-state-disabled {
+    opacity: var(--rz-menu-item-disabled-opacity);
+    cursor: initial;
+    pointer-events: none;
 }
 
 .rz-menu-toggle-item {

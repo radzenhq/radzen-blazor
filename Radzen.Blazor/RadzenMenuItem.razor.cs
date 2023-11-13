@@ -15,8 +15,15 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-navigation-item";
+            return $"rz-navigation-item{(Disabled ? " rz-state-disabled" : "")}";
         }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is disabled.
+        /// </summary>
+        /// <value><c>true</c> if this instance is disabled; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Disabled { get; set; }
 
         /// <summary>
         /// Gets or sets the target.
@@ -108,7 +115,7 @@ namespace Radzen.Blazor
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         public async Task OnClick(MouseEventArgs args)
         {
-            if (Parent != null)
+            if (Parent != null && !Disabled)
             {
                 var eventArgs = new MenuItemEventArgs
                 {
@@ -141,13 +148,16 @@ namespace Radzen.Blazor
         {
             var events = new Dictionary<string, object>();
 
-            if (Parent.ClickToOpen || ChildContent != null)
+            if (!Disabled)
             {
-                events.Add("onclick", "Radzen.toggleMenuItem(this)");
-            }
-            else
-            {
-                events.Add("onclick", "Radzen.toggleMenuItem(this, event, false)");
+                if (Parent.ClickToOpen || ChildContent != null)
+                {
+                    events.Add("onclick", "Radzen.toggleMenuItem(this)");
+                }
+                else
+                {
+                    events.Add("onclick", "Radzen.toggleMenuItem(this, event, false)");
+                }
             }
 
             return events;
