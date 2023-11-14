@@ -721,6 +721,10 @@ namespace Radzen
                     {
                         await InvokeAsync(virtualize.RefreshDataAsync);
                     }
+                    else
+                    {
+                        await LoadData.InvokeAsync(await GetLoadDataArgs());
+                    }
                     await InvokeAsync(() => { StateHasChanged(); });
 #endif
                 }
