@@ -2,7 +2,7 @@
 FROM mono:latest
 
 ENV DOCFX_VER 2.58.4
-FROM base-image
+
 RUN apt-get update && apt-get install -y \
     package1 \
     package2 \
