@@ -49,7 +49,6 @@
 
     int count;
     bool isLoading = false;
-    bool loaded;
     async Task LoadData(LoadDataArgs args)
     {
         console.Log("LoadData");
@@ -77,8 +76,6 @@
         employees = await Task.FromResult(query.Skip(args.Skip.Value).Take(args.Top.Value).ToList());
 
         isLoading = false;
-
-        loaded = true;
     }
 
     DataGridSettings _settings;

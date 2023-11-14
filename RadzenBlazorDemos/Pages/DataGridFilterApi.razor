@@ -43,8 +43,8 @@
 
             if(column != null)
             {
-                column.FilterValue = "Nan";
-                column.FilterOperator = FilterOperator.StartsWith;
+                column.SetFilterValue("Nan");
+                column.SetFilterOperator(FilterOperator.StartsWith);
                 grid.Reload();
             }
         }

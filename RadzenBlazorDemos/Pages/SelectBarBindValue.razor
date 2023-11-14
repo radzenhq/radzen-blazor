@@ -1,7 +1,7 @@
 ﻿@page "/select-bar-test"
 
 <RadzenCard>
-    <RadzenDataGrid @bind-Data="@Items" TItem="GridItem" class="mt-4 w-100">
+    <RadzenDataGrid Data="@Items" TItem="GridItem" class="mt-4 w-100">
         <HeaderTemplate>
             <div class="row d-flex w-100">
                 <div class="col-auto p-2 justify-content-end bd-highlight">
@@ -43,7 +43,7 @@
 
     private bool _disableCat;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         Items = new List<GridItem>
         {
@@ -52,7 +52,7 @@
         };
     }
 
-    private async Task CheckHeader()
+    private void CheckHeader()
     {
         _disableCat = false;
         if (Items.Any(x => x.Action == _flapsWingsAction))
