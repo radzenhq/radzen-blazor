@@ -129,11 +129,19 @@ namespace Radzen.Blazor
         /// <value>The aria-label attribute value of the collapse button.</value>
         [Parameter]
         public string CollapseAriaLabel { get; set; } = null;
-        
+
+        /// <summary>
+        /// Gets or sets the toggler position at the panel-titlebar. 
+        /// </summary>
+        /// <value>The toggler position attribute value. Default <c>PanelTogglerPosition.Right</c></value>
+        [Parameter]
+        public PanelTogglerPosition PanelTogglerPosition { get; set; } = PanelTogglerPosition.Right;
+
+
         string contentStyle = "display: block;";
         string summaryContentStyle = "display: none";
 
-        async System.Threading.Tasks.Task Toggle(MouseEventArgs args)
+        async Task Toggle(MouseEventArgs args)
         {
             collapsed = !collapsed;
             contentStyle = collapsed ? "display: none;" : "display: block;";

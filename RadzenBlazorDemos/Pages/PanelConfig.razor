@@ -4,8 +4,14 @@
 
 @inherits DbContextPage
 
+<div style="display: flex; align-items: center; margin-bottom: 16px">
+    <div style="white-space:nowrap; margin-right: 16px">Panel Toggler Position:</div>
+    <RadzenDropDown @bind-Value="@panelTogglerPosition" TextProperty="Text" ValueProperty="Value"
+                    Data="@(Enum.GetValues(typeof(PanelTogglerPosition)).Cast<PanelTogglerPosition>().Select(t => new { Text = $"{t}", Value = t }))" />
+</div>
+
 <RadzenPanel AllowCollapse="true" Class="rz-my-10 rz-mx-auto" Style="width: 700px;"
-                Expand=@(() => Change("Panel expanded")) Collapse=@(() => Change("Panel collapsed")) >
+             Expand=@(() => Change("Panel expanded")) Collapse=@(() => Change("Panel collapsed")) PanelTogglerPosition="@panelTogglerPosition">
     <HeaderTemplate>
         <RadzenText TextStyle="TextStyle.H6" Class="rz-display-flex rz-align-items-center rz-m-0">
             <RadzenIcon Icon="account_box" class="rz-mr-1" /><b>Orders</b>
@@ -53,6 +59,8 @@
     EventConsole console;
 
     IEnumerable<Order> orders;
+
+    PanelTogglerPosition panelTogglerPosition = PanelTogglerPosition.Right;
 
     protected override async Task OnInitializedAsync()
     {

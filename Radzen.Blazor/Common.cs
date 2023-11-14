@@ -1826,6 +1826,21 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Specifies the display style of a <see cref="RadzenPanel" />. Affects the visual styling of panel-titlebar toggler.
+    /// </summary>
+    public enum PanelTogglerPosition
+    {
+        /// <summary>
+        /// Toggler position before the icon and text on the left side of the panel-titlebar
+        /// </summary>
+        Left,
+        /// <summary>
+        /// Toggler default position on the right side of the panel-titlebar
+        /// </summary>
+        Right,       
+    }
+
+    /// <summary>
     /// Supplies information about a <see cref="RadzenDataGrid{TItem}.PickedColumnsChanged" /> event that is being raised.
     /// </summary>
     /// <typeparam name="T"></typeparam>
