@@ -388,7 +388,7 @@ namespace Radzen.Blazor.Tests
         
         [Theory]
         [MemberData(nameof(NumericFormatterPreservesLeadingZerosData))]
-        public void Numeric_Formatted_PreservesLeadingZeros(decimal oldValue, decimal newValue)
+        public void Numeric_Formatter_PreservesLeadingZeros(decimal oldValue, decimal newValue)
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
