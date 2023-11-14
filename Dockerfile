@@ -17,8 +17,6 @@ COPY RadzenBlazorDemos.Host /app/RadzenBlazorDemos.Host
 WORKDIR /app
 RUN docfx DocFX/docfx.json
 
-docker builder prune
-
 FROM mcr.microsoft.com/dotnet/sdk:8.0
 
 COPY --from=0 /app/RadzenBlazorDemos.Host /app/RadzenBlazorDemos.Host
