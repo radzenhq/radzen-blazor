@@ -378,5 +378,36 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains($" value=\"{valueToTest.ToString(format)}\"", component.Markup);
         }
+        
+        public static TheoryData<decimal, decimal> NumericFormatterPreservesLeadingZerosData =>
+            new()
+            {
+                { 10.000m, 100.000m },
+                { 100.000m, 10.000m }
+            };
+        
+        [Theory]
+        [MemberData(nameof(NumericFormatterPreservesLeadingZerosData))]
+        public void Numeric_Formatter_PreservesLeadingZeros(decimal oldValue, decimal newValue)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            string format = "0.000";
+
+            var component = ctx.RenderComponent<RadzenNumeric<decimal>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<decimal>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<decimal>.Value), oldValue)
+            );
+
+            component.Render();
+            
+            Assert.Contains($" value=\"{oldValue.ToString(format)}\"", component.Markup);
+
+            component.Find("input").Change(newValue);
+            
+            Assert.Contains($" value=\"{newValue.ToString(format)}\"", component.Markup);
+        }
     }
 }
