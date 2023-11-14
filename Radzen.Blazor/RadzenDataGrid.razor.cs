@@ -2578,7 +2578,7 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void CancelEditRow(TItem item)
         {
-            if (object.Equals(itemToInsert, item))
+            if (ItemEquals(itemToInsert, item))
             {
                 if(!IsVirtualizationAllowed())
                 {
