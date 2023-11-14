@@ -4,6 +4,22 @@
 
 @inherits DbContextPage
 
+@if(position == 0)
+{
+    <style>
+        .rz-panel-titlebar {
+            flex-direction: row-reverse;
+            justify-content:left;
+        }
+    </style>
+}
+
+<RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+    <RadzenText TextStyle="TextStyle.Body1">Expand/Collapse position:</RadzenText>
+    <RadzenSelectBar @bind-Value="@position" TextProperty="Text" ValueProperty="Value"
+                     Data="@(new []{ new { Text = "Left", Value = 0 }, new { Text = "Right", Value = 1 } })" Size="ButtonSize.Small" />
+</RadzenStack>
+
 <RadzenPanel AllowCollapse="true" Class="rz-my-10 rz-mx-auto" Style="width: 700px;"
                 Expand=@(() => Change("Panel expanded")) Collapse=@(() => Change("Panel collapsed")) >
     <HeaderTemplate>
@@ -50,6 +66,7 @@
 <EventConsole @ref=@console Class="rz-my-10 rz-mx-auto" Style="width: 700px;" />
 
 @code {
+    int position = 1;
     EventConsole console;
 
     IEnumerable<Order> orders;
