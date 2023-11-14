@@ -3,12 +3,6 @@ FROM mono:latest
 
 ENV DOCFX_VER 2.58.4
 
-RUN apt-get update && apt-get install -y \
-    package1 \
-    package2 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
 RUN apt-get update && apt-get install unzip wget git -y && wget -q -P /tmp https://github.com/dotnet/docfx/releases/download/v${DOCFX_VER}/docfx.zip && \
     mkdir -p /opt/docfx && \
     unzip /tmp/docfx.zip -d /opt/docfx && \
