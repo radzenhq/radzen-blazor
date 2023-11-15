@@ -11,7 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor().AddHubOptions(o =>
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents().AddHubOptions(o =>
 {
     o.MaximumReceiveMessageSize = 10 * 1024 * 1024;
 });
@@ -75,8 +76,10 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAntiforgery();
 app.MapRazorPages();
-app.MapBlazorHub();
+app.MapRazorComponents<RadzenBlazorDemos.Server.App>()
+    .AddInteractiveServerRenderMode().AddAdditionalAssemblies(typeof(RadzenBlazorDemos.App).Assembly);
 app.MapControllers();
-app.MapFallbackToPage("/_Host");
+
 app.Run();
