@@ -130,6 +130,7 @@ $form-field-helper-padding: 0 0.5rem !default;
         .rz-state-disabled,
         :disabled {
             color: var(--rz-input-disabled-color);
+            opacity: 1;
         }
     }
 
