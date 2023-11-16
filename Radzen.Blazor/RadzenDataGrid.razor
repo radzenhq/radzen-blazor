@@ -556,7 +556,7 @@
             {
                 @foreach (var c in this.childColumns.Where(c => c.GetVisible() && c.Parent == column))
                 {
-                    @RenderCell(c, Item, Attributes, rowArgs, RowIndex)
+                    @RenderCell(c, Item, this.CellAttributes(Item, c), rowArgs, RowIndex)
                 }
             }
         </text>
