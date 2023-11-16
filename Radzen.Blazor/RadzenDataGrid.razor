@@ -428,7 +428,10 @@
         }
         else
         {
-            attributes[attributeName] = $"{attributeValue};{attributes[attributeName]}";
+            var values = $"{attributes[attributeName]}".Split(";").Where(v => v != string.Empty);
+            var newValues = $"{attributeValue}".Split(";").Where(v => v != string.Empty);
+
+            attributes[attributeName] = string.Join(";", values.Concat(newValues).Distinct());
         }
     }
 

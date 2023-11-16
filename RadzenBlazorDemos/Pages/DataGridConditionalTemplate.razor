@@ -65,6 +65,7 @@
         if (args.Column.Property == "Quantity")
         {
             args.Attributes.Add("style", $"background-color: {(args.Data.Quantity > 20 ? "var(--rz-success)" : "var(--rz-base-background-color)")};");
+            args.Attributes.Add("class", args.Data.Quantity > 20 ? "my-class" : "my-other-class");
 
             if (args.Data.Discount == 0)
             {
