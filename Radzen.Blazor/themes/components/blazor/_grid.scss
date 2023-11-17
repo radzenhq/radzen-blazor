@@ -755,7 +755,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
           }
         }
 
-        &.rz-frozen-cell-left {
+        &.rz-frozen-cell-left,
+        &.rz-frozen-cell-left-inner {
           &:before {
             z-index: -1;
           }
@@ -782,7 +783,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
         > td {
           background-color: var(--rz-grid-selected-background-color);
 
-          &.rz-frozen-cell-left {
+          &.rz-frozen-cell-left,
+          &.rz-frozen-cell-left-inner {
             &:before {
               background-color: var(--rz-grid-selected-background-color);
             }
@@ -814,7 +816,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
           > td {
             background-color: var(--rz-grid-hover-background-color);
 
-            &.rz-frozen-cell-left {
+            &.rz-frozen-cell-left,
+            &.rz-frozen-cell-left-inner {
               &:before {
                 background-color: var(--rz-grid-hover-background-color);
               }
@@ -1084,7 +1087,10 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     position: sticky;
   }
 
-  .rz-frozen-cell-left, .rz-frozen-cell-right {
+  .rz-frozen-cell-left, 
+  .rz-frozen-cell-right,
+  .rz-frozen-cell-left-inner,
+  .rz-frozen-cell-right-inner {
     background: var(--rz-grid-frozen-cell-background-color);
     z-index: 1;
   }
@@ -1096,6 +1102,12 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
   .rz-frozen-cell-right.rz-frozen-cell-right-end {
     box-shadow: -5px 0 5px -5px rgba(0,0,0,0.12);
+    border-left: var(--rz-grid-frozen-cell-border) !important;
+  }
+
+  .rz-frozen-cell-left-inner,
+  .rz-frozen-cell-right-inner {
+    border-right: var(--rz-grid-frozen-cell-border) !important;
     border-left: var(--rz-grid-frozen-cell-border) !important;
   }
 }
