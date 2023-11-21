@@ -376,6 +376,8 @@ namespace Radzen
             {
                 property = $"({property})";
             }
+            bool hasNp = property.Contains("np(");
+            string npProperty = hasNp ? property : $@"np({property})";
 
             var columnFilterOperator = !second ? column.GetFilterOperator() : column.GetSecondFilterOperator();
 
@@ -415,19 +417,19 @@ namespace Radzen
                 }
                 else if (columnFilterOperator == FilterOperator.IsNull)
                 {
-                    return $@"np({property}) == null";
+                    return npProperty + " == null";
                 }
                 else if (columnFilterOperator == FilterOperator.IsEmpty)
                 {
-                    return $@"np({property}) == """"";
+                    return npProperty + @" == """"";
                 }
                 else if (columnFilterOperator == FilterOperator.IsNotEmpty)
                 {
-                    return $@"np({property}) != """"";
+                    return npProperty + @" != """"";
                 }
                 else if (columnFilterOperator == FilterOperator.IsNotNull)
                 {
-                    return $@"np({property}) != null";
+                    return npProperty + @" != null";
                 }
             }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
