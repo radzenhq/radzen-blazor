@@ -176,6 +176,9 @@
 }
 </code>
 </pre>
+        <RadzenAlert AlertStyle="AlertStyle.Warning">
+            All Radzen Blazor components with events are interactive and cannot work in .NET 8 Static @@rendermode. Make sure the components @@rendermode is set to InteractiveServer or InteractiveWebAssembly or they are nested inside interactive parent.
+        </RadzenAlert>
     </RadzenColumn>
 </RadzenRow>
 
