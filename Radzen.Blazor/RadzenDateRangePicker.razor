@@ -1,0 +1,158 @@
+﻿@using Radzen
+@using Radzen.Blazor.Rendering
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
+@using System.Globalization
+@using Microsoft.JSInterop
+
+@inherits RadzenComponent
+@implements IRadzenFormComponent
+
+@if (Visible)
+{
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@getStyle()" id="@GetId()">
+        @if (!Inline)
+        {
+            <span class="@($"rz-calendar rz-calendar-w-btn{(Disabled ? " rz-state-disabled" : "")}")" style="width:100%">
+                <input @ref="@input" @attributes="InputAttributes" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+                       @onchange="@ParseDate" autocomplete="off" type="text" name="@Name"
+                       class="rz-inputtext @InputClass @(IsReadonly ? "rz-readonly" : "")" id="@Name" placeholder="@Placeholder" onclick="@getOpenPopupForInput()" />
+                @if (ShowButton)
+                {
+                    <button @onmousedown=@OnToggle onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
+                        <span aria-hidden="true" class="@ButtonClasses"></span><span class="rz-button-text"></span>
+                    </button>
+                }
+                @if (AllowClear && HasValue)
+                {
+                    <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
+                }
+            </span>
+        }
+
+        <Popup id="@PopupID" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@popup style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")">
+            <div class="rz-display-flex rz-row rz-align-items-normal rz-justify-content-normal">
+                <div class="rz-col-6">
+                    <div class="rz-datepicker-group">
+                        <div class="rz-datepicker-header">
+                            <a href="javascript:void(0)" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { try { if(StartDate.AddMonths(-1).Year >= YearFrom) {StartDate = StartDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
+                                    <span class="rz-datepicker-prev-icon rzi rzi-chevron-left"></span>
+                                </a>
+                            <a href="javascript:void(0)" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { try { if(StartDate.AddMonths(1).Year <= YearTo) {StartDate = StartDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
+                                    <span class="rz-datepicker-next-icon rzi rzi-chevron-right"></span>
+                                </a>
+                                <div class="rz-datepicker-title">
+                                    <RadzenDropDown Style="height:auto;width:120px;margin-top:5px;text-align:left;" TabIndex="-1"
+                                                    TValue="int" Value="@StartDate.Month" Disabled="@Disabled" Data="@months" TextProperty="Name" ValueProperty="Value"
+                                                Change="@((args) => { SetStartDateMonth(int.Parse(args.ToString())); })" />
+                                    <RadzenDropDown Style="height:auto;width:80px;margin-top:5px;text-align:left;" TabIndex="-1"
+                                                    TValue="int" Value="@StartDate.Year" Disabled="@Disabled" Data="@years" TextProperty="Name" ValueProperty="Value"
+                                                Change="@((args) => { SetStartDateYear(int.Parse(args.ToString())); })" />
+                                </div>
+                            </div>
+                        <div class="rz-datepicker-calendar-container">
+                                <table class="rz-datepicker-calendar" style="@(Inline ? "" : "width:100%")">
+                                    <thead>
+                                        <tr>
+                                            @foreach (var day in ShiftedAbbreviatedDayNames)
+                                            {
+                                                <th scope="col">
+                                                    <span>@day</span>
+                                                </th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int dayNumber = 0;
+                                        }
+                                        @for (int i = 0; i < 6; i++)
+                                        {
+                                            <tr>
+                                                @for (int j = 0; j < 7; j++)
+                                                {
+                                                    @if ((DateTime.MaxValue - InitialStartDate).TotalDays <= dayNumber)
+                                                    {
+                                                        break;
+                                                    }
+
+                                                DateTime date = InitialStartDate.AddDays(dayNumber++);
+                                                    var dateArgs = DateAttributes(date);
+
+                                                    <td @attributes="@(dateArgs.Attributes)" class="@GetStartDayCssClass(date, dateArgs)" onmouseup=@(PopupRenderMode == PopupRenderMode.OnDemand || Inline || dateArgs.Disabled ? "" : $"Radzen.closePopup('{PopupID}')")
+                                                        @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetStartDay(date); } })">
+                                                        <span class=@GetStartDayCssClass(date, dateArgs, false)>@date.Day</span>
+                                                    </td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="rz-col-6">
+                    <div class="rz-datepicker-group">
+                        <div class="rz-datepicker-header">
+                                <a href="javascript:void(0)" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { try { if(EndDate.AddMonths(-1).Year >= YearFrom) {EndDate = EndDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
+                                    <span class="rz-datepicker-prev-icon rzi rzi-chevron-left"></span>
+                                </a>
+                            <a href="javascript:void(0)" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { try { if(EndDate.AddMonths(1).Year <= YearTo) {EndDate = EndDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
+                                    <span class="rz-datepicker-next-icon rzi rzi-chevron-right"></span>
+                                </a>
+                                <div class="rz-datepicker-title">
+                                    <RadzenDropDown Style="height:auto;width:120px;margin-top:5px;text-align:left;" TabIndex="-1"
+                                                    TValue="int" Value="@EndDate.Month" Disabled="@Disabled" Data="@months" TextProperty="Name" ValueProperty="Value"
+                                                    Change="@((args) => { SetEndDateMonth(int.Parse(args.ToString())); })" />
+                                    <RadzenDropDown Style="height:auto;width:80px;margin-top:5px;text-align:left;" TabIndex="-1"
+                                                TValue="int" Value="@EndDate.Year" Disabled="@Disabled" Data="@years" TextProperty="Name" ValueProperty="Value"
+                                                    Change="@((args) => { SetEndDateYear(int.Parse(args.ToString())); })" />
+                                </div>
+                            </div>
+                        <div class="rz-datepicker-calendar-container">
+                                <table class="rz-datepicker-calendar" style="@(Inline ? "" : "width:100%")">
+                                    <thead>
+                                        <tr>
+                                            @foreach (var day in ShiftedAbbreviatedDayNames)
+                                            {
+                                                <th scope="col">
+                                                    <span>@day</span>
+                                                </th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            dayNumber = 0;
+                                        }
+                                        @for (int i = 0; i < 6; i++)
+                                        {
+                                            <tr>
+                                                @for (int j = 0; j < 7; j++)
+                                                {
+                                                    @if ((DateTime.MaxValue - InitialEndDate).TotalDays <= dayNumber)
+                                                    {
+                                                        break;
+                                                    }
+
+                                                    DateTime date = InitialEndDate.AddDays(dayNumber++);
+                                                    var dateArgs = DateAttributes(date);
+
+                                                    <td @attributes="@(dateArgs.Attributes)" class="@GetEndDayCssClass(date, dateArgs)" onmouseup=@(PopupRenderMode == PopupRenderMode.OnDemand || Inline || dateArgs.Disabled ? "" : $"Radzen.closePopup('{PopupID}')")
+                                                        @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetEndDay(date); } })">
+                                                        <span class=@GetEndDayCssClass(date, dateArgs, false)>@date.Day</span>
+                                                    </td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </Popup>
+
+    </div>
+}

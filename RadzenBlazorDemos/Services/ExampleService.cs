@@ -949,6 +949,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "DateRangePicker",
+                    Title = "Blazor DateRangepicker component",
+                    Path = "daterangepicker",
+                    Icon = "&#xe916",
+                    Tags = new [] { "calendar", "form", "edit", "range" }
+                },
+                new Example()
+                {
                     Name = "DropDown",
                     Icon = "&#xe875",
                     Children = new [] {
