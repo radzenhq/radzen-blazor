@@ -2075,6 +2075,12 @@ namespace Radzen
         public string Title { get; set; }
 
         /// <summary>
+        /// Gets or sets the format string used to display the key in the group.
+        /// </summary>
+        /// <value>The format string.</value>
+        public string FormatString { get; set; }
+
+        /// <summary>
         /// Gets the title of the group.
         /// </summary>
         /// <returns>System.String.</returns>
