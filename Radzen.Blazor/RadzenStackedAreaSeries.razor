@@ -15,19 +15,10 @@
     var pathGenerator = GetPathGenerator();
 
     var ticks = Chart.CategoryScale.Ticks(Chart.CategoryAxis.TickDistance);
+
     var index = Chart.Series.IndexOf(this);
 
-    var allSeries = StackedAreaSeries;
-
-    var data = Items.Select(item =>
-    {
-      var x = category(item);
-      //var y = value(item);
-       var sum = allSeries.Take(index+1).SelectMany(series => series.ValuesForCategory(x)).DefaultIfEmpty(value(item)).Sum();
-       var y = valueScale.Scale(sum);
-
-      return new Point { X = x, Y = y };
-    }).ToList();
+    var data = GetPoints(category, value, valueScale);
 
     var className = $"rz-area-series rz-series-{index}";
 
@@ -48,7 +39,7 @@
         <path @key="@area" style="@style" d="@area" fill="@Fill" stroke="none"></path>
         <Path @key="@line" D="@line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
       }
-      <Markers Series="@this" Data="@Items" Category="@category" Value="@value" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
+      <Markers Series="@this" Data="@data" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
     </g>;
   }
 }

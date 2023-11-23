@@ -7,20 +7,6 @@
         <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
         <RadzenLabel Text="Show Data Labels" For="dataLabels" />
     </RadzenStack>
-
-    <RadzenChart>
-        <RadzenAreaSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">
-            <RadzenSeriesDataLabels Visible="@showDataLabels" />
-        </RadzenAreaSeries>
-        <RadzenAreaSeries Smooth="@smooth" Data="@revenue2020" CategoryProperty="Date" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
-            <RadzenSeriesDataLabels Visible="@showDataLabels" />
-        </RadzenAreaSeries>
-        <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth" />
-        <RadzenValueAxis Formatter="@FormatAsUSD">
-            <RadzenGridLines Visible="true" />
-            <RadzenAxisTitle Text="Revenue in USD" />
-        </RadzenValueAxis>
-    </RadzenChart>
     <RadzenChart>
         <RadzenStackedAreaSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">
             <RadzenSeriesDataLabels Visible="@showDataLabels" />
@@ -28,19 +14,6 @@
         <RadzenStackedAreaSeries Smooth="@smooth" Data="@revenue2020" CategoryProperty="Date" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
             <RadzenSeriesDataLabels Visible="@showDataLabels" />
         </RadzenStackedAreaSeries>
-        <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth" />
-        <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
-            <RadzenGridLines Visible="true" />
-            <RadzenAxisTitle Text="Revenue in USD" />
-        </RadzenValueAxis>
-    </RadzenChart>
-        <RadzenChart>
-        <RadzenStackedColumnSeries Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue">
-            <RadzenSeriesDataLabels Visible="@showDataLabels" />
-        </RadzenStackedColumnSeries>
-        <RadzenStackedColumnSeries Data="@revenue2020" CategoryProperty="Date" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
-            <RadzenSeriesDataLabels Visible="@showDataLabels" />
-        </RadzenStackedColumnSeries>
         <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth" />
         <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
             <RadzenGridLines Visible="true" />

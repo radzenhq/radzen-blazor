@@ -89,7 +89,7 @@ namespace Radzen.Blazor
             var category = ComposeCategory(Chart.CategoryScale);
             var value = ComposeValue(Chart.ValueScale);
 
-            var points = Items.Select(item => new Point { X = category(item), Y = value(item) }).ToArray();
+            var points = GetPoints(category, value, Chart.ValueScale).ToArray();
 
             var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
             var axisY = Chart.ValueScale.Scale(Math.Max(0, valueTicks.Start));
@@ -138,10 +138,39 @@ namespace Radzen.Blazor
             return false;
         }
 
+        private IEnumerable<Point<TItem>> GetPoints(Func<TItem, double> category, Func<TItem, double> value, ScaleBase valueScale)
+        {
+            var allSeries = StackedAreaSeries;
+            var index = allSeries.IndexOf(this);
+
+            return Items.Select(item =>
+            {
+                var x = category(item);
+                //var y = value(item);
+                var sum = allSeries.Take(index + 1).SelectMany(series => series.ValuesForCategory(x)).DefaultIfEmpty(value(item)).Sum();
+                var y = valueScale.Scale(sum);
+
+                return new Point<TItem> { X = x, Y = y, Data = item };
+            }).ToList();
+        }
+
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
             return base.GetDataLabels(offsetX, offsetY - 16);
+        }
+
+        /// <inheritdoc />
+        internal override double TooltipY(TItem item)
+        {
+            var category = ComposeCategory(Chart.CategoryScale);
+            var value = ComposeValue(Chart.ValueScale);
+            var x = category(item);
+            var allSeries = StackedAreaSeries;
+            var index = allSeries.IndexOf(this);
+            var sum = allSeries.Take(index + 1).SelectMany(series => series.ValuesForCategory(x)).DefaultIfEmpty(value(item)).Sum();
+            var y = Chart.ValueScale.Scale(sum);
+            return y;
         }
 
         private IPathGenerator GetPathGenerator()
