@@ -1,0 +1,54 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+  public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+  {
+    var category = ComposeCategory(categoryScale);
+
+    var value = ComposeValue(valueScale);
+
+    var pathGenerator = GetPathGenerator();
+
+    var ticks = Chart.CategoryScale.Ticks(Chart.CategoryAxis.TickDistance);
+    var index = Chart.Series.IndexOf(this);
+
+    var allSeries = StackedAreaSeries;
+
+    var data = Items.Select(item =>
+    {
+      var x = category(item);
+      //var y = value(item);
+       var sum = allSeries.Take(index+1).SelectMany(series => series.ValuesForCategory(x)).DefaultIfEmpty(value(item)).Sum();
+       var y = valueScale.Scale(sum);
+
+      return new Point { X = x, Y = y };
+    }).ToList();
+
+    var className = $"rz-area-series rz-series-{index}";
+
+    return
+    @<g class="@className">
+      @if (Items.Any())
+      {
+        var x1 = category(Items.First()).ToInvariantString();
+        var x2 = category(Items.Last()).ToInvariantString();
+        var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+        var start = Math.Max(0, valueTicks.Start);
+        var y = Chart.ValueScale.Scale(start).ToInvariantString();
+        var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
+        var path = pathGenerator.Path(data);
+        var area = $"M {x1} {y} {path} L {x2} {y}";
+        var line = $"M {path}";
+
+        <path @key="@area" style="@style" d="@area" fill="@Fill" stroke="none"></path>
+        <Path @key="@line" D="@line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
+      }
+      <Markers Series="@this" Data="@Items" Category="@category" Value="@value" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
+    </g>;
+  }
+}

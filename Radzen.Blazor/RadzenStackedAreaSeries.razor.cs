@@ -7,9 +7,9 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Renders area series in <see cref="RadzenChart" />.
+    /// Renders stacked area series in <see cref="RadzenChart" />.
     /// </summary>
-    public partial class RadzenAreaSeries<TItem> : CartesianSeries<TItem>
+    public partial class RadzenStackedAreaSeries<TItem> : CartesianSeries<TItem>, IChartStackedAreaSeries
     {
         /// <summary>
         /// Specifies the color of the line.
@@ -157,6 +157,61 @@ namespace Radzen.Blazor
                 default:
                     throw new NotSupportedException($"Interpolation {Interpolation} is not supported yet.");
             }
+        }
+        private IList<IChartSeries> AreaSeries => Chart.Series.Where(series => series is IChartStackedAreaSeries).Cast<IChartSeries>().ToList();
+        private IList<IChartSeries> VisibleColumnSeries => AreaSeries.Where(series => series.Visible).ToList();
+        private IList<IChartStackedAreaSeries> StackedAreaSeries => VisibleColumnSeries.Cast<IChartStackedAreaSeries>().ToList();
+
+        /// <inheritdoc />
+        public override ScaleBase TransformValueScale(ScaleBase scale)
+        {
+            if (Items.Any())
+            {
+                var stackedAreaSeries = StackedAreaSeries;
+                var count = stackedAreaSeries.Max(series => series.Count);
+                var sums = Enumerable.Range(0, count).Select(i => stackedAreaSeries.Sum(series => series.ValueAt(i)));
+                var max = sums.Max();
+                var min = Items.Min(Value);
+
+                scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+            }
+
+            return scale;
+        }
+
+        int IChartStackedAreaSeries.Count
+        {
+            get
+            {
+                if (Items == null)
+                {
+                    return 0;
+                }
+
+                return Items.Count();
+            }
+        }
+
+        IEnumerable<double> IChartStackedAreaSeries.ValuesForCategory(double value)
+        {
+            if (Items == null)
+            {
+                return Enumerable.Empty<double>();
+            }
+
+            var category = ComposeCategory(Chart.CategoryScale);
+
+            return Items.Where(item => category(item) == value).Select(Value);
+        }
+
+        double IChartStackedAreaSeries.ValueAt(int index)
+        {
+            if (Items == null || index < 0 || index >= Items.Count)
+            {
+                return 0;
+            }
+
+            return Value(Items[index]);
         }
     }
 }
