@@ -1239,6 +1239,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Stacked Area Chart",
+                            Path = "stacked-area-chart",
+                            New = true,
+                            Title = "Blazor stacked area chart component",
+                            Tags = new [] { "chart", "stack", "graph", "area" }
+                        },
+                        new Example
+                        {
                             Name = "Stacked Bar Chart",
                             Path = "stacked-bar-chart",
                             Title = "Blazor stacked bar chart component",

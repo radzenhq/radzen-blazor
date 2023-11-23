@@ -14,16 +14,12 @@
 
     var pathGenerator = GetPathGenerator();
 
-    var data = Items.Select(item =>
-    {
-      var x = category(item);
-      var y = value(item);
-
-      return new Point<TItem> { X = x, Y = y, Data = item };
-    });
-
     var ticks = Chart.CategoryScale.Ticks(Chart.CategoryAxis.TickDistance);
+
     var index = Chart.Series.IndexOf(this);
+
+    var data = GetPoints(category, value, valueScale);
+
     var className = $"rz-area-series rz-series-{index}";
 
     return

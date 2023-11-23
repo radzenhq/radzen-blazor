@@ -38,4 +38,15 @@ namespace Radzen.Blazor
             return Polar.ToCartesian(X, Y, radius, angle);
         }
     }
+
+    /// <summary>
+    /// Represents a point with data.
+    /// </summary>
+    public class Point<T> : Point
+    {
+        /// <summary>
+        /// The data associated with the point.
+        /// </summary>
+        public T Data { get; set; }
+    }
 }

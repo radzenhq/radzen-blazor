@@ -1,13 +1,13 @@
 @typeparam TItem
 
-@foreach(var data in Data)
+@foreach(var point in Data)
 {
-    var x = Category(data);
-    var y = Value(data);
+    var x = point.X;
+    var y = point.Y;
 
     @if (InPlotArea(x, y))
     {
-        <Marker Click="@(() => OnClick(data))" X="@x" Y="@y" Type="@MarkerType" Fill="@Fill" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Size="@Size" />
+        <Marker Click="@(() => OnClick(point.Data))" X="@x" Y="@y" Type="@MarkerType" Fill="@Fill" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Size="@Size" />
     }
 }
 
@@ -24,13 +24,7 @@
     }
 
     [Parameter]
-    public IEnumerable<TItem> Data { get; set; }
-
-    [Parameter]
-    public Func<TItem, double> Category { get; set; }
-
-    [Parameter]
-    public Func<TItem, double> Value { get; set; }
+    public IEnumerable<Point<TItem>> Data { get; set; }
 
     [Parameter]
     public MarkerType MarkerType { get; set; }
