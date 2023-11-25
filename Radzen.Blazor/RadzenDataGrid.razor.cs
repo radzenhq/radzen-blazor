@@ -3147,7 +3147,7 @@ namespace Radzen.Blazor
                             }
 
                             // Filtering
-                            if (!object.Equals(gridColumn.GetFilterValue(), GetFilterValue(column.FilterValue, gridColumn.FilterPropertyType)))
+                            if (!AreObjectsEqual(gridColumn.GetFilterValue(), GetFilterValue(column.FilterValue, gridColumn.FilterPropertyType)))
                             {
                                 gridColumn.SetFilterValue(GetFilterValue(column.FilterValue, gridColumn.FilterPropertyType));
                                 shouldUpdateState = true;
@@ -3159,7 +3159,7 @@ namespace Radzen.Blazor
                                 shouldUpdateState = true;
                             }
 
-                            if (!object.Equals(gridColumn.GetSecondFilterValue(), GetFilterValue(column.SecondFilterValue, gridColumn.FilterPropertyType)))
+                            if (!AreObjectsEqual(gridColumn.GetSecondFilterValue(), GetFilterValue(column.SecondFilterValue, gridColumn.FilterPropertyType)))
                             {
                                 gridColumn.SetFilterValue(GetFilterValue(column.SecondFilterValue, gridColumn.FilterPropertyType), false);
                                 shouldUpdateState = true;
@@ -3220,7 +3220,42 @@ namespace Radzen.Blazor
             }
         }
 
-        object GetFilterValue(object value, Type type)
+		/// <summary>
+		/// Compares two objects for equality.
+		/// </summary>
+		/// <param name="object1">The first object to compare.</param>
+		/// <param name="object2">The second object to compare.</param>
+		/// <returns>True if the objects are equal, false otherwise.</returns>
+		private static bool AreObjectsEqual(object object1, object object2)
+		{
+			// If both objects are null, they are considered equal
+			if (object1 == null && object2 == null)
+			{
+				return true;
+			}
+
+			// If only one of the objects is null, they are considered not equal
+			if (object1 == null || object2 == null)
+			{
+				return false;
+			}
+
+			// If both objects are enumerable, compare their elements
+			if (object1 is IEnumerable list1 && object2 is IEnumerable list2)
+			{
+				// Create hash sets from the enumerable objects
+				var set1 = new HashSet<object>(list1.Cast<object>());
+				var set2 = new HashSet<object>(list2.Cast<object>());
+
+				// Check if the hash sets are equal
+				return set1.SetEquals(set2);
+			}
+
+			// If the objects are not enumerable, compare them using the Equals method
+			return object1.Equals(object2);
+		}
+
+		object GetFilterValue(object value, Type type)
         {
             if (value != null && value is JsonElement)
             {
