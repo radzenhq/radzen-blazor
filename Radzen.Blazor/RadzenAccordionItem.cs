@@ -119,6 +119,17 @@ namespace Radzen.Blazor
             }
         }
 
+        bool? selected;
+        internal bool GetSelected()
+        {
+            return selected ?? Selected;
+        }
+
+        internal void SetSelected(bool? value)
+        {
+            selected = value;
+        }
+
         /// <summary>
         /// Set parameters as an asynchronous operation.
         /// </summary>
@@ -128,7 +139,7 @@ namespace Radzen.Blazor
         {
             if (parameters.DidParameterChange(nameof(Selected), Selected))
             {
-                Accordion?.SelectItem(this);
+                Accordion?.SelectItem(this, parameters.GetValueOrDefault<bool>(nameof(Selected)));
             }
 
             await base.SetParametersAsync(parameters);

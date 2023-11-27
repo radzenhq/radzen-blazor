@@ -125,7 +125,7 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if the specified index is selected; otherwise, <c>false</c>.</returns>
         protected bool IsSelected(int index, RadzenAccordionItem item)
         {
-            return expandedIdexes.Contains(index);
+            return item.GetSelected() == true;
         }
 
         List<int> expandedIdexes = new List<int>();
@@ -162,21 +162,13 @@ namespace Radzen.Blazor
             return string.IsNullOrWhiteSpace(item.ExpandAriaLabel) ? "Expand" : item.ExpandAriaLabel;          
         }
         
-        internal async System.Threading.Tasks.Task SelectItem(RadzenAccordionItem item)
+        internal async System.Threading.Tasks.Task SelectItem(RadzenAccordionItem item, bool? value = null)
         {
             await CollapseAll(item);
 
             var itemIndex = items.IndexOf(item);
-            if (!expandedIdexes.Contains(itemIndex))
-            {
-                expandedIdexes.Add(itemIndex);
-                await Expand.InvokeAsync(itemIndex);
-            }
-            else
-            {
-                expandedIdexes.Remove(itemIndex);
-                await Collapse.InvokeAsync(itemIndex);
-            }
+
+            item.SetSelected(value ?? !item.GetSelected());
 
             if (!Multiple)
             {
@@ -192,12 +184,8 @@ namespace Radzen.Blazor
             {
                 foreach (var i in items.Where(i => i != item))
                 {
-                    var itemIndex = items.IndexOf(i);
-                    if (expandedIdexes.Contains(itemIndex))
-                    {
-                        expandedIdexes.Remove(itemIndex);
-                        await Collapse.InvokeAsync(items.IndexOf(i));
-                    }
+                    i.SetSelected(false);
+                    await Collapse.InvokeAsync(items.IndexOf(i));
                 }
             }
         }
