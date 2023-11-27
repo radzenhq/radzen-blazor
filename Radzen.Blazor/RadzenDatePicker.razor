@@ -50,6 +50,8 @@
                                             Change="@((args) => { SetYear(int.Parse(args.ToString())); })" />
                             </div>
                         </div>
+                        @if(ShowDays)
+                        {
                         <div class="rz-datepicker-calendar-container">
                             <table class="rz-datepicker-calendar" style="@(Inline ? "" : "width:100%")">
                                 <thead>
@@ -89,6 +91,7 @@
                                 </tbody>
                             </table>
                         </div>
+                        }
                         @if (FooterTemplate != null)
                         {
                             <div class="rz-datepicker-footer">

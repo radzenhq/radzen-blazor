@@ -653,6 +653,13 @@ namespace Radzen.Blazor
         public bool Disabled { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether days part is shown.
+        /// </summary>
+        /// <value><c>true</c> if days part is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowDays { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets a value indicating whether time part is shown.
         /// </summary>
         /// <value><c>true</c> if time part is shown; otherwise, <c>false</c>.</value>

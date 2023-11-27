@@ -1,0 +1,12 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenDatePicker @bind-Value=@value ShowDays=false DateFormat="yyyy/MM" CurrentDateChanged=@OnCurrentDateChanged />
+</div>
+
+@code {
+    DateTime value = DateTime.Now;
+
+    async Task OnCurrentDateChanged(DateTime args)
+    {
+        value = new DateTime(args.Year, args.Month, 1);
+    }
+}
