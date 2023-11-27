@@ -44,7 +44,7 @@
     {
         await base.OnInitializedAsync();
 
-        employees = dbContext.Employees;
+        employees = dbContext.Employees.ToList();
     }
 
     List<string> titles = new List<string> { "Sales Representative", "Vice President, Sales", "Sales Manager", "Inside Sales Coordinator" };
