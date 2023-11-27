@@ -77,15 +77,6 @@ namespace Radzen.Blazor
                 if (item.Selected)
                 {
                     SelectedIndex = items.Count;
-                    if (!Multiple)
-                    {
-                        expandedIdexes.Clear();
-                    }
-
-                    if (!expandedIdexes.Contains(SelectedIndex))
-                    {
-                        expandedIdexes.Add(SelectedIndex);
-                    }
                 }
 
                 items.Add(item);
@@ -127,8 +118,6 @@ namespace Radzen.Blazor
         {
             return item.GetSelected() == true;
         }
-
-        List<int> expandedIdexes = new List<int>();
 
         /// <summary>
         /// Gets the item's title attribute value.
