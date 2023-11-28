@@ -5,7 +5,7 @@
 
 @foreach (var dialog in dialogs)
 {
-    <DialogContainer Dialog=@dialog ShowMask=@(dialog==dialogs.LastOrDefault()) />
+    <DialogContainer @key=@dialog Dialog=@dialog ShowMask=@(dialog==dialogs.LastOrDefault()) />
 }
 
 @if (isSideDialogOpen)
