@@ -2084,7 +2084,10 @@ namespace Radzen.Blazor
 
                     case nameof(AllGroupsExpanded):
                         allGroupsExpandedChanged = HasChanged(parameter.Value, AllGroupsExpanded);
-                        allGroupsExpanded = (bool?)parameter.Value;
+                        if (allGroupsExpandedChanged)
+                        {
+                            allGroupsExpanded = (bool?)parameter.Value;
+                        }
                         break;
 
                     case nameof(Value):
