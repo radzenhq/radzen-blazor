@@ -54,6 +54,13 @@ namespace Radzen.Blazor
         [Parameter]
         public LineType LineType { get; set; }
 
+        /// <summary>
+        /// Gets or sets the color mode of the series.
+        /// </summary>
+        /// <value>The color mode of the series.</value>
+        [Parameter]
+        public RenderColorMode RenderColorMode { get; set; } = RenderColorMode.Series;
+
         /// <inheritdoc />
         public override string Color
         {
@@ -102,16 +109,29 @@ namespace Radzen.Blazor
         {
             var style = base.TooltipStyle(item);
 
-            var index = Items.IndexOf(item);
-
-            if (index >= 0)
+            if (RenderColorMode == RenderColorMode.Series)
             {
-                var color = PickColor(index, Fills, Fill);
+                var index = Items.IndexOf(item);
+
+                if (index >= 0)
+                {
+                    var color = PickColor(index, Fills, Fill);
+
+                    if (color != null)
+                    {
+                        style = $"{style}; border-color: {color};";
+                    }
+                }
+            }
+            else
+            {
+                var color = PickColor(Value(item) < 0 ? 0 : 1, Fills, Fill);
 
                 if (color != null)
                 {
                     style = $"{style}; border-color: {color};";
                 }
+
             }
 
             return style;
@@ -178,7 +198,7 @@ namespace Radzen.Blazor
             var value = ComposeValue(Chart.CategoryScale);
             var category = ComposeCategory(Chart.ValueScale);
             var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
-            var x0 = Chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
+            var x0 = Chart.CategoryScale.Scale(Math.Max(Chart.ValueAxis.ChartBaseValue, ticks.Start));
 
             var barSeries = VisibleBarSeries;
             var index = barSeries.IndexOf(this);
@@ -193,8 +213,8 @@ namespace Radzen.Blazor
                 var dataX = value(data);
                 var startX = Math.Min(dataX, x0);
                 var endX = Math.Max(dataX, x0);
-
-                if (startX <= x && x <= endX && startY <= y && y <= endY)
+                var t = Math.Max(0, 16.0 - (endX - startX));
+                if (startX - t <= x && x <= endX + t && startY <= y && y <= endY)
                 {
                     return (data, new Point() { X = x, Y = y });
                 }
@@ -222,12 +242,16 @@ namespace Radzen.Blazor
         {
             var list = new List<ChartDataLabel>();
 
+            (string, int) anchor;
+
             foreach (var d in Data)
             {
-                list.Add(new ChartDataLabel 
-                { 
-                    Position = new Point() { X = TooltipX(d) + offsetX + 8, Y = TooltipY(d) + offsetY },
-                    TextAnchor = "start",
+                anchor = Value(d) < Chart.ValueAxis.ChartBaseValue ? ("end", -1) : Value(d) == Chart.ValueAxis.ChartBaseValue ? ("middle", 0) : ("start", 1);
+
+                list.Add(new ChartDataLabel
+                {
+                    Position = new Point() { X = TooltipX(d) + offsetX + (8 * anchor.Item2), Y = TooltipY(d) + offsetY },
+                    TextAnchor = anchor.Item1,
                     Text = Chart.ValueAxis.Format(Chart.CategoryScale, Value(d))
                 });
             }

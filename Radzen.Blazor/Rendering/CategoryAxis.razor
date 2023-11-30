@@ -3,36 +3,49 @@
 @if (XAxis.Visible)
 {
     <g class="rz-axis rz-category-axis">
-    <Line Class="rz-line" X1="@x1" Y1="@y1" X2="@x2" Y2="@y1" Stroke="@XAxis.Stroke" StrokeWidth="@XAxis.StrokeWidth" LineType="@XAxis.LineType" />
-    @for (var idx = start; idx <= end; idx += step)
-    {
-        var value = Chart.CategoryScale.Value((double)idx);
-        var x = Chart.CategoryScale.Scale((double)idx, true);
-
-        var text = XAxis.Format(Chart.CategoryScale, value);
-
-        if (XAxis.Ticks.Template != null)
+        <Line Class="rz-line" X1="@x1" Y1="@y1" X2="@x2" Y2="@y1" Stroke="@XAxis.Stroke" StrokeWidth="@XAxis.StrokeWidth" LineType="@XAxis.LineType" />
+        @for (var idx = start; idx <= end; idx += step)
         {
-            var context = new TickTemplateContext { Text = text, Value = value, X = x, Y = y1 } ;
+            var value = Chart.CategoryScale.Value((double)idx);
+            var x = Chart.CategoryScale.Scale((double)idx, true);
 
-            <CategoryAxisTick X="@x" Y="@y1" Text="@text" Stroke="@(XAxis.Ticks.Stroke ?? XAxis.Stroke)" StrokeWidth="@XAxis.Ticks.StrokeWidth" LineType="@XAxis.Ticks.LineType">
-                @XAxis.Ticks.Template(context)
-            </CategoryAxisTick>
-        } 
-        else if (!String.IsNullOrEmpty(text))
-        {
-            <CategoryAxisTick X="@x" Y="@y1" Text="@text" Stroke="@(XAxis.Ticks.Stroke ?? XAxis.Stroke)" StrokeWidth="@XAxis.Ticks.StrokeWidth" LineType="@XAxis.Ticks.LineType"/>
+            var text = XAxis.Format(Chart.CategoryScale, value);
+
+            if (XAxis.Ticks.Template != null)
+            {
+                var context = new TickTemplateContext { Text = text, Value = value, X = x, Y = y1 };
+
+                <CategoryAxisTick X="@x" Y="@y1" Text="@text" Stroke="@(XAxis.Ticks.Stroke ?? XAxis.Stroke)" StrokeWidth="@XAxis.Ticks.StrokeWidth" LineType="@XAxis.Ticks.LineType">
+                    @XAxis.Ticks.Template(context)
+                </CategoryAxisTick>
+            }
+            else if (!String.IsNullOrEmpty(text))
+            {
+                <CategoryAxisTick X="@x" Y="@y1" Text="@text" Stroke="@(XAxis.Ticks.Stroke ?? XAxis.Stroke)" StrokeWidth="@XAxis.Ticks.StrokeWidth" LineType="@XAxis.Ticks.LineType" />
+            }
+
+            if (XAxis.GridLines.Visible && idx > start)
+            {
+                <Line Class="rz-grid-line" X1="@x" Y1="@y1" X2="@x" Y2="@y2" Stroke="@XAxis.GridLines.Stroke" StrokeWidth="@XAxis.GridLines.StrokeWidth" LineType="@XAxis.GridLines.LineType" />
+            }
+
+            if (!basedrawn && (double)idx == Chart.ValueAxis.ChartBaseValue) basedrawn = true;
+
         }
 
-        if (XAxis.GridLines.Visible && idx > start)
+        @if (!basedrawn)
         {
-            <Line Class="rz-grid-line" X1="@x" Y1="@y1" X2="@x" Y2="@y2" Stroke="@XAxis.GridLines.Stroke" StrokeWidth="@XAxis.GridLines.StrokeWidth" LineType="@XAxis.GridLines.LineType" />
+            var x = Chart.CategoryScale.Scale(Chart.ValueAxis.ChartBaseValue);
+            if (XAxis.GridLines.Visible)
+            {
+                <Line Class="rz-grid-line" X1="@x" Y1="@y1" X2="@x" Y2="@y2" Stroke="@XAxis.GridLines.Stroke" StrokeWidth="@XAxis.GridLines.StrokeWidth" LineType="@XAxis.GridLines.LineType" />
+            }
         }
-    }
-    @if (!String.IsNullOrEmpty(XAxis.Title.Text))
-    {
-        <CategoryAxisTitle X="@((x2 - x1)/2)" Y="@(y1 + Chart.CategoryAxis.Size - XAxis.Title.Size)" Text="@XAxis.Title.Text" />
-    }
+
+        @if (!String.IsNullOrEmpty(XAxis.Title.Text))
+        {
+            <CategoryAxisTitle X="@((x2 - x1)/2)" Y="@(y1 + Chart.CategoryAxis.Size - XAxis.Title.Size)" Text="@XAxis.Title.Text" />
+        }
     </g>
 }
 @code {
@@ -46,6 +59,8 @@
 
     private AxisBase XAxis { get; set; }
     private AxisBase YAxis { get; set; }
+
+    bool basedrawn;
 
     protected override void OnParametersSet()
     {
@@ -69,5 +84,7 @@
         var valueTicks = Chart.ValueScale.Ticks(YAxis.TickDistance);
         y1 = Chart.ValueScale.Scale(valueTicks.Start);
         y2 = Chart.ValueScale.Scale(valueTicks.End);
+
+        basedrawn = false;
     }
 }

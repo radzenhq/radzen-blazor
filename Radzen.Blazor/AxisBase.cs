@@ -96,6 +96,13 @@ namespace Radzen.Blazor
         public object Step { get; set; }
 
         /// <summary>
+        /// Gets or sets the base value for the chart (defaults to 0).
+        /// </summary>
+        /// <value>The base value of the chart.</value>
+        [Parameter]
+        public double ChartBaseValue { get; set; } = 0.0;
+
+        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="AxisBase"/> is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
