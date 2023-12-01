@@ -483,7 +483,7 @@ window.Radzen = {
 
     return ul.nextSelectedIndex;
     },
-  focusTableRow: function (gridId, isDown, startIndex) {
+  focusTableRow: function (gridId, isDown, startIndex, multiple) {
     var grid = document.getElementById(gridId);
     if (!grid) return;
 
@@ -510,18 +510,23 @@ window.Radzen = {
         }
     }
 
-    var highlighted = table.querySelectorAll('.rz-state-highlight');
-    if (highlighted.length) {
-      for (var i = 0; i < highlighted.length; i++) {
-        highlighted[i].classList.remove('rz-state-highlight');
-      }
+    if (!multiple) {
+        var highlighted = table.querySelectorAll('.rz-state-highlight');
+        if (highlighted.length) {
+            for (var i = 0; i < highlighted.length; i++) {
+                highlighted[i].classList.remove('rz-state-highlight');
+            }
+        }
     }
 
     if (
       table.nextSelectedIndex >= 0 &&
       table.nextSelectedIndex <= table.rows.length - 1
     ) {
-      table.rows[table.nextSelectedIndex].classList.add('rz-state-highlight');
+      if (!table.rows[table.nextSelectedIndex].classList.contains('rz-state-highlight')) {
+        table.rows[table.nextSelectedIndex].classList.add('rz-state-highlight');
+      }
+     
       table.parentNode.parentNode.scrollTop = table.rows[table.nextSelectedIndex].offsetTop - table.rows[table.nextSelectedIndex].offsetHeight;
     }
 

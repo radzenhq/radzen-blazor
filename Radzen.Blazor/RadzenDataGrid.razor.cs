@@ -413,6 +413,43 @@ namespace Radzen.Blazor
                 "rz-listbox-item  rz-state-highlight" :
                 "rz-listbox-item ";
         }
+        
+        int focusedIndex = -1;
+        /// <summary>
+        /// Handles the <see cref="E:KeyDown" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="KeyboardEventArgs"/> instance containing the event data.</param>
+        protected virtual async Task OnKeyDown(KeyboardEventArgs args)
+        {
+            var items = PagedView.ToList();
+
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "ArrowDown" || key == "ArrowUp")
+            {
+                try
+                {
+                    var newFocusedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusTableRow", UniqueID, key == "ArrowDown", focusedIndex, SelectionMode == DataGridSelectionMode.Multiple && args.ShiftKey);
+                    var itemToSelect = items.ElementAtOrDefault(newFocusedIndex);
+
+                    if (newFocusedIndex != focusedIndex && itemToSelect != null)
+                    {
+                        focusedIndex = newFocusedIndex;
+
+                        if (SelectionMode == DataGridSelectionMode.Multiple && !args.ShiftKey)
+                        {
+                            selectedItems.Clear();
+                        }
+
+                        await SelectRow(itemToSelect, false);
+                    }
+                }
+                catch (Exception)
+                {
+                    //
+                }
+            }
+        }
 
         /// <summary>
         /// Called when filter key pressed.
@@ -2388,12 +2425,14 @@ namespace Radzen.Blazor
 
         internal async System.Threading.Tasks.Task OnRowSelect(TItem item, bool raiseChange = true)
         {
+            focusedIndex = PagedView.ToList().IndexOf(item);
+
             if (SelectionMode == DataGridSelectionMode.Single && item != null && selectedItems.Keys.Any(i => ItemEquals(i, item)))
             {
                 // Legacy RowSelect raise
                 if (raiseChange)
                 {
-                    await RowSelect.InvokeAsync((TItem)item);
+                    await RowSelect.InvokeAsync(item);
                 }
                 return;
             }
@@ -2412,29 +2451,27 @@ namespace Radzen.Blazor
             {
                 if (!selectedItems.Keys.Any(i => ItemEquals(i, item)))
                 {
-                    selectedItems.Add((TItem)item, true);
+                    selectedItems.Add(item, true);
                     if (raiseChange)
                     {
-                        await RowSelect.InvokeAsync((TItem)item);
+                        await RowSelect.InvokeAsync(item);
                     }
                 }
                 else
                 {
-                    selectedItems.Remove((TItem)item);
-                    await RowDeselect.InvokeAsync((TItem)item);
+                    selectedItems.Remove(item);
+                    await RowDeselect.InvokeAsync(item);
                 }
             }
             else
             {
                 if (raiseChange)
                 {
-                    await RowSelect.InvokeAsync((TItem)item);
+                    await RowSelect.InvokeAsync(item);
                 }
             }
 
-            var value = selectedItems.Keys;
-
-            _value = SelectionMode == DataGridSelectionMode.Multiple ? new List<TItem>(value) : new List<TItem>() { value.FirstOrDefault() };
+            _value = selectedItems.Keys.ToList();
 
             await ValueChanged.InvokeAsync(_value);
 

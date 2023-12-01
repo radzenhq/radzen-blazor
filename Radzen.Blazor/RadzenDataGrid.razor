@@ -16,7 +16,7 @@
 {
     var visibleColumns = columns.Where(c => c.GetVisible()).ToList();
 
-    <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()">
+    <div @ref=@Element style="@Style;outline:none;" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()" @onkeydown="@OnKeyDown" @onkeydown:preventDefault tabindex=0>
         @if (AllowGrouping || AllowColumnPicking)
         {
             <div class="rz-group-header" @onmouseup=@(args => EndColumnDropToGroup())>
