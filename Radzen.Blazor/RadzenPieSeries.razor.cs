@@ -204,6 +204,12 @@ namespace Radzen.Blazor
             foreach (var data in Items)
             {
                 var value = Value(data);
+
+                if (value == 0)
+                {
+                    continue;
+                }
+
                 var endAngle = startAngle - value / sum * TotalAngle; // assuming clockwise
 
                 // Normalize the endAngle
