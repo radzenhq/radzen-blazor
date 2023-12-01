@@ -21,3 +21,11 @@
 <RadzenExample ComponentName="Scheduler" Example="SchedulerPlannerTimeline" AdditionalSourceCodePages=@(new [] { "../Models/Appointment.cs", "AddAppointmentPage.razor", "EditAppointmentPage.razor" })>
     <SchedulerPlannerTimeline />
 </RadzenExample>
+
+<RadzenText Anchor="scheduler#tooltips" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Display additional content when the user hovers an appointment
+</RadzenText>
+
+<RadzenExample ComponentName="Scheduler" Example="SchedulerTooltips" AdditionalSourceCodePages=@(new [] { "../Models/Appointment.cs" })>
+    <SchedulerTooltips />
+</RadzenExample>

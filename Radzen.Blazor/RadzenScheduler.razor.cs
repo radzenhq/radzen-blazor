@@ -156,6 +156,18 @@ namespace Radzen.Blazor
         public EventCallback<SchedulerAppointmentSelectEventArgs<TItem>> AppointmentSelect { get; set; }
 
         /// <summary>
+        /// A callback that will be invoked when the user moves the mouse over an appointment in the current view.
+        /// </summary>
+        [Parameter]
+        public EventCallback<SchedulerAppointmentMouseEventArgs<TItem>> AppointmentMouseEnter { get; set; }
+
+        /// <summary>
+        /// A callback that will be invoked when the user moves the mouse out of an appointment in the current view.
+        /// </summary>
+        [Parameter]
+        public EventCallback<SchedulerAppointmentMouseEventArgs<TItem>> AppointmentMouseLeave { get; set; }
+
+        /// <summary>
         /// A callback that will be invoked when the user clicks the more text in the current view. Commonly used to view additional appointments.
         /// Invoke the <see cref="SchedulerMoreSelectEventArgs.PreventDefault"/> method to prevent the default action (showing the additional appointments).
         /// </summary>
@@ -582,6 +594,21 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return $"rz-scheduler";
+        }
+
+        async Task IScheduler.MouseEnterAppointment(ElementReference reference, AppointmentData data)
+        {
+            await AppointmentMouseEnter.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = (TItem)data.Data });
+        }
+
+        async Task IScheduler.MouseLeaveAppointment(ElementReference reference, AppointmentData data)
+        {
+            await AppointmentMouseLeave.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = (TItem)data.Data });
+        }
+
+        bool IScheduler.HasMouseEnterAppointmentDelegate()
+        {
+            return AppointmentMouseEnter.HasDelegate;
         }
     }
 }
