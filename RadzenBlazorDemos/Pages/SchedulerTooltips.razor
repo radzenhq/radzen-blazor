@@ -23,20 +23,27 @@
     void OnAppointmentMouseEnter(SchedulerAppointmentMouseEventArgs<Appointment> args)
     {
 TooltipService.Open(args.Element, ts =>
-@<div>
-    <RadzenRow>
-        <RadzenColumn Size="4">Text</RadzenColumn>
-        <RadzenColumn>@args.Data.Text</RadzenColumn>
-    </RadzenRow>
-    <RadzenRow>
-        <RadzenColumn Size="4">Start</RadzenColumn>
-        <RadzenColumn>@args.Data.Start.ToString("yyyy-MMM-dd hh:mm")</RadzenColumn>
-    </RadzenRow>
-    <RadzenRow>
-        <RadzenColumn Size="4">End</RadzenColumn>
-        <RadzenColumn>@args.Data.End.ToString("yyyy-MMM-dd hh:mm")</RadzenColumn>
-    </RadzenRow>
-</div>, new TooltipOptions { Position = TooltipPosition.Right, Duration = null });
+@<RadzenStack Orientation="Orientation.Vertical" Gap="0" Class="rz-p-6" Style="min-width: 250px; max-width: 500px;">
+    <RadzenText TextStyle="TextStyle.H4" Class="rz-mb-4" Style="color: var(--rz-tooltip-color);">
+        @args.Data.Text
+    </RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
+        <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-tooltip-color); width: 44px;">
+            <strong>Start</strong>
+        </RadzenText>
+        <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-tooltip-color);">
+            @args.Data.Start.ToString("yyyy-MMM-dd hh:mm")
+        </RadzenText>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
+        <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-tooltip-color); width: 44px;">
+            <strong>End</strong>
+        </RadzenText>
+        <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-tooltip-color);">
+            @args.Data.End.ToString("yyyy-MMM-dd hh:mm")
+        </RadzenText>
+    </RadzenStack>
+</RadzenStack>, new TooltipOptions { Position = TooltipPosition.Right, Duration = null });
     }
 
     void OnAppointmentMouseLeave(SchedulerAppointmentMouseEventArgs<Appointment> args)
