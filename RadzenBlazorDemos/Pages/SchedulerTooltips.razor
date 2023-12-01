@@ -32,7 +32,7 @@ TooltipService.Open(args.Element, ts =>
             <strong>Start</strong>
         </RadzenText>
         <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-tooltip-color);">
-            @args.Data.Start.ToString("yyyy-MMM-dd hh:mm")
+            @args.Data.Start.ToString("hh:mm ⋅ dddd, MMMM d")
         </RadzenText>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
@@ -40,7 +40,7 @@ TooltipService.Open(args.Element, ts =>
             <strong>End</strong>
         </RadzenText>
         <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-tooltip-color);">
-            @args.Data.End.ToString("yyyy-MMM-dd hh:mm")
+            @args.Data.End.ToString("hh:mm ⋅ dddd, MMMM d")
         </RadzenText>
     </RadzenStack>
 </RadzenStack>, new TooltipOptions { Position = TooltipPosition.Right, Duration = null });
