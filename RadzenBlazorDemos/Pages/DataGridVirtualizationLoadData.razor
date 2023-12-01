@@ -34,14 +34,21 @@
     int count;
     IEnumerable<OrderDetail> orderDetails;
 
+    string lastfilter;
     void LoadData(LoadDataArgs args)
     {
+        if(!string.IsNullOrEmpty(args.Filter) && lastfilter != args.Filter)
+        {
+            args.Skip = 0;
+        }
+
         console.Log($"Skip: {args.Skip}, Top: {args.Top}");
 
         var query = dbContext.OrderDetails.AsQueryable();
 
         if (!string.IsNullOrEmpty(args.Filter))
         {
+            lastfilter = args.Filter;
             query = query.Where(args.Filter);
             count = query.Count();
         }
