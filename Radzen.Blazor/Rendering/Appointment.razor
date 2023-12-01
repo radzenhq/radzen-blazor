@@ -1,8 +1,8 @@
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 
-<div class="rz-event" style=@Style @onclick=@OnClick>
-    <div class="rz-event-content" title=@Data?.Text @attributes=@Attributes>
+<div @ref=@element class="rz-event" style=@Style @onclick=@OnClick @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave>
+    <div class="rz-event-content" title=@Title @attributes=@Attributes>
         @if (ShowAppointmentContent)
         {
             @Scheduler.RenderAppointment(Data)
@@ -10,6 +10,10 @@
     </div>
 </div>
 @code {
+    private ElementReference element;
+
+    private string Title => Scheduler.HasMouseEnterAppointmentDelegate() ? null : Data?.Text;
+
     [Parameter]
     public double? Top { get; set; }
 
@@ -70,5 +74,15 @@
     async Task OnClick()
     {
         await Click.InvokeAsync(Data);
+    }
+
+    async Task OnMouseEnter()
+    {
+        await Scheduler.MouseEnterAppointment(element, Data);
+    }
+
+    async Task OnMouseLeave()
+    {
+        await Scheduler.MouseLeaveAppointment(element, Data);
     }
 }

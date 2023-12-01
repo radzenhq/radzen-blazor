@@ -91,6 +91,28 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         /// <returns>RenderFragment.</returns>
         RenderFragment RenderAppointment(AppointmentData item);
+
+        /// <summary>
+        /// Notifies the scheduler that the user has moved the mouse over the specified appointment.
+        /// </summary>
+        /// <param name="reference"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        Task MouseEnterAppointment(ElementReference reference, AppointmentData data);
+
+        /// <summary>
+        /// Returns true if the scheduler has a mouse enter appointment listener.
+        /// </summary>
+        /// <returns></returns>
+        bool HasMouseEnterAppointmentDelegate();
+
+        /// <summary>
+        /// Notifies the scheduler that the user has moved the mouse out of the specified appointment.
+        /// </summary>
+        /// <param name="reference"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        Task MouseLeaveAppointment(ElementReference reference, AppointmentData data);
         /// <summary>
         /// Reloads this instance.
         /// </summary>

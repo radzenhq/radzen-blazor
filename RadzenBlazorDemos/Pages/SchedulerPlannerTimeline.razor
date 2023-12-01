@@ -1,11 +1,5 @@
 @inject DialogService DialogService
 
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
-    Year Planner and Timeline views
-</RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Plan out the whole year with <code>&lt;RadzenYearPlannerView /&gt;</code> and <code>&lt;RadzenYearTimelineView /&gt;</code>.
-</RadzenText>
 <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
     TextProperty="Text" SelectedIndex="1"
     SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender>
