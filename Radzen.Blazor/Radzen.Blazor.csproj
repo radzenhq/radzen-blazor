@@ -27,9 +27,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'netstandard2.1'" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net5.0'" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net5.0'" Version="5.0.0" />
-	<PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net6.0'" Version="6.0.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net6.0'" Version="6.0.25" />
 	<PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net6.0'" Version="6.0.0" />
-	<PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.14" />
 	<PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.0" />
 	<PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
 	<PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />	  
