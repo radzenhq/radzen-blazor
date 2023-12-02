@@ -4,44 +4,62 @@
 {
     <g class="rz-axis rz-value-axis">
         <Line Class="rz-line" X1="@x1" Y1="@y1" X2="@x1" Y2="@y2" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
+
         @for (var idx = start; idx <= end; idx += step)
         {
             var value = Chart.ValueScale.Value(idx);
-            var y = Chart.ValueScale.Scale(idx);
+            y = Chart.ValueScale.Scale(idx);
+            var text = YAxis.Format(Chart.ValueScale, value);
+
+            if ((YAxis.ChartBaseLabelSpace == 0.0) || (YAxis.ChartBaseLabelSpace != 0.0 && (Math.Abs(y0 - y) > YAxis.ChartBaseLabelSpace)))
+            {
+                if (YAxis.Ticks.Template != null)
+                {
+                    var context = new TickTemplateContext { Text = text, Value = value, X = x1, Y = y } ;
+
+                    <ValueAxisTick X="@x1" Y="@y" Text="@text" Stroke="@(YAxis.Ticks.Stroke ?? YAxis.Stroke)" StrokeWidth="@YAxis.Ticks.StrokeWidth" LineType="@YAxis.Ticks.LineType">
+                        @YAxis.Ticks.Template(context)
+                    </ValueAxisTick>
+                }
+                else
+                {
+                    <ValueAxisTick X="@x1" Y="@y" Text="@text" Stroke="@(YAxis.Ticks.Stroke ?? YAxis.Stroke)" StrokeWidth="@YAxis.Ticks.StrokeWidth" LineType="@YAxis.Ticks.LineType"/>
+                }
+
+                if (YAxis.GridLines.Visible && idx > start)
+                {
+                    <Line Class="rz-grid-line" X1="@x1" Y1="@y" X2="@x2" Y2="@y" Stroke="@YAxis.GridLines.Stroke" StrokeWidth="@YAxis.GridLines.StrokeWidth" LineType="@YAxis.GridLines.LineType" />
+                }
+            }
+        }
+
+        @if (YAxis.ChartBaseLabelSpace != 0.0)
+        {
+            var value = Chart.ValueScale.Value(YAxis.ChartBaseValue);
             var text = YAxis.Format(Chart.ValueScale, value);
 
             if (YAxis.Ticks.Template != null)
             {
-                var context = new TickTemplateContext { Text = text, Value = value, X = x1, Y = y } ;
+                var context = new TickTemplateContext { Text = text, Value = value, X = x1, Y = y };
 
-                <ValueAxisTick X="@x1" Y="@y" Text="@text" Stroke="@(YAxis.Ticks.Stroke ?? YAxis.Stroke)" StrokeWidth="@YAxis.Ticks.StrokeWidth" LineType="@YAxis.Ticks.LineType">
+                <ValueAxisTick X="@x1" Y="@y0" Text="@text" Stroke="@(YAxis.Ticks.Stroke ?? YAxis.Stroke)" StrokeWidth="@YAxis.Ticks.StrokeWidth" LineType="@YAxis.Ticks.LineType">
                     @YAxis.Ticks.Template(context)
                 </ValueAxisTick>
             }
             else
             {
-                <ValueAxisTick X="@x1" Y="@y" Text="@text" Stroke="@(YAxis.Ticks.Stroke ?? YAxis.Stroke)" StrokeWidth="@YAxis.Ticks.StrokeWidth" LineType="@YAxis.Ticks.LineType"/>
+                <ValueAxisTick X="@x1" Y="@y0" Text="@text" Stroke="@(YAxis.Ticks.Stroke ?? YAxis.Stroke)" StrokeWidth="@YAxis.Ticks.StrokeWidth" LineType="@YAxis.Ticks.LineType" />
             }
-
-            if (YAxis.GridLines.Visible && idx > start)
-            {
-                <Line Class="rz-grid-line" X1="@x1" Y1="@y" X2="@x2" Y2="@y" Stroke="@YAxis.GridLines.Stroke" StrokeWidth="@YAxis.GridLines.StrokeWidth" LineType="@YAxis.GridLines.LineType" />
-            }
-
-            if (!basedrawn && idx == Chart.ValueAxis.ChartBaseValue) basedrawn = true;
         }
 
-        @if (!basedrawn)
+        @if (YAxis.GridLines.Visible)
         {
-            var y = Chart.ValueScale.Scale(Chart.ValueAxis.ChartBaseValue);
-            if (YAxis.GridLines.Visible)
-            {
-                <Line Class="rz-grid-line" X1="@x1" Y1="@y" X2="@x2" Y2="@y" Stroke="@YAxis.GridLines.Stroke" StrokeWidth="@YAxis.GridLines.StrokeWidth" LineType="@YAxis.GridLines.LineType" />
-            }
+            <Line Class="rz-grid-line" X1="@x1" Y1="@y0" X2="@x2" Y2="@y0" Stroke="@YAxis.GridLines.Stroke" StrokeWidth="@YAxis.GridLines.StrokeWidth" LineType="@YAxis.GridLines.LineType" />
         }
+
         @if (!String.IsNullOrEmpty(YAxis.Title.Text))
         {
-            <ValueAxisTitle X="@(x1 - Chart.ValueAxis.Size + YAxis.Title.Size)" Y="@((y1 - y2)/2)" Text="@YAxis.Title.Text" />
+            <ValueAxisTitle X="@(x1 - YAxis.Size + YAxis.Title.Size)" Y="@((y1 - y2)/2)" Text="@YAxis.Title.Text" />
         }
     </g>
 }
@@ -56,7 +74,8 @@
     private AxisBase XAxis { get; set; }
     private AxisBase YAxis { get; set; }
 
-    bool basedrawn;
+    double y;
+    double y0;
 
     protected override void OnParametersSet()
     {
@@ -80,6 +99,6 @@
         y1 = Chart.ValueScale.Scale(start);
         y2 = Chart.ValueScale.Scale(end);
 
-        basedrawn = false;
+        y0 = Chart.ValueScale.Scale(YAxis.ChartBaseValue);
     }
 }

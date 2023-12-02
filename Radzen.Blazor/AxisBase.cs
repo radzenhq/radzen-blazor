@@ -103,6 +103,13 @@ namespace Radzen.Blazor
         public double ChartBaseValue { get; set; } = 0.0;
 
         /// <summary>
+        /// Gets or sets the buffer distance from the ChartBaseValue to adjacent chart axis labels and lines. Any that fall within will not be displayed. A value of 0.0 (default) hides the base label if not part of the calculated axis grid.
+        /// </summary>
+        /// <value>Buffer distance from the base label to adjacent chart axis labels and lines.</value>
+        [Parameter]
+        public double ChartBaseLabelSpace { get; set; } = 0.0;
+
+        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="AxisBase"/> is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>

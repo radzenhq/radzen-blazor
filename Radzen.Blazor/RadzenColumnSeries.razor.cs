@@ -27,7 +27,7 @@ namespace Radzen.Blazor
         [Parameter]
         public IEnumerable<string> Fills { get; set; }
 
-        /// <summary>
+        /// <summary>   
         /// Specifies the stroke (border color) of the column series.
         /// </summary>
         /// <value>The stroke.</value>
