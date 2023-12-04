@@ -11,7 +11,7 @@
             y = Chart.ValueScale.Scale(idx);
             var text = YAxis.Format(Chart.ValueScale, value);
 
-            if ((YAxis.ChartBaseLabelSpace == 0.0) || (YAxis.ChartBaseLabelSpace != 0.0 && (Math.Abs(y0 - y) > YAxis.ChartBaseLabelSpace)))
+            if ((!YAxis.ShowChartBaseLabel) || (YAxis.ShowChartBaseLabel && (Math.Abs(y0 - y) > YAxis.ChartBaseLabelSpace)))
             {
                 if (YAxis.Ticks.Template != null)
                 {
@@ -33,7 +33,7 @@
             }
         }
 
-        @if (YAxis.ChartBaseLabelSpace != 0.0)
+        @if (YAxis.ShowChartBaseLabel)
         {
             var value = Chart.ValueScale.Value(YAxis.ChartBaseValue);
             var text = YAxis.Format(Chart.ValueScale, value);

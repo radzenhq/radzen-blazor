@@ -11,7 +11,7 @@
             x = Chart.CategoryScale.Scale(idx, true);
             var text = XAxis.Format(Chart.CategoryScale, value);
 
-            if ((XAxis.ChartBaseLabelSpace == 0.0) || (XAxis.ChartBaseLabelSpace != 0.0 && (Math.Abs(x0 - x) > XAxis.ChartBaseLabelSpace)))
+            if ((!XAxis.ShowChartBaseLabel) || (XAxis.ShowChartBaseLabel && (Math.Abs(x0 - x) > XAxis.ChartBaseLabelSpace)))
             {
                 if (XAxis.Ticks.Template != null)
                 {
@@ -32,7 +32,7 @@
                 }
             }
         }
-        @if (XAxis.ChartBaseLabelSpace != 0.0)
+        @if (XAxis.ShowChartBaseLabel)
         {
             var value = Chart.CategoryScale.Value(XAxis.ChartBaseValue);
             var text = XAxis.Format(Chart.CategoryScale, value);
