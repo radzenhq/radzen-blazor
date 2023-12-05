@@ -261,6 +261,20 @@ namespace Radzen.Blazor
         public EventCallback<Radzen.DataGridLoadChildDataEventArgs<TItem>> LoadChildData { get; set; }
 
         /// <summary>
+        /// Gets or sets the expand child item aria label text.
+        /// </summary>
+        /// <value>The expand child item aria label text.</value>
+        [Parameter]
+        public string ExpandChildItemAriaLabel { get; set; } = "Expand child item";
+
+        /// <summary>
+        /// Gets or sets the expand group aria label text.
+        /// </summary>
+        /// <value>The expand group aria label text.</value>
+        [Parameter]
+        public string ExpandGroupAriaLabel { get; set; } = "Expand group";
+
+        /// <summary>
         /// Gets or sets a value indicating whether DataGrid data cells will follow the header cells structure in composite columns.
         /// </summary>
         /// <value><c>true</c> if DataGrid data cells will follow the header cells structure in composite columns; otherwise, <c>false</c>.</value>
@@ -1336,6 +1350,13 @@ namespace Radzen.Blazor
         /// <value>The column picker columns text.</value>
         [Parameter]
         public string ColumnsText { get; set; } = "Columns";
+
+        /// <summary>
+        /// Gets or sets the remove group button aria label text.
+        /// </summary>
+        /// <value>The remove group button aria label text.</value>
+        [Parameter]
+        public string RemoveGroupArialLabel { get; set; } = "Remove group";
 
         /// <summary>
         /// Gets or sets a value indicating whether user can pick all columns in column picker.
