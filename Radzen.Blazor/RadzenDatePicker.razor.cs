@@ -867,7 +867,7 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    return $"width: 320px !important; {contentStyle}";
+                    return $"width: 320px; {contentStyle}";
                 }
             }
         }
