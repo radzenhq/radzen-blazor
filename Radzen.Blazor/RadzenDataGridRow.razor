@@ -24,7 +24,7 @@
             <span class="rz-column-title"></span>
             @if (rowArgs.Item1.Expandable)
             {
-                <a href="javascript:void(0)" @onclick="@(_ => Grid.ExpandItem(Item))" @onclick:stopPropagation>
+                <a aria-label="@Grid.ExpandChildItemAriaLabel" href="javascript:void(0)" @onclick="@(_ => Grid.ExpandItem(Item))" @onclick:stopPropagation>
                     <span class="@(Grid.ExpandedItemStyle(Item))"></span>
                 </a>
             }

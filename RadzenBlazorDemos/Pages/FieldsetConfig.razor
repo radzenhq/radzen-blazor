@@ -28,7 +28,7 @@
                     </div>
                     <hr style="border: none; background-color: rgba(0,0,0,.08); height: 1px; margin: 1rem 0;" />
                     <div class="d-flex flex-row align-items-center">
-                        <RadzenImage Path="@order.Employee?.Photo" class="rounded-circle float-start me-3" Style="width: 80px; height: 80px;" />
+                        <RadzenImage Path="@order.Employee?.Photo" class="rounded-circle float-start me-3" Style="width: 80px; height: 80px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                         <div>
                             <h4 class="mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</h4>
                             <div>@order.ShipAddress</div>

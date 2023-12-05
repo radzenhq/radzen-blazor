@@ -14,9 +14,10 @@
         @if (!Inline)
         {
             <span class="@($"rz-calendar rz-calendar-w-btn{(Disabled ? " rz-state-disabled" : "")}")" style="width:100%">
+                <label class="rz-helper-hidden-accessible" style="position:absolute !important" id="@($"{Name}-lbl")" for="@($"{(Name ?? UniqueID + "input")}")">value</label>
                 <input @ref="@input" @attributes="InputAttributes" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
                        @onchange="@ParseDate" autocomplete="off" type="text" name="@Name"
-                       class="rz-inputtext @InputClass @(IsReadonly ? "rz-readonly" : "")" id="@Name" placeholder="@Placeholder" onclick="@getOpenPopupForInput()"/>
+                       class="rz-inputtext @InputClass @(IsReadonly ? "rz-readonly" : "")" id="@(Name ?? UniqueID + "input")" placeholder="@Placeholder" onclick="@getOpenPopupForInput()"/>
                 @if (ShowButton)
                 {
 	                <button @onmousedown=@OnToggle onclick="@getOpenPopup()" class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
@@ -35,10 +36,10 @@
                     @if (!TimeOnly)
                     {
                         <div class="rz-datepicker-header">
-                            <a href="javascript:void(0)" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
+                            <a aria-label="@PrevMonthAriaLabel" href="javascript:void(0)" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
                                 <span class="rz-datepicker-prev-icon rzi rzi-chevron-left"></span>
                             </a>
-                            <a href="javascript:void(0)" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
+                            <a aria-label="@NextMonthAriaLabel" href="javascript:void(0)" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
                                 <span class="rz-datepicker-next-icon rzi rzi-chevron-right"></span>
                             </a>
                             <div class="rz-datepicker-title">
@@ -122,11 +123,11 @@
                         @if (HourFormat == "12")
                         {
                             <div class="rz-ampm-picker">
-                                <a href="javascript:void(0)" @onclick="@ToggleAmPm">
+                                <a aria-label="@ToggleAmPmAriaLabel" href="javascript:void(0)" @onclick="@ToggleAmPm">
                                     <span class="rzi rzi-chevron-up"></span>
                                 </a>
                                 <span>@CurrentDate.ToString("tt")</span>
-                                <a href="javascript:void(0)" @onclick="@ToggleAmPm">
+                                <a aria-label="@ToggleAmPmAriaLabel" href="javascript:void(0)" @onclick="@ToggleAmPm">
                                     <span class="rzi rzi-chevron-down"></span>
                                 </a>
                             </div>

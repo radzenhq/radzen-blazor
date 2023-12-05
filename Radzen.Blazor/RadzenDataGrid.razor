@@ -35,7 +35,7 @@
                             {
                                 <div class="rz-group-header-item">
                                     <span class="rz-group-header-item-title">@gd.GetTitle()</span>
-                                    <a href="javascript:void(0)" @onclick=@(args => RemoveGroupAsync(gd)) role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                                    <a aria-label="@RemoveGroupArialLabel" href="javascript:void(0)" @onclick=@(args => RemoveGroupAsync(gd)) role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
                                         <span class="rzi rzi-times"></span>
                                     </a>
                                 </div>
@@ -165,7 +165,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <label class="rz-cell-filter-label" style="height:35px; width:100%;" onclick="event.preventDefault()">
+                                                    <span class="rz-cell-filter-label" style="height:35px; width:100%;" onclick="event.preventDefault()">
                                                         @if (PropertyAccess.IsDate(column.FilterPropertyType))
                                                         {
                                                             if (FilterMode == FilterMode.Simple)
@@ -310,13 +310,14 @@
                                                             {
                                                                 <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
                                                             }
-                                                            <input disabled=@column.CanSetFilterValue() id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" placeholder="@column.GetFilterPlaceholder()" class="rz-textbox" style="width: 100%;" />
+                                                            <label class="rz-helper-hidden-accessible" style="position:absolute !important" id="@($"{getFilterInputId(column)}-sfl")" for="@($"{getFilterInputId(column)}")">filter</label>
+                                                            <input aria-labelledby="@($"{getFilterInputId(column)}-sfl")" disabled=@column.CanSetFilterValue() id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" placeholder="@column.GetFilterPlaceholder()" class="rz-textbox" style="width: 100%;" />
                                                             @if (column.GetFilterValue() != null && filters.Any(d => d.Property == column.GetFilterProperty()))
                                                             {
                                                                 <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear" style="position:absolute;right:10px;">close</i>
                                                             }
                                                         }
-                                                    </label>
+                                                    </span>
                                                 }
                                             </div>
                                         </div>
@@ -508,7 +509,7 @@
                     @if (this.LoadChildData.HasDelegate && this.ShowExpandColumn && this.allColumns.IndexOf(column) == 0)
                     {
                         <span class="rz-cell-toggle">
-                            <a class="@(getExpandIconCssClass(this, Item))" style="@(getExpandIconStyle(this, Item, rowArgs.Item1.Expandable))" href="javascript:void(0)" @onclick="_ => this.ExpandItem(Item)" @onclick:stopPropagation>
+                            <a aria-label="@ExpandChildItemAriaLabel" class="@(getExpandIconCssClass(this, Item))" style="@(getExpandIconStyle(this, Item, rowArgs.Item1.Expandable))" href="javascript:void(0)" @onclick="_ => this.ExpandItem(Item)" @onclick:stopPropagation>
                                 <span class="@(this.ExpandedItemStyle(Item))"></span>
                             </a>
                             <span class="rz-cell-data" @attributes="@spanAttributes">

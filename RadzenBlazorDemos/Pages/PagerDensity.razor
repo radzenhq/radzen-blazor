@@ -16,7 +16,7 @@
     <Template Context="order">
         <RadzenCard Style="flex: 1;">
             <RadzenStack AlignItems="AlignItems.Center" Gap="1rem">
-                <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" />
+                <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                 <RadzenStack Gap="0">
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" TextAlign="TextAlign.Center">@(order?.Employee?.FirstName + " " + order?.Employee?.LastName)</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body2" TextAlign="TextAlign.Center">@(order.ShipCity), @(order.ShipCountry)</RadzenText>

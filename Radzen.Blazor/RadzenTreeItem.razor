@@ -16,7 +16,7 @@
             <div class="rz-treenode-label">@Template(this)</div>
         } else
         {
-            <label for="@(GetHashCode())" class="rz-treenode-label">@Text</label>
+            <span for="@(GetHashCode())" class="rz-treenode-label">@Text</span>
         }
     </div>
     @if (ChildContent != null && expanded)

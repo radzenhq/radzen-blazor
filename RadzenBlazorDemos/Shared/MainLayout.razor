@@ -16,8 +16,7 @@
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                     <RadzenSidebarToggle Click="@(args => { sidebarExpanded = !sidebarExpanded; bodyExpanded = !bodyExpanded; })">
                     </RadzenSidebarToggle>
-                    <RadzenLabel Text="Radzen Blazor Components" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-                    </RadzenLabel>
+                    <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">Radzen Blazor Components</span>
                 </RadzenStack>
             </RadzenColumn>
             <RadzenColumn Size="7">
@@ -106,7 +105,7 @@
                                 </RadzenRow>
                             </RadzenCard>
                             <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Center" Class="rz-mt-12">
-                                <RadzenLabel Text="Radzen Blazor Components, &copy; 2018-2023 Radzen."></RadzenLabel> <br />
+                                <span>Radzen Blazor Components, &copy; 2018-2023 Radzen.</span> <br />
                                 <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under
                                 <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a>
                             </RadzenText>
@@ -118,7 +117,7 @@
                             <RadzenStack Gap="0" AlignItems="AlignItems.Start" Class="demos-right-sidebar rz-pl-4 rz-pl-md-6 rz-py-6 rz-py-lg-12">
                                 <RadzenBadge Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Info" Text="New" />
                                 <RadzenText TextStyle="TextStyle.H4" Class="rz-mt-1 rz-mb-4" style="line-height: 1.1"><strong>Radzen<br /> Blazor Studio</strong></RadzenText>
-                                <RadzenImage Path="images/radzen-blazor-studio.png" Class="rz-mt-4 rz-mb-8 rz-border-radius-1 rz-shadow-3" Style="width: 100%" />
+                                    <RadzenImage Path="images/radzen-blazor-studio.png" Class="rz-mt-4 rz-mb-8 rz-border-radius-1 rz-shadow-3" Style="width: 100%" AlternateText=">Radzen Blazor Studio" />
                                 <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-primary-color"><strong>Accelerated, smarter, and cost-effective Blazor development</strong></RadzenText>
                                 <RadzenText TextStyle="TextStyle.Body2" Class="rz-text-secondary-color rz-display-none rz-display-lg-block">Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</RadzenText>
                                 <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="1rem" Class="rz-pt-4">
@@ -135,7 +134,8 @@
 </RadzenBody>
 <RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded" Class="demos-sidebar" style="display: flex; flex-direction: column">
     <div style="padding: 1rem">
-        <RadzenTextBox Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" Class="rz-search-input" />
+        <label class="rz-helper-hidden-accessible" style="position:absolute !important"  for="find">find</label>
+        <RadzenTextBox id="find" Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" Class="rz-search-input" />
     </div>
     <div style="flex: 1; overflow: auto">
     <RadzenPanelMenu Match="NavLinkMatch.Prefix">

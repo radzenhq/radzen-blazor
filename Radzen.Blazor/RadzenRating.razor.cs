@@ -26,6 +26,20 @@ namespace Radzen.Blazor
         public int Stars { get; set; } = 5;
 
         /// <summary>
+        /// Gets or sets the clear aria label text.
+        /// </summary>
+        /// <value>The clear aria label text.</value>
+        [Parameter]
+        public string ClearAriaLabel { get; set; } = "Clear";
+
+        /// <summary>
+        /// Gets or sets the rate aria label text.
+        /// </summary>
+        /// <value>The rate aria label text.</value>
+        [Parameter]
+        public string RateAriaLabel { get; set; } = "Rate";
+
+        /// <summary>
         /// Gets or sets a value indicating whether is read only.
         /// </summary>
         /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>

@@ -69,7 +69,7 @@
                             else
                             {
                                 <form id="@($"{getColumnPopupID()}-form")" @onsubmit="@(args => ApplyFilter())" class="rz-grid-filter">
-                                <RadzenLabel Text="@Grid.FilterText" class="rz-grid-filter-label" />
+                                <span class="rz-grid-filter-label">@Grid.FilterText</span>
                                 <RadzenDropDown @onclick:preventDefault="true" Data="@(Column.GetFilterOperators().Select(t => new { Value = Column.GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" Value="@Column.GetFilterOperator()" Change="@(args => Column.SetFilterOperator((FilterOperator)args))" />
                                 @if (Column.FilterValueTemplate != null)
                                 {
@@ -97,7 +97,8 @@
                                 }
                                 else
                                 {
-                                    <RadzenTextBox Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
+                                    <label class="rz-helper-hidden-accessible" style="position:absolute !important" id="@($"{getColumnPopupID()}-sfl")" for="@($"{getColumnPopupID()}-sf")">filter</label>
+                                    <RadzenTextBox id="@($"{getColumnPopupID()}-sf")" aria-labelledby="@($"{getColumnPopupID()}-sfl")" Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
                                 }
 
                                 <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px"
@@ -131,7 +132,8 @@
                                 }
                                 else
                                 {
-                                    <RadzenTextBox Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
+                                    <label class="rz-helper-hidden-accessible" style="position:absolute !important" id="@($"{getColumnPopupID()}-sfl2")" for="@($"{getColumnPopupID()}-sf2")">filter</label>
+                                    <RadzenTextBox id="@($"{getColumnPopupID()}-sf2")" aria-labelledby="@($"{getColumnPopupID()}-sfl2")" Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
                                 }
                                 </form>
                             }
