@@ -338,6 +338,13 @@ namespace Radzen.Blazor
         [Parameter]
         public string FilterDateFormat { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the time part is shown in a date filter.
+        /// </summary>
+        /// <value><c>true</c> if time part is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool FilterDateShowTime { get; set; } = true;
+
         internal async Task AddFilter(bool isGroup)
         {
             if (UniqueFilters && properties.All(f => f.IsSelected))

@@ -24,8 +24,8 @@
             @foreach(var filter in Filters)
             {
                 <li class="rz-datafilter-item @(filter.Filters != null ? "rz-datafilter-group-item" : "")">
-                <RadzenDataFilterItem @key=@filter.GetHashCode() DataFilter="@this" Filter="@filter" />
-              </li>
+                    <RadzenDataFilterItem @key=@filter.GetHashCode() DataFilter="@this" Filter="@filter" />
+                </li>
             }
             <li class="rz-datafilter-item rz-datafilter-bar">
                 <RadzenSplitButton Icon="add" Click="@(args => AddFilter(args?.Value == "group"))" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter">
