@@ -17,7 +17,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
             <Template Context="order">
-                <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" />
+                <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                 <RadzenText TextStyle="TextStyle.Subtitle2" class="mb-0">@order.Employee?.FirstName @order.Employee?.LastName</RadzenText>
                 <RadzenText TextStyle="TextStyle.Caption">@order.Customer?.CompanyName</RadzenText>
             </Template>

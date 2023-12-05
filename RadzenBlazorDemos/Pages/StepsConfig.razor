@@ -35,7 +35,7 @@
                     <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
                         <Template Context="order">
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                                <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                                <RadzenImage Path="@order.Employee?.Photo" style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                                 <span>@order.Employee?.LastName</span>
                             </RadzenStack>
                         </Template>
