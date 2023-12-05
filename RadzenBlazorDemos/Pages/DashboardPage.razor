@@ -106,7 +106,7 @@
             <RadzenCard Style="height: 280px">
                 <RadzenText TextStyle="TextStyle.H6">Most Active Member</RadzenText>
                 <div Class="rz-text-align-center">
-                    <img Style="width: 120px; border-radius: 50%; margin: 20px 0;" src=@mostActiveMember?.AvatarUrl />
+                    <img Style="width: 120px; border-radius: 50%; margin: 20px 0;" src=@mostActiveMember?.AvatarUrl alt="Most active member avatar" />
                     <h4>
                         @mostActiveMember?.Login
                     </h4>
@@ -125,13 +125,13 @@
                                 <RadzenDropDown AllowClear="true" AllowFiltering="true" Data=@users TextProperty="Login" @bind-Value="selectedUser" Change=@FilterIssues>
                                     <Template Context="user">
                                         <div Style="white-space: nowrap">
-                                            <img Style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;" src=@user.AvatarUrl />@user.Login
+                                            <img Style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;" src=@user.AvatarUrl alt="User avatar"/>@user.Login
                                         </div>
                                     </Template>
                                 </RadzenDropDown>
                             </FilterTemplate>
                             <Template Context="issue">
-                                <img Style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; border: 1px solid #cccccc;" src=@issue.User.AvatarUrl /><b>@issue.User.Login</b>
+                                <img Style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; border: 1px solid #cccccc;" src=@issue.User.AvatarUrl alt="User avatar" /><b>@issue.User.Login</b>
                             </Template>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="Issue" Property="Title" Title="Title" Width="400px">
