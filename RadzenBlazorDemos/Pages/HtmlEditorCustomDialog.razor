@@ -10,7 +10,7 @@
     @if (!string.IsNullOrEmpty(Path.GetExtension(selectedFile)))
     {
         <h4>Preview</h4>
-        <img style="max-width: 100%" src=@(ToUrl(selectedFile)) />
+        <img style="max-width: 100%" src=@(ToUrl(selectedFile)) alt="Selected image file preview" />
     }
     </div>
 </div>

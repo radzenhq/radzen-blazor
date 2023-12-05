@@ -23,7 +23,7 @@
 
         if (result != null)
         {
-            await editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, $"<img style=\"max-width: 100%\" src=\"{result}\">");
+            await editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, $"<img alt=\"Selected image file preview\" style=\"max-width: 100%\" src=\"{result}\">");
         }
     }
 }
