@@ -26,7 +26,7 @@
                 @foreach (var file in files)
                 {
                 <div class="rz-fileupload-row" style="margin-bottom: 10px">
-                    <div><img src="@file.Url" width="50px" onerror="this.style.display='none';"></div>
+                    <div><img src="@file.Url" width="50px" onerror="this.style.display='none';" alt="@ImageAlternateText"></div>
                     <div>@file.Name</div>
                     <div>@(file.Size / 1024) KB</div>
                     <div>

@@ -25,7 +25,14 @@ namespace Radzen.Blazor
         {
             return Size == ButtonSize.Medium ? "md" : Size == ButtonSize.Large ? "lg" : Size == ButtonSize.Small ? "sm" : "xs";
         }
-        
+
+        /// <summary>
+        /// Gets or sets the text.
+        /// </summary>
+        /// <value>The text.</value>
+        [Parameter]
+        public string ImageAlternateText { get; set; } = "image";
+
         /// <summary>
         /// Gets or sets the text.
         /// </summary>

@@ -34,6 +34,13 @@ namespace Radzen.Blazor
         public string ChooseText { get; set; } = "Choose";
 
         /// <summary>
+        /// Gets or sets the text.
+        /// </summary>
+        /// <value>The text.</value>
+        [Parameter]
+        public string ImageAlternateText { get; set; } = "image";
+
+        /// <summary>
         /// Gets or sets the title.
         /// </summary>
         /// <value>The title.</value>

@@ -23,7 +23,7 @@
                         <div>
                             @if (IsImage)
                             {
-                                <img style="@ImageStyle" src="@Value" @onclick="@OnImageClick">
+                                <img style="@ImageStyle" src="@Value" @onclick="@OnImageClick" alt="@ImageAlternateText" />
                             }
                         </div>
                         <div>

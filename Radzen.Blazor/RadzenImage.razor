@@ -2,5 +2,5 @@
 
 @if (Visible)
 {
-    <img @ref="@Element" src="@Path" style="@Style" @onclick="@((args) => OnClick(args))" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"/>
+    <img @ref="@Element" src="@Path" style="@Style" @onclick="@((args) => OnClick(args))" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" alt="@GetAlternateText()" />
 }

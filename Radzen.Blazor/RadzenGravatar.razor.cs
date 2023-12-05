@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System;
 using System.Linq;
 
 namespace Radzen.Blazor
@@ -21,6 +22,13 @@ namespace Radzen.Blazor
         public string Email { get; set; }
 
         /// <summary>
+        /// Gets or sets the text.
+        /// </summary>
+        /// <value>The text.</value>
+        [Parameter]
+        public string AlternateText { get; set; } = "gravatar";
+
+        /// <summary>
         /// Gets gravatar URL.
         /// </summary>
         protected string Url
@@ -34,6 +42,16 @@ namespace Radzen.Blazor
 
                 return $"https://secure.gravatar.com/avatar/{md5Email}?d={style}&s={width}";
             }
+        }
+
+        string GetAlternateText()
+        {
+            if (Attributes != null && Attributes.TryGetValue("alt", out var @alt) && !string.IsNullOrEmpty(Convert.ToString(@alt)))
+            {
+                return $"{AlternateText} {@alt}";
+            }
+
+            return AlternateText;
         }
 
         /// <inheritdoc />

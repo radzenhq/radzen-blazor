@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using System;
 
 namespace Radzen.Blazor
 {
@@ -21,6 +22,13 @@ namespace Radzen.Blazor
         public string Path { get; set; }
 
         /// <summary>
+        /// Gets or sets the text.
+        /// </summary>
+        /// <value>The text.</value>
+        [Parameter]
+        public string AlternateText { get; set; } = "image";
+
+        /// <summary>
         /// Gets or sets the click callback.
         /// </summary>
         /// <value>The click callback.</value>
@@ -34,6 +42,16 @@ namespace Radzen.Blazor
         protected async System.Threading.Tasks.Task OnClick(MouseEventArgs args)
         {
             await Click.InvokeAsync(args);
+        }
+
+        string GetAlternateText()
+        {
+            if (Attributes != null && Attributes.TryGetValue("alt", out var @alt) && !string.IsNullOrEmpty(Convert.ToString(@alt)))
+            {
+                return $"{AlternateText} {@alt}";
+            }
+
+            return AlternateText;
         }
     }
 }

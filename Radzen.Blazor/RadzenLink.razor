@@ -9,7 +9,7 @@
         }
         @if (!string.IsNullOrEmpty(Image))
         {
-            <img class="rzi" src="@Image" />
+            <img class="rzi" src="@Image" alt="@ImageAlternateText" />
         }
         <span @ref="@Element" class="rz-link-text">@if (ChildContent != null) {@ChildContent} else {@Text}</span>
     </NavLink>

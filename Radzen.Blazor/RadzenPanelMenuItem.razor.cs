@@ -37,6 +37,13 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The text.</value>
         [Parameter]
+        public string ImageAlternateText { get; set; } = "image";
+
+        /// <summary>
+        /// Gets or sets the text.
+        /// </summary>
+        /// <value>The text.</value>
+        [Parameter]
         public string Text { get; set; }
 
         /// <summary>

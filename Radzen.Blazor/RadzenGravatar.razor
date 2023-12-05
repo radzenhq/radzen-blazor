@@ -1,5 +1,5 @@
 ﻿@inherits RadzenComponent
 @if (Visible)
 {
-    <img @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" src="@Url" id="@GetId()" />
+    <img @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" src="@Url" id="@GetId()" alt="@GetAlternateText()" />
 }
