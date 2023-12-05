@@ -12,7 +12,7 @@
         <RadzenDataGridColumn TItem="OrderAndDetail" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="OrderAndDetail" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <RadzenImage Path="@data.Photo" class="rz-gravatar" />
+                <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="OrderAndDetail" Property="FirstName" Title="First Name" Frozen="true" Width="160px" />

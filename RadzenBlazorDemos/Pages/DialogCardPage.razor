@@ -12,7 +12,7 @@
         <RadzenColumn Size="12" SizeMD="6" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
             <RadzenText TextStyle="TextStyle.Subtitle1">Contact</RadzenText>
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-                <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" />
+                <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                 <RadzenStack Gap="0" Class="rz-text-truncate">
                     <RadzenText TextStyle="TextStyle.Overline" Class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Employee</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body1" Class="rz-text-truncate"><b>@(order?.Employee?.FirstName + " " + order?.Employee?.LastName)</b></RadzenText>

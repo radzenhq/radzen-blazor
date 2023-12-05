@@ -86,7 +86,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Image, image));
 
-            Assert.Contains(@$"<img class=""rz-button-icon-left rzi"" src=""{image}"" />", component.Markup);
+            Assert.Contains(@$"<img class=""rz-button-icon-left rzi"" src=""{image}"" alt=""button"" />", component.Markup);
         }
 
         [Fact]
@@ -103,9 +103,10 @@ namespace Radzen.Blazor.Tests
             {
                 parameters.Add(p => p.Text, text);
                 parameters.Add(p => p.Image, image);
+                parameters.Add(p => p.ImageAlternateText, text);
             });
 
-            Assert.Contains(@$"<img class=""rz-button-icon-left rzi"" src=""{image}"" />", component.Markup);
+            Assert.Contains(@$"<img class=""rz-button-icon-left rzi"" src=""{image}"" alt=""{text}"" />", component.Markup);
             Assert.Contains(@$"<span class=""rz-button-text"">{text}</span>", component.Markup);
         }
 

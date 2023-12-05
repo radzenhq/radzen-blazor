@@ -6,7 +6,7 @@
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" >
             <Template Context="data">
-                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
@@ -28,7 +28,7 @@
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" >
             <Template Context="data">
-                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
@@ -50,7 +50,7 @@
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" >
             <Template Context="data">
-                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />

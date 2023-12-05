@@ -28,7 +28,7 @@
                         </RadzenRow>
                         <hr style="border: none; background-color: rgba(0,0,0,.08); height: 1px; margin: 1rem 0;" />
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-                            <RadzenImage Path="@order.Employee?.Photo" Class="rz-border-radius-10" Style="width: 80px; height: 80px;" />
+                            <RadzenImage Path="@order.Employee?.Photo" Class="rz-border-radius-10" Style="width: 80px; height: 80px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                             <RadzenStack Gap="0">
                                 <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-mb-0"><strong>@(order.Employee?.FirstName + " " + order.Employee?.LastName)</strong></RadzenText>
                                 <RadzenText TextStyle="TextStyle.Body2" Class="rz-mb-0">@order.ShipAddress</RadzenText>
@@ -44,7 +44,7 @@
                 <Columns>
                     <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Photo" Sortable="false" Filterable="false" Width="80px">
                         <Template Context="data">
-                            <RadzenImage Path="@data?.Photo" Style="width: 40px; height: 40px; border-radius: 8px;" />
+                            <RadzenImage Path="@data?.Photo" Style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
                         </Template>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" />

@@ -10,7 +10,7 @@
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Title="Employee" Frozen="true" Sortable="false" Filterable="false" Width="300px">
             <Template Context="data">
-                <RadzenImage Path="@data.Photo" class="rz-gravatar me-1" />
+                <RadzenImage Path="@data.Photo" class="rz-gravatar me-1" AlternateText="@(data.FirstName + " " + data.LastName)" />
                 <strong>@data.TitleOfCourtesy @data.FirstName @data.LastName</strong>
             </Template>
         </RadzenDataGridColumn>

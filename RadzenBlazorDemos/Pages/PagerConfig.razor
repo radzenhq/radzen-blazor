@@ -8,7 +8,7 @@
     <Template Context="order">
         <RadzenCard Style="width:300px;">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-                <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" />
+                <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                 <RadzenStack Gap="0">
                     <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Employee</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body1"><b>@(order?.Employee?.FirstName + " " + order?.Employee?.LastName)</b></RadzenText>
