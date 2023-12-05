@@ -222,12 +222,16 @@ namespace Radzen.Blazor
         {
             var list = new List<ChartDataLabel>();
 
+            (string Anchor, int Sign) position;
+
             foreach (var d in Data)
             {
-                list.Add(new ChartDataLabel 
-                { 
-                    Position = new Point() { X = TooltipX(d) + offsetX + 8, Y = TooltipY(d) + offsetY },
-                    TextAnchor = "start",
+                position = Value(d) < 0 ? ("end", -1) : Value(d) == 0 ? ("middle", 0) : ("start", 1);
+
+                list.Add(new ChartDataLabel
+                {
+                    Position = new Point() { X = TooltipX(d) + offsetX + (8 * position.Sign), Y = TooltipY(d) + offsetY },
+                    TextAnchor = position.Anchor,
                     Text = Chart.ValueAxis.Format(Chart.CategoryScale, Value(d))
                 });
             }
