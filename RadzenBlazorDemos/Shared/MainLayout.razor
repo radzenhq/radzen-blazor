@@ -16,8 +16,7 @@
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                     <RadzenSidebarToggle Click="@(args => { sidebarExpanded = !sidebarExpanded; bodyExpanded = !bodyExpanded; })">
                     </RadzenSidebarToggle>
-                    <RadzenLabel Text="Radzen Blazor Components" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-                    </RadzenLabel>
+                    <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">Radzen Blazor Components</span>
                 </RadzenStack>
             </RadzenColumn>
             <RadzenColumn Size="7">
@@ -106,7 +105,7 @@
                                 </RadzenRow>
                             </RadzenCard>
                             <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Center" Class="rz-mt-12">
-                                <RadzenLabel Text="Radzen Blazor Components, &copy; 2018-2023 Radzen."></RadzenLabel> <br />
+                                <span>Radzen Blazor Components, &copy; 2018-2023 Radzen.</span> <br />
                                 <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under
                                 <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a>
                             </RadzenText>
@@ -135,7 +134,8 @@
 </RadzenBody>
 <RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded" Class="demos-sidebar" style="display: flex; flex-direction: column">
     <div style="padding: 1rem">
-        <RadzenTextBox Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" Class="rz-search-input" />
+        <label class="rz-helper-hidden-accessible" style="position:absolute !important"  for="find">find</label>
+        <RadzenTextBox id="find" Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" Class="rz-search-input" />
     </div>
     <div style="flex: 1; overflow: auto">
     <RadzenPanelMenu Match="NavLinkMatch.Prefix">
