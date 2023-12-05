@@ -20,21 +20,21 @@
 
         @if (ValueTemplate != null && selectedItem != null)
         {
-            <label class="rz-dropdown-label rz-inputtext " style="width:100%;">
+            <span class="rz-dropdown-label rz-inputtext" style="width:100%;">
                 @ValueTemplate(selectedItem)
-            </label>
+            </span>
         }
         else if (Template != null && selectedItem != null)
         {
-            <label class="rz-dropdown-label rz-inputtext " style="width:100%;">
+            <span class="rz-dropdown-label rz-inputtext" style="width:100%;">
                 @Template(selectedItem)
-            </label>
+            </span>
         }
         else if (selectedItem != null && !Multiple)
         {
-            <label class="rz-dropdown-label rz-inputtext " style="width:100%;">
+            <span class="rz-dropdown-label rz-inputtext" style="width:100%;">
                 @PropertyAccess.GetItemOrValueFromProperty(selectedItem, TextProperty)
-            </label>
+            </span>
         }
         else if ((selectedItems.Count > 0 || SelectedValue is IEnumerable && !(SelectedValue is string)) && Multiple)
         {
@@ -62,7 +62,7 @@
             }
             else
             {
-                <label class="rz-dropdown-label rz-inputtext " style="width:100%;">
+                <label class="rz-dropdown-label rz-inputtext" style="width:100%;">
                     @if (itemsToUse.Count < MaxSelectedLabels)
                     {
                         @if (Template == null)
@@ -87,21 +87,21 @@
         }
         else if (SelectedValue != null && !(SelectedValue is IEnumerable && !(SelectedValue is string)))
         {
-            <label class="rz-dropdown-label rz-inputtext rz-corner-all" style="width:100%;">
+            <span class="rz-dropdown-label rz-inputtext rz-corner-all" style="width:100%;">
                 @PropertyAccess.GetItemOrValueFromProperty(SelectedValue, TextProperty)
-            </label>
+            </span>
         }
         else if (!string.IsNullOrEmpty(Placeholder))
         {
-            <label class="rz-dropdown-label rz-inputtext  rz-placeholder" style="width:100%;">
+            <span class="rz-dropdown-label rz-inputtext rz-placeholder" style="width:100%;">
                 @Placeholder
-            </label>
+            </span>
         }
         else
         {
-            <label class="rz-dropdown-label rz-inputtext " style="width:100%">
+            <span class="rz-dropdown-label rz-inputtext" style="width:100%">
                 &nbsp;
-            </label>
+            </span>
         }
 
         <div class="rz-dropdown-trigger  rz-corner-right">

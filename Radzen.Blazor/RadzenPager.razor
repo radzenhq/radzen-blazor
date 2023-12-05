@@ -4,7 +4,7 @@
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
         @if(ShowPagingSummary)
         {
-        <label class="rz-paginator-summary">@((MarkupString)string.Format(PagingSummaryFormat, CurrentPage + 1, numberOfPages, Count))</label>        
+        <span class="rz-paginator-summary">@((MarkupString)string.Format(PagingSummaryFormat, CurrentPage + 1, numberOfPages, Count))</span>        
         }
 
         <a class="rz-paginator-first rz-paginator-element @((skip > 0) ? "": "rz-state-disabled")" href="javascript:void(0)" tabindex="-1" @onclick:preventDefault="true" @onclick="@(() => FirstPage())" aria-label="@FirstPageAriaLabel" title="@FirstPageTitle">
