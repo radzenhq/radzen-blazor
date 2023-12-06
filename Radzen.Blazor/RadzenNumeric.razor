@@ -7,9 +7,8 @@
 @if (Visible)
 {
     <span @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-        <label class="rz-helper-hidden-accessible" style="position:absolute !important" id="@($"{Name}-lbl")" for="@($"{(Name ?? UniqueID + "input")}")">value</label>
         <input @ref="@input" @attributes="InputAttributes" type="text" inputmode="decimal" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
-               class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@(Name ?? UniqueID + "input")"
+               class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
                placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" value="@FormattedValue" @onchange="@OnChange"
                onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower())"
            onblur="@getOnInput()" onpaste="@getOnPaste()" />

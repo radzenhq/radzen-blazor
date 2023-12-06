@@ -13,7 +13,7 @@
          style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@GetId()" @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation 
          @onkeydown="@((args) => OnKeyPress(args))">
         <div class="rz-helper-hidden-accessible">
-            <input tabindex="-1" disabled="@Disabled" style="width:100%" aria-haspopup="listbox" readonly="" type="text"
+            <input tabindex="-1" disabled="@Disabled" style="width:100%" aria-haspopup="listbox" readonly="" type="text" id="@Name"
                    name="@Name" aria-label="@(!Multiple && internalValue != null ? PropertyAccess.GetItemOrValueFromProperty(internalValue, TextProperty) : "")" @attributes="InputAttributes"/>
 
         </div>
@@ -114,6 +114,7 @@
                 @if (AllowFiltering)
                 {
                     <div class="rz-lookup-search">
+                        <label class="rz-helper-hidden-accessible" style="position:absolute !important" for="@SearchID">search</label>
                         <input class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="-1" placeholder="@SearchTextPlaceholder"
                                @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" style="@(ShowSearch ? "" : "margin-right:0px;")"
                         @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) />
