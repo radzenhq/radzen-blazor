@@ -13,14 +13,14 @@
         <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" 
             Type="typeof(IEnumerable<string>)" FilterValue="@selectedTitles" FilterOperator="FilterOperator.Contains">
             <FilterTemplate>
-                <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%"
+                <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select title" }})"
                     Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Employee" Title="Customers" Property="Orders" FilterProperty="Customer/CustomerID" Sortable=false
                                   Type="typeof(IEnumerable<Customer>)" FilterValue="@selectedCustomers" FilterOperator="FilterOperator.In">
             <FilterTemplate>
-                <RadzenDropDown @bind-Value=@selectedCustomers Style="width:100%" TextProperty="CompanyName" ValueProperty="CustomerID"
+                <RadzenDropDown @bind-Value=@selectedCustomers Style="width:100%" TextProperty="CompanyName" ValueProperty="CustomerID" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select company" }})"
                     Change=@OnSelectedCustomersChange Data="@(customers)" AllowSelectAll="false" Multiple="true" MaxSelectedLabels="2" />
             </FilterTemplate>
             <Template>

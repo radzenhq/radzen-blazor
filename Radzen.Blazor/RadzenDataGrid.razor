@@ -258,7 +258,7 @@
                                                                                 </div>
                                                                             </div>
 
-                                                                            <RadzenDatePicker TValue="@object" AllowInput=@(AllowFilterDateInput) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter value" }})"
+                                                                            <RadzenDatePicker TValue="@object" AllowInput=@(AllowFilterDateInput) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", column.Title + " filter value "  + column.GetFilterValue() }})"
                                                                   ShowTime="@column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="false" Inline="true" DateFormat="@getFilterDateFormat(column)"
                                                                   Value="@column.GetFilterValue()" Change="@(args => { column.SetFilterValue(args.Value); SaveSettings(); })" />
 
@@ -278,7 +278,7 @@
                                                             else
                                                             {
                                                                 <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
-                                                                <RadzenDatePicker Disabled=@column.CanSetFilterValue() TValue="@object" Style="width:100%" AllowInput=@(AllowFilterDateInput) AllowClear="true" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter value" }})"
+                                                                <RadzenDatePicker Disabled=@column.CanSetFilterValue() TValue="@object" Style="width:100%" AllowInput=@(AllowFilterDateInput) AllowClear="true" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", column.Title + " filter value "  + column.GetFilterValue() }})"
                                                       ShowTime="false" ShowTimeOkButton="false" DateFormat="@getFilterDateFormat(column)"
                                                       Value="@column.GetFilterValue()" Change="@(args => { if(!args.HasValue) { InvokeAsync(() => ClearFilter(column, true)); } else {column.SetFilterValue(args.Value); InvokeAsync(() => ApplyFilter(column, true));} })" />
                                                             }
@@ -310,7 +310,7 @@
                                                             {
                                                                 <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
                                                             }
-                                                            <input aria-label="filter" disabled=@column.CanSetFilterValue() id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" placeholder="@column.GetFilterPlaceholder()" class="rz-textbox" style="width: 100%;" />
+                                                            <input aria-label=@(column.Title + " filter value " + column.GetFilterValue()) disabled=@column.CanSetFilterValue() id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" placeholder="@column.GetFilterPlaceholder()" class="rz-textbox" style="width: 100%;" />
                                                             @if (column.GetFilterValue() != null && filters.Any(d => d.Property == column.GetFilterProperty()))
                                                             {
                                                                 <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear" style="position:absolute;right:10px;">close</i>

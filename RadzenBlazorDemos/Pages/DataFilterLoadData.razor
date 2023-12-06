@@ -19,7 +19,7 @@
             <MyCustomEnumerableDataFilterProperty TItem="Order" Property="Employee.Title" Title="Employee Title" FilterValue="@finalSelectedTitles"
                                                     Type="typeof(IEnumerable<string>)" FilterOperator="FilterOperator.Contains">
                 <FilterTemplate>
-                    <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%;"
+                    <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select title" }})"
                                     Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
             </MyCustomEnumerableDataFilterProperty>
