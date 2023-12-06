@@ -10,7 +10,7 @@
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="5rem" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Frozen="@frozen" Width="80px" TextAlign="TextAlign.Center">
             <HeaderTemplate>
-                <RadzenCheckBox @bind-Value="frozen" title="Pin/Unpin this column" />
+                <RadzenCheckBox @bind-Value="frozen" title="Pin/Unpin this column" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Pin/Unpin Photo column" }})" />
             </HeaderTemplate>
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
