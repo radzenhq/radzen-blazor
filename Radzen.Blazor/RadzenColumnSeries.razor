@@ -24,70 +24,30 @@
         var width = bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();;
         var className = $"rz-column-series rz-series-{Chart.Series.IndexOf(this)}";
 
-        if (ColorMode == ColorMode.Series)
-        {
-            return
-            @<g class="@className">
-                @foreach(var data in Items)
+        return 
+        @<g class="@className">
+            @foreach(var data in Items)
+            {
+                var x = category(data) - bandWidth / 2 + index * width + index * padding;
+                var y = value(data);
+                var radius = Chart.ColumnOptions.Radius;
+
+                if (radius > width / 2)
                 {
-                    var x = category(data) - bandWidth / 2 + index * width + index * padding;
-                    var y = value(data);
-                    var radius = Chart.ColumnOptions.Radius;
-
-                    if (radius > width / 2)
-                    {
-                        radius = 0;
-                    }
-
-                    var r = radius.ToInvariantString();
-
-                    var path = $"M {x.ToInvariantString()} {(y+radius).ToInvariantString()} A {r} {r} 0 0 1 {(x + radius).ToInvariantString()} {y.ToInvariantString()} L {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 1 {(x + width).ToInvariantString()} {(y+radius).ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
-
-                    if (y > y0)
-                    {
-                        path = $"M {x.ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {(y-radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} L {(x + radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {x.ToInvariantString()} {(y-radius).ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
-                    }
-                    var fill = PickColor(Items.IndexOf(data), Fills, Fill);
-                    var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
-
-                    <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+                    radius = 0;
                 }
-            </g>;
-        }
-        else
-        {
-            return
-            @<text>
-                @foreach(var data in Items)
+
+                var path = $"M {x.ToInvariantString()} {(y+radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + radius).ToInvariantString()} {y.ToInvariantString()} L {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(y+radius).ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
+
+                if (y > y0)
                 {
-                    var x = category(data) - bandWidth / 2 + index * width + index * padding;
-                    var y = value(data);
-                    var val =  Value(data);
-                    className = val <= 0 ? $"rz-column-series rz-series-0" :  $"rz-column-series rz-series-1";
-                    var radius = Chart.ColumnOptions.Radius;
-
-                    if ((radius > width / 2))
-                    {
-                        radius = 0;
-                    }
-
-                    var r = radius.ToInvariantString();
-
-                    var path = $"M {x.ToInvariantString()} {(y+radius).ToInvariantString()} A {r} {r} 0 0 1 {(x + radius).ToInvariantString()} {y.ToInvariantString()} L {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 1 {(x + width).ToInvariantString()} {(y+radius).ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
-
-                    if (y >= y0)
-                    {
-                        path = $"M {x.ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {(y-radius).ToInvariantString()} A {r} {r} 0 0 1 {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} L {(x + radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 1 {x.ToInvariantString()} {(y-radius).ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
-                    }
-
-                    var fill = PickColor(val <= 0 ? 0 : 1, Fills, Fill);
-                    var stroke = PickColor(val <= 0 ? 0 : 1, Strokes, Stroke);
-
-                    <g class="@className">
-                        <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
-                    </g>;
+                    path = $"M {x.ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {(y-radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} L {(x + radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {x.ToInvariantString()} {(y-radius).ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
                 }
-            </text>;
-        }
+                var fill = PickColor(Items.IndexOf(data), Fills, Fill);
+                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
+
+                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+            }
+        </g>;
     }
 }

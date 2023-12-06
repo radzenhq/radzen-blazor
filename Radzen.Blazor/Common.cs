@@ -311,20 +311,6 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Render Color Mode.
-    /// </summary>
-    public enum ColorMode
-    {
-        /// <summary>
-        /// Colors will be applied from css style of current theme or from Fills to each series.
-        /// </summary>
-        Series,
-        /// <summary>
-        /// First two colors will be applied from css style of current theme or from Fills to Positive and Negative values.
-        /// </summary>
-        PositiveNegative,
-    }
-    /// <summary>
     /// DataGrid settings class used to Save/Load settings.
     /// </summary>
     public class DataGridSettings

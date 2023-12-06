@@ -54,13 +54,6 @@ namespace Radzen.Blazor
         [Parameter]
         public LineType LineType { get; set; }
 
-        /// <summary>
-        /// Gets or sets the color mode of the series.
-        /// </summary>
-        /// <value>The color mode of the series.</value>
-        [Parameter]
-        public ColorMode ColorMode { get; set; } = ColorMode.Series;
-
         /// <inheritdoc />
         public override string Color
         {
@@ -104,29 +97,16 @@ namespace Radzen.Blazor
         {
             var style = base.TooltipStyle(item);
 
-            if (ColorMode == ColorMode.Series)
-            {
-                var index = Items.IndexOf(item);
+            var index = Items.IndexOf(item);
 
-                if (index >= 0)
-                {
-                    var color = PickColor(index, Fills, Fill);
-
-                    if (color != null)
-                    {
-                        style = $"{style}; border-color: {color};";
-                    }
-                }
-            }
-            else
+            if (index >= 0)
             {
-                var color = PickColor(Value(item) < 0 ? 0 : 1, Fills, Fill);
+                var color = PickColor(index, Fills, Fill);
 
                 if (color != null)
                 {
                     style = $"{style}; border-color: {color};";
                 }
-
             }
 
             return style;
