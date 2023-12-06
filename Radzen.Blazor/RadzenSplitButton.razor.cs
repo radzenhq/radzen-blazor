@@ -123,6 +123,13 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AlwaysOpenPopup { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets the open button aria-label attribute.
+        /// </summary>
+        [Parameter]
+        public string OpenAriaLabel { get; set; } = "Open";
+
         /// <summary>
         /// Gets or sets the click callback.
         /// </summary>

@@ -10,7 +10,7 @@
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">1. Customers</RadzenText>
                 <RadzenDropDown Style="width:300px" TValue="string" @bind-Value="CustomerID" Placeholder="Select customer" AllowFiltering="true" 
-                    Data="@(customers)" TextProperty="CompanyName" ValueProperty="CustomerID" 
+                    Data="@(customers)" TextProperty="CompanyName" ValueProperty="CustomerID" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})"
                         Change="@(args => { orders = dbContext.Orders.Where(o => o.CustomerID == CustomerID); })"/>
             </RadzenCard>
         </div>
@@ -18,7 +18,7 @@
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">2. Orders</RadzenText>
                 <RadzenDropDown Style="width:300px" TValue="int" @bind-Value="OrderID" Placeholder="Select order" 
-                    Data="@(orders)" ValueProperty="OrderID"
+                    Data="@(orders)" ValueProperty="OrderID" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select order" }})"
                                 Change="@(args => { orderDetails = dbContext.OrderDetails.Where(o => o.OrderID == OrderID).Include("Product"); })">
                     <Template>
                         Order Date: @String.Format("{0:d}", ((Order)context).OrderDate)

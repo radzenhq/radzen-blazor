@@ -21,7 +21,7 @@
 
 <h3 class="mt-4">Custom Empty Text</h3>
 <div class="mb-4">
-    Custom text: <RadzenTextBox @bind-Value="emptyText" class="ml-2" Style="width: 300px;" />
+    Custom text: <RadzenTextBox @bind-Value="emptyText" class="ml-2" Style="width: 300px;" aria-label="custom text" />
 </div>
 <RadzenDataGrid TItem="Employee" Data="@data" EmptyText="@emptyText">
     <Columns>

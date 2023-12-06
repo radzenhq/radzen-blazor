@@ -31,6 +31,12 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenTree : RadzenComponent
     {
+        /// <summary>
+        /// Gets or sets the open button aria-label attribute.
+        /// </summary>
+        [Parameter]
+        public string SelectItemAriaLabel { get; set; } = "Select item";
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
