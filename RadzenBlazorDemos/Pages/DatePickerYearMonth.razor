@@ -1,5 +1,6 @@
 ﻿<div class="rz-p-12 rz-text-align-center">
-    <RadzenDatePicker @bind-Value=@value ShowDays=false DateFormat="yyyy/MM" CurrentDateChanged=@OnCurrentDateChanged />
+    <RadzenLabel Text="Select Year/Month" Component="DatePickerYearMonth" Style="margin-right: 8px; vertical-align: middle;" />
+    <RadzenDatePicker @bind-Value=@value ShowDays=false DateFormat="yyyy/MM" CurrentDateChanged=@OnCurrentDateChanged Name="DatePickerYearMonth" />
 </div>
 
 @code {

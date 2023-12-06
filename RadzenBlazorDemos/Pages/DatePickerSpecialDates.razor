@@ -1,5 +1,6 @@
 ﻿<div class="rz-p-12 rz-text-align-center">
-    <RadzenDatePicker @bind-Value=@value DateRender=@DateRender />
+    <RadzenLabel Text="Select Date" Component="DatePickerSpecialDates" Style="margin-right: 8px; vertical-align: middle;" />
+    <RadzenDatePicker @bind-Value=@value DateRender=@DateRender Name="DatePickerSpecialDates" />
 </div>
 
 @code {
