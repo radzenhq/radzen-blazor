@@ -10,8 +10,8 @@
 </CascadingValue>
 
 @code {
-   public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
-   {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
         var value = ComposeValue(categoryScale);
         var category = ComposeCategory(valueScale);
         var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
@@ -24,15 +24,31 @@
 
         var barHeight = BandHeight;
         var height = barHeight / barSeries.Count() - padding + padding / barSeries.Count();;
-        var className = $"rz-bar-series rz-series-{Chart.Series.IndexOf(this)}";
 
-        return 
-        @<g class="@className">
+        string fill, stroke, className;
+
+        return
+@<text>
             @foreach(var data in Items)
             {
                 var y = category(data) - barHeight / 2 + index * height + index * padding;
                 var x = value(data);
+                var val = Value(data);
+                
                 var radius = Chart.BarOptions.Radius;
+
+                if (ColorMode == ColorMode.Series)
+                {
+                    fill = PickColor(Items.IndexOf(data), Fills, Fill);
+                    stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
+                    className = $"rz-column-series rz-series-{Chart.Series.IndexOf(this)}";
+                }
+                else
+                {
+                    fill = PickColor(val <= 0 ? 0 : 1, Fills, Fill);
+                    stroke = PickColor(val <= 0 ? 0 : 1, Strokes, Stroke);
+                    className = val <= 0 ? $"rz-column-series rz-series-0" : $"rz-column-series rz-series-1";
+                }
 
                 if (radius > height / 2)
                 {
@@ -47,11 +63,11 @@
                 {
                     path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x+radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 0 {x.ToInvariantString()} {(y+radius).ToInvariantString()} L {x.ToInvariantString()} {(y+height-radius).ToInvariantString()} A {r} {r} 0 0 0 {(x+radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y+height).ToInvariantString()} Z";
                 }
-                var fill = PickColor(Items.IndexOf(data), Fills, Fill);
-                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
 
-                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+                <g class="@className">
+                    <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+                </g>
             }
-        </g>;
+        </text>;
     }
 }
