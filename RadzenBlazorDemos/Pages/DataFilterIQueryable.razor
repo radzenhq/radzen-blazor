@@ -21,7 +21,11 @@
                 </FilterTemplate>
             </RadzenDataFilterProperty>
             <RadzenDataFilterProperty TItem="Order" Property="Employee.LastName" Title="Employee Last Name" />
-            <MyCustomDataFilterProperty TItem="Order" Property="OrderDate" Title="Order Date" />
+            <MyCustomDataFilterProperty TItem="Order" Property="OrderDate" Title="Order Date">
+                <FilterTemplate>
+                    <RadzenDatePicker @bind-Value="@context.FilterValue" Style="width:100%" ShowTime=false DateFormat="d" />
+                </FilterTemplate>
+            </MyCustomDataFilterProperty>
             <RadzenDataFilterProperty TItem="Order" Property="Freight" Title="Freight" />
         </Properties>
     </RadzenDataFilter>
