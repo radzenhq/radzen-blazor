@@ -1360,6 +1360,48 @@ namespace Radzen.Blazor
         public string RemoveGroupArialLabel { get; set; } = "Remove group";
 
         /// <summary>
+        /// Gets or sets the select visible columns aria label text.
+        /// </summary>
+        /// <value>The select visible columns aria label text.</value>
+        [Parameter]
+        public string SelectVisibleColumnsArialLabel { get; set; } = "select visible columns";
+
+        /// <summary>
+        /// Gets or sets the column logical filter value aria label text.
+        /// </summary>
+        /// <value>The the column logical filter value aria label text.</value>
+        [Parameter]
+        public string LogicalOperatorArialLabel { get; set; } = " logical filter operator ";
+
+        /// <summary>
+        /// Gets or sets the column filter value aria label text.
+        /// </summary>
+        /// <value>The the column filter value aria label text.</value>
+        [Parameter]
+        public string FilterOperatorArialLabel { get; set; } = " filter operator ";
+
+        /// <summary>
+        /// Gets or sets the column filter value aria label text.
+        /// </summary>
+        /// <value>The the column filter value aria label text.</value>
+        [Parameter]
+        public string SecondFilterOperatorArialLabel { get; set; } = " second filter operator ";
+
+        /// <summary>
+        /// Gets or sets the column filter value aria label text.
+        /// </summary>
+        /// <value>The the column filter value aria label text.</value>
+        [Parameter]
+        public string FilterValueArialLabel { get; set; } = " filter value ";
+
+        /// <summary>
+        /// Gets or sets the column filter value aria label text.
+        /// </summary>
+        /// <value>The the column filter value aria label text.</value>
+        [Parameter]
+        public string SecondFilterValueArialLabel { get; set; } = " second filter value ";
+
+        /// <summary>
         /// Gets or sets a value indicating whether user can pick all columns in column picker.
         /// </summary>
         /// <value><c>true</c> if pick of all columns is allowed; otherwise, <c>false</c>.</value>
