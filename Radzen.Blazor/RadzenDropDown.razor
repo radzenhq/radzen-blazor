@@ -13,7 +13,7 @@
          @onkeydown="@((args) => OnKeyPress(args))" id="@GetId()"  @onfocus="@((args) => OnFocus(args))">
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" aria-haspopup="listbox" readonly="" type="text" tabindex="-1"
-                   name="@Name" value="@(internalValue != null ? internalValue : "")"
+                   name="@Name" value="@(internalValue != null ? internalValue : "")" id="@Name"
                    aria-label="@(!Multiple && internalValue != null ? internalValue : "")" @attributes="InputAttributes"/>
         </div>
 
@@ -103,6 +103,7 @@
             @if (AllowFiltering && !Multiple)
             {
                 <div class="rz-dropdown-filter-container">
+                    <label class="rz-helper-hidden-accessible" style="position:absolute !important" for="@SearchID">search</label>
                     <input id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" placeholder="@FilterPlaceholder" class="rz-dropdown-filter rz-inputtext   " autocomplete="off" type="text"
                            @onchange="@((ChangeEventArgs args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText"
                             @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) />
@@ -116,10 +117,11 @@
                     {
                     <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)" @onclick="@SelectAll">
                         <div class="rz-helper-hidden-accessible">
-                            <input readonly="readonly" type="checkbox">
+                            <label class="rz-helper-hidden-accessible" style="position:absolute !important" for="@($"{(Name ?? UniqueID + "sa")}")">selectall</label>
+                            <input readonly="readonly" type="checkbox" id="@($"{(Name ?? UniqueID + "sa")}")">
                         </div>
-                        <div class="@(IsAllSelected() ? "rz-chkbox-box    rz-state-active" : "rz-chkbox-box   ")">
-                            <span class="@(IsAllSelected() ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
+                        <div class="@(IsAllSelected() ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box")">
+                            <span class="@(IsAllSelected() ? "rz-chkbox-icon rzi rzi-check" : "rz-chkbox-icon")"></span>
                         </div>
                     </div>
                     }
@@ -130,6 +132,7 @@
                     @if (AllowFiltering)
                     {
                         <div class="rz-multiselect-filter-container">
+                            <label class="rz-helper-hidden-accessible" style="position:absolute !important" for="@SearchID">search</label>
                             <input id="@SearchID" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" class="rz-inputtext" role="textbox" type="text"
                                    onclick="Radzen.preventDefaultAndStopPropagation(event)"
                                    @ref="@search" @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);})

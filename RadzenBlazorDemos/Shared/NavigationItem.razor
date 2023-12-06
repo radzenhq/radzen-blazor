@@ -1,12 +1,12 @@
 @if (!Example.New && !Example.Updated)
 {
-    <RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Example.Name" Path="@Example.Path" Icon="@Example.Icon">
+    <RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Example.Name" Path="@Example.Path" Icon="@Example.Icon" aria-label="@Example.Name">
         @ChildContent
     </RadzenPanelMenuItem>
 }
 else
 {
-    <RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Example.Name" Path="@Example.Path" Icon="@Example.Icon">
+    <RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Example.Name" Path="@Example.Path" Icon="@Example.Icon" aria-label="@Example.Name">
         <Template>
             @Example.Name
             <RadzenBadge Text="Updated" Visible=@Example.Updated BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter"/>
