@@ -7,7 +7,7 @@
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onkeypress=@OnKeyPress @onkeypress:preventDefault style="@Style" tabindex="@(Disabled || ReadOnly ? "-1" : $"{TabIndex}")" id="@GetId()">
     <div class="rz-helper-hidden-accessible">
-        <input type="checkbox" @onchange=@Toggle value=@CheckBoxValue name=@Name id=@Name checked=@CheckBoxChecked
+        <input type="checkbox" @onchange=@Toggle value=@CheckBoxValue name=@Name id=@Name checked=@CheckBoxChecked @attributes="InputAttributes"
             tabindex="-1" readonly="@ReadOnly">
     </div>
     <div class=@BoxClassList @onclick=@Toggle @onclick:preventDefault>

@@ -9,11 +9,11 @@
         <Columns>
             <RadzenDropDownDataGridColumn Width="60px" Sortable="false">
                 <HeaderTemplate>
-                    <RadzenCheckBox Disabled="@(!grid.AllowSelectAll)" TriState="false" TValue="bool" Value="@(customers.Any(c => values != null && values.Contains(c.CustomerID)))"
+                    <RadzenCheckBox InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select all" }})" Disabled="@(!grid.AllowSelectAll)" TriState="false" TValue="bool" Value="@(customers.Any(c => values != null && values.Contains(c.CustomerID)))"
                                     Change="@(args => values = args ? grid.View.Cast<Customer>().Select(c => c.CustomerID) : values = Enumerable.Empty<string>())" />
                 </HeaderTemplate>
                 <Template Context="data">
-                    <RadzenCheckBox TriState="false" Value="@(values != null && values.Contains(((Customer) data).CustomerID))"
+                    <RadzenCheckBox InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select item" }})" TriState="false" Value="@(values != null && values.Contains(((Customer) data).CustomerID))"
                                     TValue="bool" Change=@(args => grid.SelectItem(data)) @onclick:stopPropagation/>
                 </Template>
             </RadzenDropDownDataGridColumn>

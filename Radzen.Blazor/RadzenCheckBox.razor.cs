@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -16,6 +17,13 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenCheckBox<TValue> : FormComponent<TValue>
     {
+        /// <summary>
+        /// Specifies additional custom attributes that will be rendered by the input.
+        /// </summary>
+        /// <value>The attributes.</value>
+        [Parameter]
+        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether is tri-state (true, false or null).
         /// </summary>
