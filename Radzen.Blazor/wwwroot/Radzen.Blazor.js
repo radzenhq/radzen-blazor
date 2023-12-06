@@ -1404,7 +1404,7 @@ window.Radzen = {
   },
   queryCommands: function (ref) {
     return {
-      html: ref.innerHTML,
+      html: ref != null ? ref.innerHTML : null,
       fontName: document.queryCommandValue('fontName'),
       fontSize: document.queryCommandValue('fontSize'),
       formatBlock: document.queryCommandValue('formatBlock'),
