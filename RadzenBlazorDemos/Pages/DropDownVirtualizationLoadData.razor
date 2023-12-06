@@ -5,7 +5,8 @@
 @inherits DbContextPage
 
 <div class="rz-p-sm-12 rz-text-align-center">
-    <RadzenDropDown @bind-Value=value Data=@customers LoadData=@LoadData Count="@count" AllowVirtualization="true" AllowClear="true"
+    <RadzenLabel Text="Select Value" Component="DropDownVirtualizationLoadData" Style="margin-right: 8px; vertical-align: middle;" />
+    <RadzenDropDown @bind-Value=value Data=@customers LoadData=@LoadData Count="@count" AllowVirtualization="true" AllowClear="true" Name="DropDownVirtualizationLoadData"
                     AllowFiltering="true" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width: 100%; max-width: 400px;" />
 </div>
 

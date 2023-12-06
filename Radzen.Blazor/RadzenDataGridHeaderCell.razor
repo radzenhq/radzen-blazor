@@ -87,7 +87,7 @@
                                 }
                                 else if (PropertyAccess.IsDate(Column.FilterPropertyType))
                                 {
-                                    <RadzenDatePicker TValue="@object" ShowTime="@Column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
+                                    <RadzenDatePicker InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter value" }})" TValue="@object" ShowTime="@Column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
                                                       Value="@Column.GetFilterValue()" Change="@(args => Column.SetFilterValue(args.Value))" AllowInput=@(Grid.AllowFilterDateInput) />
 
                                 }
@@ -97,8 +97,7 @@
                                 }
                                 else
                                 {
-                                    <label class="rz-helper-hidden-accessible" style="position:absolute !important" id="@($"{getColumnPopupID()}-sfl")" for="@($"{getColumnPopupID()}-sf")">filter</label>
-                                    <RadzenTextBox id="@($"{getColumnPopupID()}-sf")" aria-labelledby="@($"{getColumnPopupID()}-sfl")" Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
+                                    <RadzenTextBox id="@($"{getColumnPopupID()}-sf")" aria-label="filter" Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
                                 }
 
                                 <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px"
@@ -121,7 +120,7 @@
                                 }
                                 else if (PropertyAccess.IsDate(Column.FilterPropertyType))
                                 {
-                                    <RadzenDatePicker TValue="@object"
+                                    <RadzenDatePicker TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "second filter value" }})"
                                                 ShowTime="@Column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
                                                       Value="@Column.GetSecondFilterValue()" Change="@(args => Column.SetFilterValue(args.Value, false))" AllowInput=@(Grid.AllowFilterDateInput) />
 
@@ -132,8 +131,7 @@
                                 }
                                 else
                                 {
-                                    <label class="rz-helper-hidden-accessible" style="position:absolute !important" id="@($"{getColumnPopupID()}-sfl2")" for="@($"{getColumnPopupID()}-sf2")">filter</label>
-                                    <RadzenTextBox id="@($"{getColumnPopupID()}-sf2")" aria-labelledby="@($"{getColumnPopupID()}-sfl2")" Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
+                                    <RadzenTextBox id="@($"{getColumnPopupID()}-sf2")" aria-label="filter" Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
                                 }
                                 </form>
                             }

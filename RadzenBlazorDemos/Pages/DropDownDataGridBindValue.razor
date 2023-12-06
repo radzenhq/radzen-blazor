@@ -1,7 +1,8 @@
 ﻿@inherits DbContextPage
 
 <div class="rz-p-12 rz-text-align-center">
-    <RadzenDropDownDataGrid @bind-Value=@value Data=@companyNames />
+    <RadzenLabel Text="Select Value" Component="DropDownDataGridBindValue" Style="margin-right: 8px; vertical-align: middle;" />
+    <RadzenDropDownDataGrid @bind-Value=@value Data=@companyNames Name="DropDownDataGridBindValue" />
 </div>
 
 @code {

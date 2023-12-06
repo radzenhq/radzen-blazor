@@ -3,8 +3,9 @@
 @inherits DbContextPage
 
 <div class="rz-p-12 rz-text-align-center">
+    <RadzenLabel Text="Select Value" Component="DropDownDataGridColumns" Style="margin-right: 8px; vertical-align: middle;" />
     <RadzenDropDownDataGrid @bind-Value=@value Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID"
-                            AllowColumnResize="true" AllowFilteringByAllStringColumns="true">
+                            AllowColumnResize="true" AllowFilteringByAllStringColumns="true" Name="DropDownDataGridColumns">
         <Columns>
             <RadzenDropDownDataGridColumn Property="CustomerID" Title="CustomerID" Width="100px" />
             <RadzenDropDownDataGridColumn Property="CompanyName" Title="CompanyName" Width="200px" />

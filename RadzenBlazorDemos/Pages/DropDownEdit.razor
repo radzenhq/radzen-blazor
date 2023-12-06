@@ -1,9 +1,10 @@
 ﻿@inherits DbContextPage
 
 <div class="rz-p-sm-12 rz-text-align-center">
-    <RadzenDropDown @bind-Value=@value Data=@companyNames Style="width: 100%; max-width: 400px;">
+    <RadzenLabel id="DropDownEditLabel" Text="Select Value" Component="DropDownEdit" Style="margin-right: 8px; vertical-align: middle;" />
+    <RadzenDropDown @bind-Value=@value Data=@companyNames Style="width: 100%; max-width: 400px;" Name="DropDownEdit">
         <ValueTemplate>
-            <RadzenTextBox @bind-Value=@value Style="width:120%;height:120%;margin:-15px"/>
+            <RadzenTextBox @bind-Value=@value Style="width:120%;height:120%;margin:-15px" aria-labelledby="DropDownEditLabel" />
         </ValueTemplate>
     </RadzenDropDown>
 </div>

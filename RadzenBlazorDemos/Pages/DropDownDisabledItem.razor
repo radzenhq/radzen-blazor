@@ -3,7 +3,8 @@
 @inherits DbContextPage
 
 <div class="rz-p-sm-12 rz-text-align-center">
-    <RadzenDropDown @bind-Value=@value Data=@products TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Style="width: 100%; max-width: 400px;" />
+    <RadzenLabel Text="Select Value" Component="DropDownDisabledItem" Style="margin-right: 8px; vertical-align: middle;" />
+    <RadzenDropDown @bind-Value=@value Data=@products TextProperty="ProductName" ValueProperty="ProductID" DisabledProperty="Discontinued" Style="width: 100%; max-width: 400px;" Name="DropDownDisabledItem" />
 </div>
 
 @code {

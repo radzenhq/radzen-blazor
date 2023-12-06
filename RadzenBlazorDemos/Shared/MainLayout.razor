@@ -134,8 +134,7 @@
 </RadzenBody>
 <RadzenSidebar @ref="@sidebar0" @bind-Expanded="@sidebarExpanded" Class="demos-sidebar" style="display: flex; flex-direction: column">
     <div style="padding: 1rem">
-        <label class="rz-helper-hidden-accessible" style="position:absolute !important"  for="find">find</label>
-        <RadzenTextBox id="find" Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" Class="rz-search-input" />
+        <RadzenTextBox id="find" Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" Class="rz-search-input" aria-label="find" />
     </div>
     <div style="flex: 1; overflow: auto">
     <RadzenPanelMenu Match="NavLinkMatch.Prefix">

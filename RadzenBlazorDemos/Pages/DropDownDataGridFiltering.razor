@@ -5,8 +5,9 @@
 @inherits DbContextPage
 
 <div class="rz-p-12 rz-text-align-center">
+    <RadzenLabel Text="Select Value" Component="DropDownDataGridFiltering" Style="margin-right: 8px; vertical-align: middle;" />
     <RadzenDropDownDataGrid FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
-                    Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" AllowClear="true" @bind-Value=value />
+                    Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" AllowClear="true" @bind-Value=value Name="DropDownDataGridFiltering" />
 </div>
 
 @code {

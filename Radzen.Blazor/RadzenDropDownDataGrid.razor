@@ -114,8 +114,7 @@
                 @if (AllowFiltering)
                 {
                     <div class="rz-lookup-search">
-                        <label class="rz-helper-hidden-accessible" style="position:absolute !important" for="@SearchID">search</label>
-                        <input class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="-1" placeholder="@SearchTextPlaceholder"
+                        <input aria-label="search" class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="-1" placeholder="@SearchTextPlaceholder"
                                @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" style="@(ShowSearch ? "" : "margin-right:0px;")"
                         @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) />
                         @if (ShowSearch)
