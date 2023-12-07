@@ -15,7 +15,7 @@ else
                         <RadzenLabel Text="Credit Card" Component="CardId" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8">
-                        <RadzenDropDown @bind-Value="order.CardId" AllowClear="true" Placeholder="Select something" Data="@cards" Style="width: 100%;" TextProperty="CardNr" ValueProperty="CardId" id="CardId"></RadzenDropDown>
+                        <RadzenDropDown @bind-Value="order.CardId" AllowClear="true" Placeholder="Select something" Data="@cards" Style="width: 100%;" TextProperty="CardNr" ValueProperty="CardId" Name="CardId"></RadzenDropDown>
                     </RadzenColumn>
                 </RadzenRow>
                 <RadzenRow AlignItems="AlignItems.Center">
