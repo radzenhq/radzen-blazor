@@ -5,7 +5,7 @@
     </RadzenColumn>
     <RadzenColumn Size="6">
         <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, true, "Button2"))" />
-        <RadzenTextArea @bind-Value=@value Change=@(args => OnTextAreaChange(args, "TextArea")) class="w-100" Style="margin-top:15px" />
+        <RadzenTextArea @bind-Value=@value Change=@(args => OnTextAreaChange(args, "TextArea")) class="w-100" Style="margin-top:15px" aria-label="text area" />
     </RadzenColumn>
 </RadzenRow>
 
