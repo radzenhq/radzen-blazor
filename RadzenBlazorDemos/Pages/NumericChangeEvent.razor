@@ -1,5 +1,5 @@
 ﻿<div class="rz-p-12 rz-text-align-center">
-    <RadzenNumeric TValue="int" Value=@value Change=@(args => value = args) />
+    <RadzenNumeric TValue="int" Value=@value Change=@(args => value = args) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
 </div>
 
 @code{

@@ -6,7 +6,7 @@
         <div class="col">
             <RadzenCard class="w-100 mb-4" >
             <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
-                <RadzenLabel Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
+                <RadzenLabel Component="popup" Text="Display validators as popup" For="popup" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
         </div>
     </div>
@@ -16,7 +16,7 @@
                 <RadzenFieldset Text="Bid info">
                     <div class="row mb-5">
                         <div class="col-md-4">
-                            <RadzenLabel Text="Quantity" />
+                            <RadzenLabel Text="Quantity" Component="Quantity" />
                             <small style="display: block">(1-10 items)</small>
                         </div>
                         <div class="col">
