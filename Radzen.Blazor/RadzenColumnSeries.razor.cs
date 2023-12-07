@@ -59,7 +59,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The color mode of the series.</value>
         [Parameter]
-        public ColorMode ColorMode { get; set; } = ColorMode.Series;
+        public ChartSeriesColorMode ChartSeriesColorMode { get; set; } = ChartSeriesColorMode.Series;
 
         /// <inheritdoc />
         public override string Color
@@ -104,7 +104,7 @@ namespace Radzen.Blazor
         {
             var style = base.TooltipStyle(item);
 
-            if (ColorMode == ColorMode.Series)
+            if (ChartSeriesColorMode == ChartSeriesColorMode.Series)
             {
                 var index = Items.IndexOf(item);
 

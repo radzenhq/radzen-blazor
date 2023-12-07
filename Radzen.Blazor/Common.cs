@@ -313,7 +313,7 @@ namespace Radzen
     /// <summary>
     /// Render Color Mode .
     /// </summary>
-    public enum ColorMode
+    public enum ChartSeriesColorMode
     {
         /// <summary>
         /// Colors will be applied from css style of current theme or from Fills to each series.

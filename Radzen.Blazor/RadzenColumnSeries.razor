@@ -26,7 +26,7 @@
         string fill, stroke, className;
 
         return
-@<text>
+        @<text>
             @foreach(var data in Items)
             {
                 var x = category(data) - bandWidth / 2 + index * width + index * padding;
@@ -35,18 +35,12 @@
 
                 var radius = Chart.ColumnOptions.Radius;
 
-                if (ColorMode == ColorMode.Series)
-                {
-                    fill = PickColor(Items.IndexOf(data), Fills, Fill);
-                    stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
-                    className = $"rz-column-series rz-series-{Chart.Series.IndexOf(this)}";
-                }
-                else
-                {
-                    fill = PickColor(val <= 0 ? 0 : 1, Fills, Fill);
-                    stroke = PickColor(val <= 0 ? 0 : 1, Strokes, Stroke);
-                    className = val <= 0 ? $"rz-column-series rz-series-0" : $"rz-column-series rz-series-1";
-                }
+                var colorIndex = ChartSeriesColorMode == ChartSeriesColorMode.Series ? Items.IndexOf(data) : val <= 0 ? 0 : 1;
+                var classIndex = ChartSeriesColorMode == ChartSeriesColorMode.Series ? Chart.Series.IndexOf(this) : val <= 0 ? 0 : 1;
+
+                fill = PickColor(colorIndex, Fills, Fill);
+                stroke = PickColor(colorIndex, Strokes, Stroke);
+                className = $"rz-column-series rz-series-{classIndex}";
 
                 if (radius > width / 2)
                 {
