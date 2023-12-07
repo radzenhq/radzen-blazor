@@ -251,6 +251,13 @@ namespace Radzen
         public string DisabledProperty { get; set; }
 
         /// <summary>
+        /// Gets or sets the search aria label text.
+        /// </summary>
+        /// <value>The search aria label text.</value>
+        [Parameter]
+        public string SearchAriaLabel { get; set; } = "Search";
+
+        /// <summary>
         /// Gets or sets the selected item changed.
         /// </summary>
         /// <value>The selected item changed.</value>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -16,6 +17,20 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenListBox<TValue> : DropDownBase<TValue>
     {
+        /// <summary>
+        /// Gets or sets the select all text.
+        /// </summary>
+        /// <value>The select all text.</value>
+        [Parameter]
+        public string SelectAllText { get; set; }
+
+        /// <summary>
+        /// Specifies additional custom attributes that will be rendered by the input.
+        /// </summary>
+        /// <value>The attributes.</value>
+        [Parameter]
+        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+
         internal override void RenderItem(RenderTreeBuilder builder, object item)
         {
             builder.OpenComponent(0, typeof(RadzenListBoxItem<TValue>));

@@ -103,7 +103,7 @@
             @if (AllowFiltering && !Multiple)
             {
                 <div class="rz-dropdown-filter-container">
-                    <input aria-label="search" id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" placeholder="@FilterPlaceholder" class="rz-dropdown-filter rz-inputtext   " autocomplete="off" type="text"
+                    <input aria-label="@SearchAriaLabel" id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" placeholder="@FilterPlaceholder" class="rz-dropdown-filter rz-inputtext   " autocomplete="off" type="text"
                            @onchange="@((ChangeEventArgs args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText"
                             @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) />
                     <span class="rz-dropdown-filter-icon rzi rzi-search"></span>
@@ -116,7 +116,7 @@
                     {
                     <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)" @onclick="@SelectAll">
                         <div class="rz-helper-hidden-accessible">
-                            <input readonly="readonly" type="checkbox" id="@($"{(Name ?? UniqueID + "sa")}")" aria-label="search">
+                            <input readonly="readonly" type="checkbox" id="@($"{(Name ?? UniqueID + "sa")}")" aria-label="@SearchAriaLabel">
                         </div>
                         <div class="@(IsAllSelected() ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box")">
                             <span class="@(IsAllSelected() ? "rz-chkbox-icon rzi rzi-check" : "rz-chkbox-icon")"></span>
@@ -131,7 +131,7 @@
                     {
                         <div class="rz-multiselect-filter-container">
                             <input id="@SearchID" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" class="rz-inputtext" role="textbox" type="text"
-                                   onclick="Radzen.preventDefaultAndStopPropagation(event)" aria-label="search"
+                                   onclick="Radzen.preventDefaultAndStopPropagation(event)" aria-label="@SearchAriaLabel"
                                    @ref="@search" @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);})
                                    @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" />
                             <span class="rz-multiselect-filter-icon rzi rzi-search"></span>

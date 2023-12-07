@@ -4,7 +4,8 @@
 
 <div class="rz-p-sm-12 rz-text-align-center">
     <RadzenListBox @bind-Value=@values Data=@products TextProperty="ProductName" ValueProperty="ProductID"
-                   Multiple=true AllowClear=true Placeholder="Select products" Style="width: 100%; max-width: 400px; height: 200px" />
+                   Multiple=true AllowClear=true Placeholder="Select products" Style="width: 100%; max-width: 400px; height: 200px"
+                   InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select products" }})" />
 </div>
 
 @code {

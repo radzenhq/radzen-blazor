@@ -9,7 +9,7 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@OnKeyDown" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
-            <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" />
+            <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" @attributes=@InputAttributes />
         </div>
         @if (AllowFiltering || (Multiple && AllowSelectAll))
         {
@@ -20,7 +20,7 @@
                     {
                     <div class="rz-chkbox " @onclick="@SelectAll">
                         <div class="rz-helper-hidden-accessible">
-                            <input id="@($"{UniqueID}sa")" readonly="readonly" type="checkbox">
+                            <input id="@($"{UniqueID}sa")" readonly="readonly" type="checkbox" aria-label="@SelectAllText">
                         </div>
                         <div class="@(IsAllSelected() ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box")">
                             <span class="@(IsAllSelected() ? "rz-chkbox-icon rzi rzi-check" : "rz-chkbox-icon")"></span>
@@ -37,7 +37,7 @@
                     <div class="rz-listbox-filter-container">
                         <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@Placeholder"
                                @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" @onkeydown:stopPropagation="true"
-                               @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) />
+                               @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) aria-label="@SearchAriaLabel" />
                         <span class="rz-listbox-filter-icon rzi rzi-search"></span>
                     </div>
                 }
