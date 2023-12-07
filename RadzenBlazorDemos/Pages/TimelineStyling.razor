@@ -1,9 +1,9 @@
 ﻿<div Class="rz-p-0 rz-p-md-12">
     <RadzenStack Gap="1rem" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
         <RadzenStack Gap="1rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-            <RadzenLabel Text="Orientation:" Style="width: 6rem;" />
-            <RadzenSelectBar @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" PointSize="ButtonPointSize.Small" Class="rz-display-none rz-display-xl-flex" />
-            <RadzenDropDown @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+            <RadzenLabel Text="Orientation:" Style="width: 6rem;" Component="orientation" />
+            <RadzenSelectBar @bind-Value="@orientation" Name="orientation" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" PointSize="ButtonPointSize.Small" Class="rz-display-none rz-display-xl-flex" />
+            <RadzenDropDown @bind-Value="@orientation" Name="orientation" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
         </RadzenStack>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" FlexWrap="FlexWrap.Wrap" Gap="1rem" Class="rz-p-4 rz-mb-6">

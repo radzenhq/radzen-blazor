@@ -1,9 +1,9 @@
 ﻿<div Class="rz-p-0 rz-p-md-12">
     <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
-        <RadzenLabel Text="AlignItems:" />
-        <RadzenSelectBar @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value"
+        <RadzenLabel Text="AlignItems:" Component="AlignItems" />
+        <RadzenSelectBar @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value" Name="AlignItems"
                     Data="@(Enum.GetValues(typeof(AlignItems)).Cast<AlignItems>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
-        <RadzenDropDown @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value"
+        <RadzenDropDown @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value" Name="AlignItems"
                     Data="@(Enum.GetValues(typeof(AlignItems)).Cast<AlignItems>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
     </RadzenStack>
     <RadzenTimeline AlignItems="@alignItems" LinePosition="LinePosition.Alternate" style="max-width: 600px; margin: 0 auto;">
