@@ -35,7 +35,7 @@
                             {
                                 <div class="rz-group-header-item">
                                     <span class="rz-group-header-item-title">@gd.GetTitle()</span>
-                                    <a aria-label="@RemoveGroupArialLabel" href="javascript:void(0)" @onclick=@(args => RemoveGroupAsync(gd)) role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                                    <a aria-label="@RemoveGroupArialLabel" @onclick:preventDefault="true" @onclick=@(args => RemoveGroupAsync(gd)) role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
                                         <span class="rzi rzi-times"></span>
                                     </a>
                                 </div>
@@ -508,7 +508,7 @@
                     @if (this.LoadChildData.HasDelegate && this.ShowExpandColumn && this.allColumns.IndexOf(column) == 0)
                     {
                         <span class="rz-cell-toggle">
-                            <a aria-label="@ExpandChildItemAriaLabel" class="@(getExpandIconCssClass(this, Item))" style="@(getExpandIconStyle(this, Item, rowArgs.Item1.Expandable))" href="javascript:void(0)" @onclick="_ => this.ExpandItem(Item)" @onclick:stopPropagation>
+                            <a aria-label="@ExpandChildItemAriaLabel" class="@(getExpandIconCssClass(this, Item))" style="@(getExpandIconStyle(this, Item, rowArgs.Item1.Expandable))" @onclick:preventDefault="true" @onclick="_ => this.ExpandItem(Item)" @onclick:stopPropagation>
                                 <span class="@(this.ExpandedItemStyle(Item))"></span>
                             </a>
                             <span class="rz-cell-data" @attributes="@spanAttributes">

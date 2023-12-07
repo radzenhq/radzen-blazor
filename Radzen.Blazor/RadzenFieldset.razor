@@ -9,7 +9,7 @@
 
             @if (AllowCollapse)
             {
-                <a title="@TitleAttribute()" aria-label="@AriaLabelAttribute()" href="javascript:void(0)"
+                <a title="@TitleAttribute()" aria-label="@AriaLabelAttribute()" @onclick:preventDefault="true"
                    aria-controls="rz-fieldset-0-content" aria-expanded="false" @onclick=@Toggle>
                 @if (collapsed)
                 {

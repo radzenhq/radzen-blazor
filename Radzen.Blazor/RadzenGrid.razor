@@ -293,7 +293,7 @@
                                             <span class="rz-column-title"></span>
                                             @if (rowArgs.Item1.Expandable)
                                             {
-                                                <a href="javascript:void(0)" @onclick="@(_ => ExpandItem(item))">
+                                                <a @onclick:preventDefault="true" @onclick="@(_ => ExpandItem(item))">
                                                     <span class="@(ExpandedItemStyle(item))"></span>
                                                 </a>
                                             }

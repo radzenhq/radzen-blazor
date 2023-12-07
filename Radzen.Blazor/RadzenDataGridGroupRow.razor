@@ -17,7 +17,7 @@
     }
     <td class="rz-col-icon">
         <span class="rz-column-title"></span>
-        <a aria-label=@Grid.ExpandGroupAriaLabel href="javascript:void(0)" @onclick="@(_ => Grid.ExpandGroupItem(this, rowArgs.Item1.Expanded))">
+        <a aria-label=@Grid.ExpandGroupAriaLabel @onclick:preventDefault="true" @onclick="@(_ => Grid.ExpandGroupItem(this, rowArgs.Item1.Expanded))">
             <span class="@(Grid.ExpandedGroupItemStyle(this, Grid.allGroupsExpanded != null ? Grid.allGroupsExpanded : rowArgs.Item1.Expanded))"></span>
         </a>
     </td>

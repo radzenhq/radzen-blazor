@@ -13,7 +13,7 @@
                         <div class="rz-dialog-title" style="display: inline" id="rz-dialog-0-label">@((MarkupString)Dialog.Title)</div>
                         @if (Dialog.Options.ShowClose)
                         {
-                            <a href="javascript:void(0)" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
+                            <a @onclick:preventDefault="true" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
                                 <span class="rzi rzi-times"></span>
                             </a>
                         }
@@ -26,7 +26,7 @@
                     <div class="rz-dialog-title" style="display: inline" id="rz-dialog-0-label">@((MarkupString)Dialog.Title)</div>
                     @if (Dialog.Options.ShowClose)
                     {
-                        <a href="javascript:void(0)" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
+                        <a @onclick:preventDefault="true" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
                             <span class="rzi rzi-times"></span>
                         </a>
                     }

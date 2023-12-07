@@ -22,7 +22,7 @@
                 @if (collapsed)
                 {
                     <a @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler"
-                       href="javascript:void(0)" role="tab" id="rz-panel-0-label" aria-controls="rz-panel-0-content"
+                       @onclick:preventDefault="true" role="tab" id="rz-panel-0-label" aria-controls="rz-panel-0-content"
                        aria-expanded="false" aria-label="@ExpandAriaLabel" title="@ExpandTitle">
                         <span class="rzi rzi-plus"></span>
                     </a>
@@ -30,7 +30,7 @@
                 else
                 {
                     <a @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler"
-                       href="javascript:void(0)" role="tab" id="rz-panel-0-label" aria-controls="rz-panel-0-content"
+                       @onclick:preventDefault="true" role="tab" id="rz-panel-0-label" aria-controls="rz-panel-0-content"
                        aria-expanded="true" aria-label="@CollapseAriaLabel" title="@CollapseTitle">
                         <span class="rzi rzi-minus"></span>
                     </a>
