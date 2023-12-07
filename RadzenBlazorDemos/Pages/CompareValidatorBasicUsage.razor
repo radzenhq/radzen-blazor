@@ -12,7 +12,7 @@
             <RadzenStack Gap="2rem" Class="rz-p-4 rz-p-md-12">
                 <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                     <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
-                        <RadzenLabel Text="Password" />
+                        <RadzenLabel Text="Password" Component="Password" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8">
                         <RadzenPassword Name="Password" @bind-Value=@model.Password Style="display: block; width: 100%" />
@@ -21,7 +21,7 @@
                 </RadzenRow>
                 <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                     <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
-                        <RadzenLabel Text="Repeat Password" />
+                        <RadzenLabel Text="Repeat Password" Component="RepeatPassword" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8">
                         <RadzenPassword Name="RepeatPassword" @bind-Value=@model.RepeatPassword Style="display: block; width: 100%" />

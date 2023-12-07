@@ -16,7 +16,7 @@
                 <RadzenFieldset Text="Personal information">
                     <div class="row mb-5">
                         <div class="col-md-4">
-                            <RadzenLabel Text="First Name" />
+                            <RadzenLabel Text="First Name" Component="FirstName" />
                         </div>
                         <div class="col">
                             <RadzenTextBox style="display: block" Name="FirstName" @bind-Value=@model.FirstName class="w-100" />
@@ -25,7 +25,7 @@
                     </div>
                     <div class="row mb-5">
                         <div class="col-md-4">
-                            <RadzenLabel Text="Last Name" />
+                            <RadzenLabel Text="Last Name" Component="LastName" />
                         </div>
                         <div class="col">
                             <RadzenTextBox style="display: block" Name="LastName" @bind-Value=@model.LastName  class="w-100" />
