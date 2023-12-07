@@ -5,7 +5,7 @@
         <div class="col-sm-12 my-5">
             <RadzenCard class="w-100 mb-4" >
                 <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+                <RadzenLabel Text="Show Data Labels" Component="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
             <h4>Auto-size column series</h4>
             <RadzenChart>

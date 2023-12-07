@@ -3,9 +3,9 @@
 <div Class="rz-p-0 rz-p-md-12">
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
         <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
-        <RadzenLabel Text="Smooth" For="smooth" Class="rz-mr-6"/>
+        <RadzenLabel Text="Smooth" Component="smooth" Class="rz-mr-6"/>
         <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-        <RadzenLabel Text="Show Data Labels" For="dataLabels" />
+        <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
     </RadzenStack>
     <RadzenChart>
         <RadzenStackedAreaSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">

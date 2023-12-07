@@ -5,7 +5,7 @@
         <div class="col">
             <RadzenCard class="w-100 mb-4" >
                 <RadzenCheckBox @bind-Value="@annotation" Name="annotation"></RadzenCheckBox>
-                <RadzenLabel Text="Annotation" For="annotation" Style="margin-left: 8px; vertical-align: middle;" />
+                <RadzenLabel Text="Annotation" Component="annotation" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
             <RadzenChart>
                 <RadzenLineSeries Smooth="true" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">

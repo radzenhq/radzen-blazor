@@ -4,7 +4,7 @@
 <RadzenStack Class="rz-p-0 rz-p-md-12">
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
         <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
-        <RadzenLabel Text="Display validators as popup" For="popup" />
+        <RadzenLabel Text="Display validators as popup" Component="popup" />
     </RadzenStack>
 
     <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>

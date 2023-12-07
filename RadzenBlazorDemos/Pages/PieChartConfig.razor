@@ -3,7 +3,7 @@
             <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
             <RadzenCard class="w-100 mb-4" >
                 <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+                <RadzenLabel Text="Show Data Labels" Component="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
             <RadzenChart SeriesClick=@OnSeriesClick>
                 <RadzenPieSeries Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue">

@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-sm-12 my-5">
             <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem">
-                <RadzenLabel Text="Interpolation" For="interpolation" Style="margin-right: 1rem;"/>
+                <RadzenLabel Text="Interpolation" Component="interpolation" Style="margin-right: 1rem;"/>
                 <RadzenDropDown AllowClear="false" Name="interpolation" @bind-Value="@interpolation"
                                 TValue="Interpolation" ValueProperty="Value" TextProperty="Text"
                                 Data="@(Enum.GetValues<Interpolation>().Select(v => new { Value = v, Text = $"{v:G}" }))"/>

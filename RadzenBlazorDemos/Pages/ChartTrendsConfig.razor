@@ -5,13 +5,13 @@
         <div class="col">
             <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem" >
                 <RadzenCheckBox @bind-Value="@trend" Name="trend"></RadzenCheckBox>
-                <RadzenLabel Text="Trend" For="trend" Style="margin-right: 1rem;" class="rz-color-danger-dark" />
+                <RadzenLabel Text="Trend" Component="trend" Style="margin-right: 1rem;" class="rz-color-danger-dark" />
                 <RadzenCheckBox @bind-Value="@median" Name="median"></RadzenCheckBox>
-                <RadzenLabel Text="Median" For="median" Style="margin-right: 1rem;" class="rz-color-success-dark" />
+                <RadzenLabel Text="Median" Component="median" Style="margin-right: 1rem;" class="rz-color-success-dark" />
                 <RadzenCheckBox @bind-Value="@mean" Name="mean"></RadzenCheckBox>
-                <RadzenLabel Text="Mean" For="mean" Style="margin-right: 1rem;" class="rz-color-info-dark" />
+                <RadzenLabel Text="Mean" Component="mean" Style="margin-right: 1rem;" class="rz-color-info-dark" />
                 <RadzenCheckBox @bind-Value="@mode" Name="mode"></RadzenCheckBox>
-                <RadzenLabel Text="Mode" For="mode" class="rz-color-warning-darker" />
+                <RadzenLabel Text="Mode" Component="mode" class="rz-color-warning-darker" />
             </RadzenCard>
             <RadzenChart>
                 <RadzenLineSeries Smooth="true" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">

@@ -5,9 +5,9 @@
         <div class="col-sm-12 my-5">
             <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem" >
                 <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
-                <RadzenLabel Text="Smooth" For="smooth" Style="margin-right: 1rem;"/>
+                <RadzenLabel Text="Smooth" Component="smooth" Style="margin-right: 1rem;"/>
                 <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                <RadzenLabel Text="Show Data Labels" For="dataLabels" />
+                <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
             </RadzenCard>
             <RadzenChart>
                 <RadzenLineSeries Smooth="@smooth" Data="@revenue2019" CategoryProperty="Date" Title="2019" LineType="LineType.Dashed" ValueProperty="Revenue">
