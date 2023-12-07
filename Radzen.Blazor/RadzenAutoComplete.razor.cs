@@ -73,7 +73,7 @@ namespace Radzen.Blazor
         /// </remarks>
         /// <value>The input type.</value>
         [Parameter]
-        public string Type { get; set; } = "text";
+        public string InputType { get; set; } = "text";
 
         /// <summary>
         /// Gets search input reference.
