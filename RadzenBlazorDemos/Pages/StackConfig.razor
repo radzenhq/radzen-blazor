@@ -2,31 +2,31 @@
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
             Orientation
-            <RadzenDropDown @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value"
+            <RadzenDropDown @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "orientation" }})"
                         Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
             AlignItems
-            <RadzenDropDown @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value"
+            <RadzenDropDown @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "align items" }})"
                         Data="@(Enum.GetValues(typeof(AlignItems)).Cast<AlignItems>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
             JustifyContent
-            <RadzenDropDown @bind-Value="@justifyContent" TextProperty="Text" ValueProperty="Value"
+            <RadzenDropDown @bind-Value="@justifyContent" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "justify content" }})"
                         Data="@(Enum.GetValues(typeof(JustifyContent)).Cast<JustifyContent>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
             Wrap
-            <RadzenDropDown @bind-Value="@wrap" TextProperty="Text" ValueProperty="Value"
+            <RadzenDropDown @bind-Value="@wrap" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "wrap" }})"
                         Data="@(Enum.GetValues(typeof(FlexWrap)).Cast<FlexWrap>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
             Gap
-            <RadzenTextBox @bind-Value="@gap" />
+            <RadzenTextBox @bind-Value="@gap" aria-label="gap" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
             Reverse
-            <RadzenSwitch @bind-Value="@reverse" Style="margin-top: 4px;" />
+            <RadzenSwitch @bind-Value="@reverse" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "reverse" }})" />
         </RadzenStack>
     </RadzenStack>
 </RadzenCard>

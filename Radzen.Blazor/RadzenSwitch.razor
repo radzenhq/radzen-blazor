@@ -6,7 +6,7 @@
 <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
      @onclick="@Toggle" @onkeypress="@(async (args) => { if (args.Code == "Space") { await Toggle(); } })" style="outline: 0 none;@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")">
     <div class="rz-helper-hidden-accessible">
-        <input type="checkbox" name="@Name" id="@Name" checked="@Value" value="@ValueAsString" tabindex="-1">
+            <input type="checkbox" name="@Name" id="@Name" checked="@Value" value="@ValueAsString" tabindex="-1" @attributes=@InputAttributes>
     </div>
     <span class="rz-switch-circle@(Disabled ? " rz-disabled" : "")"></span>
 </div>
