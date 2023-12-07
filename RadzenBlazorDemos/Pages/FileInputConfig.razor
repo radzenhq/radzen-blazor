@@ -9,7 +9,7 @@
             <RadzenCard>
             <h4 class="mb-4">Employee: <b>@(firstEmployee.FirstName + " " + firstEmployee.LastName)</b></h4>
             <RadzenFileInput @bind-Value=@firstEmployee.Photo @bind-FileName=@fileName @bind-FileSize=@fileSize TValue="string" class="w-100" 
-                Change=@(args => OnChange(args, "FileInput")) Error=@(args => OnError(args, "FileInput")) />
+                Change=@(args => OnChange(args, "FileInput")) Error=@(args => OnError(args, "FileInput")) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"/>
             </RadzenCard>
         </div>
     </div>

@@ -43,7 +43,7 @@
                             }
                         </div>
                         <div tabindex="@(Disabled ? "-1" : $"{TabIndex}")">
-                            <button disabled="@Disabled" type="button" class="@ButtonClassList" @onclick="@Remove">
+                            <button disabled="@Disabled" type="button" class="@ButtonClassList" @onclick="@Remove" title="@DeleteText">
                                 <span class="rz-button-icon-left rz-icon-trash" style="display:block"></span>
                             </button>
                         </div>
