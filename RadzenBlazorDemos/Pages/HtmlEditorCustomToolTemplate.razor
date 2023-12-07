@@ -1,7 +1,7 @@
 ﻿<RadzenHtmlEditor style="height: 200px;">
     <RadzenHtmlEditorCustomTool>
         <Template Context="editor">
-            <RadzenDatePicker Change=@(args => OnDateChange(args, editor)) TValue="DateTime" />
+            <RadzenDatePicker Change=@(args => OnDateChange(args, editor)) TValue="DateTime" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select date" }})" />
         </Template>
     </RadzenHtmlEditorCustomTool>
 </RadzenHtmlEditor>
