@@ -34,9 +34,9 @@
                 var val = Value(data);
 
                 var radius = Chart.ColumnOptions.Radius;
-                var sign = val <= 0 ? 0 : 1;
-                var colorIndex = ColorMode == ChartSeriesColorMode.Series ? Items.IndexOf(data) : sign;
-                var classIndex = ColorMode == ChartSeriesColorMode.Series ? Chart.Series.IndexOf(this) : sign;
+
+                var colorIndex = ColorMode == ChartSeriesColorMode.Series ? Items.IndexOf(data) : val <= 0 ? 0 : 1;
+                var classIndex = ColorMode == ChartSeriesColorMode.Series ? Chart.Series.IndexOf(this) : val <= 0 ? 0 : 1;
 
                 fill = PickColor(colorIndex, Fills, Fill);
                 stroke = PickColor(colorIndex, Strokes, Stroke);

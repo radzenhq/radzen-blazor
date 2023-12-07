@@ -109,29 +109,16 @@ namespace Radzen.Blazor
         {
             var style = base.TooltipStyle(item);
 
-            if (ColorMode == ChartSeriesColorMode.Series)
-            {
-                var index = Items.IndexOf(item);
+            var index = ColorMode == ChartSeriesColorMode.Series ? Items.IndexOf(item) : Value(item) <= 0 ? 0 : 1;
 
-                if (index >= 0)
-                {
-                    var color = PickColor(index, Fills, Fill);
-
-                    if (color != null)
-                    {
-                        style = $"{style}; border-color: {color};";
-                    }
-                }
-            }
-            else
+            if (index >= 0)
             {
-                var color = PickColor(Value(item) < 0 ? 0 : 1, Fills, Fill);
+                var color = PickColor(index, Fills, Fill);
 
                 if (color != null)
                 {
                     style = $"{style}; border-color: {color};";
                 }
-
             }
 
             return style;
