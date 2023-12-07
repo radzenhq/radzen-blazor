@@ -2,10 +2,14 @@
 
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
-    <RadzenToggleButton Click=@(args => OnClick("Large ToggleButton")) Text="Large" Size="ButtonSize.Large" Shade="Shade.Light" ToggleShade="Shade.Darker" />
-    <RadzenToggleButton Click=@(args => OnClick("Medium ToggleButton")) Text="Medium" Size="ButtonSize.Medium" Shade="Shade.Light" ToggleShade="Shade.Darker" />
-    <RadzenToggleButton Click=@(args => OnClick("Small ToggleButton")) Text="Small" Size="ButtonSize.Small" Shade="Shade.Light" ToggleShade="Shade.Darker" />
-    <RadzenToggleButton Click=@(args => OnClick("Extra Small ToggleButton")) Text="ExtraSmall" Size="ButtonSize.ExtraSmall" Shade="Shade.Light" ToggleShade="Shade.Darker" />
+    <RadzenToggleButton Click=@(args => OnClick("Large ToggleButton")) Text="Large" Size="ButtonSize.Large" Shade="Shade.Light" ToggleShade="Shade.Darker"
+                        InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Large" }})" />
+    <RadzenToggleButton Click=@(args => OnClick("Medium ToggleButton")) Text="Medium" Size="ButtonSize.Medium" Shade="Shade.Light" ToggleShade="Shade.Darker"
+                        InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Medium" }})" />
+    <RadzenToggleButton Click=@(args => OnClick("Small ToggleButton")) Text="Small" Size="ButtonSize.Small" Shade="Shade.Light" ToggleShade="Shade.Darker"
+                        InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Small" }})" />
+    <RadzenToggleButton Click=@(args => OnClick("Extra Small ToggleButton")) Text="ExtraSmall" Size="ButtonSize.ExtraSmall" Shade="Shade.Light" ToggleShade="Shade.Darker"
+                        InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Extra Small" }})" />
 </RadzenStack>
 
 

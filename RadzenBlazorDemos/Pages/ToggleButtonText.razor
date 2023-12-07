@@ -2,55 +2,55 @@
 
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
-    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
-    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
-    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
-    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Primary" }})" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Secondary" }})" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Info" }})" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Success" }})" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Warning" }})" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Danger" }})" />
 </RadzenStack>
 
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Text Shades</RadzenText>
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Lighter Primary" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Lighter Secondary" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Lighter Info" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Lighter Success" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Lighter Warning" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Lighter" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Lighter Danger" }})" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Light Primary" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Light Secondary" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Light Info" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Light Success" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Light Warning" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Light" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Light Danger" }})" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Dark Primary" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Dark Secondary" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Dark Info" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Dark Success" }})"/>
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Dark Warning" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Dark" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Dark Danger" }})"/>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Darker Primary" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Darker Secondary" }})"/>
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Darker Info" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Darker Success" }})"/>
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Darker Warning" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Darker" Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Darker Danger" }})" />
     </RadzenStack>
 </RadzenStack>
 
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Text Light and Dark</RadzenText>
 <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">Light and Dark button styles don't have Shades</RadzenText>
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-background-color-base-500 rz-p-4">
-    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Light button")) Text="Light" ButtonStyle="ButtonStyle.Light" />
-    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Dark button")) Text="Dark" ButtonStyle="ButtonStyle.Dark" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Light button")) Text="Light" ButtonStyle="ButtonStyle.Light" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Light button" }})" />
+    <RadzenToggleButton Variant="Variant.Text" Click=@(args => OnClick("Dark button")) Text="Dark" ButtonStyle="ButtonStyle.Dark" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Dark button" }})" />
 </RadzenStack>
 
 @code {

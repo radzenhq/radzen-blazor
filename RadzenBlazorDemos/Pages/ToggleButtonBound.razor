@@ -1,7 +1,8 @@
 @inject NotificationService NotificationService
 
 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="2rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
-    <RadzenToggleButton @bind-Value=@value Change=@OnChange Text="@(value ? "Turn off Notifications" : "Turn on Notifications" )" ButtonStyle="ButtonStyle.Light" ToggleButtonStyle="ButtonStyle.Dark" />
+    <RadzenToggleButton @bind-Value=@value Change=@OnChange Text="@(value ? "Turn off Notifications" : "Turn on Notifications" )" ButtonStyle="ButtonStyle.Light" 
+        ToggleButtonStyle="ButtonStyle.Dark" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Turn off Notifications" }})" />
     
     <RadzenIcon Icon="south" />
     <RadzenCard style="width: 220px;">

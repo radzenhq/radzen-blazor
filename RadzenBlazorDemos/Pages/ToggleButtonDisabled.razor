@@ -1,13 +1,13 @@
 @inject NotificationService NotificationService
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
-    <RadzenToggleButton Disabled="true" Text="Primary" ButtonStyle="ButtonStyle.Primary" ToggleShade="Shade.Dark" />
-    <RadzenToggleButton Disabled="true" Text="Secondary" ButtonStyle="ButtonStyle.Secondary" ToggleShade="Shade.Dark" />
-    <RadzenToggleButton Disabled="true" Text="Light" ButtonStyle="ButtonStyle.Light" ToggleShade="Shade.Dark" />
-    <RadzenToggleButton Disabled="true" Text="Info" ButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" />
-    <RadzenToggleButton Disabled="true" Text="Success" ButtonStyle="ButtonStyle.Success" ToggleShade="Shade.Dark" />
-    <RadzenToggleButton Disabled="true" Text="Warning" ButtonStyle="ButtonStyle.Warning" ToggleShade="Shade.Dark" />
-    <RadzenToggleButton Disabled="true" Text="Danger" ButtonStyle="ButtonStyle.Danger" ToggleShade="Shade.Dark" />
+    <RadzenToggleButton Disabled="true" Text="Primary" ButtonStyle="ButtonStyle.Primary" ToggleShade="Shade.Dark" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Primary" }})" />
+    <RadzenToggleButton Disabled="true" Text="Secondary" ButtonStyle="ButtonStyle.Secondary" ToggleShade="Shade.Dark" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Secondary" }})" />
+    <RadzenToggleButton Disabled="true" Text="Light" ButtonStyle="ButtonStyle.Light" ToggleShade="Shade.Dark" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Light" }})" />
+    <RadzenToggleButton Disabled="true" Text="Info" ButtonStyle="ButtonStyle.Info" ToggleShade="Shade.Dark" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Info" }})" />
+    <RadzenToggleButton Disabled="true" Text="Success" ButtonStyle="ButtonStyle.Success" ToggleShade="Shade.Dark" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Success" }})" />
+    <RadzenToggleButton Disabled="true" Text="Warning" ButtonStyle="ButtonStyle.Warning" ToggleShade="Shade.Dark" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Warning" }})" />
+    <RadzenToggleButton Disabled="true" Text="Danger" ButtonStyle="ButtonStyle.Danger" ToggleShade="Shade.Dark" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Danger" }})" />
 </RadzenStack>
 
 @code {

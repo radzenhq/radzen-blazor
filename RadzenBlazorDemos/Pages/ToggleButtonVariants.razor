@@ -3,10 +3,14 @@
 
 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="2rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenToggleButton Variant="Variant.Filled" Shade="Shade.Default" ToggleShade="Shade.Darker" Click=@(args => OnClick("Filled button")) Text="Filled"/>
-        <RadzenToggleButton Variant="Variant.Flat" Shade="Shade.Default" ToggleShade="Shade.Darker" Click=@(args => OnClick("Flat button")) Text="Flat" />
-        <RadzenToggleButton Variant="Variant.Outlined" Shade="Shade.Default" ToggleShade="Shade.Darker" Click=@(args => OnClick("Outlined button")) Text="Outlined" />
-        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Default" ToggleShade="Shade.Darker" Click=@(args => OnClick("Text button ")) Text="Text" />
+        <RadzenToggleButton Variant="Variant.Filled" Shade="Shade.Default" ToggleShade="Shade.Darker" Click=@(args => OnClick("Filled button")) Text="Filled"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Filled" }})" />
+        <RadzenToggleButton Variant="Variant.Flat" Shade="Shade.Default" ToggleShade="Shade.Darker" Click=@(args => OnClick("Flat button")) Text="Flat"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Flat" }})" />
+        <RadzenToggleButton Variant="Variant.Outlined" Shade="Shade.Default" ToggleShade="Shade.Darker" Click=@(args => OnClick("Outlined button")) Text="Outlined"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Outlined" }})" />
+        <RadzenToggleButton Variant="Variant.Text" Shade="Shade.Default" ToggleShade="Shade.Darker" Click=@(args => OnClick("Text button ")) Text="Text"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Text" }})" />
     </RadzenStack>
 </RadzenStack>
 

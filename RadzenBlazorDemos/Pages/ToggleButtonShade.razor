@@ -2,17 +2,24 @@
 
 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="2rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenToggleButton Shade="Shade.Lighter" ToggleShade="Shade.Default" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
-        <RadzenToggleButton Shade="Shade.Light" ToggleShade="Shade.Dark" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
-        <RadzenToggleButton ToggleShade="Shade.Darker" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
-        <RadzenToggleButton Shade="Shade.Dark" ToggleShade="Shade.Default" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
-        <RadzenToggleButton Shade="Shade.Darker" ToggleShade="Shade.Light" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenToggleButton Shade="Shade.Lighter" ToggleShade="Shade.Default" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" 
+            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Lighter" }})" />
+        <RadzenToggleButton Shade="Shade.Light" ToggleShade="Shade.Dark" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Light" }})" />
+        <RadzenToggleButton ToggleShade="Shade.Darker" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Darker Toggle Shade" }})" />
+        <RadzenToggleButton Shade="Shade.Dark" ToggleShade="Shade.Default" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Dark Shade" }})" />
+        <RadzenToggleButton Shade="Shade.Darker" ToggleShade="Shade.Light" Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Darker Shade" }})" />
     </RadzenStack>
 
     <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3">Light and Dark button styles don't have Shades</RadzenText>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenToggleButton Click=@(args => OnClick("Light button")) Text="Light" ButtonStyle="ButtonStyle.Light" ToggleButtonStyle="ButtonStyle.Dark" />
-        <RadzenToggleButton Click=@(args => OnClick("Dark button")) Text="Dark" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Light" />
+        <RadzenToggleButton Click=@(args => OnClick("Light button")) Text="Light" ButtonStyle="ButtonStyle.Light" ToggleButtonStyle="ButtonStyle.Dark"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Light button" }})" />
+        <RadzenToggleButton Click=@(args => OnClick("Dark button")) Text="Dark" ButtonStyle="ButtonStyle.Dark" ToggleButtonStyle="ButtonStyle.Light"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Dark button" }})" />
     </RadzenStack>
 </RadzenStack>
 
