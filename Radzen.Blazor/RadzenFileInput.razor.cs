@@ -147,20 +147,6 @@ namespace Radzen.Blazor
             await OnChange();
         }
 
-        string _Id;
-        string Id
-        {
-            get
-            {
-                if (_Id == null)
-                {
-                    _Id = $"{Guid.NewGuid()}";
-                }
-
-                return _Id;
-            }
-        }
-
         private bool visibleChanged = false;
 
         /// <inheritdoc />
@@ -174,7 +160,7 @@ namespace Radzen.Blazor
 
                 if (Visible)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Id);
+                    await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, GetId());
                 }
             }
         }

@@ -52,19 +52,13 @@ namespace Radzen.Blazor
         /// Gets file input reference.
         /// </summary>
         protected ElementReference fileUpload;
-        string _Id;
-        string Id
-        {
-            get
-            {
-                if (_Id == null)
-                {
-                    _Id = $"{Guid.NewGuid()}";
-                }
 
-                return _Id;
-            }
-        }
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        /// <value>The name.</value>
+        [Parameter]
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenUpload"/> upload is automatic.
@@ -208,7 +202,7 @@ namespace Radzen.Blazor
 
                 if (Visible)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Id);
+                    await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, GetId());
                 }
             }
         }
