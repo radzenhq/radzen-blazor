@@ -4,7 +4,7 @@
 @inherits DbContextPage
 
 <div class="rz-p-12 rz-text-align-center">
-    <RadzenAutoComplete @bind-Value=@companyName Data=@companyNames Style="width: 13rem" />
+    <RadzenAutoComplete @bind-Value=@companyName Data=@companyNames Style="width: 13rem" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Company Name" }})" />
     <RadzenText TextStyle="TextStyle.Body2">Start typing e.g. Al
         @((MarkupString)(!string.IsNullOrEmpty(companyName) ? $", Value is: <strong>{companyName}</strong>" : ""))</RadzenText>
 </div>
