@@ -28,7 +28,7 @@
         string fill, stroke, className;
 
         return
-        @<text>
+        @<g>
             @foreach(var data in Items)
             {
                 var y = category(data) - barHeight / 2 + index * height + index * padding;
@@ -36,9 +36,9 @@
                 var val = Value(data);
                 
                 var radius = Chart.BarOptions.Radius;
-
-                var colorIndex = ChartSeriesColorMode == ChartSeriesColorMode.Series ? Items.IndexOf(data) : val <= 0 ? 0 : 1;
-                var classIndex = ChartSeriesColorMode == ChartSeriesColorMode.Series ? Chart.Series.IndexOf(this) : val <= 0 ? 0 : 1;
+                var sign = val <= 0 ? 0 : 1;
+                var colorIndex = ColorMode == ChartSeriesColorMode.Series ? Items.IndexOf(data) : sign;
+                var classIndex = ColorMode == ChartSeriesColorMode.Series ? Chart.Series.IndexOf(this) : sign;
 
                 fill = PickColor(colorIndex, Fills, Fill);
                 stroke = PickColor(colorIndex, Strokes, Stroke);
@@ -58,10 +58,8 @@
                     path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x+radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 0 {x.ToInvariantString()} {(y+radius).ToInvariantString()} L {x.ToInvariantString()} {(y+height-radius).ToInvariantString()} A {r} {r} 0 0 0 {(x+radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y+height).ToInvariantString()} Z";
                 }
 
-                <g class="@className">
-                    <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
-                </g>
+                <Path class="@className" @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
             }
-        </text>;
+        </g>;
     }
 }

@@ -311,7 +311,7 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Render Color Mode .
+    /// Chart Series Color Mode.
     /// </summary>
     public enum ChartSeriesColorMode
     {
