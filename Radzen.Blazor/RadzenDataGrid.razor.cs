@@ -2529,7 +2529,11 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    selectedItems.Remove(item);
+                    var itemToRemove = selectedItems.Keys.FirstOrDefault(i => ItemEquals(i, item));
+                    if (itemToRemove != null)
+                    {
+                        selectedItems.Remove(itemToRemove);
+                    }
                     await RowDeselect.InvokeAsync(item);
                 }
             }
