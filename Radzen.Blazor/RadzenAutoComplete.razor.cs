@@ -66,6 +66,16 @@ namespace Radzen.Blazor
         public int FilterDelay { get; set; } = 500;
 
         /// <summary>
+        /// Gets or sets the underlying input type.
+        /// </summary>
+        /// <remarks>
+        /// This does not apply when <see cref="Multiline"/> is <c>true</c>.
+        /// </remarks>
+        /// <value>The input type.</value>
+        [Parameter]
+        public string InputType { get; set; } = "text";
+
+        /// <summary>
         /// Gets search input reference.
         /// </summary>
         protected ElementReference search;

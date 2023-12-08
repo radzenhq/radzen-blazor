@@ -24,7 +24,7 @@
                 oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onchange="@OnChange"
                 aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
                 class="@InputClassList" onblur="Radzen.activeElement = null"
-                type="text" id="@Name" aria-expanded="true" placeholder="@CurrentPlaceholder" />
+                type="@InputType" id="@Name" aria-expanded="true" placeholder="@CurrentPlaceholder" />
         }
         <div id="@PopupID" class="rz-autocomplete-panel" style="@PopupStyle">
             <ul @ref="@list" class="rz-autocomplete-items rz-autocomplete-list" role="listbox">
