@@ -320,9 +320,9 @@ namespace Radzen
         /// </summary>
         Series,
         /// <summary>
-        /// First two colors will be applied from css style of current theme or from Fills to Positive and Negative values.
+        /// Provide a list of SeriesColorRange to set chart item color based on the chart item value.
         /// </summary>
-        PositiveNegative,
+        Range,
     }
 
     /// <summary>

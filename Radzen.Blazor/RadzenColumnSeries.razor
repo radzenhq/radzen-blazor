@@ -22,25 +22,16 @@
 
         var bandWidth = BandWidth;
         var width = bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();;
-
-        string fill, stroke, className;
+        var className = $"rz-column-series rz-series-{Chart.Series.IndexOf(this)}";
 
         return
-        @<g>
+        @<g class="@className">
             @foreach(var data in Items)
             {
                 var x = category(data) - bandWidth / 2 + index * width + index * padding;
                 var y = value(data);
                 var val = Value(data);
-
                 var radius = Chart.ColumnOptions.Radius;
-
-                var colorIndex = ColorMode == ChartSeriesColorMode.Series ? Items.IndexOf(data) : val <= 0 ? 0 : 1;
-                var classIndex = ColorMode == ChartSeriesColorMode.Series ? Chart.Series.IndexOf(this) : val <= 0 ? 0 : 1;
-
-                fill = PickColor(colorIndex, Fills, Fill);
-                stroke = PickColor(colorIndex, Strokes, Stroke);
-                className = $"rz-column-series rz-series-{classIndex}";
 
                 if (radius > width / 2)
                 {
@@ -53,7 +44,9 @@
                 {
                     path = $"M {x.ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {(y-radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} L {(x + radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {x.ToInvariantString()} {(y-radius).ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
                 }
-
+                var fill = PickColor(Items.IndexOf(data), Fills, Fill, ColorMode, FillRange, val);
+                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, ColorMode, StrokeRange, val);
+                
                 <Path class="@className" @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
             }
         </g>;

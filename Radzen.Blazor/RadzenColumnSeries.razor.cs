@@ -61,6 +61,20 @@ namespace Radzen.Blazor
         [Parameter]
         public ChartSeriesColorMode ColorMode { get; set; } = ChartSeriesColorMode.Series;
 
+        /// <summary>
+        /// Gets or sets the color range of the fill for when ColorMode = ColorRange.
+        /// </summary>
+        /// <value>The color range of the fill.</value>
+        [Parameter]
+        public IList<SeriesColorRange> FillRange { get; set; } = new List<SeriesColorRange>();
+
+        /// <summary>
+        /// Gets or sets the color range of the stroke for when ColorMode = ColorRange.
+        /// </summary>
+        /// <value>The color range of the stroke.</value>
+        [Parameter]
+        public IList<SeriesColorRange> StrokeRange { get; set; } = new List<SeriesColorRange>();
+
         /// <inheritdoc />
         public override string Color
         {
