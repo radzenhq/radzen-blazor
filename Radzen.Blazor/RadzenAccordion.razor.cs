@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -176,6 +178,23 @@ namespace Radzen.Blazor
                     i.SetSelected(false);
                     await Collapse.InvokeAsync(items.IndexOf(i));
                 }
+            }
+        }
+
+        bool preventKeyPress = false;
+        async Task OnKeyPress(KeyboardEventArgs args, RadzenAccordionItem item)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                await SelectItem(item);
+            }
+            else
+            {
+                preventKeyPress = false;
             }
         }
     }
