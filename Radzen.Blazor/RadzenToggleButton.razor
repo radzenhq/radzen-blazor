@@ -7,7 +7,7 @@
             @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
             @onclick="@OnClick" tabindex="@(Disabled ? "-1" : $"{TabIndex}")">
         <div class="rz-helper-hidden-accessible">
-            <input type="checkbox" name="@Name" id="@Name" checked="@Value" value="@(Value.ToString().ToLower())" tabindex="-1" @attributes=@InputAttributes>
+            <input type="checkbox" name="@Name" id="@Name" checked="@Value" value="@(Value.ToString().ToLower())" tabindex="-1" aria-checked="@(Value.ToString().ToLowerInvariant())" @attributes=@InputAttributes>
         </div>
         <span class="rz-button-box">
             @if (ChildContent != null)

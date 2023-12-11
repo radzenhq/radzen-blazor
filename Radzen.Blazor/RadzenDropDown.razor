@@ -116,7 +116,7 @@
                     {
                     <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)" @onclick="@SelectAll">
                         <div class="rz-helper-hidden-accessible">
-                            <input readonly="readonly" type="checkbox" id="@($"{(Name ?? UniqueID + "sa")}")" aria-label="@SearchAriaLabel">
+                            <input readonly="readonly" type="checkbox" id="@($"{(Name ?? UniqueID + "sa")}")" aria-label="@SearchAriaLabel" aria-checked="@(IsAllSelected().ToString().ToLowerInvariant())">
                         </div>
                         <div class="@(IsAllSelected() ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box")">
                             <span class="@(IsAllSelected() ? "rz-chkbox-icon rzi rzi-check" : "rz-chkbox-icon")"></span>

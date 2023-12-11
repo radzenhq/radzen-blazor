@@ -20,7 +20,7 @@
                     {
                     <div class="rz-chkbox " @onclick="@SelectAll">
                         <div class="rz-helper-hidden-accessible">
-                            <input id="@($"{UniqueID}sa")" readonly="readonly" type="checkbox" aria-label="@SelectAllText">
+                            <input id="@($"{UniqueID}sa")" readonly="readonly" type="checkbox" aria-label="@SelectAllText" aria-checked="@(IsAllSelected().ToString().ToLowerInvariant())">
                         </div>
                         <div class="@(IsAllSelected() ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box")">
                             <span class="@(IsAllSelected() ? "rz-chkbox-icon rzi rzi-check" : "rz-chkbox-icon")"></span>
