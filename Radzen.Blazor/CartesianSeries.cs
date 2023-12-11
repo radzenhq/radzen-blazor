@@ -728,7 +728,6 @@ namespace Radzen.Blazor
         /// <param name="index">The index.</param>
         /// <param name="colors">The colors.</param>
         /// <param name="defaultValue">The default value.</param>
-        /// <param name="colorMode">The color mode value.</param>
         /// <param name="colorRange">The color range value.</param>
         /// <param name="value">The value of the item.</param>
         protected string PickColor(int index, IEnumerable<string> colors, string defaultValue = null, IList<SeriesColorRange> colorRange = null, double value = 0.0)
