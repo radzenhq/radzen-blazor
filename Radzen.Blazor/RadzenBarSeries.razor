@@ -24,7 +24,7 @@
 
         var barHeight = BandHeight;
         var height = barHeight / barSeries.Count() - padding + padding / barSeries.Count();;
-        var className = $"rz-column-series rz-series-{Chart.Series.IndexOf(this)}";
+        var className = $"rz-bar-series rz-series-{Chart.Series.IndexOf(this)}";
 
         return
         @<g class="@className">
@@ -51,7 +51,7 @@
                 var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, val);
                 var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, val);
 
-                <Path class="@className" @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
             }
         </g>;
     }

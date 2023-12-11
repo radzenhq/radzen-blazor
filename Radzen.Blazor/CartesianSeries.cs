@@ -734,20 +734,19 @@ namespace Radzen.Blazor
         {
             if (colorRange != null)
             {
-                var result = colorRange.Where(r => r.Min <= value && r.Max > value).FirstOrDefault<SeriesColorRange>();
+                var result = colorRange.Where(r => r.Min <= value && r.Max >= value).FirstOrDefault<SeriesColorRange>();
                 return result != null ? result.Color : defaultValue;
             }
             else
             {
-                if (!(colors == null || !colors.Any()))
+                if (colors == null || !colors.Any())
                 {
-                    return colors.ElementAt(index % colors.Count());
+                    return defaultValue;
                 }
+
+                return colors.ElementAt(index % colors.Count());
             }
-
-            return defaultValue;
         }
-
         /// <inheritdoc />
         public void Dispose()
         {

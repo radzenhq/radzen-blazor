@@ -47,7 +47,7 @@
                 var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, val);
                 var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, val);
                 
-                <Path class="@className" @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
             }
         </g>;
     }
