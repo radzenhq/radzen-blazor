@@ -5,7 +5,7 @@
         <RadzenLabel Text="Color scheme:" Style="margin-right: 8px; vertical-align: middle;" Component="ColorScheme" />
         <RadzenDropDown Data="@colorSchemes" @bind-Value="@colorScheme" Name="ColorScheme">
             <Template>
-                @Enum.GetName(context)
+                @Enum.GetName(typeof(ColorScheme), context)
             </Template>
         </RadzenDropDown>
     </RadzenCard>
