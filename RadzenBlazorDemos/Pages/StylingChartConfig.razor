@@ -3,7 +3,11 @@
 <div class="container">
     <RadzenCard class="mt-4 w-100 mb-4 d-flex align-items-center" >
         <RadzenLabel Text="Color scheme:" Style="margin-right: 8px; vertical-align: middle;" Component="ColorScheme" />
-        <RadzenDropDown Data="@colorSchemes" @bind-Value="@colorScheme" Name="ColorScheme" />
+        <RadzenDropDown Data="@colorSchemes" @bind-Value="@colorScheme" Name="ColorScheme">
+            <Template>
+                @Enum.GetName(context)
+            </Template>
+        </RadzenDropDown>
     </RadzenCard>
     <div class="row my-5">
         <div class="col-sm-12 col-lg-8">
