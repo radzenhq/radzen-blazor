@@ -293,6 +293,13 @@ namespace Radzen.Blazor
         public bool Responsive { get; set; }
 
         /// <summary>
+        /// Allows to define a custom function for enums DisplayAttribute Description property value translation in datagrid 
+        /// Enum filters.
+        /// </summary>
+        [Parameter]
+        public Func<string, string> EnumFilterTranslationFunc { get; set; }
+
+        /// <summary>
         /// The grouped and paged View
         /// </summary>
         IEnumerable<GroupResult> _groupedPagedView;
