@@ -311,21 +311,6 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Chart Series Color Mode.
-    /// </summary>
-    public enum ChartSeriesColorMode
-    {
-        /// <summary>
-        /// Colors will be applied from css style of current theme or from Fills to each series.
-        /// </summary>
-        Series,
-        /// <summary>
-        /// Provide a list of SeriesColorRange to set chart item color based on the chart item value.
-        /// </summary>
-        Range,
-    }
-
-    /// <summary>
     /// DataGrid settings class used to Save/Load settings.
     /// </summary>
     public class DataGridSettings

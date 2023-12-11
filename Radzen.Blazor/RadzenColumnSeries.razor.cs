@@ -55,25 +55,18 @@ namespace Radzen.Blazor
         public LineType LineType { get; set; }
 
         /// <summary>
-        /// Gets or sets the color mode of the series.
-        /// </summary>
-        /// <value>The color mode of the series.</value>
-        [Parameter]
-        public ChartSeriesColorMode ColorMode { get; set; } = ChartSeriesColorMode.Series;
-
-        /// <summary>
-        /// Gets or sets the color range of the fill for when ColorMode = ColorRange.
+        /// Gets or sets the color range of the fill.
         /// </summary>
         /// <value>The color range of the fill.</value>
         [Parameter]
-        public IList<SeriesColorRange> FillRange { get; set; } = new List<SeriesColorRange>();
+        public IList<SeriesColorRange> FillRange { get; set; }
 
         /// <summary>
-        /// Gets or sets the color range of the stroke for when ColorMode = ColorRange.
+        /// Gets or sets the color range of the stroke.
         /// </summary>
         /// <value>The color range of the stroke.</value>
         [Parameter]
-        public IList<SeriesColorRange> StrokeRange { get; set; } = new List<SeriesColorRange>();
+        public IList<SeriesColorRange> StrokeRange { get; set; }
 
         /// <inheritdoc />
         public override string Color
@@ -118,11 +111,11 @@ namespace Radzen.Blazor
         {
             var style = base.TooltipStyle(item);
 
-            var index = ColorMode == ChartSeriesColorMode.Series ? Items.IndexOf(item) : Value(item) <= 0 ? 0 : 1;
+            var index = Items.IndexOf(item);
 
             if (index >= 0)
             {
-                var color = PickColor(index, Fills, Fill);
+                var color = PickColor(index, Fills, Fill, FillRange, Value(item));
 
                 if (color != null)
                 {

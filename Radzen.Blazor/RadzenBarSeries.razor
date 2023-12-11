@@ -48,8 +48,8 @@
                 {
                     path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x+radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 0 {x.ToInvariantString()} {(y+radius).ToInvariantString()} L {x.ToInvariantString()} {(y+height-radius).ToInvariantString()} A {r} {r} 0 0 0 {(x+radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y+height).ToInvariantString()} Z";
                 }
-                var fill = PickColor(Items.IndexOf(data), Fills, Fill, ColorMode, FillRange, val);
-                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, ColorMode, StrokeRange, val);
+                var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, val);
+                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, val);
 
                 <Path class="@className" @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
             }

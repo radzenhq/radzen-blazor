@@ -731,21 +731,18 @@ namespace Radzen.Blazor
         /// <param name="colorMode">The color mode value.</param>
         /// <param name="colorRange">The color range value.</param>
         /// <param name="value">The value of the item.</param>
-        protected string PickColor(int index, IEnumerable<string> colors, string defaultValue = null, ChartSeriesColorMode colorMode = ChartSeriesColorMode.Series, IList<SeriesColorRange> colorRange = null, double value = 0.0)
+        protected string PickColor(int index, IEnumerable<string> colors, string defaultValue = null, IList<SeriesColorRange> colorRange = null, double value = 0.0)
         {
-            if (colorMode == ChartSeriesColorMode.Series)
+            if (colorRange != null)
+            {
+                var result = colorRange.Where(r => r.Min <= value && r.Max > value).FirstOrDefault<SeriesColorRange>();
+                return result != null ? result.Color : defaultValue;
+            }
+            else
             {
                 if (!(colors == null || !colors.Any()))
                 {
                     return colors.ElementAt(index % colors.Count());
-                }
-            }
-            else
-            {               
-                if(colorRange != null)
-                {
-                    var result = colorRange.Where(r => r.Min <= value && r.Max > value).FirstOrDefault<SeriesColorRange>();
-                    return result != null ? result.Color : defaultValue;
                 }
             }
 
