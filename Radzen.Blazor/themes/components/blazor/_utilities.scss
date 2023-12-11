@@ -137,6 +137,9 @@ $rz-theme-constants-map: map-merge(
     "text-font-family": $rz-text-font-family,
     "icon-size": $rz-icon-size,
     "icon-font-family": $rz-icon-font-family,
+    "outline-offset": $rz-outline-offset,
+    "outline-width": $rz-outline-width,
+    "outline-color": $rz-outline-color,
   ),
   $rz-theme-constants-map
 );
@@ -190,6 +193,8 @@ $rz-link-color: var(--rz-secondary) !default;
 $rz-link-text-decoration: none !default;
 $rz-link-hover-color: var(--rz-secondary-dark) !default;
 $rz-link-hover-text-decoration: underline !default;
+$rz-link-focus-outline: var(--rz-outline-focus) !default;
+$rz-link-focus-outline-offset: var(--rz-outline-offset) !default;
 
 $rz-link-map: () !default;
 $rz-link-map: map-merge(
@@ -198,6 +203,8 @@ $rz-link-map: map-merge(
     "link-text-decoration": $rz-link-text-decoration,
     "link-hover-color": $rz-link-hover-color,
     "link-hover-text-decoration": $rz-link-hover-text-decoration,
+    "link-focus-outline": $rz-link-focus-outline,
+    "link-focus-outline-offset": $rz-link-focus-outline-offset,
   ),
   $rz-link-map
 );
@@ -285,7 +292,6 @@ $severity-styles-map: map-merge(
 }
 
 // Interaction State Border
-
 $rz-border-normal: var(--rz-border-width) solid var(--rz-base-300) !default;
 $rz-border-hover: var(--rz-border-width) solid var(--rz-base-400) !default;
 $rz-border-focus: var(--rz-border-width) solid var(--rz-base-400) !default;
@@ -352,6 +358,37 @@ $rz-border-radius-map: map-merge(
 
 // Border Radius CSS classes
 @include rz-utility-map-css('border-radius', $rz-border-radius-map);
+
+
+// Outline
+
+// Outline CSS variables
+:root {
+  @each $color, $value in $rz-theme-colors-map {
+    --rz-outline-#{$color}: var(--rz-outline-width) solid var(--rz-#{$color});
+  }
+}
+
+// Interaction State Outline
+$rz-outline-normal: none !default;
+$rz-outline-focus: var(--rz-outline-width) solid var(--rz-outline-color) !default;
+
+$rz-state-outline-map: () !default;
+$rz-state-outline-map: map-merge(
+  (
+    "outline-normal": $rz-outline-normal,
+    "outline-focus": $rz-outline-focus,
+  ),
+  $rz-state-outline-map
+);
+
+// Interaction State Outline CSS variables
+:root {
+  @each $token, $value in $rz-state-outline-map {
+    --rz-#{$token}: #{$value};
+  }
+}
+
 
 // Shadow
 

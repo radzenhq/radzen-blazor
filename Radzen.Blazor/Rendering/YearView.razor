@@ -24,8 +24,12 @@
         realstart = new DateTime(curYear, offSetMonth, 1);
         daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
         date = realstart.StartOfMonth().StartOfWeek();
+        var currentDate = date;
+        var currentMonth = month;
 
-        <div class="rz-display-flex rz-flex-column rz-col-12 rz-col-sm-6 rz-col-md-4 rz-col-lg-3">
+        <div class="rz-year-month rz-display-flex rz-flex-column rz-col-12 rz-col-sm-6 rz-col-md-4 rz-col-lg-3"
+                 tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
+                 @onfocus=@(args => {CurrentDate = currentDate; CurrentMonth = currentMonth; })>
         
             <div class="rz-slot-header rz-pb-2">
                 <span class="rz-text-subtitle1">
@@ -52,9 +56,8 @@
                                 var day = date.AddDays((row * 7) + col);
                                 var appointments = AppointmentsInSlot(day, day.AddDays(1));
                                 var excessCount = appointments.Count();
-                                string classname;
+                                string classname = $"rz-slot-title {(day.Month != month ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")} {(day == CurrentDate && month == CurrentMonth ? " rz-state-focused" : "")}".Trim();
 
-                                    classname = $"rz-slot-title {(day.Month != offSetMonth ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")}";
                                     <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
                                         <div class="@classname">
                                             @day.Day
@@ -158,5 +161,32 @@
         DialogService.Close();
 
         await OnAppointmentClick(data);
+    }
+
+    DateTime CurrentDate;
+    int CurrentMonth;
+
+    bool preventKeyPress = false;
+
+    async Task OnKeyPress(KeyboardEventArgs args)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+
+        if (key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown")
+        {
+            var days = key == "ArrowLeft" || key == "ArrowRight" ? 1 : 7;
+            CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" || key == "ArrowUp" ? -days : days);
+            preventKeyPress = true;
+        }
+        else if (key == "Enter")
+        {
+            await OnListClick(CurrentDate, AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)));
+
+            preventKeyPress = true;
+        }
+        else
+        {
+            preventKeyPress = false;
+        }
     }
 }

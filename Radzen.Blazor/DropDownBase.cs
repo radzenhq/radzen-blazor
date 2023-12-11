@@ -591,12 +591,15 @@ namespace Radzen
             }
         }
 
+        internal bool preventKeydown = false;
+
         /// <summary>
         /// Handles the key press.
         /// </summary>
         /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.KeyboardEventArgs"/> instance containing the event data.</param>
         /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
-        protected virtual async System.Threading.Tasks.Task HandleKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args, bool isFilter = false)
+        /// <param name="shouldSelectOnChange">Should select item on item change with keyboard.</param>
+        protected virtual async System.Threading.Tasks.Task HandleKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args, bool isFilter = false, bool? shouldSelectOnChange = null)
         {
             if (Disabled)
                 return;
@@ -628,23 +631,17 @@ namespace Radzen
 
             if (!args.AltKey && (key == "ArrowDown" || key == "ArrowLeft" || key == "ArrowUp" || key == "ArrowRight"))
             {
+                preventKeydown = true;
+
                 try
                 {
-                    var currentViewIndex = Multiple ? selectedIndex : items.IndexOf(selectedItem);
+                    selectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown" || key == "ArrowRight", selectedIndex);
 
-                    var newSelectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown" || key == "ArrowRight", currentViewIndex);
+                    var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
 
-                    if (!Multiple)
+                    if (!Multiple && !popupOpened && shouldSelectOnChange != false)
                     {
-                        if (newSelectedIndex != currentViewIndex && newSelectedIndex >= 0 && newSelectedIndex <= items.Count() - 1)
-                        {
-                            selectedIndex = newSelectedIndex;
-                            await OnSelectItem(items.ElementAt(selectedIndex), true);
-                        }
-                    }
-                    else
-                    {
-                        selectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown", currentViewIndex);
+                        await OnSelectItem(items.ElementAt(selectedIndex), true);
                     }
                 }
                 catch (Exception)
@@ -652,16 +649,34 @@ namespace Radzen
                     //
                 }
             }
-            else if (Multiple && key == "Enter")
+            else if (key == "Enter")
             {
+                preventKeydown = true;
+
                 if (selectedIndex >= 0 && selectedIndex <= items.Count() - 1)
                 {
                     await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, $"{searchText}".Trim());
                     await OnSelectItem(items.ElementAt(selectedIndex), true);
                 }
+
+                var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
+
+                if (!popupOpened)
+                {
+                    await OpenPopup(key, isFilter);
+                }
+                else
+                {
+                    if (!Multiple)
+                    {
+                        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                    }
+                }
             }
-            else if (key == "Enter" || (args.AltKey && key == "ArrowDown"))
+            else if (args.AltKey && key == "ArrowDown")
             {
+                preventKeydown = true;
+
                 await OpenPopup(key, isFilter);
             }
             else if (key == "Escape" || key == "Tab")
@@ -670,6 +685,8 @@ namespace Radzen
             }
             else if (key == "Delete" && AllowClear)
             {
+                preventKeydown = true;
+
                 if (!Multiple && selectedItem != null)
                 {
                     selectedIndex = -1;
@@ -683,7 +700,13 @@ namespace Radzen
             }
             else if (AllowFiltering && isFilter && FilterAsYouType)
             {
+                preventKeydown = true;
+
                 Debounce(DebounceFilter, FilterDelay);
+            }
+            else 
+            {
+                preventKeydown = false;
             }
         }
 
@@ -752,9 +775,10 @@ namespace Radzen
         /// Handles the <see cref="E:KeyPress" /> event.
         /// </summary>
         /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.KeyboardEventArgs"/> instance containing the event data.</param>
-        protected virtual async System.Threading.Tasks.Task OnKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
+        /// <param name="shouldSelectOnChange">Should select item on item change with keyboard.</param>
+        protected virtual async System.Threading.Tasks.Task OnKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args, bool? shouldSelectOnChange = null)
         {
-            await HandleKeyPress(args);
+            await HandleKeyPress(args, false, shouldSelectOnChange);
         }
 
         /// <summary>

@@ -169,7 +169,7 @@ namespace Radzen.Blazor
 
         internal string GetItemCssClass()
         {
-            return GetCssClass();
+            return $"{GetCssClass()} {(Accordion.IsFocused(this) ? "rz-state-focused" : "")}".Trim();
         }
 
         /// <inheritdoc />

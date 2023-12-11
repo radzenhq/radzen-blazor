@@ -7,7 +7,8 @@
 @inherits DbContextPage
 @inject Radzen.DialogService dialogService
 
-<RadzenStack Gap="1rem">
+<RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
+    <RadzenStack>
     <RadzenRow>
         <RadzenColumn Size="12" SizeMD="6" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
             <RadzenText TextStyle="TextStyle.Subtitle1">Contact</RadzenText>
@@ -43,9 +44,9 @@
             <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
         </Columns>
     </RadzenDataGrid>
+    </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
-        <RadzenButton Click="@((args) => dialogService.Close(false))" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Text="Cancel" Style="width: 120px" />
-        <RadzenButton Click="@((args) => dialogService.Close(true))" Variant="Variant.Flat" Text="OK" Style="width: 120px" />
+        <RadzenButton Click="@((args) => dialogService.Close(true))" Variant="Variant.Flat" Text="Close" Style="width: 120px" />
     </RadzenStack>
 </RadzenStack>
 @code {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
@@ -219,6 +220,23 @@ namespace Radzen.Blazor
         public void Refresh()
         {
             StateHasChanged();
+        }
+
+        bool preventKeyPress = true;
+        async Task OnKeyPress(KeyboardEventArgs args, Task task)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                await task;
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
         }
     }
 }

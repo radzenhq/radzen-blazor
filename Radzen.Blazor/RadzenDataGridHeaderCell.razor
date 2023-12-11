@@ -1,9 +1,10 @@
 @typeparam TItem
+@using Microsoft.JSInterop
 @using Radzen.Blazor.Rendering
 @if (RowIndex == Column.GetLevel())
 {
 <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@GetStyle()" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex))>
-    <div @onclick='@((args) => Grid.OnSort(args, Column))' tabindex="@SortingTabIndex" @onkeydown="OnSortKeyPressed">
+    <div @onclick='@((args) => Grid.OnSort(args, Column))' @onkeydown="OnSortKeyPressed">
         @if ((Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
         {
             <span id="@(Grid.getColumnUniqueId(ColumnIndex) + "-drag")" class="rz-column-drag"
@@ -55,12 +56,12 @@
         @if (Grid.AllowFiltering && Column.Filterable && Grid.FilterMode == FilterMode.Advanced)
         {
                 <i @ref=@filterButton @onclick:stopPropagation="true" @onmousedown=@ToggleFilter
-                   class="@getFilterIconCss(Column)" onclick=@getFilterOpen() >
+                   class="@getFilterIconCss(Column)" onclick=@getFilterOpen() @onclick:preventDefault="true">
                    @Grid.FilterIcon
                 </i>
 
                 <Popup Lazy=@(Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand) @ref=popup id="@($"{getColumnPopupID()}")" class="rz-overlaypanel"
-                    style="display:none;min-width:250px;" tabindex="0">
+                       style="display:none;min-width:250px;" @onkeydown="OnFilterPopupKeyPressed">
                         <div class="rz-overlaypanel-content">
                             @if (Column.FilterTemplate != null)
                             {
@@ -167,7 +168,7 @@ else
 
     string getFilterOpen()
     {
-        return Grid.FilterPopupRenderMode == PopupRenderMode.Initial ? $"Radzen.togglePopup(this, '{getColumnPopupID()}')" : "";
+        return Grid.FilterPopupRenderMode == PopupRenderMode.Initial ? $"Radzen.togglePopup(this, '{getColumnPopupID()}', false, null, null, true, true)" : "";
     }
 
     async Task ToggleFilter()
@@ -235,8 +236,6 @@ else
         return finalStyle;
     }
 
-    private int SortingTabIndex => Grid.AllowSorting && Column.Sortable ? 0 : -1;
-
     private string getFilterIconCss(RadzenDataGridColumn<TItem> column)
     {
         var additionalStyle = column.GetFilterValue() != null || column.GetSecondFilterValue() != null ||
@@ -267,7 +266,7 @@ else
     {
         base.OnParametersSet();
 
-        if (Column != null && Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand)
+        if (Column != null)
         {
             Column.headerCell = this;
         }
@@ -286,6 +285,28 @@ else
         if(args.Button == 0) 
         { 
             await Grid.StartColumnResize(args, ColumnIndex);
+        }
+    }
+
+    internal async Task OpenFilter()
+    {
+        if (Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand)
+        {
+            await popup.ToggleAsync(filterButton);
+        }
+        else
+        {
+            await Grid.GetJSRuntime().InvokeVoidAsync("Radzen.togglePopup", filterButton, getColumnPopupID(), false, null, null, true, true);
+        }
+    }
+
+    async Task OnFilterPopupKeyPressed(KeyboardEventArgs args)
+    {
+        var key = args.Code ?? args.Key;
+        if (key == "Escape")
+        {
+            await CloseFilter();
+            await Grid.GetJSRuntime().InvokeVoidAsync("Radzen.focusElement", Grid.GridId());
         }
     }
 }

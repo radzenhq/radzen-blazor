@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -216,6 +219,58 @@ namespace Radzen.Blazor
         protected string GetComponentBarCssClass()
         {
             return $"rz-splitter-bar rz-splitter-bar-{ClassName}";
+        }
+
+        bool preventKeyPress = false;
+        async Task OnKeyPress(KeyboardEventArgs args, bool? expand = null)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                string id = null;
+
+                if (expand == true)
+                {
+                    id = GetId() + "-collapse";
+                    await Splitter.OnExpand(Index);
+                }
+                else if (expand == false)
+                {
+                    id = GetId() + "-expand";
+                    await Splitter.OnCollapse(Index);
+                }
+
+                if (!string.IsNullOrEmpty(id))
+                {
+                    await JSRuntime.InvokeVoidAsync("eval",
+                        "setTimeout(function(){ document.getElementById('" + id + "').focus(); }, 200)");
+                }
+            }
+            else if (key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown")
+            {
+                preventKeyPress = true;
+
+                var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", GetId() + "-resize");
+
+                await Splitter.StartResize(new MouseEventArgs()
+                {
+                    ClientX = rect.Left,
+                    ClientY = rect.Top
+                }, Index);
+
+                await JSRuntime.InvokeVoidAsync("Radzen.resizeSplitter", UniqueID, new MouseEventArgs()
+                {
+                    ClientX = rect.Left + (key == "ArrowLeft" ? -1 : key == "ArrowRight" ? 1 : 0),
+                    ClientY = rect.Top + (key == "ArrowUp" ? -1 : key == "ArrowDown" ? 1 : 0)
+                });
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
         }
     }
 }

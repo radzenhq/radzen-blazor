@@ -9,6 +9,8 @@ $steps-number-color: var(--rz-text-color) !default;
 $steps-number-background-color: var(--rz-base-200) !default;
 $steps-number-selected-color: var(--rz-on-secondary) !default;
 $steps-number-selected-background: var(--rz-secondary) !default;
+$steps-number-focus-outline: var(--rz-outline-focus) !default;
+$steps-number-focus-outline-offset: var(--rz-outline-offset) !default;
 
 $steps-title-selected-color: var(--rz-secondary) !default;
 $steps-title-margin: 0 1rem 0 0.5rem !default;
@@ -29,6 +31,8 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
   --rz-steps-number-background-color: #{$steps-number-background-color};
   --rz-steps-number-selected-color: #{$steps-number-selected-color};
   --rz-steps-number-selected-background: #{$steps-number-selected-background};
+  --rz-steps-number-focus-outline: #{$steps-number-focus-outline};
+  --rz-steps-number-focus-outline-offset: #{$steps-number-focus-outline-offset};
   
   --rz-steps-title-selected-color: #{$steps-title-selected-color};
   --rz-steps-title-margin: #{$steps-title-margin};
@@ -89,6 +93,19 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
 
 .rz-steps-item {
   display: inline-block;
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-outline-normal);
+    
+    .rz-steps-number {
+      outline: var(--rz-steps-number-focus-outline);
+      outline-offset: var(--rz-steps-number-focus-outline-offset);
+    }
+  }
 }
 
 .rz-steps-title {

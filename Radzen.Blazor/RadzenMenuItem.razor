@@ -6,7 +6,7 @@
     <div class="rz-navigation-item-wrapper" @attributes="getOpenEvents()" @ref="@Element" id="@GetId()">
         @if (Path != null)
             {
-                <NavLink target="@Target" class="rz-navigation-item-link" href="@Path" Match="@Match">
+                <NavLink tabindex="-1" target="@Target" class="rz-navigation-item-link" href="@Path" Match="@Match">
                     @if (!string.IsNullOrEmpty(Icon))
                     {
                         <i class="rzi rz-navigation-item-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
@@ -58,7 +58,9 @@
         @if (ChildContent != null)
         {
             <ul class="rz-navigation-menu" style="display: none">
-                @ChildContent
+                <CascadingValue Value=this>
+                    @ChildContent
+                </CascadingValue>
             </ul>
         }
     </RadzenMenuItemWrapper>

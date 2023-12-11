@@ -2,11 +2,11 @@
 @inherits RadzenComponent
 @if (Visible)
 {
-    <li @attributes="Attributes" class="@GetCssClass()" style="@Style" @onclick="@OnClick">
+    <li @attributes="Attributes" class="@GetItemCssClass()" style="@Style" @onclick="@OnClick">
         <div class="rz-navigation-item-wrapper">
             @if (Path != null)
             {
-                <NavLink target="@Target" class="rz-navigation-item-link" href="@Path" Match="@Match">
+                <NavLink tabindex="-1" target="@Target" class="rz-navigation-item-link" href="@Path" Match="@Match">
                     @if (!string.IsNullOrEmpty(Icon))
                     {
                         <i class="rzi rz-navigation-item-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
@@ -20,7 +20,7 @@
             }
             else
             {
-                <div class="rz-navigation-item-link">
+                <div class="rz-navigation-item-link" >
                     @if (!string.IsNullOrEmpty(Icon))
                     {
                         <i class="rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>

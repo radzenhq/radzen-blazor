@@ -8,6 +8,8 @@ $panel-toggle-icon-height: $panel-toggle-icon-width !default;
 $panel-toggle-icon-font-size: var(--rz-icon-size) !default;
 $panel-toggle-icon-border-radius: 2px !default;
 $panel-toggle-icon-background-color: var(--rz-base-200) !default;
+$panel-toggle-icon-focus-outline: var(--rz-outline-focus) !default;
+$panel-toggle-icon-focus-outline-offset: var(--rz-outline-offset) !default;
 $panel-hover-color: var(--rz-secondary) !default;
 $panel-border-radius: var(--rz-border-radius) !default;
 $panel-shadow: none !default;
@@ -25,6 +27,8 @@ $panel-shadow: none !default;
   --rz-panel-toggle-icon-font-size: #{$panel-toggle-icon-font-size};
   --rz-panel-toggle-icon-border-radius: #{$panel-toggle-icon-border-radius};
   --rz-panel-toggle-icon-background-color: #{$panel-toggle-icon-background-color};
+  --rz-panel-toggle-icon-focus-outline: #{$panel-toggle-icon-focus-outline};
+  --rz-panel-toggle-icon-focus-outline-offset: #{$panel-toggle-icon-focus-outline-offset};
   --rz-panel-hover-color: #{$panel-hover-color};
   --rz-panel-border-radius: #{$panel-border-radius};
   --rz-panel-shadow: #{$panel-shadow};
@@ -74,6 +78,15 @@ $panel-shadow: none !default;
   &:hover {
     text-decoration: none;
     color: var(--rz-panel-hover-color);
+  }
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-panel-toggle-icon-focus-outline);
+    outline-offset: var(--rz-panel-toggle-icon-focus-outline-offset);
   }
 
   .rzi-minus {

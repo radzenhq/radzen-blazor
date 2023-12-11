@@ -2,7 +2,8 @@
 
 @if (Visible)
 {
-    <ul @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+    <ul @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" 
+        tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
         <li class="rz-navigation-item">
             <div class="rz-navigation-item-wrapper" onclick="Radzen.toggleMenuItem(this)">
                 <div class="rz-navigation-item-link">

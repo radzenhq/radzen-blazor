@@ -32,7 +32,7 @@
         if (open)
         {
             await Open.InvokeAsync(null);
-            await JSRuntime.InvokeVoidAsync("Radzen.openPopup", target, GetId(), false, null, null, null, Reference, nameof(OnClose));
+            await JSRuntime.InvokeVoidAsync("Radzen.openPopup", target, GetId(), false, null, null, null, Reference, nameof(OnClose), true, true);
         }
         else
         {

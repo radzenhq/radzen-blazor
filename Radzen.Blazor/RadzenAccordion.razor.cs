@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -195,21 +196,36 @@ namespace Radzen.Blazor
             }
         }
 
-        bool preventKeyPress = false;
-        async Task OnKeyPress(KeyboardEventArgs args, RadzenAccordionItem item)
+        internal int focusedIndex = -1;
+        bool preventKeyPress = true;
+        async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            if (key == "Space" || key == "Enter")
+            if (key == "ArrowUp" || key == "ArrowDown")
             {
                 preventKeyPress = true;
 
-                await SelectItem(item);
+                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, items.Count - 1);
+            }
+            else if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                if (focusedIndex >= 0 && focusedIndex < items.Count)
+                {
+                    await SelectItem(items.Where(i => i.Visible).ElementAt(focusedIndex));
+                }
             }
             else
             {
                 preventKeyPress = false;
             }
+        }
+
+        internal bool IsFocused(RadzenAccordionItem item)
+        {
+            return items.Where(i => i.Visible).ToList().IndexOf(item) == focusedIndex && focusedIndex != -1;
         }
     }
 }

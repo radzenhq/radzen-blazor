@@ -3,7 +3,9 @@
 
 @if (Visible)
 {
-    <ul @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+    <ul @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
+        tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
+        @onfocus=@(args => { focusedIndex = focusedIndex == -1 ? 0: focusedIndex; currentItems = currentItems != null ? currentItems : items.Where(i => i.Visible).ToList();})>
         <CascadingValue Value=this>
             @ChildContent
         </CascadingValue>

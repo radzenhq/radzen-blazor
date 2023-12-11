@@ -37,6 +37,16 @@ namespace RadzenBlazorDemos
             Description = "How to get support for the Radzen Blazor Components library.",
             Icon = "&#xe94c"
         },
+        new Example
+        {
+            Name = "Accessibility",
+            Path = "/accessibility",
+            New = true,
+            Title = "Blazor Accessibility | Free UI Components by Radzen",
+            Description = "The accessible Radzen Blazor Components library covers highest levels of web accessibility guidelines and recommendations, making you Blazor app compliant with WAI-ARIA, WCAG 2.2, section 508, and keyboard compatibility standards.",
+            Icon = "&#xe92c",
+            Tags = new[] { "keyboard", "accessibility", "standard", "508", "wai-aria", "wcag", "shortcut"}
+        },
 
         new Example()
         {

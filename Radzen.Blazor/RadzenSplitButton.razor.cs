@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -208,6 +210,84 @@ namespace Radzen.Blazor
         {
             Close();
             base.Dispose();
+        }
+
+        internal int focusedIndex = -1;
+        bool preventKeyPress = true;
+        async Task OnKeyPress(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (args.AltKey && key == "ArrowDown")
+            {
+                preventKeyPress = true;
+
+                focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
+
+                await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
+            }
+            else if (key == "ArrowUp" || key == "ArrowDown")
+            {
+                preventKeyPress = true;
+
+                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, items.Count - 1);
+            }
+            else if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                if (focusedIndex >= 0 && focusedIndex < items.Count)
+                {
+                    await items[focusedIndex].OnClick(new MouseEventArgs());
+                }
+                else
+                {
+                    await OnClick(new MouseEventArgs());
+                }
+            }
+            else if (key == "Escape")
+            {
+                preventKeyPress = true;
+
+                Close();
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
+        }
+
+        internal bool IsFocused(RadzenSplitButtonItem item)
+        {
+            return items?.IndexOf(item) == focusedIndex && focusedIndex != -1;
+        }
+
+        List<RadzenSplitButtonItem> items = new List<RadzenSplitButtonItem>();
+
+        /// <summary>
+        /// Adds the item.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        public void AddItem(RadzenSplitButtonItem item)
+        {
+            if (items.IndexOf(item) == -1)
+            {
+                items.Add(item);
+                StateHasChanged();
+            }
+        }
+
+        /// <summary>
+        /// Removes the item.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        public void RemoveItem(RadzenSplitButtonItem item)
+        {
+            if (items.IndexOf(item) != -1)
+            {
+                items.Remove(item);
+                StateHasChanged();
+            }
         }
     }
 }

@@ -22,6 +22,10 @@ $tabs-tab-selected-color: $tabs-selected-tab-color !default;
 $tabs-tab-selected-top-border-color: var(--rz-secondary) !default;
 $tabs-tab-hover-background-color: $tabs-hover-background-color !default;
 $tabs-tab-hover-color: $tabs-hover-color !default;
+$tabs-tab-focus-background-color: var(--rz-base-background-color) !default;
+$tabs-tab-focus-color: $tabs-tab-hover-color !default;
+$tabs-tab-focus-outline: var(--rz-outline-focus) !default;
+$tabs-tab-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
 $tabs-icon-font-size: var(--rz-icon-size) !default;
 $tabs-icon-margin: 0 0.25rem 0 -0.25rem !default;
@@ -47,6 +51,10 @@ $tabs-transition: var(--rz-transition-all) !default;
   --rz-tabs-tab-selected-top-border-color: #{$tabs-tab-selected-top-border-color};
   --rz-tabs-tab-hover-background-color: #{$tabs-tab-hover-background-color};
   --rz-tabs-tab-hover-color: #{$tabs-tab-hover-color};
+  --rz-tabs-tab-focus-background-color: #{$tabs-tab-focus-background-color};
+  --rz-tabs-tab-focus-color: #{$tabs-tab-focus-color};
+  --rz-tabs-tab-focus-outline: #{$tabs-tab-focus-outline};
+  --rz-tabs-tab-focus-outline-offset: #{$tabs-tab-focus-outline-offset};
   --rz-tabs-icon-font-size: #{$tabs-icon-font-size};
   --rz-tabs-icon-margin: #{$tabs-icon-margin};
   --rz-tabs-transition: #{$tabs-transition};
@@ -54,6 +62,26 @@ $tabs-transition: var(--rz-transition-all) !default;
 
 .rz-tabview {
   display: flex;
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-outline-focus);
+    outline-offset: var(--rz-outline-offset);
+
+    .rz-tabview-nav {
+      .rz-state-focused {
+        &:not(.rz-tabview-selected) {
+          &:not(.rz-state-disabled) {
+            outline: var(--rz-tabs-tab-focus-outline);
+            outline-offset: var(--rz-tabs-tab-focus-outline-offset);
+          }
+        }
+      }
+    }
+  }
 
   &.rz-tabview-top {
     flex-direction: column;
@@ -125,6 +153,20 @@ $tabs-transition: var(--rz-transition-all) !default;
 
     &.rz-state-disabled {
       opacity: 0.5;
+    }
+  }
+
+  .rz-state-focused {
+    &:not(.rz-tabview-selected) {
+      &:not(.rz-state-disabled) {
+        background-color: var(--rz-tabs-tab-focus-background-color);
+        border-color: var(--rz-tabs-tab-focus-background-color);
+
+        a,
+        a:not([href]):not([class]) {
+          color: var(--rz-tabs-tab-focus-color);
+        }
+      }
     }
   }
 

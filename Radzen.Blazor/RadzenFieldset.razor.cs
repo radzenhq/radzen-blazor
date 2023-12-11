@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Threading.Tasks;
 
@@ -154,6 +155,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void OnInitialized()
         {
+            base.OnInitialized();
             collapsed = Collapsed;
         }
 
@@ -193,6 +195,23 @@ namespace Radzen.Blazor
             summaryContentStyle = !collapsed ? "display: none" : "";
 
             return base.OnParametersSetAsync();
+        }
+
+        bool preventKeyPress = false;
+        async Task OnKeyPress(KeyboardEventArgs args, Task task)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                await task;
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
         }
     }
 }

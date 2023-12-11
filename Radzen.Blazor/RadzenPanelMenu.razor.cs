@@ -4,6 +4,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 namespace Radzen.Blazor
 {
@@ -79,7 +81,8 @@ namespace Radzen.Blazor
 
         private void UriHelper_OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
         {
-            foreach (var item in items)
+            var allExpandedItems = items.Concat(items.SelectManyRecursive(i => i.ExpandedInternal ? i.items : Enumerable.Empty<RadzenPanelMenuItem>()));
+            foreach (var item in allExpandedItems)
             {
                 SelectItem(item);
             }
@@ -190,6 +193,107 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return "rz-panel-menu";
+        }
+
+        [Inject]
+        NavigationManager NavigationManager { get; set; }
+
+        internal int focusedIndex = -1;
+        List<RadzenPanelMenuItem> currentItems;
+
+        bool preventKeyPress = false;
+        async Task OnKeyPress(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "ArrowUp" || key == "ArrowDown")
+            {
+                preventKeyPress = true;
+
+                if (key == "ArrowUp" && focusedIndex == 0 && currentItems.Any(i => i.ParentItem != null))
+                {
+                    var parentItem = currentItems.FirstOrDefault().ParentItem;
+                    currentItems = (parentItem.ParentItem != null ? parentItem.ParentItem.items : parentItem.Parent.items).ToList();
+                    focusedIndex = currentItems.IndexOf(parentItem);
+                }
+                else if (key == "ArrowDown" && currentItems.ElementAtOrDefault(focusedIndex) != null && 
+                    currentItems.ElementAtOrDefault(focusedIndex).ExpandedInternal && currentItems.ElementAtOrDefault(focusedIndex).items.Any())
+                {
+                    currentItems = currentItems.ElementAtOrDefault(focusedIndex).items.Where(i => i.Visible).ToList();
+                    focusedIndex = 0;
+                }
+                else if (key == "ArrowDown" && focusedIndex == currentItems.Count - 1)
+                {
+                    var parentItem = currentItems.FirstOrDefault().ParentItem;
+                    currentItems = (parentItem?.ParentItem != null ? parentItem.ParentItem.items : parentItem != null ? parentItem.Parent.items : items).Where(i => i.Visible).ToList();
+                    focusedIndex = parentItem != null ? currentItems.IndexOf(parentItem) + 1 : focusedIndex;
+                }
+                else if (key == "ArrowUp" && currentItems.ElementAtOrDefault(focusedIndex - 1) != null &&
+                    currentItems.ElementAtOrDefault(focusedIndex - 1).ExpandedInternal && currentItems.ElementAtOrDefault(focusedIndex - 1).items.Any())
+                {
+                    currentItems = currentItems.ElementAtOrDefault(focusedIndex - 1).items.Where(i => i.Visible).ToList();
+                    focusedIndex = currentItems.Count - 1;
+                }
+                else
+                {
+                    focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, currentItems.Count - 1);
+                }
+
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Element.prototype.scrollIntoViewIfNeeded.call", currentItems[focusedIndex].Element);
+                }
+                catch
+                { }
+            }
+            else if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                if (focusedIndex >= 0 && focusedIndex < currentItems.Count)
+                {
+                    var item = currentItems[focusedIndex];
+
+                    if (item.items.Any())
+                    {
+                        await item.Toggle();
+
+                        currentItems = (item.ExpandedInternal ?
+                                item.items :
+                                item.ParentItem != null ? item.ParentItem.items : item.Parent.items).Where(i => i.Visible).ToList();
+
+                        focusedIndex = item.ExpandedInternal ? 0 : currentItems.IndexOf(item);
+                    }
+                    else
+                    {
+                        if (item.Path != null)
+                        {
+                            NavigationManager.NavigateTo(item.Path);
+                        }
+                        else
+                        {
+                            await item.OnClick(new MouseEventArgs());
+                        }
+                    }
+                }
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
+        }
+
+        internal bool IsFocused(RadzenPanelMenuItem item)
+        {
+            return currentItems?.IndexOf(item) == focusedIndex && focusedIndex != -1;
+        }
+
+        internal void RemoveItem(RadzenPanelMenuItem item)
+        {
+            items.Remove(item);
+
+            focusedIndex = -1;
+            currentItems = null;
         }
     }
 }

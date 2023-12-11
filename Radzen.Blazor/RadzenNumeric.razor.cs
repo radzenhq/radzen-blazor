@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -432,6 +433,30 @@ namespace Radzen.Blazor
             if (maxChanged && IsJSRuntimeAvailable)
             {
                 await InternalValueChanged(Value);
+            }
+        }
+
+        bool preventKeyPress = false;
+        async Task OnKeyPress(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "ArrowUp" || key == "ArrowDown")
+            {
+                preventKeyPress = true;
+
+                if (key == "ArrowUp")
+                {
+                    await UpdateValueWithStep(true);
+                }
+                else
+                {
+                    await UpdateValueWithStep(false);
+                }
+            }
+            else
+            {
+                preventKeyPress = false;
             }
         }
 

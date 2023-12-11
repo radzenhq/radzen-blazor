@@ -3,7 +3,7 @@
 @if (Tabs.RenderMode == TabRenderMode.Server ? Visible : true)
 {
     <li role="presentation" @attributes=@Attributes style=@getStyle() class=@ClassList>
-    <a @onclick=@OnClick role="tab" @onclick:preventDefault="true" tabindex=@(Disabled? "-1" : "0") id="@($"{Tabs.Id}-tabpanel-{Index}-label")"
+    <a @onclick=@OnClick role="tab" @onclick:preventDefault="true" id="@($"{Tabs.Id}-tabpanel-{Index}-label")"
         aria-selected=@(IsSelected? "true" : "false") aria-controls="@($"{Tabs.Id}-tabpanel-{Index}")">
         @if (!string.IsNullOrEmpty(Icon))
             {

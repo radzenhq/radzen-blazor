@@ -12,13 +12,14 @@
     </div>
     <div class="rz-view-content">
         <Hours Start=@StartTime End=@EndTime TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot />
-        <div class="rz-week-view-content">
+        <div class="rz-week-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
+             @onfocus=@(args => {if(CurrentDate == default(DateTime)) { CurrentDate = StartDate; }})>
         @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
         {
             var start = day.Add(StartTime);
             var end = day.Add(EndTime);
-            <div class="rz-slots">
-                <DaySlotEvents MinutesPerSlot=@MinutesPerSlot StartDate=@start EndDate=@end Appointments=@Appointments />
+                <div class="rz-slots @(day == CurrentDate ? " rz-state-focused" : "")">
+                <DaySlotEvents MinutesPerSlot=@MinutesPerSlot StartDate=@start EndDate=@end Appointments=@Appointments CurrentDate="@CurrentDate" CurrentAppointment="@currentAppointment"/>
                 @for (var date = start; date < end; date = date.AddMinutes(MinutesPerSlot))
                 {
                     var slotDate = date;
@@ -77,5 +78,61 @@
         var attributes = Scheduler.GetSlotAttributes(date, date.AddMinutes(MinutesPerSlot));
         attributes["class"] = ClassList.Create("rz-slot").Add("rz-slot-minor", (date.Minute / MinutesPerSlot) % 2 == 1).Add(attributes).ToString();
         return attributes;
+    }
+
+    DateTime CurrentDate;
+    int currentAppointment = -1;
+    IEnumerable<AppointmentData> currentAppointments = Enumerable.Empty<AppointmentData>();
+    bool preventKeyPress = false;
+
+    async Task OnKeyPress(KeyboardEventArgs args)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+        var arrow = key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown";
+        var updown = key == "ArrowUp" || key == "ArrowDown";
+        var leftright = key == "ArrowLeft" || key == "ArrowRight";
+        var leftup = key == "ArrowLeft" || key == "ArrowUp";
+
+        if (arrow && !currentAppointments.Any())
+        {
+            var days = leftright ? 1 : 7;
+            CurrentDate = CurrentDate.AddDays(leftup ? -days : days);
+            currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1));
+
+            preventKeyPress = true;
+        }
+        else if (arrow && currentAppointments.Any())
+        {
+            if (updown)
+            {
+                currentAppointment = Math.Clamp(currentAppointment + (key == "ArrowUp" ? -1 : 1), 0, currentAppointments.Count() - 1);
+            }
+            else
+            {
+                CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
+                currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1));
+            }
+
+            preventKeyPress = true;
+        }
+        else if (key == "Enter")
+        {
+            await OnSlotClick(CurrentDate);
+
+            preventKeyPress = true;
+        }
+        else if (key == "Space")
+        {
+            if (currentAppointments.Any())
+            {
+                await Scheduler.SelectAppointment(currentAppointments.ElementAt(currentAppointment));
+            }
+
+            preventKeyPress = true;
+        }
+        else
+        {
+            preventKeyPress = false;
+        }
     }
 }

@@ -15,7 +15,7 @@
         {
             <span class="@($"rz-calendar rz-calendar-w-btn{(Disabled ? " rz-state-disabled" : "")}")" style="width:100%">
                 <input @ref="@input" @attributes="InputAttributes" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-                       @onchange="@ParseDate" autocomplete="off" type="text" name="@Name"
+                       @onchange="@ParseDate" autocomplete="off" type="text" name="@Name" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
                        class="rz-inputtext @InputClass @(IsReadonly ? "rz-readonly" : "")" id="@Name" placeholder="@Placeholder" onclick="@getOpenPopupForInput()"/>
                 @if (ShowButton)
                 {
@@ -35,24 +35,24 @@
                     @if (!TimeOnly)
                     {
                         <div class="rz-datepicker-header">
-                            <a aria-label="@PrevMonthAriaLabel" @onclick:preventDefault="true" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
+                            <a tabindex="-1" aria-label="@PrevMonthAriaLabel" @onclick:preventDefault="true" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
                                 <span class="rz-datepicker-prev-icon rzi rzi-chevron-left"></span>
                             </a>
-                            <a aria-label="@NextMonthAriaLabel" @onclick:preventDefault="true" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
+                            <a tabindex="-1" aria-label="@NextMonthAriaLabel" @onclick:preventDefault="true" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
                                 <span class="rz-datepicker-next-icon rzi rzi-chevron-right"></span>
                             </a>
                             <div class="rz-datepicker-title">
-                                <RadzenDropDown @ref="monthDropDown" Style="height:auto;width:120px;margin-top:5px;text-align:left;" TabIndex="-1"
+                            <RadzenDropDown @ref="monthDropDown" Style="height:auto;width:120px;margin-top:5px;text-align:left;" TabIndex="@TabIndex"
                                             TValue="int" Value="@CurrentDate.Month" Disabled="@Disabled" Data="@months" TextProperty="Name" ValueProperty="Value"
                                             Change="@((args) => { SetMonth(int.Parse(args.ToString())); })" />
-                                <RadzenDropDown @ref="yearDropDown" Style="height:auto;width:80px;margin-top:5px;text-align:left;" TabIndex="-1"
+                            <RadzenDropDown @ref="yearDropDown" Style="height:auto;width:80px;margin-top:5px;text-align:left;" TabIndex="@TabIndex"
                                             TValue="int" Value="@CurrentDate.Year" Disabled="@Disabled" Data="@years" TextProperty="Name" ValueProperty="Value"
                                             Change="@((args) => { SetYear(int.Parse(args.ToString())); })" />
                             </div>
                         </div>
                         @if(ShowDays)
                         {
-                        <div class="rz-datepicker-calendar-container">
+                        <div class="rz-datepicker-calendar-container" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnCalendarKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
                             <table class="rz-datepicker-calendar" style="@(Inline ? "" : "width:100%")">
                                 <thead>
                                     <tr>
@@ -132,11 +132,11 @@
                         @if (HourFormat == "12")
                         {
                             <div class="rz-ampm-picker">
-                                <a aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
+                                <a tabindex="@(Disabled ? "-1" : $"{TabIndex}")"aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
                                     <span class="rzi rzi-chevron-up"></span>
                                 </a>
                                 <span>@CurrentDate.ToString("tt")</span>
-                                <a aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
+                                <a tabindex="@(Disabled ? "-1" : $"{TabIndex}")" aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
                                     <span class="rzi rzi-chevron-down"></span>
                                 </a>
                             </div>

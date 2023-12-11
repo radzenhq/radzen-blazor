@@ -9,6 +9,9 @@ $switch-box-shadow: none !default;
 $switch-circle-background-color: var(--rz-text-contrast-color) !default;
 $switch-checked-circle-background-color: var(--rz-on-secondary) !default;
 
+$switch-focus-outline: var(--rz-outline-focus) !default;
+$switch-focus-outline-offset: var(--rz-outline-offset) !default;
+
 
 // Switch CSS variables
 
@@ -18,6 +21,8 @@ $switch-checked-circle-background-color: var(--rz-on-secondary) !default;
   --rz-switch-box-shadow: #{$switch-box-shadow};
   --rz-switch-circle-background-color: #{$switch-circle-background-color};
   --rz-switch-checked-circle-background-color: #{$switch-checked-circle-background-color};
+  --rz-switch-focus-outline: #{$switch-focus-outline};
+  --rz-switch-focus-outline-offset: #{$switch-focus-outline-offset};
 }
 
 .rz-switch {
@@ -27,6 +32,16 @@ $switch-checked-circle-background-color: var(--rz-on-secondary) !default;
   width: $switch-width;
   min-width: $switch-width;
   height: $switch-height;
+  border-radius: calc(5 * var(--rz-border-radius));
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-switch-focus-outline);
+    outline-offset: var(--rz-switch-focus-outline-offset);
+  }
 }
 
 .rz-switch-circle {

@@ -1,0 +1,68 @@
+@page "/accessibility"
+
+<PageTitle>Blazor Accessibility | Free UI Components by Radzen</PageTitle>
+<HeadContent>
+    <meta name="description" content="The accessible Radzen Blazor Components library covers highest levels of web accessibility guidelines and recommendations, making you Blazor app compliant with WAI-ARIA, WCAG 2.2, section 508, and keyboard compatibility standards.">
+</HeadContent>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Accessibility
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">
+    Radzen Blazor Components library covers highest levels of web accessibility guidelines and recommendations. It can help you make your Blazor app accessible and compliant with WAI-ARIA, WCAG 2.2, Section 508, and keyboard compatibility standards.
+</RadzenText>
+
+<RadzenText Anchor="accessibility#applying-guidelines" TextStyle="TextStyle.H3" TagName="TagName.H2" class="rz-pt-12">
+    Applying guidelines
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    While the components adhere to accessibility standards out of the box, inappropriate positioning or component configurations might lead to barriers such as low contrast between text and background colors, small text, empty or missing labels, etc. In addition, different standards and accessibility levels of conformance have different success criteria, introducing the need to always be aware and test your layouts, content, and component configurations against the desired accessibility guidelines.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    Read more about <RadzenLink Path="https://www.w3.org/WAI/test-evaluate/preliminary/" Text="testing and evaluating web accessibility" target="_blank" /> on the World Wide Web Consortium (W3C) website.
+</RadzenText>
+
+<RadzenText Anchor="accessibility#wcag" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    WCAG 2.2  
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    WCAG stands for Web Content Accessibility Guidelines - an internationally recognized set of recommendations for making web content more accessible. The latest WCAG 2.2 is the recommended specification by (W3C) since October 5, 2023.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Body1">
+    See <RadzenLink Path="https://www.w3.org/WAI/WCAG22/quickref/" Text="How to Meet WCAG (Quick Reference)" target="_blank" />.
+</RadzenText>
+
+<RadzenText Anchor="accessibility#wcag-colors" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    WCAG compliant colors (AA level of conformance)  
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    The Radzen.Blazor library contains a set of complementary WCAG AA compliant color sets for each one of the available themes.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Text="Preview" class="rz-pt-6" />
+<RadzenText TextStyle="TextStyle.Body1">
+    To preview the colors in the demos, enable the "Use WCAG compliant colors" option in the demos configuration.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Text="Usage" class="rz-pt-6" />
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To use the colors in your apps, include the <code>[theme]-wcag.css</code> file right after the <code>[theme]-base.css</code>:
+</RadzenText>
+<pre>
+<code>
+&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/standard-base.css"&gt;
+&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/standard-wcag.css"&gt; &lt;!-- Load WCAG 2.2 AA compliant colors --&gt;
+
+</code>
+</pre>
+
+<RadzenText Anchor="accessibility#keyboard-compatibility" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard compatibility 
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    Keyboard compatibility implies that all application functionality must be usable with the keyboard without any focus traps, allowing the user to freely move across the application via only a keyboard interface.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Text="Keyboard Navigation with Radzen Blazor Components" class="rz-pt-6" />
+
+<RadzenText TextStyle="TextStyle.Body1">
+    The following key shortcuts provide a way for users to navigate and interact with Radzen Blazor Components.
+</RadzenText>

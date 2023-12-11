@@ -5,6 +5,8 @@ $panel-menu-color: var(--rz-text-contrast-color) !default;
 $panel-menu-background-color: var(--rz-base-800) !default;
 $panel-menu-hover-background-color: rgba($rz-black, .3) !default;
 $panel-menu-hover-color: $panel-menu-color !default;
+$panel-menu-focus-outline: var(--rz-outline-focus) !default;
+$panel-menu-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
 $panel-menu-item-line-height: 1.25rem !default;
 $panel-menu-item-padding: 0.75rem 1rem !default;
@@ -16,7 +18,7 @@ $panel-menu-item-background-color: $panel-menu-item-active-background-color !def
 $panel-menu-item-active-color: $panel-menu-color !default;
 $panel-menu-item-active-indicator: var(--rz-secondary) !default;
 $panel-menu-item-offset: 0.75rem !default;
-$panel-menu-item-transition: var(--rz-transition-all) !default;
+$panel-menu-item-transition: color var(--rz-transition), background-color var(--rz-transition) !default;
 
 $panel-menu-2nd-level-vertical-offset: 0 !default;
 $panel-menu-item-2nd-level-padding: 0.5rem 1rem !default;
@@ -58,6 +60,8 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   --rz-panel-menu-background-color: #{$panel-menu-background-color};
   --rz-panel-menu-hover-background-color: #{$panel-menu-hover-background-color};
   --rz-panel-menu-hover-color: #{$panel-menu-hover-color};
+  --rz-panel-menu-focus-outline: #{$panel-menu-focus-outline};
+  --rz-panel-menu-focus-outline-offset: #{$panel-menu-focus-outline-offset};
   
   --rz-panel-menu-item-line-height: #{$panel-menu-item-line-height};
   --rz-panel-menu-item-padding: #{$panel-menu-item-padding};
@@ -102,7 +106,6 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   --rz-panel-menu-toggle-icon-opacity: #{$panel-menu-toggle-icon-opacity};
 }
 
-
 .rz-panel-menu {
   list-style: none;
   padding: var(--rz-panel-menu-padding);
@@ -112,6 +115,21 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   font-weight: var(--rz-panel-menu-font-weight);
   color: var(--rz-panel-menu-color);
   background-color: var(--rz-panel-menu-background-color);
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    .rz-navigation-item {
+      &.rz-state-focused {
+        > .rz-navigation-item-wrapper {
+          outline: var(--rz-panel-menu-focus-outline);
+          outline-offset: var(--rz-panel-menu-focus-outline-offset);
+        }
+      }
+    }
+  }
 
   & > .rz-navigation-item {
     margin: var(--rz-panel-menu-item-margin);

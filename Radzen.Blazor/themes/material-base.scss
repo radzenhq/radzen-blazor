@@ -116,6 +116,9 @@ $rz-body-background-color: var(--rz-base-100) !default;
 $rz-text-font-family: Roboto, sans-serif !default;
 $rz-icon-font-family: 'Material Icons' !default;
 $rz-icon-size: 1.5rem !default;
+$rz-outline-offset: 2px !default;
+$rz-outline-width: 2px !default;
+$rz-outline-color: var(--rz-primary) !default;
 
 // Utilities
 
@@ -178,6 +181,7 @@ $button-hover-shadow: var(--rz-shadow-3) !default;
 $button-hover-gradient: none !default;
 $button-focus-shadow: var(--rz-shadow-3) !default;
 $button-focus-gradient: linear-gradient(rgba(#fff, 0.2), rgba(#fff, 0.2)) !default !default;
+$button-focus-outline: var(--rz-outline-normal) !default;
 $button-active-shadow: var(--rz-shadow-6) !default;
 $button-active-gradient: none !default;
 $button-sizes: (
@@ -997,7 +1001,6 @@ $tree-node-toggle-color: var(--rz-text-tertiary-color) !default;
 $tree-node-toggle-hover-color: var(--rz-text-color) !default;
 $tree-icon-right: 'chevron_right' !default;
 $tree-icon-down: 'expand_more' !default;
-$tree-transition: var(--rz-transition-all) !default;
 
 .rz-tree-toggler {
   position: relative;
@@ -1136,10 +1139,11 @@ $tabs-tab-selected-top-border-color: var(--rz-secondary) !default;
 $tabs-tab-selected-bottom-border-color: var(--rz-primary) !default;
 $tabs-tab-hover-background-color: var(--rz-base-200) !default;
 $tabs-tab-hover-color: var(--rz-text-title-color) !default;
+$tabs-tab-focus-background-color: var(--rz-base-200) !default;
+$tabs-tab-focus-color: var(--rz-text-title-color) !default;
 $tabs-tab-panels-border: var(--rz-border-base-300) !default;
 $tabs-icon-font-size: var(--rz-icon-size) !default;
 $tabs-icon-margin: 0 0.25rem 0 -0.25rem !default;
-$tabs-transition: var(--rz-transition-all) !default;
 
 .rz-tabview-nav > li > a {
   @include rz-ripple($pseudo: true);

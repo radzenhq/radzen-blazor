@@ -46,5 +46,22 @@ namespace Radzen.Blazor
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);
         }
+
+        bool preventKeyPress = true;
+        async Task OnKeyPress(KeyboardEventArgs args, Task task)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                await task;
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
+        }
     }
 }

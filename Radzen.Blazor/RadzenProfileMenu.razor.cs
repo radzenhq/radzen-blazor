@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
+using System.Collections.Generic;
+using System;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -45,11 +49,11 @@ namespace Radzen.Blazor
         /// Toggles the menu open/close state.
         /// </summary>
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        public void Toggle(MouseEventArgs args)
+        public async Task Toggle(MouseEventArgs args)
         {
             contentStyle = contentStyle.IndexOf("display:none;") != -1 ? "display:block;" : "display:none;position:absolute;z-index:1;";
             iconStyle = iconStyle.IndexOf("rotate(0deg)") != -1 ? "transform: rotate(-180deg);" : "transform: rotate(0deg);";
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
 
         /// <summary>
@@ -60,6 +64,79 @@ namespace Radzen.Blazor
             contentStyle = "display:none;";
             iconStyle = "transform: rotate(0deg);";
             StateHasChanged();
+        }
+
+        [Inject]
+        NavigationManager NavigationManager { get; set; }
+
+        internal int focusedIndex = -1;
+
+        bool preventKeyPress = true;
+        async Task OnKeyPress(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "ArrowUp" || key == "ArrowDown")
+            {
+                preventKeyPress = true;
+
+                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, items.Count - 1);
+            }
+            else if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                if (focusedIndex >= 0 && focusedIndex < items.Count)
+                {
+                    var item = items[focusedIndex];
+
+                    if (item.Path != null)
+                    {
+                        NavigationManager.NavigateTo(item.Path);
+                    }
+                    else
+                    {
+                        await item.OnClick(new MouseEventArgs());
+                    }
+                }
+                else
+                {
+                    await Toggle(new MouseEventArgs());
+
+                    if (contentStyle.IndexOf("display:none;") == -1)
+                    {
+                        focusedIndex = 0;
+                    }
+                }
+            }
+            else if (key == "Escape")
+            {
+                preventKeyPress = true;
+
+                Close();
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
+        }
+
+        internal bool IsFocused(RadzenProfileMenuItem item)
+        {
+            return items.IndexOf(item) == focusedIndex && focusedIndex != -1;
+        }
+
+        internal List<RadzenProfileMenuItem> items = new List<RadzenProfileMenuItem>();
+        /// <summary>
+        /// Adds the item.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        public void AddItem(RadzenProfileMenuItem item)
+        {
+            if (items.IndexOf(item) == -1)
+            {
+                items.Add(item);
+            }
         }
     }
 }

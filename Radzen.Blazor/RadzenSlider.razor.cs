@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
 using System.Collections;
@@ -309,5 +310,38 @@ namespace Radzen.Blazor
         /// <value>The maximum value.</value>
         [Parameter]
         public decimal Max { get; set; } = 100;
+
+        bool preventKeyPress = false;
+        async Task OnKeyPress(KeyboardEventArgs args, bool isMin)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "ArrowLeft" || key == "ArrowRight")
+            {
+                preventKeyPress = true;
+
+                var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : decimal.Parse(Step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+
+                if (Range)
+                {
+                    var oldMinValue = ((IEnumerable)Value).OfType<object>().FirstOrDefault();
+                    var oldMaxValue = ((IEnumerable)Value).OfType<object>().LastOrDefault();
+                    var oldMinValueAsDecimal = (decimal)ConvertType.ChangeType(oldMinValue, typeof(decimal));
+                    var oldMaxValueAsDecimal = (decimal)ConvertType.ChangeType(oldMaxValue, typeof(decimal));
+
+                    await OnValueChange((isMin ? oldMinValueAsDecimal : oldMaxValueAsDecimal) + (key == "ArrowLeft" ? -step : step), isMin);
+                }
+                else
+                {
+                    var valueAsDecimal = Value == null ? 0 : (decimal)ConvertType.ChangeType(Value, typeof(decimal));
+
+                    await OnValueChange(valueAsDecimal + (key == "ArrowLeft" ? -step : step), isMin);
+                }
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
+        }
     }
 }

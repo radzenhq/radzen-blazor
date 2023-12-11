@@ -6,6 +6,8 @@ $profile-menu-border-radius: var(--rz-border-radius) !default;
 $profile-menu-toggle-button-color: var(--rz-secondary) !default;
 
 $profile-menu-item-hover-background-color: var(--rz-secondary) !default;
+$profile-menu-item-focus-outline: var(--rz-outline-focus) !default;
+$profile-menu-item-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 $profile-menu-item-icon-width: var(--rz-icon-size) !default;
 $profile-menu-item-icon-height: $profile-menu-item-icon-width !default;
 $profile-menu-item-icon-font-size: $profile-menu-item-icon-height !default;
@@ -22,6 +24,8 @@ $profile-menu-item-icon-margin: 0 0.5rem 0 0 !default;
   --rz-profile-menu-toggle-button-color: #{$profile-menu-toggle-button-color};
   
   --rz-profile-menu-item-hover-background-color: #{$profile-menu-item-hover-background-color};
+  --rz-profile-menu-item-focus-outline: #{$profile-menu-item-focus-outline};
+  --rz-profile-menu-item-focus-outline-offset: #{$profile-menu-item-focus-outline-offset};
   --rz-profile-menu-item-icon-width: #{$profile-menu-item-icon-width};
   --rz-profile-menu-item-icon-height: #{$profile-menu-item-icon-height};
   --rz-profile-menu-item-icon-font-size: #{$profile-menu-item-icon-font-size};
@@ -37,6 +41,25 @@ ul.rz-profile-menu {
   border-left: var(--rz-profile-menu-border);
   position: relative;
   z-index: 3;
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-menu-item-focus-outline);
+
+    .rz-navigation-item {
+
+      &.rz-state-focused {
+  
+        > .rz-navigation-item-wrapper {
+          outline: var(--rz-profile-menu-item-focus-outline);
+          outline-offset: var(--rz-profile-menu-item-focus-outline-offset);
+        }
+      }
+    }
+  }
 
   .rz-navigation-item-icon-children {
     color: var(--rz-profile-menu-toggle-button-color);

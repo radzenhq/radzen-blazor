@@ -41,7 +41,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
 
-            Assert.Contains(@$"style=""outline: 0 none;{value}""", component.Markup);
+            Assert.Contains(@$"style=""{value}""", component.Markup);
         }
 
         [Fact]

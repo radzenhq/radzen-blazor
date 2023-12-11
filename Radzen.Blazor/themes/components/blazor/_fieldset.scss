@@ -13,6 +13,8 @@ $fieldset-toggle-background-color: var(--rz-base-200) !default;
 $fieldset-toggle-color: var(--rz-text-tertiary-color) !default;
 $fieldset-toggle-font-size: 1rem !default;
 $fieldset-toggle-border: none !default;
+$fieldset-toggle-focus-outline: var(--rz-outline-focus) !default;
+$fieldset-toggle-focus-outline-offset: var(--rz-outline-offset) !default;
 
 // Fieldset CSS variables
 
@@ -32,6 +34,9 @@ $fieldset-toggle-border: none !default;
   --rz-fieldset-toggle-color: #{$fieldset-toggle-color};
   --rz-fieldset-toggle-font-size: #{$fieldset-toggle-font-size};
   --rz-fieldset-toggle-border: #{$fieldset-toggle-border};
+  --rz-fieldset-toggle-focus-outline: #{$fieldset-toggle-focus-outline};
+  --rz-fieldset-toggle-focus-outline-offset: #{$fieldset-toggle-focus-outline-offset};
+  
 }
 
 .rz-fieldset {
@@ -77,6 +82,15 @@ $fieldset-toggle-border: none !default;
       content: 'add';
     }
   }
+
+  a:focus & {
+    outline: var(--rz-outline-normal);
+  }
+
+  a:focus-visible & {
+    outline: var(--rz-fieldset-toggle-focus-outline);
+    outline-offset: var(--rz-fieldset-toggle-focus-outline-offset);
+  }
 }
 
 .rz-fieldset-legend {
@@ -92,5 +106,9 @@ $fieldset-toggle-border: none !default;
     align-items: center;
     color: inherit;
     text-decoration: none;
+
+    &:focus {
+      outline: var(--rz-outline-normal);
+    }
   }
 }

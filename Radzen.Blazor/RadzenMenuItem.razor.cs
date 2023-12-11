@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 namespace Radzen.Blazor
 {
@@ -15,7 +16,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-navigation-item{(Disabled ? " rz-state-disabled" : "")}";
+            return $"rz-navigation-item{(Disabled ? " rz-state-disabled" : "")}{(Parent.IsFocused(this) ? " rz-state-focused" : "")}";
         }
 
         /// <summary>
@@ -109,12 +110,54 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<MenuItemEventArgs> Click { get; set; }
 
+        RadzenMenuItem _parentItem;
+
+        /// <summary>
+        /// Gets or sets the parent item.
+        /// </summary>
+        /// <value>The parent item.</value>
+        [CascadingParameter]
+        public RadzenMenuItem ParentItem
+        {
+            get
+            {
+                return _parentItem;
+            }
+            set
+            {
+                if (_parentItem != value)
+                {
+                    _parentItem = value;
+                    _parentItem.AddItem(this);
+                }
+            }
+        }
+
+        RadzenMenu _parent;
         /// <summary>
         /// Gets or sets the parent.
         /// </summary>
         /// <value>The parent.</value>
         [CascadingParameter]
-        public RadzenMenu Parent { get; set; }
+        public RadzenMenu Parent
+        {
+            get
+            {
+                return _parent;
+            }
+            set
+            {
+                if (_parent != value)
+                {
+                    _parent = value;
+
+                    if (ParentItem == null)
+                    {
+                        _parent.AddItem(this);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Handles the <see cref="E:Click" /> event.
@@ -168,6 +211,31 @@ namespace Radzen.Blazor
             }
 
             return events;
+        }
+
+        internal List<RadzenMenuItem> items = new List<RadzenMenuItem>();
+
+        /// <summary>
+        /// Adds the item.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        public void AddItem(RadzenMenuItem item)
+        {
+            if (items.IndexOf(item) == -1)
+            {
+                items.Add(item);
+                StateHasChanged();
+            }
+        }
+
+        internal async Task Toggle()
+        {
+            await JSRuntime.InvokeVoidAsync("eval", $"document.getElementById('{GetId()}').click()");
+        }
+
+        internal async Task Close()
+        {
+            await JSRuntime.InvokeVoidAsync("eval", $"Radzen.toggleMenuItem(document.getElementById('{GetId()}'), event, false)");
         }
     }
 }

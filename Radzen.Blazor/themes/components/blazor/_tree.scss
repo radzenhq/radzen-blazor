@@ -7,12 +7,14 @@ $tree-node-selected-border-radius: calc(var(--rz-border-radius)/2) !default;
 $tree-node-margin: 1px 0 !default;
 $tree-node-hover-background-color: var(--rz-secondary-light) !default;
 $tree-node-hover-color: var(--rz-on-secondary-light) !default;
+$tree-node-focus-outline: var(--rz-outline-focus) !default;
+$tree-node-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 $tree-node-toggle-width: 1rem !default;
 $tree-node-toggle-color: var(--rz-text-tertiary-color) !default;
 $tree-node-toggle-hover-color: var(--rz-text-color) !default;
 $tree-icon-right: 'arrow_right' !default;
 $tree-icon-down: 'arrow_drop_down' !default;
-$tree-transition: var(--rz-transition-all) !default;
+$tree-transition: var(--rz-transition-all), width 0, height 0 !default;
 
 // Tree CSS variables
 
@@ -26,6 +28,8 @@ $tree-transition: var(--rz-transition-all) !default;
   --rz-tree-node-margin: #{$tree-node-margin};
   --rz-tree-node-hover-background-color: #{$tree-node-hover-background-color};
   --rz-tree-node-hover-color: #{$tree-node-hover-color};
+  --rz-tree-node-focus-outline: #{$tree-node-focus-outline};
+  --rz-tree-node-focus-outline-offset: #{$tree-node-focus-outline-offset};
   --rz-tree-node-toggle-width: #{$tree-node-toggle-width};
   --rz-tree-node-toggle-color: #{$tree-node-toggle-color};
   --rz-tree-node-toggle-hover-color: #{$tree-node-toggle-hover-color};
@@ -35,6 +39,16 @@ $tree-transition: var(--rz-transition-all) !default;
 .rz-tree {
   display: inline-block;
   overflow: auto;
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-outline-focus);
+    outline-offset: var(--rz-tree-node-focus-outline-offset);
+  }
+
 }
 
 .rz-tree .rz-treenode.rz-treenode-leaf>.rz-treenode-content>.rz-tree-toggler {
@@ -89,6 +103,13 @@ $tree-transition: var(--rz-transition-all) !default;
 
     .rzi:first-child {
       margin-right: 0.25rem;
+    }
+  }
+
+  .rz-tree:focus-visible &.rz-state-focused {
+    .rz-treenode-label {
+      outline: var(--rz-tree-node-focus-outline);
+      outline-offset: var(--rz-tree-node-focus-outline-offset);
     }
   }
 

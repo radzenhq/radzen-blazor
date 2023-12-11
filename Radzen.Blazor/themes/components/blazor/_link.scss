@@ -21,6 +21,10 @@
       text-decoration: var(--rz-link-hover-text-decoration);
     }
   }
+
+  &:focus-visible {
+    outline: var(--rz-link-focus-outline);
+  }
 }
 
 .rz-state-highlight {

@@ -11,7 +11,7 @@ namespace Radzen.Blazor
     ///  &lt;RadzenHtmlEditorUnderline /&gt;
     /// &lt;/RadzenHtmlEdito&gt;
     /// @code {
-    ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!"; 
+    ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!";
     /// }
     /// </code>
     /// </example>
@@ -25,5 +25,11 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string Title { get; set; } = "Underline";
+
+        /// <summary>
+        /// Specifies the shortcut for the command. Set to <c>"Ctrl+U"</c> by default.
+        /// </summary>
+        [Parameter]
+        public override string Shortcut { get; set; } = "Ctrl+U";
     }
 }
