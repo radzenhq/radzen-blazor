@@ -17,16 +17,16 @@
                 <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Title="Title" Property="TitleOfCourtesy" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
+        <RadzenDataGridColumn TItem="Employee" Title="Title" Property="TitleOfCourtesy" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells Width="820px">
             <Columns>
-                <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="FirstName" Width="140px" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
-                        <Columns>
+                <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="FirstName" Width="480px" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
+                    <Columns>
                         <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Job Title" Width="200px" />
                         <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="140px" />
                         <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="140px" />
-                        </Columns>
+                    </Columns>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="LastName" Width="140px" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
+                <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="LastName" Width="200px" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
                     <Columns>
                         <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" Width="200px" />
                     </Columns>

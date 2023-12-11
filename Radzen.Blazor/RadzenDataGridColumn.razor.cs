@@ -551,13 +551,15 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="forCell">if set to <c>true</c> [for cell].</param>
         /// <param name="isHeaderOrFooterCell">if set to <c>true</c> [is header or footer cell].</param>
+        /// <param name="isForCol">if set to <c>true</c> [is for col element].</param>
         /// <returns>System.String.</returns>
-        public virtual string GetStyle(bool forCell = false, bool isHeaderOrFooterCell = false)
+        public virtual string GetStyle(bool forCell = false, bool isHeaderOrFooterCell = false, bool isForCol = false)
         {
             var style = new List<string>();
 
             var width = GetWidthOrGridSetting()?.Trim();
-            if (!string.IsNullOrEmpty(width) && !forCell)
+
+            if (!string.IsNullOrEmpty(width) && !isForCol)
             {
                 style.Add($"width:{width}");
             }

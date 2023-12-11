@@ -93,7 +93,7 @@
                     }
                     @foreach (var column in visibleColumns)
                     {
-                        <col id=@(getColumnUniqueId(visibleColumns.IndexOf(column)) + "-col") style="@column.GetStyle()">
+                        <col id=@(getColumnUniqueId(visibleColumns.IndexOf(column)) + "-col") style="@column.GetStyle(false, false, true)">
                     }
                 </colgroup>
                 <thead>
