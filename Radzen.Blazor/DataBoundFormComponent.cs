@@ -187,8 +187,6 @@ namespace Radzen
             {
                 if (_data != value)
                 {
-                    _view = null;
-                    _value = null;
                     _data = value;
                     StateHasChanged();
                 }
