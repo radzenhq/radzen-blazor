@@ -159,7 +159,21 @@ namespace Radzen.Blazor
 
             var itemIndex = items.IndexOf(item);
 
-            item.SetSelected(value ?? !item.GetSelected());
+            var selected = item.GetSelected();
+
+            if (Multiple)
+            {
+                if (selected)
+                {
+                    await Collapse.InvokeAsync(itemIndex);
+                }
+                else
+                {
+                    await Expand.InvokeAsync(itemIndex);
+                }
+            }
+
+            item.SetSelected(value ?? !selected);
 
             if (!Multiple)
             {
