@@ -18,20 +18,24 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets enum description.
         /// </summary>
-        public static string GetDisplayDescription(this Enum enumValue)
+        public static string GetDisplayDescription(this Enum enumValue, Func<string, string> translationFunction = null)
         {
             var enumValueAsString = enumValue.ToString();
             var val = enumValue.GetType().GetMember(enumValueAsString).FirstOrDefault();
+            var enumVal = val?.GetCustomAttribute<DisplayAttribute>()?.GetDescription() ?? enumValueAsString;
 
-            return val?.GetCustomAttribute<DisplayAttribute>()?.GetDescription() ?? enumValueAsString;
+            if (translationFunction != null)
+                return translationFunction(enumVal);
+
+            return enumVal;
         }
 
         /// <summary>
         /// Converts Enum to IEnumerable of Value/Text.
         /// </summary>
-        public static IEnumerable<object> EnumAsKeyValuePair(Type enumType)
+        public static IEnumerable<object> EnumAsKeyValuePair(Type enumType, Func<string, string> translationFunction = null)
         {
-            return Enum.GetValues(enumType).Cast<Enum>().Distinct().Select(val => new { Value = Convert.ToInt32(val), Text = val.GetDisplayDescription() });
+            return Enum.GetValues(enumType).Cast<Enum>().Distinct().Select(val => new { Value = Convert.ToInt32(val), Text = val.GetDisplayDescription(translationFunction) });
         }
 
         /// <summary>
