@@ -728,16 +728,25 @@ namespace Radzen.Blazor
         /// <param name="index">The index.</param>
         /// <param name="colors">The colors.</param>
         /// <param name="defaultValue">The default value.</param>
-        protected string PickColor(int index, IEnumerable<string> colors, string defaultValue = null)
+        /// <param name="colorRange">The color range value.</param>
+        /// <param name="value">The value of the item.</param>
+        protected string PickColor(int index, IEnumerable<string> colors, string defaultValue = null, IList<SeriesColorRange> colorRange = null, double value = 0.0)
         {
-            if (colors == null || !colors.Any())
+            if (colorRange != null)
             {
-                return defaultValue;
+                var result = colorRange.Where(r => r.Min <= value && r.Max >= value).FirstOrDefault<SeriesColorRange>();
+                return result != null ? result.Color : defaultValue;
             }
+            else
+            {
+                if (colors == null || !colors.Any())
+                {
+                    return defaultValue;
+                }
 
-            return colors.ElementAt(index % colors.Count());
+                return colors.ElementAt(index % colors.Count());
+            }
         }
-
         /// <inheritdoc />
         public void Dispose()
         {

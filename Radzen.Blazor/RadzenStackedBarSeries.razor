@@ -29,6 +29,7 @@
             {
                 var y = GetBarTop(data, category);
                 var x = GetBarRight(data, barIndex, category, barSeries);
+                var itemValue = Value(data);
                 var radius = Chart.BarOptions.Radius;
 
                 if (radius > height / 2 || barIndex < barSeries.Count - 1)
@@ -45,8 +46,8 @@
                 {
                     path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x+radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 0 {x.ToInvariantString()} {(y+radius).ToInvariantString()} L {x.ToInvariantString()} {(y+height-radius).ToInvariantString()} A {r} {r} 0 0 0 {(x+radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y+height).ToInvariantString()} Z";
                 }
-                var fill = PickColor(Items.IndexOf(data), Fills, Fill);
-                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
+                var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, itemValue);
+                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, itemValue);
 
                 <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
             }

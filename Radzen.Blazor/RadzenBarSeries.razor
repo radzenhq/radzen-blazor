@@ -10,8 +10,8 @@
 </CascadingValue>
 
 @code {
-   public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
-   {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
         var value = ComposeValue(categoryScale);
         var category = ComposeCategory(valueScale);
         var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
@@ -26,12 +26,13 @@
         var height = barHeight / barSeries.Count() - padding + padding / barSeries.Count();;
         var className = $"rz-bar-series rz-series-{Chart.Series.IndexOf(this)}";
 
-        return 
+        return
         @<g class="@className">
             @foreach(var data in Items)
             {
                 var y = category(data) - barHeight / 2 + index * height + index * padding;
                 var x = value(data);
+                var itemValue = Value(data);                
                 var radius = Chart.BarOptions.Radius;
 
                 if (radius > height / 2)
@@ -47,8 +48,8 @@
                 {
                     path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x+radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 0 {x.ToInvariantString()} {(y+radius).ToInvariantString()} L {x.ToInvariantString()} {(y+height-radius).ToInvariantString()} A {r} {r} 0 0 0 {(x+radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y+height).ToInvariantString()} Z";
                 }
-                var fill = PickColor(Items.IndexOf(data), Fills, Fill);
-                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
+                var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, itemValue);
+                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, itemValue);
 
                 <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
             }

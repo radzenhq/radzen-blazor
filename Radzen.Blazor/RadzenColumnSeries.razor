@@ -24,12 +24,13 @@
         var width = bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();;
         var className = $"rz-column-series rz-series-{Chart.Series.IndexOf(this)}";
 
-        return 
+        return
         @<g class="@className">
             @foreach(var data in Items)
             {
                 var x = category(data) - bandWidth / 2 + index * width + index * padding;
                 var y = value(data);
+                var itemValue = Value(data);
                 var radius = Chart.ColumnOptions.Radius;
 
                 if (radius > width / 2)
@@ -43,8 +44,8 @@
                 {
                     path = $"M {x.ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {(y-radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} L {(x + radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {x.ToInvariantString()} {(y-radius).ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
                 }
-                var fill = PickColor(Items.IndexOf(data), Fills, Fill);
-                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
+                var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, itemValue);
+                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, itemValue);
 
                 <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
             }
