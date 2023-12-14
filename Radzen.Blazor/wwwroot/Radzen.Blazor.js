@@ -890,16 +890,16 @@ window.Radzen = {
     }
 
     Radzen[id] = function (e) {
+        var lastPopup = Radzen.popups && Radzen.popups[Radzen.popups.length - 1];
+        var currentPopup = lastPopup != null && document.getElementById(lastPopup.id) || popup;
+
         if(e.type == 'contextmenu' || !e.target || !closeOnDocumentClick) return;
         if (!/Android/i.test(navigator.userAgent) &&
             !['input', 'textarea'].includes(document.activeElement ? document.activeElement.tagName.toLowerCase() : '') && e.type == 'resize') {
-            Radzen.closePopup(id, instance, callback, e);
+            Radzen.closePopup(currentPopup.id, currentPopup.instance, currentPopup.callback, e);
             return;
         }
-        var closestPopup = e.target.closest && (e.target.closest('.rz-popup') || e.target.closest('.rz-overlaypanel'));
-        if (closestPopup && closestPopup != popup) {
-          return;
-        }
+
         var closestLink = e.target.closest && (e.target.closest('.rz-link') || e.target.closest('.rz-navigation-item-link'));
         if (closestLink && closestLink.closest && closestLink.closest('a')) {
             if (Radzen.closeAllPopups) {
@@ -907,12 +907,12 @@ window.Radzen = {
             }
         }
         if (parent) {
-          if (e.type == 'mousedown' && !parent.contains(e.target) && !popup.contains(e.target)) {
-            Radzen.closePopup(id, instance, callback, e);
+          if (e.type == 'mousedown' && !parent.contains(e.target) && !currentPopup.contains(e.target)) {
+              Radzen.closePopup(currentPopup.id, currentPopup.instance, currentPopup.callback, e);
           }
         } else {
-          if (!popup.contains(e.target)) {
-            Radzen.closePopup(id, instance, callback, e);
+          if (!currentPopup.contains(e.target)) {
+              Radzen.closePopup(currentPopup.id, currentPopup.instance, currentPopup.callback, e);
           }
         }
     };
@@ -995,6 +995,9 @@ window.Radzen = {
     if (instance) {
       instance.invokeMethodAsync(callback);
     }
+      Radzen.popups = Radzen.popups.filter(function (obj) {
+        return obj.id !== id;
+    });
 
     if (Radzen.activeElement && Radzen.activeElement == document.activeElement ||
         Radzen.activeElement && document.activeElement == document.body ||
