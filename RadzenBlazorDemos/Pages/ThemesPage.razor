@@ -1,5 +1,6 @@
 @page "/themes"
 @inject ThemeService ThemeService
+@inject NavigationManager NavigationManager
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Themes
 </RadzenText>
@@ -18,7 +19,7 @@
             <RadzenStack Gap="1rem">
                 <RadzenDataList Data="@ThemeService.Themes.Where(t => !t.Premium)">
                     <Template>
-                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap" @onclick=@(args => NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("theme", $"{context.Value}"), true)) Style="cursor:pointer">
                             <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 4px; overflow: hidden; outline: var(--rz-border-disabled); min-width: 80px;">
                                 <rect width="80" height="60" fill="@context.Base" />
                                 <rect x="0" y="4" width="16" height="56" fill="@context.Sidebar" />
@@ -49,7 +50,7 @@
             <RadzenStack Gap="1rem">
                 <RadzenDataList Data="@ThemeService.Themes.Where(t => t.Premium)">
                     <Template>
-                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap" @onclick=@(args => NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("theme", $"{context.Value}"), true)) Style="cursor:pointer">
                             <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 4px; overflow: hidden; outline: var(--rz-border-disabled); min-width: 80px;">
                                 <rect width="80" height="60" fill="@context.Base" />
                                 <rect x="0" y="4" width="16" height="56" fill="@context.Sidebar" />
