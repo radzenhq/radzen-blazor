@@ -1,0 +1,15 @@
+﻿<style>
+    ul[role=tablist] {
+        flex-wrap: wrap;
+    }
+</style>
+<RadzenTabs>
+    <Tabs>
+        @foreach (var i in Enumerable.Range(0,20))
+        {
+            <RadzenTabsItem Text="@("Tab" + i)">
+                @("Tab" + i)
+            </RadzenTabsItem>
+        }
+    </Tabs>
+</RadzenTabs>
