@@ -1616,12 +1616,21 @@ window.Radzen = {
       visual.id = id + 'visual';
       document.body.appendChild(visual);
 
+      var resizers = cell.parentNode.querySelectorAll('.rz-column-resizer');
+      for (let i = 0; i < resizers.length; i++) {
+          resizers[i].style.display = 'none';
+      }
+
       Radzen[id + 'end'] = function (e) {
           var el = document.getElementById(id + 'visual');
           if (el) {
               document.body.removeChild(el);
               Radzen[id + 'end'] = null;
               Radzen[id + 'move'] = null;
+              var resizers = cell.parentNode.querySelectorAll('.rz-column-resizer');
+              for (let i = 0; i < resizers.length; i++) {
+                  resizers[i].style.display = 'block';
+              }
           }
       }
       document.removeEventListener('click', Radzen[id + 'end']);
