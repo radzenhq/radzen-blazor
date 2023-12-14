@@ -32,6 +32,12 @@ namespace Radzen.Blazor
         public LineType LineType { get; set; }
 
         /// <summary>
+        /// Specifies whether to show Markers or not.
+        /// </summary>
+        [Parameter]
+        public bool ShowMarkers { get; set; } = true;
+
+        /// <summary>
         /// Specifies whether to render a smooth line. Set to <c>false</c> by default.
         /// </summary>
         [Parameter]
