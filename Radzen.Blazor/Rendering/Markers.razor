@@ -5,7 +5,7 @@
     var x = point.X;
     var y = point.Y;
 
-    @if (InPlotArea(x, y))
+    @if (Visible && InPlotArea(x, y))
     {
         <Marker Click="@(() => OnClick(point.Data))" X="@x" Y="@y" Type="@MarkerType" Fill="@Fill" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Size="@Size" />
     }
@@ -25,6 +25,9 @@
 
     [Parameter]
     public IEnumerable<Point<TItem>> Data { get; set; }
+
+    [Parameter]
+    public bool Visible { get; set; }
 
     [Parameter]
     public MarkerType MarkerType { get; set; }
