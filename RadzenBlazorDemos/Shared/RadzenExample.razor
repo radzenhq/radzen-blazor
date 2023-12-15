@@ -8,6 +8,12 @@
 <PageTitle>@ExampleService.TitleFor(example)</PageTitle>
 <HeadContent>
     <meta name="description" content="@ExampleService.DescriptionFor(example)">
+    <meta name="author" content="Radzen">
+    <meta property="og:title" content="@ExampleService.TitleFor(example)" />
+    <meta property="og:description" content="@ExampleService.DescriptionFor(example)" />
+    <meta property="og:site_name" content="Radzen Blazor Components">
+    <meta property="og:image" content="https://blazor.radzen.com/images/radzen-og.png" />
+    <meta property="twitter:card" content="summary_large_image" />
 </HeadContent>
 @if (Heading)
 {
