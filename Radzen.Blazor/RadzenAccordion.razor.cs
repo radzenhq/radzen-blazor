@@ -161,16 +161,13 @@ namespace Radzen.Blazor
 
             var selected = item.GetSelected();
 
-            if (Multiple)
+            if (selected)
             {
-                if (selected)
-                {
-                    await Collapse.InvokeAsync(itemIndex);
-                }
-                else
-                {
-                    await Expand.InvokeAsync(itemIndex);
-                }
+                await Collapse.InvokeAsync(itemIndex);
+            }
+            else
+            {
+                await Expand.InvokeAsync(itemIndex);
             }
 
             item.SetSelected(value ?? !selected);
@@ -189,8 +186,11 @@ namespace Radzen.Blazor
             {
                 foreach (var i in items.Where(i => i != item))
                 {
-                    i.SetSelected(false);
-                    await Collapse.InvokeAsync(items.IndexOf(i));
+                    if (i.GetSelected())
+                    {
+                        i.SetSelected(false);
+                        await Collapse.InvokeAsync(items.IndexOf(i));
+                    }
                 }
             }
         }
