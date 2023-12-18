@@ -12,9 +12,7 @@ namespace Radzen.Blazor.Tests
             NotificationService notificationService = new NotificationService();
             NotificationMessage notificationMessage = null;
 
-
             var exception = Record.Exception(() => notificationService.Notify(notificationMessage));
-
 
             Assert.IsType<ArgumentNullException>(exception);
         }
@@ -121,6 +119,56 @@ namespace Radzen.Blazor.Tests
             };
 
             Assert.True(messageOne != messageTwo);
+        }
+
+        [Fact]
+        public void NotificationService_CheckAreTwoMessages_EqualsByHashCode()
+        {
+            var messageOne = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Info,
+                Summary = "Info Summary",
+                Detail = "Info Detail",
+                Duration = 4000
+            };
+
+            var messageTwo = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Info,
+                Summary = "Info Summary",
+                Detail = "Info Detail",
+                Duration = 4000
+            };
+
+            var messageOneHashCode = messageOne.GetHashCode();
+            var messageTwoHashCode = messageTwo.GetHashCode();
+
+            Assert.Equal(messageOneHashCode, messageTwoHashCode);
+        }
+
+        [Fact]
+        public void NotificationService_CheckAreTwoMessages_NotEqualsByHashCode()
+        {
+            var messageOne = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Info,
+                Summary = "Info Summary",
+                Detail = "Info Detail",
+                Duration = 4000
+            };
+
+            var messageTwo = new NotificationMessage()
+            {
+                Severity = NotificationSeverity.Info,
+                Summary = "Info Summary Two",
+                Detail = "Info Detail Tow",
+                Duration = 5000
+            };
+
+            var messageOneHashCode = messageOne.GetHashCode();
+            var messageTwoHashCode = messageTwo.GetHashCode();
+
+            Assert.NotEqual(messageOneHashCode, messageTwoHashCode);
         }
 
         [Fact]

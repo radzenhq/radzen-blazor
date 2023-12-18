@@ -160,7 +160,7 @@ namespace Radzen
         ///  Return a hash code for the current object
         /// </summary>
         /// <returns></returns>
-        public override int GetHashCode() => GetHashCode();
+        public override int GetHashCode() => HashCode.Combine(Summary, Detail, Duration, Style, Click, Close, CloseOnClick, Payload);
 
         /// <summary>
         /// Overloading == operator for NotificationMessage.
