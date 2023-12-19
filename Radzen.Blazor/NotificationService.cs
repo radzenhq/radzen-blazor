@@ -31,22 +31,14 @@ namespace Radzen
         /// <param name="message">The message.</param>
         public void Notify(NotificationMessage message)
         {
-            var newMessage = new NotificationMessage()
+            if (message is null)
             {
-                Duration = message != null && message.Duration.HasValue ? message.Duration : 3000,
-                Severity = message.Severity,
-                Summary = message.Summary,
-                Detail = message.Detail,
-                Style = message.Style,
-                Click = message.Click,
-                Close = message.Close,
-                CloseOnClick = message.CloseOnClick,
-                Payload = message.Payload
-            };
+                throw new ArgumentNullException(nameof(message));
+            }
 
-            if (!Messages.Contains(newMessage))
+            if (!Messages.Contains(message))
             {
-                Messages.Add(newMessage);
+                Messages.Add(message);
             }
         }
 
@@ -85,38 +77,38 @@ namespace Radzen
     /// <summary>
     /// Class NotificationMessage.
     /// </summary>
-    public class NotificationMessage
+    public class NotificationMessage : IEquatable<NotificationMessage>
     {
         /// <summary>
         /// Gets or sets the duration.
         /// </summary>
         /// <value>The duration.</value>
-        public double? Duration { get; set; }
+        public double? Duration { get; set; } = 3000;
         /// <summary>
         /// Gets or sets the severity.
         /// </summary>
         /// <value>The severity.</value>
-        public NotificationSeverity Severity { get; set; }
+        public NotificationSeverity Severity { get; set; } = NotificationSeverity.Info;
         /// <summary>
         /// Gets or sets the summary.
         /// </summary>
         /// <value>The summary.</value>
-        public string Summary { get; set; }
+        public string Summary { get; set; } = string.Empty;
         /// <summary>
         /// Gets or sets the detail.
         /// </summary>
         /// <value>The detail.</value>
-        public string Detail { get; set; }
+        public string Detail { get; set; } = string.Empty;
         /// <summary>
         /// Gets or sets the style.
         /// </summary>
         /// <value>The style.</value>
-        public string Style { get; set; }
+        public string Style { get; set; } = string.Empty;
         /// <summary>
         /// Gets or sets the click event.
         /// </summary>
         /// <value>This event handler is called when the notification is clicked on.</value>
-        public Action<NotificationMessage> Click { get; set; }
+        public Action<NotificationMessage> Click { get; set; } 
         /// <summary>
         /// Get or set the event for when the notification is closed
         /// </summary>
@@ -131,5 +123,77 @@ namespace Radzen
         /// </summary>
         /// <value>Used to store a custom payload that can be retreived later in the click event handler.</value>
         public object Payload { get; set; }
-   }
+
+
+        #region Implementation of IEquatable<NotificationMessage> and operators overloading
+
+        /// <summary>
+        /// Check if NotificationMessage instance is equal to current instance.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(NotificationMessage other)
+        {
+            if(other == null) return false;
+            
+            if(object.ReferenceEquals(this, other)) return true;
+
+            return this.Severity == other.Severity 
+                && this.Summary == other.Summary 
+                && this.Detail == other.Detail 
+                && this.Duration == other.Duration
+                && this.Style == other.Style
+                && this.Click == other.Click
+                && this.Close == other.Close
+                && this.CloseOnClick == other.CloseOnClick
+                && this.Payload == other.Payload;
+        }
+
+        /// <summary>
+        /// Check if object instance is equal to current instance.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj) => Equals(obj as NotificationMessage);
+
+        /// <summary>
+        ///  Return a hash code for the current object
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode() => HashCode.Combine(Summary, Detail, Duration, Style, Click, Close, CloseOnClick, Payload);
+
+        /// <summary>
+        /// Overloading == operator for NotificationMessage.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="otherMessage"></param>
+        /// <returns></returns>
+        public static bool operator ==(NotificationMessage message, NotificationMessage otherMessage)
+        {
+            if (message is null)
+            {
+                if (otherMessage is null)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            return message.Equals(otherMessage);
+        }
+
+        /// <summary>
+        /// Overloading != operator for NotificationMessage.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="otherMessage"></param>
+        /// <returns></returns>
+        public static bool operator !=(NotificationMessage message, NotificationMessage otherMessage)
+        {
+            return !(message == otherMessage);
+        }
+
+        #endregion
+    }
 }
