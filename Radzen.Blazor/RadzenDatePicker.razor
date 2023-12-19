@@ -4,7 +4,7 @@
 @using System.Linq.Expressions
 @using System.Globalization
 @using Microsoft.JSInterop
-
+@namespace Radzen.Blazor
 @typeparam TValue
 @inherits RadzenComponent
 @implements IRadzenFormComponent
@@ -35,10 +35,10 @@
                     @if (!TimeOnly)
                     {
                         <div class="rz-datepicker-header">
-                            <a aria-label="@PrevMonthAriaLabel" @onclick:preventDefault="true" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
+                            <a href="javascript:void(0)" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
                                 <span class="rz-datepicker-prev-icon rzi rzi-chevron-left"></span>
                             </a>
-                            <a aria-label="@NextMonthAriaLabel" @onclick:preventDefault="true" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
+                            <a href="javascript:void(0)" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
                                 <span class="rz-datepicker-next-icon rzi rzi-chevron-right"></span>
                             </a>
                             <div class="rz-datepicker-title">
@@ -55,14 +55,20 @@
                         <div class="rz-datepicker-calendar-container">
                             <table class="rz-datepicker-calendar" style="@(Inline ? "" : "width:100%")">
                                 <thead>
-                                    <tr>
-                                        @foreach (var day in ShiftedAbbreviatedDayNames)
-                                        {
-                                            <th scope="col">
-                                                <span>@day</span>
-                                            </th>
-                                        }
-                                    </tr>
+                                <tr>
+                                    @if (ShowCalenderWeek)
+                                    {
+                                        <th scope="col" style="border-right: 1px solid #e9edf0">
+                                            <span>KW</span>
+                                        </th>
+                                    }
+                                    @foreach (var day in ShiftedAbbreviatedDayNames)
+                                    {
+                                        <th scope="col">
+                                            <span>@day</span>
+                                        </th>
+                                    }
+                                </tr>
                                 </thead>
                                 <tbody>
                                     @{
@@ -71,20 +77,35 @@
                                     @for (int i = 0; i < 6; i++)
                                     {
                                         <tr>
+                                            @if (ShowCalenderWeek)
+                                            {
+                                            <td class="rz-datepicker-other-month" style="border-right: 1px solid #e9edf0">@CalenderWeek(new DateTime(CurrentDate.Year, CurrentDate.Month, 1).AddDays(i * 7))</td>
+                                            }
                                             @for (int j = 0; j < 7; j++)
                                             {
-                                                @if((DateTime.MaxValue - StartDate).TotalDays <= dayNumber)
+
+                                                @if ((DateTime.MaxValue - StartDate).TotalDays <= dayNumber)
                                                 {
                                                     break;
                                                 }
-                                                
+
                                                 DateTime date = StartDate.AddDays(dayNumber++);
                                                 var dateArgs = DateAttributes(date);
 
-                                                <td @attributes="@(dateArgs.Attributes)" class="@GetDayCssClass(date, dateArgs)" onmouseup=@(PopupRenderMode == PopupRenderMode.OnDemand || Inline || ShowTime || dateArgs.Disabled ? "" : $"Radzen.closePopup('{PopupID}')")
-                                                @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
-                                                    <span class=@GetDayCssClass(date, dateArgs, false)>@date.Day</span>
-                                                </td>
+                                                @if (CurrentDate.Month == date.Month)
+                                                {
+                                                    <td @attributes="@(dateArgs.Attributes)" onmouseup=@(PopupRenderMode == PopupRenderMode.OnDemand || Inline || ShowTime || dateArgs.Disabled ? "" : $"Radzen.closePopup('{PopupID}')")
+                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
+                                                        <span class=@($"rz-state-default{(DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0 ? " rz-state-active" : "")}{(DateTime.Now.Date.CompareTo(date.Date) == 0 ? " rz-datepicker-currentday" : "")}{(!dateArgs.Disabled ? "" : " rz-state-disabled")}")>@date.Day</span>
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td @attributes="@(dateArgs.Attributes)" class="rz-datepicker-other-month" onmouseup=@(PopupRenderMode == PopupRenderMode.OnDemand || Inline || ShowTime || dateArgs.Disabled ? "" : $"Radzen.closePopup('{PopupID}')")
+                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
+                                                        <span class=@($"rz-state-default{(!dateArgs.Disabled ? "" : " rz-state-disabled")} rz-datepicker-other-month")>@date.Day</span>
+                                                    </td>
+                                                }
                                             }
                                         </tr>
                                     }
@@ -103,30 +124,30 @@
                 @if (ShowTime)
                 {
                 <div class="rz-timepicker" @onmousedown:stopPropagation>
-                        <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "hour" }})" TValue="int" Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)" 
+                        <RadzenNumeric TValue="int" Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)" 
                            Min="@(HourFormat == "12" ? 1 : -1)" Max="@(HourFormat == "12" ? 12 : 24)" TValue="double" Step="@HoursStep"
-                           Change="@UpdateHour" class="rz-hour-picker" @oninput=@OnUpdateHourInput Format="@(PadHours ? "00" : "")" Name="@($"{UniqueID}-h")" />
+                           Change="@UpdateHour" class="rz-hour-picker" @oninput=@OnUpdateHourInput Format="@(PadHours ? "00" : "")" />
                         <div class="rz-separator">
                             <span>:</span>
                         </div>
-                        <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "minutes" }})" TValue="int" Disabled="@Disabled" Value="CurrentDate.Minute" TValue="double" Step="@MinutesStep" Min="0" Max="59"
-                           Change="@UpdateMinutes" class="rz-minute-picker" @oninput=@OnUpdateHourMinutes Format="@(PadMinutes ? "00" : "")" Name="@($"{UniqueID}-m")"/>
+                        <RadzenNumeric TValue="int" Disabled="@Disabled" Value="CurrentDate.Minute" TValue="double" Step="@MinutesStep" Min="0" Max="59"
+                           Change="@UpdateMinutes" class="rz-minute-picker" @oninput=@OnUpdateHourMinutes Format="@(PadMinutes ? "00" : "")" />
                         @if (ShowSeconds)
                         {
                             <div class="rz-separator">
                                 <span>:</span>
                             </div>
-                            <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "seconds" }})" TValue="int" Disabled="@Disabled" Value="CurrentDate.Second" TValue="double" Step="@SecondsStep" Min="0" Max="59"
-                               Change="@UpdateSeconds" class="rz-second-picker" @oninput=@OnUpdateHourSeconds Format="@(PadSeconds ? "00" : "")" Name="@($"{UniqueID}-s")"/>
+                            <RadzenNumeric TValue="int" Disabled="@Disabled" Value="CurrentDate.Second" TValue="double" Step="@SecondsStep" Min="0" Max="59"
+                               Change="@UpdateSeconds" class="rz-second-picker" @oninput=@OnUpdateHourSeconds Format="@(PadSeconds ? "00" : "")"/>
                         }
                         @if (HourFormat == "12")
                         {
                             <div class="rz-ampm-picker">
-                                <a aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
+                                <a href="javascript:void(0)" @onclick="@ToggleAmPm">
                                     <span class="rzi rzi-chevron-up"></span>
                                 </a>
                                 <span>@CurrentDate.ToString("tt")</span>
-                                <a aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
+                                <a href="javascript:void(0)" @onclick="@ToggleAmPm">
                                     <span class="rzi rzi-chevron-down"></span>
                                 </a>
                             </div>

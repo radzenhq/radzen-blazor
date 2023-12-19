@@ -24,32 +24,29 @@ namespace Radzen.Blazor
     public partial class RadzenDatePicker<TValue> : RadzenComponent, IRadzenFormComponent
     {
         /// <summary>
-        /// Gets or sets the previous month aria label text.
-        /// </summary>
-        /// <value>The previous month aria label text.</value>
-        [Parameter]
-        public string PrevMonthAriaLabel { get; set; } = "Previous month";
-
-        /// <summary>
-        /// Gets or sets the next month aria label text.
-        /// </summary>
-        /// <value>The next month aria label text.</value>
-        [Parameter]
-        public string NextMonthAriaLabel { get; set; } = "Next month";
-
-        /// <summary>
-        /// Gets or sets the toggle Am/Pm aria label text.
-        /// </summary>
-        /// <value>The toggle Am/Pm aria label text.</value>
-        [Parameter]
-        public string ToggleAmPmAriaLabel { get; set; } = "Toggle Am/Pm";
-
-        /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
         /// </summary>
         /// <value>The attributes.</value>
-        [Parameter]
         public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+		
+		[Parameter] public bool ShowCalenderWeek { get; set; } = false;
+		
+		/// <summary> Returns the current calendar week. </summary>
+        public static int CalenderWeek(DateTime d)
+        {
+            CultureInfo ci = new CultureInfo("de-AT"); // Specify Austrian culture (German - Austria)
+            Calendar cal = ci.Calendar;
+            int calendarWeek = cal.GetWeekOfYear(d, ci.DateTimeFormat.CalendarWeekRule, ci.DateTimeFormat.FirstDayOfWeek);
+            return calendarWeek;
+        }
+
+        /// <summary> Converts an specific date to the YYYYWW format. </summary>
+        public static string YYYYWW(DateTime? d)
+        {
+            if (d == null)
+                return "";
+            return (ISOWeek.GetYear((DateTime)d) * 100 + ISOWeek.GetWeekOfYear((DateTime)d)).ToString();
+        }
 
         RadzenDropDown<int> monthDropDown;
         RadzenDropDown<int> yearDropDown;
