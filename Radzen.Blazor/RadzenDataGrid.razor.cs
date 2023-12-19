@@ -450,12 +450,9 @@ namespace Radzen.Blazor
                 preventKeyDown = true;
                 try
                 {
-                    var items = PagedView.ToList();
-
                     var newFocusedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusTableRow", UniqueID, key == "ArrowDown", focusedIndex, SelectionMode == DataGridSelectionMode.Multiple && args.ShiftKey);
-                    var itemToSelect = items.ElementAtOrDefault(newFocusedIndex);
-
-                    if (newFocusedIndex != focusedIndex && itemToSelect != null)
+                    
+                    if (newFocusedIndex != focusedIndex)
                     {
                         focusedIndex = newFocusedIndex;
 
@@ -464,7 +461,11 @@ namespace Radzen.Blazor
                             selectedItems.Clear();
                         }
 
-                        await SelectRow(itemToSelect, false);
+                        var itemToSelect = PagedView.ElementAtOrDefault(newFocusedIndex);
+                        if (itemToSelect != null)
+                        {
+                            await SelectRow(itemToSelect, false);
+                        }
                     }
                 }
                 catch (Exception)
