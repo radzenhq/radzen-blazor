@@ -43,7 +43,7 @@
         <path @key="@area" style="@style" d="@area" fill="@Fill" stroke="none"></path>
         <Path @key="@line" D="@line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
       }
-      <Markers Series="@this" Data="@data" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
+      <Markers Visible="@Markers.Visible" Series="@this" Data="@data" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
     </g>;
   }
 }

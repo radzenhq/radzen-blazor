@@ -8,6 +8,13 @@ namespace Radzen.Blazor
     public class RadzenMarkers : RadzenChartComponentBase
     {
         /// <summary>
+        /// Gets or sets whether marker is visible.
+        /// </summary>
+        /// <value>Visibility.</value>
+        [Parameter]
+        public bool Visible { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the fill.
         /// </summary>
         /// <value>The fill.</value>
@@ -62,7 +69,7 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         protected override bool ShouldRefreshChart(ParameterView parameters)
       {
-          return parameters.DidParameterChange(nameof(MarkerType), MarkerType);
+          return parameters.DidParameterChange(nameof(MarkerType), MarkerType) || DidParameterChange(parameters, nameof(Visible), Visible);
       }
     }
 }

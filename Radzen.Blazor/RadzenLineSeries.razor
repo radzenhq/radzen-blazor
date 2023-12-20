@@ -35,7 +35,7 @@
         var key = $"{path}-{LineType}";
         <Path @key=@key Style="@style" D="@path" StrokeWidth="@StrokeWidth" Stroke="@Stroke" LineType="@LineType" Fill="none" />
       }
-      <Markers Series="@this" Data="@data" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
+      <Markers Visible="@Markers.Visible" Series="@this" Data="@data" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
     </g>;
   }
 }
