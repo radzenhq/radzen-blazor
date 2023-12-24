@@ -8,15 +8,18 @@
 @for(var i = firstLevel; i < Grid.deepestChildColumnLevel + 1; i++)
 {
 <tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
-    @foreach(var g in Grid.Groups)
+    @if (Grid.ShowGroupExpandColumn)
     {
-        @if (i == firstLevel)
+        @foreach(var g in Grid.Groups)
         {
-          <td class="rz-col-icon" rowspan="@(Grid.AllowCompositeDataCells ? (Grid.deepestChildColumnLevel + 1) : 1)">
-              <span class="rz-column-title"></span>
-          </td>
-        }
+            @if (i == firstLevel)
+            {
+              <td class="rz-col-icon" rowspan="@(Grid.AllowCompositeDataCells ? (Grid.deepestChildColumnLevel + 1) : 1)">
+                  <span class="rz-column-title"></span>
+              </td>
+            }
            
+        }
     }
     @if (Grid.Template != null && Grid.ShowExpandColumn && i == firstLevel)
     {
