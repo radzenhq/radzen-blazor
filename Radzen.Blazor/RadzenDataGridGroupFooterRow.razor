@@ -3,9 +3,12 @@
 <tr>
     @if (Grid.Template != null && Grid.ShowExpandColumn)
     {
-        <th class="rz-col-icon rz-unselectable-text" scope="col">
-            <span class="rz-column-title"></span>
-        </th>
+        @if (Grid.ShowGroupExpandColumn)
+        {
+            <th class="rz-col-icon rz-unselectable-text" scope="col">
+                <span class="rz-column-title"></span>
+            </th>
+        }
     }
     @for(var i = 0; i < GetLevel(); i++)
     {
@@ -13,6 +16,7 @@
             <span class="rz-column-title"></span>
         </td>
     }
+
     @foreach (var column in Columns)
     {
         <td class="@($" {column.GroupFooterCssClass} {Grid.getFrozenColumnClass(column, Columns)}".Trim())" style="@column.GetStyle(true, true)">
