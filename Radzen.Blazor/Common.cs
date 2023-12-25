@@ -1690,7 +1690,7 @@ namespace Radzen
         /// <summary>
         /// Satisfied if the current value is not <see cref="string.Empty"/>.
         /// </summary>
-        IsNotEmpty, 
+        IsNotEmpty,
         /// <summary>
         /// Custom operator if not need to generate the filter.
         /// </summary>
@@ -2830,7 +2830,7 @@ namespace Radzen
             }
             return false;
         }
-        
+
         /// <summary>
         /// Method to only replace first occurence of a substring in a string
         /// </summary>

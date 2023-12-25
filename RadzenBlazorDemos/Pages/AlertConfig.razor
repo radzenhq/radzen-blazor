@@ -1,4 +1,6 @@
-﻿<RadzenStack Gap="0" class="rz-py-8 rz-px-12">
+﻿@inject NotificationService NotificationService
+
+<RadzenStack Gap="0" class="rz-py-8 rz-px-12">
     <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter">
         Alert with close button
     </RadzenAlert>
@@ -6,9 +8,28 @@
         Alert without close button
     </RadzenAlert>
     <RadzenAlert Title="Alert with Title" AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
-        Alert with close button
+        Alert with title
     </RadzenAlert>
     <RadzenAlert AlertStyle="AlertStyle.Danger" ShowIcon="false" Variant="Variant.Flat" Shade="Shade.Lighter">
         Alert without message icon
     </RadzenAlert>
+    <RadzenAlert @bind-Visible="visible" Close=@OnClose>
+        Toggle alert visibility and handle the <code>Close</code> event.
+    </RadzenAlert>
+    <RadzenButton Text="@ToggleButtonText" Click="@OnToggle" />
 </RadzenStack>
+@code {
+    bool visible = true;
+
+    string ToggleButtonText => visible ? "Hide alert" : "Show alert";
+
+    void OnToggle()
+    {
+        visible = !visible;
+    }
+
+    void OnClose()
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Closed", Detail = "Info" });
+    }
+}

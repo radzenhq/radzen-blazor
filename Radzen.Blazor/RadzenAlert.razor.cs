@@ -99,10 +99,65 @@ namespace Radzen.Blazor
             return Size == AlertSize.ExtraSmall ? ButtonSize.ExtraSmall : ButtonSize.Small;
         }
 
-        bool? visible;
-        bool GetVisible()
+        Shade GetCloseButtonShade()
         {
-            return visible ?? Visible;
+            if (Shade == Shade.Light || Shade == Shade.Lighter)
+            {
+                return Shade.Darker;
+            }
+            else
+            {
+                return Shade.Default;
+            }
+        }
+
+        ButtonStyle GetCloseButtonStyle()
+        {
+            if (Shade == Shade.Light || Shade == Shade.Lighter)
+            {
+                switch (AlertStyle)
+                {
+                    case AlertStyle.Success:
+                        return ButtonStyle.Success;
+                    case AlertStyle.Danger:
+                        return ButtonStyle.Danger;
+                    case AlertStyle.Warning:
+                        return ButtonStyle.Warning;
+                    case AlertStyle.Info:
+                        return ButtonStyle.Info;
+                    case AlertStyle.Primary:
+                        return ButtonStyle.Primary;
+                    case AlertStyle.Secondary:
+                        return ButtonStyle.Secondary;
+                    case AlertStyle.Light:
+                    case AlertStyle.Base:
+                        return ButtonStyle.Dark;
+                    default:
+                        return ButtonStyle.Light;
+                }
+            }
+            else
+            {
+                switch (AlertStyle)
+                {
+                    case AlertStyle.Light:
+                    case AlertStyle.Base:
+                        return ButtonStyle.Dark;
+                    default:
+                        return ButtonStyle.Light;
+                }
+            }
+        }
+
+
+        bool visible;
+
+        /// <inheritdoc />
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+
+            visible = Visible;
         }
 
         /// <inheritdoc />
@@ -111,55 +166,59 @@ namespace Radzen.Blazor
             return $"rz-alert rz-alert-{GetAlertSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(AlertStyle), AlertStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()}";
         }
 
-        string getIcon()
+        string GetIcon()
         {
             if (!string.IsNullOrEmpty(Icon))
             {
                 return Icon;
             }
-            else if (AlertStyle == AlertStyle.Primary)
-            {
-                return "lightbulb_outline";
-            }
-            else if (AlertStyle == AlertStyle.Secondary)
-            {
-                return "lightbulb_outline";
-            }
-            else if (AlertStyle == AlertStyle.Light)
-            {
-                return "lightbulb_outline";
-            }
-            else if (AlertStyle == AlertStyle.Base)
-            {
-                return "lightbulb_outline";
-            }
-            else if (AlertStyle == AlertStyle.Dark)
-            {
-                return "lightbulb_outline";
-            }
-            else if (AlertStyle == AlertStyle.Success)
-            {
-                return "check_circle_outline";
-            }
-            else if (AlertStyle == AlertStyle.Danger)
-            {
-                return "error_outline";
-            }
-            else if (AlertStyle == AlertStyle.Warning)
-            {
-                return "warning_amber";
-            }
-            else if (AlertStyle == AlertStyle.Info)
-            {
-                return "info_outline";
-            }
 
-            return "";
+            switch (AlertStyle)
+            {
+                case AlertStyle.Success:
+                    return "check_circle_outline";
+                case AlertStyle.Danger:
+                    return "error_outline";
+                case AlertStyle.Warning:
+                    return "warning_amber";
+                case AlertStyle.Info:
+                    return "info_outline";
+                default:
+                    return "lightbulb_outline";
+            }
         }
 
-        void Close()
+        async Task OnClose()
         {
             visible = false;
+
+            await VisibleChanged.InvokeAsync(false);
+            await Close.InvokeAsync(null);
+        }
+
+        /// <summary>
+        /// Gets or sets the callback which is invoked when the alert is shown or hidden.
+        /// </summary>
+        [Parameter]
+        public EventCallback<bool> VisibleChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback which is invoked when the alert is closed by the user.
+        /// </summary>
+        [Parameter]
+        public EventCallback Close { get; set; }
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            var visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+
+            await base.SetParametersAsync(parameters);
+
+            if (visibleChanged)
+            {
+                visible = Visible;
+            }
         }
     }
 }
