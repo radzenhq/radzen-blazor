@@ -24,6 +24,21 @@ namespace Radzen.Blazor
     public partial class RadzenDatePicker<TValue> : RadzenComponent, IRadzenFormComponent
     {
         /// <summary>
+        /// Gets or sets a value indicating whether calendar week will be shown.
+        /// </summary>
+        /// <value><c>true</c> if calendar week is shown; otherwise, <c>false</c>.</value>
+
+        [Parameter]
+        public bool ShowCalendarWeek { get; set; }
+
+        /// <summary>
+        /// Gets or sets the previous month aria label text.
+        /// </summary>
+        /// <value>The previous month aria label text.</value>
+        [Parameter]
+        public string CalendarWeekTitle { get; set; } = "#";
+
+        /// <summary>
         /// Gets or sets the previous month aria label text.
         /// </summary>
         /// <value>The previous month aria label text.</value>

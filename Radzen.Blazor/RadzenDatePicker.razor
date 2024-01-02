@@ -56,6 +56,12 @@
                             <table class="rz-datepicker-calendar" style="@(Inline ? "" : "width:100%")">
                                 <thead>
                                     <tr>
+                                        @if (ShowCalendarWeek)
+                                        {
+                                            <th scope="col">
+                                                <span>@CalendarWeekTitle</span>
+                                            </th>
+                                        }
                                         @foreach (var day in ShiftedAbbreviatedDayNames)
                                         {
                                             <th scope="col">
@@ -71,6 +77,10 @@
                                     @for (int i = 0; i < 6; i++)
                                     {
                                         <tr>
+                                            @if (ShowCalendarWeek)
+                                            {
+                                                <td class="rz-datepicker-other-month">@Culture.Calendar.GetWeekOfYear(new DateTime(CurrentDate.Year, CurrentDate.Month, 1).AddDays(i * 7), Culture.DateTimeFormat.CalendarWeekRule, Culture.DateTimeFormat.FirstDayOfWeek)</td>
+                                            }
                                             @for (int j = 0; j < 7; j++)
                                             {
                                                 @if((DateTime.MaxValue - StartDate).TotalDays <= dayNumber)
