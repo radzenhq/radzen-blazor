@@ -1429,14 +1429,7 @@ namespace RadzenBlazorDemos
                     Description = "Demonstration and configuration of Radzen Blazor Timeline component. RadzenTimeline component is a graphical representation used to display a chronological sequence of events or data points.",
                     Icon = "&#xe00d",
                     Tags = new [] { "timeline", "time", "line" }
-                },
-                new Example()
-                {
-                    Name = "GoogleMap",
-                    Path = "googlemap",
-                    Description = "Demonstration and configuration of Radzen Blazor Google Map component.",
-                    Icon = "&#xe55b"
-                },
+                }
             }
         },
         new Example()
