@@ -995,7 +995,7 @@ window.Radzen = {
     if (instance) {
       instance.invokeMethodAsync(callback);
     }
-      Radzen.popups = Radzen.popups.filter(function (obj) {
+    Radzen.popups = (Radzen.popups || []).filter(function (obj) {
         return obj.id !== id;
     });
 
