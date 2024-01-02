@@ -1458,6 +1458,13 @@ namespace Radzen.Blazor
         public RenderFragment<Group> GroupHeaderTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the group header with option to add custom toggle visibility button template.
+        /// </summary>
+        /// <value>The group header template with option to add custom toggle visibility.</value>
+        [Parameter]
+        public RenderFragment<(Group Group, RadzenDataGridGroupRow<TItem> GroupHeader)> GroupHeaderToggleTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets the group panel text.
         /// </summary>
         /// <value>The group panel text.</value>
@@ -2116,7 +2123,7 @@ namespace Radzen.Blazor
 
         internal bool? allGroupsExpanded;
 
-        internal async System.Threading.Tasks.Task ExpandGroupItem(RadzenDataGridGroupRow<TItem> item, bool? expandedOnLoad)
+        public async System.Threading.Tasks.Task ExpandGroupItem(RadzenDataGridGroupRow<TItem> item, bool? expandedOnLoad)
         {
             if (expandedOnLoad == true)
                 return;
@@ -2442,6 +2449,13 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if DataGrid is using alternating row styles; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowAlternatingRows { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to show group visibility column
+        /// </summary>
+        /// <value><c>true</c> if want to show left column with group visibility toggle, otherwise <c>false</c>.</value>
+        [Parameter]
+        public bool ShowGroupExpandColumn { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the grid lines.

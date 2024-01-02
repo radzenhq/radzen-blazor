@@ -3,9 +3,12 @@
 <tr>
     @if (Grid.Template != null && Grid.ShowExpandColumn)
     {
+     @if (Grid.ShowGroupExpandColumn)
+     {
         <th class="rz-col-icon rz-unselectable-text" scope="col">
             <span class="rz-column-title"></span>
         </th>
+     }
     }
     @for(var i = 0; i < GetLevel(); i++)
     {
