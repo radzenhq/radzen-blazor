@@ -1,16 +1,18 @@
 ﻿@using System.IO
 @inject DialogService DialogService
-@inject NavigationManager NavigationManager
 
 <div style="display: flex">
-    <RadzenTree Data=@entries Change=@(args => selectedFile = args.Value.ToString()) Expand=@LoadFiles Style="width: 50%; height: 300px">
-        <RadzenTreeLevel Text=@GetTextForNode Template=@FileOrFolderTemplate />
+    <RadzenTree Change=@(args => selectedFile = args.Value.ToString()) Style="width: 50%; height: 300px">
+        <RadzenTreeItem Text="Images" Expanded="true" Icon="">
+            <RadzenTreeItem Text="radzen-blazor-components.png" Value="@($"/images/radzen-blazor-components.png")" />
+            <RadzenTreeItem Text="radzen-blazor-studio.png" Value="@($"/images/radzen-blazor-studio.png")" />
+        </RadzenTreeItem>
     </RadzenTree>
     <div style="width: 50%; padding: 16px; text-align: center;">
     @if (!string.IsNullOrEmpty(Path.GetExtension(selectedFile)))
     {
         <h4>Preview</h4>
-        <img style="max-width: 100%" src=@(ToUrl(selectedFile)) alt="Selected image file preview" />
+        <RadzenImage Path=@(selectedFile) style="max-width: 100%" AlternateText="Selected image file preview" />
     }
     </div>
 </div>
@@ -20,59 +22,7 @@
     <RadzenButton Text="Cancel" Click=@OnCancelClick ButtonStyle="ButtonStyle.Secondary"  />
 </div>
 @code {
-    RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder =>
-    {
-        string path = context.Value as string;
-        bool isDirectory = Directory.Exists(path);
-
-        builder.OpenComponent<RadzenIcon>(0);
-        builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
-        if (!isDirectory)
-        {
-            builder.AddAttribute(2, "Style", "margin-left: 24px");
-        }
-        builder.CloseComponent();
-        builder.AddContent(3, context.Text);
-    };
-
-    void LoadFiles(TreeExpandEventArgs args)
-    {
-        var directory = args.Value as string;
-
-        args.Children.Data = Directory.EnumerateFileSystemEntries(directory).Where(path => {
-            if (Directory.Exists(path))
-            {
-                return true;
-            }
-
-            var extension = Path.GetExtension(path);
-
-            return extension == ".png" || extension == ".jpg";
-        });
-        args.Children.Text = GetTextForNode;
-        args.Children.HasChildren = (path) => Directory.Exists((string)path);
-        args.Children.Template = FileOrFolderTemplate;
-    }
-
-    string GetTextForNode(object data)
-    {
-        return Path.GetFileName((string)data);
-    }
-
-    IEnumerable<string> entries;
     string selectedFile;
-
-    protected override void OnInitialized()
-    {
-        entries = Directory.GetDirectories(Directory.GetCurrentDirectory())
-                           .Where(entry =>
-                           {
-                               var name = Path.GetFileName(entry);
-
-                               return !name.StartsWith(".") && name != "bin" && name != "obj";
-                           });
-
-    }
 
     void OnCancelClick()
     {
@@ -85,14 +35,9 @@
 
         if (selectedFile != null && !string.IsNullOrEmpty(Path.GetExtension(selectedFile)))
         {
-            result = ToUrl(selectedFile);
+            result = selectedFile;
         }
 
         DialogService.Close(result);
-    }
-
-    string ToUrl(string file)
-    {
-        return file.Replace(Directory.GetCurrentDirectory(), "").Replace(Path.DirectorySeparatorChar, '/');
     }
 }
