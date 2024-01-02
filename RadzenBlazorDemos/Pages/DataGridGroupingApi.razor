@@ -5,6 +5,8 @@
 @inherits DbContextPage
 
 <div style="display: flex; align-items: center; margin-bottom: 16px">
+    <RadzenCheckBox TValue="bool" @bind-Value="@showGroupExpandColumn" Name="showGroupExpandColumn" />
+    <RadzenLabel Text="Show group expand column" Component="showGroupExpandColumn" Style="margin-left: 8px; margin-right: 32px; vertical-align: middle;" />
     <RadzenCheckBox TriState="true" TValue="bool?" @bind-Value="@allGroupsExpanded" Name="allGroupsExpanded" Change="@ToggleGroups" />
     <RadzenLabel Text="All groups expanded by default" Component="allGroupsExpanded" Style="margin-left: 8px; margin-right: 32px; vertical-align: middle;" />
     <RadzenButton Text="Expand all groups" Click="@(args => ToggleGroups(true))" style="margin-right: 16px" Disabled=@(allGroupsExpanded == true) />
@@ -13,7 +15,7 @@
 <RadzenDataGrid @ref=grid AllowGrouping="true" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" 
     Data="@employees" TItem="Employee" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or" Render="@OnRender" 
         HideGroupedColumn="true" GroupRowRender="OnGroupRowRender" GroupRowExpand="OnGroupRowExpand" GroupRowCollapse="OnGroupRowCollapse" Group="@OnGroup"
-        @bind-AllGroupsExpanded="@allGroupsExpanded">
+        @bind-AllGroupsExpanded="@allGroupsExpanded" ShowGroupExpandColumn=@showGroupExpandColumn>
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Frozen="true" Groupable="false" Width="80px" TextAlign="TextAlign.Center" >
@@ -40,6 +42,7 @@
 <EventConsole @ref=@console />
 
 @code {
+    bool showGroupExpandColumn = true;
     bool? allGroupsExpanded;
     RadzenDataGrid<Employee> grid;
 
