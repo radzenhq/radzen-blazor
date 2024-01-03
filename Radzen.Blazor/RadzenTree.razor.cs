@@ -322,13 +322,16 @@ namespace Radzen.Blazor
 
                 if (AllowCheckBoxes && AllowCheckChildren && args.Children.Data != null)
                 {
-                    if (CheckedValues != null && CheckedValues.Contains(item.Value))
+                    if (CheckedValues != null)
                     {
-                        await SetCheckedValues(CheckedValues.Union(args.Children.Data.Cast<object>().Except(UncheckedValues)));
-                    }
-                    else
-                    {
-                        await SetCheckedValues(CheckedValues.Except(args.Children.Data.Cast<object>()));
+                        if (CheckedValues.Contains(item.Value))
+                        {
+                            await SetCheckedValues(CheckedValues.Union(args.Children.Data.Cast<object>().Except(UncheckedValues)));
+                        }
+                        else
+                        {
+                            await SetCheckedValues(CheckedValues.Except(args.Children.Data.Cast<object>()));
+                        }
                     }
                 }
             }
