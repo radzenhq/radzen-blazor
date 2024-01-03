@@ -76,6 +76,8 @@
 
     void OnSelectedIdsChange(object value)
     {
+        orders = orders.ToList().AsQueryable();
+
         if (selectedIds != null && !selectedIds.Any())
         {
             selectedIds = null;
