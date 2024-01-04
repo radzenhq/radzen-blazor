@@ -202,7 +202,7 @@ namespace Radzen.Blazor
 
                 if (Visible)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, GetId());
+                    await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Name ?? GetId());
                 }
             }
         }
