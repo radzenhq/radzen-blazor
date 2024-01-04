@@ -10,7 +10,7 @@
             <HeaderTemplate>
                 <RadzenCheckBox TriState="false" TValue="bool?" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select all items" }})"
                                 Value="@(selectedEmployees == null || selectedEmployees?.Any() != true ? false : !employees.All(i => selectedEmployees.Select(e => e.EmployeeID).Contains(i.EmployeeID)) ? null : employees.Any(i => selectedEmployees.Select(e => e.EmployeeID).Contains(i.EmployeeID)))"
-                                Change="@(args => selectedEmployees = args == true ? employees.ToList() : null)" />
+                                Change="@(args => selectedEmployees = args == true ? (selectedEmployees ?? Enumerable.Empty<Employee>()).Union(employees.Where(i => !(selectedEmployees ?? Enumerable.Empty<Employee>()).Select(e => e.EmployeeID).Contains(i.EmployeeID))).ToList() : null)" />
             </HeaderTemplate>
             <Template Context="data">
                 <RadzenCheckBox TriState="false" Value="@(selectedEmployees != null && selectedEmployees.Select(e => e.EmployeeID).Contains(data.EmployeeID))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select item" }})"
