@@ -430,16 +430,18 @@
 @code {
     internal void SetAttribute(Dictionary<string, object> attributes, string attributeName, object attributeValue)
     {
+        var separator = attributeName == "class" ? " " : ";";
+
         if (!attributes.ContainsKey(attributeName))
         {
             attributes.Add(attributeName, attributeValue);
         }
         else
         {
-            var values = $"{attributes[attributeName]}".Split(";").Where(v => v != string.Empty);
-            var newValues = $"{attributeValue}".Split(";").Where(v => v != string.Empty);
+            var values = $"{attributes[attributeName]}".Split(separator).Where(v => v != string.Empty);
+            var newValues = $"{attributeValue}".Split(separator).Where(v => v != string.Empty);
 
-            attributes[attributeName] = string.Join(";", values.Concat(newValues).Distinct());
+            attributes[attributeName] = string.Join(separator, values.Concat(newValues).Distinct());
         }
     }
 
