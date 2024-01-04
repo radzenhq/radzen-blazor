@@ -1,8 +1,22 @@
 ﻿@using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 
-<RadzenDataGrid @ref="grid" @bind-Value=@selectedEmployees KeyProperty="EmployeeID" IsLoading="@isLoading" Count="@count" Data="@employees" LoadData="@LoadData" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" PagerHorizontalAlign="HorizontalAlign.Center" TItem="Employee" ColumnWidth="200px">
+<RadzenDataGrid @ref="grid" @bind-Value=@selectedEmployees SelectionMode="DataGridSelectionMode.Multiple" KeyProperty="EmployeeID" IsLoading="@isLoading" Count="@count" Data="@employees" 
+    LoadData="@LoadData" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+    FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" 
+    PagerHorizontalAlign="HorizontalAlign.Center" TItem="Employee" ColumnWidth="200px">
     <Columns>
+        <RadzenDataGridColumn TItem="Employee" Width="60px" Sortable="false" Filterable="false">
+            <HeaderTemplate>
+                <RadzenCheckBox TriState="false" TValue="bool?" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select all items" }})"
+                                Value="@(selectedEmployees == null || selectedEmployees?.Any() != true ? false : !employees.All(i => selectedEmployees.Select(e => e.EmployeeID).Contains(i.EmployeeID)) ? null : employees.Any(i => selectedEmployees.Select(e => e.EmployeeID).Contains(i.EmployeeID)))"
+                                Change="@(args => selectedEmployees = args == true ? employees.ToList() : null)" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox TriState="false" Value="@(selectedEmployees != null && selectedEmployees.Select(e => e.EmployeeID).Contains(data.EmployeeID))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select item" }})"
+                                TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name">
                 <EditTemplate Context="employee">
