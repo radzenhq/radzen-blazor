@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -68,6 +69,12 @@ namespace Radzen.Blazor
         /// <value>The tabs.</value>
         [Parameter]
         public RenderFragment Tabs { get; set; }
+
+        /// <summary>
+        /// Specifies the function which validates the tab being changed. Must return <c>false</c> to prevent the tab from changing.
+        /// </summary>
+        [Parameter]
+        public Func<int, bool> TabChangeValidator { get; set; }
 
         List<RadzenTabsItem> tabs = new List<RadzenTabsItem>();
 
@@ -154,7 +161,14 @@ namespace Radzen.Blazor
 
         internal async Task SelectTab(RadzenTabsItem tab, bool raiseChange = false)
         {
-            selectedIndex = IndexOf(tab);
+            var index = IndexOf(tab);
+
+            if (TabChangeValidator != null && !TabChangeValidator(index))
+            {
+                return;
+            }
+
+            selectedIndex = index;
 
             if (raiseChange)
             {
@@ -183,7 +197,7 @@ namespace Radzen.Blazor
             {
                 positionCSS = "rz-tabview-left";
             }
-            else if(TabPosition == TabPosition.TopRight)
+            else if (TabPosition == TabPosition.TopRight)
             {
                 positionCSS = "rz-tabview-top rz-tabview-top-right";
             }
@@ -239,6 +253,11 @@ namespace Radzen.Blazor
             var index = IndexOf(tab);
             if (index != selectedIndex)
             {
+                if (TabChangeValidator != null && !TabChangeValidator(index))
+                {
+                    return;
+                }
+
                 selectedIndex = index;
 
                 await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
