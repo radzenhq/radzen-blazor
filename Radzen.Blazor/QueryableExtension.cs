@@ -1213,6 +1213,16 @@ namespace Radzen
 
                     index++;
                 }
+                else if (comparison == "In" || comparison == "NotIn")
+                {
+                    if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
+                    {
+                        filterExpressions.Add($@"{(comparison == "NotIn" ? "!" : "")}{property}.Any(i => i in @{index})");
+                        filterValues.Add(new object[] { filter.FilterValue });
+
+                        index++;
+                    }
+                }
                 else if (!(IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)))
                 {
                     var value = filter.FilterValue;
