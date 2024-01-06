@@ -1,0 +1,15 @@
+﻿<RadzenTabs>
+    <Tabs>
+        <RadzenTabsItem Text="Tab1">
+            Tab1
+            <RadzenButton Text="Enable/disable second tab" Click="@(args => disabled = !disabled)" />
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Tab2" Disabled=@disabled>
+            Tab2
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+@code {
+    bool disabled = true;
+}
