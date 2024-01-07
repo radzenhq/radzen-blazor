@@ -365,7 +365,8 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-radio-button-list-horizontal ~ &,
     .rz-checkbox-list-vertical ~ &,
     .rz-checkbox-list-horizontal  ~ &,
-    .rz-chkbox ~ &  {
+    .rz-chkbox ~ &,
+    .rz-state-empty:has(.rz-placeholder) ~ & {
         right: auto;
         top: var(--rz-form-field-label-floating-top);
         padding-top: 0;
@@ -385,7 +386,8 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-form-field:not(.rz-variant-outlined) .rz-radio-button-list-horizontal ~ &,
     .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-vertical ~ &,
     .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-horizontal  ~ &,
-    .rz-form-field:not(.rz-variant-outlined) .rz-chkbox ~ &  {
+    .rz-form-field:not(.rz-variant-outlined) .rz-chkbox ~ &,
+    .rz-form-field:not(.rz-variant-outlined) .rz-state-empty:has(.rz-placeholder) ~ &  {
         background-color: inherit !important;
     }
 
