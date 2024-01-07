@@ -96,14 +96,16 @@ $tabs-transition: var(--rz-transition-all) !default;
         &:not(.rz-state-disabled) {
           background-color: var(--rz-tabs-tab-hover-background-color);
 
-          a {
+          a,
+          a:not([href]):not([class]) {
             color: var(--rz-tabs-tab-hover-color);
           }
         }
       }
     }
 
-    a {
+    a,
+    a:not([href]):not([class]) {
       display: flex;
       align-items: center;
       color: var(--rz-tabs-tab-color);
@@ -114,6 +116,7 @@ $tabs-transition: var(--rz-transition-all) !default;
       text-transform: var(--rz-tabs-tab-text-transform);
       letter-spacing: var(--rz-tabs-tab-letter-spacing);
       text-decoration: none;
+      cursor: pointer;
 
       &:hover {
         text-decoration: none;
@@ -129,7 +132,8 @@ $tabs-transition: var(--rz-transition-all) !default;
     background-color: var(--rz-tabs-background-color);
     position: relative;
 
-    a {
+    a,
+    a:not([href]):not([class]) {
       color: var(--rz-tabs-tab-selected-color);
     }
   }
