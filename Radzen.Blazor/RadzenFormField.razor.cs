@@ -105,6 +105,13 @@ namespace Radzen.Blazor
         public string Text { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the label is floating or fixed on top.
+        /// </summary>
+        /// <value><c>true</c> if floating is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowFloatingLabel { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the name of the form field. Used to associate the label with a component.
         /// </summary>
         [Parameter]
@@ -139,7 +146,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return ClassList.Create($"rz-form-field rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()}").AddDisabled(disabled).ToString();
+            return ClassList.Create($"rz-form-field rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()}").AddDisabled(disabled).Add("rz-floating-label", AllowFloatingLabel == true).ToString();
         }
     }
 }

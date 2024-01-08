@@ -1,0 +1,12 @@
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap" Gap="1rem" Class="rz-p-sm-12">
+    <RadzenFormField Text="Floating label" >
+        <RadzenTextBox @bind-Value="@value" />
+    </RadzenFormField>
+    <RadzenFormField AllowFloatingLabel="false" Text="Fixed label" >
+        <RadzenTextBox @bind-Value="@value" />
+    </RadzenFormField>
+</RadzenStack>
+
+@code {
+    string value = "";
+}
