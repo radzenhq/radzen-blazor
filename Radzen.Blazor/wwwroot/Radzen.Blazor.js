@@ -615,6 +615,7 @@ window.Radzen = {
       files.push({Name: file.name, Size: file.size});
     }
     var xhr = new XMLHttpRequest();
+    xhr.withCredentials = true;
     xhr.upload.onprogress = function (e) {
       if (e.lengthComputable) {
         var uploadComponent =
