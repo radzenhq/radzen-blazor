@@ -1,6 +1,7 @@
 using Radzen.Blazor.Rendering;
 using Microsoft.AspNetCore.Components;
 using System;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -13,6 +14,10 @@ namespace Radzen.Blazor
         /// Notifies the form field that the disabled state of the component has changed.
         /// </summary>
         Action<bool> DisabledChanged { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether the label is floating or fixed on top.
+        /// </summary>
+        bool AllowFloatingLabel { get; set; }
     }
 
     /// <summary>
@@ -24,6 +29,10 @@ namespace Radzen.Blazor
         /// Notifies the form field that the disabled state of the component has changed.
         /// </summary>
         public Action<bool> DisabledChanged { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether the label is floating or fixed on top.
+        /// </summary>
+        public bool AllowFloatingLabel { get; set; }
     }
 
     /// <summary>
@@ -134,13 +143,21 @@ namespace Radzen.Blazor
         /// </summary>
         public RadzenFormField()
         {
-            context = new FormFieldContext { DisabledChanged = DisabledChanged };
+            context = new FormFieldContext { DisabledChanged = DisabledChanged, AllowFloatingLabel = AllowFloatingLabel };
         }
 
         private void DisabledChanged(bool value)
         {
             disabled = value;
             StateHasChanged();
+        }
+
+        /// <inheritdoc />
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+
+            context.AllowFloatingLabel = AllowFloatingLabel;
         }
 
         /// <inheritdoc />
