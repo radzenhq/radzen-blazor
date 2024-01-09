@@ -126,14 +126,16 @@
     {
         await base.OnInitializedAsync();
 
-        orders = dbContext.Orders.Include("OrderDetails.Product").Include("Customer").Include("Employee").ToList().AsQueryable();
+        orders = dbContext.Orders.Include("OrderDetails.Product").Include("Customer").Include("Employee").ToList()
+            .Select(o =>
+            {
+                o.ProductIds = o.OrderDetails.Select(od => od.ProductID);
+                return o;
+            }).AsQueryable();
+
         orderIds = orders.Select(o => o.OrderID).Distinct();
 
         productIds = orders.SelectMany(o => o.OrderDetails).Select(od => od.ProductID).Distinct();
-        foreach (var order in orders)
-        {
-            order.ProductIds = order.OrderDetails.Select(od => od.ProductID);
-        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
