@@ -380,7 +380,7 @@ $form-field-helper-padding: 0 0.5rem !default;
         max-width: calc(100% - 1.5rem);
     }
 
-    .rz-form-field:not(.rz-floating-label) &,
+    .rz-form-field:not(.rz-variant-outlined):not(.rz-floating-label) &,
     .rz-form-field:not(.rz-variant-outlined) *:focus ~ &,
     .rz-form-field:not(.rz-variant-outlined) *:focus-within ~ &,
     .rz-form-field:not(.rz-variant-outlined) :not(.rz-state-empty) ~ &,
