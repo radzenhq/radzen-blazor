@@ -20,6 +20,13 @@
                         Change=@OnSelectedIdsChange Data="@(orderIds)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
             </RadzenDataFilterProperty>
+            <RadzenDataFilterProperty TItem="Order" Property="ProductIds" Title="ProductIds" FilterValue="@finalSelectedProductIds"
+                                      Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.In">
+                <FilterTemplate>
+                    <RadzenDropDown @bind-Value=@selectedProductIds Style="width:100%;"
+                                    Change=@OnSelectedProductIdsChange Data="@(productIds)" AllowClear="true" Multiple="true" />
+                </FilterTemplate>
+            </RadzenDataFilterProperty>
             <RadzenDataFilterProperty TItem="Order" Property="Employee.LastName" Title="Employee Last Name" />
             <MyCustomDataFilterProperty TItem="Order" Property="OrderDate" Title="Order Date">
                 <FilterTemplate>
@@ -74,6 +81,10 @@
     IEnumerable<int> selectedIds;
     IEnumerable<int> orderIds;
 
+    IEnumerable<int> finalSelectedProductIds;
+    IEnumerable<int> selectedProductIds;
+    IEnumerable<int> productIds;
+
     void OnSelectedIdsChange(object value)
     {
         orders = orders.ToList().AsQueryable();
@@ -89,9 +100,25 @@
         }
     }
 
+    void OnSelectedProductIdsChange(object value)
+    {
+        orders = orders.ToList().AsQueryable();
+
+        if (selectedProductIds != null && !selectedProductIds.Any())
+        {
+            selectedProductIds = null;
+        }
+
+        if (auto)
+        {
+            finalSelectedProductIds = selectedProductIds;
+        }
+    }
+
     async Task ApplyFilter()
     {
         finalSelectedIds = selectedIds;
+        finalSelectedProductIds = selectedProductIds;
         await dataFilter.Filter();
     }
 
@@ -99,8 +126,14 @@
     {
         await base.OnInitializedAsync();
 
-        orders = dbContext.Orders.Include("Customer").Include("Employee");
+        orders = dbContext.Orders.Include("OrderDetails.Product").Include("Customer").Include("Employee").ToList().AsQueryable();
         orderIds = orders.Select(o => o.OrderID).Distinct();
+
+        productIds = orders.SelectMany(o => o.OrderDetails).Select(od => od.ProductID).Distinct();
+        foreach (var order in orders)
+        {
+            order.ProductIds = order.OrderDetails.Select(od => od.ProductID);
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

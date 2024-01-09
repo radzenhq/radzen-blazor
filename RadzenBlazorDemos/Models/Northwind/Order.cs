@@ -85,5 +85,11 @@ namespace RadzenBlazorDemos.Models.Northwind
       get;
       set;
     }
+    [NotMapped]
+    public IEnumerable<int> ProductIds
+    {
+        get;
+        set;
+    }
   }
 }
