@@ -2123,6 +2123,9 @@ namespace Radzen.Blazor
 
         internal bool? allGroupsExpanded;
 
+        /// <summary>
+        /// Expand group item.
+        /// </summary>
         public async System.Threading.Tasks.Task ExpandGroupItem(RadzenDataGridGroupRow<TItem> item, bool? expandedOnLoad)
         {
             if (expandedOnLoad == true)
