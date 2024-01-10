@@ -1,0 +1,25 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenStack>
+            <div>A <code>Temperature</code> type that implements <code>IFormattable</code>.  Value in Celsius: @value</div>
+            <RadzenNumeric TValue="Temperature?" Format="F" @bind-Value=@value ConvertValue="ParseToTemperature" ShowUpDown="false"
+                           InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })"/>
+        </RadzenStack>
+        <RadzenStack>
+            <div>A <code>Dollars</code> type that provides a <code>TypeConverter</code>, therefore <code>Min</code>, <code>Max</code>, and <code>Step</code> are supported.</div>
+            <RadzenNumeric TValue="Dollars?" @bind-Value="@dollarValue" Min="1" Max="250" Step="5"
+                           InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })"/>
+        </RadzenStack>
+    </RadzenStack>
+</div>
+
+@code{
+    Temperature? value = new(50.5m);
+    
+    Temperature? ParseToTemperature(string input)
+    {
+        return decimal.TryParse(input, out var val) ? new Temperature(val) : null;
+    }
+
+    Dollars? dollarValue = new Dollars(2.50m);
+}
