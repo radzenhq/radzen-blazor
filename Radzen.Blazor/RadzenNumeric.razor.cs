@@ -319,13 +319,13 @@ namespace Radzen.Blazor
                 newValue = default(TValue);
             }
 
+            newValue = ApplyMinMax(newValue);
+
             if (object.Equals(Value, newValue) && (!ValueChanged.HasDelegate || !string.IsNullOrEmpty(Format)))
             {
                 await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
                 return;
             }
-
-            newValue = ApplyMinMax(newValue);
 
             Value = newValue;
             if (!ValueChanged.HasDelegate)
