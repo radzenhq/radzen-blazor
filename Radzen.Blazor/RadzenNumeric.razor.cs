@@ -321,7 +321,7 @@ namespace Radzen.Blazor
                 return;
             }
 
-            newValue = CheckBounds(newValue);
+            newValue = ApplyMinMax(newValue);
 
             Value = newValue;
             if (!ValueChanged.HasDelegate)
@@ -334,7 +334,7 @@ namespace Radzen.Blazor
             await Change.InvokeAsync(Value);
         }
         
-        private TValue CheckBounds(TValue newValue)
+        private TValue ApplyMinMax(TValue newValue)
         {
             if (Max == null && Min == null)
             {
