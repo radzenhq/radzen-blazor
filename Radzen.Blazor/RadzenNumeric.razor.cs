@@ -301,7 +301,11 @@ namespace Radzen.Blazor
             TValue newValue;
             try
             {
-                if (ConvertValue != null)
+                if (value is TValue typedValue)
+                {
+                    newValue = typedValue;
+                }
+                else if (ConvertValue != null)
                 {
                     newValue = ConvertValue($"{value}");
                 }
@@ -419,22 +423,14 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
-            if (minChanged && Min.HasValue && Value != null && IsJSRuntimeAvailable)
+            if (minChanged && IsJSRuntimeAvailable)
             {
-                decimal decimalValue = (decimal)Convert.ChangeType(Value, typeof(decimal));
-                if (decimalValue < Min.Value)
-                {
-                    await InternalValueChanged(Min.Value);
-                }
+                await InternalValueChanged(Value);
             }
 
-            if (maxChanged && Max.HasValue && Value != null && IsJSRuntimeAvailable)
+            if (maxChanged && IsJSRuntimeAvailable)
             {
-                decimal decimalValue = (decimal)Convert.ChangeType(Value, typeof(decimal));
-                if (decimalValue > Max.Value)
-                {
-                    await InternalValueChanged(Max.Value);
-                }
+                await InternalValueChanged(Value);
             }
         }
 
