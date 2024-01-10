@@ -1079,6 +1079,9 @@ namespace Radzen.Blazor
             if (PopupRenderMode == PopupRenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
             {
                 await popup.ToggleAsync(Element);
+#if NET5_0_OR_GREATER
+                await FocusAsync();
+#endif
             }
         }
 
