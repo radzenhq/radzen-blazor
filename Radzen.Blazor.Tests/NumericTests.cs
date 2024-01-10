@@ -1,3 +1,4 @@
+using System;
 using Bunit;
 using Xunit;
 
@@ -408,6 +409,75 @@ namespace Radzen.Blazor.Tests
             component.Find("input").Change(newValue);
             
             Assert.Contains($" value=\"{newValue.ToString(format)}\"", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_Uses_ConvertValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var value = new Dollars(11m);
+            Dollars? ConvertFunc(string s) => decimal.TryParse(s, out var val) ? new Dollars(val) : null;
+            var component = ctx.RenderComponent<RadzenNumeric<Dollars?>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars?>.ConvertValue), (Func<string, Dollars?>)ConvertFunc),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars?>.Value), value)
+            );
+
+            component.Render();
+            
+            Assert.Contains($" value=\"{value.ToString()}\"", component.Markup);
+
+            var newValue = new Dollars(13.53m);
+            component.Find("input").Change("13.53");
+
+            Assert.Contains($" value=\"{newValue.ToString()}\"", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_Supports_TypeConverter()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = new Dollars(100.234m);
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<Dollars>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Value), valueToTest)
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest.ToString(format)}\"", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_Supports_IComparable()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenNumeric<Dollars>>();
+
+            var maxValue = 2;
+
+            component.SetParametersAndRender(parameters =>
+            {
+                component.SetParametersAndRender(parameters =>
+                {
+                    parameters.Add(p => p.Value, new Dollars(1m));
+                    parameters.Add(p => p.Max, maxValue);
+                });
+            });
+            
+            component.Find("input").Change("13.53");
+
+            var maxDollars = new Dollars(2);
+            Assert.Contains($" value=\"{maxDollars.ToString()}\"", component.Markup);
+            Assert.Equal(component.Instance.Value, maxDollars);
         }
     }
 }
