@@ -310,6 +310,30 @@ namespace Radzen.Blazor
                 newValue = default(TValue);
             }
 
+            if (object.Equals(Value, newValue) && (!ValueChanged.HasDelegate || !string.IsNullOrEmpty(Format)))
+            {
+                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
+                return;
+            }
+
+            if (Max.HasValue || Min.HasValue)
+            {
+                newValue = CheckBounds(newValue);
+            }
+
+            Value = newValue;
+            if (!ValueChanged.HasDelegate)
+            {
+                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
+            }
+
+            await ValueChanged.InvokeAsync(Value);
+            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            await Change.InvokeAsync(Value);
+        }
+        
+        private TValue CheckBounds(TValue newValue)
+        {
             decimal? newValueAsDecimal;
             try
             {
@@ -320,31 +344,16 @@ namespace Radzen.Blazor
                 newValueAsDecimal = default(TValue) == null ? default(decimal?) : (decimal)ConvertType.ChangeType(default(TValue), typeof(decimal));
             }
 
-            if (object.Equals(Value, newValue) && (!ValueChanged.HasDelegate || !string.IsNullOrEmpty(Format)))
-            {
-                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
-                return;
-            }
-
-            if (Max.HasValue && newValueAsDecimal > Max.Value)
+            if (newValueAsDecimal > Max)
             {
                 newValueAsDecimal = Max.Value;
             }
 
-            if (Min.HasValue && newValueAsDecimal < Min.Value)
+            if (newValueAsDecimal < Min)
             {
                 newValueAsDecimal = Min.Value;
             }
-
-            Value = (TValue)ConvertType.ChangeType(newValueAsDecimal, typeof(TValue));
-            if (!ValueChanged.HasDelegate)
-            {
-                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
-            }
-
-            await ValueChanged.InvokeAsync(Value);
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
-            await Change.InvokeAsync(Value);
+            return (TValue)ConvertType.ChangeType(newValueAsDecimal, typeof(TValue));
         }
 
         /// <summary>

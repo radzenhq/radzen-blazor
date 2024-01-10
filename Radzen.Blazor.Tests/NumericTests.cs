@@ -1,3 +1,4 @@
+using System;
 using Bunit;
 using Xunit;
 
@@ -409,5 +410,34 @@ namespace Radzen.Blazor.Tests
             
             Assert.Contains($" value=\"{newValue.ToString(format)}\"", component.Markup);
         }
+
+        [Fact]
+        public void Numeric_Uses_ConvertValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var value = new Dollars(11m);
+            Dollars? ConvertFunc(string s) => decimal.TryParse(s, out var val) ? new Dollars(val) : null;
+            var component = ctx.RenderComponent<RadzenNumeric<Dollars?>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars?>.ConvertValue), (Func<string, Dollars?>)ConvertFunc),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars?>.Value), value)
+            );
+
+            component.Render();
+            
+            Assert.Contains($" value=\"{value.ToString()}\"", component.Markup);
+
+            var newValue = new Dollars(13.53m);
+            component.Find("input").Change("13.53");
+
+            Assert.Contains($" value=\"{newValue.ToString()}\"", component.Markup);
+        }
+    }
+    
+    public readonly record struct Dollars(decimal Amount)
+    {
+        public override string ToString() => Amount.ToString("F2", System.Globalization.CultureInfo.CreateSpecificCulture("en-US"));
     }
 }
