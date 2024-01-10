@@ -83,9 +83,9 @@ namespace Radzen.Blazor
                 return;
             }
 
-            var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : decimal.Parse(Step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+            var step = decimal.TryParse(Step?.Replace(",", "."), out var stepVal) ? stepVal : 1;
 
-            var valueToUpdate = Value != null ? ConvertToDecimal(Value) : default;
+            var valueToUpdate = ConvertToDecimal(Value);
 
             var newValue = valueToUpdate + (stepUp ? step : -step);
 
@@ -360,7 +360,7 @@ namespace Radzen.Blazor
             }
             catch
             {
-                newValueAsDecimal = default(TValue) == null ? default(decimal?) : (decimal)ConvertType.ChangeType(default(TValue), typeof(decimal));
+                newValueAsDecimal = default;
             }
 
             if (newValueAsDecimal > Max)
