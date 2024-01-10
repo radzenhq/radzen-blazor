@@ -434,5 +434,23 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains($" value=\"{newValue.ToString()}\"", component.Markup);
         }
+
+        [Fact]
+        public void Numeric_Supports_TypeConverter()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = new Dollars(100.234m);
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<Dollars>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Value), valueToTest)
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest.ToString(format)}\"", component.Markup);
+        }
     }
 }

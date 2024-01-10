@@ -82,18 +82,18 @@ namespace Radzen.Blazor
                 return;
             }
 
-            var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : double.Parse(Step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+            var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : decimal.Parse(Step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
 
-            var valueToUpdate = Value != null ? Convert.ChangeType(Value, typeof(decimal)) : (decimal)Convert.ChangeType(default(decimal), typeof(decimal));
+            var valueToUpdate = Value != null ? ConvertToDecimal(Value) : default;
 
-            var newValue = ((decimal)Convert.ChangeType(valueToUpdate, typeof(decimal))) + (decimal)Convert.ChangeType(stepUp ? step : -step, typeof(decimal));
+            var newValue = valueToUpdate + (stepUp ? step : -step);
 
             if (Max.HasValue && newValue > Max.Value || Min.HasValue && newValue < Min.Value || object.Equals(Value, newValue))
             {
                 return;
             }
 
-            Value = (TValue)ConvertType.ChangeType(newValue, typeof(TValue));
+            Value = ConvertFromDecimal(newValue);
 
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
@@ -134,7 +134,7 @@ namespace Radzen.Blazor
                 {
                     if (Format != null)
                     {
-                        decimal decimalValue = (decimal)Convert.ChangeType(Value, typeof(decimal));
+                        decimal decimalValue = ConvertToDecimal(Value);
                         return decimalValue.ToString(Format, Culture);
                     }
                     return Value.ToString();
@@ -337,7 +337,7 @@ namespace Radzen.Blazor
             decimal? newValueAsDecimal;
             try
             {
-                newValueAsDecimal = newValue == null ? default(decimal?) : (decimal)ConvertType.ChangeType(newValue, typeof(decimal));
+                newValueAsDecimal = ConvertToDecimal(newValue);
             }
             catch
             {
@@ -353,7 +353,33 @@ namespace Radzen.Blazor
             {
                 newValueAsDecimal = Min.Value;
             }
-            return (TValue)ConvertType.ChangeType(newValueAsDecimal, typeof(TValue));
+            return ConvertFromDecimal(newValueAsDecimal);
+        }
+
+        private decimal ConvertToDecimal(TValue input)
+        {
+            if (input == null)
+                return default;
+
+            var converter = TypeDescriptor.GetConverter(typeof(TValue));
+            if (converter.CanConvertTo(typeof(decimal)))
+                return (decimal)converter.ConvertTo(null, Culture, input, typeof(decimal));
+            
+            return (decimal)ConvertType.ChangeType(input, typeof(decimal));
+        }
+
+        private TValue ConvertFromDecimal(decimal? input)
+        {
+            if (input == null)
+                return default;
+
+            var converter = TypeDescriptor.GetConverter(typeof(TValue));
+            if (converter.CanConvertFrom(typeof(decimal)))
+            {
+                return (TValue)converter.ConvertFrom(null, Culture, input);
+            }
+            
+            return (TValue)ConvertType.ChangeType(input, typeof(TValue));
         }
 
         /// <summary>
