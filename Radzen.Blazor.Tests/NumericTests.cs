@@ -452,5 +452,32 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains($" value=\"{valueToTest.ToString(format)}\"", component.Markup);
         }
+
+        [Fact]
+        public void Numeric_Supports_IComparable()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenNumeric<Dollars>>();
+
+            var maxValue = 2;
+
+            component.SetParametersAndRender(parameters =>
+            {
+                component.SetParametersAndRender(parameters =>
+                {
+                    parameters.Add(p => p.Value, new Dollars(1m));
+                    parameters.Add(p => p.Max, maxValue);
+                });
+            });
+            
+            component.Find("input").Change("13.53");
+
+            var maxDollars = new Dollars(2);
+            Assert.Contains($" value=\"{maxDollars.ToString()}\"", component.Markup);
+            Assert.Equal(component.Instance.Value, maxDollars);
+        }
     }
 }

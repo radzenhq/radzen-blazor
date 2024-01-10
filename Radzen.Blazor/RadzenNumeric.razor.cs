@@ -2,6 +2,7 @@
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -334,6 +335,14 @@ namespace Radzen.Blazor
         
         private TValue CheckBounds(TValue newValue)
         {
+            if (newValue is IComparable<decimal> c)
+            {
+                if (Max.HasValue && c.CompareTo(Max.Value) > 0)
+                    return ConvertFromDecimal(Max.Value);
+                if (Min.HasValue && c.CompareTo(Min.Value) < 0)
+                    return ConvertFromDecimal(Min.Value);
+            }
+
             decimal? newValueAsDecimal;
             try
             {
