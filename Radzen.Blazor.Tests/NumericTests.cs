@@ -435,9 +435,4 @@ namespace Radzen.Blazor.Tests
             Assert.Contains($" value=\"{newValue.ToString()}\"", component.Markup);
         }
     }
-    
-    public readonly record struct Dollars(decimal Amount)
-    {
-        public override string ToString() => Amount.ToString("F2", System.Globalization.CultureInfo.CreateSpecificCulture("en-US"));
-    }
 }
