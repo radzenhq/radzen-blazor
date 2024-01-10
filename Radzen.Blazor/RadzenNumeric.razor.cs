@@ -317,10 +317,7 @@ namespace Radzen.Blazor
                 return;
             }
 
-            if (Max.HasValue || Min.HasValue)
-            {
-                newValue = CheckBounds(newValue);
-            }
+            newValue = CheckBounds(newValue);
 
             Value = newValue;
             if (!ValueChanged.HasDelegate)
@@ -335,6 +332,11 @@ namespace Radzen.Blazor
         
         private TValue CheckBounds(TValue newValue)
         {
+            if (Max == null && Min == null)
+            {
+                return newValue;
+            }
+
             if (newValue is IComparable<decimal> c)
             {
                 if (Max.HasValue && c.CompareTo(Max.Value) > 0)
