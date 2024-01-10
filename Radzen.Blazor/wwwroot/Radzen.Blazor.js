@@ -1074,23 +1074,25 @@ window.Radzen = {
             lastDialog.removeEventListener('keydown', Radzen.focusTrapDialog);
             lastDialog.addEventListener('keydown', Radzen.focusTrapDialog);
 
-            dialog.offsetWidth = lastDialog.parentElement.offsetWidth;
-            dialog.offsetHeight = lastDialog.parentElement.offsetHeight;
-            var dialogResize = function (e) {
-                if(!dialog) return;
-                if (dialog.offsetWidth != e[0].target.offsetWidth || dialog.offsetHeight != e[0].target.offsetHeight) {
+            if (options.resizable) {
+                dialog.offsetWidth = lastDialog.parentElement.offsetWidth;
+                dialog.offsetHeight = lastDialog.parentElement.offsetHeight;
+                var dialogResize = function (e) {
+                    if (!dialog) return;
+                    if (dialog.offsetWidth != e[0].target.offsetWidth || dialog.offsetHeight != e[0].target.offsetHeight) {
 
-                    dialog.offsetWidth = e[0].target.offsetWidth;
-                    dialog.offsetHeight = e[0].target.offsetHeight;
+                        dialog.offsetWidth = e[0].target.offsetWidth;
+                        dialog.offsetHeight = e[0].target.offsetHeight;
 
-                    dialog.invokeMethodAsync(
-                        'RadzenDialog.OnResize',
-                        e[0].target.offsetWidth,
-                        e[0].target.offsetHeight
-                    );
-                }
-            };
-            Radzen.dialogResizer = new ResizeObserver(dialogResize).observe(lastDialog.parentElement);
+                        dialog.invokeMethodAsync(
+                            'RadzenDialog.OnResize',
+                            e[0].target.offsetWidth,
+                            e[0].target.offsetHeight
+                        );
+                    }
+                };
+                Radzen.dialogResizer = new ResizeObserver(dialogResize).observe(lastDialog.parentElement);
+            }
 
             if (options.autoFocusFirstElement) {
                 if (lastDialog.querySelectorAll('.rz-html-editor-content').length) {
