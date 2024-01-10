@@ -50,7 +50,7 @@
             <div id="@(Grid.getColumnUniqueId(ColumnIndex) + "-resizer")" style="cursor:col-resize;float:right;"
                     @onclick:preventDefault="true" @onclick:stopPropagation="true" class="rz-column-resizer"
                     @onmousedown:preventDefault="true"
-                    @onmousedown=@(args => Grid.StartColumnResize(args, ColumnIndex))>&nbsp;</div>
+                    @onmousedown=@StartColumnResize>&nbsp;</div>
         }
         @if (Grid.AllowFiltering && Column.Filterable && Grid.FilterMode == FilterMode.Advanced)
         {
@@ -277,6 +277,14 @@ else
         if (popup != null)
         {
             await popup.CloseAsync(filterButton);
+        }
+    }
+
+    async Task StartColumnResize(MouseEventArgs args)
+    {
+        if(args.Button == 0) 
+        { 
+            await Grid.StartColumnResize(args, ColumnIndex);
         }
     }
 }
