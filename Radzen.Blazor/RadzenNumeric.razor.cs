@@ -135,6 +135,10 @@ namespace Radzen.Blazor
                 {
                     if (Format != null)
                     {
+                        if (Value is IFormattable formattable)
+                        {
+                            return formattable.ToString(Format, Culture);
+                        }
                         decimal decimalValue = ConvertToDecimal(Value);
                         return decimalValue.ToString(Format, Culture);
                     }
