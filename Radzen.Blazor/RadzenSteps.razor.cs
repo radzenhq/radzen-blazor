@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -160,6 +161,12 @@ namespace Radzen.Blazor
         /// <value>The change callback.</value>
         [Parameter]
         public EventCallback<int> Change { get; set; }
+
+        /// <summary>
+        /// Gets or sets which will be called before changing step to ensure step can be changed
+        /// </summary>
+        [Parameter]
+        public Func<bool> CanChange { get; set; }
 
         private string _nextStep = "Next";
         /// <summary>
@@ -325,6 +332,12 @@ namespace Radzen.Blazor
 
         internal async System.Threading.Tasks.Task SelectStep(RadzenStepsItem step, bool raiseChange = false)
         {
+            var canChange = CanChange?.Invoke() ?? true;
+            if (!canChange)
+            {
+                return;
+            }
+
             var valid = true;
 
             if (EditContext != null)
