@@ -351,6 +351,7 @@ namespace Radzen.Blazor
                     return ConvertFromDecimal(Max.Value);
                 if (Min.HasValue && c.CompareTo(Min.Value) < 0)
                     return ConvertFromDecimal(Min.Value);
+                return newValue;
             }
 
             decimal? newValueAsDecimal;
