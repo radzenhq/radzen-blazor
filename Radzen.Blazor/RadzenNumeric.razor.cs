@@ -321,7 +321,7 @@ namespace Radzen.Blazor
 
             newValue = ApplyMinMax(newValue);
 
-            if (object.Equals(Value, newValue) && (!ValueChanged.HasDelegate || !string.IsNullOrEmpty(Format)))
+            if (EqualityComparer<TValue>.Default.Equals(Value, newValue))
             {
                 await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
                 return;
