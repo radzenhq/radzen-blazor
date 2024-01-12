@@ -68,3 +68,13 @@
 <RadzenExample ComponentName="Numeric" Example="NumericConvertValue">
     <NumericConvertValue />
 </RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Custom Numeric Type Support
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Types that can be converted from a string, via a <code>TypeConverter</code> or assigning <code>ConvertValue</code>, get basic support from <strong>Numeric</strong>.  If the type implements a TypeConverter that can convert to/from decimal, then <code>Step</code> and <code>Min</code>/<code>Max</code> are supported.  If the type implements <code>IFormattable</code>, <code>Format</code> strings will be passed to it.
+</RadzenText>
+<RadzenExample ComponentName="Numeric" Example="NumericCustomType">
+    <NumericCustomType />
+</RadzenExample>

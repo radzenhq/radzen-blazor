@@ -83,9 +83,9 @@ namespace Radzen.Blazor
                 return;
             }
 
-            var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : decimal.Parse(Step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+            var step = decimal.TryParse(Step?.Replace(",", "."), out var stepVal) ? stepVal : 1;
 
-            var valueToUpdate = Value != null ? ConvertToDecimal(Value) : default;
+            var valueToUpdate = ConvertToDecimal(Value);
 
             var newValue = valueToUpdate + (stepUp ? step : -step);
 
@@ -135,6 +135,10 @@ namespace Radzen.Blazor
                 {
                     if (Format != null)
                     {
+                        if (Value is IFormattable formattable)
+                        {
+                            return formattable.ToString(Format, Culture);
+                        }
                         decimal decimalValue = ConvertToDecimal(Value);
                         return decimalValue.ToString(Format, Culture);
                     }
@@ -297,7 +301,11 @@ namespace Radzen.Blazor
             TValue newValue;
             try
             {
-                if (ConvertValue != null)
+                if (value is TValue typedValue)
+                {
+                    newValue = typedValue;
+                }
+                else if (ConvertValue != null)
                 {
                     newValue = ConvertValue($"{value}");
                 }
@@ -311,13 +319,13 @@ namespace Radzen.Blazor
                 newValue = default(TValue);
             }
 
-            if (object.Equals(Value, newValue) && (!ValueChanged.HasDelegate || !string.IsNullOrEmpty(Format)))
+            newValue = ApplyMinMax(newValue);
+
+            if (EqualityComparer<TValue>.Default.Equals(Value, newValue))
             {
                 await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
                 return;
             }
-
-            newValue = CheckBounds(newValue);
 
             Value = newValue;
             if (!ValueChanged.HasDelegate)
@@ -330,7 +338,7 @@ namespace Radzen.Blazor
             await Change.InvokeAsync(Value);
         }
         
-        private TValue CheckBounds(TValue newValue)
+        private TValue ApplyMinMax(TValue newValue)
         {
             if (Max == null && Min == null)
             {
@@ -343,6 +351,7 @@ namespace Radzen.Blazor
                     return ConvertFromDecimal(Max.Value);
                 if (Min.HasValue && c.CompareTo(Min.Value) < 0)
                     return ConvertFromDecimal(Min.Value);
+                return newValue;
             }
 
             decimal? newValueAsDecimal;
@@ -352,7 +361,7 @@ namespace Radzen.Blazor
             }
             catch
             {
-                newValueAsDecimal = default(TValue) == null ? default(decimal?) : (decimal)ConvertType.ChangeType(default(TValue), typeof(decimal));
+                newValueAsDecimal = default;
             }
 
             if (newValueAsDecimal > Max)
@@ -415,22 +424,14 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
-            if (minChanged && Min.HasValue && Value != null && IsJSRuntimeAvailable)
+            if (minChanged && IsJSRuntimeAvailable)
             {
-                decimal decimalValue = (decimal)Convert.ChangeType(Value, typeof(decimal));
-                if (decimalValue < Min.Value)
-                {
-                    await InternalValueChanged(Min.Value);
-                }
+                await InternalValueChanged(Value);
             }
 
-            if (maxChanged && Max.HasValue && Value != null && IsJSRuntimeAvailable)
+            if (maxChanged && IsJSRuntimeAvailable)
             {
-                decimal decimalValue = (decimal)Convert.ChangeType(Value, typeof(decimal));
-                if (decimalValue > Max.Value)
-                {
-                    await InternalValueChanged(Max.Value);
-                }
+                await InternalValueChanged(Value);
             }
         }
 

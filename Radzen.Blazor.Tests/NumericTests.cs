@@ -479,5 +479,24 @@ namespace Radzen.Blazor.Tests
             Assert.Contains($" value=\"{maxDollars.ToString()}\"", component.Markup);
             Assert.Equal(component.Instance.Value, maxDollars);
         }
+
+        [Fact]
+        public void Numeric_Supports_IFormattable()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = new Temperature(60.23m);
+            const string format = "F";
+
+            var component = ctx.RenderComponent<RadzenNumeric<Temperature>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Temperature>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Temperature>.Value), valueToTest)
+            );
+
+            component.Render();
+
+            var input = component.Find("input").GetAttribute("value");
+            input.MarkupMatches(valueToTest.ToString(format));
+        }
     }
 }
