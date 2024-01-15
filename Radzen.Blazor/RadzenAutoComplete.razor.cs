@@ -76,6 +76,12 @@ namespace Radzen.Blazor
         public string InputType { get; set; } = "text";
 
         /// <summary>
+        /// Gets or sets the underlying max length.
+        /// </summary>
+        /// <value>The max length value.</value>
+        public long? MaxLength { get; set; }
+
+        /// <summary>
         /// Gets search input reference.
         /// </summary>
         protected ElementReference search;
