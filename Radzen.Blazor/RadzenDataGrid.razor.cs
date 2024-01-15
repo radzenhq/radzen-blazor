@@ -527,6 +527,12 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment HeaderTemplate { get; set; } 
 
+        /// <summary>
+        /// Gives the grid a custom footer, allowing the adding of components to create custom tool bars or custom pagination
+        /// </summary>
+        [Parameter]
+        public RenderFragment FooterTemplate { get; set; }
+
         internal object selectedColumns;
 
         /// <summary>

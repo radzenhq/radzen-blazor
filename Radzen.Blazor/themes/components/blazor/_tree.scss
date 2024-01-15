@@ -2,11 +2,11 @@ $tree-background-color: var(--rz-base-background-color) !default;
 
 $tree-node-padding: 0.25rem !default;
 $tree-node-selected-background-color: var(--rz-secondary) !default;
-$tree-node-selected-color: var(--rz-text-contrast-color) !default;
+$tree-node-selected-color: var(--rz-on-secondary) !default;
 $tree-node-selected-border-radius: calc(var(--rz-border-radius)/2) !default;
 $tree-node-margin: 1px 0 !default;
 $tree-node-hover-background-color: var(--rz-secondary-light) !default;
-$tree-node-hover-color: var(--rz-text-contrast-color) !default;
+$tree-node-hover-color: var(--rz-on-secondary-light) !default;
 $tree-node-toggle-width: 1rem !default;
 $tree-node-toggle-color: var(--rz-text-tertiary-color) !default;
 $tree-node-toggle-hover-color: var(--rz-text-color) !default;

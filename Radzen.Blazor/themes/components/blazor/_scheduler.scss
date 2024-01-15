@@ -1,4 +1,4 @@
-$scheduler-toolbar-color: var(--rz-text-contrast-color) !default;
+$scheduler-toolbar-color: var(--rz-on-secondary) !default;
 $scheduler-toolbar-button-background-color: var(--rz-secondary) !default;
 
 // -----
@@ -33,7 +33,7 @@ $scheduler-today-button-text-transform: uppercase !default;
 $scheduler-view-button-border: var(--rz-border-normal) !default;
 $scheduler-view-button-color: var(--rz-text-secondary-color) !default;
 $scheduler-view-button-background-color: var(--rz-base-background-color) !default;
-$scheduler-view-selected-color: var(--rz-text-contrast-color) !default;
+$scheduler-view-selected-color: var(--rz-on-secondary) !default;
 $scheduler-view-selected-background-color: var(--rz-secondary) !default;
 $scheduler-view-selected-border-color: $scheduler-view-selected-background-color !default;
 
@@ -45,7 +45,7 @@ $scheduler-header-color: inherit !default;
 $scheduler-header-border: var(--rz-border-normal) !default;
 $scheduler-header-padding: 0.5rem 0 !default;
 
-$scheduler-event-color: var(--rz-text-contrast-color) !default;
+$scheduler-event-color: var(--rz-on-info) !default;
 $scheduler-event-background-color: var(--rz-info) !default;
 $scheduler-event-font-size: 0.75rem !default;
 $scheduler-event-line-height: 1.25rem !default;
