@@ -338,15 +338,14 @@ $scheduler-prev-next-button-background-color: var(--rz-base-200) !default;
 $scheduler-prev-next-button-color: var(--rz-text-color) !default;
 $scheduler-view-button-color: var(--rz-text-color) !default;
 $scheduler-view-button-background-color: transparent !default;
-$scheduler-view-selected-background-color: lighten($rz-primary-lighter, 20%) !default;
+$scheduler-view-selected-background-color: var(--rz-primary-lighter) !default;
 $scheduler-view-selected-border-color: transparent !default;
-$scheduler-view-selected-color: var(--rz-primary) !default;
+$scheduler-view-selected-color: var(--rz-on-primary-lighter) !default;
 $scheduler-header-background-color: var(--rz-base-100) !default;
 $scheduler-header-color: var(--rz-text-tertiary-color) !default;
 $scheduler-border-color: var(--rz-base-200) !default;
 $scheduler-minor-border-color: var(--rz-base-100) !default;
 $scheduler-color: var(--rz-text-color) !default;
-$scheduler-event-color: var(--rz-text-contrast-color) !default;
 
 // Overlay Panel
 $overlay-shadow: $rz-shadow-3 !default;
