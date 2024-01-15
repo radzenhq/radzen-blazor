@@ -5,7 +5,7 @@ $numeric-button-height: $numeric-button-width !default;
 $numeric-button-offset: 2px !default;
 $numeric-button-border-radius: calc(var(--rz-border-radius) - 2px) !default;
 $numeric-button-background-color: var(--rz-secondary) !default;
-$numeric-button-color: var(--rz-text-contrast-color) !default;
+$numeric-button-color: var(--rz-on-secondary) !default;
 $numeric-button-disabled-background-color: var(--rz-base-300) !default;
 $numeric-button-disabled-color: var(--rz-text-disabled-color) !default;
 
