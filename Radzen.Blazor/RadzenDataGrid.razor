@@ -5,11 +5,10 @@
 @typeparam TItem
 @inherits PagedDataBoundComponent<TItem>
 
+<CascadingValue Value=this>
 @if (Columns != null)
 {
-    <CascadingValue Value=this>
         @Columns
-    </CascadingValue>
 }
 
 @if (Visible)
@@ -433,6 +432,7 @@
         }
     </div>
 }
+</CascadingValue>
 @code {
     internal void SetAttribute(Dictionary<string, object> attributes, string attributeName, object attributeValue)
     {
