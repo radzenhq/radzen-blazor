@@ -173,8 +173,8 @@ $button-active-background-size: 100% 0%, 100% 200%  !default;
 
 // SelectButton
 $selectbar-background-color: transparent !default;
-$selectbar-selected-background-color: lighten($rz-primary-lighter, 20%) !default;
-$selectbar-selected-color: $rz-primary !default;
+$selectbar-selected-background-color: var(--rz-primary-lighter) !default;
+$selectbar-selected-color: var(--rz-on-primary-lighter) !default;
 $selectbar-selected-border: var(--rz-border-normal) !default;
 
 
