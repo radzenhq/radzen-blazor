@@ -588,8 +588,9 @@ $rating-disabled-opacity: 0.5 !default;
 // Upload
 $upload-button-bar-background-color: var(--rz-base-100) !default;
 $upload-choose-background-color: var(--rz-secondary-lighter) !default;
-$upload-choose-color: var(--rz-secondary) !default;
+$upload-choose-color: var(--rz-on-secondary-lighter) !default;
 $upload-choose-hover-background-color: var(--rz-secondary-light) !default;
+$upload-choose-hover-color: var(--rz-on-secondary-light) !default;
 $upload-cancel-background-color: var(--rz-base-300) !default;
 
 // Dialog

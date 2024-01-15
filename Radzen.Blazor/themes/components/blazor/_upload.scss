@@ -10,11 +10,11 @@ $upload-files-remove-color: var(--rz-text-color) !default;
 $upload-files-margin: 0 0.5rem !default;
 
 $upload-choose-background-color: var(--rz-secondary) !default;
-$upload-choose-color: var(--rz-text-contrast-color) !default;
+$upload-choose-color: var(--rz-on-secondary) !default;
 $upload-choose-hover-background-color: var(--rz-secondary) !default;
-$upload-choose-hover-color: var(--rz-text-contrast-color) !default;
+$upload-choose-hover-color: var(--rz-on-secondary) !default;
 $upload-choose-active-background-color: var(--rz-secondary-dark) !default;
-$upload-choose-active-color: var(--rz-text-contrast-color) !default;
+$upload-choose-active-color: var(--rz-on-secondary-dark) !default;
 
 $upload-cancel-background-color: var(--rz-base-200) !default;
 $upload-cancel-color: var(--rz-text-color) !default;
