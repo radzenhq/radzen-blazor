@@ -50,6 +50,12 @@ namespace Radzen.Blazor
         public string FirstPageAriaLabel { get; set; } = "Go to first page.";
 
         /// <summary>
+        /// Gets or sets the pager's optional previous page button's label text.
+        /// </summary>
+        [Parameter]
+        public string PrevPageLabel { get; set; }
+
+        /// <summary>
         /// Gets or sets the pager's previous page button's title attribute.
         /// </summary>
         [Parameter]
@@ -74,6 +80,12 @@ namespace Radzen.Blazor
         public string LastPageAriaLabel { get; set; } = "Go to last page.";
 
         /// <summary>
+        /// Gets or sets the pager's optional next page button's label text.
+        /// </summary>
+        [Parameter]
+        public string NextPageLabel { get; set; }
+
+        /// <summary>
         /// Gets or sets the pager's next page button's title attribute.
         /// </summary>
         [Parameter]
@@ -84,19 +96,19 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string NextPageAriaLabel { get; set; } = "Go to next page.";
-        
+
         /// <summary>
         /// Gets or sets the pager's numeric page number buttons' title attributes.
         /// </summary>
         [Parameter]
         public string PageTitleFormat { get; set; } = "Page {0}";
-        
+
         /// <summary>
         /// Gets or sets the pager's numeric page number buttons' aria-label attributes.
         /// </summary>
         [Parameter]
         public string PageAriaLabelFormat { get; set; } = "Go to page {0}.";
-        
+
         /// <summary>
         /// Gets or sets the horizontal align.
         /// </summary>

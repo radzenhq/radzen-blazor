@@ -207,6 +207,12 @@ namespace Radzen
         public string FirstPageAriaLabel { get; set; } = "Go to first page.";
 
         /// <summary>
+        /// Gets or sets the pager's optional previous page button's label text.
+        /// </summary>
+        [Parameter]
+        public string PrevPageLabel { get; set; }
+
+        /// <summary>
         /// Gets or sets the pager's previous page button's title attribute.
         /// </summary>
         [Parameter]
@@ -229,6 +235,12 @@ namespace Radzen
         /// </summary>
         [Parameter]
         public string LastPageAriaLabel { get; set; } = "Go to last page.";
+
+        /// <summary>
+        /// Gets or sets the pager's optional next page button's label text.
+        /// </summary>
+        [Parameter]
+        public string NextPageLabel { get; set; }
 
         /// <summary>
         /// Gets or sets the pager's next page button's title attribute.
