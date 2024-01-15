@@ -34,7 +34,16 @@
                         <span class=@IconClassList(item)></span>
                     </div>
                 </div>
-                <label class="rz-chkbox-label">@((MarkupString)item.Text)</label>
+                @if (item.Template != null)
+                {
+                    <div class="rz-checkbox-template">
+                        @item.Template(item)
+                    </div>
+                }
+                else
+                {
+                    <label class="rz-chkbox-label">@((MarkupString)item.Text)</label>
+                }
             </div>
         }
     </div>
