@@ -16,6 +16,13 @@ namespace Radzen.Blazor
         public string Text { get; set; }
 
         /// <summary>
+        /// Gets or sets the template.
+        /// </summary>
+        /// <value>The template.</value>
+        [Parameter]
+        public RenderFragment<RadzenCheckBoxListItem<TValue>> Template { get; set; }
+
+        /// <summary>
         /// Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
