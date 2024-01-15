@@ -1,0 +1,125 @@
+﻿<RadzenSteps @bind-SelectedIndex="@_selectedIndex" Change="@OnChange" CanChangeAsync="@CanChangeAsync">
+    <Steps>
+        <RadzenStepsItem>
+            <RadzenRow>
+                <RadzenText Text="Enter user information"/>
+            </RadzenRow>
+            <RadzenTextBox Placeholder="Name" @bind-Value="_name"/>
+            <RadzenTextBox Placeholder="Address" @bind-Value="_address"/>
+            <RadzenButton Text="Save" Click="@SaveNameAndAdress" />
+        </RadzenStepsItem>
+        <RadzenStepsItem>
+            <RadzenRow>
+                <RadzenText Text="Enter about me" />
+            </RadzenRow>
+            <RadzenTextArea Placeholder="About me" @bind-Value="_aboutMe" />
+            <RadzenButton Text="Save" Click="@SaveAboutMe" />
+        </RadzenStepsItem>
+        <RadzenStepsItem>
+            <RadzenRow>
+                <RadzenText Text="Add your hobbies" />
+            </RadzenRow>
+            <RadzenDataGrid TItem="Hobby"
+                            Data="@_hobbies"
+                            @bind-Value="@_selectedHobbies"
+                            SelectionMode="DataGridSelectionMode.Multiple"
+                            AllowRowSelectOnRowClick="true" >
+                <Columns>
+                    <RadzenDataGridColumn TItem="Hobby" Context="hobby">
+                         <Template>
+                            <RadzenCheckBox Value="_selectedHobbies.Contains(hobby)" TValue="bool"/>
+                        </Template> 
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Hobby" Title="Hobby" Property="@nameof(Hobby.HobbyName)" />
+                </Columns>
+            </RadzenDataGrid>
+            <RadzenButton Text="Save" Click="@SaveHobbies" />
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    private int _selectedIndex;
+    private string _name;
+    private string _savedName;
+
+    private string _address;
+    private string _savedAddress;
+
+    private string _aboutMe;
+    private string _savedAboutMe;
+
+    private List<Hobby> _hobbies = new List<Hobby>() { new("Games"), new("Sport"), new("Movies"), new("Books"), new("Music") };
+    private IList<Hobby> _selectedHobbies = new List<Hobby>();
+    private List<Hobby> _savedHobbies = new List<Hobby>();
+
+    [Inject]
+    private DialogService DialogService { get; set; }
+
+    private void OnChange()
+    {
+        _name = _savedName;
+        _address = _savedAddress;
+
+        _aboutMe = _savedAboutMe;
+
+        _selectedHobbies = _savedHobbies;
+    }
+
+    private async Task<bool> CanChangeAsync()
+    {
+        if (_selectedIndex == 0 && _savedName == _name && _savedAddress == _address)
+        {
+            return true;
+        }
+
+        if (_selectedIndex == 1 && _savedAboutMe == _aboutMe)
+        {
+            return true;
+        }
+
+        if (_selectedIndex == 2 && _savedHobbies.SequenceEqual(_selectedHobbies))
+        {
+            return true;
+        }
+
+        var response = await DialogService.Confirm("Are you sure you want to contine without saving?", "Confirm");
+        return response ?? true;
+    }
+
+    private void SaveNameAndAdress()
+    {
+        _savedName = _name;
+        _savedAddress = _address;
+    }
+
+    private void SaveAboutMe()
+    {
+        _savedAboutMe = _aboutMe;
+    }
+
+    private void SaveHobbies()
+    {
+        _savedHobbies = _selectedHobbies.ToList();
+    }
+
+    private class Hobby
+    {
+        public Hobby(string hobbyName)
+        {
+            HobbyName = hobbyName;
+        }
+
+        public string HobbyName { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Hobby hobby && hobby.HobbyName == HobbyName;
+        }
+
+        public override int GetHashCode()
+        {
+            return HobbyName.GetHashCode();
+        }
+    }
+}

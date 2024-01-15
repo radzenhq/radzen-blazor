@@ -168,6 +168,12 @@ namespace Radzen.Blazor
         [Parameter]
         public Func<bool> CanChange { get; set; }
 
+        /// <summary>
+        /// Gets or sets which will be called before changing step to ensure step can be changed
+        /// </summary>
+        [Parameter]
+        public Func<Task<bool>> CanChangeAsync { get; set; }
+
         private string _nextStep = "Next";
         /// <summary>
         /// Gets or sets the next button text.
@@ -336,6 +342,15 @@ namespace Radzen.Blazor
             if (!canChange)
             {
                 return;
+            }
+
+            if (CanChangeAsync != null)
+            {
+                canChange = await CanChangeAsync.Invoke();
+                if (!canChange)
+                {
+                    return;
+                }
             }
 
             var valid = true;
