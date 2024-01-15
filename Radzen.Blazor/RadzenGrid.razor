@@ -17,7 +17,7 @@
     var grid = Reference;
     var visibleColumns = columns.Where(c => c.Visible).ToList();
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-    @if (AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
+    @if (AllowPaging && PagerPosition.HasFlag(PagerPosition.Top))
     {
             <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" ShowPagingSummary="@ShowPagingSummary" Density="@Density" />
     }
@@ -480,7 +480,7 @@
             </div>
         </div>
 
-        @if (AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
+        @if (AllowPaging && PagerPosition.HasFlag(PagerPosition.Bottom))
         {
             <RadzenPager @ref="bottomPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" ShowPagingSummary="@ShowPagingSummary" class="rz-paginator-bottom" Density="@Density" />
         }
