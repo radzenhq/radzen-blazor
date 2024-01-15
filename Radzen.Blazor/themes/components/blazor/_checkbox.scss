@@ -74,7 +74,8 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
   cursor: initial;
 }
 
-.rz-chkbox-label {
+.rz-chkbox-label,
+.rz-chkbox-template {
   margin: var(--rz-checkbox-label-margin);
 }
 
