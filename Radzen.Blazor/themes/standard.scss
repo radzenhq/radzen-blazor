@@ -566,10 +566,10 @@ $radio-checked-border: var(--rz-input-border) !default;
 $dropdown-item-hover-background-color: var(--rz-primary-lighter) !default;
 $dropdown-item-selected-background-color: var(--rz-primary-lighter) !default;
 $dropdown-item-selected-shadow: none !default;
-$dropdown-item-hover-color: var(--rz-primary) !default;
-$dropdown-item-selected-color: var(--rz-primary) !default;
+$dropdown-item-hover-color: var(--rz-on-primary-lighter) !default;
+$dropdown-item-selected-color: var(--rz-on-primary-lighter) !default;
 $dropdown-item-selected-hover-background-color: var(--rz-primary-lighter) !default;
-$dropdown-item-selected-hover-color: var(--rz-primary) !default;
+$dropdown-item-selected-hover-color: var(--rz-on-primary-lighter) !default;
 $dropdown-item-transition: var(--rz-transition-all) !default;
 $dropdown-filter-border: var(--rz-border-base-200) !default;
 
