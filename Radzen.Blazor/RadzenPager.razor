@@ -12,6 +12,10 @@
         </a>
         <a class="rz-paginator-prev rz-paginator-element @((skip > 0) ? "": "rz-state-disabled")" tabindex="-1" @onclick:preventDefault="true" @onclick="@(() => PrevPage())" aria-label="@PrevPageAriaLabel" title="@PrevPageTitle">
             <span class="rz-paginator-icon rzi rzi-caret-left"></span>
+            @if (PrevPageLabel != null)
+            {
+                <span class="rz-paginator-label">@PrevPageLabel</span>
+            }
         </a>
 
         <span class="rz-paginator-pages">
@@ -21,6 +25,10 @@
             }
         </span>
         <a class="rz-paginator-next rz-paginator-element @((CurrentPage != numberOfPages - 1) ? "": "rz-state-disabled")" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => NextPage())" aria-label="@NextPageAriaLabel" title="@NextPageTitle">
+            @if (NextPageLabel != null)
+            {
+                <span class="rz-paginator-label">@NextPageLabel</span>
+            }
             <span class="rz-paginator-icon rzi rzi-caret-right"></span>
         </a>
         <a class="rz-paginator-last rz-paginator-element  @((CurrentPage != numberOfPages - 1) ? "": "rz-state-disabled")" tabindex="0" @onclick:preventDefault="true" @onclick="@(() => LastPage())" aria-label="@LastPageAriaLabel" title="@LastPageTitle">
