@@ -2,7 +2,7 @@ $form-error-color: var(--rz-danger) !default;
 $form-error-font-size: 0.75rem !default;
 $form-group-margin-bottom: 1.5rem !default; // Bootstrap override
 $validator-background-color: var(--rz-danger) !default;
-$validator-color: var(--rz-text-contrast-color) !default;
+$validator-color: var(--rz-on-danger) !default;
 $validator-shadow: 0 6px 14px 0 rgba($rz-danger, 0.3) !default;
 $validator-text-padding: 0 !default;
 $validator-padding: 0.25rem 0.5rem !default;
