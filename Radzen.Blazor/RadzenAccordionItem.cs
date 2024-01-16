@@ -76,7 +76,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The header content.</value>
         [Parameter]
-        public RenderFragment HeaderTemplate { get; set; }
+        public RenderFragment Template { get; set; }
 
         bool _visible = true;
         /// <summary>
