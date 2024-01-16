@@ -125,6 +125,11 @@ else
                         Filter.FilterOperator = property.GetFilterOperators().FirstOrDefault();
                     }
 
+                    if(Filter.FilterOperator != property.GetFilterOperator())
+                    {
+                        Filter.FilterOperator = property.GetFilterOperator();
+                    }
+
                     var v = property.GetFilterValue();
                     if (v != null)
                     {
