@@ -9,10 +9,10 @@ $grid-cell-font-size: var(--rz-body-font-size) !default;
 $grid-cell-line-height: var(--rz-body-line-height) !default;
 
 $grid-hover-background-color: var(--rz-secondary-lighter) !default;
-$grid-hover-color: var(--rz-secondary-dark) !default;
+$grid-hover-color: var(--rz-on-secondary-lighter) !default;
 
 $grid-selected-background-color: var(--rz-secondary-dark) !default;
-$grid-selected-color: var(--rz-text-contrast-color) !default;
+$grid-selected-color: var(--rz-on-secondary-dark) !default;
 
 $grid-stripe-background-color: var(--rz-base-100) !default;
 
@@ -51,10 +51,10 @@ $grid-filter-buttons-border: var(--rz-border-normal) !default;
 $grid-filter-buttons-background-color: var(--rz-base-200) !default;
 
 $grid-clear-filter-button-background-color: var(--rz-secondary) !default;
-$grid-clear-filter-button-color: var(--rz-text-contrast-color) !default;
+$grid-clear-filter-button-color: var(--rz-on-secondary) !default;
 $grid-clear-filter-button-shadow: inherit !default;
 $grid-apply-filter-button-background-color: var(--rz-primary) !default;
-$grid-apply-filter-button-color: var(--rz-text-contrast-color) !default;
+$grid-apply-filter-button-color: var(--rz-on-primary) !default;
 $grid-apply-filter-button-shadow: inherit !default;
 
 $grid-header-filter-icon-margin: 0 0.5rem 0 auto !default;
