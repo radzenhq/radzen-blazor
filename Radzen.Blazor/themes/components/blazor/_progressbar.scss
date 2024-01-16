@@ -27,7 +27,7 @@ $progressbar-styles: map-merge(
   (
     primary: (
       background-color: var(--rz-primary),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-primary)
     ), 
     light: (
       background-color: var(--rz-base-400),
@@ -39,23 +39,23 @@ $progressbar-styles: map-merge(
     ),
     secondary: ( 
       background-color: var(--rz-secondary),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-secondary)
     ),
     info: (
       background-color: var(--rz-info),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-info)
     ),
     warning: (
       background-color: var(--rz-warning),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-warning)
     ),
     danger: (
       background-color: var(--rz-danger),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-danger)
     ),
     success: (
       background-color: var(--rz-success),
-      color: var(--rz-text-contrast-color)
+      color: var(--rz-on-success)
     )
   ),
   $progressbar-styles
