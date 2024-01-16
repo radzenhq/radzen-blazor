@@ -286,14 +286,14 @@ $input-disabled-color: var(--rz-text-disabled-color) !default;
 // Header
 $header-background-color: var(--rz-primary) !default;
 $header-border: none !default;
-$header-color: var(--rz-text-contrast-color) !default;
+$header-color: var(--rz-on-primary) !default;
 $header-shadow: var(--rz-shadow-4) !default;
 
 .rz-header {
   a,
   a:hover,
   a:focus {
-    color: var(--rz-text-contrast-color);
+    color: var(--rz-on-primary);
   }
 }
 
@@ -341,9 +341,9 @@ $panel-shadow: var(--rz-shadow-1) !default;
 
 // SidebarToggle
 $sidebar-toggle-border: none !default;
-$sidebar-toggle-color: var(--rz-text-contrast-color) !default;
+$sidebar-toggle-color: var(--rz-on-primary) !default;
 $sidebar-toggle-background-color: transparent !default;
-$sidebar-toggle-hover-color: var(--rz-text-contrast-color) !default;
+$sidebar-toggle-hover-color: var(--rz-on-primary-light) !default;
 $sidebar-toggle-hover-background-color: var(--rz-primary-light) !default;
 $sidebar-toggle-hover-border-radius: 50% !default;
 
