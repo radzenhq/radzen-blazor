@@ -429,9 +429,9 @@ $datepicker-trigger-icon-hover-color: var(--rz-text-title-color) !default;
 $datepicker-panel-shadow: $rz-shadow-3 !default;
 $datepicker-header-background-color: var(--rz-base-background-color) !default;
 $datepicker-header-color: var(--rz-text-color) !default;
-$datepicker-calendar-hover-color: var(--rz-primary) !default;
+$datepicker-calendar-hover-color: var(--rz-on-primary-lighter) !default;
 $datepicker-calendar-hover-background-color: var(--rz-primary-lighter) !default;
-$datepicker-calendar-selected-background-color: var(--rz-primary) !default;
+$datepicker-calendar-selected-background-color: var(--rz-on-primary-light) !default;
 $datepicker-calendar-selected-hover-background-color: var(--rz-primary-light) !default;
 $datepicker-calendar-border: none !default;
 $datepicker-calendar-border-radius: var(--rz-border-radius) !default;
@@ -442,6 +442,7 @@ $datepicker-calendar-today-box-shadow: inset 0 0 0 1px var(--rz-primary) !defaul
 $timepicker-background-color: $datepicker-header-background-color !default;
 $timepicker-separator-color: var(--rz-text-disabled-color) !default;
 $timepicker-button-background-color: var(--rz-primary) !default;
+$timepicker-button-color: var(--rz-on-primary) !default;
 $timepicker-button-border-radius: var(--rz-border-radius) !default;
 
 // Fieldset
