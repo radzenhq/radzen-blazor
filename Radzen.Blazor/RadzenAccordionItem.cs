@@ -70,7 +70,14 @@ namespace Radzen.Blazor
         /// <value>The child content.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
-        
+
+        /// <summary>
+        /// Gets or sets the header content.
+        /// </summary>
+        /// <value>The header content.</value>
+        [Parameter]
+        public RenderFragment HeaderTemplate { get; set; }
+
         bool _visible = true;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenAccordionItem"/> is visible.
