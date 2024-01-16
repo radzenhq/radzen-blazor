@@ -394,6 +394,7 @@ $overlay-shadow: $rz-shadow-3 !default;
 // Pager
 $paginator-background-color: transparent !default;
 $paginator-numeric-button-selected-background-color: var(--rz-primary-lighter) !default;
+$paginator-numeric-button-selected-color: var(--rz-on-primary-lighter) !default;
 $paginator-numeric-button-selected-border: 1px solid transparent !default;
 $paginator-summary-color: var(--rz-text-tertiary-color) !default;
 
