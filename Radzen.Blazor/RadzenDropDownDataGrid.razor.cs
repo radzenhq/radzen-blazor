@@ -795,6 +795,8 @@ namespace Radzen.Blazor
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
 
+            await JSRuntime.InvokeVoidAsync("Radzen.focusElement", UniqueID);
+
             if (AllowRowSelectOnRowClick)
             {
                 await SelectItem(item);
