@@ -1,6 +1,7 @@
 ﻿@using Radzen
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Globalization
 @typeparam TValue
 @inherits FormComponent<TValue>
 
@@ -10,7 +11,7 @@
         <input @ref="@input" @attributes="InputAttributes" type="text" inputmode="decimal" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
                class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
                placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" value="@FormattedValue" @onchange="@OnChange"
-               onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower())"
+               onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator')"
            onblur="@getOnInput()" onpaste="@getOnPaste()" />
         @if (ShowUpDown)
         {
