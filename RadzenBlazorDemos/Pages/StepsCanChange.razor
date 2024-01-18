@@ -1,4 +1,4 @@
-﻿<RadzenSteps @bind-SelectedIndex="@_selectedIndex" Change="@OnChange" CanChangeAsync="@CanChangeAsync">
+﻿<RadzenSteps Change="@OnChange" CanChange="@CanChangeAsync">
     <Steps>
         <RadzenStepsItem>
             <RadzenRow>
@@ -39,7 +39,6 @@
 </RadzenSteps>
 
 @code {
-    private int _selectedIndex;
     private string _name;
     private string _savedName;
 
@@ -66,25 +65,39 @@
         _selectedHobbies = _savedHobbies;
     }
 
-    private async Task<bool> CanChangeAsync()
+    private async Task CanChangeAsync(RadzenStepsCanChangeEventArgs args)
     {
-        if (_selectedIndex == 0 && _savedName == _name && _savedAddress == _address)
+        if (args.SelectedIndex == 0 && _savedName == _name && _savedAddress == _address)
         {
-            return true;
+            return;
         }
 
-        if (_selectedIndex == 1 && _savedAboutMe == _aboutMe)
+        if (args.SelectedIndex == 1 && _savedAboutMe == _aboutMe)
         {
-            return true;
+            return;
         }
 
-        if (_selectedIndex == 2 && _savedHobbies.SequenceEqual(_selectedHobbies))
+        if (args.SelectedIndex == 2 && _savedHobbies.SequenceEqual(_selectedHobbies))
         {
-            return true;
+            return;
         }
 
-        var response = await DialogService.Confirm("Are you sure you want to contine without saving?", "Confirm");
-        return response ?? true;
+        var response = await DialogService.Confirm(
+            "Are you sure you want to contine without saving?",
+            "Confirm",
+            new ConfirmOptions()
+            {
+                CloseDialogOnEsc = false,
+                CloseDialogOnOverlayClick = false,
+                ShowClose = false,
+                CancelButtonText = "No",
+                OkButtonText = "Yes",
+            });
+
+        if (response == false)
+        {
+            args.PreventStepChange();
+        }
     }
 
     private void SaveNameAndAdress()

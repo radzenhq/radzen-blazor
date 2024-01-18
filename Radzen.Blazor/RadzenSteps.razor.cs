@@ -163,16 +163,23 @@ namespace Radzen.Blazor
         public EventCallback<int> Change { get; set; }
 
         /// <summary>
-        /// Gets or sets which will be called before changing step to ensure step can be changed
+        /// A callback that will be invoked when the user tries to change the step.
+        /// Invoke the <see cref="RadzenStepsCanChangeEventArgs.PreventStepChange"/> method to prevent this change.
         /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenSteps CanChange=@OnCanChange&gt;
+        /// &lt;/RadzenSteps&gt;
+        /// @code {
+        ///  void OnCanChange(RadzenStepsCanChangeEventArgs args)
+        ///  {
+        ///     args.PreventStepChange();
+        ///  }
+        /// }
+        /// </code>
+        /// </example>
         [Parameter]
-        public Func<bool> CanChange { get; set; }
-
-        /// <summary>
-        /// Gets or sets which will be called before changing step to ensure step can be changed
-        /// </summary>
-        [Parameter]
-        public Func<Task<bool>> CanChangeAsync { get; set; }
+        public EventCallback<RadzenStepsCanChangeEventArgs> CanChange { get; set; }
 
         private string _nextStep = "Next";
         /// <summary>
@@ -338,19 +345,13 @@ namespace Radzen.Blazor
 
         internal async System.Threading.Tasks.Task SelectStep(RadzenStepsItem step, bool raiseChange = false)
         {
-            var canChange = CanChange?.Invoke() ?? true;
-            if (!canChange)
+            var newIndex = steps.IndexOf(step);
+
+            var canChangeArgs = new RadzenStepsCanChangeEventArgs(SelectedIndex, newIndex);
+            await CanChange.InvokeAsync(canChangeArgs);
+            if (canChangeArgs.IsStepChangePrevented)
             {
                 return;
-            }
-
-            if (CanChangeAsync != null)
-            {
-                canChange = await CanChangeAsync.Invoke();
-                if (!canChange)
-                {
-                    return;
-                }
             }
 
             var valid = true;
@@ -359,8 +360,6 @@ namespace Radzen.Blazor
             {
                 valid = EditContext.Validate();
             }
-
-            var newIndex = steps.IndexOf(step);
 
             if (valid || newIndex < SelectedIndex)
             {
