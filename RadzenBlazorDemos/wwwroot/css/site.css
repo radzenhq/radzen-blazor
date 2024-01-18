@@ -356,7 +356,8 @@ pre {
     padding: 0 0.25rem;
     font-size: 0.8125em !important;
     line-height: 1.25rem;
-    background:rgba(0,0,0,.08);
+    background: var(--rz-base-100);
+    color: var(--rz-base-800);
     border-radius: 0.25rem;
 }
 
