@@ -71,7 +71,7 @@ $grid-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $grid-background-color: var(--rz-base-background-color) !default;
 
 $grid-stripe-background-color: var(--rz-base-100) !default;
-$grid-stripe-background-color-odd: var(--rz-base-background-color) !default;
+$grid-stripe-odd-background-color: $grid-background-color !default;
 
 $grid-column-resizer-width: 0.5rem !default;
 $grid-column-resizer-helper-width: 0.25rem !default;
@@ -124,9 +124,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
   --rz-grid-selected-background-color: #{$grid-selected-background-color};
   --rz-grid-selected-color: #{$grid-selected-color};
-
-  --rz-grid-stripe-background-color: #{$grid-stripe-background-color};
-  --rz-grid-stripe-background-color-odd: #{$grid-stripe-background-color-odd};
 
   --rz-grid-toolbar-background-color: #{$grid-toolbar-background-color};
   --rz-grid-header-cell-border: #{$grid-header-cell-border};
@@ -184,6 +181,9 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   
   --rz-grid-shadow: #{$grid-shadow};
   --rz-grid-background-color: #{$grid-background-color};
+
+  --rz-grid-stripe-background-color: #{$grid-stripe-background-color};
+  --rz-grid-stripe-odd-background-color: #{$grid-stripe-odd-background-color};
   
   --rz-grid-column-resizer-width: #{$grid-column-resizer-width};
   --rz-grid-column-resizer-helper-width: #{$grid-column-resizer-helper-width};
@@ -512,21 +512,21 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 }
 
 .rz-grid-table-striped {
-    tbody {
-        > tr:not(.rz-expanded-row-content) {
-            &:nth-child(even) {
-                > td {
-                    background-color: var(--rz-grid-stripe-background-color);
-                }
-            }
-
-            &:nth-child(odd) {
-                > td {
-                    background-color: var(--rz-grid-stripe-background-color-odd);
-                }
-            }
+  tbody {
+    > tr:not(.rz-expanded-row-content) {
+      &:nth-child(even) {
+        > td {
+            background-color: var(--rz-grid-stripe-background-color);
         }
+      }
+
+      &:nth-child(odd) {
+        > td {
+          background-color: var(--rz-grid-stripe-odd-background-color);
+        }
+      }
     }
+  }
 }
 
 .rz-grid-table-composite {
