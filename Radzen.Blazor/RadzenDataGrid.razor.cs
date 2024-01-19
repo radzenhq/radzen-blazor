@@ -3073,6 +3073,8 @@ namespace Radzen.Blazor
                 SetColumnSortOrder(column);
                 Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
                 SaveSettings();
+                topPager?.FirstPage().GetAwaiter().GetResult();
+                bottomPager?.FirstPage().GetAwaiter().GetResult();
             }
 
             if (LoadData.HasDelegate && IsVirtualizationAllowed())
