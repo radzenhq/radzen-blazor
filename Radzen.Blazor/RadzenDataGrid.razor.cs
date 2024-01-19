@@ -3071,10 +3071,11 @@ namespace Radzen.Blazor
             if (column != null)
             {
                 SetColumnSortOrder(column);
+                topPager?.FirstPage();
+                bottomPager?.FirstPage();
+                CurrentPage = 0;
                 Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
                 SaveSettings();
-                topPager?.FirstPage().GetAwaiter().GetResult();
-                bottomPager?.FirstPage().GetAwaiter().GetResult();
             }
 
             if (LoadData.HasDelegate && IsVirtualizationAllowed())
