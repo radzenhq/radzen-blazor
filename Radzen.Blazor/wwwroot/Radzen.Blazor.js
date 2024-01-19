@@ -526,7 +526,7 @@ window.Radzen = {
       if (!table.rows[table.nextSelectedIndex].classList.contains('rz-state-highlight')) {
         table.rows[table.nextSelectedIndex].classList.add('rz-state-highlight');
       }
-     
+
       table.parentNode.parentNode.scrollTop = table.rows[table.nextSelectedIndex].offsetTop - table.rows[table.nextSelectedIndex].offsetHeight;
     }
 
@@ -713,7 +713,7 @@ window.Radzen = {
         }
       }
   },
-  numericKeyPress: function (e, isInteger) {
+  numericKeyPress: function (e, isInteger, decimalSeparator) {
     if (
       e.metaKey ||
       e.ctrlKey ||
@@ -721,6 +721,12 @@ window.Radzen = {
       e.keyCode == 8 ||
       e.keyCode == 13
     ) {
+      return;
+      }
+
+    if (e.code === 'NumpadDecimal') {
+      e.target.value += decimalSeparator;
+      e.preventDefault();
       return;
     }
 
