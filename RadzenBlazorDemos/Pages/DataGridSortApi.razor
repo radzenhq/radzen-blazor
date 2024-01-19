@@ -4,7 +4,12 @@
 
 @inherits DbContextPage
 
-<RadzenDataGrid AllowColumnResize="true" PageSize="5" AllowPaging="true" 
+<RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+    <RadzenCheckBox @bind-Value="@resetPaging" Name="resetPaging" />
+    <RadzenLabel Text="Reset to first page on sort" Component="resetPaging" Class="rz-me-6" />
+</RadzenStack>
+
+<RadzenDataGrid @ref="grid" AllowColumnResize="true" PageSize="5" AllowPaging="true" 
     AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="400px" Sort="@OnSort">
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" SortOrder="SortOrder.Descending" Width="150px" />
@@ -16,7 +21,9 @@
 </RadzenDataGrid>
 
 @code {
+    RadzenDataGrid<Employee> grid;
     IEnumerable<Employee> employees;
+    bool resetPaging;
 
     protected override async Task OnInitializedAsync()
     {
@@ -25,8 +32,11 @@
         employees = dbContext.Employees;
     }
 
-    void OnSort(DataGridColumnSortEventArgs<Employee> args)
+    async Task OnSort(DataGridColumnSortEventArgs<Employee> args)
     {
-        //
+        if (resetPaging)
+        {
+            await grid.FirstPage();
+        }
     }
 }
