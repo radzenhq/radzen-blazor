@@ -2483,7 +2483,7 @@ namespace Radzen.Blazor
         /// Gets or sets the ability to automatically goto the first page when sorting is changed.
         /// </summary>
         [Parameter]
-        public bool FirstPageOnSort { get; set; } = false;
+        public bool GotoFirstPageOnSort { get; set; } = false;
 
         internal string getCompositeCellCSSClass(RadzenDataGridColumn<TItem> column)
         {
@@ -3077,7 +3077,7 @@ namespace Radzen.Blazor
             if (column != null)
             {
                 SetColumnSortOrder(column);
-                if (FirstPageOnSort)
+                if (GotoFirstPageOnSort)
                 {
                     topPager?.FirstPage();
                     bottomPager?.FirstPage();
