@@ -2479,6 +2479,12 @@ namespace Radzen.Blazor
             return column.Columns != null || column.Parent != null;
         }
 
+        /// <summary>
+        /// Gets or sets the ability to automatically goto the first page when sorting is changed.
+        /// </summary>
+        [Parameter]
+        public bool FirstPageOnSort { get; set; } = false;
+
         internal string getCompositeCellCSSClass(RadzenDataGridColumn<TItem> column)
         {
             return column.Columns != null || column.Parent != null ? "rz-composite-cell" : "";
@@ -3071,9 +3077,12 @@ namespace Radzen.Blazor
             if (column != null)
             {
                 SetColumnSortOrder(column);
-                topPager?.FirstPage();
-                bottomPager?.FirstPage();
-                CurrentPage = 0;
+                if (FirstPageOnSort)
+                {
+                    topPager?.FirstPage();
+                    bottomPager?.FirstPage();
+                    CurrentPage = 0;
+                }
                 Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
                 SaveSettings();
             }
