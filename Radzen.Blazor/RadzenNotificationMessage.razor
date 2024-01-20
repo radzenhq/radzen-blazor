@@ -10,8 +10,8 @@
                 <div class="rz-growl-icon-close rzi rzi-times" @onclick="@Close" style="cursor:pointer"></div>
                 <span class="rz-growl-image rzi @classes.Item2" @onclick="NotificationClicked"></span>
                 <div class="rz-growl-message" @onclick="NotificationClicked">
-                    <span class="rz-growl-title">@((MarkupString)Message.Summary)</span>
-                    <p>@((MarkupString)Message.Detail)</p>
+                    <span class="rz-growl-title">@if (Message.SummaryContent != null) { @Message.SummaryContent(Service); } else { @((MarkupString)Message.Summary); }</span>
+                    <p>@if (Message.DetailContent != null) { @Message.DetailContent(Service); } else { @((MarkupString)Message.Detail); }</p>
                 </div>
                 <div style="clear: both;"></div>
             </div>

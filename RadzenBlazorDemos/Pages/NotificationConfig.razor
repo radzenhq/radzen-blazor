@@ -49,23 +49,42 @@
                              Click="@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Click Summary", Detail = "Click Me", Duration = 4000, Click=NotificationClick, CloseOnClick = true, Payload = DateTime.Now }))" />
             </RadzenCard>
          </div>
+        <div class="col-lg-6 col-xl-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Notification with custom content</RadzenText>
+                <RadzenButton Text="Show notification with custom content" class="w-100"
+                              ButtonStyle="ButtonStyle.Info"
+                              Click="@(args => ShowNotificationWithCustomContent())" />
+            </RadzenCard>
+        </div>
     </div>
 </div>
 
 <EventConsole @ref=@console />
 
 @code {
-   EventConsole console;
+    EventConsole console;
 
-   void ShowNotification(NotificationMessage message)
-   {
-      NotificationService.Notify(message);
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
 
-      console.Log($"{message.Severity} notification");
-   }
+        console.Log($"{message.Severity} notification");
+    }
 
-   void NotificationClick(NotificationMessage message)
-   {
-      console.Log($"{message.Summary} clicked, Payload = {message.Payload}");
-   }
+    void NotificationClick(NotificationMessage message)
+    {
+        console.Log($"{message.Summary} clicked, Payload = {message.Payload}");
+    }
+
+    void ShowNotificationWithCustomContent()
+    {
+        NotificationService.Notify(new NotificationMessage
+        {
+                Severity = NotificationSeverity.Warning,
+                Duration = 40000,
+                SummaryContent = ns =>@<RadzenText TextStyle="TextStyle.H6">Custom summary: <br /> @DateTime.Now</RadzenText>,
+                DetailContent = ns => @<RadzenButton Text="Clear" Click="@(args => ns.Messages.Clear())" />
+        });
+    }
 }

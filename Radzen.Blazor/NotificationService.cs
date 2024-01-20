@@ -124,6 +124,17 @@ namespace Radzen
         /// <value>Used to store a custom payload that can be retreived later in the click event handler.</value>
         public object Payload { get; set; }
 
+        /// <summary>
+        /// Gets or sets the detail content.
+        /// </summary>
+        /// <value>The detail content.</value>
+        public RenderFragment<NotificationService> DetailContent { get; set; }
+        /// <summary>
+        /// Gets or sets the summary content.
+        /// </summary>
+        /// <value>The summary content.</value>
+        public RenderFragment<NotificationService> SummaryContent { get; set; }
+
 
         #region Implementation of IEquatable<NotificationMessage> and operators overloading
 
@@ -146,7 +157,9 @@ namespace Radzen
                 && this.Click == other.Click
                 && this.Close == other.Close
                 && this.CloseOnClick == other.CloseOnClick
-                && this.Payload == other.Payload;
+                && this.Payload == other.Payload
+                && this.DetailContent == other.DetailContent
+                && this.SummaryContent == other.SummaryContent;
         }
 
         /// <summary>
@@ -160,7 +173,7 @@ namespace Radzen
         ///  Return a hash code for the current object
         /// </summary>
         /// <returns></returns>
-        public override int GetHashCode() => HashCode.Combine(Summary, Detail, Duration, Style, Click, Close, CloseOnClick, Payload);
+        public override int GetHashCode() => (Summary, Detail, Duration, Style, Click, Close, CloseOnClick, Payload, SummaryContent, DetailContent).GetHashCode();
 
         /// <summary>
         /// Overloading == operator for NotificationMessage.
