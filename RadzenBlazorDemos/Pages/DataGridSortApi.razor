@@ -9,7 +9,7 @@
     <RadzenLabel Text="Reset to first page on sort" Component="resetPaging" Class="rz-me-6" />
 </RadzenStack>
 
-<RadzenDataGrid @ref="grid" AllowColumnResize="true" PageSize="5" AllowPaging="true" 
+<RadzenDataGrid @ref="grid" AllowColumnResize="true" PageSize="5" AllowPaging="true" GotoFirstPageOnSort="@resetPaging"
     AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="400px" Sort="@OnSort">
     <Columns>
         <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" SortOrder="SortOrder.Descending" Width="150px" />
@@ -32,11 +32,8 @@
         employees = dbContext.Employees;
     }
 
-    async Task OnSort(DataGridColumnSortEventArgs<Employee> args)
+    void OnSort(DataGridColumnSortEventArgs<Employee> args)
     {
-        if (resetPaging)
-        {
-            await grid.FirstPage();
-        }
+        //
     }
 }
