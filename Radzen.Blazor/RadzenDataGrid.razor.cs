@@ -837,6 +837,13 @@ namespace Radzen.Blazor
         {
             if (AllowSorting && column.Sortable)
             {
+                if (GotoFirstPageOnSort)
+                {
+                    topPager?.FirstPage();
+                    bottomPager?.FirstPage();
+                    CurrentPage = 0;
+                }
+
                 var property = column.GetSortProperty();
                 if (!string.IsNullOrEmpty(property))
                 {
@@ -3077,12 +3084,6 @@ namespace Radzen.Blazor
             if (column != null)
             {
                 SetColumnSortOrder(column);
-                if (GotoFirstPageOnSort)
-                {
-                    topPager?.FirstPage();
-                    bottomPager?.FirstPage();
-                    CurrentPage = 0;
-                }
                 Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
                 SaveSettings();
             }
