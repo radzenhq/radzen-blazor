@@ -164,7 +164,7 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// A callback that will be invoked when the user tries to change the step.
-        /// Invoke the <see cref="RadzenStepsCanChangeEventArgs.PreventStepChange"/> method to prevent this change.
+        /// Invoke the <see cref="RadzenStepsCanChangeEventArgs.PreventDefault"/> method to prevent this change.
         /// </summary>
         /// <example>
         /// <code>
@@ -173,7 +173,7 @@ namespace Radzen.Blazor
         /// @code {
         ///  void OnCanChange(RadzenStepsCanChangeEventArgs args)
         ///  {
-        ///     args.PreventStepChange();
+        ///     args.PreventDefault();
         ///  }
         /// }
         /// </code>
@@ -349,7 +349,7 @@ namespace Radzen.Blazor
 
             var canChangeArgs = new RadzenStepsCanChangeEventArgs(SelectedIndex, newIndex);
             await CanChange.InvokeAsync(canChangeArgs);
-            if (canChangeArgs.IsStepChangePrevented)
+            if (canChangeArgs.IsDefaultPrevented)
             {
                 return;
             }

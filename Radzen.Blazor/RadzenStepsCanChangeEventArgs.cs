@@ -27,13 +27,13 @@
         /// <summary>
         /// Has step change action been prevented from occuring.
         /// </summary>
-        public bool IsStepChangePrevented { get; private set; }
+        public bool IsDefaultPrevented { get; private set; }
         /// <summary>
         /// Prevent the change of the step.
         /// </summary>
-        public void PreventStepChange()
+        public void PreventDefault()
         {
-            IsStepChangePrevented = true;
+            IsDefaultPrevented = true;
         }
     }
 }
