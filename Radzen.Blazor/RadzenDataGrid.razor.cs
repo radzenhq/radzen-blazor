@@ -92,6 +92,7 @@ namespace Radzen.Blazor
         }
 
         string lastLoadDataArgs;
+        Task lastLoadDataTask = Task.CompletedTask;
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
             var view = AllowPaging ? PagedView : View;
@@ -108,9 +109,9 @@ namespace Radzen.Blazor
 
             if (lastLoadDataArgs != loadDataArgs)
             {
-                lastLoadDataArgs = loadDataArgs;
+                await (lastLoadDataTask = InvokeLoadData(request.StartIndex, top));
 
-                await InvokeLoadData(request.StartIndex, top);
+                lastLoadDataArgs = loadDataArgs;
             }
 
             var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
