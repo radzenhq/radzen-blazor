@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -161,6 +162,25 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<int> Change { get; set; }
 
+        /// <summary>
+        /// A callback that will be invoked when the user tries to change the step.
+        /// Invoke the <see cref="StepsCanChangeEventArgs.PreventDefault"/> method to prevent this change.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenSteps CanChange=@OnCanChange&gt;
+        /// &lt;/RadzenSteps&gt;
+        /// @code {
+        ///  void OnCanChange(RadzenStepsCanChangeEventArgs args)
+        ///  {
+        ///     args.PreventDefault();
+        ///  }
+        /// }
+        /// </code>
+        /// </example>
+        [Parameter]
+        public EventCallback<StepsCanChangeEventArgs> CanChange { get; set; }
+
         private string _nextStep = "Next";
         /// <summary>
         /// Gets or sets the next button text.
@@ -228,7 +248,7 @@ namespace Radzen.Blazor
                 }
             }
         }
-        
+
         private string _previousTitle = "Go to the previous step.";
         /// <summary>
         /// Gets or sets the previous button title attribute.
@@ -256,7 +276,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The next button aria-label attribute.</value>
         public string NextAriaLabel => StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextAriaLabel;
-        
+
         /// <summary>
         /// Gets the previous button aria-label attribute.
         /// </summary>
@@ -325,14 +345,23 @@ namespace Radzen.Blazor
 
         internal async System.Threading.Tasks.Task SelectStep(RadzenStepsItem step, bool raiseChange = false)
         {
+            var newIndex = steps.IndexOf(step);
+
+            var canChangeArgs = new StepsCanChangeEventArgs { SelectedIndex = SelectedIndex, NewIndex = newIndex };
+
+            await CanChange.InvokeAsync(canChangeArgs);
+
+            if (canChangeArgs.IsDefaultPrevented)
+            {
+                return;
+            }
+
             var valid = true;
 
             if (EditContext != null)
             {
                 valid = EditContext.Validate();
             }
-
-            var newIndex = steps.IndexOf(step);
 
             if (valid || newIndex < SelectedIndex)
             {

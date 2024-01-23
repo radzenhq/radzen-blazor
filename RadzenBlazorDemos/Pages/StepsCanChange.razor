@@ -1,0 +1,135 @@
+﻿@inject DialogService DialogService
+
+<RadzenSteps Change="@OnChange" CanChange="@CanChange">
+    <Steps>
+        <RadzenStepsItem>
+            <RadzenRow>
+                <RadzenText Text="Enter user information"/>
+            </RadzenRow>
+            <RadzenTextBox Placeholder="Name" @bind-Value="name"/>
+            <RadzenTextBox Placeholder="Address" @bind-Value="address"/>
+            <RadzenButton Text="Save" Click="@SaveNameAndAdress" />
+        </RadzenStepsItem>
+        <RadzenStepsItem>
+            <RadzenRow>
+                <RadzenText Text="Enter about me" />
+            </RadzenRow>
+            <RadzenTextArea Placeholder="About me" @bind-Value="aboutMe" />
+            <RadzenButton Text="Save" Click="@SaveAboutMe" />
+        </RadzenStepsItem>
+        <RadzenStepsItem>
+            <RadzenRow>
+                <RadzenText Text="Add your hobbies" />
+            </RadzenRow>
+            <RadzenDataGrid TItem="Hobby"
+                            Data="@hobbies"
+                            @bind-Value="@selectedHobbies"
+                            SelectionMode="DataGridSelectionMode.Multiple"
+                            AllowRowSelectOnRowClick="true" >
+                <Columns>
+                    <RadzenDataGridColumn TItem="Hobby" Context="hobby">
+                         <Template>
+                            <RadzenCheckBox Value="selectedHobbies.Contains(hobby)" TValue="bool"/>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Hobby" Title="Hobby" Property="@nameof(Hobby.HobbyName)" />
+                </Columns>
+            </RadzenDataGrid>
+            <RadzenButton Text="Save" Click="@SaveHobbies" />
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    private string name;
+    private string savedName;
+
+    private string address;
+    private string savedAddress;
+
+    private string aboutMe;
+    private string savedAboutMe;
+
+    private List<Hobby> hobbies = new List<Hobby>() { new("Games"), new("Sport"), new("Movies"), new("Books"), new("Music") };
+    private IList<Hobby> selectedHobbies = new List<Hobby>();
+    private List<Hobby> savedHobbies = new List<Hobby>();
+
+    private void OnChange()
+    {
+        name = savedName;
+        address = savedAddress;
+        aboutMe = savedAboutMe;
+        selectedHobbies = savedHobbies;
+    }
+
+    private async Task CanChange(StepsCanChangeEventArgs args)
+    {
+        if (args.SelectedIndex == 0 && savedName == name && savedAddress == address)
+        {
+            return;
+        }
+
+        if (args.SelectedIndex == 1 && savedAboutMe == aboutMe)
+        {
+            return;
+        }
+
+        if (args.SelectedIndex == 2 && savedHobbies.SequenceEqual(selectedHobbies))
+        {
+            return;
+        }
+
+        var response = await DialogService.Confirm(
+            "Are you sure you want to contine without saving?",
+            "Confirm",
+            new ConfirmOptions()
+            {
+                CloseDialogOnEsc = false,
+                CloseDialogOnOverlayClick = false,
+                ShowClose = false,
+                CancelButtonText = "No",
+                OkButtonText = "Yes",
+            });
+
+        if (response == false)
+        {
+            args.PreventDefault();
+        }
+    }
+
+    private void SaveNameAndAdress()
+    {
+        savedName = name;
+        savedAddress = address;
+    }
+
+    private void SaveAboutMe()
+    {
+        savedAboutMe = aboutMe;
+    }
+
+    private void SaveHobbies()
+    {
+        savedHobbies = selectedHobbies.ToList();
+    }
+
+    private class Hobby
+    {
+        public Hobby(string hobbyName)
+        {
+            HobbyName = hobbyName;
+        }
+
+        public string HobbyName { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Hobby hobby && hobby.HobbyName == HobbyName;
+        }
+
+        public override int GetHashCode()
+        {
+            return HobbyName.GetHashCode();
+        }
+    }
+}
