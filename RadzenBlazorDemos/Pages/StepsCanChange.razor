@@ -1,18 +1,20 @@
-﻿<RadzenSteps Change="@OnChange" CanChange="@CanChangeAsync">
+﻿@inject DialogService DialogService
+
+<RadzenSteps Change="@OnChange" CanChange="@CanChange">
     <Steps>
         <RadzenStepsItem>
             <RadzenRow>
                 <RadzenText Text="Enter user information"/>
             </RadzenRow>
-            <RadzenTextBox Placeholder="Name" @bind-Value="_name"/>
-            <RadzenTextBox Placeholder="Address" @bind-Value="_address"/>
+            <RadzenTextBox Placeholder="Name" @bind-Value="name"/>
+            <RadzenTextBox Placeholder="Address" @bind-Value="address"/>
             <RadzenButton Text="Save" Click="@SaveNameAndAdress" />
         </RadzenStepsItem>
         <RadzenStepsItem>
             <RadzenRow>
                 <RadzenText Text="Enter about me" />
             </RadzenRow>
-            <RadzenTextArea Placeholder="About me" @bind-Value="_aboutMe" />
+            <RadzenTextArea Placeholder="About me" @bind-Value="aboutMe" />
             <RadzenButton Text="Save" Click="@SaveAboutMe" />
         </RadzenStepsItem>
         <RadzenStepsItem>
@@ -20,15 +22,15 @@
                 <RadzenText Text="Add your hobbies" />
             </RadzenRow>
             <RadzenDataGrid TItem="Hobby"
-                            Data="@_hobbies"
-                            @bind-Value="@_selectedHobbies"
+                            Data="@hobbies"
+                            @bind-Value="@selectedHobbies"
                             SelectionMode="DataGridSelectionMode.Multiple"
                             AllowRowSelectOnRowClick="true" >
                 <Columns>
                     <RadzenDataGridColumn TItem="Hobby" Context="hobby">
                          <Template>
-                            <RadzenCheckBox Value="_selectedHobbies.Contains(hobby)" TValue="bool"/>
-                        </Template> 
+                            <RadzenCheckBox Value="selectedHobbies.Contains(hobby)" TValue="bool"/>
+                        </Template>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Hobby" Title="Hobby" Property="@nameof(Hobby.HobbyName)" />
                 </Columns>
@@ -39,45 +41,40 @@
 </RadzenSteps>
 
 @code {
-    private string _name;
-    private string _savedName;
+    private string name;
+    private string savedName;
 
-    private string _address;
-    private string _savedAddress;
+    private string address;
+    private string savedAddress;
 
-    private string _aboutMe;
-    private string _savedAboutMe;
+    private string aboutMe;
+    private string savedAboutMe;
 
-    private List<Hobby> _hobbies = new List<Hobby>() { new("Games"), new("Sport"), new("Movies"), new("Books"), new("Music") };
-    private IList<Hobby> _selectedHobbies = new List<Hobby>();
-    private List<Hobby> _savedHobbies = new List<Hobby>();
-
-    [Inject]
-    private DialogService DialogService { get; set; }
+    private List<Hobby> hobbies = new List<Hobby>() { new("Games"), new("Sport"), new("Movies"), new("Books"), new("Music") };
+    private IList<Hobby> selectedHobbies = new List<Hobby>();
+    private List<Hobby> savedHobbies = new List<Hobby>();
 
     private void OnChange()
     {
-        _name = _savedName;
-        _address = _savedAddress;
-
-        _aboutMe = _savedAboutMe;
-
-        _selectedHobbies = _savedHobbies;
+        name = savedName;
+        address = savedAddress;
+        aboutMe = savedAboutMe;
+        selectedHobbies = savedHobbies;
     }
 
-    private async Task CanChangeAsync(RadzenStepsCanChangeEventArgs args)
+    private async Task CanChange(StepsCanChangeEventArgs args)
     {
-        if (args.SelectedIndex == 0 && _savedName == _name && _savedAddress == _address)
+        if (args.SelectedIndex == 0 && savedName == name && savedAddress == address)
         {
             return;
         }
 
-        if (args.SelectedIndex == 1 && _savedAboutMe == _aboutMe)
+        if (args.SelectedIndex == 1 && savedAboutMe == aboutMe)
         {
             return;
         }
 
-        if (args.SelectedIndex == 2 && _savedHobbies.SequenceEqual(_selectedHobbies))
+        if (args.SelectedIndex == 2 && savedHobbies.SequenceEqual(selectedHobbies))
         {
             return;
         }
@@ -102,18 +99,18 @@
 
     private void SaveNameAndAdress()
     {
-        _savedName = _name;
-        _savedAddress = _address;
+        savedName = name;
+        savedAddress = address;
     }
 
     private void SaveAboutMe()
     {
-        _savedAboutMe = _aboutMe;
+        savedAboutMe = aboutMe;
     }
 
     private void SaveHobbies()
     {
-        _savedHobbies = _selectedHobbies.ToList();
+        savedHobbies = selectedHobbies.ToList();
     }
 
     private class Hobby

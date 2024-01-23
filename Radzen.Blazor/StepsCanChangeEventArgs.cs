@@ -3,27 +3,16 @@
     /// <summary>
     /// Supplies information about a <see cref="RadzenSteps.CanChange" /> event that is being raised.
     /// </summary>
-    public class RadzenStepsCanChangeEventArgs
+    public class StepsCanChangeEventArgs
     {
         /// <summary>
-        /// Constructor to create args with selected index and new index.
+        /// Index of clicked step.
         /// </summary>
-        /// <param name="selectedIndex"></param>
-        /// <param name="newIndex"></param>
-        public RadzenStepsCanChangeEventArgs(int selectedIndex, int newIndex)
-        {
-            SelectedIndex = selectedIndex;
-            NewIndex = newIndex;
-        }
-
+        public int SelectedIndex { get; set; }
         /// <summary>
         /// Index of clicked step.
         /// </summary>
-        public int SelectedIndex { get; private set; }
-        /// <summary>
-        /// Index of clicked step.
-        /// </summary>
-        public int NewIndex { get; private set; }
+        public int NewIndex { get; set; }
         /// <summary>
         /// Has step change action been prevented from occuring.
         /// </summary>
