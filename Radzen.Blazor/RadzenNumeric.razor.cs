@@ -340,7 +340,7 @@ namespace Radzen.Blazor
         
         private TValue ApplyMinMax(TValue newValue)
         {
-            if (Max == null && Min == null)
+            if (Max == null && Min == null || newValue == null)
             {
                 return newValue;
             }
