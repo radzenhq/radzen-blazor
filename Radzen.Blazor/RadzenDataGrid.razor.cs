@@ -834,7 +834,7 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<DataGridColumnSortEventArgs<TItem>> Sort { get; set; }
 
-        internal void OnSort(EventArgs args, RadzenDataGridColumn<TItem> column)
+        internal async Task OnSort(EventArgs args, RadzenDataGridColumn<TItem> column)
         {
             if (AllowSorting && column.Sortable)
             {
@@ -846,26 +846,24 @@ namespace Radzen.Blazor
                 }
 
                 var property = column.GetSortProperty();
-                if (!string.IsNullOrEmpty(property))
-                {
-                    OrderBy(property);
-                }
-                else
-                {
-                    SetColumnSortOrder(column);
 
-                    Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
-                    SaveSettings();
+                SetColumnSortOrder(column);
+                await Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
+                SaveSettings();
 
-                    if (LoadData.HasDelegate && IsVirtualizationAllowed())
-                    {
-                        Data = null;
+                if (LoadData.HasDelegate && IsVirtualizationAllowed())
+                {
+                    Data = null;
 #if NET5_0_OR_GREATER
-                        ResetLoadData();
+                    ResetLoadData();
 #endif
-                    }
+                }
 
-                    InvokeAsync(ReloadInternal);
+                await InvokeAsync(ReloadInternal);
+
+                if (IsVirtualizationAllowed())
+                {
+                    StateHasChanged();
                 }
             }
         }

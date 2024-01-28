@@ -246,13 +246,14 @@ else
         return $"rzi rz-grid-filter-icon {additionalStyle}";
     }
 
-    private void OnSortKeyPressed(KeyboardEventArgs args)
+    private Task OnSortKeyPressed(KeyboardEventArgs args)
     {
         var key = args.Code ?? args.Key;
         if (key == "Enter")
         {
-            Grid.OnSort(args, Column);
+            return Grid.OnSort(args, Column);
         }
+        return Task.CompletedTask;
     }
 
     string getColumnPopupID()
