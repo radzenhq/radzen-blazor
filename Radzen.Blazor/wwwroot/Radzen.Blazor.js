@@ -1191,7 +1191,7 @@ window.Radzen = {
       arg instanceof Element || arg instanceof HTMLDocument
         ? arg
         : document.getElementById(arg);
-    return input ? input.value : '';
+    return input && input.value != '' ? input.value : null;
   },
   setInputValue: function (arg, value) {
     var input =
