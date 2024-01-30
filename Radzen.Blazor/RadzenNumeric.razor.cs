@@ -83,7 +83,7 @@ namespace Radzen.Blazor
                 return;
             }
 
-            var step = decimal.TryParse(Step?.Replace(",", "."), out var stepVal) ? stepVal : 1;
+            var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : decimal.Parse(Step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
 
             var valueToUpdate = ConvertToDecimal(Value);
 
