@@ -1699,14 +1699,14 @@ window.Radzen = {
           },
           mouseMoveHandler: function (e) {
               if (Radzen[el]) {
-                  var widhtFloat = (Radzen[el].width - (Radzen[el].clientX - e.clientX));
+                  var widthFloat = (Radzen[el].width - (Radzen[el].clientX - e.clientX));
                   var minWidth = parseFloat(cell.style.minWidth || 0)
 
-                  if (widhtFloat < minWidth) {
-                      widhtFloat = minWidth;
+                  if (widthFloat < minWidth) {
+                      widthFloat = minWidth;
                   }
 
-                  var width = widhtFloat + 'px';
+                  var width = widthFloat + 'px';
 
                   if (cell) {
                       cell.style.width = width;
