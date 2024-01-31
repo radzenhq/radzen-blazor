@@ -4,8 +4,7 @@ $source-sans-path: '../fonts';
   font-family: 'Material Icons';
   font-style: normal;
   font-weight: 400;
-  src: local('Material Icons'), local('MaterialIcons-Regular'),
-    url('#{$source-sans-path}/MaterialIcons-Regular.woff') format('woff');
+  src: url('#{$source-sans-path}/MaterialIcons-Regular.woff') format('woff');
 }
 
 @if $material == false and $fluent == false {
@@ -123,31 +122,27 @@ $source-sans-path: '../fonts';
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 300;
-    src: local(''),
-        url('#{$source-sans-path}/roboto-v30-latin-300.woff') format('woff');
+    src: url('#{$source-sans-path}/roboto-v30-latin-300.woff') format('woff');
   }
 
   @font-face {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 400;
-    src: local(''),
-        url('#{$source-sans-path}/roboto-v30-latin-regular.woff') format('woff');
+    src: url('#{$source-sans-path}/roboto-v30-latin-regular.woff') format('woff');
   }
 
   @font-face {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 500;
-    src: local(''),
-        url('#{$source-sans-path}/roboto-v30-latin-500.woff') format('woff');
+    src: url('#{$source-sans-path}/roboto-v30-latin-500.woff') format('woff');
   }
 
   @font-face {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 700;
-    src: local(''),
-        url('#{$source-sans-path}/roboto-v30-latin-700.woff') format('woff');
+    src: url('#{$source-sans-path}/roboto-v30-latin-700.woff') format('woff');
   }
 }
