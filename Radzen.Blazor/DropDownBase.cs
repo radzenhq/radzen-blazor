@@ -53,7 +53,7 @@ namespace Radzen
 
             if (LoadData.HasDelegate)
             {
-                await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = request.Count, Filter = searchText });
+                await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = request.StartIndex, Top = top, Filter = searchText });
             }
 
             virtualItems = (LoadData.HasDelegate ? Data : view.Skip(request.StartIndex).Take(top)).Cast<object>().ToList();
