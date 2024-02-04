@@ -308,7 +308,14 @@ namespace Radzen.Blazor
         /// <value>The filter placeholder value.</value>
         [Parameter]
         public string FilterPlaceholder { get; set; }
-        
+
+        /// <summary>
+        /// Gets or sets the custom filter dynamic Linq dictionary.
+        /// </summary>
+        /// <value>The custom filter dynamic Linq dictionary.</value>
+        [Parameter]
+        public string CustomFilterCommand { get; set; }
+
         /// <summary>
         /// Gets the filter placeholder.
         /// </summary>
@@ -762,6 +769,7 @@ namespace Radzen.Blazor
         object secondFilterValue;
         FilterOperator? secondFilterOperator;
         LogicalFilterOperator? logicalFilterOperator;
+        string customFilterCommand;
 
         /// <summary>
         /// Set parameters as an asynchronous operation.
@@ -875,6 +883,32 @@ namespace Radzen.Blazor
                 }
             }
 
+            if (parameters.DidParameterChange(nameof(CustomFilterCommand), CustomFilterCommand))
+            {
+                customFilterCommand = parameters.GetValueOrDefault<string>(nameof(CustomFilterCommand));
+
+                if (CustomFilterCommand != null)
+                {
+                    CustomFilterCommand = customFilterCommand;
+                    Grid.SaveSettings();
+                    if (Grid.IsVirtualizationAllowed())
+                    {
+#if NET5_0_OR_GREATER
+                        if (Grid.virtualize != null)
+                        {
+                            await Grid.virtualize.RefreshDataAsync();
+                        }
+#endif
+                    }
+                    else
+                    {
+                        await Grid.Reload();
+                    }
+
+                    return;
+                }
+            }
+            
             if (parameters.DidParameterChange(nameof(FilterOperator), FilterOperator))
             {
                 filterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(FilterOperator));
@@ -985,6 +1019,33 @@ namespace Radzen.Blazor
                     || GetFilterOperator() == FilterOperator.IsNotNull
                     || GetFilterOperator() == FilterOperator.IsEmpty
                     || GetFilterOperator() == FilterOperator.IsNotEmpty;
+        }
+
+        /// <summary>
+        /// Get custom filter linq.
+        /// </summary>
+        public string GetCustomFilterCommand()
+        {
+            return customFilterCommand ?? CustomFilterCommand;
+        }
+
+        /// <summary>
+        /// Set column custom filter linq.
+        /// </summary>
+        public void SetCustomFilterCommand(string value)
+        {
+            customFilterCommand = value;
+        }
+
+        /// <summary>
+        /// Set column custom filter linq and reload grid.
+        /// </summary>
+        /// <param name="value">Filter value.</param>
+        public async Task SetCustomFilterCommandAsync(string value)
+        {
+            SetCustomFilterCommand(value);
+            Grid.SaveSettings();
+            await Grid.FirstPage(true);
         }
 
         /// <summary>
