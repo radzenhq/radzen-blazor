@@ -128,7 +128,7 @@ else
         {
             foreach (var item in selectedWorkStatus)
             {
-                createWhereCommand.Add($"(WorkStatus == null ? \"\" : WorkStatus).Contains(\"{item}\")");
+                createWhereCommand.Add($"WorkStatus.Contains(\"{item}\")");
             }
             var booleanOperator = workStatusOperator == LogicalFilterOperator.And ? "and" : "or";
 
