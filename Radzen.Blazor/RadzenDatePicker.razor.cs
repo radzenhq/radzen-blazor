@@ -255,6 +255,13 @@ namespace Radzen.Blazor
 
             UpdateYearsAndMonths(Min, Max);
 
+#if NET6_0_OR_GREATER
+            if (typeof(TValue) == typeof(TimeOnly))
+            {
+                TimeOnly = true;
+                ShowTime = true;
+            }
+#endif
         }
 
         void UpdateYearsAndMonths(DateTime? min, DateTime? max)
@@ -406,6 +413,10 @@ namespace Radzen.Blazor
                         {
                             DateTimeValue = dateOnly.ToDateTime(System.TimeOnly.MinValue, Kind);
                         }
+                        else if (value is TimeOnly timeOnly)
+                        {
+                            DateTimeValue = new DateTime(1,1,0001, timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond, Kind);
+                        }
 #endif
                         else
                         {
@@ -419,10 +430,18 @@ namespace Radzen.Blazor
         private static object ConvertToTValue(object value)
         {
 #if NET6_0_OR_GREATER
-            if (typeof(TValue) == typeof(DateOnly) && value is DateTime dt)
+            if (value is DateTime dt)
             {
-                value = DateOnly.FromDateTime(dt);
-                return (TValue)value;
+                if (typeof(TValue) == typeof(DateOnly))
+                {
+                    value = DateOnly.FromDateTime(dt);
+                    return (TValue)value;
+                }
+                if (typeof(TValue) == typeof(TimeOnly))
+                {
+                    value = System.TimeOnly.FromDateTime(dt);
+                    return (TValue)value;
+                }
             }
 #endif
             return value;
