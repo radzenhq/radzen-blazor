@@ -1174,7 +1174,7 @@ namespace Radzen
             }
             else
             {
-                if (filter.Property == null || (filter.FilterValue == null &&
+                if (filter.Property == null || filter.FilterOperator == null || (filter.FilterValue == null &&
                     filter.FilterOperator != FilterOperator.IsNull && filter.FilterOperator != FilterOperator.IsNotNull))
                 {
                     return;
@@ -1203,7 +1203,7 @@ namespace Radzen
                        && dataFilter.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
 
 
-                var comparison = LinqFilterOperators[filter.FilterOperator];
+                var comparison = LinqFilterOperators[filter.FilterOperator.Value];
 
                 if (comparison == "StartsWith" || comparison == "EndsWith" || comparison == "Contains")
                 {
@@ -1319,7 +1319,7 @@ namespace Radzen
             }
             else
             {
-                if (filter.Property == null || (filter.FilterValue == null &&
+                if (filter.Property == null || filter.FilterOperator == null || (filter.FilterValue == null &&
                     filter.FilterOperator != FilterOperator.IsNull && filter.FilterOperator != FilterOperator.IsNotNull))
                 {
                     return;
@@ -1359,8 +1359,8 @@ namespace Radzen
                     else
                     {
                         var expression = dataFilter.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
-                            $"{ODataFilterOperators[filter.FilterOperator]}({property}, tolower('{filter.FilterValue}'))" :
-                            $"{ODataFilterOperators[filter.FilterOperator]}({property}, '{filter.FilterValue}')";
+                            $"{ODataFilterOperators[filter.FilterOperator.Value]}({property}, tolower('{filter.FilterValue}'))" :
+                            $"{ODataFilterOperators[filter.FilterOperator.Value]}({property}, '{filter.FilterValue}')";
 
                         if (filter.FilterOperator == FilterOperator.DoesNotContain)
                         {
@@ -1407,7 +1407,7 @@ namespace Radzen
                         value = $"{value?.ToLower()}";
                     }
 
-                    filterExpressions.Add($@"{property} {ODataFilterOperators[filter.FilterOperator]} {value}");
+                    filterExpressions.Add($@"{property} {ODataFilterOperators[filter.FilterOperator.Value]} {value}");
                 }
             }
         }
