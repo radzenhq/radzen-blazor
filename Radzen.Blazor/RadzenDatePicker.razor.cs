@@ -375,7 +375,7 @@ namespace Radzen.Blazor
             {
                 if (_value != value)
                 {
-                    _value = value;
+                    _value = ConvertToTValue(value);
                     _currentDate = default(DateTime);
 
                     if (value is DateTimeOffset offset)
@@ -401,6 +401,12 @@ namespace Radzen.Blazor
                         {
                             DateTimeValue = DateTime.SpecifyKind(dateTime, Kind);
                         }
+#if NET6_0_OR_GREATER
+                        else if (value is DateOnly dateOnly)
+                        {
+                            DateTimeValue = dateOnly.ToDateTime(System.TimeOnly.MinValue, Kind);
+                        }
+#endif
                         else
                         {
                             DateTimeValue = null;
@@ -408,6 +414,18 @@ namespace Radzen.Blazor
                     }
                 }
             }
+        }
+
+        private static object ConvertToTValue(object value)
+        {
+#if NET6_0_OR_GREATER
+            if (typeof(TValue) == typeof(DateOnly) && value is DateTime dt)
+            {
+                value = DateOnly.FromDateTime(dt);
+                return (TValue)value;
+            }
+#endif
+            return value;
         }
 
         DateTime _currentDate;

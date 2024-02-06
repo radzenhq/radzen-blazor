@@ -578,5 +578,34 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"rzi-time", component.Markup);
         }
+
+        [Fact]
+        public void DatePicker_Supports_DateOnly()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var dateOnly = new DateOnly(2024, 1, 31);
+            DateOnly newValue;
+            var component = ctx.RenderComponent<RadzenDatePicker<DateOnly>>(parameters =>
+            {
+                parameters.Add(p => p.Value, dateOnly);
+                parameters.Add(p => p.ValueChanged, args => { newValue = args; });
+            });
+            
+            Assert.False(component.Instance.ShowTime);
+            var input = component.Find("input");
+            input.GetAttribute("value").MarkupMatches(dateOnly.ToString());
+
+            // update to new value
+            var inputElement = component.Find(".rz-inputtext");
+            var enteredValue = new DateOnly(2024, 2, 28);
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(enteredValue.ToShortDateString());
+            inputElement.Change(enteredValue);
+            
+            input.GetAttribute("value").MarkupMatches(enteredValue.ToString());
+            Assert.Equal(enteredValue, component.Instance.Value);
+        }
     }
 }
