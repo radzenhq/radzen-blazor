@@ -1669,15 +1669,15 @@ namespace Radzen
         /// </summary>
         DoesNotContain,
         /// <summary>
-        /// Satisfied if the current value is null.
+        /// Satisfied if the current value is in the specified value.
         /// </summary>
         In,
         /// <summary>
-        /// Satisfied if the current value is in the specified value.
+        /// Satisfied if the current value is not in the specified value.
         /// </summary>
         NotIn,
         /// <summary>
-        /// Satisfied if the current value is not in the specified value.
+        /// Satisfied if the current value is null.
         /// </summary>
         IsNull,
         /// <summary>

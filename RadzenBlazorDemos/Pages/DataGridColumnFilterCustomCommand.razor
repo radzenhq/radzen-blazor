@@ -1,0 +1,153 @@
+﻿@using System.Linq.Dynamic.Core
+
+@if (employees == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="my-4">Custom filtering template with Custom Command</RadzenText>
+    <RadzenDataGrid Render="@OnRender" Style="height:400px;" AllowVirtualization="true" @ref="grid" Data=@employees FilterMode="FilterMode.Advanced"
+                    AllowFiltering="true" AllowPaging="false" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
+        <Columns>
+            <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" FilterValue="@idValue">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Title="Customer" Property="CompanyName">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Title="Hire Date" Property="HireDate.Date" FormatString="{0:d}"
+                                  FilterValue="@hireDate?.Date">
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Title="Work Status" Property="WorkStatus" Type="typeof(IEnumerable<string>)" Sortable=true
+                                  FilterValue="@selectedWorkStatus" FilterOperator="FilterOperator.Custom" LogicalFilterOperator="@workStatusOperator">
+                <FilterTemplate Context="column">
+                    <div class="rz-grid-filter">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Stretch" JustifyContent="JustifyContent.SpaceBetween">
+                            <span class="rz-grid-filter-label">Filter</span>
+                            <RadzenSelectBar Style="margin-top:-6px;" Change="@(()=>OnSelectedWorkStatusChange(column))" @bind-Value=@workStatusOperator TValue="LogicalFilterOperator">
+                                <Items>
+                                    <RadzenSelectBarItem Text="Any" Value="@(LogicalFilterOperator.Or)" />
+                                    <RadzenSelectBarItem Text="All" Value="@(LogicalFilterOperator.And)" />
+                                </Items>
+                            </RadzenSelectBar>
+                            @* <RadzenButton Variant="Variant.Text" Text="X" Click="@(() => CollectionFilterApply(column))" Style="margin-top:-12px;margin-right:-10px;" /> *@
+                        </RadzenStack>
+                        <RadzenListBox AllowClear="true" @bind-Value=@selectedWorkStatus Multiple="true" AllowSelectAll=true Style="width:100%; height:200px;"
+                                       Change="@(()=>OnSelectedWorkStatusChange(column))" Data=@workStatuses />
+                        <div class="rz-grid-filter-buttons">
+                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Clear" Click="@(() => WorkStatusFilterClear(column))" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Close" Click="@(() => WorkStatusFilterClose(column))" />
+                        </div>
+                    </div>
+                </FilterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" 
+                FilterValue="@currentTOC">
+                <FilterTemplate>
+                    <RadzenListBox @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by title of courtesy" }})"
+                                    Change=@OnSelectedTOCChange
+                                    Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy?>().Select(t => new { Text = $"{t}", Value = t == TitleOfCourtesy.All ? null : t }))" />
+                </FilterTemplate>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+}
+
+
+@code {
+    RadzenDataGrid<Employee> grid;
+    int? idValue;
+    DateTime? hireDate;
+    TitleOfCourtesy? currentTOC;
+    IEnumerable<string> selectedCompanyNames;
+    List<string> selectedWorkStatus;
+    string whereExpression;
+
+    public LogicalFilterOperator workStatusOperator { get; set; } = LogicalFilterOperator.Or;
+
+    List<string> companyNames = new List<string> {"Vins et alcools Chevalier", "Toms Spezialitäten", "Hanari Carnes", "Richter Supermarkt", "Wellington Importadora", "Centro comercial Moctezuma" };
+    List<string> workStatuses = new List<string> { "Office", "Remote", "Temporary", "Permanent" };
+    public enum TitleOfCourtesy
+    {
+        Ms,
+        Mr,
+        All = -1
+    }
+
+    public class Employee
+    {
+        public int ID { get; set; }
+        public string CompanyName { get; set; }
+        public DateTime HireDate { get; set; }
+        public TitleOfCourtesy TitleOfCourtesy { get; set; }
+        public string WorkStatus { get; set; }
+    }
+
+    void OnSelectedTOCChange(object value)
+    {
+        if (currentTOC == TitleOfCourtesy.All)
+        {
+            currentTOC = null;
+        }
+    }
+
+    IEnumerable<Employee> employees; 
+
+    protected override async Task OnInitializedAsync()
+    {
+        employees = await Task.FromResult(Enumerable.Range(0, 60).Select(i =>
+            new Employee
+            {
+                ID = i,
+                CompanyName = companyNames[i % 6],
+                HireDate = DateTime.Now.AddMonths(-i),
+                TitleOfCourtesy = i % 2 == 1 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms,
+                    WorkStatus = $"{(i < 20 ? "Office" : i >= 20 && i < 40 ? "Remote" : "Office, Remote")} {(i < 12 ? ", Temporary" : i >= 12 && i < 30 ? ", Permanent" : i > 30 && i < 44 ? ", Temporary" : ", Permanent")}"
+            }).AsQueryable());
+    }
+
+    private async Task WorkStatusFilterClear(RadzenDataGridColumn<Employee> column)
+    {
+        if(selectedWorkStatus!=null)
+        {
+            selectedWorkStatus.Clear();
+            await OnSelectedWorkStatusChange(column);            
+        }
+        await column.CloseFilter();
+    }
+
+    private async Task WorkStatusFilterClose(RadzenDataGridColumn<Employee> column)
+    {
+        await column.CloseFilter();
+    }
+
+    async Task OnSelectedWorkStatusChange(RadzenDataGridColumn<Employee> column)
+    {
+        var createWhereExpression = new List<string>();
+
+        if (selectedWorkStatus != null && selectedWorkStatus.Count > 0)
+        {
+            foreach (var item in selectedWorkStatus)
+            {
+                createWhereExpression.Add($"WorkStatus.Contains(\"{item}\")");
+            }
+            var booleanOperator = workStatusOperator == LogicalFilterOperator.And ? "and" : "or";
+
+            whereExpression = string.Join($" {booleanOperator} ", createWhereExpression);
+        }
+        else
+        {
+            whereExpression = "";
+        }
+
+        await column.SetCustomFilterExpressionAsync(whereExpression);
+    }
+
+    void OnRender(DataGridRenderEventArgs<Employee> args)
+    {
+        if (args.FirstRender)
+        {
+            args.Grid.Sorts.Add(new SortDescriptor() { Property = "CompanyName", SortOrder = SortOrder.Ascending });
+            args.Grid.Sorts.Add(new SortDescriptor() { Property = "TitleOfCourtesy", SortOrder = SortOrder.Ascending });
+        }
+    }
+}

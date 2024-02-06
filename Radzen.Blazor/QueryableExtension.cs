@@ -153,7 +153,8 @@ namespace Radzen
             Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
                (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty) || c.GetFilterOperator() == FilterOperator.IsNotNull
                    || c.GetFilterOperator() == FilterOperator.IsNull || c.GetFilterOperator() == FilterOperator.IsEmpty
-                   || c.GetFilterOperator() == FilterOperator.IsNotEmpty)
+                   || c.GetFilterOperator() == FilterOperator.IsNotEmpty
+                   || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterExpression() != null))
                && c.GetFilterProperty() != null;
 
             if (columns.Where(canFilter).Any())
@@ -170,7 +171,15 @@ namespace Radzen
                     var v = column.GetFilterValue();
                     var sv = column.GetSecondFilterValue();
 
-                    if (PropertyAccess.IsDate(column.FilterPropertyType))
+                    if (column.GetFilterOperator() == FilterOperator.Custom)
+                    {
+                        var customFilterExpression = column.GetCustomFilterExpression();
+                        if (!string.IsNullOrEmpty(customFilterExpression))
+                        {
+                            whereList.Add(customFilterExpression);
+                        }
+                    }
+                    else if (PropertyAccess.IsDate(column.FilterPropertyType))
                     {
                         if (v != null)
                         {
@@ -817,7 +826,8 @@ namespace Radzen
             Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
                (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty)
                 || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
-                || c.GetFilterOperator() == FilterOperator.IsEmpty || c.GetFilterOperator() == FilterOperator.IsNotEmpty)
+                || c.GetFilterOperator() == FilterOperator.IsEmpty || c.GetFilterOperator() == FilterOperator.IsNotEmpty
+                || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterExpression() != null))
                && c.GetFilterProperty() != null;
 
             if (columns.Where(canFilter).Any())
@@ -833,7 +843,15 @@ namespace Radzen
                     var value = column.GetFilterValue();
                     var secondValue = column.GetSecondFilterValue();
 
-                    if (value != null || column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull
+                    if (column.GetFilterOperator() == FilterOperator.Custom)
+                    {
+                        var customFilterExpression = column.GetCustomFilterExpression();
+                        if (!string.IsNullOrEmpty(customFilterExpression))
+                        {
+                            whereList.Add(customFilterExpression);
+                        }
+                    }
+                    else if (value != null || column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull
                         || column.GetFilterOperator() == FilterOperator.IsEmpty || column.GetFilterOperator() == FilterOperator.IsNotEmpty)
                     {
                         var linqOperator = ODataFilterOperators[column.GetFilterOperator()];
@@ -964,7 +982,8 @@ namespace Radzen
             Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
                (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty)
                 || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
-                || c.GetFilterOperator() == FilterOperator.IsEmpty || c.GetFilterOperator() == FilterOperator.IsNotEmpty)
+                || c.GetFilterOperator() == FilterOperator.IsEmpty || c.GetFilterOperator() == FilterOperator.IsNotEmpty
+                || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterExpression() != null))
                && c.GetFilterProperty() != null;
 
             if (columns.Where(canFilter).Any())
@@ -976,7 +995,17 @@ namespace Radzen
                 var whereList = new Dictionary<string, IEnumerable<object>>();
                 foreach (var column in columns.Where(canFilter))
                 {
-                    var property = PropertyAccess.GetProperty(column.GetFilterProperty());
+                    if (column.GetFilterOperator() == FilterOperator.Custom)
+                    {
+                        var customFilterExpression = column.GetCustomFilterExpression();
+                        if (!string.IsNullOrEmpty(customFilterExpression))
+                        {
+                            whereList.Add(customFilterExpression, Enumerable.Empty<object>());
+                        }
+                    }
+                    else
+                    {
+                        var property = PropertyAccess.GetProperty(column.GetFilterProperty());
 
                     if (property.IndexOf(".") != -1)
                     {
@@ -1082,6 +1111,7 @@ namespace Radzen
                             whereList.Add($@"({firstFilter} {booleanOperator} {secondFilter})", new object[] { column.GetFilterValue(), column.GetSecondFilterValue() });
                         }
                     }
+                }
                 }
 
                 return whereList.Keys.Any() ?
