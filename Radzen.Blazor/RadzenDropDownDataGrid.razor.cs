@@ -390,7 +390,7 @@ namespace Radzen.Blazor
 
             if (!string.IsNullOrEmpty(searchText) && !LoadData.HasDelegate)
             {
-                await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
+                await OnLoadData(new Radzen.LoadDataArgs() { Skip = skip, Top = PageSize });
             }
         }
 
@@ -422,10 +422,13 @@ namespace Radzen.Blazor
             return type == typeof(string);
         }
 
+        int? skip;
         async Task OnLoadData(LoadDataArgs args)
         {
             if (!LoadData.HasDelegate)
             {
+                skip = args.Skip;
+
                 var query = Query;
 
                 if (query == null)
@@ -602,7 +605,7 @@ namespace Radzen.Blazor
                 await grid.SelectRow(null);
             }
 
-            await grid.Reload();
+            await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
 
             StateHasChanged();
         }
