@@ -3450,9 +3450,9 @@ namespace Radzen.Blazor
                 {
                     return element.GetDateTime();
                 }
-                else if (type == typeof(DateTime) || type == typeof(DateTime?))
+                else if (type == typeof(DateTimeOffset) || type == typeof(DateTimeOffset?))
                 {
-                    return element.GetDateTime();
+                    return element.GetDateTimeOffset();
                 }
                 else if (type.IsEnum || Nullable.GetUnderlyingType(type)?.IsEnum == true)
                 {
