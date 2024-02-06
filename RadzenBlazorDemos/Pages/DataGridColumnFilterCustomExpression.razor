@@ -29,7 +29,6 @@ else
                                     <RadzenSelectBarItem Text="All" Value="@(LogicalFilterOperator.And)" />
                                 </Items>
                             </RadzenSelectBar>
-                            @* <RadzenButton Variant="Variant.Text" Text="X" Click="@(() => CollectionFilterApply(column))" Style="margin-top:-12px;margin-right:-10px;" /> *@
                         </RadzenStack>
                         <RadzenListBox AllowClear="true" @bind-Value=@selectedWorkStatus Multiple="true" AllowSelectAll=true Style="width:100%; height:200px;"
                                        Change="@(()=>OnSelectedWorkStatusChange(column))" Data=@workStatuses />
@@ -107,9 +106,9 @@ else
 
     private async Task WorkStatusFilterClear(RadzenDataGridColumn<Employee> column)
     {
-        if(selectedWorkStatus!=null)
+        if(selectedWorkStatus != null)
         {
-            selectedWorkStatus.Clear();
+            selectedWorkStatus = null;
             await OnSelectedWorkStatusChange(column);            
         }
         await column.CloseFilter();
@@ -124,19 +123,15 @@ else
     {
         var createWhereExpression = new List<string>();
 
-        if (selectedWorkStatus != null && selectedWorkStatus.Count > 0)
+        if (selectedWorkStatus?.Any() == true)
         {
-            foreach (var item in selectedWorkStatus)
-            {
-                createWhereExpression.Add($"WorkStatus.Contains(\"{item}\")");
-            }
-            var booleanOperator = workStatusOperator == LogicalFilterOperator.And ? "and" : "or";
-
-            whereExpression = string.Join($" {booleanOperator} ", createWhereExpression);
+            whereExpression = string.Join($" {Enum.GetName(typeof(LogicalFilterOperator), workStatusOperator).ToLowerInvariant()} ",
+                selectedWorkStatus.Select(s => $"WorkStatus.Contains(\"{s}\")"));
         }
         else
         {
             whereExpression = "";
+            selectedWorkStatus = null;
         }
 
         await column.SetCustomFilterExpressionAsync(whereExpression);
