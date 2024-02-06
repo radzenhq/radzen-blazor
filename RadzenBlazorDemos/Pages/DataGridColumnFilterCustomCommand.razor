@@ -60,7 +60,7 @@ else
     TitleOfCourtesy? currentTOC;
     IEnumerable<string> selectedCompanyNames;
     List<string> selectedWorkStatus;
-    string whereCommand;
+    string whereExpression;
 
     public LogicalFilterOperator workStatusOperator { get; set; } = LogicalFilterOperator.Or;
 
@@ -122,25 +122,24 @@ else
 
     async Task OnSelectedWorkStatusChange(RadzenDataGridColumn<Employee> column)
     {
-        var createWhereCommand = new List<string>();
+        var createWhereExpression = new List<string>();
 
         if (selectedWorkStatus != null && selectedWorkStatus.Count > 0)
         {
             foreach (var item in selectedWorkStatus)
             {
-                createWhereCommand.Add($"WorkStatus.Contains(\"{item}\")");
+                createWhereExpression.Add($"WorkStatus.Contains(\"{item}\")");
             }
             var booleanOperator = workStatusOperator == LogicalFilterOperator.And ? "and" : "or";
 
-            whereCommand = string.Join($" {booleanOperator} ", createWhereCommand);
-            whereCommand = $"({whereCommand})";
+            whereExpression = string.Join($" {booleanOperator} ", createWhereExpression);
         }
         else
         {
-            whereCommand = "";
+            whereExpression = "";
         }
 
-        await column.SetCustomFilterExpressionAsync(whereCommand);
+        await column.SetCustomFilterExpressionAsync(whereExpression);
     }
 
     void OnRender(DataGridRenderEventArgs<Employee> args)
