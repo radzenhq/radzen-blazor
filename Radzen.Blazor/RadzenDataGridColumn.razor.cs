@@ -314,7 +314,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The custom filter dynamic Linq dictionary.</value>
         [Parameter]
-        public string CustomFilterCommand { get; set; }
+        public string CustomFilterExpression { get; set; }
 
         /// <summary>
         /// Gets the filter placeholder.
@@ -769,7 +769,7 @@ namespace Radzen.Blazor
         object secondFilterValue;
         FilterOperator? secondFilterOperator;
         LogicalFilterOperator? logicalFilterOperator;
-        string customFilterCommand;
+        string customFilterExpression;
 
         /// <summary>
         /// Set parameters as an asynchronous operation.
@@ -883,13 +883,13 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (parameters.DidParameterChange(nameof(CustomFilterCommand), CustomFilterCommand))
+            if (parameters.DidParameterChange(nameof(CustomFilterExpression), CustomFilterExpression))
             {
-                customFilterCommand = parameters.GetValueOrDefault<string>(nameof(CustomFilterCommand));
+                customFilterExpression = parameters.GetValueOrDefault<string>(nameof(CustomFilterExpression));
 
-                if (CustomFilterCommand != null)
+                if (CustomFilterExpression != null)
                 {
-                    CustomFilterCommand = customFilterCommand;
+                    CustomFilterExpression = customFilterExpression;
                     Grid.SaveSettings();
                     if (Grid.IsVirtualizationAllowed())
                     {
@@ -1024,26 +1024,26 @@ namespace Radzen.Blazor
         /// <summary>
         /// Get custom filter linq.
         /// </summary>
-        public string GetCustomFilterCommand()
+        public string GetCustomFilterExpression()
         {
-            return customFilterCommand ?? CustomFilterCommand;
+            return customFilterExpression ?? CustomFilterExpression;
         }
 
         /// <summary>
         /// Set column custom filter linq.
         /// </summary>
-        public void SetCustomFilterCommand(string value)
+        public void SetCustomFilterExpression(string value)
         {
-            customFilterCommand = value;
+            customFilterExpression = value;
         }
 
         /// <summary>
         /// Set column custom filter linq and reload grid.
         /// </summary>
         /// <param name="value">Filter value.</param>
-        public async Task SetCustomFilterCommandAsync(string value)
+        public async Task SetCustomFilterExpressionAsync(string value)
         {
-            SetCustomFilterCommand(value);
+            SetCustomFilterExpression(value);
             Grid.SaveSettings();
             await Grid.FirstPage(true);
         }

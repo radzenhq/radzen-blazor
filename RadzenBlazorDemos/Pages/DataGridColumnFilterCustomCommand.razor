@@ -140,7 +140,7 @@ else
             whereCommand = "";
         }
 
-        await column.SetCustomFilterCommandAsync(whereCommand);
+        await column.SetCustomFilterExpressionAsync(whereCommand);
     }
 
     void OnRender(DataGridRenderEventArgs<Employee> args)

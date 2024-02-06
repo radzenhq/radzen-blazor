@@ -154,7 +154,7 @@ namespace Radzen
                (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty) || c.GetFilterOperator() == FilterOperator.IsNotNull
                    || c.GetFilterOperator() == FilterOperator.IsNull || c.GetFilterOperator() == FilterOperator.IsEmpty
                    || c.GetFilterOperator() == FilterOperator.IsNotEmpty
-                   || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterCommand() != null))
+                   || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterExpression() != null))
                && c.GetFilterProperty() != null;
 
             if (columns.Where(canFilter).Any())
@@ -173,10 +173,10 @@ namespace Radzen
 
                     if (column.GetFilterOperator() == FilterOperator.Custom)
                     {
-                        var customFilterCommand = column.GetCustomFilterCommand();
-                        if (!string.IsNullOrEmpty(customFilterCommand))
+                        var customFilterExpression = column.GetCustomFilterExpression();
+                        if (!string.IsNullOrEmpty(customFilterExpression))
                         {
-                            whereList.Add(customFilterCommand);
+                            whereList.Add(customFilterExpression);
                         }
                     }
                     else if (PropertyAccess.IsDate(column.FilterPropertyType))
@@ -827,7 +827,7 @@ namespace Radzen
                (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty)
                 || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
                 || c.GetFilterOperator() == FilterOperator.IsEmpty || c.GetFilterOperator() == FilterOperator.IsNotEmpty
-                || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterCommand() != null))
+                || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterExpression() != null))
                && c.GetFilterProperty() != null;
 
             if (columns.Where(canFilter).Any())
@@ -845,10 +845,10 @@ namespace Radzen
 
                     if (column.GetFilterOperator() == FilterOperator.Custom)
                     {
-                        var customFilterCommand = column.GetCustomFilterCommand();
-                        if (!string.IsNullOrEmpty(customFilterCommand))
+                        var customFilterExpression = column.GetCustomFilterExpression();
+                        if (!string.IsNullOrEmpty(customFilterExpression))
                         {
-                            whereList.Add(customFilterCommand);
+                            whereList.Add(customFilterExpression);
                         }
                     }
                     else if (value != null || column.GetFilterOperator() == FilterOperator.IsNotNull || column.GetFilterOperator() == FilterOperator.IsNull
@@ -983,7 +983,7 @@ namespace Radzen
                (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty)
                 || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
                 || c.GetFilterOperator() == FilterOperator.IsEmpty || c.GetFilterOperator() == FilterOperator.IsNotEmpty
-                || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterCommand() != null))
+                || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterExpression() != null))
                && c.GetFilterProperty() != null;
 
             if (columns.Where(canFilter).Any())
@@ -997,10 +997,10 @@ namespace Radzen
                 {
                     if (column.GetFilterOperator() == FilterOperator.Custom)
                     {
-                        var customFilterCommand = column.GetCustomFilterCommand();
-                        if (!string.IsNullOrEmpty(customFilterCommand))
+                        var customFilterExpression = column.GetCustomFilterExpression();
+                        if (!string.IsNullOrEmpty(customFilterExpression))
                         {
-                            whereList.Add(customFilterCommand, Enumerable.Empty<object>());
+                            whereList.Add(customFilterExpression, Enumerable.Empty<object>());
                         }
                     }
                     else
