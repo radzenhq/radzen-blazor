@@ -2020,7 +2020,7 @@ namespace Radzen
         /// Gets or sets the operator which will compare the property value with <see cref="FilterValue" />.
         /// </summary>
         /// <value>The filter operator.</value>
-        public FilterOperator FilterOperator { get; set; }
+        public FilterOperator? FilterOperator { get; set; }
 
         /// <summary>
         /// Gets or sets the logic used to combine the outcome of filtering by <see cref="FilterValue" />.

@@ -40,7 +40,7 @@ else
     if (property != null)
     {
         <RadzenDropDown @onclick:preventDefault="true" Data="@(property.GetFilterOperators().Select(t => new { Value = property.GetFilterOperatorText(t), Key = t }))" 
-                TextProperty="Value" ValueProperty="Key" TValue="FilterOperator" @bind-Value="@Filter.FilterOperator" Change="@OnOperatorChange" class="rz-datafilter-operator" />
+                TextProperty="Value" ValueProperty="Key" TValue="FilterOperator?" @bind-Value="@Filter.FilterOperator" Change="@OnOperatorChange" class="rz-datafilter-operator" />
         @if (property.FilterTemplate != null)
         {
             <div class="rz-datafilter-editor" style="display:flex">
@@ -120,14 +120,14 @@ else
                     
 	                Filter.Property = property.Property;
 
-                    if (!property.GetFilterOperators().Contains(Filter.FilterOperator))
-                    {
-                        Filter.FilterOperator = property.GetFilterOperators().FirstOrDefault();
-                    }
-
-                    if(Filter.FilterOperator != property.GetFilterOperator())
+                    if (Filter.FilterOperator == null)
                     {
                         Filter.FilterOperator = property.GetFilterOperator();
+                    }
+                    
+                    else if (!property.GetFilterOperators().Contains(Filter.FilterOperator.Value))
+                    {
+                        Filter.FilterOperator = property.GetFilterOperators().FirstOrDefault();
                     }
 
                     var v = property.GetFilterValue();
