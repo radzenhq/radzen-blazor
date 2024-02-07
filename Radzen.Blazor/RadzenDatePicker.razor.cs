@@ -255,6 +255,13 @@ namespace Radzen.Blazor
 
             UpdateYearsAndMonths(Min, Max);
 
+#if NET6_0_OR_GREATER
+            if (typeof(TValue) == typeof(TimeOnly))
+            {
+                TimeOnly = true;
+                ShowTime = true;
+            }
+#endif
         }
 
         void UpdateYearsAndMonths(DateTime? min, DateTime? max)
@@ -375,7 +382,7 @@ namespace Radzen.Blazor
             {
                 if (_value != value)
                 {
-                    _value = value;
+                    _value = ConvertToTValue(value);
                     _currentDate = default(DateTime);
 
                     if (value is DateTimeOffset offset)
@@ -401,6 +408,16 @@ namespace Radzen.Blazor
                         {
                             DateTimeValue = DateTime.SpecifyKind(dateTime, Kind);
                         }
+#if NET6_0_OR_GREATER
+                        else if (value is DateOnly dateOnly)
+                        {
+                            DateTimeValue = dateOnly.ToDateTime(System.TimeOnly.MinValue, Kind);
+                        }
+                        else if (value is TimeOnly timeOnly)
+                        {
+                            DateTimeValue = new DateTime(1,1,0001, timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond, Kind);
+                        }
+#endif
                         else
                         {
                             DateTimeValue = null;
@@ -408,6 +425,26 @@ namespace Radzen.Blazor
                     }
                 }
             }
+        }
+
+        private static object ConvertToTValue(object value)
+        {
+#if NET6_0_OR_GREATER
+            if (value is DateTime dt)
+            {
+                if (typeof(TValue) == typeof(DateOnly))
+                {
+                    value = DateOnly.FromDateTime(dt);
+                    return (TValue)value;
+                }
+                if (typeof(TValue) == typeof(TimeOnly))
+                {
+                    value = System.TimeOnly.FromDateTime(dt);
+                    return (TValue)value;
+                }
+            }
+#endif
+            return value;
         }
 
         DateTime _currentDate;
