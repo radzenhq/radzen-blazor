@@ -295,9 +295,9 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Html editor mode (Rendered or Raw). Also used for toolbar buttons to enable/disable according to mode.
+    /// Month enum
     /// </summary>
-    public enum ScheduleStartMonth
+    public enum Month
     {
         /// <summary>
         /// January.

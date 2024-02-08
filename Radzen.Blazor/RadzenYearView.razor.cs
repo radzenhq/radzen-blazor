@@ -25,13 +25,13 @@ namespace Radzen.Blazor
         {
             get
             {
-                if (ScheduleStartMonth == ScheduleStartMonth.January)
+                if (StartMonth == Month.January)
                 {
                     return Scheduler.CurrentDate.ToString("yyyy", Scheduler.Culture);
                 }
                 else
                 {
-                    return (Scheduler.CurrentDate.Month < (int)ScheduleStartMonth + 1) ? $"{Scheduler.CurrentDate.AddYears(-1).ToString("yyyy", Scheduler.Culture)}-{Scheduler.CurrentDate.ToString("yyyy", Scheduler.Culture)}" : $"{Scheduler.CurrentDate.ToString("yyyy", Scheduler.Culture)}-{Scheduler.CurrentDate.AddYears(+1).ToString("yyyy", Scheduler.Culture)}";
+                    return (Scheduler.CurrentDate.Month < (int)StartMonth + 1) ? $"{Scheduler.CurrentDate.AddYears(-1).ToString("yyyy", Scheduler.Culture)}-{Scheduler.CurrentDate.ToString("yyyy", Scheduler.Culture)}" : $"{Scheduler.CurrentDate.ToString("yyyy", Scheduler.Culture)}-{Scheduler.CurrentDate.AddYears(+1).ToString("yyyy", Scheduler.Culture)}";
                 }
             }
         }
@@ -52,7 +52,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                if (ScheduleStartMonth == ScheduleStartMonth.January)
+                if (StartMonth == Month.January)
                 {
                     var d = new DateTime(Scheduler.CurrentDate.Date.Year, 1, 1).StartOfWeek();
                     if (d.DayOfWeek == DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek) d.AddDays(-7);
@@ -60,7 +60,7 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    var d = new DateTime(Scheduler.CurrentDate.Date.Year + (Scheduler.CurrentDate.Month < (int)ScheduleStartMonth + 1 ? -1 : 0), (int)ScheduleStartMonth + 1, 1).StartOfWeek();
+                    var d = new DateTime(Scheduler.CurrentDate.Date.Year + (Scheduler.CurrentDate.Month < (int)StartMonth + 1 ? -1 : 0), (int)StartMonth + 1, 1).StartOfWeek();
                     if (d.DayOfWeek == DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek) d.AddDays(-7);
                     return d;
                 }
@@ -83,7 +83,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The start month.</value>
         [Parameter]
-        public ScheduleStartMonth ScheduleStartMonth { get; set; } = ScheduleStartMonth.January;
+        public Month StartMonth { get; set; } = Month.January;
 
         /// <inheritdoc />
         public override DateTime Next()

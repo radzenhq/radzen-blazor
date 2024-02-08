@@ -28,7 +28,7 @@
     </div>
     @for (int month = 0; month < 12; month++)
     {
-        int offSetMonth = ((month + (int)ScheduleStartMonth) % 12) + 1;
+        int offSetMonth = ((month + (int)StartMonth) % 12) + 1;
         int curYear = startyear + (offSetMonth <= month ? 1 : 0);
         realstart = new DateTime(curYear, offSetMonth, 1);
         daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
@@ -141,7 +141,7 @@
     public DateTime EndDate { get; set; }
 
     [Parameter]
-    public ScheduleStartMonth ScheduleStartMonth { get; set; }
+    public Month StartMonth { get; set; }
 
     [Parameter]
     public int MaxAppointmentsInSlot { get; set; }
