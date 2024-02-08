@@ -24,7 +24,17 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override string Title
         {
-            get => Scheduler.CurrentDate.ToString("yyyy", Scheduler.Culture);
+            get
+            {
+                if (ScheduleStartMonth == ScheduleStartMonth.January)
+                {
+                    return Scheduler.CurrentDate.ToString("yyyy", Scheduler.Culture);
+                }
+                else
+                {
+                    return (Scheduler.CurrentDate.Month < (int)ScheduleStartMonth + 1) ? $"{Scheduler.CurrentDate.AddYears(-1).ToString("yyyy", Scheduler.Culture)}-{Scheduler.CurrentDate.ToString("yyyy", Scheduler.Culture)}" : $"{Scheduler.CurrentDate.ToString("yyyy", Scheduler.Culture)}-{Scheduler.CurrentDate.AddYears(+1).ToString("yyyy", Scheduler.Culture)}";
+                }
+            }
         }
 
         /// <inheritdoc />
@@ -50,10 +60,18 @@ namespace Radzen.Blazor
         {
             get
             {
-                var d = new DateTime(Scheduler.CurrentDate.Date.Year, 1, 1).StartOfWeek();
-                if (d.DayOfWeek == DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek) d.AddDays(-7);
-
-                return d;
+                if (ScheduleStartMonth == 0)
+                {
+                    var d = new DateTime(Scheduler.CurrentDate.Date.Year, 1, 1).StartOfWeek();
+                    if (d.DayOfWeek == DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek) d.AddDays(-7);
+                    return d;
+                }
+                else
+                {
+                    var d = new DateTime(Scheduler.CurrentDate.Date.Year + (Scheduler.CurrentDate.Month < (int)ScheduleStartMonth + 1 ? -1 : 0), (int)ScheduleStartMonth + 1, 1).StartOfWeek();
+                    if (d.DayOfWeek == DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek) d.AddDays(-7);
+                    return d;
+                }
             }
         }
 
@@ -62,9 +80,18 @@ namespace Radzen.Blazor
         {
             get
             {
-                var d = new DateTime(Scheduler.CurrentDate.Date.Year, 1, 1).AddDays(DateTime.IsLeapYear(Scheduler.CurrentDate.Date.Year) ? 366 : 365).EndOfWeek();
-
+                var realFirstYear = StartDate.AddDays(7);
+                var d = StartDate.AddDays(DateTime.IsLeapYear(realFirstYear.Year) || DateTime.IsLeapYear(realFirstYear.Year + 1) ? 366 : 365).EndOfWeek();
                 return d;
+            }
+        }
+
+        /// <inheritdoc />
+        public ScheduleStartMonth ScheduleStartMonth
+        {
+            get
+            {
+                return Scheduler.ScheduleStartMonth;
             }
         }
 

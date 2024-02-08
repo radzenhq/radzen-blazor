@@ -115,6 +115,13 @@ namespace Radzen.Blazor
         public DateTime CurrentDate { get; set; }
 
         /// <summary>
+        /// Gets or sets the start month for the year views />.
+        /// </summary>
+        /// <value>The start month.</value>
+        [Parameter]
+        public ScheduleStartMonth ScheduleStartMonth { get; set; } = ScheduleStartMonth.January;
+
+        /// <summary>
         /// Specifies the property of <typeparamref name="TItem" /> which will set <see cref="AppointmentData.Text" />.
         /// </summary>
         /// <value>The name of the property. Must be a <c>DateTime</c> property.</value>
