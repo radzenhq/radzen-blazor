@@ -127,10 +127,5 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The culture.</value>
         CultureInfo Culture { get; set; }
-        /// <summary>
-        /// Sets the start month for year views.
-        /// </summary>
-        /// <value>The month.</value>
-        ScheduleStartMonth ScheduleStartMonth { get; }
     }
 }

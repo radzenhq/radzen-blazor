@@ -86,14 +86,12 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <inheritdoc />
-        public ScheduleStartMonth ScheduleStartMonth
-        {
-            get
-            {
-                return Scheduler.ScheduleStartMonth;
-            }
-        }
+        /// <summary>
+        /// Gets or sets the start month for the year views />.
+        /// </summary>
+        /// <value>The start month.</value>
+        [Parameter]
+        public ScheduleStartMonth ScheduleStartMonth { get; set; } = ScheduleStartMonth.January;
 
         /// <inheritdoc />
         public override DateTime Next()
