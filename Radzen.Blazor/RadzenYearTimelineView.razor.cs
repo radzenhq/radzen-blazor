@@ -60,7 +60,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                if (ScheduleStartMonth == 0)
+                if (ScheduleStartMonth == ScheduleStartMonth.January)
                 {
                     var d = new DateTime(Scheduler.CurrentDate.Date.Year, 1, 1).StartOfWeek();
                     if (d.DayOfWeek == DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek) d.AddDays(-7);
