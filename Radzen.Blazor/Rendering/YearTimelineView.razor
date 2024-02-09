@@ -26,10 +26,12 @@
             </div>
         }
     </div>
-    @for (int month = 1; month < 13; month++)
+    @for (int month = 0; month < 12; month++)
     {
-        realstart = new DateTime(startyear, month, 1);
-        daysinmonth = DateTime.DaysInMonth(startyear, month);
+        int offSetMonth = ((month + (int)StartMonth) % 12) + 1;
+        int curYear = startyear + (offSetMonth <= month ? 1 : 0);
+        realstart = new DateTime(curYear, offSetMonth, 1);
+        daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
         date = realstart.StartOfMonth().StartOfWeek();
 
         <div class="rz-month">
@@ -40,7 +42,7 @@
                     var appointments = AppointmentsInSlot(start, end);
                     var excessCount = appointments.Count() - MaxAppointmentsInSlot;
                     var existingTops = ExistingTops(points, appointments.Take(MaxAppointmentsInSlot));
-                    if (start.Month == month)
+                    if (start.Month == offSetMonth)
                     {
                         @foreach (var item in appointments.Take(MaxAppointmentsInSlot))
                         {
@@ -89,7 +91,7 @@
                 }
             </div>
             <div class="rz-slots">
-                <div @attributes=@Attributes(realstart, "rz-slot")>
+                <div @attributes=@Attributes(realstart, "rz-slot", false)>
                     <div class="rz-slot-header">
                         @realstart.ToString("MMMM", Scheduler.Culture)
                     </div>
@@ -98,30 +100,23 @@
                 {
                     string dayType = "";
                     var dayOfWeek = date.AddDays(day);
-                    bool slotInMonth = dayOfWeek.Month == month;
+                    bool slotInMonth = dayOfWeek.Month == offSetMonth;
 
                     dayType = dayOfWeek.DayOfWeek == DayOfWeek.Saturday || dayOfWeek.DayOfWeek == DayOfWeek.Sunday ? "rz-weekend" : "";
-                    dayType = dayOfWeek.Month != month ? "rz-other-month" : dayType;
+                    dayType = dayOfWeek.Month != offSetMonth ? "rz-other-month" : dayType;
 
                     @if (slotInMonth)
                     {
-                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"))>
+                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"), slotInMonth)>
                             <div class="rz-slot-title">
-                                @if (dayOfWeek.Month == month)
-                                {
-                                    @dayOfWeek.Day
-                                }
+                                @dayOfWeek.Day
                             </div>
                         </div>
                     }
                     else
                     {
-                        <div @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"))>
+                        <div @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"), slotInMonth)>
                             <div class="rz-slot-title">
-                                @if (dayOfWeek.Month == month)
-                                {
-                                    @dayOfWeek.Day
-                                }
                             </div>
                         </div>
                     }
@@ -139,6 +134,9 @@
     public DateTime EndDate { get; set; }
 
     [Parameter]
+    public Month StartMonth { get; set; }
+
+    [Parameter]
     public int MaxAppointmentsInSlot { get; set; }
 
     [Parameter]
@@ -150,10 +148,14 @@
     [Parameter]
     public IEnumerable<AppointmentData> Appointments { get; set; }
 
-    IDictionary<string, object> Attributes(DateTime start, string className)
+    IDictionary<string, object> Attributes(DateTime start, string className, bool slotInMonth)
     {
         var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1));
         attributes["class"] = ClassList.Create(className).Add(attributes).ToString();
+        if (!slotInMonth)
+        {
+            attributes.Remove("style");
+        }
         return attributes;
     }
 

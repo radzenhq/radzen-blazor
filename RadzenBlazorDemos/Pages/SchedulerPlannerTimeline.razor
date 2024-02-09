@@ -1,11 +1,18 @@
 @inject DialogService DialogService
 
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+    <RadzenLabel Text="Schedule Start Month:" />
+    <RadzenSelectBar @bind-Value="@startMonth" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Month)).Cast<Month>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
+    <RadzenDropDown @bind-Value="@startMonth" Change="StartMonthChange" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Month)).Cast<Month>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+</RadzenStack>
+
 <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
     TextProperty="Text" SelectedIndex="1"
     SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender>
     <RadzenMonthView />
-    <RadzenYearPlannerView />
-    <RadzenYearTimelineView />
+    <RadzenYearPlannerView StartMonth="@startMonth" />
+    <RadzenYearTimelineView StartMonth="@startMonth" />
+    <RadzenYearView StartMonth="@startMonth" />
 </RadzenScheduler>
 
 <EventConsole @ref=@console />
@@ -14,6 +21,7 @@
     RadzenScheduler<Appointment> scheduler;
     EventConsole console;
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    Month startMonth = Month.January;
 
     IList<Appointment> appointments = new List<Appointment>
     {
@@ -26,6 +34,11 @@
         new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
     };
 
+    async Task StartMonthChange()
+    {
+        await scheduler.Reload();
+    }
+
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {
         // Highlight today in month view
@@ -34,10 +47,10 @@
             args.Attributes["style"] = "background: rgba(255,220,40,.2);";
         }
 
-        // Highlight working hours (9-18)
-        if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
+        // Draw a line for new year if start month is not January
+        if ((args.View.Text == "Planner" || args.View.Text == "Timeline") && args.Start.Month == 12 && startMonth != Month.January)
         {
-            args.Attributes["style"] = "background: rgba(255,220,40,.2);";
+            args.Attributes["style"] = "border-bottom: thick double var(--rz-base-600);";
         }
     }
 
@@ -45,14 +58,17 @@
     {
         console.Log($"SlotSelect: Start={args.Start} End={args.End}");
 
-        Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
-            new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
+        if(args.View.Text != "Year")
+        {            
+            Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
+                new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
 
-        if (data != null)
-        {
-            appointments.Add(data);
-            // Either call the Reload method or reassign the Data property of the Scheduler
-            await scheduler.Reload();
+            if (data != null)
+            {
+                appointments.Add(data);
+                // Either call the Reload method or reassign the Data property of the Scheduler
+                await scheduler.Reload();
+            }
         }
     }
 

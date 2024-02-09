@@ -17,10 +17,12 @@
 
 <div class="rz-view rz-year-view">
 <div class="rz-display-flex rz-row rz-align-items-normal rz-justify-content-space-between">
-    @for (int month = 1; month < 13; month++)
+    @for (int month = 0; month < 12; month++)
     {
-        realstart = new DateTime(year, month, 1);
-        daysinmonth = DateTime.DaysInMonth(year, month);
+        int offSetMonth = ((month + (int)StartMonth) % 12) + 1;
+        int curYear = year + (offSetMonth <= month ? 1 : 0);
+        realstart = new DateTime(curYear, offSetMonth, 1);
+        daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
         date = realstart.StartOfMonth().StartOfWeek();
 
         <div class="rz-display-flex rz-flex-column rz-col-12 rz-col-sm-6 rz-col-md-4 rz-col-lg-3">
@@ -52,7 +54,7 @@
                                 var excessCount = appointments.Count();
                                 string classname;
 
-                                    classname = $"rz-slot-title {(day.Month != month ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")}";
+                                    classname = $"rz-slot-title {(day.Month != offSetMonth ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")}";
                                     <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
                                         <div class="@classname">
                                             @day.Day
@@ -81,6 +83,9 @@
 
     [Parameter]
     public DateTime EndDate { get; set; }
+
+    [Parameter]
+    public Month StartMonth { get; set; }
 
     [Parameter]
     public int MaxAppointmentsInSlot { get; set; }
