@@ -158,7 +158,7 @@ else
         ColumnIndex = Grid.allColumns.IndexOf(column);//for child must have different columnindex
 
         <RadzenDataGridHeaderCell RowIndex="@RowIndex" Grid="@Grid" Column="@column" Style="@column.GetStyle(true, true)" ColumnIndex="@ColumnIndex"
-            CssClass="@($" maitest rz-unselectable-text {(Grid.AllowSorting && column.Sortable ? "rz-sortable-column" : "")} {column.HeaderCssClass} {Grid.getFrozenColumnClass(column, Grid.ColumnsCollection.Where(c => c.GetVisible()).ToList())} {Grid.getCompositeCellCSSClass(column)} {Grid.getColumnAlignClass(column)}".Trim())" />
+            CssClass="@($"rz-unselectable-text {(Grid.AllowSorting && column.Sortable ? "rz-sortable-column" : "")} {column.HeaderCssClass} {Grid.getFrozenColumnClass(column, Grid.ColumnsCollection.Where(c => c.GetVisible()).ToList())} {Grid.getCompositeCellCSSClass(column)} {Grid.getColumnAlignClass(column)}".Trim())" />
     }
 }
 @code {
@@ -219,7 +219,7 @@ else
 
     private string GetStyle()
     {
-        var styles = new List<string>() { Column.GetStyle(true, true), Style };
+        var styles = (new List<string>() { Column.GetStyle(true, true), Style }).Distinct().ToList();
 
         if (Attributes?.TryGetValue("style", out var styleAttribute) == true)
         {
