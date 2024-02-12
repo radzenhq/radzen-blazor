@@ -10,3 +10,49 @@
 <RadzenExample ComponentName="Tree" Example="TreeConfig">
     <TreeConfig />
 </RadzenExample>
+
+<RadzenText Anchor="tree#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Tree component.
+</RadzenText>
+
+<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
+    <div class="rz-data-grid-data">
+        <table class="rz-grid-table">
+            <thead>
+                <tr>
+                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
+                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
+                    <td><span class="rz-cell-data">Navigate to a Tree component.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Up Arrow" /></span></td>
+                    <td><span class="rz-cell-data">Select previous hierarchical Tree item.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Down Arrow" /></span></td>
+                    <td><span class="rz-cell-data">Select next hierarchical Tree item.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Right Arrow" /></span></td>
+                    <td><span class="rz-cell-data">Expands selected Tree item.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Left Arrow" /></span></td>
+                    <td><span class="rz-cell-data">Collapse selected Tree item.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /> or <RadzenBadge Text="Space" /></span></td>
+                    <td><span class="rz-cell-data">Check/uncheck selected Tree item if CheckBox is available.</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
