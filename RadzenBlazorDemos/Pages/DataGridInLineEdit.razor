@@ -4,18 +4,26 @@
 
 @inherits DbContextPage
 
- <style>
+<style>
     .rz-grid-table {
         width: unset;
     }
 </style>
 
-<RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" class="mt-2 mb-4" Text="Add New Order" Click="@InsertRow" Disabled=@(orderToInsert != null || orderToUpdate != null) />
-<RadzenDataGrid @ref="ordersGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single"
-            Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="200px">
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10px" class="mt-2 mb-4">
+    <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Text="Add New Order" Click="@InsertRow" Disabled="@(editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)" />
+    <div style="white-space:nowrap; margin-left: 20px ">Edit Mode:</div>
+    <RadzenSelectBar @bind-Value="@editMode" TextProperty="Text" ValueProperty="Value" style="margin-right: 16px"
+                     Data="@(Enum.GetValues(typeof(DataGridEditMode)).Cast<DataGridEditMode>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small"
+                     Disabled="@(editMode == DataGridEditMode.Multiple && ordersToInsert.Count() > 1)" />
+</RadzenStack>
+
+<RadzenDataGrid @ref="ordersGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="@editMode"
+                Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="200px">
     <Columns>
-        <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID" Width="120px" Frozen="true"/>
-        <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" Width="280px" >
+        <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID" Width="120px" Frozen="true" />
+        <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" Width="280px">
             <EditTemplate Context="order">
                 <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%; display: block;" />
             </EditTemplate>
@@ -72,7 +80,7 @@
             <Template Context="order">
                 <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(order))" @onclick:stopPropagation="true">
                 </RadzenButton>
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(order))"  @onclick:stopPropagation="true">
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(order))" @onclick:stopPropagation="true">
                 </RadzenButton>
             </Template>
             <EditTemplate Context="order">
@@ -93,13 +101,21 @@
     IEnumerable<Customer> customers;
     IEnumerable<Employee> employees;
 
-    Order orderToInsert;
-    Order orderToUpdate;
+    DataGridEditMode editMode = DataGridEditMode.Single;
+
+    List<Order> ordersToInsert = new List<Order>();
+    List<Order> ordersToUpdate = new List<Order>();
 
     void Reset()
     {
-        orderToInsert = null;
-        orderToUpdate = null;
+        ordersToInsert.Clear();
+        ordersToUpdate.Clear();
+    }
+
+    void Reset(Order order)
+    {
+        ordersToInsert.Remove(order);
+        ordersToUpdate.Remove(order);
     }
 
     protected override async Task OnInitializedAsync()
@@ -114,13 +130,18 @@
 
     async Task EditRow(Order order)
     {
-        orderToUpdate = order;
+        if (editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)
+        {
+            Reset();
+        }
+
+        ordersToUpdate.Add(order);
         await ordersGrid.EditRow(order);
     }
 
     void OnUpdateRow(Order order)
     {
-        Reset();
+        Reset(order);
 
         dbContext.Update(order);
 
@@ -134,7 +155,7 @@
 
     void CancelEdit(Order order)
     {
-        Reset();
+        Reset(order);
 
         ordersGrid.CancelEditRow(order);
 
@@ -148,7 +169,7 @@
 
     async Task DeleteRow(Order order)
     {
-        Reset();
+        Reset(order);
 
         if (orders.Contains(order))
         {
@@ -167,8 +188,14 @@
 
     async Task InsertRow()
     {
-        orderToInsert = new Order();
-        await ordersGrid.InsertRow(orderToInsert);
+        if (editMode == DataGridEditMode.Single)
+        {
+            Reset();
+        }
+
+        var order = new Order();
+        ordersToInsert.Add(order);
+        await ordersGrid.InsertRow(order);
     }
 
     void OnCreateRow(Order order)
@@ -176,7 +203,7 @@
         dbContext.Add(order);
 
         dbContext.SaveChanges();
-        
-        orderToInsert = null;
+
+        ordersToInsert.Remove(order);
     }
 }
