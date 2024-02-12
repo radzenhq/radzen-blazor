@@ -33,6 +33,12 @@
     public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
         (double a, double b) = series.GetTrend();
+
+        if (double.IsNaN(a) || double.IsNaN(b))
+        {
+            return null;
+        }
+
         double x1, x2, y1, y2;
 
         if (Chart.ShouldInvertAxes())
@@ -40,7 +46,7 @@
             y1 = 0; y2 = Chart.ValueScale.OutputSize;
             x1 = a; x2 = (a + b * y2);
 
-            x1 = Math.Min(Math.Max(0, x1), Chart.CategoryScale.OutputSize); 
+            x1 = Math.Min(Math.Max(0, x1), Chart.CategoryScale.OutputSize);
             x2 = Math.Max(Math.Min(Chart.CategoryScale.OutputSize, x2), 0);
         }
         else
@@ -48,7 +54,7 @@
             x1 = 0; x2 = Chart.CategoryScale.OutputSize;
             y1 = a; y2 = (a + b * x2);
 
-            y1 = Math.Min(Math.Max(0, y1), Chart.ValueScale.OutputSize); 
+            y1 = Math.Min(Math.Max(0, y1), Chart.ValueScale.OutputSize);
             y2 = Math.Max(Math.Min(Chart.ValueScale.OutputSize, y2), 0);
         }
 
