@@ -39,5 +39,7 @@
         await base.OnInitializedAsync();
  
         employees = dbContext.Employees;
+
+        selectedEmployees = new List<Employee>(){ employees.FirstOrDefault() };
     }
 }
