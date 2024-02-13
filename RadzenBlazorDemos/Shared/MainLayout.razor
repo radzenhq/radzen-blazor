@@ -107,7 +107,7 @@
 <RadzenSidebar @bind-Expanded="@configSidebarExpanded" Style="width: 370px; grid-area: rz-config-sidebar; background-color: var(--rz-body-background-color); color: var(--rz-text-color);">
     <RadzenStack Class="rz-p-4" Gap="0">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-            <RadzenText TextStyle="TextStyle.H6" Class="rz-m-0">Demos Configuration</RadzenText>
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" Class="rz-m-0">Demos Configuration</RadzenText>
             <RadzenButton Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary" Click="@(() => configSidebarExpanded = false)" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem" Class="rz-mt-8">
