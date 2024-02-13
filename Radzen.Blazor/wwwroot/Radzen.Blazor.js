@@ -511,7 +511,7 @@ window.Radzen = {
                 break;
         }
     } else if (key == 'ArrowUp') {
-        while (table.nextSelectedIndex >= 0) {
+        while (table.nextSelectedIndex > 0) {
             table.nextSelectedIndex--;
             if (!rows[table.nextSelectedIndex].classList.contains('rz-state-disabled'))
                 break;
@@ -523,7 +523,7 @@ window.Radzen = {
                 break;
         }
     } else if (key == 'ArrowLeft') {
-        while (table.nextSelectedCellIndex >= 0) {
+        while (table.nextSelectedCellIndex > 0) {
             table.nextSelectedCellIndex--;
             if (!rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].classList.contains('rz-state-disabled'))
                 break;
