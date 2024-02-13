@@ -75,6 +75,13 @@ namespace Radzen.Blazor
         public string Image { get; set; }
 
         /// <summary>
+        /// Gets or sets the image style.
+        /// </summary>
+        /// <value>The image style.</value>
+        [Parameter]
+        public string ImageStyle { get; set; }
+
+        /// <summary>
         /// Gets or sets the text.
         /// </summary>
         /// <value>The text.</value>
