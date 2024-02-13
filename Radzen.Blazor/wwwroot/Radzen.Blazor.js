@@ -511,7 +511,7 @@ window.Radzen = {
                 break;
         }
     } else if (key == 'ArrowUp') {
-        while (table.nextSelectedIndex > 0) {
+        while (table.nextSelectedIndex >= 0) {
             table.nextSelectedIndex--;
             if (!rows[table.nextSelectedIndex].classList.contains('rz-state-disabled'))
                 break;
@@ -523,14 +523,35 @@ window.Radzen = {
                 break;
         }
     } else if (key == 'ArrowLeft') {
-        while (table.nextSelectedCellIndex > 0) {
+        while (table.nextSelectedCellIndex >= 0) {
             table.nextSelectedCellIndex--;
             if (!rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].classList.contains('rz-state-disabled'))
                 break;
         }
     }
 
-    if (key == 'ArrowDown' || key == 'ArrowUp') {
+    if (key == 'ArrowLeft' || key == 'ArrowRight' || (key == 'ArrowUp' && table.nextSelectedIndex == 0)) {
+        var highlightedCells = rows[table.nextSelectedIndex].querySelectorAll('.rz-state-focused');
+        if (highlightedCells.length) {
+            for (var i = 0; i < highlightedCells.length; i++) {
+                highlightedCells[i].classList.remove('rz-state-focused');
+            }
+        }
+
+        if (
+            table.nextSelectedCellIndex >= 0 &&
+            table.nextSelectedCellIndex <= rows[table.nextSelectedIndex].cells.length - 1
+        ) {
+            var cell = rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex];
+
+            if (!cell.classList.contains('rz-state-focused')) {
+                cell.classList.add('rz-state-focused');
+                cell.scrollIntoViewIfNeeded();
+            }
+
+            table.parentNode.parentNode.scrollLeft = rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].offsetLeft - rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].offsetWidth;
+        }
+    } else if (key == 'ArrowDown' || key == 'ArrowUp') {
         var highlighted = table.querySelectorAll('.rz-state-focused');
         if (highlighted.length) {
             for (var i = 0; i < highlighted.length; i++) {
@@ -551,28 +572,7 @@ window.Radzen = {
 
             table.parentNode.parentNode.scrollTop = rows[table.nextSelectedIndex].offsetTop - rows[table.nextSelectedIndex].offsetHeight;
         }
-    } else if (key == 'ArrowLeft' || key == 'ArrowRight') {
-        var highlightedCells = rows[table.nextSelectedIndex].querySelectorAll('.rz-state-focused');
-        if (highlightedCells.length) {
-            for (var i = 0; i < highlightedCells.length; i++) {
-                highlightedCells[i].classList.remove('rz-state-focused');
-            }
-        }
-
-        if (
-            table.nextSelectedCellIndex >= 0 &&
-            table.nextSelectedCellIndex <= rows[table.nextSelectedCellIndex].cells.length - 1
-        ) {
-            var cell = rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex];
-
-            if (!cell.classList.contains('rz-state-focused')) {
-                cell.classList.add('rz-state-focused');
-                cell.scrollIntoViewIfNeeded();
-            }
-
-            table.parentNode.parentNode.scrollLeft = rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].offsetLeft - rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].offsetWidth;
-        }
-    }
+    } 
 
     return [table.nextSelectedIndex, table.nextSelectedCellIndex];
   },
