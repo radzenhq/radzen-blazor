@@ -256,7 +256,7 @@ namespace Radzen.Blazor
             UpdateYearsAndMonths(Min, Max);
 
 #if NET6_0_OR_GREATER
-            if (typeof(TValue) == typeof(TimeOnly))
+            if (typeof(TValue) == typeof(TimeOnly) || typeof(TValue) == typeof(TimeOnly?))
             {
                 TimeOnly = true;
                 ShowTime = true;
@@ -430,14 +430,15 @@ namespace Radzen.Blazor
         private static object ConvertToTValue(object value)
         {
 #if NET6_0_OR_GREATER
+            var typeofTValue = typeof(TValue);
             if (value is DateTime dt)
             {
-                if (typeof(TValue) == typeof(DateOnly))
+                if (typeofTValue == typeof(DateOnly) || typeofTValue == typeof(DateOnly?))
                 {
                     value = DateOnly.FromDateTime(dt);
                     return (TValue)value;
                 }
-                if (typeof(TValue) == typeof(TimeOnly))
+                if (typeofTValue == typeof(TimeOnly) || typeofTValue == typeof(TimeOnly?))
                 {
                     value = System.TimeOnly.FromDateTime(dt);
                     return (TValue)value;
