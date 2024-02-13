@@ -496,8 +496,8 @@ window.Radzen = {
     if (!grid) return;
 
     var table = grid.querySelector('.rz-grid-table');
-    var tbody = table.getElementsByTagName("tbody")[0];
-    var thead = table.getElementsByTagName("thead")[0];
+    var tbody = table.tBodies[0];
+    var thead = table.tHead;
 
     var rows = (cellIndex != null && thead && thead.rows && thead.rows.length ? [...thead.rows] : []).concat(tbody && tbody.rows && tbody.rows.length ? [...tbody.rows] : []);
 
