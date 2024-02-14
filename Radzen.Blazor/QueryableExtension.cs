@@ -101,45 +101,43 @@ namespace Radzen
             Func<RadzenGridColumn<T>, bool> canFilter = (c) => c.Filterable && !string.IsNullOrEmpty(c.Type) &&
                 !(c.FilterValue == null || c.FilterValue as string == string.Empty) && c.GetFilterProperty() != null;
 
-            if (columns.Where(canFilter).Any())
+            var columnsWithFilter = columns.Where(canFilter).ToList();
+
+            if (columnsWithFilter.Count == 0)
             {
-                var gridLogicalFilterOperator = columns.FirstOrDefault()?.Grid?.LogicalFilterOperator;
-                var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
-
-                var whereList = new List<string>();
-                foreach (var column in columns.Where(canFilter))
-                {
-                    var value = (string)Convert.ChangeType(column.FilterValue, typeof(string));
-                    var secondValue = (string)Convert.ChangeType(column.SecondFilterValue, typeof(string));
-
-                    var columnType = column.Type;
-                    var columnFormat = column.Format;
-
-                    if (!string.IsNullOrEmpty(columnType) && !string.IsNullOrEmpty(value))
-                    {
-                        var linqOperator = FilterOperators[column.FilterOperator];
-                        if (linqOperator == null)
-                        {
-                            linqOperator = "==";
-                        }
-
-                        var booleanOperator = column.LogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
-
-                        if (string.IsNullOrEmpty(secondValue))
-                        {
-                            whereList.Add(GetColumnFilter(column));
-                        }
-                        else
-                        {
-                            whereList.Add($"({GetColumnFilter(column)} {booleanOperator} {GetColumnFilter(column, true)})");
-                        }
-                    }
-                }
-
-                return string.Join($" {gridBooleanOperator} ", whereList.Where(i => !string.IsNullOrEmpty(i)));
+                return "";
             }
 
-            return "";
+            var gridLogicalFilterOperator = columns.FirstOrDefault()?.Grid?.LogicalFilterOperator;
+            var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
+
+            var whereList = new List<string>();
+            foreach (var column in columnsWithFilter)
+            {
+                var value = (string)Convert.ChangeType(column.FilterValue, typeof(string));
+                var secondValue = (string)Convert.ChangeType(column.SecondFilterValue, typeof(string));
+
+                var columnType = column.Type;
+                var columnFormat = column.Format;
+
+                if (!string.IsNullOrEmpty(columnType) && !string.IsNullOrEmpty(value))
+                {
+                    var linqOperator = FilterOperators[column.FilterOperator] ?? "==";
+
+                    var booleanOperator = column.LogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
+
+                    if (string.IsNullOrEmpty(secondValue))
+                    {
+                        whereList.Add(GetColumnFilter(column));
+                    }
+                    else
+                    {
+                        whereList.Add($"({GetColumnFilter(column)} {booleanOperator} {GetColumnFilter(column, true)})");
+                    }
+                }
+            }
+
+            return string.Join($" {gridBooleanOperator} ", whereList.Where(i => !string.IsNullOrEmpty(i)));
         }
 
         /// <summary>
@@ -157,119 +155,77 @@ namespace Radzen
                    || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterExpression() != null))
                && c.GetFilterProperty() != null;
 
-            if (columns.Where(canFilter).Any())
+            var columnsWithFilter = columns.Where(canFilter).ToList();
+
+            if (columnsWithFilter.Count == 0)
             {
-                var gridLogicalFilterOperator = columns.FirstOrDefault()?.Grid?.LogicalFilterOperator;
-                var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
+                return "";
+            }
 
-                var whereList = new List<string>();
-                foreach (var column in columns.Where(canFilter))
+            var gridLogicalFilterOperator = columns.FirstOrDefault()?.Grid?.LogicalFilterOperator;
+            var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
+
+            var whereList = new List<string>();
+            foreach (var column in columnsWithFilter)
+            {
+                string value = "";
+                string secondValue = "";
+
+                var v = column.GetFilterValue();
+                var sv = column.GetSecondFilterValue();
+
+                if (column.GetFilterOperator() == FilterOperator.Custom
+                    && string.IsNullOrEmpty(column.GetCustomFilterExpression()) == false)
                 {
-                    string value = "";
-                    string secondValue = "";
-
-                    var v = column.GetFilterValue();
-                    var sv = column.GetSecondFilterValue();
-
-                    if (column.GetFilterOperator() == FilterOperator.Custom)
+                    whereList.Add(column.GetCustomFilterExpression());
+                }
+                else if (PropertyAccess.IsDate(column.FilterPropertyType))
+                {
+                    if (v != null)
                     {
-                        var customFilterExpression = column.GetCustomFilterExpression();
-                        if (!string.IsNullOrEmpty(customFilterExpression))
-                        {
-                            whereList.Add(customFilterExpression);
-                        }
+                        value = v is DateTime dateTime
+                            ? dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                            : v is DateTimeOffset dateTimeOffset
+                                ? dateTimeOffset.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                : "";
                     }
-                    else if (PropertyAccess.IsDate(column.FilterPropertyType))
+                    if (sv != null)
                     {
-                        if (v != null)
-                        {
-                            value = v is DateTime ? ((DateTime)v).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : v is DateTimeOffset ? ((DateTimeOffset)v).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : "";
-                        }
-                        if (sv != null)
-                        {
-                            secondValue = sv is DateTime ? ((DateTime)sv).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : sv is DateTimeOffset ? ((DateTimeOffset)sv).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : "";
-                        }
+                        secondValue = sv is DateTime dateTime
+                            ? dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                            : sv is DateTimeOffset dateTimeOffset
+                                ? dateTimeOffset.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                : "";
                     }
-                    else if (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
+                }
+                else if (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
+                {
+                    if (v != null)
                     {
-                        if (v != null)
-                        {
-                            value = ((int)v).ToString();
-                        }
-                        if (sv != null)
-                        {
-                            secondValue = ((int)sv).ToString();
-                        }
+                        value = ((int)v).ToString();
                     }
-                    else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
+                    if (sv != null)
                     {
-                        var enumerableValue = ((IEnumerable)(v != null ? v : Enumerable.Empty<object>())).AsQueryable();
-                        var enumerableSecondValue = ((IEnumerable)(sv != null ? sv : Enumerable.Empty<object>())).AsQueryable();
-
-                        string baseType = column.FilterPropertyType.GetGenericArguments().Count() == 1 ? column.FilterPropertyType.GetGenericArguments()[0].Name : "";
-
-                        var enumerableValueAsString = "new " + baseType + "[]{" + String.Join(",",
-                                (enumerableValue.ElementType == typeof(string) ? enumerableValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>() : enumerableValue.Cast<object>())) + "}";
-
-                        var enumerableSecondValueAsString = "new " + baseType + "[]{" + String.Join(",",
-                                (enumerableSecondValue.ElementType == typeof(string) ? enumerableSecondValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>() : enumerableSecondValue.Cast<object>())) + "}";
-
-                        if (enumerableValue?.Any() == true)
-                        {
-                            var columnFilterOperator = column.GetFilterOperator();
-                            var columnSecondFilterOperator = column.GetSecondFilterOperator();
-                            var linqOperator = LinqFilterOperators[column.GetFilterOperator()];
-                            if (linqOperator == null)
-                            {
-                                linqOperator = "==";
-                            }
-
-                            var booleanOperator = column.LogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
-
-                            var property = PropertyAccess.GetProperty(column.GetFilterProperty());
-
-                            if (property.IndexOf(".") != -1)
-                            {
-                                property = $"({property})";
-                            }
-
-                            if (sv == null)
-                            {
-                                if (columnFilterOperator == FilterOperator.Contains || columnFilterOperator == FilterOperator.DoesNotContain)
-                                {
-                                    whereList.Add($@"{(columnFilterOperator == FilterOperator.DoesNotContain ? "!" : "")}({enumerableValueAsString}).Contains({property})");
-                                }
-                                else if (columnFilterOperator == FilterOperator.In || columnFilterOperator == FilterOperator.NotIn)
-                                {
-	                                whereList.Add($@"({property}).{(columnFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableValueAsString}).Any()");
-                                }
-                            }
-                            else
-                            {
-                                if ((columnFilterOperator == FilterOperator.Contains || columnFilterOperator == FilterOperator.DoesNotContain) &&
-                                        (columnSecondFilterOperator == FilterOperator.Contains || columnSecondFilterOperator == FilterOperator.DoesNotContain))
-                                {
-                                    whereList.Add($@"{(columnFilterOperator == FilterOperator.DoesNotContain ? "!" : "")}({enumerableValueAsString}).Contains({property}) {booleanOperator} {(columnSecondFilterOperator == FilterOperator.DoesNotContain ? "!" : "")}({enumerableSecondValueAsString}).Contains({property})");
-                                }
-                                else if ((columnFilterOperator == FilterOperator.In || columnFilterOperator == FilterOperator.NotIn) &&
-                                         (columnSecondFilterOperator == FilterOperator.In || columnSecondFilterOperator == FilterOperator.NotIn))
-                                {
-	                                whereList.Add($@"({property}).{(columnFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableValueAsString}).Any() {booleanOperator} ({property}).{(columnSecondFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableSecondValueAsString}).Any()");
-                                }
-                            }
-                        }
+                        secondValue = ((int)sv).ToString();
                     }
-                    else
-                    {
-                        value = (string)Convert.ChangeType(column.GetFilterValue(), typeof(string), CultureInfo.InvariantCulture);
-                        secondValue = (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string), CultureInfo.InvariantCulture);
-                    }
+                }
+                else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
+                {
+                    var enumerableValue = ((IEnumerable)(v ?? Enumerable.Empty<object>())).AsQueryable();
+                    var enumerableSecondValue = ((IEnumerable)(sv ?? Enumerable.Empty<object>())).AsQueryable();
 
-                    if (!string.IsNullOrEmpty(value) || column.GetFilterOperator() == FilterOperator.IsNotNull
-                                                    || column.GetFilterOperator() == FilterOperator.IsNull
-                                                    || column.GetFilterOperator() == FilterOperator.IsEmpty
-                                                    || column.GetFilterOperator() == FilterOperator.IsNotEmpty)
+                    string baseType = column.FilterPropertyType.GetGenericArguments().Length == 1 ? column.FilterPropertyType.GetGenericArguments()[0].Name : "";
+
+                    var enumerableValueAsString = "new " + baseType + "[]{" + String.Join(",",
+                            (enumerableValue.ElementType == typeof(string) ? enumerableValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>() : enumerableValue.Cast<object>())) + "}";
+
+                    var enumerableSecondValueAsString = "new " + baseType + "[]{" + String.Join(",",
+                            (enumerableSecondValue.ElementType == typeof(string) ? enumerableSecondValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>() : enumerableSecondValue.Cast<object>())) + "}";
+
+                    if (enumerableValue?.Any() == true)
                     {
+                        var columnFilterOperator = column.GetFilterOperator();
+                        var columnSecondFilterOperator = column.GetSecondFilterOperator();
                         var linqOperator = LinqFilterOperators[column.GetFilterOperator()];
                         if (linqOperator == null)
                         {
@@ -278,21 +234,65 @@ namespace Radzen
 
                         var booleanOperator = column.LogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
 
-                        if (string.IsNullOrEmpty(secondValue))
+                        var property = PropertyAccess.GetProperty(column.GetFilterProperty());
+
+                        if (property.IndexOf(".") != -1)
                         {
-                            whereList.Add(GetColumnFilter(column, value));
+                            property = $"({property})";
+                        }
+
+                        if (sv == null)
+                        {
+                            if (columnFilterOperator == FilterOperator.Contains || columnFilterOperator == FilterOperator.DoesNotContain)
+                            {
+                                whereList.Add($@"{(columnFilterOperator == FilterOperator.DoesNotContain ? "!" : "")}({enumerableValueAsString}).Contains({property})");
+                            }
+                            else if (columnFilterOperator == FilterOperator.In || columnFilterOperator == FilterOperator.NotIn)
+                            {
+                                whereList.Add($@"({property}).{(columnFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableValueAsString}).Any()");
+                            }
                         }
                         else
                         {
-                            whereList.Add($"({GetColumnFilter(column, value)} {booleanOperator} {GetColumnFilter(column, secondValue, true)})");
+                            if ((columnFilterOperator == FilterOperator.Contains || columnFilterOperator == FilterOperator.DoesNotContain) &&
+                                    (columnSecondFilterOperator == FilterOperator.Contains || columnSecondFilterOperator == FilterOperator.DoesNotContain))
+                            {
+                                whereList.Add($@"{(columnFilterOperator == FilterOperator.DoesNotContain ? "!" : "")}({enumerableValueAsString}).Contains({property}) {booleanOperator} {(columnSecondFilterOperator == FilterOperator.DoesNotContain ? "!" : "")}({enumerableSecondValueAsString}).Contains({property})");
+                            }
+                            else if ((columnFilterOperator == FilterOperator.In || columnFilterOperator == FilterOperator.NotIn) &&
+                                        (columnSecondFilterOperator == FilterOperator.In || columnSecondFilterOperator == FilterOperator.NotIn))
+                            {
+                                whereList.Add($@"({property}).{(columnFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableValueAsString}).Any() {booleanOperator} ({property}).{(columnSecondFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableSecondValueAsString}).Any()");
+                            }
                         }
                     }
                 }
+                else
+                {
+                    value = (string)Convert.ChangeType(column.GetFilterValue(), typeof(string), CultureInfo.InvariantCulture);
+                    secondValue = (string)Convert.ChangeType(column.GetSecondFilterValue(), typeof(string), CultureInfo.InvariantCulture);
+                }
 
-                return string.Join($" {gridBooleanOperator} ", whereList.Where(i => !string.IsNullOrEmpty(i)));
+                if (!string.IsNullOrEmpty(value) || column.GetFilterOperator() == FilterOperator.IsNotNull
+                                                || column.GetFilterOperator() == FilterOperator.IsNull
+                                                || column.GetFilterOperator() == FilterOperator.IsEmpty
+                                                || column.GetFilterOperator() == FilterOperator.IsNotEmpty)
+                {
+                    var linqOperator = LinqFilterOperators[column.GetFilterOperator()] ?? "==";
+                    var booleanOperator = column.LogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
+
+                    if (string.IsNullOrEmpty(secondValue))
+                    {
+                        whereList.Add(GetColumnFilter(column, value));
+                    }
+                    else
+                    {
+                        whereList.Add($"({GetColumnFilter(column, value)} {booleanOperator} {GetColumnFilter(column, secondValue, true)})");
+                    }
+                }
             }
 
-            return "";
+            return string.Join($" {gridBooleanOperator} ", whereList.Where(i => !string.IsNullOrEmpty(i)));
         }
 
         /// <summary>
