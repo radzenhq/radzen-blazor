@@ -49,7 +49,7 @@
                         @if (item.Start >= start && item.Start <= end)
                         {
                             <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
-                                CssClass="@(CurrentDate >= start && CurrentDate <= end && currentAppointment != -1 && currentAppointment == appointmentsToRender.IndexOf(item) ? "rz-state-focused" : "")" />
+                                CssClass="@(CurrentDate >= start && CurrentDate <= end && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment),item) ? "rz-state-focused" : "")" />
                         }
                         else if (start == date)
                         {
@@ -58,7 +58,7 @@
                             width = length * slotWidth;
 
                             <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
-                                CssClass="@(CurrentDate == date && currentAppointment != -1 && currentAppointment == appointmentsToRender.IndexOf(item) ? "rz-state-focused" : "")"/>
+                                CssClass="@(CurrentDate == date && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment),item) ? "rz-state-focused" : "")"/>
                         }
                     }
 
@@ -236,9 +236,10 @@
         }
         else if (key == "Space")
         {
-            if (currentAppointments.Any())
+            var appointment = currentAppointments.ElementAtOrDefault(currentAppointment);
+            if (appointment != null)
             {
-                await OnAppointmentClick(currentAppointments.ElementAt(currentAppointment));
+                await OnAppointmentClick(appointment);
             }
 
             preventKeyPress = true;
