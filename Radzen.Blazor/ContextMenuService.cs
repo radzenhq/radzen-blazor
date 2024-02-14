@@ -215,6 +215,11 @@ namespace Radzen
         /// <value>The image.</value>
         public string Image { get; set; }
         /// <summary>
+        /// Gets or sets the image style.
+        /// </summary>
+        /// <value>The image style.</value>
+        public string ImageStyle { get; set; }
+        /// <summary>
         /// Gets a value indicating whether this instance is disabled.
         /// </summary>
         /// <value><c>true</c> if this instance is disabled; otherwise, <c>false</c>.</value>
