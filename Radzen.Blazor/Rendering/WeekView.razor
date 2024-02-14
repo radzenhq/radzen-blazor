@@ -1,4 +1,6 @@
 @using Radzen.Blazor
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
 
 <div class="rz-view rz-week-view">
     <div class="rz-view-header">
@@ -12,7 +14,7 @@
     </div>
     <div class="rz-view-content">
         <Hours Start=@StartTime End=@EndTime TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot />
-        <div class="rz-week-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
+        <div @ref=view class="rz-week-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
              @onfocus=@(args => {if(CurrentDate == default(DateTime)) { CurrentDate = StartDate; }})>
         @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
         {
@@ -31,6 +33,8 @@
     </div>
 </div>
 @code {
+    ElementReference view;
+
     [Parameter]
     public DateTime StartDate { get; set; }
 
@@ -95,9 +99,18 @@
 
         if (arrow && !currentAppointments.Any())
         {
-            var days = leftright ? 1 : 7;
-            CurrentDate = CurrentDate.AddDays(leftup ? -days : days);
+            CurrentDate = CurrentDate.AddDays(leftup ? -1 : 1);
             currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1));
+
+            if(CurrentDate < StartDate)
+            {
+                CurrentDate = StartDate;
+            }
+
+            if(CurrentDate > EndDate.AddDays(-2))
+            {
+                CurrentDate = EndDate.AddDays(-2);
+            }
 
             preventKeyPress = true;
         }
@@ -113,19 +126,37 @@
                 currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1));
             }
 
+            if(CurrentDate < StartDate)
+            {
+                CurrentDate = StartDate;
+            }
+
+            if(CurrentDate > EndDate.AddDays(-2))
+            {
+                CurrentDate = EndDate.AddDays(-2);
+            }
+
             preventKeyPress = true;
         }
         else if (key == "Enter")
         {
             await OnSlotClick(CurrentDate);
 
+#if NET5_0_OR_GREATER
+            await view.FocusAsync();
+#endif
+
             preventKeyPress = true;
         }
         else if (key == "Space")
         {
-            if (currentAppointments.Any())
+            var appointment = currentAppointments.ElementAtOrDefault(currentAppointment);
+            if (appointment != null)
             {
-                await Scheduler.SelectAppointment(currentAppointments.ElementAt(currentAppointment));
+                await Scheduler.SelectAppointment(appointment);
+#if NET5_0_OR_GREATER
+                await view.FocusAsync();
+#endif
             }
 
             preventKeyPress = true;
