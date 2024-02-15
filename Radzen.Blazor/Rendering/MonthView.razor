@@ -231,6 +231,9 @@
         else if (key == "Enter")
         {
             await OnSlotClick(CurrentDate);
+#if NET5_0_OR_GREATER
+            await contentView.FocusAsync();
+#endif
 
             preventKeyPress = true;
         }
