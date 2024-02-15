@@ -33,12 +33,14 @@
         @if (item.Start >= start && item.Start <= end)
         {
             <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect
-                CssClass="@(CurrentDate.Date == date.Date && object.Equals(Appointments.Where(i => i.Start.Date == CurrentDate.Date).OrderBy(i => i.Start).ThenByDescending(i => i.End).ElementAtOrDefault(CurrentAppointment),item) ? "rz-state-focused" : "")" />
+                CssClass="@(CurrentDate.Date == date.Date && object.Equals(Appointments.Where(i => i.Start.Date == CurrentDate.Date).OrderBy(i => i.Start).ThenByDescending(i => i.End).ElementAtOrDefault(CurrentAppointment),item) ? "rz-state-focused" : "")" 
+                DragStart=@OnAppointmentDragStart />
         } 
         else if (date == StartDate)
         {
             <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect
-                CssClass="@(CurrentDate == date && CurrentAppointment != - 1 && object.Equals(appointments.ElementAtOrDefault(CurrentAppointment),item) ? "rz-state-focused" : "")" />
+                CssClass="@(CurrentDate == date && CurrentAppointment != - 1 && object.Equals(appointments.ElementAtOrDefault(CurrentAppointment),item) ? "rz-state-focused" : "")" 
+                DragStart=@OnAppointmentDragStart />
         }
     }
 }
@@ -62,6 +64,9 @@
 
     [Parameter]
     public int MinutesPerSlot { get; set; }
+
+    [Parameter]
+    public EventCallback<AppointmentData> AppointmentDragStart { get; set; }
 
     [Parameter]
     public IList<AppointmentData> Appointments { get; set; }
@@ -136,4 +141,9 @@
         return groups;
     }
 
+    public async Task OnAppointmentDragStart(AppointmentData Data)
+    {
+        await AppointmentDragStart.InvokeAsync(Data);
+    }
+    
 }

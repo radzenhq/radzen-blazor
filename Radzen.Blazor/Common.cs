@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Radzen.Blazor;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -293,7 +294,7 @@ namespace Radzen
             return services;
         }
     }
-
+    
     /// <summary>
     /// SecurityCodeType enum
     /// </summary>
@@ -580,6 +581,22 @@ namespace Radzen
         /// The position which represents the clicked map location.
         /// </summary>
         public GoogleMapPosition Position { get; set; }
+    }
+
+    /// <summary>
+    /// Supplies information about a <see cref="ViewBase.AppointmentMove" /> event that is being raised.
+    /// </summary>
+    public class AppointmentMoveEventArgs
+    {
+        /// <summary>
+        /// Gets or sets the appointment data.
+        /// </summary> 
+        public AppointmentData Appointment { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the time span.
+        /// </summary> 
+        public TimeSpan TimeSpan { get; set; }
     }
 
     /// <summary>
