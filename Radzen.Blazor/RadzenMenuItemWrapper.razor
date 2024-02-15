@@ -3,7 +3,7 @@
 
 @if (Item.Parent.ClickToOpen)
 {
-    <li @attributes="@Attributes" @onclick="@Item.OnClick" @onclick:stopPropagation>
+    <li style=@Style @attributes="@Attributes" @onclick="@Item.OnClick" @onclick:stopPropagation>
         @ChildContent
     </li>
 }
@@ -11,13 +11,13 @@ else
 {
     if (Item.ChildContent != null)
     {
-        <li @attributes="@Attributes" onmouseenter="Radzen.toggleMenuItem(this, event, true)" onmouseleave="Radzen.toggleMenuItem(this, event, false)">
+        <li style=@Style @attributes="@Attributes" onmouseenter="Radzen.toggleMenuItem(this, event, true)" onmouseleave="Radzen.toggleMenuItem(this, event, false)">
             @ChildContent
         </li>
     }
     else
     {
-        <li @attributes="@Attributes" @onclick="@Item.OnClick" @onclick:stopPropagation>
+        <li style=@Style @attributes="@Attributes" @onclick="@Item.OnClick" @onclick:stopPropagation>
             @ChildContent
         </li>
     }
