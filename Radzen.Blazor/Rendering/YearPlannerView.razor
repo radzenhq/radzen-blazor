@@ -256,7 +256,7 @@
 
         if (key == "ArrowLeft" || key == "ArrowRight")
         {
-            CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" || key == "ArrowUp" ? -1 : 1);
+            CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
 
             if(CurrentDate < StartDate.AddDays(1))
             {
@@ -274,7 +274,7 @@
         {
             CurrentMonth = Math.Clamp(CurrentMonth + (key == "ArrowUp" ? -1 : 1), 0, 11);
 
-            CurrentDate = new DateTime(StartDate.Year, CurrentMonth, 1);
+            CurrentDate = new DateTime(CurrentDate.Year, CurrentMonth, 1);
 
             preventKeyPress = true;
         }

@@ -15,7 +15,8 @@
     const double CALENDAR_WIDTH = 3800.0;
 }
 
-<div class="rz-view rz-timeline-view">
+<div @ref=view class="rz-view rz-timeline-view" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
+                 @onfocus=@(args => {CurrentDate = CurrentDate != null ? CurrentDate : StartDate; })>
     <div class="rz-view-header">
         <div class="rz-slot-header">
         </div>
@@ -107,7 +108,7 @@
 
                     @if (slotInMonth)
                     {
-                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"), slotInMonth)>
+                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType} {(CurrentDate.Date == dayOfWeek.Date ? "rz-state-focused" : "")}"), slotInMonth)>
                             <div class="rz-slot-title">
                                 @dayOfWeek.Day
                             </div>
@@ -229,5 +230,70 @@
         DialogService.Close();
 
         await OnAppointmentClick(data);
+    }
+
+    ElementReference view;
+    DateTime CurrentDate;
+    int CurrentMonth;
+    bool preventKeyPress = false;
+
+    async Task OnKeyPress(KeyboardEventArgs args)
+    {
+        if(CurrentDate == default(DateTime))
+        {
+            CurrentDate = StartDate.AddDays(1);
+        }
+        
+        var key = args.Code != null ? args.Code : args.Key;
+
+        if (key == "ArrowLeft" || key == "ArrowRight")
+        {
+            CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
+
+            if(CurrentDate < StartDate.AddDays(1))
+            {
+                CurrentDate = StartDate.AddDays(1);
+            }
+
+            if(CurrentDate > EndDate.AddDays(-2))
+            {
+                CurrentDate = EndDate.AddDays(-2);
+            }
+
+            preventKeyPress = true;
+        }
+        else if (key == "ArrowUp" || key == "ArrowDown")
+        {
+            CurrentMonth = Math.Clamp(CurrentMonth + (key == "ArrowUp" ? -1 : 1), 0, 11);
+
+            CurrentDate = new DateTime(CurrentDate.Year, CurrentMonth, 1);
+
+            preventKeyPress = true;
+        }
+        else if (key == "Enter")
+        {
+            await OnListClick(CurrentDate, AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)));
+#if NET5_0_OR_GREATER
+            await view.FocusAsync();
+#endif
+            preventKeyPress = true;
+        }
+        else if (key == "Space")
+        {
+            var appointment = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).FirstOrDefault();
+            if (appointment != null)
+            {
+                await Scheduler.SelectAppointment(appointment);
+#if NET5_0_OR_GREATER
+                await view.FocusAsync();
+#endif
+            }
+
+            preventKeyPress = true;
+        }
+        else
+        {
+            preventKeyPress = false;
+        }
     }
 }
