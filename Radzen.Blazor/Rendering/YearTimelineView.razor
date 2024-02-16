@@ -235,7 +235,7 @@
     ElementReference view;
     DateTime CurrentDate;
     int CurrentMonth = -1;
-    bool preventKeyPress = false;
+    bool preventKeyPress = true;
 
     async Task OnKeyPress(KeyboardEventArgs args)
     {
@@ -248,16 +248,20 @@
 
         if (key == "ArrowLeft" || key == "ArrowRight")
         {
-            CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
+            var firstDate = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
+            var lastDate = new DateTime(CurrentDate.Year, CurrentDate.Month, DateTime.DaysInMonth(CurrentDate.Year, CurrentDate.Month));
 
-            if(CurrentDate < StartDate.AddDays(1))
+            if(CurrentDate <= firstDate)
             {
-                CurrentDate = StartDate.AddDays(1);
+                CurrentDate = firstDate;
+            } 
+            else if(CurrentDate >= lastDate)
+            {
+                CurrentDate = lastDate;
             }
-
-            if(CurrentDate > EndDate.AddDays(-2))
+            else
             {
-                CurrentDate = EndDate.AddDays(-2);
+                CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
             }
 
             preventKeyPress = true;
