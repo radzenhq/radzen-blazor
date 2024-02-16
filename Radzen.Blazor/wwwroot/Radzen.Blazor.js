@@ -414,6 +414,12 @@ window.Radzen = {
       el.focus();
     }
   },
+  scrollIntoViewIfNeeded: function (ref, selector) {
+    var el = ref.getElementsByClassName(selector)[0];
+    if (el) {
+      el.scrollIntoViewIfNeeded();
+    }
+  },
   selectListItem: function (input, ul, index) {
     if (!input || !ul) return;
 

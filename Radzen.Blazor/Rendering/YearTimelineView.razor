@@ -1,8 +1,9 @@
 @using Radzen
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
+@using Microsoft.JSInterop
 @inject DialogService DialogService
-
+@inject IJSRuntime JSRuntime
 @{
     var points = new Dictionary<AppointmentData, double>();
     var startyear = StartDate.AddDays(7).Year;
@@ -266,6 +267,8 @@
                 CurrentDate = newDate;
             }
 
+            await ScrollIntoView("rz-slot rz-state-focused");
+
             preventKeyPress = true;
         }
         else if (key == "ArrowUp" || key == "ArrowDown")
@@ -273,6 +276,8 @@
             CurrentMonth = Math.Clamp(CurrentMonth + (key == "ArrowUp" ? -1 : 1), 0, 11);
 
             CurrentDate = new DateTime(CurrentDate.Year, CurrentMonth + 1, 1);
+
+            await ScrollIntoView("rz-month rz-state-focused");
 
             preventKeyPress = true;
         }
@@ -301,5 +306,15 @@
         {
             preventKeyPress = false;
         }
+    }
+
+    async Task ScrollIntoView(string cssClasses)
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", view, cssClasses);
+        }
+        catch
+        { }
     }
 }
