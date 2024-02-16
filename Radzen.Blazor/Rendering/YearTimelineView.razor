@@ -35,7 +35,7 @@
         daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
         date = realstart.StartOfMonth().StartOfWeek();
 
-        <div class="rz-month">
+        <div class="rz-month @(month == CurrentMonth ? "rz-state-focused" : "")">
             <div class="rz-events">
                 @for (var start = date; start < date.AddDays(NUMBER_DAYS_COLUMNS); start = start.AddDays(1))
                 {
@@ -234,7 +234,7 @@
 
     ElementReference view;
     DateTime CurrentDate;
-    int CurrentMonth;
+    int CurrentMonth = -1;
     bool preventKeyPress = false;
 
     async Task OnKeyPress(KeyboardEventArgs args)
@@ -266,7 +266,7 @@
         {
             CurrentMonth = Math.Clamp(CurrentMonth + (key == "ArrowUp" ? -1 : 1), 0, 11);
 
-            CurrentDate = new DateTime(CurrentDate.Year, CurrentMonth, 1);
+            CurrentDate = new DateTime(CurrentDate.Year, CurrentMonth + 1, 1);
 
             preventKeyPress = true;
         }

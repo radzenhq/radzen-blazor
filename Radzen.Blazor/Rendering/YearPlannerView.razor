@@ -241,7 +241,7 @@
     }
 
     DateTime CurrentDate;
-    int CurrentMonth;
+    int CurrentMonth = -1;
 
     bool preventKeyPress = false;
 
@@ -274,7 +274,7 @@
         {
             CurrentMonth = Math.Clamp(CurrentMonth + (key == "ArrowUp" ? -1 : 1), 0, 11);
 
-            CurrentDate = new DateTime(CurrentDate.Year, CurrentMonth, 1);
+            CurrentDate = new DateTime(CurrentDate.Year, CurrentMonth + 1, 1);
 
             preventKeyPress = true;
         }
