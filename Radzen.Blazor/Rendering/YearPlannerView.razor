@@ -256,20 +256,22 @@
 
         if (key == "ArrowLeft" || key == "ArrowRight")
         {
+            var newDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
+
             var firstDate = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
             var lastDate = new DateTime(CurrentDate.Year, CurrentDate.Month, DateTime.DaysInMonth(CurrentDate.Year, CurrentDate.Month));
 
-            if(CurrentDate <= firstDate)
+            if(newDate < firstDate)
             {
                 CurrentDate = firstDate;
             } 
-            else if(CurrentDate >= lastDate)
+            else if(newDate > lastDate)
             {
                 CurrentDate = lastDate;
             }
             else
             {
-                CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
+                CurrentDate = newDate;
             }
 
             preventKeyPress = true;
