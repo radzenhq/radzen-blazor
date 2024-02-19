@@ -5,7 +5,9 @@
 
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()"
+        tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
+        @onfocus=@(args => focusedIndex = focusedIndex == -1 ? 0: focusedIndex)>
     <ul class="rz-tree-container">
         <CascadingValue Value=this>
             @ChildContent

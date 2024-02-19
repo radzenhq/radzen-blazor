@@ -7,9 +7,16 @@ $grid-cell-padding: 0.5rem !default;
 $grid-cell-color: var(--rz-text-color) !default;
 $grid-cell-font-size: var(--rz-body-font-size) !default;
 $grid-cell-line-height: var(--rz-body-line-height) !default;
+$grid-cell-focus-background-color: var(--rz-secondary-lighter) !default;
+$grid-cell-focus-color: var(--rz-on-secondary-lighter) !default;
+$grid-cell-focus-outline: var(--rz-outline-focus) !default;
+$grid-cell-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
 $grid-hover-background-color: var(--rz-secondary-lighter) !default;
 $grid-hover-color: var(--rz-on-secondary-lighter) !default;
+
+$grid-focus-outline: var(--rz-outline-focus) !default;
+$grid-focus-outline-offset: var(--rz-outline-offset) !default;
 
 $grid-selected-background-color: var(--rz-secondary-dark) !default;
 $grid-selected-color: var(--rz-on-secondary-dark) !default;
@@ -118,9 +125,16 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   --rz-grid-cell-color: #{$grid-cell-color};
   --rz-grid-cell-font-size: #{$grid-cell-font-size};
   --rz-grid-cell-line-height: #{$grid-cell-line-height};
+  --rz-grid-cell-focus-background-color: #{$grid-cell-focus-background-color};
+  --rz-grid-cell-focus-color: #{$grid-cell-focus-color};
+  --rz-grid-cell-focus-outline: #{$grid-cell-focus-outline};
+  --rz-grid-cell-focus-outline-offset: #{$grid-cell-focus-outline-offset};
  
   --rz-grid-hover-background-color: #{$grid-hover-background-color};
   --rz-grid-hover-color: #{$grid-hover-color};
+
+  --rz-grid-focus-outline: #{$grid-focus-outline};
+  --rz-grid-focus-outline-offset: #{$grid-focus-outline-offset};
 
   --rz-grid-selected-background-color: #{$grid-selected-background-color};
   --rz-grid-selected-color: #{$grid-selected-color};
@@ -226,6 +240,14 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   border-radius: var(--rz-grid-border-radius);
   background-color: var(--rz-grid-background-color);
   overflow: hidden;
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+  &:focus-visible {
+    outline: var(--rz-grid-focus-outline);
+    outline-offset: var(--rz-grid-focus-outline-offset);
+  }
 
   .rz-col-icon {
     text-align: center;
@@ -362,6 +384,11 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       width: 100%;
       outline: none;
       padding: var(--rz-grid-header-cell-padding);
+    }
+
+    &.rz-state-focused {
+      outline: var(--rz-grid-cell-focus-outline);
+      outline-offset: var(--rz-grid-cell-focus-outline-offset);
     }
 
     .rz-column-title {
@@ -805,6 +832,40 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
         > .rzi {
           color: var(--rz-grid-selected-color);
+        }
+      }
+
+      &.rz-state-focused {
+        > td {
+          background-color: var(--rz-grid-cell-focus-background-color);
+          color: var(--rz-grid-cell-focus-color);
+
+          &.rz-frozen-cell-left,
+          &.rz-frozen-cell-left-inner {
+            &:before {
+              background-color: var(--rz-grid-cell-focus-background-color);
+              color: var(--rz-grid-cell-focus-color);
+            }
+          }
+
+          &.rz-frozen-cell-right {
+            &:after {
+              background-color: var(--rz-grid-cell-focus-background-color);
+              color: var(--rz-grid-cell-focus-color);
+            }
+          }
+        }
+
+        > th.rz-state-focused {
+          color: var(--rz-grid-cell-focus-color) !important;
+        }
+
+        .rz-cell-data {
+          color: var(--rz-grid-cell-focus-color);
+        }
+
+        > .rzi {
+          color: var(--rz-grid-cell-focus-color);
         }
       }
 

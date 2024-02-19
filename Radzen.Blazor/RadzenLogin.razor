@@ -37,7 +37,7 @@
                 }
                 @if (AllowResetPassword)
                 {
-                    <a class="rz-link" @onclick=@OnReset>@ResetPasswordText</a>
+                    <a tabindex="0" class="rz-link" @onclick=@OnReset>@ResetPasswordText</a>
                 }
             </RadzenStack>
             @if (AllowRegister)
@@ -81,7 +81,7 @@
                     <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text=@LoginText Click=@OnLogin />
                     @if (AllowResetPassword)
                     {
-                        <a class="rz-link" @onclick=@OnReset>@ResetPasswordText</a>
+                        <a tabindex="0" class="rz-link" @onclick=@OnReset>@ResetPasswordText</a>
                     }
                 </div>
             </div>

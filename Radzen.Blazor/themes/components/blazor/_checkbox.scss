@@ -4,6 +4,8 @@ $checkbox-border-radius: 2px !default;
 $checkbox-border-width: inherit !default;
 $checkbox-label-margin: 0 1rem 0 0.5rem !default;
 $checkbox-margin: 1rem 0 !default;
+$checkbox-focus-outline: var(--rz-outline-focus) !default;
+$checkbox-focus-outline-offset: var(--rz-outline-offset) !default;
 
 $checkbox-checked-background-color: var(--rz-secondary) !default;
 $checkbox-checked-color: var(--rz-on-secondary) !default;
@@ -33,6 +35,8 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
   --rz-checkbox-border-width: #{$checkbox-border-width};
   --rz-checkbox-label-margin: #{$checkbox-label-margin};
   --rz-checkbox-margin: #{$checkbox-margin};
+  --rz-checkbox-focus-outline: #{$checkbox-focus-outline};
+  --rz-checkbox-focus-outline-offset: #{$checkbox-focus-outline-offset};
 
   --rz-checkbox-checked-background-color: #{$checkbox-checked-background-color};
   --rz-checkbox-checked-hover-background-color: #{$checkbox-checked-hover-background-color};
@@ -88,6 +92,17 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
   min-width: var(--rz-checkbox-width);
   height: var(--rz-checkbox-height);
 
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    .rz-chkbox-box {
+      outline: var(--rz-checkbox-focus-outline);
+      outline-offset: var(--rz-checkbox-focus-outline-offset);
+    }
+  }
+
 }
 
 .rz-chkbox-box {
@@ -100,7 +115,6 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
   display: flex;
   align-items: center;
   justify-content: center;
-
   border: var(--rz-input-border);
   border-width: var(--rz-checkbox-border-width);
   border-radius: var(--rz-checkbox-border-radius);
@@ -156,7 +170,6 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
     &:hover:not(.rz-state-disabled) {
       background-color: var(--rz-checkbox-checked-hover-background-color);
       border: var(--rz-checkbox-checked-hover-border);
-
     }
 
     &.rz-state-disabled {

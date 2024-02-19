@@ -1,8 +1,9 @@
 @using Radzen
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
+@using Microsoft.JSInterop
 @inject DialogService DialogService
-
+@inject IJSRuntime JSRuntime
 @{
     var points = new Dictionary<AppointmentData, double>();
     var startyear = StartDate.AddDays(7).Year;
@@ -15,7 +16,8 @@
     const double CALENDAR_WIDTH = 3800.0;
 }
 
-<div class="rz-view rz-timeline-view">
+<div @ref=view class="rz-view rz-timeline-view" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
+                 @onfocus=@(args => {CurrentDate = CurrentDate != null ? CurrentDate : StartDate; })>
     <div class="rz-view-header">
         <div class="rz-slot-header">
         </div>
@@ -34,7 +36,7 @@
         daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
         date = realstart.StartOfMonth().StartOfWeek();
 
-        <div class="rz-month">
+        <div class="rz-month @(month == CurrentMonth ? "rz-state-focused" : "")">
             <div class="rz-events">
                 @for (var start = date; start < date.AddDays(NUMBER_DAYS_COLUMNS); start = start.AddDays(1))
                 {
@@ -107,7 +109,7 @@
 
                     @if (slotInMonth)
                     {
-                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"), slotInMonth)>
+                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType} {(CurrentDate.Date == dayOfWeek.Date ? "rz-state-focused" : "")}"), slotInMonth)>
                             <div class="rz-slot-title">
                                 @dayOfWeek.Day
                             </div>
@@ -229,5 +231,90 @@
         DialogService.Close();
 
         await OnAppointmentClick(data);
+    }
+
+    ElementReference view;
+    DateTime CurrentDate;
+    int CurrentMonth = -1;
+    bool preventKeyPress = true;
+
+    async Task OnKeyPress(KeyboardEventArgs args)
+    {
+        if(CurrentDate == default(DateTime))
+        {
+            CurrentDate = StartDate.AddDays(1);
+        }
+        
+        var key = args.Code != null ? args.Code : args.Key;
+
+        if (key == "ArrowLeft" || key == "ArrowRight")
+        {
+            var newDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
+
+            var firstDate = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
+            var lastDate = new DateTime(CurrentDate.Year, CurrentDate.Month, DateTime.DaysInMonth(CurrentDate.Year, CurrentDate.Month));
+
+            if(newDate < firstDate)
+            {
+                CurrentDate = firstDate;
+            } 
+            else if(newDate > lastDate)
+            {
+                CurrentDate = lastDate;
+            }
+            else
+            {
+                CurrentDate = newDate;
+            }
+
+            await ScrollIntoView("rz-slot rz-state-focused");
+
+            preventKeyPress = true;
+        }
+        else if (key == "ArrowUp" || key == "ArrowDown")
+        {
+            CurrentMonth = Math.Clamp(CurrentMonth + (key == "ArrowUp" ? -1 : 1), 0, 11);
+
+            CurrentDate = new DateTime(CurrentDate.Year, CurrentMonth + 1, 1);
+
+            await ScrollIntoView("rz-month rz-state-focused");
+
+            preventKeyPress = true;
+        }
+        else if (key == "Enter")
+        {
+            await OnListClick(CurrentDate, AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)));
+#if NET5_0_OR_GREATER
+            await view.FocusAsync();
+#endif
+            preventKeyPress = true;
+        }
+        else if (key == "Space")
+        {
+            var appointment = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).FirstOrDefault();
+            if (appointment != null)
+            {
+                await Scheduler.SelectAppointment(appointment);
+#if NET5_0_OR_GREATER
+                await view.FocusAsync();
+#endif
+            }
+
+            preventKeyPress = true;
+        }
+        else
+        {
+            preventKeyPress = false;
+        }
+    }
+
+    async Task ScrollIntoView(string cssClasses)
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", view, cssClasses);
+        }
+        catch
+        { }
     }
 }

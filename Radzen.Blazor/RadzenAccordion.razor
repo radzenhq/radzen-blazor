@@ -10,7 +10,9 @@
 }
 @if (Visible)
 {
-<div @ref="@Element" role="tablist" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+<div @ref="@Element" role="tablist" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()" 
+    tabindex="0" @onkeydown="@((args) => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation=preventKeyPress 
+    @onfocus=@(args => focusedIndex = focusedIndex == -1 ? 0: focusedIndex)>
     @for (var i = 0; i < items.Count; i++)
     {
         var item = items[i];    
@@ -18,7 +20,7 @@
             continue;
 
         <div @ref="@item.Element" id="@item.GetItemId()" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style">
-            <a @onkeypress="@((args) => OnKeyPress(args, item))" @onkeypress:preventDefault=preventKeyPress @onclick="@((args) => SelectItem(item))" aria-label="@ItemAriaLabel(i, item)" title="@ItemTitle(i, item)" @onclick:preventDefault="true" role="tab" tabindex="0"
+            <a @onclick="@((args) => SelectItem(item))" aria-label="@ItemAriaLabel(i, item)" title="@ItemTitle(i, item)" @onclick:preventDefault="true" role="tab" 
                id="@($"rz-accordiontab-{items.IndexOf(item)}")" aria-controls="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-expanded="true">
                 @if (IsSelected(i, item))
                 {

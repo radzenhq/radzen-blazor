@@ -1,7 +1,7 @@
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 
-<div @ref=@element class="rz-event" style=@Style @onclick=@OnClick @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave>
+<div @ref=@element class="@($"{"rz-event"} {CssClass}".Trim())" style=@Style @onclick=@OnClick @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave>
     <div class="rz-event-content" title=@Title @attributes=@Attributes>
         @if (ShowAppointmentContent)
         {
@@ -13,6 +13,9 @@
     private ElementReference element;
 
     private string Title => Scheduler.HasMouseEnterAppointmentDelegate() ? null : Data?.Text;
+
+    [Parameter]
+    public string CssClass { get; set; }
 
     [Parameter]
     public double? Top { get; set; }

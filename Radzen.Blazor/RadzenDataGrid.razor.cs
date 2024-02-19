@@ -438,6 +438,13 @@ namespace Radzen.Blazor
 
         bool preventKeyDown = false;
         int focusedIndex = -1;
+        int focusedCellIndex = 0;
+
+        internal string GridId()
+        {
+            return GetId();
+        }
+
         /// <summary>
         /// Handles the <see cref="E:KeyDown" /> event.
         /// </summary>
@@ -446,32 +453,55 @@ namespace Radzen.Blazor
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            if (key == "ArrowDown" || key == "ArrowUp")
+            if (key == "ArrowDown" || key == "ArrowUp" || key == "ArrowLeft" || key == "ArrowRight")
             {
                 preventKeyDown = true;
+
+                if (focusedIndex == 0 && AllowFiltering && FilterMode == FilterMode.Advanced && key == "ArrowDown" && args.AltKey)
+                {
+                    var column = ColumnsCollection.Where(c => c.GetVisible()).ElementAtOrDefault(focusedCellIndex);
+                    if (column != null && column.headerCell != null && column.Filterable)
+                    {
+                        await column.headerCell.OpenFilter();
+                    }
+                    return;
+                }
+
                 try
                 {
-                    var newFocusedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusTableRow", UniqueID, key == "ArrowDown", focusedIndex, SelectionMode == DataGridSelectionMode.Multiple && args.ShiftKey);
-                    
-                    if (newFocusedIndex != focusedIndex)
-                    {
-                        focusedIndex = newFocusedIndex;
+                    var result = await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", UniqueID, key, focusedIndex, focusedCellIndex);
+                    focusedIndex = result[0];
+                    focusedCellIndex = result[1];
+                }
+                catch (Exception)
+                {
+                    //
+                }
+            }
+            else if (key == "Space" || key == "Enter")
+            {
+                preventKeyDown = true;
 
+                if (focusedIndex == 0)
+                {
+                    var column = ColumnsCollection.Where(c => c.GetVisible()).ElementAtOrDefault(focusedCellIndex);
+                    if (column != null)
+                    {
+                        await OnSort(args, column);
+                    }
+                }
+                else
+                {
+                    var itemToSelect = PagedView.ElementAtOrDefault(focusedIndex - 1);
+                    if (itemToSelect != null)
+                    {
                         if (SelectionMode == DataGridSelectionMode.Multiple && !args.ShiftKey)
                         {
                             selectedItems.Clear();
                         }
 
-                        var itemToSelect = PagedView.ElementAtOrDefault(newFocusedIndex);
-                        if (itemToSelect != null)
-                        {
-                            await SelectRow(itemToSelect, false);
-                        }
+                        await SelectRow(itemToSelect, false);
                     }
-                }
-                catch (Exception)
-                {
-                    //
                 }
             }
             else
@@ -2539,7 +2569,15 @@ namespace Radzen.Blazor
 
         internal async System.Threading.Tasks.Task OnRowSelect(TItem item, bool raiseChange = true)
         {
-            focusedIndex = PagedView.ToList().IndexOf(item);
+            var focusedIndexResult = PagedView
+                .Select((x, i) => new { Item = x, Index = i })
+                .Where(itemWithIndex => ItemEquals(itemWithIndex.Item, item))
+                .FirstOrDefault();
+
+            if (focusedIndexResult != null)
+            {
+                focusedIndex = focusedIndexResult.Index + 1;
+            }
 
             if (SelectionMode == DataGridSelectionMode.Single && item != null && selectedItems.Keys.Any(i => ItemEquals(i, item)))
             {

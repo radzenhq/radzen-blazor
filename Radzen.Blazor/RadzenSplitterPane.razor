@@ -14,23 +14,28 @@
         <div class="@GetComponentBarCssClass()"
              @onclick:preventDefault="true"
              @onclick:stopPropagation="true"
-             @onmousedown=@(args => Splitter.ResizeExec(args, Index))>
+             @onmousedown=@(args => Splitter.StartResize(args, Index))>
 
             @if (IsCollapsible)
             {
-                <span class="rz-collapse" @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter.CollapseExec(args, Index, UniqueID))>
+                <span tabindex="0" class="rz-collapse" id="@(GetId() + "-collapse")"
+                    @onkeypress="@(args => OnKeyPress(args, false))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
+                    @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter.OnCollapse(Index))>
                 </span>
             }
 
             @if (IsResizable)
             {
-                <span class="rz-resize">
+                <span tabindex="0" class="rz-resize" id="@(GetId() + "-resize")"
+                    @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
                 </span>
             }
 
             @if (IsExpandable)
             {
-                <span class="rz-expand" @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter.ExpandExec(args, Index, UniqueID))>
+                <span tabindex="0" class="rz-expand" id="@(GetId() + "-expand")"
+                    @onkeypress="@(args => OnKeyPress(args, true))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
+                    @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter.OnExpand(Index))>
                 </span>
             }
 

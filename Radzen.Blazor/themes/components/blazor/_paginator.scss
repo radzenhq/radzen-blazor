@@ -88,6 +88,19 @@ $paginator-button-size: "%button-md" !default;
   justify-content: space-between;
   flex-wrap: wrap;
 
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+  &:focus-visible {
+    .rz-paginator-element,
+    .rz-paginator-page {
+      &.rz-state-focused {
+        outline: var(--rz-outline-focus);
+        outline-offset: var(--rz-outline-offset);
+      }
+    }
+  }
+
   &.rz-align-right {
     justify-content: flex-end;
   }
@@ -149,6 +162,11 @@ $paginator-button-size: "%button-md" !default;
 .rz-paginator-element,
 .rz-paginator-page {
   &:hover {
+    background-color: var(--rz-paginator-numeric-button-hover-background-color);
+    color: var(--rz-paginator-numeric-button-hover-color);
+  }
+
+  &.rz-state-focused {
     background-color: var(--rz-paginator-numeric-button-hover-background-color);
     color: var(--rz-paginator-numeric-button-hover-color);
   }

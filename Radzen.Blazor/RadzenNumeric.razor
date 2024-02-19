@@ -12,7 +12,9 @@
                class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
                placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" value="@FormattedValue" @onchange="@OnChange"
                onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator')"
-           onblur="@getOnInput()" onpaste="@getOnPaste()" />
+               onblur="@getOnInput()" onpaste="@getOnPaste()"
+               @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation />
+
         @if (ShowUpDown)
         {
             <button type="button" class="rz-spinner-button rz-spinner-up rz-button" tabindex="-1"

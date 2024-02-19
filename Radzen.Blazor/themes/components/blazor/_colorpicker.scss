@@ -4,6 +4,8 @@ $colorpicker-panel-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06) !default;
 $colorpicker-panel-padding: 0.5rem !default;
 $colorpicker-panel-max-width: 20rem !default;
 $colorpicker-saturation-height: 200px !default;
+$colorpicker-focus-outline: var(--rz-outline-focus) !default;
+$colorpicker-focus-outline-offset: var(--rz-outline-offset) !default;
 
 $colorpicker-value-border-radius: var(--rz-border-radius) !default;
 
@@ -31,6 +33,8 @@ $colorpicker-input-labels-color: var(--rz-text-tertiary-color) !default;
   --rz-colorpicker-panel-padding: #{$colorpicker-panel-padding};
   --rz-colorpicker-panel-max-width: #{$colorpicker-panel-max-width};
   --rz-colorpicker-saturation-height: #{$colorpicker-saturation-height};
+  --rz-colorpicker-focus-outline: #{$colorpicker-focus-outline};
+  --rz-colorpicker-focus-outline-offset: #{$colorpicker-focus-outline-offset};
 
   --rz-colorpicker-value-border-radius: #{$colorpicker-value-border-radius};
 
@@ -106,11 +110,21 @@ button.rz-colorpicker-trigger {
   min-width: 20px;
   min-height: 20px;
 }
+
 .rz-saturation-picker {
   height: var(--rz-colorpicker-saturation-height);
   position: relative;
   touch-action: none;
   border-radius: var(--rz-border-radius);
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-colorpicker-focus-outline);
+    outline-offset: var(--rz-colorpicker-focus-outline-offset);
+  }
 }
 
 .rz-saturation-white {
@@ -164,6 +178,15 @@ button.rz-colorpicker-trigger {
   &:active {
     cursor: none;
   }
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-colorpicker-focus-outline);
+    outline-offset: var(--rz-colorpicker-focus-outline-offset);
+  }
 }
 
 .rz-alpha-picker {
@@ -175,6 +198,15 @@ button.rz-colorpicker-trigger {
 
   &:active {
     cursor: none;
+  }
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-colorpicker-focus-outline);
+    outline-offset: var(--rz-colorpicker-focus-outline-offset);
   }
 }
 
@@ -294,4 +326,13 @@ button.rz-colorpicker-trigger {
   margin: var(--rz-colorpicker-item-margin);
   box-shadow: var(--rz-colorpicker-item-shadow);
   cursor: pointer;
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-colorpicker-focus-outline);
+    outline-offset: var(--rz-colorpicker-focus-outline-offset);
+  }
 }

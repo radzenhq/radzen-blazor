@@ -1,6 +1,8 @@
 $listbox-background-color: var(--rz-input-background-color) !default;
 $listbox-border-radius: var(--rz-input-border-radius) !default;
 $listbox-border: var(--rz-input-border) !default;
+$listbox-focus-border: var(--rz-input-focus-border) !default;
+$listbox-focus-shadow: var(--rz-input-focus-shadow) !default;
 $listbox-filter-border: var(--rz-border-base-100) !default;
 $listbox-padding: 0 !default;
 
@@ -20,6 +22,8 @@ $listbox-header-icon-margin: 0 !default;
   --rz-listbox-background-color: #{$listbox-background-color};
   --rz-listbox-border-radius: #{$listbox-border-radius};
   --rz-listbox-border: #{$listbox-border};
+  --rz-listbox-focus-border: #{$listbox-focus-border};
+  --rz-listbox-focus-shadow: #{$listbox-focus-shadow};
   --rz-listbox-filter-border: #{$listbox-filter-border};
   --rz-listbox-padding: #{$listbox-padding};
 
@@ -57,6 +61,13 @@ $listbox-header-icon-margin: 0 !default;
         @include dropdown-item-hover();
       }
     }
+  }
+
+  &:focus,
+  &:focus-within {
+    outline: var(--rz-outline-normal);
+    border: var(--rz-listbox-focus-border);
+    box-shadow: var(--rz-listbox-focus-shadow);
   }
 }
 

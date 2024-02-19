@@ -7,7 +7,7 @@
     Demonstration and configuration of the Radzen Blazor <strong>DropDown</strong> component.
 </RadzenText>
 
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+<RadzenText Anchor="dropdown#get-set-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Get and Set the value of DropDown
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -17,7 +17,7 @@
     <DropDownBindValue />
 </RadzenExample>
 
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+<RadzenText Anchor="dropdown#value-and-change-event" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Get and Set the value of DropDown using Value and Change event
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -27,37 +27,91 @@
     <DropDownChangeEvent />
 </RadzenExample>
 
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+<RadzenText Anchor="dropdown#text-and-value-properties" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Define Text and Value properties
 </RadzenText>
 <RadzenExample ComponentName="DropDown" Example="DropDownTextValueProperties">
     <DropDownTextValueProperties />
 </RadzenExample>
 
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+<RadzenText Anchor="dropdown#template" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     DropDown with template
 </RadzenText>
 <RadzenExample ComponentName="DropDown" Example="DropDownTemplate">
     <DropDownTemplate />
 </RadzenExample>
 
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+<RadzenText Anchor="dropdown#disable-item" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Disable specific item
 </RadzenText>
 <RadzenExample ComponentName="DropDown" Example="DropDownDisabledItem">
     <DropDownDisabledItem />
 </RadzenExample>
 
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+<RadzenText Anchor="dropdown#clear-selected-item" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Clear selected item
 </RadzenText>
 <RadzenExample ComponentName="DropDown" Example="DropDownClear">
     <DropDownClear/>
 </RadzenExample>
 
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+<RadzenText Anchor="dropdown#editable-dropdown" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Editable DropDown
 </RadzenText>
 <RadzenExample ComponentName="DropDown" Example="DropDownEdit">
     <DropDownEdit/>
 </RadzenExample>
+
+<RadzenText Anchor="dropdown#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor DropDown component.
+</RadzenText>
+
+<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
+    <div class="rz-data-grid-data">
+        <table class="rz-grid-table">
+            <thead>
+                <tr>
+                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
+                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
+                    <td><span class="rz-cell-data">Navigate to a DropDown.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Alt" /> + <RadzenBadge Text="Down arrow" /></span></td>
+                    <td><span class="rz-cell-data">Open DropDown popup.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Down Arrow" /> on closed popup</span></td>
+                    <td><span class="rz-cell-data">Select next DropDown item.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Up Arrow" /> on closed popup</span></td>
+                    <td><span class="rz-cell-data">Select previous DropDown item.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Down Arrow" /> in an opened popup</span></td>
+                    <td><span class="rz-cell-data">Focus next DropDown item.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Up Arrow" /> in an opened popup</span></td>
+                    <td><span class="rz-cell-data">Focus previous DropDown item.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /> in an opened popup</span></td>
+                    <td><span class="rz-cell-data">Select the focused DropDown item and close the popup.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Esc" /> or <RadzenBadge Text="Alt" /> + <RadzenBadge Text="Down arrow" /> in an opened popup</span></td>
+                    <td><span class="rz-cell-data">Close the DropDown popup.</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

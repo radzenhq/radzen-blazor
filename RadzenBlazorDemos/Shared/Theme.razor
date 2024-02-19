@@ -2,11 +2,16 @@
 @inject ThemeService ThemeService
 
 <link href="@Href" rel="stylesheet" />
+@if (ThemeService.WCAG)
+{
+    <link href="@WcagHref" rel="stylesheet" />
+}
 
 @code {
     bool IsPremiumTheme => ThemeService.CurrentTheme == "fluent" || ThemeService.CurrentTheme == "fluent-dark" || ThemeService.CurrentTheme == "material-dark" || ThemeService.CurrentTheme == "material3" || ThemeService.CurrentTheme == "material3-dark";
 
     string Href => IsPremiumTheme ? $"/css/{ThemeService.CurrentTheme}-base.css" : $"_content/Radzen.Blazor/css/{ThemeService.CurrentTheme}-base.css";
+    string WcagHref => IsPremiumTheme ? $"/css/{ThemeService.CurrentTheme}-wcag.css" : $"_content/Radzen.Blazor/css/{ThemeService.CurrentTheme}-wcag.css";
 
     protected override void OnInitialized()
     {

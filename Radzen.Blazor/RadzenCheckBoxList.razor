@@ -26,7 +26,7 @@
         @foreach (var item in allItems.Where(i => i.Visible))
         {
             <div @ref="@item.Element" id="@item.GetItemId()" @onclick="@(args => SelectItem(item))" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style">
-                <div class="rz-chkbox " @onkeypress="@(async args => { if (args.Code == "Space") { await SelectItem(item); } })" tabindex="@(Disabled || ReadOnly || item.Disabled || item.ReadOnly ? "-1" : $"{TabIndex}")">
+                <div class="rz-chkbox" @onkeypress="@(args => OnKeyPress(args, SelectItem(item)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation tabindex="@(Disabled || ReadOnly || item.Disabled || item.ReadOnly ? "-1" : $"{TabIndex}")">
                     <div class="rz-helper-hidden-accessible">
                         <input type="checkbox" name="@Name" value="@item.Value" disabled="@Disabled" readonly="@ReadOnly" tabindex="-1" aria-label="@(item.Text + " " + item.Value)" aria-checked="@((item.Value as bool? == true).ToString().ToLowerInvariant())">
                     </div>

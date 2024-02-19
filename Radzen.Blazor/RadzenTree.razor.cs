@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -383,6 +385,89 @@ namespace Radzen.Blazor
             {
                 Levels.Add(level);
                 StateHasChanged();
+            }
+        }
+
+        internal int focusedIndex = -1;
+
+        bool preventKeyPress = true;
+        async Task OnKeyPress(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "ArrowUp" || key == "ArrowDown")
+            {
+                preventKeyPress = true;
+
+                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, CurrentItems.Count - 1);
+
+                //await JSRuntime.InvokeVoidAsync("Element.prototype.scrollIntoViewIfNeeded.call", AllExpandedItems[focusedIndex].Element);
+            }
+            else if (key == "ArrowLeft" || key == "ArrowRight")
+            {
+                preventKeyPress = true;
+
+                if (focusedIndex >= 0 && focusedIndex < CurrentItems.Count)
+                {
+                    var item = CurrentItems[focusedIndex];
+
+                    if (item.ChildContent != null || item.HasChildren)
+                    {
+                        await item.ExpandCollapse(key == "ArrowRight");
+                    }
+                }
+            }
+            else if (key == "Enter" || key == "Space")
+            {
+                preventKeyPress = true;
+
+                if (focusedIndex >= 0 && focusedIndex < CurrentItems.Count)
+                {
+                    await SelectItem(CurrentItems[focusedIndex]);
+                    
+                    if (AllowCheckBoxes)
+                    {
+                        await CurrentItems[focusedIndex].CheckedChange(!CurrentItems[focusedIndex].IsChecked());
+                    }
+                }
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
+        }
+
+        internal bool IsFocused(RadzenTreeItem item)
+        {
+            return CurrentItems.IndexOf(item) == focusedIndex && focusedIndex != -1;
+        }
+
+        internal void InsertInCurrentItems(int index, RadzenTreeItem item)
+        {
+            CurrentItems.Insert(index, item);
+        }
+
+        internal void RemoveFromCurrentItems(int index, int count)
+        {
+            CurrentItems.RemoveRange(index, count);
+
+            if (focusedIndex > index)
+            {
+                focusedIndex = index;
+            }
+        }
+
+        List<RadzenTreeItem> _currentItems;
+        internal List<RadzenTreeItem> CurrentItems
+        {
+            get
+            { 
+                if(_currentItems == null)
+                {
+                    _currentItems = items;
+                }
+
+                return _currentItems;
             }
         }
     }

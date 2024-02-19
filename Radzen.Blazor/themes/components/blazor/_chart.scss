@@ -2,6 +2,8 @@ $chart-axis-color: var(--rz-base-300) !default;
 $chart-axis-label-color: var(--rz-text-secondary-color) !default;
 $chart-axis-font-size: 0.875rem !default;
 $chart-legend-font-size: 0.875rem !default;
+$chart-legend-focus-outline: var(--rz-outline-focus) !default;
+$chart-legend-focus-outline-offset: var(--rz-outline-offset) !default;
 $chart-tooltip-background: var(--rz-base-background-color) !default;
 $chart-tooltip-color: var(--rz-text-color) !default;
 $chart-marker-stroke: var(--rz-base-background-color) !default;
@@ -73,6 +75,8 @@ $chart-color-schemes: (
   --rz-chart-axis-label-color: #{$chart-axis-label-color};
   --rz-chart-axis-font-size: #{$chart-axis-font-size};
   --rz-chart-legend-font-size: #{$chart-legend-font-size};
+  --rz-chart-legend-focus-outline: #{$chart-legend-focus-outline};
+  --rz-chart-legend-focus-outline-offset: #{$chart-legend-focus-outline-offset};
   --rz-chart-tooltip-background: #{$chart-tooltip-background};
   --rz-chart-tooltip-color: #{$chart-tooltip-color};
   --rz-chart-marker-stroke: #{$chart-marker-stroke};
@@ -210,17 +214,26 @@ $chart-color-schemes: (
 }
 
 .rz-legend-item {
-  align-items: center;
   display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 4px;
+  cursor: pointer;
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-chart-legend-focus-outline);
+    outline-offset: var(--rz-chart-legend-focus-outline-offset);
+    border-radius: var(--rz-border-radius);
+  }
 }
 
 .rz-legend-top .rz-legend-item,
 .rz-legend-bottom .rz-legend-item {
   display: inline-flex;
-}
-
-.rz-legend-item-text {
-  padding: 4px;
 }
 
 .rz-chart-tooltip {

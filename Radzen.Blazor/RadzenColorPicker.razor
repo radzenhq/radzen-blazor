@@ -5,7 +5,7 @@
 
 @if (Visible)
 {
-    <div @ref=@Element style=@Style @onclick=@Toggle @attributes=@Attributes class=@GetCssClass() id=@GetId()>
+    <div @ref=@Element style=@Style @onclick=@Toggle @attributes=@Attributes class=@GetCssClass() id=@GetId() tabindex="@(Disabled ? -1 : TabIndex)" @onkeypress="@(args => OnKeyPress(args, Toggle()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
         @if (Icon != null)
         {
             <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
@@ -15,7 +15,8 @@
         <Popup Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@Popup class="rz-colorpicker-popup" Close=@OnClosePopup Open=@Open>
             @if (ShowHSV)
             {
-                <Draggable class="rz-saturation-picker rz-colorpicker-section" style=@($"background-color: hsl({(HueHandleLeft * 360).ToInvariantString()}, 100%, 50%)") Drag=@OnSaturationMove>
+                <Draggable class="rz-saturation-picker rz-colorpicker-section" style=@($"background-color: hsl({(HueHandleLeft * 360).ToInvariantString()}, 100%, 50%)") Drag=@OnSaturationMove
+                           id=@(GetId() + "hsl" ) tabindex="@(Disabled ? -1 : 0)" @onkeydown="@(args => OnHslKeyPress(args))">
                     <div class="rz-saturation-white">
                         <div class="rz-saturation-black"></div>
                         <div class="rz-saturation-handle" style=@($"top: {(SaturationHandleTop * 100).ToInvariantString()}%; left: {(SaturationHandleLeft * 100).ToInvariantString()}%")></div>
@@ -23,10 +24,12 @@
                 </Draggable>
                 <div class="rz-colorpicker-preview-area rz-colorpicker-section">
                     <div class="rz-hue-and-alpha">
-                        <Draggable class="rz-hue-picker" Drag=@OnHueMove>
+                        <Draggable class="rz-hue-picker" Drag=@OnHueMove 
+                            id=@(GetId() + "hue" ) tabindex="@(Disabled ? -1 : 0)" @onkeydown="@(args => OnHueKeyPress(args))">
                             <div class="rz-hue-handle" style=@($"top: 0; left: {(HueHandleLeft * 100).ToInvariantString()}%")></div>
                         </Draggable>
-                        <Draggable style=@($"background-image: linear-gradient(to right, {AlphaGradientStart} 0%, {AlphaGradientEnd} 100%)") class="rz-alpha-picker" Drag=@OnAlphaMove>
+                        <Draggable style=@($"background-image: linear-gradient(to right, {AlphaGradientStart} 0%, {AlphaGradientEnd} 100%)") class="rz-alpha-picker" Drag=@OnAlphaMove
+                            id=@(GetId() + "alpha" ) tabindex="@(Disabled ? -1 : 0)" @onkeydown="@(args => OnAlphaKeyPress(args))">
                             <div class="rz-alpha-handle" style=@($"top: 0; left: {(AlphaHandleLeft * 100).ToInvariantString()}%")></div>
                         </Draggable>
                     </div>

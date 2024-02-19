@@ -39,6 +39,9 @@ $datepicker-calendar-today-border-radius: var(--rz-datepicker-calendar-border-ra
 
 $datepicker-title-height: 47px !default;
 
+$datepicker-focus-outline: var(--rz-outline-focus) !default;
+$datepicker-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
+
 $timepicker-background-color: var(--rz-base-200)!default;
 $timepicker-color: var(--rz-text-color) !default;
 $timepicker-padding: 0.5rem !default;
@@ -97,6 +100,9 @@ $timepicker-border: none !default;
   --rz-datepicker-calendar-today-border-radius: #{$datepicker-calendar-today-border-radius};
 
   --rz-datepicker-title-height: #{$datepicker-title-height};
+
+  --rz-datepicker-focus-outline: #{$datepicker-focus-outline};
+  --rz-datepicker-focus-outline-offset: #{$datepicker-focus-outline-offset};
 
   --rz-timepicker-background-color: #{$timepicker-background-color};
   --rz-timepicker-color: #{$timepicker-color};
@@ -268,6 +274,17 @@ $timepicker-border: none !default;
 .rz-datepicker-title {
   height: var(--rz-datepicker-title-height);
   text-align: center;
+}
+
+.rz-datepicker-calendar-container {
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-datepicker-focus-outline);
+    outline-offset: var(--rz-datepicker-focus-outline-offset);
+  }
 }
 
 .rz-datepicker-calendar {

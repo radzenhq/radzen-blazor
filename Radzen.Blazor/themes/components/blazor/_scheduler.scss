@@ -76,6 +76,9 @@ $scheduler-year-slot-title-border-radius: 0.25rem !default;
 $scheduler-planner-slot-width: 3rem !default;
 $scheduler-planner-slot-height: 4.5rem !default;
 
+$scheduler-focus-outline: var(--rz-outline-focus) !default;
+$scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
+
 // Scheduler CSS variables
 
 :root {
@@ -151,6 +154,8 @@ $scheduler-planner-slot-height: 4.5rem !default;
 
   --rz-scheduler-planner-slot-width: #{$scheduler-planner-slot-width};
   --rz-scheduler-planner-slot-height: #{$scheduler-planner-slot-height};
+  --rz-scheduler-focus-outline: #{$scheduler-focus-outline};
+  --rz-scheduler-focus-outline-offset: #{$scheduler-focus-outline-offset};
 }
 
 .rz-scheduler {
@@ -284,6 +289,15 @@ $scheduler-planner-slot-height: 4.5rem !default;
   display: flex;
   overflow: auto;
   height: 0;
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-scheduler-focus-outline);
+    outline-offset: var(--rz-scheduler-focus-outline-offset);
+  }
 }
 
 .rz-slots {
@@ -299,23 +313,27 @@ $scheduler-planner-slot-height: 4.5rem !default;
     color: var(--rz-scheduler-view-button-color);
     border: var(--rz-scheduler-view-button-border);
     border-radius: 0;
+    border-right: none;
 
     &:first-child {
       border-top-left-radius: var(--rz-scheduler-border-radius);
       border-bottom-left-radius: var(--rz-scheduler-border-radius);
-      border-right: none;
     }
 
     &:last-child {
       border-top-right-radius: var(--rz-scheduler-border-radius);
       border-bottom-right-radius: var(--rz-scheduler-border-radius);
-      border-left: none;
+      border-right: var(--rz-scheduler-view-button-border);
     }
 
     &.rz-state-active {
       background-color: var(--rz-scheduler-view-selected-background-color);
       border-color: var(--rz-scheduler-view-selected-border-color);
       color: var(--rz-scheduler-view-selected-color);
+    }
+
+    &:focus-visible {
+      z-index: 1;
     }
   }
 }
@@ -342,6 +360,10 @@ $scheduler-planner-slot-height: 4.5rem !default;
 
     &.rz-next {
       border-radius: var(--rz-scheduler-next-button-border-radius);
+    }
+
+    &:focus-visible {
+      z-index: 1;
     }
   }
 }
@@ -432,6 +454,31 @@ $scheduler-planner-slot-height: 4.5rem !default;
 .rz-week-view-content {
   flex: 1;
   display: flex;
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-scheduler-focus-outline);
+    outline-offset: var(--rz-scheduler-focus-outline-offset);
+
+    .rz-slots {
+      &.rz-state-focused {
+      outline: var(--rz-scheduler-focus-outline);
+      outline-offset: var(--rz-scheduler-focus-outline-offset);
+      }
+    }
+
+    .rz-event {
+      &.rz-state-focused {
+        .rz-event-content {
+          outline: var(--rz-scheduler-focus-outline);
+          outline-offset: var(--rz-outline-offset);
+        }
+      }
+    }
+  }
 }
 
 .rz-week-view {
@@ -442,6 +489,7 @@ $scheduler-planner-slot-height: 4.5rem !default;
   .rz-view-header {
     padding-right: 15px;
   }
+  
 }
 
 // Month View
@@ -450,6 +498,24 @@ $scheduler-planner-slot-height: 4.5rem !default;
   .rz-view-content {
     flex: 1;
     flex-direction: column;
+
+    &:focus-visible {
+      .rz-slot:has(.rz-state-focused) {
+        outline: var(--rz-scheduler-focus-outline);
+        outline-offset: var(--rz-scheduler-focus-outline-offset);
+      }
+    }
+
+    &:focus-visible {
+      .rz-event {
+        &.rz-state-focused {
+          .rz-event-content {
+            outline: var(--rz-scheduler-focus-outline);
+            outline-offset: var(--rz-outline-offset);
+          }
+        }
+      }
+    }
   }
 
   .rz-slot {
@@ -472,6 +538,27 @@ $scheduler-planner-slot-height: 4.5rem !default;
     top: 0px;
     min-height: 2.25rem;
     z-index: 9999;
+  }
+
+  &:focus-visible {
+    outline: var(--rz-scheduler-focus-outline);
+    outline-offset: var(--rz-scheduler-focus-outline-offset);
+
+    .rz-slot {
+      &.rz-state-focused {
+        outline: var(--rz-scheduler-focus-outline);
+        outline-offset: var(--rz-scheduler-focus-outline-offset);
+      }
+    }
+    
+    .rz-event {
+      &.rz-state-focused {
+        .rz-event-content {
+          outline: var(--rz-scheduler-focus-outline);
+          outline-offset: var(--rz-outline-offset);
+        }
+      }
+    }
   }
 
   .rz-month {
@@ -527,6 +614,27 @@ $scheduler-planner-slot-height: 4.5rem !default;
     .rz-slot-header {
       min-width: var(--rz-scheduler-timeline-slot-width);
       flex: 0 0 auto;
+    }
+  }
+
+  &:focus-visible {
+    outline: var(--rz-scheduler-focus-outline);
+    outline-offset: var(--rz-scheduler-focus-outline-offset);
+
+    .rz-slot {
+      &.rz-state-focused {
+        outline: var(--rz-scheduler-focus-outline);
+        outline-offset: var(--rz-scheduler-focus-outline-offset);
+      }
+    }
+    
+    .rz-event {
+      &.rz-state-focused {
+        .rz-event-content {
+          outline: var(--rz-scheduler-focus-outline);
+          outline-offset: var(--rz-outline-offset);
+        }
+      }
     }
   }
 
@@ -593,6 +701,11 @@ $scheduler-planner-slot-height: 4.5rem !default;
         color: var(--rz-scheduler-event-color);
         background-color: var(--rz-scheduler-event-background-color)
       }
+
+      &.rz-state-focused {
+        color: var(--rz-datepicker-calendar-hover-color);
+        background: var(--rz-datepicker-calendar-hover-background-color);
+      }
     }
 
     &:hover {
@@ -601,6 +714,18 @@ $scheduler-planner-slot-height: 4.5rem !default;
         background: var(--rz-datepicker-calendar-hover-background-color);
       }
     }
+  }
+}
+
+.rz-year-month {
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-scheduler-focus-outline);
+    outline-offset: var(--rz-outline-offset);
+    border-radius: var(--rz-border-radius);
   }
 }
 

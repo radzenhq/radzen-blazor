@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
@@ -12,11 +13,11 @@ namespace Radzen.Blazor
     ///  &lt;RadzenHtmlEditorFormatBlock /&gt;
     /// &lt;/RadzenHtmlEdito&gt;
     /// @code {
-    ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!"; 
+    ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!";
     /// }
     /// </code>
     /// </example>
-    public partial class RadzenHtmlEditorFormatBlock
+    public partial class RadzenHtmlEditorFormatBlock : ComponentBase, IDisposable
     {
         /// <summary>
         /// The RadzenHtmlEditor component which this tool is part of.
@@ -82,6 +83,31 @@ namespace Radzen.Blazor
         {
             await Editor.ExecuteCommandAsync("formatBlock", value);
         }
-    }
 
+        /// <inheritdoc/>
+        override protected void OnInitialized()
+        {
+            Editor?.RegisterShortcut("Alt+Shift+1", () => OnChange("h1"));
+            Editor?.RegisterShortcut("Alt+Shift+2", () => OnChange("h2"));
+            Editor?.RegisterShortcut("Alt+Shift+3", () => OnChange("h3"));
+            Editor?.RegisterShortcut("Alt+Shift+4", () => OnChange("h4"));
+            Editor?.RegisterShortcut("Alt+Shift+5", () => OnChange("h5"));
+            Editor?.RegisterShortcut("Alt+Shift+6", () => OnChange("h6"));
+            Editor?.RegisterShortcut("Alt+Shift+7", () => OnChange("p"));
+        }
+
+        /// <summary>
+        /// IDisposable implementation.
+        /// </summary>
+        public void Dispose()
+        {
+            Editor?.UnregisterShortcut("Alt+Shift+1");
+            Editor?.UnregisterShortcut("Alt+Shift+2");
+            Editor?.UnregisterShortcut("Alt+Shift+3");
+            Editor?.UnregisterShortcut("Alt+Shift+4");
+            Editor?.UnregisterShortcut("Alt+Shift+5");
+            Editor?.UnregisterShortcut("Alt+Shift+6");
+            Editor?.UnregisterShortcut("Alt+Shift+7");
+        }
+    }
 }

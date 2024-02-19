@@ -3,8 +3,9 @@
 @inherits RadzenComponentWithChildren
 @if (Visible)
 {
-    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-        <button disabled="@IsDisabled" class="@getButtonCss()" type="button" @onclick="@OnClick">
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
+        tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
+        <button tabindex="-1" disabled="@IsDisabled" class="@getButtonCss()" type="button" @onclick="@OnClick">
             @if (IsBusy)
             {
                 <RadzenIcon Icon="refresh" Style="animation: rotation 700ms linear infinite" />
@@ -32,7 +33,7 @@
                     <span class="rz-button-text">&nbsp;</span>
                 }
             }
-        </button><button disabled="@IsDisabled" onclick="@OpenPopupScript()" class="@getPopupButtonCss()" type="button" aria-label="@OpenAriaLabel">
+        </button><button tabindex="-1" disabled="@IsDisabled" onclick="@OpenPopupScript()" class="@getPopupButtonCss()" type="button" aria-label="@OpenAriaLabel">
             <span aria-hidden="true" class="rz-button-icon-left rzi rzi-chevron-down"></span><span class="rz-button-text"></span>
         </button>
         <div id="@PopupID" class="rz-splitbutton-menu">

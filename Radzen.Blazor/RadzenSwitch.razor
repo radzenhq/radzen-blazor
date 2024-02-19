@@ -4,7 +4,7 @@
 @if (Visible)
 {
 <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
-     @onclick="@Toggle" @onkeypress="@(async (args) => { if (args.Code == "Space") { await Toggle(); } })" style="outline: 0 none;@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")">
+     @onclick="@Toggle" @onkeypress="@(args => OnKeyPress(args, Toggle()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")">
     <div class="rz-helper-hidden-accessible">
             <input type="checkbox" name="@Name" id="@Name" checked="@Value" value="@ValueAsString" tabindex="-1" aria-checked="@(Value.ToString().ToLowerInvariant())" @attributes=@InputAttributes>
     </div>

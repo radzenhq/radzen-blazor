@@ -1,7 +1,8 @@
 $rating-color: var(--rz-secondary) !default;
-$rating-opacity: 0.5 !default;
+$rating-opacity: 1 !default;
 $rating-font-size: var(--rz-icon-size) !default;
 $rating-selected-color: var(--rz-primary) !default;
+$rating-focus-color: var(--rz-primary-darker) !default;
 $rating-disabled-color: var(--rz-text-disabled-color) !default;
 $rating-disabled-opacity: 0.3 !default;
 $rating-ban-icon: "highlight_off" !default;
@@ -14,6 +15,7 @@ $rating-ban-icon-color: $rating-color !default;
   --rz-rating-opacity: #{$rating-opacity};
   --rz-rating-font-size: #{$rating-font-size};
   --rz-rating-selected-color: #{$rating-selected-color};
+  --rz-rating-focus-color: #{$rating-focus-color};
   --rz-rating-disabled-color: #{$rating-disabled-color};
   --rz-rating-disabled-opacity: #{$rating-disabled-opacity};
   --rz-rating-ban-icon: #{$rating-ban-icon};
@@ -68,26 +70,33 @@ $rating-ban-icon-color: $rating-color !default;
       content: "star";
     }
   }
-}
 
-.rz-rating:not(.rz-state-disabled):not(.rz-state-readonly) {
-  .rzi-star-o {
-    cursor: pointer;
+  &:not(.rz-state-disabled):not(.rz-state-readonly) {
 
-    &:hover {
-      color: var(--rz-rating-selected-color);
+    a:hover {
+      cursor: pointer;
 
-      &:before {
+      .rzi-star,
+      .rzi-star-o,
+      .rzi-ban {
+        color: var(--rz-rating-selected-color);
+      }
+
+      .rzi-star-o:before {
         content: "star";
       }
     }
-  }
 
-  .rzi-ban {
-    cursor: pointer;
+    a:focus-visible {
+      .rzi-star,
+      .rzi-star-o,
+      .rzi-ban {
+        color: var(--rz-rating-focus-color);
+      }
 
-    &:hover {
-      color: var(--rz-rating-selected-color);
+      .rzi-star-o:before {
+        content: "star";
+      }
     }
   }
 }

@@ -32,17 +32,25 @@
 
         @if (item.Start >= start && item.Start <= end)
         {
-            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect />
+            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect
+                CssClass="@(CurrentDate.Date == date.Date && object.Equals(Appointments.Where(i => i.Start.Date == CurrentDate.Date).OrderBy(i => i.Start).ThenByDescending(i => i.End).ElementAtOrDefault(CurrentAppointment),item) ? "rz-state-focused" : "")" />
         } 
         else if (date == StartDate)
         {
-            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect />
+            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect
+                CssClass="@(CurrentDate == date && CurrentAppointment != - 1 && object.Equals(appointments.ElementAtOrDefault(CurrentAppointment),item) ? "rz-state-focused" : "")" />
         }
     }
 }
 </div>
 
 @code {
+    [Parameter]
+    public int CurrentAppointment { get; set; } = -1;
+
+    [Parameter]
+    public DateTime CurrentDate { get; set; }
+
     [CascadingParameter]
     public IScheduler Scheduler { get; set; }
 

@@ -24,6 +24,12 @@ $selectbar-sizes: xs, sm, md, lg;
 
 .rz-selectbutton {
   display: inline-flex;
+
+  .rz-button {
+    &:focus-visible {
+      z-index: 1;
+    }
+  }
 }
 
 @each $size in $selectbar-sizes {  //.rz-selectbutton .rz-button.rz-button-md

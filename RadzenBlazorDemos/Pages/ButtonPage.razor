@@ -18,7 +18,7 @@
     <ButtonFilled />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="buttons#flat-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Flat Buttons
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -28,7 +28,7 @@
     <ButtonFlat />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="buttons#outlined-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Outlined Buttons
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -38,7 +38,7 @@
     <ButtonOutlined />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="buttons#text-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Text Buttons
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -48,7 +48,7 @@
     <ButtonText />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#filled-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="buttons#content-in-buttons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Content in Buttons
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -68,7 +68,7 @@
     <ButtonSizes />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#button-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="buttons#fab" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     FAB
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -78,7 +78,7 @@
     <ButtonFab />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#button-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="buttons#disabled-button" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Disabled Button
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -88,7 +88,7 @@
     <ButtonDisabled />
 </RadzenExample>
 
-<RadzenText Anchor="buttons#button-sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="buttons#busy-button" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Busy button
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -97,3 +97,37 @@
 <RadzenExample ComponentName="Button" Example="ButtonBusy">
     <ButtonBusy />
 </RadzenExample>
+
+<RadzenText Anchor="buttons#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Button component.
+</RadzenText>
+
+<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
+    <div class="rz-data-grid-data">
+        <table class="rz-grid-table">
+            <thead>
+                <tr>
+                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
+                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
+                    <td><span class="rz-cell-data">Navigate to a button.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /></span></td>
+                    <td><span class="rz-cell-data">Click the focused button.</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data"><RadzenBadge Text="Space" /></span></td>
+                    <td><span class="rz-cell-data">Click the focused button.</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
 using System.Threading.Tasks;
 
@@ -36,6 +37,27 @@ namespace Radzen.Blazor
         async Task OnClick()
         {
             await ColorPicker.SelectColor(Value);
+        }
+
+        bool preventKeyPress = false;
+        async Task OnKeyPress(KeyboardEventArgs args, Task task)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                await task;
+            }
+            else if (key == "Escape")
+            {
+                await ColorPicker.ClosePopup();
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
         }
     }
 }

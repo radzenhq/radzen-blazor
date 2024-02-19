@@ -94,7 +94,7 @@ namespace Radzen.Blazor
             }
         }
 
-        internal Task ResizeExec(MouseEventArgs args, int paneIndex)
+        internal Task StartResize(MouseEventArgs args, int paneIndex)
         {
             var pane = Panes[paneIndex];
             if (!pane.Resizable)
@@ -159,7 +159,7 @@ namespace Radzen.Blazor
             }
         }
 
-        internal async Task CollapseExec(object args, int paneIndex, string paneId)
+        internal async Task OnCollapse(int paneIndex)
         {
             var pane = Panes[paneIndex];
             var paneNext = pane.Next();
@@ -192,7 +192,7 @@ namespace Radzen.Blazor
             await InvokeAsync(StateHasChanged);
         }
 
-        internal async Task ExpandExec(MouseEventArgs args, int paneIndex, string paneId)
+        internal async Task OnExpand(int paneIndex)
         {
             var pane = Panes[paneIndex];
             var paneNext = pane.Next();

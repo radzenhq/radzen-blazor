@@ -118,6 +118,9 @@ $rz-text-font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
 'Segoe UI Emoji', 'Segoe UI Symbol' !default;
 $rz-icon-font-family: 'Material Icons' !default;
 $rz-icon-size: 1.25rem !default;
+$rz-outline-offset: 2px !default;
+$rz-outline-width: 2px !default;
+$rz-outline-color: var(--rz-secondary) !default;
 
 // Utilities
 

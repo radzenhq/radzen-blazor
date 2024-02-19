@@ -3,6 +3,8 @@ $accordion-item-margin: 0 !default;
 $accordion-item-border: none !default;
 $accordion-item-background-color: var(--rz-base-background-color) !default;
 $accordion-item-color: var(--rz-text-color) !default;
+$accordion-item-focus-outline: var(--rz-outline-focus) !default;
+$accordion-item-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 $accordion-item-line-height: 1.25rem !default;
 $accordion-item-font-size: var(--rz-body-font-size) !default;
 $accordion-item-font-weight: normal !default;
@@ -29,6 +31,8 @@ $accordion-shadow: none !default;
   --rz-accordion-item-border: #{$accordion-item-border};
   --rz-accordion-item-background-color: #{$accordion-item-background-color};
   --rz-accordion-item-color: #{$accordion-item-color};
+  --rz-accordion-item-focus-outline: #{$accordion-item-focus-outline};
+  --rz-accordion-item-focus-outline-offset: #{$accordion-item-focus-outline-offset};
   --rz-accordion-item-line-height: #{$accordion-item-line-height};
   --rz-accordion-item-font-size: #{$accordion-item-font-size};
   --rz-accordion-item-font-weight: #{$accordion-item-font-weight};
@@ -62,6 +66,14 @@ $accordion-shadow: none !default;
   & > div:only-child {
     border-radius: var(--rz-accordion-border-radius);
   }
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-accordion-item-focus-outline);
+  }
 }
 
 .rz-accordion-header {
@@ -89,6 +101,11 @@ $accordion-shadow: none !default;
     span:not(.rz-accordion-toggle-icon) {
       flex-grow: 1;
     }
+  }
+
+  :focus-visible &.rz-state-focused {
+    outline: var(--rz-accordion-item-focus-outline);
+    outline-offset: var(--rz-accordion-item-focus-outline-offset);
   }
 
   .rzi {

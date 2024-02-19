@@ -7,6 +7,8 @@ $menu-item-border-radius: 0 !default;
 $menu-item-color: var(--rz-text-color) !default;
 $menu-item-hover-color: var(--rz-on-secondary-light) !default;
 $menu-item-hover-background-color: var(--rz-secondary-light) !default;
+$menu-item-focus-outline: var(--rz-outline-focus) !default;
+$menu-item-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 $menu-item-selected-color: var(--rz-text-color) !default;
 $menu-item-icon-margin: 0 0.5rem 0 0 !default;
 $menu-item-icon-color: $menu-item-color !default;
@@ -40,6 +42,8 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
   --rz-menu-item-color: #{$menu-item-color};
   --rz-menu-item-hover-color: #{$menu-item-hover-color};
   --rz-menu-item-hover-background-color: #{$menu-item-hover-background-color};
+  --rz-menu-item-focus-outline: #{$menu-item-focus-outline};
+  --rz-menu-item-focus-outline-offset: #{$menu-item-focus-outline-offset};
   --rz-menu-item-selected-color: #{$menu-item-selected-color};
   --rz-menu-item-icon-margin: #{$menu-item-icon-margin};
   --rz-menu-item-icon-color: #{$menu-item-icon-color};
@@ -172,6 +176,25 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
 
       .rzi:not(.rz-navigation-item-icon-children) {
         color: var(--rz-menu-top-item-selected-color);
+      }
+    }
+  }
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-menu-item-focus-outline);
+
+    .rz-navigation-item {
+
+      &.rz-state-focused {
+  
+        > .rz-navigation-item-wrapper {
+          outline: var(--rz-menu-item-focus-outline);
+          outline-offset: var(--rz-menu-item-focus-outline-offset);
+        }
       }
     }
   }

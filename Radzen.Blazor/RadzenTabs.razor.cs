@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -253,6 +255,43 @@ namespace Radzen.Blazor
         internal RadzenTabsItem FirstVisibleTab()
         {
             return tabs.Where(t => t.Visible).FirstOrDefault();
+        }
+
+        internal int focusedIndex = -1;
+        bool preventKeyPress = true;
+        async Task OnKeyPress(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "ArrowLeft" || key == "ArrowRight")
+            {
+                preventKeyPress = true;
+
+                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowLeft" ? -1 : 1), 0, tabs.Count - 1);
+            }
+            else if (key == "Home" || key == "End")
+            {
+                preventKeyPress = true;
+
+                focusedIndex = key == "Home" ? 0 : tabs.Count - 1;
+            }
+            else if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                if (focusedIndex >= 0 && focusedIndex < tabs.Count)
+                {
+                    await tabs[focusedIndex].OnClick();
+                }
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
+        }
+        internal bool IsFocused(RadzenTabsItem item)
+        {
+            return tabs.IndexOf(item) == focusedIndex && focusedIndex != -1;
         }
     }
 }

@@ -21,7 +21,8 @@ namespace Radzen.Blazor
         public IReadOnlyDictionary<string, object> Attributes { get; set; }
 
         ClassList ContentClassList => ClassList.Create("rz-treenode-content")
-                                               .Add("rz-treenode-content-selected", selected);
+                                               .Add("rz-treenode-content-selected", selected)
+                                               .Add("rz-state-focused", Tree.IsFocused(this));
         ClassList IconClassList => ClassList.Create("rz-tree-toggler rzi")
                                                .Add("rzi-caret-down", clientExpanded)
                                                .Add("rzi-caret-right", !clientExpanded);
@@ -134,6 +135,11 @@ namespace Radzen.Blazor
                 }
                 else
                 {
+                    if (items.Count > 0)
+                    {
+                        Tree.RemoveFromCurrentItems(Tree.CurrentItems.IndexOf(items[0]), items.Count);
+                    }
+
                     if (Tree != null)
                     {
                         await Tree.Collapse.InvokeAsync(new TreeEventArgs()
@@ -153,6 +159,33 @@ namespace Radzen.Blazor
             if (expanded)
             {
                 await Expand();
+            }
+        }
+
+        internal async Task ExpandCollapse(bool value)
+        {
+            expanded = value;
+            clientExpanded = value;
+
+            if (expanded || clientExpanded)
+            {
+                await Expand();
+            }
+            else
+            {
+                if (items.Count > 0)
+                {
+                    Tree.RemoveFromCurrentItems(Tree.CurrentItems.IndexOf(items[0]), items.Count);
+                }
+
+                if (Tree != null)
+                {
+                    await Tree.Collapse.InvokeAsync(new TreeEventArgs()
+                    {
+                        Text = Text,
+                        Value = Value
+                    });
+                }
             }
         }
 
@@ -220,6 +253,10 @@ namespace Radzen.Blazor
             if (ParentItem != null)
             {
                 ParentItem.AddItem(this);
+
+                var currentItems = ParentItem.ParentItem != null ? ParentItem.ParentItem.items : Tree.items;
+
+                Tree.InsertInCurrentItems(currentItems.IndexOf(ParentItem) + (ParentItem != null ? ParentItem.items.Count : 0), this);
             }
         }
 
@@ -265,7 +302,7 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        async Task CheckedChange(bool? value)
+        internal async Task CheckedChange(bool? value)
         {
             if (Tree != null)
             {
@@ -307,7 +344,7 @@ namespace Radzen.Blazor
             }
         }
 
-        bool? IsChecked()
+        internal bool? IsChecked()
         {
             var checkedValues = GetCheckedValues();
 

@@ -13,11 +13,11 @@ namespace Radzen.Blazor
     ///  &lt;RadzenHtmlEditorLink /&gt;
     /// &lt;/RadzenHtmlEdito&gt;
     /// @code {
-    ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!"; 
+    ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!";
     /// }
     /// </code>
     /// </example>
-    public partial class RadzenHtmlEditorLink
+    public partial class RadzenHtmlEditorLink : RadzenHtmlEditorButtonBase
     {
         class LinkAttributes
         {
@@ -62,5 +62,11 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string CancelText { get; set; } = "Cancel";
+
+        /// <summary>
+        /// Specifies the shortcut for the command. Set to <c>"Ctrl+K"</c> by default.
+        /// </summary>
+        [Parameter]
+        public override string Shortcut { get; set; } = "Ctrl+K";
     }
 }

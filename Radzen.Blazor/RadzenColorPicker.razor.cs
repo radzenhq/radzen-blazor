@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.JSInterop;
 
 namespace Radzen.Blazor
 {
@@ -170,8 +172,11 @@ namespace Radzen.Blazor
             TriggerChange();
         }
 
+        Rect lastHslRect;
         void OnSaturationMove(DraggableEventArgs args)
         {
+            lastHslRect = args.Rect; ;
+
             SaturationHandleLeft = Math.Clamp((args.ClientX - args.Rect.Left) / args.Rect.Width, 0, 1);
             SaturationHandleTop = Math.Clamp((args.ClientY - args.Rect.Top) / args.Rect.Height, 0, 1);
 
@@ -264,15 +269,21 @@ namespace Radzen.Blazor
             }
         }
 
+        Rect lastAlphaRect;
         void OnAlphaMove(DraggableEventArgs args)
         {
+            lastAlphaRect = args.Rect;
+
             AlphaHandleLeft = Math.Round(Math.Clamp((args.ClientX - args.Rect.Left) / args.Rect.Width, 0, 1), 2);
 
             UpdateColorUsingHsvHandles();
         }
 
+        Rect lastHueRect;
         void OnHueMove(DraggableEventArgs args)
         {
+            lastHueRect = args.Rect;
+
             HueHandleLeft = Math.Clamp((args.ClientX - args.Rect.Left) / args.Rect.Width, 0, 1);
 
             UpdateColorUsingHsvHandles();
@@ -402,6 +413,113 @@ namespace Radzen.Blazor
             {
                 SetInitialValue();
             }
+        }
+
+        async Task OnHueKeyPress(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "ArrowLeft" || key == "ArrowRight")
+            {
+                preventKeyPress = true;
+
+                if (lastHueRect == null)
+                {
+                    lastHueRect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", (GetId() + "hue"));
+                }
+
+                OnHueMove(new DraggableEventArgs() { Rect = lastHueRect, ClientX = lastHueRect.Left + lastHueRect.Width * HueHandleLeft + (key == "ArrowLeft" ? -1 : 1) });
+            }
+            else if (key == "Escape")
+            {
+                await ClosePopup();
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
+        }
+
+        async Task OnAlphaKeyPress(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "ArrowLeft" || key == "ArrowRight")
+            {
+                preventKeyPress = true;
+
+                if (lastAlphaRect == null)
+                {
+                    lastAlphaRect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", (GetId() + "alpha"));
+                }
+
+                OnAlphaMove(new DraggableEventArgs() { Rect = lastAlphaRect, ClientX = lastAlphaRect.Left + lastAlphaRect.Width * AlphaHandleLeft + (key == "ArrowLeft" ? -3 : 3) });
+            }
+            else if (key == "Escape")
+            {
+                await ClosePopup();
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
+        }
+
+        async Task OnHslKeyPress(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (lastHslRect == null)
+            {
+                lastHslRect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", (GetId() + "hsl"));
+            }
+
+            if (key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown")
+            {
+                preventKeyPress = true;
+
+                OnSaturationMove(new DraggableEventArgs() 
+                { 
+                    Rect = lastHslRect, 
+                    ClientX = lastHslRect.Left + lastHslRect.Width * SaturationHandleLeft + (key == "ArrowLeft" ? -1 : key == "ArrowRight" ? 1 : 0),
+                    ClientY = lastHslRect.Top + lastHslRect.Height * SaturationHandleTop + (key == "ArrowUp" ? -1 : key == "ArrowDown" ? 1 : 0)
+                });
+            }
+            else if (key == "Escape")
+            {
+                await ClosePopup();
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
+        }
+
+        bool preventKeyPress = false;
+        async Task OnKeyPress(KeyboardEventArgs args, Task task)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                await task;
+            }
+            else if (key == "Escape")
+            {
+                await ClosePopup();
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
+        }
+
+        internal async Task ClosePopup()
+        {
+            await Popup.CloseAsync();
+            await JSRuntime.InvokeVoidAsync("Radzen.focusElement", GetId());
         }
     }
 }

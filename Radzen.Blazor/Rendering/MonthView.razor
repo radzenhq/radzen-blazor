@@ -16,7 +16,8 @@
         var days = 0;
         var points = new Dictionary<AppointmentData, double>();
     }
-    <div class="rz-view-content">
+    <div @ref=contentView class="rz-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
+         @onfocus=@(args => {if(CurrentDate == default(DateTime)) { CurrentDate = StartDate; }})>
     @for (var date = StartDate; date < EndDate; date = date.AddDays(7))
     {
         <div class="rz-week">
@@ -27,8 +28,9 @@
                     var appointments = AppointmentsInSlot(start, end);
                     var excessCount = appointments.Count() - MaxAppointmentsInSlot;
                     var existingTops = ExistingTops(points, appointments.Take(MaxAppointmentsInSlot));
+                    var appointmentsToRender = appointments.Take(MaxAppointmentsInSlot).ToList();
 
-                    @foreach(var item in appointments.Take(MaxAppointmentsInSlot))
+                    @foreach(var item in appointmentsToRender)
                     {
                         var slotIndex = item.Start.Date.Subtract(date).Days;
                         var slotWidth = 100 / 7.0;
@@ -46,7 +48,8 @@
 
                         @if (item.Start >= start && item.Start <= end)
                         {
-                            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick />
+                            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
+                                CssClass="@(CurrentDate >= start && CurrentDate <= end && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment),item) ? "rz-state-focused" : "")" />
                         }
                         else if (start == date)
                         {
@@ -54,7 +57,8 @@
                             length = Math.Max(1, Math.Min(7, Math.Ceiling(item.End.Subtract(date).TotalDays)));
                             width = length * slotWidth;
 
-                            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick />
+                            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
+                                CssClass="@(CurrentDate == date && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment),item) ? "rz-state-focused" : "")"/>
                         }
                     }
 
@@ -74,7 +78,7 @@
             {
                 var dayOfWeek = StartDate.AddDays(days++);
                 <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek)>
-                    <div class="rz-slot-title">
+                    <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")">
                         @dayOfWeek.Day
                     </div>
                 </div>
@@ -110,7 +114,7 @@
         attributes["class"] = ClassList.Create("rz-slot").Add(attributes).ToString();
         return attributes;
     }
-    
+
     async Task OnSlotClick(DateTime date)
     {
         await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInSlot(date, date.AddDays(1)));
@@ -143,9 +147,14 @@
         return existingTops;
     }
 
+    ElementReference contentView;
+
     async Task OnAppointmentClick(AppointmentData data)
     {
         await Scheduler.SelectAppointment(data);
+#if NET5_0_OR_GREATER
+        await contentView.FocusAsync();
+#endif
     }
 
     private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
@@ -172,7 +181,8 @@
             <Appointment Data=@item Click="OnListEventClick" />
         }
         </CascadingValue>
-        </div>);
+        </div>
+           );
         }
     }
 
@@ -181,5 +191,65 @@
         DialogService.Close();
 
         await OnAppointmentClick(data);
+    }
+
+    DateTime CurrentDate;
+    int currentAppointment = -1;
+    IEnumerable<AppointmentData> currentAppointments = Enumerable.Empty<AppointmentData>();
+    bool preventKeyPress = false;
+
+    async Task OnKeyPress(KeyboardEventArgs args)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+        var arrow = key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown";
+        var updown = key == "ArrowUp" || key == "ArrowDown";
+        var leftright = key == "ArrowLeft" || key == "ArrowRight";
+        var leftup = key == "ArrowLeft" || key == "ArrowUp";
+
+        if (arrow && !currentAppointments.Any())
+        {
+            var days = leftright ? 1 : 7;
+            CurrentDate = CurrentDate.AddDays(leftup ? -days : days);
+            currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).Take(MaxAppointmentsInSlot);
+
+            preventKeyPress = true;
+        }
+        else if (arrow && currentAppointments.Any())
+        {
+            if (updown)
+            {
+                currentAppointment = Math.Clamp(currentAppointment + (key == "ArrowUp" ? -1 : 1), 0, currentAppointments.Count() - 1);
+            }
+            else
+            {
+                CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
+                currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).Take(MaxAppointmentsInSlot);
+            }
+
+            preventKeyPress = true;
+        }
+        else if (key == "Enter")
+        {
+            await OnSlotClick(CurrentDate);
+#if NET5_0_OR_GREATER
+            await contentView.FocusAsync();
+#endif
+
+            preventKeyPress = true;
+        }
+        else if (key == "Space")
+        {
+            var appointment = currentAppointments.ElementAtOrDefault(currentAppointment);
+            if (appointment != null)
+            {
+                await OnAppointmentClick(appointment);
+            }
+
+            preventKeyPress = true;
+        }
+        else
+        {
+            preventKeyPress = false;
+        }
     }
 }

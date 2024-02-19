@@ -19,22 +19,12 @@
             @HeaderTemplate
             @if (AllowCollapse)
             {
-                @if (collapsed)
-                {
-                    <a @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler"
-                       @onclick:preventDefault="true" role="tab" id="rz-panel-0-label" aria-controls="rz-panel-0-content"
-                       aria-expanded="false" aria-label="@ExpandAriaLabel" title="@ExpandTitle">
-                        <span class="rzi rzi-plus"></span>
-                    </a>
-                }
-                else
-                {
-                    <a @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler"
-                       @onclick:preventDefault="true" role="tab" id="rz-panel-0-label" aria-controls="rz-panel-0-content"
-                       aria-expanded="true" aria-label="@CollapseAriaLabel" title="@CollapseTitle">
-                        <span class="rzi rzi-minus"></span>
-                    </a>
-                }
+                <a @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler"
+                   @onclick:preventDefault="true" role="tab" aria-controls="rz-panel-0-content"
+                   aria-expanded="@(collapsed ? "false" : "true")" aria-label="@(collapsed ? ExpandAriaLabel : CollapseAriaLabel)" title="@(collapsed ? ExpandTitle : CollapseTitle)"
+                   tabindex="0" @onkeypress="@(args => OnKeyPress(args, Toggle(new MouseEventArgs())))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
+                    <span class="rzi @(collapsed ? "rzi-plus" : "rzi-minus")"></span>
+                </a>
             }
         </div>
         <div class="rz-panel-content-wrapper" role="region" aria-hidden="false" style="@contentStyle">

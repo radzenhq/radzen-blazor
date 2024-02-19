@@ -22,22 +22,67 @@
                 These themes are free for commercial use. The source SCSS files are licensed under MIT and available on <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">GitHub</a>.
             </RadzenText>
             <RadzenStack Gap="1rem">
-                <RadzenDataList Data="@ThemeService.Themes.Where(t => !t.Premium)">
+                <RadzenDataList Data="@ThemeService.Themes.Where(t => !t.Premium)" Style="--rz-datalist-item-border: none;--rz-datalist-padding: 0.5rem 0;--rz-datalist-item-vertical-margin: 0;--rz-datalist-item-horizontal-margin: 0;">
                     <Template>
-                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap" @onclick=@(args => NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("theme", $"{context.Value}"), true)) Style="cursor:pointer">
-                            <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 4px; overflow: hidden; outline: var(--rz-border-disabled); min-width: 80px;">
-                                <rect width="80" height="60" fill="@context.Base" />
-                                <rect x="0" y="4" width="16" height="56" fill="@context.Sidebar" />
-                                <rect x="24" y="17" width="48" height="32" rx="2" fill="@context.Content" />
-                                <rect x="43" y="41" width="12" height="4" rx="1" fill="@context.Secondary" />
-                                <rect x="28" y="21" width="16" height="2" rx="1" fill="@context.TitleText" />
-                                <rect x="28" y="27" width="40" height="2" rx="1" fill="@context.ContentText" />
-                                <rect x="28" y="31" width="40" height="2" rx="1" fill="@context.ContentText" />
-                                <rect x="28" y="35" width="16" height="2" rx="1" fill="@context.ContentText" />
-                                <rect x="28" y="41" width="12" height="4" rx="1" fill="@context.Primary" />
-                                <rect width="80" height="6" fill="@context.Header" />
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap" @onclick=@(args => NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("theme", $"{context.Value}"), true)) Style="cursor:pointer">
+                            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" Class="rz-m-0">@context.Text</RadzenText>
+                            <svg width="100%" viewBox="0 0 288 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: var(--rz-border-radius); overflow: hidden; outline: var(--rz-border-disabled);">
+                                <rect width="288" height="72" fill="@context.Base"/>
+                                <g filter="url(#dropShadow1)"><rect x="196" y="12" width="80" height="48" rx="@context.CardRadius" fill="@context.Content"/></g>
+                                <g filter="url(#dropShadow0)"><rect x="104" y="12" width="80" height="48" rx="@context.CardRadius" fill="@context.Content"/></g>
+                                <circle cx="229" cy="36" r="16" fill="@context.SeriesA"/>
+                                <path d="M229 20V36H229.059L240.343 47.2841C237.446 50.1969 233.433 52 229 52C220.163 52 213 44.8366 213 36C213 27.1634 220.163 20 229 20Z" fill="@context.SeriesB"/>
+                                <path d="M229 36V20C220.163 20 213 27.1634 213 36H229Z" fill="@context.SeriesC"/>
+                                <rect x="253" y="22" width="6" height="6" rx="@context.ButtonRadius" fill="@context.SeriesA"/>
+                                <rect x="253" y="33" width="6" height="6" rx="@context.ButtonRadius" fill="@context.SeriesB"/>
+                                <rect x="253" y="44" width="6" height="6" rx="@context.ButtonRadius" fill="@context.SeriesC"/>
+                                <rect x="120" y="22" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="138" y="22" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="156" y="22" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="114" y="27" width="60" height="8" rx="@context.ButtonRadius" fill="@context.Selection"/>
+                                <rect x="120" y="30" width="12" height="2" rx="1" fill="@context.SelectionText"/>
+                                <rect x="138" y="30" width="12" height="2" rx="1" fill="@context.SelectionText"/>
+                                <rect x="156" y="30" width="12" height="2" rx="1" fill="@context.SelectionText"/>
+                                <rect x="120" y="38" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="138" y="38" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="156" y="38" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="120" y="43" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="138" y="43" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="156" y="43" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="120" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="138" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="156" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/> 
+                                <rect x="20" y="44" width="28" height="8" rx="@context.ButtonRadius" fill="@context.Primary"/>
+                                <rect x="56" y="44" width="28" height="8" rx="@context.ButtonRadius" fill="@context.Secondary"/>
+                                <rect x="56" y="21" width="28" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="56" y="25" width="28" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="56" y="29" width="28" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="56" y="33" width="14" height="2" rx="1" fill="@context.ContentText"/>
+                                <path d="M41.2344 33.6172V28.9102C41.2344 28.5716 41.179 28.2819 41.0684 28.041C40.9577 27.7936 40.7852 27.6016 40.5508 27.4648C40.3229 27.3281 40.0267 27.2598 39.6621 27.2598C39.3496 27.2598 39.0794 27.3151 38.8516 27.4258C38.6237 27.5299 38.4479 27.6829 38.3242 27.8848C38.2005 28.0801 38.1387 28.3112 38.1387 28.5781H35.3262C35.3262 28.1289 35.4303 27.7025 35.6387 27.2988C35.847 26.8952 36.1497 26.5404 36.5469 26.2344C36.944 25.9219 37.416 25.6777 37.9629 25.502C38.5163 25.3262 39.1348 25.2383 39.8184 25.2383C40.6387 25.2383 41.3678 25.375 42.0059 25.6484C42.6439 25.9219 43.1452 26.332 43.5098 26.8789C43.8809 27.4258 44.0664 28.1094 44.0664 28.9297V33.4512C44.0664 34.0306 44.1022 34.5059 44.1738 34.877C44.2454 35.2415 44.3496 35.5605 44.4863 35.834V36H41.6445C41.5078 35.7135 41.4036 35.3555 41.332 34.9258C41.2669 34.4896 41.2344 34.0534 41.2344 33.6172ZM41.6055 29.5645L41.625 31.1562H40.0527C39.6816 31.1562 39.3594 31.1986 39.0859 31.2832C38.8125 31.3678 38.5879 31.4883 38.4121 31.6445C38.2363 31.7943 38.1061 31.9701 38.0215 32.1719C37.9434 32.3737 37.9043 32.5951 37.9043 32.8359C37.9043 33.0768 37.9596 33.2949 38.0703 33.4902C38.181 33.679 38.3405 33.8288 38.5488 33.9395C38.7572 34.0436 39.0013 34.0957 39.2812 34.0957C39.7044 34.0957 40.0723 34.0111 40.3848 33.8418C40.6973 33.6725 40.9382 33.4642 41.1074 33.2168C41.2832 32.9694 41.3743 32.735 41.3809 32.5137L42.123 33.7051C42.0189 33.972 41.8757 34.2487 41.6934 34.5352C41.5176 34.8216 41.293 35.0918 41.0195 35.3457C40.7461 35.5931 40.4173 35.7982 40.0332 35.9609C39.6491 36.1172 39.1934 36.1953 38.666 36.1953C37.9954 36.1953 37.3867 36.0618 36.8398 35.7949C36.2995 35.5215 35.8698 35.1471 35.5508 34.6719C35.2383 34.1901 35.082 33.6432 35.082 33.0312C35.082 32.4779 35.1862 31.9863 35.3945 31.5566C35.6029 31.127 35.9089 30.7656 36.3125 30.4727C36.7227 30.1732 37.2337 29.9486 37.8457 29.7988C38.4577 29.6426 39.1673 29.5645 39.9746 29.5645H41.6055Z" fill="@context.ContentText"/>
+                                <path d="M28.0508 24.2129L24.1836 36H21.0684L26.3516 21.7812H28.334L28.0508 24.2129ZM31.2637 36L27.3867 24.2129L27.0742 21.7812H29.0762L34.3887 36H31.2637ZM31.0879 30.707V33.002H23.5781V30.707H31.0879Z" fill="@context.TitleText"/>
+                                <defs>
+                                    <filter id="dropShadow0" x="101" y="10" width="86" height="54" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                        <feOffset dy="1"/>
+                                        <feGaussianBlur stdDeviation="1"/>
+                                        <feComposite in2="hardAlpha" operator="out"/>
+                                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"/>
+                                        <feBlend mode="normal" in2="BackgroundImageFix" result="filter_dropShadow"/>
+                                        <feBlend mode="normal" in="SourceGraphic" in2="filter_dropShadow" result="shape"/>
+                                    </filter>
+                                    <filter id="dropShadow1" x="193" y="10" width="86" height="54" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                        <feOffset dy="1"/>
+                                        <feGaussianBlur stdDeviation="1"/>
+                                        <feComposite in2="hardAlpha" operator="out"/>
+                                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"/>
+                                        <feBlend mode="normal" in2="BackgroundImageFix" result="filter_dropShadow"/>
+                                        <feBlend mode="normal" in="SourceGraphic" in2="filter_dropShadow" result="shape"/>
+                                    </filter>
+                                </defs>
                             </svg>
-                            @context.Text
                         </RadzenStack>
                     </Template>
                 </RadzenDataList>
@@ -53,22 +98,67 @@
                 Premium themes can be used with an active <a href="https://www.radzen.com/pricing/" title="See Radzen Pricing" target="_blank">Radzen Professional or Enterprise subscription</a>.
             </RadzenText>
             <RadzenStack Gap="1rem">
-                <RadzenDataList Data="@ThemeService.Themes.Where(t => t.Premium)">
+                <RadzenDataList Data="@ThemeService.Themes.Where(t => t.Premium)" Style="--rz-datalist-item-border: none;--rz-datalist-padding: 0.5rem 0;--rz-datalist-item-vertical-margin: 0;--rz-datalist-item-horizontal-margin: 0;">
                     <Template>
-                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap" @onclick=@(args => NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("theme", $"{context.Value}"), true)) Style="cursor:pointer">
-                            <svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 4px; overflow: hidden; outline: var(--rz-border-disabled); min-width: 80px;">
-                                <rect width="80" height="60" fill="@context.Base" />
-                                <rect x="0" y="4" width="16" height="56" fill="@context.Sidebar" />
-                                <rect x="24" y="17" width="48" height="32" rx="2" fill="@context.Content" />
-                                <rect x="43" y="41" width="12" height="4" rx="1" fill="@context.Secondary" />
-                                <rect x="28" y="21" width="16" height="2" rx="1" fill="@context.TitleText" />
-                                <rect x="28" y="27" width="40" height="2" rx="1" fill="@context.ContentText" />
-                                <rect x="28" y="31" width="40" height="2" rx="1" fill="@context.ContentText" />
-                                <rect x="28" y="35" width="16" height="2" rx="1" fill="@context.ContentText" />
-                                <rect x="28" y="41" width="12" height="4" rx="1" fill="@context.Primary" />
-                                <rect width="80" height="6" fill="@context.Header" />
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap" @onclick=@(args => NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("theme", $"{context.Value}"), true)) Style="cursor:pointer">
+                            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" Class="rz-m-0">@context.Text</RadzenText>
+                            <svg width="100%" viewBox="0 0 288 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: var(--rz-border-radius); overflow: hidden; outline: var(--rz-border-disabled);">
+                                <rect width="288" height="72" fill="@context.Base"/>
+                                <g filter="url(#dropShadow1)"><rect x="196" y="12" width="80" height="48" rx="@context.CardRadius" fill="@context.Content"/></g>
+                                <g filter="url(#dropShadow0)"><rect x="104" y="12" width="80" height="48" rx="@context.CardRadius" fill="@context.Content"/></g>
+                                <circle cx="229" cy="36" r="16" fill="@context.SeriesA"/>
+                                <path d="M229 20V36H229.059L240.343 47.2841C237.446 50.1969 233.433 52 229 52C220.163 52 213 44.8366 213 36C213 27.1634 220.163 20 229 20Z" fill="@context.SeriesB"/>
+                                <path d="M229 36V20C220.163 20 213 27.1634 213 36H229Z" fill="@context.SeriesC"/>
+                                <rect x="253" y="22" width="6" height="6" rx="@context.ButtonRadius" fill="@context.SeriesA"/>
+                                <rect x="253" y="33" width="6" height="6" rx="@context.ButtonRadius" fill="@context.SeriesB"/>
+                                <rect x="253" y="44" width="6" height="6" rx="@context.ButtonRadius" fill="@context.SeriesC"/>
+                                <rect x="120" y="22" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="138" y="22" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="156" y="22" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="114" y="27" width="60" height="8" rx="@context.ButtonRadius" fill="@context.Selection"/>
+                                <rect x="120" y="30" width="12" height="2" rx="1" fill="@context.SelectionText"/>
+                                <rect x="138" y="30" width="12" height="2" rx="1" fill="@context.SelectionText"/>
+                                <rect x="156" y="30" width="12" height="2" rx="1" fill="@context.SelectionText"/>
+                                <rect x="120" y="38" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="138" y="38" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="156" y="38" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="120" y="43" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="138" y="43" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="156" y="43" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="120" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="138" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="156" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/> 
+                                <rect x="20" y="44" width="28" height="8" rx="@context.ButtonRadius" fill="@context.Primary"/>
+                                <rect x="56" y="44" width="28" height="8" rx="@context.ButtonRadius" fill="@context.Secondary"/>
+                                <rect x="56" y="21" width="28" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="56" y="25" width="28" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="56" y="29" width="28" height="2" rx="1" fill="@context.ContentText"/>
+                                <rect x="56" y="33" width="14" height="2" rx="1" fill="@context.ContentText"/>
+                                <path d="M41.2344 33.6172V28.9102C41.2344 28.5716 41.179 28.2819 41.0684 28.041C40.9577 27.7936 40.7852 27.6016 40.5508 27.4648C40.3229 27.3281 40.0267 27.2598 39.6621 27.2598C39.3496 27.2598 39.0794 27.3151 38.8516 27.4258C38.6237 27.5299 38.4479 27.6829 38.3242 27.8848C38.2005 28.0801 38.1387 28.3112 38.1387 28.5781H35.3262C35.3262 28.1289 35.4303 27.7025 35.6387 27.2988C35.847 26.8952 36.1497 26.5404 36.5469 26.2344C36.944 25.9219 37.416 25.6777 37.9629 25.502C38.5163 25.3262 39.1348 25.2383 39.8184 25.2383C40.6387 25.2383 41.3678 25.375 42.0059 25.6484C42.6439 25.9219 43.1452 26.332 43.5098 26.8789C43.8809 27.4258 44.0664 28.1094 44.0664 28.9297V33.4512C44.0664 34.0306 44.1022 34.5059 44.1738 34.877C44.2454 35.2415 44.3496 35.5605 44.4863 35.834V36H41.6445C41.5078 35.7135 41.4036 35.3555 41.332 34.9258C41.2669 34.4896 41.2344 34.0534 41.2344 33.6172ZM41.6055 29.5645L41.625 31.1562H40.0527C39.6816 31.1562 39.3594 31.1986 39.0859 31.2832C38.8125 31.3678 38.5879 31.4883 38.4121 31.6445C38.2363 31.7943 38.1061 31.9701 38.0215 32.1719C37.9434 32.3737 37.9043 32.5951 37.9043 32.8359C37.9043 33.0768 37.9596 33.2949 38.0703 33.4902C38.181 33.679 38.3405 33.8288 38.5488 33.9395C38.7572 34.0436 39.0013 34.0957 39.2812 34.0957C39.7044 34.0957 40.0723 34.0111 40.3848 33.8418C40.6973 33.6725 40.9382 33.4642 41.1074 33.2168C41.2832 32.9694 41.3743 32.735 41.3809 32.5137L42.123 33.7051C42.0189 33.972 41.8757 34.2487 41.6934 34.5352C41.5176 34.8216 41.293 35.0918 41.0195 35.3457C40.7461 35.5931 40.4173 35.7982 40.0332 35.9609C39.6491 36.1172 39.1934 36.1953 38.666 36.1953C37.9954 36.1953 37.3867 36.0618 36.8398 35.7949C36.2995 35.5215 35.8698 35.1471 35.5508 34.6719C35.2383 34.1901 35.082 33.6432 35.082 33.0312C35.082 32.4779 35.1862 31.9863 35.3945 31.5566C35.6029 31.127 35.9089 30.7656 36.3125 30.4727C36.7227 30.1732 37.2337 29.9486 37.8457 29.7988C38.4577 29.6426 39.1673 29.5645 39.9746 29.5645H41.6055Z" fill="@context.ContentText"/>
+                                <path d="M28.0508 24.2129L24.1836 36H21.0684L26.3516 21.7812H28.334L28.0508 24.2129ZM31.2637 36L27.3867 24.2129L27.0742 21.7812H29.0762L34.3887 36H31.2637ZM31.0879 30.707V33.002H23.5781V30.707H31.0879Z" fill="@context.TitleText"/>
+                                <defs>
+                                    <filter id="dropShadow0" x="101" y="10" width="86" height="54" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                        <feOffset dy="1"/>
+                                        <feGaussianBlur stdDeviation="1"/>
+                                        <feComposite in2="hardAlpha" operator="out"/>
+                                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"/>
+                                        <feBlend mode="normal" in2="BackgroundImageFix" result="filter_dropShadow"/>
+                                        <feBlend mode="normal" in="SourceGraphic" in2="filter_dropShadow" result="shape"/>
+                                    </filter>
+                                    <filter id="dropShadow1" x="193" y="10" width="86" height="54" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                        <feOffset dy="1"/>
+                                        <feGaussianBlur stdDeviation="1"/>
+                                        <feComposite in2="hardAlpha" operator="out"/>
+                                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"/>
+                                        <feBlend mode="normal" in2="BackgroundImageFix" result="filter_dropShadow"/>
+                                        <feBlend mode="normal" in="SourceGraphic" in2="filter_dropShadow" result="shape"/>
+                                    </filter>
+                                </defs>
                             </svg>
-                            @context.Text
                         </RadzenStack>
                     </Template>
                 </RadzenDataList>
@@ -101,24 +191,6 @@
         <RadzenLink Path="https://www.radzen.com/blazor-studio/documentation/appearance/edit-theme/" target="_blank" Class="rz-display-block rz-mb-6">
             Read more about theme editing ↗
         </RadzenLink>
-        <style>
-            .embed-container {
-                position: relative;
-                padding-bottom: 56.25%;
-                height: 0;
-                overflow: hidden;
-                max-width: 100%;
-                }
-            .embed-container iframe,
-            .embed-container object,
-            .embed-container embed {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                }
-        </style>
     <RadzenCard Variant="Variant.Outlined" class="rz-p-7">
         <div class="embed-container">
             <iframe src="https://www.youtube.com/embed/u59RQ_AHiAs?&rel=0" frameborder="0" allowfullscreen=""></iframe>

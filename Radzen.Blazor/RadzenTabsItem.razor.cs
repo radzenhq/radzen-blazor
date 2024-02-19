@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
@@ -80,6 +81,7 @@ namespace Radzen.Blazor
         /// <value>The class list.</value>
         ClassList ClassList => ClassList.Create()
                                         .Add("rz-tabview-selected", IsSelected)
+                                        .Add("rz-state-focused", Tabs.IsFocused(this))
                                         .AddDisabled(Disabled)
                                         .Add(Attributes);
 
@@ -130,7 +132,7 @@ namespace Radzen.Blazor
             await Tabs.AddTab(this);
         }
 
-        async Task OnClick()
+        internal async Task OnClick()
         {
             if (!Disabled)
             {

@@ -10,6 +10,8 @@ $editor-button-selected-background-color: var(--rz-secondary) !default;
 $editor-button-selected-color: var(--rz-on-secondary) !default;
 $editor-separator-background-color: var(--rz-base-200) !default;
 $editor-content-background-color: var(--rz-base-background-color) !default;
+$editor-focus-outline: var(--rz-outline-focus) !default;
+$editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
 // Editor CSS variables
 
@@ -26,6 +28,8 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
   --rz-editor-button-selected-color: #{$editor-button-selected-color};
   --rz-editor-separator-background-color: #{$editor-separator-background-color};
   --rz-editor-content-background-color: #{$editor-content-background-color};
+  --rz-editor-focus-outline: #{$editor-focus-outline};
+  --rz-editor-focus-outline-offset: #{$editor-focus-outline-offset};
 }
 
 .rz-html-editor {
@@ -33,6 +37,12 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
   flex-direction: column;
   border-radius: var(--rz-editor-border-radius);
   border: var(--rz-editor-border);
+  overflow: hidden;
+
+  &:focus-within {
+    outline: var(--rz-editor-focus-outline);
+    outline-offset: var(--rz-editor-focus-outline-offset);
+  }
 }
 
 .rz-html-editor-content {

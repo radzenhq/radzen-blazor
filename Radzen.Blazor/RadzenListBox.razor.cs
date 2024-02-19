@@ -57,7 +57,7 @@ namespace Radzen.Blazor
                 await JSRuntime.InvokeVoidAsync("Radzen.focusElement", SearchID);
             }
 
-            await OnKeyPress(args);
+            await OnKeyPress(args, false);
         }
 
         private bool visibleChanged = false;
