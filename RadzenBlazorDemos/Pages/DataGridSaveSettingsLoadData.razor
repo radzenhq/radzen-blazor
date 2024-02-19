@@ -106,6 +106,7 @@
             if (_settings.PageSize.HasValue)
             {
                 pageSize = _settings.PageSize.Value;
+                await Task.Yield();
             }
         }
     }
