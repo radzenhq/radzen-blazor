@@ -251,6 +251,13 @@ namespace Radzen
         public string DisabledProperty { get; set; }
 
         /// <summary>
+        /// Gets or sets the remove chip button title.
+        /// </summary>
+        /// <value>The remove chip button title.</value>
+        [Parameter]
+        public string RemoveChipTitle { get; set; } = "Remove";
+
+        /// <summary>
         /// Gets or sets the search aria label text.
         /// </summary>
         /// <value>The search aria label text.</value>

@@ -51,7 +51,7 @@
                                 @GetItemOrValueFromProperty(item, TextProperty)
                             }
                         </span>
-                        <button type=button class="rz-button rz-button-sm rz-button-icon-only rz-light @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
+                        <button title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty))" type=button class="rz-button rz-button-sm rz-button-icon-only rz-light @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
                     </div>
                 }
             </div>
