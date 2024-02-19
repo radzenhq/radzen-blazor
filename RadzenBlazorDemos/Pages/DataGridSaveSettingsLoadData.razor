@@ -100,7 +100,7 @@
     {
         console.Log("LoadStateAsync");
         var result = await JSRuntime.InvokeAsync<string>("window.localStorage.getItem", "SettingsLoadData");
-        if (!string.IsNullOrEmpty(result))
+        if (!string.IsNullOrEmpty(result) && result != "null")
         {
             _settings = JsonSerializer.Deserialize<DataGridSettings>(result);
             if (_settings.PageSize.HasValue)
