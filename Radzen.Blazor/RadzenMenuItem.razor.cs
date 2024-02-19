@@ -235,12 +235,18 @@ namespace Radzen.Blazor
             }
         }
 
-        internal async Task Toggle()
+        /// <summary>
+        /// Toggle the menu item.
+        /// </summary>
+        public async Task Toggle()
         {
             await JSRuntime.InvokeVoidAsync("eval", $"document.getElementById('{GetId()}').click()");
         }
 
-        internal async Task Close()
+        /// <summary>
+        /// Close the menu item.
+        /// </summary>
+        public async Task Close()
         {
             await JSRuntime.InvokeVoidAsync("eval", $"Radzen.toggleMenuItem(document.getElementById('{GetId()}'), event, false)");
         }
