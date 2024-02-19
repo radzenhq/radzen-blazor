@@ -540,6 +540,27 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
     z-index: 9999;
   }
 
+  &:focus-visible {
+    outline: var(--rz-scheduler-focus-outline);
+    outline-offset: var(--rz-scheduler-focus-outline-offset);
+
+    .rz-slot {
+      &.rz-state-focused {
+        outline: var(--rz-scheduler-focus-outline);
+        outline-offset: var(--rz-scheduler-focus-outline-offset);
+      }
+    }
+    
+    .rz-event {
+      &.rz-state-focused {
+        .rz-event-content {
+          outline: var(--rz-scheduler-focus-outline);
+          outline-offset: var(--rz-outline-offset);
+        }
+      }
+    }
+  }
+
   .rz-month {
     .rz-slot {
       &:first-child {
@@ -593,6 +614,27 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
     .rz-slot-header {
       min-width: var(--rz-scheduler-timeline-slot-width);
       flex: 0 0 auto;
+    }
+  }
+
+  &:focus-visible {
+    outline: var(--rz-scheduler-focus-outline);
+    outline-offset: var(--rz-scheduler-focus-outline-offset);
+
+    .rz-slot {
+      &.rz-state-focused {
+        outline: var(--rz-scheduler-focus-outline);
+        outline-offset: var(--rz-scheduler-focus-outline-offset);
+      }
+    }
+    
+    .rz-event {
+      &.rz-state-focused {
+        .rz-event-content {
+          outline: var(--rz-scheduler-focus-outline);
+          outline-offset: var(--rz-outline-offset);
+        }
+      }
     }
   }
 
