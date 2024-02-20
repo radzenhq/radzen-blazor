@@ -35,8 +35,10 @@
     IEnumerable<OrderDetail> orderDetails;
 
     string lastfilter;
-    void LoadData(LoadDataArgs args)
+    async Task LoadData(LoadDataArgs args)
     {
+        await Task.Yield();
+
         if(!string.IsNullOrEmpty(args.Filter) && lastfilter != args.Filter)
         {
             args.Skip = 0;
@@ -50,11 +52,11 @@
         {
             lastfilter = args.Filter;
             query = query.Where(args.Filter);
-            count = query.Count();
+            count = await Task.FromResult(query.Count());
         }
         else
         {
-            count = dbContext.OrderDetails.Count();
+            count = await Task.FromResult(dbContext.OrderDetails.Count());
         }
 
         if (!string.IsNullOrEmpty(args.OrderBy))
@@ -62,6 +64,6 @@
             query = query.OrderBy(args.OrderBy);
         }
 
-        orderDetails = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+        orderDetails = await Task.FromResult(query.Skip(args.Skip.Value).Take(args.Top.Value).ToList());
     }
 }
