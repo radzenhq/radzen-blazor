@@ -228,6 +228,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets the header tooltip.
+        /// </summary>
+        /// <value>The header tooltip.</value>
+        [Parameter]
+        public string HeaderTooltip { get; set; }
+
+        /// <summary>
         /// Gets or sets the title.
         /// </summary>
         /// <value>The title.</value>
