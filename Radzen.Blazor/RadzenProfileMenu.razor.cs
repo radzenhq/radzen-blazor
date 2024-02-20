@@ -42,6 +42,13 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<RadzenProfileMenuItem> Click { get; set; }
 
+        /// <summary>
+        /// Show/Hide the "arrow down" icon
+        /// </summary>
+        /// <value>Show the "arrow down" icon.</value>
+        [Parameter]
+        public bool ShowIcon { get; set; } = true;
+
         string contentStyle = "display:none;position:absolute;z-index:1;";
         string iconStyle = "transform: rotate(0deg);";
 
