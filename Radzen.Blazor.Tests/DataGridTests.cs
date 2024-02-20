@@ -148,7 +148,7 @@ namespace Radzen.Blazor.Tests
 
             var title = component.Find(".rz-column-title");
             Assert.Equal("MyId", title.TextContent.Trim());
-            Assert.Empty(title.GetAttribute("title"));
+            Assert.Null(title.GetAttribute("title"));
         }
 
         [Fact]
