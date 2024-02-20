@@ -43,7 +43,7 @@ namespace Radzen.Blazor
         public EventCallback<RadzenProfileMenuItem> Click { get; set; }
 
         /// <summary>
-        /// Enable/Disable the "arrow down" icon
+        /// Show/Hide the "arrow down" icon
         /// </summary>
         /// <value>Show the "arrow down" icon.</value>
         [Parameter]
