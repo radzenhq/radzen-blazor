@@ -2,7 +2,7 @@
 
 @if (Visible)
 {
-    <button @ref="@Element" style="@Style" disabled="@IsDisabled"
+    <button @ref="@Element" style="@Style" disabled="@IsDisabled" tabindex="@(Disabled ? -1 : TabIndex)"
             type="@Enum.GetName(typeof(ButtonType), ButtonType).ToLower()"
             @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
             @onclick="@OnClick">
