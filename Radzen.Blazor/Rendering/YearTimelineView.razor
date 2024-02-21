@@ -17,7 +17,7 @@
 }
 
 <div @ref=view class="rz-view rz-timeline-view" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
-                 @onfocus=@(args => {CurrentDate = CurrentDate != null ? CurrentDate : StartDate; })>
+                 @onfocus=@(args => {CurrentDate = CurrentDate != default(DateTime) ? CurrentDate : StartDate; })>
     <div class="rz-view-header">
         <div class="rz-slot-header">
         </div>

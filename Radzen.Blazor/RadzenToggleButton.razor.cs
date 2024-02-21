@@ -34,13 +34,6 @@ namespace Radzen.Blazor
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the index of the tab.
-        /// </summary>
-        /// <value>The index of the tab.</value>
-        [Parameter]
-        public int TabIndex { get; set; } = 0;
-
-        /// <summary>
         /// Gets or sets the placeholder.
         /// </summary>
         /// <value>The placeholder.</value>

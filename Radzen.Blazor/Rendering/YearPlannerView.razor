@@ -14,7 +14,7 @@
 }
 
 <div @ref=view class="rz-view rz-planner-view" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
-                 @onfocus=@(args => {CurrentDate = CurrentDate != null ? CurrentDate : StartDate; CurrentMonth = CurrentMonth != -1 ? CurrentMonth : 0; })>
+                 @onfocus=@(args => {CurrentDate = CurrentDate != default(DateTime) ? CurrentDate : StartDate; CurrentMonth = CurrentMonth != -1 ? CurrentMonth : 0; })>
     <div class="rz-view-header">
         <div class="rz-slot-header">
         </div>
