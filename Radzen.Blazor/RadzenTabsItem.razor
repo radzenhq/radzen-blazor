@@ -4,7 +4,7 @@
 {
     <li role="presentation" @attributes=@Attributes style=@getStyle() class=@ClassList>
     <a @onclick=@OnClick role="tab" @onclick:preventDefault="true" id="@($"{Tabs.Id}-tabpanel-{Index}-label")"
-        aria-selected=@(IsSelected? "true" : "false") aria-controls="@($"{Tabs.Id}-tabpanel-{Index}")">
+        aria-selected=@(IsSelected? "true" : "false") aria-controls="@($"{Tabs.Id}-tabpanel-{Index}")" @onkeydown:stopPropagation>
         @if (!string.IsNullOrEmpty(Icon))
             {
                 <span class="rz-tabview-left-icon rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</span>

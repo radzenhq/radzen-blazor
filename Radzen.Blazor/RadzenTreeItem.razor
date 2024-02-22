@@ -13,7 +13,7 @@
         }
         @if (Template != null)
         {
-            <div class="rz-treenode-label">@Template(this)</div>
+            <div class="rz-treenode-label" @onkeydown:stopPropagation>@Template(this)</div>
         } else
         {
             <span for="@(GetHashCode())" class="rz-treenode-label">@Text</span>
@@ -22,7 +22,7 @@
     @if (ChildContent != null && expanded)
     {
     <CascadingValue Value=this>
-    <ul class="rz-treenode-children" style=@(clientExpanded ? "" : "display:none;")>
+    <ul class="rz-treenode-children" style=@(clientExpanded ? "" : "display:none;") @onkeydown:stopPropagation>
         @ChildContent
     </ul>
     </CascadingValue>

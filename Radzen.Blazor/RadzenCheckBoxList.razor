@@ -36,7 +36,7 @@
                 </div>
                 @if (item.Template != null)
                 {
-                    <div class="rz-chkbox-template">
+                    <div class="rz-chkbox-template" @onkeydown:stopPropagation>
                         @item.Template(item)
                     </div>
                 }
