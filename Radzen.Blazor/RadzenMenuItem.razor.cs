@@ -250,5 +250,13 @@ namespace Radzen.Blazor
         {
             await JSRuntime.InvokeVoidAsync("Radzen.toggleMenuItem", Element, "event", false);
         }
+
+        /// <summary>
+        /// Open the menu item.
+        /// </summary>
+        public async Task Open()
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.toggleMenuItem", Element, "event", true);
+        }
     }
 }

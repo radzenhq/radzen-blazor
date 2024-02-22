@@ -88,7 +88,25 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
 
-                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, currentItems.Count - 1);
+                if (subMenuOpen)
+                {
+                    focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, currentItems.Count - 1);
+                }
+                else
+                {
+                    if (key == "ArrowDown")
+                    {
+                        var item = currentItems[focusedIndex];
+
+                        if (item.items.Any())
+                        {
+                            currentItems = item.items.Where(i => i.Visible && !i.Disabled).ToList();
+                            focusedIndex = -1;
+                            subMenuOpen = true;
+                            await item.Open();
+                        }
+                    }
+                }
             }
             else if (key == "ArrowLeft" || key == "ArrowRight")
             {
