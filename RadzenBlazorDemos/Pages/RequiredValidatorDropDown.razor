@@ -47,6 +47,8 @@
         await base.OnInitializedAsync();
 
         categories = dbContext.Categories.ToList();
+        
+        products = new List<Product>();
     }
 
     void CategoryChange()
