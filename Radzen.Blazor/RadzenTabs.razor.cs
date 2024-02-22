@@ -213,14 +213,22 @@ namespace Radzen.Blazor
                 selectedIndex = parameters.GetValueOrDefault<int>(nameof(SelectedIndex));
             }
 
+            if (focusedIndex != selectedIndex)
+            {
+                focusedIndex = selectedIndex;
+            }
+
             await base.SetParametersAsync(parameters);
         }
 
+
+        int previousSelectedIndex;
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (RenderMode == TabRenderMode.Client)
+            if (RenderMode == TabRenderMode.Client && previousSelectedIndex != selectedIndex)
             {
+                previousSelectedIndex = selectedIndex;
                 await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
             }
 

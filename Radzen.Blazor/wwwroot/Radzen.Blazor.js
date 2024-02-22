@@ -159,9 +159,11 @@ window.Radzen = {
             if (header) {
                 if (i == index) {
                     header.classList.add('rz-tabview-selected');
+                    header.classList.add('rz-state-focused');
                 }
                 else {
                     header.classList.remove('rz-tabview-selected');
+                    header.classList.remove('rz-state-focused');
                 }
             }
         }
