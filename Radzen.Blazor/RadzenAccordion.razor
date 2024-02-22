@@ -19,7 +19,7 @@
         if (!item.Visible)
             continue;
 
-        <div @ref="@item.Element" id="@item.GetItemId()" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style">
+        <div @ref="@item.Element" id="@item.GetItemId()" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style" @onkeydown:stopPropagation>
             <a @onclick="@((args) => SelectItem(item))" aria-label="@ItemAriaLabel(i, item)" title="@ItemTitle(i, item)" @onclick:preventDefault="true" role="tab" 
                id="@($"rz-accordiontab-{items.IndexOf(item)}")" aria-controls="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-expanded="true">
                 @if (IsSelected(i, item))
@@ -48,7 +48,7 @@
         {
             <div class="rz-accordion-content-wrapper" role="tabpanel"
                  id="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-hidden="false" aria-labelledby="@($"rz-accordiontab-{items.IndexOf(item)}")">
-                <div class="rz-accordion-content ">
+                <div class="rz-accordion-content" @onkeydown:stopPropagation>
                     @item.ChildContent
                 </div>
             </div>
