@@ -79,7 +79,7 @@
 {
     @if (Grid.IsRowInEditMode(Item) && Grid.EditTemplate != null)
     {
-        <tr class="rz-expanded-row-content">
+        <tr class="rz-expanded-row-content" @onkeydown:stopPropagation>
             <td colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
                 <div class="rz-expanded-row-template" style="position:sticky">
                     <CascadingValue Value=@EditContext>
@@ -93,7 +93,7 @@
     }
     else if (Grid.Template != null)
     {
-        <tr class="rz-expanded-row-content">
+        <tr class="rz-expanded-row-content" @onkeydown:stopPropagation>
             <td colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
                 <div class="rz-expanded-row-template" style="position:sticky">
                     @Grid.Template(Item)
