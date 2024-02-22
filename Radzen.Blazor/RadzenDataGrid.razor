@@ -143,7 +143,7 @@
                     }
                     @if (AllowFiltering && (FilterMode == FilterMode.Simple || FilterMode == FilterMode.SimpleWithMenu) && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())
                     {
-                        <tr>
+                        <tr @onkeydown:stopPropagation>
                              @if (ShowGroupExpandColumn)
                                 {
                                     @foreach (var g in Groups)
