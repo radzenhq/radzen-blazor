@@ -240,6 +240,7 @@ namespace Radzen.Blazor
             if (items.IndexOf(item) == -1)
             {
                 items.Add(item);
+                Parent.SelectItem(item);
                 StateHasChanged();
             }
         }

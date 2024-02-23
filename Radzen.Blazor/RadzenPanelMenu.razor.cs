@@ -183,7 +183,7 @@ namespace Radzen.Blazor
             }
         }
 
-        void SelectItem(RadzenPanelMenuItem item)
+        internal void SelectItem(RadzenPanelMenuItem item)
         {
             var selected = ShouldMatch(item.Path);
             item.Select(selected);
