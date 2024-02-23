@@ -970,6 +970,9 @@ namespace Radzen.Blazor
                     Close();
                 }
             }
+#if NET5_0_OR_GREATER
+            await FocusAsync();
+#endif
         }
 
         private void SetMonth(int month)
