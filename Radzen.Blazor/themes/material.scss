@@ -363,18 +363,21 @@ $card-shadow: var(--rz-shadow-1) !default;
 $card-border: var(--rz-border-base-300) !default;
 
 // Accordion
-$accordion-item-padding: 1rem !default;
+$accordion-item-padding-block: 1rem !default;
+$accordion-item-padding-inline: 1rem !default;
 $accordion-item-color: var(--rz-text-secondary-color) !default;
 $accordion-item-line-height: 1.5rem !default;
 $accordion-item-font-weight: 500 !default;
-$accordion-icon-margin: 0 0.75rem 0 0 !default;
-$accordion-toggle-icon-margin: 0 0 0 0.75rem !default;
+$accordion-icon-margin-inline: 0 0.75rem !default;
+$accordion-toggle-icon-margin-inline: 0.75rem 0 !default;
 $accordion-toggle-icon-order: 1 !default;
 $accordion-toggle-icon-collapsed: 'keyboard_arrow_down' !default;
+$accordion-toggle-icon-collapsed-rtl: $accordion-toggle-icon-collapsed !default;
 $accordion-toggle-icon-expanded: 'keyboard_arrow_up' !default;
 $accordion-selected-color: var(--rz-text-title-color) !default;
 $accordion-hover-color: $accordion-selected-color !default;
-$accordion-content-padding: 1rem !default;
+$accordion-content-padding-block: 1rem !default;
+$accordion-content-padding-inline: 1rem !default;
 $accordion-border-radius: var(--rz-border-radius)!default;
 $accordion-item-border: var(--rz-border-base-200) !default;
 $accordion-shadow: var(--rz-shadow-1) !default;
@@ -403,14 +406,16 @@ $sidebar-toggle-hover-border-radius: 50% !default;
 $menu-background-color: var(--rz-base-background-color) !default;
 $menu-border: none !default;
 $menu-border-radius: var(--rz-border-radius) !default;
-$menu-item-padding: 0.5rem 1rem !default;
+$menu-item-padding-block: 0.5rem !default;
+$menu-item-padding-inline: 1rem !default;
 $menu-item-color: var(--rz-text-color) !default;
 $menu-item-hover-color: var(--rz-text-title-color) !default;
 $menu-item-hover-background-color: var(--rz-base-100) !default;
 $menu-item-selected-color: var(--rz-text-title-color) !default;
 $menu-item-icon-color: $menu-item-color !default;
 $menu-item-icon-hover-color: $menu-item-hover-color !default;
-$menu-top-item-padding: 0.5rem !default;
+$menu-top-item-padding-block: 0.5rem !default;
+$menu-top-item-padding-inline: 0.5rem !default;
 $menu-top-item-color: var(--rz-on-primary) !default;
 $menu-top-item-background-color: var(--rz-primary) !default;
 $menu-top-item-hover-color: var(--rz-on-primary) !default;
@@ -418,7 +423,8 @@ $menu-top-item-hover-background-color: transparent !default;
 $menu-top-item-selected-color: var(--rz-on-primary) !default;
 $menu-top-item-icon-color: $menu-top-item-color !default;
 $menu-top-item-icon-hover-color: $menu-top-item-hover-color !default;
-$context-menu-padding: 0.5rem 0 !default;
+$context-menu-padding-block: 0.5rem !default;
+$context-menu-padding-inline: 0 !default;
 $context-menu-box-shadow: var(--rz-shadow-6) !default;
 
 .rz-navigation-item-link,
@@ -429,38 +435,42 @@ $context-menu-box-shadow: var(--rz-shadow-6) !default;
 // PanelMenu
 $panel-menu-font-size: calc(var(--rz-body-font-size) * 0.875) !default;
 $panel-menu-font-weight: 500 !default;
-$panel-menu-background-color: var(--rz-base-background-color) !default;
-$panel-menu-color: var(--rz-text-title-color) !default;
-$panel-menu-hover-background-color: rgba(0, 0, 0, 0.04) !default;
-$panel-menu-hover-color: var(--rz-text-title-color) !default;
 $panel-menu-item-line-height: 1.5rem !default;
-$panel-menu-item-padding: 1rem !default;
+$panel-menu-item-padding-block: 1rem !default;
+$panel-menu-item-padding-inline: 1rem !default;
 $panel-menu-item-border: var(--rz-border-base-200) !default;
+$panel-menu-item-color: var(--rz-text-title-color) !default;
 $panel-menu-item-background-color: var(--rz-base-background-color) !default;
-$panel-menu-item-active-background-color: var(--rz-primary-lighter) !default;
+$panel-menu-item-hover-color: var(--rz-text-title-color) !default;
+$panel-menu-item-hover-background-color: rgba(0, 0, 0, 0.04) !default;
 $panel-menu-item-active-color: var(--rz-on-primary-lighter) !default;
+$panel-menu-item-active-background-color: var(--rz-primary-lighter) !default;
 $panel-menu-item-offset: 0 !default;
 $panel-menu-2nd-level-vertical-offset: 0.5rem !default;
-$panel-menu-item-2nd-level-padding: 0.5rem 0.5rem 0.5rem 1rem !default;
-$panel-menu-item-2nd-level-margin: 0 0.5rem !default;
+$panel-menu-item-2nd-level-padding-block: 0.5rem !default;
+$panel-menu-item-2nd-level-padding-inline: 1rem 0.5rem !default;
+$panel-menu-item-2nd-level-margin-block: 0 !default;
+$panel-menu-item-2nd-level-margin-inline: 0.5rem !default;
 $panel-menu-item-2nd-level-border-radius: var(--rz-border-radius) !default;
 $panel-menu-item-2nd-level-offset: 3rem !default;
-$panel-menu-item-2nd-level-background-color: var(--rz-base-background-color) !default;
 $panel-menu-item-2nd-level-color: var(--rz-text-tertiary-color) !default;
+$panel-menu-item-2nd-level-background-color: var(--rz-base-background-color) !default;
 $panel-menu-item-2nd-level-font-size: calc(var(--rz-body-font-size) * 0.875) !default;
 $panel-menu-item-2nd-level-font-weight: 400 !default;
-$panel-menu-item-2nd-level-hover-background-color: var(--rz-base-100) !default;
 $panel-menu-item-2nd-level-hover-color: var(--rz-text-title-color) !default;
-$panel-menu-item-2nd-level-active-background-color: var(--rz-primary-lighter) !default;
+$panel-menu-item-2nd-level-hover-background-color: var(--rz-base-100) !default;
 $panel-menu-item-2nd-level-active-color: var(--rz-on-primary-lighter) !default;
+$panel-menu-item-2nd-level-active-background-color: var(--rz-primary-lighter) !default;
 $panel-menu-item-2nd-level-active-font-weight: 500 !default;
-$panel-menu-item-3rd-level-hover-background-color: var(--rz-base-100) !default;
+$panel-menu-item-3rd-level-color: var(--rz-text-tertiary-color) !default;
+$panel-menu-item-3rd-level-background-color: var(--rz-base-background-color) !default;
 $panel-menu-item-3rd-level-hover-color: var(--rz-text-title-color) !default;
-$panel-menu-item-3rd-level-active-background-color: var(--rz-primary-lighter) !default;
+$panel-menu-item-3rd-level-hover-background-color: var(--rz-base-100) !default;
 $panel-menu-item-3rd-level-active-color: var(--rz-on-primary-lighter) !default;
+$panel-menu-item-3rd-level-active-background-color: var(--rz-primary-lighter) !default;
 $panel-menu-icon-color: var(--rz-text-tertiary-color) !default;
-$panel-menu-icon-margin: 0 1rem 0 0 !default;
-$panel-menu-icon-2nd-level-margin: 0 1rem 0 -2.25rem !default;
+$panel-menu-icon-margin-inline: 0 1rem !default;
+$panel-menu-icon-2nd-level-margin-inline: -2.25rem 1rem !default;
 
 .panel-menu {
   .navigation-item-wrapper-active {
@@ -485,7 +495,8 @@ $panel-menu-icon-2nd-level-margin: 0 1rem 0 -2.25rem !default;
 $profile-menu-background-color: var(--rz-base-background-color) !default;
 $profile-menu-top-item-background-color: var(--rz-primary) !default;
 $profile-menu-border: none !default;
-$profile-menu-padding: 0.5rem 1rem !default;
+$profile-menu-padding-block: 0.5rem !default;
+$profile-menu-padding-inline: 1rem !default;
 $profile-menu-toggle-button-color: var(--rz-text-contrast-color) !default;
 $profile-menu-item-hover-background-color: var(--rz-base-100) !default;
 
@@ -495,7 +506,8 @@ $gravatar-width: 2.5rem !default;
 
 // Steps
 $steps-color: var(--rz-text-tertiary-color) !default;
-$steps-number-padding: 0.25rem 0 !default;
+$steps-number-padding-block: 0.25rem !default;
+$steps-number-padding-inline: 0 !default;
 $steps-number-background-color: var(--rz-base-500) !default;
 $steps-number-color: var(--rz-text-contrast-color) !default;
 
@@ -513,7 +525,7 @@ $steps-number-color: var(--rz-text-contrast-color) !default;
         content: '';
         flex: auto;
         height: 1px;
-        margin-right: 16px;
+        margin-inline-end: 16px;
         background-color: var(--rz-base-300);
       }
     }
@@ -584,7 +596,7 @@ $switch-height: 0.875rem !default;
 $switch-circle-background-color: var(--rz-text-contrast-color) !default;
 $switch-checked-circle-background-color: var(--rz-on-primary-lighter) !default;
 $switch-circle-size: 1.25rem !default;
-$switch-circle-margin: 0 !default;
+$switch-circle-offset: 0 !default;
 
 .rz-switch .rz-switch-circle {
   &:hover:not(.rz-disabled) {

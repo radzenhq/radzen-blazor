@@ -226,9 +226,11 @@ namespace RadzenBlazorDemos
         public const string DefaultTheme = "material3";
         public const string QueryParameter = "theme";
         public const string WCAGQueryParameter = "wcag";
+        public const string RTLQueryParameter = "rtl";
 
         public string CurrentTheme { get; set; } = DefaultTheme;
         public bool WCAG { get; set; }
+        public bool RTL { get; set; }
 
         public void Initialize(NavigationManager navigationManager)
         {
@@ -242,12 +244,13 @@ namespace RadzenBlazorDemos
             }
 
             WCAG = bool.Parse(query.Get(WCAGQueryParameter) ?? "false");
+            RTL = bool.Parse(query.Get(RTLQueryParameter) ?? "false");
         }
 
-        public void Change(NavigationManager navigationManager, string theme, bool wcag)
+        public void Change(NavigationManager navigationManager, string theme, bool wcag, bool rtl)
         {
             var url = navigationManager.GetUriWithQueryParameters(navigationManager.Uri,
-                new Dictionary<string, object>() { { QueryParameter, theme }, { WCAGQueryParameter, $"{wcag}".ToLowerInvariant() } });
+                new Dictionary<string, object>() { { QueryParameter, theme }, { WCAGQueryParameter, $"{wcag}".ToLowerInvariant() }, { RTLQueryParameter, $"{rtl}".ToLowerInvariant() } });
 
             navigationManager.NavigateTo(url, true);
         }

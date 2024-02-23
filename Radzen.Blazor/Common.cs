@@ -682,23 +682,6 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Supplies information about a <see cref="RadzenGrid{TItem}.Render" /> event that is being raised.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class GridRenderEventArgs<T>
-    {
-        /// <summary>
-        /// Gets the instance of the RadzenGrid component which has rendered.
-        /// </summary>
-        public RadzenGrid<T> Grid { get; internal set; }
-        /// <summary>
-        /// Gets a value indicating whether this is the first time the RadzenGrid has rendered.
-        /// </summary>
-        /// <value><c>true</c> if this is the first time; otherwise, <c>false</c>.</value>
-        public bool FirstRender { get; internal set; }
-    }
-
-    /// <summary>
     /// Supplies information about a <see cref="RadzenDataGrid{TItem}.Render" /> event that is being raised.
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -724,18 +707,6 @@ namespace Radzen
         /// Gets or sets the settings.
         /// </summary>
         public DataGridSettings Settings { get; set; }
-    }
-
-    /// <summary>
-    /// Supplies information about a <see cref="RadzenGrid{TItem}.CellRender" /> event that is being raised.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class CellRenderEventArgs<T> : RowRenderEventArgs<T>
-    {
-        /// <summary>
-        /// Gets the RadzenGridColumn which this cells represents.
-        /// </summary>
-        public RadzenGridColumn<T> Column { get; internal set; }
     }
 
     /// <summary>
@@ -2117,22 +2088,6 @@ namespace Radzen
         /// Gets the new index of the column.
         /// </summary>
         public int NewIndex { get; internal set; }
-    }
-
-    /// <summary>
-    /// Supplies information about a <see cref="RadzenGrid{TItem}.ColumnResized" /> event that is being raised.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class ColumnResizedEventArgs<T>
-    {
-        /// <summary>
-        /// Gets the resized RadzenGridColumn.
-        /// </summary>
-        public RadzenGridColumn<T> Column { get; internal set; }
-        /// <summary>
-        /// Gets the new width of the column.
-        /// </summary>
-        public double Width { get; internal set; }
     }
 
     /// <summary>

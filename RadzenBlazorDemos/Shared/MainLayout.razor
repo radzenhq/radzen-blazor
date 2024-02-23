@@ -117,6 +117,13 @@
             </RadzenStack>
             <RadzenSwitch @bind-Value="@WCAG" Name="WCAG" Change="@(args => ChangeTheme(ThemeService.CurrentTheme))" />
         </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem" Class="rz-mt-8">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                <RadzenLabel Text="Enable RTL directionality" Component="RTL" Title="Use right to left direction for languages that are written from the right to the left (like Arabic)" />
+                <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.ExtraSmall" @ref="wcagColorsInfo" Click="@(args => WcagColorsTooltip(wcagColorsInfo.Element, new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" }))" />
+            </RadzenStack>
+            <RadzenSwitch @bind-Value="@RTL" Name="RTL" Change="@(args => ChangeTheme(ThemeService.CurrentTheme))" />
+        </RadzenStack>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Class="rz-mt-8 rz-mb-2">
             <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" Class="rz-m-0">Premium Themes</RadzenText>
             <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.ExtraSmall" @ref="premiumThemesInfo" Click="@(args => PremiumThemesTooltip(premiumThemesInfo.Element, new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" }))" />
@@ -274,6 +281,7 @@
     bool configSidebarExpanded = false;
     bool rendered;
     bool WCAG;
+    bool RTL;
 
     IEnumerable<Example> examples;
     protected override void OnInitialized()
@@ -281,6 +289,8 @@
         ThemeService.Initialize(UriHelper);
 
         WCAG = ThemeService.WCAG;
+
+        RTL = ThemeService.RTL;
 
         examples = ExampleService.Examples;
 
@@ -304,7 +314,7 @@
 
     void ChangeTheme(object value)
     {
-        ThemeService.Change(UriHelper, $"{value}", WCAG);
+        ThemeService.Change(UriHelper, $"{value}", WCAG, RTL);
     }
 
     void WcagColorsTooltip(ElementReference elementReference, TooltipOptions options = null) => TooltipService.Open(elementReference, ds =>

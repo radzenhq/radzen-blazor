@@ -229,27 +229,27 @@ $badge-styles: map-merge(
 );
 
 // PanelMenu
-
-$panel-menu-color: $rz-white !default;
-$panel-menu-background-color: $rz-base-900 !default;
-$panel-menu-hover-background-color: mix($rz-white, $rz-base-900, 6%) !default;
-$panel-menu-hover-color: inherit !default;
 $panel-menu-item-border: 1px solid mix($rz-white, $rz-base-900, 8%) !default;
-$panel-menu-item-active-background-color: mix($rz-white, $rz-base-900, 20%) !default;
-$panel-menu-item-background-color: mix($rz-white, $rz-base-900, 8%) !default;
+$panel-menu-item-color: $rz-white !default;
+$panel-menu-item-background-color: $rz-base-900 !default;
+$panel-menu-item-hover-color: inherit !default;
+$panel-menu-item-hover-background-color: mix($rz-white, $rz-base-900, 6%) !default;
 $panel-menu-item-active-color: inherit !default;
+$panel-menu-item-active-background-color: mix($rz-white, $rz-base-900, 20%) !default;
 $panel-menu-item-active-indicator: $rz-primary !default;
 $panel-menu-item-2nd-level-color: inherit !default;
-$panel-menu-item-2nd-level-hover-background-color: mix($rz-white, $rz-base-900, 16%) !default;
-$panel-menu-item-2nd-level-background-color: mix($rz-white, $rz-base-900, 12%) !default;
+$panel-menu-item-2nd-level-background-color: mix($rz-white, $rz-base-900, 8%) !default;
 $panel-menu-item-2nd-level-hover-color: inherit !default;
-$panel-menu-item-2nd-level-active-background-color: mix($rz-white, $rz-base-900, 16%)  !default;
+$panel-menu-item-2nd-level-hover-background-color: mix($rz-white, $rz-base-900, 16%) !default;
 $panel-menu-item-2nd-level-active-color: inherit !default;
-$panel-menu-item-3rd-level-hover-background-color: mix($rz-white, $rz-base-900, 20%) !default;
+$panel-menu-item-2nd-level-active-background-color: mix($rz-white, $rz-base-900, 16%)  !default;
+$panel-menu-item-3rd-level-color: inherit !default;
+$panel-menu-item-3rd-level-background-color: mix($rz-white, $rz-base-900, 12%) !default;
 $panel-menu-item-3rd-level-hover-color: inherit !default;
-$panel-menu-item-3rd-level-active-background-color: mix($rz-white, $rz-base-900, 20%) !default;
+$panel-menu-item-3rd-level-hover-background-color: mix($rz-white, $rz-base-900, 20%) !default;
 $panel-menu-item-3rd-level-active-color: inherit !default;
-$panel-menu-icon-color: $panel-menu-color !default;
+$panel-menu-item-3rd-level-active-background-color: mix($rz-white, $rz-base-900, 20%) !default;
+$panel-menu-icon-color: $panel-menu-item-color !default;
 $panel-menu-toggle-icon-opacity: 0.4 !default;
 
 // Card

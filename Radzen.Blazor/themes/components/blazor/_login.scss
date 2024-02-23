@@ -1,15 +1,21 @@
 $login-register-background-color: var(--rz-base-100) !default;
-$login-register-padding: 1rem !default;
-$login-register-margin: 2rem 0 0 !default;
-$login-register-button-margin: 0 !default;
+$login-register-padding-block: 1rem !default;
+$login-register-padding-inline: 1rem !default;
+$login-register-margin-block: 2rem 0 !default;
+$login-register-margin-inline: 0 !default;
+$login-register-button-margin-block: 0 !default;
+$login-register-button-margin-inline: 0 !default;
 
 // Login CSS variables
 
 :root {
   --rz-login-register-background-color: #{$login-register-background-color};
-  --rz-login-register-padding: #{$login-register-padding};
-  --rz-login-register-margin: #{$login-register-margin};
-  --rz-login-register-button-margin: #{$login-register-button-margin};
+  --rz-login-register-padding-block: #{$login-register-padding-block};
+  --rz-login-register-padding-inline: #{$login-register-padding-inline};
+  --rz-login-register-margin-block: #{$login-register-margin-block};
+  --rz-login-register-margin-inline: #{$login-register-margin-inline};
+  --rz-login-register-button-margin-block: #{$login-register-button-margin-block};
+  --rz-login-register-button-margin-inline: #{$login-register-button-margin-inline};
 }
 
 .rz-login {
@@ -46,7 +52,7 @@ $login-register-button-margin: 0 !default;
       }
 
       .rz-switch {
-        margin-right: 0.5rem;
+        margin-inline-end: 0.5rem;
       }
     }
 
@@ -62,12 +68,15 @@ $login-register-button-margin: 0 !default;
     justify-content: space-between;
     gap: 0.5rem;
     background-color: var(--rz-login-register-background-color);
-    margin: var(--rz-login-register-margin);
-    padding: var(--rz-login-register-padding);
+    margin-block: var(--rz-login-register-margin-block);
+    margin-inline: var(--rz-login-register-margin-inline);
+    padding-block: var(--rz-login-register-padding-block);
+    padding-inline: var(--rz-login-register-padding-inline);
     border-radius: var(--rz-border-radius);
 
     .rz-button {
-      margin: var(--rz-login-register-button-margin);
+      margin-block: var(--rz-login-register-button-margin-block);
+      margin-inline: var(--rz-login-register-button-margin-inline);
     }
   }
 

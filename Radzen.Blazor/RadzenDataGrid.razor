@@ -338,9 +338,24 @@
                     {
                         @if (!ShowEmptyMessage || Count > 0 && (IsVirtualizationAllowed() ? Data.Any() : true) || LoadData.HasDelegate && Data != null && Data.Any())
                         {
-                            if (columns.Count > 0)
+                            if (columns.Count > 0 && Data.Any())
                             {
                                 @DrawRows(visibleColumns)
+                            }
+                            else
+                            {
+                                <tr class=" rz-datatable-emptymessage-row" @onkeydown:stopPropagation>
+                                    <td class="rz-datatable-emptymessage" colspan="@(visibleColumns.Sum(c => c.GetColSpan()) + (Template != null && ShowExpandColumn ? 1 : 0))">
+                                        @if (EmptyTemplate != null)
+                                        {
+                                            @EmptyTemplate
+                                        }
+                                        else
+                                        {
+                                            <span style="white-space: normal">@EmptyText</span>
+                                        }
+                                    </td>
+                                </tr>
                             }
                         }
                         else

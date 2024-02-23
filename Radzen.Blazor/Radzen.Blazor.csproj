@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <NoWarn>BL9993;BL0007;BL0005</NoWarn>
-    <TargetFrameworks>netstandard2.1;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
     <RazorLangVersion>3.0</RazorLangVersion>
     <LangVersion>latest</LangVersion>
     <OutputType>Library</OutputType>
@@ -23,17 +23,12 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DartSassBuilder" Version="1.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'netstandard2.1'" Version="3.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'netstandard2.1'" Version="3.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net5.0'" Version="5.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net5.0'" Version="5.0.0" />
-	<PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net6.0'" Version="6.0.25" />
-	<PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net6.0'" Version="6.0.0" />
-	<PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.14" />
-	<PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.0" />
-	<PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
-	<PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
-	<PackageReference Include="Microsoft.CSharp" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net6.0'" Version="6.0.25" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net6.0'" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.14" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />	  
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.7" />
   </ItemGroup>
 

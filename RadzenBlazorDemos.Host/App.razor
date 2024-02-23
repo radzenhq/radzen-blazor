@@ -1,6 +1,8 @@
 ﻿@inject IHostEnvironment Env
+@inject NavigationManager NavigationManager
+@inject ThemeService ThemeService
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="@(ThemeService.RTL == true ? "rtl" : "ltr")">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -78,3 +80,12 @@
     </script>
 </body>
 </html>
+
+@code {
+    protected override void OnInitialized()
+    {
+#if !RADZEN
+        ThemeService.Initialize(NavigationManager);
+#endif
+    }
+}
