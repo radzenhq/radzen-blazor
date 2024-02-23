@@ -1,5 +1,6 @@
 $numeric-line-height: 1.25rem !default;
-$numeric-input-padding: 0.5rem 1.25rem 0.5rem 0.5rem !default;
+$numeric-input-padding-block: 0.5rem !default;
+$numeric-input-padding-inline: 0.5rem 1.25rem !default;
 $numeric-button-width: 0.875rem !default;
 $numeric-button-height: $numeric-button-width !default;
 $numeric-button-offset: 2px !default;
@@ -9,22 +10,7 @@ $numeric-button-color: var(--rz-on-secondary) !default;
 $numeric-button-disabled-background-color: var(--rz-base-300) !default;
 $numeric-button-disabled-color: var(--rz-text-disabled-color) !default;
 
-// Numeric CSS variables
-
-:root {
-  --rz-numeric-line-height: #{$numeric-line-height};
-  --rz-numeric-input-padding: #{$numeric-input-padding};
-  --rz-numeric-button-width: #{$numeric-button-width};
-  --rz-numeric-button-height: #{$numeric-button-height};
-  --rz-numeric-button-offset: #{$numeric-button-offset};
-  --rz-numeric-button-border-radius: #{$numeric-button-border-radius};
-  --rz-numeric-button-background-color: #{$numeric-button-background-color};
-  --rz-numeric-button-disabled-background-color: #{$numeric-button-disabled-background-color};
-  --rz-numeric-button-disabled-color: #{$numeric-button-disabled-color};
-  --rz-numeric-button-color: #{$numeric-button-color};
-}
-
-.rz-spinner {
+.rz-numeric {
   display: inline-block;
   position: relative;
 
@@ -40,8 +26,8 @@ $numeric-button-disabled-color: var(--rz-text-disabled-color) !default;
     border: none;
     background-color: transparent;
     line-height: var(--rz-numeric-line-height);
-    text-align: inherit;
-    padding: var(--rz-numeric-input-padding);
+    padding-block: var(--rz-numeric-input-padding-block);
+    padding-inline: var(--rz-numeric-input-padding-inline);
     outline: none;
 
     &::-webkit-inner-spin-button,
@@ -58,7 +44,7 @@ $numeric-button-disabled-color: var(--rz-text-disabled-color) !default;
   &.rz-state-disabled {
     @extend %input-disabled;
 
-    .rz-spinner-button {
+    .rz-numeric-button {
       background-color: var(--rz-numeric-button-disabled-background-color);
       color: var(--rz-numeric-button-disabled-color);
 
@@ -74,9 +60,9 @@ $numeric-button-disabled-color: var(--rz-text-disabled-color) !default;
   }
 }
 
-.rz-spinner-button {
+.rz-numeric-button {
   position: absolute;
-  right: var(--rz-numeric-button-offset);
+  inset-inline-end: var(--rz-numeric-button-offset);
   padding: 0;
 
   width: var(--rz-numeric-button-width);
@@ -107,10 +93,10 @@ $numeric-button-disabled-color: var(--rz-text-disabled-color) !default;
   }
 }
 
-.rz-spinner-up {
-  top: var(--rz-numeric-button-offset);
+.rz-numeric-up {
+  inset-block-start: var(--rz-numeric-button-offset);
 }
 
-.rz-spinner-down {
-  bottom: var(--rz-numeric-button-offset);
+.rz-numeric-down {
+  inset-block-end: var(--rz-numeric-button-offset);
 }

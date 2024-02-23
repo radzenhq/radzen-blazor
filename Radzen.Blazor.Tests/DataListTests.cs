@@ -29,7 +29,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AllowPaging, true));
 
-            Assert.Contains(@$"rz-paginator-bottom", component.Markup);
+            Assert.Contains(@$"rz-pager-bottom", component.Markup);
         }
 
         [Fact]
@@ -44,8 +44,8 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.Top); 
             });
 
-            Assert.Contains(@$"rz-paginator", component.Markup);
-            Assert.DoesNotContain(@$"rz-paginator-bottom", component.Markup);
+            Assert.Contains(@$"rz-pager", component.Markup);
+            Assert.DoesNotContain(@$"rz-pager-bottom", component.Markup);
         }
 
         [Fact]
@@ -60,8 +60,8 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<PagerPosition>(p => p.PagerPosition, PagerPosition.TopAndBottom);
             });
 
-            Assert.Contains(@$"rz-paginator", component.Markup);
-            Assert.Contains(@$"rz-paginator-bottom", component.Markup);
+            Assert.Contains(@$"rz-pager", component.Markup);
+            Assert.Contains(@$"rz-pager-bottom", component.Markup);
         }
 
         [Fact]
@@ -127,7 +127,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
 
-            component.Find(".rz-paginator-next").Click();
+            component.Find(".rz-pager-next").Click();
 
             Assert.True(raised);
             Assert.True(newArgs.Skip == 10);
@@ -149,7 +149,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
 
-            component.Find(".rz-paginator-last").Click();
+            component.Find(".rz-pager-last").Click();
 
             Assert.True(raised);
             Assert.True(newArgs.Skip == 90);
@@ -171,8 +171,8 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
 
-            component.Find(".rz-paginator-next").Click();
-            component.Find(".rz-paginator-prev").Click();
+            component.Find(".rz-pager-next").Click();
+            component.Find(".rz-pager-prev").Click();
 
             Assert.True(raised);
             Assert.True(newArgs.Skip == 0);
@@ -194,8 +194,8 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
 
-            component.Find(".rz-paginator-next").Click();
-            component.Find(".rz-paginator-first").Click();
+            component.Find(".rz-pager-next").Click();
+            component.Find(".rz-pager-first").Click();
 
             Assert.True(raised);
             Assert.True(newArgs.Skip == 0);
@@ -216,7 +216,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; });
             });
 
-            component.Find(".rz-paginator-first").Click();
+            component.Find(".rz-pager-first").Click();
 
             Assert.False(raised);
         }
@@ -235,7 +235,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; });
             });
 
-            component.Find(".rz-paginator-prev").Click();
+            component.Find(".rz-pager-prev").Click();
 
             Assert.False(raised);
         }
@@ -253,13 +253,13 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<bool>(p => p.AllowPaging, true);
             });
 
-            component.Find(".rz-paginator-last").Click();
+            component.Find(".rz-pager-last").Click();
 
             component.SetParametersAndRender(parameters => {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; });
             });
 
-            component.Find(".rz-paginator-last").Click();
+            component.Find(".rz-pager-last").Click();
 
             Assert.False(raised);
         }
@@ -277,13 +277,13 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<bool>(p => p.AllowPaging, true);
             });
 
-            component.Find(".rz-paginator-last").Click();
+            component.Find(".rz-pager-last").Click();
 
             component.SetParametersAndRender(parameters => {
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; });
             });
 
-            component.Find(".rz-paginator-next").Click();
+            component.Find(".rz-pager-next").Click();
 
             Assert.False(raised);
         }
@@ -304,7 +304,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
             });
 
-            component.Find(".rz-paginator-next").Click();
+            component.Find(".rz-pager-next").Click();
 
             Assert.True(raised);
             Assert.True(newArgs.Skip == 20);

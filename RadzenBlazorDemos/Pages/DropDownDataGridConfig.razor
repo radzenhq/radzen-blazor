@@ -5,112 +5,110 @@
 @inherits DbContextPage
 
 
-<div class="container-fluid">
-    <div class="row px-3">
-        <div class="col-md-6 p-3">
+<RadzenRow Gap="2rem" RowGap="2rem" Class="rz-m-0 rz-m-md-12">
+    <RadzenColumn Size="12" SizeMD="6">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Binding to simple collection</RadzenText>
                 <RadzenDropDownDataGrid @bind-Value="@simpleValue" TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true"
                                         Data=@(customers.Select(c => c.CompanyName).Distinct().AsQueryable())
                                         Change=@(args => OnChange(args, "DropDownDataGrid")) Style="width: 100%"/>
             </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Filtering by all string columns</RadzenText>
-                <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true"
-                                        Data=@(customers) Style="width: 100%" AllowColumnResize="true"
-                                        TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" AllowFilteringByAllStringColumns="true"
-                                        Change=@(args => OnChange(args, "DropDownDataGrid with filtering by all string columns"))>
-                    <Columns>
-                        <RadzenDropDownDataGridColumn Property="@nameof(Customer.CustomerID)" Title="CustomerID" Width="100px"/>
-                        <RadzenDropDownDataGridColumn Property="@nameof(Customer.CompanyName)" Title="CompanyName" Width="200px"/>
-                        <RadzenDropDownDataGridColumn Property="@nameof(Customer.City)" Title="City" Width="100px" />
-                        <RadzenDropDownDataGridColumn Property="@nameof(Customer.Country)" Title="Country" Width="100px" />
-                    </Columns>
-                </RadzenDropDownDataGrid>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Filter operator</RadzenText>
-                <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith"
-                                        AllowFiltering="true" AllowClear="true" Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
-                                        Change=@(args => OnChange(args, "DropDownDataGrid with custom filter operator")) Style="width: 100%"/>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom filtering</RadzenText>
-                <RadzenDropDownDataGrid TValue="string" LoadData="@LoadData" AllowFiltering="true" AllowClear="true"
-                                        Data=@customCustomersData Count="@count" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
-                                        Change=@(args => OnChange(args, "DropDownDataGrid with custom filtering")) class="w-100"/>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" style="float:left;">Multiple selection</RadzenText>
-                <div style="float: right;">
-                    <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" Style="margin: 0 8px 0 40px;" />
-                    <RadzenLabel Text="Row select on row click" Component="CheckBox1" class="rz-text-body2" />
-                </div>
-                <RadzenDropDownDataGrid @ref="grid" Chips="true" AllowRowSelectOnRowClick="@allowRowSelectOnRowClick" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value=@multipleValues
-                                        Multiple="true" Placeholder="Select..." Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
-                                        Change=@(args => OnChange(args, "DropDownDataGrid with multiple selection")) class="w-100">
-                    <Columns>
-                        <RadzenDropDownDataGridColumn Width="60px" Sortable="false">
-                            <HeaderTemplate>
-                                <RadzenCheckBox Disabled="@(!grid.AllowSelectAll)" TriState="false" TValue="bool" Value="@(customers.Any(c => multipleValues != null && multipleValues.Contains(c.CustomerID)))"
-                                                Change="@(args => multipleValues = args ? grid.View.Cast<Customer>().Select(c => c.CustomerID) : multipleValues = Enumerable.Empty<string>())"/>
-                            </HeaderTemplate>
-                            <Template Context="data">
-                                <RadzenCheckBox TriState="false" Value="@(multipleValues != null && multipleValues.Contains(((Customer) data).CustomerID))" 
-                                                TValue="bool" Change=@(args => { if(!allowRowSelectOnRowClick) { grid.SelectItem(data); }})/>
-                            </Template>
-                        </RadzenDropDownDataGridColumn>
-                        <RadzenDropDownDataGridColumn Property="@nameof(Customer.CustomerID)" Title="CustomerID" Width="80px"/>
-                        <RadzenDropDownDataGridColumn Property="@nameof(Customer.CompanyName)" Title="CompanyName" Width="200px"/>
-                        <RadzenDropDownDataGridColumn Property="@nameof(Customer.City)" Title="City" Width="100px"/>
-                        <RadzenDropDownDataGridColumn Property="@nameof(Customer.Country)" Title="Country" Width="100px" />
-                    </Columns>
-                </RadzenDropDownDataGrid>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom template</RadzenText>
-                <RadzenDropDownDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true"
-                                        @bind-Value="value" Placeholder="Select..." Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
-                                        Change=@(args => OnChange(args, "DropDownDataGrid with placeholder")) class="w-100">
-                    <Template>
-                        Company: @((context as Customer).CompanyName)
-                    </Template>
-                </RadzenDropDownDataGrid>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Virtualization using IQueryable</RadzenText>
-                <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowVirtualization="true"
-                                        AllowFiltering="true" AllowClear="true" Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
-                                        Change=@(args => OnChange(args, "DropDownDataGrid with virtualization using IQueryable")) class="w-100">
-                    <Columns>
-                        <RadzenDropDownDataGridColumn Property="@nameof(Customer.CustomerID)" Title="Customer ID"/>
-                        <RadzenDropDownDataGridColumn Property="@nameof(Customer.CompanyName)" Title="Company Name"/>
-                    </Columns>
-                </RadzenDropDownDataGrid>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Virtualization using LoadData event</RadzenText>
-                <RadzenDropDownDataGrid TValue="string" LoadData="@LoadDataVirtualization" AllowFiltering="true" AllowClear="true" AllowVirtualization="true"
-                                        Data=@customCustomersDataVirtualization Count="@customCustomersDataVirtualizationCount" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
-                                        Change=@(args => OnChange(args, "DropDownDataGrid with virtualization using LoadData event")) class="w-100"/>
-            </RadzenCard>
-        </div>
-    </div>
-</div>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Filtering by all string columns</RadzenText>
+            <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowFiltering="true" AllowClear="true"
+                                    Data=@(customers) Style="width: 100%" AllowColumnResize="true"
+                                    TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" AllowFilteringByAllStringColumns="true"
+                                    Change=@(args => OnChange(args, "DropDownDataGrid with filtering by all string columns"))>
+                <Columns>
+                    <RadzenDropDownDataGridColumn Property="CustomerID" Title="CustomerID" Width="100px"/>
+                    <RadzenDropDownDataGridColumn Property="CompanyName" Title="CompanyName" Width="200px"/>
+                    <RadzenDropDownDataGridColumn Property="@nameof(Employee.City)" Title="City" Width="100px"/>
+                    <RadzenDropDownDataGridColumn Property="@nameof(Employee.Country)" Title="Country" Width="100px"/>
+                </Columns>
+            </RadzenDropDownDataGrid>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Filter operator</RadzenText>
+            <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith"
+                                    AllowFiltering="true" AllowClear="true" Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
+                                    Change=@(args => OnChange(args, "DropDownDataGrid with custom filter operator")) Style="width: 100%"/>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom filtering</RadzenText>
+            <RadzenDropDownDataGrid TValue="string" LoadData="@LoadData" AllowFiltering="true" AllowClear="true"
+                                    Data=@customCustomersData Count="@count" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
+                                    Change=@(args => OnChange(args, "DropDownDataGrid with custom filtering")) Style="width: 100%"/>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" style="float:left;">Multiple selection</RadzenText>
+            <div style="float: right;">
+                <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" Style="margin: 0 8px 0 40px;" />
+                <RadzenLabel Text="Row select on row click" Component="CheckBox1" class="rz-text-body2" />
+            </div>
+            <RadzenDropDownDataGrid @ref="grid" Chips="true" AllowRowSelectOnRowClick="@allowRowSelectOnRowClick" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true" @bind-Value=@multipleValues
+                                    Multiple="true" Placeholder="Select..." Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
+                                    Change=@(args => OnChange(args, "DropDownDataGrid with multiple selection")) Style="width: 100%">
+                <Columns>
+                    <RadzenDropDownDataGridColumn Width="60px" Sortable="false">
+                        <HeaderTemplate>
+                            <RadzenCheckBox Disabled="@(!grid.AllowSelectAll)" TriState="false" TValue="bool" Value="@(customers.Any(c => multipleValues != null && multipleValues.Contains(c.CustomerID)))"
+                                            Change="@(args => multipleValues = args ? grid.View.Cast<Customer>().Select(c => c.CustomerID) : multipleValues = Enumerable.Empty<string>())"/>
+                        </HeaderTemplate>
+                        <Template Context="data">
+                            <RadzenCheckBox TriState="false" Value="@(multipleValues != null && multipleValues.Contains(((Customer) data).CustomerID))" 
+                                            TValue="bool" Change=@(args => { if(!allowRowSelectOnRowClick) { grid.SelectItem(data); }})/>
+                        </Template>
+                    </RadzenDropDownDataGridColumn>
+                    <RadzenDropDownDataGridColumn Property="CustomerID" Title="CustomerID" Width="80px"/>
+                    <RadzenDropDownDataGridColumn Property="CompanyName" Title="CompanyName" Width="200px"/>
+                    <RadzenDropDownDataGridColumn Property="@nameof(Employee.City)" Title="City" Width="100px"/>
+                    <RadzenDropDownDataGridColumn Property="@nameof(Employee.Country)" Title="Country" Width="100px"/>
+                </Columns>
+            </RadzenDropDownDataGrid>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom template</RadzenText>
+            <RadzenDropDownDataGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowClear="true"
+                                    @bind-Value="value" Placeholder="Select..." Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
+                                    Change=@(args => OnChange(args, "DropDownDataGrid with placeholder")) Style="width: 100%">
+                <Template>
+                    Company: @((context as Customer).CompanyName)
+                </Template>
+            </RadzenDropDownDataGrid>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Virtualization using IQueryable</RadzenText>
+            <RadzenDropDownDataGrid TValue="string" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowVirtualization="true"
+                                    AllowFiltering="true" AllowClear="true" Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
+                                    Change=@(args => OnChange(args, "DropDownDataGrid with virtualization using IQueryable")) Style="width: 100%">
+                <Columns>
+                    <RadzenDropDownDataGridColumn Property="CustomerID" Title="Customer ID"/>
+                    <RadzenDropDownDataGridColumn Property="CompanyName" Title="Company Name"/>
+                </Columns>
+            </RadzenDropDownDataGrid>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Virtualization using LoadData event</RadzenText>
+            <RadzenDropDownDataGrid TValue="string" LoadData="@LoadDataVirtualization" AllowFiltering="true" AllowClear="true" AllowVirtualization="true"
+                                    Data=@customCustomersDataVirtualization Count="@customCustomersDataVirtualizationCount" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
+                                    Change=@(args => OnChange(args, "DropDownDataGrid with virtualization using LoadData event")) Style="width: 100%"/>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
 
 <EventConsole @ref=@console />
 

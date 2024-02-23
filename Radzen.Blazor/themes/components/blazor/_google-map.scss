@@ -3,16 +3,8 @@ $map-padding: 1.25rem !default;
 $map-background-color: var(--rz-base-background-color) !default;
 $map-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 
-// Map CSS variables
-
-:root {
-  --rz-map-height: #{$map-height};
-  --rz-map-padding: #{$map-padding};
-  --rz-map-background-color: #{$map-background-color};
-  --rz-map-shadow: #{$map-shadow};
-}
-
 .rz-map {
+  box-sizing: border-box;
   height: var(--rz-map-height);
   padding: var(--rz-map-padding);
   background-color: var(--rz-map-background-color);

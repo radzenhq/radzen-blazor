@@ -1,260 +1,250 @@
-@page "/get-started"
+@inject NavigationManager NavigationManager
+@page "/get-started/{version?}"
+@page "/docs/guides/getting-started/installation.html/{version?}"
+
 
 <PageTitle>Get Started | Free UI Components by Radzen</PageTitle>
 <HeadContent>
-    <meta name="description" content="How to get started with the Radzen Blazor Components library.">
+    <meta name="description" content="How to get started with the Radzen Blazor Component library.">
 </HeadContent>
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8 rz-mb-12">
     Get started
 </RadzenText>
 
-<RadzenRow class="docu">
-    <RadzenColumn Size="12" SizeLG="4" class="rz-text-align-center">
-        <svg viewBox="0 0 924.76626 641.9894" class="rz-display-none rz-display-md-inline-block rz-mt-12 illustration">
-            <use xlink:href="images/quickstart.svg#quickstart"></use>
-        </svg>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeLG="8">
-        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-mt-8 rz-mb-4">Quickstart Video</RadzenText>
-        <style>
-            .embed-container {
-                position: relative;
-                padding-bottom: 56.25%;
-                margin-bottom: 3rem;
-                height: 0;
-                overflow: hidden;
-                max-width: 100%;
-                }
-            .embed-container iframe,
-            .embed-container object,
-            .embed-container embed {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                }
-        </style>
-    <div class="embed-container">
-        <iframe src="https://www.youtube.com/embed/q6PDQ-mXtf8?loop=0&rel=0" frameborder="0" allowfullscreen=""></iframe>
-    </div>
-    </RadzenColumn>
-</RadzenRow>
-
-<RadzenRow class="docu">
-    <RadzenColumn Size="12" SizeLG="4" class="rz-text-align-center">
-        <svg viewBox="0 0 777.00073 407.99846" class="rz-display-none rz-display-md-inline-block rz-mt-12 illustration">
-            <use xlink:href="images/install.svg#install"></use>
-        </svg>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeLG="8">
-        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-mt-8 rz-mb-4">1. Install</RadzenText>
-        <RadzenText>
-            Radzen Blazor Components are distributed as the <a href="https://www.nuget.org/packages/Radzen.Blazor/">Radzen.Blazor</a> nuget package.
-        </RadzenText>
-        <RadzenText>
-            You can add them to your project in one of the following ways
-        </RadzenText>
-        <ul class="rz-text-body1">
-            <li>Install the package from command line by running <code>dotnet add package Radzen.Blazor</code></li>
-            <li>Add the project from the Visual Nuget Package Manager <img class="rz-ml-0" src="images/nuget-explorer.png" alt="NuGet explorer"></li>
-            <li>Manually edit the .csproj file and add a project reference <code></code></li>
-        </ul>
-        <RadzenAlert AlertStyle="AlertStyle.Info" Shade="Shade.Lighter">
-            If you want to use the Radzen.Blazor components in Blazor 8 static rendering mode (SSR) you should be aware that:
-            <ul>
-                <li>
-                    Static rendering mode <a target="_blank" href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#render-modes">does not support</a> events and all component interactivity will not be available (e.g. opening a dropdown, sorting a datagrid, opening a dialog).
-                </li>
-                <li>
-                    Applications created using the Blazor 8 template use static rendering mode by default and only some pages (Counter.razor) have interactivity enabled.
-                </li>
-                <li>
-                    The layout is not interactive by default (MainLayout.razor). Blazor components added to it will not be interactive as a result.
-                </li>
-                <li>
-                    You can <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#apply-a-render-mode-to-a-component-instance" target="_blank">enable interactivity per component basis</a> via the <code>@@rendermode</code> attribute e.g. <code>&lt;RadzenDialog @@rendermode="@@RenderMode.InteractiveServer" /&gt;</code>.
-                    Components that have child content cannot use that approach. You will need a <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#child-component-with-a-serializable-parameter" target="_blank">wrapper component</a> with render mode set as an attribute.
-                </li>
-                <li>
-                    You can <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#set-the-render-mode-for-the-entire-app" target="_blank">enable interactivity</a> for the entire application.
-                </li>
-            </ul>
-        </RadzenAlert>
-    </RadzenColumn>
-</RadzenRow>
-
-<RadzenRow class="docu">
-    <RadzenColumn Size="12" SizeLG="4" class="rz-text-align-center">
-        <svg viewBox="0 0 924.76626 641.9894" class="rz-display-none rz-display-md-inline-block rz-mt-12 illustration">
-            <use xlink:href="images/import.svg#import"></use>
-        </svg>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeLG="8">
-        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-mt-8 rz-mb-4">2. Import the namespace</RadzenText>
-        <RadzenText>
-            Open the <code>_Imports.razor</code> file of your Blazor application and add these two lines <code>@@using Radzen</code> and <code>@@using Radzen.Blazor</code>.
-        </RadzenText>
-    </RadzenColumn>
-</RadzenRow>
-
-<RadzenRow class="docu">
-    <RadzenColumn Size="12" SizeLG="4" class="rz-text-align-center">
-        <svg viewBox="0 0 776.36327 516.12769" class="rz-display-none rz-display-md-inline-block rz-mt-12 illustration">
-            <use xlink:href="images/theme.svg#theme"></use>
-        </svg>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeLG="8">
-        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-mt-8 rz-mb-4">3. Include a theme</RadzenText>
-        <RadzenText>
-            Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6), <code>Pages\_Host.cshtml</code> (Blazor Server .NET 7), <code>wwwroot/index.html</code> (Blazor WebAssembly)
-            or <code>Components\App.razor</code> (Blazor .NET 8) and include a theme CSS file by adding this snippet:
-        </RadzenText>
-<pre>
-<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css"&gt;</code>
-</pre>
-        <RadzenText>
-            To include a different theme (i.e. Standard) just change the name of the CSS file:
-        </RadzenText>
-<pre>
-<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/standard-base.css"&gt;</code>
-</pre>
-        <RadzenText>
-           Make sure you have also bootstrap CSS:
-        </RadzenText>
-<pre>
-<code>&lt;link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"&gt;</code>
-</pre>
-    </RadzenColumn>
-</RadzenRow>
-
-<RadzenRow class="docu">
-    <RadzenColumn Size="12" SizeLG="4" class="rz-text-align-center">
-        <svg viewBox="0 0 909.75363 730.11005" class="rz-display-none rz-display-md-inline-block rz-mt-12 illustration">
-            <use xlink:href="images/include-radzen.svg#include-radzen"></use>
-        </svg>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeLG="8">
-        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-mt-8 rz-mb-4">4. Include Radzen.Blazor.js</RadzenText>
-        <RadzenText>
-            Open <code>Pages\_Layout.cshtml</code> (Blazor Server .NET 6), <code>Pages\_Host.cshtml</code> (Blazor Server .NET 7), <code>wwwroot/index.html</code> (Blazor WebAssembly)
-            or <code>Components\App.razor</code> (Blazor .NET 8) and include this snippet
-        </RadzenText>
-<pre>
-<code>&lt;script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@@(typeof(Radzen.Colors).Assembly.GetName().Version)"&gt;&lt;/script&gt;</code>
-</pre>
-    </RadzenColumn>
-</RadzenRow>
-
-<RadzenRow class="docu">
-    <RadzenColumn Size="12" SizeLG="4" class="rz-text-align-center">
-        <svg viewBox="0 0 868.10999 522.45083" class="rz-display-none rz-display-md-inline-block rz-mt-12 illustration">
-            <use xlink:href="images/use-component.svg#use-component"></use>
-        </svg>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeLG="8">
-        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-mt-8 rz-mb-4">5. Use a component</RadzenText>
-        <RadzenText>
-            Use any Radzen Blazor component by typing its tag name in a Blazor page e.g. <code>&lt;RadzenButton Text="Hi"&gt;&lt;/RadzenButton&gt;</code>
-        </RadzenText>
-        <h4 class="rz-my-2">Setting a property</h4>
-<pre>
-<code>
-&lt;RadzenButton Text="@@text"&gt;&lt;/RadzenButton&gt;
-@@code {
-  string text = "Hi";
-}
+<RadzenTabs SelectedIndex=@selectedIndex Change="@OnTabChange">
+    <Tabs>
+        <RadzenTabsItem Text=".NET 8">
+            <div class="rz-py-0 rz-py-sm-4 rz-px-0 rz-px-sm-2 rz-px-lg-12">
+            <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">
+All interactive features of the Radzen Blazor components require interactivity of the container <code>.razor</code> file to be enabled or the <code>@@rendermode</code>
+attribute of the component to be set to one of the following values: <code>InteractiveServer</code>, <code>InteractiveAuto</code> or <code>InteractiveWebAssembly</code>.
+More info is available in the <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0" target="_blank">rendering mode article</a> from the official Blazor documentation.
+            </RadzenAlert>
+            @Installation(CurrentVersion)
+            @Import(CurrentVersion)
+            <RadzenText Anchor="@($"get-started/{CurrentVersion}#theme")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">3. Set the theme</RadzenText>
+            <RadzenText>
+                Open the <code>App.razor</code> file of your application. Add this code within the <code>&lt;head&gt;</code> element:
+            </RadzenText>
+<pre class="rz-p-4">
+<code>&lt;RadzenTheme Theme="material" @@rendermode="InteractiveAuto" /&gt;
 </code>
 </pre>
-    <h4 class="rz-my-2">Handing events</h4>
-<pre>
+            <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">
+                Set the <code>@@rendermode</code> attribute to the render mode of your application e.g. <code>InteractiveServer</code>, <code>InteractiveWebAssembly</code> or <code>InteractiveAuto</code>.
+            </RadzenAlert>
+            @IncludeJavaScript(("App.razor", CurrentVersion))
+            @UseComponent(CurrentVersion)
+            <RadzenText Anchor="@($"get-started/{CurrentVersion}#additional")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">6. Use Dialog, Notification, ContextMenu and Tooltip components</RadzenText>
+            <RadzenText>
+                Open the <code>MainLayout.razor</code> file and include:
+            </RadzenText>
+<pre class="rz-p-4">
+<code>&lt;RadzenComponents @@rendermode="InteractiveAuto" /></code>
+</pre>
+            <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">
+                Set the <code>@@rendermode</code> attribute to the render mode of your application e.g. <code>InteractiveServer</code>, <code>InteractiveWebAssembly</code> or <code>InteractiveAuto</code>.
+            </RadzenAlert>
+            <RadzenText>
+                Open the <code>Program.cs</code> file and include:
+            </RadzenText>
+<pre class="rz-p-4">
+<code>builder.Services.AddRadzenComponents();
+</code>
+</pre>
+        @Next
+        </div>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text=".NET 7 Server">
+            <div class="rz-p-0 rz-p-sm-2 rz-p-lg-12">
+            @Installation(CurrentVersion)
+            @Import(CurrentVersion)
+            @IncludeTheme(("_Host.cshtml", "ServerPrerendered", CurrentVersion))
+            @IncludeJavaScript(("_Host.cshtml", CurrentVersion))
+            @UseComponent(CurrentVersion)
+            @Additional(CurrentVersion)
+            </div>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text=".NET 7 WebAssembly (hosted)">
+            <div class="rz-p-0 rz-p-sm-2 rz-p-lg-12">
+            @Installation(CurrentVersion)
+            @Import(CurrentVersion)
+            @IncludeTheme(("_Host.cshtml", "WebAssemblyPrerendered", CurrentVersion))
+            @IncludeJavaScript(("_Host.cshtml", CurrentVersion))
+            @UseComponent(CurrentVersion)
+            @Additional(CurrentVersion)
+            </div>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text=".NET 6 Server">
+            <div class="rz-p-0 rz-p-sm-2 rz-p-lg-12">
+            @Installation(CurrentVersion)
+            @Import(CurrentVersion)
+            @IncludeTheme(("_Layout.cshtml", "ServerPrerendered", CurrentVersion))
+            @IncludeJavaScript(("_Layout.cshtml", CurrentVersion))
+            @UseComponent(CurrentVersion)
+            @Additional(CurrentVersion)
+            </div>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text=".NET 6 WebAssembly (hosted)">
+            <div class="rz-p-0 rz-p-sm-2 rz-p-lg-12">
+            @Installation(CurrentVersion)
+            @Import(CurrentVersion)
+            @IncludeTheme(("_Layout.cshtml", "WebAssemblyPrerendered", CurrentVersion))
+            @IncludeJavaScript(("_Layout.cshtml", CurrentVersion))
+            @UseComponent(CurrentVersion)
+            @Additional(CurrentVersion)
+            </div>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="WebAssembly (standalone)">
+            <div class="rz-p-0 rz-p-sm-2 rz-p-lg-12">
+            @Installation(CurrentVersion)
+            @Import(CurrentVersion)
+            <RadzenText Anchor="@($"get-started/{CurrentVersion}#theme")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">3. Set the theme</RadzenText>
+            <RadzenText>
+                Open the <code>index.html</code> file of your application. Add this code within the <code>&lt;head&gt;</code> element:
+            </RadzenText>
+<pre class="rz-p-4">
+<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css"&gt;</code>
+</pre>
+            <RadzenText Anchor="@($"get-started/{CurrentVersion}#js")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">4. Include Radzen.Blazor.js</RadzenText>
+            <RadzenText>
+                Open the <code>index.html</code> file of your application. Add this code after the last <code>&lt;script&gt;</code>:
+            </RadzenText>
+<pre class="rz-p-4">
+<code>&lt;script src="_content/Radzen.Blazor/Radzen.Blazor.js"&gt;&lt;/script&gt;
+</code>
+</pre>
+            @UseComponent(CurrentVersion)
+            @Additional(CurrentVersion)
+            </div>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+@code {
+    private static readonly string[] versions = ["net8", "net7-server", "net7-wasm", "net6-server", "net6-wasm", "wasm"];
+
+    private int selectedIndex = 0;
+
+    [Parameter]
+    public string Version { get; set; }
+
+    private string CurrentVersion => Version ?? "net8";
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        selectedIndex = Array.IndexOf(versions, CurrentVersion);
+    }
+
+    private void OnTabChange(int index)
+    {
+        NavigationManager.NavigateTo($"/get-started/{versions[index]}");
+    }
+
+    RenderFragment<string> Installation = version =>
+        @<text>
+            <RadzenText Anchor="@($"get-started/{version}#install")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">1. Install</RadzenText>
+            <RadzenText>
+                The Radzen Blazor components are distributed via the <a href="https://www.nuget.org/packages/Radzen.Blazor/" target="_blank">Radzen.Blazor</a> nuget package.
+            </RadzenText>
+            <RadzenText>
+                You can add the Radzen.Blazor nuget package to your Blazor application in one of the following ways:
+            </RadzenText>
+            <ul>
+                <li>Via Visual Studio's Nuget Package Manager.</li>
+                <li>Via command line <code>dotnet add package Radzen.Blazor</code></li>
+                <li>By editing your application's <code>.csproj</code> file and adding a package reference <code>&lt;PackageReference Include="Radzen.Blazor" Version="*" /&gt;</code></li>
+            </ul>
+        </text>;
+
+    RenderFragment<string> Import = version =>
+        @<text>
+        <RadzenText Anchor="@($"get-started/{version}#import")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">2. Import the namespace</RadzenText>
+        <RadzenText>
+            Open the <code>_Imports.razor</code> file of your Blazor application and append the following:
+        </RadzenText>
+<pre class="rz-p-4">
 <code>
-&lt;RadzenButton Click="@@ButtonClicked" Text="Hi"&gt;&lt;/RadzenButton&gt;
+@@using Radzen
+@@using Radzen.Blazor
+</code>
+</pre>
+        </text>;
+
+    RenderFragment<(string file, string version)> IncludeJavaScript = args =>
+        @<text>
+            <RadzenText Anchor="@($"get-started/{args.version}#js")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">4. Include Radzen.Blazor.js</RadzenText>
+            <RadzenText>
+                Open the <code>@(args.file)</code> file of your application. Add this code after the last <code>&lt;script&gt;</code>:
+            </RadzenText>
+<pre class="rz-p-4">
+<code>&lt;script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@@(typeof(Radzen.Colors).Assembly.GetName().Version)"&gt;&lt;/script&gt;
+</code>
+</pre>
+        </text>;
+
+    RenderFragment<(string file, string renderMode, string version)> IncludeTheme = args =>
+        @<text>
+        <RadzenText Anchor="@($"get-started/{args.version}#theme")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">3. Include a theme</RadzenText>
+        <RadzenText>
+            Open <code>@(args.file)</code> and add this code within the <code>&lt;head&gt;</code> element:
+        </RadzenText>
+<pre class="rz-p-4">
+<code>&lt;component type="typeof(RadzenTheme)" render-mode="@(args.renderMode)" param-Theme="@@("material")" /&gt;
+</code>
+</pre>
+        </text>;
+
+
+    RenderFragment<string> UseComponent = version =>
+        @<text>
+        <RadzenText Anchor="@($"get-started/{version}#use")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">5. Use a component</RadzenText>
+        <RadzenText>
+            Use any Radzen Blazor component by typing its tag name in a Blazor page:
+        </RadzenText>
+<pre class="rz-p-4">
+<code>&lt;RadzenButton Click="@@ButtonClicked" Text="Hi"&gt;&lt;/RadzenButton&gt;
 @@code {
   void ButtonClicked()
   {
-    //
+    // Handle the Click event of RadzenButton
   }
 }
 </code>
 </pre>
-        <RadzenAlert AlertStyle="AlertStyle.Warning">
-            All Radzen Blazor components with events are interactive and cannot work in .NET 8 Static @@rendermode. Make sure the components @@rendermode is set to InteractiveServer or InteractiveWebAssembly or they are nested inside interactive parent.
-        </RadzenAlert>
-    </RadzenColumn>
-</RadzenRow>
+        </text>;
 
-<RadzenRow class="docu">
-    <RadzenColumn Size="12" SizeLG="4" class="rz-text-align-center">
-        <svg viewBox="0 0 943 601.74159" class="rz-display-none rz-display-md-inline-block rz-mt-12 illustration">
-            <use xlink:href="images/premium.svg#premium"></use>
-        </svg>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeLG="8">
-        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-mt-8 rz-mb-4">6. Use Dialog, Notification, ContextMenu and Tooltip components</RadzenText>
-        <RadzenText>
-            Open the <code>Shared\MainLayout.razor</code> file and include:
-        </RadzenText>
-        <ul class="rz-text-body1">
-            <li><code>&lt;RadzenComponents/&gt;</code></li>
-        </ul>
-        <RadzenAlert AlertStyle="AlertStyle.Warning">
-            Make sure that you do not nest RadzenComponents inside a positioned element (i.e. with position: relative, position: absolute or position: fixed).
-            To be safe you can add them at the end of the layout file after all other elements.
-        </RadzenAlert>
-        <RadzenText>
-            Open <code>Startup.cs</code> file (Blazor Server before .NET 6) or <code>Program.cs</code> (Blazor WebAssembly or Blazor Server after .NET 6) and add required services:
-        </RadzenText>
-        <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="rz-my-6">Startup.cs (Blazor Server before .NET 6)</RadzenText>
-<pre>
-    <code>
-    using Radzen;
-    ...
-    public void ConfigureServices(IServiceCollection services)
-    {
-        ...
-        services.AddRadzenComponents();
-        ...
-    }
-    </code>
+    RenderFragment<string> Additional = version =>
+        @<text>
+                <RadzenText Anchor="@($"get-started/{version}#additional")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">6. Use Dialog, Notification, ContextMenu and Tooltip components</RadzenText>
+            <RadzenText>
+                Open the <code>MainLayout.razor</code> file and include:
+            </RadzenText>
+<pre class="rz-p-4">
+<code>&lt;RadzenComponents /></code>
 </pre>
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="rz-my-6">Program.cs (Blazor WebAssembly Blazor and Blazor Server after .NET 6)</RadzenText>
-<pre>
-    <code>
-    using Radzen;
-    ...
-    public static async Task Main(string[] args)
-    {
-        var builder = WebAssemblyHostBuilder.CreateDefault(args);
-        builder.RootComponents.Add&lt;App&gt;("app");
-
-        builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-
-        ...
-
-        builder.Services.AddRadzenComponents();
-        ...
-
-        await builder.Build().RunAsync();
-    }
-    </code>
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">
+                Make sure that you do not nest <code>RadzenComponents</code> inside a positioned element (i.e. with position: relative, position: absolute or position: fixed).
+                To be safe you can add them at the end of the layout file after all other elements.
+            </RadzenAlert>
+            <RadzenText>
+                Open the <code>Program.cs</code> file and include:
+            </RadzenText>
+<pre class="rz-p-4">
+<code>builder.Services.AddRadzenComponents();
+</code>
 </pre>
-    </RadzenColumn>
-</RadzenRow>
-
-<RadzenRow class="docu">
-    <RadzenColumn Size="12" SizeLG="4" class="rz-text-align-center">
-        <svg viewBox="0 0 680.83858 584.23207" class="rz-display-none rz-display-md-inline-block rz-mt-12 illustration">
-            <use xlink:href="images/success.svg#success"></use>
-        </svg>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeLG="8">
-        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-mt-8 rz-mb-4">Next: Explore Demos</RadzenText>
+    </text>;
+    RenderFragment Next =
+        @<text>
+        <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">Next: Explore Demos</RadzenText>
         <RadzenText>
             Hooray! You have successfuly added Radzen Blazor Components to your Blazor app. Now let's take a deeper look and explore more components and demos.
         </RadzenText>
         <RadzenText class="rz-text-align-center rz-text-align-lg-start rz-mt-8">
             <a class="rz-button rz-button-lg rz-primary" href="/datagrid">Explore Demos</a>
         </RadzenText>
-    </RadzenColumn>
-</RadzenRow>
+        </text>;
+}

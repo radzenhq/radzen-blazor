@@ -1,0 +1,1164 @@
+:root {
+
+  /* Theme Colors */
+  @each $color, $value in $rz-theme-colors-map {
+    --rz-#{$color}: #{$value};
+  }
+
+  /* Theme Constants */
+  @each $token, $value in $rz-theme-constants-map {
+    --rz-#{$token}: #{$value};
+  }
+
+  /* Semantic Text */
+  @each $token, $value in $rz-text-map {
+    --rz-#{$token}: #{$value};
+  }
+
+  /* Text */
+  @each $element, $property in $text {
+    @each $key, $value in $property {
+      --rz-text-#{$element}-#{$key}: #{$value};
+    }
+  }
+  --rz-text-selection-background-color: #{$rz-text-selection-background-color};
+  --rz-text-selection-color: #{$rz-text-selection-color};
+
+  /* Link */
+  @each $token, $value in $rz-link-map {
+    --rz-#{$token}: #{$value};
+  }
+
+  /* Base Background */
+  --rz-base-background-color: #{$rz-base-background-color};
+
+  /* Border */
+  @each $color, $value in $rz-theme-colors-map {
+    --rz-border-#{$color}: var(--rz-border-width) solid var(--rz-#{$color});
+  }
+
+  /* Interaction State Border */
+  @each $token, $value in $rz-state-border-map {
+    --rz-#{$token}: #{$value};
+  }
+
+  /* Border Radius */
+  @each $token, $value in $rz-border-radius-map {
+    --rz-#{$token}: #{$value};
+  }
+
+  /* Outline */
+  @each $color, $value in $rz-theme-colors-map {
+    --rz-outline-#{$color}: var(--rz-outline-width) solid var(--rz-#{$color});
+  }
+
+  /* Interaction State Outline */
+  @each $token, $value in $rz-state-outline-map {
+    --rz-#{$token}: #{$value};
+  }
+
+  /* Shadow */
+  @each $token, $value in $rz-shadow-map {
+    --rz-#{$token}: #{$value};
+  }
+
+  /* Transition */
+  --rz-transition: #{$rz-transition};
+  --rz-transition-all: #{$rz-transition-all};
+
+  /* Layout Body */
+  --rz-layout-body-margin: #{$layout-body-margin};
+  --rz-layout-body-padding: #{$layout-body-padding};
+  --rz-layout-body-border-radius: #{$layout-body-border-radius};
+  --rz-layout-body-background-color: #{$layout-body-background-color};
+
+  /* Accordion */
+  --rz-accordion-item-padding-block: #{$accordion-item-padding-block};
+  --rz-accordion-item-padding-inline: #{$accordion-item-padding-inline};
+  --rz-accordion-item-margin: #{$accordion-item-margin};
+  --rz-accordion-item-border: #{$accordion-item-border};
+  --rz-accordion-item-background-color: #{$accordion-item-background-color};
+  --rz-accordion-item-color: #{$accordion-item-color};
+  --rz-accordion-item-focus-outline: #{$accordion-item-focus-outline};
+  --rz-accordion-item-focus-outline-offset: #{$accordion-item-focus-outline-offset};
+  --rz-accordion-item-line-height: #{$accordion-item-line-height};
+  --rz-accordion-item-font-size: #{$accordion-item-font-size};
+  --rz-accordion-item-font-weight: #{$accordion-item-font-weight};
+  --rz-accordion-icon-width: #{$accordion-icon-width};
+  --rz-accordion-icon-height: #{$accordion-icon-height};
+  --rz-accordion-icon-font-size: #{$accordion-icon-font-size};
+  --rz-accordion-icon-margin-inline: #{$accordion-icon-margin-inline};
+  --rz-accordion-toggle-icon-margin-inline: #{$accordion-toggle-icon-margin-inline};
+  --rz-accordion-toggle-icon-order: #{$accordion-toggle-icon-order};
+  --rz-accordion-selected-color: #{$accordion-selected-color};
+  --rz-accordion-hover-color: #{$accordion-hover-color};
+  --rz-accordion-content-padding-inline: #{$accordion-content-padding-inline};
+  --rz-accordion-content-padding-block: #{$accordion-content-padding-block};
+  --rz-accordion-content-font-size: #{$accordion-content-font-size};
+  --rz-accordion-border-radius: #{$accordion-border-radius};
+  --rz-accordion-shadow: #{$accordion-shadow};
+
+ /* Alert */
+  --rz-alert-margin: #{$alert-margin};
+  --rz-alert-padding: #{$alert-padding};
+  --rz-alert-gap: #{$alert-gap};
+  --rz-alert-color: #{$alert-color};
+  --rz-alert-background-color: #{$alert-background-color};
+  --rz-alert-box-shadow: #{$alert-box-shadow};
+  --rz-alert-border-radius: #{$alert-border-radius};
+  --rz-alert-message-margin: #{$alert-message-margin};
+  --rz-alert-title-color: #{$alert-title-color};
+  --rz-alert-icon-color: #{$alert-icon-color};
+  --rz-alert-icon-margin: #{$alert-icon-margin};
+  --rz-alert-icon-size: #{$alert-icon-size};
+
+  /* Badge */
+  --rz-badge-border-radius: #{$badge-border-radius};
+  --rz-badge-pill-border-radius: #{$badge-pill-border-radius};
+  --rz-badge-padding: #{$badge-padding};
+  --rz-badge-pill-padding: #{$badge-pill-padding};
+  --rz-badge-font-size: #{$badge-font-size};
+  --rz-badge-font-weight: #{$badge-font-weight};
+  --rz-badge-line-height: #{$badge-line-height};
+  --rz-badge-text-transform: #{$badge-text-transform};
+  --rz-badge-letter-spacing: #{$badge-letter-spacing};
+
+  /* Button */
+  --rz-button-base-background-color: #{$button-base-background-color};
+  --rz-button-base-color: #{$button-base-color};
+  --rz-button-background-size: #{$button-background-size};
+  --rz-button-border-radius: #{$button-border-radius};
+  --rz-button-shadow: #{$button-shadow};
+  --rz-button-transition: #{$button-transition};
+  --rz-button-line-height: #{$button-line-height};
+  --rz-button-vertical-align: #{$button-vertical-align};
+  --rz-button-hover-shadow: #{$button-hover-shadow};
+  --rz-button-hover-gradient: #{$button-hover-gradient};
+  --rz-button-hover-background-size: #{$button-hover-background-size};
+  --rz-button-focus-shadow: #{$button-focus-shadow};
+  --rz-button-focus-gradient: #{$button-focus-gradient};
+  --rz-button-focus-background-size: #{$button-focus-background-size};
+  --rz-button-focus-outline: #{$button-focus-outline};
+  --rz-button-focus-outline-offset: #{$button-focus-outline-offset};
+  --rz-button-active-shadow: #{$button-active-shadow};
+  --rz-button-active-gradient: #{$button-active-gradient};
+  --rz-button-active-background-size: #{$button-active-background-size};
+  --rz-button-disabled-opacity: #{$button-disabled-opacity};
+  --rz-button-empty-opacity: #{$button-empty-opacity};
+
+  /* Card */
+  --rz-card-padding: #{$card-padding};
+  --rz-card-background-color: #{$card-background-color};
+  --rz-card-flat-background-color: #{$card-flat-background-color};
+  --rz-card-shadow: #{$card-shadow};
+  --rz-card-border: #{$card-border};
+  --rz-card-border-radius: #{$card-border-radius};
+  --rz-card-heading-margin-bottom: #{$card-heading-margin-bottom};
+
+  /* Chart */
+  --rz-chart-axis-color: #{$chart-axis-color};
+  --rz-chart-axis-label-color: #{$chart-axis-label-color};
+  --rz-chart-axis-font-size: #{$chart-axis-font-size};
+  --rz-chart-legend-font-size: #{$chart-legend-font-size};
+  --rz-chart-legend-focus-outline: #{$chart-legend-focus-outline};
+  --rz-chart-legend-focus-outline-offset: #{$chart-legend-focus-outline-offset};
+  --rz-chart-tooltip-background: #{$chart-tooltip-background};
+  --rz-chart-tooltip-color: #{$chart-tooltip-color};
+  --rz-chart-marker-stroke: #{$chart-marker-stroke};
+
+  /* Checkbox */
+  --rz-checkbox-width: #{$checkbox-width};
+  --rz-checkbox-height: #{$checkbox-height};
+  --rz-checkbox-border-radius: #{$checkbox-border-radius};
+  --rz-checkbox-border-width: #{$checkbox-border-width};
+  --rz-checkbox-label-margin-block: #{$checkbox-label-margin-block};
+  --rz-checkbox-label-margin-inline: #{$checkbox-label-margin-inline};
+  --rz-checkbox-margin-block: #{$checkbox-margin-block};
+  --rz-checkbox-margin-inline: #{$checkbox-margin-inline};
+  --rz-checkbox-focus-outline: #{$checkbox-focus-outline};
+  --rz-checkbox-focus-outline-offset: #{$checkbox-focus-outline-offset};
+  --rz-checkbox-checked-background-color: #{$checkbox-checked-background-color};
+  --rz-checkbox-checked-hover-background-color: #{$checkbox-checked-hover-background-color};
+  --rz-checkbox-checked-disabled-background-color: #{$checkbox-checked-disabled-background-color};
+  --rz-checkbox-checked-color: #{$checkbox-checked-color};
+  --rz-checkbox-checked-shadow: #{$checkbox-checked-shadow};
+  --rz-checkbox-checked-border: #{$checkbox-checked-border};
+  --rz-checkbox-checked-hover-border: #{$checkbox-checked-hover-border};
+  --rz-checkbox-checked-disabled-border: #{$checkbox-checked-disabled-border};
+  --rz-checkbox-checked-icon-background-color: #{$checkbox-checked-icon-background-color};
+  --rz-checkbox-checked-icon-border-radius: #{$checkbox-checked-icon-border-radius};
+  --rz-checkbox-icon-width: #{$checkbox-icon-width};
+  --rz-checkbox-icon-height: #{$checkbox-icon-height};
+  --rz-checkbox-icon-font-size: #{$checkbox-icon-font-size};
+  --rz-checkbox-tri-icon-width: #{$checkbox-tri-icon-width};
+  --rz-checkbox-tri-icon-height: #{$checkbox-tri-icon-height};
+  --rz-checkbox-tri-icon-font-size: #{$checkbox-tri-icon-font-size};
+
+  /* Chip */
+  --rz-chip-background-color: #{$chip-background-color};
+  --rz-chip-color: #{$chip-color};
+  --rz-chip-padding-block: #{$chip-padding-block};
+  --rz-chip-padding-inline: #{$chip-padding-inline};
+  --rz-chip-gap: #{$chip-gap};
+  --rz-chip-border-radius: #{$chip-border-radius};
+  --rz-chip-font-size: #{$chip-font-size};
+
+  /* ColorPicker */
+  --rz-colorpicker-panel-border: #{$colorpicker-panel-border};
+  --rz-colorpicker-panel-background-color: #{$colorpicker-panel-background-color};
+  --rz-colorpicker-panel-shadow: #{$colorpicker-panel-shadow};
+  --rz-colorpicker-panel-padding: #{$colorpicker-panel-padding};
+  --rz-colorpicker-panel-max-width: #{$colorpicker-panel-max-width};
+  --rz-colorpicker-saturation-height: #{$colorpicker-saturation-height};
+  --rz-colorpicker-focus-outline: #{$colorpicker-focus-outline};
+  --rz-colorpicker-focus-outline-offset: #{$colorpicker-focus-outline-offset};
+  --rz-colorpicker-value-border-radius: #{$colorpicker-value-border-radius};
+  --rz-colorpicker-items-gap: #{$colorpicker-items-gap};
+  --rz-colorpicker-item-size: #{$colorpicker-item-size};
+  --rz-colorpicker-item-border-radius: #{$colorpicker-item-border-radius};
+  --rz-colorpicker-item-shadow: #{$colorpicker-item-shadow};
+  --rz-colorpicker-handle-size: #{$colorpicker-handle-size};
+  --rz-colorpicker-handle-border: #{$colorpicker-handle-border};
+  --rz-colorpicker-handle-shadow: #{$colorpicker-handle-shadow};
+  --rz-colorpicker-hex-input-padding: #{$colorpicker-hex-input-padding};
+  --rz-colorpicker-hex-input-height: #{$colorpicker-hex-input-height};
+  --rz-colorpicker-rgba-input-padding: #{$colorpicker-rgba-input-padding};
+  --rz-colorpicker-rgba-input-height: #{$colorpicker-rgba-input-height};
+  --rz-colorpicker-input-labels-color: #{$colorpicker-input-labels-color};
+
+  /* DataFilter */
+  --rz-datafilter-item-padding-block: #{$datafilter-item-padding-block};
+  --rz-datafilter-item-padding-inline-start: #{$datafilter-item-padding-inline-start};
+  --rz-datafilter-item-indentation: #{$datafilter-item-indentation};
+  --rz-datafilter-item-path-width: #{$datafilter-item-path-width};
+  --rz-datafilter-item-path-height: #{$datafilter-item-path-height};
+  --rz-datafilter-item-path-border: #{$datafilter-item-path-border};
+  --rz-datafilter-item-path-border-radius: #{$datafilter-item-path-border-radius};
+
+  /* DataList */
+  --rz-datalist-background-color: #{$datalist-background-color};
+  --rz-datalist-shadow: #{$datalist-shadow};
+  --rz-datalist-padding: #{$datalist-padding};
+  --rz-datalist-border: #{$datalist-border};
+  --rz-datalist-border-radius: #{$datalist-border-radius};
+  --rz-datalist-item-shadow: #{$datalist-item-shadow};
+  --rz-datalist-item-border: #{$datalist-item-border};
+  --rz-datalist-item-margin-block: #{$datalist-item-margin-block};
+  --rz-datalist-item-margin-inline: #{$datalist-item-margin-inline};
+  --rz-datalist-item-padding: #{$datalist-item-padding};
+  --rz-datalist-item-background-color: #{$datalist-item-background-color};
+
+  /* DatePicker */
+  --rz-datepicker-trigger-icon-width: #{$datepicker-trigger-icon-width};
+  --rz-datepicker-trigger-icon-height: #{$datepicker-trigger-icon-height};
+  --rz-datepicker-line-height: #{$datepicker-line-height};
+  --rz-datepicker-trigger-icon-color: #{$datepicker-trigger-icon-color};
+  --rz-datepicker-trigger-icon-hover-color: #{$datepicker-trigger-icon-hover-color};
+  --rz-datepicker-popup-width: #{$datepicker-popup-width};
+  --rz-datepicker-panel-border: #{$datepicker-panel-border};
+  --rz-datepicker-panel-background-color: #{$datepicker-panel-background-color};
+  --rz-datepicker-panel-shadow: #{$datepicker-panel-shadow};
+  --rz-datepicker-panel-margin: #{$datepicker-panel-margin};
+  --rz-datepicker-header-color: #{$datepicker-header-color};
+  --rz-datepicker-header-background-color: #{$datepicker-header-background-color};
+  --rz-datepicker-header-padding-block: #{$datepicker-header-padding-block};
+  --rz-datepicker-header-padding-inline: #{$datepicker-header-padding-inline};
+  --rz-datepicker-header-border: #{$datepicker-header-border};
+  --rz-datepicker-footer-padding: #{$datepicker-footer-padding};
+  --rz-datepicker-footer-line-height: #{$datepicker-footer-line-height};
+  --rz-datepicker-prev-next-icon-size: #{$datepicker-prev-next-icon-size};
+  --rz-datepicker-prev-next-button-border-radius: #{$datepicker-prev-next-button-border-radius};
+  --rz-datepicker-calendar-padding-block: #{$datepicker-calendar-padding-block};
+  --rz-datepicker-calendar-padding-inline: #{$datepicker-calendar-padding-inline};
+  --rz-datepicker-calendar-item-padding: #{$datepicker-calendar-item-padding};
+  --rz-datepicker-calendar-header-font-size: #{$datepicker-calendar-header-font-size};
+  --rz-datepicker-calendar-header-text-transform: #{$datepicker-calendar-header-text-transform};
+  --rz-datepicker-calendar-header-color: #{$datepicker-calendar-header-color};
+  --rz-datepicker-calendar-font-size: #{$datepicker-calendar-font-size};
+  --rz-datepicker-calendar-color: #{$datepicker-calendar-color};
+  --rz-datepicker-calendar-hover-color: #{$datepicker-calendar-hover-color};
+  --rz-datepicker-calendar-hover-background-color: #{$datepicker-calendar-hover-background-color};
+  --rz-datepicker-calendar-selected-color: #{$datepicker-calendar-selected-color};
+  --rz-datepicker-calendar-selected-background-color: #{$datepicker-calendar-selected-background-color};
+  --rz-datepicker-calendar-selected-hover-color: #{$datepicker-calendar-selected-hover-color};
+  --rz-datepicker-calendar-selected-hover-background-color: #{$datepicker-calendar-selected-hover-background-color};
+  --rz-datepicker-calendar-border: #{$datepicker-calendar-border};
+  --rz-datepicker-calendar-border-radius: #{$datepicker-calendar-border-radius};
+  --rz-datepicker-calendar-transition: #{$datepicker-calendar-transition};
+  --rz-datepicker-calendar-today-color: #{$datepicker-calendar-today-color};
+  --rz-datepicker-calendar-today-background-color: #{$datepicker-calendar-today-background-color};
+  --rz-datepicker-calendar-today-box-shadow: #{$datepicker-calendar-today-box-shadow};
+  --rz-datepicker-calendar-today-border-radius: #{$datepicker-calendar-today-border-radius};
+  --rz-datepicker-month-dropdown-width: #{$datepicker-month-dropdown-width};
+  --rz-datepicker-year-dropdown-width: #{$datepicker-year-dropdown-width};
+  --rz-datepicker-focus-outline: #{$datepicker-focus-outline};
+  --rz-datepicker-focus-outline-offset: #{$datepicker-focus-outline-offset};
+  --rz-timepicker-color: #{$timepicker-color};
+  --rz-timepicker-background-color: #{$timepicker-background-color};
+  --rz-timepicker-separator-color: #{$timepicker-separator-color};
+  --rz-timepicker-padding-block: #{$timepicker-padding-block};
+  --rz-timepicker-padding-inline: #{$timepicker-padding-inline};
+  --rz-timepicker-hour-padding: #{$timepicker-hour-padding};
+  --rz-timepicker-button-color: #{$timepicker-button-color};
+  --rz-timepicker-button-background-color: #{$timepicker-button-background-color};
+  --rz-timepicker-button-width: #{$timepicker-button-width};
+  --rz-timepicker-button-height: #{$timepicker-button-height};
+  --rz-timepicker-button-border-radius: #{$timepicker-button-border-radius};
+  --rz-timepicker-button-padding: #{$timepicker-button-padding};
+  --rz-timepicker-gap: #{$timepicker-gap};
+  --rz-timepicker-separator-margin: #{$timepicker-separator-margin};
+  --rz-timepicker-border: #{$timepicker-border};
+
+  /* Dialog */
+  --rz-dialog-background-color: #{$dialog-background-color};
+  --rz-dialog-shadow: #{$dialog-shadow};
+  --rz-dialog-title-background-color: #{$dialog-title-background-color};
+  --rz-dialog-title-border: #{$dialog-title-border};
+  --rz-dialog-title-padding-block: #{$dialog-title-padding-block};
+  --rz-dialog-title-padding-inline: #{$dialog-title-padding-inline};
+  --rz-dialog-title-font-size: #{$dialog-title-font-size};
+  --rz-dialog-title-line-height: #{$dialog-title-line-height};
+  --rz-dialog-title-font-weight: #{$dialog-title-font-weight};
+  --rz-dialog-title-letter-spacing: #{$dialog-title-letter-spacing};
+  --rz-dialog-title-color: #{$dialog-title-color};
+  --rz-dialog-close-font-size: #{$dialog-close-font-size};
+  --rz-dialog-close-color: #{$dialog-close-color};
+  --rz-dialog-close-hover-color: #{$dialog-close-hover-color};
+  --rz-dialog-close-vertical-align: #{$dialog-close-vertical-align};
+  --rz-dialog-content-padding: #{$dialog-content-padding};
+  --rz-dialog-mask-background-color: #{$dialog-mask-background-color};
+  --rz-dialog-border-radius: #{$dialog-border-radius};
+  --rz-dialog-mask-zindex: #{$dialog-mask-zindex};
+  --rz-dialog-zindex: #{$dialog-zindex};
+
+  /* DropDown */
+  --rz-dropdown-trigger-icon-width: #{$dropdown-trigger-icon-width};
+  --rz-dropdown-trigger-icon-height: #{$dropdown-trigger-icon-height};
+  --rz-dropdown-trigger-icon-margin-block: #{$dropdown-trigger-icon-margin-block};
+  --rz-dropdown-trigger-icon-margin-inline: #{$dropdown-trigger-icon-margin-inline};
+  --rz-dropdown-horizontal-padding: #{$dropdown-horizontal-padding};
+  --rz-dropdown-panel-padding: #{$dropdown-panel-padding};
+  --rz-dropdown-items-margin: #{$dropdown-items-margin};
+  --rz-dropdown-items-padding: #{$dropdown-items-padding};
+  --rz-dropdown-item-padding: #{$dropdown-item-padding};
+  --rz-dropdown-item-font-size: #{$dropdown-item-font-size};
+  --rz-dropdown-item-hover-background-color: #{$dropdown-item-hover-background-color};
+  --rz-dropdown-item-selected-background-color: #{$dropdown-item-selected-background-color};
+  --rz-dropdown-item-selected-shadow: #{$dropdown-item-selected-shadow};
+  --rz-dropdown-item-hover-color: #{$dropdown-item-hover-color};
+  --rz-dropdown-item-selected-color: #{$dropdown-item-selected-color};
+  --rz-dropdown-item-selected-hover-background-color: #{$dropdown-item-selected-hover-background-color};
+  --rz-dropdown-item-selected-hover-color: #{$dropdown-item-selected-hover-color};
+  --rz-dropdown-item-transition: #{$dropdown-item-transition};
+  --rz-dropdown-item-disabled-opacity: #{$dropdown-item-disabled-opacity};
+  --rz-dropdown-label-padding-block: #{$dropdown-label-padding-block};
+  --rz-dropdown-label-padding-inline: #{$dropdown-label-padding-inline};
+  --rz-dropdown-filter-border: #{$dropdown-filter-border};
+  --rz-dropdown-filter-padding: #{$dropdown-filter-padding};
+  --rz-dropdown-open-background-color: #{$dropdown-open-background-color};
+  --rz-dropdown-open-border: #{$dropdown-open-border};
+  --rz-dropdown-panel-border: #{$dropdown-panel-border};
+  --rz-dropdown-panel-shadow: #{$dropdown-panel-shadow};
+  --rz-dropdown-chips-padding-block: #{$dropdown-chips-padding-block};
+  --rz-dropdown-chips-padding-inline: #{$dropdown-chips-padding-inline};
+  --rz-multiselect-checkbox-margin-block: #{$multiselect-checkbox-margin-block};
+  --rz-multiselect-checkbox-margin-inline: #{$multiselect-checkbox-margin-inline};
+
+  /* Editor */
+  --rz-editor-border: #{$editor-border};
+  --rz-editor-border-radius: #{$editor-border-radius};
+  --rz-editor-toolbar-background-color: #{$editor-toolbar-background-color};
+  --rz-editor-toolbar-item-margin: #{$editor-toolbar-item-margin};
+  --rz-editor-button-padding: #{$editor-button-padding};
+  --rz-editor-button-background-color: #{$editor-button-background-color};
+  --rz-editor-button-color: #{$editor-button-color};
+  --rz-editor-button-disabled-color: #{$editor-button-disabled-color};
+  --rz-editor-button-selected-background-color: #{$editor-button-selected-background-color};
+  --rz-editor-button-selected-color: #{$editor-button-selected-color};
+  --rz-editor-separator-background-color: #{$editor-separator-background-color};
+  --rz-editor-content-background-color: #{$editor-content-background-color};
+  --rz-editor-focus-outline: #{$editor-focus-outline};
+  --rz-editor-focus-outline-offset: #{$editor-focus-outline-offset};
+
+  /* Fieldset */
+  --rz-fieldset-border: #{$fieldset-border};
+  --rz-fieldset-border-radius: #{$fieldset-border-radius};
+  --rz-fieldset-padding: #{$fieldset-padding};
+  --rz-fieldset-legend-color: #{$fieldset-legend-color};
+  --rz-fieldset-legend-font-size: #{$fieldset-legend-font-size};
+  --rz-fieldset-legend-margin-block: #{$fieldset-legend-margin-block};
+  --rz-fieldset-legend-margin-inline: #{$fieldset-legend-margin-inline};
+  --rz-fieldset-legend-padding-block: #{$fieldset-legend-padding-block};
+  --rz-fieldset-legend-padding-inline: #{$fieldset-legend-padding-inline};
+  --rz-fieldset-toggle-width: #{$fieldset-toggle-width};
+  --rz-fieldset-toggle-margin-block: #{$fieldset-toggle-margin-block};
+  --rz-fieldset-toggle-margin-inline: #{$fieldset-toggle-margin-inline};
+  --rz-fieldset-toggle-height: #{$fieldset-toggle-height};
+  --rz-fieldset-toggle-background-color: #{$fieldset-toggle-background-color};
+  --rz-fieldset-toggle-color: #{$fieldset-toggle-color};
+  --rz-fieldset-toggle-font-size: #{$fieldset-toggle-font-size};
+  --rz-fieldset-toggle-border: #{$fieldset-toggle-border};
+  --rz-fieldset-toggle-focus-outline: #{$fieldset-toggle-focus-outline};
+  --rz-fieldset-toggle-focus-outline-offset: #{$fieldset-toggle-focus-outline-offset};
+
+  /* Footer */
+  --rz-footer-padding: #{$footer-padding};
+  --rz-footer-background-color: #{$footer-background-color};
+  --rz-footer-border: #{$footer-border};
+  --rz-footer-color: #{$footer-color};
+  --rz-footer-z: #{$footer-z};
+
+  /* FormField */
+  --rz-form-field-margin-block: #{$form-field-margin-block};
+  --rz-form-field-margin-inline: #{$form-field-margin-inline};
+  --rz-form-field-start-end-padding-block: #{$form-field-start-end-padding-block};
+  --rz-form-field-start-end-padding-inline: #{$form-field-start-end-padding-inline};
+  --rz-form-field-filled-height: #{$form-field-filled-height};
+  --rz-form-field-filled-padding-block: #{$form-field-filled-padding-block};
+  --rz-form-field-filled-padding-inline: #{$form-field-filled-padding-inline};
+  --rz-form-field-filled-numeric-padding-block: #{$form-field-filled-numeric-padding-block};
+  --rz-form-field-filled-numeric-padding-inline: #{$form-field-filled-numeric-padding-inline};
+  --rz-form-field-filled-background-color: #{$form-field-filled-background-color};
+  --rz-form-field-filled-hover-background-color: #{$form-field-filled-hover-background-color};
+  --rz-form-field-filled-border: #{$form-field-filled-border};
+  --rz-form-field-filled-hover-border: #{$form-field-filled-hover-border};
+  --rz-form-field-filled-focus-border: #{$form-field-filled-focus-border};
+  --rz-form-field-filled-border-radius: #{$form-field-filled-border-radius};
+  --rz-form-field-filled-label-floating-top: #{$form-field-filled-label-floating-top};
+  --rz-form-field-filled-hover-shadow: #{$form-field-filled-hover-shadow};
+  --rz-form-field-filled-focus-shadow: #{$form-field-filled-focus-shadow};
+  --rz-form-field-filled-underline-display: #{$form-field-filled-underline-display};
+  --rz-form-field-shadow: #{$form-field-shadow};
+  --rz-form-field-hover-shadow: #{$form-field-hover-shadow};
+  --rz-form-field-focus-shadow: #{$form-field-focus-shadow};
+  --rz-form-field-label-color: #{$form-field-label-color};
+  --rz-form-field-label-focus-color: #{$form-field-label-focus-color};
+  --rz-form-field-label-padding: #{$form-field-label-padding};
+  --rz-form-field-text-label-padding: #{$form-field-text-label-padding};
+  --rz-form-field-label-inset-inline-start: #{$form-field-label-inset-inline-start};
+  --rz-form-field-label-textarea-top: #{$form-field-label-textarea-top};
+  --rz-form-field-label-floating-top: #{$form-field-label-floating-top};
+  --rz-form-field-label-floating-background-color: #{$form-field-label-floating-background-color};
+  --rz-form-field-helper-padding: #{$form-field-helper-padding};
+
+  /* Forms */
+  --rz-form-error-color: #{$form-error-color};
+  --rz-form-error-font-size: #{$form-error-font-size};
+  --rz-validator-background-color: #{$validator-background-color};
+  --rz-validator-color: #{$validator-color};
+  --rz-validator-shadow: #{$validator-shadow};
+  --rz-validator-text-padding: #{$validator-text-padding};
+  --rz-validator-padding: #{$validator-padding};
+  --rz-validator-pointer-size: #{$validator-pointer-size};
+  --rz-validator-transform: #{$validator-transform};
+
+  /* Gauge */
+  --rz-gauge-scale-color: #{$gauge-scale-color};
+  --rz-gauge-scale-label-color: #{$gauge-scale-label-color};
+  --rz-gauge-scale-font-size: #{$gauge-scale-font-size};
+  --rz-gauge-pointer-color: #{$gauge-pointer-color};
+  --rz-gauge-arc-scale-color: #{$gauge-arc-scale-color};
+  --rz-gauge-arc-scale-label-color: #{$gauge-arc-scale-label-color};
+  --rz-gauge-arc-value-color: #{$gauge-arc-value-color};
+
+  /* Map */
+  --rz-map-height: #{$map-height};
+  --rz-map-padding: #{$map-padding};
+  --rz-map-background-color: #{$map-background-color};
+  --rz-map-shadow: #{$map-shadow};
+
+  /* Gravatar */
+  --rz-gravatar-width: #{$gravatar-width};
+  --rz-gravatar-height: #{$gravatar-height};
+  --rz-gravatar-border-radius: #{$gravatar-border-radius};
+  --rz-gravatar-box-shadow: #{$gravatar-box-shadow};
+
+  /* Grid */
+  --rz-grid-data-border-shadow: #{$grid-data-border-shadow};
+  --rz-grid-cell-border: #{$grid-cell-border};
+  --rz-grid-right-cell-border: #{$grid-right-cell-border};
+  --rz-grid-bottom-cell-border: #{$grid-bottom-cell-border};
+  --rz-grid-cell-padding: #{$grid-cell-padding};
+  --rz-grid-cell-color: #{$grid-cell-color};
+  --rz-grid-cell-font-size: #{$grid-cell-font-size};
+  --rz-grid-cell-line-height: #{$grid-cell-line-height};
+  --rz-grid-cell-focus-background-color: #{$grid-cell-focus-background-color};
+  --rz-grid-cell-focus-color: #{$grid-cell-focus-color};
+  --rz-grid-cell-focus-outline: #{$grid-cell-focus-outline};
+  --rz-grid-cell-focus-outline-offset: #{$grid-cell-focus-outline-offset};
+  --rz-grid-hover-background-color: #{$grid-hover-background-color};
+  --rz-grid-hover-color: #{$grid-hover-color};
+  --rz-grid-focus-outline: #{$grid-focus-outline};
+  --rz-grid-focus-outline-offset: #{$grid-focus-outline-offset};
+  --rz-grid-selected-background-color: #{$grid-selected-background-color};
+  --rz-grid-selected-color: #{$grid-selected-color};
+  --rz-grid-toolbar-background-color: #{$grid-toolbar-background-color};
+  --rz-grid-header-cell-border: #{$grid-header-cell-border};
+  --rz-grid-header-cell-border-bottom: #{$grid-header-cell-border-bottom};
+  --rz-grid-header-background-color: #{$grid-header-background-color};
+  --rz-grid-header-font-size: #{$grid-header-font-size};
+  --rz-grid-header-line-height: #{$grid-header-line-height};
+  --rz-grid-header-font-weight: #{$grid-header-font-weight};
+  --rz-grid-header-text-transform: #{$grid-header-text-transform};
+  --rz-grid-header-color: #{$grid-header-color};
+  --rz-grid-header-cell-padding: #{$grid-header-cell-padding};
+  --rz-grid-header-title-padding-inline: #{$grid-header-title-padding-inline};
+  --rz-grid-header-sorted-background-color: #{$grid-header-sorted-background-color};
+  --rz-grid-header-padding: #{$grid-header-padding};
+  --rz-grid-foot-cell-color: #{$grid-foot-cell-color};
+  --rz-grid-foot-background-color: #{$grid-foot-background-color};
+  --rz-grid-filter-background-color: #{$grid-filter-background-color};
+  --rz-grid-filter-padding: #{$grid-filter-padding};
+  --rz-grid-filter-margin: #{$grid-filter-margin};
+  --rz-grid-filter-border: #{$grid-filter-border};
+  --rz-grid-filter-font-size: #{$grid-filter-font-size};
+  --rz-grid-filter-icon-width: #{$grid-filter-icon-width};
+  --rz-grid-filter-icon-height: #{$grid-filter-icon-height};
+  --rz-grid-filter-icon-margin-inline: #{$grid-filter-icon-margin-inline};
+  --rz-grid-filter-icon-font-size: #{$grid-filter-icon-font-size};
+  --rz-grid-filter-color: #{$grid-filter-color};
+  --rz-grid-filter-focus-color: #{$grid-filter-focus-color};
+  --rz-grid-filter-gap: #{$grid-filter-gap};
+  --rz-grid-filter-buttons-padding: #{$grid-filter-buttons-padding};
+  --rz-grid-filter-buttons-border: #{$grid-filter-buttons-border};
+  --rz-grid-filter-buttons-background-color: #{$grid-filter-buttons-background-color};
+  --rz-grid-filter-button-padding-inline: #{$grid-filter-button-padding-inline};
+  --rz-grid-clear-filter-button-background-color: #{$grid-clear-filter-button-background-color};
+  --rz-grid-clear-filter-button-color: #{$grid-clear-filter-button-color};
+  --rz-grid-clear-filter-button-shadow: #{$grid-clear-filter-button-shadow};
+  --rz-grid-apply-filter-button-background-color: #{$grid-apply-filter-button-background-color};
+  --rz-grid-apply-filter-button-color: #{$grid-apply-filter-button-color};
+  --rz-grid-apply-filter-button-shadow: #{$grid-apply-filter-button-shadow};
+  --rz-grid-header-filter-icon-margin-inline: #{$grid-header-filter-icon-margin-inline};
+  --rz-grid-header-filter-icon-hover-color: #{$grid-header-filter-icon-hover-color};
+  --rz-grid-header-filter-icon-active-color: #{$grid-header-filter-icon-active-color};
+  --rz-grid-header-filter-icon-font-size: #{$grid-header-filter-icon-font-size};
+  --rz-grid-border: #{$grid-border};
+  --rz-grid-border-radius: #{$grid-border-radius};
+  --rz-grid-sort-icon-width: #{$grid-sort-icon-width};
+  --rz-grid-sort-icon-height: #{$grid-sort-icon-height};
+  --rz-grid-sort-icon-color: #{$grid-sort-icon-color};
+  --rz-grid-shadow: #{$grid-shadow};
+  --rz-grid-background-color: #{$grid-background-color};
+  --rz-grid-stripe-background-color: #{$grid-stripe-background-color};
+  --rz-grid-stripe-odd-background-color: #{$grid-stripe-odd-background-color};
+  --rz-grid-column-resizer-width: #{$grid-column-resizer-width};
+  --rz-grid-column-resizer-helper-width: #{$grid-column-resizer-helper-width};
+  --rz-grid-column-resizer-helper-background-color: #{$grid-column-resizer-helper-background-color};
+  --rz-grid-column-icon-width: #{$grid-column-icon-width};
+  --rz-grid-column-icon-padding: #{$grid-column-icon-padding};
+  --rz-grid-detail-template-border: #{$grid-detail-template-border};
+  --rz-grid-detail-template-border-radius: #{$grid-detail-template-border-radius};
+  --rz-grid-detail-template-padding: #{$grid-detail-template-padding};
+  --rz-grid-detail-template-background-color: #{$grid-detail-template-background-color};
+  --rz-grid-loading-indicator-color: #{$grid-loading-indicator-color};
+  --rz-grid-loading-indicator-background-color: #{$grid-loading-indicator-background-color};
+  --rz-grid-frozen-cell-border: #{$grid-frozen-cell-border};
+  --rz-grid-frozen-cell-background-color: #{$grid-frozen-cell-background-color};
+  --rz-grid-state-transition: #{$grid-state-transition};
+  --rz-grid-group-header-padding: #{$grid-group-header-padding};
+  --rz-grid-group-header-gap: #{$grid-group-header-gap};
+  --rz-grid-group-header-item-color: #{$grid-group-header-item-color};
+  --rz-grid-group-header-item-background-color: #{$grid-group-header-item-background-color};
+  --rz-grid-group-header-item-padding-block: #{$grid-group-header-item-padding-block};
+  --rz-grid-group-header-item-padding-inline: #{$grid-group-header-item-padding-inline};
+  --rz-grid-group-header-item-border: #{$grid-group-header-item-border};
+  --rz-grid-group-header-item-border-radius: #{$grid-group-header-item-border-radius};
+  --rz-grid-group-header-item-title-margin-inline: #{$grid-group-header-item-title-margin-inline};
+  --rz-column-drag-handle-color: #{$column-drag-handle-color};
+  --rz-column-drag-handle-hover-color: #{$column-drag-handle-hover-color};
+  --rz-column-drag-handle-margin-inline: #{$column-drag-handle-margin-inline};
+  --rz-column-draggable-shadow: #{$column-draggable-shadow};
+
+  /* Header */
+  --rz-header-background-color: #{$header-background-color};
+  --rz-header-min-height: #{$header-min-height};
+  --rz-header-z: #{$header-z};
+  --rz-header-border: #{$header-border};
+  --rz-header-color: #{$header-color};
+  --rz-header-shadow: #{$header-shadow};
+
+  /* Icon */
+  --rz-icon-font-family: #{$rz-icon-font-family};
+  --rz-icon-size: #{$rz-icon-size};
+  --rz-icon-fill: #{$rz-icon-fill};
+  --rz-icon-weight: #{$rz-icon-weight};
+  --rz-icon-grade: #{$rz-icon-grade};
+  --rz-icon-optical-size: #{$rz-icon-optical-size};
+
+  /* Input */
+  --rz-input-font-size: #{$input-font-size};
+  --rz-input-height: #{$input-height};
+  --rz-input-line-height: #{$input-line-height};
+  --rz-input-padding-block: #{$input-padding-block};
+  --rz-input-padding-inline: #{$input-padding-inline};
+  --rz-input-value-color: #{$input-value-color};
+  --rz-input-placeholder-color: #{$input-placeholder-color};
+  --rz-input-background-color: #{$input-background-color};
+  --rz-input-border: #{$input-border};
+  --rz-input-border-radius: #{$input-border-radius};
+  --rz-input-shadow: #{$input-shadow};
+  --rz-input-hover-shadow: #{$input-hover-shadow};
+  --rz-input-hover-border: #{$input-hover-border};
+  --rz-input-focus-shadow: #{$input-focus-shadow};
+  --rz-input-focus-border: #{$input-focus-border};
+  --rz-input-focus-outline: #{$input-focus-outline};
+  --rz-input-focus-outline-offset: #{$input-focus-outline-offset};
+  --rz-input-disabled-border: #{$input-disabled-border};
+  --rz-input-disabled-shadow: #{$input-disabled-shadow};
+  --rz-input-disabled-background-color: #{$input-disabled-background-color};
+  --rz-input-disabled-color: #{$input-disabled-color};
+  --rz-input-disabled-placeholder-color: #{$input-disabled-placeholder-color};
+  --rz-input-disabled-opacity: #{$input-disabled-opacity};
+  --rz-input-transition: #{$input-transition};
+
+  /* Layout */
+  --rz-layout-background-color: #{$layout-background-color};
+
+  /* Listbox */
+  --rz-listbox-background-color: #{$listbox-background-color};
+  --rz-listbox-border-radius: #{$listbox-border-radius};
+  --rz-listbox-border: #{$listbox-border};
+  --rz-listbox-focus-border: #{$listbox-focus-border};
+  --rz-listbox-focus-shadow: #{$listbox-focus-shadow};
+  --rz-listbox-filter-border: #{$listbox-filter-border};
+  --rz-listbox-padding: #{$listbox-padding};
+  --rz-listbox-item-padding: #{$listbox-item-padding};
+  --rz-listbox-item-margin: #{$listbox-item-margin};
+  --rz-listbox-checkbox-margin-block: #{$listbox-checkbox-margin-block};
+  --rz-listbox-checkbox-margin-inline: #{$listbox-checkbox-margin-inline};
+  --rz-listbox-header-padding-block: #{$listbox-header-padding-block};
+  --rz-listbox-header-padding-inline: #{$listbox-header-padding-inline};
+  --rz-listbox-header-icon-width: #{$listbox-header-icon-width};
+  --rz-listbox-header-icon-height: #{$listbox-header-icon-height};
+  --rz-listbox-header-icon-margin: #{$listbox-header-icon-margin};
+
+  /* Login */
+  --rz-login-register-background-color: #{$login-register-background-color};
+  --rz-login-register-padding-block: #{$login-register-padding-block};
+  --rz-login-register-padding-inline: #{$login-register-padding-inline};
+  --rz-login-register-margin-block: #{$login-register-margin-block};
+  --rz-login-register-margin-inline: #{$login-register-margin-inline};
+  --rz-login-register-button-margin-block: #{$login-register-button-margin-block};
+  --rz-login-register-button-margin-inline: #{$login-register-button-margin-inline};
+
+  /* Lookup */
+  --rz-lookup-panel-background-color: #{$lookup-panel-background-color};
+  --rz-lookup-panel-padding: #{$lookup-panel-padding};
+  --rz-lookup-search-gap: #{$lookup-search-gap};
+  --rz-lookup-search-margin-bottom: #{$lookup-search-margin-bottom};
+
+  /* Menu */
+  --rz-menu-background-color: #{$menu-background-color};
+  --rz-menu-border: #{$menu-border};
+  --rz-menu-border-radius: #{$menu-border-radius};
+  --rz-menu-item-padding-block: #{$menu-item-padding-block};
+  --rz-menu-item-padding-inline: #{$menu-item-padding-inline};
+  --rz-menu-item-border-radius: #{$menu-item-border-radius};
+  --rz-menu-item-color: #{$menu-item-color};
+  --rz-menu-item-hover-color: #{$menu-item-hover-color};
+  --rz-menu-item-hover-background-color: #{$menu-item-hover-background-color};
+  --rz-menu-item-focus-outline: #{$menu-item-focus-outline};
+  --rz-menu-item-focus-outline-offset: #{$menu-item-focus-outline-offset};
+  --rz-menu-item-selected-color: #{$menu-item-selected-color};
+  --rz-menu-item-icon-margin-inline: #{$menu-item-icon-margin-inline};
+  --rz-menu-item-icon-color: #{$menu-item-icon-color};
+  --rz-menu-item-icon-hover-color: #{$menu-item-icon-hover-color};
+  --rz-menu-item-offset: #{$menu-item-offset};
+  --rz-menu-item-transition: #{$menu-item-transition};
+  --rz-menu-item-disabled-opacity: #{$menu-item-disabled-opacity};
+  --rz-menu-top-item-padding-block: #{$menu-top-item-padding-block};
+  --rz-menu-top-item-padding-inline: #{$menu-top-item-padding-inline};
+  --rz-menu-top-item-border-radius: #{$menu-top-item-border-radius};
+  --rz-menu-top-item-color: #{$menu-top-item-color};
+  --rz-menu-top-item-background-color: #{$menu-top-item-background-color};
+  --rz-menu-top-item-hover-color: #{$menu-top-item-hover-color};
+  --rz-menu-top-item-hover-background-color: #{$menu-top-item-hover-background-color};
+  --rz-menu-top-item-selected-color: #{$menu-top-item-selected-color};
+  --rz-menu-top-item-icon-color: #{$menu-top-item-icon-color};
+  --rz-menu-top-item-icon-hover-color: #{$menu-top-item-icon-hover-color};
+  --rz-context-menu-padding-block: #{$context-menu-padding-block};
+  --rz-context-menu-padding-inline: #{$context-menu-padding-inline};
+  --rz-context-menu-box-shadow: #{$context-menu-box-shadow};
+
+  /* Notification */
+  --rz-notification-padding: #{$notification-padding};
+  --rz-notification-gap: #{$notification-gap};
+  --rz-notification-icon-margin: #{$notification-icon-margin};
+  --rz-notification-container-background-color: #{$notification-container-background-color};
+  --rz-notification-shadow: #{$notification-shadow};
+  --rz-notification-border-radius: #{$notification-border-radius};
+  --rz-notification-success-color: #{$notification-success-color};
+  --rz-notification-success-background-color: #{$notification-success-background-color};
+  --rz-notification-success-icon-color: #{$notification-success-icon-color};
+  --rz-notification-warning-color: #{$notification-warning-color};
+  --rz-notification-warning-background-color: #{$notification-warning-background-color};
+  --rz-notification-warning-icon-color: #{$notification-warning-icon-color};
+  --rz-notification-error-color: #{$notification-error-color};
+  --rz-notification-error-background-color: #{$notification-error-background-color};
+  --rz-notification-error-icon-color: #{$notification-error-icon-color};
+  --rz-notification-info-color: #{$notification-info-color};
+  --rz-notification-info-background-color: #{$notification-info-background-color};
+  --rz-notification-info-icon-color: #{$notification-info-icon-color};
+
+  /* Numeric */
+  --rz-numeric-line-height: #{$numeric-line-height};
+  --rz-numeric-input-padding-block: #{$numeric-input-padding-block};
+  --rz-numeric-input-padding-inline: #{$numeric-input-padding-inline};
+  --rz-numeric-button-width: #{$numeric-button-width};
+  --rz-numeric-button-height: #{$numeric-button-height};
+  --rz-numeric-button-offset: #{$numeric-button-offset};
+  --rz-numeric-button-border-radius: #{$numeric-button-border-radius};
+  --rz-numeric-button-background-color: #{$numeric-button-background-color};
+  --rz-numeric-button-disabled-background-color: #{$numeric-button-disabled-background-color};
+  --rz-numeric-button-disabled-color: #{$numeric-button-disabled-color};
+  --rz-numeric-button-color: #{$numeric-button-color};
+
+  /* Overlay */
+  --rz-overlay-shadow: #{$overlay-shadow};
+  --rz-overlay-border: #{$overlay-border};
+  --rz-overlay-background-color: #{$overlay-background-color};
+
+  /* Pager */
+  --rz-pager-background-color: #{$pager-background-color};
+  --rz-pager-padding: #{$pager-padding};
+  --rz-pager-gap: #{$pager-gap};
+  --rz-pager-border: #{$pager-border};
+  --rz-pager-button-border-radius: #{$pager-button-border-radius};
+  --rz-pager-numeric-button-background-color: #{$pager-numeric-button-background-color};
+  --rz-pager-numeric-button-color: #{$pager-numeric-button-color};
+  --rz-pager-numeric-button-border: #{$pager-numeric-button-border};
+  --rz-pager-numeric-button-hover-background-color: #{$pager-numeric-button-hover-background-color};
+  --rz-pager-numeric-button-hover-color: #{$pager-numeric-button-hover-color};
+  --rz-pager-numeric-button-padding: #{$pager-numeric-button-padding};
+  --rz-pager-numeric-button-selected-background-color: #{$pager-numeric-button-selected-background-color};
+  --rz-pager-numeric-button-selected-color: #{$pager-numeric-button-selected-color};
+  --rz-pager-numeric-button-selected-border: #{$pager-numeric-button-selected-border};
+  --rz-pager-numeric-button-selected-padding: #{$pager-numeric-button-selected-padding};
+  --rz-pager-numeric-button-min-width: #{$pager-numeric-button-min-width};
+  --rz-pager-back-button-background-color: #{$pager-back-button-background-color};
+  --rz-pager-back-button-color: #{$pager-back-button-color};
+  --rz-pager-back-button-hover-background-color: #{$pager-back-button-hover-background-color};
+  --rz-pager-back-button-hover-color: #{$pager-back-button-hover-color};
+  --rz-pager-next-button-background-color: #{$pager-next-button-background-color};
+  --rz-pager-next-button-color: #{$pager-next-button-color};
+  --rz-pager-next-button-hover-background-color: #{$pager-next-button-hover-background-color};
+  --rz-pager-next-button-hover-color: #{$pager-next-button-hover-color};
+  --rz-pager-dropdown-width: #{$pager-dropdown-width};
+  --rz-pager-summary-padding: #{$pager-summary-padding};
+  --rz-pager-summary-font-size: #{$pager-summary-font-size};
+  --rz-pager-summary-color: #{$pager-summary-color};
+
+  /* PanelMenu */
+  --rz-panel-menu-padding-block: #{$panel-menu-padding-block};
+  --rz-panel-menu-padding-inline: #{$panel-menu-padding-inline};
+  --rz-panel-menu-font-size: #{$panel-menu-font-size};
+  --rz-panel-menu-font-weight: #{$panel-menu-font-weight};
+  --rz-panel-menu-focus-outline: #{$panel-menu-focus-outline};
+  --rz-panel-menu-focus-outline-offset: #{$panel-menu-focus-outline-offset};
+  --rz-panel-menu-item-line-height: #{$panel-menu-item-line-height};
+  --rz-panel-menu-item-padding-block: #{$panel-menu-item-padding-block};
+  --rz-panel-menu-item-padding-inline: #{$panel-menu-item-padding-inline};
+  --rz-panel-menu-item-margin-block: #{$panel-menu-item-margin-block};
+  --rz-panel-menu-item-margin-inline: #{$panel-menu-item-margin-inline};
+  --rz-panel-menu-item-border: #{$panel-menu-item-border};
+  --rz-panel-menu-item-border-radius: #{$panel-menu-item-border-radius};
+  --rz-panel-menu-item-color: #{$panel-menu-item-color};
+  --rz-panel-menu-item-background-color: #{$panel-menu-item-background-color};
+  --rz-panel-menu-item-hover-color: #{$panel-menu-item-hover-color};
+  --rz-panel-menu-item-hover-background-color: #{$panel-menu-item-hover-background-color};
+  --rz-panel-menu-item-active-color: #{$panel-menu-item-active-color};
+  --rz-panel-menu-item-active-background-color: #{$panel-menu-item-active-background-color};
+  --rz-panel-menu-item-active-indicator: #{$panel-menu-item-active-indicator};
+  --rz-panel-menu-item-offset: #{$panel-menu-item-offset};
+  --rz-panel-menu-item-transition: #{$panel-menu-item-transition};
+  --rz-panel-menu-2nd-level-vertical-offset: #{$panel-menu-2nd-level-vertical-offset};
+  --rz-panel-menu-item-2nd-level-padding-block: #{$panel-menu-item-2nd-level-padding-block};
+  --rz-panel-menu-item-2nd-level-padding-inline: #{$panel-menu-item-2nd-level-padding-inline};
+  --rz-panel-menu-item-2nd-level-margin-block: #{$panel-menu-item-2nd-level-margin-block};
+  --rz-panel-menu-item-2nd-level-margin-inline: #{$panel-menu-item-2nd-level-margin-inline};
+  --rz-panel-menu-item-2nd-level-border-radius: #{$panel-menu-item-2nd-level-border-radius};
+  --rz-panel-menu-item-2nd-level-offset: #{$panel-menu-item-2nd-level-offset};
+  --rz-panel-menu-item-2nd-level-font-size: #{$panel-menu-item-2nd-level-font-size};
+  --rz-panel-menu-item-2nd-level-font-weight: #{$panel-menu-item-2nd-level-font-weight};
+  --rz-panel-menu-item-2nd-level-color: #{$panel-menu-item-2nd-level-color};
+  --rz-panel-menu-item-2nd-level-background-color: #{$panel-menu-item-2nd-level-background-color};
+  --rz-panel-menu-item-2nd-level-hover-color: #{$panel-menu-item-2nd-level-hover-color};
+  --rz-panel-menu-item-2nd-level-hover-background-color: #{$panel-menu-item-2nd-level-hover-background-color};
+  --rz-panel-menu-item-2nd-level-active-color: #{$panel-menu-item-2nd-level-active-color};
+  --rz-panel-menu-item-2nd-level-active-background-color: #{$panel-menu-item-2nd-level-active-background-color};
+  --rz-panel-menu-item-2nd-level-active-font-weight: #{$panel-menu-item-2nd-level-active-font-weight};
+  --rz-panel-menu-item-3rd-level-color: #{$panel-menu-item-3rd-level-color};
+  --rz-panel-menu-item-3rd-level-background-color: #{$panel-menu-item-3rd-level-background-color};
+  --rz-panel-menu-item-3rd-level-hover-color: #{$panel-menu-item-3rd-level-hover-color};
+  --rz-panel-menu-item-3rd-level-hover-background-color: #{$panel-menu-item-3rd-level-hover-background-color};
+  --rz-panel-menu-item-3rd-level-active-color: #{$panel-menu-item-3rd-level-active-color};
+  --rz-panel-menu-item-3rd-level-active-background-color: #{$panel-menu-item-3rd-level-active-background-color};
+  --rz-panel-menu-icon-width: #{$panel-menu-icon-width};
+  --rz-panel-menu-icon-font-size: #{$panel-menu-icon-font-size};
+  --rz-panel-menu-icon-color: #{$panel-menu-icon-color};
+  --rz-panel-menu-icon-height: #{$panel-menu-icon-height};
+  --rz-panel-menu-icon-margin-inline: #{$panel-menu-icon-margin-inline};
+  --rz-panel-menu-icon-2nd-level-margin-inline: #{$panel-menu-icon-2nd-level-margin-inline};
+  --rz-panel-menu-icon-2nd-level-icon-size: #{$panel-menu-icon-2nd-level-icon-size};
+  --rz-panel-menu-toggle-icon-font-size: #{$panel-menu-toggle-icon-font-size};
+  --rz-panel-menu-toggle-icon-opacity: #{$panel-menu-toggle-icon-opacity};
+
+  /* Panel */
+  --rz-panel-background-color: #{$panel-background-color};
+  --rz-panel-padding: #{$panel-padding};
+  --rz-panel-title-line-height: #{$panel-title-line-height};
+  --rz-panel-title-font-weight: #{$panel-title-font-weight};
+  --rz-panel-content-margin: #{$panel-content-margin};
+  --rz-panel-toggle-icon-width: #{$panel-toggle-icon-width};
+  --rz-panel-toggle-icon-height: #{$panel-toggle-icon-height};
+  --rz-panel-toggle-icon-font-size: #{$panel-toggle-icon-font-size};
+  --rz-panel-toggle-icon-border-radius: #{$panel-toggle-icon-border-radius};
+  --rz-panel-toggle-icon-background-color: #{$panel-toggle-icon-background-color};
+  --rz-panel-toggle-icon-focus-outline: #{$panel-toggle-icon-focus-outline};
+  --rz-panel-toggle-icon-focus-outline-offset: #{$panel-toggle-icon-focus-outline-offset};
+  --rz-panel-hover-color: #{$panel-hover-color};
+  --rz-panel-border-radius: #{$panel-border-radius};
+  --rz-panel-shadow: #{$panel-shadow};
+
+  /* ProfileMenu */
+  --rz-profile-menu-background-color: #{$profile-menu-background-color};
+  --rz-profile-menu-top-item-background-color: #{$profile-menu-top-item-background-color};
+  --rz-profile-menu-border: #{$profile-menu-border};
+  --rz-profile-menu-padding-block: #{$profile-menu-padding-block};
+  --rz-profile-menu-padding-inline: #{$profile-menu-padding-inline};
+  --rz-profile-menu-border-radius: #{$profile-menu-border-radius};
+  --rz-profile-menu-toggle-button-color: #{$profile-menu-toggle-button-color};
+  --rz-profile-menu-item-hover-background-color: #{$profile-menu-item-hover-background-color};
+  --rz-profile-menu-item-focus-outline: #{$profile-menu-item-focus-outline};
+  --rz-profile-menu-item-focus-outline-offset: #{$profile-menu-item-focus-outline-offset};
+  --rz-profile-menu-item-icon-width: #{$profile-menu-item-icon-width};
+  --rz-profile-menu-item-icon-height: #{$profile-menu-item-icon-height};
+  --rz-profile-menu-item-icon-font-size: #{$profile-menu-item-icon-font-size};
+  --rz-profile-menu-item-icon-margin-inline: #{$profile-menu-item-icon-margin-inline};
+
+  /* ProgressBar */
+  --rz-progressbar-background-color: #{$progressbar-background-color};
+  --rz-progressbar-font-size: #{$progressbar-font-size};
+  --rz-progressbar-height: #{$progressbar-height};
+  --rz-progressbar-border-radius: #{$progressbar-border-radius};
+  --rz-progressbar-value-background-color: #{$progressbar-value-background-color};
+  --rz-progressbar-value-transition: #{$progressbar-value-transition};
+  --rz-progressbar-circular-stroke-width:  #{$progressbar-circular-stroke-width};
+  --rz-progressbar-circular-value-stroke-width:  #{$progressbar-circular-value-stroke-width};
+  --rz-progressbar-circular-value-endpoint:  #{$progressbar-circular-value-endpoint};
+
+  /* Radio */
+  --rz-radio-width: #{$radio-width};
+  --rz-radio-height: #{$radio-height};
+  --rz-radio-border-radius: #{$radio-border-radius};
+  --rz-radio-border-width: #{$radio-border-width};
+  --rz-radio-label-margin-block: #{$radio-label-margin-block};
+  --rz-radio-label-margin-inline: #{$radio-label-margin-inline};
+  --rz-radio-margin-block: #{$radio-margin-block};
+  --rz-radio-margin-inline: #{$radio-margin-inline};
+  --rz-radio-focus-outline: #{$radio-focus-outline};
+  --rz-radio-focus-outline-offset: #{$radio-focus-outline-offset};
+  --rz-radio-active-background-color: #{$radio-active-background-color};
+  --rz-radio-active-shadow: #{$radio-active-shadow};
+  --rz-radio-checked-background-color: #{$radio-checked-background-color};
+  --rz-radio-checked-hover-background-color: #{$radio-checked-hover-background-color};
+  --rz-radio-checked-hover-shadow: #{$radio-checked-hover-shadow};
+  --rz-radio-checked-color: #{$radio-checked-color};
+  --rz-radio-circle-background-color: #{$radio-circle-background-color};
+  --rz-radio-circle-shadow: #{$radio-circle-shadow};
+  --rz-radio-circle-hover-background-color: #{$radio-circle-hover-background-color};
+  --rz-radio-icon-width: #{$radio-icon-width};
+  --rz-radio-icon-height: #{$radio-icon-height};
+  --rz-radio-checked-border: #{$radio-checked-border};
+
+  /* Rating */
+  --rz-rating-color: #{$rating-color};
+  --rz-rating-opacity: #{$rating-opacity};
+  --rz-rating-font-size: #{$rating-font-size};
+  --rz-rating-selected-color: #{$rating-selected-color};
+  --rz-rating-focus-color: #{$rating-focus-color};
+  --rz-rating-disabled-color: #{$rating-disabled-color};
+  --rz-rating-disabled-opacity: #{$rating-disabled-opacity};
+  --rz-rating-ban-icon: #{$rating-ban-icon};
+  --rz-rating-ban-icon-color: #{$rating-ban-icon-color};
+
+  /* Scheduler */
+  --rz-scheduler-border: #{$scheduler-border};
+  --rz-scheduler-border-color: #{$scheduler-border-color};
+  --rz-scheduler-minor-border-color: #{$scheduler-minor-border-color};
+  --rz-scheduler-border-radius: #{$scheduler-border-radius};
+  --rz-scheduler-shadow: #{$scheduler-shadow};
+  --rz-scheduler-background-color: #{$scheduler-background-color};
+  --rz-scheduler-color: #{$scheduler-color};
+  --rz-scheduler-toolbar-padding: #{$scheduler-toolbar-padding};
+  --rz-scheduler-toolbar-background-color: #{$scheduler-toolbar-background-color};
+  --rz-scheduler-toolbar-title-font-size: #{$scheduler-toolbar-title-font-size};
+  --rz-scheduler-toolbar-title-font-weight: #{$scheduler-toolbar-title-font-weight};
+  --rz-scheduler-toolbar-title-color: #{$scheduler-toolbar-title-color};
+  --rz-scheduler-prev-next-button-background-color: #{$scheduler-prev-next-button-background-color};
+  --rz-scheduler-prev-next-button-color: #{$scheduler-prev-next-button-color};
+  --rz-scheduler-prev-next-button-padding-block: #{$scheduler-prev-next-button-padding-block};
+  --rz-scheduler-prev-next-button-padding-inline: #{$scheduler-prev-next-button-padding-inline};
+  --rz-scheduler-prev-next-button-font-size: #{$scheduler-prev-next-button-font-size};
+  --rz-scheduler-prev-button-border-start-start-radius: #{$scheduler-prev-button-border-start-start-radius};
+  --rz-scheduler-prev-button-border-start-end-radius: #{$scheduler-prev-button-border-start-end-radius};
+  --rz-scheduler-prev-button-border-end-start-radius: #{$scheduler-prev-button-border-end-start-radius};
+  --rz-scheduler-prev-button-border-end-end-radius: #{$scheduler-prev-button-border-end-end-radius};
+  --rz-scheduler-next-button-border-start-start-radius: #{$scheduler-next-button-border-start-start-radius};
+  --rz-scheduler-next-button-border-start-end-radius: #{$scheduler-next-button-border-start-end-radius};
+  --rz-scheduler-next-button-border-end-start-radius: #{$scheduler-next-button-border-end-start-radius};
+  --rz-scheduler-next-button-border-end-end-radius: #{$scheduler-next-button-border-end-end-radius};
+  --rz-scheduler-today-button-margin-inline-start: #{$scheduler-today-button-margin-inline-start};
+  --rz-scheduler-today-button-padding: #{$scheduler-today-button-padding};
+  --rz-scheduler-today-button-font-size: #{$scheduler-today-button-font-size};
+  --rz-scheduler-today-button-text-transform: #{$scheduler-today-button-text-transform};
+  --rz-scheduler-view-button-border: #{$scheduler-view-button-border};
+  --rz-scheduler-view-button-color: #{$scheduler-view-button-color};
+  --rz-scheduler-view-button-background-color: #{$scheduler-view-button-background-color};
+  --rz-scheduler-view-selected-color: #{$scheduler-view-selected-color};
+  --rz-scheduler-view-selected-background-color: #{$scheduler-view-selected-background-color};
+  --rz-scheduler-view-selected-border-color: #{$scheduler-view-selected-border-color};
+  --rz-scheduler-header-background-color: #{$scheduler-header-background-color};
+  --rz-scheduler-header-font-size: #{$scheduler-header-font-size};
+  --rz-scheduler-header-font-size-small: #{$scheduler-header-font-size-small};
+  --rz-scheduler-header-text-transform: #{$scheduler-header-text-transform};
+  --rz-scheduler-header-color: #{$scheduler-header-color};
+  --rz-scheduler-header-border: #{$scheduler-header-border};
+  --rz-scheduler-header-padding: #{$scheduler-header-padding};
+  --rz-scheduler-event-color: #{$scheduler-event-color};
+  --rz-scheduler-event-background-color: #{$scheduler-event-background-color};
+  --rz-scheduler-event-font-size: #{$scheduler-event-font-size};
+  --rz-scheduler-event-line-height: #{$scheduler-event-line-height};
+  --rz-scheduler-event-padding-block: #{$scheduler-event-padding-block};
+  --rz-scheduler-event-padding-inline: #{$scheduler-event-padding-inline};
+  --rz-scheduler-event-content-padding: #{$scheduler-event-content-padding};
+  --rz-scheduler-event-list-button-color: #{$scheduler-event-list-button-color};
+  --rz-scheduler-event-list-button-font-size: #{$scheduler-event-list-button-font-size};
+  --rz-scheduler-slot-title-font-size: #{$scheduler-slot-title-font-size};
+  --rz-scheduler-slot-title-font-size-small: #{$scheduler-slot-title-font-size-small};
+  --rz-scheduler-slot-title-padding: #{$scheduler-slot-title-padding};
+  --rz-scheduler-day-number-padding: #{$scheduler-day-number-padding};
+  --rz-scheduler-weekend-color: #{$scheduler-weekend-color};
+  --rz-scheduler-weekend-background-color: #{$scheduler-weekend-background-color};
+  --rz-scheduler-other-month-background-color: #{$scheduler-other-month-background-color};
+  --rz-scheduler-timeline-slot-width: #{$scheduler-timeline-slot-width};
+  --rz-scheduler-timeline-slot-height: #{$scheduler-timeline-slot-height};
+  --rz-scheduler-year-padding: #{$scheduler-year-padding};
+  --rz-scheduler-year-slot-padding: #{$scheduler-year-slot-padding};
+  --rz-scheduler-year-slot-title-width: #{$scheduler-year-slot-title-width};
+  --rz-scheduler-year-slot-title-border-radius: #{$scheduler-year-slot-title-border-radius};
+  --rz-scheduler-planner-slot-width: #{$scheduler-planner-slot-width};
+  --rz-scheduler-planner-slot-height: #{$scheduler-planner-slot-height};
+  --rz-scheduler-focus-outline: #{$scheduler-focus-outline};
+  --rz-scheduler-focus-outline-offset: #{$scheduler-focus-outline-offset};
+  --rz-scheduler-highlight-background-color: #{$scheduler-highlight-background-color};
+
+  /* Scrollbar */
+  --rz-scrollbar-background-color: #{$scrollbar-background-color};
+  --rz-scrollbar-color: #{$scrollbar-color};
+  --rz-scrollbar-border-radius: #{$scrollbar-border-radius};
+  --rz-scrollbar-size: #{$scrollbar-size};
+
+  /* SecurityCode */
+  --rz-security-code-input-min-width: #{$rz-security-code-input-min-width};
+  --rz-security-code-input-min-height: #{$rz-security-code-input-min-height};
+  --rz-security-code-input-padding: #{$rz-security-code-input-padding};
+  --rz-security-code-input-font-size: #{$rz-security-code-input-font-size};
+  --rz-security-code-input-font-weight: #{$rz-security-code-input-font-weight};
+  --rz-security-code-input-line-height: #{$rz-security-code-input-line-height};
+
+  /* SelectBar */
+  --rz-selectbar-background-color: #{$selectbar-background-color};
+  --rz-selectbar-color: #{$selectbar-color};
+  --rz-selectbar-border: #{$selectbar-border};
+  --rz-selectbar-selected-background-color: #{$selectbar-selected-background-color};
+  --rz-selectbar-selected-color: #{$selectbar-selected-color};
+  --rz-selectbar-selected-border: #{$selectbar-selected-border};
+  --rz-selectbar-border-radius: #{$selectbar-border-radius};
+
+  /* SidebarToggle */
+  --rz-sidebar-toggle-icon-width: #{$sidebar-toggle-icon-width};
+  --rz-sidebar-toggle-icon-height: #{$sidebar-toggle-icon-height};
+  --rz-sidebar-toggle-margin-inline-end: #{$sidebar-toggle-margin-inline-end};
+  --rz-sidebar-toggle-padding: #{$sidebar-toggle-padding};
+  --rz-sidebar-toggle-border: #{$sidebar-toggle-border};
+  --rz-sidebar-toggle-color: #{$sidebar-toggle-color};
+  --rz-sidebar-toggle-background-color: #{$sidebar-toggle-background-color};
+  --rz-sidebar-toggle-hover-color: #{$sidebar-toggle-hover-color};
+  --rz-sidebar-toggle-hover-background-color: #{$sidebar-toggle-hover-background-color};
+  --rz-sidebar-toggle-hover-border-radius: #{$sidebar-toggle-hover-border-radius};
+  --rz-sidebar-toggle-focus-outline: #{$sidebar-toggle-focus-outline};
+  --rz-sidebar-toggle-focus-outline-offset: #{$sidebar-toggle-focus-outline-offset};
+
+  /* Sidebar */
+  --rz-sidebar-z: #{$sidebar-z};
+  --rz-sidebar-width: #{$sidebar-width};
+  --rz-sidebar-border-inline-end: #{$sidebar-border-inline-end};
+  --rz-sidebar-background-color: #{$sidebar-background-color};
+  --rz-sidebar-color: #{$sidebar-color};
+
+  /* Slider */
+  --rz-slider-background-color: #{$slider-background-color};
+  --rz-slider-border: #{$slider-border};
+  --rz-slider-border-radius: #{$slider-border-radius};
+  --rz-slider-horizontal-height: #{$slider-horizontal-height};
+  --rz-slider-horizontal-width: #{$slider-horizontal-width};
+  --rz-slider-range-background-color: #{$slider-range-background-color};
+  --rz-slider-range-border: #{$slider-range-border};
+  --rz-slider-handle-width: #{$slider-handle-width};
+  --rz-slider-handle-height: #{$slider-handle-height};
+  --rz-slider-handle-color: #{$slider-handle-color};
+  --rz-slider-handle-background-color: #{$slider-handle-background-color};
+  --rz-slider-handle-border: #{$slider-handle-border};
+  --rz-slider-handle-border-radius: #{$slider-handle-border-radius};
+  --rz-slider-handle-shadow: #{$slider-handle-shadow};
+  --rz-slider-handle-transition: #{$slider-handle-transition};
+  --rz-slider-handle-hover-background-color: #{$slider-handle-hover-background-color};
+  --rz-slider-handle-hover-border: #{$slider-handle-hover-border};
+  --rz-slider-handle-hover-shadow: #{$slider-handle-hover-shadow};
+  --rz-slider-handle-focus-outline: #{$slider-handle-focus-outline};
+  --rz-slider-handle-focus-outline-offset: #{$slider-handle-focus-outline-offset};
+  --rz-slider-disabled-background-color: #{$slider-disabled-background-color};
+  --rz-slider-disabled-border: #{$slider-disabled-border};
+  --rz-slider-disabled-range-background-color: #{$slider-disabled-range-background-color};
+  --rz-slider-disabled-range-border: #{$slider-disabled-range-border};
+  --rz-slider-disabled-handle-border: #{$slider-disabled-handle-border};
+  --rz-slider-disabled-handle-background-color: #{$slider-disabled-handle-background-color};
+
+  /* SplitButton */
+  --rz-splitbutton-menu-shadow: #{$splitbutton-menu-shadow};
+  --rz-splitbutton-menu-min-width: #{$splitbutton-menu-min-width};
+  --rz-splitbutton-background-color: #{$splitbutton-background-color};
+  --rz-splitbutton-border-radius: #{$splitbutton-border-radius};
+
+  /* Splitter */
+  --rz-splitter-bar-color: #{$splitter-bar-color};
+  --rz-splitter-bar-color-active: #{$splitter-bar-color-active};
+  --rz-splitter-bar-background-color: #{$splitter-bar-background-color};
+  --rz-splitter-bar-background-color-active: #{$splitter-bar-background-color-active};
+  --rz-splitter-bar-hover-opacity: #{$splitter-bar-hover-opacity};
+
+  /* Stack/Grid Layout */
+  --rz-gap: #{$rz-gap};
+  --rz-row-gap: #{$rz-row-gap};
+
+  /* Steps */
+  --rz-steps-color: #{$steps-color};
+  --rz-steps-number-border-radius: #{$steps-number-border-radius};
+  --rz-steps-number-padding-block: #{$steps-number-padding-block};
+  --rz-steps-number-padding-inline: #{$steps-number-padding-inline};
+  --rz-steps-number-width: #{$steps-number-width};
+  --rz-steps-number-height: #{$steps-number-height};
+  --rz-steps-number-line-height: #{$steps-number-line-height};
+  --rz-steps-number-color: #{$steps-number-color};
+  --rz-steps-number-background-color: #{$steps-number-background-color};
+  --rz-steps-number-selected-color: #{$steps-number-selected-color};
+  --rz-steps-number-selected-background: #{$steps-number-selected-background};
+  --rz-steps-number-focus-outline: #{$steps-number-focus-outline};
+  --rz-steps-number-focus-outline-offset: #{$steps-number-focus-outline-offset};
+  --rz-steps-title-selected-color: #{$steps-title-selected-color};
+  --rz-steps-title-margin-block: #{$steps-title-margin-block};
+  --rz-steps-title-margin-inline: #{$steps-title-margin-inline};
+  --rz-steps-buttons-padding-block: #{$steps-buttons-padding-block};
+  --rz-steps-buttons-padding-inline: #{$steps-buttons-padding-inline};
+  --rz-steps-button-color: #{$steps-button-color};
+
+  /* Switch */
+  --rz-switch-background-color: #{$switch-background-color};
+  --rz-switch-checked-background-color: #{$switch-checked-background-color};
+  --rz-switch-box-shadow: #{$switch-box-shadow};
+  --rz-switch-circle-background-color: #{$switch-circle-background-color};
+  --rz-switch-checked-circle-background-color: #{$switch-checked-circle-background-color};
+  --rz-switch-focus-outline: #{$switch-focus-outline};
+  --rz-switch-focus-outline-offset: #{$switch-focus-outline-offset};
+
+  /* Tabs */
+  --rz-tabs-padding: #{$tabs-padding};
+  --rz-tabs-shadow: #{$tabs-shadow};
+  --rz-tabs-border: #{$tabs-border};
+  --rz-tabs-border-radius: #{$tabs-border-radius};
+  --rz-tabs-background-color: #{$tabs-background-color};
+  --rz-tabs-tab-font-size: #{$tabs-tab-font-size};
+  --rz-tabs-tab-line-height: #{$tabs-tab-line-height};
+  --rz-tabs-tab-font-weight: #{$tabs-tab-font-weight};
+  --rz-tabs-tab-text-transform: #{$tabs-tab-text-transform};
+  --rz-tabs-tab-letter-spacing: #{$tabs-tab-letter-spacing};
+  --rz-tabs-tab-padding-block: #{$tabs-tab-padding-block};
+  --rz-tabs-tab-padding-inline: #{$tabs-tab-padding-inline};
+  --rz-tabs-tab-background-color: #{$tabs-tab-background-color};
+  --rz-tabs-tab-color: #{$tabs-tab-color};
+  --rz-tabs-tab-selected-background-color: #{$tabs-tab-selected-background-color};
+  --rz-tabs-tab-selected-color: #{$tabs-tab-selected-color};
+  --rz-tabs-tab-selected-top-border-color: #{$tabs-tab-selected-top-border-color};
+  --rz-tabs-tab-hover-background-color: #{$tabs-tab-hover-background-color};
+  --rz-tabs-tab-hover-color: #{$tabs-tab-hover-color};
+  --rz-tabs-tab-focus-background-color: #{$tabs-tab-focus-background-color};
+  --rz-tabs-tab-focus-color: #{$tabs-tab-focus-color};
+  --rz-tabs-tab-focus-outline: #{$tabs-tab-focus-outline};
+  --rz-tabs-tab-focus-outline-offset: #{$tabs-tab-focus-outline-offset};
+  --rz-tabs-icon-font-size: #{$tabs-icon-font-size};
+  --rz-tabs-icon-margin-inline: #{$tabs-icon-margin-inline};
+  --rz-tabs-transition: #{$tabs-transition};
+
+  /* Textarea */
+  --rz-text-area-padding-block: #{$text-area-padding-block};
+  --rz-text-area-padding-inline: #{$text-area-padding-inline};
+
+  /* Timeline */
+  --rz-timeline-item-padding: #{$rz-timeline-item-padding};
+  --rz-timeline-axis-size: #{$rz-timeline-axis-size};
+  --rz-timeline-point-size: #{$rz-timeline-point-size};
+  --rz-timeline-point-border: #{$rz-timeline-point-border};
+  --rz-timeline-point-border-radius: #{$rz-timeline-point-border-radius};
+  --rz-timeline-point-background-color: #{$rz-timeline-point-background-color};
+  --rz-timeline-point-color: #{$rz-timeline-point-color};
+  --rz-timeline-line-color: #{$rz-timeline-line-color};
+  --rz-timeline-line-width: #{$rz-timeline-line-width};
+  --rz-timeline-line-border-radius: #{$rz-timeline-line-border-radius};
+
+  /* Tooltip */
+  --rz-tooltip-background-color: #{$tooltip-background-color};
+  --rz-tooltip-color: #{$tooltip-color};
+  --rz-tooltip-shadow: #{$tooltip-shadow};
+  --rz-tooltip-padding: #{$tooltip-padding};
+  --rz-tooltip-border-radius: #{$tooltip-border-radius};
+  --rz-tooltip-font-size: #{$tooltip-font-size};
+
+  /* Tree */
+  --rz-tree-background-color: #{$tree-background-color};
+  --rz-tree-node-padding-block: #{$tree-node-padding-block};
+  --rz-tree-node-padding-inline: #{$tree-node-padding-inline};
+  --rz-tree-node-selected-background-color: #{$tree-node-selected-background-color};
+  --rz-tree-node-selected-color: #{$tree-node-selected-color};
+  --rz-tree-node-selected-border-radius: #{$tree-node-selected-border-radius};
+  --rz-tree-node-margin-block: #{$tree-node-margin-block};
+  --rz-tree-node-margin-inline: #{$tree-node-margin-inline};
+  --rz-tree-node-hover-background-color: #{$tree-node-hover-background-color};
+  --rz-tree-node-hover-color: #{$tree-node-hover-color};
+  --rz-tree-node-focus-outline: #{$tree-node-focus-outline};
+  --rz-tree-node-focus-outline-offset: #{$tree-node-focus-outline-offset};
+  --rz-tree-node-toggle-width: #{$tree-node-toggle-width};
+  --rz-tree-node-toggle-color: #{$tree-node-toggle-color};
+  --rz-tree-node-toggle-hover-color: #{$tree-node-toggle-hover-color};
+  --rz-tree-transition: #{$tree-transition};
+
+  /* Upload */
+  --rz-upload-button-bar-background-color: #{$upload-button-bar-background-color};
+  --rz-upload-button-bar-padding: #{$upload-button-bar-padding};
+  --rz-upload-button-bar-border-radius: #{$upload-button-bar-border-radius};
+  --rz-upload-files-background-color: #{$upload-files-background-color};
+  --rz-upload-files-padding: #{$upload-files-padding};
+  --rz-upload-files-remove-background-color: #{$upload-files-remove-background-color};
+  --rz-upload-files-remove-color: #{$upload-files-remove-color};
+  --rz-upload-files-margin: #{$upload-files-margin};
+  --rz-upload-choose-background-color: #{$upload-choose-background-color};
+  --rz-upload-choose-color: #{$upload-choose-color};
+  --rz-upload-choose-hover-background-color: #{$upload-choose-hover-background-color};
+  --rz-upload-choose-hover-color: #{$upload-choose-hover-color};
+  --rz-upload-choose-active-background-color: #{$upload-choose-active-background-color};
+  --rz-upload-choose-active-color: #{$upload-choose-active-color};
+  --rz-upload-cancel-background-color: #{$upload-cancel-background-color};
+  --rz-upload-cancel-color: #{$upload-cancel-color};
+  --rz-upload-button-background-color: #{$upload-button-background-color};
+}

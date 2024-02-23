@@ -1,12 +1,18 @@
 @using System.Globalization
 
-<div Class="rz-p-0 rz-p-md-12">
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
-        <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
-        <RadzenLabel Text="Smooth" Component="smooth" Class="rz-mr-6"/>
-        <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-        <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
-    </RadzenStack>
+<RadzenStack Class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
+                <RadzenLabel Text="Smooth" Component="smooth" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
 
     <RadzenChart>
         <RadzenAreaSeries Smooth="@smooth" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" RenderingOrder="1">
@@ -21,7 +27,7 @@
             <RadzenAxisTitle Text="Revenue in USD" />
         </RadzenValueAxis>
     </RadzenChart>
-</div>
+</RadzenStack>
 
 @code {
     bool smooth = true;

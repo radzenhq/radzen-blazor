@@ -1,34 +1,39 @@
 @using System.Globalization
 
-<div class="container">
-    <div class="row">
-        <div class="col-sm-12 my-5">
-            <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem" >
+<RadzenStack Class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
-                <RadzenLabel Text="Smooth" Component="smooth" Style="margin-right: 1rem;"/>
+                <RadzenLabel Text="Smooth" Component="smooth" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                <RadzenLabel Text="Show Data Labels" Component="dataLabels" Style="margin-right: 1rem;" />
+                <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenCheckBox @bind-Value="@showMarkers" Name="markers"></RadzenCheckBox>
                 <RadzenLabel Text="Show Markers" Component="markers" />
-            </RadzenCard>
-            <RadzenChart>
-                <RadzenLineSeries Smooth="@smooth" Data="@revenue2023" CategoryProperty="Date" Title="2023" LineType="LineType.Dashed" ValueProperty="Revenue">
-                    <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Square" />
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                </RadzenLineSeries>
-                <RadzenLineSeries Smooth="@smooth" Data="@revenue2024" CategoryProperty="Date" Title="2024" ValueProperty="Revenue">
-                    <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Circle" />
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                </RadzenLineSeries>
-                <RadzenCategoryAxis Padding="20" />
-                <RadzenValueAxis Formatter="@FormatAsUSD">
-                    <RadzenGridLines Visible="true" />
-                    <RadzenAxisTitle Text="Revenue in USD" />
-                </RadzenValueAxis>
-            </RadzenChart>
-        </div>
-    </div>
-</div>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart>
+        <RadzenLineSeries Smooth="@smooth" Data="@revenue2023" CategoryProperty="Date" Title="2023" LineType="LineType.Dashed" ValueProperty="Revenue">
+            <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Square" />
+            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+        </RadzenLineSeries>
+        <RadzenLineSeries Smooth="@smooth" Data="@revenue2024" CategoryProperty="Date" Title="2024" ValueProperty="Revenue">
+            <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Circle" />
+            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Padding="20" />
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Revenue in USD" />
+        </RadzenValueAxis>
+    </RadzenChart>
+</RadzenStack>
 
 @code {
     bool smooth = false;

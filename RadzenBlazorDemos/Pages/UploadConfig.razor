@@ -1,105 +1,109 @@
-﻿<div class="container-fluid">
-    <div class="row px-3">
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Single file upload</RadzenText>
-                <RadzenUpload Url="upload/single" Progress=@(args => OnProgress(args, "Single file upload")) class="w-100" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})">
-                </RadzenUpload>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Upload with icon</RadzenText>
-                <RadzenUpload Url="upload/single" Icon="upload" ChooseText="" Progress=@(args => OnProgress(args, "Upload with icon")) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})">
-                </RadzenUpload>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom HTTP headers</RadzenText>
-                <RadzenUpload Url="upload/single" Progress=@(args => OnProgress(args, "Custom HTTP headers")) class="w-100" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})">
-                    <RadzenUploadHeader Name="Authorization" Value="Bearer <token>" />
-                    <RadzenUploadHeader Name="X-Uploaded-By" Value="Radzen" />
-                </RadzenUpload>
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple files upload</RadzenText>
-                <RadzenUpload Multiple="true" Url="upload/multiple" Progress=@(args => OnProgress(args, "Multiple files upload")) class="w-100" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Upload images only</RadzenText>
-                <RadzenUpload Multiple="true" Accept="image/*" Url="upload/multiple" Progress=@(args => OnProgress(args, "Images only upload")) class="w-100" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Upload with additional parameter</RadzenText>
-                <RadzenUpload Multiple="true" Accept="image/*" Url=@($"upload/{customParameter}") Progress=@(args => OnProgress(args, "Upload with additional parameter")) class="w-100" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Upload Complete event</RadzenText>
-                <RadzenUpload Url="upload/single" Complete=@OnComplete class="w-100" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Using RadzenProgressBar</RadzenText>
-                <RadzenUpload Url="upload/single" Progress=@TrackProgress Complete=@CompleteUpload class="w-100" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
-                <RadzenProgressBar Value=@progress class="mt-4" Visible=@showProgress />
-                <RadzenButton Text="Cancel" Click=@(args => CancelUpload()) class="d-block mt-4" Visible=@showProgress />
-                <RadzenLabel Visible=@showComplete class="mt-4" Text=@completionMessage />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Specify upload parameter name</RadzenText>
-                <RadzenUpload Url="upload/specific" ParameterName="myName" Progress=@(args => OnProgress(args, "Upload with specified parameter name")) class="w-100" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Upload client-side without Url</RadzenText>
-                <RadzenUpload Multiple="true" Change=@OnClientChange class="w-100"
-                              InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Drag and drop files to upload</RadzenText>
-                <RadzenUpload id="ddUpload" @ref="uploadDD" ChooseText="Drag and drop here or click to choose files" Auto="false" Multiple="true" Url="upload/multiple" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
-                              Progress=@(args => OnProgress(args, "Drag and drop files to upload")) class="w-100" />
-                <RadzenButton Text="Upload" Click=@(args => uploadDD.Upload()) class="d-block mt-4" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Manual Upload</RadzenText>
-                <RadzenUpload @ref="upload" Auto="false" Multiple="true" Url="upload/multiple" Change=@(args => OnChange(args, "Manual Upload")) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
-                              Progress=@(args => OnProgress(args, "Manual Upload")) class="w-100" />
-                <RadzenButton Text="Upload" Click=@(args => upload.Upload()) class="d-block mt-4" />
-            </RadzenCard>
-        </div>
-    </div>
-</div>
+﻿<RadzenRow Gap="2rem" RowGap="2rem" Class="rz-m-0 rz-m-md-12">
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Single file upload</RadzenText>
+            <RadzenUpload Url="upload/single" Progress=@(args => OnProgress(args, "Single file upload")) Style="width: 100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})">
+            </RadzenUpload>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Upload with icon</RadzenText>
+            <RadzenUpload Url="upload/single" Icon="upload" ChooseText="" Progress=@(args => OnProgress(args, "Upload with icon")) Style="width: 100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})">
+            </RadzenUpload>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Custom HTTP headers</RadzenText>
+            <RadzenUpload Url="upload/single" Progress=@(args => OnProgress(args, "Custom HTTP headers")) Style="width: 100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})">
+                <RadzenUploadHeader Name="Authorization" Value="Bearer <token>" />
+                <RadzenUploadHeader Name="X-Uploaded-By" Value="Radzen" />
+            </RadzenUpload>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Multiple files upload</RadzenText>
+            <RadzenUpload Multiple="true" Url="upload/multiple" Progress=@(args => OnProgress(args, "Multiple files upload")) Style="width: 100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Upload images only</RadzenText>
+            <RadzenUpload Multiple="true" Accept="image/*" Url="upload/multiple" Progress=@(args => OnProgress(args, "Images only upload")) Style="width: 100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Upload with additional parameter</RadzenText>
+            <RadzenUpload Multiple="true" Accept="image/*" Url=@($"upload/{customParameter}") Progress=@(args => OnProgress(args, "Upload with additional parameter")) Style="width: 100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Upload Complete event</RadzenText>
+            <RadzenUpload Url="upload/single" Complete=@OnComplete Style="width: 100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Using RadzenProgressBar</RadzenText>
+            <RadzenUpload Url="upload/single" Progress=@TrackProgress Complete=@CompleteUpload Style="width: 100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+            <RadzenProgressBar Value=@progress class="rz-mt-6" Visible=@showProgress />
+            <RadzenButton Text="Cancel" Click=@(args => CancelUpload()) class="rz-mt-4" Visible=@showProgress />
+            <RadzenLabel Visible=@showComplete class="rz-mt-6" Text=@completionMessage />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Specify upload parameter name</RadzenText>
+            <RadzenUpload Url="upload/specific" ParameterName="myName" Progress=@(args => OnProgress(args, "Upload with specified parameter name")) Style="width: 100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Upload client-side without Url</RadzenText>
+            <RadzenUpload Multiple="true" Change=@OnClientChange Style="width: 100%"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+<RadzenRow Gap="2rem" RowGap="2rem" Class="rz-m-0 rz-m-md-12">
+    <RadzenColumn Size="12">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Drag and drop files to upload</RadzenText>
+            <RadzenUpload id="ddUpload" @ref="uploadDD" ChooseText="Drag and drop here or click to choose files" Auto="false" Multiple="true" Url="upload/multiple" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
+                            Progress=@(args => OnProgress(args, "Drag and drop files to upload")) Style="width: 100%" />
+            <RadzenButton Text="Upload" Click=@(args => uploadDD.Upload()) class="rz-mt-4" />
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+<RadzenRow Gap="2rem" RowGap="2rem" Class="rz-m-0 rz-m-md-12">
+    <RadzenColumn Size="12">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Manual Upload</RadzenText>
+            <RadzenUpload @ref="upload" Auto="false" Multiple="true" Url="upload/multiple" Change=@(args => OnChange(args, "Manual Upload")) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
+                            Progress=@(args => OnProgress(args, "Manual Upload")) Style="width: 100%" />
+            <RadzenButton Text="Upload" Click=@(args => upload.Upload()) class="rz-mt-4" />
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
 
 <EventConsole @ref=@console />
 
 <style>
     #ddUpload {
         left: 0;
+        --rz-upload-button-bar-background-color: transparent;
+        --rz-upload-button-bar-padding: 0;
     }
+
     #ddUpload .rz-fileupload-buttonbar .rz-fileupload-choose {
         width: 100%;
         text-align: center;
         font-size: 16px;
         padding: 100px 0;
-        border-radius: 0;
     }
 </style>
 

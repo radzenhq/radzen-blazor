@@ -13,7 +13,7 @@
 
     <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => ordersGrid.Reload())>
         <Properties>
-            <RadzenDataFilterProperty Property="OrderID" Title="Order ID" />
+            <RadzenDataFilterProperty Property="@nameof(Order.OrderID)" Title="Order ID" />
             <RadzenDataFilterProperty Property="Employee.LastName" Title="Employee Last Name" />
             <MyCustomEnumerableDataFilterProperty Property="Employee.Title" Title="Employee Title" FilterValue="@finalSelectedTitles"
                                                     Type="typeof(IEnumerable<string>)" FilterOperator="FilterOperator.Contains">
@@ -31,7 +31,7 @@
                     Data="@(filteredOrders)" Count="@count" LoadData="@LoadData"
                     ColumnWidth="200px" PageSize="20" Style="height: 500px">
         <Columns>
-            <RadzenDataGridColumn Width="200px" Property="OrderID" Title="Order ID" />
+            <RadzenDataGridColumn Width="200px" Property="@nameof(Order.OrderID)" Title="Order ID" />
             <RadzenDataGridColumn Width="200px" Property="Customer.CompanyName" Title="Customer" />
             <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
                 <Template Context="order">

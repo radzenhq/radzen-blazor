@@ -1,0 +1,364 @@
+$pager-background-color: var(--rz-base-background-color) !default;
+$pager-padding: 0.5rem !default;
+$pager-gap: 0.5rem !default;
+$pager-border: $grid-border !default;
+$pager-button-border-radius: var(--rz-border-radius) !default;
+$pager-numeric-button-background-color: var(--rz-base-200) !default;
+$pager-numeric-button-color: var(--rz-text-color) !default;
+$pager-numeric-button-border: 1px solid transparent !default;
+$pager-numeric-button-hover-background-color: $pager-numeric-button-background-color !default;
+$pager-numeric-button-hover-color: $pager-numeric-button-color !default;
+$pager-numeric-button-padding: 0.4375rem !default;
+$pager-numeric-button-selected-background-color: var(--rz-base-background-color) !default;
+$pager-numeric-button-selected-color: var(--rz-primary) !default;
+$pager-numeric-button-selected-border: var(--rz-border-base-200) !default;
+$pager-numeric-button-selected-padding: $pager-numeric-button-padding; // Selected button padding should be the same as the default one
+$pager-numeric-button-min-width: 2.25rem !default;
+$pager-back-button-background-color: var(--rz-base-200) !default;
+$pager-back-button-color: var(--rz-text-color) !default;
+$pager-back-button-hover-background-color: $pager-back-button-background-color !default;
+$pager-back-button-hover-color: $pager-back-button-color !default;
+$pager-next-button-background-color: var(--rz-base-200) !default;
+$pager-next-button-color: var(--rz-text-color) !default;
+$pager-next-button-hover-background-color: $pager-next-button-background-color !default;
+$pager-next-button-hover-color: $pager-next-button-color !default;
+$pager-dropdown-width: 80px !default;
+$pager-summary-padding: 1.25rem !default;
+$pager-summary-font-size: var(--rz-body-font-size) !default;
+$pager-summary-color: var(--rz-text-secondary-color) !default;
+$pager-button-size: "%button-md" !default;
+
+.rz-pager {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rz-pager-gap);
+  flex-wrap: wrap;
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    .rz-pager-element,
+    .rz-pager-page {
+      &.rz-state-focused {
+        outline: var(--rz-outline-focus);
+        outline-offset: var(--rz-outline-offset);
+      }
+    }
+  }
+
+  &.rz-align-right {
+    justify-content: right;
+  }
+
+  &.rz-align-left {
+    justify-content: left;
+  }
+
+  &.rz-align-center {
+    justify-content: center;
+  }
+
+  background-color: var(--rz-pager-background-color);
+  padding: var(--rz-pager-padding);
+
+  .rzi-step-backward {
+    &:before {
+      content: 'first_page';
+    }
+  }
+
+  .rzi-caret-left {
+    &:before {
+      content: 'navigate_before';
+    }
+  }
+
+  .rzi-caret-right {
+    &:before {
+      content: 'navigate_next';
+    }
+  }
+
+  .rzi-step-forward {
+    &:before {
+      content: 'last_page';
+    }
+  }
+
+  /* Right-to-left arrow icons */
+  *[dir="rtl"] & {
+    .rz-pager-icon {
+      transform: rotate(180deg);
+    }
+  }
+
+  .rz-dropdown {
+    order: 2;
+    width: var(--rz-pager-dropdown-width);
+    overflow: visible;
+  }
+
+  .rz-pagesize-text {
+    order: 2;
+    font-size: var(--rz-pager-summary-font-size);
+    color: var(--rz-pager-summary-color);
+  }
+
+  .rz-dropdown-items-wrapper {
+    width: var(--rz-pager-dropdown-width - 4px);
+  }
+}
+
+.rz-pager-element,
+.rz-pager-page {
+  &:hover {
+    background-color: var(--rz-pager-numeric-button-hover-background-color);
+    color: var(--rz-pager-numeric-button-hover-color);
+  }
+}
+
+.rz-pager-bottom {
+  border-top: var(--rz-pager-border);
+}
+
+.rz-pager-pages {
+  display: inline-flex;
+  gap: var(--rz-pager-gap);
+  margin: 0 0.5rem;
+}
+
+.rz-pager-element {
+  @extend %button, #{$pager-button-size}, .rz-button-icon-only;
+  letter-spacing: 0;
+}
+
+.rz-pager-first {
+  .rz-align-center & {
+    margin-inline-start: auto;
+  }
+}
+
+.rz-pager-prev {
+  margin-inline-end: auto;
+
+  .rz-align-left &,
+  .rz-align-right &,
+  .rz-align-center & {
+    margin-inline-end: 0;
+  }
+}
+
+.rz-pager-next {
+  margin-inline-start: auto;
+
+  .rz-align-left &,
+  .rz-align-right &,
+  .rz-align-center & {
+    margin-inline-start: 0;
+  }
+}
+
+.rz-pager-last {
+  .rz-align-center & {
+    margin-inline-end: auto;
+  }
+}
+
+.rz-pager-first,
+.rz-pager-prev {
+  background-color: var(--rz-pager-back-button-background-color);
+  color: var(--rz-pager-back-button-color);
+  border-radius: var(--rz-pager-button-border-radius);
+}
+
+.rz-pager-element {
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.rz-pager-last,
+.rz-pager-next {
+  background-color: var(--rz-pager-next-button-background-color);
+  color: var(--rz-pager-next-button-color);
+  border-radius: var(--rz-pager-button-border-radius);
+}
+
+.rz-pager-page {
+  display: inline-block;
+  min-width: var(--rz-pager-numeric-button-min-width);
+  text-align: center;
+  gap: var(--rz-pager-gap);
+  background-color: var(--rz-pager-numeric-button-background-color);
+  border: var(--rz-pager-numeric-button-border);
+  border-radius: var(--rz-pager-button-border-radius);
+  padding: var(--rz-pager-numeric-button-padding);
+  color: var(--rz-pager-numeric-button-color);
+
+  &.rz-state-active {
+    background-color: var(--rz-pager-numeric-button-selected-background-color);
+    color: var(--rz-pager-numeric-button-selected-color);
+    border: var(--rz-pager-numeric-button-selected-border);
+    padding: var(--rz-pager-numeric-button-selected-padding);
+  }
+}
+
+.rz-pager-summary {
+  padding-inline-end: var(--rz-pager-summary-padding);
+  font-size: var(--rz-pager-summary-font-size);
+  color: var(--rz-pager-summary-color);
+
+  .rz-align-right & {
+    margin-right: auto;
+  }
+
+  .rz-align-left & {
+    order: 2;
+    margin-left: auto;
+    padding: 0;
+  }
+
+  *[dir="rtl"] .rz-align-right & {
+    order: 1;
+  }
+
+  *[dir="rtl"] .rz-align-left & {
+    order: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .rz-pager-page {
+      &:not(.rz-state-active) {
+          display: none;
+      }
+  }
+
+  .rz-pager {
+      display: grid;
+      grid-column-gap: 0.5rem;
+      grid-row-gap: 1rem;
+      grid-template-columns: repeat(9, 1fr);
+      text-align: center;
+
+      .rz-dropdown {
+          grid-column: 1/4;
+          width: auto;
+          margin: 0 !important;
+          text-align: left;
+      }
+
+      .rz-pagesize-text {
+          grid-column: 4/10;
+          margin: 0 !important;
+          text-align: left;
+      }
+  }
+
+  .rz-pager-summary {
+      grid-column: 1/10;
+      padding: 0 !important;
+      text-align: left;
+  }
+
+  .rz-pager-first {
+      grid-column: 1/3;
+      margin: 0 !important;
+  }
+
+  .rz-pager-prev {
+      grid-column: 3/5;
+      margin: 0 !important;
+  }
+
+  .rz-pager-pages {
+      grid-column: 5/6;
+      margin: 0 !important;
+  }
+
+  .rz-pager-next {
+      grid-column: 6/8;
+      margin: 0 !important;
+  }
+
+  .rz-pager-last {
+      grid-column: 8/10;
+      margin: 0 !important;
+  }
+}
+
+@container rz-lookup-panel (max-width: 768px) {
+  .rz-pager-page {
+    &:not(.rz-state-active) {
+      display: none;
+    }
+  }
+
+  .rz-pager {
+    display: grid;
+    grid-column-gap: 0.5rem;
+    grid-row-gap: 1rem;
+    grid-template-columns: repeat(9, 1fr);
+    text-align: center;
+
+    .rz-dropdown {
+      grid-column: 1/4;
+      width: auto;
+      margin: 0 !important;
+      text-align: left;
+    }
+    .rz-pagesize-text {
+      grid-column: 4/10;
+      margin: 0 !important;
+      text-align: left;
+    } 
+  }
+
+  .rz-pager-summary {
+    grid-column: 1/10;
+    padding: 0 !important;
+    text-align: left;
+  }
+
+  .rz-pager-first {
+    grid-column: 1/3;
+    margin: 0 !important;
+  }
+
+  .rz-pager-prev {
+    grid-column: 3/5;
+    margin: 0 !important;
+  }
+
+  .rz-pager-pages {
+    grid-column: 5/6;
+    margin: 0 !important;
+  }
+
+  .rz-pager-next {
+    grid-column: 6/8;
+    margin: 0 !important;
+  }
+
+  .rz-pager-last {
+    grid-column: 8/10;
+    margin: 0 !important;
+  }
+}
+
+// Density
+.rz-pager {
+  &.rz-density-compact {
+    --rz-pager-padding: 0.25rem;
+    --rz-pager-gap: 0.25rem;
+    --rz-pager-summary-padding: 0.5rem ;
+
+    .rz-pager-element {
+      @extend %button-sm;
+    }
+  }
+}

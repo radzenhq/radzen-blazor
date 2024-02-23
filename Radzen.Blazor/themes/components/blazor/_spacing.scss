@@ -1,3 +1,8 @@
+// Reset <body> margins
+body {
+  margin: 0;
+}
+
 // Margins and Paddings
 @each $property, $shorthand in (margin: m, padding: p) {
   @each $gutter, $gutter-value in $rz-gutter-map {

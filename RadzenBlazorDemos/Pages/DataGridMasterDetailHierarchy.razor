@@ -4,72 +4,79 @@
 
 @inherits DbContextPage
 
-<div style="display: flex; align-items: center; margin-bottom: 16px">
-    <div style="white-space:nowrap; margin-right: 16px">ExpandMode:</div>
-    <RadzenSelectBar @bind-Value="@expandMode" TextProperty="Text" ValueProperty="Value" style="margin-right: 16px"
+<RadzenStack Gap="1rem">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1.5rem;" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <div>ExpandMode:</div>
+                <RadzenSelectBar @bind-Value="@expandMode" TextProperty="Text" ValueProperty="Value"
                         Data="@(Enum.GetValues(typeof(DataGridExpandMode)).Cast<DataGridExpandMode>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
-    <RadzenButton Text="Expand all rows" Click="@(args => ToggleRowsExpand(true))" style="margin-right: 16px" 
-        Disabled=@(allRowsExpanded == true || expandMode == DataGridExpandMode.Single) />
-    <RadzenButton Text="Collapse all rows" Click="@(args => ToggleRowsExpand(false))" 
-        Disabled=@(allRowsExpanded == false || expandMode == DataGridExpandMode.Single) />
-</div>
-<RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" RowRender="@RowRender" ExpandMode="@expandMode"
-                Data="@orders" TItem="Order">
-    <Template Context="order">
-        <RadzenCard Style="margin-bottom:20px">
-            Company:
-            <b>@order.Customer?.CompanyName</b>
-        </RadzenCard>
-        <RadzenTabs>
-            <Tabs>
-                <RadzenTabsItem Text="Order Details">
-                    <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@order.OrderDetails">
-                        <Columns>
-                            <RadzenDataGridColumn Property="Order.CustomerID" Title="Order" />
-                            <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
-                            <RadzenDataGridColumn Property="@nameof(OrderDetail.UnitPrice)" Title="Unit Price">
-                                <Template Context="detail">
-                                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
-                                </Template>
-                            </RadzenDataGridColumn>
-                            <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
-                            <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount">
-                                <Template Context="detail">
-                                    @String.Format("{0}%", detail.Discount * 100)
-                                </Template>
-                            </RadzenDataGridColumn>
-                        </Columns>
-                    </RadzenDataGrid>
-                </RadzenTabsItem>
-                <RadzenTabsItem Text="Products">
-                    <RadzenDataList WrapItems="true" AllowPaging="true" Data="@order.OrderDetails" PageSize="10">
-                        <Template Context="detail">
-                            <RadzenCard Style="width:100px; height:100px">
-                                <h4 class="text-thin">Product</h4>
-                                <b>@detail?.Product?.ProductName</b>
-                            </RadzenCard>
-                        </Template>
-                    </RadzenDataList>
-                </RadzenTabsItem>
-            </Tabs>
-        </RadzenTabs>
-    </Template>
-    <Columns>
-        <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" />
-        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" Width="200px" />
-        <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="200px">
-            <Template Context="order">
-                <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 16px; margin-right: 6px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
-                @order.Employee?.FirstName @order.Employee?.LastName
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" Width="140px" />
-        <RadzenDataGridColumn Property="RequiredDate" Title="Required Date" FormatString="{0:d}" Width="140px" />
-        <RadzenDataGridColumn Property="ShippedDate" Title="Shipped Date" FormatString="{0:d}" Width="140px" />
-        <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
-        <RadzenDataGridColumn Property="ShipCountry" Title="Ship Country" />
-    </Columns>
-</RadzenDataGrid>
+            </RadzenStack>
+            <RadzenButton Text="Expand all rows" Click="@(args => ToggleRowsExpand(true))" 
+                          Disabled=@(allRowsExpanded == true || expandMode == DataGridExpandMode.Single) />
+            <RadzenButton Text="Collapse all rows" Click="@(args => ToggleRowsExpand(false))" 
+                          Disabled=@(allRowsExpanded == false || expandMode == DataGridExpandMode.Single) />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" RowRender="@RowRender" ExpandMode="@expandMode"
+                    Data="@orders" TItem="Order">
+        <Template Context="order">
+            <RadzenCard Variant="Variant.Text" Class="rz-background-color-primary-lighter rz-color-on-primary-lighter rz-m-4">
+                Company:
+                <b>@order.Customer?.CompanyName</b>
+            </RadzenCard>
+            <RadzenTabs>
+                <Tabs>
+                    <RadzenTabsItem Text="Order Details">
+                        <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@order.OrderDetails">
+                            <Columns>
+                                <RadzenDataGridColumn Property="Order.CustomerID" Title="Order" />
+                                <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
+                                <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price">
+                                    <Template Context="detail">
+                                        @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
+                                    </Template>
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
+                                <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount">
+                                    <Template Context="detail">
+                                        @String.Format("{0}%", detail.Discount * 100)
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Products">
+                        <RadzenDataList WrapItems="true" AllowPaging="true" Data="@order.OrderDetails" PageSize="10">
+                            <Template Context="detail">
+                                <RadzenCard Variant="Variant.Outlined"Style="width:100px; height:100px">
+                                    <RadzenBadge Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Info" Text="Product" Class="rz-mb-1" />
+                                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">@detail?.Product?.ProductName</RadzenText>
+                                </RadzenCard>
+                            </Template>
+                        </RadzenDataList>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </Template>
+        <Columns>
+            <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" />
+            <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" Width="200px" />
+            <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="200px">
+                <Template Context="order">
+                    <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px;" Class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                    @order.Employee?.FirstName @order.Employee?.LastName
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="OrderDate" Title="Order Date" FormatString="{0:d}" Width="140px" />
+            <RadzenDataGridColumn Property="@nameof(Order.RequiredDate)" Title="Required Date" FormatString="{0:d}" Width="140px" />
+            <RadzenDataGridColumn Property="@nameof(Order.ShippedDate)" Title="Shipped Date" FormatString="{0:d}" Width="140px" />
+            <RadzenDataGridColumn Property="ShipName" Title="Ship Name" />
+            <RadzenDataGridColumn Property="@nameof(Order.ShipCountry)" Title="Ship Country" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
 
 @code {
     DataGridExpandMode expandMode = DataGridExpandMode.Single;

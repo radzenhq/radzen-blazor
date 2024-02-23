@@ -42,7 +42,7 @@
         <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
             <RadzenCard Style="position: relative;">
                 <RadzenText TextStyle="TextStyle.H6">Open Issues</RadzenText>
-                <RadzenText TextStyle="TextStyle.H2" Class="rz-color-success" Style="position: absolute; right: 1.5rem; top: 1rem;">@openIssues?.Count()</RadzenText>
+                <RadzenText TextStyle="TextStyle.H2" Class="rz-color-success" Style="position: absolute; inset-inline-end: 1.5rem; top: 1rem;">@openIssues?.Count()</RadzenText>
                 <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
                     <RadzenColumnSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-success)" />
                     <RadzenValueAxis Visible="false" />
@@ -55,7 +55,7 @@
         <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
             <RadzenCard Style="position: relative;">
                 <RadzenText TextStyle="TextStyle.H6">Closed Issues</RadzenText>
-                <RadzenText TextStyle="TextStyle.H2" Class="rz-color-danger" Style="position: absolute; right: 1.5rem; top: 1rem;">@closedIssues?.Count()</RadzenText>
+                <RadzenText TextStyle="TextStyle.H2" Class="rz-color-danger" Style="position: absolute; inset-inline-end: 1.5rem; top: 1rem;">@closedIssues?.Count()</RadzenText>
                 <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
                     <RadzenColumnSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-danger)" />
                     <RadzenValueAxis Visible="false" />
@@ -68,7 +68,7 @@
         <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
             <RadzenCard Style="position: relative;">
                 <RadzenText TextStyle="TextStyle.H6">All Issues</RadzenText>
-                <RadzenText TextStyle="TextStyle.H2" Style="position: absolute; right: 1.5rem; top: 1rem;">@issues?.Count()</RadzenText>
+                <RadzenText TextStyle="TextStyle.H2" Style="position: absolute; inset-inline-end: 1.5rem; top: 1rem;">@issues?.Count()</RadzenText>
                 <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
                     <RadzenLineSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" Stroke="var(--rz-success)" />
                     <RadzenLineSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" Stroke="var(--rz-danger)" />
@@ -129,13 +129,13 @@
                                 <RadzenDropDown AllowClear="true" AllowFiltering="true" Data=@users TextProperty="Login" @bind-Value="selectedUser" Change=@FilterIssues>
                                     <Template Context="user">
                                         <div Style="white-space: nowrap">
-                                            <img Style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;" src=@user.AvatarUrl alt="User avatar"/>@user.Login
+                                            <img Style="width: 24px; height: 24px; border-radius: 50%; margin-inline-end: 8px;" src=@user.AvatarUrl alt="User avatar"/>@user.Login
                                         </div>
                                     </Template>
                                 </RadzenDropDown>
                             </FilterTemplate>
                             <Template Context="issue">
-                                <img Style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; border: 1px solid #cccccc;" src=@issue.User.AvatarUrl alt="User avatar" /><b>@issue.User.Login</b>
+                                <img Style="width: 32px; height: 32px; border-radius: 50%; margin-inline-end: 8px; border: 1px solid #cccccc;" src=@issue.User.AvatarUrl alt="User avatar" /><b>@issue.User.Login</b>
                             </Template>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn Property="@nameof(Issue.Title)" Title="Title" Width="400px">
@@ -143,7 +143,7 @@
                                 <RadzenLink Path=@issue.Url Text=@issue.Title Target="_blank" />
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="State" Title="State" Width="120px">
+                        <RadzenDataGridColumn Property="@nameof(Issue.State)" Title="State" Width="120px">
                             <FilterTemplate>
                                 <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues>
                                     <Template Context="issueState">
@@ -174,7 +174,7 @@
                             <Template Context="issue">
                                 @foreach(var label in issue.Labels)
                                 {
-                                    <span Class="rz-badge rz-badge-pill rz-mr-1 rz-mb-1" Style="background-color: #@label.Color">@Regex.Replace(label.Name, ":\\w+:", "")</span>
+                                    <span Class="rz-badge rz-badge-pill rz-me-1 rz-mb-1" Style="background-color: #@label.Color">@Regex.Replace(label.Name, ":\\w+:", "")</span>
                                 }
                             </Template>
                         </RadzenDataGridColumn>

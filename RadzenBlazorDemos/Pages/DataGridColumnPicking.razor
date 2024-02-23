@@ -4,7 +4,7 @@
 
 @inherits DbContextPage
 
-<RadzenButton Text="Toggle EmployeeID column visibility" Click=@(() => EmployeeIDVisible = !EmployeeIDVisible) class="my-3"/>
+<RadzenButton Text="Toggle EmployeeID column visibility" Click=@(() => EmployeeIDVisible = !EmployeeIDVisible) class="rz-my-4"/>
 <RadzenDataGrid Data="@employees" TItem="Employee" AllowFiltering=true ColumnWidth="300px" AllowColumnPicking="true" PickedColumnsChanged="@PickedColumnsChanged">
     <Columns>
         <RadzenDataGridColumn Visible="@EmployeeIDVisible" Property="@nameof(Employee.EmployeeID)" Title="ID" Width="80px" TextAlign="TextAlign.Center" Frozen="true" />

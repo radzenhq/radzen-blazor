@@ -8,27 +8,13 @@ $progressbar-circular-stroke-width: 2px !default;
 $progressbar-circular-value-stroke-width: 3px !default;
 $progressbar-circular-value-endpoint: round !default;
 
-// ProgressBar CSS variables
-
-:root {
-  --rz-progressbar-background-color: #{$progressbar-background-color};
-  --rz-progressbar-font-size: #{$progressbar-font-size};
-  --rz-progressbar-height: #{$progressbar-height};
-  --rz-progressbar-border-radius: #{$progressbar-border-radius};
-  --rz-progressbar-value-background-color: #{$progressbar-value-background-color};
-  --rz-progressbar-value-transition: #{$progressbar-value-transition};
-  --rz-progressbar-circular-stroke-width:  #{$progressbar-circular-stroke-width};
-  --rz-progressbar-circular-value-stroke-width:  #{$progressbar-circular-value-stroke-width};
-  --rz-progressbar-circular-value-endpoint:  #{$progressbar-circular-value-endpoint};
-}
-
-$progressbar-styles: () !default;
-$progressbar-styles: map-merge(
+$progressbar-base-styles: () !default;
+$progressbar-base-styles: map-merge(
   (
-    primary: (
-      background-color: var(--rz-primary),
-      color: var(--rz-on-primary)
-    ), 
+    base: (
+      background-color: var(--rz-base-600),
+      color: var(--rz-text-contrast-color)
+    ),
     light: (
       background-color: var(--rz-base-400),
       color: var(--rz-text-title-color)
@@ -36,29 +22,9 @@ $progressbar-styles: map-merge(
     dark: (
       background-color: var(--rz-base-900),
       color: var(--rz-text-contrast-color)
-    ),
-    secondary: ( 
-      background-color: var(--rz-secondary),
-      color: var(--rz-on-secondary)
-    ),
-    info: (
-      background-color: var(--rz-info),
-      color: var(--rz-on-info)
-    ),
-    warning: (
-      background-color: var(--rz-warning),
-      color: var(--rz-on-warning)
-    ),
-    danger: (
-      background-color: var(--rz-danger),
-      color: var(--rz-on-danger)
-    ),
-    success: (
-      background-color: var(--rz-success),
-      color: var(--rz-on-success)
     )
   ),
-  $progressbar-styles
+  $progressbar-base-styles
 );
 
 $progressbar-circular-sizes: () !default;
@@ -85,6 +51,7 @@ $progressbar-circular-sizes: map-merge(
 );
 
 .rz-progressbar {
+  box-sizing: border-box;
   border-radius: var(--rz-progressbar-border-radius);
   height: var(--rz-progressbar-height);
   position: relative;
@@ -113,6 +80,7 @@ $progressbar-circular-sizes: map-merge(
 }
 
 .rz-progressbar-circular {
+  box-sizing: border-box;
   position: relative;
 }
 
@@ -174,10 +142,14 @@ $progressbar-circular-sizes: map-merge(
       background-color: var(--rz-progressbar-value-background-color);
       will-change: left, right;
       animation: 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite rz-progressbar-indeterminate-anim;
+
+      *[dir="rtl"] & {
+        animation-name: rz-progressbar-indeterminate-anim-rtl;
+      }
     }
 
     &:after {
-    content: '';
+      content: '';
       position: absolute;
       top: 0;
       left: 0;
@@ -186,6 +158,10 @@ $progressbar-circular-sizes: map-merge(
       will-change: left, right;
       animation: 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite rz-progressbar-indeterminate-anim-short;
       animation-delay: 1.15s;
+
+      *[dir="rtl"] & {
+        animation-name: rz-progressbar-indeterminate-anim-short-rtl;
+      }
     }
 
     @keyframes rz-progressbar-indeterminate-anim {
@@ -209,6 +185,30 @@ $progressbar-circular-sizes: map-merge(
       100%, 60% {
         left: 107%;
         right: -8%;
+      }
+    }
+
+    @keyframes rz-progressbar-indeterminate-anim-rtl {
+      0% {
+        right: -35%;
+        left: 100%;
+      }
+
+      60%, 100% {
+        right: 100%;
+        left: -90%;
+      }
+    }
+
+    @keyframes rz-progressbar-indeterminate-anim-short-rtl {
+      0% {
+        right: -200%;
+        left: 100%;
+      }
+
+      60%, 100% {
+        right: 107%;
+        left: -8%;
       }
     }
   }
@@ -242,7 +242,7 @@ $progressbar-circular-sizes: map-merge(
   }
 }
 
-@each $style, $progressbar in $progressbar-styles {
+@each $style, $progressbar in map-merge($severity-styles-map, $progressbar-base-styles) {
   .rz-progressbar.rz-progressbar-#{$style} {
     color: map-get($progressbar, color);
   }

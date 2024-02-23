@@ -1,62 +1,27 @@
 $input-font-size: var(--rz-body-font-size) !default;
 $input-height: 2.25rem !default;
 $input-line-height: var(--rz-body-line-height) !default;
-$input-padding: 0.4375rem !default;
+$input-padding-block: 0.4375rem !default;
+$input-padding-inline: 0.4375rem !default;
 $input-value-color: var(--rz-text-color) !default;
 $input-placeholder-color: var(--rz-text-tertiary-color) !default;
 $input-background-color: var(--rz-base-background-color) !default;
 $input-border: var(--rz-border-normal) !default;
 $input-border-radius: var(--rz-border-radius) !default;
 $input-shadow: inset 0 4px 3px 0 rgba(0, 0, 0, 0.03) !default;
-
 $input-hover-shadow: $input-shadow !default;
 $input-hover-border: var(--rz-border-hover) !default;
-
 $input-focus-shadow: $input-shadow !default;
 $input-focus-border: var(--rz-border-focus) !default;
 $input-focus-outline: var(--rz-outline-normal) !default;
 $input-focus-outline-offset: 0 !default;
-
 $input-disabled-border: var(--rz-border-disabled) !default;
 $input-disabled-shadow: $input-shadow !default;
 $input-disabled-background-color: var(--rz-base-100) !default;
 $input-disabled-color: var(--rz-text-tertiary-color) !default;
 $input-disabled-placeholder-color: var(--rz-text-disabled-color) !default;
 $input-disabled-opacity: 1 !default;
-
 $input-transition: var(--rz-transition-all), width 0, height 0 !default;
-
-// Input CSS variables
-
-:root {
-  --rz-input-font-size: #{$input-font-size};
-  --rz-input-height: #{$input-height};
-  --rz-input-line-height: #{$input-line-height};
-  --rz-input-padding: #{$input-padding};
-  --rz-input-value-color: #{$input-value-color};
-  --rz-input-placeholder-color: #{$input-placeholder-color};
-  --rz-input-background-color: #{$input-background-color};
-  --rz-input-border: #{$input-border};
-  --rz-input-border-radius: #{$input-border-radius};
-  --rz-input-shadow: #{$input-shadow};
-  
-  --rz-input-hover-shadow: #{$input-hover-shadow};
-  --rz-input-hover-border: #{$input-hover-border};
-  
-  --rz-input-focus-shadow: #{$input-focus-shadow};
-  --rz-input-focus-border: #{$input-focus-border};
-  --rz-input-focus-outline: #{$input-focus-outline};
-  --rz-input-focus-outline-offset: #{$input-focus-outline-offset};
-  
-  --rz-input-disabled-border: #{$input-disabled-border};
-  --rz-input-disabled-shadow: #{$input-disabled-shadow};
-  --rz-input-disabled-background-color: #{$input-disabled-background-color};
-  --rz-input-disabled-color: #{$input-disabled-color};
-  --rz-input-disabled-placeholder-color: #{$input-disabled-placeholder-color};
-  --rz-input-disabled-opacity: #{$input-disabled-opacity};
-  
-  --rz-input-transition: #{$input-transition};
-}
 
 %input-hover {
   box-shadow: var(--rz-input-hover-shadow);
@@ -100,10 +65,12 @@ input {
 
 %input-base {
   @extend %input-no-padding;
-  padding: var(--rz-input-padding);
+  padding-block: var(--rz-input-padding-block);
+  padding-inline: var(--rz-input-padding-inline);
 }
 
 %input-no-padding {
+  box-sizing: border-box;
   border: var(--rz-input-border);
   border-radius: var(--rz-input-border-radius);
   box-shadow: var(--rz-input-shadow);
@@ -114,6 +81,7 @@ input {
   height: var(--rz-input-height);
   line-height: var(--rz-input-line-height);
   color: var(--rz-input-value-color);
+  font-family: inherit;
   font-size: var(--rz-input-font-size);
   transition: var(--rz-input-transition);
   outline: none;

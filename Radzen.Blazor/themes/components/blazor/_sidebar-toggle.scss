@@ -1,6 +1,6 @@
 $sidebar-toggle-icon-width: 1.5rem !default;
 $sidebar-toggle-icon-height: 1.5rem !default;
-$sidebar-toggle-margin: 0 1rem 0 0 !default;
+$sidebar-toggle-margin-inline-end: 1rem !default;
 $sidebar-toggle-padding: 0.8125rem !default;
 $sidebar-toggle-border: var(--rz-border-base-200) !default;
 $sidebar-toggle-color: var(--rz-base-900) !default;
@@ -11,35 +11,19 @@ $sidebar-toggle-hover-border-radius: 0 !default;
 $sidebar-toggle-focus-outline: var(--rz-outline-focus) !default;
 $sidebar-toggle-focus-outline-offset: calc(-1 * var(--rz-outline-offset)) !default;
 
-// SidebarToggle CSS variables
-
-:root {
-  --rz-sidebar-toggle-icon-width: #{$sidebar-toggle-icon-width};
-  --rz-sidebar-toggle-icon-height: #{$sidebar-toggle-icon-height};
-  --rz-sidebar-toggle-margin: #{$sidebar-toggle-margin};
-  --rz-sidebar-toggle-padding: #{$sidebar-toggle-padding};
-  --rz-sidebar-toggle-border: #{$sidebar-toggle-border};
-  --rz-sidebar-toggle-color: #{$sidebar-toggle-color};
-  --rz-sidebar-toggle-background-color: #{$sidebar-toggle-background-color};
-  --rz-sidebar-toggle-hover-color: #{$sidebar-toggle-hover-color};
-  --rz-sidebar-toggle-hover-background-color: #{$sidebar-toggle-hover-background-color};
-  --rz-sidebar-toggle-hover-border-radius: #{$sidebar-toggle-hover-border-radius};
-  --rz-sidebar-toggle-focus-outline: #{$sidebar-toggle-focus-outline};
-  --rz-sidebar-toggle-focus-outline-offset: #{$sidebar-toggle-focus-outline-offset};
-}
-
 .rz-sidebar-toggle {
-  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
   border: none;
   padding: var(--rz-sidebar-toggle-padding);
-  margin: var(--rz-sidebar-toggle-margin);
-  border-right: var(--rz-sidebar-toggle-border);
+  margin-inline-end: var(--rz-sidebar-toggle-margin-inline-end);
+  border-inline-end: var(--rz-sidebar-toggle-border);
   background-color: var(--rz-sidebar-toggle-background-color);
   color: var(--rz-sidebar-toggle-color);
 
   .rz-justify-content-flex-end & {
-    border-left: var(--rz-sidebar-toggle-border);
-    border-right: none;
+    border-inline-start: var(--rz-sidebar-toggle-border);
+    border-inline-end: none;
   }
 
   &:focus {

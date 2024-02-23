@@ -1,10 +1,11 @@
 $tree-background-color: var(--rz-base-background-color) !default;
-
-$tree-node-padding: 0.25rem !default;
+$tree-node-padding-block: 0.25rem !default;
+$tree-node-padding-inline: 0.25rem !default;
 $tree-node-selected-background-color: var(--rz-secondary) !default;
 $tree-node-selected-color: var(--rz-on-secondary) !default;
 $tree-node-selected-border-radius: calc(var(--rz-border-radius)/2) !default;
-$tree-node-margin: 1px 0 !default;
+$tree-node-margin-block: 1px !default;
+$tree-node-margin-inline: 1px!default;
 $tree-node-hover-background-color: var(--rz-secondary-light) !default;
 $tree-node-hover-color: var(--rz-on-secondary-light) !default;
 $tree-node-focus-outline: var(--rz-outline-focus) !default;
@@ -16,27 +17,8 @@ $tree-icon-right: 'arrow_right' !default;
 $tree-icon-down: 'arrow_drop_down' !default;
 $tree-transition: var(--rz-transition-all), width 0, height 0 !default;
 
-// Tree CSS variables
-
-:root {
-  --rz-tree-background-color: #{$tree-background-color};
-  
-  --rz-tree-node-padding: #{$tree-node-padding};
-  --rz-tree-node-selected-background-color: #{$tree-node-selected-background-color};
-  --rz-tree-node-selected-color: #{$tree-node-selected-color};
-  --rz-tree-node-selected-border-radius: #{$tree-node-selected-border-radius};
-  --rz-tree-node-margin: #{$tree-node-margin};
-  --rz-tree-node-hover-background-color: #{$tree-node-hover-background-color};
-  --rz-tree-node-hover-color: #{$tree-node-hover-color};
-  --rz-tree-node-focus-outline: #{$tree-node-focus-outline};
-  --rz-tree-node-focus-outline-offset: #{$tree-node-focus-outline-offset};
-  --rz-tree-node-toggle-width: #{$tree-node-toggle-width};
-  --rz-tree-node-toggle-color: #{$tree-node-toggle-color};
-  --rz-tree-node-toggle-hover-color: #{$tree-node-toggle-hover-color};
-  --rz-tree-transition: #{$tree-transition};
-}
-
 .rz-tree {
+  box-sizing: border-box;
   display: inline-block;
   overflow: auto;
 
@@ -56,12 +38,12 @@ $tree-transition: var(--rz-transition-all), width 0, height 0 !default;
  }
 
  .rz-treenode {
-   padding-left: var(--rz-tree-node-toggle-width);
+   padding-inline-start: var(--rz-tree-node-toggle-width);
  }
 
 .rz-tree-toggler {
   cursor: pointer;
-  margin-left: calc(var(--rz-tree-node-toggle-width) * -1);
+  margin-inline-start: calc(var(--rz-tree-node-toggle-width) * -1);
   width: var(--rz-tree-node-toggle-width);
   height: 1.5rem;
   font-size: var(--rz-icon-size);
@@ -73,14 +55,19 @@ $tree-transition: var(--rz-transition-all), width 0, height 0 !default;
   &.rzi-caret-right {
     &:before {
       content: $tree-icon-right;
-      margin-left: -0.125rem;
+      margin-inline-start: -0.125rem;
+    }
+
+    /* Right-to-left arrow icons */
+    *[dir="rtl"] & {
+      transform: rotate(180deg);
     }
   }
 
   &.rzi-caret-down {
     &:before {
       content: $tree-icon-down;
-      margin-left: -0.125rem;
+      margin-inline-start: -0.125rem;
     }
   }
 
@@ -94,15 +81,17 @@ $tree-transition: var(--rz-transition-all), width 0, height 0 !default;
   display: flex;
   align-items: center;
   cursor: pointer;
-  margin: var(--rz-tree-node-margin);
+  margin-block: var(--rz-tree-node-margin-block);
+  margin-inline: var(--rz-tree-node-margin-inline);
 
   .rz-treenode-label {
     display: flex;
     align-items: center;
-    padding: var(--rz-tree-node-padding);
+    padding-block: var(--rz-tree-node-padding-block);
+    padding-inline: var(--rz-tree-node-padding-inline);
 
     .rzi:first-child {
-      margin-right: 0.25rem;
+      margin-inline-end: 0.25rem;
     }
   }
 
@@ -122,7 +111,7 @@ $tree-transition: var(--rz-transition-all), width 0, height 0 !default;
   }
 
   .rz-chkbox {
-    margin-right: 0.25rem;
+    margin-inline-end: 0.25rem;
   }
 }
 

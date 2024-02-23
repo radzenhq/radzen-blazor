@@ -23,14 +23,14 @@ namespace Radzen.Blazor.Tests
 
             component.Render();
 
-            Assert.Contains(@$"rz-paginator", component.Markup);
+            Assert.Contains(@$"rz-pager", component.Markup);
 
             component.SetParametersAndRender(parameters =>
             {
                 parameters.Add<int>(p => p.PageSize, 101);
                 parameters.Add<int>(p => p.Count, 100);
             });
-            Assert.DoesNotContain(@$"rz-paginator", component.Markup);
+            Assert.DoesNotContain(@$"rz-pager", component.Markup);
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace Radzen.Blazor.Tests
 
             component.Render();
 
-            Assert.Contains(@$"rz-paginator", component.Markup);
+            Assert.Contains(@$"rz-pager", component.Markup);
             Assert.Contains(@$"rz-dropdown-trigger", component.Markup);
         }
 
@@ -67,13 +67,13 @@ namespace Radzen.Blazor.Tests
             await component.Instance.GoToPage(2);
             component.Render();
 
-            Assert.Contains(@$"rz-paginator-summary", component.Markup); 
+            Assert.Contains(@$"rz-pager-summary", component.Markup); 
             Assert.Contains(@$"Page 3 of 10 (100 items)", component.Markup); 
             
             component.SetParametersAndRender(parameters => {
                 parameters.Add<bool>(p => p.ShowPagingSummary, false);
             });
-            Assert.DoesNotContain(@$"rz-paginator-summary", component.Markup);
+            Assert.DoesNotContain(@$"rz-pager-summary", component.Markup);
         }
 
         [Fact]

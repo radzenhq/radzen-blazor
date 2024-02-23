@@ -6,19 +6,8 @@ $card-border: var(--rz-border-normal) !default;
 $card-border-radius: var(--rz-border-radius) !default;
 $card-heading-margin-bottom: 0.5rem !default;
 
-// Card CSS variables
-
-:root {
-  --rz-card-padding: #{$card-padding};
-  --rz-card-background-color: #{$card-background-color};
-  --rz-card-flat-background-color: #{$card-flat-background-color};
-  --rz-card-shadow: #{$card-shadow};
-  --rz-card-border: #{$card-border};
-  --rz-card-border-radius: #{$card-border-radius};
-  --rz-card-heading-margin-bottom: #{$card-heading-margin-bottom};
-}
-
  .rz-card {
+  box-sizing: border-box;
   padding: var(--rz-card-padding);
   border-radius: var(--rz-card-border-radius);
   background-color: var(--rz-card-background-color);

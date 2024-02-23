@@ -1,12 +1,14 @@
 @using System.Globalization
 
-<div class="container">
-    <div class="row">
-        <div class="col-sm-12 my-5">
-            <RadzenCard class="w-100 mb-4" >
-                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                <RadzenLabel Text="Show Data Labels" Component="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
-            </RadzenCard>
+<RadzenStack Class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+            <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+            <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenRow>
+        <RadzenColumn Size="12">
             <h4>Auto-size column series</h4>
             <RadzenChart>
                 <RadzenColumnSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
@@ -21,6 +23,9 @@
                     <RadzenAxisTitle Text="Revenue in USD" />
                 </RadzenValueAxis>
             </RadzenChart>
+        </RadzenColumn>
+        
+        <RadzenColumn Size="12">
             <h4>Custom size column series</h4>
             <RadzenChart>
                 <RadzenColumnSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
@@ -36,6 +41,9 @@
                     <RadzenAxisTitle Text="Revenue in USD" />
                 </RadzenValueAxis>
             </RadzenChart>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12">
             <h4>Range fills column series</h4>
             <RadzenChart>
                 <RadzenColumnSeries FillRange="@fillRange" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
@@ -51,9 +59,9 @@
                 </RadzenValueAxis>
                 <RadzenLegend Visible="false" />
             </RadzenChart>
-        </div>
-    </div>
-</div>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
 
 @code {
     bool showDataLabels = false;

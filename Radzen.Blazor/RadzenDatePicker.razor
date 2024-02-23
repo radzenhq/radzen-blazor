@@ -10,50 +10,48 @@
 @implements IRadzenFormComponent
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@getStyle()" id="@GetId()">
+    <div @ref="@Element" @attributes="Attributes" class="@($"rz-datepicker{(Disabled ? " rz-state-disabled" : "")}") @GetCssClass()" style="@getStyle()" id="@GetId()">
         @if (!Inline)
         {
-            <span class="@($"rz-calendar rz-calendar-w-btn{(Disabled ? " rz-state-disabled" : "")}")" style="width:100%">
-                <input @ref="@input" @attributes="InputAttributes" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-                       @onchange="@ParseDate" autocomplete="off" type="text" name="@Name" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
-                       class="rz-inputtext @InputClass @(IsReadonly ? "rz-readonly" : "")" id="@Name" placeholder="@Placeholder" />
-                @if (ShowButton)
-                {
-                    <button aria-label="@ToggleAriaLabel" @onmousedown=@OnToggle class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
-		                <span aria-hidden="true" class="@ButtonClasses"></span><span class="rz-button-text"></span>
-	                </button>
-                }
-                @if (AllowClear && HasValue)
-                {
-                    <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
-                }
-            </span>
+            <input @ref="@input" @attributes="InputAttributes" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+                    @onchange="@ParseDate" autocomplete="off" type="text" name="@Name" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
+                    class="rz-inputtext @InputClass @(IsReadonly ? "rz-readonly" : "")" id="@Name" placeholder="@Placeholder" />
+            @if (ShowButton)
+            {
+                <button aria-label="@ToggleAriaLabel" @onmousedown=@OnToggle class="@($"rz-datepicker-trigger rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
+                    <span aria-hidden="true" class="@ButtonClasses"></span><span class="rz-button-text"></span>
+                </button>
+            }
+            @if (AllowClear && HasValue)
+            {
+                <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
+            }
         }
 
-        <Popup id="@PopupID" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@popup style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline " : "")}rz-datepicker")">
-                <div class="rz-datepicker-group" @onkeydown="@OnPopupKeyDown">
+        <Popup id="@PopupID" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@popup style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline-container " : "rz-datepicker-popup-container ")}")">
+                <div class="rz-calendar" @onkeydown="@OnPopupKeyDown">
                     @if (!TimeOnly)
                     {
-                        <div class="rz-datepicker-header">
-                            <a id="@(GetId() + "pm")" tabindex="-1" aria-label="@PrevMonthAriaLabel" @onclick:preventDefault="true" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
-                                <span class="rz-datepicker-prev-icon rzi rzi-chevron-left"></span>
+                        <div class="rz-calendar-header">
+                            <a id="@(GetId() + "pm")" tabindex="-1" aria-label="@PrevMonthAriaLabel" @onclick:preventDefault="true" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-prev" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
+                                <span class="rzi rz-calendar-prev-icon"></span>
                             </a>
-                            <a id="@(GetId() + "nm")" tabindex="-1" aria-label="@NextMonthAriaLabel" @onclick:preventDefault="true" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
-                                <span class="rz-datepicker-next-icon rzi rzi-chevron-right"></span>
+                            <a id="@(GetId() + "nm")" tabindex="-1" aria-label="@NextMonthAriaLabel" @onclick:preventDefault="true" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-next" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
+                                <span class="rzi rz-calendar-next-icon"></span>
                             </a>
-                            <div class="rz-datepicker-title">
-                            <RadzenDropDown @ref="monthDropDown" Style="height:auto;width:120px;margin-top:5px;text-align:left;" TabIndex="@TabIndex"
-                                            TValue="int" Value="@CurrentDate.Month" Disabled="@Disabled" Data="@months" TextProperty="Name" ValueProperty="Value"
-                                            Change="@((args) => { SetMonth(int.Parse(args.ToString())); })"/>
-                            <RadzenDropDown @ref="yearDropDown" Style="height:auto;width:80px;margin-top:5px;text-align:left;" TabIndex="@TabIndex"
-                                            TValue="int" Value="@CurrentDate.Year" Disabled="@Disabled" Data="@years" TextProperty="Name" ValueProperty="Value"
-                                            Change="@((args) => { SetYear(int.Parse(args.ToString())); })"/>
+                            <div class="rz-calendar-title">
+                                <RadzenDropDown @ref="monthDropDown" Class="rz-calendar-month-dropdown" TabIndex="@TabIndex"
+                                                TValue="int" Value="@CurrentDate.Month" Disabled="@Disabled" Data="@months" TextProperty="Name" ValueProperty="Value"
+                                                Change="@((args) => { SetMonth(int.Parse(args.ToString())); })"/>
+                                <RadzenDropDown @ref="yearDropDown" Class="rz-calendar-year-dropdown" TabIndex="@TabIndex"
+                                                TValue="int" Value="@CurrentDate.Year" Disabled="@Disabled" Data="@years" TextProperty="Name" ValueProperty="Value"
+                                                Change="@((args) => { SetYear(int.Parse(args.ToString())); })"/>
                             </div>
                         </div>
                         @if(ShowDays)
                         {
-                        <div class="rz-datepicker-calendar-container" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnCalendarKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
-                            <table class="rz-datepicker-calendar" style="@(Inline ? "" : "width:100%")">
+                        <div class="rz-calendar-view-container" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnCalendarKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
+                            <table class="rz-calendar-view rz-calendar-month-view" style="@(Inline ? "" : "width:100%")">
                                 <thead>
                                     <tr>
                                         @if (ShowCalendarWeek)
@@ -79,7 +77,7 @@
                                         <tr>
                                             @if (ShowCalendarWeek)
                                             {
-                                                <td class="rz-datepicker-other-month rz-datepicker-week-number">@Culture.Calendar.GetWeekOfYear(new DateTime(CurrentDate.Year, CurrentDate.Month, 1).AddDays(i * 7), Culture.DateTimeFormat.CalendarWeekRule, Culture.DateTimeFormat.FirstDayOfWeek)</td>
+                                                <td class="rz-calendar-other-month rz-calendar-week-number">@Culture.Calendar.GetWeekOfYear(new DateTime(CurrentDate.Year, CurrentDate.Month, 1).AddDays(i * 7), Culture.DateTimeFormat.CalendarWeekRule, Culture.DateTimeFormat.FirstDayOfWeek)</td>
                                             }
                                             @for (int j = 0; j < 7; j++)
                                             {

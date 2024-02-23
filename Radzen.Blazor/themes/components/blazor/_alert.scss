@@ -42,23 +42,8 @@ $alert-sizes: map-merge(
   $alert-sizes
 );
 
-:root {
---rz-alert-margin: #{$alert-margin};
---rz-alert-padding: #{$alert-padding};
---rz-alert-gap: #{$alert-gap};
---rz-alert-color: #{$alert-color};
---rz-alert-background-color: #{$alert-background-color};
---rz-alert-box-shadow: #{$alert-box-shadow};
---rz-alert-border-radius: #{$alert-border-radius};
---rz-alert-message-margin: #{$alert-message-margin};
---rz-alert-title-color: #{$alert-title-color};
---rz-alert-icon-color: #{$alert-icon-color};
---rz-alert-icon-margin: #{$alert-icon-margin};
---rz-alert-icon-size: #{$alert-icon-size};
-}
-
 .rz-alert {
-
+  box-sizing: border-box;
   display: flex;
   align-items: flex-start;
   gap: var(--rz-alert-gap);

@@ -1,0 +1,1527 @@
+@import 'variables';
+@import 'mixins';
+$material: true;
+$theme-dark: true;
+$base: true;
+$theme-name: material-dark;
+
+// Theme Colors
+
+$rz-white: #ffffff !default;
+$rz-black: #000000 !default;
+
+$rz-base: #383838 !default;
+$rz-primary: #bb86fc !default;
+$rz-secondary: #01a299 !default;
+$rz-info: #2196f3 !default;
+$rz-success: #4caf50 !default;
+$rz-warning: #ff9800 !default;
+$rz-danger: #f44336 !default;
+
+$rz-series-1: #3700b3 !default;
+$rz-series-2: #ba68c8 !default;
+$rz-series-3: #f06292 !default;
+$rz-series-4: #ff8a65 !default;
+$rz-series-5: #ffee58 !default;
+$rz-series-6: #9ccc65 !default;
+$rz-series-7: #26a69a !default;
+$rz-series-8: #4fc3f7 !default;
+$rz-series-9: #7f5cce !default;
+$rz-series-10: #ce93d8 !default;
+$rz-series-11: #f48fb1 !default;
+$rz-series-12: #ffab91 !default;
+$rz-series-13: #fff176 !default;
+$rz-series-14: #aed581 !default;
+$rz-series-15: #4db6ac !default;
+$rz-series-16: #81d4fa !default;
+$rz-series-17: #a58cdd !default;
+$rz-series-18: #e1bee7 !default;
+$rz-series-19: #f8bbd0 !default;
+$rz-series-20: #ffccbc !default;
+$rz-series-21: #fff59d !default;
+$rz-series-22: #c5e1a5 !default;
+$rz-series-23: #80cbc4 !default;
+$rz-series-24: #b3e5fc !default;
+
+$rz-base-50: #e0e0e0 !default;
+$rz-base-100: #a0a0a0 !default;
+$rz-base-200: #6c6c6c !default;
+$rz-base-300: #545454 !default;
+$rz-base-400: #383838 !default;
+$rz-base-500: #333333 !default;
+$rz-base-600: #2e2e2e !default;
+$rz-base-700: #252525 !default;
+$rz-base-800: #1e1e1e !default;
+$rz-base-900: #121212 !default;
+$rz-base-light: #a0a0a0 !default;
+$rz-base-lighter: #ffffff !default;
+$rz-base-dark: #252525 !default;
+$rz-base-darker: #000000 !default;
+
+$rz-primary-light: mix($rz-white, $rz-primary, 20%) !default;
+$rz-primary-lighter: rgba($rz-primary, .12) !default;
+$rz-primary-dark: mix($rz-black, $rz-primary, 20%) !default;
+$rz-primary-darker: mix($rz-black, $rz-primary, 32%) !default;
+
+$rz-secondary-light: mix($rz-white, $rz-secondary, 20%) !default;
+$rz-secondary-lighter: rgba($rz-secondary, .12) !default;
+$rz-secondary-dark: mix($rz-black, $rz-secondary, 20%) !default;
+$rz-secondary-darker: mix($rz-black, $rz-secondary, 32%) !default;
+
+$rz-info-light: mix($rz-white, $rz-info, 20%) !default;
+$rz-info-lighter: rgba($rz-info, .20) !default;
+$rz-info-dark: mix($rz-black, $rz-info, 20%) !default;
+$rz-info-darker: mix($rz-black, $rz-info, 32%) !default;
+
+$rz-success-light: mix($rz-white, $rz-success, 20%) !default;
+$rz-success-lighter: rgba($rz-success, .16) !default;
+$rz-success-dark: mix($rz-black, $rz-success, 20%) !default;
+$rz-success-darker: mix($rz-black, $rz-success, 32%) !default;
+
+$rz-warning-light: mix($rz-white, $rz-warning, 20%) !default;
+$rz-warning-lighter: rgba($rz-warning, .20) !default;
+$rz-warning-dark: mix($rz-black, $rz-warning, 20%) !default;
+$rz-warning-darker: mix($rz-black, $rz-warning, 32%) !default;
+
+$rz-danger-light: mix($rz-white, $rz-danger, 20%) !default;
+$rz-danger-lighter: rgba($rz-danger, .20) !default;
+$rz-danger-dark: mix($rz-black, $rz-danger, 20%) !default;
+$rz-danger-darker: mix($rz-black, $rz-danger, 32%) !default;
+
+// Theme Constants
+
+$rz-border-width: 1px !default;
+$rz-border-radius: 4px !default;
+$rz-root-font-size: 16px !default;
+$rz-body-font-size: 1rem !default;
+$rz-body-line-height: 1.5 !default;
+$rz-body-background-color: var(--rz-base-900) !default;
+$rz-text-font-family: Roboto, sans-serif !default;
+$rz-outline-offset: 2px !default;
+$rz-outline-width: 2px !default;
+$rz-outline-color: var(--rz-primary) !default;
+
+// Utilities
+
+$rz-theme-colors-map: () !default;
+$rz-theme-colors-map: map-merge(
+  (
+    "white": $rz-white,
+    "black": $rz-black,
+
+    "base": $rz-base,
+    "base-50": $rz-base-50,
+    "base-100": $rz-base-100,
+    "base-200": $rz-base-200,
+    "base-300": $rz-base-300,
+    "base-400": $rz-base-400,
+    "base-500": $rz-base-500,
+    "base-600": $rz-base-600,
+    "base-700": $rz-base-700,
+    "base-800": $rz-base-800,
+    "base-900": $rz-base-900,
+    "base-light": $rz-base-light,
+    "base-lighter": $rz-base-lighter,
+    "base-dark": $rz-base-dark,
+    "base-darker": $rz-base-darker,
+    
+    "primary": $rz-primary,
+    "primary-light": $rz-primary-light,
+    "primary-lighter": $rz-primary-lighter,
+    "primary-dark": $rz-primary-dark,
+    "primary-darker": $rz-primary-darker,
+    
+    "secondary": $rz-secondary,
+    "secondary-light": $rz-secondary-light,
+    "secondary-lighter": $rz-secondary-lighter,
+    "secondary-dark": $rz-secondary-dark,
+    "secondary-darker": $rz-secondary-darker,
+    
+    "info": $rz-info,
+    "info-light": $rz-info-light,
+    "info-lighter": $rz-info-lighter,
+    "info-dark": $rz-info-dark,
+    "info-darker": $rz-info-darker,
+    
+    "success": $rz-success,
+    "success-light": $rz-success-light,
+    "success-lighter": $rz-success-lighter,
+    "success-dark": $rz-success-dark,
+    "success-darker": $rz-success-darker,
+    
+    "warning": $rz-warning,
+    "warning-light": $rz-warning-light,
+    "warning-lighter": $rz-warning-lighter,
+    "warning-dark": $rz-warning-dark,
+    "warning-darker": $rz-warning-darker,
+    
+    "danger": $rz-danger,
+    "danger-light": $rz-danger-light,
+    "danger-lighter": $rz-danger-lighter,
+    "danger-dark": $rz-danger-dark,
+    "danger-darker": $rz-danger-darker,
+
+    "on-base": $rz-white,
+    "on-base-light": $rz-base-900,
+    "on-base-lighter": $rz-base-900,
+    "on-base-dark": $rz-white,
+    "on-base-darker": $rz-white,
+
+    "on-primary": $rz-white,
+    "on-primary-light": $rz-white,
+    "on-primary-lighter": $rz-primary,
+    "on-primary-dark": $rz-white,
+    "on-primary-darker": $rz-white,
+    
+    "on-secondary": $rz-white,
+    "on-secondary-light": $rz-white,
+    "on-secondary-lighter": $rz-secondary,
+    "on-secondary-dark": $rz-white,
+    "on-secondary-darker": $rz-white,
+    
+    "on-info": $rz-white,
+    "on-info-light": $rz-white,
+    "on-info-lighter": $rz-info,
+    "on-info-dark": $rz-white,
+    "on-info-darker": $rz-white,
+    
+    "on-success": $rz-white,
+    "on-success-light": $rz-white,
+    "on-success-lighter": $rz-success,
+    "on-success-dark": $rz-white,
+    "on-success-darker": $rz-white,
+    
+    "on-warning": $rz-white,
+    "on-warning-light": $rz-white,
+    "on-warning-lighter": $rz-warning,
+    "on-warning-dark": $rz-white,
+    "on-warning-darker": $rz-white,
+    
+    "on-danger": $rz-white,
+    "on-danger-light": $rz-white,
+    "on-danger-lighter": $rz-danger,
+    "on-danger-dark": $rz-white,
+    "on-danger-darker": $rz-white,
+    
+    "series-1": $rz-series-1,
+    "series-2": $rz-series-2,
+    "series-3": $rz-series-3,
+    "series-4": $rz-series-4,
+    "series-5": $rz-series-5,
+    "series-6": $rz-series-6,
+    "series-7": $rz-series-7,
+    "series-8": $rz-series-8,
+    "series-9": $rz-series-9,
+    "series-10": $rz-series-10,
+    "series-11": $rz-series-11,
+    "series-12": $rz-series-12,
+    "series-13": $rz-series-13,
+    "series-14": $rz-series-14,
+    "series-15": $rz-series-15,
+    "series-16": $rz-series-16,
+    "series-17": $rz-series-17,
+    "series-18": $rz-series-18,
+    "series-19": $rz-series-19,
+    "series-20": $rz-series-20,
+    "series-21": $rz-series-21,
+    "series-22": $rz-series-22,
+    "series-23": $rz-series-23,
+    "series-24": $rz-series-24,
+  ),
+  $rz-theme-colors-map
+);
+
+// Semantic Text Color
+$rz-text-title-color: var(--rz-base-50) !default;
+$rz-text-color: var(--rz-base-50) !default;
+$rz-text-secondary-color: var(--rz-base-100) !default;
+$rz-text-tertiary-color: var(--rz-base-200) !default;
+$rz-text-disabled-color: var(--rz-base-300) !default;
+$rz-text-contrast-color: var(--rz-white) !default;
+
+// Background Color
+$rz-base-background-color: var(--rz-base-800) !default;
+
+// Borders
+
+$rz-border-normal: var(--rz-border-width) solid var(--rz-base-300) !default;
+$rz-border-hover: var(--rz-border-width) solid var(--rz-base-100) !default;
+$rz-border-focus: var(--rz-border-width) solid var(--rz-primary) !default;
+$rz-border-disabled: var(--rz-border-width) solid var(--rz-base-500) !default;
+
+// Shadow
+$rz-shadow-0: none !default;
+$rz-shadow-1: 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 2px 1px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-2: 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 3px 1px rgba(0, 0, 0, 0.12), 0px 1px 5px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-3: 0px 3px 4px rgba(0, 0, 0, 0.14), 0px 3px 3px rgba(0, 0, 0, 0.12), 0px 1px 8px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-4: 0px 4px 5px rgba(0, 0, 0, 0.14), 0px 1px 10px rgba(0, 0, 0, 0.12), 0px 2px 4px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-5: 0px 6px 10px rgba(0, 0, 0, 0.14), 0px 1px 18px rgba(0, 0, 0, 0.12), 0px 3px 5px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-6: 0px 8px 10px rgba(0, 0, 0, 0.14), 0px 3px 14px rgba(0, 0, 0, 0.12), 0px 5px 5px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-7: 0px 9px 12px rgba(0, 0, 0, 0.14), 0px 3px 16px rgba(0, 0, 0, 0.12), 0px 5px 6px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-8: 0px 12px 17px rgba(0, 0, 0, 0.14), 0px 5px 22px rgba(0, 0, 0, 0.12), 0px 7px 8px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-9: 0px 16px 24px rgba(0, 0, 0, 0.14), 0px 6px 30px rgba(0, 0, 0, 0.12), 0px 8px 10px rgba(0, 0, 0, 0.14) !default;
+$rz-shadow-10: 0px 24px 38px rgba(0, 0, 0, 0.14), 0px 9px 46px rgba(0, 0, 0, 0.12), 0px 11px 15px rgba(0, 0, 0, 0.14) !default;
+
+// Base Styles Map
+
+$base-styles-map: () !default;
+$base-styles-map: map-merge(
+  (
+    base: (
+      background-color: var(--rz-base-600),
+      color: var(--rz-text-color)
+    ),
+    light: (
+      background-color: var(--rz-base-600),
+      color: var(--rz-text-color)
+    ),
+    dark: (
+      background-color: var(--rz-black),
+      color: var(--rz-text-color)
+    )
+  ),
+  $base-styles-map
+);
+
+// Components
+
+// Typography
+$text: (
+  display-h1: (font-size: clamp(4.5rem, 6.667vw, 6rem), line-height: normal, font-weight: 400, letter-spacing: -1.5px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 1rem),
+  display-h2: (font-size: clamp(3rem, 4.167vw, 3.75rem), line-height: normal,  font-weight: 400, letter-spacing: -0.5px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 1rem),
+  display-h3: (font-size: clamp(2.25rem, 3.333vw, 3rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.75rem),
+  display-h4: (font-size: clamp(1.75rem, 2.361vw, 2.125rem), line-height: normal,  font-weight: 400, letter-spacing: 0.25px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  display-h5: (font-size: clamp(1.25rem, 1.667vw, 1.5rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  display-h6: (font-size: clamp(1rem, 1.389vw, 1.25rem), line-height: normal,  font-weight: 500, letter-spacing: 0.15px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  h1: (font-size: clamp(4.5rem, 6.667vw, 6rem), line-height: normal, font-weight: 400, letter-spacing: -1.5px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 1rem),
+  h2: (font-size: clamp(3rem, 4.167vw, 3.75rem), line-height: normal,  font-weight: 400, letter-spacing: -0.5px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 1rem),
+  h3: (font-size: clamp(2.25rem, 3.333vw, 3rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.75rem),
+  h4: (font-size: clamp(1.75rem, 2.361vw, 2.125rem), line-height: normal,  font-weight: 400, letter-spacing: 0.25px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  h5: (font-size: clamp(1.25rem, 1.667vw, 1.5rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  h6: (font-size: clamp(1rem, 1.389vw, 1.25rem), line-height: normal,  font-weight: 500, letter-spacing: 0.15px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  subtitle1: (font-size: 1rem, line-height: 1.5,  font-weight: 400, letter-spacing: 0.15px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  subtitle2: (font-size: 0.875rem, line-height: 1.5,  font-weight: 500, letter-spacing: 0.1px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  body1: (font-size: 1rem, line-height: 1.5,  font-weight: 400, letter-spacing: 0.5px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  body2: (font-size: 0.875rem, line-height: 1.5,  font-weight: 400, letter-spacing: 0.25px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  button: (font-size: 0.875rem, line-height: normal,  font-weight: 500, letter-spacing: 1.25px, text-transform: uppercase, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  caption: (font-size: 0.75rem, line-height: normal,  font-weight: 400, letter-spacing: 0.4px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  overline:  (font-size: 0.625rem, line-height: normal,  font-weight: 400, letter-spacing: 1.5px, text-transform: uppercase, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+) !default;
+
+// Icon
+$rz-icon-size: 1.5rem !default;
+$rz-icon-optical-size: 40 !default;
+
+// Button
+$button-shadow: var(--rz-shadow-1) !default;
+$button-hover-shadow: var(--rz-shadow-3) !default;
+$button-hover-gradient: none !default;
+$button-focus-shadow: var(--rz-shadow-3) !default;
+$button-focus-gradient: linear-gradient(rgba(#fff, 0.2), rgba(#fff, 0.2)) !default !default;
+$button-active-shadow: var(--rz-shadow-6) !default;
+$button-active-gradient: none !default;
+$button-sizes: (
+  lg: (
+    font-size: 1rem,
+    padding: 0.75rem 1.5rem,
+    line-height: 1.5rem,
+    height: auto,
+    min-height: 3rem,
+    min-width: 3rem,
+    font-weight: 500,
+    letter-spacing: 1.25px,
+    text-transform: uppercase,
+    gap: 0.25rem,
+    icon: (
+      font-size: 1.5rem,
+      height: 1.5rem,
+      line-height: 1.5rem,
+      width: 1.5rem
+    ),
+    text-with-icon-padding: 0 1.375rem, //not used
+    icon-only-padding: 0.75rem
+  ),
+  md: (
+    font-size: 0.875rem,
+    padding: 0.5rem 1rem,
+    line-height: 1.25rem,
+    height: auto,
+    min-height: 2.25rem,
+    min-width: 2.25rem,
+    font-weight: 500,
+    letter-spacing: 1.25px,
+    text-transform: uppercase,
+    gap: 0.25rem,
+    icon: (
+      font-size: 1.25rem,
+      height: 1.25rem,
+      line-height: 1.25rem,
+      width: 1.25rem
+    ),
+    text-with-icon-padding: 0 1.375rem, //not used
+    icon-only-padding: 0.5rem
+  ),
+  sm: (
+    font-size: 0.75rem,
+    padding: 0.375rem 0.75rem,
+    line-height: 1rem,
+    height: auto,
+    min-height: 1.75rem,
+    min-width: 1.75rem,
+    font-weight: 500,
+    letter-spacing: 0.75px,
+    text-transform: uppercase,
+    gap: 0.25rem,
+    icon: (
+      font-size: 1rem,
+      height: 1rem,
+      line-height: 1rem,
+      width: 1rem
+    ),
+    text-with-icon-padding: 0 1.375rem,
+    icon-only-padding: 0.375rem
+  ),
+  xs: (
+    font-size: 0.75rem,
+    padding: 0.25rem 0.5rem,
+    line-height: 1rem,
+    height: auto,
+    min-height: 1.25rem,
+    min-width: 1.25rem,
+    font-weight: 500,
+    letter-spacing: 0,
+    text-transform: uppercase,
+    gap: 0.125rem,
+    icon: (
+      font-size: 1rem,
+      height: 1rem,
+      line-height: 1rem,
+      width: 1rem
+    ),
+    text-with-icon-padding: 0 1rem,
+    icon-only-padding: 0.25rem
+  )
+) !default;
+
+.rz-button {
+  @include rz-ripple($pseudo: true);
+}
+
+// Badge
+$badge-font-weight: 500 !default;
+
+// Chip
+$chip-padding-block: 0.125rem !default;
+$chip-padding-inline: 0.75rem 0.125rem !default;
+$chip-background-color: var(--rz-base-600);
+$chip-border-radius: calc(4 * var(--rz-border-radius)) !default;
+
+// Input
+$input-height: 2.5rem !default;
+$input-line-height: var(--rz-body-line-height) !default;
+$input-padding-block: 0.4375rem !default;
+$input-padding-inline: 0.9375rem !default;
+$input-shadow: none !default;
+$input-focus-shadow: inset 0 0 0 1px var(--rz-primary) !default;
+$input-disabled-background-color: var(--rz-base-background-color) !default;
+$input-disabled-color: var(--rz-text-disabled-color) !default;
+
+// Header
+$header-background-color: var(--rz-base-700) !default;
+$header-border: none !default;
+$header-color: var(--rz-text-color) !default;
+$header-shadow: var(--rz-shadow-4) !default;
+
+.rz-header {
+  a,
+  a:hover,
+  a:focus {
+    color: var(--rz-primary);
+  }
+}
+
+// Footer
+$footer-border: none !default;
+$footer-color: var(--rz-text-secondary-color) !default;
+
+// Sidebar
+$sidebar-z: 1 !default;
+$sidebar-border-inline-end: var(--rz-border-base-800) !default;
+$sidebar-width: 300px !default;
+$sidebar-background-color: var(--rz-base-background-color) !default;
+
+// Card
+$card-padding: 1rem !default;
+$card-flat-background-color: var(--rz-base-background-color) !default;
+$card-shadow: var(--rz-shadow-1) !default;
+$card-border: var(--rz-border-base-500) !default;
+
+// Accordion
+$accordion-item-padding-block: 1rem !default;
+$accordion-item-padding-inline: 1rem !default;
+$accordion-item-color: var(--rz-text-secondary-color) !default;
+$accordion-item-line-height: 1.5rem !default;
+$accordion-item-font-weight: 500 !default;
+$accordion-icon-margin-inline: 0 0.75rem !default;
+$accordion-toggle-icon-margin-inline: 0.75rem 0 !default;
+$accordion-toggle-icon-order: 1 !default;
+$accordion-toggle-icon-collapsed: 'keyboard_arrow_down' !default;
+$accordion-toggle-icon-collapsed-rtl: $accordion-toggle-icon-collapsed !default;
+$accordion-toggle-icon-expanded: 'keyboard_arrow_up' !default;
+$accordion-selected-color: var(--rz-text-title-color) !default;
+$accordion-hover-color: $accordion-selected-color !default;
+$accordion-content-padding-block: 1rem !default;
+$accordion-content-padding-inline: 1rem !default;
+$accordion-border-radius: var(--rz-border-radius)!default;
+$accordion-item-border: var(--rz-border-base-900) !default;
+$accordion-shadow: var(--rz-shadow-1) !default;
+
+// Panel
+$panel-padding: 1rem !default;
+$panel-title-line-height: 1.5rem !default;
+$panel-title-font-weight: 500 !default;
+$panel-toggle-icon-background-color: transparent !default;
+$panel-hover-color: var(--rz-text-title-color) !default;
+$panel-shadow: var(--rz-shadow-1) !default;
+
+// SidebarToggle
+$sidebar-toggle-border: none !default;
+$sidebar-toggle-color: var(--rz-text-color) !default;
+$sidebar-toggle-background-color: transparent !default;
+$sidebar-toggle-hover-color: var(--rz-white) !default;
+$sidebar-toggle-hover-background-color: var(--rz-base-500) !default;
+$sidebar-toggle-hover-border-radius: 50% !default;
+
+.rz-sidebar-toggle {
+  @include rz-ripple($pseudo: true);
+}
+
+// Menu
+$menu-background-color: var(--rz-base-700) !default;
+$menu-border: none !default;
+$menu-border-radius: var(--rz-border-radius) !default;
+$menu-item-padding-block: 0.5rem !default;
+$menu-item-padding-inline: 1rem !default;
+$menu-item-color: var(--rz-text-color) !default;
+$menu-item-hover-color: var(--rz-white) !default;
+$menu-item-hover-background-color: var(--rz-base-400) !default;
+$menu-item-selected-color: var(--rz-primary) !default;
+$menu-item-icon-color: $menu-item-color !default;
+$menu-item-icon-hover-color: $menu-item-hover-color !default;
+$menu-top-item-padding-block: 0.5rem !default;
+$menu-top-item-padding-inline: 0.5rem !default;
+$menu-top-item-color: $menu-item-color !default;
+$menu-top-item-hover-color: var(--rz-primary) !default;
+$menu-top-item-selected-color: var(--rz-primary) !default;
+$menu-top-item-background-color: $menu-background-color !default;
+$menu-top-item-hover-background-color: $menu-top-item-background-color !default;
+$menu-top-item-icon-color: $menu-top-item-color !default;
+$menu-top-item-icon-hover-color: $menu-top-item-hover-color !default;
+$context-menu-padding-block: 0.5rem !default;
+$context-menu-padding-inline: 0 !default;
+$context-menu-box-shadow: var(--rz-shadow-6) !default;
+
+.rz-navigation-item-link,
+.rz-menu-toggle {
+  @include rz-ripple($pseudo: true);
+}
+
+// PanelMenu
+$panel-menu-font-size: calc(var(--rz-body-font-size) * 0.875) !default;
+$panel-menu-font-weight: 500 !default;
+$panel-menu-item-line-height: 1.5rem !default;
+$panel-menu-item-padding-block: 1rem !default;
+$panel-menu-item-padding-inline: 1rem !default;
+$panel-menu-item-border: var(--rz-border-base-600) !default;
+$panel-menu-item-color: var(--rz-text-color) !default;
+$panel-menu-item-background-color: var(--rz-base-background-color) !default;
+$panel-menu-item-hover-color: var(--rz-white) !default;
+$panel-menu-item-hover-background-color: var(--rz-base-600) !default;
+$panel-menu-item-active-color: var(--rz-on-primary-lighter) !default;
+$panel-menu-item-active-background-color: var(--rz-primary-lighter) !default;
+$panel-menu-item-offset: 0 !default;
+$panel-menu-2nd-level-vertical-offset: 0.5rem !default;
+$panel-menu-item-2nd-level-padding-block: 0.5rem !default;
+$panel-menu-item-2nd-level-padding-inline: 1rem 0.5rem !default;
+$panel-menu-item-2nd-level-margin-block: 0 !default;
+$panel-menu-item-2nd-level-margin-inline: 0.5rem !default;
+$panel-menu-item-2nd-level-border-radius: var(--rz-border-radius) !default;
+$panel-menu-item-2nd-level-offset: 3rem !default;
+$panel-menu-item-2nd-level-color: var(--rz-text-color) !default;
+$panel-menu-item-2nd-level-background-color: var(--rz-base-background-color) !default;
+$panel-menu-item-2nd-level-font-size: calc(var(--rz-body-font-size) * 0.875) !default;
+$panel-menu-item-2nd-level-font-weight: 400 !default;
+$panel-menu-item-2nd-level-hover-color: var(--rz-text-title-color) !default;
+$panel-menu-item-2nd-level-hover-background-color: var(--rz-base-600) !default;
+$panel-menu-item-2nd-level-active-color: var(--rz-on-primary-lighter) !default;
+$panel-menu-item-2nd-level-active-background-color: var(--rz-primary-lighter) !default;
+$panel-menu-item-2nd-level-active-font-weight: 500 !default;
+$panel-menu-item-3rd-level-color: var(--rz-text-color) !default;
+$panel-menu-item-3rd-level-background-color: var(--rz-base-background-color) !default;
+$panel-menu-item-3rd-level-hover-color: var(--rz-text-title-color) !default;
+$panel-menu-item-3rd-level-hover-background-color: var(--rz-base-600) !default;
+$panel-menu-item-3rd-level-active-color: var(--rz-on-primary-lighter) !default;
+$panel-menu-item-3rd-level-active-background-color: var(--rz-primary-lighter) !default;
+$panel-menu-icon-color: var(--rz-text-secondary-color) !default;
+$panel-menu-icon-margin-inline: 0 1rem !default;
+$panel-menu-icon-2nd-level-margin-inline: -2.25rem 1rem !default;
+
+.panel-menu {
+  .navigation-item-wrapper-active {
+    &:before {
+      display: none;
+    }
+  }
+}
+
+.rz-panel-menu {
+  .rz-navigation-item-link {
+    @include rz-ripple($ripple-background: rgba(255,255,255,.08));
+  }
+  .rz-navigation-item-wrapper-active {
+    &:before {
+      display: none;
+    }
+  }
+}
+
+// ProfileMenu
+$profile-menu-background-color: var(--rz-base-700) !default;
+$profile-menu-top-item-background-color: var(--rz-base-700) !default;
+$profile-menu-border: none !default;
+$profile-menu-padding-block: 0.5rem !default;
+$profile-menu-padding-inline: 1rem !default;
+$profile-menu-toggle-button-color: var(--rz-text-color) !default;
+$profile-menu-item-hover-background-color: var(--rz-base-400) !default;
+
+
+// Gravatar
+$gravatar-width: 2.5rem !default;
+
+// Steps
+$steps-color: var(--rz-text-secondary-color) !default;
+$steps-number-padding-block: 0.25rem !default;
+$steps-number-padding-inline: 0 !default;
+$steps-number-background-color: var(--rz-base-600) !default;
+$steps-number-color: var(--rz-text-secondary-color) !default;
+
+.rz-steps {
+  [role='tablist'] {
+    display: flex;
+  }
+  .rz-steps-item {
+    &:not(:last-child) {
+      flex: auto;
+      display: flex;
+      align-items: center;
+      &:after {
+        display: 'block';
+        content: '';
+        flex: auto;
+        height: 1px;
+        margin-inline-end: 16px;
+        background-color: var(--rz-base-600);
+      }
+    }
+  }
+}
+
+// Checkbox
+$checkbox-width: 1.125rem !default;
+$checkbox-border-width: 2px !default;
+$checkbox-label-margin-inline: 1rem !default;
+$checkbox-checked-background-color: var(--rz-primary) !default;
+$checkbox-checked-color: var(--rz-on-primary) !default;
+$checkbox-checked-hover-background-color: var(--rz-primary-light) !default;
+$checkbox-checked-disabled-background-color: var(--rz-base-300) !default;
+$checkbox-checked-shadow: none !default;
+$checkbox-checked-border: var(--rz-border-primary) !default;
+$checkbox-checked-hover-border: var(--rz-border-primary) !default;
+$checkbox-checked-disabled-border: var(--rz-border-300) !default;
+
+.rz-chkbox-box {
+  &:after {
+    content: "";
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    opacity: 0;
+    transition: background-color var(--rz-transition), width var(--rz-transition), height var(--rz-transition);
+  }
+
+  &:hover:not(.rz-state-disabled) {
+    &:after {
+      width: 2.5rem;
+      height: 2.5rem;
+      background-color: var(--rz-base-300);
+      opacity: 0.3;
+    }
+  }
+
+  &:active:not(.rz-state-disabled) {
+    &:after {
+      background-color: var(--rz-base-200);
+    }
+  }
+
+  &.rz-state-active {
+    &:hover:not(.rz-state-disabled) {
+      &:after {
+        background-color: var(--rz-primary);
+        opacity: 0.08;
+      }
+    }
+
+    &:active:hover:not(.rz-state-disabled) {
+      &:after {
+        opacity: 0.16;
+      }
+    }
+  }
+}
+
+// Switch
+$switch-background-color: var(--rz-base-600) !default;
+$switch-checked-background-color: var(--rz-primary-lighter) !default;
+$switch-box-shadow: var(--rz-shadow-1) !default;
+$switch-width: 2.25rem !default;
+$switch-height: 0.875rem !default;
+$switch-circle-background-color: var(--rz-text-color) !default;
+$switch-checked-circle-background-color: var(--rz-on-primary-lighter) !default;
+$switch-circle-size: 1.25rem !default;
+$switch-circle-offset: 0 !default;
+
+.rz-switch .rz-switch-circle {
+  &:hover:not(.rz-disabled) {
+    &:before {
+      transition: background var(--rz-transition), transform var(--rz-transition), outlin-color var(--rz-transition);
+      box-shadow: var(--rz-switch-box-shadow), 0 0 0 10px rgba(255,255,255, 0.08);
+    }
+  }
+}
+
+.rz-switch.rz-switch-checked .rz-switch-circle {
+  &:hover:not(.rz-disabled) {
+    &:before {
+      box-shadow: var(--rz-switch-box-shadow), 0 0 0 10px var(--rz-primary-lighter);
+    }
+  }
+}
+
+// RadioButtonList
+$radio-width: 1.25rem !default;
+$radio-height: $radio-width !default;
+$radio-border-radius: 50% !default;
+$radio-border-width: 2px !default;
+$radio-label-margin-inline: 1rem !default;
+$radio-active-background-color: var(--rz-base-background-color) !default;
+$radio-active-shadow: none !default;
+$radio-checked-background-color: var(--rz-base-background-color) !default;
+$radio-checked-hover-background-color: var(--rz-base-background-color) !default;
+$radio-checked-hover-shadow: none !default;
+$radio-checked-color: var(--rz-text-color) !default;
+$radio-circle-background-color: var(--rz-primary) !default;
+$radio-circle-shadow: none;
+$radio-circle-hover-background-color: var(--rz-primary-light) !default;
+$radio-icon-width: 0.625rem !default;
+$radio-icon-height: $radio-icon-width !default;
+$radio-checked-border: var(--rz-border-primary) !default;
+
+.rz-radiobutton-box {
+  &:after {
+    content: "";
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    opacity: 0;
+    transition: background-color var(--rz-transition), width var(--rz-transition), height var(--rz-transition);
+  }
+
+  &:hover:not(.rz-state-disabled) {
+    &:after {
+      width: 2.5rem;
+      height: 2.5rem;
+      background-color: var(--rz-base-300);
+      opacity: 0.3;
+    }
+  }
+
+  &:active:not(.rz-state-disabled) {
+    &:after {
+      background-color: var(--rz-base-200);
+    }
+  }
+
+  &.rz-state-active {
+    &:hover:not(.rz-state-disabled) {
+      &:after {
+        background-color: var(--rz-primary);
+        opacity: 0.08;
+      }
+    }
+
+    &:active:hover:not(.rz-state-disabled) {
+      &:after {
+        opacity: 0.16;
+      }
+    }
+  }
+}
+
+// Fieldset
+$fieldset-border: var(--rz-border-base-600) !default;
+$fieldset-border-radius: var(--rz-border-radius) !default;
+$fieldset-padding: 0 1rem 1rem !default;
+$fieldset-legend-color: var(--rz-text-secondary-color) !default;
+$fieldset-legend-font-size: var(--rz-body-font-size) !default;
+$fieldset-legend-margin-block: 0 1rem !default;
+$fieldset-legend-margin-inline: 0.5rem 0 !default;
+$fieldset-legend-padding-block: 0 !default;
+$fieldset-legend-padding-inline: 0.5rem !default;
+$fieldset-toggle-width: 1.5rem !default;
+$fieldset-toggle-margin-block: 0 !default;
+$fieldset-toggle-margin-inline: 0 !default;
+$fieldset-toggle-height: $fieldset-toggle-width !default;
+$fieldset-toggle-background-color: transparent !default;
+$fieldset-toggle-color: var(--rz-text-secondary-color) !default;
+$fieldset-toggle-font-size: 1.5rem !default;
+$fieldset-toggle-border: none !default;
+
+// Dropdown
+$dropdown-horizontal-padding: 1rem !default;
+$dropdown-items-margin: 0 (-$dropdown-horizontal-padding) !default;
+$dropdown-items-padding: 0.5rem 0 !default;
+$dropdown-item-padding: 0.75rem 1rem !default;
+$dropdown-item-font-size: var(--rz-input-font-size) !default;
+$dropdown-item-hover-background-color: var(--rz-base-400) !default;
+$dropdown-item-hover-color: var(--rz-white) !default;
+$dropdown-item-selected-background-color: var(--rz-primary-lighter) !default;
+$dropdown-item-selected-shadow: none !default;
+$dropdown-item-selected-color: var(--rz-on-primary-lighter) !default;
+$dropdown-item-selected-hover-background-color: var(--rz-primary-lighter) !default;
+$dropdown-item-selected-hover-color: var(--rz-on-primary-lighter) !default;
+$dropdown-item-transition: none !default;
+$dropdown-filter-border: var(--rz-border-base-500) !default;
+$dropdown-filter-padding: 1rem 0 0.5rem !default;
+$dropdown-open-background-color: var(--rz-base-600) !default;
+$dropdown-open-border: 2px solid var(--rz-primary) !default;
+$dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
+$dropdown-panel-border: none !default;
+$dropdown-panel-shadow: var(--rz-shadow-4) !default;
+$dropdown-chips-padding-block: 0.4375rem !default;
+$dropdown-chips-padding-inline: 0.4375rem 0.9375rem !default;
+
+$multiselect-checkbox-margin-block: 0 !default;
+$multiselect-checkbox-margin-inline: 0 1rem !default;
+
+// ListBox
+$listbox-filter-border: var(--rz-border-base-500) !default;
+$listbox-checkbox-margin-block: 0 !default;
+$listbox-checkbox-margin-inline: 0 1rem !default;
+$listbox-header-padding-block: 0.75rem !default;
+$listbox-header-padding-inline: 1rem !default;
+
+// Slider
+$slider-border: none !default;
+$slider-background-color: var(--rz-primary-lighter) !default;
+$slider-horizontal-height: 4px !default;
+$slider-range-background-color: var(--rz-primary) !default;
+$slider-range-border: none !default;
+$slider-handle-background-color: var(--rz-primary) !default;
+$slider-handle-width: 20px !default;
+$slider-handle-height: 20px !default;
+$slider-handle-border-radius: 50% !default;
+$slider-handle-hover-background-color: var(--rz-primary) !default;
+$slider-handle-hover-shadow: 0px 0px 0px 10px var(--rz-primary-lighter) !default;
+$slider-disabled-background-color: var(--rz-base-400) !default;
+$slider-disabled-range-background-color: var(--rz-base-200) !default;
+$slider-disabled-range-border: none !default;
+$slider-disabled-border: none !default;
+$slider-disabled-handle-background-color: $slider-disabled-range-background-color !default;
+
+.rz-slider {
+  .rz-slider-range {
+    top: 0;
+    bottom: 0;
+  }
+
+  .rz-slider-handle {
+    &:before {
+      display: none;
+    }
+  }
+}
+
+// Rating
+$rating-color: var(--rz-text-secondary-color) !default;
+$rating-opacity: 1 !default;
+$rating-selected-color: var(--rz-primary) !default;
+$rating-disabled-color: var(--rz-text-disabled-color) !default;
+$rating-disabled-opacity: 0.5 !default;
+$rating-ban-icon-color: var(--rz-text-disabled-color) !default;
+
+// SelectBar
+$selectbar-background-color: var(--rz-base-background-color) !default;
+$selectbar-color: var(--rz-text-color) !default;
+$selectbar-border: var(--rz-border-base-600) !default;
+$selectbar-selected-background-color: var(--rz-primary-lighter) !default;
+$selectbar-selected-color: var(--rz-on-primary-lighter) !default;
+$selectbar-selected-border: var(--rz-border-base-600) !default;
+$selectbar-border-radius: var(--rz-border-radius) !default;
+
+.rz-selectbutton {
+  .rz-button {
+    box-shadow: none;
+    &:hover {
+      box-shadow: none !important;
+      background: var(--rz-base-600);
+    }
+  }
+}
+
+// DatePicker
+$datepicker-line-height: 1.5rem !default;
+$datepicker-trigger-icon-color: var(--rz-text-secondary-color) !default;
+$datepicker-trigger-icon-hover-color: var(--rz-text-title-color) !default;
+$datepicker-popup-width: 22rem !default;
+$datepicker-panel-border: none !default;
+$datepicker-panel-shadow: var(--rz-shadow-4);
+$datepicker-header-background-color: var(--rz-base-background-color) !default;
+$datepicker-header-padding-block: 0.75rem !default;
+$datepicker-header-padding-inline: 0.75rem !default;
+$datepicker-footer-padding: 0 0.75rem !default;
+$datepicker-footer-line-height: 3rem !default;
+$datepicker-prev-next-icon-size: 2rem !default;
+$datepicker-prev-next-button-border-radius: 50% !default;
+$datepicker-calendar-padding-block: 0 0.75rem !default;
+$datepicker-calendar-padding-inline: 0.75rem !default;
+$datepicker-calendar-item-padding: 0.625rem 0 !default;
+$datepicker-calendar-header-font-size: 0.75rem !default;
+$datepicker-calendar-font-size: 0.875rem !default;
+$datepicker-calendar-hover-color: var(--rz-white) !default;
+$datepicker-calendar-hover-background-color: var(--rz-base-600) !default;
+$datepicker-calendar-selected-color: var(--rz-on-secondary) !default;
+$datepicker-calendar-selected-background-color: var(--rz-secondary) !default;
+$datepicker-calendar-selected-hover-color: var(--rz-on-secondary-dark) !default;
+$datepicker-calendar-selected-hover-background-color: var(--rz-secondary-dark) !default;
+$datepicker-calendar-border: none !default;
+$datepicker-calendar-border-radius: 50% !default;
+$datepicker-calendar-transition: var(--rz-transition-all) !default;
+$datepicker-calendar-today-color: var(--rz-text-color) !default;
+$datepicker-calendar-today-box-shadow: inset 0 0 0 1px var(--rz-base-100) !default;
+$datepicker-month-dropdown-width: 8.75rem !default;
+$datepicker-year-dropdown-width: 6rem !default;
+$timepicker-padding-block: 0.75rem !default;
+$timepicker-padding-inline: 0.75rem !default;
+$timepicker-background-color: var(--rz-base-background-color) !default;
+$timepicker-button-background-color: var(--rz-base-700) !default;
+$timepicker-button-color: var(--rz-text-color) !default;
+$timepicker-button-width: 0.875rem !default;
+$timepicker-button-height: $timepicker-button-width !default;
+$timepicker-button-border-radius: 2px !default;
+$timepicker-button-padding: 0.5rem 1rem !important;
+$timepicker-separator-margin: 0 0.5rem !default;
+$timepicker-border: var(--rz-border-base-600) !default;
+
+.rz-datepicker-inline {
+  table {
+    width: 100%;
+  }
+}
+
+.rz-calendar-view {
+  td,
+  th {
+    text-align: center;
+
+    a.rz-state-default,
+    span.rz-state-default {
+      display: inline-block;
+      width: 2.25rem;
+      height: 2.25rem;
+      line-height: 1rem;
+
+      &:not(.rz-state-active) {
+        &:hover {
+          border-radius: 50%;
+        }
+      }
+    }
+    .rz-state-active {
+      border-radius: 50%;
+    }
+  }
+}
+
+.rz-timepicker {
+  flex-wrap: wrap;
+
+  .rz-numeric {
+    flex: 1;
+  }
+
+  > .rz-button {
+    flex-basis: 100%;
+  }
+}
+
+// Numeric
+$numeric-button-background-color: transparent !default;
+$numeric-button-color: var(--rz-text-color) !default;
+$numeric-button-disabled-background-color: transparent !default;
+$numeric-line-height: var(--rz-body-line-height) !default;
+$numeric-input-padding-block: 0.4375rem !default;
+$numeric-input-padding-inline: 0.9375rem 1.25rem !default;
+$numeric-button-width: 1rem !default;
+
+.rz-numeric {
+  .rz-numeric-button {
+    box-shadow: none;
+
+    &:hover {
+      box-shadow: none !important;
+    }
+  }
+}
+
+// Upload
+$upload-button-bar-background-color: var(--rz-base-700) !default;
+$upload-button-bar-padding: 0.5rem !default;
+$upload-files-background-color: var(--rz-base-background-color) !default;
+$upload-files-remove-background-color: var(--rz-base-600) !default;
+$upload-choose-background-color: var(--rz-base-600) !default;
+$upload-choose-color: var(--rz-text-color) !default;
+$upload-choose-hover-background-color: var(--rz-base-400) !default;
+$upload-choose-hover-color: var(--rz-white) !default;
+$upload-choose-active-background-color: var(--rz-base-400) !default;
+$upload-choose-active-color: var(--rz-white) !default;
+$upload-cancel-background-color: var(--rz-base-600) !default;
+$upload-cancel-color: var(--rz-text-color) !default;
+$upload-button-background-color: var(--rz-primary) !default;
+
+.rz-fileupload-choose.rz-button {
+  @include rz-ripple($ripple-background: rgba(255,255,255,.08));
+
+  input {
+    z-index: 1;
+  }
+}
+
+// Grid
+$grid-cell-border: var(--rz-border-base-600) !default;
+$grid-right-cell-border: none !default;
+$grid-cell-padding: 0.625rem 1rem !default;
+$grid-cell-font-size: 0.875rem !default;
+$grid-hover-background-color: var(--rz-base-600) !default;
+$grid-hover-color: var(--rz-white) !default;
+$grid-selected-background-color: var(--rz-primary-lighter) !default;
+$grid-selected-color: var(--rz-on-primary-lighter) !default;
+$grid-stripe-background-color: var(--rz-base-900) !default;
+$grid-header-cell-border: none !default;
+$grid-header-cell-border-bottom: var(--rz-border-base-600) !default;
+$grid-header-background-color: var(--rz-base-background-color) !default;
+$grid-header-font-size: 0.875rem !default;
+$grid-header-line-height: 1.5rem !default;
+$grid-header-font-weight: 500 !default;
+$grid-header-text-transform: none !default;
+$grid-header-color: var(--rz-text-title-color) !default;
+$grid-header-cell-padding: 0.75rem 0 !default;
+$grid-header-title-padding-inline: 1rem 0 !default;
+$grid-header-sorted-background-color: var(--rz-base-600) !default;
+$grid-foot-background-color: var(--rz-base-600) !default;
+$grid-filter-background-color: var(--rz-base-600) !default;
+$grid-filter-border: none !default;
+$grid-filter-font-size: 0.875rem !default;
+$grid-filter-icon-font-size: 0.875rem !default;
+$grid-filter-buttons-padding: 0 1rem 1rem !default;
+$grid-filter-buttons-border: none !default;
+$grid-filter-buttons-background-color: var(--rz-base-600) !default;
+$grid-clear-filter-button-background-color: var(--rz-base-600) !default;
+$grid-clear-filter-button-color: var(--rz-text-color) !default;
+$grid-clear-filter-button-shadow: none !default;
+$grid-apply-filter-button-background-color: var(--rz-base-600) !default;
+$grid-apply-filter-button-color: var(--rz-primary) !default;
+$grid-apply-filter-button-shadow: none !default;
+$grid-header-filter-icon-margin-inline: auto 1rem !default;
+$grid-header-filter-icon-hover-color: var(--rz-text-title-color) !default;
+$grid-header-filter-icon-font-size: 1.25rem !default;
+$grid-border: var(--rz-border-base-600) !default;
+$grid-sort-icon-width: 1.25rem !default;
+$grid-shadow: none !default;
+$grid-column-resizer-width: 0.25rem !default;
+$grid-column-resizer-helper-width: 0.125rem !default;
+$grid-column-resizer-helper-background-color: var(--rz-secondary) !default;
+$grid-detail-template-background-color: var(--rz-base-900) !default;
+$grid-group-header-padding: 1rem !default;
+$grid-group-header-item-background-color: var(--rz-base-600) !default;
+$grid-group-header-item-padding-block: 0.25rem !default;
+$grid-group-header-item-padding-inline: 0.75rem 0.5rem !default;
+$grid-group-header-item-border: var(--rz-border-base-600) !default;
+$grid-group-header-item-border-radius: calc(4 * var(--rz-border-radius)) !default;
+$column-drag-handle-color: var(--rz-text-disabled-color) !default;
+$column-drag-handle-hover-color: var(--rz-text-title-color) !default;
+$column-drag-handle-margin-inline: 0 !default;
+$column-draggable-shadow: var(--rz-shadow-4) !default;
+
+.rz-datatable {
+  .rz-col-icon {
+    border-inline-end: $grid-cell-border;
+  }
+}
+
+.rz-grid-table-composite {
+  --rz-grid-right-cell-border: #{$grid-cell-border};
+  --rz-grid-header-cell-border: #{$grid-cell-border};
+}
+
+// Pager
+$pager-background-color: transparent !default;
+$pager-padding: 0.5rem 1rem !default;
+$pager-border: none !default;
+$pager-button-border-radius: 2rem !default;
+$pager-button-shadow: inherit !default;
+$pager-numeric-button-background-color: transparent !default;
+$pager-numeric-button-color: var(--rz-text-color) !default;
+$pager-numeric-button-border: none !default;
+$pager-numeric-button-hover-background-color: var(--rz-base-600) !default;
+$pager-numeric-button-hover-color: var(--rz-white) !default;
+$pager-numeric-button-padding: 0.75rem 1rem !default;
+$pager-numeric-button-selected-background-color: var(--rz-primary-lighter) !default;
+$pager-numeric-button-selected-color: var(--rz-primary) !default;
+$pager-numeric-button-selected-border: none !default;
+$pager-numeric-button-min-width: 3rem !default;
+$pager-back-button-background-color: transparent !default;
+$pager-back-button-color: var(--rz-text-color) !default;
+$pager-back-button-hover-background-color: var(--rz-base-600) !default;
+$pager-back-button-hover-color: var(--rz-white) !default;
+$pager-gap: 0.5rem !default;
+$pager-next-button-background-color: transparent !default;
+$pager-next-button-color: var(--rz-text-color) !default;
+$pager-next-button-hover-background-color: var(--rz-base-600) !default;
+$pager-next-button-hover-color: var(--rz-white) !default;
+$pager-dropdown-width: 80px !default;
+$pager-summary-padding: 1.25rem !default;
+$pager-summary-font-size: 0.875rem !default;
+$pager-summary-color: var(--rz-text-secondary-color) !default;
+$pager-button-size: "%button-lg" !default;
+
+.rz-pager-pages {
+  max-height: 3rem;
+}
+
+.rz-pager-element {
+  box-shadow: var(--rz-shadow-0) !important;
+
+  &:hover {
+    box-shadow: var(--rz-shadow-0) !important;
+  }
+
+  &:active {
+    box-shadow: var(--rz-shadow-0) !important;
+  }
+}
+
+// Tree
+$tree-background-color: transparent !default;
+$tree-node-padding-block: 0.25rem !default;
+$tree-node-padding-inline: 0.5rem !default;
+$tree-node-selected-background-color: var(--rz-primary-lighter) !default;
+$tree-node-selected-color: var(--rz-on-primary-lighter) !default;
+$tree-node-selected-border-radius: var(--rz-border-radius) !default;
+$tree-node-margin-block: 0 !default;
+$tree-node-margin-inline: 0 !default;
+$tree-node-hover-background-color: var(--rz-base-600) !default;
+$tree-node-hover-color: var(--rz-white) !default;
+$tree-node-toggle-width: 2rem !default;
+$tree-node-toggle-color: var(--rz-text-tertiary-color) !default;
+$tree-node-toggle-hover-color: var(--rz-text-color) !default;
+$tree-icon-right: 'chevron_right' !default;
+$tree-icon-down: 'expand_more' !default;
+$tree-transition: var(--rz-transition-all) !default;
+
+.rz-tree-toggler {
+  position: relative;
+}
+
+.rz-tree-toggler {
+  &.rzi-caret-right {
+    &:before {
+      margin-left: 0 !important;
+    }
+  }
+
+  &.rzi-caret-down {
+    &:before {
+      margin-left: 0 !important;
+    }
+  }
+
+  &:after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    opacity: 0;
+    transition: background-color var(--rz-transition), width var(--rz-transition), height var(--rz-transition), left var(--rz-transition), top var(--rz-transition);
+  }
+
+  &:active {
+    &:after {
+      left: 0;
+      top: -0.25rem;
+      width: 2rem;
+      height: 2rem;
+      background-color: var(--rz-base-200);
+      opacity: 0.3;
+    }
+  }
+}
+
+// DataList
+$datalist-shadow: var(--rz-shadow-1) !default;
+$datalist-border: var(--rz-border-base-600) !default;
+$datalist-item-shadow: var(--rz-shadow-0) !default;
+$datalist-item-border: var(--rz-border-base-600) !default;
+
+// Scheduler
+$scheduler-border: var(--rz-border-base-600) !default;
+$scheduler-border-color: var(--rz-base-600) !default;
+$scheduler-minor-border-color: var(--rz-base-700) !default;
+$scheduler-border-radius: var(--rz-border-radius) !default;
+$scheduler-shadow: var(--rz-shadow-0) !default;
+$scheduler-background-color: var(--rz-base-background-color) !default;
+$scheduler-color: var(--rz-text-secondary-color) !default;
+$scheduler-toolbar-padding: 0.5rem !default;
+$scheduler-toolbar-background-color: var(--rz-base-background-color) !default;
+$scheduler-toolbar-title-font-size: 1.5rem !default;
+$scheduler-toolbar-title-font-weight: 700 !default;
+$scheduler-toolbar-title-color: var(--rz-text-title-color) !default;
+$scheduler-prev-next-button-background-color: var(--rz-base-background-color) !default;
+$scheduler-prev-next-button-color: var(--rz-text-color) !default;
+$scheduler-prev-next-button-padding-block: 0.5rem !default;
+$scheduler-prev-next-button-padding-inline: 0.5rem !default;
+$scheduler-prev-next-button-font-size: var(--rz-icon-size) !default;
+$scheduler-prev-button-border-start-start-radius: 2rem !default;
+$scheduler-prev-button-border-start-end-radius: 2rem !default;
+$scheduler-prev-button-border-end-start-radius: 2rem !default;
+$scheduler-prev-button-border-end-end-radius: 2rem !default;
+$scheduler-next-button-border-start-start-radius: 2rem !default;
+$scheduler-next-button-border-start-end-radius: 2rem !default;
+$scheduler-next-button-border-end-start-radius: 2rem !default;
+$scheduler-next-button-border-end-end-radius: 2rem !default;
+$scheduler-today-button-margin-inline-start: 1rem !default;
+$scheduler-today-button-padding: 0.5rem 1rem !default;
+$scheduler-today-button-font-size: 0.875rem !default;
+$scheduler-today-button-text-transform: capitalize !default;
+$scheduler-view-button-border: var(--rz-border-base-600) !default;
+$scheduler-view-button-color: var(--rz-text-secondary-color) !default;
+$scheduler-view-button-background-color: var(--rz-base-background-color) !default;
+$scheduler-view-selected-color: var(--rz-on-primary-lighter) !default;
+$scheduler-view-selected-background-color: var(--rz-primary-lighter) !default;
+$scheduler-view-selected-border-color: var(--rz-base-600) !default;
+$scheduler-header-background-color: var(--rz-base-background-color) !default;
+$scheduler-header-font-size: 0.75rem !default;
+$scheduler-header-text-transform: uppercase !default;
+$scheduler-header-color: inherit !default;
+$scheduler-header-border: var(--rz-border-base-600) !default;
+$scheduler-header-padding: 0.5rem 0 !default;
+$scheduler-event-color: var(--rz-on-info) !default;
+$scheduler-event-background-color: var(--rz-info) !default;
+$scheduler-event-font-size: 0.75rem !default;
+$scheduler-event-line-height: 1.25rem !default;
+$scheduler-event-content-padding: 0.125rem 0.25rem !default;
+$scheduler-slot-title-padding: 0 0.25rem !default;
+$scheduler-day-number-padding: 0 0.5rem !default;
+$scheduler-year-padding: 1.5rem !default;
+$scheduler-year-slot-padding: .25rem !default;
+$scheduler-year-slot-title-width: 'fit-content' !default;
+$scheduler-year-slot-title-border-radius: 50% !default;
+$scheduler-weekend-color: var(--rz-text-tertiary-color) !default;
+$scheduler-weekend-background-color: var(--rz-base-700) !default;
+$scheduler-other-month-background-color: var(--rz-base-900) !default;
+
+.rz-scheduler-nav {
+  .rz-button {
+    box-shadow: var(--rz-shadow-0) !important;
+
+    &:hover {
+      box-shadow: var(--rz-shadow-0) !important;
+      background: var(--rz-base-600);
+    }
+
+    &:active {
+      box-shadow: var(--rz-shadow-0) !important;
+    }
+  }
+}
+
+.rz-view-header {
+  border-top: none !important;
+
+  .rz-year-view & {
+    border-bottom: none !important;
+  }
+}
+
+// Tabs
+$tabs-padding: 1rem !default;
+$tabs-shadow: none !default;
+$tabs-border: none !default;
+$tabs-border-radius: 0 !default;
+$tabs-background-color: transparent !default;
+$tabs-tab-font-size: 0.875rem !default;
+$tabs-tab-line-height: 1.5rem !default;
+$tabs-tab-font-weight: 500 !default;
+$tabs-tab-text-transform: uppercase !default;
+$tabs-tab-letter-spacing: 1.25px !default;
+$tabs-tab-padding-block: 0.75rem !default;
+$tabs-tab-padding-inline: 1rem !default;
+$tabs-tab-background-color: transparent !default;
+$tabs-tab-color: var(--rz-text-secondary-color) !default;
+$tabs-tab-selected-color: var(--rz-primary) !default;
+$tabs-tab-selected-top-border-color: var(--rz-primary) !default;
+$tabs-tab-selected-bottom-border-color: var(--rz-primary) !default;
+$tabs-tab-hover-background-color: var(--rz-base-600) !default;
+$tabs-tab-hover-color: var(--rz-text-title-color) !default;
+$tabs-tab-panels-border: var(--rz-border-base-600) !default;
+$tabs-icon-font-size: var(--rz-icon-size) !default;
+$tabs-icon-margin-inline: -0.25rem 0.25rem !default;
+$tabs-transition: var(--rz-transition-all) !default;
+
+.rz-tabview-nav > li > a {
+  @include rz-ripple($pseudo: true);
+}
+
+.rz-tabview {
+  &.rz-tabview-top > .rz-tabview-nav {
+    li {
+      border-bottom: 2px solid transparent;
+    }
+    .rz-tabview-selected {
+      border-top-width: 0;
+      border-bottom: 2px solid $tabs-tab-selected-bottom-border-color;
+    }
+  }
+  &.rz-tabview-bottom > .rz-tabview-nav {
+    li {
+      border-top: 2px solid transparent;
+    }
+    .rz-tabview-selected {
+      border-bottom-width: 0;
+      border-top: 2px solid $tabs-tab-selected-bottom-border-color;
+    }
+  }
+  &.rz-tabview-left > .rz-tabview-nav {
+    li {
+      border-right: 2px solid transparent;
+    }
+    .rz-tabview-selected {
+      border-left-width: 0;
+      border-right: 2px solid $tabs-tab-selected-bottom-border-color;
+    }
+  }
+  &.rz-tabview-right > .rz-tabview-nav {
+    li {
+      border-left: 2px solid transparent;
+    }
+    .rz-tabview-selected {
+      border-right-width: 0;
+      border-left: 2px solid $tabs-tab-selected-bottom-border-color;
+    }
+  }
+  &.rz-tabview-top > .rz-tabview-panels {
+    border-top: $tabs-tab-panels-border;
+  }
+  &.rz-tabview-bottom > .rz-tabview-panels {
+    border-bottom: $tabs-tab-panels-border;
+  }
+  &.rz-tabview-left > .rz-tabview-panels {
+    border-left: $tabs-tab-panels-border;
+  }
+  &.rz-tabview-right > .rz-tabview-panels {
+    border-right: $tabs-tab-panels-border;
+  }
+}
+
+// Dialog
+$dialog-background-color: var(--rz-base-900) !default;
+$dialog-shadow: var(--rz-shadow-9) !default;
+$dialog-title-background-color: var(--rz-base-900) !default;
+$dialog-title-border: none !default;
+$dialog-title-padding-block: 1.5rem 0 !default;
+$dialog-title-padding-inline: 1.5rem !default;
+$dialog-title-font-size: 1.25rem !default;
+$dialog-title-line-height: 1.5rem !default;
+$dialog-title-font-weight: 500 !default;
+$dialog-title-letter-spacing: .0125em !default;
+$dialog-title-color: var(--rz-text-title-color) !default;
+$dialog-close-font-size: var(--rz-icon-size) !default;
+$dialog-close-color: var(--rz-text-tertiary-color) !default;
+$dialog-close-hover-color: var(--rz-text-title-color) !default;
+$dialog-close-vertical-align: middle !default;
+$dialog-content-padding: 1.5rem !default;
+$dialog-mask-background-color: var(--rz-black) !default;
+$dialog-border-radius: var(--rz-border-radius) !default;
+
+//Notification
+$notification-padding: 1rem 1.25rem !default;
+$notification-gap: 0.625rem !default;
+$notification-icon-margin: 0 !default;
+$notification-container-background-color: var(--rz-base-800) !default;
+$notification-success-color: var(--rz-success) !default;
+$notification-success-background-color: var(--rz-success-lighter) !default;
+$notification-warning-color: var(--rz-warning) !default;
+$notification-warning-background-color: var(--rz-warning-lighter) !default;
+$notification-error-color: var(--rz-danger) !default;
+$notification-error-background-color: var(--rz-danger-lighter) !default;
+$notification-info-color: var(--rz-info) !default;
+$notification-info-background-color: var(--rz-info-lighter) !default;
+
+// Alert 
+$alert-message-margin: 0 !default;
+
+$alert-sizes: () !default;
+$alert-sizes: map-merge(
+  (
+    lg: (
+      gap: 1.5rem,
+      margin: 1.5rem 0,
+      padding: 1.5rem,
+      message-margin: 0.125rem 0
+    ),
+    md: (
+      gap: 1rem,
+      margin: 1rem 0,
+      padding: 1rem,
+      message-margin: 0.125rem 0
+    ),
+    sm: (
+      gap: 0.5rem,
+      margin: 0.5rem 0,
+      padding: 0.5rem,
+      message-margin: 0.125rem 0
+    ),
+    xs: (
+      gap: 0.25rem,
+      margin: 0.25rem 0,
+      padding: 0.25rem,
+      message-margin: 0
+    )
+  ),
+  $alert-sizes
+);
+
+// Scrollbar
+$scrollbar-background-color: transparent !default;
+$scrollbar-color: rgba(#fff, 0.12) !default;
+$scrollbar-border-radius: 0 !default;
+
+// Login
+$login-register-background-color: rgba(#000, 0.04) !default;
+
+.rz-login {
+  .rz-textbox  {
+    &.invalid {
+      --rz-input-focus-shadow: inset 0 0 0 1px var(--rz-danger);
+    }
+  }
+}
+
+// Lookup
+$lookup-panel-background-color: rgba(#000, 0.04) !default;
+
+// Overlay
+$overlay-shadow: var(--rz-shadow-4) !default;
+$overlay-border: none !default;
+$overlay-background-color: var(--rz-base-600) !default;
+
+// ProgressBar
+$progressbar-value-background-color: var(--rz-primary) !default;
+$progressbar-background-color: var(--rz-primary-lighter) !default;
+$progressbar-border-radius: 0 !default;
+$progressbar-height: 0.25rem !default;
+
+.rz-progressbar:has(.rz-progressbar-label) {
+  --rz-progressbar-height: 1.25rem;
+}
+
+// ProgressBarCircular
+$progressbar-circular-stroke-width: 0 !default;
+$progressbar-circular-value-stroke-width: 3px !default;
+$progressbar-circular-value-endpoint: square !default;
+
+// Chart
+$chart-axis-color: var(--rz-base-300) !default;
+$chart-axis-label-color: var(--rz-text-secondary-color) !default;
+
+// Gauge
+$gauge-arc-scale-color: var(--rz-base-300) !default;
+
+// Timeline
+$rz-timeline-item-padding: 1rem !default;
+$rz-timeline-point-background-color: var(--rz-base-200) !default;
+$rz-timeline-line-color: var(--rz-base-200) !default;
+
+// Editor
+$editor-border: var(--rz-border-base-600)  !default;
+$editor-border-radius: var(--rz-border-radius) !default;
+$editor-toolbar-background-color: var(--rz-base-background-color) !default;
+$editor-toolbar-item-margin: 0.25rem 0.125rem !default;
+$editor-button-padding: 0.5rem !default;
+$editor-button-background-color: var(--rz-base-background-color) !default;
+$editor-button-color: var(--rz-text-color) !default;
+$editor-button-disabled-color: var(--rz-text-disabled-color) !default;
+$editor-button-selected-background-color: var(--rz-secondary-lighter) !default;
+$editor-button-selected-color: var(--rz-on-secondary-lighter) !default;
+$editor-separator-background-color: var(--rz-base-600) !default;
+$editor-content-background-color: var(--rz-base-background-color) !default;
+
+.rz-html-editor-toolbar {
+  font-size: 0.825rem;
+
+  .rz-html-editor-button {
+    @include rz-ripple($pseudo: true);
+  }
+}
+
+// Splitter
+$splitter-bar-color: var(--rz-text-color) !default;
+$splitter-bar-color-active: var(--rz-on-primary) !default;
+$splitter-bar-background-color-active: var(--rz-primary) !default;
+
+// FormField
+$form-field-margin-block: 0.5rem 0 !default;
+$form-field-margin-inline: 0 !default;
+$form-field-start-end-padding-block: 0 !default;
+$form-field-start-end-padding-inline: 0.75rem !default;
+$form-field-filled-height: 3.375rem !default;
+$form-field-filled-padding-block: 1.4375rem 0.4375rem  !default;
+$form-field-filled-padding-inline: 0.9375rem !default;
+$form-field-filled-numeric-padding-block: 1.4375rem 0.4375rem !default;
+$form-field-filled-numeric-padding-inline: 0.9375rem 1.25rem !default;
+$form-field-filled-background-color: var(--rz-base-600) !default;
+$form-field-filled-hover-background-color: var(--rz-base-500) !default;
+$form-field-filled-border: var(--rz-border-width) solid var(--rz-base-600) !default;
+$form-field-filled-hover-border: var(--rz-border-width) solid var(--rz-base-500) !default;
+$form-field-filled-focus-border: $form-field-filled-border !default;
+$form-field-filled-border-radius: var(--rz-border-radius) var(--rz-border-radius) 0 0 !default;
+$form-field-filled-label-floating-top: 0.5rem !default;
+$form-field-filled-hover-shadow: none !default;
+$form-field-filled-focus-shadow: none !default;
+$form-field-filled-underline-display: block !default;
+$form-field-hover-shadow: var(--rz-input-hover-shadow) !default;
+$form-field-focus-shadow: var(--rz-input-focus-shadow) !default;
+$form-field-label-padding: 0 0.25rem !default;
+$form-field-text-label-padding: 0 !default;
+$form-field-label-inset-inline-start: 0.6875rem !default;
+$form-field-label-textarea-top: 0.5rem !default;
+$form-field-label-floating-top: -0.5625rem !default;
+$form-field-helper-padding: 0 1rem !default;
+
+@import 'fonts';
+@import 'components';

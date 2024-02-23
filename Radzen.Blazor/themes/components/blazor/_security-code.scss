@@ -5,19 +5,8 @@ $rz-security-code-input-font-size: 1.25rem !default;
 $rz-security-code-input-font-weight: 600 !default;
 $rz-security-code-input-line-height: 1 !default;
 
-
-// SecurityCode CSS variables
-
-:root {
-  --rz-security-code-input-min-width: #{$rz-security-code-input-min-width};
-  --rz-security-code-input-min-height: #{$rz-security-code-input-min-height};
-  --rz-security-code-input-padding: #{$rz-security-code-input-padding};
-  --rz-security-code-input-font-size: #{$rz-security-code-input-font-size};
-  --rz-security-code-input-font-weight: #{$rz-security-code-input-font-weight};
-  --rz-security-code-input-line-height: #{$rz-security-code-input-line-height};
-}
-
 .rz-security-code {
+  box-sizing: border-box;
   display: inline-flex;
 }
 

@@ -1,38 +1,39 @@
 @using Radzen
 @using System.Text.Json
 
-<div class="container my-4">
-    <div class="row">
-        <div class="col">
-            <RadzenCard class="w-100 mb-4" >
+<RadzenStack Class="rz-p-0 rz-p-md-12">
+    <RadzenCard Variant="Variant.Outlined" Style="width: 100%">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
             <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
-                <RadzenLabel Text="Display validators as popup" Component="popup" Style="margin-left: 8px; vertical-align: middle;" />
-            </RadzenCard>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-6 offset-lg-3">
-            <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
-                <RadzenFieldset Text="Personal information">
-                    <div class="row mb-5">
-                        <div class="col-md-4">
-                            <RadzenLabel Text="Email" Component="Email" />
-                        </div>
-                        <div class="col">
-                            <RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email class="w-100" Placeholder="Try with mail@example.com"/>
-                            <RadzenRequiredValidator Component="Email" Text="Email is required" Popup=@popup />
-                            <RadzenEmailValidator Component="Email" Text="Provide a valid email address" Popup=@popup />
-                            <RadzenCustomValidator Component="Email" Validator="@(() => ValidateNewEmail(model.Email))" Text="Email already exists" Popup=@popup />
-                        </div>
-                    </div>
-                    <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
-                </RadzenFieldset>
-            </RadzenTemplateForm>
-        </div>
-    </div>
-</div>
+            <RadzenLabel Text="Display validators as popup" Component="popup" />
+        </RadzenStack>
+    </RadzenCard>
 
-<EventConsole @ref=@console />
+    <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+        <RadzenFieldset Text="Personal information">
+            <RadzenStack Gap="2rem" Class="rz-p-4 rz-p-md-12">
+                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                    <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
+                        <RadzenLabel Text="Email" Component="Email" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenTextBox Name="Email" @bind-Value=@model.Email Placeholder="Try with mail@example.com" Style="display: block; width: 100%;" />
+                        <RadzenRequiredValidator Component="Email" Text="Email is required" Popup=@popup />
+                        <RadzenEmailValidator Component="Email" Text="Provide a valid email address" Popup=@popup />
+                        <RadzenCustomValidator Component="Email" Validator="@(() => ValidateNewEmail(model.Email))" Text="Email already exists" Popup=@popup />
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
+                    <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
+        </RadzenFieldset>
+    </RadzenTemplateForm>
+
+    <EventConsole @ref=@console />
+</RadzenStack>
 
 @code {
     class Model

@@ -8,21 +8,8 @@ $rating-disabled-opacity: 0.3 !default;
 $rating-ban-icon: "highlight_off" !default;
 $rating-ban-icon-color: $rating-color !default;
 
-// Rating CSS variables
-
-:root {
-  --rz-rating-color: #{$rating-color};
-  --rz-rating-opacity: #{$rating-opacity};
-  --rz-rating-font-size: #{$rating-font-size};
-  --rz-rating-selected-color: #{$rating-selected-color};
-  --rz-rating-focus-color: #{$rating-focus-color};
-  --rz-rating-disabled-color: #{$rating-disabled-color};
-  --rz-rating-disabled-opacity: #{$rating-disabled-opacity};
-  --rz-rating-ban-icon: #{$rating-ban-icon};
-  --rz-rating-ban-icon-color: #{$rating-ban-icon-color};
-}
-
 .rz-rating {
+  box-sizing: border-box;
   display: inline-flex;
   font-size: var(--rz-rating-font-size);
   height: 1em;

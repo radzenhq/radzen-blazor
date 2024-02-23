@@ -11,9 +11,9 @@
             AllowSorting="true" Data="@employees" ColumnWidth="200px"
             SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees  TItem="Employee" CellContextMenu="@OnCellContextMenu">
     <Columns>
-        <RadzenDataGridColumn Property="Photo" Title="Employee" Sortable="false" Filterable="false">
+        <RadzenDataGridColumn Property="@nameof(Employee.Photo)" Title="Employee" Sortable="false" Filterable="false">
             <Template Context="data">
-                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                <RadzenImage Path="@data.Photo" Style="width: 40px; height: 40px;" Class="rz-border-radius-2 rz-me-2" AlternateText="@(data.FirstName + " " + data.LastName)" />
                 @data.FirstName @data.LastName
             </Template>
         </RadzenDataGridColumn>

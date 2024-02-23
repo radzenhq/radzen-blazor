@@ -1,16 +1,14 @@
 @using System.IO
 
-<div class="container-fluid">
-    <div class="row my-5">
-        <div class="col-lg-6 offset-lg-3">
-            <RadzenCard>
-                <RadzenTree Data=@entries Expand=@LoadFiles Style="width: 100%; height: 300px">
-                    <RadzenTreeLevel Text=@GetTextForNode Template=@FileOrFolderTemplate />
-                </RadzenTree>
-            </RadzenCard>
-        </div>
-    </div>
-</div>
+<RadzenRow Class="rz-p-0 rz-p-lg-12">
+    <RadzenColumn Size="12" SizeLG="6" OffsetLG="3">
+        <RadzenCard>
+            <RadzenTree Data=@entries Expand=@LoadFiles Style="width: 100%; height: 300px">
+                <RadzenTreeLevel Text=@GetTextForNode Template=@FileOrFolderTemplate />
+            </RadzenTree>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
 
 @code {
     IEnumerable<string> entries;

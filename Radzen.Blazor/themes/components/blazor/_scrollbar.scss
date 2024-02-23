@@ -3,15 +3,6 @@ $scrollbar-color: var(--rz-secondary) !default;
 $scrollbar-border-radius: calc(2 * var(--rz-border-radius)) !default;
 $scrollbar-size: 16px !default;
 
-// Scrollbar CSS variables
-
-:root {
-  --rz-scrollbar-background-color: #{$scrollbar-background-color};
-  --rz-scrollbar-color: #{$scrollbar-color};
-  --rz-scrollbar-border-radius: #{$scrollbar-border-radius};
-  --rz-scrollbar-size: #{$scrollbar-size};
-}
-
 @if $base == false {
   body {
     &:not(.rz-default-scrollbars) {

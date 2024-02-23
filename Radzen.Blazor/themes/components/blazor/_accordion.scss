@@ -1,4 +1,5 @@
-$accordion-item-padding: 0.25rem 0 !default;
+$accordion-item-padding-block: 0.25rem !default;
+$accordion-item-padding-inline: 0 !default;
 $accordion-item-margin: 0 !default;
 $accordion-item-border: none !default;
 $accordion-item-background-color: var(--rz-base-background-color) !default;
@@ -11,46 +12,23 @@ $accordion-item-font-weight: normal !default;
 $accordion-icon-width: var(--rz-icon-size) !default;
 $accordion-icon-height: $accordion-icon-width !default;
 $accordion-icon-font-size: var(--rz-icon-size) !default;
-$accordion-icon-margin: 0 0.25rem 0 0 !default;
-$accordion-toggle-icon-margin: $accordion-icon-margin !default;
+$accordion-icon-margin-inline: 0 0.25rem !default;
+$accordion-toggle-icon-margin-inline: $accordion-icon-margin-inline !default;
 $accordion-toggle-icon-order: 0 !default;
 $accordion-toggle-icon-collapsed: 'arrow_right' !default;
+$accordion-toggle-icon-collapsed-rtl: 'arrow_left' !default;
 $accordion-toggle-icon-expanded: 'arrow_drop_down' !default;
+$accordion-toggle-icon-expanded-rtl: $accordion-toggle-icon-expanded !default;
 $accordion-selected-color: var(--rz-secondary) !default;
 $accordion-hover-color: $accordion-selected-color !default;
-$accordion-content-padding: 0.5rem 0.5rem 0.5rem 1.5rem !default;
+$accordion-content-padding-block: 0.5rem !default;
+$accordion-content-padding-inline: 1.5rem 0.5rem !default;
 $accordion-content-font-size: $accordion-item-font-size !default;
 $accordion-border-radius: var(--rz-border-radius) !default;
 $accordion-shadow: none !default;
 
-// Accordion CSS variables
-
-:root {
-  --rz-accordion-item-padding: #{$accordion-item-padding};
-  --rz-accordion-item-margin: #{$accordion-item-margin};
-  --rz-accordion-item-border: #{$accordion-item-border};
-  --rz-accordion-item-background-color: #{$accordion-item-background-color};
-  --rz-accordion-item-color: #{$accordion-item-color};
-  --rz-accordion-item-focus-outline: #{$accordion-item-focus-outline};
-  --rz-accordion-item-focus-outline-offset: #{$accordion-item-focus-outline-offset};
-  --rz-accordion-item-line-height: #{$accordion-item-line-height};
-  --rz-accordion-item-font-size: #{$accordion-item-font-size};
-  --rz-accordion-item-font-weight: #{$accordion-item-font-weight};
-  --rz-accordion-icon-width: #{$accordion-icon-width};
-  --rz-accordion-icon-height: #{$accordion-icon-height};
-  --rz-accordion-icon-font-size: #{$accordion-icon-font-size};
-  --rz-accordion-icon-margin: #{$accordion-icon-margin};
-  --rz-accordion-toggle-icon-margin: #{$accordion-toggle-icon-margin};
-  --rz-accordion-toggle-icon-order: #{$accordion-toggle-icon-order};
-  --rz-accordion-selected-color: #{$accordion-selected-color};
-  --rz-accordion-hover-color: #{$accordion-hover-color};
-  --rz-accordion-content-padding: #{$accordion-content-padding};
-  --rz-accordion-content-font-size: #{$accordion-content-font-size};
-  --rz-accordion-border-radius: #{$accordion-border-radius};
-  --rz-accordion-shadow: #{$accordion-shadow};
-}
-
 .rz-accordion {
+  box-sizing: border-box;
   border-radius: var(--rz-accordion-border-radius);
   box-shadow: var(--rz-accordion-shadow);
 
@@ -74,43 +52,45 @@ $accordion-shadow: none !default;
   &:focus-visible {
     outline: var(--rz-accordion-item-focus-outline);
   }
-}
 
-.rz-accordion-header {
-  background-color: var(--rz-accordion-item-background-color);
-  margin: var(--rz-accordion-item-margin);
+  .rz-accordion-header {
+    background-color: var(--rz-accordion-item-background-color);
+    margin: var(--rz-accordion-item-margin);
 
-  &:not(:first-child) {
-    border-top: var(--rz-accordion-item-border)
-  }
-
-  a[role='tab'] {
-    padding: var(--rz-accordion-item-padding);
-    color: var(--rz-accordion-item-color);
-    line-height: var(--rz-accordion-item-line-height);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    font-size: var(--rz-accordion-item-font-size);
-    font-weight: var(--rz-accordion-item-font-weight);
-
-    &:hover {
-      color: var(--rz-accordion-hover-color);
+    &:not(:first-child) {
+      border-top: var(--rz-accordion-item-border)
     }
 
-    span:not(.rz-accordion-toggle-icon) {
-      flex-grow: 1;
+    > a {
+      padding-block: var(--rz-accordion-item-padding-block);
+      padding-inline: var(--rz-accordion-item-padding-inline);
+      color: var(--rz-accordion-item-color);
+      line-height: var(--rz-accordion-item-line-height);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      font-size: var(--rz-accordion-item-font-size);
+      font-weight: var(--rz-accordion-item-font-weight);
+      cursor: pointer;
+
+      &:hover {
+        color: var(--rz-accordion-hover-color);
+      }
+
+      span:not(.rz-accordion-toggle-icon) {
+        flex-grow: 1;
+      }
     }
-  }
 
-  :focus-visible &.rz-state-focused {
-    outline: var(--rz-accordion-item-focus-outline);
-    outline-offset: var(--rz-accordion-item-focus-outline-offset);
-  }
+    :focus-visible &.rz-state-focused {
+      outline: var(--rz-accordion-item-focus-outline);
+      outline-offset: var(--rz-accordion-item-focus-outline-offset);
+    }
 
-  .rzi {
-    font-size: var(--rz-accordion-icon-font-size);
-    margin: var(--rz-accordion-icon-margin);
+    .rzi {
+      font-size: var(--rz-accordion-icon-font-size);
+      margin-inline: var(--rz-accordion-icon-margin-inline);
+    }
   }
 }
 
@@ -121,7 +101,7 @@ $accordion-shadow: none !default;
   order: var(--rz-accordion-toggle-icon-order);
 
   &.rzi {
-    margin: var(--rz-accordion-toggle-icon-margin);
+    margin-inline: var(--rz-accordion-toggle-icon-margin-inline);
   }
 
   &.rzi-chevron-right {
@@ -137,12 +117,6 @@ $accordion-shadow: none !default;
   }
 }
 
-.rz-state-active {
-  a[role='tab'] {
-    color: var(--rz-accordion-selected-color);
-  }
-}
-
 .rz-accordion-content-wrapper-overflown {
   overflow: hidden;
 }
@@ -150,5 +124,22 @@ $accordion-shadow: none !default;
 .rz-accordion-content {
   font-size: var(--rz-accordion-content-font-size);
   background-color: var(--rz-accordion-item-background-color);
-  padding: var(--rz-accordion-content-padding);
+  padding-block: var(--rz-accordion-content-padding-block);
+  padding-inline: var(--rz-accordion-content-padding-inline);
+}
+
+/* Right-to-left toggle icons */
+*[dir="rtl"] .rz-accordion-toggle-icon {
+
+  &.rzi-chevron-right {
+    &:before {
+      content: $accordion-toggle-icon-collapsed-rtl;
+    }
+  }
+
+  &.rzi-chevron-down {
+    &:before {
+      content: $accordion-toggle-icon-expanded-rtl;
+    }
+  }
 }

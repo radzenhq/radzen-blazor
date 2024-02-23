@@ -2,40 +2,39 @@
 
 @if (Visible)
 {
-    var classes = GetMessageCssClasses();
+   var classes = GetMessageCssClasses();
 
-   <div class="rz-notification-message rz-growl " style="width: 250px;z-index: 1002;position:static;@(Message.Click != null || Message.CloseOnClick ? "cursor: pointer;" : "") @Style">
-        <div class="rz-growl-item-container rz-state-highlight @classes.Item1">
-            <div class="rz-growl-item">
-                <div class="rz-growl-icon-close rzi rzi-times" @onclick="@Close" style="cursor:pointer"></div>
-                <span class="rz-growl-image rzi @classes.Item2" @onclick="NotificationClicked"></span>
-                <div class="rz-growl-message" @onclick="NotificationClicked">
-                    <span class="rz-growl-title">@if (Message.SummaryContent != null) { @Message.SummaryContent(Service); } else { @((MarkupString)Message.Summary); }</span>
-                    <p>@if (Message.DetailContent != null) { @Message.DetailContent(Service); } else { @((MarkupString)Message.Detail); }</p>
-                </div>
-                <div style="clear: both;"></div>
+   <div aria-live="polite" class="rz-notification-item-wrapper @classes.Item1" style="@(Message.Click != null || Message.CloseOnClick ? "cursor: pointer;" : "") @Style">
+      <div class="rz-notification-item">
+         <div class="rz-notification-message-wrapper">
+            <span class="rzi rz-notification-icon @classes.Item2" @onclick="NotificationClicked"></span>
+            <div class="rz-notification-message" @onclick="NotificationClicked">
+               <div class="rz-notification-title">@if (Message.SummaryContent != null) { @Message.SummaryContent(Service); } else { @((MarkupString)Message.Summary); }</div>
+               <div class="rz-notification-content">@if (Message.DetailContent != null) { @Message.DetailContent(Service); } else { @((MarkupString)Message.Detail); }</div>
             </div>
-        </div>
-    </div>
+         </div>
+         <div class="rzi rz-notification-close" @onclick="@Close"></div>
+      </div>
+   </div>
 }
 @code {
    Tuple<string, string> GetMessageCssClasses()
    {
       if (Message.Severity == NotificationSeverity.Error)
       {
-         return new Tuple<string, string>("rz-growl-message-error", "rzi-times");
+         return new Tuple<string, string>("rz-notification-error", "rzi-times");
       }
       else if (Message.Severity == NotificationSeverity.Info)
       {
-         return new Tuple<string, string>("rz-growl-message-info", "rzi-info-circle");
+         return new Tuple<string, string>("rz-notification-info", "rzi-info-circle");
       }
       else if (Message.Severity == NotificationSeverity.Success)
       {
-         return new Tuple<string, string>("rz-growl-message-success", "rzi-check");
+         return new Tuple<string, string>("rz-notification-success", "rzi-check");
       }
       else if (Message.Severity == NotificationSeverity.Warning)
       {
-         return new Tuple<string, string>("rz-growl-message-warn", "rzi-exclamation-triangle");
+         return new Tuple<string, string>("rz-notification-warn", "rzi-exclamation-triangle");
       }
 
       return new Tuple<string, string>("", "");

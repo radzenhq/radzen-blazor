@@ -1,148 +1,36 @@
-$source-sans-path: '../fonts';
+$fonts-path: '../fonts';
 
 @font-face {
-  font-family: 'Material Icons';
+  font-family: 'Material Symbols';
+  src: url('#{$fonts-path}/MaterialSymbolsOutlined.woff2') format('woff2 supports variations'),
+         url('#{$fonts-path}/MaterialSymbolsOutlined.woff2') format('woff2-variations');
   font-style: normal;
-  font-weight: 400;
-  src: url('#{$source-sans-path}/MaterialIcons-Regular.woff') format('woff');
+  font-weight: 100 700;
 }
 
 @if $material == false and $fluent == false {
   @font-face {
     font-family: 'Source Sans Pro';
-    font-weight: 200;
+    src: url('#{$fonts-path}/SourceSans3VF-Upright.ttf.woff2') format('woff2 supports variations'),
+         url('#{$fonts-path}/SourceSans3VF-Upright.ttf.woff2') format('woff2-variations');
     font-style: normal;
-    font-stretch: normal;
-    src: local('SourceSansPro-ExtraLight'), local('Source Sans Pro'),
-      url('#{$source-sans-path}/SourceSansPro-ExtraLight.woff') format('woff');
+    font-weight: 200 900;
   }
 
   @font-face {
     font-family: 'Source Sans Pro';
-    font-weight: 300;
-    font-style: normal;
-    font-stretch: normal;
-    src: local('SourceSansPro-Light'), local('Source Sans Pro'),
-      url('#{$source-sans-path}/SourceSansPro-Light.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Source Sans Pro';
-    font-weight: 400;
-    font-style: normal;
-    font-stretch: normal;
-    src: local('SourceSansPro-Regular'), local('Source Sans Pro'),
-      url('#{$source-sans-path}/SourceSansPro-Regular.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Source Sans Pro';
-    font-weight: 600;
-    font-style: normal;
-    font-stretch: normal;
-    src: local('SourceSansPro-Semibold'), local('Source Sans Pro Semibold'),
-      url('#{$source-sans-path}/SourceSansPro-Semibold.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Source Sans Pro';
-    font-weight: 700;
-    font-style: normal;
-    font-stretch: normal;
-    src: local('SourceSansPro-Bold'), local('Source Sans Pro Bold'),
-      url('#{$source-sans-path}/SourceSansPro-Bold.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Source Sans Pro';
-    font-weight: 900;
-    font-style: normal;
-    font-stretch: normal;
-    src: local('SourceSansPro-Black'), local('Source Sans Pro Black'),
-      url('#{$source-sans-path}/SourceSansPro-Black.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Source Sans Pro';
-    font-weight: 200;
+    src: url('#{$fonts-path}/SourceSans3VF-Italic.ttf.woff2') format('woff2 supports variations'),
+         url('#{$fonts-path}/SourceSans3VF-Italic.ttf.woff2') format('woff2-variations');
     font-style: italic;
-    font-stretch: normal;
-    src: local('SourceSansPro-ExtraLightIt'), local('Source Sans Pro'),
-      url('#{$source-sans-path}/SourceSansPro-ExtraLightIt.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Source Sans Pro';
-    font-weight: 300;
-    font-style: italic;
-    font-stretch: normal;
-    src: local('SourceSansPro-LightIt'), local('Source Sans Pro'),
-      url('#{$source-sans-path}/SourceSansPro-LightIt.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Source Sans Pro';
-    font-weight: 400;
-    font-style: italic;
-    font-stretch: normal;
-    src: local('SourceSansPro-It'), local('Source Sans Pro'),
-      url('#{$source-sans-path}/SourceSansPro-It.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Source Sans Pro';
-    font-weight: 600;
-    font-style: italic;
-    font-stretch: normal;
-    src: local('SourceSansPro-SemiboldIt'), local('Source Sans Pro'),
-      url('#{$source-sans-path}/SourceSansPro-SemiboldIt.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Source Sans Pro';
-    font-weight: 700;
-    font-style: italic;
-    font-stretch: normal;
-    src: local('SourceSansPro-BoldIt'), local('Source Sans Pro'),
-      url('#{$source-sans-path}/SourceSansPro-BoldIt.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Source Sans Pro';
-    font-weight: 900;
-    font-style: italic;
-    font-stretch: normal;
-    src: local('SourceSansPro-BlackIt'), local('Source Sans Pro'),
-      url('#{$source-sans-path}/SourceSansPro-BlackIt.woff') format('woff');
+    font-weight: 200 900;
   }
 }
 
 @if $material == true {
   @font-face {
     font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 300;
-    src: url('#{$source-sans-path}/roboto-v30-latin-300.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
-    src: url('#{$source-sans-path}/roboto-v30-latin-regular.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 500;
-    src: url('#{$source-sans-path}/roboto-v30-latin-500.woff') format('woff');
-  }
-
-  @font-face {
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 700;
-    src: url('#{$source-sans-path}/roboto-v30-latin-700.woff') format('woff');
+    src: url('#{$fonts-path}/RobotoFlex.woff2') format('woff2 supports variations'),
+         url('#{$fonts-path}/RobotoFlex.woff2') format('woff2-variations');
+    font-weight: 100 1000;
   }
 }

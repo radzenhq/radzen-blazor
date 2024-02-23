@@ -176,15 +176,15 @@ namespace Radzen.Blazor
             switch (AlertStyle)
             {
                 case AlertStyle.Success:
-                    return "check_circle_outline";
+                    return "check_circle";
                 case AlertStyle.Danger:
-                    return "error_outline";
+                    return "error";
                 case AlertStyle.Warning:
                     return "warning_amber";
                 case AlertStyle.Info:
-                    return "info_outline";
+                    return "info";
                 default:
-                    return "lightbulb_outline";
+                    return "lightbulb";
             }
         }
 

@@ -1,31 +1,17 @@
 $switch-width: 3rem !default;
 $switch-height: round($switch-width*600)/1000 !default;
 $switch-circle-size: round($switch-width*420)/1000 !default;
-$switch-circle-margin: round(($switch-height - $switch-circle-size)*500)/1000 !default;
-
+$switch-circle-offset: round(($switch-height - $switch-circle-size)*500)/1000 !default;
 $switch-background-color: var(--rz-base-400) !default;
 $switch-checked-background-color: var(--rz-secondary) !default;
 $switch-box-shadow: none !default;
 $switch-circle-background-color: var(--rz-text-contrast-color) !default;
 $switch-checked-circle-background-color: var(--rz-on-secondary) !default;
-
 $switch-focus-outline: var(--rz-outline-focus) !default;
 $switch-focus-outline-offset: var(--rz-outline-offset) !default;
 
-
-// Switch CSS variables
-
-:root {
-  --rz-switch-background-color: #{$switch-background-color};
-  --rz-switch-checked-background-color: #{$switch-checked-background-color};
-  --rz-switch-box-shadow: #{$switch-box-shadow};
-  --rz-switch-circle-background-color: #{$switch-circle-background-color};
-  --rz-switch-checked-circle-background-color: #{$switch-checked-circle-background-color};
-  --rz-switch-focus-outline: #{$switch-focus-outline};
-  --rz-switch-focus-outline-offset: #{$switch-focus-outline-offset};
-}
-
 .rz-switch {
+  box-sizing: border-box;
   position: relative;
   display: inline-block;
   vertical-align: middle;
@@ -47,10 +33,10 @@ $switch-focus-outline-offset: var(--rz-outline-offset) !default;
 .rz-switch-circle {
   position: absolute;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+  inset-block-end: 0;
 }
 
 .rz-switch-circle.rz-disabled {
@@ -72,8 +58,8 @@ $switch-focus-outline-offset: var(--rz-outline-offset) !default;
   background: var(--rz-switch-circle-background-color);
   width: $switch-circle-size;
   height: $switch-circle-size;
-  left: $switch-circle-margin;
-  margin-top: round($switch-circle-size*-500)/1000;
+  inset-inline-start: $switch-circle-offset;
+  margin-block-start: round($switch-circle-size*-500)/1000;
   border-radius: calc((5 * var(--rz-border-radius)) - 3px);
   transition: transform 0.2s linear;
   box-shadow: var(--rz-switch-box-shadow);
@@ -82,7 +68,7 @@ $switch-focus-outline-offset: var(--rz-outline-offset) !default;
 .rz-switch-circle:before {
   position: absolute;
   content: "";
-  top: 50%;
+  inset-block-start: 50%;
 }
 
 .rz-switch-circle.rz-disabled:before {
@@ -91,5 +77,9 @@ $switch-focus-outline-offset: var(--rz-outline-offset) !default;
 
 .rz-switch.rz-switch-checked .rz-switch-circle:before {
   background: var(--rz-switch-checked-circle-background-color);
-  transform: translateX($switch-width - ($switch-circle-size + $switch-circle-margin*2));
+  transform: translateX($switch-width - ($switch-circle-size + $switch-circle-offset*2));
+}
+
+*[dir="rtl"] .rz-switch.rz-switch-checked .rz-switch-circle:before {
+  transform: translateX(-1 * ($switch-width - ($switch-circle-size + $switch-circle-offset*2)));
 }

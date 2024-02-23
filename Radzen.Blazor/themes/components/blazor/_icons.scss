@@ -1,40 +1,14 @@
-$icon-styles: () !default;
-$icon-styles: map-merge(
-  (
-    primary: (
-      color: var(--rz-primary)
-    ),
-    light: (
-      color: var(--rz-base-200)
-    ),
-    dark: (
-      color: var(--rz-base-900)
-    ),
-    secondary: (
-      color: var(--rz-secondary)
-    ),
-    info: (
-      color: var(--rz-info)
-    ),
-    warning: (
-      color: var(--rz-warning)
-    ),
-    error: (
-      color: var(--rz-danger)
-    ),
-    danger: (
-      color: var(--rz-danger)
-    ),
-    success: (
-      color: var(--rz-success)
-    )
-  ),
-  $icon-styles
-);
+$rz-icon-font-family: 'Material Symbols' !default;
+$rz-icon-size: 1.25rem !default;
+$rz-icon-fill: 0 !default;
+$rz-icon-weight: inherit !default;
+$rz-icon-grade: 0 !default;
+$rz-icon-optical-size: 48 !default;
 
 %rzi, .rzi {
+  box-sizing: border-box;
   font-family: var(--rz-icon-font-family);
-  font-weight: normal;
+  font-weight: var(--rz-icon-weight, inherit);
   font-style: normal;
   font-size: var(--rz-icon-size);
   display: inline-block;
@@ -45,7 +19,7 @@ $icon-styles: map-merge(
   letter-spacing: normal;
   word-wrap: normal;
   white-space: nowrap;
-  direction: ltr;
+  font-variation-settings: "FILL" var(--rz-icon-fill), "GRAD" var(--rz-icon-grade), "opsz" var(--rz-icon-optical-size);
 
 
   /* Support for all WebKit browsers. */
@@ -67,10 +41,12 @@ i.rzi {
   align-items: center;
 }
 
-@each $style, $icon in $icon-styles {
-    .rzi-#{$style} {
-        @each $name, $value in $icon {
-            #{$name}: #{$value};
-        }
+@each $style, $rule in map-merge($severity-styles-map, $base-styles-map) {
+  .rzi-#{$style} {
+    @each $name, $value in $rule {
+      @if $name == 'background-color' {
+        color: #{$value};
+      }
     }
+  }
 }

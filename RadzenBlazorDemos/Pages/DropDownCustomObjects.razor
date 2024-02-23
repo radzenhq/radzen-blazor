@@ -4,12 +4,12 @@
 @using Microsoft.EntityFrameworkCore
 @using System.ComponentModel.DataAnnotations
 
-<div class="rz-p-sm-12 rz-text-align-center">
-    <RadzenLabel Text="Select Value" Component="DropDownCustomObjects" Style="margin-right: 8px; vertical-align: middle;" />
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-sm-12">
+    <RadzenLabel Text="Select Value" Component="DropDownCustomObjects" />
     <RadzenDropDown Data=@data TValue="MyObject" @bind-Value=@singleValue
                     AllowClear="true" AllowFiltering="true" Style="width: 100%; max-width: 400px;" Name="DropDownCustomObjects">
     </RadzenDropDown>
-</div>
+</RadzenStack>
 
 @code {
 

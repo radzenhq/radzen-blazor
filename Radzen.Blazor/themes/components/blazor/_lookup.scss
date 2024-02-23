@@ -1,12 +1,7 @@
 $lookup-panel-background-color: var(--rz-base-background-color) !default;
 $lookup-panel-padding: 1rem !default;
-
-// Lookup CSS variables
-
-:root {
-  --rz-lookup-panel-background-color: #{$lookup-panel-background-color};
-  --rz-lookup-panel-padding: #{$lookup-panel-padding};
-}
+$lookup-search-gap: 0.5rem !default;
+$lookup-search-margin-bottom: 0.5rem !default;
 
 .rz-lookup-panel {
   background-color: var(--rz-lookup-panel-background-color);
@@ -17,27 +12,11 @@ $lookup-panel-padding: 1rem !default;
 
 .rz-lookup-search {
   display: flex;
-  margin-bottom: 1rem;
+  gap: var(--rz-lookup-search-gap);
+  margin-bottom: var(--rz-lookup-search-margin-bottom);
 
   input {
     flex: auto;
-    margin-right: 1rem;
-
     @extend %input;
-  }
-}
-
-.rz-lookup-select {
-  margin-top: 1rem;
-
-  display: flex;
-  justify-content: flex-end;
-}
-
-.rz-lookup {
-  display: inline-block;
-
-  .rz-dropdown {
-    width: 100%;
   }
 }

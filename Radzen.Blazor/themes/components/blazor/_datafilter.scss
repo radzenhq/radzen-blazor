@@ -1,25 +1,13 @@
-$datafilter-item-padding-left: 2rem;
-$datafilter-item-padding-y: 0.25rem;
+$datafilter-item-padding-inline-start: 2rem;
+$datafilter-item-padding-block: 0.25rem;
 $datafilter-item-indentation: 0.25rem;
 $datafilter-item-path-width: 1rem;
-$datafilter-item-path-height: calc(#{$datafilter-item-padding-y} + (var(--rz-input-height) / 2));
+$datafilter-item-path-height: calc(#{$datafilter-item-padding-block} + (var(--rz-input-height) / 2));
 $datafilter-item-path-border: var(--rz-border-normal);
 $datafilter-item-path-border-radius: calc(2 * var(--rz-border-radius));
 
-// DataFilter CSS variables
-
-:root {
-    --rz-datafilter-item-padding-y: #{$datafilter-item-padding-y};
-    --rz-datafilter-item-padding-left: #{$datafilter-item-padding-left};
-    --rz-datafilter-item-indentation: #{$datafilter-item-indentation};
-    --rz-datafilter-item-path-width: #{$datafilter-item-path-width};
-    --rz-datafilter-item-path-height: #{$datafilter-item-path-height};
-    --rz-datafilter-item-path-border: #{$datafilter-item-path-border};
-    --rz-datafilter-item-path-border-radius: #{$datafilter-item-path-border-radius};
-}
-
-
 .rz-datafilter {
+    box-sizing: border-box;
     display: flex;
     flex-wrap: wrap;
     column-gap: 0.25rem;
@@ -44,7 +32,8 @@ $datafilter-item-path-border-radius: calc(2 * var(--rz-border-radius));
         position: relative;
         list-style: none;
         margin: 0;
-        padding: var(--rz-datafilter-item-padding-y) 0 var(--rz-datafilter-item-padding-y) calc(var(--rz-datafilter-item-padding-left) + var(--rz-datafilter-item-indentation) );
+        padding-block: var(--rz-datafilter-item-padding-block);
+        padding-inline: calc(var(--rz-datafilter-item-padding-inline-start) + var(--rz-datafilter-item-indentation)) 0;
         display: flex;
         flex-wrap: wrap;
         gap: 0.25rem;
@@ -55,11 +44,11 @@ $datafilter-item-path-border-radius: calc(2 * var(--rz-border-radius));
             position: absolute;
             background-color: transparent;
             width: var(--rz-datafilter-item-path-width);
-            top: 0;
-            bottom: 0;
-            left: calc(var(--rz-datafilter-item-padding-left) / 2);
+            inset-block-start: 0;
+            inset-block-end: 0;
+            inset-inline-start: calc(var(--rz-datafilter-item-padding-inline-start) / 2);
             border: 0;
-            border-left: var(--rz-datafilter-item-path-border);
+            border-inline-start: var(--rz-datafilter-item-path-border);
         }
 
         &:after {
@@ -67,12 +56,12 @@ $datafilter-item-path-border-radius: calc(2 * var(--rz-border-radius));
             position: absolute;
             background-color: transparent;
             width: var(--rz-datafilter-item-path-width);
-            height: calc(var(--rz-datafilter-item-padding-y) + (var(--rz-input-height) / 2));
-            top: 0;
-            left: calc(var(--rz-datafilter-item-padding-left) / 2);
+            height: calc(var(--rz-datafilter-item-padding-block) + (var(--rz-input-height) / 2));
+            inset-block-start: 0;
+            inset-inline-start: calc(var(--rz-datafilter-item-padding-inline-start) / 2);
             border: 0;
-            border-bottom: var(--rz-datafilter-item-path-border);
-            border-left: var(--rz-datafilter-item-path-border);
+            border-block-end: var(--rz-datafilter-item-path-border);
+            border-inline-start: var(--rz-datafilter-item-path-border);
         }
 
         .rz-multiselect,
@@ -88,18 +77,19 @@ $datafilter-item-path-border-radius: calc(2 * var(--rz-border-radius));
     }
 
     .rz-datafilter-bar {
-        padding: 0 0 0 calc(var(--rz-datafilter-item-padding-left) + var(--rz-datafilter-item-indentation) );
+        padding-block: 0;
+        padding-inline: calc(var(--rz-datafilter-item-padding-inline-start) + var(--rz-datafilter-item-indentation)) 0;
         &:before {
             display: none;
         }
 
         &:after {
             height: calc(var(--rz-input-height) / 2);
-            border-bottom-left-radius: var(--rz-datafilter-item-path-border-radius);
+            border-end-start-radius: var(--rz-datafilter-item-path-border-radius);
         }
 
         .rz-splitbutton {
-            margin-top: 0.3125rem;
+            margin-block-start: 0.3125rem;
         }
     }
 

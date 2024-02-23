@@ -2,6 +2,7 @@
 @using Radzen.Blazor
 @inherits LayoutComponentBase
 @inject ThemeService ThemeService
+@inject QueryStringThemeService QueryStringThemeService
 @inject ExampleService ExampleService
 @inject NavigationManager UriHelper
 @inject IJSRuntime JSRuntime
@@ -27,6 +28,7 @@
                         <a href="https://www.radzen.com/" title="Create .NET Core web applications fast & easy" Class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank">About Radzen</a>
                         <a href="https://github.com/radzenhq/radzen-blazor" title="Star Radzen Blazor Components on GitHub" Class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank">GitHub</a>
                     </div>
+                    <RadzenAppearanceToggle Class="rz-mx-2" />
                     <RadzenSidebarToggle Icon="settings" Click="@(() => configSidebarExpanded = !configSidebarExpanded)" Class="rz-m-0" />
                 </RadzenStack>
             </RadzenColumn>
@@ -47,8 +49,8 @@
                                         <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" Class="rz-mb-4" Style="line-height: 1.2; text-wrap: balance;">Supercharge your Blazor development with Radzen Blazor Studio</RadzenText>
                                         <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P" Class="rz-text-secondary-color" Style="line-height: 1.5; text-wrap: balance;">Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</RadzenText>
                                         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap" Class="rz-mt-8 rz-mb-4">
-                                            <RadzenButton Text="See in Action" Icon="play_circle_outline" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Large" Click=@ShowVideoDialog />
-                                            <NavLink Class="rz-button rz-button-lg rz-secondary rz-text-align-center" href="https://www.radzen.com/blazor-studio/" target="_blank"><RadzenIcon Icon="open_in_new" /> Learn More</NavLink>
+                                            <RadzenButton Text="See in Action" Icon="play_circle" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Large" Click=@ShowVideoDialog />
+                                            <NavLink Class="rz-button rz-button-lg rz-base rz-shade-default rz-text-align-center" href="https://www.radzen.com/blazor-studio/" target="_blank"><RadzenIcon Icon="open_in_new" /> Learn More</NavLink>
                                         </RadzenStack>
                                     </RadzenColumn>
                                     <RadzenColumn SizeMD="12" SizeLG="6" Class="rz-px-8 rz-py-5 rz-py-xl-12 rz-pr-xl-12">
@@ -108,20 +110,27 @@
     <RadzenStack Class="rz-p-4" Gap="0">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
             <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" Class="rz-m-0">Demos Configuration</RadzenText>
-            <RadzenButton Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary" Click="@(() => configSidebarExpanded = false)" />
+            <RadzenButton Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Click="@(() => configSidebarExpanded = false)" />
         </RadzenStack>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem" Class="rz-mt-8">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem" Class="rz-mt-6">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
                 <RadzenLabel Text="Use WCAG compliant colors" Component="WCAG" Title="Use WCAG 2.2 AA compliant color swatches" />
-                <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.ExtraSmall" @ref="wcagColorsInfo" Click="@(args => WcagColorsTooltip(wcagColorsInfo.Element, new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" }))" />
+                <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" @ref="wcagColorsInfo" Click="@(args => WcagColorsTooltip(wcagColorsInfo.Element, new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" }))" />
             </RadzenStack>
-            <RadzenSwitch @bind-Value="@WCAG" Name="WCAG" Change="@(args => ChangeTheme(ThemeService.CurrentTheme))" />
+            <RadzenSwitch Value="@(ThemeService.Wcag == true)" Name="WCAG" Change="@(ThemeService.SetWcag)" />
         </RadzenStack>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Class="rz-mt-8 rz-mb-2">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem" Class="rz-mt-5">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                <RadzenLabel Text="Enable RTL directionality" Component="RTL" Title="Use right to left direction for languages that are written from the right to the left (like Arabic)" />
+                <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" @ref="rtlInfo" Click="@(args => RtlTooltip(rtlInfo.Element, new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" }))" />
+            </RadzenStack>
+            <RadzenSwitch Value="@(ThemeService.RightToLeft == true)" Name="RTL" Change="@(ThemeService.SetRightToLeft)" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Class="rz-mt-5 rz-mb-2">
             <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" Class="rz-m-0">Premium Themes</RadzenText>
-            <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.ExtraSmall" @ref="premiumThemesInfo" Click="@(args => PremiumThemesTooltip(premiumThemesInfo.Element, new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" }))" />
+            <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" @ref="premiumThemesInfo" Click="@(args => PremiumThemesTooltip(premiumThemesInfo.Element, new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" }))" />
         </RadzenStack>
-        <RadzenListBox TValue="string" TextProperty="Text" ValueProperty="Value" Data="@ThemeService.Themes.Where(t => t.Premium)" Value="@ThemeService.CurrentTheme" Change="@ChangeTheme" Style="width: 100%; max-width: 400px; height: 50%; --rz-dropdown-item-padding: 12px 16px 16px; --rz-listbox-padding: 0;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select theme" }})">
+        <RadzenListBox TValue="string" TextProperty="Text" ValueProperty="Value" Data="@Themes.Premium" Value="@ThemeService.Theme" Change="@ChangeTheme" Style="width: 100%; max-width: 400px; height: 50%; --rz-dropdown-item-padding: 12px 16px 16px; --rz-listbox-padding: 0;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select theme" }})">
             <Template>
                 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Gap="0.25rem">
                     @context.Text
@@ -189,7 +198,7 @@
             <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" Class="rz-m-0">Free Themes</RadzenText>
             <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.ExtraSmall" @ref="freeThemesInfo" Click="@(args => FreeThemesTooltip(freeThemesInfo.Element, new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" }))" />
         </RadzenStack>
-        <RadzenListBox TValue="string" TextProperty="Text" ValueProperty="Value" Data="@ThemeService.Themes.Where(t => !t.Premium)" Value="@ThemeService.CurrentTheme" Change="@ChangeTheme" Style="width: 100%; max-width: 400px; height: 50%; --rz-dropdown-item-padding: 10px 16px 16px; --rz-listbox-padding: 0;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select theme" }})">
+        <RadzenListBox TValue="string" TextProperty="Text" ValueProperty="Value" Data="@Themes.Free" Value="@ThemeService.Theme" Change="@ChangeTheme" Style="width: 100%; max-width: 400px; height: 50%; --rz-dropdown-item-padding: 10px 16px 16px; --rz-listbox-padding: 0;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select theme" }})">
             <Template>
                 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Gap="0.25rem">
                     @context.Text
@@ -268,20 +277,16 @@
     RadzenSidebar sidebar0;
     RadzenBody body0;
     RadzenButton wcagColorsInfo;
+    RadzenButton rtlInfo;
     RadzenButton freeThemesInfo;
     RadzenButton premiumThemesInfo;
     bool sidebarExpanded = true;
     bool configSidebarExpanded = false;
     bool rendered;
-    bool WCAG;
 
     IEnumerable<Example> examples;
     protected override void OnInitialized()
     {
-        ThemeService.Initialize(UriHelper);
-
-        WCAG = ThemeService.WCAG;
-
         examples = ExampleService.Examples;
 
         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
@@ -304,7 +309,7 @@
 
     void ChangeTheme(object value)
     {
-        ThemeService.Change(UriHelper, $"{value}", WCAG);
+        ThemeService.SetTheme($"{value}");
     }
 
     void WcagColorsTooltip(ElementReference elementReference, TooltipOptions options = null) => TooltipService.Open(elementReference, ds =>
@@ -314,6 +319,12 @@
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Class="rz-mt-4">
         <NavLink Class="rz-button rz-button-sm rz-secondary rz-text-align-center" href="/accessibility#wcag-colors">See how to use</NavLink>
     </RadzenStack>
+</div>, options);
+
+    void RtlTooltip(ElementReference elementReference, TooltipOptions options = null) => TooltipService.Open(elementReference, ds =>
+@<div Style="width: 280px; white-space: normal; padding: 20px;">
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H4" Style="color: currentColor;">RTL directionality</RadzenText>
+    <RadzenText TextStyle="TextStyle.Body2" Style="color: currentColor;">Use right to left direction for languages that are written from the right to the left (like Arabic).</RadzenText>
 </div>, options);
 
     void PremiumThemesTooltip(ElementReference elementReference, TooltipOptions options = null) => TooltipService.Open(elementReference, ds =>

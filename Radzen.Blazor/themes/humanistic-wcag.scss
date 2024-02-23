@@ -1,6 +1,8 @@
-:root {
+:root,
+.rz-humanistic {
   --rz-white: #ffffff;
   --rz-black: #000000;
+  --rz-base: #d9e1ea;
   --rz-base-50: #ffffff;
   --rz-base-100: #f3f5f7;
   --rz-base-200: #ebeef2;
@@ -11,6 +13,10 @@
   --rz-base-700: #395374;
   --rz-base-800: #30445f;
   --rz-base-900: #2b3a50;
+  --rz-base-light: #ebeef2;
+  --rz-base-lighter: #ffffff;
+  --rz-base-dark: #3f618d;
+  --rz-base-darker: #2b3a50;
   --rz-primary: #a9352d;
   --rz-primary-light: #b34d46;
   --rz-primary-lighter: rgba(169, 53, 45, 0.16);
@@ -41,6 +47,11 @@
   --rz-danger-lighter: rgba(178, 36, 46, 0.2);
   --rz-danger-dark: #961e27;
   --rz-danger-darker: #861b23;
+  --rz-on-base: #000000;
+  --rz-on-base-light: #000000;
+  --rz-on-base-lighter: #000000;
+  --rz-on-base-dark: #ffffff;
+  --rz-on-base-darker: #ffffff;
   --rz-on-primary: #ffffff;
   --rz-on-primary-light: #ffffff;
   --rz-on-primary-lighter: #a9352d;

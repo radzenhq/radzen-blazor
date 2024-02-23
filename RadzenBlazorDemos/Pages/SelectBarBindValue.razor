@@ -1,37 +1,33 @@
 ﻿@page "/select-bar-test"
 
-<RadzenCard>
-    <RadzenDataGrid Data="@Items" TItem="GridItem" class="mt-4 w-100">
-        <HeaderTemplate>
-            <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0px">
-                <RadzenColumn Size="12">
-                    <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedAnimal">
+<RadzenDataGrid Data="@Items" TItem="GridItem">
+    <HeaderTemplate>
+        <RadzenStack AlignItems="AlignItems.Center">
+            <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedAnimal">
+                <Items>
+                    <RadzenSelectBarItem Value="1" Text="Cat " Disabled="@_disableCat" />
+                    <RadzenSelectBarItem Value="2" Text="Birds" />
+                </Items>
+            </RadzenSelectBar>
+        </RadzenStack>
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn Title="Name" Property="Name" />
+        <RadzenDataGridColumn Title="Action">
+            <Template Context="data">
+                <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@data.Action" Change="() => CheckHeader()">
                         <Items>
-                            <RadzenSelectBarItem Value="1" Text="Cat " Disabled="@_disableCat" />
-                            <RadzenSelectBarItem Value="2" Text="Birds" />
+                            <RadzenSelectBarItem Value="1" Text="Eats food" />
+                            <RadzenSelectBarItem Value="2" Text="drinks water" />
+                            <RadzenSelectBarItem Value="3" Text="flaps wings" />
                         </Items>
                     </RadzenSelectBar>
-                </RadzenColumn>
-            </RadzenRow>
-        </HeaderTemplate>
-        <Columns>
-            <RadzenDataGridColumn Title="Name" Property="Name" />
-            <RadzenDataGridColumn Title="Action">
-                <Template Context="data">
-                    <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-                        <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@data.Action" Change="() => CheckHeader()">
-                            <Items>
-                                <RadzenSelectBarItem Value="1" Text="Eats food" />
-                                <RadzenSelectBarItem Value="2" Text="drinks water" />
-                                <RadzenSelectBarItem Value="3" Text="flaps wings" />
-                            </Items>
-                        </RadzenSelectBar>
-                    </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
-        </Columns>
-    </RadzenDataGrid>
-</RadzenCard>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
 
 @code {
     public List<GridItem> Items { get; private set; }
