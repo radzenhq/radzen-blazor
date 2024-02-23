@@ -449,7 +449,10 @@ namespace Radzen.Blazor
 
         internal void RemoveFromCurrentItems(int index, int count)
         {
-            CurrentItems.RemoveRange(index, count);
+            if (index >= 0)
+            {
+                CurrentItems.RemoveRange(index, count);
+            }
 
             if (focusedIndex > index)
             {
