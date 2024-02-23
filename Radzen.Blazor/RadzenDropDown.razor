@@ -112,7 +112,7 @@
             @if (Multiple && (AllowSelectAll || AllowFiltering))
             {
                 <div class="rz-multiselect-header rz-helper-clearfix" @onclick:preventDefault>
-                    @if(AllowSelectAll)
+                    @if(AllowSelectAll && Data != null && Data.Cast<object>().Any())
                     {
                     <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)" @onclick="@SelectAll">
                         <div class="rz-helper-hidden-accessible">
@@ -123,7 +123,7 @@
                         </div>
                     </div>
                     }
-                    @if (AllowSelectAll && !AllowFiltering && !string.IsNullOrEmpty(SelectAllText))
+                    @if (AllowSelectAll && !AllowFiltering && !string.IsNullOrEmpty(SelectAllText) && Data != null && Data.Cast<object>().Any())
                     {
                         <span style="cursor:pointer" @onclick="@SelectAll">@SelectAllText</span>
                     }
