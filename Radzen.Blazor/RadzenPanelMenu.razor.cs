@@ -241,7 +241,7 @@ namespace Radzen.Blazor
 
                 try
                 {
-                    await JSRuntime.InvokeVoidAsync("Element.prototype.scrollIntoViewIfNeeded.call", currentItems[focusedIndex].Element);
+                    await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", currentItems[focusedIndex].Element);
                 }
                 catch
                 { }

@@ -417,9 +417,11 @@ window.Radzen = {
     }
   },
   scrollIntoViewIfNeeded: function (ref, selector) {
-    var el = ref.getElementsByClassName(selector)[0];
-    if (el) {
-      el.scrollIntoViewIfNeeded();
+    var el = selector ? ref.getElementsByClassName(selector)[0] : ref;
+    if (el && el.scrollIntoViewIfNeeded) {
+        el.scrollIntoViewIfNeeded();
+    } else if (el && el.scrollIntoView) {
+        el.scrollIntoView();
     }
   },
   selectListItem: function (input, ul, index) {
@@ -481,7 +483,7 @@ window.Radzen = {
       ul.nextSelectedIndex <= childNodes.length - 1
     ) {
       childNodes[ul.nextSelectedIndex].classList.add('rz-state-highlight');
-      childNodes[ul.nextSelectedIndex].scrollIntoViewIfNeeded();
+      Radzen.scrollIntoViewIfNeeded(childNodes[ul.nextSelectedIndex]);
     }
 
     return ul.nextSelectedIndex;
@@ -554,7 +556,7 @@ window.Radzen = {
 
             if (!cell.classList.contains('rz-state-focused')) {
                 cell.classList.add('rz-state-focused');
-                cell.scrollIntoViewIfNeeded();
+                Radzen.scrollIntoViewIfNeeded(cell);
             }
 
             table.parentNode.parentNode.scrollLeft = rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].offsetLeft - rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].offsetWidth;
@@ -575,7 +577,7 @@ window.Radzen = {
 
             if (!row.classList.contains('rz-state-focused')) {
                 row.classList.add('rz-state-focused');
-                row.scrollIntoViewIfNeeded();
+                Radzen.scrollIntoViewIfNeeded(row);
             }
 
             table.parentNode.parentNode.scrollTop = rows[table.nextSelectedIndex].offsetTop - rows[table.nextSelectedIndex].offsetHeight;
