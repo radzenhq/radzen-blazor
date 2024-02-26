@@ -66,13 +66,14 @@ ul.rz-profile-menu {
   }
 
   .rz-navigation-menu {
+    list-style: none;
+    overflow: hidden;
+    position: absolute;
+    margin-bottom: 0;
+    padding: var(--rz-context-menu-padding);
     border-radius: var(--rz-profile-menu-border-radius);
     background-color: var(--rz-profile-menu-background-color);
     box-shadow: var(--rz-context-menu-box-shadow);
-    overflow: hidden;
-    margin-bottom: 0;
-    padding: var(--rz-context-menu-padding);
-    position: absolute;
     text-align: left;
     top: calc(100% - 2px);
     min-width: 100%;
