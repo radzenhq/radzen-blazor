@@ -662,7 +662,7 @@ namespace Radzen.Blazor
             }
             else if (key == "Enter")
             {
-                preventKeydown = true;
+                preventKeydown = false;
 
                 var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
 
@@ -694,6 +694,8 @@ namespace Radzen.Blazor
             }
             else if (key == "Escape" || key == "Tab")
             {
+                preventKeydown = false;
+
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
             else if (key == "Delete" && AllowClear)
