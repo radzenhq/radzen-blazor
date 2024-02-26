@@ -579,7 +579,9 @@ window.Radzen = {
 
             if (!row.classList.contains('rz-state-focused')) {
                 row.classList.add('rz-state-focused');
-                Radzen.scrollIntoViewIfNeeded(row);
+                if (!isVirtual) {
+                    Radzen.scrollIntoViewIfNeeded(row);
+                }
             }
         }
     } 
