@@ -320,6 +320,7 @@ $timepicker-border: none !default;
         border-radius: var(--rz-datepicker-calendar-today-border-radius);
       }
 
+      &.rz-state-focused,
       &:hover {
         text-decoration: none;
         color: var(--rz-datepicker-calendar-hover-color);
@@ -335,6 +336,7 @@ $timepicker-border: none !default;
       padding: var(--rz-datepicker-calendar-padding);
       box-shadow: none;
 
+      &.rz-state-focused,
       &:hover {
         color: var(--rz-datepicker-calendar-selected-hover-color);
         background-color: var(--rz-datepicker-calendar-selected-hover-background-color);
