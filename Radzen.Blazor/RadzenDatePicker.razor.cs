@@ -381,7 +381,7 @@ namespace Radzen.Blazor
             }
             set
             {
-                if (_value != value)
+                if (!EqualityComparer<object>.Default.Equals(value, _value))
                 {
                     _value = ConvertToTValue(value);
                     _currentDate = default(DateTime);
