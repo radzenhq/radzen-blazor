@@ -469,7 +469,7 @@ namespace Radzen.Blazor
 
                 try
                 {
-                    var result = await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", UniqueID, key, focusedIndex, focusedCellIndex);
+                    var result = await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", UniqueID, key, focusedIndex, focusedCellIndex, IsVirtualizationAllowed());
                     focusedIndex = result[0];
                     focusedCellIndex = result[1];
                 }
