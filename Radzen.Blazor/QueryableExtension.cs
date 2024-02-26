@@ -101,13 +101,15 @@ namespace Radzen
             Func<RadzenGridColumn<T>, bool> canFilter = (c) => c.Filterable && !string.IsNullOrEmpty(c.Type) &&
                 !(c.FilterValue == null || c.FilterValue as string == string.Empty) && c.GetFilterProperty() != null;
 
-            if (columns.Where(canFilter).Any())
+            var columnsWithFilter = columns.Where(canFilter).ToList();
+
+            if (columnsWithFilter.Any())
             {
                 var gridLogicalFilterOperator = columns.FirstOrDefault()?.Grid?.LogicalFilterOperator;
                 var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
 
                 var whereList = new List<string>();
-                foreach (var column in columns.Where(canFilter))
+                foreach (var column in columnsWithFilter)
                 {
                     var value = (string)Convert.ChangeType(column.FilterValue, typeof(string));
                     var secondValue = (string)Convert.ChangeType(column.SecondFilterValue, typeof(string));
@@ -157,13 +159,15 @@ namespace Radzen
                    || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterExpression() != null))
                && c.GetFilterProperty() != null;
 
-            if (columns.Where(canFilter).Any())
+            var columnsWithFilter = columns.Where(canFilter).ToList();
+
+            if (columnsWithFilter.Any())
             {
                 var gridLogicalFilterOperator = columns.FirstOrDefault()?.Grid?.LogicalFilterOperator;
                 var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
 
                 var whereList = new List<string>();
-                foreach (var column in columns.Where(canFilter))
+                foreach (var column in columnsWithFilter)
                 {
                     string value = "";
                     string secondValue = "";
