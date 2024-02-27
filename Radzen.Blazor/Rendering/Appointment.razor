@@ -1,7 +1,7 @@
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 
-    <div @ref=@element class="@($"{"rz-event"} {CssClass}".Trim())" draggable="true" style=@Style @onclick=@OnClick @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave @ondragstart=@OnDragStart>
+    <div @ref=@element class="@($"{"rz-event"} {CssClass}".Trim())" draggable="true" style=@Style @onclick=@OnClick @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave @ondragstart=@OnDragStart @ontouchstart=@OnDragStart >
         <div class="rz-event-content" title=@Title @attributes=@Attributes>
             @if (ShowAppointmentContent)
             {

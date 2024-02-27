@@ -294,7 +294,7 @@ namespace Radzen
             return services;
         }
     }
-    
+
     /// <summary>
     /// SecurityCodeType enum
     /// </summary>
@@ -584,9 +584,9 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Supplies information about a <see cref="ViewBase.AppointmentMove" /> event that is being raised.
+    /// Supplies information about a <see cref="DropableViewBase.AppointmentMove" /> event that is being raised.
     /// </summary>
-    public class AppointmentMoveEventArgs
+    public class SchedulerAppointmentMoveEventArgs
     {
         /// <summary>
         /// Gets or sets the appointment data.

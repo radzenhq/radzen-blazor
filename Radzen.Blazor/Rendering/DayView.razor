@@ -1,5 +1,5 @@
 @using Radzen.Blazor
-@inherits ViewBase
+@inherits DropableViewBase
 
 <div class="rz-view rz-day-view">
     <div class="rz-view-header">
@@ -16,7 +16,7 @@
             @for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
             {
                 var slotDate = date;
-                <div @onclick=@(args => OnSlotClick(slotDate)) @attributes=@Attributes(date) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate))></div>
+                <div @onclick=@(args => OnSlotClick(slotDate)) @attributes=@Attributes(date) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate)) @ontouchend='@(args => @OnDrop(slotDate))'></div>
             }
         </div>
     </div>
@@ -67,7 +67,8 @@
     IDictionary<string, object> Attributes(DateTime date)
     {
         var attributes = Scheduler.GetSlotAttributes(date, date.AddMinutes(MinutesPerSlot));
-        attributes["class"] = ClassList.Create("rz-slot dropzone").Add("rz-slot-minor", (date.Minute / MinutesPerSlot) % 2 == 1).Add(attributes).ToString();
+        attributes["class"] = ClassList.Create("rz-slot").Add("rz-slot-minor", (date.Minute / MinutesPerSlot) % 2 == 1).Add(attributes).ToString();
+        attributes["dropzone"] = "move";
         return attributes;
     }
 

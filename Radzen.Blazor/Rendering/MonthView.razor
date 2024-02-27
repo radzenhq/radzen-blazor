@@ -2,7 +2,7 @@
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 @inject DialogService DialogService
-@inherits ViewBase
+@inherits DropableViewBase
 
 
 <div class="rz-view rz-month-view">
@@ -115,7 +115,8 @@
     IDictionary<string, object> Attributes(DateTime start)
     {
         var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1));
-        attributes["class"] = ClassList.Create("rz-slot dropzone").Add(attributes).ToString();
+        attributes["class"] = ClassList.Create("rz-slot").Add(attributes).ToString();
+        attributes["dropzone"] = "move";
         return attributes;
     }
 
@@ -177,16 +178,16 @@
 
         if (!preventDefault)
         {
-     await DialogService.OpenAsync(date.ToShortDateString(), ds =>
-        @<div class="rz-event-list">
-        <CascadingValue Value=@Scheduler>
-        @foreach(var item in appointments)
-        {
-            <Appointment Data=@item Click="OnListEventClick" />
-        }
-        </CascadingValue>
-        </div>
-           );
+            await DialogService.OpenAsync(date.ToShortDateString(), ds =>
+                @<div class="rz-event-list">
+                    <CascadingValue Value=@Scheduler>
+                        @foreach(var item in appointments)
+                        {
+                            <Appointment Data=@item Click="OnListEventClick" />
+                        }
+                    </CascadingValue>
+                </div>
+            );
         }
     }
 

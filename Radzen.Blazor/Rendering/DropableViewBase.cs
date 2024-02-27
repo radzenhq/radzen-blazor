@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor.Rendering
 {
     /// <summary>
-    /// A base class for <see cref="MonthView" /> <see cref="DayView" /> <see cref="WeekView" /> views.
+    /// A base class for <see cref="MonthView" /> <see cref="DayView" /> <see cref="WeekView" /> <see cref="YearPlannerView" /> <see cref="YearTimelineView" /> views.
     /// </summary>
-    public abstract class ViewBase : ComponentBase
+    public abstract class DropableViewBase : ComponentBase
     {
         private bool dragStarted = false;
         private AppointmentData draggedAppointment;
@@ -16,7 +16,7 @@ namespace Radzen.Blazor.Rendering
         /// </summary>
         /// <value>The appointment move event callback.</value>
         [Parameter]
-        public EventCallback<AppointmentMoveEventArgs> AppointmentMove { get; set; }
+        public EventCallback<SchedulerAppointmentMoveEventArgs> AppointmentMove { get; set; }
         
         /// <summary>
         /// Handles on slot drop.
@@ -25,9 +25,13 @@ namespace Radzen.Blazor.Rendering
         /// <returns>Task</returns>
         public async Task OnDrop(DateTime slotDate)
         {
+            if(draggedAppointment != null)
+            {
+                TimeSpan timespan = slotDate - draggedAppointment.Start;
+                await AppointmentMove.InvokeAsync(new SchedulerAppointmentMoveEventArgs() { Appointment = draggedAppointment, TimeSpan = timespan });
+                draggedAppointment = null;
+            }
             dragStarted = false;
-            TimeSpan timespan = slotDate - draggedAppointment.Start;
-            await AppointmentMove.InvokeAsync(new AppointmentMoveEventArgs() { Appointment = draggedAppointment, TimeSpan = timespan });
         }
 
         /// <summary>

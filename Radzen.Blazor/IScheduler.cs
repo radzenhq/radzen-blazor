@@ -12,6 +12,11 @@ namespace Radzen.Blazor
     public interface IScheduler
     {
         /// <summary>
+        /// Gets or sets the appointment move event callback.
+        /// </summary>
+        /// <value>The appointment move event callback.</value>
+        EventCallback<SchedulerAppointmentMoveEventArgs> AppointmentMove { get; set; }
+        /// <summary>
         /// Gets the appointments in the specified range.
         /// </summary>
         /// <param name="start">The start of the range.</param>

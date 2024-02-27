@@ -2,10 +2,13 @@
 
 <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
     TextProperty="Text" SelectedIndex="2"
-    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender>
-    <RadzenDayView AppointmentMove=@OnAppointmentMove />
-    <RadzenWeekView AppointmentMove=@OnAppointmentMove />
-    <RadzenMonthView AppointmentMove=@OnAppointmentMove />
+    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender
+    AppointmentMove=@OnAppointmentMove >
+    <RadzenDayView />
+    <RadzenWeekView />
+    <RadzenMonthView />
+    <RadzenYearPlannerView />
+    <RadzenYearTimelineView />
     <RadzenYearView />
 </RadzenScheduler>
 
@@ -94,7 +97,7 @@
         }
     }
 
-    async Task OnAppointmentMove(AppointmentMoveEventArgs moved)
+    async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs moved)
     {
         var draggedAppointment = appointments.SingleOrDefault(x => x == (Appointment)moved.Appointment.Data);
         if(draggedAppointment!=null)

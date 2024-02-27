@@ -34,12 +34,6 @@ namespace Radzen.Blazor
         [CascadingParameter]
         public IScheduler Scheduler { get; set; }
 
-        /// <summary>
-        /// Gets or sets the appointment move event callback.
-        /// </summary>
-        /// <value>The appointment move event callback.</value>
-        [Parameter]
-        public EventCallback<AppointmentMoveEventArgs> AppointmentMove { get; set; }
 
         /// <summary>
         /// Disposes this instance.
@@ -101,9 +95,9 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public async Task OnAppointmentMove(AppointmentMoveEventArgs data)
+        public async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs data)
         {
-            await AppointmentMove.InvokeAsync(data);
+            await Scheduler.AppointmentMove.InvokeAsync(data);
         }
     }
 }
