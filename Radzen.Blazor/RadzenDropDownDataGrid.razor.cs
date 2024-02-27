@@ -103,6 +103,11 @@ namespace Radzen.Blazor
             if (Disabled)
                 return;
 
+            if (IsVirtualizationAllowed())
+            {
+                await grid.RefreshDataAsync();
+            }
+
             await JSRuntime.InvokeVoidAsync(OpenOnFocus ? "Radzen.openPopup" : "Radzen.togglePopup", Element, PopupID, true);
 
             if (FocusFilterOnPopup)
