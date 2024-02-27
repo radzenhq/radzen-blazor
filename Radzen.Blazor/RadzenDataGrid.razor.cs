@@ -436,13 +436,27 @@ namespace Radzen.Blazor
                 "rz-listbox-item ";
         }
 
-        bool preventKeyDown = false;
+        bool preventKeyDown = true;
         int focusedIndex = -1;
         int focusedCellIndex = 0;
 
         internal string GridId()
         {
             return GetId();
+        }
+
+        async Task FocusRow(string key)
+        {
+            try
+            {
+                var result = await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", UniqueID, key, focusedIndex, focusedCellIndex, IsVirtualizationAllowed());
+                focusedIndex = result[0];
+                focusedCellIndex = result[1];
+            }
+            catch (Exception)
+            {
+                //
+            }
         }
 
         /// <summary>
@@ -467,16 +481,13 @@ namespace Radzen.Blazor
                     return;
                 }
 
-                try
-                {
-                    var result = await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", UniqueID, key, focusedIndex, focusedCellIndex, IsVirtualizationAllowed());
-                    focusedIndex = result[0];
-                    focusedCellIndex = result[1];
-                }
-                catch (Exception)
-                {
-                    //
-                }
+                await FocusRow(key);
+            }
+            else if (IsVirtualizationAllowed() && (key == "PageUp" || key == "PageDown" || key == "Home" || key == "End"))
+            {
+                preventKeyDown = true;
+
+                await FocusRow(key);
             }
             else if (key == "Space" || key == "Enter")
             {

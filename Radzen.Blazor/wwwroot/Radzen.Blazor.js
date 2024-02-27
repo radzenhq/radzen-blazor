@@ -511,9 +511,23 @@ window.Radzen = {
 
     var rows = (cellIndex != null && thead && thead.rows && thead.rows.length ? [...thead.rows] : []).concat(tbody && tbody.rows && tbody.rows.length ? [...tbody.rows] : []);
 
-    if (isVirtual) {
-        var rowHeight = rows[rows.length - 1] ? rows[rows.length - 1].offsetHeight : 25;
-        table.parentNode.scrollTop = table.parentNode.scrollTop + (key == 'ArrowDown' ? rowHeight : -rowHeight);
+    if (isVirtual && (key == 'ArrowUp' || key == 'ArrowDown' || key == 'PageUp' || key == 'PageDown' || key == 'Home' || key == 'End')) {
+        if (rowIndex == 0 && (key == 'End' || key == 'PageDown')) {
+            var highlightedCells = thead.querySelectorAll('.rz-state-focused');
+            if (highlightedCells.length) {
+                for (var i = 0; i < highlightedCells.length; i++) {
+                    highlightedCells[i].classList.remove('rz-state-focused');
+                }
+            }
+        }
+        if (key == 'ArrowUp' || key == 'ArrowDown' || key == 'PageUp' || key == 'PageDown') {
+            var rowHeight = rows[rows.length - 1] ? rows[rows.length - 1].offsetHeight : 40;
+            var factor = key == 'PageUp' || key == 'PageDown' ? 10 : 1;
+            table.parentNode.scrollTop = table.parentNode.scrollTop + (factor * (key == 'ArrowDown' || key == 'PageDown' ? rowHeight : -rowHeight));
+        }
+        else {
+            table.parentNode.scrollTop = key == 'Home' ? 0 : table.parentNode.scrollHeight;
+        }
     }
 
     table.nextSelectedIndex = rowIndex || 0;
@@ -543,7 +557,11 @@ window.Radzen = {
             if (!rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].classList.contains('rz-state-disabled'))
                 break;
         }
-    }
+    } else if (isVirtual && (key == 'PageDown' || key == 'End')) {
+        table.nextSelectedIndex = rows.length - 1;
+    } else if (isVirtual && (key == 'PageUp' || key == 'Home')) {
+        table.nextSelectedIndex = 1;
+    } 
 
     if (key == 'ArrowLeft' || key == 'ArrowRight' || (key == 'ArrowUp' && table.nextSelectedIndex == 0 && table.parentNode.scrollTop == 0)) {
         var highlightedCells = rows[table.nextSelectedIndex].querySelectorAll('.rz-state-focused');
@@ -561,7 +579,9 @@ window.Radzen = {
 
             if (!cell.classList.contains('rz-state-focused')) {
                 cell.classList.add('rz-state-focused');
-                Radzen.scrollIntoViewIfNeeded(cell);
+                if (!isVirtual) {
+                    Radzen.scrollIntoViewIfNeeded(cell);
+                }
             }
         }
     } else if (key == 'ArrowDown' || key == 'ArrowUp') {
